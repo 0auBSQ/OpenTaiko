@@ -1,0 +1,98 @@
+#Title screen
+At the first screen, press and hold the P key->Load Bananapass.
+
+After loading is complete, use the left and right edge keys to select 1P, 2P, or Don't use.
+
+After joining, use the edge keys to move the mode selection bar.
+
+Press the face key to confirm the mode selection (Performance mode -> Music selection screen Dan Dojo -> Dan selection screen)
+
+#Song selection screen
+Use the edge key to select a song.
+
+Press the face key.
+If it is a Box : Enter the Box
+If Score (song) : Difficulty selection screen
+
+SHIFT + F1 : Go into Config
+F2 : QuickConfig (You can switch the number of players and the mode here. Use arrow keys and Enter or edge and face keys)
+F3 : 1P autoplay switching
+F4 : Toggle 2P autoplay
+F7 : Toggle special training mode
+
+#Difficulty selection screen
+Edge key : Move bar
+Face key : Back : Return to song selection screen
+         Option : Open the option menu (use edge key and face key)
+	 Other : Play at the selected difficulty level (The darkened area has no difficulty level.)
+         
+#Stage selection screen
+Edge key : Select a level.
+Edge key : Select the level of the challenge.
+
+#Song loading screen
+Esc : Return to song selection or dan selection screen.
+
+#Play screen
+Face and edge keys : Click to select.
+Left and right arrows : Move the judgment frame.
+Up and down arrows : Change scroll speed
+F1 : Display of simple configuration (Stop, Redo, Continue) Redo cannot be selected for Dan.
+
+
+# You can't select "redo" when you are at a rank.
+
+|        key        |           action            |
+| :---------------: | :-------------------------: | 
+|       Space       |   Playback of music sheet   |
+| 1P edge/PgUp/PgDn |       Move the score        |
+|      2P edge      |    Change playback speed    | 
+|         A         | Use Space to play the score |
+
+If you want to move to a jump point, you can do so using Config.  
+　To move to a jump point, hit the ``1P edge`` five times in a row within the time specified in Config.ini.
+
+#Results screen
+Esc, face key, or Enter: Return to the music selection screen or rank selection screen.
+
+#NamePlate
+Open the NamePlate.json file (generated when you start the program) with Notepad or any other text editor and edit it.
+For detailed instructions, see the Youtube video below.
+https://youtu.be/1wsSfYVk1Os
+
+#Add a genre
+In System/0.JpnNijiiro/OtherConfig.ini
+You can add a genre by adding SongSelect_GenreName in
+Make sure that the number and the location of the genre are aligned. Basically, if you put them in order, you should be able to do this normally.
+
+#Loading the song list
+If a song does not load, wait until the song list loading display in the upper left corner finishes. If it still doesn't load, change the [Path to folder containing music sheet files] setting in Config.ini to something like the following
+This will put the file in Songs. This will basically load the songs in Songs.
+
+TJAPath=. \
+
+(I think you can copy and paste this.)
+
+#I can't get it to start.
+https://web.archive.org/web/20210112074744/https://www.microsoft.com/en-us/download/details.aspx?id=6812
+
+Please download and install from the link above.
+
+#Sound won't play.
+If you set the value of SoundDeviceType to 0 or 2, it basically works. (Maybe)
+
+#The font is misaligned!
+Look at the video below!
+https://youtu.be/1wsSfYVk1Os
+
+#Where can I report a bug?
+Please file a bug report from Issue on Github. We don't accept questions there, so please don't ask. It's annoying.
+
+#Changing the language
+We will create a setting to change the language later, but for now, we are working on changing the skin.
+Please check the video below for details.
+https://youtu.be/1wsSfYVk1Os
+
+GITHUB : https://github.com/touhourenren/TJAPlayer3-Develop-ReWrite
+
+Translated with www.DeepL.com/Translator (free version)

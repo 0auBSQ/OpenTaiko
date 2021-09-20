@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BCD40908-F3E2-4707-BFAA-1DD99DF6357D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FDK</RootNamespace>
+    <AssemblyName>FDK</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <NoWarn>0219</NoWarn>
+    <DefineConstants>TRACE;TEST_CancelEnterCodeInAltEnter2 TEST_Direct3D9Ex_</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <LangVersion>7.3</LangVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <NoWarn>0219</NoWarn>
+    <DefineConstants>TRACE;TEST_ENGLISH_ TEST_Direct3D9Ex_</DefineConstants>
+    <Optimize>true</Optimize>
+    <LangVersion>7.3</LangVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>..\Test\dll\Bass.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DirectShowLib-2005, Version=2.1.0.0, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Test\dll\DirectShowLib-2005.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="コード\00.共通\CJudgeTextEncoding.cs" />
+    <Compile Include="コード\00.共通\COS.cs" />
+    <Compile Include="コード\00.共通\CPowerManagement.cs" />
+    <Compile Include="コード\00.共通\CSendMessage.cs" />
+    <Compile Include="コード\00.共通\CTimerBase.cs" />
+    <Compile Include="コード\00.共通\C一定間隔処理.cs" />
+    <Compile Include="コード\00.共通\C共通.cs" />
+    <Compile Include="コード\00.共通\ExtensionMethods\DoubleExtensions.cs" />
+    <Compile Include="コード\00.共通\ExtensionMethods\Int32Extensions.cs" />
+    <Compile Include="コード\01.フレームワーク\Core\GameWindowSize.cs" />
+    <Compile Include="コード\01.フレームワーク\Core\Game.cs" />
+    <Compile Include="コード\01.フレームワーク\Core\GameClock.cs" />
+    <Compile Include="コード\01.フレームワーク\Core\GameTime.cs" />
+    <Compile Include="コード\01.フレームワーク\Core\GameWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="コード\01.フレームワーク\DeviceSettings\ConversionMethods.cs" />
+    <Compile Include="コード\01.フレームワーク\DeviceSettings\DeviceSettings.cs" />
+    <Compile Include="コード\01.フレームワーク\DeviceSettings\Direct3D9Settings.cs" />
+    <Compile Include="コード\01.フレームワーク\Enumeration\Enumeration9.cs" />
+    <Compile Include="コード\01.フレームワーク\Properties\Resources.Designer.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\DeviceCreationException.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\DeviceCache.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\Direct3D9Manager.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\Enums.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\GraphicsDeviceManager.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\NoCompatibleDevicesException.cs" />
+    <Compile Include="コード\01.フレームワーク\Rendering\VertexElementAttribute.cs" />
+    <Compile Include="コード\01.フレームワーク\Utilities\Camera.cs" />
+    <Compile Include="コード\01.フレームワーク\Utilities\TransformedColoredTexturedVertex.cs" />
+    <Compile Include="コード\01.フレームワーク\Utilities\TransformedColoredVertex.cs" />
+    <Compile Include="コード\01.フレームワーク\Win32\NativeMethods.cs" />
+    <Compile Include="コード\01.フレームワーク\Win32\NativeStructures.cs" />
+    <Compile Include="コード\01.フレームワーク\Win32\WindowConstants.cs" />
+    <Compile Include="コード\02.入力\CInputJoystick.cs" />
+    <Compile Include="コード\02.入力\CInputKeyboard.cs" />
+    <Compile Include="コード\02.入力\CInputMIDI.cs" />
+    <Compile Include="コード\02.入力\CInputMouse.cs" />
+    <Compile Include="コード\02.入力\CInput管理.cs" />
+    <Compile Include="コード\02.入力\DeviceConstantConverter.cs" />
+    <Compile Include="コード\02.入力\E入力デバイス種別.cs" />
+    <Compile Include="コード\02.入力\IInputDevice.cs" />
+    <Compile Include="コード\02.入力\SlimDXKeys.cs" />
+    <Compile Include="コード\02.入力\STInputEvent.cs" />
+    <Compile Include="コード\03.サウンド\Cmp3.cs" />
+    <Compile Include="コード\03.サウンド\Cogg.cs" />
+    <Compile Include="コード\03.サウンド\CSound.cs" />
+    <Compile Include="コード\03.サウンド\CSoundDeviceASIO.cs" />
+    <Compile Include="コード\03.サウンド\CSoundDeviceDirectSound.cs" />
+    <Compile Include="コード\03.サウンド\CSoundDeviceWASAPI.cs" />
+    <Compile Include="コード\03.サウンド\CSoundTimer.cs" />
+    <Compile Include="コード\03.サウンド\Cxa.cs" />
+    <Compile Include="コード\03.サウンド\ESoundDeviceType.cs" />
+    <Compile Include="コード\03.サウンド\ESoundGroup.cs" />
+    <Compile Include="コード\03.サウンド\LoudnessMetadata.cs" />
+    <Compile Include="コード\03.サウンド\LoudnessMetadataScanner.cs" />
+    <Compile Include="コード\03.サウンド\Lufs.cs" />
+    <Compile Include="コード\03.サウンド\SongGainController.cs" />
+    <Compile Include="コード\03.サウンド\SoundDecoder.cs" />
+    <Compile Include="コード\03.サウンド\ISoundDevice.cs" />
+    <Compile Include="コード\03.サウンド\SoundGroupLevelController.cs" />
+    <Compile Include="コード\04.グラフィック\BitmapUtil.cs" />
+    <Compile Include="コード\04.グラフィック\CAero.cs" />
+    <Compile Include="コード\04.グラフィック\CAvi.cs" />
+    <Compile Include="コード\04.グラフィック\CTaskBar.cs" />
+    <Compile Include="コード\04.グラフィック\CTextureAutofold.cs" />
+    <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\ColoredVertex.cs" />
+    <Compile Include="コード\04.グラフィック\CTexture.cs" />
+    <Compile Include="コード\04.グラフィック\CTextureCreateFailedException.cs" />
+    <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\PositionColoredTexturedVertex.cs" />
+    <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\TexturedVertex.cs" />
+    <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\TransformedColoredTexturedVertex.cs" />
+    <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\TransformedColoredVertex.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="コード\00.共通\CActivity.cs" />
+    <Compile Include="コード\00.共通\CCounter.cs" />
+    <Compile Include="コード\00.共通\CFPS.cs" />
+    <Compile Include="コード\00.共通\CIniFile.cs" />
+    <Compile Include="コード\00.共通\CTimer.cs" />
+    <Compile Include="コード\00.共通\CTraceLogListener.cs" />
+    <Compile Include="コード\00.共通\CWin32.cs" />
+    <Compile Include="コード\00.共通\C変換.cs" />
+    <Compile Include="コード\05.DirectShow\CDirectShow.cs" />
+    <Compile Include="コード\05.DirectShow\CDStoWAVFileImage.cs" />
+    <Compile Include="コード\05.DirectShow\MemoryRenderer.cs" />
+    <Compile Include="コード\06.Tempo\CBeatDetect.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="コード\01.フレームワーク\Core\GameWindow.resx">
+      <DependentUpon>GameWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="コード\01.フレームワーク\Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="コード\01.フレームワーク\Resources\sdx_icon_black.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ReadJEnc">
+      <Version>1.3.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.Direct3D9">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.DirectInput">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.DirectSound">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SlimDX">
+      <Version>4.0.13.44</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

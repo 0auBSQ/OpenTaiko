@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{81BEC512-8074-4BD1-8A3C-AC73BC7BF846}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TJAPlayer3</RootNamespace>
+    <AssemblyName>TJAPlayer3-Develop-ReWrite</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>TJAPlayer3-Develop-ReWrite.ico</ApplicationIcon>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <LargeAddressAware>true</LargeAddressAware>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Test\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;_TEST_ENGLISH TEST_Direct3D9Ex_ _WindowedFullscreen MemoryRenderer</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>0219</NoWarn>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Optimize>false</Optimize>
+    <LangVersion>7.3</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\Test\</OutputPath>
+    <DefineConstants>TRACE;TEST_ENGLISH_ TEST_Direct3D9Ex_ _WindowedFullscreen</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>0219</NoWarn>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <LangVersion>7.3</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>TJAPlayer3.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>..\Test\dll\Bass.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DirectShowLib-2005, Version=2.1.0.0, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Test\dll\DirectShowLib-2005.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Test\dll\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animations\Animator.cs" />
+    <Compile Include="Animations\EaseInOut.cs" />
+    <Compile Include="Animations\EaseOut.cs" />
+    <Compile Include="Animations\EaseIn.cs" />
+    <Compile Include="Animations\FadeIn.cs" />
+    <Compile Include="Animations\FadeOut.cs" />
+    <Compile Include="Animations\IAnimatable.cs" />
+    <Compile Include="Animations\Linear.cs" />
+    <Compile Include="Common\ConfigManager.cs" />
+    <Compile Include="Common\Discord.cs" />
+    <Compile Include="Common\Easing.cs" />
+    <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Properties\Discord.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Discord.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Discord.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Discord.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="TJAPlayer3.manifest" />
+    <None Include="DTXManiaGR.exe.x86.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Items\CItemBase.cs" />
+    <Compile Include="Items\CItemInteger.cs" />
+    <Compile Include="Items\CItemList.cs" />
+    <Compile Include="Items\CItemThreeState.cs" />
+    <Compile Include="Items\CItemToggle.cs" />
+    <Compile Include="Songs\CBoxDef.cs" />
+    <Compile Include="Songs\CCourse.cs" />
+    <Compile Include="Songs\CDTX.cs" />
+    <Compile Include="Songs\CDTXCompanionFileFinder.cs" />
+    <Compile Include="Songs\CDTXStyleExtractor.cs" />
+    <Compile Include="Songs\CScoreIni.cs" />
+    <Compile Include="Songs\CStrジャンルtoNum.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\ComparerChain.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerAC15.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerAC8_14.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerタイトル.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerノード種別.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparer絶対パス.cs" />
+    <Compile Include="Songs\Dan-C.cs" />
+    <Compile Include="Songs\GaugeIncreaseMode.cs" />
+    <Compile Include="Stages\01.StartUp\TextureLoader.cs" />
+    <Compile Include="Stages\02.Title\CActScanningLoudness.cs" />
+    <Compile Include="Stages\02.Title\CEnumSongs.cs" />
+    <Compile Include="Songs\CSong管理.cs" />
+    <Compile Include="Songs\Cスコア.cs" />
+    <Compile Include="Songs\C曲リストノード.cs" />
+    <Compile Include="Stages\01.StartUp\CStage起動.cs" />
+    <Compile Include="Stages\02.Title\CActEnumSongs.cs" />
+    <Compile Include="Stages\02.Title\CStageタイトル.cs" />
+    <Compile Include="Stages\04.Config\CActConfigKeyAssign.cs" />
+    <Compile Include="Stages\04.Config\CActConfigList.cs" />
+    <Compile Include="Stages\04.Config\CStageコンフィグ.cs" />
+    <Compile Include="Stages\05.DaniSelect\CActSelect段位リスト.cs" />
+    <Compile Include="Stages\05.DaniSelect\CActSelect段位挑戦選択画面.cs" />
+    <Compile Include="Stages\05.DaniSelect\CStage段位選択.cs" />
+    <Compile Include="Stages\05.SongSelect\CActPlayOption.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectArtistComment.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectInformation.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectPopupMenu.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectPreimageパネル.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectPresound.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectQuickConfig.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectShowCurrentPosition.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectステータスパネル.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelect難易度選択画面.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelect曲リスト.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelect演奏履歴パネル.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSortSongs.cs" />
+    <Compile Include="Stages\05.SongSelect\CStage選曲.cs" />
+    <Compile Include="Stages\06.SongLoading\CStage曲読み込み.cs" />
+    <Compile Include="Stages\06.SongLoading\FastRender.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏AVI.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏Combo共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏Danger共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏Combo音声.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏ゲージ共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏スクロール速度.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏スコア共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏ステージ失敗.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏ステータスパネル共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏チップファイアGB.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏パネル文字列.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏レーンフラッシュGB共通.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏演奏情報.cs" />
+    <Compile Include="Stages\07.Game\CInvisibleChip.cs" />
+    <Compile Include="Stages\07.Game\CLagLogger.cs" />
+    <Compile Include="Stages\07.Game\CStage演奏画面共通.cs" />
+    <Compile Include="Stages\07.Game\C演奏判定ライン座標共通.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsスコアランク.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums特訓モード.cs" />
+    <Compile Include="Stages\07.Game\Taiko\Dan_Cert.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsFooter.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsMob.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsDanger.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsキャラクター.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsグラフ.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsゲージ.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsゲームモード.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsコンボDGB.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsスコア.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsステータスパネル.cs" />
+    <Compile Include="Stages\07.Game\Taiko\FireWorks.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums背景.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsコンボ吹き出し.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsチップエフェクト.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums連打キャラ.cs" />
+    <Compile Include="Stages\07.Game\Taiko\FlyingNotes.cs" />
+    <Compile Include="Stages\07.Game\Taiko\LaneFlash.cs" />
+    <Compile Include="Stages\07.Game\Taiko\PuchiChara.cs" />
+    <Compile Include="Stages\07.Game\Taiko\Rainbow.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsチップファイアD.cs" />
+    <Compile Include="Stages\07.Game\CAct演奏PauseMenu.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsパッド.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsレーン.cs" />
+    <Compile Include="Stages\07.Game\Taiko\TaikoLaneFlash.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsレーンフラッシュGB.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums判定文字列.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums風船.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums連打.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CStage演奏ドラム画面.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums演奏終了演出.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsDancer.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏Drumsレーン太鼓.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsMtaiko.cs" />
+    <Compile Include="Stages\07.Game\Taiko\GoGoSplash.cs" />
+    <Compile Include="Stages\08.Result\CActResultImage.cs" />
+    <Compile Include="Stages\08.Result\CActResultParameterPanel.cs" />
+    <Compile Include="Stages\08.Result\CActResultRank.cs" />
+    <Compile Include="Stages\08.Result\CActResultSongBar.cs" />
+    <Compile Include="Stages\08.Result\CStage結果.cs" />
+    <Compile Include="Stages\09.Ending\CStage終了.cs" />
+    <Compile Include="Stages\10.ChangeSkin\CStageChangeSkin.cs" />
+    <Compile Include="Stages\CActDFPFont.cs" />
+    <Compile Include="Stages\CActFIFOBlack.cs" />
+    <Compile Include="Stages\CActFIFOStart.cs" />
+    <Compile Include="Stages\CActFIFOResult.cs" />
+    <Compile Include="Stages\CActFIFOWhite.cs" />
+    <Compile Include="Stages\CActLVLNFont.cs" />
+    <Compile Include="Stages\CActオプションパネル.cs" />
+    <Compile Include="Stages\CDTXVmode.cs" />
+    <Compile Include="Stages\CNamePlate.cs" />
+    <Compile Include="Stages\CStage.cs" />
+    <Compile Include="Plugins\CPluginHost.cs" />
+    <Compile Include="Plugins\IPluginActivity.cs" />
+    <Compile Include="Plugins\IPluginHost.cs" />
+    <Compile Include="Common\CActFlushGPU.cs" />
+    <Compile Include="Common\CConfigIni.cs" />
+    <Compile Include="Common\TJAPlayer3.cs" />
+    <Compile Include="Common\CDTXVersion.cs" />
+    <Compile Include="Common\ConfigIniToSongGainControllerBinder.cs" />
+    <Compile Include="Common\ConfigIniToSoundGroupLevelControllerBinder.cs" />
+    <Compile Include="Common\CPad.cs" />
+    <Compile Include="Common\CPrivateFastFont.cs" />
+    <Compile Include="Common\CVeirticalSongNameFont.cs" />
+    <Compile Include="Common\CPrivateFont.cs" />
+    <Compile Include="Common\CSkin.cs" />
+    <Compile Include="Common\C定数.cs" />
+    <Compile Include="Common\C文字コンソール.cs" />
+    <Compile Include="Common\KeyboardSoundGroupLevelControlHandler.cs" />
+    <Compile Include="Common\Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="dtx.ico" />
+    <Content Include="TJAPlayer3-Develop-ReWrite.ico" />
+    <None Include="Resources\TJAPlayer3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FDK19\FDK19.csproj">
+      <Project>{BCD40908-F3E2-4707-BFAA-1DD99DF6357D}</Project>
+      <Name>FDK19</Name>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LargeAddressAware">
+      <Version>1.0.5</Version>
+    </PackageReference>
+    <PackageReference Include="ReadJEnc">
+      <Version>1.3.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.Direct3D9">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.DirectInput">
+      <Version>4.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX.DirectSound">
+      <Version>4.2.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>move /y "$(TargetDir)FDK.dll" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)FDK.pdb" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)Hnx8.ReadJEnc.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)Newtonsoft.Json.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.Direct3D9.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.DirectInput.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.DirectSound.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.DXGI.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.Mathematics.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SharpDX.*" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)Bass.Net.dll" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)DirectShowLib-2005.dll" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)SlimDX.dll" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
+copy /y "$(SolutionDir)Readme.txt" "$(SolutionDir)Test\"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('packages\SharpDX.2.6.3\build\SharpDX.targets')" />
+</Project>

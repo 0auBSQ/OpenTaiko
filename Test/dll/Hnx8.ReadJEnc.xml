@@ -1,0 +1,499 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Hnx8.ReadJEnc</name>
+    </assembly>
+    <members>
+        <member name="T:Hnx8.ReadJEnc.CharCode">
+            <summary>
+            ReadJEnc 文字コード種類定義(Rev.20170821)
+            </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF8">
+            <summary>UTF8(BOMあり)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF32">
+            <summary>UTF32(BOMありLittleEndian)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF32B">
+            <summary>UTF32(BOMありBigEndian)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF16">
+            <summary>UTF16(BOMありLittleEndian)</summary><remarks>Windows標準のUnicode</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF16B">
+            <summary>UTF16(BOMありBigEndian)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF16LE">
+            <summary>UTF16(BOM無しLittleEndian)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF16BE">
+            <summary>UTF16(BOM無しBigEndian)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UTF8N">
+            <summary>UTF8(BOM無し)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.ASCII">
+            <summary>Ascii</summary><remarks>デコードはUTF8Encodingを流用。Bom情報は転記しない</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.ANSI">
+            <summary>1252 ISO8859 西ヨーロッパ言語</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.JIS">
+            <summary>50221 iso-2022-jp 日本語 (JIS-Allow 1 byte Kana) ※MS版</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.JIS50222">
+            <summary>50222 iso-2022-jp 日本語 (JIS-Allow 1 byte Kana - SO/SI)</summary><remarks>SO/SIによるカナシフトのみのファイルもCP50222とみなす</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.JISH">
+            <summary>50221(MS版JIS) + 20932(JIS補助漢字を無理やりデコード)</summary><remarks>JIS補助漢字はデコードのみ対応、エンコードは未対応</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.JISNG">
+            <summary>JISのように見えるがデコード不能な箇所あり、実質非テキストファイル</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.ISOKR">
+            <summary>50225 iso-2022-kr 韓国語(ISO)</summary><remarks>SO/SIカナシフトファイルの判定ロジックに流れ込まないようにするため定義</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.SJIS">
+            <summary>932 shift_jis 日本語 (シフト JIS) ※MS独自</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.EUCH">
+            <summary>EUC補助漢字(0x8F)あり ※MS-CP20932を利用し強引にデコードする</summary><remarks>エンコードするとファイルが壊れるので注意</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.EUC">
+            <summary>51932 euc-jp 日本語 (EUC) ※MS版</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.BIG5TW">
+            <summary>950 big5 繁体字中国語 (BIG5)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.EUCTW">
+            <summary>20000 x-Chinese-CNS 繁体字中国語(EUC-TW)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.GB18030">
+            <summary>54936 GB18030 簡体字中国語 (GB2312/GBKの拡張)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.UHCKR">
+            <summary>949 ks_c_5601-1987 韓国語 (UHC=EUC-KRの拡張)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1250">
+            <summary>Windows1250 中央ヨーロッパ言語(チェコ語等) iso-8859-2</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1251">
+            <summary>Windows1251 キリル言語(ロシア語等) </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1253">
+            <summary>Windows1253 ギリシャ語 iso-8859-7</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1254">
+            <summary>Windows1254 トルコ語 iso-8859-9</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1255">
+            <summary>Windows1255 ヘブライ語 iso-8859-8</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1256">
+            <summary>Windows1256 アラビア語 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1257">
+            <summary>Windows1257 バルト言語 iso-8859-13</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CP1258">
+            <summary>Windows1258 ベトナム語</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.TIS620">
+            <summary>TIS-620/Windows874 タイ語 iso-8859-11</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.GetPreamble(System.Byte[],System.Int32)">
+            <summary>引数で指定されたbyte配列がBOMありUTFファイルと判定できる場合、その文字コードを返します。</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="read">バイト配列先頭の読み込み済バイト数（LEASTREADSIZEのバイト数以上読み込んでおくこと）</param>
+            <returns>BOMから判定できた文字コード種類、合致なしの場合null</returns>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.Name">
+            <summary>ファイル文字コード種類名</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.Bytes">
+            <summary>先頭バイト識別データ（BOM/マジックナンバー）</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.Encoding">
+            <summary>エンコーディング</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.CharCode.CodePage">
+            <summary>コードページ番号(Unicode以外のローカルなエンコーディングを使用するものについて設定あり。遅延初期化用の退避変数を兼ねる)</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.#ctor(System.String,System.Int32,System.Byte[])">
+            <summary>基本コンストラクタ</summary>
+            <param name="Name">ファイル文字コード種類名を定義する</param>
+            <param name="CodePage">デコード時に使用するCodePageを指定(正値ならDecoderExceptionFallback、マイナス値ならDecoderReplacementFallBackを設定)</param>
+            <param name="Bytes">先頭バイト識別データを指定する</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.#ctor(System.String,System.Text.Encoding,System.Byte[])">
+            <summary>基本コンストラクタ</summary>
+            <param name="Name">ファイル文字コード種類名を定義する</param>
+            <param name="Encoding">デコード時に使用するEncodingを指定する</param>
+            <param name="Bytes">先頭バイト識別データを指定する</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.GetEncoding">
+            <summary>このファイル文字コード種類のEncodingオブジェクトを取得します。</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.GetString(System.Byte[],System.Int32)">
+            <summary>引数のバイト配列から文字列を取り出します。失敗時はnullが返ります。</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からの先頭からのデコード対象バイト数)</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.ToString">
+            <summary>このファイル文字コード種類の名前を取得します。</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.CharCode.GetPreamble(System.Byte[],System.Int32,Hnx8.ReadJEnc.CharCode[])">
+            <summary>判定対象のファイル文字コード種類一覧から、BOM/マジックナンバーが一致するものを探索して返す</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="read">バイト配列先頭の読み込み済バイト数（LEASTREADSIZEのバイト数以上読み込んでおくこと）</param>
+            <param name="arr">判定対象とするファイル文字コード種類の一覧</param>
+            <returns>先頭バイトが一致したファイル文字コード種類、合致なしの場合null</returns>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.CharCode.Text">
+            <summary>文字コード種類：テキスト
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.CharCode.EucHText">
+            <summary>
+            EUC補助漢字特殊処理(MS版CP20932の特異なコード体系によりデコードする)
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.CharCode.JisHText">
+            <summary>
+            JIS補助漢字特殊処理(MS版CP20932の特異なコード体系によりデコードする)
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.FileReader">
+            <summary>
+            ReadJEnc ファイル読み出し＆ファイル文字コード種類自動判別(Rev.20170821)
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.#ctor(System.IO.FileInfo)">
+            <summary>単一ファイル読み出し用にファイルを指定して新しいインスタンスを初期化します。</summary>
+            <param name="file">読み出すファイル（このファイルのサイズどおりに読み出し領域バッファを確保する）</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.#ctor(System.Int32)">
+            <summary>複数ファイル連続読み出し用にバッファサイズを指定して新しいインスタンスを初期化します。</summary>
+            <param name="len">最大読み出しファイルサイズ（領域バッファ確保サイズ）</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.Dispose">
+            <summary>ファイル読み出し用のリソースを解放します。</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.Dispose(System.Boolean)">
+            <summary>ファイル読み出し用のリソースを解放します。</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileReader.ReadJEnc">
+            <summary>文字コード自動判別対象言語指定（初期状態は日本語ShiftJIS）</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.Read(System.IO.FileInfo)">
+            <summary>ファイルを読み出してファイル文字コード種類を取得します。</summary>
+            <param name="file">読み出すファイル</param>
+            <returns>ファイル文字コード種類の判定結果</returns>
+        </member>
+        <member name="P:Hnx8.ReadJEnc.FileReader.Text">
+            <summary>Readメソッド呼び出し時にファイルから読み出したテキスト文字列内容を取得します。</summary>
+            <remarks>ファイルからテキストが取り出せなかった場合はnullとなります。</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileReader.Bytes">
+            <summary>ファイル内容の読み出し先領域</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileReader.Length">
+            <summary>現在読み出し済のファイルサイズ</summary><remarks>非読み出し時は0、分割読み出し時は読込済部分のサイズ</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileReader.text">
+            <summary>ファイルから取り出したテキスト文字列</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileReader.GetPreamble(System.Int64)">
+            <summary>読み込んであるバイト配列のプリアンブル（BOMヘッダ／マジックナンバー）からファイル文字コード種類特定を試みる</summary>
+            <param name="len">ファイルサイズ(未読込部分も含む。読み込み済サイズはthis.Lengthを参照)</param>
+            <returns>確定した場合、ファイル文字コード種類。確定できなかった場合null</returns>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.FileType">
+            <summary>
+            ReadJEnc ファイル種類定義(Rev.20170821)
+            </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.READERROR">
+            <summary>読み込み失敗</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.EMPTYFILE">
+            <summary>空ファイル</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.HUGEFILE">
+            <summary>巨大ファイル</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.BINARY">
+            <summary>バイナリ</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.JAVABIN">
+            <summary>Javaバイナリ</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.WINBIN">
+            <summary>Windowsバイナリ</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.SHORTCUT">
+            <summary>Windowsショートカット</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.PDF">
+            <summary>PDF</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.ZIP">
+            <summary>Zip圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.GZIP">
+            <summary>GZip圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.SEVENZIP">
+            <summary>7zip圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.RAR">
+            <summary>Rar圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.CABINET">
+            <summary>Cab圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.BZIP2">
+            <summary>BZip2圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.ZLZW">
+            <summary>Z(compress)圧縮</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.BMP">
+            <summary>BMP画像</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.GIF">
+            <summary>GIF画像</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.JPEG">
+            <summary>JPEG画像</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.PNG">
+            <summary>PNG画像</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.TIFF">
+            <summary>TIFF画像</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.IMGICON">
+            <summary>Windowsアイコン画像</summary><remarks>マジックナンバーのほか追加チェックあり</remarks>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.FileType.GetBinaryType_LEASTREADSIZE">
+            <summary>BOM/マジックナンバー一致判定にあたり、最低限読み込みを済ませておく必要がある先頭バイト数です。</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.FileType.GetBinaryType(System.Byte[],System.Int32)">
+            <summary>引数で指定されたbyte配列についてバイナリファイルの種類を判定します。</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="read">バイト配列先頭の読み込み済バイト数（LEASTREADSIZEのバイト数以上読み込んでおくこと）</param>
+            <returns>バイナリファイル種類判定結果（どれにも該当しなければ一般バイナリと判定）</returns>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.FileType.Bin">
+            <summary>ファイル文字コード種類：バイナリ
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.FileType.ZipBinary">
+            <summary>ファイル文字コード種類：Zipバイナリ
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.FileType.Image">
+            <summary>ファイル文字コード種類：画像
+            </summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc">
+            <summary>
+            ReadJEnc 文字コード自動判別ライブラリ・処理本体(Rev.20180421)
+            </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.JP">
+            <summary>日本語文字コード判別(SJIS/EUCJP)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.ANSI">
+            <summary>ANSI文字コード判別(CP1252)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.TW">
+            <summary>繁体字中国語文字コード判別(BIG5/EUCTW)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CN">
+            <summary>簡体字中国語文字コード判別(GB18030)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.KR">
+            <summary>ハングル文字コード判別(UHCKR)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1250">
+            <summary>Windows1250(iso-8859-2) 中央ヨーロッパ言語(チェコ語等)判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1251">
+            <summary>Windows1251 キリル言語(ロシア語等)＆ANSI判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1253">
+            <summary>Windows1253(iso-8859-7) ギリシャ語＆ANSI判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1254">
+            <summary>Windows1254(iso-8859-9) トルコ語判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1255">
+            <summary>Windows1255(iso-8859-8) ヘブライ語＆ANSI判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1256">
+            <summary>Windows1256 アラビア語＆ANSI判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1257">
+            <summary>Windows1257(iso-8859-13) バルト言語判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP1258">
+            <summary>Windows1258 ベトナム語判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.TIS620">
+            <summary>TIS620/Windows874(iso-8859-11) タイ語＆ANSI判別 </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.DEL">
+            <summary>バイナリと判定するDEL文字コード、兼、ASCII/非ASCIIの境界文字コード</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.BINARY">
+            <summary>非テキストファイルと判定する制御文字コードの最大値</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CharCode">
+            <summary>このインスタンスでおもに判別対象とするデフォルト文字コード</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.EUC">
+            <summary>EUCデコードで用いる文字コード（無指定null時はEUCの判別を行わない）</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.CP125X">
+            <summary>CP1252系で判別対象とする文字コード（デフォルトはANSI=CP1252）</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.NODEF">
+            <summary>CP1252系の判別にあたり、0x80-0x9Fのうち文字コード未定義の箇所をbitで表現した値</summary>
+            <remarks>
+            デフォルトの非CP1252チェック用定義値(0x2001A002)＝未定義の81,8D,8F,90,9Dに対応するビットがON
+                   FEDC BA98 7654 3210         FEDC BA98 7654 3210
+                   ---- ---- ---- ----         ---- ---- ---- ----
+            (0x9#) 0010 0000 0000 0001  (0x8#) 1010 0000 0000 0010
+            </remarks>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.#ctor(Hnx8.ReadJEnc.CharCode,Hnx8.ReadJEnc.CharCode)">
+            <summary>引数指定文字コード/CP1252/EUCを判別対象とする際のコンストラクタ</summary>
+            <param name="CharCode">このインスタンスで判別対象とするデフォルト文字コード</param>
+            <param name="EUC">EUCの文字コード</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.#ctor(Hnx8.ReadJEnc.CharCode,System.UInt32)">
+            <summary>CP1252系文字コードのみを判別対象とする際のコンストラクタ</summary>
+            <param name="CP125X">CP1252系の判別対象デフォルト文字コード(CP1252以外を指定)</param>
+            <param name="NODEF">0x80-0x9Fのうち文字コード未定義の箇所をbitで表現した値</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.ToString">
+            <summary>オブジェクト文字列表現として、自動判別デフォルト文字コードの名前を返す</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.GetEncoding(System.Byte[],System.Int32,System.String@)">
+            <summary>バイト配列を全走査し、文字コードを自動判別する</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からのデコード対象バイト数)</param>
+            <param name="text">out 判別した文字コードにより取り出したテキスト文字列（非テキストならnull）</param>
+            <returns>文字コード判別結果（非テキストならnull）</returns>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.GetEncoding(System.Byte[],System.Int32,System.Int32)">
+            <summary>デフォルト文字コードの判定スコア算出（判定開始位置～ファイル末尾までの範囲を対象）</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="pos">判定開始位置(非ASCII文字コードが初めて登場した位置)</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からのデコード対象バイト数)</param>
+            <returns>判定スコア算出結果</returns>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.SeemsUTF16N(System.Byte[],System.Int32)">
+            <summary>BOMなしUTF16の可能性があるか(先頭文字がASCIIか否かをもとに)判定</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からのデコード対象バイト数)</param>
+            <returns>UTF16Nと思われる場合はその文字コード、否ならnull</returns>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.JIS">
+            <summary>
+            JIS判定関連処理クラス
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.JIS.hasSOSI(System.Byte[],System.Int32)">
+            <summary>SO/SI文字出現チェック</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からのデコード対象バイト数)</param>
+            <returns>出現していればtrue、否ならfalse</returns>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.JIS.JISH">
+            <summary>JIS補助漢字エスケープシーケンス有無(有ならtrue)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.JIS.ISOKR">
+            <summary>ISO-2022-KRエスケープシーケンス有無(有ならtrue)</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.JIS.c">
+            <summary>JIS評価値(JISとしてデコードすべきなら正値、否ならマイナス値)</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.JIS.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>JISエスケープシーケンス判定オブジェクト初期化（およびISO-2022-KR判定）</summary>
+            <param name="bytes">判定対象のバイト配列</param>
+            <param name="len">ファイルサイズ(バイト配列先頭からのデコード対象バイト数)</param>
+            <param name="pos">エスケープ(0x1B)出現位置</param>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.JIS.GetEncoding(System.Int32)">
+            <summary>JISエスケープシーケンス妥当性チェック</summary>
+            <param name="pos">エスケープ(0x1B)出現位置</param>
+            <returns>エスケープシーケンスとして妥当ならpos加算値、そうでなければゼロ</returns>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.JIS.GetEncoding(System.String@)">
+            <summary>JISと判定された場合の文字コードを確定する</summary>
+            <param name="text">out 判別した文字コードにより取り出したテキスト文字列（非テキストならnull）</param>
+            <returns>カナSO/SI有無やデコード不能箇所有無に応じたJIS文字コード種類</returns>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.SJIS">
+            <summary>
+            SJIS評価クラス
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.SJIS.#ctor">
+            <summary>日本語ShiftJIS・EUCJP・CP1252を判別対象とする際のコンストラクタ</summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.BIG5TW">
+            <summary>
+            BIG5TW評価クラス
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.BIG5TW.#ctor">
+            <summary>中国語繁体字・EUC-TW・CP1252を判別対象とする際のコンストラクタ</summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.GB18030">
+            <summary>
+            GB18030評価クラス
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.GB18030.#ctor">
+            <summary>中国語簡体字・CP1252を判別対象とする際のコンストラクタ</summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.UHCKR">
+            <summary>
+            UHCKR評価クラス
+            </summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.UHCKR.#ctor">
+            <summary>ハングルUHC・CP1252を判別対象とする際のコンストラクタ</summary>
+        </member>
+        <member name="T:Hnx8.ReadJEnc.ReadJEnc.SBCS">
+            <summary>
+            １バイト文字コード汎用評価クラス
+            タイ語ほかアルファベットと混在させない文字種の文字コード判別で共通仕様
+            </summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.SBCS.BOUND">
+            <summary>その文字コード体系固有のコードの開始位置</summary>
+        </member>
+        <member name="F:Hnx8.ReadJEnc.ReadJEnc.SBCS.NODEF">
+            <summary>0x80-0xFFの文字コード未定義の箇所をbitで表現した値</summary>
+        </member>
+        <member name="M:Hnx8.ReadJEnc.ReadJEnc.SBCS.#ctor(Hnx8.ReadJEnc.CharCode,System.Int32,System.UInt32[])">
+            <summary>引数指定文字コードとCP1252を判別対象とする際のコンストラクタ</summary>
+            <param name="CharCode">このインスタンスで判別対象とするデフォルト文字コード</param>
+            <param name="BOUND">通常文字／この文字コード固有の文字種範囲の境界</param>
+            <param name="NODEF">
+            文字コード未定義の箇所をbitで表現した値
+            <remarks>
+            [0]=0x80-0x9Fの未定義箇所
+            [1]=0xA0-0xBFの未定義箇所
+            [2]=0xC0-0xDFの未定義箇所
+            [3]=0xE0-0xFFの未定義箇所
+            </remarks></param>
+        </member>
+    </members>
+</doc>
