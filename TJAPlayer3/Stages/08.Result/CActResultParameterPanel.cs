@@ -198,7 +198,7 @@ namespace TJAPlayer3
 		{
 			if (!base.b活性化してない)
 			{
-				ct全体進行 = new CCounter(0, 20000, 1, TJAPlayer3.Timer);
+				ct全体進行 = new CCounter(0, 50000, 1, TJAPlayer3.Timer);
 
 				ctゲージアニメ = new CCounter();
 				ct虹ゲージアニメ = new CCounter();
@@ -528,8 +528,6 @@ namespace TJAPlayer3
 
 					/* TO DO */
 
-					// Reset counter for clouds
-
 					// Random seed for fireworks
 
 					// Random seed for shines
@@ -664,8 +662,8 @@ namespace TJAPlayer3
 						Mood = 1;
 
 
-					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.X = ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
-					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
+					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 					TJAPlayer3.Tx.Result_Speech_Bubble.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 430, 526, new Rectangle(Mood * 358, RandomText * 230, 358, 230));
 
 					if (!b音声再生[9])
