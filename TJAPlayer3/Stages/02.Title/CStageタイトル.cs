@@ -62,7 +62,7 @@ namespace TJAPlayer3
 				for (int i = 0; i < this.nbModes; i++)
 				{
 					this.stModeBar[i].BarTexture = TJAPlayer3.Tx.ModeSelect_Bar[i];
-					this.stModeBar[i].n現在存在している行 = i + 1;
+					this.stModeBar[i].n現在存在している行 = i + 1 - n現在の選択行モード選択;
 				}
 
 				TJAPlayer3.Skin.soundEntry.t再生する();
