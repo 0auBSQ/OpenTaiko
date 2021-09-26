@@ -501,6 +501,7 @@ namespace TJAPlayer3
                     #endregion
                 }
 
+				// Should be Score + 4000, to synchronize with Stage Kekka
                 float MountainAppearValue = 2000 + (ctゲージアニメ.n終了値 * 66) + 8360 - 85;
 
 				if (ct全体進行.n現在の値 >= MountainAppearValue)
@@ -527,10 +528,6 @@ namespace TJAPlayer3
                     #endregion
 
 					/* TO DO */
-
-					// Random seed for fireworks
-
-					// Random seed for shines
 
 					// Alter Mountain appear value/Crown appear value if no Score Rank/no Crown
                 }
