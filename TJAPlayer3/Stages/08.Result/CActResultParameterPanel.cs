@@ -152,7 +152,7 @@ namespace TJAPlayer3
 			stScore文字位置Array[9] = stScore文字位置10;
 			this.stScoreFont = stScore文字位置Array;
 
-
+			base.list子Activities.Add(this.PuchiChara = new PuchiChara());
 
 			this.ptFullCombo位置 = new Point[] { new Point(0x80, 0xed), new Point(0xdf, 0xed), new Point(0x141, 0xed) };
 			base.b活性化してない = true;
@@ -221,6 +221,8 @@ namespace TJAPlayer3
 				ctDonchan_Failed = new CCounter();
 				ctDonchan_Failed_In = new CCounter();
 
+				this.PuchiChara.IdleAnimation();
+
 				Dan_Plate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス) + @"\Dan_Plate.png");
 
 				base.OnManagedリソースの作成();
@@ -261,6 +263,8 @@ namespace TJAPlayer3
 			ctFlash_Icon.t進行Loop();
 			ctRotate_Flowers.t進行Loop();
 			ctShine_Plate.t進行Loop();
+
+			// this.PuchiChara.IdleAnimation();
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 			{
@@ -565,6 +569,12 @@ namespace TJAPlayer3
 
 				#endregion
 
+				#region [PuchiChara]
+
+				this.PuchiChara.On進行描画(202 - 70, 532 + 30, false);
+
+				#endregion
+
 				if (ct全体進行.n現在の値 >= MountainAppearValue)
                 {
 					float AddCount = 135;
@@ -748,6 +758,8 @@ namespace TJAPlayer3
 		private CCounter ctFlash_Icon;
 		private CCounter ctRotate_Flowers;
 		private CCounter ctShine_Plate;
+
+		public PuchiChara PuchiChara;
 
 		public bool[] b音声再生 = { false, false, false, false, false, false, false, false, false, false, false, false, false };
 
