@@ -17,6 +17,7 @@ Self-made assets will be distributed separately.
 
 # Short term To-Do List
 
+```
 ☐ Implement 段位道場 results screen
 ☐ Implement 段位道場 ini save file
 ☐ Implement プチチャラ on menus 
@@ -27,3 +28,4 @@ Self-made assets will be distributed separately.
 ☐ Fix Soul jauge while playing multiple branch songs
 ☐ Implement 2P results screen
 ☐ Find a way to calculate Speed up/down difficulty and adjust the menu preview song accordingly, Add the Song speed setting directly in the in-game menu
+```
