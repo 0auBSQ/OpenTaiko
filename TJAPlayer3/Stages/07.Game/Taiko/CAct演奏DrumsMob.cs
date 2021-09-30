@@ -53,12 +53,13 @@ namespace TJAPlayer3
                 if (TJAPlayer3.Skin.Game_Mob_Ptn != 0)
                 {
 
+                    /*
                     TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctMob.n現在の値.ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 20, C文字コンソール.Eフォント種別.白, ctMobPtn.n現在の値.ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 30, C文字コンソール.Eフォント種別.白, ((int)ctMobPtn.n現在の値).ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0].ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 10, C文字コンソール.Eフォント種別.白, Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)).ToString());
-
+                    */
 
                     if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
                     {
