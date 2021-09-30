@@ -2831,7 +2831,7 @@ namespace TJAPlayer3
         #endregion
         #region PuchiChara
         public int[] Game_PuchiChara_X = new int[] { 100, 100 };
-        public int[] Game_PuchiChara_Y = new int[] { 140, 600 };
+        public int[] Game_PuchiChara_Y = new int[] { 140, 675 };
         public int[] Game_PuchiChara_BalloonX = new int[] { 300, 300 };
         public int[] Game_PuchiChara_BalloonY = new int[] { 240, 500 };
         public float[] Game_PuchiChara_Scale = new float[] { 0.6f, 0.8f }; // 通常時、 ふうせん連打時
