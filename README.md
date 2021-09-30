@@ -7,11 +7,9 @@ Will update this readme later.
 
 This Taiko no Tatsujin simulator is a touhourenren's TJAPlayer3-Develop-ReWrite fork, fixing multiple bugs and adding multiple features to make it closer than the arcade Nijiiro version and planning to add various original features later (Like PS2 Taiko Towers type charts handling, an adventure/story mode, a way to unlock puchicharas/charts with coins earned after each play and so on)
 
-I can't share the skin for obvious reasons (Wouldn't take the risk of getting sued lol), but you can reconstitute it yourself through the following links :
-- https://github.com/4444fugu4444/TJAPlayer3-Develop-ReWrite (Base Nijiiro skin)
-- https://tjadataba.se/shimyu/ (Extra Nijiiro skin elements from the TaikoPlusEX simulator)
+I can't share the skin for obvious reasons (Wouldn't take the risk of getting sued lol)
 
-I'll make later a guide to reconsitute the skin by yourself (Including the images to resize, or to hue shift/color filter for few custom assets like >= 11 star charts red star or additional boxes for the main menu)
+But you can reconstitute the skin yourself following the `README_SKIN.md` guide.
 
 Self-made assets will be distributed separately.
 
