@@ -752,7 +752,7 @@ namespace TJAPlayer3
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
                     {
                         TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                        this.PuchiChara.On進行描画(981 + 250, 330 + 230, false);
+                        this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player : 1);
                     }
 
                     TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
@@ -765,12 +765,12 @@ namespace TJAPlayer3
                         if (this.ctDonchan_Jump[1].n現在の値 > 0)
                         {
                             TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[1].n現在の値 >= 17 ? 17 : ctDonchan_Jump[1].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false);
+                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
                         }
                         else
                         {
                             TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false);
+                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
                         }
                     }
                     if (this.ctDonchan_Jump[0].n現在の値 > 0)

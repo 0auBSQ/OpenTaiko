@@ -24,10 +24,12 @@ namespace TJAPlayer3
             public string[] Title = { "どんちゃんですよ！", "かっちゃんですよ！" };
             public string[] Dan = { "達人", "達人" };
 
-            public bool[] DanGold = { false, true };
+            public bool[] DanGold = { false, false };
 
             public int[] DanType = { 1, 2 };
             public int[] TitleType = { 1, 2 };
+
+            public int[] PuchiChara = { 2, 11 };
         }
 
         public Data data = new Data();

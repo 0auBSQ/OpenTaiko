@@ -50,7 +50,7 @@ namespace TJAPlayer3
         /// <param name="y">Y座標(中央)</param>
         /// <param name="alpha">不透明度</param>
         /// <returns></returns>
-        public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false)
+        public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0)
         {
             if (!TJAPlayer3.ConfigIni.ShowPuchiChara) return base.On進行描画();
             if (Counter == null || SineCounter == null || TJAPlayer3.Tx.PuchiChara == null) return base.On進行描画();
@@ -87,7 +87,12 @@ namespace TJAPlayer3
             ** - Yellow light color filter when isGrowing is true
             */
 
-            int puriChar = 11;
+            int puriChar = TJAPlayer3.NamePlateConfig.data.PuchiChara[player];
+            
+            if (puriChar < 0)
+                puriChar = 0;
+            else if (puriChar >= 120)
+                puriChar = 119;
 
             int puriColumn = puriChar % 5;
             int puriRow = puriChar / 5;
