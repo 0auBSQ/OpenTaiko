@@ -21,6 +21,8 @@ namespace TJAPlayer3
 			base.list子Activities.Add( this.actFI = new CActFIFOBlack() );
 			base.list子Activities.Add( this.actFO = new CActFIFOBlack() );
 
+			base.list子Activities.Add(this.PuchiChara = new PuchiChara());
+
 		}
 
 
@@ -49,6 +51,8 @@ namespace TJAPlayer3
 				this.ctBarAnimeIn = new CCounter();
 				this.ctBarMove = new CCounter();
 				this.ctBarMove.n現在の値 = 250;
+
+				this.PuchiChara.IdleAnimation();
 
 				this.bバナパス読み込み = false;
 				this.bバナパス読み込み失敗 = false;
@@ -461,19 +465,24 @@ namespace TJAPlayer3
 						this.bどんちゃんカウンター初期化 = true;
 					}
 
-					TJAPlayer3.Tx.Entry_Player[0].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400); 
-					TJAPlayer3.Tx.Entry_Player[1].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
-					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
+					int alpha = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
+
+					TJAPlayer3.Tx.Entry_Player[0].Opacity = alpha; 
+					TJAPlayer3.Tx.Entry_Player[1].Opacity = alpha;
+					
+					
+					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
 
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
+					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
 
 					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800 ) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
 						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 0, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
 
-					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
+					TJAPlayer3.Tx.Entry_Player[2].Opacity = alpha;
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
 						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 92, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
 
@@ -522,9 +531,11 @@ namespace TJAPlayer3
 
 					TJAPlayer3.Tx.Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 341 - DonchanY);
 
+					this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
+
 					#endregion
 
-					if(ctBarAnimeIn.n現在の値 >= (int)(16 * 16.6f))
+					if (ctBarAnimeIn.n現在の値 >= (int)(16 * 16.6f))
 					{
 						TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
 
@@ -721,6 +732,8 @@ namespace TJAPlayer3
 
 		private bool bDownPushed;
 
+		private PuchiChara PuchiChara;
+
 		private bool bバナパス読み込み;
 		private bool bバナパス読み込み失敗;
 		private bool bプレイヤーエントリー;
@@ -733,10 +746,6 @@ namespace TJAPlayer3
 
 		private Point[] ptプレイヤーエントリーバー座標 =
 			{ new Point(337, 488), new Point( 529, 487), new Point(743, 486) };
-
-		//private Point[] ptモード選択バー座標 =
-		//	{ new Point(290, 107), new Point(319, 306), new Point(356, 513), new Point(385, 712), new Point(414, 911), new Point(443, 1110), new Point(472, 1309) };
-
 		
 		private Point[] ptモード選択バー座標 =
 			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };

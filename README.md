@@ -18,7 +18,7 @@ Self-made assets will be distributed separately.
 ```
 ☐ Implement 段位道場 results screen
 ☐ Implement 段位道場 ini save file
-☐ Implement プチチャラ on menus 
+☑ Implement プチチャラ on menus 
 ☐ Coin earning and change the save file format
 ☐ Implement 太鼓タワー charts (COURSE: 5) (Ex: https://www.youtube.com/watch?v=rtSe70X1QII)
 ☐ Multiple ingame backgrounds and 踊り子 sets (And the possibility to choose one on the TJA file, such as the Vocaloid one for Vocaloid maps)
