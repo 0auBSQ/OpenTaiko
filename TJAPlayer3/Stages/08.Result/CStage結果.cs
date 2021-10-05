@@ -575,6 +575,7 @@ namespace TJAPlayer3
 
 		public void t後処理()
         {
+			// To check and correct later
 			if (!TJAPlayer3.ConfigIni.bAutoPlay[0])
 			{
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
