@@ -157,6 +157,27 @@ namespace TJAPlayer3
 						ini.stファイル.BestRank[0] = this.nランク値[0];
 					}
 
+
+					// Clear and score ranks
+
+					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+                    {
+						this.st演奏記録[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nクリア);
+						this.st演奏記録[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nスコアランク);
+
+						for (int i = 0; i < 5; i++)
+						{
+							if (i != TJAPlayer3.stage選曲.n確定された曲の難易度[0])
+							{
+								this.st演奏記録[0].nクリア[i] = ini.stセクション[0].nクリア[i];
+								this.st演奏記録[0].nスコアランク[i] = ini.stセクション[0].nスコアランク[i];
+							}
+
+							ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
+							ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
+						}
+					}
+						
 					// 新記録スコアチェック
 					if ((this.st演奏記録[0].nスコア > ini.stセクション[0].nスコア) && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					{
@@ -164,6 +185,7 @@ namespace TJAPlayer3
 						ini.stセクション[0] = this.st演奏記録[0];
 					}
 
+					// Header hi-score
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 						if (this.st演奏記録[0].nスコア > ini.stセクション[0].nスコア)
 							this.st演奏記録[0].nハイスコア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = (int)st演奏記録[0].nスコア;
@@ -175,11 +197,16 @@ namespace TJAPlayer3
 						ini.stセクション[0] = this.st演奏記録[0];
 					}
 
+					// Clear & Score rank (Legacy)
+					/*
 					if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 					{
-						ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
-						ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
+						if (this.nクリア > ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
+							ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
+						if (this.nスコアランク > ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
+							ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
 					}
+					*/
 
 					// ラストプレイ #23595 2011.1.9 ikanick
 					// オートじゃなければプレイ結果を書き込む
