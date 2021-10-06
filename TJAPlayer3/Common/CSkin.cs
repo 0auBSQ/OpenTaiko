@@ -335,6 +335,8 @@ namespace TJAPlayer3
         public Cシステムサウンド bgmリザルトイン音 = null;
         public Cシステムサウンド bgmリザルト音 = null;
 
+        public Cシステムサウンド bgmDanResult = null;
+
         public Cシステムサウンド bgmタイトル = null;
         public Cシステムサウンド bgmタイトルイン = null;
         public Cシステムサウンド bgm選曲画面 = null;
@@ -702,6 +704,8 @@ namespace TJAPlayer3
             this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\BGM\SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
+
+            this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", false, false, true, ESoundGroup.SongPlayback);
 
 
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -2907,8 +2911,8 @@ namespace TJAPlayer3
         public int[] Result_NamePlate_Y = new int[] { 611, 611 };
 
         public int[] Result_Dan = new int[] { 500, 500 };
-        public int[] Result_Dan_XY = new int[] { 100, 0 };
-        public int[] Result_Dan_Plate_XY = new int[] { 149, 416 };
+        public int[] Result_Dan_XY = new int[] { 0, 420 };
+        public int[] Result_Dan_Plate_XY = new int[] { 149, 149 };
         #endregion
         #region Font
         public int Font_Edge_Ratio = 30;

@@ -36,6 +36,10 @@ Sound/Result/CrownIn.ogg => Sounds/ResultScreen/CrownIn.ogg
 Sound/Result/RankIn.ogg => Sounds/ResultScreen/RankIn.ogg
 Sound/Result/Donchan/Donchan_Clear.ogg => Sounds/ResultScreen/Donchan_Clear.ogg
 Sound/Result/Donchan/Donchan_Miss.ogg => Sounds/ResultScreen/Donchan_Miss.ogg
+
+## Ver 0.4 ##
+
+Sound/Dan/Dan_Result.ogg => Sounds/Dan/Dan_Result.ogg
 ```
 
 ## Third step (Second booster)
@@ -59,6 +63,18 @@ Sounds/Donda Full combo 2P.ogg => Sounds/Donda Full combo 2P.ogg
 Sounds/SongSelect Chara.ogg => Sounds/SongSelect Chara.ogg
 Sounds/DiffSelect.ogg => Sounds/DiffSelect.ogg
 Sounds/SongDecide.ogg => Sounds/SongDecide.ogg
+```
+
+## Fourth Step (Third booster) (From Ver 0.4 (DanichiDoujou update))
+
+- Download and extract BetterTaikoCatsCaffe from the https://tjadataba.se/shimyu/ website
+
+- Copy and paste the following files/folders (Resize to the annoted size if necessary) (Left starts at `BetterTaikoCatsCaffe/System/Base`, Right at `TJAPlayer3-Develop-BSQ/Test/System/0.JpnNijiiro`)
+
+```
+Sounds/Result/Dan/Failure.ogg => Sounds/Dan/Failure.ogg
+Sounds/Result/Dan/Success.ogg => Sounds/Dan/Success.ogg
+Sounds/Result/Dan/Better_Success.ogg => Sounds/Dan/Better_Success.ogg
 ```
 
 ## Last step (Additional assets)

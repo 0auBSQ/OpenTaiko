@@ -19,6 +19,7 @@ namespace TJAPlayer3
         const string GAME = @"5_Game\";
         const string RESULT = @"6_Result\";
         const string EXIT = @"7_Exit\";
+        const string DANRESULT = @"7_DanResult\";
 
         // InGame
         const string CHARA = @"1_Chara\";
@@ -767,9 +768,15 @@ namespace TJAPlayer3
             Exit_Background = TxC(EXIT + @"Background.png");
             #endregion
 
-        }
+            #region [8_DanResults]
 
-        public void DisposeTexture()
+            DanResult_Background = TxC(DANRESULT + @"Background.png");
+
+            #endregion
+
+    }
+
+    public void DisposeTexture()
         {
             foreach (var tex in listTexture)
             {
@@ -1105,6 +1112,12 @@ namespace TJAPlayer3
         #region 7_終了画面
         public CTexture Exit_Background/* , */
                                        /*Exit_Text */;
+        #endregion
+
+        #region [8_DanResults]
+
+        public CTexture DanResult_Background;
+
         #endregion
 
         #region [ 解放用 ]

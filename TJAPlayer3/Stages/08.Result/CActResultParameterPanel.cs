@@ -223,8 +223,6 @@ namespace TJAPlayer3
 
 				this.PuchiChara.IdleAnimation();
 
-				Dan_Plate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス) + @"\Dan_Plate.png");
-
 				base.OnManagedリソースの作成();
 			}
 		}
@@ -232,7 +230,6 @@ namespace TJAPlayer3
 		{
 			if (!base.b活性化してない)
 			{
-				Dan_Plate?.Dispose();
 				base.OnManagedリソースの解放();
 			}
 		}
@@ -695,29 +692,6 @@ namespace TJAPlayer3
 
 				#endregion
 			}
-			else
-			{
-				#region 段位時リザルト
-
-				switch (TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C))
-				{
-					case Exam.Status.Failure:
-						TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Dan_XY[0], TJAPlayer3.Skin.Result_Dan_XY[1], new Rectangle(0, 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-						break;
-					case Exam.Status.Success:
-						TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Dan_XY[0], TJAPlayer3.Skin.Result_Dan_XY[1], new Rectangle(TJAPlayer3.Skin.Result_Dan[0], 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-						break;
-					case Exam.Status.Better_Success:
-						TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Dan_XY[0], TJAPlayer3.Skin.Result_Dan_XY[1], new Rectangle(TJAPlayer3.Skin.Result_Dan[0] * 2, 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-						break;
-					default:
-						break;
-				}
-
-				Dan_Plate?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Dan_Plate_XY[0], TJAPlayer3.Skin.Result_Dan_Plate_XY[1]);
-
-				#endregion
-			}
 
 			if (!this.ct表示用.b終了値に達した)
 			{
@@ -782,8 +756,6 @@ namespace TJAPlayer3
 		private readonly ST文字位置[] st小文字位置;
 		private readonly ST文字位置[] st大文字位置;
 		private ST文字位置[] stScoreFont;
-
-		private CTexture Dan_Plate;
 
 		private void t小文字表示(int x, int y, string str)
 		{
