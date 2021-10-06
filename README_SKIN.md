@@ -40,6 +40,12 @@ Sound/Result/Donchan/Donchan_Miss.ogg => Sounds/ResultScreen/Donchan_Miss.ogg
 ## Ver 0.4 ##
 
 Sound/Dan/Dan_Result.ogg => Sounds/Dan/Dan_Result.ogg
+
+Texture/Dan/Result/Rank.png => Graphics/7_DanResult/Rank.png (Resize 2004x334)
+Texture/Dan/Result/SongPanel_Base.png => Graphics/7_DanResult/SongPanel_Base.png (Resize 1280x720)
+Texture/Dan/Result/StatePanel_Base.png => Graphics/7_DanResult/StatePanel_Base.png (Resize 1280x720)
+Texture/Dan/Result/StatePanel_Main.png => Graphics/7_DanResult/StatePanel_Main.png (Resize 1280x720)
+Texture/Dan/Result/SongPanel_Main.png => Graphics/7_DanResult/SongPanel_Main.png (Resize 960x512)
 ```
 
 ## Third step (Second booster)

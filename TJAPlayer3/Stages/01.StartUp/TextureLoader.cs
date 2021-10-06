@@ -771,10 +771,15 @@ namespace TJAPlayer3
             #region [8_DanResults]
 
             DanResult_Background = TxC(DANRESULT + @"Background.png");
+            DanResult_Rank = TxC(DANRESULT + @"Rank.png");
+            DanResult_SongPanel_Base = TxC(DANRESULT + @"SongPanel_Base.png");
+            DanResult_StatePanel_Base = TxC(DANRESULT + @"StatePanel_Base.png");
+            DanResult_SongPanel_Main = TxC(DANRESULT + @"SongPanel_Main.png");
+            DanResult_StatePanel_Main = TxC(DANRESULT + @"StatePanel_Main.png");
 
             #endregion
 
-    }
+        }
 
     public void DisposeTexture()
         {
@@ -1116,7 +1121,12 @@ namespace TJAPlayer3
 
         #region [8_DanResults]
 
-        public CTexture DanResult_Background;
+        public CTexture DanResult_Background,
+            DanResult_Rank,
+            DanResult_SongPanel_Base,
+            DanResult_StatePanel_Base,
+            DanResult_SongPanel_Main,
+            DanResult_StatePanel_Main;
 
         #endregion
 

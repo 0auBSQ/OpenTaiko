@@ -3,7 +3,7 @@ TJAPlayer3-Develop-ReWriteのフォーク, 太鼓の達人 ニジイロVerを切
 
 # In progress
 
-Ver. 0.3.3
+Ver. 0.3.4
 
 Will update this readme later.
 
@@ -21,7 +21,7 @@ Self-made assets will be distributed separately.
 
 ```
 ☐ Implement 段位道場 results screen
-☐ Implement 段位道場 ini save file
+☑ Implement 段位道場 ini save file
 ☑ Implement プチチャラ on menus 
 ☐ Coin earning and change the save file format
 ☐ Implement 太鼓タワー charts (COURSE: 5) (Ex: https://www.youtube.com/watch?v=rtSe70X1QII)

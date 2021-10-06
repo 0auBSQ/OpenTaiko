@@ -106,6 +106,19 @@ namespace TJAPlayer3
                 if (stバー情報[n現在の選択行].txDanPlate != null) stバー情報[n現在の選択行].txDanPlate.Opacity = 255;
                 stバー情報[n現在の選択行].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, 173 + Anime, 301);
 
+                #region [Goukaku plate]
+
+                int currentRank = Math.Min(stバー情報[n現在の選択行].clearGrade, 6) - 1;
+
+                if (currentRank >= 0)
+                {
+                    TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.8f;
+                    TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.8f;
+                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 173 + Anime, 422, new Rectangle(334 * currentRank, 0, 334, 334));
+                }
+                
+                #endregion
+
                 if (stバー情報[n現在の選択行].List_DanSongs[0].Dan_C[0] != null)
                     tSoulDraw(370 + Anime, 462, stバー情報[n現在の選択行].List_DanSongs[0].Dan_C[0].Value[0].ToString());
 
@@ -151,6 +164,19 @@ namespace TJAPlayer3
                     if (stバー情報[n現在の選択行 - 1].txDanPlate != null) stバー情報[n現在の選択行 - 1].txDanPlate.Opacity = 255;
                     stバー情報[n現在の選択行 - 1].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, -1280 + 173 + Anime, 301);
 
+                    #region [Goukaku plate]
+
+                    currentRank = Math.Min(stバー情報[n現在の選択行 - 1].clearGrade, 6) - 1;
+
+                    if (currentRank >= 0)
+                    {
+                        TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.8f;
+                        TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.8f;
+                        TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, -1280 + 173 + Anime, 422, new Rectangle(334 * currentRank, 0, 334, 334));
+                    }
+
+                    #endregion
+
                     if (stバー情報[n現在の選択行 - 1].List_DanSongs[0].Dan_C[0] != null)
                         tSoulDraw(-1280 + 370 + Anime, 462, stバー情報[n現在の選択行 - 1].List_DanSongs[0].Dan_C[0].Value[0].ToString());
 
@@ -195,6 +221,19 @@ namespace TJAPlayer3
 
                     if(stバー情報[n現在の選択行 + 1].txDanPlate != null) stバー情報[n現在の選択行 + 1].txDanPlate.Opacity = 255;
                     stバー情報[n現在の選択行 + 1].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, 1280 + 173 + Anime, 301);
+
+                    #region [Goukaku plate]
+
+                    currentRank = Math.Min(stバー情報[n現在の選択行 + 1].clearGrade, 6) - 1;
+
+                    if (currentRank >= 0)
+                    {
+                        TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.8f;
+                        TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.8f;
+                        TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 + 173 + Anime, 422, new Rectangle(334 * currentRank, 0, 334, 334));
+                    }
+
+                    #endregion
 
                     if (stバー情報[n現在の選択行 + 1].List_DanSongs[0].Dan_C[0] != null)
                         tSoulDraw(1280 + 370 + Anime, 462, stバー情報[n現在の選択行 + 1].List_DanSongs[0].Dan_C[0].Value[0].ToString());
@@ -281,26 +320,28 @@ namespace TJAPlayer3
             public List<CDTX.DanSongs> List_DanSongs;
             public CTexture txBarCenter;
             public CTexture txDanPlate;
+            public int clearGrade;
         }
 
         private void tバーの初期化()
         {
             for(int i = 0; i < stバー情報.Length; i++)
             {
+                var song = TJAPlayer3.Songs管理.list曲ルート_Dan[i];
+
                 stバー情報[i].ttkタイトル = new TitleTextureKey[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 stバー情報[i].n曲難易度 = new int[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 stバー情報[i].n曲レベル = new int[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 for (int j = 0; j < TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count; j++)
                 {
-                    var song = TJAPlayer3.Songs管理.list曲ルート_Dan[i];
-
                     stバー情報[i].ttkタイトル[j] = new TitleTextureKey(song.DanSongs[j].bTitleShow ? "???" : song.DanSongs[j].Title, pfDanSong, Color.White, Color.Black, 700);
                     stバー情報[i].n曲難易度[j] = song.DanSongs[j].Difficulty;
                     stバー情報[i].n曲レベル[j] = song.DanSongs[j].Level;
                     stバー情報[i].List_DanSongs = song.DanSongs;
-                    stバー情報[i].txBarCenter = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Bar_Center.png");
-                    stバー情報[i].txDanPlate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Dan_Plate.png");
                 }
+                stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
+                stバー情報[i].txBarCenter = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Bar_Center.png");
+                stバー情報[i].txDanPlate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Dan_Plate.png");
             }
         }
 

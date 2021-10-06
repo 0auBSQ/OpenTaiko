@@ -165,6 +165,8 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
                     {
+						// Regular (Ensou game) Score and Score Rank saves
+
 						this.st演奏記録[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nクリア);
 						this.st演奏記録[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nスコアランク);
 
@@ -179,6 +181,45 @@ namespace TJAPlayer3
 							ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
 							ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
 						}
+					}
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                    {
+						/* == Specific format for DaniDoujou charts ==
+						**
+						** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
+						**
+						** 0 (Fugoukaku, no insign)
+						** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
+						** Gold Iki (Full Combo) : 3 (Red Goukaku) / 4 (Gold Goukaku)
+						** Rainbow Iki (Donda Full Combo) : 5 (Red Goukaku) / 6 (Gold Goukaku)
+						**
+						*/
+
+						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
+
+						int clearValue = 0;
+
+						if (examStatus != Exam.Status.Failure)
+						{
+							// Red Goukaku
+							clearValue += 1;
+
+							// Gold Goukaku
+							if (examStatus == Exam.Status.Better_Success)
+								clearValue += 1;
+
+							// Gold Iki
+							if (this.st演奏記録.Drums.nMiss数 == 0)
+                            {
+								clearValue += 2;
+
+								// Rainbow Iki
+								if (this.st演奏記録.Drums.nGreat数 == 0)
+									clearValue += 2;
+							}
+						}
+
+						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], clearValue);
 					}
 						
 					// 新記録スコアチェック
@@ -554,6 +595,7 @@ namespace TJAPlayer3
 						}
 
 						TJAPlayer3.Tx.DanResult_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+						TJAPlayer3.Tx.DanResult_SongPanel_Base.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 						#region [DanPlate]
 
@@ -563,28 +605,63 @@ namespace TJAPlayer3
 
 						#endregion
 
-						// Placeholder
-						switch (TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C))
-						{
-							case Exam.Status.Failure:
-								TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, -80, 180, new Rectangle(0, 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-								break;
-							case Exam.Status.Success:
-								TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, -80, 180, new Rectangle(TJAPlayer3.Skin.Result_Dan[0], 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-								break;
-							case Exam.Status.Better_Success:
-								TJAPlayer3.Tx.Result_Dan?.t2D描画(TJAPlayer3.app.Device, -80, 180, new Rectangle(TJAPlayer3.Skin.Result_Dan[0] * 2, 0, TJAPlayer3.Skin.Result_Dan[0], TJAPlayer3.Skin.Result_Dan[1]));
-								break;
-							default:
-								break;
-						}
+						#region [Charts Individual Results]
+
+						for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+                        {
+							int baseX = 255;
+							int baseY = 100;
+
+							TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY + 183 * i, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
 
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
-						{
-							TJAPlayer3.Skin.bgmDanResult.t再生する();
-							b音声再生 = true;
 						}
+
+						#endregion
+
+						/*
+						int TmpTimer = Math.Max(0, (2 * 255) - (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue - 255));
+
+						
+						TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
+						TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
+						TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
+						*/
+
+						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctMob.n現在の値.ToString());
+
+						#region [PassLogo]
+
+						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
+
+						if (examStatus != Exam.Status.Failure)
+                        {
+							int successType = 0;
+
+							if (examStatus == Exam.Status.Better_Success)
+								successType += 1;
+
+							int comboType = 0;
+							if (this.st演奏記録.Drums.nMiss数 == 0)
+                            {
+								comboType += 1;
+
+								if (this.st演奏記録.Drums.nGreat数 == 0)
+									comboType += 1;
+							}
+
+							TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
+							TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
+							TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(334 * (2 * comboType + successType), 0, 334, 334));
+
+							if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+							{
+								TJAPlayer3.Skin.bgmDanResult.t再生する();
+								b音声再生 = true;
+							}
+						}
+
+						#endregion
 
 
 						#endregion
@@ -740,6 +817,35 @@ namespace TJAPlayer3
 
 						if (cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nスコアランク)
 							cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
+					}
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                    {
+						Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+
+						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
+
+						int clearValue = 0;
+
+						if (examStatus != Exam.Status.Failure)
+						{
+							// Red Goukaku
+							clearValue += 1;
+
+							// Gold Goukaku
+							if (examStatus == Exam.Status.Better_Success)
+								clearValue += 1;
+
+							// Gold Iki
+							if (this.st演奏記録.Drums.nMiss数 == 0)
+							{
+								clearValue += 2;
+
+								// Rainbow Iki
+								if (this.st演奏記録.Drums.nGreat数 == 0)
+									clearValue += 2;
+							}
+						}
+						cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
 					}
 				}
 				//---------------------
