@@ -254,16 +254,37 @@ namespace TJAPlayer3
                 #region[ ゲージ1P ]
                 if( TJAPlayer3.Tx.Gauge[0] != null )
                 {
+
+                    // Adapt gauge to dan
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     {
                         TJAPlayer3.Tx.Gauge_Dan[1]?.t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
+
+                        for (int i = 0; i < TJAPlayer3.DTX.Dan_C.Length; i++)
+                        {
+                            if (TJAPlayer3.DTX.Dan_C[i] != null && TJAPlayer3.DTX.Dan_C[i].GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= TJAPlayer3.DTX.Dan_C[i].GetValue(false))
+                            {
+                                TJAPlayer3.Tx.Gauge_Dan[3].Opacity = 255;
+                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, 492 + (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * 14), 144, new Rectangle(0, 0, nRectX - (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * 14), 44));
+
+                                int Opacity = 0;
+                                if (this.ctGaugeFlash.n現在の値 <= 365) Opacity = 0;
+                                else if (this.ctGaugeFlash.n現在の値 <= 448) Opacity = (int)((this.ctGaugeFlash.n現在の値 - 365) / 83f * 255f);
+                                else if (this.ctGaugeFlash.n現在の値 <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.n現在の値 - 448) / 83f * 255f);
+                                TJAPlayer3.Tx.Gauge_Dan[3].Opacity = Opacity;
+                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * 14, 44));
+
+                                break;
+                            }
+                        }
+
                     }
                     else
                     {
                         TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
                     }
 
-                    if (db現在のゲージ値[0] >= 80.0 && db現在のゲージ値[0] < 100.0)
+                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && db現在のゲージ値[0] >= 80.0 && db現在のゲージ値[0] < 100.0)
                     {
                         int Opacity = 0;
                         if (this.ctGaugeFlash.n現在の値 <= 365) Opacity = 0;
@@ -272,6 +293,8 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Gauge_Flash.Opacity = Opacity;
                         TJAPlayer3.Tx.Gauge_Flash.t2D描画(TJAPlayer3.app.Device, 492, 144);
                     }
+
+
                     if (TJAPlayer3.Tx.Gauge_Line[0] != null )
                     {
                         if( this.db現在のゲージ値[ 0 ] >= 100.0 )
