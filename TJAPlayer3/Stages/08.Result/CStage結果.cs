@@ -609,23 +609,18 @@ namespace TJAPlayer3
 
 						for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                         {
+							// To alter in order to shift the whole tab
 							int baseX = 255;
-							int baseY = 100;
 
-							TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY + 183 * i, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
+							int baseY = 100 + 183 * i;
 
-
+							TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
 						}
 
 						#endregion
 
 						/*
 						int TmpTimer = Math.Max(0, (2 * 255) - (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue - 255));
-
-						
-						TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
-						TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
-						TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
 						*/
 
 						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctMob.n現在の値.ToString());
@@ -654,15 +649,15 @@ namespace TJAPlayer3
 							TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
 							TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(334 * (2 * comboType + successType), 0, 334, 334));
 
-							if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
-							{
-								TJAPlayer3.Skin.bgmDanResult.t再生する();
-								b音声再生 = true;
-							}
 						}
 
 						#endregion
 
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+						{
+							TJAPlayer3.Skin.bgmDanResult.t再生する();
+							b音声再生 = true;
+						}
 
 						#endregion
 

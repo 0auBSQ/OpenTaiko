@@ -3,7 +3,7 @@ TJAPlayer3-Develop-ReWriteのフォーク, 太鼓の達人 ニジイロVerを切
 
 # In progress
 
-Ver. 0.3.4
+Ver. 0.3.4.1
 
 Will update this readme later.
 
@@ -26,7 +26,7 @@ Self-made assets will be distributed separately.
 ☐ Coin earning and change the save file format
 ☐ Implement 太鼓タワー charts (COURSE: 5) (Ex: https://www.youtube.com/watch?v=rtSe70X1QII)
 ☐ Multiple ingame backgrounds and 踊り子 sets (And the possibility to choose one on the TJA file, such as the Vocaloid one for Vocaloid maps)
-☐ Fix Mob animation within BPM changing maps
+☑ Fix Mob animation within BPM changing maps
 ☐ Fix Soul jauge while playing multiple branch songs
 ☐ Implement 2P results screen
 ☐ Find a way to calculate Speed up/down difficulty and adjust the menu preview song accordingly, Add the Song speed setting directly in the in-game menu

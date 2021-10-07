@@ -406,6 +406,7 @@ namespace TJAPlayer3
 			}
             #endregion
 
+            // Note
             if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
                 n良 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
@@ -3450,6 +3451,7 @@ namespace TJAPlayer3
                                     {
                                         this.actChara.ctChara_Normal[nPlayer] = new CCounter();
                                     }
+
                                     if (TJAPlayer3.Skin.Game_Chara_Ptn_Clear != 0)
                                     {
                                         double dbPtn_Clear = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Game_Chara_Beat_Clear / this.actChara.arクリアモーション番号.Length / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
@@ -3459,6 +3461,7 @@ namespace TJAPlayer3
                                     {
                                         this.actChara.ctChara_Clear[nPlayer] = new CCounter();
                                     }
+
                                     if (TJAPlayer3.Skin.Game_Chara_Ptn_GoGo != 0)
                                     {
                                         double dbPtn_GoGo = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Game_Chara_Beat_GoGo / this.actChara.arゴーゴーモーション番号.Length / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
@@ -3468,6 +3471,7 @@ namespace TJAPlayer3
                                     {
                                         this.actChara.ctChara_GoGo[nPlayer] = new CCounter();
                                     }
+
                                     if (TJAPlayer3.Skin.Game_Dancer_Ptn != 0)
                                     {
                                         double dbUnit_dancer = (((60 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM))) / this.actDancer.ar踊り子モーション番号.Length) / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
@@ -3477,6 +3481,7 @@ namespace TJAPlayer3
                                     {
                                         this.actDancer.ct踊り子モーション = new CCounter();
                                     }
+
                                     if (TJAPlayer3.Skin.Game_Mob_Ptn != 0 && TJAPlayer3.Skin.Game_Mob_Beat > 0 ) //2018.6.15 Game_Mob_Beatが0のままCCounter生成をされて無限ループが発生しないよう対策
                                     {
                                         this.actMob.ctMob = new CCounter(1, 180, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Beat / 180 / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0), CSound管理.rc演奏用タイマ);
@@ -3487,6 +3492,7 @@ namespace TJAPlayer3
                                         this.actMob.ctMob = new CCounter();
                                         this.actMob.ctMobPtn = new CCounter();
                                     }
+
                                     TJAPlayer3.stage演奏ドラム画面.PuchiChara.ChangeBPM(60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
                                 }
                                 if (!bPAUSE)//2020.07.08 Mr-Ojii KabanFriends氏のコードを参考に
@@ -3712,8 +3718,9 @@ namespace TJAPlayer3
                                 }
                                 if (TJAPlayer3.Skin.Game_Mob_Ptn != 0)
                                 {
+                                    this.actMob.ctMob = new CCounter(1, 180, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Beat / 180 / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0), CSound管理.rc演奏用タイマ);
                                     this.actMob.ctMobPtn = new CCounter(0, TJAPlayer3.Skin.Game_Mob_Ptn - 1, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Ptn_Beat / TJAPlayer3.Skin.Game_Mob_Ptn / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0), CSound管理.rc演奏用タイマ);
-                                    this.actMob.ctMobPtn = new CCounter(0, TJAPlayer3.Skin.Game_Mob_Ptn - 1, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Ptn_Beat / TJAPlayer3.Skin.Game_Mob_Ptn, CSound管理.rc演奏用タイマ);
+                                    // this.actMob.ctMobPtn = new CCounter(0, TJAPlayer3.Skin.Game_Mob_Ptn - 1, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Ptn_Beat / TJAPlayer3.Skin.Game_Mob_Ptn, CSound管理.rc演奏用タイマ);
                                 } else
                                 {
                                     this.actMob.ctMob = new CCounter();
