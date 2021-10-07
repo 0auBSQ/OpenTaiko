@@ -3,7 +3,7 @@ TJAPlayer3-Develop-ReWriteのフォーク, 太鼓の達人 ニジイロVerを切
 
 # In progress
 
-Ver. 0.3.4.1
+Ver. 0.3.4.2
 
 Will update this readme later.
 

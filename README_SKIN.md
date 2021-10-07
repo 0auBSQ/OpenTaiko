@@ -37,7 +37,7 @@ Sound/Result/RankIn.ogg => Sounds/ResultScreen/RankIn.ogg
 Sound/Result/Donchan/Donchan_Clear.ogg => Sounds/ResultScreen/Donchan_Clear.ogg
 Sound/Result/Donchan/Donchan_Miss.ogg => Sounds/ResultScreen/Donchan_Miss.ogg
 
-## Ver 0.4 ##
+## Ver 0.3.3 ##
 
 Sound/Dan/Dan_Result.ogg => Sounds/Dan/Dan_Result.ogg
 
@@ -71,7 +71,7 @@ Sounds/DiffSelect.ogg => Sounds/DiffSelect.ogg
 Sounds/SongDecide.ogg => Sounds/SongDecide.ogg
 ```
 
-## Fourth Step (Third booster) (From Ver 0.4 (DanichiDoujou update))
+## Fourth Step (Third booster) (From Ver 0.3.3 (DanichiDoujou update))
 
 - Download and extract BetterTaikoCatsCaffe from the https://tjadataba.se/shimyu/ website
 

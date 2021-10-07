@@ -19,6 +19,8 @@ namespace TJAPlayer3
             base.list子Activities.Add(this.actFOtoNowLoading = new CActFIFOStart());
             base.list子Activities.Add(this.段位挑戦選択画面 = new CActSelect段位挑戦選択画面());
             base.list子Activities.Add(this.actFOtoTitle = new CActFIFOBlack());
+
+            base.list子Activities.Add(this.PuchiChara = new PuchiChara());
         }
 
         public override void On活性化()
@@ -34,6 +36,8 @@ namespace TJAPlayer3
             ct待機 = new CCounter();
             ctDonchan_In = new CCounter();
             ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+
+            this.PuchiChara.IdleAnimation();
 
             base.On活性化();
         }
@@ -124,6 +128,12 @@ namespace TJAPlayer3
 
                     TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
                     TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
+
+                    #region [PuchiChara]
+
+                    this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+
+                    #endregion
                 }
 
                 #endregion
@@ -189,6 +199,8 @@ namespace TJAPlayer3
 
         private CCounter ctDonchan_In;
         private CCounter ctDonchan_Normal;
+
+        private PuchiChara PuchiChara;
 
         public E戻り値 eフェードアウト完了時の戻り値;
 
