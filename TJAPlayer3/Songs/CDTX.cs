@@ -776,7 +776,7 @@ namespace TJAPlayer3
             public int Difficulty;
             public static int Number = 0;
             public bool bTitleShow;
-            public Dan_C[] Dan_C = new Dan_C[4];
+            public Dan_C[] Dan_C = new Dan_C[CExamInfo.cMaxExam];
             public CWAV Wave;
 
             public DanSongs()
@@ -1438,7 +1438,7 @@ namespace TJAPlayer3
 #endif
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Change default culture to invariant, fixes (Purota)
-            Dan_C = new Dan_C[4];
+            Dan_C = new Dan_C[CExamInfo.cMaxExam];
             pDan_LastChip = new CChip[1];
             DanSongs.Number = 0;
         }
@@ -3021,7 +3021,7 @@ namespace TJAPlayer3
 
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
-             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
+             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
@@ -4676,7 +4676,10 @@ namespace TJAPlayer3
                 strCommandParam = strArray[1].Trim();
             }
 
-            if (strCommandName.Equals("EXAM1") || strCommandName.Equals("EXAM2") || strCommandName.Equals("EXAM3") || strCommandName.Equals("EXAM4"))
+            // Adapt to EXAM until 7, optimise condition
+
+            if (strCommandName.Equals("EXAM1") || strCommandName.Equals("EXAM2") || strCommandName.Equals("EXAM3") || strCommandName.Equals("EXAM4")
+                || strCommandName.Equals("EXAM5") || strCommandName.Equals("EXAM6") || strCommandName.Equals("EXAM7"))
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {

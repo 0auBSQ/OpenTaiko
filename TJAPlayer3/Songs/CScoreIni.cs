@@ -292,7 +292,7 @@ namespace TJAPlayer3
                 this.fゲージ = 0.0f;
 				this.nクリア = new int[5];
 				this.nスコアランク = new int[5];
-                Dan_C = new Dan_C[4];
+                Dan_C = new Dan_C[CExamInfo.cMaxExam];
 			}
 
 			public bool bフルコンボじゃない

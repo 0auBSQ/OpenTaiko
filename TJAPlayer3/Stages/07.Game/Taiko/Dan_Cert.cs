@@ -10,6 +10,16 @@ using System.Linq;
 
 namespace TJAPlayer3
 {
+    static internal class CExamInfo
+    {
+        // Includes the gauge exam, DanCert max number of exams is 6
+        public static readonly int cMaxExam = 7;
+
+        // Max number of songs for a Dan chart
+        public static readonly int cExamMaxSongs = 3;
+    }
+
+
     internal class Dan_Cert : CActivity
     {
         /// <summary>
@@ -21,7 +31,7 @@ namespace TJAPlayer3
         }
 
         //
-        Dan_C[] Challenge = new Dan_C[4];
+        Dan_C[] Challenge = new Dan_C[CExamInfo.cMaxExam];
         //
 
         public void Start(int number)
@@ -37,12 +47,12 @@ namespace TJAPlayer3
             }
             bExamChangeCheck = false;
 
-            if(number == 0)
+            if (number == 0)
             {
-                for (int i = 1; i < 4; i++)
+                for (int i = 1; i < CExamInfo.cMaxExam; i++)
                     ExamChange[i] = false;
 
-                for (int j = 1; j < 4; j++)  //段位条件のループ(魂ゲージを除く) 縦(y)
+                for (int j = 1; j < CExamInfo.cMaxExam; j++)  //段位条件のループ(魂ゲージを除く) 縦(y)
                 {
                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                     {
@@ -74,7 +84,7 @@ namespace TJAPlayer3
 
         public override void On活性化()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 if(TJAPlayer3.DTX.Dan_C[i] != null) Challenge[i] = new Dan_C(TJAPlayer3.DTX.Dan_C[i]);
 
@@ -92,19 +102,25 @@ namespace TJAPlayer3
 
             FirstSectionAnime = false;
             // 始点を決定する。
-            ExamCount = 0;
+            // ExamCount = 0;
+
             songsnotesremain = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
             this.ct虹アニメ = new CCounter(0, TJAPlayer3.Skin.Game_Gauge_Dan_Rainbow_Ptn - 1, 30, TJAPlayer3.Timer);
             this.ct虹透明度 = new CCounter(0, TJAPlayer3.Skin.Game_Gauge_Rainbow_Timer - 1, 1, TJAPlayer3.Timer);
-            for (int i = 0; i < 4; i++)
+
+
+            /*
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 if (Challenge[i] != null && Challenge[i].GetEnable() == true)
                     this.ExamCount++;
             }
+            */
+
             NowCymbolShowingNumber = 0;
             bExamChangeCheck = false;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 Status[i] = new ChallengeStatus();
                 Status[i].Timer_Amount = new CCounter();
@@ -120,9 +136,9 @@ namespace TJAPlayer3
 
         public void Update()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
-                if (Challenge[i] == null || !Challenge[i].GetEnable()) return;
+                if (Challenge[i] == null || !Challenge[i].GetEnable()) continue;
                 var oldReached = Challenge[i].GetReached();
                 var isChangedAmount = false;
                 switch (Challenge[i].GetExamType())
@@ -243,12 +259,12 @@ namespace TJAPlayer3
 
         public override void On非活性化()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 Challenge[i] = null;
             }
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 Status[i].Timer_Amount = null;
                 Status[i].Timer_Gauge = null;
@@ -319,7 +335,7 @@ namespace TJAPlayer3
                 Counter_Text_Old = Counter_Text.n現在の値;
             }
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 Status[i].Timer_Amount?.t進行();
             }
@@ -373,10 +389,10 @@ namespace TJAPlayer3
                         {
                             if (!bExamChangeCheck)
                             {
-                                for (int i = 1; i < 4; i++)
+                                for (int i = 0; i < CExamInfo.cMaxExam; i++)
                                     ExamChange[i] = false;
 
-                                for (int j = 1; j < 4; j++)  //段位条件のループ(魂ゲージを除く) 縦(y)
+                                for (int j = 0; j < CExamInfo.cMaxExam; j++)  // EXAM1 check for individual conditions added back, so gauge can be EXAM2, 5, 7 whatever
                                 {
                                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                                     {
@@ -446,433 +462,441 @@ namespace TJAPlayer3
 
         public void DrawExam(Dan_C[] dan_C)
         {
-            var count = 0;
-            for (int i = 0; i < 4; i++)
+            int count = 0;
+            int countNoGauge = 0;
+
+            // Count exams, both with and without gauge
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 if (dan_C[i] != null && dan_C[i].GetEnable() == true)
+                {
                     count++;
+                    if (dan_C[i].GetExamType() != Exam.Type.Gauge)
+                        countNoGauge++;
+                }
+                    
             }
-            for (int i = 0; i < count; i++)
+
+            // Bar position on the cert
+            int currentPosition = -1;
+
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
+                if (dan_C[i] == null || dan_C[i].GetEnable() != true)
+                    continue ;
+
                 if (dan_C[i].GetExamType() != Exam.Type.Gauge)
                 {
-                    #region ゲージの土台を描画する。
+                    currentPosition++;
 
-                    TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_X[count - 1], TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * i + (i * TJAPlayer3.Skin.Game_DanC_Padding), new RectangleF(0, ExamChange[i] ? 92 : 0, 1006, 92));
+                    // Determines if a small bar will be used to optimise the display layout
+                    bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition);
 
-                    for (int j = 1; j < 3; j++)
+                    // Y index of the gauge
+                    int yIndex = (currentPosition % 3) + 1;
+
+                    // Origin position which will be used as a reference for bar elements
+                    int barXOffset = TJAPlayer3.Skin.Game_DanC_X[1] + (currentPosition >= 3 ? 503 : 0);
+                    int barYOffset = TJAPlayer3.Skin.Game_DanC_Y[1] + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    int lowerBarYOffset = barYOffset + TJAPlayer3.Skin.Game_DanC_Size[1] + TJAPlayer3.Skin.Game_DanC_Padding;
+
+                    // Skin X : 70
+                    // Skin Y : 292
+
+                    #region [Gauge base]
+
+                    if (!isSmallGauge)
+                        TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 1006, 92));
+                    else
+                        TJAPlayer3.Tx.DanC_Base_Small?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 503, 92));
+
+                    #endregion
+
+                    #region [Counter wait variables]
+
+                    int counter800 = (Counter_Wait != null ? Counter_Wait.n現在の値 - 800 : 0);
+                    int counter255M255 = (Counter_Wait != null ? 255 - (Counter_Wait.n現在の値 - (800 - 255)) : 0);
+
+                    #endregion
+
+                    #region [Small bars]
+
+                    if (ExamChange[i] == true)
                     {
-                        if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i] != null)
+                        for (int j = 1; j < CExamInfo.cExamMaxSongs; j++)
                         {
-                            if (NowShowingNumber > j)
+
+                            if (!(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i] != null))
+                                continue;
+
+                            // rainbowBetterSuccess (bool) : is current minibar better success ? | drawGaugeTypetwo (int) : Gauge style [0,2]
+                            #region [Success type variables]
+        
+                            bool rainbowBetterSuccess = GetExamStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success 
+                                && GetExamConfirmStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
+
+                            int amountToPercent;
+                            int drawGaugeTypetwo = 0;
+
+                            if (!rainbowBetterSuccess)
                             {
-                                TJAPlayer3.Tx.DanC_SmallBase.Opacity = 255;
-                                TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = 255;
+                                amountToPercent = TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent();
+
+                                if (amountToPercent >= 100)
+                                    drawGaugeTypetwo = 2;
+                                else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetExamRange() == Exam.Range.More && amountToPercent >= 70 || amountToPercent > 70)
+                                    drawGaugeTypetwo = 1;
                             }
 
+                            #endregion
+
+                            // Small bar elements base opacity
+                            #region [Default opacity]
+
+                            TJAPlayer3.Tx.DanC_SmallBase.Opacity = 255;
+                            TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = 255;
+
+                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = 255;
+                            TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 255;
+
+                            TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = 255;
+
+                            #endregion
+
+                            // Currently showing song parameters
                             if (NowShowingNumber == j)
                             {
                                 if (Counter_Wait != null && Counter_Wait.n現在の値 >= 800)
                                 {
-                                    TJAPlayer3.Tx.DanC_SmallBase.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = (Counter_Wait.n現在の値 - 800);
+                                    #region [counter800 opacity]
+
+                                    TJAPlayer3.Tx.DanC_SmallBase.Opacity = counter800;
+                                    TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = counter800;
+
+                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = counter800;
+                                    TJAPlayer3.Tx.DanC_MiniNumber.Opacity = counter800;
+
+                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = counter800;
+
+                                    #endregion
                                 }
-                                else
+                                else if (Counter_In != null || (Counter_Wait != null && Counter_Wait.n現在の値 < 800))
                                 {
-                                    if (Counter_In != null || (Counter_Wait != null && Counter_Wait.n現在の値 < 800))
-                                    {
-                                        TJAPlayer3.Tx.DanC_SmallBase.Opacity = 0;
-                                        TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = 0;
-                                    }
-                                    else
-                                    {
-                                        TJAPlayer3.Tx.DanC_SmallBase.Opacity = 255;
-                                        TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = 255;
-                                    }
+                                    #region [0 opacity]
+
+                                    TJAPlayer3.Tx.DanC_SmallBase.Opacity = 0;
+                                    TJAPlayer3.Tx.DanC_Small_ExamCymbol.Opacity = 0;
+
+                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = 0;
+                                    TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 0;
+
+                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = 0;
+
+                                    #endregion
                                 }
                             }
 
+                            // Bars starting from the song N
                             if (NowShowingNumber >= j)
                             {
-                                TJAPlayer3.Tx.DanC_SmallBase?.t2D描画(TJAPlayer3.app.Device, 815, 613 + (j - 1) * 33);
-                                TJAPlayer3.Tx.DanC_Small_ExamCymbol?.t2D描画(TJAPlayer3.app.Device, 785, 610 + (j - 1) * 33, new RectangleF(0, (j - 1) * 28, 30, 28));
+                                // Determine bars width
+                                TJAPlayer3.Tx.DanC_SmallBase.vc拡大縮小倍率.X = isSmallGauge ? 0.34f : 1f;
+
+                                // 815 : Small base (70 + 745)
+                                int miniBarPositionX = barXOffset + (isSmallGauge ? 410 : 745);
+
+                                // 613 + (j - 1) * 33 : Small base (barYoffset for 3rd exam : 494 + 119 + Local song offset (j - 1) * 33)
+                                int miniBarPositionY = (barYOffset + 119) + (j - 1) * 33 - (TJAPlayer3.Skin.Game_DanC_Size[1] + (TJAPlayer3.Skin.Game_DanC_Padding));
+
+                                // Display bars
+                                #region [Displayables]
+
+                                // Display mini-bar base and small symbol
+                                TJAPlayer3.Tx.DanC_SmallBase?.t2D描画(TJAPlayer3.app.Device, miniBarPositionX, miniBarPositionY);
+                                TJAPlayer3.Tx.DanC_Small_ExamCymbol?.t2D描画(TJAPlayer3.app.Device, miniBarPositionX - 30, miniBarPositionY - 3, new RectangleF(0, (j - 1) * 28, 30, 28));
+
+                                // Display bar content
+                                if (rainbowBetterSuccess)
+                                {
+                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.X = 0.23875f * TJAPlayer3.Tx.DanC_SmallBase.vc拡大縮小倍率.X * (isSmallGauge ? 0.94f : 1f);
+                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.Y = 0.35185f;
+
+                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0]?.t2D描画(TJAPlayer3.app.Device, miniBarPositionX + 3, miniBarPositionY + 2,
+                                        new Rectangle(0, 0, (int)(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].szテクスチャサイズ.Height));
+                                }
+                                else
+                                {
+                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].vc拡大縮小倍率.X = 0.23875f * TJAPlayer3.Tx.DanC_SmallBase.vc拡大縮小倍率.X * (isSmallGauge ? 0.94f : 1f);
+                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].vc拡大縮小倍率.Y = 0.35185f;
+
+                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo]?.t2D描画(TJAPlayer3.app.Device, miniBarPositionX + 3, miniBarPositionY + 2,
+                                        new Rectangle(0, 0, (int)(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Height));
+                                }
+
+                                // Usually +23 for gold and +17 for white, to test
+                                DrawMiniNumber(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmount(), miniBarPositionX + 11, miniBarPositionY + 20, 14, TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
+
+                                #endregion
                             }
                         }
                     }
 
                     #endregion
 
-                    #region ゲージを描画する。
+                    #region [Currently playing song icons]
 
-                    #region ゲージ横のシンボル描画しようぜ。
+                    TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = 255;
 
                     if (ExamChange[i] && NowShowingNumber != 0)
                     {
                         if (Counter_Wait != null)
                         {
                             if (Counter_Wait.n現在の値 >= 800)
-                            {
-                                TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = (Counter_Wait.n現在の値 - 800);
-                            }
+                                TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = counter800;
                             else if (Counter_Wait.n現在の値 >= 800 - 255)
-                            {
-                                TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                            }
+                                TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = counter255M255;
                         }
-                        else
-                        {
-                            TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = 255;
-                        }
-                    }
-                    else
-                    {
-                        TJAPlayer3.Tx.DanC_ExamCymbol.Opacity = 255;
                     }
 
                     //75, 418
+                    // 292 - 228 = 64
                     if (ExamChange[i])
                     {
-                        TJAPlayer3.Tx.DanC_ExamCymbol.t2D描画(TJAPlayer3.app.Device, 75, 428 + (i - 1) * 100, new RectangleF(0, 41 * NowCymbolShowingNumber, 197, 41));
+                        TJAPlayer3.Tx.DanC_ExamCymbol.t2D描画(TJAPlayer3.app.Device, barXOffset + 5, lowerBarYOffset - 64, new RectangleF(0, 41 * NowCymbolShowingNumber, 197, 41));
                     }
 
                     #endregion
 
-                    for (int j = 1; j < 3; j++)
+                    #region [Large bars]
+
+                    // LrainbowBetterSuccess (bool) : is current minibar better success ? | LdrawGaugeTypetwo (int) : Gauge style [0,2]
+                    #region [Success type variables]
+
+                    bool LrainbowBetterSuccess = GetExamStatus(dan_C[i]) == Exam.Status.Better_Success && GetExamConfirmStatus(dan_C[i]);
+
+                    int LamountToPercent;
+                    int LdrawGaugeTypetwo = 0;
+
+                    if (!LrainbowBetterSuccess)
                     {
-                        if(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i] != null)
-                        {
-                            if (GetExamStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success && GetExamConfirmStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]))
-                            {
-                                if (NowShowingNumber > j)
-                                {
-                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = 255;
-                                    TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 255;
-                                }
+                        LamountToPercent = dan_C[i].GetAmountToPercent();
 
-                                if (NowShowingNumber == j)
-                                {
-                                    if (Counter_Wait != null && Counter_Wait.n現在の値 >= 800)
-                                    {
-                                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = (Counter_Wait.n現在の値 - 800);
-                                        TJAPlayer3.Tx.DanC_MiniNumber.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    }
-                                    else
-                                    {
-                                        if (Counter_In != null || (Counter_Wait != null && Counter_Wait.n現在の値 < 800))
-                                        {
-                                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = 0;
-                                            TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 0;
-                                        }
-                                        else
-                                        {
-                                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].Opacity = 255;
-                                            TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 255;
-                                        }
-                                    }
-                                }
-
-                                if (NowShowingNumber >= j)
-                                {
-                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.X = 0.23875f;
-                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.Y = 0.35185f;
-
-                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[0]?.t2D描画(TJAPlayer3.app.Device, 818, 615 + (j - 1) * 33,
-                                        new Rectangle(0, 0, (int)(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].szテクスチャサイズ.Height));
-
-                                    DrawMiniNumber(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmount(), 826, 636 + (j - 1) * 33, 14, TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
-                                }
-                            }
-                            else
-                            {
-                                if (NowShowingNumber > j)
-                                {
-                                    for (int l = 0; l < TJAPlayer3.Tx.DanC_Gauge.Length; l++)
-                                        TJAPlayer3.Tx.DanC_Gauge[l].Opacity = 255;
-
-                                    TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 255;
-                                }
-
-                                if (NowShowingNumber == j)
-                                {
-                                    if (Counter_Wait != null && Counter_Wait.n現在の値 >= 800)
-                                    {
-                                        for (int l = 0; l < TJAPlayer3.Tx.DanC_Gauge.Length; l++)
-                                            TJAPlayer3.Tx.DanC_Gauge[l].Opacity = (Counter_Wait.n現在の値 - 800);
-
-                                        TJAPlayer3.Tx.DanC_MiniNumber.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    }
-                                    else
-                                    {
-                                        if (Counter_In != null || (Counter_Wait != null && Counter_Wait.n現在の値 < 800))
-                                        {
-                                            for (int l = 0; l < TJAPlayer3.Tx.DanC_Gauge.Length; l++)
-                                                TJAPlayer3.Tx.DanC_Gauge[l].Opacity = 0;
-
-                                            TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 0;
-                                        }
-                                        else
-                                        {
-                                            for (int l = 0; l < TJAPlayer3.Tx.DanC_Gauge.Length; l++)
-                                                TJAPlayer3.Tx.DanC_Gauge[l].Opacity = 255;
-
-                                            TJAPlayer3.Tx.DanC_MiniNumber.Opacity = 255;
-                                        }
-                                    }
-                                }
-
-                                if (NowShowingNumber >= j)
-                                {
-                                    var drawGaugeTypetwo = 0;
-                                    if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetExamRange() == Exam.Range.More)
-                                    {
-                                        if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() >= 100)
-                                            drawGaugeTypetwo = 2;
-                                        else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() >= 70)
-                                            drawGaugeTypetwo = 1;
-                                        else
-                                            drawGaugeTypetwo = 0;
-                                    }
-                                    else
-                                    {
-                                        if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() >= 100)
-                                            drawGaugeTypetwo = 2;
-                                        else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() > 70)
-                                            drawGaugeTypetwo = 1;
-                                        else
-                                            drawGaugeTypetwo = 0;
-                                    }
-
-                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].vc拡大縮小倍率.X = 0.23875f;
-                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].vc拡大縮小倍率.Y = 0.35185f;
-                                    TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo]?.t2D描画(TJAPlayer3.app.Device, 818, 615 + (j - 1) * 33, new Rectangle(0, 0, (int)(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Height));
-
-                                    DrawMiniNumber(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmount(), 826, 630 + (j - 1) * 33, 14, TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
-                                }
-                            }
-                        }
+                        if (LamountToPercent >= 100)
+                            LdrawGaugeTypetwo = 2;
+                        else if (dan_C[i].GetExamRange() == Exam.Range.More && LamountToPercent >= 70 || LamountToPercent > 70)
+                            LdrawGaugeTypetwo = 1;
                     }
 
-                    if (GetExamStatus(dan_C[i]) == Exam.Status.Better_Success && GetExamConfirmStatus(dan_C[i]))
+
+
+                    #endregion
+
+                    // rainbowIndex : Rainbow bar texture to display (int), rainbowBase : same as rainbowIndex, but 0 if the counter is maxed
+                    #region [Rainbow gauge counter]
+
+                    int rainbowIndex = 0;
+                    int rainbowBase = 0;
+                    if (LrainbowBetterSuccess)
                     {
-                        if (ExamChange[i] && NowShowingNumber != 0)
-                        {
-                            if (Counter_Wait != null)
-                            {
-                                if (Counter_Wait.n現在の値 >= 800)
-                                {
-                                    for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                        TJAPlayer3.Tx.DanC_Gauge[j].Opacity = (Counter_Wait.n現在の値 - 800);
-
-                                    for (int j = 0; j < TJAPlayer3.Tx.Gauge_Dan_Rainbow.Length; j++)
-                                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[j].Opacity = (Counter_Wait.n現在の値 - 800);
-
-                                    TJAPlayer3.Tx.DanC_Number.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    TJAPlayer3.Tx.DanC_ExamRange.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    TJAPlayer3.Tx.DanC_Small_Number.Opacity = (Counter_Wait.n現在の値 - 800);
-                                }
-                                else if (Counter_Wait.n現在の値 >= 800 - 255)
-                                {
-                                    for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                        TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-
-                                    for (int j = 0; j < TJAPlayer3.Tx.Gauge_Dan_Rainbow.Length; j++)
-                                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[j].Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-
-                                    TJAPlayer3.Tx.DanC_Number.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                    TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                    TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                }
-                            }
-                            else
-                            {
-                                for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                    TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255;
-
-                                for (int j = 0; j < TJAPlayer3.Tx.Gauge_Dan_Rainbow.Length; j++)
-                                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[j].Opacity = 255;
-
-                                TJAPlayer3.Tx.DanC_Number.Opacity = 255;
-                                TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255;
-                                TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255;
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255;
-
-                            for (int j = 0; j < TJAPlayer3.Tx.Gauge_Dan_Rainbow.Length; j++)
-                                TJAPlayer3.Tx.Gauge_Dan_Rainbow[j].Opacity = 255;
-
-                            TJAPlayer3.Tx.DanC_Number.Opacity = 255;
-                            TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255;
-                            TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255;
-                        }
-
                         this.ct虹アニメ.t進行Loop();
                         this.ct虹透明度.t進行Loop();
 
-                        int 虹ベース = ct虹アニメ.n現在の値;
-                        if (虹ベース == ct虹アニメ.n終了値) 虹ベース = 0;
+                        rainbowIndex = this.ct虹アニメ.n現在の値;
 
-                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値].vc拡大縮小倍率.X = ExamChange[i] ? 0.663333333f : 1.0f;
-                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.X = ExamChange[i] ? 0.663333333f : 1.0f;
+                        rainbowBase = rainbowIndex;
+                        if (rainbowBase == ct虹アニメ.n終了値) rainbowBase = 0;
+                    }
+
+                    #endregion
+
+                    #region [Default opacity]
+
+                    TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = 255;
+
+                    TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = 255;
+
+                    TJAPlayer3.Tx.DanC_Number.Opacity = 255;
+                    TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255;
+                    TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255;
+
+                    #endregion
+
+                    if (ExamChange[i] && NowShowingNumber != 0 && Counter_Wait != null)
+                    {
+                        if (Counter_Wait.n現在の値 >= 800)
+                        {
+                            #region [counter800 opacity]
+
+                            TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = counter800;
+
+                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = counter800;
+
+                            TJAPlayer3.Tx.DanC_Number.Opacity = counter800;
+                            TJAPlayer3.Tx.DanC_ExamRange.Opacity = counter800;
+                            TJAPlayer3.Tx.DanC_Small_Number.Opacity = counter800;
+
+                            #endregion
+                        }
+                        else if (Counter_Wait.n現在の値 >= 800 - 255)
+                        {
+                            #region [counter255M255 opacity]
+
+                            TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = counter255M255;
+
+                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = counter255M255;
+
+                            TJAPlayer3.Tx.DanC_Number.Opacity = counter255M255;
+                            TJAPlayer3.Tx.DanC_ExamRange.Opacity = counter255M255;
+                            TJAPlayer3.Tx.DanC_Small_Number.Opacity = counter255M255;
+
+                            #endregion
+                        }
+                    }
+
+                    #region [Displayables]
+
+                    // Non individual : 209 / 650 : 0.32154f
+                    // Individual : 97 / 432 : 0.22454f
+
+                    float xExtend = ExamChange[i] ? (isSmallGauge ? 0.215f * 0.663333333f : 0.663333333f) : (isSmallGauge ? 0.32154f : 1.0f);
+
+                    if (LrainbowBetterSuccess)
+                    {
+                        #region [Rainbow gauge display]
+
+                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].vc拡大縮小倍率.X = xExtend;
+
+                        // Reset base since it was used for minibars
+                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.X = xExtend;
                         TJAPlayer3.Tx.Gauge_Dan_Rainbow[0].vc拡大縮小倍率.Y = 1.0f;
 
                         if (Counter_Wait != null && !(Counter_Wait.n現在の値 <= 1055 && Counter_Wait.n現在の値 >= 800 - 255))
                         {
-                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値].Opacity = 255;
+                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = 255;
                         }
-                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
-                            TJAPlayer3.Skin.Game_DanC_X[count - 1] + TJAPlayer3.Skin.Game_DanC_Offset[0], TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Offset[1],
-                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height));
+
+                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                            barXOffset + TJAPlayer3.Skin.Game_DanC_Offset[0], lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Offset[1],
+                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].szテクスチャサイズ.Height));
 
                         if (Counter_Wait != null && !(Counter_Wait.n現在の値 <= 1055 && Counter_Wait.n現在の値 >= 800 - 255))
                         {
-                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[虹ベース].Opacity = (ct虹透明度.n現在の値 * 255 / (int)ct虹透明度.n終了値) / 1;
+                            TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowBase].Opacity = (ct虹透明度.n現在の値 * 255 / (int)ct虹透明度.n終了値) / 1;
                         }
 
-                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[虹ベース]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
-                            TJAPlayer3.Skin.Game_DanC_X[count - 1] + TJAPlayer3.Skin.Game_DanC_Offset[0], TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Offset[1],
-                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[虹ベース].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height));
+                        TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowBase]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                            barXOffset + TJAPlayer3.Skin.Game_DanC_Offset[0], lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Offset[1],
+                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowBase].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.Gauge_Dan_Rainbow[rainbowIndex].szテクスチャサイズ.Height));
 
+                        #endregion
                     }
                     else
                     {
-                        if(ExamChange[i] && NowShowingNumber != 0)
-                        {
-                            if (Counter_Wait != null)
-                            {
-                                if (Counter_Wait.n現在の値 >= 800)
-                                {
-                                    for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                        TJAPlayer3.Tx.DanC_Gauge[j].Opacity = (Counter_Wait.n現在の値 - 800);
+                        #region [Regular gauge display]
 
-                                    TJAPlayer3.Tx.DanC_Number.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    TJAPlayer3.Tx.DanC_ExamRange.Opacity = (Counter_Wait.n現在の値 - 800);
-                                    TJAPlayer3.Tx.DanC_Small_Number.Opacity = (Counter_Wait.n現在の値 - 800);
-                                }
-                                else if (Counter_Wait.n現在の値 >= 800 - 255)
-                                {
-                                    for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                        TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
+                        TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].vc拡大縮小倍率.X = xExtend;
+                        TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].vc拡大縮小倍率.Y = 1.0f;
+                        TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                            barXOffset + TJAPlayer3.Skin.Game_DanC_Offset[0], lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Offset[1],
+                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.DanC_Gauge[LdrawGaugeTypetwo].szテクスチャサイズ.Height));
 
-                                    TJAPlayer3.Tx.DanC_Number.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                    TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                    TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255 - (Counter_Wait.n現在の値 - (800 - 255));
-                                }
-                            }
-                            else
-                            {
-                                for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                    TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255;
-
-                                TJAPlayer3.Tx.DanC_Number.Opacity = 255;
-                                TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255;
-                                TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255;
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < TJAPlayer3.Tx.DanC_Gauge.Length; j++)
-                                TJAPlayer3.Tx.DanC_Gauge[j].Opacity = 255;
-
-                            TJAPlayer3.Tx.DanC_Number.Opacity = 255;
-                            TJAPlayer3.Tx.DanC_ExamRange.Opacity = 255;
-                            TJAPlayer3.Tx.DanC_Small_Number.Opacity = 255;
-                        }
-
-                        var drawGaugeType = 0;
-                        if (dan_C[i].GetExamRange() == Exam.Range.More)
-                        {
-                            if (dan_C[i].GetAmountToPercent() >= 100)
-                                drawGaugeType = 2;
-                            else if (dan_C[i].GetAmountToPercent() >= 70)
-                                drawGaugeType = 1;
-                            else
-                                drawGaugeType = 0;
-                        }
-                        else
-                        {
-                            if (dan_C[i].GetAmountToPercent() >= 100)
-                                drawGaugeType = 2;
-                            else if (dan_C[i].GetAmountToPercent() > 70)
-                                drawGaugeType = 1;
-                            else
-                                drawGaugeType = 0;
-                        }
-                        TJAPlayer3.Tx.DanC_Gauge[drawGaugeType].vc拡大縮小倍率.X = ExamChange[i] ? 0.663333333f : 1.0f;
-                        TJAPlayer3.Tx.DanC_Gauge[drawGaugeType].vc拡大縮小倍率.Y = 1.0f;
-                        TJAPlayer3.Tx.DanC_Gauge[drawGaugeType]?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
-                            TJAPlayer3.Skin.Game_DanC_X[count - 1] + TJAPlayer3.Skin.Game_DanC_Offset[0], TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Offset[1],
-                            new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.DanC_Gauge[drawGaugeType].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.DanC_Gauge[drawGaugeType].szテクスチャサイズ.Height));
-                        
+                        #endregion
                     }
 
                     #endregion
 
-                    #region 現在の値を描画する。
-                    var nowAmount = 0;
+
+                    #endregion
+
+                    #region [Print the current value number]
+
+                    int nowAmount = dan_C[i].Amount;
+
                     if (dan_C[i].GetExamRange() == Exam.Range.Less)
-                    {
                         nowAmount = dan_C[i].Value[0] - dan_C[i].Amount;
-                    }
-                    else
-                    {
-                        nowAmount = dan_C[i].Amount;
-                    }
+
                     if (nowAmount < 0) nowAmount = 0;
 
-                    DrawNumber(nowAmount, 
-                        TJAPlayer3.Skin.Game_DanC_X[count - 1] + TJAPlayer3.Skin.Game_DanC_Number_Small_Number_Offset[0], 
-                        TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Number_Small_Number_Offset[1],
-                        TJAPlayer3.Skin.Game_DanC_Number_Padding, 
+                    float numberXScale = isSmallGauge ? TJAPlayer3.Skin.Game_DanC_Number_Small_Scale * 0.6f : TJAPlayer3.Skin.Game_DanC_Number_Small_Scale;
+                    float numberYScale = isSmallGauge ? TJAPlayer3.Skin.Game_DanC_Number_Small_Scale * 0.8f : TJAPlayer3.Skin.Game_DanC_Number_Small_Scale;
+                    int numberPadding = (int)(TJAPlayer3.Skin.Game_DanC_Number_Padding * (isSmallGauge ? 0.6f : 1f));
+
+                    DrawNumber(nowAmount,
+                        barXOffset + TJAPlayer3.Skin.Game_DanC_Number_Small_Number_Offset[0],
+                        lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Number_Small_Number_Offset[1],
+                        numberPadding, 
                         true, 
                         Challenge[i], 
-                        TJAPlayer3.Skin.Game_DanC_Number_Small_Scale, 
-                        TJAPlayer3.Skin.Game_DanC_Number_Small_Scale, 
+                        numberXScale, 
+                        numberYScale, 
                         (Status[i].Timer_Amount != null ? ScoreScale[Status[i].Timer_Amount.n現在の値] : 0f));
 
                     #endregion
 
-                    #region 条件の文字を描画する。
-                    var offset = TJAPlayer3.Skin.Game_DanC_Exam_Offset[0];
-                    //offset -= CDTXMania.Skin.Game_DanC_ExamRange_Padding;
-                    // 条件の範囲
+                    #region [Dan conditions display]
+
+                    int offset = TJAPlayer3.Skin.Game_DanC_Exam_Offset[0];
+
                     TJAPlayer3.Tx.DanC_ExamType.vc拡大縮小倍率.X = 1.0f;
                     TJAPlayer3.Tx.DanC_ExamType.vc拡大縮小倍率.Y = 1.0f;
 
-                    TJAPlayer3.Tx.DanC_ExamRange?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_X[count - 1] + offset - TJAPlayer3.Tx.DanC_ExamRange.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1], new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamRange_Size[1] * (int)dan_C[i].GetExamRange(), TJAPlayer3.Skin.Game_DanC_ExamRange_Size[0], TJAPlayer3.Skin.Game_DanC_ExamRange_Size[1]));
-                    //offset -= CDTXMania.Skin.Game_DanC_ExamRange_Padding;
+                    // Exam range (Less than/More)
+                    TJAPlayer3.Tx.DanC_ExamRange?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                        barXOffset + offset - TJAPlayer3.Tx.DanC_ExamRange.szテクスチャサイズ.Width,
+                        lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1], 
+                        new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamRange_Size[1] * (int)dan_C[i].GetExamRange(), TJAPlayer3.Skin.Game_DanC_ExamRange_Size[0], TJAPlayer3.Skin.Game_DanC_ExamRange_Size[1]));
+                    
                     offset -= TJAPlayer3.Skin.Game_DanC_ExamRange_Padding;
 
-                    // 条件の数字
+                    // Condition number
                     DrawNumber(
-                        dan_C[i].Value[0], 
-                        TJAPlayer3.Skin.Game_DanC_X[count - 1] + offset - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale), 
-                        TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 1, 
+                        dan_C[i].Value[0],
+                        barXOffset + offset - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
+                        lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 1, 
                         (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale), 
                         false, 
                         Challenge[i]);
 
-                    //offset -= CDTXMania.Skin.Game_DanC_Number_Small_Padding * (dan_C[i].Value[0].ToString().Length + 1);
-                    offset -= TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * (dan_C[i].Value[0].ToString().Length);
 
-                    // 条件の種類
-                    TJAPlayer3.Tx.DanC_ExamType?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_X[1] + TJAPlayer3.Skin.Game_DanC_Exam_Offset[0] - TJAPlayer3.Tx.DanC_ExamType.szテクスチャサイズ.Width + 22, TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 48, new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[1] * (int)dan_C[i].GetExamType(), TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
+                    // Exam type flag
+                    TJAPlayer3.Tx.DanC_ExamType?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                        barXOffset + TJAPlayer3.Skin.Game_DanC_Exam_Offset[0] - TJAPlayer3.Tx.DanC_ExamType.szテクスチャサイズ.Width + 22,
+                        lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 48, 
+                        new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[1] * (int)dan_C[i].GetExamType(), TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
+
                     #endregion
 
-                    #region 条件達成失敗の画像を描画する。
+                    #region [Failed condition box]
+
+                    TJAPlayer3.Tx.DanC_Failed.vc拡大縮小倍率.X = isSmallGauge ? 0.33f : 1f;
+
                     if (dan_C[i].GetReached())
                     {
-                        TJAPlayer3.Tx.DanC_Failed.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_X[count - 1] + TJAPlayer3.Skin.Game_DanC_Offset[0], TJAPlayer3.Skin.Game_DanC_Y[count - 1] + TJAPlayer3.Skin.Game_DanC_Size[1] * (i + 1) + ((i + 1) * TJAPlayer3.Skin.Game_DanC_Padding) - TJAPlayer3.Skin.Game_DanC_Offset[1]);
+                        TJAPlayer3.Tx.DanC_Failed.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                            barXOffset + TJAPlayer3.Skin.Game_DanC_Offset[0],
+                            lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Offset[1]);
                     }
+
                     #endregion
+                
                 }
                 else
                 {
-                    #region ゲージの土台を描画する。
-                    TJAPlayer3.Tx.DanC_Gauge_Base?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 4, TJAPlayer3.Skin.Game_DanC_Y[0] + TJAPlayer3.Skin.Game_DanC_Size[1] * i + (i * TJAPlayer3.Skin.Game_DanC_Padding));
+                    #region [Gauge dan condition]
+
+                    TJAPlayer3.Tx.DanC_Gauge_Base?.t2D描画(TJAPlayer3.app.Device, 
+                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 4, 
+                        TJAPlayer3.Skin.Game_DanC_Y[0]);
+
+                    // Display percentage here
+                    DrawNumber(
+                        dan_C[i].Value[0],
+                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 292 - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
+                        TJAPlayer3.Skin.Game_DanC_Y[0] - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] + 64,
+                        (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
+                        false,
+                        Challenge[i]);
+
                     #endregion
                 }
             }
@@ -943,8 +967,10 @@ namespace TJAPlayer3
         public bool GetFailedAllChallenges()
         {
             var isFailed = false;
-            for (int i = 0; i < this.ExamCount; i++)
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
+                if (Challenge[i] == null) continue;
+                
                 for(int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; j++ )
                 {
                     if(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j].Dan_C[i] != null)
@@ -965,20 +991,16 @@ namespace TJAPlayer3
         public Exam.Status GetExamStatus(Dan_C[] dan_C)
         {
             var status = Exam.Status.Better_Success;
-            var count = 0;
-            for (int i = 0; i < 4; i++)
+            
+            for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
-                if (dan_C[i] != null && dan_C[i].GetEnable() == true)
-                    count++;
-            }
-            for (int i = 0; i < count; i++)
-            {
+                if (dan_C[i] == null || dan_C[i].GetEnable() != true)
+                    continue;
+
                 if (!dan_C[i].GetCleared()[1]) status = Exam.Status.Success;
+                if (!dan_C[i].GetCleared()[0]) return (Exam.Status.Failure);
             }
-            for (int i = 0; i < count; i++)
-            {
-                if (!dan_C[i].GetCleared()[0]) status = Exam.Status.Failure;
-            }
+
             return status;
         }
 
@@ -1050,9 +1072,9 @@ namespace TJAPlayer3
         private bool bExamChangeCheck;
         private int notesremain;
         private int[] songsnotesremain;
-        private bool[] ExamChange = new bool[4];
+        private bool[] ExamChange = new bool[CExamInfo.cMaxExam];
         private int ExamCount;
-        private ChallengeStatus[] Status = new ChallengeStatus[4];
+        private ChallengeStatus[] Status = new ChallengeStatus[CExamInfo.cMaxExam];
         private CTexture Dan_Plate;
         private bool[] IsEnded;
         public bool FirstSectionAnime;
