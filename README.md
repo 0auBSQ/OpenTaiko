@@ -1,33 +1,115 @@
 # TJAPlayer3-Develop-BSQ
-TJAPlayer3-Develop-ReWriteのフォーク, 太鼓の達人 ニジイロVerを切っ掛けに開発したシミュレーター
+TJAPlayer3-Develop-ReWrite-1のフォーク, 太鼓の達人 ニジイロVerを切っ掛けに開発したシミュレーター
 
-# In progress
+(English version coming soon)
 
-Ver. 0.3.4.2
+- 現在の版： v0.4.0
 
-Will update this readme later.
+## 予告情報 （重要）
 
-This Taiko no Tatsujin simulator is a touhourenren's TJAPlayer3-Develop-ReWrite fork, fixing multiple bugs and adding multiple features to make it closer than the arcade Nijiiro version and planning to add various original features later (Like PS2 Taiko Towers type charts handling, an adventure/story mode, a way to unlock puchicharas/charts with coins earned after each play and so on)
+このプログラムはまだスキンを含みません。
 
-I can't share the skin for obvious reasons (Wouldn't take the risk of getting sued lol)
+訴えを全く避けるためにデフォルトスキンを作る予定でございます。
 
-But you can reconstitute the skin yourself following the `README_SKIN.md` guide.
+それまでニジイロスキンが希望なら僕のDiscordでご連絡ください：
 
-(`README_SKIN.md` guide will be updated at each skin update, please take a look at it each time you download an update to be sure you don't miss any required asset)
+- 申しコミ#5734 （日本語・英語・仏語可）
 
-Self-made assets will be distributed separately.
+Discord以外で配布しておりません。
 
-# Short term To-Do List
+## 更新記録
 
+<details>
+	<summary>v0.4.0</summary>
+	
+	- EXAM5,6,7の実装 (下記の映像をご覧ください)
+	
+	- EXAM数にギャップのあるクラッシュ場面を修正
+	
+	- Danに関してコードの構造を改善（コード蓄積の修正）
+  
+  ![selected_item](https://user-images.githubusercontent.com/58159635/136692306-c429680c-881d-44f8-9c9f-69882f25fda5.png)
+	
+</details>
+
+<details>
+	<summary>v0.3.4.2</summary>
+	
+	- 段位道場選曲画面にプチキャラを追加
+	
+</details>
+
+<details>
+	<summary>v0.3.4.1</summary>
+	
+	- Mobアニメーション速度の変化バグを修正
+	
+</details>
+
+<details>
+	<summary>v0.3.4</summary>
+	
+	- 段位道場の結果を保存を可能にする機能を実装
+	
+	- 段位道場選曲画面に合格プレートを表示
+	
+</details>
+
+<details>
+	<summary>v0.3.3</summary>
+	
+	- 段位道場の魂ゲージの表示を修正
+	
+	- 段位道場の結果画面の基盤を実装（まだ実装中）
+	
+</details>
+
+<details>
+	<summary>v0.3.2</summary>
+	
+	- 演奏セーブの重ね書きバグを修正
+	
+</details>
+
+<details>
+	<summary>v0.3.1</summary>
+	
+	- P2にスコアランクを表示されないバグを修正
+	
+</details>
+
+<details>
+	<summary>v0.3.0</summary>
+	
+	- メニュにプチキャラを表示
+	
+	- Nameplate.jsonファイルにプレイヤー別々のプチキャラを選べる可能にする機能を実装
+	
+</details>
+
+<details>
+	<summary>v0.2.0</summary>
+	
+	- 様々な演奏選曲画面のバグを修正
+	
+	- メインメニュに様々なバグを修正、コード蓄積を修正
+	
+</details>
+
+<details>
+	<summary>v0.1.0</summary>
+	
+	- 演奏結果画面のアニメーションを実装
+	
+</details>
+
+# 短期で実装する予定機能
 ```
-☐ Implement 段位道場 results screen
-☑ Implement 段位道場 ini save file
-☑ Implement プチチャラ on menus 
-☐ Coin earning and change the save file format
-☐ Implement 太鼓タワー charts (COURSE: 5) (Ex: https://www.youtube.com/watch?v=rtSe70X1QII)
-☐ Multiple ingame backgrounds and 踊り子 sets (And the possibility to choose one on the TJA file, such as the Vocaloid one for Vocaloid maps)
-☑ Fix Mob animation within BPM changing maps
-☐ Fix Soul jauge while playing multiple branch songs
-☐ Implement 2P results screen
-☐ Find a way to calculate Speed up/down difficulty and adjust the menu preview song accordingly, Add the Song speed setting directly in the in-game menu
+☐ 段位道場結果画面を実装し切る
+☐ コイン（ドンメダル）を貯蓄可能にする機能を実装＋ドンメダル商店
+☐ PS2の太鼓タワーを実装し切る (COURSE: 5) (Ex: https://www.youtube.com/watch?v=rtSe70X1QII)
+☐ 複数な背景と踊り子セットを選べる機能を実装
+☐ ２P結果画面を実装
+☐ プログラムの性能を改善、メモリリークを修正
+☐ 段位道場で４曲以上連続でやれる機能を実装
 ```
