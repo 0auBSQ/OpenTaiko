@@ -134,6 +134,8 @@ namespace TJAPlayer3
             return 0;
         }
 
+        #region [private]
+
         private CCounter ctExamConditionsAnim;
 
         private bool DaniInAnime;
@@ -386,5 +388,9 @@ namespace TJAPlayer3
                 }
             }
         }
+
+        #endregion
+
     }
+
 }

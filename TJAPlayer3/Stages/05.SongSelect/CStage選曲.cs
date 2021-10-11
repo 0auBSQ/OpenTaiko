@@ -747,6 +747,10 @@ namespace TJAPlayer3
                     }
                 }
 
+                // Would be good to have a separate class for Don + Puchichara + Nameplate
+                #region [Donchan & PuchiChara]
+
+
                 if (this.ctDonchan_Select.b終了値に達してない)
                 {
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
@@ -785,7 +789,10 @@ namespace TJAPlayer3
                     }
                 }
 
-            
+
+                #endregion
+
+
                 for (int i = 0; i < 10; i++)
                 {
                     tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? this.act曲リスト.ScoreRankCount[i].ToString() : this.act曲リスト.CrownCount[i - 7].ToString());

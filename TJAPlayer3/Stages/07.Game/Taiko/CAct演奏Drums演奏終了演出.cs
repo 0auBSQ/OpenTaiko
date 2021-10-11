@@ -96,24 +96,30 @@ namespace TJAPlayer3
         public override void OnManagedリソースの作成()
         {
             this.b再生済み = false;
-            this.soundClear = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Clear.ogg"), ESoundGroup.SoundEffect);
-            this.soundFailed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Failed.ogg"), ESoundGroup.SoundEffect);
-            this.soundFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Full combo.ogg"), ESoundGroup.SoundEffect);
-            this.soundDondaFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Donda Full Combo.ogg"), ESoundGroup.SoundEffect);
-            base.OnManagedリソースの作成();
+            if (!base.b活性化してない)
+            {
+                this.soundClear = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Clear.ogg"), ESoundGroup.SoundEffect);
+                this.soundFailed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Failed.ogg"), ESoundGroup.SoundEffect);
+                this.soundFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Full combo.ogg"), ESoundGroup.SoundEffect);
+                this.soundDondaFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Donda Full Combo.ogg"), ESoundGroup.SoundEffect);
+                base.OnManagedリソースの作成();
+            }
         }
 
         public override void OnManagedリソースの解放()
         {
-            if (this.soundClear != null)
-                this.soundClear.t解放する();
-            if (this.soundFailed != null)
-                this.soundFailed.t解放する();
-            if (this.soundFullCombo != null)
-                this.soundFullCombo.t解放する();
-            if (this.soundDondaFullCombo != null)
-                this.soundDondaFullCombo.t解放する();
-            base.OnManagedリソースの解放();
+            if (!base.b活性化してない)
+            {
+                if (this.soundClear != null)
+                    this.soundClear.t解放する();
+                if (this.soundFailed != null)
+                    this.soundFailed.t解放する();
+                if (this.soundFullCombo != null)
+                    this.soundFullCombo.t解放する();
+                if (this.soundDondaFullCombo != null)
+                    this.soundDondaFullCombo.t解放する();
+                base.OnManagedリソースの解放();
+            }
         }
 
         #region [effects]
