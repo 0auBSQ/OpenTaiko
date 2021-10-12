@@ -58,13 +58,16 @@ namespace TJAPlayer3
             }
             else if (n現在の選択行[player] >= 5)
             {
-                if (nスイッチカウント < 0 && TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] >= 0)
+                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] < 0 || TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3] < 0)
+                    return;
+
+                if (nスイッチカウント < 0)
                 {
                     nスイッチカウント++;
                 }
-                else if (nスイッチカウント == 0 && TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] >= 0)
+                else if (nスイッチカウント == 0)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for (int i = 0; i < 2; i++)
                     {
                         if(!bSelect[i])
                         {
@@ -117,7 +120,8 @@ namespace TJAPlayer3
             this.n現在の選択行 = new int[2];
             this.bSelect[0] = false;
             this.bSelect[1] = false;
-            this.b裏譜面 = false;
+
+            this.b裏譜面 = (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0 && TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] < 0);
 
             this.b初めての進行描画 = true;
 		}
@@ -181,6 +185,9 @@ namespace TJAPlayer3
             ctBarAnimeIn.t進行();
             ctBarAnime[0].t進行();
             ctBarAnime[1].t進行();
+
+            bool uraExists = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
+            bool omoteExists = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
 
             #region [ キー入力 ]
 
@@ -306,83 +313,49 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
             TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 255, 270, new RectangleF(0, 0, 171, 236));    //閉じる、演奏オプション
 
-            for (int i = 0; i < 3; i++)
+
+            for (int i = 0; i <= (int)Difficulty.Edit; i++)
             {
-                if(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > 0)
+                if (i == (int)Difficulty.Edit && (!uraExists || !b裏譜面))
+                    break;
+                else if (i == (int)Difficulty.Oni && (!omoteExists && uraExists || b裏譜面))
+                    continue;
+
+                int screenPos = Math.Min((int)Difficulty.Oni, i);
+                int level = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i];
+                bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > 0;
+
+                if (avaliable)
                     TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
                 else
                     TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(0.5f, 0.5f, 0.5f);
 
-                TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 255 + 171 + 143 * i, 270, new RectangleF(171 + 143 * i, 0, 143, 236));    //閉じる～難しいまで
+                TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 255 + 171 + 143 * screenPos, 270, new RectangleF(171 + 143 * i, 0, 138, 236));
 
-                TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + i * 144, 284, new RectangleF(TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nクリア[i] * 24.5f, 0, 24.5f, 26));
+                if (!avaliable)
+                    continue;
 
-                if(TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[i] != 0)
-                    TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + i * 144, 281, new RectangleF(0, (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[i] - 1) * 42.71f, 50, 42.71f));
+                TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + screenPos * 144, 284, new RectangleF(TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[i].譜面情報.nクリア[i] * 24.5f, 0, 24.5f, 26));
 
-                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > 0)
-                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i].ToString(), 498 + i * 144, 434.5f);
+                if (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[i].譜面情報.nスコアランク[i] != 0)
+                    TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + screenPos * 144, 281, new RectangleF(0, (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[i].譜面情報.nスコアランク[i] - 1) * 42.71f, 50, 42.71f));
 
-
-
-                for (int g = 0; g < 10; g++)
-                {
-                    if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > g + 10)
-                        TJAPlayer3.Tx.Difficulty_Star_Red.t2D描画(TJAPlayer3.app.Device, 444 + i * 143 + g * 10, 459);
-                    else if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > g)
-                        TJAPlayer3.Tx.Difficulty_Star.t2D描画(TJAPlayer3.app.Device, 444 + i * 143 + g * 10, 459);
-                }
-            }
-
-            if (b裏譜面)
-            {
-                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] > 0)
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
-                else
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(0.5f, 0.5f, 0.5f);
-
-                TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 855, 270, new RectangleF(743, 0, 138, 236));
-
-                TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + 3 * 144, 284, new RectangleF(TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nクリア[4] * 24.5f, 0, 24.5f, 26));
-
-                if (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[4] != 0)
-                    TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + 3 * 144, 281, new RectangleF(0, (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[4] - 1) * 42.71f, 50, 42.71f));
-
-                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] > 0)
-                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4].ToString(), 498 + 3 * 143, 434.5f);
+                if (level > 0)
+                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i].ToString(), 498 + screenPos * 143, 434.5f);
 
                 for (int g = 0; g < 10; g++)
                 {
-                    if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] > g + 10)
-                        TJAPlayer3.Tx.Difficulty_Star_Red.t2D描画(TJAPlayer3.app.Device, 444 + 3 * 143 + g * 10, 459);
-                    else if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[4] > g)
-                        TJAPlayer3.Tx.Difficulty_Star.t2D描画(TJAPlayer3.app.Device, 444 + 3 * 143 + g * 10, 459);
-                }
-
-            }
-            else
-            {
-                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3] > 0)
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
-                else
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(0.5f, 0.5f, 0.5f);
-
-                TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 855, 270, new RectangleF(600, 0, 143, 236));
-
-                TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + 3 * 144, 284, new RectangleF(TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nクリア[3] * 24.5f, 0, 24.5f, 26));
-
-                if (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[3] != 0)
-                    TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + 3 * 144, 281, new RectangleF(0, (TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク[3] - 1) * 42.71f, 50, 42.71f));
-
-                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3] > 0)
-                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3].ToString(), 498 + 3 * 143, 434.5f);
-
-                for (int g = 0; g < 10; g++)
-                {
-                    if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3] > g + 10)
-                        TJAPlayer3.Tx.Difficulty_Star_Red.t2D描画(TJAPlayer3.app.Device, 444 + 3 * 143 + g * 10, 459);
-                    else if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[3] > g)
-                        TJAPlayer3.Tx.Difficulty_Star.t2D描画(TJAPlayer3.app.Device, 444 + 3 * 143 + g * 10, 459);
+                    if (level > g + 10)
+                    {
+                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 0.2f, 0.2f);
+                        TJAPlayer3.Tx.Difficulty_Star?.t2D描画(TJAPlayer3.app.Device, 444 + screenPos * 143 + g * 10, 459);
+                    }
+                    else if (level > g)
+                    {
+                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 1f, 1f);
+                        TJAPlayer3.Tx.Difficulty_Star?.t2D描画(TJAPlayer3.app.Device, 444 + screenPos * 143 + g * 10, 459);
+                    }
+                        
                 }
             }
 
