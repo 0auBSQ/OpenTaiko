@@ -179,7 +179,10 @@ namespace TJAPlayer3
                                            ?? LoudnessMetadataScanner.LoadForAudioPath(strPreviewFilename);
                     TJAPlayer3.SongGainController.Set( cスコア.譜面情報.SongVol, loudnessMetadata, this.sound );
 
-                    this.sound.t再生を開始する( true );
+					// Disable song if playing while playing the preview song
+					CSongSelectSongManager.disable();
+
+					this.sound.t再生を開始する( true );
 
                     if( long再生位置 == -1 )
                     {

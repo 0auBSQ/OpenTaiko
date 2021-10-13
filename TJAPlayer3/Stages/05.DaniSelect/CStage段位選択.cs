@@ -189,7 +189,8 @@ namespace TJAPlayer3
                 this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
                 base.eフェーズID = CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト;
             }
-            TJAPlayer3.Skin.bgm選曲画面.t停止する();
+            // TJAPlayer3.Skin.bgm選曲画面.t停止する();
+            CSongSelectSongManager.stopSong();
         }
 
         public CCounter ct待機;

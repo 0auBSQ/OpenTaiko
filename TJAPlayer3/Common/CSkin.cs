@@ -685,7 +685,7 @@ namespace TJAPlayer3
             this.bgm起動画面 = new Cシステムサウンド(@"Sounds\Setup BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\Option BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\Config BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
+            //this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
             this.soundSkip = new Cシステムサウンド(@"Sounds\Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.SoundBanapas = new Cシステムサウンド(@"Sounds\Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);

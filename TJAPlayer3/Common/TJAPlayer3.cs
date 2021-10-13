@@ -975,8 +975,13 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
 
+								/*
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
+								*/
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
 								foreach ( STPlugin pg in this.listプラグイン )
 								{
 									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
@@ -999,8 +1004,13 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage曲読み込み;
 
+								/*
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
+								*/
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
 								foreach ( STPlugin pg in this.listプラグイン )
 								{
 									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
@@ -1089,8 +1099,13 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
 
+								/*
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
+								*/
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
 								foreach (STPlugin pg in this.listプラグイン)
 								{
 									Directory.SetCurrentDirectory(pg.strプラグインフォルダ);

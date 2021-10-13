@@ -270,7 +270,8 @@ namespace TJAPlayer3
 				this.t選択曲が変更された(false);
 				TJAPlayer3.stage選曲.t選択曲変更通知();                          // #27648 項目数変更を反映させる
 				this.b選択曲が変更された = true;
-				TJAPlayer3.Skin.bgm選曲画面.t停止する();
+				// TJAPlayer3.Skin.bgm選曲画面.t停止する();
+				CSongSelectSongManager.stopSong();
 			}
 			return ret;
 		}
@@ -1635,10 +1636,13 @@ namespace TJAPlayer3
 				{
 					this.tBOXを出る();
 					TJAPlayer3.stage選曲.bBGM再生済み = false;
-					if (TJAPlayer3.ConfigIni.bBGM音を発声する)
+					/*
+					if (TJAPlayer3.ConfigIni.bBGM音を発声する || !TJAPlayer3.Skin.bgm選曲画面イン.b再生中)
 						TJAPlayer3.Skin.bgm選曲画面イン.t再生する();
 					TJAPlayer3.stage選曲.bBGMIn再生した = true;
-					 bBoxClose = false;
+					*/
+					CSongSelectSongManager.playSongIfPossible();
+					bBoxClose = false;
 				}
 			}
 
