@@ -1673,6 +1673,9 @@ namespace TJAPlayer3
 					// (A) スクロールが停止しているときの選択曲バーの描画。
 
 					#region [ タイトル名テクスチャを描画。]
+
+					// Fonts here
+
 					//-----------------
 					if (this.stバー情報[nパネル番号].strタイトル文字列 != "" && this.ttk選択している曲の曲名 == null)
 						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(this.stバー情報[nパネル番号].strタイトル文字列, this.stバー情報[nパネル番号].ForeColor, this.stバー情報[nパネル番号].BackColor, stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
