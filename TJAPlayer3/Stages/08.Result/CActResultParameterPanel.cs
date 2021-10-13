@@ -263,7 +263,7 @@ namespace TJAPlayer3
 
 			// this.PuchiChara.IdleAnimation();
 
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 			{
 				#region [ 通常時リザルト ]
 

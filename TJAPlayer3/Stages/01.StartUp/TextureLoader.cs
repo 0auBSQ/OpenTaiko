@@ -232,7 +232,6 @@ namespace TJAPlayer3
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
             Difficulty_Number = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number.png");
             Difficulty_Star = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Star.png");
-            Difficulty_Star_Red = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Star_Red.png");
             Difficulty_Crown = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Crown.png");
             Difficulty_Option = TxC($"{SONGSELECT}Difficulty_Select/Difficulty_Option.png");
             Difficulty_Option_Select = TxC($"{SONGSELECT}Difficulty_Select/Difficulty_Option_Select.png");
@@ -478,9 +477,10 @@ namespace TJAPlayer3
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
-            Taiko_Frame = new CTexture[2];
+            Taiko_Frame = new CTexture[3];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
+            Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
@@ -875,7 +875,6 @@ namespace TJAPlayer3
         public CTexture Difficulty_Bar;
         public CTexture Difficulty_Number;
         public CTexture Difficulty_Star;
-        public CTexture Difficulty_Star_Red;
         public CTexture Difficulty_Crown;
         public CTexture Difficulty_Option;
         public CTexture Difficulty_Option_Select;

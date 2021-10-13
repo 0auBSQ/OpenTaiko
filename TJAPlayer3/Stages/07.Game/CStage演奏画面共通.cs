@@ -343,6 +343,7 @@ namespace TJAPlayer3
             this.nJPOSSCROLL = new int[ 4 ];
             this.bLEVELHOLD = new bool[]{ false, false, false, false };
 
+            // Double play set here
             this.bDoublePlay = TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? true : false;
 
             this.nLoopCount_Clear = 1;

@@ -638,15 +638,14 @@ namespace TJAPlayer3
 
             if (TJAPlayer3.Tx.Taiko_Frame[0] != null)
             {
-                TJAPlayer3.Tx.Taiko_Frame[0].t2D描画(TJAPlayer3.app.Device, 329, 136);
+                // Tower frame (without tamashii jauge) if playing a tower chart
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
+                    TJAPlayer3.Tx.Taiko_Frame[2].t2D描画(TJAPlayer3.app.Device, 329, 136);
+                else
+                    TJAPlayer3.Tx.Taiko_Frame[0].t2D描画(TJAPlayer3.app.Device, 329, 136);
 
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
-                {
-                    if(TJAPlayer3.Tx.Taiko_Frame[1] != null)
-                    {
-                        TJAPlayer3.Tx.Taiko_Frame[1].t2D描画(TJAPlayer3.app.Device, 329, 360);
-                    }
-                }
+                    TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.app.Device, 329, 360);
             }
             var nTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 

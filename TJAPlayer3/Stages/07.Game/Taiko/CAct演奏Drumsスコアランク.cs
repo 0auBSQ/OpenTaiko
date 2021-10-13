@@ -38,7 +38,7 @@ namespace TJAPlayer3
 
         public override int On進行描画()
         {
-            if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
             {
                 float x = 0;
                 for (int i = 0; i < 7; i++)

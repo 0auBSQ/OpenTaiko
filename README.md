@@ -3,9 +3,9 @@ TJAPlayer3-Develop-ReWrite-1のフォーク, 太鼓の達人 ニジイロVerを�
 
 (English version coming soon)
 
-- 現在の版： v0.4.1
+- 現在の版： v0.4.2
 
-- スキンの最新版： v0.4.0
+- スキンの最新版： v0.4.2
 
 ## 予告情報 （重要）
 
@@ -48,6 +48,15 @@ Discord以外で配布しておりません。
 ```
 
 ## 更新記録
+
+<details>
+	<summary>v0.4.2</summary>
+	
+	- 演奏選曲画面に複数のバグとクラッシュ場面を修正
+	
+	- COURSE:Towerの.tjaファイルのクラッシュを修正、太鼓タワーメニュ・LIFE管理・結果画面がまだ実装されていません。
+
+</details>
 
 <details>
 	<summary>v0.4.1</summary>

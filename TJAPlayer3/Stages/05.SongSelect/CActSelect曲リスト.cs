@@ -1542,6 +1542,7 @@ namespace TJAPlayer3
                                     #endregion
 
                                 }
+								/*
                                 else
 								{
 									// To replace (Generate a display bug for tower mapc)
@@ -1559,6 +1560,7 @@ namespace TJAPlayer3
 										TJAPlayer3.Tx.SongSelect_Frame_Score.t2D下中央基準描画(TJAPlayer3.app.Device, 494 + (3 * 122) - 31, TJAPlayer3.Skin.SongSelect_Overall_Y + 465, new Rectangle(0, 360 + (360 * (TJAPlayer3.stage選曲.n現在選択中の曲の難易度 - (int)Difficulty.Tower)), TJAPlayer3.Tx.SongSelect_Frame_Score.szテクスチャサイズ.Width, 360));
 									}
 								}
+								*/
 							}
 						}
 						break;

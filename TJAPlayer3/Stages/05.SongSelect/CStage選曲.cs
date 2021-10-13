@@ -666,10 +666,17 @@ namespace TJAPlayer3
                                             {
                                                 case C曲リストノード.Eノード種別.SCORE:
                                                     {
-                                                        if (this.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+                                                        if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
                                                         {
-                                                            TJAPlayer3.Skin.sound決定音.t再生する();
-                                                            this.t曲を選択する();
+                                                            if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                                                            {
+                                                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                                                this.t曲を選択する();
+                                                            }
+                                                            else
+                                                            {
+                                                                TJAPlayer3.Skin.soundError.t再生する();
+                                                            }
                                                         }
                                                         else
                                                         {
