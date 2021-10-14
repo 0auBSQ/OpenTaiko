@@ -181,7 +181,127 @@ namespace TJAPlayer3
 
             #region 1P-2P-上背景
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            {
+                #region [Tower HAIKEI]
+
+                TJAPlayer3.Tx.Background_Up_Tower[0]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[1] != null)
+                    for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[1].szテクスチャサイズ.Width + 2; i++)
+                        TJAPlayer3.Tx.Background_Up_Tower[1].t2D描画(TJAPlayer3.app.Device, (i * TJAPlayer3.Tx.Background_Up_Dan[1].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[0].n現在の値, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[2] != null)
+                    for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[2].szテクスチャサイズ.Width + 2; i++)
+                        TJAPlayer3.Tx.Background_Up_Tower[2].t2D描画(TJAPlayer3.app.Device, (i * TJAPlayer3.Tx.Background_Up_Dan[2].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[1].n現在の値, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[3] != null)
+                    for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[3].szテクスチャサイズ.Width + 2; i++)
+                        TJAPlayer3.Tx.Background_Up_Tower[3].t2D描画(TJAPlayer3.app.Device, (i * TJAPlayer3.Tx.Background_Up_Dan[3].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[2].n現在の値, 0);
+
+                TJAPlayer3.Tx.Background_Up_Tower[6]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[4] != null)
+                    for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[4].szテクスチャサイズ.Width + 2; i++)
+                        TJAPlayer3.Tx.Background_Up_Tower[4].t2D描画(TJAPlayer3.app.Device, +(i * TJAPlayer3.Tx.Background_Up_Dan[4].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー2stDan.n現在の値, -200 + ct上背景スクロール用タイマー2stDan.n現在の値);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[5] != null)
+                    for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[5].szテクスチャサイズ.Width + 2; i++)
+                        TJAPlayer3.Tx.Background_Up_Tower[5].t2D描画(TJAPlayer3.app.Device, (i * TJAPlayer3.Tx.Background_Up_Dan[5].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[3].n現在の値, 0);
+
+
+
+                #endregion
+
+                #region [Tower background informations]
+
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                {
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.app.Device, 550, 32);
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 750, 104);
+
+                    this.ct炎.t進行Loop();
+
+                    #region [Floor number]
+
+                    if (CFloorManagement.CurrentNumberOfLives > 0)
+                        CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+
+                    string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
+
+                    int len = floorStr.Length;
+
+                    int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Width / 10;
+
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f);
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.4f;
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.4f;
+
+                    for (int idx = len - 1; idx >= 0; idx--)
+                    {
+                        int currentNum = int.Parse(floorStr[idx].ToString());
+
+                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 756 - ((digitLength - 8) * (len - idx) * 1.4f),
+                            84,
+                            new Rectangle(digitLength * currentNum, 0,
+                                digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
+                    }
+
+                    #endregion
+
+                    #region [Life Tamashii icon]
+
+                    int baseX = 886;
+                    int baseY = 22;
+
+                    TJAPlayer3.Tx.Gauge_Soul_Fire?.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(230 * (this.ct炎.n現在の値), 0, 230, 230));
+                    TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, baseX + 72, baseY + 73, new Rectangle(0, 0, 80, 80));
+
+                    #endregion
+
+                    #region [Life number]
+
+                    if (CFloorManagement.MaxNumberOfLives <= 0)
+                    {
+                        CFloorManagement.MaxNumberOfLives = 5;
+                        CFloorManagement.CurrentNumberOfLives = 5;
+                    }
+
+                    string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
+
+                    len = lifeStr.Length;
+
+                    bool lifeSpecialCase = CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1;
+                    float lifeRatio = CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives;
+
+                    Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f)
+                            : ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f)
+                            : new Color4(1f, 0.2f, 0.2f));
+
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.1f;
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.1f;
+
+                    for (int idx = 0; idx < len; idx++)
+                    {
+                        int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
+
+                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 996 + ((digitLength - 8) * (len - idx) * 1.1f),
+                            106,
+                            new Rectangle(digitLength * currentNum, 0,
+                                digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
+                    }
+
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f);
+
+                    #endregion
+
+                }
+
+                #endregion
+            }
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
             {
                 // Multiple background handling will be here 
                 #region [ 通常背景 ]
@@ -338,92 +458,7 @@ namespace TJAPlayer3
                 #endregion
 
 
-                #region [Tower background informations]
-
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-                {
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.app.Device, 550, 32);
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 750, 104);
-
-                    this.ct炎.t進行Loop();
-
-                    #region [Floor number]
-
-                    if (CFloorManagement.CurrentNumberOfLives > 0)
-                        CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
-
-                    string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
-
-                    int len = floorStr.Length;
-
-                    int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Width / 10;
-
-                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f);
-                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.4f;
-                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.4f;
-
-                    for (int idx = len - 1; idx >= 0; idx--) 
-                    {
-                        int currentNum = int.Parse(floorStr[idx].ToString());
- 
-                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 756 - ((digitLength - 8) * (len - idx) * 1.4f), 
-                            84, 
-                            new Rectangle(digitLength * currentNum, 0,
-                                digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
-                    }
-
-                    #endregion
-
-                    #region [Life Tamashii icon]
-
-                    int baseX = 886;
-                    int baseY = 22;
-
-                    TJAPlayer3.Tx.Gauge_Soul_Fire?.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(230 * (this.ct炎.n現在の値), 0, 230, 230));
-                    TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, baseX + 72, baseY + 73, new Rectangle(0, 0, 80, 80));
-
-                    #endregion
-
-                    #region [Life number]
-
-                    if (CFloorManagement.MaxNumberOfLives <= 0)
-                    {
-                        CFloorManagement.MaxNumberOfLives = 5;
-                        CFloorManagement.CurrentNumberOfLives = 5;
-                    }
-
-                    string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
-
-                    len = lifeStr.Length;
-
-                    bool lifeSpecialCase = CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1;
-                    float lifeRatio = CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives;
-
-                    Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f)
-                            : ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f)
-                            : new Color4(1f, 0.2f, 0.2f));
-
-                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
-                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.1f;
-                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.1f;
-
-                    for (int idx = 0; idx < len; idx++)
-                    {
-                        int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
-
-                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 996 + ((digitLength - 8) * (len - idx) * 1.1f),
-                            106,
-                            new Rectangle(digitLength * currentNum, 0,
-                                digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
-                    }
-
-                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f);
-
-                    #endregion
-
-                }
-
-                #endregion
+                
             }
             else
             {
