@@ -6,7 +6,7 @@ using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
-    // Small static class which refers to the latest encountered floor, would allow more control later
+    // Small static class which refers to the Tower mode important informations
     static internal class CFloorManagement
     {
         public static void reinitialize(int life)
@@ -14,11 +14,46 @@ namespace TJAPlayer3
             CFloorManagement.LastRegisteredFloor = 1;
             CFloorManagement.MaxNumberOfLives = life;
             CFloorManagement.CurrentNumberOfLives = life;
+            CFloorManagement.InvincibilityFrames = null;
+        }
+
+        public static void damage()
+        {
+            if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.n現在の値 < InvincibilityDuration)
+                return;
+
+            if (CFloorManagement.CurrentNumberOfLives > 0)
+            {
+                CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDuration + 1000, 1, TJAPlayer3.Timer);
+                CFloorManagement.CurrentNumberOfLives--;
+                // Play "outch" sfx
+            }
+        }
+
+        public static bool isBlinking()
+        {
+            if (CFloorManagement.InvincibilityFrames == null || CFloorManagement.InvincibilityFrames.n現在の値 >= InvincibilityDuration)
+                return false;
+
+            if (CFloorManagement.InvincibilityFrames.n現在の値 % 200 > 100)
+                return false;
+
+            return true;
+        }
+
+        public static void loopFrames()
+        {
+            if (CFloorManagement.InvincibilityFrames != null)
+                CFloorManagement.InvincibilityFrames.t進行();
         }
 
         public static int LastRegisteredFloor = 1;
         public static int MaxNumberOfLives = 5;
         public static int CurrentNumberOfLives = 5;
+
+        // ms
+        public static readonly int InvincibilityDuration = 2000;
+        public static CCounter InvincibilityFrames = null;
     }
 
     internal class CAct演奏Drums背景 : CActivity
@@ -222,6 +257,7 @@ namespace TJAPlayer3
                     TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 750, 104);
 
                     this.ct炎.t進行Loop();
+                    CFloorManagement.loopFrames();
 
                     #region [Floor number]
 

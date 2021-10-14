@@ -131,6 +131,13 @@ namespace TJAPlayer3
 
                 if (this.b風船連打中[i] != true && this.bマイどんアクション中[i] != true && CharaAction_Balloon_Delay[i].b終了値に達した)
                 {
+                    // Blinking animation during invincibility frames
+                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                    {
+                        if (CFloorManagement.isBlinking() == true)
+                            break;
+                    }
+
                     if (!TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i])
                     {
                         if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100.0 && TJAPlayer3.Skin.Game_Chara_Ptn_Clear != 0)

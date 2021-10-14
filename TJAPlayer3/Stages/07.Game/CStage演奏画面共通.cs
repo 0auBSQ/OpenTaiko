@@ -1734,6 +1734,9 @@ namespace TJAPlayer3
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                         this.n不可[actDan.NowShowingNumber]++;
+                                    else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                        CFloorManagement.damage();
+
                                     this.CBranchScore[nPlayer].nMiss++;
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Miss++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
@@ -1783,6 +1786,9 @@ namespace TJAPlayer3
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n不可[actDan.NowShowingNumber]++;
+                                        else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                            CFloorManagement.damage();
+
                                         this.CBranchScore[nPlayer].nMiss++;
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                         this.actComboVoice.tReset(nPlayer);
