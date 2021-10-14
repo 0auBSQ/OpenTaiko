@@ -61,6 +61,8 @@ Discord以外で配布しておりません。
 	
 	- PS2の太鼓タワーを実装 (Gameplay)
 	
+![selected_item](https://user-images.githubusercontent.com/58159635/137376169-cf906aaa-672a-4229-8301-28c9154117bd.png)
+	
 </details>
 
 <details>
