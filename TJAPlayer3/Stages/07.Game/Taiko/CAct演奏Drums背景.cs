@@ -6,6 +6,21 @@ using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
+    // Small static class which refers to the latest encountered floor, would allow more control later
+    static internal class CFloorManagement
+    {
+        public static void reinitialize(int life)
+        {
+            CFloorManagement.LastRegisteredFloor = 1;
+            CFloorManagement.MaxNumberOfLives = life;
+            CFloorManagement.CurrentNumberOfLives = life;
+        }
+
+        public static int LastRegisteredFloor = 1;
+        public static int MaxNumberOfLives = 5;
+        public static int CurrentNumberOfLives = 5;
+    }
+
     internal class CAct演奏Drums背景 : CActivity
     {
         // 本家っぽい背景を表示させるメソッド。
@@ -53,6 +68,8 @@ namespace TJAPlayer3
 
             this.ttkTouTatsuKaiSuu = new TitleTextureKey("到達階数", pfTowerText, Color.White, Color.Black, 700);
             this.ttkKai = new TitleTextureKey("階", pfTowerText, Color.White, Color.Black, 700);
+
+            this.ct炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
 
             base.On活性化();
         }
@@ -328,9 +345,13 @@ namespace TJAPlayer3
                     TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.app.Device, 550, 32);
                     TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 750, 104);
 
+                    this.ct炎.t進行Loop();
+
                     #region [Floor number]
 
-                    string floorStr = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0].ToString();
+                    CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+
+                    string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
                     int len = floorStr.Length;
 
@@ -346,6 +367,45 @@ namespace TJAPlayer3
  
                         TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 756 - ((digitLength - 8) * (len - idx) * 1.4f), 
                             84, 
+                            new Rectangle(digitLength * currentNum, 0,
+                                digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
+                    }
+
+                    #endregion
+
+                    #region [Life Tamashii icon]
+
+                    int baseX = 886;
+                    int baseY = 22;
+
+                    TJAPlayer3.Tx.Gauge_Soul_Fire?.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(230 * (this.ct炎.n現在の値), 0, 230, 230));
+                    TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, baseX + 72, baseY + 73, new Rectangle(0, 0, 80, 80));
+
+                    #endregion
+
+                    #region [Life number]
+
+                    string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
+
+                    len = lifeStr.Length;
+
+                    bool lifeSpecialCase = CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1;
+                    float lifeRatio = CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives;
+
+                    Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f)
+                            : ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f)
+                            : new Color4(1f, 0.2f, 0.2f));
+
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.1f;
+                    TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.1f;
+
+                    for (int idx = 0; idx < len; idx++)
+                    {
+                        int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
+
+                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 996 + ((digitLength - 8) * (len - idx) * 1.1f),
+                            106,
                             new Rectangle(digitLength * currentNum, 0,
                                 digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
                     }
@@ -442,6 +502,8 @@ namespace TJAPlayer3
         private TitleTextureKey ttkTouTatsuKaiSuu;
         private TitleTextureKey ttkKai;
         private CPrivateFastFont pfTowerText;
+
+        private CCounter ct炎;
 
         private EFIFOモード eFadeMode;
         //-----------------

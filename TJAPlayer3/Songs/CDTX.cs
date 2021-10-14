@@ -1185,6 +1185,10 @@ namespace TJAPlayer3
         public STDGBVALUE<int> LEVEL;
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+        
+        // Tower lifes
+        public int LIFE;
+        
         public Dictionary<int, CAVI> listAVI;
         public Dictionary<int, CAVIPAN> listAVIPAN;
         public Dictionary<int, CDirectShow> listDS;
@@ -4880,6 +4884,11 @@ namespace TJAPlayer3
                 this.LEVEL.Drums = level;
                 this.LEVEL.Taiko = level;
                 this.LEVELtaiko[this.n参照中の難易度] = level;
+            }
+            else if (strCommandName.Equals("LIFE"))
+            {
+                var life = (int)Convert.ToDouble(strCommandParam);
+                this.LIFE = life;
             }
             else if (strCommandName.Equals("BPM"))
             {

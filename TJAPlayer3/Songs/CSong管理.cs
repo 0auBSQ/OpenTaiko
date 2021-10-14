@@ -205,7 +205,10 @@ namespace TJAPlayer3
                                     }
                                     c曲リストノード.nLevel = dtx.LEVELtaiko;
 
-                                    switch (c曲リストノード.strジャンル) 
+									// LIFE here
+									c曲リストノード.nLife = dtx.LIFE;
+
+									switch (c曲リストノード.strジャンル) 
 									{
 										case "J-POP":
 											c曲リストノード.strジャンル = "ポップス";
@@ -949,7 +952,12 @@ namespace TJAPlayer3
                                     c曲リストノード.arスコア[ i ].譜面情報.nレベル[4] = cdtx.LEVELtaiko[4];
                                     c曲リストノード.arスコア[i].譜面情報.nレベル[5] = cdtx.LEVELtaiko[5];
                                     c曲リストノード.arスコア[i].譜面情報.nレベル[6] = cdtx.LEVELtaiko[6];
-                                    this.nファイルから反映できたスコア数++;
+
+									// Tower Lives
+									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
+
+
+									this.nファイルから反映できたスコア数++;
 									cdtx.On非活性化();
 //Debug.WriteLine( "★" + this.nファイルから反映できたスコア数 + " " + c曲リストノード.arスコア[ i ].譜面情報.タイトル );
 									#region [ 曲検索ログ出力 ]

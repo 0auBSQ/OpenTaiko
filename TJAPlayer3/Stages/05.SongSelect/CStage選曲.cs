@@ -670,6 +670,9 @@ namespace TJAPlayer3
                                                         {
                                                             if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
                                                             {
+                                                                // Init tower variables 
+                                                                CFloorManagement.reinitialize(this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+
                                                                 TJAPlayer3.Skin.sound決定音.t再生する();
                                                                 this.t曲を選択する();
                                                             }

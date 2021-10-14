@@ -81,6 +81,9 @@ namespace TJAPlayer3
 			public int[] nクリア;		//0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 			public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 
+			// Tower lifes
+			public int nLife;
+
 			[Serializable]
 			[StructLayout( LayoutKind.Sequential )]
 			public struct STHISTORY

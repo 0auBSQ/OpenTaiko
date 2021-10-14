@@ -379,7 +379,7 @@ namespace TJAPlayer3
                 }
                 #endregion
 
-
+                // Soul fire here
                 if(TJAPlayer3.Tx.Gauge_Soul_Fire != null )
                 {
                     //仮置き
