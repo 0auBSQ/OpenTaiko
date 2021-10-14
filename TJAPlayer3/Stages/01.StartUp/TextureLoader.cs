@@ -20,6 +20,7 @@ namespace TJAPlayer3
         const string RESULT = @"6_Result\";
         const string EXIT = @"7_Exit\";
         const string DANRESULT = @"7_DanResult\";
+        const string TOWERRESULT = @"8_TowerResult\";
 
         // InGame
         const string CHARA = @"1_Chara\";
@@ -774,7 +775,7 @@ namespace TJAPlayer3
             Exit_Background = TxC(EXIT + @"Background.png");
             #endregion
 
-            #region [8_DanResults]
+            #region [7_DanResults]
 
             DanResult_Background = TxC(DANRESULT + @"Background.png");
             DanResult_Rank = TxC(DANRESULT + @"Rank.png");
@@ -785,9 +786,21 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [8_TowerResults]
+
+            TowerResult_Background = TxC(TOWERRESULT + @"Background.png");
+            TowerResult_Panel = TxC(TOWERRESULT + @"Panel.png");
+
+            for (int i = 0; i < TowerResult_Tower.Length; i++)
+            {
+                TowerResult_Tower[i] = TxC(TOWERRESULT + @"Tower\" + i.ToString() + ".png");
+            }
+
+            #endregion
+
         }
 
-    public void DisposeTexture()
+        public void DisposeTexture()
         {
             foreach (var tex in listTexture)
             {
@@ -1128,7 +1141,7 @@ namespace TJAPlayer3
                                        /*Exit_Text */;
         #endregion
 
-        #region [8_DanResults]
+        #region [7_DanResults]
 
         public CTexture DanResult_Background,
             DanResult_Rank,
@@ -1136,6 +1149,15 @@ namespace TJAPlayer3
             DanResult_StatePanel_Base,
             DanResult_SongPanel_Main,
             DanResult_StatePanel_Main;
+
+        #endregion
+
+        #region [8_TowerResults]
+
+        public CTexture TowerResult_Background,
+            TowerResult_Panel;
+        public CTexture[]
+            TowerResult_Tower = new CTexture[1];
 
         #endregion
 

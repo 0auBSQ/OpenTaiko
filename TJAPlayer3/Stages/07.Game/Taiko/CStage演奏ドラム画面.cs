@@ -435,7 +435,10 @@ namespace TJAPlayer3
 					base.b初めての進行描画 = false;
 				}
 				#endregion
-				if ( ( ( TJAPlayer3.ConfigIni.nRisky != 0 && this.actGauge.IsFailed( E楽器パート.TAIKO ) ) || this.actGame.st叩ききりまショー.ct残り時間.b終了値に達した ) && ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ) )
+				if ( ( ( TJAPlayer3.ConfigIni.nRisky != 0 && this.actGauge.IsFailed( E楽器パート.TAIKO ) ) 
+                    || this.actGame.st叩ききりまショー.ct残り時間.b終了値に達した 
+                    || (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0)) 
+                    && ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ))
 				{
 					this.actStageFailed.Start();
 					TJAPlayer3.DTX.t全チップの再生停止();

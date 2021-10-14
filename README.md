@@ -3,9 +3,9 @@ TJAPlayer3-Develop-ReWrite-1のフォーク, 太鼓の達人 ニジイロVerを�
 
 (English version coming soon)
 
-- 現在の版： v0.4.2
+- 現在の版： v0.4.3
 
-- スキンの最新版： v0.4.2
+- スキンの最新版： v0.4.3
 
 ## 予告情報 （重要）
 
@@ -48,6 +48,13 @@ Discord以外で配布しておりません。
 ```
 
 ## 更新記録
+
+<details>
+	<summary>v0.4.3</summary>
+	
+	- PS2の太鼓タワーを実装 (Gameplay)
+	
+</details>
 
 <details>
 	<summary>v0.4.2</summary>

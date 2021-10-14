@@ -31,7 +31,24 @@ namespace TJAPlayer3
             this.ctEnd_DondaFullComboLoop = new CCounter(0, 2, 30, TJAPlayer3.Timer);
 
             // モードの決定。クリア失敗・フルコンボも事前に作っとく。
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            {
+                if (CFloorManagement.CurrentNumberOfLives > 0)
+                {
+                    if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nMiss == 0)
+                    {
+                        if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nGood == 0)
+                            this.Mode[0] = EndMode.StageDondaFullCombo;
+                        else
+                            this.Mode[0] = EndMode.StageFullCombo;
+                    }
+                    else
+                        this.Mode[0] = EndMode.StageCleared;
+                }
+                else
+                    this.Mode[0] = EndMode.StageFailed;
+            }
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
                 // 段位認定モード。
                 if (!TJAPlayer3.stage演奏ドラム画面.actDan.GetFailedAllChallenges())

@@ -26,7 +26,7 @@ namespace TJAPlayer3
             {
                 CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDuration + 1000, 1, TJAPlayer3.Timer);
                 CFloorManagement.CurrentNumberOfLives--;
-                // Play "outch" sfx
+                TJAPlayer3.Skin.soundTowerMiss.t再生する();
             }
         }
 
@@ -253,8 +253,8 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.app.Device, 550, 32);
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 750, 104);
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.app.Device, 350, 32);
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.app.Device, 550, 104);
 
                     this.ct炎.t進行Loop();
                     CFloorManagement.loopFrames();
@@ -278,7 +278,7 @@ namespace TJAPlayer3
                     {
                         int currentNum = int.Parse(floorStr[idx].ToString());
 
-                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 756 - ((digitLength - 8) * (len - idx) * 1.4f),
+                        TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.app.Device, 556 - ((digitLength - 8) * (len - idx) * 1.4f),
                             84,
                             new Rectangle(digitLength * currentNum, 0,
                                 digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));

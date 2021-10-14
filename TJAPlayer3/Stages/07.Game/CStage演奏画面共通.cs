@@ -3081,12 +3081,24 @@ namespace TJAPlayer3
 		}
 		protected void t進行描画_STAGEFAILED()
 		{
-			if ( ( ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED ) || ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) && ( ( this.actStageFailed.On進行描画() != 0 ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) )
+            // Transition for failed games
+			if ( ( ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED ) 
+                || ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) 
+                && ( ( this.actStageFailed.On進行描画() != 0 ) 
+                && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) )
 			{
-				this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージ失敗;
-				base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト;
-				this.actFO.tフェードアウト開始();
-			}
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                {
+                    this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージクリア;
+                }
+                else
+                {
+                    this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージ失敗;
+                    
+                }
+                base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト;
+                this.actFO.tフェードアウト開始();
+            }
 		}
 
 		protected void t進行描画_チップファイアGB()

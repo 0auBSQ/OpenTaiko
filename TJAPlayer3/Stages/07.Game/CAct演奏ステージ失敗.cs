@@ -70,8 +70,9 @@ namespace TJAPlayer3
 		public void Start()
 		{
             this.dbFailedTime = TJAPlayer3.Timer.n現在時刻;
-			this.ct進行 = new CCounter( 0, 1000, 2, TJAPlayer3.Timer );
-            if( TJAPlayer3.ConfigIni.eGameMode != EGame.OFF )
+			this.ct進行 = new CCounter( 0, 300, 22, TJAPlayer3.Timer );
+			this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
+			if ( TJAPlayer3.ConfigIni.eGameMode != EGame.OFF )
             {
 			    this.ct進行 = new CCounter( 0, 4000, 2, TJAPlayer3.Timer );
             }
@@ -99,12 +100,14 @@ namespace TJAPlayer3
 		}
 		public override void OnManagedリソースの作成()
 		{
+			this.failedSongPlayed = false;
 			if( !base.b活性化してない )
 			{
-    //            this.txBlack = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Tile black 64x64.png" ) );
+				//            this.txBlack = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Tile black 64x64.png" ) );
 				//this.txStageFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_stage_failed.jpg" ) );
 				//this.txGameFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_GameFailed.png" ) );
-    //            this.tx数字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_RollNumber.png" ) );
+				//            this.tx数字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_RollNumber.png" ) );
+				this.soundFailed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Failed.ogg"), ESoundGroup.SoundEffect);
 				base.OnManagedリソースの作成();
 			}
 		}
@@ -114,11 +117,41 @@ namespace TJAPlayer3
 			{
 				//CDTXMania.tテクスチャの解放( ref this.txStageFailed );
 				//CDTXMania.tテクスチャの解放( ref this.txGameFailed );
-    //            CDTXMania.tテクスチャの解放( ref this.txBlack );
-    //            CDTXMania.tテクスチャの解放( ref this.tx数字 );
+				//            CDTXMania.tテクスチャの解放( ref this.txBlack );
+				//            CDTXMania.tテクスチャの解放( ref this.tx数字 );
+				if (this.soundFailed != null)
+					this.soundFailed.t解放する();
 				base.OnManagedリソースの解放();
 			}
 		}
+
+		#region [Effect]
+
+		private void showEndEffect_Failed(int i)
+		{
+			int[] y = new int[] { 0, 176 };
+
+			this.ctEnd_ClearFailed.t進行();
+			if (this.ctEnd_ClearFailed.n現在の値 <= 20)
+			{
+				TJAPlayer3.Tx.End_ClearFailed[this.ctEnd_ClearFailed.n現在の値].t2D描画(TJAPlayer3.app.Device, 505, y[i] + 145);
+			}
+			if (this.ctEnd_ClearFailed.n現在の値 >= 20 && this.ctEnd_ClearFailed.n現在の値 <= 67)
+			{
+				TJAPlayer3.Tx.ClearFailed.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+			}
+			else if (this.ctEnd_ClearFailed.n現在の値 == 68)
+			{
+				TJAPlayer3.Tx.ClearFailed1.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+			}
+			else if (this.ctEnd_ClearFailed.n現在の値 >= 69)
+			{
+				TJAPlayer3.Tx.ClearFailed2.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+			}
+		}
+
+		#endregion
+
 		public override int On進行描画()
 		{
 			if( base.b活性化してない )
@@ -131,7 +164,20 @@ namespace TJAPlayer3
 			}
 			this.ct進行.t進行();
 
-            if (TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー || TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛)
+			#region [Failed screen]
+
+			if (this.soundFailed != null && !this.failedSongPlayed)
+			{
+				this.soundFailed.t再生を開始する();
+				this.failedSongPlayed = true;
+			}
+			this.showEndEffect_Failed(0);
+
+			#endregion
+
+			/*
+			 
+			if (TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー || TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛)
             {
                 if (TJAPlayer3.Tx.Tile_Black != null)
                 {
@@ -191,6 +237,8 @@ namespace TJAPlayer3
                 }
             }
 
+			*/
+
 			if( !this.ct進行.b終了値に達した )
 			{
 				return 0;
@@ -206,11 +254,15 @@ namespace TJAPlayer3
 		private bool b効果音再生済み;
 		private CCounter ct進行;
 		private CSound sd効果音;
+
+		private bool failedSongPlayed;
+		private CSound soundFailed;
+		private CCounter ctEnd_ClearFailed;
 		//private CTexture txStageFailed;
-  //      private CTexture txGameFailed;
-  //      private CTexture txBlack;
-  //      private CTexture tx数字;
-        private double dbFailedTime;
+		//      private CTexture txGameFailed;
+		//      private CTexture txBlack;
+		//      private CTexture tx数字;
+		private double dbFailedTime;
 		//-----------------
         private ST文字位置[] st文字位置;
 

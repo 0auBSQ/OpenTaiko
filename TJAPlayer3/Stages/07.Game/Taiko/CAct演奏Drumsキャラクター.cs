@@ -128,16 +128,15 @@ namespace TJAPlayer3
                 if (this.ctキャラクターアクション_ノルマ != null || TJAPlayer3.Skin.Game_Chara_Ptn_ClearIn != 0) this.ctキャラクターアクション_ノルマ[i].t進行db();
                 if (this.ctキャラクターアクション_魂MAX != null || TJAPlayer3.Skin.Game_Chara_Ptn_SoulIn != 0) this.ctキャラクターアクション_魂MAX[i].t進行db();
 
+                // Blinking animation during invincibility frames
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                {
+                    if (CFloorManagement.isBlinking() == true)
+                        break;
+                }
 
                 if (this.b風船連打中[i] != true && this.bマイどんアクション中[i] != true && CharaAction_Balloon_Delay[i].b終了値に達した)
                 {
-                    // Blinking animation during invincibility frames
-                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-                    {
-                        if (CFloorManagement.isBlinking() == true)
-                            break;
-                    }
-
                     if (!TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i])
                     {
                         if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100.0 && TJAPlayer3.Skin.Game_Chara_Ptn_Clear != 0)
@@ -177,7 +176,6 @@ namespace TJAPlayer3
 
                 if (this.b風船連打中[i] != true && bマイどんアクション中[i] == true && CharaAction_Balloon_Delay[i].b終了値に達した)
                 {
-
                     if (this.ctキャラクターアクション_10コンボ[i].b進行中)
                     {
                         if (TJAPlayer3.Tx.Chara_10Combo[i] != null && TJAPlayer3.Skin.Game_Chara_Ptn_10combo != 0)

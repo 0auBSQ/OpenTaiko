@@ -319,6 +319,11 @@ namespace TJAPlayer3
 				ctShine_Plate = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
 				ctWork_Plate = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
 
+				if (TJAPlayer3.Tx.TowerResult_Background != null)
+					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720, 25, TJAPlayer3.Timer);
+				else
+					ctTower_Animation = new CCounter();
+
 				Dan_Plate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス) + @"\Dan_Plate.png");
 
 
@@ -666,7 +671,33 @@ namespace TJAPlayer3
                     {
 						#region [Tower result screen]
 
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						{
+							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							b音声再生 = true;
+						}
 
+						// Pictures here
+
+						this.ctTower_Animation.t進行();
+
+						int xFactor = 0;
+						float yFactor = 1f;
+						if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[0] != null)
+                        {
+							xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Width) / 2;
+							yFactor = TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+						}
+
+						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * this.ctTower_Animation.n現在の値);
+						TJAPlayer3.Tx.TowerResult_Tower[0]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
+						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						{
+							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							b音声再生 = true;
+						}
 
 
 						#endregion
@@ -752,6 +783,7 @@ namespace TJAPlayer3
 								this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 								TJAPlayer3.Skin.bgmリザルト音.t停止する();
 								TJAPlayer3.Skin.bgmDanResult.t停止する();
+								TJAPlayer3.Skin.bgmTowerResult.t停止する();
 								TJAPlayer3.Skin.sound決定音.t再生する();
 							}
 						}
@@ -926,6 +958,9 @@ namespace TJAPlayer3
 
 		// Dan informations
 		private CTexture Dan_Plate;
+
+		// Tower informations
+		private CCounter ctTower_Animation;
 
 		private CCounter ctAutoReturn;
 		//private CTexture txオプションパネル;

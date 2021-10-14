@@ -367,6 +367,10 @@ namespace TJAPlayer3
 
         public Cシステムサウンド soundSelectAnnounce = null;
 
+        // Tower Sfx
+        public Cシステムサウンド soundTowerMiss = null;
+        public Cシステムサウンド bgmTowerResult = null;
+
         //public Cシステムサウンド soundRed = null;
         //public Cシステムサウンド soundBlue = null;
         public Cシステムサウンド soundBalloon = null;
@@ -707,6 +711,8 @@ namespace TJAPlayer3
 
             this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", false, false, true, ESoundGroup.SongPlayback);
 
+            this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
 
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundRankIn = new Cシステムサウンド(@"Sounds\ResultScreen\RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
