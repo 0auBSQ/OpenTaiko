@@ -349,7 +349,8 @@ namespace TJAPlayer3
 
                     #region [Floor number]
 
-                    CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+                    if (CFloorManagement.CurrentNumberOfLives > 0)
+                        CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
 
                     string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
@@ -384,6 +385,12 @@ namespace TJAPlayer3
                     #endregion
 
                     #region [Life number]
+
+                    if (CFloorManagement.MaxNumberOfLives <= 0)
+                    {
+                        CFloorManagement.MaxNumberOfLives = 5;
+                        CFloorManagement.CurrentNumberOfLives = 5;
+                    }
 
                     string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
 

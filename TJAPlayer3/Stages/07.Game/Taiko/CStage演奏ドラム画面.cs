@@ -552,6 +552,10 @@ namespace TJAPlayer3
 
                 actChara.OnDraw_Balloon();
 
+                // Floor voice
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                    this.actComboVoice.tPlayFloorSound();
+
                 this.t全体制御メソッド();
                 
                 this.actPauseMenu.t進行描画();

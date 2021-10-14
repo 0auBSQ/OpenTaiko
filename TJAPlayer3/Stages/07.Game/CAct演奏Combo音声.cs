@@ -20,7 +20,7 @@ namespace TJAPlayer3
 		// メソッド
         public void t再生( int nCombo, int player )
         {
-            if(VoiceIndex[player] < ListCombo[player].Count)
+            if (VoiceIndex[player] < ListCombo[player].Count)
             {
                 
                 var index = ListCombo[player][VoiceIndex[player]];
@@ -30,6 +30,20 @@ namespace TJAPlayer3
                     VoiceIndex[player]++;
                 }
                 
+            }
+        }
+
+        public void tPlayFloorSound()
+        {
+            if (FloorIndex[0] < ListFloor[0].Count)
+            {
+
+                var index = ListFloor[0][FloorIndex[0]];
+                if (CFloorManagement.LastRegisteredFloor == index.nCombo)
+                {
+                    index.soundComboVoice.t再生を開始する();
+                    FloorIndex[0]++;
+                }
             }
         }
 
@@ -49,18 +63,24 @@ namespace TJAPlayer3
             for (int i = 0; i < 2; i++)
             {
                 ListCombo[i] = new List<CComboVoice>();
+                ListFloor[i] = new List<CComboVoice>();
             }
             VoiceIndex = new int[] { 0, 0 };
-			base.On活性化();
+            FloorIndex = new int[] { 0, 0 };
+            base.On活性化();
 		}
 		public override void OnManagedリソースの作成()
 		{
 			if( !base.b活性化してない )
 			{
+                
+
                 // フォルダ内を走査してコンボボイスをListに入れていく
                 // 1P、2P コンボボイス
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
+                    #region [Combo voices]
+
                     var currentDir = CSkin.Path(string.Format(@"Sounds\Combo_{0}P\", i + 1));
                     if (Directory.Exists(currentDir))
                     {
@@ -86,8 +106,34 @@ namespace TJAPlayer3
                             ListCombo[i].Sort();
                         }
                     }
+
+                    #endregion
+
+                    #region [Floor voices]
+
+                    currentDir = CSkin.Path(string.Format(@"Sounds\Tower_Combo\"));
+                    if (Directory.Exists(currentDir))
+                    {
+                        foreach (var item in Directory.GetFiles(currentDir))
+                        {
+                            var comboVoice = new CComboVoice();
+                            comboVoice.bFileFound = true;
+                            comboVoice.nPlayer = i;
+                            comboVoice.strFilePath = item;
+                            comboVoice.soundComboVoice = TJAPlayer3.Sound管理.tサウンドを生成する(item, ESoundGroup.Voice);
+                            comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
+                            ListFloor[i].Add(comboVoice);
+                        }
+                        if (ListFloor[i].Count > 0)
+                        {
+                            ListFloor[i].Sort();
+                        }
+                    }
+
+                    #endregion
+
                 }
-    			base.OnManagedリソースの作成();
+                base.OnManagedリソースの作成();
 			}
 		}
 		public override void OnManagedリソースの解放()
@@ -101,6 +147,12 @@ namespace TJAPlayer3
                         TJAPlayer3.Sound管理.tサウンドを破棄する(item.soundComboVoice);
                     }
                     ListCombo[i].Clear();
+
+                    foreach (var item in ListFloor[i])
+                    {
+                        TJAPlayer3.Sound管理.tサウンドを破棄する(item.soundComboVoice);
+                    }
+                    ListFloor[i].Clear();
                 }
 
 				base.OnManagedリソースの解放();
@@ -110,10 +162,13 @@ namespace TJAPlayer3
 		#region [ private ]
 		//-----------------
         int[] VoiceIndex;
+        int[] FloorIndex;
+
         readonly List<CComboVoice>[] ListCombo = new List<CComboVoice>[2];
-		//-----------------
-		#endregion
-	}
+        readonly List<CComboVoice>[] ListFloor = new List<CComboVoice>[2];
+        //-----------------
+        #endregion
+    }
 
     public class CComboVoice : IComparable<CComboVoice>
     {
