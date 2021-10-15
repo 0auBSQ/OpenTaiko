@@ -1,7 +1,5 @@
 # TJAPlayer3-Develop-BSQ
-TJAPlayer3-Develop-ReWrite-1のフォーク, 太鼓の達人 ニジイロVerを切っ掛けに開発したシミュレーター
-
-(English version coming soon)
+TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレーター
 
 - 現在の版： v0.4.3
 
@@ -61,8 +59,6 @@ Discord以外で配布しておりません。
 	
 	- PS2の太鼓タワーを実装 (Gameplay)
 	
-![selected_item](https://user-images.githubusercontent.com/58159635/137376169-cf906aaa-672a-4229-8301-28c9154117bd.png)
-	
 </details>
 
 <details>
@@ -90,8 +86,6 @@ Discord以外で配布しておりません。
 	
 	- Danに関してコードの構造を改善（コード蓄積の修正）
   
-  ![selected_item](https://user-images.githubusercontent.com/58159635/136692306-c429680c-881d-44f8-9c9f-69882f25fda5.png)
-	
 </details>
 
 <details>
