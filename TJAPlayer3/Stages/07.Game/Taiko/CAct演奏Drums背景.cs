@@ -160,6 +160,8 @@ namespace TJAPlayer3
                 this.ct上背景FIFOタイマー = new CCounter();
 
                 this.ctSlideAnimation = new CCounter();
+                this.ctClimbAnimation = new CCounter();
+                this.ctDonAnimation = new CCounter(0, 1000, 24000f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
 
                 base.OnManagedリソースの作成();
             }
@@ -579,7 +581,7 @@ namespace TJAPlayer3
 
                 int skyboxYPosition = (int)(5000 * (1f - (currentFloorPositionMax140 + progressFactor)));
 
-                TJAPlayer3.Tx.Tower_Sky_Gradient.t2D描画(TJAPlayer3.app.Device, 0, 360, new Rectangle(0, skyboxYPosition, 1280, 316));
+                TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.app.Device, 0, 360, new Rectangle(0, skyboxYPosition, 1280, 316));
 
                 #endregion
 
@@ -590,17 +592,21 @@ namespace TJAPlayer3
 
                 // Will be personnalisable within the .tja file
                 int currentTower = 0;
+
+                // Will implement the roof later, need the beforehand total floor count calculation before
                 int nextTowerBase = ((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
                 int towerBase = (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
 
                 int heightChange = (int)(progressFactor * 288f);
 
+                /*
                 if (ctSlideAnimation != null)
                 {
                     TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctSlideAnimation.n現在の値.ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 10, C文字コンソール.Eフォント種別.白, progressFactor.ToString());
                     TJAPlayer3.act文字コンソール.tPrint(0, 20, C文字コンソール.Eフォント種別.白, heightChange.ToString());
                 }
+                */
                 
 
                 // Current trunk
@@ -615,7 +621,44 @@ namespace TJAPlayer3
 
                 #endregion
 
+                #region [Climbing don]
+
+                // Will be added in a future skinning update
+                int currentDon = 0;
+
+                if (bFloorChanged == true)
+                {
+                    ctClimbAnimation.t開始(0, 1500, 120f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                    ctDonAnimation.t開始(0, 1000, 24000f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                }
+                    
+
+                if (ctClimbAnimation.n現在の値 == 0 || ctClimbAnimation.n現在の値 == 1500)
+                {
+                    int animDon = ctDonAnimation.n現在の値 % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing[currentDon];
+                    TJAPlayer3.Tx.Tower_Don_Standing[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.app.Device, 590, 648); // Center X - 50
+                }
+                else if (ctClimbAnimation.n現在の値 <= 1000)
+                {
+                    int animDon = ctDonAnimation.n現在の値 % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing[currentDon];
+                    int distDon = (int)(ctClimbAnimation.n現在の値 * (300 / 1000f));
+                    TJAPlayer3.Tx.Tower_Don_Climbing[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.app.Device, 590 + distDon, 648);
+                }
+                else
+                {
+                    int animDon = ctDonAnimation.n現在の値 % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running[currentDon];
+                    int distDon = (int)((1500 - ctClimbAnimation.n現在の値) * (300 / 500f));
+                    TJAPlayer3.Tx.Tower_Don_Running[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.app.Device, 590 + distDon, 648);
+                }
+                
+
+                // Move 300 right, then 300 left
+
+                #endregion
+
                 ctSlideAnimation?.t進行();
+                ctClimbAnimation?.t進行();
+                ctDonAnimation?.t進行Loop();
 
                 #endregion
             }
@@ -683,6 +726,8 @@ namespace TJAPlayer3
 
         private bool bFloorChanged = false;
         private CCounter ctSlideAnimation;
+        private CCounter ctDonAnimation;
+        private CCounter ctClimbAnimation;
 
         private CCounter ct炎;
 
