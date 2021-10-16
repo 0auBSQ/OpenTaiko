@@ -159,6 +159,8 @@ namespace TJAPlayer3
 
                 this.ct上背景FIFOタイマー = new CCounter();
 
+                this.ctSlideAnimation = new CCounter();
+
                 base.OnManagedリソースの作成();
             }
         }
@@ -227,11 +229,9 @@ namespace TJAPlayer3
             {
                 #region [Tower animations variables]
 
-                this.bFloorChanged = CFloorManagement.LastRegisteredFloor != TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+                this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
 
                 currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 140f, 1f);
-
-
 
                 #endregion
 
@@ -568,15 +568,54 @@ namespace TJAPlayer3
 
                 #region [Tower lower background]
 
+                float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 140f, 1f);
+
+                if (bFloorChanged == true)
+                    ctSlideAnimation.t開始(0, 1000, 120f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                
+                float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.n現在の値 / 1000f);
+
                 #region [Skybox]
 
-
-                int skyboxYPosition = (int)(5000 * (1f - currentFloorPositionMax140));
+                int skyboxYPosition = (int)(5000 * (1f - (currentFloorPositionMax140 + progressFactor)));
 
                 TJAPlayer3.Tx.Tower_Sky_Gradient.t2D描画(TJAPlayer3.app.Device, 0, 360, new Rectangle(0, skyboxYPosition, 1280, 316));
 
+                #endregion
+
+
+                #region [Tower body]
+
+                progressFactor = ctSlideAnimation.n現在の値 / 1000f;
+
+                // Will be personnalisable within the .tja file
+                int currentTower = 0;
+                int nextTowerBase = ((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
+                int towerBase = (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
+
+                int heightChange = (int)(progressFactor * 288f);
+
+                if (ctSlideAnimation != null)
+                {
+                    TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctSlideAnimation.n現在の値.ToString());
+                    TJAPlayer3.act文字コンソール.tPrint(0, 10, C文字コンソール.Eフォント種別.白, progressFactor.ToString());
+                    TJAPlayer3.act文字コンソール.tPrint(0, 20, C文字コンソール.Eフォント種別.白, heightChange.ToString());
+                }
+                
+
+                // Current trunk
+                TJAPlayer3.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 676 + heightChange); // 316 + 360
+
+                // Next trunk
+                TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 388 + heightChange, // Current - 288  
+                    new Rectangle(0, 288 - heightChange, 
+                        TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Width,
+                        Math.Min(TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Height, heightChange + 28)));
+
 
                 #endregion
+
+                ctSlideAnimation?.t進行();
 
                 #endregion
             }
@@ -643,6 +682,7 @@ namespace TJAPlayer3
         private CPrivateFastFont pfTowerText;
 
         private bool bFloorChanged = false;
+        private CCounter ctSlideAnimation;
 
         private CCounter ct炎;
 
