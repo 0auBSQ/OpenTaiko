@@ -214,14 +214,49 @@ namespace TJAPlayer3
             if (this.ct上背景スクロール用タイマー2stDan != null)
                 this.ct上背景スクロール用タイマー2stDan.t進行Loop();
 
-            #region 1P-2P-上背景
+            #region [Tower specific variables declaration]
 
+            float currentFloorPositionMax140 = 0;
+
+            #endregion
+
+
+            #region [Upper background]
 
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
             {
+                #region [Tower animations variables]
+
+                this.bFloorChanged = CFloorManagement.LastRegisteredFloor != TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+
+                currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 140f, 1f);
+
+
+
+                #endregion
+
                 #region [Tower HAIKEI]
 
                 TJAPlayer3.Tx.Background_Up_Tower[0]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[7] != null)
+                    TJAPlayer3.Tx.Background_Up_Tower[7].Opacity = (int)(255f * currentFloorPositionMax140);
+
+
+                TJAPlayer3.Tx.Background_Up_Tower[7]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                if (TJAPlayer3.Tx.Background_Up_Tower[1] != null && TJAPlayer3.Tx.Background_Up_Tower[2] != null && TJAPlayer3.Tx.Background_Up_Tower[3] != null)
+                {
+                    float colorTmp = 0.5f + (1f - currentFloorPositionMax140) * 0.5f;
+
+                    TJAPlayer3.Tx.Background_Up_Tower[1].color4 = new Color4(colorTmp, colorTmp, colorTmp);
+                    TJAPlayer3.Tx.Background_Up_Tower[2].color4 = new Color4(colorTmp, colorTmp, colorTmp);
+                    TJAPlayer3.Tx.Background_Up_Tower[3].color4 = new Color4(colorTmp, colorTmp, colorTmp);
+
+                    TJAPlayer3.Tx.Background_Up_Tower[1].Opacity = (int)(255f * colorTmp);
+                    TJAPlayer3.Tx.Background_Up_Tower[2].Opacity = (int)(255f * colorTmp);
+                    TJAPlayer3.Tx.Background_Up_Tower[3].Opacity = (int)(255f * colorTmp);
+                }
 
                 if (TJAPlayer3.Tx.Background_Up_Tower[1] != null)
                     for (int i = 0; i < 1280 / TJAPlayer3.Tx.Background_Up_Tower[1].szテクスチャサイズ.Width + 2; i++)
@@ -525,9 +560,31 @@ namespace TJAPlayer3
 
 
 
-            #region 1P-下背景
-            if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
+            #region [Lower background]
+
+
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
             {
+
+                #region [Tower lower background]
+
+                #region [Skybox]
+
+
+                int skyboxYPosition = (int)(5000 * (1f - currentFloorPositionMax140));
+
+                TJAPlayer3.Tx.Tower_Sky_Gradient.t2D描画(TJAPlayer3.app.Device, 0, 360, new Rectangle(0, skyboxYPosition, 1280, 316));
+
+
+                #endregion
+
+                #endregion
+            }
+            else if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            {
+
+                #region [Ensou lower background]
+
                 if (TJAPlayer3.Tx.Background_Down != null)
                 {
                     TJAPlayer3.Tx.Background_Down.t2D描画(TJAPlayer3.app.Device, 0, 360);
@@ -556,7 +613,11 @@ namespace TJAPlayer3
 
                     }
                 }
+
+                #endregion
             }
+
+
             #endregion
 
             return base.On進行描画();
@@ -580,6 +641,8 @@ namespace TJAPlayer3
         private TitleTextureKey ttkTouTatsuKaiSuu;
         private TitleTextureKey ttkKai;
         private CPrivateFastFont pfTowerText;
+
+        private bool bFloorChanged = false;
 
         private CCounter ct炎;
 

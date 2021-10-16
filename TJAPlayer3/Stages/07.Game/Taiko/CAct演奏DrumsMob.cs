@@ -50,7 +50,7 @@ namespace TJAPlayer3
                 if (ctMob != null) ctMob.t進行LoopDb();
                 if (ctMobPtn != null || TJAPlayer3.Skin.Game_Mob_Ptn != 0) ctMobPtn.t進行LoopDb();
 
-                if (TJAPlayer3.Skin.Game_Mob_Ptn != 0)
+                if (TJAPlayer3.Skin.Game_Mob_Ptn != 0 && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
                 {
 
                     /*
@@ -68,14 +68,6 @@ namespace TJAPlayer3
                         
                         if (TJAPlayer3.Tx.Mob[RandomMob] != null)
                             TJAPlayer3.Tx.Mob[RandomMob].t2D描画(TJAPlayer3.app.Device, 0, (720 - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)) * 70));
-                        
-                        
-                        /*
-                        if (TJAPlayer3.Tx.Mob[(int)ctMobPtn.n現在の値] != null)
-                        {
-                            TJAPlayer3.Tx.Mob[(int)ctMobPtn.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, (720 - (TJAPlayer3.Tx.Mob[0].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)) * 70));
-                        }
-                        */
                         
                     }
 

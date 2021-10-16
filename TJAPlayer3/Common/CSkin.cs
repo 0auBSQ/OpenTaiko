@@ -2657,11 +2657,16 @@ namespace TJAPlayer3
 
         #endregion
         #region Game
+
+        // Game parameters here
+
         public bool Game_Notes_Anime = false;
         public string Game_StageText = "1曲目";
         public RollColorMode Game_RollColorMode = RollColorMode.All;
         public bool Game_JudgeFrame_AddBlend = true;
+
         #region Chara
+
         public int[] Game_Chara_X = new int[] { 0, 0 };
         public int[] Game_Chara_Y = new int[] { 0, 537 };
         public int[] Game_Chara_Balloon_X = new int[] { 240, 240, 0, 0 };
@@ -2687,15 +2692,34 @@ namespace TJAPlayer3
         public int Game_Chara_Balloon_Timer = 28;
         public int Game_Chara_Balloon_Delay = 500;
         public int Game_Chara_Balloon_FadeOut = 84;
+        
         #endregion
+
         #region Dancer
+
         public int[] Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
         public int[] Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
         public string Game_Dancer_Motion = "0";
         public int Game_Dancer_Ptn = 0;
         public int Game_Dancer_Beat = 8;
         public int[] Game_Dancer_Gauge = new int[] { 0, 0, 0, 40, 80 };
+
         #endregion
+
+        #region Tower
+
+        public int Game_Tower_Ptn;
+        public int[] Game_Tower_Ptn_Deco,
+            Game_Tower_Ptn_Base;
+
+        public int Game_Tower_Ptn_Don;
+        public int[] Game_Tower_Ptn_Don_Standing,
+            Game_Tower_Ptn_Don_Jump,
+            Game_Tower_Ptn_Don_Climbing,
+            Game_Tower_Ptn_Don_Running;
+
+        #endregion
+
         #region Mob
         public int Game_Mob_Ptn = 1;
         public int Game_Mob_Beat,

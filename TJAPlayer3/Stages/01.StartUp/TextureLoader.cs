@@ -42,6 +42,11 @@ namespace TJAPlayer3
         const string PUCHICHARA = @"18_PuchiChara\";
         const string TRAINING = @"19_Training\";
         const string DANC = @"17_DanC\";
+        const string TOWER = @"20_Tower\";
+
+        // Tower infos
+        const string TOWERDON = @"Tower_Don\";
+        const string TOWERFLOOR = @"Tower_Floors\";
 
         // InGame_Effects
         const string FIRE = @"Fire\";
@@ -293,6 +298,9 @@ namespace TJAPlayer3
 
             #endregion
             #region キャラクター
+
+            // Count here
+
             TJAPlayer3.Skin.Game_Chara_Ptn_Normal = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Normal\"));
             if (TJAPlayer3.Skin.Game_Chara_Ptn_Normal != 0)
             {
@@ -716,6 +724,88 @@ namespace TJAPlayer3
             Tokkun_SmallNumber = TxC(GAME + TRAINING + @"SmallNumber.png");
             Tokkun_Speed_Measure = TxC(GAME + TRAINING + @"Speed_Measure.png");
             #endregion
+
+            #region [20_Tower]
+
+            Tower_Sky_Gradient = TxC(GAME + TOWER + @"Sky_Gradient.png");
+
+            // Tower elements
+            TJAPlayer3.Skin.Game_Tower_Ptn = System.IO.Directory.GetDirectories(CSkin.Path(BASE + GAME + TOWER + TOWERFLOOR)).Length;
+            Tower_Top = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn];
+            Tower_Base = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn][];
+            Tower_Deco = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn][];
+
+            TJAPlayer3.Skin.Game_Tower_Ptn_Base = new int[TJAPlayer3.Skin.Game_Tower_Ptn];
+            TJAPlayer3.Skin.Game_Tower_Ptn_Deco = new int[TJAPlayer3.Skin.Game_Tower_Ptn];
+
+            for (int i = 0; i < TJAPlayer3.Skin.Game_Tower_Ptn; i++)
+            {
+                TJAPlayer3.Skin.Game_Tower_Ptn_Base[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERFLOOR + i.ToString() + @"\Base\"), "Base");
+                TJAPlayer3.Skin.Game_Tower_Ptn_Deco[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERFLOOR + i.ToString() + @"\Deco\"), "Deco");
+
+                Tower_Top[i] = TxC(GAME + TOWER + TOWERFLOOR + i.ToString() + @"\Top.png");
+
+                Tower_Base[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Base[i]];
+                Tower_Deco[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Deco[i]];
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Base[i]; j++)
+                {
+                    Tower_Base[i][j] = TxC(GAME + TOWER + TOWERFLOOR + i.ToString() + @"\Base\Base" + j.ToString() + ".png");
+                }
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Deco[i]; j++)
+                {
+                    Tower_Deco[i][j] = TxC(GAME + TOWER + TOWERFLOOR + i.ToString() + @"\Deco\Deco" + j.ToString() + ".png");
+                }
+            }
+
+            // Tower climbing Don
+            TJAPlayer3.Skin.Game_Tower_Ptn_Don = System.IO.Directory.GetDirectories(CSkin.Path(BASE + GAME + TOWER + TOWERDON)).Length;
+            Tower_Don_Climbing = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don][];
+            Tower_Don_Jump = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don][];
+            Tower_Don_Running = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don][];
+            Tower_Don_Standing = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don][];
+
+            TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing = new int[TJAPlayer3.Skin.Game_Tower_Ptn_Don];
+            TJAPlayer3.Skin.Game_Tower_Ptn_Don_Jump = new int[TJAPlayer3.Skin.Game_Tower_Ptn_Don];
+            TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running = new int[TJAPlayer3.Skin.Game_Tower_Ptn_Don];
+            TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing = new int[TJAPlayer3.Skin.Game_Tower_Ptn_Don];
+
+            for (int i = 0; i < TJAPlayer3.Skin.Game_Tower_Ptn_Don; i++)
+            {
+                TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @"\Climbing\"), "Climbing");
+                TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @"\Running\"), "Running");
+                TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @"\Standing\"), "Standing");
+                TJAPlayer3.Skin.Game_Tower_Ptn_Don_Jump[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @"\Jump\"), "Jump");
+
+                Tower_Don_Climbing[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing[i]];
+                Tower_Don_Running[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running[i]];
+                Tower_Don_Standing[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing[i]];
+                Tower_Don_Jump[i] = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Don_Jump[i]];
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing[i]; j++)
+                {
+                    Tower_Don_Climbing[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @"\Climbing\Climbing" + j.ToString() + ".png");
+                }
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running[i]; j++)
+                {
+                    Tower_Don_Running[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @"\Running\Running" + j.ToString() + ".png");
+                }
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing[i]; j++)
+                {
+                    Tower_Don_Standing[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @"\Standing\Standing" + j.ToString() + ".png");
+                }
+
+                for (int j = 0; j < TJAPlayer3.Skin.Game_Tower_Ptn_Don_Jump[i]; j++)
+                {
+                    Tower_Don_Jump[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @"\Jump\Jump" + j.ToString() + ".png");
+                }
+            }
+
+            #endregion
+
             #endregion
 
             #region 6_結果発表
@@ -969,7 +1059,7 @@ namespace TJAPlayer3
                           Background_Up_2nd,
                           Background_Up_3rd,
                           Background_Up_Dan = new CTexture[6],
-                          Background_Up_Tower = new CTexture[7];
+                          Background_Up_Tower = new CTexture[8];
         #endregion
         #region 太鼓
         public CTexture[] Taiko_Frame, // MTaiko下敷き
@@ -1098,6 +1188,24 @@ namespace TJAPlayer3
             Tokkun_SmallNumber,
             Tokkun_Speed_Measure;
         #endregion
+
+        #region [20_Tower]
+
+        public CTexture Tower_Sky_Gradient;
+
+        public CTexture[] Tower_Top;
+
+        public CTexture[][] Tower_Base,
+            Tower_Deco,
+            Tower_Don_Running,
+            Tower_Don_Standing,
+            Tower_Don_Climbing,
+            Tower_Don_Jump;
+
+
+        #endregion
+
+
         #endregion
 
         #region 6_結果発表
