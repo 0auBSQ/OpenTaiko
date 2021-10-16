@@ -161,7 +161,7 @@ namespace TJAPlayer3
 
                 this.ctSlideAnimation = new CCounter();
                 this.ctClimbAnimation = new CCounter();
-                this.ctDonAnimation = new CCounter(0, 1000, 24000f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                this.ctDonAnimation = new CCounter(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
 
                 base.OnManagedリソースの作成();
             }
@@ -233,7 +233,10 @@ namespace TJAPlayer3
 
                 this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
 
-                currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 140f, 1f);
+                int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+                int nightTime = Math.Max(140, maxFloor / 2);
+
+                currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 
                 #endregion
 
@@ -560,20 +563,23 @@ namespace TJAPlayer3
 
             #endregion
 
-
-
             #region [Lower background]
 
 
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
             {
+                int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+
+                TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, maxFloor.ToString());
+
+                int nightTime = Math.Max(140, maxFloor / 2);
 
                 #region [Tower lower background]
 
-                float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 140f, 1f);
+                float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
                 if (bFloorChanged == true)
-                    ctSlideAnimation.t開始(0, 1000, 120f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                    ctSlideAnimation.t開始(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
                 
                 float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.n現在の値 / 1000f);
 
@@ -609,19 +615,31 @@ namespace TJAPlayer3
                 int heightChange = (int)(progressFactor * 288f);
 
                 // Current trunk
-                TJAPlayer3.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 676 + heightChange); // 316 + 360
+                if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] < maxFloor)
+                    TJAPlayer3.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 676 + heightChange); // 316 + 360
+                else
+                    TJAPlayer3.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 676 + heightChange);
 
                 // Current deco
                 TJAPlayer3.Tx.Tower_Deco[currentTower][currentDeco]?.t2D下中央基準描画(TJAPlayer3.app.Device, 460, 640 + heightChange);
 
-                // Next trunk
-                TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 388 + heightChange, // Current - 288  
-                    new Rectangle(0, 288 - heightChange, 
-                        TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Width,
-                        Math.Min(TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Height, heightChange + 28)));
 
-                // Next deco
-                if (heightChange > 46)
+                // Next trunk
+                if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
+                    TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 388 + heightChange, // Current - 288  
+                        new Rectangle(0, 288 - heightChange, 
+                            TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Width,
+                            Math.Min(TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Height, heightChange + 28)));
+                else if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 == maxFloor)
+                {
+                    TJAPlayer3.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 388 + heightChange, // Current - 288  
+                        new Rectangle(0, 351 - heightChange,
+                            TJAPlayer3.Tx.Tower_Top[currentTower].szテクスチャサイズ.Width,
+                            Math.Min(TJAPlayer3.Tx.Tower_Top[currentTower].szテクスチャサイズ.Height, heightChange + 28)));
+                }
+
+                    // Next deco
+                if (heightChange > 46 && TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
                     TJAPlayer3.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(TJAPlayer3.app.Device, 460, 352 + heightChange);
 
 
@@ -634,8 +652,8 @@ namespace TJAPlayer3
 
                 if (bFloorChanged == true)
                 {
-                    ctClimbAnimation.t開始(0, 1500, 120f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
-                    ctDonAnimation.t開始(0, 1000, 24000f / (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM, TJAPlayer3.Timer);
+                    ctClimbAnimation.t開始(0, 1500, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    ctDonAnimation.t開始(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
                 }
                     
 

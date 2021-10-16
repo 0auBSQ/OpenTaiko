@@ -62,6 +62,7 @@ namespace TJAPlayer3
 		
 		// Tower Lives
 		public int nLife = 5;
+		public int nTotalFloor = 140;
 		
 		public string[] strBoxText = new string[3];
         public Eジャンル eジャンル = Eジャンル.None;

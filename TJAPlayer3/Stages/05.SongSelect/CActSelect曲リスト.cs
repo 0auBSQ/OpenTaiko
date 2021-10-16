@@ -2009,6 +2009,7 @@ namespace TJAPlayer3
 					}
 				}
 
+				// To investigate
 				for ( int j = 0; j < 3; j++ )
 					this.stバー情報[ i ].nスキル値[ j ] = (int) song.arスコア[ this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す( song ) ].譜面情報.最大スキル[ j ];
 

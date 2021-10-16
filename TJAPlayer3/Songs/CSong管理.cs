@@ -208,6 +208,19 @@ namespace TJAPlayer3
 									// LIFE here
 									c曲リストノード.nLife = dtx.LIFE;
 
+									// Total count of floors for a tower chart
+									c曲リストノード.nTotalFloor = 0;
+
+									for (int i = 0; i < dtx.listChip.Count; i++)
+									{
+										CDTX.CChip pChip = dtx.listChip[i];
+
+										if (pChip.n整数値_内部番号 > c曲リストノード.nTotalFloor && pChip.nチャンネル番号 == 0x50) c曲リストノード.nTotalFloor = pChip.n整数値_内部番号;
+
+									}
+									c曲リストノード.nTotalFloor++;
+
+
 									switch (c曲リストノード.strジャンル) 
 									{
 										case "J-POP":
@@ -955,6 +968,17 @@ namespace TJAPlayer3
 
 									// Tower Lives
 									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
+
+									c曲リストノード.arスコア[i].譜面情報.nTotalFloor = 0;
+									for (int k = 0; k < cdtx.listChip.Count; k++)
+									{
+										CDTX.CChip pChip = cdtx.listChip[k];
+
+										if (pChip.n整数値_内部番号 > c曲リストノード.arスコア[i].譜面情報.nTotalFloor && pChip.nチャンネル番号 == 0x50)
+											c曲リストノード.arスコア[i].譜面情報.nTotalFloor = pChip.n整数値_内部番号;
+									}
+									c曲リストノード.arスコア[i].譜面情報.nTotalFloor++;
+
 
 
 									this.nファイルから反映できたスコア数++;

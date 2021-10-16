@@ -83,6 +83,7 @@ namespace TJAPlayer3
 
 			// Tower lifes
 			public int nLife;
+			public int nTotalFloor;
 
 			[Serializable]
 			[StructLayout( LayoutKind.Sequential )]
@@ -313,6 +314,9 @@ namespace TJAPlayer3
             this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1};
 			this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
+
+			this.譜面情報.nLife = 5;
+			this.譜面情報.nTotalFloor = 140;
 		}
 	}
 }

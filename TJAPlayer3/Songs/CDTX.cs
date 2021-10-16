@@ -4887,6 +4887,7 @@ namespace TJAPlayer3
             }
             else if (strCommandName.Equals("LIFE"))
             {
+                // LIFE here
                 var life = (int)Convert.ToDouble(strCommandParam);
                 this.LIFE = life;
             }
