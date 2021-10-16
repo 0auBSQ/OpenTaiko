@@ -729,6 +729,8 @@ namespace TJAPlayer3
 
             Tower_Sky_Gradient = TxC(GAME + TOWER + @"Sky_Gradient.png");
 
+            Tower_Miss = TxC(GAME + TOWER + @"Miss.png");
+
             // Tower elements
             TJAPlayer3.Skin.Game_Tower_Ptn = System.IO.Directory.GetDirectories(CSkin.Path(BASE + GAME + TOWER + TOWERFLOOR)).Length;
             Tower_Top = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn];
@@ -1191,7 +1193,8 @@ namespace TJAPlayer3
 
         #region [20_Tower]
 
-        public CTexture Tower_Sky_Gradient;
+        public CTexture Tower_Sky_Gradient,
+            Tower_Miss;
 
         public CTexture[] Tower_Top;
 

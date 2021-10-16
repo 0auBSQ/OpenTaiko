@@ -19,7 +19,7 @@ namespace TJAPlayer3
 
         public static void damage()
         {
-            if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.n現在の値 < InvincibilityDuration)
+            if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.n現在の値 < CFloorManagement.InvincibilityDuration)
                 return;
 
             if (CFloorManagement.CurrentNumberOfLives > 0)
@@ -32,7 +32,7 @@ namespace TJAPlayer3
 
         public static bool isBlinking()
         {
-            if (CFloorManagement.InvincibilityFrames == null || CFloorManagement.InvincibilityFrames.n現在の値 >= InvincibilityDuration)
+            if (CFloorManagement.InvincibilityFrames == null || CFloorManagement.InvincibilityFrames.n現在の値 >= CFloorManagement.InvincibilityDuration)
                 return false;
 
             if (CFloorManagement.InvincibilityFrames.n現在の値 % 200 > 100)
@@ -656,7 +656,18 @@ namespace TJAPlayer3
                     int distDon = (int)((1500 - ctClimbAnimation.n現在の値) * (300 / 500f));
                     TJAPlayer3.Tx.Tower_Don_Running[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.app.Device, 590 + distDon, 648);
                 }
-                
+
+                #endregion
+
+                #region [Miss icon]
+
+                if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.n現在の値 < CFloorManagement.InvincibilityDuration)
+                {
+                    if (TJAPlayer3.Tx.Tower_Miss != null)
+                        TJAPlayer3.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - CFloorManagement.InvincibilityFrames.n現在の値);
+                    TJAPlayer3.Tx.Tower_Miss?.t2D下中央基準描画(TJAPlayer3.app.Device, 640, 520);
+                }
+
                 #endregion
 
                 ctSlideAnimation?.t進行();
