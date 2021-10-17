@@ -221,7 +221,16 @@ namespace TJAPlayer3
 
 						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], clearValue);
 					}
-						
+					else // Tower
+                    {
+						// Clear if top reached, then FC or DFC like any regular chart
+						// Score Rank cointains highest reached floor
+						if (CFloorManagement.CurrentNumberOfLives > 0)
+							this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], this.nクリア);
+						this.st演奏記録[0].nスコアランク[0] = Math.Max(ini.stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
+
+					}
+
 					// 新記録スコアチェック
 					if ((this.st演奏記録[0].nスコア > ini.stセクション[0].nスコア) && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					{
