@@ -221,12 +221,25 @@ namespace TJAPlayer3
 
 						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], clearValue);
 					}
-					else // Tower
-                    {
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					{
 						// Clear if top reached, then FC or DFC like any regular chart
 						// Score Rank cointains highest reached floor
+						int tmpClear = 0;
+
 						if (CFloorManagement.CurrentNumberOfLives > 0)
-							this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], this.nクリア);
+						{
+							tmpClear++;
+							if (this.st演奏記録.Drums.nMiss数 == 0)
+							{
+								tmpClear++;
+								if (this.st演奏記録.Drums.nGreat数 == 0)
+									tmpClear++;
+							}
+						}
+
+
+						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], tmpClear);
 						this.st演奏記録[0].nスコアランク[0] = Math.Max(ini.stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
 
 					}
