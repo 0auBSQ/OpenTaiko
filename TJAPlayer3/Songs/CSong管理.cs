@@ -376,6 +376,11 @@ namespace TJAPlayer3
                                         c曲リストノード.BackColor = c曲リストノード.r親ノード.BackColor;
                                         c曲リストノード.IsChangedBackColor = true;
                                     }
+									if (c曲リストノード.r親ノード.isChangedBoxColor)
+                                    {
+										c曲リストノード.BoxColor = c曲リストノード.r親ノード.BoxColor;
+										c曲リストノード.isChangedBoxColor = true;
+                                    }
                                 }
 
 
@@ -534,6 +539,10 @@ namespace TJAPlayer3
                         {
                             c曲リストノード.BackColor = boxdef.BackColor;
                         }
+						if (boxdef.IsChangedBoxColor)
+                        {
+							c曲リストノード.BoxColor = boxdef.BoxColor;
+                        }
                     }
 
 					switch (c曲リストノード.strジャンル)
@@ -617,6 +626,11 @@ namespace TJAPlayer3
                     {
                         c曲リストノード.BackColor = boxdef.BackColor;
                         c曲リストノード.IsChangedBackColor = true;
+                    }
+					if (boxdef.IsChangedBoxColor)
+                    {
+						c曲リストノード.BoxColor = boxdef.BoxColor;
+						c曲リストノード.isChangedBoxColor = true;
                     }
 
 					for (int i = 0; i < 3; i++)
@@ -707,6 +721,10 @@ namespace TJAPlayer3
                             if (c曲リストノード.IsChangedBackColor)
                             {
                                 sb.Append(", BackColor=" + c曲リストノード.BackColor.ToString());
+                            }
+							if (c曲リストノード.isChangedBoxColor)
+                            {
+								sb.Append(", BoxColor=" + c曲リストノード.BoxColor.ToString());
                             }
                             Trace.TraceInformation( sb.ToString() );
 						}
@@ -1080,6 +1098,7 @@ namespace TJAPlayer3
 				crecentryplaysong.nスコア数 = 1;
 				crecentryplaysong.list子リスト = new List<C曲リストノード>();
 				crecentryplaysong.BackColor = ColorTranslator.FromHtml("#164748");
+				crecentryplaysong.BoxColor = Color.White;
 
 				crecentryplaysong.arスコア[0] = new Cスコア();
 				crecentryplaysong.arスコア[0].ファイル情報.フォルダの絶対パス = "";
@@ -1171,6 +1190,8 @@ namespace TJAPlayer3
 						itemBack.eノード種別 = C曲リストノード.Eノード種別.BACKBOX;
 						itemBack.strタイトル = "とじる";
 						itemBack.BackColor = ColorTranslator.FromHtml("#513009");
+						itemBack.BoxColor = Color.White;
+
 						itemBack.strジャンル = c曲リストノード.strジャンル;
 						itemBack.nスコア数 = 1;
 						itemBack.r親ノード = c曲リストノード;

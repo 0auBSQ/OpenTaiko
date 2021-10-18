@@ -37,8 +37,10 @@ namespace TJAPlayer3
 		public Color col文字色 = Color.White;
         public Color ForeColor = Color.White;
         public Color BackColor = Color.Black;
+		public Color BoxColor = Color.White;
         public bool IsChangedForeColor;
         public bool IsChangedBackColor;
+		public bool isChangedBoxColor;
 		public List<C曲リストノード> listランダム用ノードリスト;
 		public List<C曲リストノード> list子リスト;
 		public int nGood範囲ms = -1;

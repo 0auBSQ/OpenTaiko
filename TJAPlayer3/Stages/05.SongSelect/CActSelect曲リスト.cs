@@ -918,6 +918,7 @@ namespace TJAPlayer3
 						this.stバー情報[index].strタイトル文字列 = song.strタイトル;
 						this.stバー情報[index].ForeColor = song.ForeColor;
 						this.stバー情報[index].BackColor = song.BackColor;
+						this.stバー情報[index].BoxColor = song.BoxColor;
 						this.stバー情報[index].strジャンル = song.strジャンル;
 						this.stバー情報[index].strサブタイトル = song.strサブタイトル;
 						this.stバー情報[index].ar難易度 = song.nLevel;
@@ -1004,6 +1005,7 @@ namespace TJAPlayer3
 						this.stバー情報[index].strタイトル文字列 = song.strタイトル;
 						this.stバー情報[index].ForeColor = song.ForeColor;
 						this.stバー情報[index].BackColor = song.BackColor;
+						this.stバー情報[index].BoxColor = song.BoxColor;
 						this.stバー情報[index].strサブタイトル = song.strサブタイトル;
 						this.stバー情報[index].strジャンル = song.strジャンル;
 						this.stバー情報[index].ar難易度 = song.nLevel;
@@ -1227,6 +1229,9 @@ namespace TJAPlayer3
 
 				#region [ バーテクスチャを描画。]
 				//-----------------
+
+				TJAPlayer3.Tx.SongSelect_Bar_Genre[nStrジャンルtoNum(stバー情報[nパネル番号].strジャンル)].color4 = stバー情報[nパネル番号].BoxColor;
+
 				TJAPlayer3.Tx.SongSelect_Bar_Genre[nStrジャンルtoNum(stバー情報[nパネル番号].strジャンル)].vc拡大縮小倍率.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.vc拡大縮小倍率.X = 1.0f;
@@ -1308,11 +1313,13 @@ namespace TJAPlayer3
 
 				if (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
                 {
-                    #region [ Score ]
+					#region [ Score ]
 
-                    #region [ Bar ]
+					#region [ Bar ]
 
-                    if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
+					TJAPlayer3.Tx.SongSelect_Bar_Genre[nStrジャンルtoNum(r現在選択中の曲.strジャンル)].color4 = r現在選択中の曲.BoxColor;
+
+					if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
 					{
 						TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f - (float)Math.Sin(((ctBoxOpen.n現在の値 - 1300) * 0.28125f) * (Math.PI / 180)) * 1.0f;
 						TJAPlayer3.Tx.SongSelect_Bar_Genre[nStrジャンルtoNum(r現在選択中の曲.strジャンル)].vc拡大縮小倍率.X = 1.0f - (float)Math.Sin(((ctBoxOpen.n現在の値 - 1300) * 0.28125f) * (Math.PI / 180)) * 1.0f;
@@ -1388,6 +1395,9 @@ namespace TJAPlayer3
                 if (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX)
                 {
 					#region [ Box ]
+
+					TJAPlayer3.Tx.SongSelect_Bar_Genre[nStrジャンルtoNum(r現在選択中の曲.strジャンル)].color4 = r現在選択中の曲.BoxColor;
+
 					if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
                     {
 						TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f - (float)Math.Sin(((ctBoxOpen.n現在の値 - 1300) * 0.28125f) * (Math.PI / 180)) * 1.0f;
@@ -1798,6 +1808,7 @@ namespace TJAPlayer3
 			public Color col文字色;
             public Color ForeColor;
             public Color BackColor;
+			public Color BoxColor;
             public int[] ar難易度;
             public bool[] b分岐;
             public string strジャンル;
@@ -1981,6 +1992,7 @@ namespace TJAPlayer3
 				this.stバー情報[ i ].col文字色 = song.col文字色;
                 this.stバー情報[i].ForeColor = song.ForeColor;
                 this.stバー情報[i].BackColor = song.BackColor;
+				this.stバー情報[i].BoxColor = song.BoxColor;
 				this.stバー情報[ i ].eバー種別 = this.e曲のバー種別を返す( song );
                 this.stバー情報[ i ].strサブタイトル = song.strサブタイトル;
                 this.stバー情報[ i ].ar難易度 = song.nLevel;

@@ -19,7 +19,8 @@ namespace TJAPlayer3
         public Color BackColor;
         public bool IsChangedForeColor;
         public bool IsChangedBackColor;
-
+		public Color BoxColor;
+		public bool IsChangedBoxColor;
 
 		// コンストラクタ
 
@@ -31,7 +32,7 @@ namespace TJAPlayer3
 			this.Genre = "";
             ForeColor = Color.White;
             BackColor = Color.Black;
-
+			BoxColor = Color.White;
 		}
 		public CBoxDef( string boxdefファイル名 )
 			: this()
@@ -85,6 +86,11 @@ namespace TJAPlayer3
                             {
                                 this.BackColor = ColorTranslator.FromHtml(str.Substring(10).Trim(ignoreChars));
                                 IsChangedBackColor = true;
+							}
+							else if (str.StartsWith("#BOXCOLOR", StringComparison.OrdinalIgnoreCase))
+							{
+								this.BoxColor = ColorTranslator.FromHtml(str.Substring(10).Trim(ignoreChars));
+								IsChangedBoxColor = true;
 							}
 							else
 							{
