@@ -296,6 +296,11 @@ namespace TJAPlayer3
             // int boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
             int boxType = TJAPlayer3.stage選曲.r現在選択中の曲.BoxType;
 
+            if (!TJAPlayer3.stage選曲.r現在選択中の曲.isChangedBoxType)
+            {
+                boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
+            }
+
 
             TJAPlayer3.Tx.Difficulty_Back[boxType].Opacity =
                 (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.n現在の値 - 1255);
