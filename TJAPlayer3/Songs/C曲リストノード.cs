@@ -38,6 +38,14 @@ namespace TJAPlayer3
         public Color ForeColor = Color.White;
         public Color BackColor = Color.Black;
 		public Color BoxColor = Color.White;
+
+		public Color BgColor = Color.White;
+		public bool isChangedBgColor;
+		public bool isChangedBgType;
+		public bool isChangedBoxType;
+		public int BoxType;
+		public int BgType;
+
         public bool IsChangedForeColor;
         public bool IsChangedBackColor;
 		public bool isChangedBoxColor;

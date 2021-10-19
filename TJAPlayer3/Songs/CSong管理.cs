@@ -381,7 +381,22 @@ namespace TJAPlayer3
 										c曲リストノード.BoxColor = c曲リストノード.r親ノード.BoxColor;
 										c曲リストノード.isChangedBoxColor = true;
                                     }
-                                }
+									if (c曲リストノード.r親ノード.isChangedBgColor)
+									{
+										c曲リストノード.BgColor = c曲リストノード.r親ノード.BgColor;
+										c曲リストノード.isChangedBgColor = true;
+									}
+									if (c曲リストノード.r親ノード.isChangedBgType)
+                                    {
+										c曲リストノード.BgType = c曲リストノード.r親ノード.BgType;
+										c曲リストノード.isChangedBgType = true;
+									}
+									if (c曲リストノード.r親ノード.isChangedBoxType)
+                                    {
+										c曲リストノード.BoxType = c曲リストノード.r親ノード.BoxType;
+										c曲リストノード.isChangedBoxType = true;
+									}
+								}
 
 
                                 switch (CStrジャンルtoNum.ForAC15(c曲リストノード.strジャンル))
@@ -543,7 +558,19 @@ namespace TJAPlayer3
                         {
 							c曲リストノード.BoxColor = boxdef.BoxColor;
                         }
-                    }
+						if (boxdef.IsChangedBgColor)
+                        {
+							c曲リストノード.BgColor = boxdef.BgColor;
+                        }
+						if (boxdef.IsChangedBgType)
+                        {
+							c曲リストノード.BgType = boxdef.BgType;
+                        }
+						if (boxdef.IsChangedBoxType)
+                        {
+							c曲リストノード.BoxType = boxdef.BoxType;
+                        }
+					}
 
 					switch (c曲リストノード.strジャンル)
 					{
@@ -632,6 +659,22 @@ namespace TJAPlayer3
 						c曲リストノード.BoxColor = boxdef.BoxColor;
 						c曲リストノード.isChangedBoxColor = true;
                     }
+					if (boxdef.IsChangedBgColor)
+					{
+						c曲リストノード.BgColor = boxdef.BgColor;
+						c曲リストノード.isChangedBgColor = true;
+					}
+					if (boxdef.IsChangedBgType)
+					{
+						c曲リストノード.BgType = boxdef.BgType;
+						c曲リストノード.isChangedBgType = true;
+					}
+					if (boxdef.IsChangedBoxType)
+					{
+						c曲リストノード.BoxType = boxdef.BoxType;
+						c曲リストノード.isChangedBoxType = true;
+					}
+
 
 					for (int i = 0; i < 3; i++)
 					{
@@ -726,7 +769,19 @@ namespace TJAPlayer3
                             {
 								sb.Append(", BoxColor=" + c曲リストノード.BoxColor.ToString());
                             }
-                            Trace.TraceInformation( sb.ToString() );
+							if (c曲リストノード.isChangedBgColor)
+							{
+								sb.Append(", BgColor=" + c曲リストノード.BgColor.ToString());
+							}
+							if (c曲リストノード.isChangedBoxType)
+							{
+								sb.Append(", BoxType=" + c曲リストノード.BoxType.ToString());
+							}
+							if (c曲リストノード.isChangedBgType)
+							{
+								sb.Append(", BgType=" + c曲リストノード.BgType.ToString());
+							}
+							Trace.TraceInformation( sb.ToString() );
 						}
 						finally
 						{
@@ -1099,6 +1154,7 @@ namespace TJAPlayer3
 				crecentryplaysong.list子リスト = new List<C曲リストノード>();
 				crecentryplaysong.BackColor = ColorTranslator.FromHtml("#164748");
 				crecentryplaysong.BoxColor = Color.White;
+				crecentryplaysong.BgColor = Color.White;
 
 				crecentryplaysong.arスコア[0] = new Cスコア();
 				crecentryplaysong.arスコア[0].ファイル情報.フォルダの絶対パス = "";
@@ -1119,6 +1175,7 @@ namespace TJAPlayer3
 			{
 				if(c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
+					// Dojo node removed here
 					if (c曲リストノード.strタイトル == "段位道場")
 					{
 						list曲ルート.Remove(c曲リストノード);
@@ -1191,6 +1248,11 @@ namespace TJAPlayer3
 						itemBack.strタイトル = "とじる";
 						itemBack.BackColor = ColorTranslator.FromHtml("#513009");
 						itemBack.BoxColor = Color.White;
+
+						itemBack.BgColor = c曲リストノード.BgColor;
+						itemBack.isChangedBgColor = c曲リストノード.isChangedBgColor;
+						itemBack.BgType = c曲リストノード.BgType;
+						itemBack.isChangedBgType = c曲リストノード.isChangedBgType;
 
 						itemBack.strジャンル = c曲リストノード.strジャンル;
 						itemBack.nスコア数 = 1;
@@ -1851,6 +1913,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		#endregion
 
 		// その他
+
 
 		#region [ private ]
 		//-----------------

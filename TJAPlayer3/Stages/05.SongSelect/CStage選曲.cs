@@ -417,22 +417,31 @@ namespace TJAPlayer3
 
                 if (this.r現在選択中の曲 != null)
                 {
-                    if (this.nStrジャンルtoNum(this.r現在選択中の曲.strジャンル) != 0 || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
-                    {
-                        nGenreBack = this.nStrジャンルtoNum(this.NowGenre);
-                        nOldGenreBack = this.nStrジャンルtoNum(this.OldGenre);
-                    }
+                   // if (this.nStrジャンルtoNum(this.r現在選択中の曲.strジャンル) != 0 || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+                    // {
+                        if (this.NowUseGenre)
+                            nGenreBack = this.nStrジャンルtoNum(this.NowGenre);
+                        else
+                            nGenreBack = this.NowBg;
+
+                        if (this.OldUseGenre)
+                            nOldGenreBack = this.nStrジャンルtoNum(this.OldGenre);
+                        else
+                            nOldGenreBack = this.OldBg;
+                    // }
                     if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                     {
                         for (int i = 0; i < (1280 / TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width) + 2; i++)
                         {
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                             {
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = this.NowBgColor;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].Opacity = 255;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack] != null)
                             {
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = this.OldBgColor;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].Opacity = 600 - ctBackgroundFade.n現在の値;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }
@@ -666,6 +675,8 @@ namespace TJAPlayer3
                                             {
                                                 case C曲リストノード.Eノード種別.SCORE:
                                                     {
+                                                        // Maybe auxilliary don select here too ?
+
                                                         if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
                                                         {
                                                             if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
@@ -986,6 +997,12 @@ namespace TJAPlayer3
         public CCounter ctBackgroundFade;
         public string NowGenre;
         public string OldGenre;
+        public int NowBg;
+        public int OldBg;
+        public Color NowBgColor = Color.White;
+        public Color OldBgColor = Color.White;
+        public bool NowUseGenre;
+        public bool OldUseGenre;
         private CActSelectArtistComment actArtistComment;
         private CActFIFOBlack actFIFO;
         private CActFIFOBlack actFIfrom結果画面;
@@ -1216,7 +1233,13 @@ namespace TJAPlayer3
             }
             this.ctBackgroundFade.t開始(0, 600, 1, TJAPlayer3.Timer);
             if (this.act曲リスト.ctBarOpen.n現在の値 >= 200 || this.ctBackgroundFade.n現在の値 >= 600 - 255)
+            {
                 TJAPlayer3.stage選曲.OldGenre = this.r現在選択中の曲.strジャンル;
+                TJAPlayer3.stage選曲.OldUseGenre = !this.r現在選択中の曲.isChangedBgType;
+                TJAPlayer3.stage選曲.OldBg = this.r現在選択中の曲.BgType;
+                TJAPlayer3.stage選曲.OldBgColor = this.r現在選択中の曲.BgColor;
+            }
+                
             this.act曲リスト.t次に移動();
             TJAPlayer3.Skin.soundカーソル移動音.t再生する();
         }
@@ -1247,8 +1270,14 @@ namespace TJAPlayer3
             }
 
             this.ctBackgroundFade.t開始(0, 600, 1, TJAPlayer3.Timer);
-            if (this.act曲リスト.ctBarOpen.n現在の値 >= 200 || this.ctBackgroundFade.n現在の値 >= 600 - 255)                
+            if (this.act曲リスト.ctBarOpen.n現在の値 >= 200 || this.ctBackgroundFade.n現在の値 >= 600 - 255)
+            {
                 TJAPlayer3.stage選曲.OldGenre = this.r現在選択中の曲.strジャンル;
+                TJAPlayer3.stage選曲.OldUseGenre = !this.r現在選択中の曲.isChangedBgType;
+                TJAPlayer3.stage選曲.OldBg = this.r現在選択中の曲.BgType;
+                TJAPlayer3.stage選曲.OldBgColor = this.r現在選択中の曲.BgColor;
+            }           
+                
             this.act曲リスト.t前に移動();
             TJAPlayer3.Skin.soundカーソル移動音.t再生する();
         }
@@ -1256,7 +1285,13 @@ namespace TJAPlayer3
         {
             this.ctBackgroundFade.t開始(0, 600, 1, TJAPlayer3.Timer);
             if (this.act曲リスト.ctBarOpen.n現在の値 >= 200 || this.ctBackgroundFade.n現在の値 >= 600 - 255)
+            {
                 TJAPlayer3.stage選曲.OldGenre = this.r現在選択中の曲.strジャンル;
+                TJAPlayer3.stage選曲.OldUseGenre = !this.r現在選択中の曲.isChangedBgType;
+                TJAPlayer3.stage選曲.OldBg = this.r現在選択中の曲.BgType;
+                TJAPlayer3.stage選曲.OldBgColor = this.r現在選択中の曲.BgColor;
+            }
+
             if (Up) this.act曲リスト.t前に移動();
             else this.act曲リスト.t次に移動();
 

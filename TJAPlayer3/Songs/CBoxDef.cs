@@ -21,6 +21,12 @@ namespace TJAPlayer3
         public bool IsChangedBackColor;
 		public Color BoxColor;
 		public bool IsChangedBoxColor;
+		public Color BgColor;
+		public bool IsChangedBgColor;
+		public int BoxType;
+		public int BgType;
+		public bool IsChangedBoxType;
+		public bool IsChangedBgType;
 
 		// コンストラクタ
 
@@ -33,6 +39,9 @@ namespace TJAPlayer3
             ForeColor = Color.White;
             BackColor = Color.Black;
 			BoxColor = Color.White;
+			BoxType = 0;
+			BgType = 0;
+			BgColor = Color.White;
 		}
 		public CBoxDef( string boxdefファイル名 )
 			: this()
@@ -89,8 +98,23 @@ namespace TJAPlayer3
 							}
 							else if (str.StartsWith("#BOXCOLOR", StringComparison.OrdinalIgnoreCase))
 							{
-								this.BoxColor = ColorTranslator.FromHtml(str.Substring(10).Trim(ignoreChars));
+								this.BoxColor = ColorTranslator.FromHtml(str.Substring(9).Trim(ignoreChars));
 								IsChangedBoxColor = true;
+							}
+							else if (str.StartsWith("#BGCOLOR", StringComparison.OrdinalIgnoreCase))
+							{
+								this.BgColor = ColorTranslator.FromHtml(str.Substring(8).Trim(ignoreChars));
+								IsChangedBgColor = true;
+							}
+							else if (str.StartsWith("#BGTYPE", StringComparison.OrdinalIgnoreCase))
+							{
+								this.BgType = int.Parse(str.Substring(7).Trim(ignoreChars));
+								IsChangedBgType = true;
+							}
+							else if (str.StartsWith("#BOXTYPE", StringComparison.OrdinalIgnoreCase))
+							{
+								this.BoxType = int.Parse(str.Substring(8).Trim(ignoreChars));
+								IsChangedBoxType = true;
 							}
 							else
 							{
@@ -114,6 +138,20 @@ namespace TJAPlayer3
 				}
 			}
 			reader.Close();
+
+			/*
+			if (!IsChangedBoxType)
+            {
+				this.BoxType = this.nStrジャンルtoNum(this.Genre);
+            }
+			if (!IsChangedBgType)
+            {
+				this.BgType = this.nStrジャンルtoNum(this.Genre);
+			}
+			*/
 		}
+
+
+
 	}
 }

@@ -30,9 +30,9 @@ Discord以外で配布しておりません。
 
 例：
 
-旧： #NEXTSONG Calculator,M-O-T-U,ナムコオリジナル,Calculator.ogg,920,330
+旧： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF]
 
-新（簡単☆４）： #NEXTSONG Calculator,M-O-T-U,ナムコオリジナル,Calculator.ogg,920,330,4,0
+新： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
 - 「太鼓叩いてスタート」と言える画面を通り過ぎれません
