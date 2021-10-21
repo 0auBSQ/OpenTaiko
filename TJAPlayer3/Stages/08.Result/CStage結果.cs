@@ -4,6 +4,7 @@ using System.Diagnostics;
 using FDK;
 using System.Drawing;
 using System.Collections.Generic;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -348,6 +349,33 @@ namespace TJAPlayer3
 
 				Dan_Plate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス) + @"\Dan_Plate.png");
 
+				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                {
+					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+					{
+						this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 72);
+					}
+					else
+					{
+						this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 72);
+					}
+
+					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + "階", pfTowerText48, Color.Black, Color.Transparent, 700);
+					this.ttkToutatsu = new TitleTextureKey("到達階数", pfTowerText48, Color.White, Color.Black, 700);
+					this.ttkTen = new TitleTextureKey("点", pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
+					this.ttkScore = new TitleTextureKey("スコア", pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+				}
+
+				
+
+
 
 				base.OnManagedリソースの作成();
 			}
@@ -365,6 +393,13 @@ namespace TJAPlayer3
 				//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
 				//CDTXMania.tテクスチャの解放( ref this.txオプションパネル );
 				Dan_Plate?.Dispose();
+
+				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+				{
+					TJAPlayer3.t安全にDisposeする(ref pfTowerText);
+					TJAPlayer3.t安全にDisposeする(ref pfTowerText48);
+					TJAPlayer3.t安全にDisposeする(ref pfTowerText72);
+				}
 
 				base.OnManagedリソースの解放();
 			}
@@ -715,7 +750,23 @@ namespace TJAPlayer3
 						TJAPlayer3.Tx.TowerResult_Tower[0]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+						int firstRowY = 394;
+						int secondRowY = firstRowY + 96;
 
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.app.Device, 196, 160);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.app.Device, 616, 296);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.app.Device, 982, firstRowY);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.app.Device, 248, firstRowY);
+
+						CTexture tmpScoreCount = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScoreCount);
+						CTexture tmpCurrentFloor = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkReachedFloor);
+						CTexture tmpRemainingLifes = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkRemaningLifes);
+
+						tmpCurrentFloor?.t2D描画(TJAPlayer3.app.Device, 616 - tmpCurrentFloor.szテクスチャサイズ.Width + 72, 258);
+						tmpScoreCount?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpScoreCount.szテクスチャサイズ.Width + 12, firstRowY);
+						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpRemainingLifes.szテクスチャサイズ.Width + 54, secondRowY);
+
+						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, 248, secondRowY - 16, new Rectangle(0, 0, 80, 80));
 
 						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
 						{
@@ -986,6 +1037,16 @@ namespace TJAPlayer3
 
 		// Tower informations
 		private CCounter ctTower_Animation;
+		private TitleTextureKey ttkMaxFloors;
+		private TitleTextureKey ttkToutatsu;
+		private TitleTextureKey ttkTen;
+		private TitleTextureKey ttkReachedFloor;
+		private TitleTextureKey ttkScore;
+		private TitleTextureKey ttkRemaningLifes;
+		private TitleTextureKey ttkScoreCount;
+		private CPrivateFastFont pfTowerText;
+		private CPrivateFastFont pfTowerText48;
+		private CPrivateFastFont pfTowerText72;
 
 		private CCounter ctAutoReturn;
 		//private CTexture txオプションパネル;
