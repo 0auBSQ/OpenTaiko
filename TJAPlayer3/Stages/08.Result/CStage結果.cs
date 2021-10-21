@@ -715,6 +715,8 @@ namespace TJAPlayer3
 						TJAPlayer3.Tx.TowerResult_Tower[0]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+
+
 						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
 						{
 							TJAPlayer3.Skin.bgmTowerResult.t再生する();
@@ -783,6 +785,8 @@ namespace TJAPlayer3
 						if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
 						{
 							TJAPlayer3.Skin.bgmリザルト音.t停止する();
+							TJAPlayer3.Skin.bgmDanResult.t停止する();
+							TJAPlayer3.Skin.bgmTowerResult.t停止する();
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							actFI.tフェードアウト開始();
 							t後処理();
@@ -817,7 +821,6 @@ namespace TJAPlayer3
 
 		public void t後処理()
         {
-			// To check and correct later
 			if (!TJAPlayer3.ConfigIni.bAutoPlay[0])
 			{
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)

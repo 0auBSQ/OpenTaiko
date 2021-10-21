@@ -224,6 +224,7 @@ namespace TJAPlayer3
 
             #endregion
 
+            // fNow_Measure_s (/ m)
 
             #region [Upper background]
 
