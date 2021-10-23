@@ -145,7 +145,13 @@ namespace TJAPlayer3
                 int totalGoods = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect;
                 int totalOks = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great;
                 int totalBads = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss;
+
+                int individualGoods = TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber];
+                int individualOks = TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber];
+                int individualBads = TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber];
+
                 double accuracy = (totalGoods * 100 + totalOks * 50) / (double)(totalGoods + totalOks + totalBads);
+                double individualAccuracy = (individualGoods * 100 + individualOks * 50) / (double)(individualGoods + individualOks + individualBads);
 
                 switch (Challenge[i].GetExamType())
                 {
@@ -153,13 +159,13 @@ namespace TJAPlayer3
                         isChangedAmount = Challenge[i].Update((int)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0]);
                         break;
                     case Exam.Type.JudgePerfect:
-                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber] : totalGoods);
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualGoods : totalGoods);
                         break;
                     case Exam.Type.JudgeGood:
-                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber] : totalOks);
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualOks : totalOks);
                         break;
                     case Exam.Type.JudgeBad:
-                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber] : totalBads);
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualBads : totalBads);
                         break;
                     case Exam.Type.Score:
                         isChangedAmount = Challenge[i].Update((int)TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0));
@@ -174,7 +180,7 @@ namespace TJAPlayer3
                         isChangedAmount = Challenge[i].Update((int)TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0]);
                         break;
                     case Exam.Type.Accuracy:
-                        isChangedAmount = Challenge[i].Update((int)accuracy);
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? (int)individualAccuracy : (int)accuracy);
                         break;
                     default:
                         break;
@@ -926,6 +932,8 @@ namespace TJAPlayer3
         /// <param name="scaleJump">アニメーション用拡大率(Yに加算される)。</param>
         private void DrawNumber(int value, int x, int y, int padding,　bool bBig, Dan_C dan_c, float scaleX = 1.0f, float scaleY = 1.0f, float scaleJump = 0.0f)
         {
+            if (value < 0)
+                return;
             if (bBig)
             {
                 var notesRemainDigit = 0;
@@ -963,6 +971,8 @@ namespace TJAPlayer3
         public void DrawMiniNumber(int value, int x, int y, int padding, Dan_C dan_c)
         {
             var notesRemainDigit = 0;
+            if (value < 0)
+                return;
             for (int i = 0; i < value.ToString().Length; i++)
             {
                 var number = Convert.ToInt32(value.ToString()[i].ToString());
@@ -1038,7 +1048,9 @@ namespace TJAPlayer3
 
                 case Exam.Range.More:
                     {
-                        if (GetExamStatus(dan_C) == Exam.Status.Better_Success)
+                        if (dan_C.GetExamType() == Exam.Type.Accuracy && notesremain != 0)
+                            return false;
+                        else if (GetExamStatus(dan_C) == Exam.Status.Better_Success)
                             return true;
                         else
                             return false;

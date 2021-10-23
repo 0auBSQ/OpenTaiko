@@ -310,6 +310,8 @@ namespace TJAPlayer3
 
 		protected virtual void tコンボ表示_太鼓(int nCombo値, int nジャンプインデックス, int nPlayer)
 		{
+			// Combo display here
+
 			//テスト用コンボ数
 			//nCombo値 = 72;
 			#region [ 事前チェック。]

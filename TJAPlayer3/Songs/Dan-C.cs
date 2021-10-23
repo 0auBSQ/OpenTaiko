@@ -42,6 +42,10 @@ namespace TJAPlayer3
         public bool Update(int nowValue)
         {
             var isChangedAmount = false;
+            
+            if (nowValue < 0)
+                return isChangedAmount;
+
             if (!GetEnable()) return isChangedAmount;
             if (GetAmount() < nowValue) isChangedAmount = true;
             if (GetExamRange() == Exam.Range.Less && nowValue > GetValue(false)) isChangedAmount = false; // n未満でその数を超えたらfalseを返す。
@@ -73,7 +77,7 @@ namespace TJAPlayer3
                         SetCleared();
                     break;
                 case Exam.Type.Accuracy:
-                    SetCleared();
+                        SetCleared();
                     break;
                 default:
                     break;

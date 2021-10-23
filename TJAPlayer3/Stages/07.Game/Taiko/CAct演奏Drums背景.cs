@@ -575,6 +575,11 @@ namespace TJAPlayer3
 
                 int nightTime = Math.Max(140, maxFloor / 2);
 
+                int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+
+                if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
+                    currentTowerType = 0;
+
                 #region [Tower lower background]
 
                 float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
@@ -583,6 +588,8 @@ namespace TJAPlayer3
                     ctSlideAnimation.t開始(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
                 
                 float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.n現在の値 / 1000f);
+
+                
 
                 #region [Skybox]
 
@@ -597,8 +604,7 @@ namespace TJAPlayer3
 
                 progressFactor = ctSlideAnimation.n現在の値 / 1000f;
 
-                // Will be personnalisable within the .tja file
-                int currentTower = 0;
+                int currentTower = currentTowerType;
 
                 // Will implement the roof later, need the beforehand total floor count calculation before
                 int nextTowerBase = ((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];

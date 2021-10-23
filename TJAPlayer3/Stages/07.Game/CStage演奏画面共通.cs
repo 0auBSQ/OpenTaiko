@@ -1922,6 +1922,7 @@ namespace TJAPlayer3
                         nAddScore = (long)nAddScoreNiji[nPlayer] / 20;
                         nAddScore = (long)nAddScore * 10;
                     }
+
                     this.actScore.Add( E楽器パート.TAIKO, bIsAutoPlay, (long)nAddScore, nPlayer );
                 }
                 else if( TJAPlayer3.DTX.nScoreModeTmp == 2 )

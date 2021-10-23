@@ -880,10 +880,13 @@ namespace TJAPlayer3
 
             #region [8_TowerResults]
 
+            TJAPlayer3.Skin.Game_Tower_Ptn_Result = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + TOWERRESULT + @"Tower\"));
+            TowerResult_Tower = new CTexture[TJAPlayer3.Skin.Game_Tower_Ptn_Result];
+
             TowerResult_Background = TxC(TOWERRESULT + @"Background.png");
             TowerResult_Panel = TxC(TOWERRESULT + @"Panel.png");
 
-            for (int i = 0; i < TowerResult_Tower.Length; i++)
+            for (int i = 0; i < TJAPlayer3.Skin.Game_Tower_Ptn_Result; i++)
             {
                 TowerResult_Tower[i] = TxC(TOWERRESULT + @"Tower\" + i.ToString() + ".png");
             }
@@ -1268,7 +1271,7 @@ namespace TJAPlayer3
         public CTexture TowerResult_Background,
             TowerResult_Panel;
         public CTexture[]
-            TowerResult_Tower = new CTexture[1];
+            TowerResult_Tower;
 
         #endregion
 
