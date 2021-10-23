@@ -84,6 +84,7 @@ namespace TJAPlayer3
 			// Tower lifes
 			public int nLife;
 			public int nTotalFloor;
+			public int nTowerType;
 
 			[Serializable]
 			[StructLayout( LayoutKind.Sequential )]

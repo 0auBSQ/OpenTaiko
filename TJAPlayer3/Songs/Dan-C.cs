@@ -72,6 +72,9 @@ namespace TJAPlayer3
                 case Exam.Type.Combo:
                         SetCleared();
                     break;
+                case Exam.Type.Accuracy:
+                    SetCleared();
+                    break;
                 default:
                     break;
             }
@@ -237,6 +240,7 @@ namespace TJAPlayer3
                     case Exam.Type.Roll:
                     case Exam.Type.Hit:
                     case Exam.Type.Combo:
+                    case Exam.Type.Accuracy:
                         percent = 1.0 * GetAmount() / GetValue(false);
                         break;
                     default:
@@ -255,6 +259,7 @@ namespace TJAPlayer3
                     case Exam.Type.Roll:
                     case Exam.Type.Hit:
                     case Exam.Type.Combo:
+                    case Exam.Type.Accuracy:
                         percent = (1.0 * (GetValue(false) - GetAmount())) / GetValue(false);
                         break;
                     default:
@@ -351,7 +356,8 @@ namespace TJAPlayer3
             Score,
             Roll,
             Hit,
-            Combo
+            Combo,
+            Accuracy
         }
 
         /// <summary>

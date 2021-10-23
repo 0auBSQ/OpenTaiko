@@ -1188,6 +1188,8 @@ namespace TJAPlayer3
         
         // Tower lifes
         public int LIFE;
+
+        public int TOWERTYPE;
         
         public Dictionary<int, CAVI> listAVI;
         public Dictionary<int, CAVIPAN> listAVIPAN;
@@ -3025,7 +3027,7 @@ namespace TJAPlayer3
 
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
-             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
+             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
@@ -4717,6 +4719,9 @@ namespace TJAPlayer3
                         case "c":
                             examType = Exam.Type.Combo;
                             break;
+                        case "a":
+                            examType = Exam.Type.Accuracy;
+                            break;
                         default:
                             examType = Exam.Type.Gauge;
                             break;
@@ -4890,6 +4895,11 @@ namespace TJAPlayer3
                 // LIFE here
                 var life = (int)Convert.ToDouble(strCommandParam);
                 this.LIFE = life;
+            }
+            else if (strCommandName.Equals("TOWERTYPE"))
+            {
+                var tt = (int)Convert.ToDouble(strCommandParam);
+                this.TOWERTYPE = tt;
             }
             else if (strCommandName.Equals("BPM"))
             {

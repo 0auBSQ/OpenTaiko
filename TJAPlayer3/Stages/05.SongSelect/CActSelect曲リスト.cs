@@ -1655,9 +1655,8 @@ namespace TJAPlayer3
 							if (!r現在選択中の曲.isChangedBoxChara)
 								boxType = this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル);
 
-
 							// If BoxChara < 0, don't display any character
-							if (boxType >= 0)
+							if (boxType >= 0 && boxType < TJAPlayer3.Skin.SongSelect_Box_Chara_Count)
                             {
 								if (!ctBoxOpen.b終了値に達した)
 									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)(ctBoxOpen.n現在の値 >= 1200 && ctBoxOpen.n現在の値 <= 1620 ? 255 - (ctBoxOpen.n現在の値 - 1200) * 2.55f :
@@ -1677,11 +1676,11 @@ namespace TJAPlayer3
 								else
 									anime = 150 - (BarAnimeCount - 45) * 2.11764705f;
 
-								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].t2D中心基準描画(TJAPlayer3.app.Device, 640 - TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 + 114 - anime, 360,
+								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType]?.t2D中心基準描画(TJAPlayer3.app.Device, 640 - TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 + 114 - anime, 360,
 									new Rectangle(0, 0, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2,
 									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
 
-								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 - 114 + anime, 360,
+								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType]?.t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 - 114 + anime, 360,
 									new Rectangle(TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, 0,
 									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
 							}

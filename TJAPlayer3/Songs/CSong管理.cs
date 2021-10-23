@@ -208,6 +208,8 @@ namespace TJAPlayer3
 									// LIFE here
 									c曲リストノード.nLife = dtx.LIFE;
 
+									c曲リストノード.nTowerType = dtx.TOWERTYPE;
+
 									// Total count of floors for a tower chart
 									c曲リストノード.nTotalFloor = 0;
 
@@ -1059,6 +1061,8 @@ namespace TJAPlayer3
 
 									// Tower Lives
 									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
+
+									c曲リストノード.arスコア[i].譜面情報.nTowerType = cdtx.TOWERTYPE;
 
 									c曲リストノード.arスコア[i].譜面情報.nTotalFloor = 0;
 									for (int k = 0; k < cdtx.listChip.Count; k++)
