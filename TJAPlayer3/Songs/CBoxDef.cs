@@ -27,6 +27,8 @@ namespace TJAPlayer3
 		public int BgType;
 		public bool IsChangedBoxType;
 		public bool IsChangedBgType;
+		public int BoxChara;
+		public bool IsChangedBoxChara;
 
 		// コンストラクタ
 
@@ -41,6 +43,7 @@ namespace TJAPlayer3
 			BoxColor = Color.White;
 			BoxType = 0;
 			BgType = 0;
+			BoxChara = 0;
 			BgColor = Color.White;
 		}
 		public CBoxDef( string boxdefファイル名 )
@@ -115,6 +118,11 @@ namespace TJAPlayer3
 							{
 								this.BoxType = int.Parse(str.Substring(8).Trim(ignoreChars));
 								IsChangedBoxType = true;
+							}
+							else if (str.StartsWith("#BOXCHARA", StringComparison.OrdinalIgnoreCase))
+							{
+								this.BoxChara = int.Parse(str.Substring(9).Trim(ignoreChars));
+								IsChangedBoxChara = true;
 							}
 							else
 							{

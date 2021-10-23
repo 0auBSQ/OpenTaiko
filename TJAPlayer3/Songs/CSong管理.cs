@@ -396,6 +396,11 @@ namespace TJAPlayer3
 										c曲リストノード.BoxType = c曲リストノード.r親ノード.BoxType;
 										c曲リストノード.isChangedBoxType = true;
 									}
+									if (c曲リストノード.r親ノード.isChangedBoxChara)
+									{
+										c曲リストノード.BoxChara = c曲リストノード.r親ノード.BoxChara;
+										c曲リストノード.isChangedBoxChara = true;
+									}
 								}
 
 
@@ -570,6 +575,10 @@ namespace TJAPlayer3
                         {
 							c曲リストノード.BoxType = boxdef.BoxType;
                         }
+						if (boxdef.IsChangedBoxChara)
+                        {
+							c曲リストノード.BoxChara = boxdef.BoxChara;
+                        }
 					}
 
 					switch (c曲リストノード.strジャンル)
@@ -673,6 +682,11 @@ namespace TJAPlayer3
 					{
 						c曲リストノード.BoxType = boxdef.BoxType;
 						c曲リストノード.isChangedBoxType = true;
+					}
+					if (boxdef.IsChangedBoxChara)
+					{
+						c曲リストノード.BoxChara = boxdef.BoxChara;
+						c曲リストノード.isChangedBoxChara = true;
 					}
 
 
@@ -780,6 +794,10 @@ namespace TJAPlayer3
 							if (c曲リストノード.isChangedBgType)
 							{
 								sb.Append(", BgType=" + c曲リストノード.BgType.ToString());
+							}
+							if (c曲リストノード.isChangedBoxChara)
+							{
+								sb.Append(", BoxChara=" + c曲リストノード.BoxChara.ToString());
 							}
 							Trace.TraceInformation( sb.ToString() );
 						}

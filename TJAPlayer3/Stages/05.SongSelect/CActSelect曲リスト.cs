@@ -928,6 +928,9 @@ namespace TJAPlayer3
 						this.stバー情報[index].BgTypeChanged = song.isChangedBgType;
 						this.stバー情報[index].BoxTypeChanged = song.isChangedBoxType;
 
+						this.stバー情報[index].BoxChara = song.BoxChara;
+						this.stバー情報[index].BoxCharaChanged = song.isChangedBoxChara;
+
 						this.stバー情報[index].strジャンル = song.strジャンル;
 						this.stバー情報[index].strサブタイトル = song.strサブタイトル;
 						this.stバー情報[index].ar難易度 = song.nLevel;
@@ -1031,6 +1034,9 @@ namespace TJAPlayer3
 
 						this.stバー情報[index].BgTypeChanged = song.isChangedBgType;
 						this.stバー情報[index].BoxTypeChanged = song.isChangedBoxType;
+
+						this.stバー情報[index].BoxChara = song.BoxChara;
+						this.stバー情報[index].BoxCharaChanged = song.isChangedBoxChara;
 
 						this.stバー情報[index].strサブタイトル = song.strサブタイトル;
 						this.stバー情報[index].strジャンル = song.strジャンル;
@@ -1644,29 +1650,41 @@ namespace TJAPlayer3
 
 							// Chara here
 
-							if (!ctBoxOpen.b終了値に達した)
-								TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].Opacity = (int)(ctBoxOpen.n現在の値 >= 1200 && ctBoxOpen.n現在の値 <= 1620 ? 255 - (ctBoxOpen.n現在の値 - 1200) * 2.55f :
-								ctBoxOpen.n現在の値 >= 2000 ? (ctBoxOpen.n現在の値 - 2000) * 2.55f : ctBoxOpen.n現在の値 <= 1200 ? 255 : 0);
-							else
-							{
-								if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
-									TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].Opacity = (int)(BarAnimeCount * 4.25f);
-								else if (ctDifficultyIn.n現在の値 >= 1000)
-									TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
+							int boxType = r現在選択中の曲.BoxChara;
+
+							if (!r現在選択中の曲.isChangedBoxChara)
+								boxType = this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル);
+
+
+							// If BoxChara < 0, don't display any character
+							if (boxType >= 0)
+                            {
+								if (!ctBoxOpen.b終了値に達した)
+									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)(ctBoxOpen.n現在の値 >= 1200 && ctBoxOpen.n現在の値 <= 1620 ? 255 - (ctBoxOpen.n現在の値 - 1200) * 2.55f :
+									ctBoxOpen.n現在の値 >= 2000 ? (ctBoxOpen.n現在の値 - 2000) * 2.55f : ctBoxOpen.n現在の値 <= 1200 ? 255 : 0);
+								else
+								{
+									if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
+										TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)(BarAnimeCount * 4.25f);
+									else if (ctDifficultyIn.n現在の値 >= 1000)
+										TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
+								}
+
+								float anime = 0;
+
+								if (BarAnimeCount <= 45)
+									anime = BarAnimeCount * 3.333333333f;
+								else
+									anime = 150 - (BarAnimeCount - 45) * 2.11764705f;
+
+								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].t2D中心基準描画(TJAPlayer3.app.Device, 640 - TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 + 114 - anime, 360,
+									new Rectangle(0, 0, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2,
+									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
+
+								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 4 - 114 + anime, 360,
+									new Rectangle(TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, 0,
+									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
 							}
-
-							float anime = 0;
-
-							if(BarAnimeCount <= 45)
-								anime = BarAnimeCount * 3.333333333f;
-                            else
-								anime = 150 - (BarAnimeCount - 45) * 2.11764705f;
-
-							TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].t2D中心基準描画(TJAPlayer3.app.Device, 640 - TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Width / 4 + 114 - anime, 360, 
-								new Rectangle(0, 0, TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Height));
-							
-							TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Width / 4 - 114 + anime, 360, 
-								new Rectangle(TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.SongSelect_Box_Chara[this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル)].szテクスチャサイズ.Height));
 						}
 						break;
 
@@ -1862,10 +1880,11 @@ namespace TJAPlayer3
 			public Color BgColor;
 			public int BoxType;
 			public int BgType;
+			public int BoxChara;
 
 			public bool BoxTypeChanged;
 			public bool BgTypeChanged;
-
+			public bool BoxCharaChanged;
 
 			public int[] ar難易度;
             public bool[] b分岐;
@@ -2059,6 +2078,9 @@ namespace TJAPlayer3
 
 				this.stバー情報[i].BgTypeChanged = song.isChangedBgType;
 				this.stバー情報[i].BoxTypeChanged = song.isChangedBoxType;
+
+				this.stバー情報[i].BoxChara = song.BoxChara;
+				this.stバー情報[i].BoxCharaChanged = song.isChangedBoxChara;
 
 				this.stバー情報[ i ].eバー種別 = this.e曲のバー種別を返す( song );
                 this.stバー情報[ i ].strサブタイトル = song.strサブタイトル;
