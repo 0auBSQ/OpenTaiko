@@ -62,7 +62,7 @@ namespace TJAPlayer3
 
 		// メソッド
 		#region [ t項目リストの設定_System() ]
-		public void t項目リストの設定_System()
+		public void t項目リストの設定_System(bool refresh = true)
 		{
 			this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
@@ -79,13 +79,19 @@ namespace TJAPlayer3
 				"Reload song data." );
 			this.list項目リスト.Add( this.iSystemReloadDTX );
 
-            //this.iCommonDark = new CItemList( "Dark", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.eDark,
-            //    "HALF: 背景、レーン、ゲージが表示\nされなくなります。\nFULL: さらに小節線、拍線、判定ラ\nイン、パッドも表示されなくなります。",
-            //    "OFF: all display parts are shown.\nHALF: wallpaper, lanes and gauge are\n disappeared.\nFULL: additionaly to HALF, bar/beat\n lines, hit bar, pads are disappeared.",
-            //    new string[] { "OFF", "HALF", "FULL" } );
-            //this.list項目リスト.Add( this.iCommonDark );
 
-            this.iTaikoPlayerCount = new CItemInteger( "プレイ人数", 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
+			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.ConfigChangeLanguageHead(), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
+				CLangManager.LangInstance.ConfigChangeLanguage(),
+				CLangManager.Languages);
+			this.list項目リスト.Add(this.iSystemLanguage);
+
+			//this.iCommonDark = new CItemList( "Dark", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.eDark,
+			//    "HALF: 背景、レーン、ゲージが表示\nされなくなります。\nFULL: さらに小節線、拍線、判定ラ\nイン、パッドも表示されなくなります。",
+			//    "OFF: all display parts are shown.\nHALF: wallpaper, lanes and gauge are\n disappeared.\nFULL: additionaly to HALF, bar/beat\n lines, hit bar, pads are disappeared.",
+			//    new string[] { "OFF", "HALF", "FULL" } );
+			//this.list項目リスト.Add( this.iCommonDark );
+
+			this.iTaikoPlayerCount = new CItemInteger( "プレイ人数", 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
                 "プレイ人数切り替え：\n2にすると演奏画面が2人プレイ専用のレイアウトになり、2P専用譜面を読み込むようになります。",
                 "" );
             this.list項目リスト.Add( this.iTaikoPlayerCount );
@@ -489,9 +495,13 @@ namespace TJAPlayer3
 			"Settings for the system key/pad inputs." );
 			this.list項目リスト.Add( this.iSystemGoToKeyAssign );
 
-            OnListMenuの初期化();
-			this.n現在の選択項目 = 0;
-			this.eメニュー種別 = Eメニュー種別.System;
+			OnListMenuの初期化();
+			if (refresh)
+            {
+				this.n現在の選択項目 = 0;
+				this.eメニュー種別 = Eメニュー種別.System;
+			}
+            
 		}
 		#endregion
 		#region [ t項目リストの設定_Drums() ]
@@ -804,7 +814,14 @@ namespace TJAPlayer3
                 //else
                 //{
                 //    // 変更許可
-                    this.list項目リスト[ this.n現在の選択項目 ].tEnter押下();
+                this.list項目リスト[ this.n現在の選択項目 ].tEnter押下();
+
+				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemLanguage)
+                {
+					TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
+					CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
+					t項目リストの設定_System(refresh : false);
+				}
                 //}
 
 
@@ -1554,7 +1571,10 @@ namespace TJAPlayer3
         private CItemToggle SendDiscordPlayingInformation;
         private CItemToggle iSystemBufferedInput;
 		private CItemInteger iSystemRisky;					// #23559 2011.7.27 yyagi
-		private CItemList iSystemSoundType;					// #24820 2013.1.3 yyagi
+		private CItemList iSystemSoundType;                 // #24820 2013.1.3 yyagi
+
+		private CItemList iSystemLanguage;
+		
 		private CItemInteger iSystemWASAPIBufferSizeMs;		// #24820 2013.1.15 yyagi
 //		private CItemInteger iSystemASIOBufferSizeMs;		// #24820 2013.1.3 yyagi
 		private CItemList	iSystemASIODevice;				// #24820 2013.1.17 yyagi
@@ -1713,13 +1733,19 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.bUseOSTimer = this.iSystemSoundTimerType.bON;								// #33689 2014.6.17 yyagi
 
 			TJAPlayer3.ConfigIni.bTimeStretch = this.iSystemTimeStretch.bON;									// #23664 2013.2.24 yyagi
-//Trace.TraceInformation( "saved" );
-//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(true) );
-//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
-//Trace.TraceInformation( "Skin現在BoxDef  : " + CSkin.strBoxDefSkinSubfolderFullName );
+
+
+			TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
+			CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
+
+
+			//Trace.TraceInformation( "saved" );
+			//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(true) );
+			//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
+			//Trace.TraceInformation( "Skin現在BoxDef  : " + CSkin.strBoxDefSkinSubfolderFullName );
 			//CDTXMania.ConfigIni.nMasterVolume = this.iSystemMasterVolume.n現在の値;							// #33700 2014.4.26 yyagi
 			//CDTXMania.ConfigIni.e判定表示優先度 = (E判定表示優先度) this.iSystemJudgeDispPriority.n現在選択されている項目番号;
-            TJAPlayer3.ConfigIni.ShowChara = this.ShowChara.bON;
+			TJAPlayer3.ConfigIni.ShowChara = this.ShowChara.bON;
             TJAPlayer3.ConfigIni.ShowDancer = this.ShowDancer.bON;
             TJAPlayer3.ConfigIni.ShowRunner = this.ShowRunner.bON;
             TJAPlayer3.ConfigIni.ShowMob = this.ShowMob.bON;

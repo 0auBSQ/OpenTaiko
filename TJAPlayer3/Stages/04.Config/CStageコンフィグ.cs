@@ -358,6 +358,9 @@ namespace TJAPlayer3
 							case EItemPanelモード.パッド一覧:
 								bool bIsKeyAssignSelectedBeforeHitEnter = this.actList.bIsKeyAssignSelected;	// #24525 2011.3.15 yyagi
 								this.actList.tEnter押下();
+
+								this.t説明文パネルに現在選択されている項目の説明を描画する();
+
 								if ( this.actList.b現在選択されている項目はReturnToMenuである )
 								{
 									this.t説明文パネルに現在選択されているメニューの説明を描画する();

@@ -106,6 +106,9 @@
     <Compile Include="Common\Discord.cs" />
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="I18N\CLang_fr.cs" />
+    <Compile Include="I18N\CLang_en.cs" />
+    <Compile Include="I18N\CLang_jp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -127,6 +130,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <Compile Include="I18N\ILang.cs" />
     <None Include="TJAPlayer3.manifest" />
     <None Include="DTXManiaGR.exe.x86.manifest" />
     <None Include="Properties\Settings.settings">
@@ -338,6 +342,7 @@
       <Version>4.2.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

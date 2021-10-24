@@ -770,7 +770,6 @@ namespace TJAPlayer3
 
         public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
-
 		public STDGBVALUE<E判定文字表示位置> 判定文字表示位置;
 //		public int nハイハット切り捨て下限Velocity;
 //		public int n切り捨て下限Velocity;			// #23857 2010.12.12 yyagi VelocityMin
@@ -875,10 +874,14 @@ namespace TJAPlayer3
         public bool ShinuchiMode; // 真打モード
         public bool FastRender; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
-        /// <summary>
-        /// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
-        /// </summary>
-        public bool SendDiscordPlayingInformation;
+
+		// I18N choosen language
+		public string sLang = "jp";
+
+		/// <summary>
+		/// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
+		/// </summary>
+		public bool SendDiscordPlayingInformation;
 #if false
 		[StructLayout( LayoutKind.Sequential )]
 		public struct STAUTOPLAY								// C定数のEレーンとindexを一致させること
@@ -1287,6 +1290,7 @@ namespace TJAPlayer3
             this.BoxFontName = "MS UI Gothic";
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
+			this.sLang = "jp";
 
 			// 2018-08-28 twopointzero:
 			// There exists a particular large, well-known, well-curated, and
@@ -1530,9 +1534,20 @@ namespace TJAPlayer3
             sw.WriteLine("; Use pre-textures render.");
             sw.WriteLine("{0}={1}", nameof(FastRender), FastRender ? 1 : 0);
             sw.WriteLine();
-            #endregion
-            #region [ Window関連 ]
-            sw.WriteLine( "; 画面モード(0:ウィンドウ, 1:全画面)" );
+			#endregion
+
+
+			#region [Language]
+
+			sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
+			sw.WriteLine("; Change the displayed language ingame and within the menus.");
+			sw.WriteLine("Lang={0}", this.sLang);
+			sw.WriteLine();
+
+			#endregion
+
+			#region [ Window関連 ]
+			sw.WriteLine( "; 画面モード(0:ウィンドウ, 1:全画面)" );
 			sw.WriteLine( "; Screen mode. (0:Window, 1:Fullscreen)" );
 			sw.WriteLine( "FullScreen={0}", this.b全画面モード ? 1 : 0 );
             sw.WriteLine();
@@ -2163,6 +2178,12 @@ namespace TJAPlayer3
 												this.str曲データ検索パス = str4;
 											}
 											#endregion
+
+											else if( str3.Equals("Lang"))
+                                            {
+												CLangManager.langAttach(str4);
+                                            }
+
 											#region [ skin関係 ]
 											else if ( str3.Equals( "SkinPath" ) )
 											{
