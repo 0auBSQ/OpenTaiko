@@ -7,14 +7,23 @@ namespace TJAPlayer3
 {
     internal class CLang_jp : ILang
     {
-        string ILang.ConfigChangeLanguage()
+        string ILang.GetString(int idx)
         {
-            return "プレイ中やメニューの\n表示される言語を変更。";
+            if (!dictionnary.ContainsKey(idx))
+                return "[!] 辞書で求める指数を見つけられませんでした";
+
+            return dictionnary[idx];
         }
 
-        string ILang.ConfigChangeLanguageHead()
+
+        private static readonly Dictionary<int, string> dictionnary = new Dictionary<int, string>
         {
-            return "システム言語";
-        }
+            [0] = "プレイ中やメニューの\n表示される言語を変更。",
+            [1] = "システム言語",
+            [2] = "<< 戻る",
+            [3] = "左側のメニューに戻ります。",
+            [4] = "曲データ再読込み",
+            [5] = "曲データの一覧情報を取得し直します。",
+        };
     }
 }

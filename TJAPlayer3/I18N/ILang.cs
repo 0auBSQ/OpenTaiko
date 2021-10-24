@@ -7,8 +7,7 @@ namespace TJAPlayer3
 {
     internal interface ILang
     {
-        string ConfigChangeLanguage();
-        string ConfigChangeLanguageHead();
+        string GetString(int idx);
     }
 
     static internal class CLangManager

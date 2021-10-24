@@ -7,14 +7,23 @@ namespace TJAPlayer3
 {
     internal class CLang_en : ILang
     {
-        string ILang.ConfigChangeLanguage()
+        string ILang.GetString(int idx)
         {
-            return "Change the displayed language\ningame and within the menus.";
+            if (!dictionnary.ContainsKey(idx))
+                return "[!] Index not found in dictionnary";
+
+            return dictionnary[idx];
         }
 
-        string ILang.ConfigChangeLanguageHead()
+
+        private static readonly Dictionary<int, string> dictionnary = new Dictionary<int, string>
         {
-            return "System language";
-        }
+            [0] = "Change the displayed language\ningame and within the menus.",
+            [1] = "System language",
+            [2] = "<< Return to Menu",
+            [3] = "Return to left menu.",
+            [4] = "Reload song data",
+            [5] = "Retrieve and update the song list.",
+        };
     }
 }

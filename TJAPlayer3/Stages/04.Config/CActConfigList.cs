@@ -69,19 +69,17 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iSystemReturnToMenu = new CItemBase( "<< ReturnTo Menu", CItemBase.Eパネル種別.その他,
-				"左側のメニューに戻ります。",
-				"Return to left menu." );
+			this.iSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
+				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iSystemReturnToMenu );
 
-			this.iSystemReloadDTX = new CItemBase( "曲データ再読込み", CItemBase.Eパネル種別.通常,
-				"曲データの一覧情報を取得し直します。",
-				"Reload song data." );
+			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(4), CItemBase.Eパネル種別.通常,
+				CLangManager.LangInstance.GetString(5));
 			this.list項目リスト.Add( this.iSystemReloadDTX );
 
 
-			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.ConfigChangeLanguageHead(), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
-				CLangManager.LangInstance.ConfigChangeLanguage(),
+			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
+				CLangManager.LangInstance.GetString(0),
 				CLangManager.Languages);
 			this.list項目リスト.Add(this.iSystemLanguage);
 
