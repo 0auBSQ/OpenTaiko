@@ -101,8 +101,8 @@ namespace TJAPlayer3
                 this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
             }
 
-            this.ttkTouTatsuKaiSuu = new TitleTextureKey("到達階数", pfTowerText, Color.White, Color.Black, 700);
-            this.ttkKai = new TitleTextureKey("階", pfTowerText, Color.White, Color.Black, 700);
+            this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString(12), pfTowerText, Color.White, Color.Black, 700);
+            this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString(13), pfTowerText, Color.White, Color.Black, 700);
 
             this.ct炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
 

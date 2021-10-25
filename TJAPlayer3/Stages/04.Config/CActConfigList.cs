@@ -89,33 +89,16 @@ namespace TJAPlayer3
 			//    new string[] { "OFF", "HALF", "FULL" } );
 			//this.list項目リスト.Add( this.iCommonDark );
 
-			this.iTaikoPlayerCount = new CItemInteger( "プレイ人数", 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
-                "プレイ人数切り替え：\n2にすると演奏画面が2人プレイ専用のレイアウトになり、2P専用譜面を読み込むようになります。",
-                "" );
+			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
+				CLangManager.LangInstance.GetString(7));
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
-			this.iSystemRisky = new CItemInteger( "Risky", 0, 10, TJAPlayer3.ConfigIni.nRisky,
-				"Riskyモードの設定:\n1以上の値にすると、その回数分の\nPoor/MissでFAILEDとなります。\n0にすると無効になり、\nDamageLevelに従ったゲージ増減と\nなります。\nStageFailedの設定と併用できます。",
-				"Risky mode:\nSet over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode." );
+			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(8), 0, 10, TJAPlayer3.ConfigIni.nRisky,
+				CLangManager.LangInstance.GetString(9));
 			this.list項目リスト.Add( this.iSystemRisky );
 
-			this.iCommonPlaySpeed = new CItemInteger("再生速度", 5, 400, TJAPlayer3.ConfigIni.n演奏速度,
-				"曲の演奏速度を、速くしたり遅くした\n" +
-				"りすることができます。\n" +
-				"（※一部のサウンドカードでは正しく\n" +
-				"　再生できない可能性があります。）\n" +
-				"\n" +
-				"TimeStretchがONのときに、演奏\n" +
-				"速度をx0.850以下にすると、チップの\n" +
-				"ズレが大きくなります。",
-				"It changes the song speed.\n" +
-				"For example, you can play in half\n" +
-				" speed by setting PlaySpeed = 0.500\n" +
-				" for your practice.\n" +
-				"\n" +
-				"Note: It also changes the songs' pitch.\n" +
-				"In case TimeStretch=ON, some sound\n" +
-				"lag occurs slower than x0.900.");
+			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString(10), 5, 400, TJAPlayer3.ConfigIni.n演奏速度,
+				CLangManager.LangInstance.GetString(11));
 			this.list項目リスト.Add( this.iCommonPlaySpeed );
 
 			this.iSystemTimeStretch = new CItemToggle( "TimeStretch", TJAPlayer3.ConfigIni.bTimeStretch,

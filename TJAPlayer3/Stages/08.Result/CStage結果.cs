@@ -364,11 +364,11 @@ namespace TJAPlayer3
 						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 72);
 					}
 
-					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + "階", pfTowerText48, Color.Black, Color.Transparent, 700);
-					this.ttkToutatsu = new TitleTextureKey("到達階数", pfTowerText48, Color.White, Color.Black, 700);
-					this.ttkTen = new TitleTextureKey("点", pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(13), pfTowerText48, Color.Black, Color.Transparent, 700);
+					this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString(12), pfTowerText48, Color.White, Color.Black, 700);
+					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString(14), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
-					this.ttkScore = new TitleTextureKey("スコア", pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString(15), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
