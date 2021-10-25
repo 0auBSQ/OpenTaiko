@@ -57,7 +57,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static string[] Languages = new string[] { "日本語", "English", "Français" };
-        public static ILang LangInstance = new CLang_jp();
+        public static readonly string[] Languages = new string[] { "日本語", "English", "Français" };
+        public static ILang LangInstance { get; private set; }  = new CLang_jp();
     }
 }
