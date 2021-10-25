@@ -878,6 +878,9 @@ namespace TJAPlayer3
 		// I18N choosen language
 		public string sLang = "jp";
 
+		// Song select screen layout type
+		public int nLayoutType = 0;
+
 		/// <summary>
 		/// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
 		/// </summary>
@@ -1291,6 +1294,7 @@ namespace TJAPlayer3
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
 			this.sLang = "jp";
+			this.nLayoutType = 0;
 
 			// 2018-08-28 twopointzero:
 			// There exists a particular large, well-known, well-curated, and
@@ -1542,6 +1546,16 @@ namespace TJAPlayer3
 			sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
 			sw.WriteLine("; Change the displayed language ingame and within the menus.");
 			sw.WriteLine("Lang={0}", this.sLang);
+			sw.WriteLine();
+
+			#endregion
+
+			#region [Layout Type]
+
+			//this.nLayoutType
+
+			sw.WriteLine("; Change the song select screen layout type.");
+			sw.WriteLine("LayoutType={0}", this.nLayoutType);
 			sw.WriteLine();
 
 			#endregion
@@ -2182,6 +2196,11 @@ namespace TJAPlayer3
 											else if( str3.Equals("Lang"))
                                             {
 												CLangManager.langAttach(str4);
+                                            }
+
+											else if (str3.Equals("LayoutType"))
+                                            {
+												this.nLayoutType = int.Parse(str4);
                                             }
 
 											#region [ skin関係 ]

@@ -41,6 +41,13 @@ namespace TJAPlayer3
             [13] = "F",
             [14] = "P",
             [15] = "Score",
+            [16] = "Layout type",
+            [17] = "You can change the layout type \ndisplayed on the song select screen.\n" +
+                "0 : Regular (Up to down diagonal)\n" +
+                "1 : Vertical\n" +
+                "2 : Down to up diagonal\n" +
+                "3 : Half-circle facing right\n" +
+                "4 : Half-circle facing left",
         };
     }
 }

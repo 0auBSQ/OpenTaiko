@@ -1140,8 +1140,52 @@ namespace TJAPlayer3
 				int n見た目の行番号 = i;
 				int n次のパネル番号 = (this.n現在のスクロールカウンタ <= 0) ? ((i + 1) % 9) : (((i - 1) + 9) % 9);
 				int x = i選曲バーX座標;
-				int xAnime = this.ptバーの座標[n見た目の行番号].X + ((int)((this.ptバーの座標[n次のパネル番号].X - this.ptバーの座標[n見た目の行番号].X) * (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
-				int y = this.ptバーの座標[n見た目の行番号].Y + ((int)((this.ptバーの座標[n次のパネル番号].Y - this.ptバーの座標[n見た目の行番号].Y) * (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
+
+                #region [Positions and layouts]
+
+                int xZahyou = this.ptバーの座標[n見た目の行番号].X;
+				int xNextZahyou = this.ptバーの座標[n次のパネル番号].X;
+				int xCentralZahyou = this.ptバーの座標[4].X;
+
+				int yZahyou = this.ptバーの座標[n見た目の行番号].Y;
+				int yNextZahyou = this.ptバーの座標[n次のパネル番号].Y;
+				int yCentralZahyou = this.ptバーの座標[4].Y;
+
+				int Diff4 = Math.Abs(n見た目の行番号 - 4);
+				int NextDiff4 = Math.Abs(n次のパネル番号 - 4);
+
+				eLayoutType eLayout = (eLayoutType)TJAPlayer3.ConfigIni.nLayoutType;
+
+				switch (eLayout)
+                {
+					case eLayoutType.DiagonalDownUp:
+						xZahyou = xCentralZahyou - 2 * (xZahyou - xCentralZahyou);
+						xNextZahyou = xCentralZahyou - 2 * (xNextZahyou - xCentralZahyou);
+						break;
+					case eLayoutType.Vertical:
+						xZahyou = xCentralZahyou;
+						xNextZahyou = xCentralZahyou;
+						break;
+					case eLayoutType.HalfCircleRight:
+						xZahyou = xCentralZahyou - 25 * (int)Math.Pow(Diff4, 2);
+						xNextZahyou = xCentralZahyou - 25 * (int)Math.Pow(NextDiff4, 2);
+						break;
+					case eLayoutType.HalfCircleLeft:
+						xZahyou = xCentralZahyou + 25 * (int)Math.Pow(Diff4, 2);
+						xNextZahyou = xCentralZahyou + 25 * (int)Math.Pow(NextDiff4, 2);
+						break;
+					default:
+						break;
+				}
+
+				#endregion
+				
+				// x set here
+				int xAnime = xZahyou + ((int)((xNextZahyou - xZahyou) 
+					* (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
+				
+				int y = yZahyou + ((int)((yNextZahyou - yZahyou) 
+					* (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
 
 				// (B) スクロール中の選択曲バー、またはその他のバーの描画。
 
@@ -1741,7 +1785,9 @@ namespace TJAPlayer3
 				//int x = this.ptバーの基本座標[ n見た目の行番号 ].X + ( (int) ( ( this.ptバーの基本座標[ n次のパネル番号 ].X - this.ptバーの基本座標[ n見た目の行番号 ].X ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 				int x = i選曲バーX座標;
 				int xAnime = this.ptバーの座標[n見た目の行番号].X + ((int)((this.ptバーの座標[n次のパネル番号].X - this.ptバーの座標[n見た目の行番号].X) * (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
+
 				int y = this.ptバーの座標[n見た目の行番号].Y + ((int)((this.ptバーの座標[n次のパネル番号].Y - this.ptバーの座標[n見た目の行番号].Y) * (((double)Math.Abs(this.n現在のスクロールカウンタ)) / 100.0)));
+				
 				if ((i == 4) && (this.n現在のスクロールカウンタ == 0))
 				{
 					CTexture tx選択している曲のサブタイトル = null;
@@ -2441,4 +2487,15 @@ namespace TJAPlayer3
 		//-----------------
 		#endregion
 	}
+
+
+	public enum eLayoutType
+    {
+		DiagonalUpDown,
+		Vertical,
+		DiagonalDownUp,
+		HalfCircleRight,
+		HalfCircleLeft,
+		TOTAL
+    }
 }

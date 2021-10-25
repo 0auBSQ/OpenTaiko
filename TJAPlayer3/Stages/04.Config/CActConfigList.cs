@@ -83,6 +83,10 @@ namespace TJAPlayer3
 				CLangManager.Languages);
 			this.list項目リスト.Add(this.iSystemLanguage);
 
+			this.iLayoutType = new CItemInteger(CLangManager.LangInstance.GetString(16), 0, (int)eLayoutType.TOTAL - 1, TJAPlayer3.ConfigIni.nLayoutType,
+				CLangManager.LangInstance.GetString(17));
+			this.list項目リスト.Add(this.iLayoutType);
+
 			//this.iCommonDark = new CItemList( "Dark", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.eDark,
 			//    "HALF: 背景、レーン、ゲージが表示\nされなくなります。\nFULL: さらに小節線、拍線、判定ラ\nイン、パッドも表示されなくなります。",
 			//    "OFF: all display parts are shown.\nHALF: wallpaper, lanes and gauge are\n disappeared.\nFULL: additionaly to HALF, bar/beat\n lines, hit bar, pads are disappeared.",
@@ -1600,6 +1604,9 @@ namespace TJAPlayer3
 		private CItemBase iDrumsGoToKeyAssign;
 		private CItemBase iSystemGoToKeyAssign;		// #24609
 		private CItemInteger iCommonPlaySpeed;
+
+		private CItemInteger iLayoutType;
+
 		private CItemBase iDrumsReturnToMenu;
 		private CItemInteger iDrumsScrollSpeed;
 		private CItemToggle iDrumsTight;
@@ -1733,7 +1740,8 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.ShowFooter = this.ShowFooter.bON;
             TJAPlayer3.ConfigIni.ShowPuchiChara = this.ShowPuchiChara.bON;
             TJAPlayer3.ConfigIni.nPlayerCount = this.iTaikoPlayerCount.n現在の値;
-            TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
+			TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
+			TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
 		}
 		private void tConfigIniへ記録する_Drums()
 		{

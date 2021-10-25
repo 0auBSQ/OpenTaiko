@@ -19,4 +19,6 @@
 13 : Floor suffix (1 character)
 14 : Points accronym (1 character)
 15 : Score
+16 : "Layout type" option title
+17 : "Layout type" description
 ```

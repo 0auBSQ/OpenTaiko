@@ -41,6 +41,13 @@ namespace TJAPlayer3
             [13] = "",
             [14] = "P",
             [15] = "Score",
+            [16] = "Disposition des blocs",
+            [17] = "Cette option détermine l'ordonnancement \ndes blocs dans le menu de selection \n des musiques en mode partie rapide.\n" +
+                "0 : Standard (Diagonale haut-bas)\n" +
+                "1 : Vertical\n" +
+                "2 : Diagonale bas-haut\n" +
+                "3 : Demi-cercle orienté à droite\n" +
+                "4 : Demi-cercle orienté à gauche",
         };
     }
 }
