@@ -739,7 +739,13 @@ namespace TJAPlayer3
         public int n両手判定の待ち時間;
         public int nBranchAnime;
 
-        public bool bJudgeCountDisplay;
+		// I18N choosen language
+		public string sLang;
+
+		// Song select screen layout type
+		public int nLayoutType;
+
+		public bool bJudgeCountDisplay;
 
 		public bool bEnableCountdownTimer;
 
@@ -875,11 +881,7 @@ namespace TJAPlayer3
         public bool FastRender; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
 
-		// I18N choosen language
-		public string sLang = "jp";
-
-		// Song select screen layout type
-		public int nLayoutType = 0;
+		
 
 		/// <summary>
 		/// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
@@ -2195,6 +2197,7 @@ namespace TJAPlayer3
 
 											else if( str3.Equals("Lang"))
                                             {
+												this.sLang = str4;
 												CLangManager.langAttach(str4);
                                             }
 

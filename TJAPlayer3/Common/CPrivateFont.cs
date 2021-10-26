@@ -174,7 +174,8 @@ namespace TJAPlayer3
 			Normal,
 			Edge,
 			Gradation,
-            Vertical
+            Vertical,
+            DoubleEdge
 		}
 
 		#region [ DrawPrivateFontのオーバーロード群 ]
@@ -391,7 +392,7 @@ namespace TJAPlayer3
         /// <param name="gradationTopColor">グラデーション 上側の色</param>
         /// <param name="gradationBottomColor">グラデーション 下側の色</param>
         /// <returns>描画済テクスチャ</returns>
-        protected Bitmap DrawPrivateFont(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color gradationTopColor, Color gradationBottomColor)
+        protected Bitmap DrawPrivateFont(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color gradationTopColor, Color gradationBottomColor, Color? secondBorder = null)
         {
             int Interval = 5;
 
@@ -411,10 +412,22 @@ namespace TJAPlayer3
             bool bEdge = ((drawmode & DrawMode.Edge) == DrawMode.Edge);
             bool bGradation = ((drawmode & DrawMode.Gradation) == DrawMode.Gradation);
 
+            bool bDoubleEdge = ((drawmode & DrawMode.DoubleEdge) == DrawMode.DoubleEdge);
+
             // 縁取りの縁のサイズは、とりあえずフォントの大きさの1/4とする
             //int nEdgePt = (bEdge)? _pt / 4 : 0;
             //int nEdgePt = (bEdge) ? (_pt / 3) : 0; // 縁取りが少なすぎるという意見が多かったため変更。 (AioiLight)
             int nEdgePt = (bEdge) ? (10 * _pt / TJAPlayer3.Skin.Font_Edge_Ratio) : 0; //SkinConfigにて設定可能に(rhimm)
+            int nFatEdgePt = 0; 
+
+            if (bDoubleEdge)
+            {
+                nEdgePt = 4 * _pt / TJAPlayer3.Skin.Font_Edge_Ratio;
+                nFatEdgePt = 10 * _pt / TJAPlayer3.Skin.Font_Edge_Ratio;
+            }
+
+
+            int largest = Math.Max(nEdgePt, nFatEdgePt);
 
             // 描画サイズを測定する
             Size stringSize = System.Windows.Forms.TextRenderer.MeasureText(drawstr, this._font, new Size(int.MaxValue, int.MaxValue),
@@ -425,7 +438,7 @@ namespace TJAPlayer3
             stringSize.Height += 5;
 
             //取得した描画サイズを基に、描画先のbitmapを作成する
-            Bitmap bmp = new Bitmap(stringSize.Width + nEdgePt * 2, stringSize.Height + nEdgePt * 2);
+            Bitmap bmp = new Bitmap(stringSize.Width + nEdgePt * 2, stringSize.Height + largest * 2);
             bmp.MakeTransparent();
             Graphics g = Graphics.FromImage(bmp);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -436,7 +449,9 @@ namespace TJAPlayer3
             sf.FormatFlags = StringFormatFlags.NoWrap; // どんなに長くて単語の区切りが良くても改行しない (AioiLight)
             sf.Trimming = StringTrimming.None; // どんなに長くてもトリミングしない (AioiLight)
                                                // レイアウト枠
-            Rectangle r = new Rectangle(0, 0, stringSize.Width + nEdgePt * 2 + (TJAPlayer3.Skin.Text_Correction_X * stringSize.Width / 100), stringSize.Height + nEdgePt * 2 + (TJAPlayer3.Skin.Text_Correction_Y * stringSize.Height / 100));
+            Rectangle r = new Rectangle(0, 0, stringSize.Width + largest * 2 
+                + (TJAPlayer3.Skin.Text_Correction_X * stringSize.Width / 100), stringSize.Height + largest * 2 
+                + (TJAPlayer3.Skin.Text_Correction_Y * stringSize.Height / 100));
 
             if (bEdge)  // 縁取り有りの描画
             {
@@ -447,7 +462,15 @@ namespace TJAPlayer3
                 System.Drawing.Drawing2D.GraphicsPath gp = new System.Drawing.Drawing2D.GraphicsPath();
                 gp.AddString(drawstr, this._fontfamily, (int)this._font.Style, sizeInPixels, r, sf);
 
+                if (bDoubleEdge)
+                {
+                    Pen fat = new Pen((Color)secondBorder, nFatEdgePt);
+                    fat.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
+                    g.DrawPath(fat, gp);
+                }
+
                 // 縁取りを描画する
+                // Edge drawn here
                 Pen p = new Pen(edgeColor, nEdgePt);
                 p.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
                 g.DrawPath(p, gp);

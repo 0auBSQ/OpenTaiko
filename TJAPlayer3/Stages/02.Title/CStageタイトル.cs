@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using FDK;
 using System.Reflection;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -63,6 +64,9 @@ namespace TJAPlayer3
 
 				this.n現在の選択行プレイヤーエントリー = 1;
 
+				
+
+
 				for (int i = 0; i < this.nbModes; i++)
 				{
 					this.stModeBar[i].BarTexture = TJAPlayer3.Tx.ModeSelect_Bar[i];
@@ -99,11 +103,36 @@ namespace TJAPlayer3
 		}
 		public override void OnManagedリソースの作成()
 		{
+			if (base.b活性化してない)
+				return;
 
+			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+			{
+				this.pfMenuTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 36);
+			}
+			else
+			{
+				this.pfMenuTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 36);
+			}
+
+			this.ttkEnsou = new TitleTextureKey(CLangManager.LangInstance.GetString(18), this.pfMenuTitle, Color.White, Color.FromArgb(233, 53, 71), 700, Color.Black);
+			this.ttkDan = new TitleTextureKey(CLangManager.LangInstance.GetString(19), this.pfMenuTitle, Color.White, Color.FromArgb(71, 64, 135), 700, Color.Black);
+			this.ttkTower = new TitleTextureKey(CLangManager.LangInstance.GetString(20), this.pfMenuTitle, Color.White, Color.FromArgb(255, 180, 42), 700, Color.Black);
+			this.ttkShop = new TitleTextureKey(CLangManager.LangInstance.GetString(21), this.pfMenuTitle, Color.White, Color.FromArgb(16, 255, 255), 700, Color.Black);
+			this.ttkBouken = new TitleTextureKey(CLangManager.LangInstance.GetString(22), this.pfMenuTitle, Color.White, Color.FromArgb(128, 0, 128), 700, Color.Black);
+			this.ttkSettings = new TitleTextureKey(CLangManager.LangInstance.GetString(23), this.pfMenuTitle, Color.White, Color.FromArgb(128, 128, 128), 700, Color.Black);
+			this.ttkExit = new TitleTextureKey(CLangManager.LangInstance.GetString(24), this.pfMenuTitle, Color.White, Color.FromArgb(72, 72, 72), 700, Color.Black);
+
+			base.OnManagedリソースの作成();
 		}
 		public override void OnManagedリソースの解放()
 		{
+			if (!base.b活性化してない)
+				return;
 
+			TJAPlayer3.t安全にDisposeする(ref pfMenuTitle);
+
+			base.OnManagedリソースの解放();
 		}
 		public override int On進行描画()
 		{
@@ -578,11 +607,16 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 4 - 114 + anime, 360,
 									new Rectangle(TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Height));
 
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 - BarAnimeCount / 1.5f, new Rectangle(0, 0, 642, 122));
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 - BarAnimeCount / 1.5f, new Rectangle(0, 0, 642, 122));
+
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i))?.t2D中心基準描画(TJAPlayer3.app.Device, 631, 379 - BarAnimeCount / 1.5f);
+
 
 								TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = (int)(BarAnimeCount * 2.55f);
 								TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 + 132 / 2, new Rectangle(0, 122, 642, 148));
+
+
 
 							}
 							else
@@ -615,8 +649,11 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.ModeSelect_Bar[this.nbModes].vc拡大縮小倍率.Y = 1.0f;
 								this.stModeBar[i].BarTexture.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 								TJAPlayer3.Tx.ModeSelect_Bar[this.nbModes].t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY - 13, new Rectangle(0, 0, 642, 122));
+
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY - 13, new Rectangle(0, 0, 642, 122));
+
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i))?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + 311, pos.Y + BarAnimeY - BarMoveY + 72);
 							}
                         }
 					}
@@ -734,6 +771,15 @@ namespace TJAPlayer3
 
 		private PuchiChara PuchiChara;
 
+		private CPrivateFastFont pfMenuTitle;
+		private TitleTextureKey ttkEnsou;
+		private TitleTextureKey ttkDan;
+		private TitleTextureKey ttkTower;
+		private TitleTextureKey ttkShop;
+		private TitleTextureKey ttkBouken;
+		private TitleTextureKey ttkSettings;
+		private TitleTextureKey ttkExit;
+
 		private bool bバナパス読み込み;
 		private bool bバナパス読み込み失敗;
 		private bool bプレイヤーエントリー;
@@ -784,6 +830,28 @@ namespace TJAPlayer3
 
 			return new Point(posX, posY);
 		}
+
+		private TitleTextureKey idxToTex(int idx)
+        {
+			switch (idx)
+            {
+				case 6:
+					return this.ttkExit;
+				case 5:
+					return this.ttkSettings;
+				case 4:
+					return this.ttkBouken;
+				case 3:
+					return this.ttkShop;
+				case 2:
+					return this.ttkTower;
+				case 1:
+					return this.ttkDan;
+				case 0:
+				default:
+					return this.ttkEnsou;
+            }
+        }
 
 		private bool b音声再生;
 		private CActFIFOBlack actFI;

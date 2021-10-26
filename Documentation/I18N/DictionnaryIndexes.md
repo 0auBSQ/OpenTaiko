@@ -21,4 +21,11 @@
 15 : Score
 16 : "Layout type" option title
 17 : "Layout type" description
+18 : Ensou main menu button
+19 : Dan main menu button
+20 : Tower main menu button 
+21 : Shop main menu button 
+22 : Bouken main menu button 
+23 : Settings main menu button 
+24 : Quit main menu button
 ```

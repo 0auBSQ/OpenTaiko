@@ -92,9 +92,9 @@ namespace TJAPlayer3
 		/// <param name="fontColor">描画色</param>
 		/// <param name="edgeColor">縁取色</param>
 		/// <returns>描画済テクスチャ</returns>
-		public new Bitmap DrawPrivateFont(string drawstr, Color fontColor, Color edgeColor)
+		public new Bitmap DrawPrivateFont(string drawstr, Color fontColor, Color edgeColor, Color? secondBorder = null)
 		{
-			return DrawPrivateFont(drawstr, DrawMode.Edge, fontColor, edgeColor, Color.White, Color.White);
+			return DrawPrivateFont(drawstr, (secondBorder == null) ? DrawMode.Edge : (DrawMode.Edge | DrawMode.DoubleEdge), fontColor, edgeColor, Color.White, Color.White, secondBorder);
 		}
 
 		/// <summary>
@@ -270,7 +270,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		protected new Bitmap DrawPrivateFont(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color gradationTopColor, Color gradationBottomColor)
+		protected new Bitmap DrawPrivateFont(string drawstr, DrawMode drawmode, Color fontColor, Color edgeColor, Color gradationTopColor, Color gradationBottomColor, Color? secondBorder = null)
 		{
 			#region [ 以前レンダリングしたことのある文字列/フォントか? (キャッシュにヒットするか?) ]
 			int index = listFontCache.FindIndex(
@@ -293,7 +293,7 @@ namespace TJAPlayer3
 				// キャッシュにヒットせず。
 				#region [ レンダリングして、キャッシュに登録 ]
 				FontCache fc = new FontCache();
-				fc.bmp = base.DrawPrivateFont(drawstr, drawmode, fontColor, edgeColor, gradationTopColor, gradationBottomColor);
+				fc.bmp = base.DrawPrivateFont(drawstr, drawmode, fontColor, edgeColor, gradationTopColor, gradationBottomColor, secondBorder);
 				fc.drawstr = drawstr;
 				fc.drawmode = drawmode;
 				fc.fontColor = fontColor;

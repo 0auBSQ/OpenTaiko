@@ -2341,7 +2341,7 @@ namespace TJAPlayer3
 		private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey)
 	    {
 			using (var bmp = new Bitmap(titleTextureKey.cPrivateFastFont.DrawPrivateFont(
-	            titleTextureKey.str文字, titleTextureKey.forecolor, titleTextureKey.backcolor)))
+	            titleTextureKey.str文字, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge)))
 	        {
 	            CTexture tx文字テクスチャ = TJAPlayer3.tテクスチャの生成(bmp, false);
 	            if (tx文字テクスチャ.szテクスチャサイズ.Width > titleTextureKey.maxWidth)
@@ -2371,14 +2371,16 @@ namespace TJAPlayer3
 	        public readonly Color forecolor;
 	        public readonly Color backcolor;
 	        public readonly int maxWidth;
+			public readonly Color? secondEdge;
 
-	        public TitleTextureKey(string str文字, CPrivateFastFont cPrivateFastFont, Color forecolor, Color backcolor, int maxHeight)
+	        public TitleTextureKey(string str文字, CPrivateFastFont cPrivateFastFont, Color forecolor, Color backcolor, int maxHeight, Color? secondEdge = null)
 	        {
 	            this.str文字 = str文字;
 	            this.cPrivateFastFont = cPrivateFastFont;
 	            this.forecolor = forecolor;
 	            this.backcolor = backcolor;
 	            this.maxWidth = maxHeight;
+				this.secondEdge = secondEdge;
 	        }
 
 	        private bool Equals(TitleTextureKey other)
@@ -2387,6 +2389,7 @@ namespace TJAPlayer3
 	                   cPrivateFastFont.Equals(other.cPrivateFastFont) &&
 	                   forecolor.Equals(other.forecolor) &&
 	                   backcolor.Equals(other.backcolor) &&
+					   secondEdge.Equals(other.secondEdge) &&
 	                   maxWidth == other.maxWidth;
 	        }
 
@@ -2406,6 +2409,8 @@ namespace TJAPlayer3
 	                hashCode = (hashCode * 397) ^ forecolor.GetHashCode();
 	                hashCode = (hashCode * 397) ^ backcolor.GetHashCode();
 	                hashCode = (hashCode * 397) ^ maxWidth;
+					if (secondEdge != null)
+						hashCode = (hashCode * 397) ^ secondEdge.GetHashCode();
 	                return hashCode;
 	            }
 	        }

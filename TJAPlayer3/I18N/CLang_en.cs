@@ -48,6 +48,13 @@ namespace TJAPlayer3
                 "2 : Down to up diagonal\n" +
                 "3 : Half-circle facing right\n" +
                 "4 : Half-circle facing left",
+            [18] = "Rhythm Game",
+            [19] = "Exam Dojo",
+            [20] = "Taiko towers",
+            [21] = "Shop",
+            [22] = "Taiko adventure",
+            [23] = "Settings",
+            [24] = "Exit",
         };
     }
 }

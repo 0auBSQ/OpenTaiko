@@ -48,6 +48,13 @@ namespace TJAPlayer3
                 "2 : Diagonale bas-haut\n" +
                 "3 : Demi-cercle orienté à droite\n" +
                 "4 : Demi-cercle orienté à gauche",
+            [18] = "Partie rapide",
+            [19] = "Défis du Dojo",
+            [20] = "Tours rhytmiques",
+            [21] = "Magasin",
+            [22] = "Aventure",
+            [23] = "Paramètres",
+            [24] = "Quitter le jeu",
         };
     }
 }
