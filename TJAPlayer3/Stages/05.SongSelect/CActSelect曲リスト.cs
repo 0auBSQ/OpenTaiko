@@ -133,6 +133,7 @@ namespace TJAPlayer3
 
 		// メソッド
 
+		// Closest level
 		public int n現在のアンカ難易度レベルに最も近い難易度レベルを返す( C曲リストノード song )
 		{
 			// 事前チェック。
@@ -946,15 +947,20 @@ namespace TJAPlayer3
 						if (stバー情報[index].nスコアランク == null)
 							this.stバー情報[index].nスコアランク = new int[5];
 
+						this.stバー情報[index].nクリア = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nクリア;
+						this.stバー情報[index].nスコアランク = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nスコアランク;
+
+						/*
 						for (int i = 0; i <= (int)Difficulty.Edit; i++)
                         {
+
 							if (song.arスコア[i] != null)
 							{
 								this.stバー情報[index].nクリア = song.arスコア[i].譜面情報.nクリア;
 								this.stバー情報[index].nスコアランク = song.arスコア[i].譜面情報.nスコアランク;
 							}
 						}
-						
+						*/
 
 						// stバー情報[] の内容を1行ずつずらす。
 
@@ -1450,9 +1456,12 @@ namespace TJAPlayer3
 
 					if (this.r現在選択中の曲.arスコア[3] != null || this.r現在選択中の曲.arスコア[4] != null)
 					{
-						int[] クリア;
-						int[] スコアランク;
+						int[] クリア = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nクリア;
+						
+						int[] スコアランク = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nスコアランク;
 
+
+						/*
 						if (this.r現在選択中の曲.arスコア[3] != null)
 						{
 							クリア = this.r現在選択中の曲.arスコア[3].譜面情報.nクリア;
@@ -1463,12 +1472,14 @@ namespace TJAPlayer3
 							クリア = this.r現在選択中の曲.arスコア[4].譜面情報.nクリア;
 							スコアランク = this.r現在選択中の曲.arスコア[4].譜面情報.nスコアランク;
 						}
+						*/
 
 						TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.X = 0.8f + BarAnimeCount / 620f;
 						TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.Y = 0.8f + BarAnimeCount / 620f;
 						TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = 0.8f + BarAnimeCount / 620f;
 						TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = 0.8f + BarAnimeCount / 620f;
 
+						// Crowns here
 						if (クリア[3] > 0 && クリア[4] == 0)
 							TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 354, 344 - BarAnimeCount / 1.1f, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
 						else if (クリア[4] > 0)
@@ -2144,8 +2155,14 @@ namespace TJAPlayer3
 				if (stバー情報[i].nスコアランク == null)
 					this.stバー情報[i].nスコアランク = new int[5];
 
+
+
 				if(this.stバー情報[i].eバー種別 == Eバー種別.Score)
 				{
+					this.stバー情報[i].nクリア = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nクリア;
+					this.stバー情報[i].nスコアランク = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nスコアランク;
+
+					/*
 					for (int j = 0; j <= (int)Difficulty.Edit; j++)
 					{
 						if (song.arスコア[j] != null)
@@ -2154,6 +2171,7 @@ namespace TJAPlayer3
 							this.stバー情報[i].nスコアランク = song.arスコア[j].譜面情報.nスコアランク;
 						}
 					}
+					*/
 				}
 
 				for ( int j = 0; j < 3; j++ )
@@ -2252,6 +2270,7 @@ namespace TJAPlayer3
 				TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = 0.8f;
 				TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = 0.8f;
 
+				// Other crowns
 				if (クリア[3] > 0 && クリア[4] == 0)
 					TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 30, y + 30, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
 				else if (クリア[4] > 0)
