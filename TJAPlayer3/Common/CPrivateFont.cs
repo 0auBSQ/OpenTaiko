@@ -444,7 +444,8 @@ namespace TJAPlayer3
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
             StringFormat sf = new StringFormat();
-            sf.LineAlignment = StringAlignment.Far; // 画面下部（垂直方向位置）
+            // sf.LineAlignment = StringAlignment.Far; // 画面下部（垂直方向位置）
+            sf.LineAlignment = StringAlignment.Near; // 画面下部（垂直方向位置）
             sf.Alignment = StringAlignment.Center;	// 画面中央（水平方向位置）     
             sf.FormatFlags = StringFormatFlags.NoWrap; // どんなに長くて単語の区切りが良くても改行しない (AioiLight)
             sf.Trimming = StringTrimming.None; // どんなに長くてもトリミングしない (AioiLight)

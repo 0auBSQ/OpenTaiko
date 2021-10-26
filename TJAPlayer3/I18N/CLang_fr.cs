@@ -37,10 +37,6 @@ namespace TJAPlayer3
                 "Note: Cette option change aussi le ton de la musique.\n" +
                 "Si TimeStretch=ON, il peut y avoir du\n" +
                 "lag si la vitesse générale est inférieure à x0.900.",
-            [12] = "Étage atteint",
-            [13] = "",
-            [14] = "P",
-            [15] = "Score",
             [16] = "Disposition des blocs",
             [17] = "Cette option détermine l'ordonnancement \ndes blocs dans le menu de selection \n des musiques en mode partie rapide.\n" +
                 "0 : Standard (Diagonale haut-bas)\n" +
@@ -48,13 +44,27 @@ namespace TJAPlayer3
                 "2 : Diagonale bas-haut\n" +
                 "3 : Demi-cercle orienté à droite\n" +
                 "4 : Demi-cercle orienté à gauche",
-            [18] = "Partie rapide",
-            [19] = "Défis du Dojo",
-            [20] = "Tours rhytmiques",
-            [21] = "Magasin",
-            [22] = "Aventure",
-            [23] = "Paramètres",
-            [24] = "Quitter le jeu",
+
+            [100] = "Partie rapide",
+            [101] = "Défis du Dojo",
+            [102] = "Tours rhytmiques",
+            [103] = "Magasin",
+            [104] = "Aventure",
+            [105] = "Paramètres",
+            [106] = "Quitter le jeu",
+
+            [150] = "Jouez vos sons favoris\nà votre propre rhythme !",
+            [151] = "Jouez plusieurs sons à la suite\nen suivant des règles exigentes\ndans le but de reussir le défi !",
+            [152] = "Jouez de longs sons avec un\nnombre de vies limité et\natteignez le sommet de la tour !",
+            [153] = "Achetez de nouveaux sons ou personnages\ngrâce aux médailles acquises en jeu !",
+            [154] = "Surmontez une multitude d'obstables\nafin de découvrir du nouveau contenu\net de nouveaux horizons !",
+            [155] = "Changez votre style de jeu\n ou les paramètres généraux !",
+            [156] = "Quitter le jeu.\nÀ bientôt !",
+
+            [1000] = "Étage atteint",
+            [1001] = "",
+            [1002] = "P",
+            [1003] = "Score",
         };
     }
 }

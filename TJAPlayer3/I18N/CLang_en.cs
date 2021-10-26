@@ -37,10 +37,6 @@ namespace TJAPlayer3
                 "Note: It also changes the songs' pitch.\n" +
                 "In case TimeStretch=ON, some sound\n" +
                 "lag occurs slower than x0.900.",
-            [12] = "Reached floor",
-            [13] = "F",
-            [14] = "P",
-            [15] = "Score",
             [16] = "Layout type",
             [17] = "You can change the layout type \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
@@ -48,13 +44,27 @@ namespace TJAPlayer3
                 "2 : Down to up diagonal\n" +
                 "3 : Half-circle facing right\n" +
                 "4 : Half-circle facing left",
-            [18] = "Rhythm Game",
-            [19] = "Exam Dojo",
-            [20] = "Taiko towers",
-            [21] = "Shop",
-            [22] = "Taiko adventure",
-            [23] = "Settings",
-            [24] = "Exit",
+
+            [100] = "Rhythm Game",
+            [101] = "Exam Dojo",
+            [102] = "Taiko towers",
+            [103] = "Shop",
+            [104] = "Taiko adventure",
+            [105] = "Settings",
+            [106] = "Exit",
+
+            [150] = "Play your favorite\nsongs at your own pace !",
+            [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
+            [152] = "Play long charts within a limited\ncount of lives and reach\nthe tower roof !",
+            [153] = "Buy new songs, petit-chara or characters\nusing the medals you won in game !",
+            [154] = "Surpass various obstacles and\nunlock new content and horizons !",
+            [155] = "Change your game style\n or general settings !",
+            [156] = "Quit the game.\nSee you next time !",
+
+            [1000] = "Reached floor",
+            [1001] = "F",
+            [1002] = "P",
+            [1003] = "Score",
         };
     }
 }

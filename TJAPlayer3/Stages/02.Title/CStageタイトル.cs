@@ -107,21 +107,30 @@ namespace TJAPlayer3
 				return;
 
 			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-			{
 				this.pfMenuTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 36);
-			}
 			else
-			{
 				this.pfMenuTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 36);
-			}
 
-			this.ttkEnsou = new TitleTextureKey(CLangManager.LangInstance.GetString(18), this.pfMenuTitle, Color.White, Color.FromArgb(233, 53, 71), 700, Color.Black);
-			this.ttkDan = new TitleTextureKey(CLangManager.LangInstance.GetString(19), this.pfMenuTitle, Color.White, Color.FromArgb(71, 64, 135), 700, Color.Black);
-			this.ttkTower = new TitleTextureKey(CLangManager.LangInstance.GetString(20), this.pfMenuTitle, Color.White, Color.FromArgb(255, 180, 42), 700, Color.Black);
-			this.ttkShop = new TitleTextureKey(CLangManager.LangInstance.GetString(21), this.pfMenuTitle, Color.White, Color.FromArgb(16, 255, 255), 700, Color.Black);
-			this.ttkBouken = new TitleTextureKey(CLangManager.LangInstance.GetString(22), this.pfMenuTitle, Color.White, Color.FromArgb(128, 0, 128), 700, Color.Black);
-			this.ttkSettings = new TitleTextureKey(CLangManager.LangInstance.GetString(23), this.pfMenuTitle, Color.White, Color.FromArgb(128, 128, 128), 700, Color.Black);
-			this.ttkExit = new TitleTextureKey(CLangManager.LangInstance.GetString(24), this.pfMenuTitle, Color.White, Color.FromArgb(72, 72, 72), 700, Color.Black);
+			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.BoxFontName))
+				this.pfBoxText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.BoxFontName), 15);
+			else
+				this.pfBoxText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 15);
+
+			this.ttkEnsou = new TitleTextureKey(CLangManager.LangInstance.GetString(100), this.pfMenuTitle, Color.White, Color.FromArgb(233, 53, 71), 700, Color.Black);
+			this.ttkDan = new TitleTextureKey(CLangManager.LangInstance.GetString(101), this.pfMenuTitle, Color.White, Color.FromArgb(71, 64, 135), 700, Color.Black);
+			this.ttkTower = new TitleTextureKey(CLangManager.LangInstance.GetString(102), this.pfMenuTitle, Color.White, Color.FromArgb(255, 180, 42), 700, Color.Black);
+			this.ttkShop = new TitleTextureKey(CLangManager.LangInstance.GetString(103), this.pfMenuTitle, Color.White, Color.FromArgb(16, 255, 255), 700, Color.Black);
+			this.ttkBouken = new TitleTextureKey(CLangManager.LangInstance.GetString(104), this.pfMenuTitle, Color.White, Color.FromArgb(128, 0, 128), 700, Color.Black);
+			this.ttkSettings = new TitleTextureKey(CLangManager.LangInstance.GetString(105), this.pfMenuTitle, Color.White, Color.FromArgb(128, 128, 128), 700, Color.Black);
+			this.ttkExit = new TitleTextureKey(CLangManager.LangInstance.GetString(106), this.pfMenuTitle, Color.White, Color.FromArgb(72, 72, 72), 700, Color.Black);
+
+			this.ttkBoxText = new TitleTextureKey[(int)E戻り値.EXIT];
+
+			for (int i = 0; i < this.ttkBoxText.Length; i++)
+            {
+				this.ttkBoxText[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(150 + i), this.pfBoxText, Color.White, Color.Black, 1000);
+            }
+
 
 			base.OnManagedリソースの作成();
 		}
@@ -131,6 +140,7 @@ namespace TJAPlayer3
 				return;
 
 			TJAPlayer3.t安全にDisposeする(ref pfMenuTitle);
+			TJAPlayer3.t安全にDisposeする(ref pfBoxText);
 
 			base.OnManagedリソースの解放();
 		}
@@ -613,10 +623,17 @@ namespace TJAPlayer3
 								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i))?.t2D中心基準描画(TJAPlayer3.app.Device, 631, 379 - BarAnimeCount / 1.5f);
 
 
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = (int)(BarAnimeCount * 2.55f);
-								TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 + 132 / 2, new Rectangle(0, 122, 642, 148));
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = (int)(BarAnimeCount * 2.55f);
+								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 + 132 / 2, new Rectangle(0, 122, 642, 148));
 
+								if (i < this.ttkBoxText.Length)
+                                {
+									CTexture currentText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]);
 
+									currentText.Opacity = (int)(BarAnimeCount * 2.55f);
+									currentText?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 331 + 132 / 2);
+								}
+								
 
 							}
 							else
@@ -772,6 +789,8 @@ namespace TJAPlayer3
 		private PuchiChara PuchiChara;
 
 		private CPrivateFastFont pfMenuTitle;
+		private CPrivateFastFont pfBoxText;
+
 		private TitleTextureKey ttkEnsou;
 		private TitleTextureKey ttkDan;
 		private TitleTextureKey ttkTower;
@@ -779,6 +798,8 @@ namespace TJAPlayer3
 		private TitleTextureKey ttkBouken;
 		private TitleTextureKey ttkSettings;
 		private TitleTextureKey ttkExit;
+
+		private TitleTextureKey[] ttkBoxText;
 
 		private bool bバナパス読み込み;
 		private bool bバナパス読み込み失敗;

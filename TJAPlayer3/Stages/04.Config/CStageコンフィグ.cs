@@ -225,7 +225,7 @@ namespace TJAPlayer3
 			#endregion
 			#region [ メニュー ]
 			//---------------------
-			int menuY = 162 - 22;
+			int menuY = 162 - 22 + 13;
 			int stepY = 39;
 			for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 			{

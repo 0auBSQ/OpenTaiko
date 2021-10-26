@@ -636,6 +636,7 @@ namespace TJAPlayer3
 
 			this.ctScoreFrameAnime = new CCounter();
 
+			// strboxText here
 			if (this.r現在選択中の曲 != null)
 			{
 				for (int i = 0; i < 3; i++)
