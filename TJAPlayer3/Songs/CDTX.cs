@@ -1190,6 +1190,9 @@ namespace TJAPlayer3
         public int LIFE;
 
         public int TOWERTYPE;
+
+        public int DANTICK = 0;
+        public Color DANTICKCOLOR = Color.White;
         
         public Dictionary<int, CAVI> listAVI;
         public Dictionary<int, CAVIPAN> listAVIPAN;
@@ -3027,7 +3030,7 @@ namespace TJAPlayer3
 
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
-             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
+             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
@@ -4900,6 +4903,16 @@ namespace TJAPlayer3
             {
                 var tt = (int)Convert.ToDouble(strCommandParam);
                 this.TOWERTYPE = tt;
+            }
+            else if (strCommandName.Equals("DANTICK"))
+            {
+                var tick = (int)Convert.ToDouble(strCommandParam);
+                this.DANTICK = tick;
+            }
+            else if (strCommandName.Equals("DANTICKCOLOR"))
+            {
+                var tickcolor = ColorTranslator.FromHtml(strCommandParam);
+                this.DANTICKCOLOR = tickcolor;
             }
             else if (strCommandName.Equals("BPM"))
             {

@@ -157,8 +157,15 @@ namespace TJAPlayer3
 
                 #region [Plate background]
 
+                int tick = Math.Max(0, Math.Min(5, stバー情報[currentSong].nDanTick));
+                Color tickColor = stバー情報[currentSong].cDanTickColor;
+
                 TJAPlayer3.Tx.Dani_Plate.Opacity = 255;
-                TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos, yPos, new Rectangle(0, 0, tickWidth, tickHeight));
+                TJAPlayer3.Tx.Dani_Plate.color4 = tickColor;
+                TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
+
+                // Reset color for plate flash
+                TJAPlayer3.Tx.Dani_Plate.color4 = Color.White;
 
                 #endregion
 
@@ -231,7 +238,11 @@ namespace TJAPlayer3
             public List<CDTX.DanSongs> List_DanSongs;
             public CTexture txBarCenter;
             public CTexture txDanPlate;
+
+            // Extra parameters
             public int clearGrade;
+            public int nDanTick;
+            public Color cDanTickColor;
         }
 
         private void tDrawDanSelectedLevel(float Anime, int modifier = 0)
@@ -382,9 +393,12 @@ namespace TJAPlayer3
                     stバー情報[i].List_DanSongs = song.DanSongs;
                 }
 
-
+                // Two char header, will be used for grade unlocking too
                 string tmp = song.strタイトル.Substring(0, 2);
                 stバー情報[i].ttkタイトル[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
+
+                stバー情報[i].nDanTick = song.arスコア[6].譜面情報.nDanTick;
+                stバー情報[i].cDanTickColor = song.arスコア[6].譜面情報.cDanTickColor;
 
                 stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
                 stバー情報[i].txBarCenter = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Bar_Center.png");

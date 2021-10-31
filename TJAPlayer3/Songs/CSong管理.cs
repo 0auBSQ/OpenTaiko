@@ -210,6 +210,9 @@ namespace TJAPlayer3
 
 									c曲リストノード.nTowerType = dtx.TOWERTYPE;
 
+									c曲リストノード.nDanTick = dtx.DANTICK;
+									c曲リストノード.cDanTickColor = dtx.DANTICKCOLOR;
+
 									// Total count of floors for a tower chart
 									c曲リストノード.nTotalFloor = 0;
 
@@ -1063,6 +1066,9 @@ namespace TJAPlayer3
 									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
 
 									c曲リストノード.arスコア[i].譜面情報.nTowerType = cdtx.TOWERTYPE;
+
+									c曲リストノード.arスコア[i].譜面情報.nDanTick = cdtx.DANTICK;
+									c曲リストノード.arスコア[i].譜面情報.cDanTickColor = cdtx.DANTICKCOLOR;
 
 									c曲リストノード.arスコア[i].譜面情報.nTotalFloor = 0;
 									for (int k = 0; k < cdtx.listChip.Count; k++)

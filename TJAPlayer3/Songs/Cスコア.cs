@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using FDK;
+using System.Drawing;
 
 namespace TJAPlayer3
 {
@@ -85,6 +86,9 @@ namespace TJAPlayer3
 			public int nLife;
 			public int nTotalFloor;
 			public int nTowerType;
+
+			public int nDanTick;
+			public Color cDanTickColor;
 
 			[Serializable]
 			[StructLayout( LayoutKind.Sequential )]

@@ -76,6 +76,9 @@ namespace TJAPlayer3
 		public int nLife = 5;
 		public int nTotalFloor = 140;
 		public int nTowerType = 0;
+
+		public int nDanTick = 0;
+		public Color cDanTickColor = Color.White;
 		
 		public string[] strBoxText = new string[3];
         public Eジャンル eジャンル = Eジャンル.None;
