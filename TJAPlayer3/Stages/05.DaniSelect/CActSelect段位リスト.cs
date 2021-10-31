@@ -46,6 +46,8 @@ namespace TJAPlayer3
             ctDanAnimeIn = new CCounter();
             ctDaniIn = new CCounter(0, 3000, 1, TJAPlayer3.Timer);
 
+            ctDanTick = new CCounter(0, 510, 3, TJAPlayer3.Timer);
+
             ctExamConditionsAnim = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
 
             stバー情報 = new STバー情報[TJAPlayer3.Songs管理.list曲ルート_Dan.Count];
@@ -82,6 +84,7 @@ namespace TJAPlayer3
             ctDaniMoveAnime.t進行();
             ctDaniIn.t進行();
             ctDanAnimeIn.t進行();
+            ctDanTick.t進行Loop();
 
             ctExamConditionsAnim.t進行Loop();
 
@@ -131,6 +134,68 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [Upper plates]
+
+            // stバー情報[n現在の選択行]
+
+            int tickWidth = TJAPlayer3.Tx.Dani_Plate.szテクスチャサイズ.Width / 7;
+            int tickHeight = TJAPlayer3.Tx.Dani_Plate.szテクスチャサイズ.Height;
+
+            for (int idx = -13; idx < 14; idx++)
+            {
+                int currentSong = n現在の選択行 + idx;
+
+                if (currentSong < 0)
+                    continue;
+                if (currentSong >= stバー情報.Length)
+                    break;
+
+                int xPos = 640 + idx * (tickWidth - 4);
+                int yPos = idx == 0 ? 25 : 10;
+
+
+
+                #region [Plate background]
+
+                TJAPlayer3.Tx.Dani_Plate.Opacity = 255;
+                TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos, yPos, new Rectangle(0, 0, tickWidth, tickHeight));
+
+                #endregion
+
+                #region [Dan grade title]
+
+                TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTextureTate(stバー情報[currentSong].ttkタイトル[stバー情報[currentSong].ttkタイトル.Length - 1])
+                    .t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos + 2, yPos + 36);
+
+                #endregion
+
+
+                #region [Plate flash]
+
+                if (idx == 0)
+                {
+                    TJAPlayer3.Tx.Dani_Plate.Opacity = Math.Abs(255 - ctDanTick.n現在の値);
+                    TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos, yPos, new Rectangle(tickWidth * 6, 0, tickWidth, tickHeight));
+                }
+
+                #endregion
+
+                #region [Goukaku plate]
+
+                int currentRank = Math.Min(stバー情報[currentSong].clearGrade, 6) - 1;
+
+                if (currentRank >= 0)
+                {
+                    TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.24f;
+                    TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.24f;
+                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 24, new Rectangle(334 * currentRank, 0, 334, 334));
+                }
+
+                #endregion
+            }
+
+            #endregion
+
             return 0;
         }
 
@@ -142,6 +207,8 @@ namespace TJAPlayer3
         public CCounter ctDaniIn;
 
         private CCounter ctDanAnimeIn;
+
+        private CCounter ctDanTick;
 
         private CCounter ctDaniMoveAnime;
         public int n現在の選択行;
@@ -205,7 +272,7 @@ namespace TJAPlayer3
 
             #region [Song information]
 
-            for (int i = 0; i < stバー情報[currentSong].ttkタイトル.Length; i++)
+            for (int i = 0; i < stバー情報[currentSong].ttkタイトル.Length - 1; i++)
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(TJAPlayer3.app.Device, scroll + 401 + Anime, 173 + i * 73);
             for (int i = 0; i < stバー情報[currentSong].n曲難易度.Length; i++)
                 TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 377 + Anime, 180 + i * 73, new Rectangle(stバー情報[currentSong].n曲難易度[i] * 53, 0, 53, 53));
@@ -304,7 +371,7 @@ namespace TJAPlayer3
             {
                 var song = TJAPlayer3.Songs管理.list曲ルート_Dan[i];
 
-                stバー情報[i].ttkタイトル = new TitleTextureKey[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
+                stバー情報[i].ttkタイトル = new TitleTextureKey[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count + 1];
                 stバー情報[i].n曲難易度 = new int[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 stバー情報[i].n曲レベル = new int[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 for (int j = 0; j < TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count; j++)
@@ -314,6 +381,11 @@ namespace TJAPlayer3
                     stバー情報[i].n曲レベル[j] = song.DanSongs[j].Level;
                     stバー情報[i].List_DanSongs = song.DanSongs;
                 }
+
+
+                string tmp = song.strタイトル.Substring(0, 2);
+                stバー情報[i].ttkタイトル[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
+
                 stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
                 stバー情報[i].txBarCenter = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Bar_Center.png");
                 stバー情報[i].txDanPlate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Dan_Plate.png");

@@ -2358,6 +2358,37 @@ namespace TJAPlayer3
 			return texture;
 	    }
 
+		#region [Yes I do code bloating, what will you do ? =)]
+
+		public CTexture ResolveTitleTextureTate(TitleTextureKey titleTextureKey)
+		{
+			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture))
+			{
+				texture = GenerateTitleTextureTate(titleTextureKey);
+				_titledictionary.Add(titleTextureKey, texture);
+			}
+
+			return texture;
+		}
+
+		private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey)
+		{
+			using (var bmp = new Bitmap(titleTextureKey.cPrivateFastFont.DrawPrivateFont(
+				titleTextureKey.str文字, titleTextureKey.forecolor, titleTextureKey.backcolor, true)))
+			{
+				CTexture tx文字テクスチャ = TJAPlayer3.tテクスチャの生成(bmp, false);
+				if (tx文字テクスチャ.szテクスチャサイズ.Width > titleTextureKey.maxWidth)
+				{
+					tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
+					tx文字テクスチャ.vc拡大縮小倍率.Y = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
+				}
+
+				return tx文字テクスチャ;
+			}
+		}
+
+		#endregion
+
 		private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey)
 	    {
 			using (var bmp = new Bitmap(titleTextureKey.cPrivateFastFont.DrawPrivateFont(

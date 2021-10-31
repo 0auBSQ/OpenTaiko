@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +36,12 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.Challenge_Select[0].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.n現在の値 : 255 - ctBarOut.n現在の値;
                 TJAPlayer3.Tx.Challenge_Select[1].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.n現在の値 : 255 - ctBarOut.n現在の値;
+                TJAPlayer3.Tx.Challenge_Select[2].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.n現在の値 : 255 - ctBarOut.n現在の値;
+
                 TJAPlayer3.Tx.Challenge_Select[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                TJAPlayer3.Tx.Challenge_Select[2].t2D描画(TJAPlayer3.app.Device, 228 + 228 * (2 - n現在の選択行), 0, new Rectangle(228 + 228 * (2 - n現在の選択行), 0, 228, 720));
+
                 TJAPlayer3.Tx.Challenge_Select[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
                 if (ctBarIn.b終了値に達した && !TJAPlayer3.stage段位選択.b選択した)

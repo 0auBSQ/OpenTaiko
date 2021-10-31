@@ -137,11 +137,6 @@ namespace TJAPlayer3
                 ModeSelect_Bar_Chara[i] = TxC(TITLE + @"ModeSelect_Bar_Chara_" + i.ToString() + ".png");
             }
 
-            for(int i = 0; i < 6; i++)
-            {
-                ModeSelect_Bar_Text[i] = TxC(TITLE + @"ModeSelect_Bar_Text_" + i.ToString() + ".png");
-            }
-
             ModeSelect_Bar[6] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
 
             #endregion
@@ -267,8 +262,9 @@ namespace TJAPlayer3
             Dani_Soul_Number = TxC(DANISELECT + "SoulNumber.png");
             Dani_Exam_Number = TxC(DANISELECT + "ExamNumber.png");
             Dani_Bar_Center = TxC(DANISELECT + "Bar_Center.png");
+            Dani_Plate = TxC(DANISELECT + "Plate.png");
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < Challenge_Select.Length; i++)
                 Challenge_Select[i] = TxC(DANISELECT + "Challenge_Select_" + i.ToString() + ".png");
 
             #endregion
@@ -922,6 +918,7 @@ namespace TJAPlayer3
         public CTexture[] NamePlate_Effect = new CTexture[5];
         #endregion
         #region 1_タイトル画面
+
         public CTexture Title_Background,
             Entry_Bar,
             Entry_Bar_Text;
@@ -934,7 +931,7 @@ namespace TJAPlayer3
         public CTexture[] Entry_Donchan_Normal = new CTexture[13];
         public CTexture[] ModeSelect_Bar = new CTexture[7];
         public CTexture[] ModeSelect_Bar_Chara = new CTexture[6];
-        public CTexture[] ModeSelect_Bar_Text = new CTexture[6];
+
         #endregion
 
         #region 2_コンフィグ画面
@@ -1005,8 +1002,9 @@ namespace TJAPlayer3
         public CTexture Dani_Soul_Number;
         public CTexture Dani_Exam_Number;
         public CTexture Dani_Bar_Center;
+        public CTexture Dani_Plate;
 
-        public CTexture[] Challenge_Select = new CTexture[2];
+        public CTexture[] Challenge_Select = new CTexture[3];
 
         #endregion
 
