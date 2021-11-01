@@ -10,7 +10,7 @@ namespace TJAPlayer3
         string ILang.GetString(int idx)
         {
             if (!dictionnary.ContainsKey(idx))
-                return "[!] Index not found in dictionnary";
+                return "[!] Index not found in dictionary";
 
             return dictionnary[idx];
         }
@@ -25,9 +25,9 @@ namespace TJAPlayer3
             [4] = "Reload song data",
             [5] = "Retrieve and update the song list.",
             [6] = "Player count",
-            [7] = "Change the ingame player countÅF\nSetting it to 2 makes able to play\nregular charts at 2 players by splitting \nthe screen in half.",
+            [7] = "Change the ingame player count¬ÅF\nSetting it to 2 makes able to play\nregular charts at 2 players by splitting \nthe screen in half.",
             [8] = "Risky",
-            [9] = "Risky mode:\nSet over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode.",
+            [9] = "Risky mode:\nSet it over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode.",
             [10] = "Song speed",
             [11] = "It changes the song speed.\n" +
                 "For example, you can play in half\n" +
@@ -55,7 +55,7 @@ namespace TJAPlayer3
 
             [150] = "Play your favorite\nsongs at your own pace !",
             [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
-            [152] = "Play long charts within a limited\ncount of lives and reach\nthe tower roof !",
+            [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
             [153] = "Buy new songs, petit-chara or characters\nusing the medals you won in game !",
             [154] = "Surpass various obstacles and\nunlock new content and horizons !",
             [155] = "Change your game style\n or general settings !",
