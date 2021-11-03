@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 using FDK;
 using SlimDX.DirectInput;
 
@@ -16,6 +17,7 @@ namespace TJAPlayer3
             base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
 
             base.list子Activities.Add(this.段位リスト = new CActSelect段位リスト());
+
             base.list子Activities.Add(this.actFOtoNowLoading = new CActFIFOStart());
             base.list子Activities.Add(this.段位挑戦選択画面 = new CActSelect段位挑戦選択画面());
             base.list子Activities.Add(this.actFOtoTitle = new CActFIFOBlack());
@@ -37,6 +39,8 @@ namespace TJAPlayer3
             ctDonchan_In = new CCounter();
             ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
+            bInSongPlayed = false;
+            
             this.PuchiChara.IdleAnimation();
 
             base.On活性化();
@@ -63,11 +67,71 @@ namespace TJAPlayer3
             ctDonchan_In.t進行();
             ct待機.t進行();
 
-            TJAPlayer3.Tx.Dani_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            int stamp = this.段位リスト.ctDaniIn.n現在の値;
+
+            float zoom = Math.Max(1f, 5000 / (float)stamp);
+
+            TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.X = zoom;
+            TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.Y = zoom;
+            TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
 
             this.段位リスト.On進行描画();
 
-            if(this.段位リスト.ctDaniIn.n現在の値 == 3000)
+
+            if (stamp < 6000)
+            {
+                #region [Dan intro anim]
+
+                if (!bInSongPlayed)
+                {
+                    this.段位リスト.ctDaniIn = new CCounter(0, 6000, 1, TJAPlayer3.Timer);
+                    TJAPlayer3.Skin.soundDanSongSelectIn.t再生する();
+                    bInSongPlayed = true;
+                }
+
+                int doorLeft = 0;
+                int doorRight = 640;
+                if (stamp >= 3834)
+                {
+                    doorLeft -= stamp - 3834;
+                    doorRight += stamp - 3834;
+                }
+                    
+                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorLeft, 0, new Rectangle(0, 0, 640, 720));
+                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorRight, 0, new Rectangle(640, 0, 640, 720));
+
+                if (stamp <= 3934)
+                {
+                    #region [Dan intro letters]
+
+                    int quarter = TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Width / 4;
+
+                    int[] xAxis = { 250, 1030 };
+                    int[] yAxis = { 148, 572 };
+                    int[] appearStamps = { 1645, 2188, 2646, 3152 };
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (stamp < appearStamps[i])
+                            break;
+
+                        TJAPlayer3.Tx.Dani_Dan_Text.Opacity = Math.Min(255, stamp - appearStamps[i]);
+
+                        float ratio = (255 - TJAPlayer3.Tx.Dani_Dan_Text.Opacity) / 400f + 1f;
+
+                        TJAPlayer3.Tx.Dani_Dan_Text.vc拡大縮小倍率.X = ratio;
+                        TJAPlayer3.Tx.Dani_Dan_Text.vc拡大縮小倍率.Y = ratio;
+
+                        TJAPlayer3.Tx.Dani_Dan_Text.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, xAxis[i % 2], yAxis[i / 2],
+                            new Rectangle(quarter * i, 0, quarter, TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Height));
+                    }
+
+                    #endregion
+                }
+
+                #endregion
+            }
+            else if (stamp == 6000)
             {
                 if (!ctDonchan_In.b開始した)
                 {
@@ -197,6 +261,8 @@ namespace TJAPlayer3
 
         public bool b選択した;
         public bool bDifficultyIn;
+
+        public bool bInSongPlayed;
 
         private CCounter ctDonchan_In;
         private CCounter ctDonchan_Normal;

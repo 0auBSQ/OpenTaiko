@@ -267,6 +267,10 @@ namespace TJAPlayer3
             for (int i = 0; i < Challenge_Select.Length; i++)
                 Challenge_Select[i] = TxC(DANISELECT + "Challenge_Select_" + i.ToString() + ".png");
 
+            Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
+            Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
+
+
             #endregion
 
             #region 4_読み込み画面
@@ -669,6 +673,15 @@ namespace TJAPlayer3
             End_DondaFullComboLoop = new CTexture[3];
             for (int i = 0; i < 3; i++)
                 End_DondaFullComboLoop[i] = TxC(GAME + END + @"DondaFullCombo\" + "loop_" + i.ToString() + ".png");
+
+
+            End_Goukaku = new CTexture[3];
+
+            for (int i = 0; i < End_Goukaku.Length; i++)
+            {
+                End_Goukaku[i] = TxC(GAME + END + @"Dan" + i.ToString() + ".png");
+            }
+
             #endregion
             #region ゲームモード
             GameMode_Timer_Tick = TxC(GAME + GAMEMODE + @"Timer_Tick.png");
@@ -1006,6 +1019,9 @@ namespace TJAPlayer3
 
         public CTexture[] Challenge_Select = new CTexture[3];
 
+        public CTexture Dani_Dan_In;
+        public CTexture Dani_Dan_Text;
+
         #endregion
 
         #region 4_読み込み画面
@@ -1137,13 +1153,15 @@ namespace TJAPlayer3
             End_FullCombo,
             End_FullComboLoop,
             End_DondaFullCombo,
-            End_DondaFullComboLoop;
+            End_DondaFullComboLoop,
+            End_Goukaku;
         public CTexture End_Clear_Text_,
             End_Clear_Text_Effect,
             ClearFailed,
             ClearFailed1,
             ClearFailed2,
             End_DondaFullComboBg;
+
         #endregion
         #region ゲームモード
         public CTexture GameMode_Timer_Frame,

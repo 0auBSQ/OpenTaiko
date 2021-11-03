@@ -357,6 +357,9 @@ namespace TJAPlayer3
         public Cシステムサウンド soundChallengeVoice = null;
         public Cシステムサウンド soundDanSelectStart = null;
         public Cシステムサウンド soundDanSongSelectCheck = null;
+
+        public Cシステムサウンド soundDanSongSelectIn = null;
+
         public Cシステムサウンド soundDanSelectBGM = null;
         public Cシステムサウンド soundDanSongSelect = null;
 
@@ -731,6 +734,9 @@ namespace TJAPlayer3
             this.soundChallengeVoice = new Cシステムサウンド(@"Sounds\Dan\ChallengeVoice.wav", false, false, false, ESoundGroup.SoundEffect);
             this.soundDanSelectStart = new Cシステムサウンド(@"Sounds\Dan\DanSelectStart.wav", false, false, false, ESoundGroup.SoundEffect);
             this.soundDanSongSelectCheck = new Cシステムサウンド(@"Sounds\Dan\DanSongSelectCheck.wav", false, false, false, ESoundGroup.SoundEffect);
+
+            this.soundDanSongSelectIn = new Cシステムサウンド(@"Sounds\Dan\Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
+
             this.soundDanSelectBGM = new Cシステムサウンド(@"Sounds\Dan\DanSelectBGM.wav", true, false, false, ESoundGroup.SongPlayback);
             this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
             ReloadSkin();
