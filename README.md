@@ -1,5 +1,5 @@
 # TJAPlayer3-Develop-BSQ
-TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレーターです。
+TJAPlayer3-Develop-ReWriteのフォーク, .tjaファイルのシミュレーターです。
 
 - 現在のバージョン： v0.5.0
 
@@ -7,11 +7,11 @@ TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレー�
 
 ## 予告情報 （重要）
 
-このプログラムはまだスキンを含みません。
+このプログラムはまだスキンを用意しておりません。
 
-著作権に従うためにデフォルトスキンを作る予定でございます。
+著作権に従うためにデフォルトスキンを作る予定です。
 
-それまでDevelop系のスキンが希望なら僕のDiscordでご連絡ください：
+それまでに本家風のスキンが希望なら僕のDiscordでご連絡ください：
 
 - 申しコミ#5734 （日本語・英語・仏語可）
 
@@ -19,14 +19,14 @@ TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレー�
 
 Discord以外で配布しておりません。
 
-`スキンの最新版`はリリースを後でする予定です。
+`スキンの最新版`は後でリリースをする予定です。
 
-## 質疑応答
+## Q＆A
 
-- 道場の選曲画面に曲ごとの表示される難易度が全部鬼☆１０になってます
+- 道場の選曲画面に曲ごとの表示される難易度が全部鬼の☆10になっています
 
 ```
-.tjaファイルの#NEXTSONG行に「,[難易度],[COURSE]」をご追加ください。
+.tjaファイルの#NEXTSONG行に「,[難易度],[COURSE]」を追加してください。
 
 例：
 
@@ -35,13 +35,13 @@ Discord以外で配布しておりません。
 新： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
-- スタートの画面を通り過ぎれません
+- スタートの画面を通過できません
 
 ```
-長くPキーを押してください。
+Pキーを長押ししてください。
 ```
 
-- バグを発見してしました、どうしますか？
+- バグを発見しました、どうすればいいですか？
 
 ```
 バグを発見したらGithubのIssueをご提出ください。
@@ -79,7 +79,7 @@ Discord以外で配布しておりません。
 <details>
 	<summary>v0.4.2</summary>
 	
-	- 演奏選曲画面に複数のバグとクラッシュ場面を修正
+	- 演奏選曲画面に複数のバグとクラッシュを修正
 	
 	- COURSE:Towerの.tjaファイルのクラッシュを修正、太鼓タワーメニュ・LIFE管理・結果画面がまだ実装されていません。
 
@@ -185,10 +185,11 @@ Discord以外で配布しておりません。
 ☐ プログラムの性能を改善、メモリリークを修正
 ☐ 道場で４曲以上連続でやれる機能を実装
 ```
-## 謝辞
-
-FROM氏/yyagi氏 - DTXMania 開発者
-kairera0467氏 - TJAPlayer2 forPC 開発者
-ろみゅ～？氏 - バグ報告、不具合報告
-コーシー氏 - バグ報告、不具合報告
-twopointzero氏 - プログラムの最適化
+## クレジット
+> * [Aioiloght/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)
+> * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
+> * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
+> * [Mr-Ojii/TJAPlayer3-f](https://github.com/Mr-Ojii/TJAPlayer3-f)(@Mr-Ojii)
+> * [Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
+> * [FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
+> * [Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
