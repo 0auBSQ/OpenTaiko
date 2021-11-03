@@ -1487,7 +1487,7 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.ConfigIni.bAuto先生の連打 && this.bPAUSE == false)
                                 {
-                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / 15.0) * pChip.nRollCount))
+                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 19.9985)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 19.9985)) > (pChip.n発声時刻ms + (100.0 / 5.0) * pChip.nRollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
@@ -1503,7 +1503,7 @@ namespace TJAPlayer3
                                         TJAPlayer3.stage演奏ドラム画面.actMtaiko.tMtaikoEvent(pChip.nチャンネル番号, this.nHand[nPlayer], nPlayer);
 
 
-                                        this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, 0, 0, nPlayer);
+                                        this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 19.9985)), 1, 0, 0, nPlayer);
                                     }
                                 }
                             }
