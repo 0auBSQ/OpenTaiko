@@ -6,7 +6,7 @@ TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレー�
 
 ## 使用上の注意 （重要）
 
-- このプログラムはまだスキンを含んでいません。（ソフトのみ） 著作権に従うデフォルトスキンを作る予定でございます。
+- このプログラムはまだスキンを用意しておりません。（ソフトのみ） 著作権に従うデフォルトスキンを作る予定です。
 
 - このシミュレータを使用する場合は、**全て自己責任**でお願いします。
 
@@ -66,12 +66,12 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 
 - **重要** ： 「こういうUI・UXのパートをニジイロに倣って実装してください」みたいの提案は基本的に拒否しております。
 
-## 質疑応答
+## Q＆A
 
-- 道場の選曲画面に曲ごとの表示される難易度が全部鬼☆１０になってます
+- 道場の選曲画面に曲ごとの表示される難易度が全部鬼の☆１０になってます
 
 ```
-.tjaファイルの#NEXTSONG行に「,[難易度],[COURSE]」をご追加ください。
+.tjaファイルの#NEXTSONG行に「,[難易度],[COURSE]」を追加してください。
 
 例：
 
@@ -80,13 +80,13 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 新： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
-- スタートの画面を通り過ぎれません
+- スタートの画面を通過できません
 
 ```
-長くPキーを押してください。
+Pキーを長押ししてください。
 ```
 
-- バグを発見してしました、どうしますか？
+- バグを発見してしました、どうすればいいですか？
 
 ```
 バグを発見したらGithubのIssueをご提出ください。
@@ -124,7 +124,7 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 <details>
 	<summary>v0.4.2</summary>
 	
-	- 演奏選曲画面に複数のバグとクラッシュ場面を修正
+	- 演奏選曲画面に複数のバグとクラッシュを修正
 	
 	- COURSE:Towerの.tjaファイルのクラッシュを修正、太鼓タワーメニュ・LIFE管理・結果画面がまだ実装されていません。
 
@@ -230,15 +230,12 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 ☐ プログラムの性能を改善、メモリリークを修正
 ☐ 道場で４曲以上連続でやれる機能を実装
 ```
-## 謝辞
+## クレジット
 
-```
-FROM氏/yyagi氏 - DTXMania 開発者
-kairera0467氏 - TJAPlayer2 forPC 開発者
-ろみゅ～？氏 - バグ報告、不具合報告
-コーシー氏 - バグ報告、不具合報告
-twopointzero氏 - プログラムの最適化
-AioiLight氏 - TJAPlayer3 開発者
-KabanFriends氏 - TJAPlayer3-Develop-ReWrite 開発者 
-touhou-renren氏 - TJAPlayer3-Develop-ReWrite 開発者
-```
+> * [Aioiloght/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)
+> * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
+> * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
+> * [Mr-Ojii/TJAPlayer3-f](https://github.com/Mr-Ojii/TJAPlayer3-f)(@Mr-Ojii)
+> * [Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
+> * [FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
+> * [Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
