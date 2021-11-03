@@ -100,7 +100,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorLeft, 0, new Rectangle(0, 0, 640, 720));
                 TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorRight, 0, new Rectangle(640, 0, 640, 720));
 
-                if (stamp <= 3934)
+                if (stamp <= 3834)
                 {
                     #region [Dan intro letters]
 
