@@ -298,38 +298,26 @@ namespace TJAPlayer3
 						}
 						if (bモード選択)
 						{
-							if (this.n現在の選択行モード選択 == (int)E戻り値.CONFIG - 1)
-							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
-								n現在の選択行モード選択 = (int)E戻り値.CONFIG - 1;
-								this.actFO.tフェードアウト開始(0, 500);
-								base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
-							}
-							else if (this.n現在の選択行モード選択 == (int)E戻り値.DANGAMESTART - 1)
+							bool operationSucceded = false;
+
+							if (this.n現在の選択行モード選択 == (int)E戻り値.DANGAMESTART - 1)
 							{
 								if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0 && TJAPlayer3.ConfigIni.nPlayerCount != 2)
-								{
-									TJAPlayer3.Skin.sound決定音.t再生する();
-									n現在の選択行モード選択 = (int)E戻り値.DANGAMESTART - 1;
-									this.actFO.tフェードアウト開始(0, 500);
-									base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
-								}
-								else
-								{
-									TJAPlayer3.Skin.soundError.t再生する();
-								}
+									operationSucceded = true;
 							}
-							else if (this.n現在の選択行モード選択 == (int)E戻り値.GAMESTART - 1)
-							{
+							else if (this.n現在の選択行モード選択 == (int)E戻り値.GAMESTART - 1
+								|| this.n現在の選択行モード選択 == (int)E戻り値.EXIT - 1
+								|| this.n現在の選択行モード選択 == (int)E戻り値.CONFIG - 1)
+								operationSucceded = true;
+
+							if (operationSucceded == true)
+                            {
 								TJAPlayer3.Skin.sound決定音.t再生する();
-								n現在の選択行モード選択 = (int)E戻り値.GAMESTART - 1;
 								this.actFO.tフェードアウト開始(0, 500);
 								base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 							}
 							else
-                            {
 								TJAPlayer3.Skin.soundError.t再生する();
-							}
 						}
 					}
 
@@ -585,6 +573,23 @@ namespace TJAPlayer3
 								int BarAnime = ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) + 100 ? 0 : ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) && ctBarAnimeIn.n現在の値 <= (int)(26 * 16.6f) + 100 ? 40 + (int)((ctBarAnimeIn.n現在の値 - (26 * 16.6)) / 100f * 71f) : ctBarAnimeIn.n現在の値 < (int)(26 * 16.6f) ? 40 : 111;
 								int BarAnime1 = BarAnime == 0 ? ctBarMove.n現在の値 >= 150 ? 40 + (int)((ctBarMove.n現在の値 - 150) / 100f * 71f) : ctBarMove.n現在の値 < 150 ? 40 : 111 : 0;
 
+                                #region [Disable visualy 1p specific buttons if 2p]
+
+                                if (restricted1p[i] == true && TJAPlayer3.ConfigIni.nPlayerCount > 1)
+								{
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.DarkGray;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.DarkGray;
+									this.stModeBar[i].BarTexture.color4 = Color.DarkGray;
+								}
+								else
+                                {
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.White;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.White;
+									this.stModeBar[i].BarTexture.color4 = Color.White;
+								}
+
+								#endregion
+
 								this.stModeBar[i].BarTexture.Opacity = (int)((ctBarAnimeIn.n現在の値 - (16 * 16.6f)) * 1.23f);
 
 								this.stModeBar[i].BarTexture.vc拡大縮小倍率.Y = 1.0f;
@@ -617,14 +622,7 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].t2D中心基準描画(TJAPlayer3.app.Device, 640 + TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 4 - 114 + anime, 360,
 									new Rectangle(TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].szテクスチャサイズ.Height));
 
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 - BarAnimeCount / 1.5f, new Rectangle(0, 0, 642, 122));
-
 								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i))?.t2D中心基準描画(TJAPlayer3.app.Device, 631, 379 - BarAnimeCount / 1.5f);
-
-
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = (int)(BarAnimeCount * 2.55f);
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 355 + 132 / 2, new Rectangle(0, 122, 642, 148));
 
 								if (i < this.ttkBoxText.Length)
                                 {
@@ -659,6 +657,23 @@ namespace TJAPlayer3
 
 								#endregion
 
+								#region [Disable visualy 1p specific buttons if 2p]
+
+								if (restricted1p[i] == true && TJAPlayer3.ConfigIni.nPlayerCount > 1)
+								{
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.DarkGray;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.DarkGray;
+									this.stModeBar[i].BarTexture.color4 = Color.DarkGray;
+								}
+								else
+								{
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.White;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.White;
+									this.stModeBar[i].BarTexture.color4 = Color.White;
+								}
+
+								#endregion
+
 								BarMoveX = ctBarMove.n現在の値 <= 100 ? (int)(pos.X - posSelect.X) - (int)(ctBarMove.n現在の値 / 100f * (pos.X - posSelect.X)) : 0;
 								BarMoveY = ctBarMove.n現在の値 <= 100 ? (int)(pos.Y - posSelect.Y) - (int)(ctBarMove.n現在の値 / 100f * (pos.Y - posSelect.Y)) : 0;
 
@@ -666,9 +681,6 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.ModeSelect_Bar[this.nbModes].vc拡大縮小倍率.Y = 1.0f;
 								this.stModeBar[i].BarTexture.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 								TJAPlayer3.Tx.ModeSelect_Bar[this.nbModes].t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
-
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i].Opacity = 255;
-								// TJAPlayer3.Tx.ModeSelect_Bar_Text[i]?.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY - 13, new Rectangle(0, 0, 642, 122));
 
 								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i))?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + 311, pos.Y + BarAnimeY - BarMoveY + 72);
 							}
@@ -817,8 +829,9 @@ namespace TJAPlayer3
 		private Point[] ptモード選択バー座標 =
 			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };
 
-		private int nbModes = 6;
-		private STModeBar[] stModeBar = new STModeBar[6];
+		private int nbModes = 7;
+		private STModeBar[] stModeBar = new STModeBar[7];
+		private bool[] restricted1p = { false, true, true, false, true, false, false };
 
 		private struct STModeBar
 		{

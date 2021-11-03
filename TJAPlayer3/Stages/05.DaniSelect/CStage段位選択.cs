@@ -69,7 +69,7 @@ namespace TJAPlayer3
 
             int stamp = this.段位リスト.ctDaniIn.n現在の値;
 
-            float zoom = Math.Max(1f, 5000 / (float)stamp);
+            float zoom = Math.Min(1.14f, Math.Max(1f, (float)Math.Pow(stamp / 3834f, 0.5f)));
 
             TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.X = zoom;
             TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.Y = zoom;
@@ -106,8 +106,8 @@ namespace TJAPlayer3
 
                     int quarter = TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Width / 4;
 
-                    int[] xAxis = { 250, 1030 };
-                    int[] yAxis = { 148, 572 };
+                    int[] xAxis = { 300, 980 };
+                    int[] yAxis = { 198, 522 };
                     int[] appearStamps = { 1645, 2188, 2646, 3152 };
 
                     for (int i = 0; i < 4; i++)

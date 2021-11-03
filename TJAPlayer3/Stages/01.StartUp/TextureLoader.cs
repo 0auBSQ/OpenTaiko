@@ -127,17 +127,17 @@ namespace TJAPlayer3
                 Entry_Donchan_Normal[i] = TxC(TITLE + @"Donchan_Normal\" + i.ToString() + ".png");
             }
 
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < 7; i++)
             {
                 ModeSelect_Bar[i] = TxC(TITLE + @"ModeSelect_Bar_" + i.ToString() + ".png");
             }
             
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < 7; i++)
             {
                 ModeSelect_Bar_Chara[i] = TxC(TITLE + @"ModeSelect_Bar_Chara_" + i.ToString() + ".png");
             }
 
-            ModeSelect_Bar[6] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
+            ModeSelect_Bar[7] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
 
             #endregion
 
@@ -942,8 +942,8 @@ namespace TJAPlayer3
         public CTexture[] Entry_Player = new CTexture[3];
         public CTexture[] Donchan_Entry = new CTexture[44];
         public CTexture[] Entry_Donchan_Normal = new CTexture[13];
-        public CTexture[] ModeSelect_Bar = new CTexture[7];
-        public CTexture[] ModeSelect_Bar_Chara = new CTexture[6];
+        public CTexture[] ModeSelect_Bar = new CTexture[8];
+        public CTexture[] ModeSelect_Bar_Chara = new CTexture[7];
 
         #endregion
 
