@@ -127,17 +127,17 @@ namespace TJAPlayer3
                 Entry_Donchan_Normal[i] = TxC(TITLE + @"Donchan_Normal\" + i.ToString() + ".png");
             }
 
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < 8; i++)
             {
                 ModeSelect_Bar[i] = TxC(TITLE + @"ModeSelect_Bar_" + i.ToString() + ".png");
             }
             
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < 8; i++)
             {
                 ModeSelect_Bar_Chara[i] = TxC(TITLE + @"ModeSelect_Bar_Chara_" + i.ToString() + ".png");
             }
 
-            ModeSelect_Bar[6] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
+            ModeSelect_Bar[8] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
 
             #endregion
 
@@ -266,6 +266,10 @@ namespace TJAPlayer3
 
             for (int i = 0; i < Challenge_Select.Length; i++)
                 Challenge_Select[i] = TxC(DANISELECT + "Challenge_Select_" + i.ToString() + ".png");
+
+            Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
+            Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
+
 
             #endregion
 
@@ -669,6 +673,15 @@ namespace TJAPlayer3
             End_DondaFullComboLoop = new CTexture[3];
             for (int i = 0; i < 3; i++)
                 End_DondaFullComboLoop[i] = TxC(GAME + END + @"DondaFullCombo\" + "loop_" + i.ToString() + ".png");
+
+
+            End_Goukaku = new CTexture[3];
+
+            for (int i = 0; i < End_Goukaku.Length; i++)
+            {
+                End_Goukaku[i] = TxC(GAME + END + @"Dan" + i.ToString() + ".png");
+            }
+
             #endregion
             #region ゲームモード
             GameMode_Timer_Tick = TxC(GAME + GAMEMODE + @"Timer_Tick.png");
@@ -929,8 +942,8 @@ namespace TJAPlayer3
         public CTexture[] Entry_Player = new CTexture[3];
         public CTexture[] Donchan_Entry = new CTexture[44];
         public CTexture[] Entry_Donchan_Normal = new CTexture[13];
-        public CTexture[] ModeSelect_Bar = new CTexture[7];
-        public CTexture[] ModeSelect_Bar_Chara = new CTexture[6];
+        public CTexture[] ModeSelect_Bar = new CTexture[9];
+        public CTexture[] ModeSelect_Bar_Chara = new CTexture[8];
 
         #endregion
 
@@ -1005,6 +1018,9 @@ namespace TJAPlayer3
         public CTexture Dani_Plate;
 
         public CTexture[] Challenge_Select = new CTexture[3];
+
+        public CTexture Dani_Dan_In;
+        public CTexture Dani_Dan_Text;
 
         #endregion
 
@@ -1137,13 +1153,15 @@ namespace TJAPlayer3
             End_FullCombo,
             End_FullComboLoop,
             End_DondaFullCombo,
-            End_DondaFullComboLoop;
+            End_DondaFullComboLoop,
+            End_Goukaku;
         public CTexture End_Clear_Text_,
             End_Clear_Text_Effect,
             ClearFailed,
             ClearFailed1,
             ClearFailed2,
             End_DondaFullComboBg;
+
         #endregion
         #region ゲームモード
         public CTexture GameMode_Timer_Frame,

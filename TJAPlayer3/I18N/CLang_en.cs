@@ -45,21 +45,23 @@ namespace TJAPlayer3
                 "3 : Half-circle facing right\n" +
                 "4 : Half-circle facing left",
 
-            [100] = "Rhythm Game",
+            [100] = "Taiko Mode",
             [101] = "Exam Dojo",
             [102] = "Taiko towers",
             [103] = "Shop",
             [104] = "Taiko adventure",
-            [105] = "Settings",
-            [106] = "Exit",
+            [105] = "My room",
+            [106] = "Settings",
+            [107] = "Exit",
 
             [150] = "Play your favorite\nsongs at your own pace !",
             [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
             [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
             [153] = "Buy new songs, petit-chara or characters\nusing the medals you won in game !",
             [154] = "Surpass various obstacles and\nunlock new content and horizons !",
-            [155] = "Change your game style\n or general settings !",
-            [156] = "Quit the game.\nSee you next time !",
+            [155] = "Change your nameplate info\n or your character visuals !",
+            [156] = "Change your game style\n or general settings !",
+            [157] = "Quit the game.\nSee you next time !",
 
             [1000] = "Reached floor",
             [1001] = "F",

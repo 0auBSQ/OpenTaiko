@@ -44,6 +44,12 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.Challenge_Select[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+
+                if (TJAPlayer3.stage段位選択.ct待機.b開始した)
+                    return base.On進行描画();
+
+                #region [Key bindings]
+
                 if (ctBarIn.b終了値に達した && !TJAPlayer3.stage段位選択.b選択した)
                 {
                     if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.RightArrow) ||
@@ -83,6 +89,8 @@ namespace TJAPlayer3
                         }
                     }
                 }
+
+                #endregion
             }
 
             return base.On進行描画();

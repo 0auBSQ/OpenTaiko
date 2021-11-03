@@ -26,16 +26,19 @@
 101 : Dan main menu button
 102 : Tower main menu button 
 103 : Shop main menu button 
-104 : Bouken main menu button 
-105 : Settings main menu button 
-106 : Quit main menu button
+104 : Bouken main menu button
+105 : Heya main menu button 
+106 : Settings main menu button 
+107 : Quit main menu button
+
 150 : Ensou main menu box text
 151 : Dan main menu box text
 152 : Tower main menu box text
 153 : Shop main menu box text
 154 : Bouken main menu box text 
-155 : Settings main menu box text
-156 : Quit main menu box text
+155 : Heya main menu box text
+156 : Settings main menu box text
+157 : Quit main menu box text
 
 # Tower text (0100X)
 

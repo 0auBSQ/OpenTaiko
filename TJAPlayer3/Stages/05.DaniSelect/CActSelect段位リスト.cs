@@ -44,7 +44,7 @@ namespace TJAPlayer3
 
             ctDaniMoveAnime = new CCounter();
             ctDanAnimeIn = new CCounter();
-            ctDaniIn = new CCounter(0, 3000, 1, TJAPlayer3.Timer);
+            ctDaniIn = new CCounter(0, 6000, 1, TJAPlayer3.Timer);
 
             ctDanTick = new CCounter(0, 510, 3, TJAPlayer3.Timer);
 
@@ -88,7 +88,7 @@ namespace TJAPlayer3
 
             ctExamConditionsAnim.t進行Loop();
 
-            if (ctDaniIn.n現在の値 == 3000)
+            if (ctDaniIn.n現在の値 == 6000)
             {
                 if(!DaniInAnime)
                 {
@@ -99,7 +99,7 @@ namespace TJAPlayer3
 
             #region [ バー表示 ]
 
-            if (stバー情報.Length != 0)
+            if (stバー情報.Length != 0 && ctDaniIn.n現在の値 == 6000)
             {
                 TJAPlayer3.Tx.DanC_ExamType.vc拡大縮小倍率.X = 0.81f;
                 TJAPlayer3.Tx.DanC_ExamType.vc拡大縮小倍率.Y = 0.81f;
@@ -134,6 +134,10 @@ namespace TJAPlayer3
 
             #endregion
 
+            // To do : Display the 27 (max) bars one by one
+            if (ctDaniIn.n現在の値 < 5000)
+                return 0;
+
             #region [Upper plates]
 
             // stバー情報[n現在の選択行]
@@ -143,6 +147,10 @@ namespace TJAPlayer3
 
             for (int idx = -13; idx < 14; idx++)
             {
+
+                if (ctDaniIn.n現在の値 < 5000 + (idx + 13) * 33)
+                    break;
+
                 int currentSong = n現在の選択行 + idx;
 
                 if (currentSong < 0)
