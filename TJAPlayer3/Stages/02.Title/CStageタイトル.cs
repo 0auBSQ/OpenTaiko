@@ -121,8 +121,10 @@ namespace TJAPlayer3
 			this.ttkTower = new TitleTextureKey(CLangManager.LangInstance.GetString(102), this.pfMenuTitle, Color.White, Color.FromArgb(255, 180, 42), 700, Color.Black);
 			this.ttkShop = new TitleTextureKey(CLangManager.LangInstance.GetString(103), this.pfMenuTitle, Color.White, Color.FromArgb(16, 255, 255), 700, Color.Black);
 			this.ttkBouken = new TitleTextureKey(CLangManager.LangInstance.GetString(104), this.pfMenuTitle, Color.White, Color.FromArgb(128, 0, 128), 700, Color.Black);
-			this.ttkSettings = new TitleTextureKey(CLangManager.LangInstance.GetString(105), this.pfMenuTitle, Color.White, Color.FromArgb(128, 128, 128), 700, Color.Black);
-			this.ttkExit = new TitleTextureKey(CLangManager.LangInstance.GetString(106), this.pfMenuTitle, Color.White, Color.FromArgb(72, 72, 72), 700, Color.Black);
+			this.ttkSettings = new TitleTextureKey(CLangManager.LangInstance.GetString(106), this.pfMenuTitle, Color.White, Color.FromArgb(128, 128, 128), 700, Color.Black);
+			this.ttkExit = new TitleTextureKey(CLangManager.LangInstance.GetString(107), this.pfMenuTitle, Color.White, Color.FromArgb(72, 72, 72), 700, Color.Black);
+
+			this.ttkHeya = new TitleTextureKey(CLangManager.LangInstance.GetString(105), this.pfMenuTitle, Color.White, Color.FromArgb(24, 128, 24), 700, Color.Black);
 
 			this.ttkBoxText = new TitleTextureKey[(int)E戻り値.EXIT];
 
@@ -744,6 +746,9 @@ namespace TJAPlayer3
 							case (int)E戻り値.BOUKENSTART - 1:
 								return (int)E戻り値.BOUKENSTART;
 
+							case (int)E戻り値.HEYA - 1:
+								return (int)E戻り値.HEYA;
+
 							case (int) E戻り値.CONFIG - 1:
 								return (int) E戻り値.CONFIG;
 
@@ -770,6 +775,7 @@ namespace TJAPlayer3
 			TAIKOTOWERSSTART,
 			SHOPSTART,
 			BOUKENSTART,
+			HEYA,
 			CONFIG,
 			EXIT
 		}
@@ -811,6 +817,8 @@ namespace TJAPlayer3
 		private TitleTextureKey ttkSettings;
 		private TitleTextureKey ttkExit;
 
+		private TitleTextureKey ttkHeya;
+
 		private TitleTextureKey[] ttkBoxText;
 
 		private bool bバナパス読み込み;
@@ -829,9 +837,9 @@ namespace TJAPlayer3
 		private Point[] ptモード選択バー座標 =
 			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };
 
-		private int nbModes = 7;
-		private STModeBar[] stModeBar = new STModeBar[7];
-		private bool[] restricted1p = { false, true, true, false, true, false, false };
+		private int nbModes = 8;
+		private STModeBar[] stModeBar = new STModeBar[8];
+		private bool[] restricted1p = { false, true, true, false, true, false, false, false };
 
 		private struct STModeBar
 		{
@@ -869,10 +877,12 @@ namespace TJAPlayer3
         {
 			switch (idx)
             {
-				case 6:
+				case 7:
 					return this.ttkExit;
-				case 5:
+				case 6:
 					return this.ttkSettings;
+				case 5:
+					return this.ttkHeya;
 				case 4:
 					return this.ttkBouken;
 				case 3:
