@@ -431,6 +431,7 @@ namespace TJAPlayer3
 					}
 					else
                     {
+						TJAPlayer3.Tx.Result_ScoreRankEffect.Opacity = 255;
 						TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
 						TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
 					}
@@ -478,6 +479,7 @@ namespace TJAPlayer3
 					}
 					else
                     {
+						TJAPlayer3.Tx.Result_CrownEffect.Opacity = 255;
 						TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 1f;
 						TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 1f;
 					}
