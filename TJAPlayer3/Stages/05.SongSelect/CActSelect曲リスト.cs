@@ -1664,6 +1664,7 @@ namespace TJAPlayer3
 								/*
                                 else
 								{
+
 									// To replace (Generate a display bug for tower mapc)
 
 									if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[TJAPlayer3.stage選曲.n現在選択中の曲の難易度] >= 0)
@@ -1981,7 +1982,7 @@ namespace TJAPlayer3
 
 		private Font ft曲リスト用フォント;
 		private long nスクロールタイマ;
-		private int n現在のスクロールカウンタ;
+		public int n現在のスクロールカウンタ;
 		private int n現在の選択行;
 		private int n目標のスクロールカウンタ;
         private readonly Point[] ptバーの座標 = new Point[] {

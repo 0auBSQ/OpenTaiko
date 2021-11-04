@@ -6,11 +6,11 @@ using System.Resources;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("TJAPlayer3 - A .tja file player.")]
+[assembly: AssemblyTitle("OpenTaiko - A .tja file player.")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TJAPlayer3")]
+[assembly: AssemblyProduct("OpenTaiko")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -33,7 +33,7 @@ using System.Resources;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.0")]
+[assembly: AssemblyVersion("0.5.1")]
 [assembly: AssemblyFileVersion("1.4.5.3")]
 [assembly: NeutralResourcesLanguage("ja-JP")]
 
