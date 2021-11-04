@@ -10,6 +10,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using FDK;
 using FDK.ExtensionMethods;
+using System.Linq;
 using TJAPlayer3;
 
 namespace TJAPlayer3
@@ -2963,8 +2964,23 @@ namespace TJAPlayer3
         private object str改行文字を削除する(string strInput, int nMode)
         {
             string str = "";
-            str = strInput.Replace(Environment.NewLine, "\n");
-            str = str.Replace('\t', ' ');
+            str = strInput;
+            // str = strInput.Replace(Environment.NewLine, "\n");
+            // str = str.Replace('\t', ' ');
+
+            unsafe
+            {
+                fixed (char *s = str)
+                {
+                    for (int i = 0; i < str.Length; i++)
+                    {
+                        if (s[i] == '\t')
+                            s[i] = ' ';
+                        else if (s[i] == '\r')
+                            s[i] = '\n';
+                    }
+                }
+            }
 
             if (nMode == 0)
             {
@@ -3028,10 +3044,13 @@ namespace TJAPlayer3
             return strCourseTJA;
         }
 
+        // Regexes
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
              @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
+
+        // private static readonly HashSet<string> valableTokens = new HashSet<string>(@"TIT|LEV|BPM|WAV|OFF|BAL|EXA|DAN|REN|BAL|SON|SEV|SCO|COU|STY|TOW|GAM|LIF|DEM|SID|SUB|GEN|MOV|BGI|BGM|HID|GAU|LYR|#HB|#BM".Split('|'));
 
         /// <summary>
         /// 新型。
@@ -3045,16 +3064,6 @@ namespace TJAPlayer3
         {
             if (!String.IsNullOrEmpty(strInput)) //空なら通さない
             {
-                //StreamWriter stream = null;
-                //bool bLog = true;
-                //try
-                //{
-                //    stream = new StreamWriter("noteTest.txt", false);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Trace.TraceError( ex.StackTrace );
-                //}
 
                 //2017.01.31 DD カンマのみの行を0,に置き換え
                 strInput = regexForPrefixingCommaStartingLinesWithZero.Replace(strInput, "0,");
@@ -3067,14 +3076,22 @@ namespace TJAPlayer3
                 }
                 string strInputHeader = strInput.Remove(startIndex);
                 strInput = strInput.Remove(0, startIndex);
-                strInputHeader = regexForStrippingHeadingLines.Replace(strInputHeader, "");
+
+                // Regex called here
+                // strInputHeader = regexForStrippingHeadingLines.Replace(strInputHeader, "");
+                
+
                 strInput = strInputHeader + "\n" + strInput;
 
                 //どうせ使わないので先にSplitしてコメントを削除。
                 var strSplitした譜面 = (string[])this.str改行文字を削除する(strInput, 1);
+
                 for (int i = 0; strSplitした譜面.Length > i; i++)
                 {
-                    strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
+                    // strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
+
+                    if (strSplitした譜面[i].Contains("//"))
+                        strSplitした譜面[i] = "";
                 }
                 //空のstring配列を詰める
                 strSplitした譜面 = this.t空のstring配列を詰めたstring配列を返す(strSplitした譜面);
