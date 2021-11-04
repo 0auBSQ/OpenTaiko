@@ -35,10 +35,10 @@ namespace TJAPlayer3
                 " for your practice.\n" +
                 "\n" +
                 "Note: It also changes the songs' pitch.\n" +
-                "In case TimeStretch=ON, some sound\n" +
-                "lag occurs slower than x0.900.",
+                "In case TimeStretch=ON, some audio\n" +
+                "lag occurs if slower than x0.900.",
             [16] = "Layout type",
-            [17] = "You can change the layout type \ndisplayed on the song select screen.\n" +
+            [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
                 "1 : Vertical\n" +
                 "2 : Down to up diagonal\n" +
@@ -46,18 +46,18 @@ namespace TJAPlayer3
                 "4 : Half-circle facing left",
 
             [100] = "Taiko Mode",
-            [101] = "Exam Dojo",
-            [102] = "Taiko towers",
+            [101] = "Dan-i Dojo",
+            [102] = "Taiko Towers",
             [103] = "Shop",
-            [104] = "Taiko adventure",
-            [105] = "My room",
+            [104] = "Taiko Adventure",
+            [105] = "My Room",
             [106] = "Settings",
             [107] = "Exit",
 
             [150] = "Play your favorite\nsongs at your own pace !",
             [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
             [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
-            [153] = "Buy new songs, petit-chara or characters\nusing the medals you won in game !",
+            [153] = "Buy new songs, petit-chara or characters\nusing the medals you earned in game !",
             [154] = "Surpass various obstacles and\nunlock new content and horizons !",
             [155] = "Change your nameplate info\n or your character visuals !",
             [156] = "Change your game style\n or general settings !",
