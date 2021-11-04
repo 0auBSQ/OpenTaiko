@@ -986,11 +986,6 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.DanC_MiniNumber == null || value < 0)
                 return;
 
-            if (value == 0)
-                TJAPlayer3.Tx.DanC_MiniNumber.color4 = Color.Gray;
-            else
-                TJAPlayer3.Tx.DanC_MiniNumber.color4 = Color.White;
-
             var notesRemainDigit = 0;
             if (value < 0)
                 return;
