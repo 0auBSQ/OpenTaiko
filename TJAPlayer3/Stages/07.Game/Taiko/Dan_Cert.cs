@@ -932,8 +932,21 @@ namespace TJAPlayer3
         /// <param name="scaleJump">アニメーション用拡大率(Yに加算される)。</param>
         private void DrawNumber(int value, int x, int y, int padding,　bool bBig, Dan_C dan_c, float scaleX = 1.0f, float scaleY = 1.0f, float scaleJump = 0.0f)
         {
-            if (value < 0)
+
+            if (TJAPlayer3.Tx.DanC_Number == null || TJAPlayer3.Tx.DanC_Small_Number == null || value < 0)
                 return;
+
+            if (value == 0)
+            {
+                TJAPlayer3.Tx.DanC_Number.color4 = Color.Gray;
+                TJAPlayer3.Tx.DanC_Small_Number.color4 = Color.Gray;
+            }
+            else
+            {
+                TJAPlayer3.Tx.DanC_Number.color4 = Color.White;
+                TJAPlayer3.Tx.DanC_Small_Number.color4 = Color.White;
+            }
+                
             if (bBig)
             {
                 var notesRemainDigit = 0;
@@ -970,6 +983,14 @@ namespace TJAPlayer3
 
         public void DrawMiniNumber(int value, int x, int y, int padding, Dan_C dan_c)
         {
+            if (TJAPlayer3.Tx.DanC_MiniNumber == null || value < 0)
+                return;
+
+            if (value == 0)
+                TJAPlayer3.Tx.DanC_MiniNumber.color4 = Color.Gray;
+            else
+                TJAPlayer3.Tx.DanC_MiniNumber.color4 = Color.White;
+
             var notesRemainDigit = 0;
             if (value < 0)
                 return;
@@ -977,7 +998,7 @@ namespace TJAPlayer3
             {
                 var number = Convert.ToInt32(value.ToString()[i].ToString());
                 Rectangle rectangle = new Rectangle(TJAPlayer3.Skin.Game_DanC_MiniNumber_Size[0] * number - 1, GetExamConfirmStatus(dan_c) ? TJAPlayer3.Skin.Game_DanC_MiniNumber_Size[1] : 0, TJAPlayer3.Skin.Game_DanC_MiniNumber_Size[0], TJAPlayer3.Skin.Game_DanC_MiniNumber_Size[1]);
-                TJAPlayer3.Tx.DanC_MiniNumber?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, x - (notesRemainDigit * padding), y, rectangle);
+                TJAPlayer3.Tx.DanC_MiniNumber.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, x - (notesRemainDigit * padding), y, rectangle);
                 notesRemainDigit--;
             }
         }
