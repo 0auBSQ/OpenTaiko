@@ -36,7 +36,7 @@ namespace TJAPlayer3
                 "\n" +
                 "Note: It also changes the songs' pitch.\n" +
                 "In case TimeStretch=ON, some audio\n" +
-                "lag occurs slower if than x0.900.",
+                "lag occurs if slower than x0.900.",
             [16] = "Layout type",
             [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
