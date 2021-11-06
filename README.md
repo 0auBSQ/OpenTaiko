@@ -254,6 +254,7 @@ Pキーを長押ししてください。
 ```
 ## クレジット
 
+> * [AkiraChnl/OpenTaiko Icon)(https://github.com/AkiraChnl)
 > * [cien/OpenTaiko Logo](https://twitter.com/cienisfrog)(@cienisfrog)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
