@@ -1,5 +1,10 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/58159635/140600257-f712fc48-d09a-4a5e-a78d-e7c65ca19b80.png">
+</p>
+
 # OpenTaiko
-TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレーターです。
+
+TJAPlayer3-Develop-ReWriteのフォーク, .tjaファイルのシミュレーターです。
 旧TJAPlayer3-Develop-BSQ
 
 - 現在のバージョン： v0.5.1
@@ -249,6 +254,7 @@ Pキーを長押ししてください。
 ```
 ## クレジット
 
+> * [cien/OpenTaiko Logo](https://twitter.com/cienisfrog)(@cienisfrog)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
