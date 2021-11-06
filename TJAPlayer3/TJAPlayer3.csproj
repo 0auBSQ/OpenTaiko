@@ -12,7 +12,7 @@
     <AssemblyName>OpenTaiko</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>TJAPlayer3-Develop-ReWrite.ico</ApplicationIcon>
+    <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -285,7 +285,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dtx.ico" />
-    <Content Include="TJAPlayer3-Develop-ReWrite.ico" />
+    <Content Include="OpenTaiko.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\TJAPlayer3.ico" />
   </ItemGroup>
   <ItemGroup>
