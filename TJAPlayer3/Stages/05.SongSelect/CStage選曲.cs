@@ -908,10 +908,14 @@ namespace TJAPlayer3
                 #endregion
 
 
+                // Current board
                 for (int i = 0; i < 10; i++)
                 {
                     tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? this.act曲リスト.ScoreRankCount[i].ToString() : this.act曲リスト.CrownCount[i - 7].ToString());
                 }
+
+                if (TJAPlayer3.NamePlateConfig.data.Medals[0] >= 0)
+                    tBoardNumberDraw(this.ptBoardNumber[10].X - 10, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[0].ToString());
 
                 if (act難易度選択画面.bOption[0]) actPlayOption.On進行描画(0);
                 if (act難易度選択画面.bOption[1]) actPlayOption.On進行描画(1);
@@ -1074,7 +1078,7 @@ namespace TJAPlayer3
         }
 
         private Point[] ptBoardNumber =
-            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311) };
+            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(100, 360) };
 
         public void tBoardNumberDraw(int x, int y, string str)
         {

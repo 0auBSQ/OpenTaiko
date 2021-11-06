@@ -468,6 +468,13 @@ namespace TJAPlayer3
 					}
 				}
 
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+					this.nEarnedMedalsCount[0] = 0;
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P)
+					this.nEarnedMedalsCount[1] = 0;
+
+				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
+
 				#endregion
 
 				base.On活性化();
