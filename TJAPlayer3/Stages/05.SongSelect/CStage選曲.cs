@@ -1078,7 +1078,7 @@ namespace TJAPlayer3
         }
 
         private Point[] ptBoardNumber =
-            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(100, 360) };
+            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(84, 360) };
 
         public void tBoardNumberDraw(int x, int y, string str)
         {
