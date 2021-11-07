@@ -3090,8 +3090,9 @@ namespace TJAPlayer3
                 {
                     // strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
 
-                    if (strSplitした譜面[i].Contains("//"))
-                        strSplitした譜面[i] = "";
+                    int idx = strSplitした譜面[i].IndexOf("//");
+                    if (idx >= 0)
+                        strSplitした譜面[i] = strSplitした譜面[i].Substring(0, idx);
                 }
                 //空のstring配列を詰める
                 strSplitした譜面 = this.t空のstring配列を詰めたstring配列を返す(strSplitした譜面);

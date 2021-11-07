@@ -63,6 +63,8 @@ namespace TJAPlayer3
             public int[] PuchiChara = { 2, 11 };
 
             public int[] Medals = { 0, 0 };
+
+            public int[] Character = { 0, 0 };
         }
 
         public Data data = new Data();
