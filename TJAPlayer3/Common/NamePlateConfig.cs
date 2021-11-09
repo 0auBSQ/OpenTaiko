@@ -49,11 +49,67 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [Dan titles]
+
+        public void tUpdateDanTitle(string title, bool isGold, int clearStatus, int player)
+        {
+            bool iG = isGold;
+            int cs = clearStatus;
+
+            if (TJAPlayer3.NamePlateConfig.data.DanTitles[player] == null)
+                TJAPlayer3.NamePlateConfig.data.DanTitles[player] = new Dictionary<string, CDanTitle>();
+
+            if (TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title))
+            {
+                if (TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].clearStatus > cs)
+                    cs = TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].clearStatus;
+                if (TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].isGold)
+                    iG = true;
+            }
+
+            // Automatically set the dan to nameplate if new
+            // Add a function within the NamePlate.cs file to update the title texture 
+            /*
+            if (!TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title) || cs != clearStatus || iG != isGold)
+            {
+                TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
+                TJAPlayer3.NamePlateConfig.data.DanGold[player] = iG;
+                TJAPlayer3.NamePlateConfig.data.DanType[player] = cs;
+            }
+            */
+
+            CDanTitle danTitle = new CDanTitle(iG, cs);
+
+            TJAPlayer3.NamePlateConfig.data.DanTitles[player][title] = danTitle;
+
+            tSaveFile();
+        }
+
+        #endregion
+
+        #region [Auxilliary classes]
+
+        public class CDanTitle
+        {
+            public CDanTitle(bool iG, int cs)
+            {
+                isGold = iG;
+                clearStatus = cs;
+            }
+
+            public bool isGold;
+            public int clearStatus;
+        }
+
+        #endregion
+
+
+
         public class Data
         {
             public string[] Name = { "プレイヤー1", "プレイヤー2" };
             public string[] Title = { "初心者", "初心者" };
-            public string[] Dan = { "素人", "素人" };
+            public string[] Dan = { "新人", "新人" };
 
             public bool[] DanGold = { false, false };
 
@@ -65,6 +121,8 @@ namespace TJAPlayer3
             public int[] Medals = { 0, 0 };
 
             public int[] Character = { 0, 0 };
+
+            public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[2];
         }
 
         public Data data = new Data();
