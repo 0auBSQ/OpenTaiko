@@ -106,6 +106,7 @@
     <Compile Include="Common\Discord.cs" />
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="I18N\CLang_es.cs" />
     <Compile Include="I18N\CLang_fr.cs" />
     <Compile Include="I18N\CLang_en.cs" />
     <Compile Include="I18N\CLang_jp.cs" />
