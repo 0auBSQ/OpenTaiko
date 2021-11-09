@@ -221,6 +221,15 @@ namespace TJAPlayer3
 						}
 
 						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], clearValue);
+
+						// Unlock dan grade
+						if (clearValue > 0)
+                        {
+							TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
+								clearValue % 2 == 0,
+								(clearValue - 1) / 2,
+								0);
+                        }
 					}
 					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 					{
