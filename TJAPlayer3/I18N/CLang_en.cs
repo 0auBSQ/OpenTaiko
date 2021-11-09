@@ -46,7 +46,7 @@ namespace TJAPlayer3
                 "4 : Medio circulo hacia la izquierda",
 
             [100] = "Modo Taiko",
-            [101] = "Dan-i Dojo",
+            [101] = "Desafíos del Dojo",
             [102] = "Torres Taiko",
             [103] = "Tienda",
             [104] = "Aventura Taiko",
