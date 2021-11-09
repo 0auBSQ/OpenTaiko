@@ -55,7 +55,7 @@ namespace TJAPlayer3
             [107] = "Salir",
 
             [150] = "Juega tus canciones\nfavoritas a tu propio gusto !",
-            [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
+            [151] = "Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango de Aprobado !",
             [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
             [153] = "Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando !",
             [154] = "Surpass various obstacles and\nunlock new content and horizons !",
