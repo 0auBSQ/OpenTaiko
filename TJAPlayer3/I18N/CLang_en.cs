@@ -25,14 +25,14 @@ namespace TJAPlayer3
             [4] = "Recargar datos de canciones",
             [5] = "Recarga y actualiza la lista de canciones.",
             [6] = "Numero de jugadores",
-            [7] = "Change the ingame player countF\nSetting it to 2 makes able to play\nregular charts at 2 players by splitting \nthe screen in half.",
-            [8] = "Risky",
+            [7] = "Cambia el numero de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo \nla pantalla a la mitad.",
+            [8] = "Riesgoso",
             [9] = "Risky mode:\nSet it over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode.",
             [10] = "Velocidad de la canción",
             [11] = "Cambia la velocidad de la canción.\n" +
-                "For example, you can play in half\n" +
-                " speed by setting PlaySpeed = 0.500\n" +
-                " for your practice.\n" +
+                "Por ejemplo, puedes jugar a mitad de\n" +
+                " velocidad ajustando el valor PlaySpeed = 0.500\n" +
+                " para practicar.\n" +
                 "\n" +
                 "Nota: Tambien cambia el tono de la canción.\n" +
                 "In case TimeStretch=ON, some audio\n" +
@@ -50,7 +50,7 @@ namespace TJAPlayer3
             [102] = "Torres Taiko",
             [103] = "Tienda",
             [104] = "Aventura Taiko",
-            [105] = "My Room",
+            [105] = "Mi Habitación",
             [106] = "Ajustes",
             [107] = "Salir",
 
@@ -64,7 +64,7 @@ namespace TJAPlayer3
             [157] = "Salir del juego.\nHasta la proxima !",
 
             [1000] = "Piso alcanzado",
-            [1001] = "F",
+            [1001] = "P",
             [1002] = "P",
             [1003] = "Puntuación",
         };
