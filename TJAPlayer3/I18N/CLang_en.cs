@@ -10,7 +10,7 @@ namespace TJAPlayer3
         string ILang.GetString(int idx)
         {
             if (!dictionnary.ContainsKey(idx))
-                return "[!] No se ha encontrado el índice en el diccionario.";
+                return "[!] Index not found in dictionary";
 
             return dictionnary[idx];
         }
@@ -18,55 +18,55 @@ namespace TJAPlayer3
 
         private static readonly Dictionary<int, string> dictionnary = new Dictionary<int, string>
         {
-            [0] = "Cambia el idioma que se usa\nen el juego y menús.",
-            [1] = "Idioma del sistema",
-            [2] = "<< Volver al menú",
-            [3] = "Volver al menú de la izquierda.",
-            [4] = "Recargar datos de canciones",
-            [5] = "Recarga y actualiza la lista de canciones.",
-            [6] = "Numero de jugadores",
-            [7] = "Cambia el numero de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo \nla pantalla a la mitad.",
-            [8] = "Riesgoso",
+            [0] = "Change the displayed language\ningame and within the menus.",
+            [1] = "System language",
+            [2] = "<< Return to Menu",
+            [3] = "Return to left menu.",
+            [4] = "Reload song data",
+            [5] = "Retrieve and update the song list.",
+            [6] = "Player count",
+            [7] = "Change the ingame player countF\nSetting it to 2 makes able to play\nregular charts at 2 players by splitting \nthe screen in half.",
+            [8] = "Risky",
             [9] = "Risky mode:\nSet it over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode.",
-            [10] = "Velocidad de la canción",
-            [11] = "Cambia la velocidad de la canción.\n" +
-                "Por ejemplo, puedes jugar a mitad de\n" +
-                " velocidad ajustando el valor PlaySpeed = 0.500\n" +
-                " para practicar.\n" +
+            [10] = "Song speed",
+            [11] = "It changes the song speed.\n" +
+                "For example, you can play in half\n" +
+                " speed by setting PlaySpeed = 0.500\n" +
+                " for your practice.\n" +
                 "\n" +
-                "Nota: Tambien cambia el tono de la canción.\n" +
+                "Note: It also changes the songs' pitch.\n" +
                 "In case TimeStretch=ON, some audio\n" +
                 "lag occurs if slower than x0.900.",
-            [16] = "Tipo de interfaz",
-            [17] = "Puedes cambiar la interfaz de las canciones \nmostradas en la pantalla de selección.\n" +
-                "0 : Regular (Diagonal de arriba hacia abajo)\n" +
+            [16] = "Layout type",
+            [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
+                "0 : Regular (Up to down diagonal)\n" +
                 "1 : Vertical\n" +
-                "2 : Diagonal de abajo hacia arriba\n" +
-                "3 : Medio circulo hacia la derecha\n" +
-                "4 : Medio circulo hacia la izquierda",
+                "2 : Down to up diagonal\n" +
+                "3 : Half-circle facing right\n" +
+                "4 : Half-circle facing left",
 
-            [100] = "Modo Taiko",
-            [101] = "Desafíos del Dojo",
-            [102] = "Torres Taiko",
-            [103] = "Tienda",
-            [104] = "Aventura Taiko",
-            [105] = "Mi Habitación",
-            [106] = "Ajustes",
-            [107] = "Salir",
+            [100] = "Taiko Mode",
+            [101] = "Dan-i Dojo",
+            [102] = "Taiko Towers",
+            [103] = "Shop",
+            [104] = "Taiko Adventure",
+            [105] = "My Room",
+            [106] = "Settings",
+            [107] = "Exit",
 
-            [150] = "Juega tus canciones\nfavoritas a tu propio gusto !",
-            [151] = "Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango de Aprobado !",
+            [150] = "Play your favorite\nsongs at your own pace !",
+            [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
             [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
-            [153] = "Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando !",
+            [153] = "Buy new songs, petit-chara or characters\nusing the medals you earned in game !",
             [154] = "Surpass various obstacles and\nunlock new content and horizons !",
-            [155] = "Cambia la informacion de tu placa\n o el aspecto de tu personaje !",
-            [156] = "Cambia tu estilo de juego\n o ajustes generales !",
-            [157] = "Salir del juego.\nHasta la proxima !",
+            [155] = "Change your nameplate info\n or your character visuals !",
+            [156] = "Change your game style\n or general settings !",
+            [157] = "Quit the game.\nSee you next time !",
 
-            [1000] = "Piso alcanzado",
-            [1001] = "P",
+            [1000] = "Reached floor",
+            [1001] = "F",
             [1002] = "P",
-            [1003] = "Puntuación",
+            [1003] = "Score",
         };
     }
 }
