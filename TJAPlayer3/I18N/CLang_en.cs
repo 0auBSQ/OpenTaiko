@@ -10,7 +10,7 @@ namespace TJAPlayer3
         string ILang.GetString(int idx)
         {
             if (!dictionnary.ContainsKey(idx))
-                return "[!] Index not found in dictionary";
+                return "[!] No se ha encontrado el índice en el diccionario.";
 
             return dictionnary[idx];
         }
