@@ -21,6 +21,7 @@ namespace TJAPlayer3
         const string EXIT = @"7_Exit\";
         const string DANRESULT = @"7_DanResult\";
         const string TOWERRESULT = @"8_TowerResult\";
+        const string HEYA = @"10_Heya\";
 
         // InGame
         const string CHARA = @"1_Chara\";
@@ -909,6 +910,16 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [10_Heya]
+
+            Heya_Background = TxC(HEYA + @"Background.png");
+            Heya_Center_Menu_Bar = TxC(HEYA + @"Center_Menu_Bar.png");
+            Heya_Center_Menu_Box = TxC(HEYA + @"Center_Menu_Box.png");
+            Heya_Center_Menu_Box_Slot = TxC(HEYA + @"Center_Menu_Box_Slot.png");
+            Heya_Side_Menu = TxC(HEYA + @"Side_Menu.png");
+
+            #endregion
+
         }
 
         public void DisposeTexture()
@@ -1299,6 +1310,16 @@ namespace TJAPlayer3
             TowerResult_Panel;
         public CTexture[]
             TowerResult_Tower;
+
+        #endregion
+
+        #region [10_Heya]
+
+        public CTexture Heya_Background,
+            Heya_Center_Menu_Bar,
+            Heya_Center_Menu_Box,
+            Heya_Center_Menu_Box_Slot,
+            Heya_Side_Menu;
 
         #endregion
 

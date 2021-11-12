@@ -363,6 +363,8 @@ namespace TJAPlayer3
         public Cシステムサウンド soundDanSelectBGM = null;
         public Cシステムサウンド soundDanSongSelect = null;
 
+        public Cシステムサウンド soundHeyaBGM = null;
+
         public Cシステムサウンド soundCrownIn = null;
         public Cシステムサウンド soundRankIn = null;
         public Cシステムサウンド soundDonClear = null;
@@ -739,6 +741,8 @@ namespace TJAPlayer3
 
             this.soundDanSelectBGM = new Cシステムサウンド(@"Sounds\Dan\DanSelectBGM.wav", true, false, false, ESoundGroup.SongPlayback);
             this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
+
+            this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             ReloadSkin();
             tReadSkinConfig();
         }
