@@ -460,9 +460,13 @@ namespace TJAPlayer3
 
 						for (int j = 1; j < 8; j++)
                         {
-							if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[j - 1])
-								scoreRankModifier = srModifiers[j] * diffModifier;
-                        }
+							if (i == 0)
+								if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[j - 1])
+									scoreRankModifier = srModifiers[j] * diffModifier;
+							else
+								if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank2P[j - 1])
+									scoreRankModifier = srModifiers[j] * diffModifier;
+						}
 
 						#endregion
 
