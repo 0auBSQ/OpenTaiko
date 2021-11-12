@@ -2911,9 +2911,11 @@ namespace TJAPlayer3
 
                     TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t分岐レイヤー_コース変化(TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.stBranch[0].nAfter, CDTX.ECourse.eNormal, 0);
                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.tBranchEvent(TJAPlayer3.stage演奏ドラム画面.actMtaiko.After[0], CDTX.ECourse.eNormal, 0);
+                    
                     this.n現在のコース[0] = CDTX.ECourse.eNormal;
                     this.n次回のコース[0] = CDTX.ECourse.eNormal;
                     this.nレーン用表示コース[0] = CDTX.ECourse.eNormal;
+                    
 
                     this.b強制的に分岐させた[0] = true;
                 }
@@ -2935,6 +2937,7 @@ namespace TJAPlayer3
 
                     TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t分岐レイヤー_コース変化(TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.stBranch[0].nAfter, CDTX.ECourse.eExpert, 0);
                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.tBranchEvent(TJAPlayer3.stage演奏ドラム画面.actMtaiko.After[0], CDTX.ECourse.eExpert, 0);
+
 
                     this.n現在のコース[0] = CDTX.ECourse.eExpert;
                     this.n次回のコース[0] = CDTX.ECourse.eExpert;

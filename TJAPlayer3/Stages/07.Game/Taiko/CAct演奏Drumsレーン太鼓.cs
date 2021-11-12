@@ -547,7 +547,7 @@ namespace TJAPlayer3
 
                         if (this.stBranch[i].nY座標 == 0)
                         {
-                            switch (TJAPlayer3.stage演奏ドラム画面.nレーン用表示コース[0])
+                            switch (TJAPlayer3.stage演奏ドラム画面.nレーン用表示コース[i])
                             {
                                 case CDTX.ECourse.eNormal:
                                     TJAPlayer3.Tx.Lane_Text[0].Opacity = 255;
