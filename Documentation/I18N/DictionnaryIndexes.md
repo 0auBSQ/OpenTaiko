@@ -40,6 +40,12 @@
 156 : Settings main menu box text
 157 : Quit main menu box text
 
+# Special items (002XX)
+
+200 : Ensou Back box (Tojiru)
+201 : Ensou recently played songs 
+202 : Ensou recently played songs description
+
 # Tower text (0100X)
 
 1000 : Reached floor (Tower)

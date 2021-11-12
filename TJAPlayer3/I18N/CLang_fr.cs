@@ -63,6 +63,10 @@ namespace TJAPlayer3
             [156] = "Changez votre style de jeu\n ou les paramètres généraux !",
             [157] = "Quitter le jeu.\nÀ bientôt !",
 
+            [200] = "Retour",
+            [201] = "Sons joués récemment",
+            [202] = "Rejouez les sons joués précedement !",
+
             [1000] = "Étage atteint",
             [1001] = "",
             [1002] = "P",

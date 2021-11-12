@@ -63,6 +63,10 @@ namespace TJAPlayer3
             [156] = "Change your game style\n or general settings !",
             [157] = "Quit the game.\nSee you next time !",
 
+            [200] = "Return",
+            [201] = "Recently played songs",
+            [202] = "Play recently played songs !",
+
             [1000] = "Reached floor",
             [1001] = "F",
             [1002] = "P",
