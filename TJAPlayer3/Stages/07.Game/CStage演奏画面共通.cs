@@ -188,7 +188,10 @@ namespace TJAPlayer3
                 }
             }
 
-            if(TJAPlayer3.DTX.bチップがある.Branch)
+            
+
+
+            if (TJAPlayer3.DTX.bチップがある.Branch)
             {
                 for (int i = 0; i < TJAPlayer3.DTX.listChip_Branch[2].Count; i++)
                 {
@@ -205,19 +208,10 @@ namespace TJAPlayer3
                 }
             }
 
-            //nAddScoreNiji = (1000000 - (15 * RollTimems * 100) - (nBalloonCount * 100)) / TJAPlayer3.DTX.listChip.Count;
-            if(nNoteCount[0] == 0 && nBalloonCount[0] == 0)
-            {
-                nAddScoreNiji[0] = 1000000;
-            }
-            else
-            {
-                nAddScoreNiji[0] = (double)Math.Ceiling((decimal)(1000000 - (nBalloonCount[0] * 100)) / nNoteCount[0] / 10) * 10;
-            }
 
-            if(TJAPlayer3.ConfigIni.nPlayerCount == 2)
+            if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
             {
-                if (TJAPlayer3.DTX.bチップがある.Branch)
+                if (TJAPlayer3.DTX_2P.bチップがある.Branch)
                 {
                     for (int i = 0; i < TJAPlayer3.DTX_2P.listChip_Branch[2].Count; i++)
                     {
@@ -233,17 +227,23 @@ namespace TJAPlayer3
                         nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip[i].nRollCount;
                     }
                 }
+            }
 
+
+            for (int k = 0; k < TJAPlayer3.ConfigIni.nPlayerCount; k++)
+            {
                 //nAddScoreNiji = (1000000 - (15 * RollTimems * 100) - (nBalloonCount * 100)) / TJAPlayer3.DTX.listChip.Count;
-                if (nNoteCount[1] == 0 && nBalloonCount[1] == 0)
+                if (nNoteCount[k] == 0 && nBalloonCount[k] == 0)
                 {
-                    nAddScoreNiji[1] = 1000000;
+                    nAddScoreNiji[k] = 1000000;
                 }
                 else
                 {
-                    nAddScoreNiji[1] = (double)Math.Ceiling((decimal)(1000000 - (nBalloonCount[1] * 100)) / nNoteCount[1] / 10) * 10;
+                    nAddScoreNiji[k] = (double)Math.Ceiling((decimal)(1000000 - (nBalloonCount[k] * 100)) / nNoteCount[k] / 10) * 10;
                 }
+
             }
+
             
             for (int index = TJAPlayer3.DTX.listChip.Count - 1; index >= 0; index--)
             {
