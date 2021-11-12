@@ -67,6 +67,16 @@ namespace TJAPlayer3
             [1001] = "",
             [1002] = "P",
             [1003] = "Score",
+
+            [1010] = "Jauge d'âme",
+            [1011] = "Nombre de Parfait",
+            [1012] = "Nombre de Bon",
+            [1013] = "Nombre de Mauvais",
+            [1014] = "Score",
+            [1015] = "Frappes successives",
+            [1016] = "Nombre de frappes",
+            [1017] = "Combo",
+            [1018] = "Précision",
         };
     }
 }

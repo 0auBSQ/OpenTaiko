@@ -270,16 +270,23 @@ namespace TJAPlayer3
             Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
             Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
 
+            Dani_DanPlates = TxC(DANISELECT + "DanPlates.png");
+            Dani_DanSides = TxC(DANISELECT + "DanSides.png");
+
+            for (int i = 0; i < Dani_Bloc.Length; i++)
+                Dani_Bloc[i] = TxC(DANISELECT + "Bloc" + i.ToString() + ".png");
 
             #endregion
 
             #region 4_読み込み画面
+
             SongLoading_Plate = TxC(SONGLOADING + @"Plate.png");
             SongLoading_Bg = TxC(SONGLOADING + @"Bg.png");
             SongLoading_BgWait = TxC(SONGLOADING + @"Bg_Wait.png");
             SongLoading_Chara = TxC(SONGLOADING + @"Chara.png");
             SongLoading_Fade = TxC(SONGLOADING + @"Fade.png");
             SongLoading_Bg_Dan = TxC(SONGLOADING + @"Bg_Dan.png");
+
             #endregion
 
             #region 5_演奏画面
@@ -1021,6 +1028,10 @@ namespace TJAPlayer3
 
         public CTexture Dani_Dan_In;
         public CTexture Dani_Dan_Text;
+
+        public CTexture Dani_DanPlates;
+        public CTexture Dani_DanSides;
+        public CTexture[] Dani_Bloc = new CTexture[3];
 
         #endregion
 

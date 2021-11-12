@@ -47,4 +47,16 @@
 1002 : Points accronym (1 character)
 1003 : Score
 
+# Dan exam types (0101X - 0102X)
+
+1010 : Soul gauge
+1011 : Perfect count
+1012 : Good count 
+1013 : Bad count 
+1014 : Score
+1015 : Rolls count 
+1016 : Notes hit count
+1017 : Combo 
+1018 : Accuracy
+
 ```

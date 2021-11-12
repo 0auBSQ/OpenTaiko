@@ -56,9 +56,21 @@ namespace TJAPlayer3
                 pfDanSong = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 24);
             else
                 pfDanSong = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 16);
-            
+
+            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                this.pfExamFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 13);
+            else
+                this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 13);
+
+            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Accuracy + 1];
+            for (int i = 0; i < this.ttkExams.Length; i++)
+            {
+                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
+            }
+
+
             //一応チェックしておく。
-            if(TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0)
+            if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0)
                 this.tバーの初期化();
 
             base.On活性化();
@@ -232,6 +244,9 @@ namespace TJAPlayer3
 
         private CPrivateFastFont pfDanSong;
 
+        public CPrivateFastFont pfExamFont;
+        public TitleTextureKey[] ttkExams;
+
         private CStage選曲.STNumber[] stLevel = new CStage選曲.STNumber[10];
         private CStage選曲.STNumber[] stSoulNumber = new CStage選曲.STNumber[10];
         private CStage選曲.STNumber[] stExamNumber = new CStage選曲.STNumber[10];
@@ -261,11 +276,58 @@ namespace TJAPlayer3
 
             #region [Center bar and Dan plate]
 
-            if (stバー情報[currentSong].txBarCenter != null) stバー情報[currentSong].txBarCenter?.t2D描画(TJAPlayer3.app.Device, scroll + Anime, 0);
-            else TJAPlayer3.Tx.Dani_Bar_Center.t2D描画(TJAPlayer3.app.Device, scroll + Anime, 0);
+            int danTick = stバー情報[currentSong].nDanTick;
+            Color danTickColor = stバー情報[currentSong].cDanTickColor;
 
-            if (stバー情報[currentSong].txDanPlate != null) stバー情報[currentSong].txDanPlate.Opacity = 255;
-            stバー情報[currentSong].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 301);
+            // Use the given bar center if provided, else use a default one
+            if (stバー情報[currentSong].txBarCenter != null)
+            {
+                stバー情報[currentSong].txBarCenter?.t2D描画(TJAPlayer3.app.Device, scroll + Anime, 0);
+            }
+            else
+            {
+                int unit = TJAPlayer3.Tx.Dani_DanSides.szテクスチャサイズ.Width / 6;
+                TJAPlayer3.Tx.Dani_DanSides.color4 = danTickColor;
+
+                TJAPlayer3.Tx.Dani_Bar_Center.t2D描画(TJAPlayer3.app.Device, scroll + Anime, 0);
+
+                // Bar sides
+                TJAPlayer3.Tx.Dani_DanSides.t2D描画(TJAPlayer3.app.Device, (int)(scroll + Anime + 243), 143, new Rectangle(
+                    unit * danTick,
+                    0,
+                    unit,
+                    TJAPlayer3.Tx.Dani_DanSides.szテクスチャサイズ.Height
+                ));
+
+                TJAPlayer3.Tx.Dani_DanSides.t2D左右反転描画(TJAPlayer3.app.Device, (int)(scroll + Anime + 1199), 143, new Rectangle(
+                    unit * danTick,
+                    0,
+                    unit,
+                    TJAPlayer3.Tx.Dani_DanSides.szテクスチャサイズ.Height
+                ));
+            }
+
+            // Use the given DanPlate if provided, else use a default one
+            if (stバー情報[currentSong].txDanPlate != null)
+            {
+                stバー情報[currentSong].txDanPlate.Opacity = 255;
+                stバー情報[currentSong].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 301);
+            }
+            else
+            {
+                int unit = TJAPlayer3.Tx.Dani_DanPlates.szテクスチャサイズ.Width / 6;
+
+                if (TJAPlayer3.Tx.Dani_DanPlates != null) { 
+                    TJAPlayer3.Tx.Dani_DanPlates.Opacity = 255;
+                    TJAPlayer3.Tx.Dani_DanPlates.color4 = danTickColor;
+                }
+                TJAPlayer3.Tx.Dani_DanPlates?.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 301, new Rectangle(
+                    unit * danTick,
+                    0,
+                    unit,
+                    TJAPlayer3.Tx.Dani_DanPlates.szテクスチャサイズ.Height
+                ));
+            }
 
             #endregion
 
@@ -284,8 +346,12 @@ namespace TJAPlayer3
 
             #region [Soul gauge condition]
 
+            TJAPlayer3.Tx.Dani_Bloc[2]?.t2D描画(TJAPlayer3.app.Device, scroll + 291 + Anime, 412);
+
             if (stバー情報[currentSong].List_DanSongs[0].Dan_C[0] != null)
                 tSoulDraw(scroll + 370 + Anime, 462, stバー情報[currentSong].List_DanSongs[0].Dan_C[0].Value[0].ToString());
+
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D下中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 396 + Anime), 452);
 
             #endregion
 
@@ -350,16 +416,6 @@ namespace TJAPlayer3
 
                 #endregion
 
-                #region [Exam type sign]
-
-                if (stバー情報[currentSong].List_DanSongs[0].Dan_C[j] != null)
-                {
-                    TJAPlayer3.Tx.DanC_ExamType.Opacity = opacity;
-                    TJAPlayer3.Tx.DanC_ExamType?.t2D描画(TJAPlayer3.app.Device, scroll + 515 + Anime, 412 + index * 88, new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[1] * (int)stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetExamType(), TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
-                }
-
-                #endregion
-
                 #region [Exam value (individual included)]
 
                 for (int i = 0; i < stバー情報[currentSong].List_DanSongs.Count; i++)  //曲ごとのループ(魂ゲージを除く) 横(x)
@@ -368,13 +424,51 @@ namespace TJAPlayer3
                     {
                         TJAPlayer3.Tx.Dani_Exam_Number.Opacity = opacity;
 
-                        if (stバー情報[currentSong].List_DanSongs[stバー情報[currentSong].List_DanSongs.Count - 1].Dan_C[j] != null) //個別の条件がありますよー
+                        if (stバー情報[currentSong].List_DanSongs[stバー情報[currentSong].List_DanSongs.Count - 1].Dan_C[j] != null) {
+                            //個別の条件がありますよー
+
+                            if (i == 0)
+                            {
+                                if (TJAPlayer3.Tx.Dani_Bloc[1] != null)
+                                    TJAPlayer3.Tx.Dani_Bloc[1].Opacity = opacity;
+                                TJAPlayer3.Tx.Dani_Bloc[1]?.t2D描画(TJAPlayer3.app.Device, 
+                                    scroll + Anime + 515, 
+                                    412 + 88 * index);
+                            }
+
                             tExamDraw(scroll + 590 + Anime + i * 220, 455 + index * 88, stバー情報[currentSong].List_DanSongs[i].Dan_C[j].Value[0].ToString(), stバー情報[currentSong].List_DanSongs[i].Dan_C[j].GetExamRange());
-                        else    //全体の条件ですよー
+                        } 
+                        else    
+                        {
+                            //全体の条件ですよー
+
+                            if (i == 0)
+                            {
+                                if (TJAPlayer3.Tx.Dani_Bloc[0] != null)
+                                    TJAPlayer3.Tx.Dani_Bloc[0].Opacity = opacity;
+                                TJAPlayer3.Tx.Dani_Bloc[0]?.t2D描画(TJAPlayer3.app.Device,
+                                    scroll + Anime + 515,
+                                    412 + 88 * index);
+                            }
+
                             tExamDraw(scroll + 590 + Anime, 455 + index * 88, stバー情報[currentSong].List_DanSongs[0].Dan_C[j].Value[0].ToString(), stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetExamRange());
+
+                        }
 
                         TJAPlayer3.Tx.Dani_Exam_Number.Opacity = 255;
                     }
+                }
+
+                #endregion
+
+                #region [Exam title]
+
+                if (stバー情報[currentSong].List_DanSongs[0].Dan_C[j] != null)
+                {
+                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[(int)stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetExamType()]);
+
+                    tmpTex.Opacity = opacity;
+                    tmpTex.t2D下中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 614 + Anime), 452 + index * 88);
                 }
 
                 #endregion
