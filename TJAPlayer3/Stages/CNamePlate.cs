@@ -18,7 +18,6 @@ namespace TJAPlayer3
                 else if (TJAPlayer3.NamePlateConfig.data.DanType[player] > 2) TJAPlayer3.NamePlateConfig.data.DanType[player] = 2;
 
                 if (TJAPlayer3.NamePlateConfig.data.TitleType[player] < 0) TJAPlayer3.NamePlateConfig.data.TitleType[player] = 0;
-                else if (TJAPlayer3.NamePlateConfig.data.TitleType[player] > 2) TJAPlayer3.NamePlateConfig.data.TitleType[player] = 2;
 
                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
                 {
@@ -52,16 +51,33 @@ namespace TJAPlayer3
             }
 
             ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
+            ctAnimatedNamePlateTitle = new CCounter(0, 10000, 60.0f, TJAPlayer3.Timer);
         }
+
+        public void tNamePlateRefreshTitles(int player)
+        {
+            using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
+                txName[player] = TJAPlayer3.tテクスチャの生成(tex);
+
+            using (var tex = pfTitle.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Title[player], Color.Black, Color.Empty))
+                txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
+
+            using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
+                txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
+        }
+
 
         public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255)
         {
             ctNamePlateEffect.t進行Loop();
+            ctAnimatedNamePlateTitle.t進行Loop();
 
             this.txName[player].Opacity = Opacity;
             this.txTitle[player].Opacity = Opacity;
             this.txdan[player].Opacity = Opacity;
+
             TJAPlayer3.Tx.NamePlateBase.Opacity = Opacity;
+
             for (int i = 0; i < 5; i++)
                 TJAPlayer3.Tx.NamePlate_Effect[i].Opacity = Opacity;
 
@@ -73,7 +89,18 @@ namespace TJAPlayer3
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
                 {
                     if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
-                        TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (4 + TJAPlayer3.NamePlateConfig.data.TitleType[player]) * 54, 220, 54));
+                    {
+                        int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
+                        if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
+                        {
+                            TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]].Opacity = Opacity;
+                            TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]].t2D描画(
+                                TJAPlayer3.app.Device, x - 2, y - 2);
+                        }
+
+                        //TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (4 + TJAPlayer3.NamePlateConfig.data.TitleType[player]) * 54, 220, 54));
+                    }
+                        
                 }
 
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
@@ -82,7 +109,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (8 + TJAPlayer3.NamePlateConfig.data.DanType[player]) * 54, 220, 54));
                 }
 
-                tNamePlateDraw(player, x, y);
+                tNamePlateDraw(player, x, y, Opacity);
 
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
                 {
@@ -134,7 +161,18 @@ namespace TJAPlayer3
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
                 {
                     if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
-                        TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (4 + TJAPlayer3.NamePlateConfig.data.TitleType[player]) * 54, 220, 54));
+                    {
+                        int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
+                        if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
+                        {
+                            TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]].Opacity = Opacity;
+                            TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]].t2D描画(
+                                TJAPlayer3.app.Device, x - 2, y - 2);
+                        }
+
+                        //TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (4 + TJAPlayer3.NamePlateConfig.data.TitleType[player]) * 54, 220, 54));
+                    }
+                        
                 }
 
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
@@ -143,7 +181,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (8 + TJAPlayer3.NamePlateConfig.data.DanType[player]) * 54, 220, 54));
                 }
 
-                tNamePlateDraw(player, x, y);
+                tNamePlateDraw(player, x, y, Opacity);
 
                 TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, player == 1 ? 2 * 54 : 0, 220, 54));
 
@@ -191,8 +229,11 @@ namespace TJAPlayer3
             }
         }
 
-        private void tNamePlateDraw(int player, int x, int y)
+        private void tNamePlateDraw(int player, int x, int y, int Opacity = 255)
         {
+            if (Opacity == 0)
+                return;
+
             if(TJAPlayer3.NamePlateConfig.data.TitleType[player] != 0)
             {
                 int Type = TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1;
@@ -316,29 +357,44 @@ namespace TJAPlayer3
                 if (this.ctNamePlateEffect.n現在の値 >= 85 && this.ctNamePlateEffect.n現在の値 <= 112)
                 {
                     TJAPlayer3.Tx.NamePlate_Effect[4].Opacity = (int)(1400 - (this.ctNamePlateEffect.n現在の値 - 85) * 50f);
+
                     TJAPlayer3.Tx.NamePlate_Effect[4].t2D描画(TJAPlayer3.app.Device, x + ((this.ctNamePlateEffect.n現在の値 - 85) * (150f / 27f)), y + 7);
                 }
                 if (this.ctNamePlateEffect.n現在の値 >= 105 && this.ctNamePlateEffect.n現在の値 <= 120)
                 {
+                    /*
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].Opacity = this.ctNamePlateEffect.n現在の値 >= 112 ? (int)(255 - (this.ctNamePlateEffect.n現在の値 - 112) * 31.875f) : 255;
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].vc拡大縮小倍率.X = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 193, y + 6);
+                    */
+                    TJAPlayer3.Tx.NamePlate_Effect[3].Opacity = this.ctNamePlateEffect.n現在の値 >= 112 ? (int)(255 - (this.ctNamePlateEffect.n現在の値 - 112) * 31.875f) : 255;
+                    TJAPlayer3.Tx.NamePlate_Effect[3].vc拡大縮小倍率.X = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
+                    TJAPlayer3.Tx.NamePlate_Effect[3].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
+                    TJAPlayer3.Tx.NamePlate_Effect[3].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 193, y + 6);
                 }
             }
         }
 
         private void tNamePlateStarDraw(int player, float Scale, int x, int y)
         {
+            /*
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.X = Scale;
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.Y = Scale;
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
+            */
+            TJAPlayer3.Tx.NamePlate_Effect[1].vc拡大縮小倍率.X = Scale;
+            TJAPlayer3.Tx.NamePlate_Effect[1].vc拡大縮小倍率.Y = Scale;
+            TJAPlayer3.Tx.NamePlate_Effect[1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
         }
 
         private CPrivateFastFont pfName;
         private CPrivateFastFont pfTitle;
         private CPrivateFastFont pfdan;
         private CCounter ctNamePlateEffect;
+
+        private CCounter ctAnimatedNamePlateTitle;
+
         private CTexture[] txName = new CTexture[2];
         private CTexture[] txTitle = new CTexture[2];
         private CTexture[] txdan = new CTexture[2];

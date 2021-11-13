@@ -98,7 +98,26 @@ namespace TJAPlayer3
             NamePlate_Effect[2] = TxC(@"9_NamePlateEffect\GoldBStar.png");
             NamePlate_Effect[3] = TxC(@"9_NamePlateEffect\PurpleBStar.png");
             NamePlate_Effect[4] = TxC(@"9_NamePlateEffect\Slash.png");
+
+            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title = System.IO.Directory.GetDirectories(CSkin.Path(BASE + @"9_NamePlateEffect\Title\")).Length;
+            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes = new int[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
+
+            NamePlate_Title = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title][];
+
+            for (int i = 0; i < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title; i++)
+            {
+                TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + @"9_NamePlateEffect\Title\" + i.ToString() + @"\"));
+                NamePlate_Title[i] = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]];
+
+                for (int j = 0; j < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]; j++)
+                {
+                    NamePlate_Title[i][j] = TxC(@"9_NamePlateEffect\Title\" + i.ToString() + @"\" + j.ToString() + @".png");
+                }
+            }
+
+
             #endregion
+
             #region 1_タイトル画面
             Title_Background = TxC(TITLE + @"Background.png");
             Entry_Bar = TxC(TITLE + @"Entry_Bar.png");
@@ -947,7 +966,11 @@ namespace TJAPlayer3
         public CTexture[] NamePlate;
 
         public CTexture[] NamePlate_Effect = new CTexture[5];
+
+        public CTexture[][] NamePlate_Title;
+
         #endregion
+
         #region 1_タイトル画面
 
         public CTexture Title_Background,

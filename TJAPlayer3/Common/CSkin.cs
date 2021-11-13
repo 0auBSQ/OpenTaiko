@@ -2604,10 +2604,17 @@ namespace TJAPlayer3
         public string Skin_Version = "Unknown";
         public string Skin_Creator = "Unknown";
         #endregion
+        
         #region Config
+
         public int Config_ItemText_Correction_X = 0;
         public int Config_ItemText_Correction_Y = 0;
+
+        public int Config_NamePlate_Ptn_Title;
+        public int[] Config_NamePlate_Ptn_Title_Boxes;
+
         #endregion
+
         #region SongSelect
         public int SongSelect_Overall_Y = 123;
         public int SongSelect_BoxExplanation_X = 0;
