@@ -1149,8 +1149,20 @@ namespace TJAPlayer3
 							song2.r親ノード = song;
 							song2.strジャンル = "最近遊んだ曲";
 
+							song2.isChangedBgType = song.isChangedBgType;
+							song2.isChangedBgColor = song.isChangedBgColor;
+							song2.isChangedBoxType = song.isChangedBoxType;
+							song2.isChangedBoxColor = song.isChangedBoxColor;
+
 							if (song2.eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
-								song2.BackColor = ColorTranslator.FromHtml("#164748");
+                            {
+								song2.ForeColor = song.ForeColor;
+								song2.BackColor = song.BackColor;
+								song2.BoxColor = song.BoxColor;
+								song2.BgColor = song.BgColor;
+								// song2.BackColor = ColorTranslator.FromHtml("#164748");
+							}
+								
 						}
 
 						if (song.list子リスト.Count >= 6)
