@@ -1136,6 +1136,8 @@ namespace TJAPlayer3
 				//---------------------
 				#endregion
 
+				// Song added to recently added songs here
+
 				foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)

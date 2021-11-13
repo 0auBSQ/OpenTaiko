@@ -22,6 +22,7 @@ namespace TJAPlayer3
             base.list子Activities.Add(this.PuchiChara = new PuchiChara());
         }
 
+
         public override void On活性化()
         {
             if (base.b活性化してる)
@@ -33,8 +34,75 @@ namespace TJAPlayer3
             ctDonchan_In = new CCounter();
             ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
-
             bInSongPlayed = false;
+
+
+            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                this.pfHeyaFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+            else
+                this.pfHeyaFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+
+
+            // 1P, configure later for default 2P
+            iPlayer = 0;
+
+            #region [Main menu]
+
+            this.ttkMainMenuOpt = new TitleTextureKey[5];
+            
+            for (int i = 0; i < ttkMainMenuOpt.Length; i++)
+            {
+                this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            }
+
+            #endregion
+
+            #region [Dan title]
+
+            int amount = 1;
+            if (TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer] != null)
+                amount += TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer].Count;
+
+            this.ttkDanTitles = new TitleTextureKey[amount];
+
+            // Silver Shinjin (default rank) always avaliable by default
+            this.ttkDanTitles[0] = new TitleTextureKey("新人", this.pfHeyaFont, Color.White, Color.Black, 1000);
+
+            int idx = 1;
+            if (TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer] != null)
+            {
+                foreach (var item in TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer])
+                {
+                    if (item.Value.isGold == true)
+                        this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.Gold, Color.Black, 1000);
+                    else 
+                        this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.White, Color.Black, 1000);
+                    idx++;
+                }
+            }
+
+            #endregion
+
+            #region [Plate title]
+
+            amount = 1;
+
+            this.ttkTitles = new TitleTextureKey[amount];
+
+            // Wood shojinsha (default title) always avaliable by default
+            this.ttkTitles[0] = new TitleTextureKey("初心者", this.pfHeyaFont, Color.White, Color.Black, 1000);
+
+            #endregion
+
+            // -1 : Main Menu, >= 0 : See Main menu opt
+            iCurrentMenu = -1;
+            iMainMenuCurrent = 0;
+
+            // Tmp variables
+            iPuchiCharaCount = 120;
+            iCharacterCount = 1;
+
+            this.tResetOpts();
 
             this.PuchiChara.IdleAnimation();
 
@@ -63,6 +131,69 @@ namespace TJAPlayer3
 
             TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+            #region [Menus display]
+
+            #region [Main menu (Side bar)]
+
+            for (int i = 0; i < this.ttkMainMenuOpt.Length; i++)
+            {
+                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
+
+                if (iCurrentMenu != -1 || iMainMenuCurrent != i)
+                {
+                    tmpTex.color4 = Color.DarkGray;
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                }
+                else
+                {
+                    tmpTex.color4 = Color.White;
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                }
+
+                TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 26 + 80 * i);
+                tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 40 + 80 * i);
+            }
+
+            #endregion
+
+            #region [Dan title]
+
+            if (iCurrentMenu == 2)
+            {
+                for (int i = -5; i < 6; i++)
+                {
+                    int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
+
+                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[pos]);
+
+                    if (i != 0)
+                    {
+                        tmpTex.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                    }
+                    else
+                    {
+                        tmpTex.color4 = Color.White;
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                    }
+
+                    TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+                }
+
+                for (int i = 0; i < this.ttkDanTitles.Length; i++)
+                {
+                    int pos = i - iDanTitleCurrent;
+                }
+            }
+
+            #endregion
+
+
+            #endregion
+
+            #region [General Don animations]
+
             if (!ctDonchan_In.b開始した)
             {
                 TJAPlayer3.Skin.soundHeyaBGM.t再生する();
@@ -71,9 +202,11 @@ namespace TJAPlayer3
 
             TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
 
+            #endregion
+
             #region [ どんちゃん関連 ]
 
-                if (ctDonchan_In.n現在の値 != 90)
+            if (ctDonchan_In.n現在の値 != 90)
                 {
                     float DonchanX = 0f, DonchanY = 0f;
 
@@ -97,31 +230,89 @@ namespace TJAPlayer3
             if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.RightArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
             {
-                //this.段位リスト.t右に移動();
+                if (this.tMove(1))
+                {
+                    TJAPlayer3.Skin.sound変更音.t再生する();
+                }
             }
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.LeftArrow) ||
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.LeftArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
             {
-                //this.段位リスト.t左に移動();
+                if (this.tMove(-1))
+                {
+                    TJAPlayer3.Skin.sound変更音.t再生する();
+                }
             }
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Return) ||
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Return) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
             {
-                //this.t段位を選択する();
+
+                #region [Decide]
+
                 TJAPlayer3.Skin.sound決定音.t再生する();
-                //this.段位挑戦選択画面.ctBarIn.t開始(0, 255, 1, TJAPlayer3.Timer);
+
+                // Return to main menu
+                if (iCurrentMenu == -1 && iMainMenuCurrent == 0)
+                {
+                    TJAPlayer3.Skin.soundHeyaBGM.t停止する();
+                    this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                    this.actFOtoTitle.tフェードアウト開始();
+                    base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                }
+
+                else if (iCurrentMenu == -1)
+                {
+                    iCurrentMenu = iMainMenuCurrent - 1;
+                }
+
+                else if (iCurrentMenu == 2)
+                {
+                    bool iG = false;
+                    int cs = 0;
+
+                    if (iDanTitleCurrent > 0)
+                    {
+                        iG = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].str文字].isGold;
+                        cs = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].str文字].clearStatus;
+                    }
+
+                    TJAPlayer3.NamePlateConfig.data.Dan[iPlayer] = this.ttkDanTitles[iDanTitleCurrent].str文字;
+                    TJAPlayer3.NamePlateConfig.data.DanGold[iPlayer] = iG;
+                    TJAPlayer3.NamePlateConfig.data.DanType[iPlayer] = cs;
+
+                    TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
+
+                    TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+
+                    iCurrentMenu = -1;
+                    this.tResetOpts();
+                }
+
+                #endregion
             }
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Escape))
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Escape))
             {
-                TJAPlayer3.Skin.soundHeyaBGM.t停止する();
+                
                 TJAPlayer3.Skin.sound取消音.t再生する();
-                this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
-                this.actFOtoTitle.tフェードアウト開始();
-                base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+
+                if (iCurrentMenu == -1)
+                {
+                    TJAPlayer3.Skin.soundHeyaBGM.t停止する();
+                    this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                    this.actFOtoTitle.tフェードアウト開始();
+                    base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                }
+                else
+                {
+                    iCurrentMenu = -1;
+                    this.tResetOpts();
+                }
+                    
+
                 return 0;
             }
 
@@ -154,6 +345,52 @@ namespace TJAPlayer3
         private CCounter ctDonchan_Normal;
 
         private PuchiChara PuchiChara;
+
+        private int iPlayer;
+
+        private int iMainMenuCurrent;
+        private int iPuchiCharaCurrent;
+        private int iCharacterCurrent;
+        private int iDanTitleCurrent;
+        private int iTitleCurrent;
+
+        private int iCurrentMenu;
+
+        private void tResetOpts()
+        {
+            iTitleCurrent = 0;
+            iDanTitleCurrent = 0;
+            iCharacterCurrent = TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer];
+            iPuchiCharaCurrent = TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer];
+        }
+
+        private bool tMove(int off)
+        {
+            if (iCurrentMenu == -1)
+                iMainMenuCurrent = (this.ttkMainMenuOpt.Length + iMainMenuCurrent + off) % this.ttkMainMenuOpt.Length;
+            else if (iCurrentMenu == 0)
+                iPuchiCharaCurrent = (iPuchiCharaCount + iPuchiCharaCurrent + off) % iPuchiCharaCount;
+            else if (iCurrentMenu == 1)
+                iCharacterCurrent = (iCharacterCount + iCharacterCurrent + off) % iCharacterCount;
+            else if (iCurrentMenu == 2)
+                iDanTitleCurrent = (this.ttkDanTitles.Length + iDanTitleCurrent + off) % this.ttkDanTitles.Length;
+            else if (iCurrentMenu == 3)
+                iTitleCurrent = (this.ttkTitles.Length + iTitleCurrent + off) % this.ttkTitles.Length;
+            else
+                return false;
+
+            return true;
+        }
+
+        private TitleTextureKey[] ttkMainMenuOpt;
+        private CPrivateFastFont pfHeyaFont;
+
+        private TitleTextureKey[] ttkDanTitles;
+
+        private TitleTextureKey[] ttkTitles;
+
+        private int iPuchiCharaCount;
+        private int iCharacterCount;
 
         public E戻り値 eフェードアウト完了時の戻り値;
 

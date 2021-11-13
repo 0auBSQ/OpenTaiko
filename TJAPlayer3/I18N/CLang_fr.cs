@@ -81,6 +81,12 @@ namespace TJAPlayer3
             [1016] = "Nombre de frappes",
             [1017] = "Combo",
             [1018] = "Précision",
+
+            [1030] = "Retour",
+            [1031] = "Petit Personnage",
+            [1032] = "Personnage",
+            [1033] = "Titre Dan",
+            [1034] = "Titre",
         };
     }
 }

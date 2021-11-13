@@ -81,6 +81,12 @@ namespace TJAPlayer3
             [1016] = "Hit count",
             [1017] = "Combo",
             [1018] = "Accuracy",
+
+            [1030] = "Return",
+            [1031] = "Petit-Chara",
+            [1032] = "Character",
+            [1033] = "Dan Title",
+            [1034] = "Nameplate Title",
         };
     }
 }

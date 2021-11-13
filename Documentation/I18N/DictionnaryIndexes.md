@@ -65,4 +65,12 @@
 1017 : Combo 
 1018 : Accuracy
 
+# Heya buttons (0103X)
+
+1030 : Return
+1031 : PetitChara
+1032 : Character
+1033 : Dan title
+1034 : Plate title
+
 ```
