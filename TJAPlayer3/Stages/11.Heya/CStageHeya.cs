@@ -156,6 +156,43 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [Petit chara]
+
+            if (iCurrentMenu == 0)
+            {
+                for (int i = -5; i < 6; i++)
+                {
+                    int pos = (iPuchiCharaCount * 5 + iPuchiCharaCurrent + i) % iPuchiCharaCount;
+
+                    if (i != 0)
+                    {
+                        TJAPlayer3.Tx.PuchiChara.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                    }
+                    else
+                    {
+                        TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                    }
+
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+
+                    int puriColumn = pos % 5;
+                    int puriRow = pos / 5;
+                    
+                    TJAPlayer3.Tx.PuchiChara.t2DŠg‘å—¦l—¶’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
+                        new Rectangle((PuchiChara.Counter.nŒ»İ‚Ì’l + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
+                        puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
+                        TJAPlayer3.Skin.Game_PuchiChara[0], 
+                        TJAPlayer3.Skin.Game_PuchiChara[1]));
+
+                    TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+                }
+            }
+
+            #endregion
+
+
             #region [Dan title]
 
             if (iCurrentMenu == 2)
@@ -170,15 +207,32 @@ namespace TJAPlayer3
                     {
                         tmpTex.color4 = Color.DarkGray;
                         TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.DarkGray;
                     }
                     else
                     {
                         tmpTex.color4 = Color.White;
                         TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+                    }
+
+                    int danGrade = 0;
+                    if (pos > 0)
+                    {
+                        danGrade = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[pos].str•¶š].clearStatus;
                     }
 
                     TJAPlayer3.Tx.Heya_Side_Menu.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+
+                    TJAPlayer3.Tx.NamePlateBase.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device,
+                        718 + -10 * Math.Abs(i),
+                        331 + 70 * i,
+                        new RectangleF(0, (8 + danGrade) * 54, 220, 54));
+                    TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+
                     tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+
+                    
                 }
 
                 for (int i = 0; i < this.ttkDanTitles.Length; i++)
@@ -202,8 +256,6 @@ namespace TJAPlayer3
 
             TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
 
-            #endregion
-
             #region [ ‚Ç‚ñ‚¿‚á‚ñŠÖ˜A ]
 
             if (ctDonchan_In.nŒ»İ‚Ì’l != 90)
@@ -222,6 +274,8 @@ namespace TJAPlayer3
 
                     #endregion
                 }
+
+            #endregion
 
             #endregion
 
@@ -266,6 +320,16 @@ namespace TJAPlayer3
                 else if (iCurrentMenu == -1)
                 {
                     iCurrentMenu = iMainMenuCurrent - 1;
+                }
+
+                else if (iCurrentMenu == 0)
+                {
+                    TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
+
+                    TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+
+                    iCurrentMenu = -1;
+                    this.tResetOpts();
                 }
 
                 else if (iCurrentMenu == 2)
