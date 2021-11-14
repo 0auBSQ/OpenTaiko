@@ -21,6 +21,7 @@ namespace TJAPlayer3
         const string EXIT = @"7_Exit\";
         const string DANRESULT = @"7_DanResult\";
         const string TOWERRESULT = @"8_TowerResult\";
+        const string HEYA = @"10_Heya\";
 
         // InGame
         const string CHARA = @"1_Chara\";
@@ -97,7 +98,26 @@ namespace TJAPlayer3
             NamePlate_Effect[2] = TxC(@"9_NamePlateEffect\GoldBStar.png");
             NamePlate_Effect[3] = TxC(@"9_NamePlateEffect\PurpleBStar.png");
             NamePlate_Effect[4] = TxC(@"9_NamePlateEffect\Slash.png");
+
+            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title = System.IO.Directory.GetDirectories(CSkin.Path(BASE + @"9_NamePlateEffect\Title\")).Length;
+            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes = new int[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
+
+            NamePlate_Title = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title][];
+
+            for (int i = 0; i < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title; i++)
+            {
+                TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + @"9_NamePlateEffect\Title\" + i.ToString() + @"\"));
+                NamePlate_Title[i] = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]];
+
+                for (int j = 0; j < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]; j++)
+                {
+                    NamePlate_Title[i][j] = TxC(@"9_NamePlateEffect\Title\" + i.ToString() + @"\" + j.ToString() + @".png");
+                }
+            }
+
+
             #endregion
+
             #region 1_タイトル画面
             Title_Background = TxC(TITLE + @"Background.png");
             Entry_Bar = TxC(TITLE + @"Entry_Bar.png");
@@ -270,16 +290,23 @@ namespace TJAPlayer3
             Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
             Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
 
+            Dani_DanPlates = TxC(DANISELECT + "DanPlates.png");
+            Dani_DanSides = TxC(DANISELECT + "DanSides.png");
+
+            for (int i = 0; i < Dani_Bloc.Length; i++)
+                Dani_Bloc[i] = TxC(DANISELECT + "Bloc" + i.ToString() + ".png");
 
             #endregion
 
             #region 4_読み込み画面
+
             SongLoading_Plate = TxC(SONGLOADING + @"Plate.png");
             SongLoading_Bg = TxC(SONGLOADING + @"Bg.png");
             SongLoading_BgWait = TxC(SONGLOADING + @"Bg_Wait.png");
             SongLoading_Chara = TxC(SONGLOADING + @"Chara.png");
             SongLoading_Fade = TxC(SONGLOADING + @"Fade.png");
             SongLoading_Bg_Dan = TxC(SONGLOADING + @"Bg_Dan.png");
+
             #endregion
 
             #region 5_演奏画面
@@ -902,6 +929,16 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [10_Heya]
+
+            Heya_Background = TxC(HEYA + @"Background.png");
+            Heya_Center_Menu_Bar = TxC(HEYA + @"Center_Menu_Bar.png");
+            Heya_Center_Menu_Box = TxC(HEYA + @"Center_Menu_Box.png");
+            Heya_Center_Menu_Box_Slot = TxC(HEYA + @"Center_Menu_Box_Slot.png");
+            Heya_Side_Menu = TxC(HEYA + @"Side_Menu.png");
+
+            #endregion
+
         }
 
         public void DisposeTexture()
@@ -929,7 +966,11 @@ namespace TJAPlayer3
         public CTexture[] NamePlate;
 
         public CTexture[] NamePlate_Effect = new CTexture[5];
+
+        public CTexture[][] NamePlate_Title;
+
         #endregion
+
         #region 1_タイトル画面
 
         public CTexture Title_Background,
@@ -1021,6 +1062,10 @@ namespace TJAPlayer3
 
         public CTexture Dani_Dan_In;
         public CTexture Dani_Dan_Text;
+
+        public CTexture Dani_DanPlates;
+        public CTexture Dani_DanSides;
+        public CTexture[] Dani_Bloc = new CTexture[3];
 
         #endregion
 
@@ -1288,6 +1333,16 @@ namespace TJAPlayer3
             TowerResult_Panel;
         public CTexture[]
             TowerResult_Tower;
+
+        #endregion
+
+        #region [10_Heya]
+
+        public CTexture Heya_Background,
+            Heya_Center_Menu_Bar,
+            Heya_Center_Menu_Box,
+            Heya_Center_Menu_Box_Slot,
+            Heya_Side_Menu;
 
         #endregion
 

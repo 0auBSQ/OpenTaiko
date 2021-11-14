@@ -63,10 +63,30 @@ namespace TJAPlayer3
             [156] = "Change your game style\n or general settings !",
             [157] = "Quit the game.\nSee you next time !",
 
+            [200] = "Return",
+            [201] = "Recently played songs",
+            [202] = "Play recently played songs !",
+
             [1000] = "Reached floor",
             [1001] = "F",
             [1002] = "P",
             [1003] = "Score",
+
+            [1010] = "Soul gauge",
+            [1011] = "Perfect count",
+            [1012] = "Good count",
+            [1013] = "Bad count",
+            [1014] = "Score",
+            [1015] = "Rolls count",
+            [1016] = "Hit count",
+            [1017] = "Combo",
+            [1018] = "Accuracy",
+
+            [1030] = "Return",
+            [1031] = "Petit-Chara",
+            [1032] = "Character",
+            [1033] = "Dan Title",
+            [1034] = "Nameplate Title",
         };
     }
 }

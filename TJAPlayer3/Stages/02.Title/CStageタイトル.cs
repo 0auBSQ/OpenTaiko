@@ -309,7 +309,8 @@ namespace TJAPlayer3
 							}
 							else if (this.n現在の選択行モード選択 == (int)E戻り値.GAMESTART - 1
 								|| this.n現在の選択行モード選択 == (int)E戻り値.EXIT - 1
-								|| this.n現在の選択行モード選択 == (int)E戻り値.CONFIG - 1)
+								|| this.n現在の選択行モード選択 == (int)E戻り値.CONFIG - 1
+								|| this.n現在の選択行モード選択 == (int)E戻り値.HEYA - 1)
 								operationSucceded = true;
 
 							if (operationSucceded == true)
@@ -582,12 +583,14 @@ namespace TJAPlayer3
 									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.DarkGray;
 									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.DarkGray;
 									this.stModeBar[i].BarTexture.color4 = Color.DarkGray;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = Color.DarkGray;
 								}
 								else
                                 {
 									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.White;
 									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.White;
 									this.stModeBar[i].BarTexture.color4 = Color.White;
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = Color.White;
 								}
 
 								#endregion

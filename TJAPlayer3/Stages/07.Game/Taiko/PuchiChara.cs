@@ -64,8 +64,6 @@ namespace TJAPlayer3
             TJAPlayer3.act文字コンソール.tPrint(700, 540, C文字コンソール.Eフォント種別.白, SineCounterIdle.n現在の値.ToString());
             */
 
-            double sineY;
-
             if (inGame)
                 sineY = (double)SineCounter.n現在の値;
             else
@@ -89,6 +87,7 @@ namespace TJAPlayer3
 
             int puriChar = TJAPlayer3.NamePlateConfig.data.PuchiChara[player];
             
+            // To change later
             if (puriChar < 0)
                 puriChar = 0;
             else if (puriChar >= 120)
@@ -107,7 +106,9 @@ namespace TJAPlayer3
             return base.On進行描画();
         }
 
-        private CCounter Counter;
+        public double sineY;
+
+        public CCounter Counter;
         private CCounter SineCounter;
         private CCounter SineCounterIdle;
         private bool inGame;

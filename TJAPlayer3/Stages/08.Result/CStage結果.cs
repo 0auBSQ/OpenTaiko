@@ -460,9 +460,13 @@ namespace TJAPlayer3
 
 						for (int j = 1; j < 8; j++)
                         {
-							if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[j - 1])
-								scoreRankModifier = srModifiers[j] * diffModifier;
-                        }
+							if (i == 0)
+								if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[j - 1])
+									scoreRankModifier = srModifiers[j] * diffModifier;
+							else
+								if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(i) >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank2P[j - 1])
+									scoreRankModifier = srModifiers[j] * diffModifier;
+						}
 
 						#endregion
 
@@ -1132,6 +1136,8 @@ namespace TJAPlayer3
 				//---------------------
 				#endregion
 
+				// Song added to recently added songs here
+
 				foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
@@ -1143,8 +1149,20 @@ namespace TJAPlayer3
 							song2.r親ノード = song;
 							song2.strジャンル = "最近遊んだ曲";
 
+							song2.isChangedBgType = song.isChangedBgType;
+							song2.isChangedBgColor = song.isChangedBgColor;
+							song2.isChangedBoxType = song.isChangedBoxType;
+							song2.isChangedBoxColor = song.isChangedBoxColor;
+
 							if (song2.eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
-								song2.BackColor = ColorTranslator.FromHtml("#164748");
+                            {
+								song2.ForeColor = song.ForeColor;
+								song2.BackColor = song.BackColor;
+								song2.BoxColor = song.BoxColor;
+								song2.BgColor = song.BgColor;
+								// song2.BackColor = ColorTranslator.FromHtml("#164748");
+							}
+								
 						}
 
 						if (song.list子リスト.Count >= 6)

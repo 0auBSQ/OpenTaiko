@@ -103,7 +103,14 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [Heya]
 
+        public void tApplyHeyaChanges()
+        {
+            this.tSaveFile();
+        }
+
+        #endregion
 
         public class Data
         {

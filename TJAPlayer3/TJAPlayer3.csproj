@@ -255,6 +255,7 @@
     <Compile Include="Stages\08.Result\CStage結果.cs" />
     <Compile Include="Stages\09.Ending\CStage終了.cs" />
     <Compile Include="Stages\10.ChangeSkin\CStageChangeSkin.cs" />
+    <Compile Include="Stages\11.Heya\CStageHeya.cs" />
     <Compile Include="Stages\CActDFPFont.cs" />
     <Compile Include="Stages\CActFIFOBlack.cs" />
     <Compile Include="Stages\CActFIFOStart.cs" />

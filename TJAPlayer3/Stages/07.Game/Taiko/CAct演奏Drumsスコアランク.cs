@@ -20,10 +20,14 @@ namespace TJAPlayer3
                 }
             }
 
-            this.ScoreRank = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 1000000 };
+            this.ScoreRank = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
+                (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10) };
             //    (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)};
 
-            for(int i = 0; i < 7; i++)
+            this.ScoreRank2P = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
+                (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10) };
+
+            for (int i = 0; i < 7; i++)
             {
                 this.counter[i] = new CCounter();
                 this.counterJ2[i] = new CCounter();
@@ -80,7 +84,7 @@ namespace TJAPlayer3
 
                     x = 0;
                     counterJ2[i].t進行();
-                    if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank[i])
+                    if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank2P[i])
                     {
                         if (!this.counterJ2[i].b進行中)
                         {
@@ -116,10 +120,14 @@ namespace TJAPlayer3
                 }
             }
 
+            //TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ScoreRank[6].ToString());
+            //TJAPlayer3.act文字コンソール.tPrint(0, 10, C文字コンソール.Eフォント種別.白, ScoreRank2P[6].ToString());
+
             return base.On進行描画();
         }
 
         public int[] ScoreRank;
+        public int[] ScoreRank2P;
         private CCounter[] counter = new CCounter[7];
         private CCounter[] counterJ2 = new CCounter[7];
     }

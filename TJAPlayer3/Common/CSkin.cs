@@ -363,6 +363,8 @@ namespace TJAPlayer3
         public Cシステムサウンド soundDanSelectBGM = null;
         public Cシステムサウンド soundDanSongSelect = null;
 
+        public Cシステムサウンド soundHeyaBGM = null;
+
         public Cシステムサウンド soundCrownIn = null;
         public Cシステムサウンド soundRankIn = null;
         public Cシステムサウンド soundDonClear = null;
@@ -739,6 +741,8 @@ namespace TJAPlayer3
 
             this.soundDanSelectBGM = new Cシステムサウンド(@"Sounds\Dan\DanSelectBGM.wav", true, false, false, ESoundGroup.SongPlayback);
             this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
+
+            this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             ReloadSkin();
             tReadSkinConfig();
         }
@@ -2600,10 +2604,17 @@ namespace TJAPlayer3
         public string Skin_Version = "Unknown";
         public string Skin_Creator = "Unknown";
         #endregion
+        
         #region Config
+
         public int Config_ItemText_Correction_X = 0;
         public int Config_ItemText_Correction_Y = 0;
+
+        public int Config_NamePlate_Ptn_Title;
+        public int[] Config_NamePlate_Ptn_Title_Boxes;
+
         #endregion
+
         #region SongSelect
         public int SongSelect_Overall_Y = 123;
         public int SongSelect_BoxExplanation_X = 0;

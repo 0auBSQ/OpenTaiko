@@ -92,48 +92,7 @@ namespace TJAPlayer3
 
 
 		// メソッド
-		/*
-		#region [ SongsDB(songs.db) を読み込む ]
-		//-----------------
-		public void tSongsDBを読み込む( string SongsDBファイル名 )
-		{
-			this.nSongsDBから取得できたスコア数 = 0;
-			if( File.Exists( SongsDBファイル名 ) )
-			{
-				BinaryReader br = null;
-				try
-				{
-					br = new BinaryReader( File.OpenRead( SongsDBファイル名 ) );
-					if ( !br.ReadString().Equals( SONGSDB_VERSION ) )
-					{
-						throw new InvalidDataException( "ヘッダが異なります。" );
-					}
-					this.listSongsDB = new List<Cスコア>();
 
-					while( true )
-					{
-						try
-						{
-							Cスコア item = this.tSongsDBからスコアを１つ読み込む( br );
-							this.listSongsDB.Add( item );
-							this.nSongsDBから取得できたスコア数++;
-						}
-						catch( EndOfStreamException )
-						{
-							break;
-						}
-					}
-				}
-				finally
-				{
-					if( br != null )
-						br.Close();
-				}
-			}
-		}
-		//-----------------
-		#endregion
-		*/
 		#region [ 曲を検索してリストを作成する ]
 		//-----------------
 		public void t曲を検索してリストを作成する( string str基点フォルダ, bool b子BOXへ再帰する )
@@ -831,167 +790,7 @@ namespace TJAPlayer3
 		}
 		//-----------------
 		#endregion
-		/*#region [ スコアキャッシュを曲リストに反映する ]
-		//-----------------
-		public void tスコアキャッシュを曲リストに反映する()
-		{
-			this.nスコアキャッシュから反映できたスコア数 = 0;
-			this.tスコアキャッシュを曲リストに反映する( this.list曲ルート );
-		}
-		private void tスコアキャッシュを曲リストに反映する( List<C曲リストノード> ノードリスト )
-		{
-			using( List<C曲リストノード>.Enumerator enumerator = ノードリスト.GetEnumerator() )
-			{
-				while( enumerator.MoveNext() )
-				{
-					SlowOrSuspendSearchTask();		// #27060 中断要求があったら、解除要求が来るまで待機, #PREMOVIE再生中は検索負荷を落とす
-
-					C曲リストノード node = enumerator.Current;
-					if( node.eノード種別 == C曲リストノード.Eノード種別.BOX )
-					{
-						this.tスコアキャッシュを曲リストに反映する( node.list子リスト );
-					}
-					else if( ( node.eノード種別 == C曲リストノード.Eノード種別.SCORE ) || ( node.eノード種別 == C曲リストノード.Eノード種別.SCORE_MIDI ) )
-					{
-						Predicate<Cスコア> match = null;
-						for( int lv = 0; lv < (int)Difficulty.Total; lv++ )
-						{
-							if( node.arスコア[ lv ] != null )
-							{
-								if( match == null )
-								{
-									match = delegate( Cスコア sc )
-									{
-										return
-											(
-											( sc.ファイル情報.ファイルの絶対パス.Equals( node.arスコア[ lv ].ファイル情報.ファイルの絶対パス )
-											&& sc.ファイル情報.ファイルサイズ.Equals( node.arスコア[ lv ].ファイル情報.ファイルサイズ ) )
-											&& ( sc.ファイル情報.最終更新日時.Equals( node.arスコア[ lv ].ファイル情報.最終更新日時 )
-											&& sc.ScoreIni情報.ファイルサイズ.Equals( node.arスコア[ lv ].ScoreIni情報.ファイルサイズ ) ) )
-											&& sc.ScoreIni情報.最終更新日時.Equals( node.arスコア[ lv ].ScoreIni情報.最終更新日時 );
-									};
-								}
-								int nMatched = this.listSongsDB.FindIndex( match );
-								if( nMatched == -1 )
-								{
-//Trace.TraceInformation( "songs.db に存在しません。({0})", node.arスコア[ lv ].ファイル情報.ファイルの絶対パス );
-									if ( TJAPlayer3.ConfigIni.bLog曲検索ログ出力 )
-									{
-										Trace.TraceInformation( "songs.db に存在しません。({0})", node.arスコア[ lv ].ファイル情報.ファイルの絶対パス );
-									}
-								}
-								else
-								{
-									node.arスコア[ lv ].譜面情報 = this.listSongsDB[ nMatched ].譜面情報;
-									node.arスコア[ lv ].bSongDBにキャッシュがあった = true;
-									if( TJAPlayer3.ConfigIni.bLog曲検索ログ出力 )
-									{
-										Trace.TraceInformation( "songs.db から転記しました。({0})", node.arスコア[ lv ].ファイル情報.ファイルの絶対パス );
-									}
-									this.nスコアキャッシュから反映できたスコア数++;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		private Cスコア tSongsDBからスコアを１つ読み込む( BinaryReader br )
-		{
-			Cスコア cスコア = new Cスコア();
-			cスコア.ファイル情報.ファイルの絶対パス = br.ReadString();
-			cスコア.ファイル情報.フォルダの絶対パス = br.ReadString();
-			cスコア.ファイル情報.最終更新日時 = new DateTime( br.ReadInt64() );
-			cスコア.ファイル情報.ファイルサイズ = br.ReadInt64();
-			cスコア.ScoreIni情報.最終更新日時 = new DateTime( br.ReadInt64() );
-			cスコア.ScoreIni情報.ファイルサイズ = br.ReadInt64();
-			cスコア.譜面情報.タイトル = br.ReadString();
-			cスコア.譜面情報.アーティスト名 = br.ReadString();
-			cスコア.譜面情報.コメント = br.ReadString();
-			cスコア.譜面情報.ジャンル = br.ReadString();
-			cスコア.譜面情報.Preimage = br.ReadString();
-			cスコア.譜面情報.Premovie = br.ReadString();
-			cスコア.譜面情報.Presound = br.ReadString();
-			cスコア.譜面情報.Backgound = br.ReadString();
-			cスコア.譜面情報.レベル.Drums = br.ReadInt32();
-			cスコア.譜面情報.レベル.Guitar = br.ReadInt32();
-			cスコア.譜面情報.レベル.Bass = br.ReadInt32();
-			cスコア.譜面情報.最大ランク.Drums = br.ReadInt32();
-			cスコア.譜面情報.最大ランク.Guitar = br.ReadInt32();
-			cスコア.譜面情報.最大ランク.Bass = br.ReadInt32();
-			cスコア.譜面情報.最大スキル.Drums = br.ReadDouble();
-			cスコア.譜面情報.最大スキル.Guitar = br.ReadDouble();
-			cスコア.譜面情報.最大スキル.Bass = br.ReadDouble();
-			cスコア.譜面情報.フルコンボ.Drums = br.ReadBoolean();
-			cスコア.譜面情報.フルコンボ.Guitar = br.ReadBoolean();
-			cスコア.譜面情報.フルコンボ.Bass = br.ReadBoolean();
-			cスコア.譜面情報.演奏回数.Drums = br.ReadInt32();
-			cスコア.譜面情報.演奏回数.Guitar = br.ReadInt32();
-			cスコア.譜面情報.演奏回数.Bass = br.ReadInt32();
-			cスコア.譜面情報.演奏履歴.行1 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行2 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行3 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行4 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行5 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行6 = br.ReadString();
-			cスコア.譜面情報.演奏履歴.行7 = br.ReadString();
-			cスコア.譜面情報.レベルを非表示にする = br.ReadBoolean();
-			cスコア.譜面情報.曲種別 = (CDTX.E種別) br.ReadInt32();
-			cスコア.譜面情報.Bpm = br.ReadDouble();
-			cスコア.譜面情報.Duration = br.ReadInt32();
-            cスコア.譜面情報.strBGMファイル名 = br.ReadString();
-            cスコア.譜面情報.SongVol = br.ReadInt32();
-		    var hasSongIntegratedLoudness = br.ReadBoolean();
-		    var songIntegratedLoudness = br.ReadDouble();
-		    var integratedLoudness = hasSongIntegratedLoudness ? new Lufs(songIntegratedLoudness) : default(Lufs?);
-		    var hasSongPeakLoudness = br.ReadBoolean();
-		    var songPeakLoudness = br.ReadDouble();
-		    var peakLoudness = hasSongPeakLoudness ? new Lufs(songPeakLoudness) : default(Lufs?);
-		    var songLoudnessMetadata = hasSongIntegratedLoudness
-		        ? new LoudnessMetadata(integratedLoudness.Value, peakLoudness)
-		        : default(LoudnessMetadata?);
-		    cスコア.譜面情報.SongLoudnessMetadata = songLoudnessMetadata;
-            cスコア.譜面情報.nデモBGMオフセット = br.ReadInt32();
-            cスコア.譜面情報.b譜面分岐[0] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[1] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[2] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[3] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[4] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[5] = br.ReadBoolean();
-            cスコア.譜面情報.b譜面分岐[6] = br.ReadBoolean();
-            cスコア.譜面情報.ハイスコア = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[0] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[1] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[2] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[3] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[4] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[5] = br.ReadInt32();
-            cスコア.譜面情報.nハイスコア[6] = br.ReadInt32();
-            cスコア.譜面情報.strサブタイトル = br.ReadString();
-            cスコア.譜面情報.nレベル[0] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[1] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[2] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[3] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[4] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[5] = br.ReadInt32();
-            cスコア.譜面情報.nレベル[6] = br.ReadInt32();
-			cスコア.譜面情報.nクリア[0] = br.ReadInt32();
-			cスコア.譜面情報.nクリア[1] = br.ReadInt32();
-			cスコア.譜面情報.nクリア[2] = br.ReadInt32();
-			cスコア.譜面情報.nクリア[3] = br.ReadInt32();
-			cスコア.譜面情報.nクリア[4] = br.ReadInt32();
-			cスコア.譜面情報.nスコアランク[0] = br.ReadInt32();
-			cスコア.譜面情報.nスコアランク[1] = br.ReadInt32();
-			cスコア.譜面情報.nスコアランク[2] = br.ReadInt32();
-			cスコア.譜面情報.nスコアランク[3] = br.ReadInt32();
-			cスコア.譜面情報.nスコアランク[4] = br.ReadInt32();
-
-
-            //Debug.WriteLine( "songs.db: " + cスコア.ファイル情報.ファイルの絶対パス );
-            return cスコア;
-		}
-		//-----------------
-		#endregion*/
+		
 		#region [ SongsDBになかった曲をファイルから読み込んで反映する ]
 		//-----------------
 		public void tSongsDBになかった曲をファイルから読み込んで反映する()
@@ -1154,6 +953,7 @@ namespace TJAPlayer3
 		}
 		//-----------------
 		#endregion
+
 		#region [ 曲リストへ後処理を適用する ]
 		//-----------------
 		public void t曲リストへ後処理を適用する()
@@ -1173,10 +973,14 @@ namespace TJAPlayer3
 			{
 				C曲リストノード crecentryplaysong = new C曲リストノード();
 				crecentryplaysong.eノード種別 = C曲リストノード.Eノード種別.BOX;
-				crecentryplaysong.strタイトル = "最近あそんだ曲";
+
+				// 最近あそんだ曲
+				crecentryplaysong.strタイトル = CLangManager.LangInstance.GetString(201);
+
 				crecentryplaysong.strBoxText[0] = "";
-				crecentryplaysong.strBoxText[1] = "最近あそんだ曲を集めたよ！";
+				crecentryplaysong.strBoxText[1] = CLangManager.LangInstance.GetString(202);
 				crecentryplaysong.strBoxText[2] = "";
+
 				crecentryplaysong.strジャンル = "最近遊んだ曲";
 				crecentryplaysong.nスコア数 = 1;
 				crecentryplaysong.list子リスト = new List<C曲リストノード>();
@@ -1204,6 +1008,7 @@ namespace TJAPlayer3
 				if(c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
 					// Dojo node removed here
+
 					if (c曲リストノード.strタイトル == "段位道場")
 					{
 						list曲ルート.Remove(c曲リストノード);
@@ -1273,7 +1078,10 @@ namespace TJAPlayer3
 					{
 						C曲リストノード itemBack = new C曲リストノード();
 						itemBack.eノード種別 = C曲リストノード.Eノード種別.BACKBOX;
-						itemBack.strタイトル = "とじる";
+
+						// とじる
+						itemBack.strタイトル = CLangManager.LangInstance.GetString(200);
+
 						itemBack.BackColor = ColorTranslator.FromHtml("#513009");
 						itemBack.BoxColor = Color.White;
 

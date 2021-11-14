@@ -63,10 +63,30 @@ namespace TJAPlayer3
             [156] = "Changez votre style de jeu\n ou les paramètres généraux !",
             [157] = "Quitter le jeu.\nÀ bientôt !",
 
+            [200] = "Retour",
+            [201] = "Sons joués récemment",
+            [202] = "Rejouez les sons joués précedement !",
+
             [1000] = "Étage atteint",
             [1001] = "",
             [1002] = "P",
             [1003] = "Score",
+
+            [1010] = "Jauge d'âme",
+            [1011] = "Nombre de Parfait",
+            [1012] = "Nombre de Bon",
+            [1013] = "Nombre de Mauvais",
+            [1014] = "Score",
+            [1015] = "Frappes successives",
+            [1016] = "Nombre de frappes",
+            [1017] = "Combo",
+            [1018] = "Précision",
+
+            [1030] = "Retour",
+            [1031] = "Petit Personnage",
+            [1032] = "Personnage",
+            [1033] = "Titre Dan",
+            [1034] = "Titre",
         };
     }
 }

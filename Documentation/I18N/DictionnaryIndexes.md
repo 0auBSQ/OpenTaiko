@@ -40,11 +40,37 @@
 156 : Settings main menu box text
 157 : Quit main menu box text
 
+# Special items (002XX)
+
+200 : Ensou Back box (Tojiru)
+201 : Ensou recently played songs 
+202 : Ensou recently played songs description
+
 # Tower text (0100X)
 
 1000 : Reached floor (Tower)
 1001 : Floor suffix (1 character)
 1002 : Points accronym (1 character)
 1003 : Score
+
+# Dan exam types (0101X - 0102X)
+
+1010 : Soul gauge
+1011 : Perfect count
+1012 : Good count 
+1013 : Bad count 
+1014 : Score
+1015 : Rolls count 
+1016 : Notes hit count
+1017 : Combo 
+1018 : Accuracy
+
+# Heya buttons (0103X)
+
+1030 : Return
+1031 : PetitChara
+1032 : Character
+1033 : Dan title
+1034 : Plate title
 
 ```

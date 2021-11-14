@@ -34,6 +34,7 @@ namespace TJAPlayer3
 			演奏,
 			結果,
 			ChangeSkin,						// #28195 2011.5.4 yyagi
+			Heya,
 			終了
 		}
 		

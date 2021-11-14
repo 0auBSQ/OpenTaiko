@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using FDK;
 using SlimDX.DirectInput;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
