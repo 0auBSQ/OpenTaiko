@@ -103,6 +103,8 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes = new int[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
 
             NamePlate_Title = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title][];
+            NamePlate_Title_Big = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
+            NamePlate_Title_Small = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
 
             for (int i = 0; i < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title; i++)
             {
@@ -113,6 +115,9 @@ namespace TJAPlayer3
                 {
                     NamePlate_Title[i][j] = TxC(@"9_NamePlateEffect\Title\" + i.ToString() + @"\" + j.ToString() + @".png");
                 }
+
+                NamePlate_Title_Big[i] = TxC(@"9_NamePlateEffect\Title\" + i.ToString() + @"\Big.png");
+                NamePlate_Title_Small[i] = TxC(@"9_NamePlateEffect\Title\" + i.ToString() + @"\Small.png");
             }
 
 
@@ -968,6 +973,8 @@ namespace TJAPlayer3
         public CTexture[] NamePlate_Effect = new CTexture[5];
 
         public CTexture[][] NamePlate_Title;
+        public CTexture[] NamePlate_Title_Big;
+        public CTexture[] NamePlate_Title_Small;
 
         #endregion
 
