@@ -368,10 +368,15 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
                     TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 193, y + 6);
                     */
-                    TJAPlayer3.Tx.NamePlate_Effect[3].Opacity = this.ctNamePlateEffect.n現在の値 >= 112 ? (int)(255 - (this.ctNamePlateEffect.n現在の値 - 112) * 31.875f) : 255;
-                    TJAPlayer3.Tx.NamePlate_Effect[3].vc拡大縮小倍率.X = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
-                    TJAPlayer3.Tx.NamePlate_Effect[3].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
-                    TJAPlayer3.Tx.NamePlate_Effect[3].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 193, y + 6);
+
+                    int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
+                    if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title && TJAPlayer3.Tx.NamePlate_Title_Big[tt] != null) {
+                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].Opacity = this.ctNamePlateEffect.n現在の値 >= 112 ? (int)(255 - (this.ctNamePlateEffect.n現在の値 - 112) * 31.875f) : 255;
+                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].vc拡大縮小倍率.X = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
+                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
+                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 193, y + 6);
+                    }
+
                 }
             }
         }
@@ -383,9 +388,14 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.Y = Scale;
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
             */
-            TJAPlayer3.Tx.NamePlate_Effect[1].vc拡大縮小倍率.X = Scale;
-            TJAPlayer3.Tx.NamePlate_Effect[1].vc拡大縮小倍率.Y = Scale;
-            TJAPlayer3.Tx.NamePlate_Effect[1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
+            int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
+            if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title && TJAPlayer3.Tx.NamePlate_Title_Small[tt] != null)
+            {
+                TJAPlayer3.Tx.NamePlate_Title_Small[tt].vc拡大縮小倍率.X = Scale;
+                TJAPlayer3.Tx.NamePlate_Title_Small[tt].vc拡大縮小倍率.Y = Scale;
+                TJAPlayer3.Tx.NamePlate_Title_Small[tt].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
+            }
+
         }
 
         private CPrivateFastFont pfName;
