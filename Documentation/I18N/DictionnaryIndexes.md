@@ -76,6 +76,23 @@
 71 : "No information" description
 72 : "Just" option title
 73 : "Just" description
+74 : "Tight" option title
+75 : "Tight" description
+76 : "Minimum number of combo that shows" option title
+77 : "Minimum number of combo that shows" description
+78 : "Input adjust" option title
+79 : "Input adjust" description
+80 : "Default difficulty course" option title
+81 : "Default difficulty course" description
+82 : "Score calculation formula" option title
+83 : "Score calculation formula" description
+84 : "Shin-uchi toggle" option title & description
+85 : "Branch guide" option title
+86 : "Branch guide" description
+87 : "Branch animation toggle" option title
+88 : "Branch animation toggle" description
+89 : "Game mode toggle" option title
+90 : "Game mode toggle" description
 
 # Main Menu text (001XX)
 
