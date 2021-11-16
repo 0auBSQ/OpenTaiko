@@ -101,6 +101,16 @@ namespace TJAPlayer3
             public int clearStatus;
         }
 
+        public class CNamePlateTitle
+        {
+            public CNamePlateTitle(int type)
+            {
+                iType = type;
+            }
+
+            public int iType;
+        }
+
         #endregion
 
         #region [Heya]
@@ -121,7 +131,7 @@ namespace TJAPlayer3
             public bool[] DanGold = { false, false };
 
             public int[] DanType = { 0, 0 };
-            public int[] TitleType = { 1, 1 };
+            public int[] TitleType = { 0, 0 };
 
             public int[] PuchiChara = { 2, 11 };
 
@@ -130,6 +140,8 @@ namespace TJAPlayer3
             public int[] Character = { 0, 0 };
 
             public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[2];
+
+            public Dictionary<string, CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, CNamePlateTitle>[2];
         }
 
         public Data data = new Data();

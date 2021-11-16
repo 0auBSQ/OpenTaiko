@@ -86,11 +86,23 @@ namespace TJAPlayer3
             #region [Plate title]
 
             amount = 1;
+            if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null)
+                amount += TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].Count;
 
             this.ttkTitles = new TitleTextureKey[amount];
 
             // Wood shojinsha (default title) always avaliable by default
-            this.ttkTitles[0] = new TitleTextureKey("èâêSé“", this.pfHeyaFont, Color.White, Color.Black, 1000);
+            this.ttkTitles[0] = new TitleTextureKey("èâêSé“", this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+
+            idx = 1;
+            if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null)
+            {
+                foreach (var item in TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer])
+                {
+                    this.ttkTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+                    idx++;
+                }
+            }
 
             #endregion
 
@@ -234,10 +246,51 @@ namespace TJAPlayer3
 
                     
                 }
+            }
 
-                for (int i = 0; i < this.ttkDanTitles.Length; i++)
+            #endregion
+
+
+
+            #region [Title plate]
+
+            if (iCurrentMenu == 3)
+            {
+                for (int i = -5; i < 6; i++)
                 {
-                    int pos = i - iDanTitleCurrent;
+                    int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
+
+                    CTexture tmpTex = TJAPlayer3.stageëIã».actã»ÉäÉXÉg.ResolveTitleTexture(this.ttkTitles[pos]);
+
+                    if (i != 0)
+                    {
+                        tmpTex.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                    }
+                    else
+                    {
+                        tmpTex.color4 = Color.White;
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                    }
+
+                    TJAPlayer3.Tx.Heya_Side_Menu.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+
+                    int iType = -1;
+
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].strï∂éö))
+                        iType = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[pos].strï∂éö].iType;
+                    else if (pos == 0)
+                        iType = 0;
+
+                    if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
+                    {
+                        TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.nåªç›ÇÃíl % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device,
+                            730 + -10 * Math.Abs(i),
+                            348 + 70 * i);
+                    } 
+
+                    tmpTex.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+
                 }
             }
 
@@ -346,6 +399,25 @@ namespace TJAPlayer3
                     TJAPlayer3.NamePlateConfig.data.Dan[iPlayer] = this.ttkDanTitles[iDanTitleCurrent].strï∂éö;
                     TJAPlayer3.NamePlateConfig.data.DanGold[iPlayer] = iG;
                     TJAPlayer3.NamePlateConfig.data.DanType[iPlayer] = cs;
+
+                    TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
+
+                    TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+
+                    iCurrentMenu = -1;
+                    this.tResetOpts();
+                }
+
+                else if (iCurrentMenu == 3)
+                {
+                    TJAPlayer3.NamePlateConfig.data.Title[iPlayer] = this.ttkTitles[iTitleCurrent].strï∂éö;
+
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].strï∂éö))
+                        TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[iTitleCurrent].strï∂éö].iType;
+                    else if (iTitleCurrent == 0)
+                        TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = 0;
+                    else
+                        TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = -1;
 
                     TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
 
