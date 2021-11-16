@@ -144,7 +144,7 @@ namespace TJAPlayer3
                         txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
                     }
 
-                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 115, y + 19);
+                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 115, y + 21);
                     if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
                         this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 100, y + 45);
                     else
@@ -218,7 +218,7 @@ namespace TJAPlayer3
                         txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
                     }
 
-                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 20);
+                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 22);
                     if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
                         this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 44);
                     else
@@ -405,7 +405,7 @@ namespace TJAPlayer3
         private CPrivateFastFont pfdan;
         private CCounter ctNamePlateEffect;
 
-        private CCounter ctAnimatedNamePlateTitle;
+        public CCounter ctAnimatedNamePlateTitle;
 
         private CTexture[] txName = new CTexture[2];
         private CTexture[] txTitle = new CTexture[2];
