@@ -227,6 +227,8 @@ namespace TJAPlayer3
                 else
                     this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
             }
+
+            TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 4 * 54 + 3, 220, 54));
         }
 
         private void tNamePlateDraw(int player, int x, int y, int Opacity = 255)
