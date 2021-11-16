@@ -410,7 +410,7 @@ namespace TJAPlayer3
         private CCounter[] ctBarAnime = new CCounter[2];
 
         //0 閉じる 1 演奏オプション 2~ 難易度
-		private int[] n現在の選択行;
+		public int[] n現在の選択行;
         private int nスイッチカウント;
 
         private bool b裏譜面;

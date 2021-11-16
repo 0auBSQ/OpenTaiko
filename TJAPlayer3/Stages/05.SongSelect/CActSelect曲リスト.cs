@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Drawing.Text;
+using System.Threading.Tasks;
 using SlimDX;
 using FDK;
 using System.Linq;
@@ -535,23 +536,102 @@ namespace TJAPlayer3
 
 		// CActivity 実装
 
-		public override void On活性化()
-		{
-			if( this.b活性化してる )
-				return;
-
-            if (!bFirstCrownLoad)
+		async public void tLoadPads()
+        {
+			while (bIsEnumeratingSongs)
             {
+				await Task.Delay(100);
+			}
 
-				for (int i = 0; i < ScoreRankCount.Length; i++)
-					ScoreRankCount[i] = 0;
+            #region [Reset nodes]
 
-				for (int i = 0; i < CrownCount.Length; i++)
-					CrownCount[i] = 0;
+            for (int s = 0; s <= (int)Difficulty.Edit; s++)
+			{
+				CScorePad SPRef = ScorePads[s];
 
-				foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
+				for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+					SPRef.ScoreRankCount[i] = 0;
+
+				for (int i = 0; i < ScorePads[s].CrownCount.Length; i++)
+					SPRef.CrownCount[i] = 0;
+			}
+
+            #endregion
+
+            #region [Load notes]
+
+            foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
 				{
-					if (song.eノード種別 == C曲リストノード.Eノード種別.BOX)
+					
+					// All score pads except UraOmote
+					// this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)
+					for (int s = 0; s <= (int)Difficulty.Edit; s++)
+					{
+						CScorePad SPRef = ScorePads[s];
+
+						if (song.eノード種別 == C曲リストノード.Eノード種別.BOX)
+						{
+							for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+							{
+								SPRef.ScoreRankCount[i] += song.list子リスト.Where(a =>
+									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
+									&& a.strジャンル != "最近遊んだ曲"
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+							}
+							for (int i = 0; i < SPRef.CrownCount.Length; i++)
+							{
+								SPRef.CrownCount[i] += song.list子リスト.Where(a =>
+									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
+									&& a.strジャンル != "最近遊んだ曲"
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+							}
+						}
+						else
+						{
+							if (song.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+							{
+								for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+								{
+									SPRef.ScoreRankCount[i] += TJAPlayer3.Songs管理.list曲ルート.Where(a =>
+										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
+										&& a.strジャンル != "最近遊んだ曲"
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+								}
+								for (int i = 0; i < SPRef.CrownCount.Length; i++)
+								{
+									SPRef.CrownCount[i] += TJAPlayer3.Songs管理.list曲ルート.Where(a =>
+										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
+										&& a.strジャンル != "最近遊んだ曲"
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+								}
+							}
+						}
+					}
+
+				#endregion
+
+				#region [UraOmote pad]
+
+				// UraOmote pad
+				for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount.Length; i++)
+				{
+					ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount[i] = ScorePads[(int)Difficulty.Edit].ScoreRankCount[i] + ScorePads[(int)Difficulty.Oni].ScoreRankCount[i];
+				}
+				for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].CrownCount.Length; i++)
+				{
+					ScorePads[(int)Difficulty.Edit + 1].CrownCount[i] = ScorePads[(int)Difficulty.Edit].CrownCount[i] + ScorePads[(int)Difficulty.Oni].CrownCount[i];
+				}
+
+				#endregion
+
+				/*
+                #region [Legacy]
+
+                if (song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 					{
 						for (int i = 0; i < ScoreRankCount.Length; i++)
 						{
@@ -580,9 +660,30 @@ namespace TJAPlayer3
 							}
 						}
 					}
-				}
+					
 
-				bFirstCrownLoad = true;
+				
+
+			#endregion
+				*/
+
+			}
+
+		}
+
+		public override void On活性化()
+		{
+			if( this.b活性化してる )
+				return;
+
+            if (!bFirstCrownLoad)
+            {
+				// tLoadPads();
+				
+				// Calculate Pads asynchonously
+				new Task(tLoadPads).Start();
+				
+				// bFirstCrownLoad = true;
 
 			}
 
@@ -1880,6 +1981,15 @@ namespace TJAPlayer3
 
 		public int[] ScoreRankCount = new int[7];
 		public int[] CrownCount = new int[3];
+
+		// Edit + 1 => UraOmote ScorePad, add 2P later
+		public CScorePad[] ScorePads = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
+
+		public class CScorePad
+        {
+			public int[] ScoreRankCount = new int[7];
+			public int[] CrownCount = new int[3];
+        }
 
 		private struct STバー
 		{

@@ -907,15 +907,30 @@ namespace TJAPlayer3
 
                 #endregion
 
+                #region [Pad displayables]
+
+                int currentPad = (int)Difficulty.Edit + 1;
+                if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
+                {
+                    currentPad = Math.Max(0, TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] - 2);
+                }
+
+                TJAPlayer3.Tx.SongSelect_Table[currentPad]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
                 // Current board
                 for (int i = 0; i < 10; i++)
                 {
-                    tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? this.act曲リスト.ScoreRankCount[i].ToString() : this.act曲リスト.CrownCount[i - 7].ToString());
+                    
+                    tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? 
+                        this.act曲リスト.ScorePads[currentPad].ScoreRankCount[i].ToString() 
+                        : this.act曲リスト.ScorePads[currentPad].CrownCount[i - 7].ToString());
+
                 }
 
                 if (TJAPlayer3.NamePlateConfig.data.Medals[0] >= 0)
                     tBoardNumberDraw(this.ptBoardNumber[10].X - 10, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[0].ToString());
+
+                #endregion
 
                 if (act難易度選択画面.bOption[0]) actPlayOption.On進行描画(0);
                 if (act難易度選択画面.bOption[1]) actPlayOption.On進行描画(1);

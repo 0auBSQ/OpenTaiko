@@ -1054,6 +1054,7 @@ namespace TJAPlayer3
 
 		public void t後処理()
         {
+			/*
 			if (!TJAPlayer3.ConfigIni.bAutoPlay[0])
 			{
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
@@ -1086,6 +1087,7 @@ namespace TJAPlayer3
 					}
 				}
 			}
+			*/
 
 			if (!b最近遊んだ曲追加済み)
 			{

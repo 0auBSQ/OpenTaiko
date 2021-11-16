@@ -254,6 +254,11 @@ namespace TJAPlayer3
                 }
             }
 
+            for (int i = 0; i < SongSelect_Table.Length; i++)
+            {
+                SongSelect_Table[i] = TxC(SONGSELECT + @"Table\" + i.ToString() + ".png");
+            }
+
             #region [ 難易度選択画面 ]
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
             Difficulty_Number = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number.png");
@@ -1039,7 +1044,8 @@ namespace TJAPlayer3
             SongSelect_Donchan_Select = new CTexture[47],
             SongSelect_Donchan_Normal = new CTexture[49],
             SongSelect_Donchan_Jump = new CTexture[18],
-            SongSelect_NamePlate = new CTexture[1];
+            SongSelect_NamePlate = new CTexture[1],
+            SongSelect_Table = new CTexture[6];
 
         #region [ 難易度選択画面 ]
         public CTexture Difficulty_Bar;
