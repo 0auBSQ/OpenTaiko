@@ -19,6 +19,29 @@
 11 : "Song speed" description 
 16 : "Layout type" option title
 17 : "Layout type" description
+18 : "Ensou speed" option title & description
+19 : "Window mode" option title & description
+20 : "Stage failed" option title & description
+21 : "Random select affects boxes" option title & description
+22 : "Turn on asynchronous mode" option title & description
+23 : "AVI playback" option title & description
+24 : "BGA playback" option title & description
+25 : "Time until preview playback" option title & description
+26 : "Time until preview image" option title & description
+27 : "Show playing information on down right" option title & description
+28 : "Background picture transparency" option title & description
+29 : "BGM playback" option title & description
+30 : "Save score information" option title & description
+31 : "Use BS1770GAIN measured numbers" option title & description
+32 : "Set BS1770GAIN loudness meter number" option title & description
+33 : "Use .tja files' SONGVOL meter" option title & description
+34 : "Sound effect volume" option title & description
+35 : "Voice and combo voice volume" option title & description
+36 : "Volume in-game" option title & description
+37 : "Amount of 1 change in volume" option title & description
+38 : "Time before song start in-game" option title & description
+39 : "Auto save results" option title & description
+40 : "Discord-RPC toggle" option title & description
 
 # Main Menu text (001XX)
 
