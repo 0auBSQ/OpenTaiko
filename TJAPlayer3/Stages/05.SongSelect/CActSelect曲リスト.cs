@@ -545,7 +545,7 @@ namespace TJAPlayer3
 
             #region [Reset nodes]
 
-            for (int s = 0; s <= (int)Difficulty.Edit; s++)
+            for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
 			{
 				CScorePad SPRef = ScorePads[s];
 

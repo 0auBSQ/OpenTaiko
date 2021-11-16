@@ -909,26 +909,36 @@ namespace TJAPlayer3
 
                 #region [Pad displayables]
 
-                int currentPad = (int)Difficulty.Edit + 1;
+                int[] currentPads = new int[2] { (int)Difficulty.Edit + 1, (int)Difficulty.Edit + 1 };
+
+                //int currentPad = (int)Difficulty.Edit + 1;
                 if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
                 {
-                    currentPad = Math.Max(0, TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] - 2);
+                    if (TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] >= 2)
+                        currentPads[0] = TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] - 2;
+                    if (TJAPlayer3.ConfigIni.nPlayerCount > 1 && TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] > 2)
+                        currentPads[1] = TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] - 2;
                 }
 
-                TJAPlayer3.Tx.SongSelect_Table[currentPad]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                TJAPlayer3.Tx.SongSelect_Table[currentPads[0]]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
+                    TJAPlayer3.Tx.SongSelect_Table[currentPads[1]]?.t2D描画(TJAPlayer3.app.Device, 1034, 0);
 
                 // Current board
                 for (int i = 0; i < 10; i++)
                 {
                     
                     tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? 
-                        this.act曲リスト.ScorePads[currentPad].ScoreRankCount[i].ToString() 
-                        : this.act曲リスト.ScorePads[currentPad].CrownCount[i - 7].ToString());
+                        this.act曲リスト.ScorePads[currentPads[0]].ScoreRankCount[i].ToString() 
+                        : this.act曲リスト.ScorePads[currentPads[0]].CrownCount[i - 7].ToString());
 
                 }
 
                 if (TJAPlayer3.NamePlateConfig.data.Medals[0] >= 0)
                     tBoardNumberDraw(this.ptBoardNumber[10].X - 10, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[0].ToString());
+
+                if (TJAPlayer3.NamePlateConfig.data.Medals[1] >= 0 && TJAPlayer3.ConfigIni.nPlayerCount > 1)
+                    tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[1].ToString());
 
                 #endregion
 
