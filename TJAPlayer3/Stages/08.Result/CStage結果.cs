@@ -490,6 +490,8 @@ namespace TJAPlayer3
 
 				#endregion
 
+				TJAPlayer3.stage選曲.act曲リスト.bFirstCrownLoad = false;
+
 				base.On活性化();
 			}
 			finally

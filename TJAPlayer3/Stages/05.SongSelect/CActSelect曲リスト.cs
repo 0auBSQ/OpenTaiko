@@ -683,7 +683,7 @@ namespace TJAPlayer3
 				// Calculate Pads asynchonously
 				new Task(tLoadPads).Start();
 				
-				// bFirstCrownLoad = true;
+				bFirstCrownLoad = true;
 
 			}
 
@@ -2063,7 +2063,7 @@ namespace TJAPlayer3
 			public int[] nスコアランク;
 		}
 
-		private bool bFirstCrownLoad;
+		public bool bFirstCrownLoad;
 
 		public CCounter ctBarFlash;
 		public CCounter ctDifficultyIn;
