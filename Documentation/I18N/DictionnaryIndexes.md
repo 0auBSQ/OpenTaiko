@@ -1,6 +1,7 @@
 # Dictionnary Indexes
 
 - This document describes all the indexes used by the fonction `CLangManager.LangInstance.GetString(idx)`.
+- 70 and 71 that's the actual name.
 
 ```
 # Config menu text (000XX)
@@ -42,6 +43,39 @@
 38 : "Time before song start in-game" option title & description
 39 : "Auto save results" option title & description
 40 : "Discord-RPC toggle" option title & description
+41 : "Buffer inputs" option title & description
+42 : "Trace log output" option title & description
+43 : "Sound output" option title & description
+44 : "WASAPI buffer size" option title & description
+45 : "ASIO device" option title & description
+46 : "OS timer" option title & description
+47 : "Show character image" option title & description
+48 : "Show dancer image" option title & description
+49 : "Show mob image" option title & description
+50 : "Show runner image" option title & description
+51 : "Show footer image" option title & description
+52 : "Use image processed beforehand" option title & description
+53 : "Show petit-character image" option title & description
+54 : "Change skin" option title & description
+55 : "System key input configuration" option title & description
+56 : "Toggle auto play" option title
+57 : "Toggle auto play" description
+58 : "Toggle auto play for 2P" option title
+59 : "Toggle auto play for 2P" description
+60 : "Auto roll" option title
+61 : "Auto roll" description
+62 : "Scroll speed" option title
+63 : "Scroll speed" description
+64 : "Risky" option title
+65 : "Risky" description
+66 : "Random" option title
+67 : "Random" description
+68 : "Stealth" option title
+69 : "Stealth" description
+70 : "No information" option title
+71 : "No information" description
+72 : "Just" option title
+73 : "Just" description
 
 # Main Menu text (001XX)
 
