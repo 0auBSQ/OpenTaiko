@@ -93,6 +93,15 @@
 88 : "Branch animation toggle" description
 89 : "Game mode toggle" option title
 90 : "Game mode toggle" description
+91 : "Big notes with both drum sides" option title
+92 : "Big notes with both drum sides" description
+93 : "Judge count display" option title
+94 : "Judge count display" description
+95 : "Key config" option title
+96 : "Key config" description
+97 : "Capture key" option title
+98 : "Capture key" description
+99 : "Left red drum key settings" option title
 
 # Main Menu text (001XX)
 
@@ -147,4 +156,21 @@
 1033 : Dan title
 1034 : Plate title
 
+# Config menu text (10000 - 1001X)
+
+10000 : "Left red drum key settings" description
+10001 : "Right red drum key settings" option title
+10002 : "Right red drum key settings" description
+10003 : "Left blue drum key settings" option title
+10004 : "Left blue drum key settings" description
+10005 : "Right blue drum key settings" option title
+10006 : "Right blue drum key settings" description
+10007 : "Left red drum key settings for 2P" option title
+10008 : "Left red drum key settings for 2P" description
+10009 : "Right red drum key settings for 2P" option title
+10010 : "Right red drum key settings for 2P" description
+10011 : "Left blue drum key settings for 2P" option title
+10012 : "Left blue drum key settings for 2P" description
+10013 : "Right blue drum key settings for 2P" option title
+10014 : "Right blue drum key settings for 2P" description
 ```
