@@ -21,11 +21,10 @@ namespace TJAPlayer3
             }
 
             this.ScoreRank = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10) };
-            //    (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)};
+                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)) };
 
             this.ScoreRank2P = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10) };
+                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)) };
 
             for (int i = 0; i < 7; i++)
             {
