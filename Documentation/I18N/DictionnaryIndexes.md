@@ -21,43 +21,43 @@
 16 : "Layout type" option title
 17 : "Layout type" description
 18 : "Ensou speed" option title & description
-19 : "Window mode" option title & description
-20 : "Stage failed" option title & description
-21 : "Random select affects boxes" option title & description
-22 : "Turn on asynchronous mode" option title & description
-23 : "AVI playback" option title & description
-24 : "BGA playback" option title & description
-25 : "Time until preview playback" option title & description
-26 : "Time until preview image" option title & description
-27 : "Show playing information on down right" option title & description
-28 : "Background picture transparency" option title & description
-29 : "BGM playback" option title & description
-30 : "Save score information" option title & description
-31 : "Use BS1770GAIN measured numbers" option title & description
-32 : "Set BS1770GAIN loudness meter number" option title & description
-33 : "Use .tja files' SONGVOL meter" option title & description
-34 : "Sound effect volume" option title & description
-35 : "Voice and combo voice volume" option title & description
-36 : "Volume in-game" option title & description
-37 : "Amount of 1 change in volume" option title & description
-38 : "Time before song start in-game" option title & description
-39 : "Auto save results" option title & description
-40 : "Discord-RPC toggle" option title & description
-41 : "Buffer inputs" option title & description
-42 : "Trace log output" option title & description
-43 : "Sound output" option title & description
-44 : "WASAPI buffer size" option title & description
-45 : "ASIO device" option title & description
-46 : "OS timer" option title & description
-47 : "Show character image" option title & description
-48 : "Show dancer image" option title & description
-49 : "Show mob image" option title & description
-50 : "Show runner image" option title & description
-51 : "Show footer image" option title & description
-52 : "Use image processed beforehand" option title & description
-53 : "Show petit-character image" option title & description
-54 : "Change skin" option title & description
-55 : "System key input configuration" option title & description
+19 : "Window mode" description
+20 : "Stage failed" description
+21 : "Random select affects boxes" description
+22 : "Turn on asynchronous mode" description
+23 : "AVI playback" description
+24 : "BGA playback" description
+25 : "Time until preview playback" description
+26 : "Time until preview image" description
+27 : "Show playing information on down right" description
+28 : "Background picture transparency" description
+29 : "BGM playback" description
+30 : "Save score information" description
+31 : "Use BS1770GAIN measured numbers" description
+32 : "Set BS1770GAIN loudness meter number" description
+33 : "Use .tja files' SONGVOL meter" description
+34 : "Sound effect volume" description
+35 : "Voice and combo voice volume" description
+36 : "Volume in-game" description
+37 : "Amount of 1 change in volume" description
+38 : "Time before song start in-game" description
+39 : "Auto save results" description
+40 : "Discord-RPC toggle" description
+41 : "Buffer inputs" description
+42 : "Trace log output" description
+43 : "Sound output" description
+44 : "WASAPI buffer size" description
+45 : "ASIO device" description
+46 : "OS timer" description
+47 : "Show character image" description
+48 : "Show dancer image" description
+49 : "Show mob image" description
+50 : "Show runner image" description
+51 : "Show footer image" description
+52 : "Use image processed beforehand" description
+53 : "Show petit-character image" description
+54 : "Change skin" description
+55 : "System key input configuration" description
 56 : "Toggle auto play" option title
 57 : "Toggle auto play" description
 58 : "Toggle auto play for 2P" option title
