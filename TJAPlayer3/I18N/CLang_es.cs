@@ -54,19 +54,39 @@ namespace TJAPlayer3
             [106] = "Ajustes",
             [107] = "Salir",
 
-            [150] = "Juega tus canciones\nfavoritas a tu propio gusto!",
-            [151] = "Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango Aprobado!",
-            [152] = "Juega canciones largas con un\nnumero de vidas limitado y llega\na la punta de la torre!",
-            [153] = "Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando!",
-            [154] = "Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
-            [155] = "Cambia la información de tu placa\n o el aspecto de tu personaje!",
-            [156] = "Cambia tu estilo de juego\n o ajustes generales!",
-            [157] = "Salir del juego.\nHasta la próxima!",
+            [150] = "¡Juega tus canciones\nfavoritas a tu propio gusto!",
+            [151] = "¡Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango Aprobado!",
+            [152] = "¡Juega canciones largas con un\nnumero de vidas limitado y llega\na la punta de la torre!",
+            [153] = "¡Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando!",
+            [154] = "¡Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
+            [155] = "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
+            [156] = "¡Cambia tu estilo de juego\n o ajustes generales!",
+            [157] = "Salir del juego.\n¡Hasta la próxima!",
+            
+            [200] = "Regresar",
+            [201] = "Canciones jugadas recientemente",
+            [202] = "¡Juega las canciones que jugaste recientemente!",
 
             [1000] = "Piso alcanzado",
             [1001] = "P",
             [1002] = "P",
             [1003] = "Puntuación",
+            
+            [1010] = "Indicador de almas",
+            [1011] = "Cantidad de Perfectas",
+            [1012] = "Cantidad de Buenas",
+            [1013] = "Cantidad de Malas",
+            [1014] = "Puntuación",
+            [1015] = "Cantidad de redobles",
+            [1016] = "Cantidad de golpes",
+            [1017] = "Combo",
+            [1018] = "Precisión",
+
+            [1030] = "Regresar",
+            [1031] = "Petit-Chara",
+            [1032] = "Personaje",
+            [1033] = "Título de Dan",
+            [1034] = "Título de la Nameplate",
         };
     }
 }
