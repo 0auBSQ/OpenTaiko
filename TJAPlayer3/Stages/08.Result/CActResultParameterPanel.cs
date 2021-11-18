@@ -167,6 +167,21 @@ namespace TJAPlayer3
 		}
 
 
+		public void tSkipResultAnimations()
+        {
+			ct全体進行.n現在の値 = (int)MountainAppearValue;
+			
+			for (int i = 0; i < 9; i++)
+            {
+				b音声再生[i] = true;
+			}
+
+			if (!ctゲージアニメ.b進行中)
+				ctゲージアニメ.t開始(0, GaugeFactor, 59, TJAPlayer3.Timer);
+			ctゲージアニメ.n現在の値 = (int)ctゲージアニメ.n終了値;
+			TJAPlayer3.Skin.soundGauge.t停止する();
+		}
+
 		// CActivity 実装
 
 		public override void On活性化()
@@ -221,6 +236,9 @@ namespace TJAPlayer3
 				ctDonchan_Failed = new CCounter();
 				ctDonchan_Failed_In = new CCounter();
 
+				GaugeFactor = (int)TJAPlayer3.stage結果.st演奏記録.Drums.fゲージ / 2;
+				MountainAppearValue = 2000 + (66 * GaugeFactor) + 8360 - 85;
+
 				this.PuchiChara.IdleAnimation();
 
 				base.OnManagedリソースの作成();
@@ -267,7 +285,7 @@ namespace TJAPlayer3
 			{
 				#region [ 通常時リザルト ]
 
-				int AnimeCount = 3000 + (int)ctゲージアニメ.n終了値 * 59;
+				int AnimeCount = 3000 + GaugeFactor * 59;
 				int ScoreApparitionTimeStamp = AnimeCount + 420 * 4 + 840;
 
 				TJAPlayer3.Tx.Result_Panel.t2D描画(TJAPlayer3.app.Device, 0, 0);
@@ -287,7 +305,11 @@ namespace TJAPlayer3
 					}
 
 					if (!ctゲージアニメ.b進行中)
-						ctゲージアニメ.t開始(0, (int)TJAPlayer3.stage結果.st演奏記録.Drums.fゲージ / 2, 59, TJAPlayer3.Timer);
+					{
+						ctゲージアニメ.t開始(0, GaugeFactor, 59, TJAPlayer3.Timer);
+						if (ct全体進行.n現在の値 >= MountainAppearValue)
+							ctゲージアニメ.n現在の値 = (int)ctゲージアニメ.n終了値;
+					}
 
 					TJAPlayer3.Tx.Result_Gauge.t2D描画(TJAPlayer3.app.Device, 57, 140, new RectangleF(0, 0, 9.74f * ctゲージアニメ.n現在の値, 36));
 
@@ -511,7 +533,8 @@ namespace TJAPlayer3
                 }
 
 				// Should be Score + 4000, to synchronize with Stage Kekka
-                float MountainAppearValue = 2000 + (ctゲージアニメ.n終了値 * 66) + 8360 - 85;
+
+                // MountainAppearValue = 2000 + (ctゲージアニメ.n終了値 * 66) + 8360 - 85;
 
 				if (ct全体進行.n現在の値 >= MountainAppearValue)
 				{
@@ -742,6 +765,9 @@ namespace TJAPlayer3
 		private CCounter ctShine_Plate;
 
 		public PuchiChara PuchiChara;
+
+		public float MountainAppearValue;
+		private int GaugeFactor;
 
 		public bool[] b音声再生 = { false, false, false, false, false, false, false, false, false, false, false, false, false };
 

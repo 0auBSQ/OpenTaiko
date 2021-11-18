@@ -266,3 +266,4 @@ Pキーを長押ししてください。
 > * [Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
 > * [FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
 > * [Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
+> * [touhourenren/TJAPlayer3-Develop-Rewrite](https://github.com/touhourenren)
