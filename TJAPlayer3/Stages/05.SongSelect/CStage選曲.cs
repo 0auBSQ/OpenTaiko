@@ -678,14 +678,16 @@ namespace TJAPlayer3
                                                     {
                                                         // Maybe auxilliary don select here too ?
 
-                                                        if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+                                                        if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower)
                                                         {
                                                             if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
                                                             {
                                                                 // Init tower variables 
-                                                                CFloorManagement.reinitialize(this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+                                                                if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+                                                                    CFloorManagement.reinitialize(this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+                                                                
+                                                                TJAPlayer3.Skin.sound曲決定音.t再生する();
 
-                                                                TJAPlayer3.Skin.sound決定音.t再生する();
                                                                 this.t曲を選択する();
                                                             }
                                                             else
@@ -725,6 +727,13 @@ namespace TJAPlayer3
                                                         this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                                         this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
                                                         this.act曲リスト.bBoxClose = true;
+                                                        this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                    }
+                                                    break;
+                                                case C曲リストノード.Eノード種別.RANDOM:
+                                                    {
+                                                        this.t曲をランダム選択する();
+
                                                         this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                                     }
                                                     break;
@@ -1366,6 +1375,7 @@ namespace TJAPlayer3
                 {
                     song.stackランダム演奏番号.Push(numArray[k]);
                 }
+
                 if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
                 {
                     StringBuilder builder = new StringBuilder(0x400);
@@ -1377,14 +1387,28 @@ namespace TJAPlayer3
                     Trace.TraceInformation(builder.ToString());
                 }
             }
+
+            
+
             // Third assignment
             this.r確定された曲 = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
             this.n確定された曲の難易度[0] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+            if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
+            {
+                this.n確定された曲の難易度[1] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+            }
+                
             this.r確定されたスコア = this.r確定された曲.arスコア[this.n確定された曲の難易度[0]];
             this.str確定された曲のジャンル = this.r確定された曲.strジャンル;
+
+            TJAPlayer3.Skin.sound曲決定音.t再生する();
+
             this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
             this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
             base.eフェーズID = CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト;
+
+            #region [Log]
+
             if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
             {
                 int[] numArray2 = song.stackランダム演奏番号.ToArray();
@@ -1403,16 +1427,21 @@ namespace TJAPlayer3
                 }
                 Trace.TraceInformation(builder2.ToString());
             }
-            // TJAPlayer3.Skin.bgm選曲画面.t停止する();
+
+            #endregion
+
             CSongSelectSongManager.stopSong();
+            
         }
         private void t曲を選択する()
         {
             // First assignation
             this.r確定された曲 = this.act曲リスト.r現在選択中の曲;
             this.r確定されたスコア = this.act曲リスト.r現在選択中のスコア;
+
             this.n確定された曲の難易度[0] = this.act曲リスト.n現在選択中の曲の現在の難易度レベル;
             this.str確定された曲のジャンル = this.r確定された曲.strジャンル;
+
             if ((this.r確定された曲 != null) && (this.r確定されたスコア != null))
             {
                 this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
@@ -1427,8 +1456,10 @@ namespace TJAPlayer3
             // Second assignation
             this.r確定された曲 = this.act曲リスト.r現在選択中の曲;
             this.r確定されたスコア = this.act曲リスト.r現在選択中のスコア;
+
             this.n確定された曲の難易度[player] = nCurrentLevel;
             this.str確定された曲のジャンル = this.r確定された曲.strジャンル;
+
             if ((this.r確定された曲 != null) && (this.r確定されたスコア != null))
             {
                 this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
@@ -1439,6 +1470,8 @@ namespace TJAPlayer3
             // TJAPlayer3.Skin.bgm選曲画面.t停止する();
             CSongSelectSongManager.stopSong();
         }
+
+        // Foreach randomly selectable songs
         private List<C曲リストノード> t指定された曲が存在する場所の曲を列挙する_子リスト含む(C曲リストノード song)
         {
             List<C曲リストノード> list = new List<C曲リストノード>();
@@ -1449,7 +1482,9 @@ namespace TJAPlayer3
                 {
                     if ((c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE) || (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE_MIDI))
                     {
-                        list.Add(c曲リストノード);
+                        // Don't add Dan/Tower charts for Random
+                        if (c曲リストノード.arスコア[(int)Difficulty.Tower] == null && c曲リストノード.arスコア[(int)Difficulty.Dan] == null)
+                            list.Add(c曲リストノード);
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
                     {
@@ -1461,6 +1496,7 @@ namespace TJAPlayer3
             this.t指定された曲の子リストの曲を列挙する_孫リスト含む(song, ref list);
             return list;
         }
+
         private void t指定された曲の子リストの曲を列挙する_孫リスト含む(C曲リストノード r親, ref List<C曲リストノード> list)
         {
             if ((r親 != null) && (r親.list子リスト != null))

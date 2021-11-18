@@ -1007,7 +1007,7 @@ namespace TJAPlayer3
 			{
 				if(c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
-					// Dojo node removed here
+					// Dojo node removed here, add an option soonish to put it off
 
 					if (c曲リストノード.strタイトル == "段位道場")
 					{
@@ -1064,6 +1064,56 @@ namespace TJAPlayer3
 		}
 		private void t曲リストへ後処理を適用する( List<C曲リストノード> ノードリスト )
 		{
+
+
+			#region [ リストに１つ以上の曲があるなら RANDOM BOX を入れる ]
+
+			//-----------------------------
+			if (ノードリスト.Count > 0)
+			{
+				C曲リストノード itemRandom = new C曲リストノード();
+				itemRandom.eノード種別 = C曲リストノード.Eノード種別.RANDOM;
+				itemRandom.strタイトル = CLangManager.LangInstance.GetString(203);
+				itemRandom.nスコア数 = (int)Difficulty.Total;
+				itemRandom.r親ノード = ノードリスト[0].r親ノード;
+
+				itemRandom.strBreadcrumbs = (itemRandom.r親ノード == null) ?
+					itemRandom.strタイトル : itemRandom.r親ノード.strBreadcrumbs + " > " + itemRandom.strタイトル;
+
+				itemRandom.arスコア[0] = new Cスコア();
+				/*
+				for (int i = 0; i < (int)Difficulty.Total; i++)
+				{
+					itemRandom.arスコア[0].譜面情報.タイトル = string.Format("< RANDOM SELECT Lv.{0} >", i + 1);
+				}
+				*/
+				ノードリスト.Add(itemRandom);
+
+				#region [ ログ出力 ]
+				//-----------------------------
+				if (TJAPlayer3.ConfigIni.bLog曲検索ログ出力)
+				{
+					StringBuilder sb = new StringBuilder(0x100);
+					sb.Append(string.Format("nID#{0:D3}", itemRandom.nID));
+					if (itemRandom.r親ノード != null)
+					{
+						sb.Append(string.Format("(in#{0:D3}):", itemRandom.r親ノード.nID));
+					}
+					else
+					{
+						sb.Append("(onRoot):");
+					}
+					sb.Append(" RANDOM");
+					Trace.TraceInformation(sb.ToString());
+				}
+				//-----------------------------
+				#endregion
+			}
+			//-----------------------------
+			#endregion
+
+
+
 			// すべてのノードについて…
 			foreach ( C曲リストノード c曲リストノード in ノードリスト )
 			{

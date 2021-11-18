@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FDK;
 
 namespace TJAPlayer3
 {
@@ -66,6 +67,7 @@ namespace TJAPlayer3
             [200] = "Retour",
             [201] = "Sons joués récemment",
             [202] = "Rejouez les sons joués précedement !",
+            [203] = "Surprend moi !",
 
             [1000] = "Étage atteint",
             [1001] = "",
