@@ -4,7 +4,7 @@
 - 70 and 71 that's the actual name.
 
 ```
-# Config menu text (000XX)
+# Config menu text (000XX & 100XX)
 
 0 : "System language" description
 1 : "System language" option title
@@ -20,16 +20,16 @@
 11 : "Song speed" description 
 16 : "Layout type" option title
 17 : "Layout type" description
-18 : "Ensou speed" option title & description
-19 : "Window mode" description
+18 : "Time stretch" description
+19 : "Full screen mode" description
 20 : "Stage failed" description
 21 : "Random select affects boxes" description
-22 : "Turn on asynchronous mode" description
+22 : "VSync mode" description
 23 : "AVI playback" description
 24 : "BGA playback" description
 25 : "Time until preview playback" description
 26 : "Time until preview image" description
-27 : "Show playing information on down right" description
+27 : "Show debug information on down right" description
 28 : "Background picture transparency" description
 29 : "BGM playback" description
 30 : "Save score information" description
@@ -38,14 +38,14 @@
 33 : "Use .tja files' SONGVOL meter" description
 34 : "Sound effect volume" description
 35 : "Voice and combo voice volume" description
-36 : "Volume in-game" description
-37 : "Amount of 1 change in volume" description
+36 : "Volume in-game (Song playback level)" description
+37 : "Keyboard level increment" description
 38 : "Time before song start in-game" description
 39 : "Auto save results" description
 40 : "Discord-RPC toggle" description
 41 : "Buffer inputs" description
 42 : "Trace log output" description
-43 : "Sound output" description
+43 : "Sound output type" description
 44 : "WASAPI buffer size" description
 45 : "ASIO device" description
 46 : "OS timer" description
@@ -54,7 +54,7 @@
 49 : "Show mob image" description
 50 : "Show runner image" description
 51 : "Show footer image" description
-52 : "Use image processed beforehand" description
+52 : "Use image processed beforehand (Fast render)" description
 53 : "Show petit-character image" description
 54 : "Change skin" description
 55 : "System key input configuration" description
@@ -86,7 +86,7 @@
 81 : "Default difficulty course" description
 82 : "Score calculation formula" option title
 83 : "Score calculation formula" description
-84 : "Shin-uchi toggle" option title & description
+84 : "Shin-uchi toggle" description
 85 : "Branch guide" option title
 86 : "Branch guide" description
 87 : "Branch animation toggle" option title
@@ -102,6 +102,60 @@
 97 : "Capture key" option title
 98 : "Capture key" description
 99 : "Left red drum key settings" option title
+10000 : "Left red drum key settings" description
+10001 : "Right red drum key settings" option title
+10002 : "Right red drum key settings" description
+10003 : "Left blue drum key settings" option title
+10004 : "Left blue drum key settings" description
+10005 : "Right blue drum key settings" option title
+10006 : "Right blue drum key settings" description
+10007 : "Left red drum key settings for 2P" option title
+10008 : "Left red drum key settings for 2P" description
+10009 : "Right red drum key settings for 2P" option title
+10010 : "Right red drum key settings for 2P" description
+10011 : "Left blue drum key settings for 2P" option title
+10012 : "Left blue drum key settings for 2P" description
+10013 : "Right blue drum key settings for 2P" option title
+10014 : "Right blue drum key settings for 2P" description
+10018 : "Time stretch" option title
+10019 : "Full screen mode" option title
+10020 : "Stage failed" option title
+10021 : "Random select affects boxes" option title
+10022 : "VSync mode" option title
+10023 : "AVI playback" option title
+10024 : "BGA playback" option title
+10025 : "Time until preview playback" option title
+10026 : "Time until preview image" option title
+10027 : "Show debug information on down right" option title
+10028 : "Background picture transparency" option title
+10029 : "BGM playback" option title
+10030 : "Save score information" option title
+10031 : "Use BS1770GAIN measured numbers" option title
+10032 : "Set BS1770GAIN loudness meter number" option title
+10033 : "Use .tja files' SONGVOL meter" option title
+10034 : "Sound effect volume" option title
+10035 : "Voice and combo voice volume" option title
+10036 : "Volume in-game (Song playback level)" option title
+10037 : "Keyboard level increment" option title
+10038 : "Time before song start in-game" option title
+10039 : "Auto save results" option title
+10040 : "Discord-RPC toggle" option title
+10041 : "Buffer inputs" option title
+10042 : "Trace log output" option title
+10043 : "Sound output type" option title
+10044 : "WASAPI buffer size" option title
+10045 : "ASIO device" option title
+10046 : "OS timer" option title
+10047 : "Show character image" option title
+10048 : "Show dancer image" option title
+10049 : "Show mob image" option title
+10050 : "Show runner image" option title
+10051 : "Show footer image" option title
+10052 : "Use image processed beforehand (Fast render)" option title
+10053 : "Show petit-character image" option title
+10054 : "Change skin" option title
+10055 : "System key input configuration" option title
+10084 : "Shin-uchi toggle" option title
 
 # Main Menu text (001XX)
 
@@ -155,22 +209,4 @@
 1032 : Character
 1033 : Dan title
 1034 : Plate title
-
-# Config menu text (10000 - 1001X)
-
-10000 : "Left red drum key settings" description
-10001 : "Right red drum key settings" option title
-10002 : "Right red drum key settings" description
-10003 : "Left blue drum key settings" option title
-10004 : "Left blue drum key settings" description
-10005 : "Right blue drum key settings" option title
-10006 : "Right blue drum key settings" description
-10007 : "Left red drum key settings for 2P" option title
-10008 : "Left red drum key settings for 2P" description
-10009 : "Right red drum key settings for 2P" option title
-10010 : "Right red drum key settings for 2P" description
-10011 : "Left blue drum key settings for 2P" option title
-10012 : "Left blue drum key settings for 2P" description
-10013 : "Right blue drum key settings for 2P" option title
-10014 : "Right blue drum key settings for 2P" description
 ```
