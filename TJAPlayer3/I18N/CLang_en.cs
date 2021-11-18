@@ -272,6 +272,7 @@ namespace TJAPlayer3
             [200] = "Return",
             [201] = "Recently played songs",
             [202] = "Play recently played songs !",
+            [203] = "Random song",
 
             [1000] = "Reached floor",
             [1001] = "F",
