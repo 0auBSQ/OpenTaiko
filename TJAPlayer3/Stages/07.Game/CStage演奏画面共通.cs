@@ -2891,7 +2891,19 @@ namespace TJAPlayer3
 				}
 				else if ( ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ) && ( keyboard.bキーが押された( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) ) && !this.actPauseMenu.bIsActivePopupMenu )
 				{	// escape (exit)
-                    this.t演奏中止();
+                    if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
+                    {
+                        TJAPlayer3.Skin.sound変更音.t再生する();
+
+                        CSound管理.rc演奏用タイマ.t一時停止();
+                        TJAPlayer3.Timer.t一時停止();
+                        TJAPlayer3.DTX.t全チップの再生一時停止();
+                        this.actAVI.tPauseControl();
+
+                        this.bPAUSE = true;
+                        this.actPauseMenu.tActivatePopupMenu(0);
+                    }
+                    // this.t演奏中止();
 				}
                 else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.D1 ) )
                 {
