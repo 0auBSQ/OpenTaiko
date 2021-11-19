@@ -191,6 +191,7 @@ namespace TJAPlayer3
             SongSelect_Frame_BackBox = TxC(SONGSELECT + @"Frame_BackBox.png");
             SongSelect_Frame_Random = TxC(SONGSELECT + @"Frame_Random.png");
             SongSelect_Bar_Genre_Back = TxC(SONGSELECT + @"Bar_Genre_Back.png");
+            SongSelect_Bar_Genre_Random = TxC(SONGSELECT + @"Bar_Genre_Random.png");
             SongSelect_Bar_Genre_RecentryPlaySong = TxC(SONGSELECT + @"Bar_Genre_RecentryPlaySong.png");
             SongSelect_Bar_Select = TxC(SONGSELECT + @"Bar_Select.png");
             SongSelect_Level_Number = TxC(SONGSELECT + @"Level_Number.png");
@@ -1026,6 +1027,7 @@ namespace TJAPlayer3
             SongSelect_Frame_Random,
             SongSelect_Bar_Center,
             SongSelect_Bar_Genre_Back,
+            SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
             SongSelect_Bar_Select,
