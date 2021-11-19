@@ -1035,7 +1035,7 @@ namespace TJAPlayer3
 						{
 							TJAPlayer3.Skin.sound決定音.t再生する();
 
-							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower
 								&& this.actParameterPanel.ct全体進行.n現在の値 < this.actParameterPanel.MountainAppearValue)
                             {
 								this.actParameterPanel.tSkipResultAnimations();

@@ -182,6 +182,7 @@
 200 : Ensou Back box (Tojiru)
 201 : Ensou recently played songs 
 202 : Ensou recently played songs description
+203 : Ensou randomly select song
 
 # Tower text (0100X)
 

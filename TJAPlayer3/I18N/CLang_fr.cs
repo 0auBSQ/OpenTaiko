@@ -67,6 +67,7 @@ namespace TJAPlayer3
             [200] = "Retour",
             [201] = "Sons joués récemment",
             [202] = "Rejouez les sons joués précedement !",
+            [203] = "Surprend moi !",
 
             [1000] = "Étage atteint",
             [1001] = "",
