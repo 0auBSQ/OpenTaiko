@@ -27,8 +27,8 @@ namespace TJAPlayer3
             [5] = "Recarga y actualiza la lista de canciones.",
             [6] = "Número de jugadores",
             [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\ncanciones regulares a dos jugadores dividiendo \nla pantalla a la mitad.",
-            [8] = "Riesgoso",
-            [9] = "Modo riesgoso:\nDéjalo por sobre 1, en caso de que quieras especificar\nel número de Malo/Fallos para considerar el intento\nfallido.\nDejar en 0 para deshabilitar el modo riesgoso.",
+            [8] = "Modo Arriesgado",
+            [9] = "Modo arriesgado:\nDéjalo por sobre 1, en caso de que quieras especificar\nel número de Malo/Fallos para considerar el intento\nfallido.\nDejar en 0 para deshabilitar el modo riesgoso.",
             [10] = "Velocidad de la canción",
             [11] = "Cambia la velocidad de la canción.\n" +
                 "Por ejemplo, puedes jugar a mitad de\n" +
@@ -62,7 +62,7 @@ namespace TJAPlayer3
             [26] = "Delay time(ms) to show preview image\n in SELECT MUSIC screen.\nYou can specify from 0ms to 10000ms.",
             [27] = "To show song informations on playing\n BGA area. (FPS, BPM, total time etc)\nYou can ON/OFF the indications\n by pushing [Del] while playing drums",
             [28] = "The degree for transparing playing\n screen and wallpaper.\n\n0=completely transparent,\n255=no transparency",
-            [29] = "Turn OFF if you don't want to play\n BGM.",
+            [29] = "Desactívalo si quieres desactivar la\nmusíca de fondo.",
             [30] = "To save high-scores/skills, turn it ON.\nTurn OFF in case your song data are\n in read-only media (CD-ROM etc).\nNote that the score files also contain\n 'BGM Adjust' parameter. So if you\n want to keep adjusting parameter,\n you need to set SaveScore=ON.",
             [31] = "To apply BS1770GAIN loudness\nmetadata when playing songs, turn it ON.\nTurn OFF if you prefer to use only\nthe main song level controls.\nIt needs BS1770GAIN.",
             [32] = "When applying BS1770GAIN loudness\nmetadata while playing songs, song levels\nwill be adjusted to target this loudness,\nmeasured in cB (centibels) relative to full scale.\n",
@@ -71,8 +71,8 @@ namespace TJAPlayer3
             [35] = $"The level adjustment for voices.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
             [36] = $"The level adjustment for songs during gameplay.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
             [37] = "The amount of sound level change for each press\nof a sound level control key.\nYou can specify from 1 to 20.",
-            [38] = "Blank time before music source to play. (ms)\n",
-            [39] = "AutoSaveResult:\nTurn ON to save your result screen\n image automatically when you get\n hiscore/hiskill.",
+            [38] = "Tiempo vacío antes de que la musíca empiece. (ms)\n",
+            [39] = "AAutoguardado de puntuacion:\nTurn ON to save your result screen\n image automatically when you get\n hiscore/hiskill.",
             [40] = "Share Playing .tja file infomation on Discord.",
             [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
             [42] = "Turn ON to put debug log to\n DTXManiaLog.txt\nTo take it effective, you need to\n re-open DTXMania.",
@@ -113,26 +113,24 @@ namespace TJAPlayer3
                 "\n" +
                 "This settings is avilable only when\n" +
                 "you uses WASAPI/ASIO.\n",
-            [47] = "Show Character Images.\n",
-            [48] = "Show Dancer Images.\n",
-            [49] = "Show Mob Images.\n",
-            [50] = "Show Runner Images.\n",
-            [51] = "Show Footer Image.\n",
-            [52] = "Use pre-textures render.\n",
-            [53] = "Show PuchiChara Images.\n",
+            [47] = "Mostrar imagenes del Personaje.\n",
+            [48] = "Mostrar imagenes de los Dancer.\n",
+            [49] = "Mostrar imagenes de Mob.\n",
+            [50] = "Mostrar imagenes de los Runner.\n",
+            [51] = "Mostrar imagen del Footer.\n",
+            [52] = "Usar texturas pre-renderizadas.\n",
+            [53] = "Mostrar PuchiCharas.\n",
             [54] = "Skin:\n" +
-                "Change skin.",
-            [55] = "Settings for the system key/pad inputs.",
-            [56] = "AUTO PLAY",
-            [57] = "To play P1 Taiko\n" +
-                " automatically.",
-            [58] = "AUTO PLAY 2P",
-            [59] = "To play P2 Taiko\n" +
-                " automatically.",
-            [60] = "AUTO Roll",
-            [61] = "If OFF the drumrolls\n" +
-                    "aren't played by auto.",
-            [62] = "ScrollSpeed",
+                "Cambiar Skin.",
+            [55] = "Ajustes de los controles y entrada.",
+            [56] = "JUEGO AUTO",
+            [57] = "Juego automatico del P1.\n" +
+            [58] = "JUEGO AUTO 2P",
+            [59] = "Juego automatico del P2\n" +
+            [60] = "REDOBLE AUTO",
+            [61] = "Si se desactiva, los redobles no son tomados\n" +
+                    "en cuenta al usar Juego Automatico.",
+            [62] = "Velocidad de desplazamiento",
             [63] = "To change the scroll speed for the\n" +
                 "drums lanes.\n" +
                 "You can set it from x0.1 to x200.0.\n" +
@@ -189,11 +187,11 @@ namespace TJAPlayer3
             [91] = "BigNotesJudge",
             [92] = "Require to hit both side for big notes.",
             [93] = "JudgeCountDisp",
-            [94] = "Show the JudgeCount\n" +
-                "(SinglePlay Only)",
-            [95] = "KEY CONFIG",
-            [96] = "Settings for the drums key/pad inputs.",
-            [97] = "Capture",
+            [94] = "Muestra el conteo de notas\n" +
+                "(Solo en modo de un jugador)",
+            [95] = "AJUSTE DE TECLAS",
+            [96] = "Ajustes de los controles para los tambores.",
+            [97] = "Captura",
             [98] = "Capture key assign:\nTo assign key for screen capture.\n (You can use keyboard only. You can't\nuse pads to capture screenshot.",
             [99] = "LeftRed",
             [10000] = "Drums key assign:\nTo assign key/pads for LeftRed\n button.",
@@ -211,8 +209,8 @@ namespace TJAPlayer3
             [10012] = "Drums key assign:\nTo assign key/pads for LeftBlue2P\n button.",
             [10013] = "RightBlue2P",
             [10014] = "Drums key assign:\nTo assign key/pads for RightBlue2P\n button.",
-            [10018] = "TimeStretch",
-            [10019] = "Fullscreen",
+            [10018] = "Time Stretch",
+            [10019] = "Pantalla Completa",
             [10020] = "StageFailed",
             [10021] = "RandSubBox",
             [10022] = "VSyncWait",
