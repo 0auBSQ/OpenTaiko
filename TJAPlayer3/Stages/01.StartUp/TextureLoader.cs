@@ -1,6 +1,7 @@
 using FDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -22,6 +23,7 @@ namespace TJAPlayer3
         const string DANRESULT = @"7_DanResult\";
         const string TOWERRESULT = @"8_TowerResult\";
         const string HEYA = @"10_Heya\";
+        const string CHARACTERS = @"11_Characters\";
 
         // InGame
         const string CHARA = @"1_Chara\";
@@ -950,7 +952,319 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [11_Characters]
+
+            #region [Character count initialisations]
+
+            TJAPlayer3.Skin.Characters_Ptn = System.IO.Directory.GetDirectories(CSkin.Path(BASE + CHARACTERS)).Length;
+
+            Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Normal_Cleared = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Normal_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_GoGoTime = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_GoGoTime_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_10Combo = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_10Combo_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_GoGoStart = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_GoGoStart_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Become_Cleared = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Become_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Balloon_Breaking = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Balloon_Broke = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Balloon_Miss = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Title_Donchan_Entry = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Title_Donchan_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Result_Donchan_Clear = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Result_Donchan_Failed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Result_Donchan_Failed_In = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Result_Donchan_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+
+            TJAPlayer3.Skin.Characters_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_GoGoTime_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_10Combo_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_GoGoStart_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Become_Cleared_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Become_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Title_Donchan_Entry_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Title_Donchan_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Result_Donchan_Clear_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Result_Donchan_Failed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Result_Donchan_Failed_In_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Result_Donchan_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+
+            TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Balloon_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Balloon_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_Normal = new string[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Motion_Clear = new string[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Motion_GoGo = new string[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_Normal = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_Clear = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_GoGo = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_Timer = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_Delay = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Balloon_FadeOut = new int[TJAPlayer3.Skin.Characters_Ptn];
+
+            #endregion
+
+            for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
+            {
+                #region [Character individual values count initialisation]
+
+                TJAPlayer3.Skin.Characters_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Normal\"));
+                TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Clear\"));
+                TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Clear_Max\"));
+                TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\GoGo\"));
+                TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\GoGo_Max\"));
+                TJAPlayer3.Skin.Characters_10Combo_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\10combo\"));
+                TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\10combo_Max\"));
+                TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\GoGoStart\"));
+                TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\GoGoStart_Max\"));
+                TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Clearin\"));
+                TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Soulin\"));
+                TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Balloon_Breaking\"));
+                TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Balloon_Broke\"));
+                TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Balloon_Miss\"));
+                TJAPlayer3.Skin.Characters_Title_Donchan_Entry_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Title_Donchan_Entry\"));
+                TJAPlayer3.Skin.Characters_Title_Donchan_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Title_Donchan_Normal\"));
+                TJAPlayer3.Skin.Characters_Result_Donchan_Clear_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Result_Donchan_Clear\"));
+                TJAPlayer3.Skin.Characters_Result_Donchan_Failed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Result_Donchan_Failed\"));
+                TJAPlayer3.Skin.Characters_Result_Donchan_Failed_In_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Result_Donchan_Failed_In\"));
+                TJAPlayer3.Skin.Characters_Result_Donchan_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Result_Donchan_Normal\"));
+
+                Characters_Normal[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Ptn[i]];
+                Characters_Normal_Cleared[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]];
+                Characters_Normal_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]];
+                Characters_GoGoTime[i] = new CTexture[TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]];
+                Characters_GoGoTime_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i]];
+                Characters_10Combo[i] = new CTexture[TJAPlayer3.Skin.Characters_10Combo_Ptn[i]];
+                Characters_10Combo_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i]];
+                Characters_GoGoStart[i] = new CTexture[TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i]];
+                Characters_GoGoStart_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i]];
+                Characters_Become_Cleared[i] = new CTexture[TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i]];
+                Characters_Become_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i]];
+                Characters_Balloon_Breaking[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i]];
+                Characters_Balloon_Broke[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i]];
+                Characters_Balloon_Miss[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]];
+                Characters_Title_Donchan_Entry[i] = new CTexture[TJAPlayer3.Skin.Characters_Title_Donchan_Entry_Ptn[i]];
+                Characters_Title_Donchan_Normal[i] = new CTexture[TJAPlayer3.Skin.Characters_Title_Donchan_Normal_Ptn[i]];
+                Characters_Result_Donchan_Clear[i] = new CTexture[TJAPlayer3.Skin.Characters_Result_Donchan_Clear_Ptn[i]];
+                Characters_Result_Donchan_Failed[i] = new CTexture[TJAPlayer3.Skin.Characters_Result_Donchan_Failed_Ptn[i]];
+                Characters_Result_Donchan_Failed_In[i] = new CTexture[TJAPlayer3.Skin.Characters_Result_Donchan_Failed_In_Ptn[i]];
+                Characters_Result_Donchan_Normal[i] = new CTexture[TJAPlayer3.Skin.Characters_Result_Donchan_Normal_Ptn[i]];
+
+                #endregion
+
+                #region [Characters asset loading]
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Normal_Ptn[i]; j++)
+                    Characters_Result_Donchan_Normal[i][j] = TxC(CHARACTERS + i.ToString() + @"\Result_Donchan_Normal\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Failed_In_Ptn[i]; j++)
+                    Characters_Result_Donchan_Failed_In[i][j] = TxC(CHARACTERS + i.ToString() + @"\Result_Donchan_Failed_In\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Failed_Ptn[i]; j++)
+                    Characters_Result_Donchan_Failed[i][j] = TxC(CHARACTERS + i.ToString() + @"\Result_Donchan_Failed\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Clear_Ptn[i]; j++)
+                    Characters_Result_Donchan_Clear[i][j] = TxC(CHARACTERS + i.ToString() + @"\Result_Donchan_Clear\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Donchan_Normal_Ptn[i]; j++)
+                    Characters_Title_Donchan_Normal[i][j] = TxC(CHARACTERS + i.ToString() + @"\Title_Donchan_Normal\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Donchan_Entry_Ptn[i]; j++)
+                    Characters_Title_Donchan_Entry[i][j] = TxC(CHARACTERS + i.ToString() + @"\Title_Donchan_Entry\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Ptn[i]; j++)
+                    Characters_Normal[i][j] = TxC(CHARACTERS + i.ToString() + @"\Normal\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]; j++)
+                    Characters_Normal_Cleared[i][j] = TxC(CHARACTERS + i.ToString() + @"\Clear\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]; j++)
+                    Characters_Normal_Maxed[i][j] = TxC(CHARACTERS + i.ToString() + @"\Clear_Max\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]; j++)
+                    Characters_GoGoTime[i][j] = TxC(CHARACTERS + i.ToString() + @"\GoGo\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i]; j++)
+                    Characters_GoGoTime_Maxed[i][j] = TxC(CHARACTERS + i.ToString() + @"\GoGo_Max\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i]; j++)
+                    Characters_GoGoStart[i][j] = TxC(CHARACTERS + i.ToString() + @"\GoGoStart\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i]; j++)
+                    Characters_GoGoStart_Maxed[i][j] = TxC(CHARACTERS + i.ToString() + @"\GoGoStart_Max\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Ptn[i]; j++)
+                    Characters_10Combo[i][j] = TxC(CHARACTERS + i.ToString() + @"\10combo\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i]; j++)
+                    Characters_10Combo_Maxed[i][j] = TxC(CHARACTERS + i.ToString() + @"\10combo_Max\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i]; j++)
+                    Characters_Become_Cleared[i][j] = TxC(CHARACTERS + i.ToString() + @"\Clearin\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i]; j++)
+                    Characters_Become_Maxed[i][j] = TxC(CHARACTERS + i.ToString() + @"\Soulin\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i]; j++)
+                    Characters_Balloon_Breaking[i][j] = TxC(CHARACTERS + i.ToString() + @"\Balloon_Breaking\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i]; j++)
+                    Characters_Balloon_Broke[i][j] = TxC(CHARACTERS + i.ToString() + @"\Balloon_Broke\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]; j++)
+                    Characters_Balloon_Miss[i][j] = TxC(CHARACTERS + i.ToString() + @"\Balloon_Miss\" + j.ToString() + @".png");
+
+                #endregion
+
+                #region [Parse individual character parameters]
+
+                #region [Default values]
+
+                TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
+                TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
+                TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
+                TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
+                TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
+                TJAPlayer3.Skin.Characters_Motion_Clear[i] = "0";
+                TJAPlayer3.Skin.Characters_Motion_GoGo[i] = "0";
+                TJAPlayer3.Skin.Characters_Beat_Normal[i] = 1;
+                TJAPlayer3.Skin.Characters_Beat_Clear[i] = 2;
+                TJAPlayer3.Skin.Characters_Beat_GoGo[i] = 2;
+                TJAPlayer3.Skin.Characters_Balloon_Timer[i] = 28;
+                TJAPlayer3.Skin.Characters_Balloon_Delay[i] = 500;
+                TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = 84;
+
+                #endregion
+
+                var _str = "";
+                TJAPlayer3.Skin.LoadSkinConfigFromFile(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\CharaConfig.txt"), ref _str);
+
+                string[] delimiter = { "\n" };
+                string[] strSingleLine = _str.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string s in strSingleLine)
+                {
+                    string str = s.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
+                    if ((str.Length != 0) && (str[0] != ';'))
+                    {
+                        try
+                        {
+                            string strCommand;
+                            string strParam;
+                            string[] strArray = str.Split(new char[] { '=' });
+
+                            if (strArray.Length == 2)
+                            {
+                                strCommand = strArray[0].Trim();
+                                strParam = strArray[1].Trim();
+
+                                if (strCommand == "Game_Chara_X")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_X[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Y")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_X")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Balloon_X[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_Y")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_Timer")
+                                {
+                                    if (int.Parse(strParam) > 0)
+                                        TJAPlayer3.Skin.Characters_Balloon_Timer[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_Delay")
+                                {
+                                    if (int.Parse(strParam) > 0)
+                                        TJAPlayer3.Skin.Characters_Balloon_Delay[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_FadeOut")
+                                {
+                                    if (int.Parse(strParam) > 0)
+                                        TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = int.Parse(strParam);
+                                }
+                                // パターン数の設定はTextureLoader.csで反映されます。
+                                else if (strCommand == "Game_Chara_Motion_Normal")
+                                {
+                                    TJAPlayer3.Skin.Characters_Motion_Normal[i] = strParam;
+                                }
+                                else if (strCommand == "Game_Chara_Motion_Clear")
+                                {
+                                    TJAPlayer3.Skin.Characters_Motion_Clear[i] = strParam;
+                                }
+                                else if (strCommand == "Game_Chara_Motion_GoGo")
+                                {
+                                    TJAPlayer3.Skin.Characters_Motion_GoGo[i] = strParam;
+                                }
+                                else if (strCommand == "Game_Chara_Beat_Normal")
+                                {
+                                    TJAPlayer3.Skin.Characters_Beat_Normal[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Game_Chara_Beat_Clear")
+                                {
+                                    TJAPlayer3.Skin.Characters_Beat_Clear[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Game_Chara_Beat_GoGo")
+                                {
+                                    TJAPlayer3.Skin.Characters_Beat_GoGo[i] = int.Parse(strParam);
+                                }
+
+                            }
+                            continue;
+                        }
+                        catch (Exception exception)
+                        {
+                            Trace.TraceError(exception.ToString());
+                            Trace.TraceError("例外が発生しましたが処理を継続します。 (6a32cc37-1527-412e-968a-512c1f0135cd)");
+                            continue;
+                        }
+                    }
+                }
+
+                #endregion
+            }
+
+            #endregion
+
         }
+
+
+
+
 
         public void DisposeTexture()
         {
@@ -994,8 +1308,12 @@ namespace TJAPlayer3
         public CTexture[] Banapas_Load_Clear = new CTexture[2];
         public CTexture[] Banapas_Load_Failure = new CTexture[2];
         public CTexture[] Entry_Player = new CTexture[3];
+        
+        // To remove soon
         public CTexture[] Donchan_Entry = new CTexture[44];
         public CTexture[] Entry_Donchan_Normal = new CTexture[13];
+
+
         public CTexture[] ModeSelect_Bar = new CTexture[9];
         public CTexture[] ModeSelect_Bar_Chara = new CTexture[8];
 
@@ -1361,8 +1679,35 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [11_Characters]
+
+        public CTexture[][] Characters_Normal,
+            Characters_Normal_Cleared,
+            Characters_Normal_Maxed,
+            Characters_GoGoTime,
+            Characters_GoGoTime_Maxed,
+            Characters_10Combo,
+            Characters_10Combo_Maxed,
+            Characters_GoGoStart,
+            Characters_GoGoStart_Maxed,
+            Characters_Become_Cleared,
+            Characters_Become_Maxed,
+            Characters_Balloon_Breaking,
+            Characters_Balloon_Broke,
+            Characters_Balloon_Miss,
+            Characters_Title_Donchan_Entry,
+            Characters_Title_Donchan_Normal,
+            Characters_Result_Donchan_Clear,
+            Characters_Result_Donchan_Failed,
+            Characters_Result_Donchan_Failed_In,
+            Characters_Result_Donchan_Normal;
+
+        #endregion
+
+
         #region [ 解放用 ]
         public List<CTexture> listTexture = new List<CTexture>();
         #endregion
+
     }
 }
