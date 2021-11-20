@@ -466,8 +466,7 @@ namespace TJAPlayer3
 
                 //this.t進行描画_DANGER();
                 //this.t進行描画_判定ライン();
-                if (!TJAPlayer3.ConfigIni.bNoInfo && TJAPlayer3.ConfigIni.bTokkunMode)
-                    this.t進行描画_ネームプレート();
+
                 if( TJAPlayer3.ConfigIni.ShowChara )
                     this.actChara.On進行描画();
 
@@ -2213,32 +2212,7 @@ namespace TJAPlayer3
                 }
 
             }
-            //if( CDTXMania.Input管理.Keyboard.bキーが押された( (int)SlimDX.DirectInput.Key.F8 ) )
-            //{
-            //this.actChipFireD.Start紙吹雪();
-            //this.actDancer.t入退場( 0, 0, 0.4 );
-            //}
 
-            if (!this.bStartFlag)
-            {
-                //CSound管理.rc演奏用タイマ.n現在時刻ms = 80000;
-            }
-            this.bStartFlag = true;
-        }
-        private bool bStartFlag;
-        private void t進行描画_ネームプレート()
-        {
-            //if( this.txNamePlate != null )
-            //this.txNamePlate.t2D描画( CDTXMania.app.Device, 0, 100 );
-
-            //if(CDTXMania.Tx.Taiko_NamePlate[0] != null) CDTXMania.Tx.Taiko_NamePlate[0].t2D描画(CDTXMania.app.Device, 0, 100);
-            //if(CDTXMania.stage演奏ドラム画面.bDoublePlay && CDTXMania.Tx.Taiko_NamePlate[1] != null) CDTXMania.Tx.Taiko_NamePlate[0].t2D描画(CDTXMania.app.Device, 0, 600);
-
-            //if ( CDTXMania.stage演奏ドラム画面.bDoublePlay )
-            //{
-            //    if( this.txNamePlate2P != null )
-            //        this.txNamePlate2P.t2D描画( CDTXMania.app.Device, 314, 636 );
-            //}
         }
 
         private void t進行描画_リアルタイム判定数表示()

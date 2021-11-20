@@ -35,9 +35,9 @@ namespace TJAPlayer3
             {
                 if (CFloorManagement.CurrentNumberOfLives > 0)
                 {
-                    if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nMiss == 0)
+                    if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0)
                     {
-                        if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nGood == 0)
+                        if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
                             this.Mode[0] = EndMode.StageDondaFullCombo;
                         else
                             this.Mode[0] = EndMode.StageFullCombo;
@@ -56,9 +56,9 @@ namespace TJAPlayer3
                     // 段位認定モード、クリア成功
                     // this.Mode[0] = EndMode.StageCleared;
 
-                    if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nMiss == 0)
+                    if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0)
                     {
-                        if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[0].nGood == 0)
+                        if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
                             this.Mode[0] = EndMode.StageDondaFullCombo;
                         else
                             this.Mode[0] = EndMode.StageFullCombo;
@@ -83,10 +83,10 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
                     {
-                        if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nMiss == 0)
+                        if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0)
                         //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
                         {
-                            if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGood == 0)
+                            if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
                                 //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
                             {
                                 this.Mode[i] = EndMode.StageDondaFullCombo;

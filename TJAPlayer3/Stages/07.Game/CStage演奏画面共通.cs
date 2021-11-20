@@ -89,65 +89,6 @@ namespace TJAPlayer3
 			}
 		}
 		#endregion
-		#region [ t演奏結果を格納する_太鼓() ]
-		public void t演奏結果を格納する_太鼓( out CScoreIni.C演奏記録 Drums )
-		{
-			Drums = new CScoreIni.C演奏記録();
-
-			//if ( CDTXMania.DTX.bチップがある.Drums )
-			{
-				Drums.nスコア = (long) this.actScore.Get( E楽器パート.DRUMS, 0 );
-				Drums.dbゲーム型スキル値 = CScoreIni.tゲーム型スキルを計算して返す( TJAPlayer3.DTX.LEVEL.Drums, TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.actCombo.n現在のコンボ数.P2, E楽器パート.DRUMS, bIsAutoPlay );
-				Drums.db演奏型スキル値 = CScoreIni.t演奏型スキルを計算して返す( TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.nヒット数_Auto含まない.Drums.Great, this.nヒット数_Auto含まない.Drums.Good, this.nヒット数_Auto含まない.Drums.Poor, this.nヒット数_Auto含まない.Drums.Miss, E楽器パート.DRUMS, bIsAutoPlay );
-				Drums.nPerfect数 = this.nヒット数_Auto含まない.Taiko.Perfect;
-				Drums.nGreat数 = this.nヒット数_Auto含まない.Taiko.Great;
-				Drums.nGood数 = this.nヒット数_Auto含まない.Taiko.Good;
-				Drums.nPoor数 = this.nヒット数_Auto含まない.Taiko.Poor;
-				Drums.nMiss数 = this.nヒット数_Auto含まない.Taiko.Miss;
-				Drums.nPerfect数_Auto含まない = this.nヒット数_Auto含まない.Taiko.Perfect;
-				Drums.nGreat数_Auto含まない = this.nヒット数_Auto含まない.Taiko.Great;
-				Drums.nGood数_Auto含まない = this.nヒット数_Auto含まない.Taiko.Good;
-				Drums.nPoor数_Auto含まない = this.nヒット数_Auto含まない.Taiko.Poor;
-				Drums.nMiss数_Auto含まない = this.nヒット数_Auto含まない.Taiko.Miss;
-                Drums.n連打数 = this.n合計連打数[ 0 ];
-				Drums.n最大コンボ数 = this.actCombo.n現在のコンボ数.P2;
-				Drums.n全チップ数 = TJAPlayer3.DTX.nノーツ数[ 3 ];
-				for ( int i = 0; i < (int) Eレーン.MAX;  i++ )
-				{
-					Drums.bAutoPlay[ i ] = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
-				}
-				Drums.bTight = TJAPlayer3.ConfigIni.bTight;
-				for ( int i = 0; i < 3; i++ )
-				{
-					Drums.bSudden[ i ] = TJAPlayer3.ConfigIni.bSudden[ i ];
-					Drums.bHidden[ i ] = TJAPlayer3.ConfigIni.bHidden[ i ];
-					Drums.eInvisible[ i ] = TJAPlayer3.ConfigIni.eInvisible[ i ];
-					Drums.bReverse[ i ] = TJAPlayer3.ConfigIni.bReverse[ i ];
-					Drums.eRandom[ i ] = TJAPlayer3.ConfigIni.eRandom[ i ];
-					Drums.bLight[ i ] = TJAPlayer3.ConfigIni.bLight[ i ];
-					Drums.bLeft[ i ] = TJAPlayer3.ConfigIni.bLeft[ i ];
-					Drums.f譜面スクロール速度[ i ] = ( (float) ( TJAPlayer3.ConfigIni.n譜面スクロール速度[ i ] + 1 ) ) * 0.5f;
-				}
-				Drums.eDark = TJAPlayer3.ConfigIni.eDark;
-				Drums.n演奏速度分子 = TJAPlayer3.ConfigIni.n演奏速度;
-				Drums.n演奏速度分母 = 20;
-				Drums.bSTAGEFAILED有効 = TJAPlayer3.ConfigIni.bSTAGEFAILED有効;
-				Drums.eダメージレベル = TJAPlayer3.ConfigIni.eダメージレベル;
-				Drums.b演奏にキーボードを使用した = this.b演奏にキーボードを使った;
-				Drums.b演奏にMIDI入力を使用した = this.b演奏にMIDI入力を使った;
-				Drums.b演奏にジョイパッドを使用した = this.b演奏にジョイパッドを使った;
-				Drums.b演奏にマウスを使用した = this.b演奏にマウスを使った;
-				Drums.nPerfectになる範囲ms = TJAPlayer3.nPerfect範囲ms;
-				Drums.nGreatになる範囲ms = TJAPlayer3.nGreat範囲ms;
-				Drums.nGoodになる範囲ms = TJAPlayer3.nGood範囲ms;
-				Drums.nPoorになる範囲ms = TJAPlayer3.nPoor範囲ms;
-				Drums.strDTXManiaのバージョン = TJAPlayer3.VERSION;
-				Drums.最終更新日時 = DateTime.Now.ToString();
-				Drums.Hash = CScoreIni.t演奏セクションのMD5を求めて返す( Drums );
-                Drums.fゲージ = (float)this.actGauge.db現在のゲージ値[ 0 ];
-			}
-		}
-        #endregion
 
         // CStage 実装
         
@@ -315,15 +256,19 @@ namespace TJAPlayer3
             this.bUseBranch = new bool[]{ false, false, false, false };
             this.n現在のコース = new CDTX.ECourse[4];
             this.n次回のコース = new CDTX.ECourse[4];
+
             for (int i = 0; i < 2; i++)
             {
                 this.b強制的に分岐させた[i] = false;
+
+                this.CChartScore[i] = new CBRANCHSCORE();
 
                 TJAPlayer3.stage演奏ドラム画面.actMtaiko.After[i] = CDTX.ECourse.eNormal;
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.stBranch[i].nAfter = CDTX.ECourse.eNormal;
                 TJAPlayer3.stage演奏ドラム画面.actMtaiko.Before[i] = CDTX.ECourse.eNormal;
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.stBranch[i].nBefore = CDTX.ECourse.eNormal;
             }
+
             for (int i = 0; i < CBranchScore.Length; i++)
             {
                 this.CBranchScore[i] = new CBRANCHSCORE();
@@ -331,6 +276,8 @@ namespace TJAPlayer3
                 //大音符分岐時の情報をまとめるため
                 this.CBranchScore[i].cBigNotes = new CBRANCHSCORE();
             }
+
+
             this.nレーン用表示コース = new CDTX.ECourse[4];
             this.b連打中 = new bool[] { false, false, false, false };
             this.n現在の連打数 = new int[]{ 0, 0, 0, 0 };
@@ -776,6 +723,8 @@ namespace TJAPlayer3
 		protected E判定表示優先度 e判定表示優先度;
 
         public CBRANCHSCORE[] CBranchScore = new CBRANCHSCORE[6];
+        public CBRANCHSCORE[] CChartScore = new CBRANCHSCORE[2];
+
         public bool[] bIsGOGOTIME = new bool[4];
         public bool[] bUseBranch = new bool[ 4 ];
         public CDTX.ECourse[] n現在のコース = new CDTX.ECourse[4]; //0:普通譜面 1:玄人譜面 2:達人譜面
@@ -1226,7 +1175,10 @@ namespace TJAPlayer3
                     this.n連打[actDan.NowShowingNumber]++;
 
                 this.n現在の連打数[ nPlayer ]++;
+                
                 this.CBranchScore[ nPlayer ].nRoll++;
+                this.CChartScore[nPlayer].nRoll++;
+
                 this.n合計連打数[ nPlayer ]++;
                 if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
@@ -1685,6 +1637,8 @@ namespace TJAPlayer3
                             case E判定.Perfect:
                                 {
                                     this.CBranchScore[nPlayer].nGreat++;
+                                    this.CChartScore[nPlayer].nGreat++;
+
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Perfect++;
                                     this.actCombo.n現在のコンボ数[nPlayer]++;
 
@@ -1705,13 +1659,14 @@ namespace TJAPlayer3
                             case E判定.Good:
                                 {
                                     this.CBranchScore[nPlayer].nGood++;
+                                    this.CChartScore[nPlayer].nGood++;
+
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Great++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ]++;
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                         this.n可[actDan.NowShowingNumber]++;
-                                    //this.actCombo.ctコンボ加算 = new CCounter( 0, 8, 10, CDTXMania.Timer );
-                                    //this.actCombo.ctコンボ加算.t進行();
+                                    
                                     if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
                                     {
                                         this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 1;
@@ -1736,6 +1691,8 @@ namespace TJAPlayer3
                                         CFloorManagement.damage();
 
                                     this.CBranchScore[nPlayer].nMiss++;
+                                    this.CChartScore[nPlayer].nMiss++;
+
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Miss++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                     this.actComboVoice.tReset(nPlayer);
@@ -1762,7 +1719,10 @@ namespace TJAPlayer3
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n良[actDan.NowShowingNumber]++;
+
                                         this.CBranchScore[nPlayer].nGreat++;
+                                        this.CChartScore[nPlayer].nGreat++;
+
                                         if ( nPlayer == 0 ) this.nヒット数_Auto含む.Drums.Perfect++;
                                         this.actCombo.n現在のコンボ数[ nPlayer ]++;
                                         //this.actCombo.ctコンボ加算.t進行();
@@ -1788,6 +1748,8 @@ namespace TJAPlayer3
                                             CFloorManagement.damage();
 
                                         this.CBranchScore[nPlayer].nMiss++;
+                                        this.CChartScore[nPlayer].nMiss++;
+
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                         this.actComboVoice.tReset(nPlayer);
                                         //for (int i = 0; i < 2; i++)
@@ -2071,6 +2033,7 @@ namespace TJAPlayer3
 
                 //キーを押したときにスコア情報 + nAddScoreを置き換える様に
                 this.CBranchScore[nPlayer].nScore = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+                this.CChartScore[nPlayer].nScore = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
             }
 
 
@@ -4143,6 +4106,8 @@ namespace TJAPlayer3
 
         public void tBranchJudge(CDTX.CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer)
         {
+            // Branch check score here 
+
             if (this.b強制的に分岐させた[nPlayer]) return;
 
             var e種類 = pChip.e分岐の種類;
@@ -4157,12 +4122,12 @@ namespace TJAPlayer3
             {
                 if ((n良 + n可 + n不可) != 0)
                 {
-                    dbRate = ((double)n良 / (double)(n良 + n可 + n不可)) * 100.0;
+                    dbRate = (((double)n良 + (double)n可 * 0.5)  / (double)(n良 + n可 + n不可)) * 100.0;
                 }
             }
             else if (e種類 == CDTX.E分岐種類.eスコア分岐)
             {
-                dbRate = nスコア;
+                dbRate = nスコア; 
             }
             else if (e種類 == CDTX.E分岐種類.e連打分岐)
             {
