@@ -47,7 +47,7 @@ namespace TJAPlayer3
                 "4 : Medio circulo hacia la izquierda",
             [18] = "Como cambiar la velocidad del juego:\n" +
                 "Encender para usar Time Stretch\n" +
-                "para cambiar la velocidad del juego." +
+                "y así cambiar la velocidad del juego." +
                 "\n" +
                 "Con Time Stretch activado, el juego usa\n" +
                 "más capacidad del procesador. Y algo de \n" +
