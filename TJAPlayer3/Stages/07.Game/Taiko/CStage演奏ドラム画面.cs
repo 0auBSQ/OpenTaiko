@@ -586,9 +586,10 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
                                 {
+                                    int Character = this.actChara.iCurrentCharacter[i];
                                     double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM))));
                                     this.actChara.アクションタイマーリセット(i);
-                                    this.actChara.ctキャラクターアクション_10コンボMAX[i] = new CCounter(0, TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max - 1, (dbUnit / TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max) * 2, CSound管理.rc演奏用タイマ);
+                                    this.actChara.ctキャラクターアクション_10コンボMAX[i] = new CCounter(0, TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] - 1, (dbUnit / TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character]) * 2, CSound管理.rc演奏用タイマ);
                                     this.actChara.ctキャラクターアクション_10コンボMAX[i].t進行db();
                                     this.actChara.ctキャラクターアクション_10コンボMAX[i].n現在の値 = 0;
                                     this.actChara.bマイどんアクション中[i] = true;
