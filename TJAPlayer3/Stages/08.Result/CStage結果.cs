@@ -440,10 +440,10 @@ namespace TJAPlayer3
 						if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
                         {
 							clearModifier = modifiers[1] * diffModifier;
-							if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nMiss == 0)
+							if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0)
                             {
 								clearModifier = modifiers[2] * diffModifier;
-								if (TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGood == 0)
+								if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
 									clearModifier = modifiers[3] * diffModifier;
 							}
 						}
@@ -470,9 +470,9 @@ namespace TJAPlayer3
 
 						#endregion
 
-						nTotalHits = TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGood + TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nMiss + TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGreat;
+						nTotalHits = TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood + TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss + TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGreat;
 
-						dAccuracyRate = Math.Pow((50 * TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGood + 100 * TJAPlayer3.stage演奏ドラム画面.CBranchScore[i].nGreat) / (double)(100 * nTotalHits), 3);
+						dAccuracyRate = Math.Pow((50 * TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood + 100 * TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGreat) / (double)(100 * nTotalHits), 3);
 
 						if (clearModifier < 0)
 							this.nEarnedMedalsCount[i] = 5;

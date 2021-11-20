@@ -1264,18 +1264,6 @@ for (int i = 0; i < 3; i++) {
 
 					case CStage.Eステージ.演奏:
 						#region [ *** ]
-						//-----------------------------
-						//long n1 = FDK.CSound管理.rc演奏用タイマ.nシステム時刻ms;
-						//long n2 = FDK.CSound管理.SoundDevice.n経過時間ms;
-						//long n3 = FDK.CSound管理.SoundDevice.tmシステムタイマ.nシステム時刻ms;
-						//long n4 = FDK.CSound管理.rc演奏用タイマ.n現在時刻;
-						//long n5 = FDK.CSound管理.SoundDevice.n経過時間を更新したシステム時刻ms;
-
-						//swlist1.Add( Convert.ToInt32(n1) );
-						//swlist2.Add( Convert.ToInt32(n2) );
-						//swlist3.Add( Convert.ToInt32( n3 ) );
-						//swlist4.Add( Convert.ToInt32( n4 ) );
-						//swlist5.Add( Convert.ToInt32( n5 ) );
 
 						#region [ DTXVモード中にDTXCreatorから指示を受けた場合の処理 ]
 						if ( DTXVmode.Enabled && DTXVmode.Refreshed )

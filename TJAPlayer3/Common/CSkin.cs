@@ -950,33 +950,34 @@ namespace TJAPlayer3
             this.b現在のステージ数を表示しない = false;
         }
 
+        public void LoadSkinConfigFromFile(string path, ref string work)
+        {
+            if (!File.Exists(Path(path))) return;
+            using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding("Shift_JIS")))
+            {
+                while (streamReader.Peek() > -1) // 一行ずつ読み込む。
+                {
+                    var nowLine = streamReader.ReadLine();
+                    if (nowLine.StartsWith("#include"))
+                    {
+                        // #include hogehoge.iniにぶち当たった
+                        var includePath = nowLine.Substring("#include ".Length).Trim();
+                        LoadSkinConfigFromFile(includePath, ref work); // 再帰的に読み込む
+                    }
+                    else
+                    {
+                        work += nowLine + Environment.NewLine;
+                    }
+                }
+            }
+        }
+
         public void tReadSkinConfig()
         {
             var str = "";
             LoadSkinConfigFromFile(Path(@"SkinConfig.ini"), ref str);
             this.t文字列から読み込み(str);
 
-            void LoadSkinConfigFromFile(string path, ref string work)
-            {
-                if (!File.Exists(Path(path))) return;
-                using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding("Shift_JIS")))
-                {
-                    while (streamReader.Peek() > -1) // 一行ずつ読み込む。
-                    {
-                        var nowLine = streamReader.ReadLine();
-                        if (nowLine.StartsWith("#include"))
-                        {
-                            // #include hogehoge.iniにぶち当たった
-                            var includePath = nowLine.Substring("#include ".Length).Trim();
-                            LoadSkinConfigFromFile(includePath, ref work); // 再帰的に読み込む
-                        }
-                        else
-                        {
-                            work += nowLine + Environment.NewLine;
-                        }
-                    }
-                }
-            }
         }
 
         private void t文字列から読み込み(string strAllSettings)	// 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
@@ -1444,6 +1445,8 @@ namespace TJAPlayer3
                                 Game_Lyric_BackColor = ColorTranslator.FromHtml(strParam);
                             }
                             #endregion
+
+                            // Chara read
                             #region Chara
                             else if (strCommand == "Game_Chara_X")
                             {
@@ -1518,6 +1521,7 @@ namespace TJAPlayer3
                                 ParseInt32(value => Game_Chara_Beat_GoGo = value);
                             }
                             #endregion
+
                             #region Dancer
                             else if (strCommand == "Game_Dancer_X")
                             {
@@ -2614,6 +2618,49 @@ namespace TJAPlayer3
         public int[] Config_NamePlate_Ptn_Title_Boxes;
 
         #endregion
+
+        #region Characters
+
+        public int Characters_Ptn;
+        public int[] Characters_Normal_Ptn,
+            Characters_Normal_Cleared_Ptn,
+            Characters_Normal_Maxed_Ptn,
+            Characters_GoGoTime_Ptn,
+            Characters_GoGoTime_Maxed_Ptn,
+            Characters_10Combo_Ptn,
+            Characters_10Combo_Maxed_Ptn,
+            Characters_GoGoStart_Ptn,
+            Characters_GoGoStart_Maxed_Ptn,
+            Characters_Become_Cleared_Ptn,
+            Characters_Become_Maxed_Ptn,
+            Characters_Balloon_Breaking_Ptn,
+            Characters_Balloon_Broke_Ptn,
+            Characters_Balloon_Miss_Ptn,
+            Characters_Title_Donchan_Entry_Ptn,
+            Characters_Title_Donchan_Normal_Ptn,
+            Characters_Result_Donchan_Clear_Ptn,
+            Characters_Result_Donchan_Failed_Ptn,
+            Characters_Result_Donchan_Failed_In_Ptn,
+            Characters_Result_Donchan_Normal_Ptn;
+
+        // Config
+
+        public int[][] Characters_X;
+        public int[][] Characters_Y;
+        public int[][] Characters_Balloon_X;
+        public int[][] Characters_Balloon_Y;
+        public string[] Characters_Motion_Normal,
+            Characters_Motion_Clear,
+            Characters_Motion_GoGo;
+        public int[] Characters_Beat_Normal;
+        public int[] Characters_Beat_Clear;
+        public int[] Characters_Beat_GoGo;
+        public int[] Characters_Balloon_Timer;
+        public int[] Characters_Balloon_Delay;
+        public int[] Characters_Balloon_FadeOut;
+
+        #endregion
+
 
         #region SongSelect
         public int SongSelect_Overall_Y = 123;

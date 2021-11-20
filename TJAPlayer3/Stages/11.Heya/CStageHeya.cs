@@ -112,7 +112,7 @@ namespace TJAPlayer3
 
             // Tmp variables
             iPuchiCharaCount = 120;
-            iCharacterCount = 1;
+            iCharacterCount = TJAPlayer3.Skin.Characters_Ptn;
 
             this.tResetOpts();
 
@@ -204,6 +204,37 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [Character]
+
+            if (iCurrentMenu == 1)
+            {
+                for (int i = -5; i < 6; i++)
+                {
+                    int pos = (iCharacterCount * 5 + iCharacterCurrent + i) % iCharacterCount;
+
+                    if (i != 0)
+                    {
+                        if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
+                            TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                    }
+                    else
+                    {
+                        if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
+                            TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.White;
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                    }
+
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+
+                    TJAPlayer3.Tx.Characters_Normal[pos][0]?.t2DŠg‘å—¦l—¶’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 320);
+
+                    if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
+                        TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.White;
+                }
+            }
+
+            #endregion
 
             #region [Dan title]
 
@@ -249,8 +280,6 @@ namespace TJAPlayer3
             }
 
             #endregion
-
-
 
             #region [Title plate]
 
@@ -378,6 +407,16 @@ namespace TJAPlayer3
                 else if (iCurrentMenu == 0)
                 {
                     TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
+
+                    TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+
+                    iCurrentMenu = -1;
+                    this.tResetOpts();
+                }
+
+                else if (iCurrentMenu == 1)
+                {
+                    TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
 
                     TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
 
