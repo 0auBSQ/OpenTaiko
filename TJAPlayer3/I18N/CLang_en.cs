@@ -23,21 +23,15 @@ namespace TJAPlayer3
             [1] = "System language",
             [2] = "<< Return to Menu",
             [3] = "Return to left menu.",
-            [4] = "Reload song data",
-            [5] = "Retrieve and update the song list.",
-            [6] = "Player count",
-            [7] = "Change the ingame player countF\nSetting it to 2 makes able to play\nregular charts at 2 players by splitting \nthe screen in half.",
-            [8] = "Risky",
-            [9] = "Risky mode:\nSet it over 1, in case you'd like to specify\n the number of Poor/Miss times to be\n FAILED.\nSet 0 to disable Risky mode.",
-            [10] = "Song speed",
-            [11] = "It changes the song speed.\n" +
-                "For example, you can play in half\n" +
-                " speed by setting PlaySpeed = 0.500\n" +
-                " for your practice.\n" +
-                "\n" +
-                "Note: It also changes the songs' pitch.\n" +
-                "In case TimeStretch=ON, some audio\n" +
-                "lag occurs if slower than x0.900.",
+            [4] = "Reload Songs",
+            [5] = "Reload the song folder.",
+            [6] = "Player Count",
+            [7] = "Select whether to use 2 player mode.",
+            [8] = "Kanpeki Mode",
+            [9] = "Choose how many BADs are allowed\nbefore a song is automatically failed.\nSet this to 0 to disable the mode.",
+            [10] = "Song Playback Speed",
+            [11] = "Change song playback speed.\nIf the Time Stretch option is enabled,\nsound issues may occur below 0.9x playback speed.\n" +
+                "Note: It also changes the songs' pitch.",
             [16] = "Layout type",
             [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
@@ -45,68 +39,43 @@ namespace TJAPlayer3
                 "2 : Down to up diagonal\n" +
                 "3 : Half-circle facing right\n" +
                 "4 : Half-circle facing left",
-            [18] = "How to change the playing speed:\n" +
-                "Turn ON to use time stretch\n" +
-                "to change the play speed." +
-                "\n" +
-                "If you set TimeStretch=ON, it usese\n" +
-                "more CPU power. And some sound\n" +
-                "lag occurs slower than x0.900.",
-            [19] = "Fullscreen mode or window mode.",
-            [20] = "Turn OFF if you don't want to encount\n GAME OVER.",
-            [21] = "Turn ON to use child BOX (subfolders)\n at RANDOM SELECT.",
-            [22] = "Turn ON to wait VSync (Vertical\n Synchronizing signal) at every\n drawings. (so FPS becomes 60)\nIf you have enough CPU/GPU power,\n the scroll would become smooth.",
-            [23] = "To use AVI playback or not.",
-            [24] = "To draw BGA (back ground animations)\n or not.",
-            [25] = "Delay time(ms) to start playing preview\n sound in SELECT MUSIC screen.\nYou can specify from 0ms to 10000ms.",
-            [26] = "Delay time(ms) to show preview image\n in SELECT MUSIC screen.\nYou can specify from 0ms to 10000ms.",
-            [27] = "To show song informations on playing\n BGA area. (FPS, BPM, total time etc)\nYou can ON/OFF the indications\n by pushing [Del] while playing drums",
-            [28] = "The degree for transparing playing\n screen and wallpaper.\n\n0=completely transparent,\n255=no transparency",
-            [29] = "Turn OFF if you don't want to play\n BGM.",
-            [30] = "To save high-scores/skills, turn it ON.\nTurn OFF in case your song data are\n in read-only media (CD-ROM etc).\nNote that the score files also contain\n 'BGM Adjust' parameter. So if you\n want to keep adjusting parameter,\n you need to set SaveScore=ON.",
-            [31] = "To apply BS1770GAIN loudness\nmetadata when playing songs, turn it ON.\nTurn OFF if you prefer to use only\nthe main song level controls.\nIt needs BS1770GAIN.",
-            [32] = "When applying BS1770GAIN loudness\nmetadata while playing songs, song levels\nwill be adjusted to target this loudness,\nmeasured in cB (centibels) relative to full scale.\n",
-            [33] = "To apply .tja SONGVOL properties when playing\nsongs, turn it ON. Turn OFF if you prefer to\nuse only the main song level controls.",
-            [34] = $"The level adjustment for sound effects.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
-            [35] = $"The level adjustment for voices.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
-            [36] = $"The level adjustment for songs during gameplay.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
-            [37] = "The amount of sound level change for each press\nof a sound level control key.\nYou can specify from 1 to 20.",
-            [38] = "Blank time before music source to play. (ms)\n",
-            [39] = "AutoSaveResult:\nTurn ON to save your result screen\n image automatically when you get\n hiscore/hiskill.",
-            [40] = "Share Playing .tja file infomation on Discord.",
-            [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
-            [42] = "Turn ON to put debug log to\n DTXManiaLog.txt\nTo take it effective, you need to\n re-open DTXMania.",
-            [43] = "Sound output type:\n" +
-                "You can choose WASAPI, ASIO or\n" +
-                "DShow(DirectShow).\n" +
-                "WASAPI can use only after Vista.\n" +
-                "ASIO can use on the\n" +
-                "\"ASIO-supported\" sound device.\n" +
-                "You should use WASAPI or ASIO\n" +
-                "to decrease the sound lag.\n" +
+            [18] = "Not sure what this option does.\nIt uses more CPU power,\nand might cause sound issues below 0.9x playback speed.",
+            [19] = "Toggle between fullscreen and windowed mode.",
+            [20] = "This is a redundant setting\nported from DTXMania.\nIt does nothing.",
+            [21] = "Toggle whether subfolders are used\nduring random song selection.",
+            [22] = "Toggle whether VSync is used.\nTurning it on will cap the FPS at 60,\nwhich will make the note scroll appear smoother\nbut increase input delay.\nTurning it off will uncap the fps,\nwhich will decrease input delay\nbut make the note scroll appear more unstable.",
+            [23] = "Toggle whether background videos are used.\nIf this is enabled and a video is missing from a folder,\nthe background will appear blacked out.",
+            [24] = "Toggle whether background animations appear.",
+            [25] = "The time taken before a song preview is played.\nDecreasing this value may cause previews\nto begin while still scrolling.\nYou can specify from 0ms to 10000ms.",
+            [26] = "This is a redundant setting\nported from DTXMania.\nIt does nothing.",
+            [27] = "Toggle whether debug mode is enabled.\nThis will cause additional information\nto appear in the bottom right.\nThis will display your latency calibration\nfor hitsoundless play.",
+            [28] = "This controls the opacity of background videos.\nIncrease the value if videos aren’t playing.\n\n0 = completely transparent,\n255 = no transparency",
+            [29] = "Toggles whether music is played.",
+            [30] = "Toggles whether score.ini files are saved in song folders.\nSong offset is saved here,\nso if hitsounds are disabled turn this on.",
+            [31] = "This is a redundant setting that intended to use BSGain\nsound settings.\nSince BSGain support is broken,\nthis setting does nothing.",
+            [32] = "This is a redundant setting that intended to use BSGain\nto normalise sound volume.\nSince BSGain support is broken,\nthis setting does nothing.",
+            [33] = "This is a partially redundant setting\nthat toggles whether SONGVOL metadata is used.\nValues between 0 and 100 will lower song volume,\nbut any values over 100 do nothing.",
+            [34] = "Adjust the volume of sounds related to don and ka.\nTo play without hitsounds, set this to 0.\nYou must restart the game after leaving config\nfor this setting to save.",
+            [35] = "Adjust the volume of sounds related don-chan’s voice.\nYou must restart the game after leaving config\nfor this setting to save.",
+            [36] = "Adjust the volume of song playback.\nYou must restart the game after leaving config\nfor this setting to save.",
+            [37] = "Use the [ key to decrease volume\nand use the ] key to increase volume.\nThis setting changes how much they change the volume by.\nYou can specify from 1 to 20.",
+            [38] = "The time taken before song playback during gameplay.\nDecreasing the value may cause songs to play too early.",
+            [39] = "Toggle whether results screenshots are automatically taken.\nThis will only occur when a highscore is achieved,\nwhich may not correlate to the best play on that song.",
+            [40] = "Toggle whether song information is shared with discord.",
+            [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
+            [42] = "Toggle whether a TJAPlayer3.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
+            [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\n\nWasapi:\n- Disables sound playback from any source except TJAP3\n- Has the second lowest input delay\n\nDirect Sound:\n- Allows exterior sound playback\n- Has the most input delay\n" +
+                "Note: Exit CONFIGURATION to make\n" +
+                "     the setting take effect.",
+            [44] = "Change the sound buffer for wasapi sound playback mode.\nSet the number to be as low as possible\nwithout causing sound issues such as\nsong freezing and incorrect timing.\nSet it to 0 to use an estimated correct value,\nor use trial and error to find the correct value." +
                 "\n" +
                 "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
-            [44] = "Sound buffer size for WASAPI:\n" +
-                "You can set from 0 to 99999ms.\n" +
-                "Set 0 to use a default sysytem\n" +
-                "buffer size.\n" +
-                "Smaller value makes smaller lag,\n" +
-                "but it may cause sound troubles.\n" +
-                "\n" +
-                "Note: Exit CONFIGURATION to make\n" +
-                "     the setting take effect.",
-            [45] = "ASIO device:\n" +
-                    "You can choose the sound device\n" +
-                    "used with ASIO.\n" +
+            [45] = "Choose a valid device to enable asio playback mode with." +
                     "\n" +
                     "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
-            [46] = "Use OS Timer or not:\n" +
-                "If this settings is ON, DTXMania uses\n" +
-                "OS Standard timer. It brings smooth\n" +
-                "scroll, but may cause some sound lag.\n" +
-                "(so AdjustWaves is also avilable)\n" +
+            [46] = "Turning this on will create smoother note scroll,\nbut may introduce sound lag.\nTurning it off will create unstable note scroll,\nbut ensure no sound lag occurs.\n" +
                 "\n" +
                 "If OFF, DTXMania uses its original\n" +
                 "timer and the effect is vice versa.\n" +
@@ -118,81 +87,64 @@ namespace TJAPlayer3
             [49] = "Show Mob Images.\n",
             [50] = "Show Runner Images.\n",
             [51] = "Show Footer Image.\n",
-            [52] = "Use pre-textures render.\n",
+            [52] = "Toggle whether images are rendered prior to songs loading.\n",
             [53] = "Show PuchiChara Images.\n",
-            [54] = "Skin:\n" +
-                "Change skin.",
-            [55] = "Settings for the system key/pad inputs.",
-            [56] = "AUTO PLAY",
-            [57] = "To play P1 Taiko\n" +
-                " automatically.",
-            [58] = "AUTO PLAY 2P",
-            [59] = "To play P2 Taiko\n" +
-                " automatically.",
-            [60] = "AUTO Roll",
-            [61] = "If OFF the drumrolls\n" +
-                    "aren't played by auto.",
-            [62] = "ScrollSpeed",
-            [63] = "To change the scroll speed for the\n" +
-                "drums lanes.\n" +
+            [54] = "Choose a skin to use from the system folder.",
+            [55] = "A secondary menu for assigning system keys.",
+            [56] = "Player 1 Auto Play",
+            [57] = "Toggle whether player 1 plays automatically.\nPress F3 on song select to toggle this.",
+            [58] = "Player 2 Auto Play",
+            [59] = "Toggle whether player 2 plays automatically.\nPress F4 on song select to toggle this.",
+            [60] = "Auto Roll",
+            [61] = "Toggle whether rolls are played automatically.\nBalloons will still be played\nif their respective auto option is enabled.",
+            [62] = "Scroll Speed",
+            [63] = "Change the speed the notes travel at.\n" +
                 "You can set it from x0.1 to x200.0.\n" +
                 "(ScrollSpeed=x0.5 means half speed)",
-            [64] = "Risky",
-            [65] = "Risky mode:\n" +
-                "Set over 1, in case you'd like to specify\n" +
-                " the number of Poor/Miss times to be\n" +
-                " FAILED.\n" +
-                "Set 0 to disable Risky mode.",
-            [66] = "Random",
+            [64] = "Kanpeki Mode",
+            [65] = "Choose how many BADs are allowed\nbefore a song is automatically failed.\nSet this to 0 to disable the mode.",
+            [66] = "Note Modifiers",
             [67] = "Notes come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
-            [68] = "Stealth",
-            [69] = "DORON:Hidden for NoteImage.\n" +
-                "STEALTH:Hidden for NoteImage and SeNotes",
-            [70] = "NoInfo",
-            [71] = "Hide the song informations.\n",
-            [72] = "JUST",
-            [73] = "Allow only GOODs, making OKs becoming\n" +
-                    "BADs.",
-            [74] = "Tight",
-            [75] = "It becomes MISS to hit pad without\n" +
-                " chip.",
-            [76] = "D-MinCombo",
-            [77] = "Initial number to show the combo\n" +
-                " for the drums.\n" +
+            [68] = "Hidden Notes",
+            [69] = "DORON: Notes are hidden.\n" +
+                "STEALTH: Notes and the text below them are hidden.",
+            [70] = "No Information Mode",
+            [71] = "Toggle whether song information is shown.\nTurning this on will disable song informaton.\nTurning this off will enable song information.\n",
+            [72] = "Justice Mode",
+            [73] = "Enabling this turns all OKs into BADs.",
+            [74] = "Notelock Mode",
+            [75] = "Toggle whether hitting in the space between notes\ncounts as a BAD.",
+            [76] = "Minimum Combo Display",
+            [77] = "Choose the initial number that combo is displayed at.\n" +
                 "You can specify from 1 to 99999.",
-            [78] = "InputAdjust",
-            [79] = "To adjust the input timing.\n" +
+            [78] = "Hitcircle Adjustment",
+            [79] = "Increasing the value will move the note\njudge area further right.\nDecreasing the value will move the note\njudge area further left.\n" +
                 "You can set from -99 to 99ms.\n" +
                 "To decrease input lag, set minus value.",
-            [80] = "DefaultCourse",
-            [81] = "Difficulty selected by default\n",
-            [82] = "ScoreMode",
-            [83] = "Score calculation method\n" +
-                    "TYPE-A: Old allotment\n" +
-                    "TYPE-B: Old case allotment\n" +
-                    "TYPE-C: New allotment\n",
-            [84] = "Turn on fixed score mode.",
-            [85] = "BranchGuide",
-            [86] = "Display the referenced value for branches.\n" +
-                    "Not effective with auto.",
-            [87] = "BranchAnime",
-            [88] = "Branch animation type\n" +
-                    "TYPE-A: Taiko 7-14\n" +
-                    "TYPE-B: Taiko 15+\n" +
+            [80] = "Default Difficulty",
+            [81] = "Choose the default difficulty to be chosen on song select.\nIf ura is not chosen, it will not be visible\nunless the right arrow key is pressed\non that song’s oni difficulty.",
+            [82] = "Score Mode",
+            [83] = "Chooses the formula used to determine scores.\n" +
+                    "TYPE-A: (Gen-1) Old allotment\n" +
+                    "TYPE-B: (Gen-2) Old case allotment\n" +
+                    "TYPE-C: (Gen-3) New allotment\n",
+            [84] = "Makes every note worth\nthe same amount of points.\nUses the Gen-4 formula.",
+            [85] = "Branch Guide",
+            [86] = "Toggle whether a numerical guide is displayed\nto view which branch is going to be picked.\nIt doesn’t display on auto mode.",
+            [87] = "Branch Animation Set",
+            [88] = "Changes the animation set used when a chart branches.\n" +
+                    "TYPE-A: Gen-2\n" +
+                    "TYPE-B: Gen-3\n" +
                     " \n",
-            [89] = "GameMode",
-            [90] = "Game mode:\n" +
-                    "(Not avaliable for 2P mode)\n" +
-                    "TYPE-A: 完走!叩ききりまショー!\n" +
-                    "TYPE-B: 完走!叩ききりまショー!(激辛)\n" +
-                    " \n",
-            [91] = "BigNotesJudge",
-            [92] = "Require to hit both side for big notes.",
-            [93] = "JudgeCountDisp",
-            [94] = "Show the JudgeCount\n" +
-                "(SinglePlay Only)",
-            [95] = "KEY CONFIG",
-            [96] = "Settings for the drums key/pad inputs.",
+            [89] = "Survival Mode",
+            [90] = "This mode is broken.\nIt implements a timer system similar to stepmania courses,\nbut some code is missing so the functionality is limited.",
+            [91] = "Big Note Judgement",
+            [92] = "Toggle whether big notes reward being hit with 2 keys.\nIf this is on, using 1 key will cause a visual delay\nbefore they disappear.\nHits with 2 keys will award double points.\nIf this is off, using 1 key will hit them like a regular note.\nDouble points will still be awarded\nAttempting to hit them with 2 keys may cause\nthe next note to be hit instead.",
+            [93] = "Toggle Score Display",
+            [94] = "Display the current good/ok/bad judgements\n in the bottom left.\n" +
+                "(Single Player Only)",
+            [95] = "Gameplay Key Config",
+            [96] = "A secondary menu to adjust keys used during gameplay.",
             [97] = "Capture",
             [98] = "Capture key assign:\nTo assign key for screen capture.\n (You can use keyboard only. You can't\nuse pads to capture screenshot.",
             [99] = "LeftRed",
@@ -204,52 +156,52 @@ namespace TJAPlayer3
             [10005] = "RightBlue",
             [10006] = "Drums key assign:\nTo assign key/pads for RightBlue\n button.",
             [10007] = "LeftRed2P",
-            [10008] = "Drums key assign:\nTo assign key/pads for RightCymbal\n button.",
+            [10008] = "Drums key assign:\nTo assign key/pads for LeftRed2P\n button.",
             [10009] = "RightRed2P",
             [10010] = "Drums key assign:\nTo assign key/pads for RightRed2P\n button.",
             [10011] = "LeftBlue2P",
             [10012] = "Drums key assign:\nTo assign key/pads for LeftBlue2P\n button.",
             [10013] = "RightBlue2P",
             [10014] = "Drums key assign:\nTo assign key/pads for RightBlue2P\n button.",
-            [10018] = "TimeStretch",
-            [10019] = "Fullscreen",
-            [10020] = "StageFailed",
-            [10021] = "RandSubBox",
-            [10022] = "VSyncWait",
-            [10023] = "AVI",
-            [10024] = "BGA",
-            [10025] = "PreSoundWait",
-            [10026] = "PreImageWait",
-            [10027] = "Debug Info",
-            [10028] = "BG Alpha",
-            [10029] = "BGM Sound",
-            [10030] = "SaveScore",
+            [10018] = "Time Stretch Mode",
+            [10019] = "Fullscreen Mode",
+            [10020] = "Game Over Mode",
+            [10021] = "Use Subfolders in Random Selection",
+            [10022] = "VSync Mode",
+            [10023] = "Toggle Video Playback",
+            [10024] = "Draw BGA",
+            [10025] = "Song Preview Buffer",
+            [10026] = "Image Preview Buffer",
+            [10027] = "Debug Mode",
+            [10028] = "Background Opacity",
+            [10029] = "Toggle Song Playback",
+            [10030] = "Save Scores",
             [10031] = "Apply Loudness Metadata",
             [10032] = "Target Loudness",
-            [10033] = "Apply SONGVOL",
-            [10034] = "Sound Effect Level",
-            [10035] = "Voice Level",
-            [10036] = "Song Playback Level",
-            [10037] = "Keyboard Level Increment",
-            [10038] = "MusicPreTimeMs",
-            [10039] = "Autosaveresult",
-            [10040] = "SendDiscordPlayingInformation",
-            [10041] = "BufferedInput",
-            [10042] = "TraceLog",
-            [10043] = "SoundType",
-            [10044] = "WASAPIBufSize",
-            [10045] = "ASIO device",
-            [10046] = "UseOSTimer",
-            [10047] = "ShowChara",
-            [10048] = "ShowDancer",
-            [10049] = "ShowMob",
-            [10050] = "ShowRunner",
-            [10051] = "ShowFooter",
-            [10052] = "FastRender",
-            [10053] = "ShowPuchiChara",
-            [10054] = "Skin (Full)",
-            [10055] = "System Keys",
-            [10084] = "ShinuchiMode",
+            [10033] = "Apply SONGVOL Metadata",
+            [10034] = "Sound Effect Volume",
+            [10035] = "Voice Volume",
+            [10036] = "Song Playback Volume",
+            [10037] = "Keyboard Volume Increment",
+            [10038] = "Song Playback Buffer",
+            [10039] = "Automatic Screenshots",
+            [10040] = "Discord Rich Presence",
+            [10041] = "Buffered Input Mode",
+            [10042] = "Create Error Logs",
+            [10043] = "Sound Playback Mode",
+            [10044] = "Wasapi Buffer Size",
+            [10045] = "Asio Playback Device",
+            [10046] = "OS Timer Mode",
+            [10047] = "Draw Characters",
+            [10048] = "Draw Dancers",
+            [10049] = "Draw Mob",
+            [10050] = "Draw Runners",
+            [10051] = "Draw Footers",
+            [10052] = "Fast Render",
+            [10053] = "Draw PuchiChara",
+            [10054] = "Current Skin",
+            [10055] = "System Key Config",
+            [10084] = "Shin'uchi Mode",
 
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",
