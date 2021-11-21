@@ -23,12 +23,12 @@ namespace TJAPlayer3
             [1] = "Idioma del sistema",
             [2] = "<< Volver al menú",
             [3] = "Volver al menú de la izquierda.",
-            [4] = "Recargar datos de canciones",
+            [4] = "Recargar lista de canciones",
             [5] = "Recarga y actualiza la lista de canciones.",
             [6] = "Número de jugadores",
             [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\ncanciones regulares a dos jugadores dividiendo \nla pantalla a la mitad.",
-            [8] = "Modo de riesgo",
-            [9] = "Modo de riesgo:\nDéjalo por sobre 1, en caso de que quieras especificar\nel número de Malo/Fallos para considerar el intento\nfallido.\nDejar en 0 para deshabilitar el modo de riesgo.",
+            [8] = "Modo Kanpeki",
+            [9] = "Modo Kanpeki:\nElige el numero de fallos antes de\nque se considere un intento fallido.\nDejar en 0 para deshabilitar el modo de riesgo.",
             [10] = "Velocidad de la canción",
             [11] = "Cambia la velocidad de la canción.\n" +
                 "Por ejemplo, puedes jugar a mitad de\n" +
@@ -37,7 +37,7 @@ namespace TJAPlayer3
                 "\n" +
                 "Nota: También cambia el tono de la canción.\n" +
                 "Si Time Stretch está encendido, puede haber\n" +
-                "lag de audio si se usa en menos de x0.900.",
+                "lag de audio si se usa en menos de x0.9.",
             [16] = "Tipo de interfaz",
             [17] = "Puedes cambiar la interfaz de las canciones \nmostradas en la pantalla de selección.\n" +
                 "0 : Regular (Diagonal de arriba hacia abajo)\n" +
@@ -45,15 +45,9 @@ namespace TJAPlayer3
                 "2 : Diagonal de abajo hacia arriba\n" +
                 "3 : Medio circulo hacia la derecha\n" +
                 "4 : Medio circulo hacia la izquierda",
-            [18] = "Como cambiar la velocidad del juego:\n" +
-                "Encender para usar Time Stretch\n" +
-                "y así cambiar la velocidad del juego." +
-                "\n" +
-                "Con Time Stretch activado, el juego usa\n" +
-                "más capacidad del procesador. Y algo de \n" +
-                "lag de audio ocurre por debajo de x0.900.",
+            [18] = "No se está seguro de que hace esto.\nUsa mas capacidad de la CPU,\ny causa lag si la velocidad de juego está\nen menos de x0.9.",
             [19] = "Modo de ventana o pantalla completa.",
-            [20] = "Desactivalo si no quieres que aparezca\nla pantalla de FIN DEL JUEGO.",
+            [20] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [21] = "Activar el uso de subcarpetas en la\nSELECCIÓN ALEATORIA.",
             [23] = "Usar la reproducción AVI o no.",
             [24] = "Activar BGA (animaciones de fondo) o no.",
