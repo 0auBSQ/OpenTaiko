@@ -468,9 +468,16 @@ namespace TJAPlayer3
                 {
                     Counter_Out = null;
                 }
-            } 
-            // 段プレートを描画する。
-            Dan_Plate?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_Dan_Plate[0], TJAPlayer3.Skin.Game_DanC_Dan_Plate[1]);
+            }
+
+            #region [Dan Plate]
+
+            CActSelect段位リスト.tDisplayDanPlate(Dan_Plate, 
+                TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行], 
+                TJAPlayer3.Skin.Game_DanC_Dan_Plate[0], 
+                TJAPlayer3.Skin.Game_DanC_Dan_Plate[1]);
+
+            #endregion
 
             TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms + " / " + CSound管理.rc演奏用タイマ.n現在時刻);
 
