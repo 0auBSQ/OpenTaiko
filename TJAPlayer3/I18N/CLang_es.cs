@@ -122,20 +122,20 @@ namespace TJAPlayer3
             [54] = "Skin:\n" +
                 "Cambiar Skin.",
             [55] = "Settings for the system key/pad inputs.",
-            [56] = "AUTO PLAY",
-            [57] = "To play P1 Taiko\n" +
-                " automatically.",
-            [58] = "AUTO PLAY 2P",
-            [59] = "To play P2 Taiko\n" +
-                " automatically.",
-            [60] = "AUTO Roll",
-            [61] = "If OFF the drumrolls\n" +
-                    "aren't played by auto.",
-            [62] = "ScrollSpeed",
-            [63] = "To change the scroll speed for the\n" +
-                "drums lanes.\n" +
-                "You can set it from x0.1 to x200.0.\n" +
-                "(ScrollSpeed=x0.5 means half speed)",
+            [56] = "Juego automático",
+            [57] = "Para que el carril de P1\n" +
+                "se juegue automaticamente.",
+            [58] = "Juego Automático P2",
+            [59] = "Para que el carril de P2\n" +
+                "se juegue automaticamente.",
+            [60] = "Redoble Automático",
+            [61] = "Si se desactiva, los redobles\n" +
+                    "no se completarán en modo automático.",
+            [62] = "VelDesplazamiento",
+            [63] = "Cambiar la velocidad de desplazamiento\n" +
+                "en el carril de las notas\n" +
+                "Puedes ajustarlo desde x0.1 a x200.0.\n" +
+                "(ScrollSpeed=x0.5 sería la mitad de velocidad)",
             [64] = "Risky",
             [65] = "Risky mode:\n" +
                 "Set over 1, in case you'd like to specify\n" +
