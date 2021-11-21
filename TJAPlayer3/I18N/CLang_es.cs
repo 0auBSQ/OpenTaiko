@@ -63,8 +63,8 @@ namespace TJAPlayer3
             [28] = "Ajuste del grado de transparencia del\n juego y fondo.\n\n0=completamente transparente,\n255=sin transparencia",
             [29] = "Desactívalo si no quieres que\nse reproduzca música de fondo.",
             [30] = "Si quieres guardar tus records, actívalo.\nDesactívalo si tus canciones estan en\nun medio de solo lectura (CD-ROM, etc).\nNote that the score files also contain\n 'BGM Adjust' parameter. So if you\n want to keep adjusting parameter,\n you need to set SaveScore=ON.",
-            [31] = "To apply BS1770GAIN loudness\nmetadata when playing songs, turn it ON.\nTurn OFF if you prefer to use only\nthe main song level controls.\nIt needs BS1770GAIN.",
-            [32] = "When applying BS1770GAIN loudness\nmetadata while playing songs, song levels\nwill be adjusted to target this loudness,\nmeasured in cB (centibels) relative to full scale.\n",
+            [31] = "Originalmente una opción especial\npara el control de volumen.\nEste ajuste ya no sirve y deberia ser removido.",
+            [32] = "Otro ajuste relacionado con BS1770GAIN\ny por lo mismo, inutilizable.",
             [33] = "Actívalo para usar el valor SONGVOL desde\nel .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
             [34] = $"The level adjustment for sound effects.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
             [35] = $"The level adjustment for voices.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
@@ -112,15 +112,15 @@ namespace TJAPlayer3
                 "\n" +
                 "This settings is avilable only when\n" +
                 "you uses WASAPI/ASIO.\n",
-            [47] = "Show Character Images.\n",
-            [48] = "Show Dancer Images.\n",
-            [49] = "Show Mob Images.\n",
-            [50] = "Show Runner Images.\n",
-            [51] = "Show Footer Image.\n",
-            [52] = "Use pre-textures render.\n",
-            [53] = "Show PuchiChara Images.\n",
+            [47] = "Mostrar imágenes del Personaje.\n",
+            [48] = "Mostrar imágenes de Dancer.\n",
+            [49] = "Mostrar imágenes de Mob.\n",
+            [50] = "Mostrar imágenes de Runner.\n",
+            [51] = "Mostrar imagen del Footer.\n",
+            [52] = "Usar texturas pre-renderizadas.\n",
+            [53] = "Mostrar imágenes del PuchiChara.\n",
             [54] = "Skin:\n" +
-                "Change skin.",
+                "Cambiar Skin.",
             [55] = "Settings for the system key/pad inputs.",
             [56] = "AUTO PLAY",
             [57] = "To play P1 Taiko\n" +
@@ -163,9 +163,9 @@ namespace TJAPlayer3
             [79] = "To adjust the input timing.\n" +
                 "You can set from -99 to 99ms.\n" +
                 "To decrease input lag, set minus value.",
-            [80] = "DefaultCourse",
-            [81] = "Difficulty selected by default\n",
-            [82] = "ScoreMode",
+            [80] = "DificultadDefecto",
+            [81] = "Dificultad seleccionada por defecto.\n",
+            [82] = "ModoPuntuación",
             [83] = "Score calculation method\n" +
                     "TYPE-A: Old allotment\n" +
                     "TYPE-B: Old case allotment\n" +
