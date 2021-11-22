@@ -196,7 +196,7 @@ namespace TJAPlayer3
             [10048] = "Draw Dancers",
             [10049] = "Draw Mob",
             [10050] = "Draw Runners",
-            [10051] = "Draw Footers",
+            [10051] = "Draw Footer",
             [10052] = "Fast Render",
             [10053] = "Draw PuchiChara",
             [10054] = "Current Skin",
