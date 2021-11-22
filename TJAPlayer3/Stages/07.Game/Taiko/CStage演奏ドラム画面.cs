@@ -583,11 +583,12 @@ namespace TJAPlayer3
                             base.eフェーズID = CStage.Eフェーズ.演奏_演奏終了演出;
 
                             this.actEnd.Start();
-                            if (TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max != 0)
+
+                            int Character = this.actChara.iCurrentCharacter[i];
+                            if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                             {
                                 if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
                                 {
-                                    int Character = this.actChara.iCurrentCharacter[i];
                                     double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM))));
                                     this.actChara.アクションタイマーリセット(i);
                                     this.actChara.ctキャラクターアクション_10コンボMAX[i] = new CCounter(0, TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] - 1, (dbUnit / TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character]) * 2, CSound管理.rc演奏用タイマ);
