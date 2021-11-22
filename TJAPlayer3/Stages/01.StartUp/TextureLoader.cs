@@ -337,137 +337,7 @@ namespace TJAPlayer3
             Bar_Branch = TxC(GAME + @"Bar_Branch.png");
 
             #endregion
-            #region キャラクター
 
-            // Count here
-
-            TJAPlayer3.Skin.Game_Chara_Ptn_Normal = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Normal\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Normal != 0)
-            {
-                Chara_Normal = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Normal];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Normal; i++)
-                {
-                    Chara_Normal[i] = TxC(GAME + CHARA + @"Normal\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_Clear = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Clear\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Clear != 0)
-            {
-                Chara_Normal_Cleared = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Clear];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Clear; i++)
-                {
-                    Chara_Normal_Cleared[i] = TxC(GAME + CHARA + @"Clear\" + i.ToString() + ".png");
-                }
-            }
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Clear != 0)
-            {
-                Chara_Normal_Maxed = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Clear];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Clear; i++)
-                {
-                    Chara_Normal_Maxed[i] = TxC(GAME + CHARA + @"Clear_Max\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_GoGo = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"GoGo\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_GoGo != 0)
-            {
-                Chara_GoGoTime = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_GoGo];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_GoGo; i++)
-                {
-                    Chara_GoGoTime[i] = TxC(GAME + CHARA + @"GoGo\" + i.ToString() + ".png");
-                }
-            }
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_GoGo != 0)
-            {
-                Chara_GoGoTime_Maxed = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_GoGo];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_GoGo; i++)
-                {
-                    Chara_GoGoTime_Maxed[i] = TxC(GAME + CHARA + @"GoGo_Max\" + i.ToString() + ".png");
-                }
-            }
-
-            TJAPlayer3.Skin.Game_Chara_Ptn_10combo = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"10combo\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_10combo != 0)
-            {
-                Chara_10Combo = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_10combo];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_10combo; i++)
-                {
-                    Chara_10Combo[i] = TxC(GAME + CHARA + @"10combo\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"10combo_Max\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max != 0)
-            {
-                Chara_10Combo_Maxed = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max; i++)
-                {
-                    Chara_10Combo_Maxed[i] = TxC(GAME + CHARA + @"10combo_Max\" + i.ToString() + ".png");
-                }
-            }
-
-            TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"GoGoStart\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart != 0)
-            {
-                Chara_GoGoStart = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart; i++)
-                {
-                    Chara_GoGoStart[i] = TxC(GAME + CHARA + @"GoGoStart\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart_Max = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"GoGoStart_Max\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart_Max != 0)
-            {
-                Chara_GoGoStart_Maxed = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart_Max];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart_Max; i++)
-                {
-                    Chara_GoGoStart_Maxed[i] = TxC(GAME + CHARA + @"GoGoStart_Max\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_ClearIn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"ClearIn\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_ClearIn != 0)
-            {
-                Chara_Become_Cleared = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_ClearIn];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_ClearIn; i++)
-                {
-                    Chara_Become_Cleared[i] = TxC(GAME + CHARA + @"ClearIn\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_SoulIn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"SoulIn\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_SoulIn != 0)
-            {
-                Chara_Become_Maxed = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_SoulIn];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_SoulIn; i++)
-                {
-                    Chara_Become_Maxed[i] = TxC(GAME + CHARA + @"SoulIn\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Breaking = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Balloon_Breaking\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Breaking != 0)
-            {
-                Chara_Balloon_Breaking = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Breaking];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Breaking; i++)
-                {
-                    Chara_Balloon_Breaking[i] = TxC(GAME + CHARA + @"Balloon_Breaking\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Balloon_Broke\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke != 0)
-            {
-                Chara_Balloon_Broke = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke; i++)
-                {
-                    Chara_Balloon_Broke[i] = TxC(GAME + CHARA + @"Balloon_Broke\" + i.ToString() + ".png");
-                }
-            }
-            TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + CHARA + @"Balloon_Miss\"));
-            if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss != 0)
-            {
-                Chara_Balloon_Miss = new CTexture[TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss];
-                for (int i = 0; i < TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss; i++)
-                {
-                    Chara_Balloon_Miss[i] = TxC(GAME + CHARA + @"Balloon_Miss\" + i.ToString() + ".png");
-                }
-            }
-            #endregion
             #region 踊り子
             TJAPlayer3.Skin.Game_Dancer_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + DANCER + @"1\"));
             if (TJAPlayer3.Skin.Game_Dancer_Ptn != 0)
@@ -958,6 +828,8 @@ namespace TJAPlayer3
 
             TJAPlayer3.Skin.Characters_Ptn = System.IO.Directory.GetDirectories(CSkin.Path(BASE + CHARACTERS)).Length;
 
+            Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Cleared = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1016,8 +888,101 @@ namespace TJAPlayer3
 
             #endregion
 
+            for (int i = 0; i < 2; i++)
+                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i);
+
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
+                Characters_Heya_Preview[i] = TxC(CHARACTERS + i.ToString() + @"\Normal\0.png");
+
+            #endregion
+
+            
+        }
+
+
+
+        public void ReloadCharacter(int old, int newC, int player)
+        {
+            if (old == newC)
+                return;
+
+            int other = (player == 0) ? 1 : 0;
+
+            if (old >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != old)
             {
+                int i = old;
+
+                #region [Dispose the previous character]
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Normal_Ptn[i]; j++)
+                    Characters_Result_Donchan_Normal[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Failed_In_Ptn[i]; j++)
+                    Characters_Result_Donchan_Failed_In[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Failed_Ptn[i]; j++)
+                    Characters_Result_Donchan_Failed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Donchan_Clear_Ptn[i]; j++)
+                    Characters_Result_Donchan_Clear[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Donchan_Normal_Ptn[i]; j++)
+                    Characters_Title_Donchan_Normal[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Donchan_Entry_Ptn[i]; j++)
+                    Characters_Title_Donchan_Entry[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Ptn[i]; j++)
+                    Characters_Normal[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]; j++)
+                    Characters_Normal_Cleared[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]; j++)
+                    Characters_Normal_Maxed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]; j++)
+                    Characters_GoGoTime[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i]; j++)
+                    Characters_GoGoTime_Maxed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i]; j++)
+                    Characters_GoGoStart[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i]; j++)
+                    Characters_GoGoStart_Maxed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Ptn[i]; j++)
+                    Characters_10Combo[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i]; j++)
+                    Characters_10Combo_Maxed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i]; j++)
+                    Characters_Become_Cleared[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i]; j++)
+                    Characters_Become_Maxed[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i]; j++)
+                    Characters_Balloon_Breaking[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i]; j++)
+                    Characters_Balloon_Broke[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]; j++)
+                    Characters_Balloon_Miss[i][j]?.Dispose();
+
+                #endregion
+            }
+
+            if (newC >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != newC)
+            {
+                int i = newC;
+
+                #region [Allocate the new character]
+
                 #region [Character individual values count initialisation]
 
                 TJAPlayer3.Skin.Characters_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + CHARACTERS + i.ToString() + @"\Normal\"));
@@ -1256,15 +1221,11 @@ namespace TJAPlayer3
                 }
 
                 #endregion
+
+                #endregion
             }
 
-            #endregion
-
         }
-
-
-
-
 
         public void DisposeTexture()
         {
@@ -1701,6 +1662,8 @@ namespace TJAPlayer3
             Characters_Result_Donchan_Failed,
             Characters_Result_Donchan_Failed_In,
             Characters_Result_Donchan_Normal;
+
+        public CTexture[] Characters_Heya_Preview;
 
         #endregion
 

@@ -207,7 +207,7 @@ namespace TJAPlayer3
                 {
                     if (this.ctキャラクターアクション_10コンボ[i].b進行中)
                     {
-                        if (TJAPlayer3.Tx.Characters_10Combo[Character] != null && TJAPlayer3.Skin.Game_Chara_Ptn_10combo != 0)
+                        if (TJAPlayer3.Tx.Characters_10Combo[Character] != null && TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0)
                         {
                             TJAPlayer3.Tx.Characters_10Combo[Character][(int)this.ctキャラクターアクション_10コンボ[i].n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
                         }
@@ -222,7 +222,7 @@ namespace TJAPlayer3
 
                     if (this.ctキャラクターアクション_10コンボMAX[i].b進行中)
                     {
-                        if (TJAPlayer3.Tx.Characters_10Combo_Maxed[Character] != null && TJAPlayer3.Skin.Game_Chara_Ptn_10combo_Max != 0)
+                        if (TJAPlayer3.Tx.Characters_10Combo_Maxed[Character] != null && TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                         {
                             TJAPlayer3.Tx.Characters_10Combo_Maxed[Character][(int)this.ctキャラクターアクション_10コンボMAX[i].n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
                         }
@@ -237,7 +237,7 @@ namespace TJAPlayer3
 
                     if (this.ctキャラクターアクション_ゴーゴースタート[i].b進行中)
                     {
-                        if (TJAPlayer3.Tx.Characters_GoGoStart[Character] != null && TJAPlayer3.Skin.Game_Chara_Ptn_GoGoStart != 0)
+                        if (TJAPlayer3.Tx.Characters_GoGoStart[Character] != null && TJAPlayer3.Skin.Characters_GoGoStart_Ptn[Character] != 0)
                         {
                             TJAPlayer3.Tx.Characters_GoGoStart[Character][(int)this.ctキャラクターアクション_ゴーゴースタート[i].n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
                         }
@@ -305,10 +305,10 @@ namespace TJAPlayer3
         {
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Breaking != 0) CharaAction_Balloon_Breaking[i]?.t進行();
-                if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke != 0) CharaAction_Balloon_Broke[i]?.t進行();
+                if (TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[iCurrentCharacter[i]] != 0) CharaAction_Balloon_Breaking[i]?.t進行();
+                if (TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[iCurrentCharacter[i]] != 0) CharaAction_Balloon_Broke[i]?.t進行();
                 CharaAction_Balloon_Delay[i]?.t進行();
-                if (TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss != 0) CharaAction_Balloon_Miss[i]?.t進行();
+                if (TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[iCurrentCharacter[i]] != 0) CharaAction_Balloon_Miss[i]?.t進行();
                 CharaAction_Balloon_FadeOut[i].Tick();
 
                 if (bマイどんアクション中[i])

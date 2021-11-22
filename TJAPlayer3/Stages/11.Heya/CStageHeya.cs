@@ -214,23 +214,23 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
-                            TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.DarkGray;
+                        if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.DarkGray;
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
                     }
                     else
                     {
-                        if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
-                            TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.White;
+                        if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
-                    TJAPlayer3.Tx.Characters_Normal[pos][0]?.t2DägëÂó¶çló∂íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 320);
+                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2DägëÂó¶çló∂íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 320);
 
-                    if (TJAPlayer3.Tx.Characters_Normal[pos][0] != null)
-                        TJAPlayer3.Tx.Characters_Normal[pos][0].color4 = Color.White;
+                    if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
                 }
             }
 
@@ -306,7 +306,8 @@ namespace TJAPlayer3
 
                     int iType = -1;
 
-                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].strï∂éö))
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null &&
+                        TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].strï∂éö))
                         iType = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[pos].strï∂éö].iType;
                     else if (pos == 0)
                         iType = 0;
@@ -416,6 +417,9 @@ namespace TJAPlayer3
 
                 else if (iCurrentMenu == 1)
                 {
+                    // Reload character, a bit time expensive but with a O(N) memory complexity instead of O(N * M)
+                    TJAPlayer3.Tx.ReloadCharacter(TJAPlayer3.NamePlateConfig.data.Character[iPlayer], iCharacterCurrent, iPlayer);
+
                     TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
 
                     TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
@@ -451,7 +455,8 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.NamePlateConfig.data.Title[iPlayer] = this.ttkTitles[iTitleCurrent].strï∂éö;
 
-                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].strï∂éö))
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null
+                        && TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].strï∂éö))
                         TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[iTitleCurrent].strï∂éö].iType;
                     else if (iTitleCurrent == 0)
                         TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = 0;
