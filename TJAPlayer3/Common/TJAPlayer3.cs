@@ -1975,6 +1975,7 @@ for (int i = 0; i < 3; i++) {
 			{
 				try
 				{
+					// Load config info
 					ConfigIni.tファイルから読み込み( path );
 				}
 				catch (Exception e)
