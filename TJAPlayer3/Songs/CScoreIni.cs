@@ -583,7 +583,7 @@ namespace TJAPlayer3
 			if( File.Exists( iniファイル名 ) )
 			{
 				string str;
-				StreamReader reader = new StreamReader( iniファイル名, Encoding.GetEncoding( "Shift_JIS" ) );
+				StreamReader reader = new StreamReader( iniファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType) );
 				while( ( str = reader.ReadLine() ) != null )
 				{
 					str = str.Replace( '\t', ' ' ).TrimStart( new char[] { '\t', ' ' } );
@@ -1217,7 +1217,7 @@ namespace TJAPlayer3
 			this.iniファイルのあるフォルダ名 = Path.GetDirectoryName( iniファイル名 );
 			this.iniファイル名 = Path.GetFileName( iniファイル名 );
 
-			StreamWriter writer = new StreamWriter( iniファイル名, false, Encoding.GetEncoding( "Shift_JIS" ) );
+			StreamWriter writer = new StreamWriter( iniファイル名, false, Encoding.GetEncoding(TJAPlayer3.sEncType) );
 			writer.WriteLine( "[File]" );
 			writer.WriteLine( "Title={0}", this.stファイル.Title );
 			writer.WriteLine( "Name={0}", this.stファイル.Name );
@@ -1496,7 +1496,7 @@ namespace TJAPlayer3
 			builder.Append( cc.strDTXManiaのバージョン );
 			builder.Append( cc.最終更新日時 );
 
-			byte[] bytes = Encoding.GetEncoding( "Shift_JIS" ).GetBytes( builder.ToString() );
+			byte[] bytes = Encoding.GetEncoding(TJAPlayer3.sEncType).GetBytes( builder.ToString() );
 			StringBuilder builder2 = new StringBuilder(0x21);
 			{
 				MD5CryptoServiceProvider m = new MD5CryptoServiceProvider();

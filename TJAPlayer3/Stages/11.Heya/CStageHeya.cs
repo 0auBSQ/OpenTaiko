@@ -306,7 +306,8 @@ namespace TJAPlayer3
 
                     int iType = -1;
 
-                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].str•¶Žš))
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null &&
+                        TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].str•¶Žš))
                         iType = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[pos].str•¶Žš].iType;
                     else if (pos == 0)
                         iType = 0;
@@ -454,7 +455,8 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.NamePlateConfig.data.Title[iPlayer] = this.ttkTitles[iTitleCurrent].str•¶Žš;
 
-                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].str•¶Žš))
+                    if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null
+                        && TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].str•¶Žš))
                         TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[iTitleCurrent].str•¶Žš].iType;
                     else if (iTitleCurrent == 0)
                         TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = 0;
