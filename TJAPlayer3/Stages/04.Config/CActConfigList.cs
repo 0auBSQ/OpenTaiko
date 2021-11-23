@@ -113,9 +113,13 @@ namespace TJAPlayer3
 			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.b全画面モード,
 				CLangManager.LangInstance.GetString(19));
 			this.list項目リスト.Add( this.iSystemFullscreen );
+
+			/*
 			this.iSystemStageFailed = new CItemToggle(CLangManager.LangInstance.GetString(10020), TJAPlayer3.ConfigIni.bSTAGEFAILED有効,
 				CLangManager.LangInstance.GetString(20));
 			this.list項目リスト.Add( this.iSystemStageFailed );
+			*/
+
 			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString(10021), TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする,
 				CLangManager.LangInstance.GetString(21));
 			this.list項目リスト.Add( this.iSystemRandomFromSubBox );
@@ -177,6 +181,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(30));
 			this.list項目リスト.Add( this.iSystemSaveScore );
 
+			/*
 		    this.iSystemApplyLoudnessMetadata = new CItemToggle(CLangManager.LangInstance.GetString(10031), TJAPlayer3.ConfigIni.ApplyLoudnessMetadata,
 				CLangManager.LangInstance.GetString(31));
 		    this.list項目リスト.Add( this.iSystemApplyLoudnessMetadata );
@@ -184,6 +189,7 @@ namespace TJAPlayer3
 		    this.iSystemTargetLoudness = new CItemInteger(CLangManager.LangInstance.GetString(10032), (int)Math.Round(CSound.MinimumLufs.ToDouble() * 10.0), (int)Math.Round(CSound.MaximumLufs.ToDouble() * 10.0), (int)Math.Round(TJAPlayer3.ConfigIni.TargetLoudness * 10.0),
 				CLangManager.LangInstance.GetString(32));
 		    this.list項目リスト.Add( this.iSystemTargetLoudness );
+			*/
 
 		    this.iSystemApplySongVol = new CItemToggle(CLangManager.LangInstance.GetString(10033), TJAPlayer3.ConfigIni.ApplySongVol,
 				CLangManager.LangInstance.GetString(33));
@@ -1458,7 +1464,7 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.n演奏速度 = this.iCommonPlaySpeed.n現在の値;
 
 			TJAPlayer3.ConfigIni.b全画面モード = this.iSystemFullscreen.bON;
-			TJAPlayer3.ConfigIni.bSTAGEFAILED有効 = this.iSystemStageFailed.bON;
+			// TJAPlayer3.ConfigIni.bSTAGEFAILED有効 = this.iSystemStageFailed.bON;
 			TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする = this.iSystemRandomFromSubBox.bON;
 
 			//CDTXMania.ConfigIni.bWave再生位置自動調整機能有効 = this.iSystemAdjustWaves.bON;
@@ -1476,8 +1482,8 @@ namespace TJAPlayer3
 			//CDTXMania.ConfigIni.eダメージレベル = (Eダメージレベル) this.iSystemDamageLevel.n現在選択されている項目番号;
 			TJAPlayer3.ConfigIni.bScoreIniを出力する = this.iSystemSaveScore.bON;
 
-		    TJAPlayer3.ConfigIni.ApplyLoudnessMetadata = this.iSystemApplyLoudnessMetadata.bON;
-		    TJAPlayer3.ConfigIni.TargetLoudness = this.iSystemTargetLoudness.n現在の値 / 10.0;
+		    // TJAPlayer3.ConfigIni.ApplyLoudnessMetadata = this.iSystemApplyLoudnessMetadata.bON;
+		    // TJAPlayer3.ConfigIni.TargetLoudness = this.iSystemTargetLoudness.n現在の値 / 10.0;
 		    TJAPlayer3.ConfigIni.ApplySongVol = this.iSystemApplySongVol.bON;
 		    TJAPlayer3.ConfigIni.SoundEffectLevel = this.iSystemSoundEffectLevel.n現在の値;
 		    TJAPlayer3.ConfigIni.VoiceLevel = this.iSystemVoiceLevel.n現在の値;
