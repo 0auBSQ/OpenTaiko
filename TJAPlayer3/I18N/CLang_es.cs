@@ -28,7 +28,7 @@ namespace TJAPlayer3
             [6] = "Número de jugadores",
             [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\ncanciones regulares a dos jugadores dividiendo \nla pantalla a la mitad.",
             [8] = "Modo Kanpeki",
-            [9] = "Modo Kanpeki:\nElige el numero de fallos antes de\nque se considere un intento fallido.\nDejar en 0 para deshabilitar el modo de riesgo.",
+            [9] = "Modo Kanpeki:\nElige el numero de fallos antes de\nque se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [10] = "Velocidad de la canción",
             [11] = "Cambia la velocidad de la canción.\n" +
                 "Por ejemplo, puedes jugar a mitad de\n" +
@@ -61,10 +61,10 @@ namespace TJAPlayer3
             [32] = "Otro ajuste relacionado con BS1770GAIN\ny por lo mismo, inutilizable.",
             [33] = "Actívalo para usar el valor SONGVOL desde\nel .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
             [34] = $"The level adjustment for sound effects.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
-            [35] = $"The level adjustment for voices.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
+            [35] = "Ajusta el volumen de las voces de Don-Chan.\nDebes reiniciar el juego despues de salir\nde la configuraciónfor para aplicar los cambios",
             [36] = $"The level adjustment for songs during gameplay.\nYou can specify from {CSound.MinimumGroupLevel} to {CSound.MaximumGroupLevel}%.",
             [37] = "The amount of sound level change for each press\nof a sound level control key.\nYou can specify from 1 to 20.",
-            [38] = "Blank time before music source to play. (ms)\n",
+            [38] = "Tiempo antes de que la música comience. (ms)\n",
             [39] = "AutoSaveResult:\nTurn ON to save your result screen\n image automatically when you get\n hiscore/hiskill.",
             [40] = "Comparte la información del .tja que estas\njugando en Discord.",
             [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
