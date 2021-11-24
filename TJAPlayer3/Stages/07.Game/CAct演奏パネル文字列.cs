@@ -27,15 +27,15 @@ namespace TJAPlayer3
         private readonly Dictionary<string, Color4> tTagDict = new Dictionary<string, Color4>
         {
             ["アニメ"] = new Color4(tToArgb(253, 145, 208)),
-            ["ナムコオリジナル"] = new Color4(tToArgb(253, 145, 208)),
+            ["ナムコオリジナル"] = new Color4(tToArgb(255, 112, 40)),
             ["クラシック"] = new Color4(tToArgb(221, 172, 4)),
             ["バラエティ"] = new Color4(tToArgb(32, 218, 56)),
             ["どうよう"] = new Color4(tToArgb(254, 191, 3)),
             ["キッズ"] = new Color4(tToArgb(254, 191, 3)),
             ["ボーカロイド"] = new Color4(tToArgb(204, 207, 222)),
             ["Vocaloid"] = new Color4(tToArgb(204, 207, 222)),
-            ["ゲームミュージック"] = new Color4(tToArgb(255, 112, 40)),
-            ["ゲームバラエティ"] = new Color4(tToArgb(255, 112, 40)),
+            ["ゲームミュージック"] = new Color4(tToArgb(205, 138, 237)),
+            ["ゲームバラエティ"] = new Color4(tToArgb(205, 138, 237)),
             ["J-POP"] = new Color4(tToArgb(68, 192, 209)),
             ["ポップス"] = new Color4(tToArgb(68, 192, 209)),
             ["太鼓タワー"] = new Color4(tToArgb(254, 191, 3)),
@@ -51,7 +51,7 @@ namespace TJAPlayer3
         /// <param name="songName">曲名</param>
         /// <param name="genreName">ジャンル名</param>
         /// <param name="stageText">曲数</param>
-        public void SetPanelString(string songName, string genreName, string stageText = null)
+        public void SetPanelString(string songName, string genreName, string stageText = null, C曲リストノード songNode = null)
 		{
 			if( base.b活性化してる )
 			{
@@ -116,9 +116,19 @@ namespace TJAPlayer3
 
                 this.txGENRE = TJAPlayer3.Tx.TxCGen("Template");
 
-                if (tTagDict != null && tTagDict.ContainsKey(genreName))
+                Color stageColor = Color.White;
+                if (songNode != null && songNode.isChangedBoxColor)
+                    stageColor = songNode.BoxColor;
+
+                if (!(songNode != null && songNode.isChangedBoxColor) 
+                    && tTagDict != null 
+                    && tTagDict.ContainsKey(genreName))
                 {
                     this.txGENRE.color4 = tTagDict[genreName];
+                }
+                else
+                {
+                    this.txGENRE.color4 = stageColor;
                 }
 
                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
