@@ -70,16 +70,11 @@ namespace TJAPlayer3
             [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
             [42] = "Actívalo para guardar info. de depuración\nen TJAPlayer3.log cuando cierres el juego.\nAquí se guarda informacion del rendimiento y\neventuales errores del simulador.",
             [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
-                "Nota: Sal de la configuracion\n" +
+                "Nota: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
-            [44] = "Sound buffer size for WASAPI:\n" +
-                "You can set from 0 to 99999ms.\n" +
-                "Set 0 to use a default sysytem\n" +
-                "buffer size.\n" +
-                "Smaller value makes smaller lag,\n" +
-                "but it may cause sound troubles.\n" +
+            [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el numero mas bajo posible\nevitando problemas como\ncongelamiento de la canción y timing incorrecto.\nDejalo en 0 para usar un valor estimado,\no encuentra el valor correcto para ti a base de\nprueba y error." +
                 "\n" +
-                "Note: Exit CONFIGURATION to make\n" +
+                "Nota: Sal de la configuración\n" +
                 "     the setting take effect.",
             [45] = "ASIO device:\n" +
                     "You can choose the sound device\n" +
@@ -87,11 +82,7 @@ namespace TJAPlayer3
                     "\n" +
                     "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
-            [46] = "Use OS Timer or not:\n" +
-                "If this settings is ON, DTXMania uses\n" +
-                "OS Standard timer. It brings smooth\n" +
-                "scroll, but may cause some sound lag.\n" +
-                "(so AdjustWaves is also avilable)\n" +
+            [46] = "Usar esto puede hacer que las notas se vean\nmas suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\npero sin ningun tipo de lag.\n" +
                 "\n" +
                 "If OFF, DTXMania uses its original\n" +
                 "timer and the effect is vice versa.\n" +
@@ -135,31 +126,29 @@ namespace TJAPlayer3
             [73] = "Allow only GOODs, making OKs becoming\n" +
                     "BADs.",
             [74] = "Tight",
-            [75] = "It becomes MISS to hit pad without\n" +
-                " chip.",
-            [76] = "D-MinCombo",
-            [77] = "Initial number to show the combo\n" +
-                " for the drums.\n" +
-                "You can specify from 1 to 99999.",
-            [78] = "InputAdjust",
-            [79] = "To adjust the input timing.\n" +
-                "You can set from -99 to 99ms.\n" +
-                "To decrease input lag, set minus value.",
+            [75] = "Activa si golpear en espacios vacios\ncuenta como una falla.",
+            [76] = "Combo minimo",
+            [77] = "Numero minimo para mostrar el combo\n" +
+                "en el tambor.\n" +
+                "Puedes elegir desde 1 a 99999.",
+            [78] = "Ajuste de timing",
+            [79] = "Para cambiar el timing de la entrada.\n" +
+                "Puedes dejarlo desde -99 a 99ms.\n" +
+                "Para disminuir el lag de la entrada,\ndeja un valor negativo.",
             [80] = "Dificultad por defecto",
             [81] = "Dificultad seleccionada por defecto.\n",
             [82] = "Modo de puntuación",
-            [83] = "Score calculation method\n" +
-                    "TYPE-A: Old allotment\n" +
-                    "TYPE-B: Old case allotment\n" +
-                    "TYPE-C: New allotment\n",
-            [84] = "Turn on fixed score mode.",
-            [85] = "BranchGuide",
-            [86] = "Display the referenced value for branches.\n" +
-                    "Not effective with auto.",
-            [87] = "BranchAnime",
-            [88] = "Branch animation type\n" +
-                    "TYPE-A: Taiko 7-14\n" +
-                    "TYPE-B: Taiko 15+\n" +
+            [83] = "Elige el metodo para calcular la puntuación\n" +
+                    "TYPE-A: Puntuación de Gen-1\n" +
+                    "TYPE-B: Puntuación de Gen-2\n" +
+                    "TYPE-C: Puntuación de Gen-3\n",
+            [84] = "Hace que todas las notas\nvalgan los mismos puntos.\nUsa la formula de Gen-4.",
+            [85] = "Guía de divisiones",
+            [86] = "Activa una guía numerica para ver\nque división se elegirá.\nNo se muestra en modo automatíco.",
+            [87] = "Animación de división",
+            [88] = "Tipo de animación para las divisiones\n" +
+                    "TYPE-A: Animación de Gen-2\n" +
+                    "TYPE-B: Animación de Gen-3\n" +
                     " \n",
             [89] = "GameMode",
             [90] = "Esta opción no funciona.\nImplementa un contador parecido al de Stepmania,\npero el codigo está incompleto asi que su\nfuncionamiento es limitado.",
