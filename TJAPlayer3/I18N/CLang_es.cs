@@ -67,7 +67,7 @@ namespace TJAPlayer3
             [38] = "Tiempo antes de que la música comience. (ms)\n",
             [39] = "Si activas esto, se tomará una captura automaticamente\ncuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\njugando en Discord.",
-            [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
+            [41] = "Cuando se activa, la entrada no tendra perdidas,\npero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\npero se actualizaran con mas frecuencia.",
             [42] = "Actívalo para guardar info. de depuración\nen TJAPlayer3.log cuando cierres el juego.\nAquí se guarda informacion del rendimiento y\neventuales errores del simulador.",
             [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
                 "Nota: Sal de la configuración\n" +
@@ -83,11 +83,11 @@ namespace TJAPlayer3
                 "     para aplicar los cambios.",
             [46] = "Usar esto puede hacer que las notas se vean\nmas suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\npero sin ningun tipo de lag.\n" +
                 "\n" +
-                "If OFF, DTXMania uses its original\n" +
-                "timer and the effect is vice versa.\n" +
+                "Si se desactiva, OpenTaiko lo ignorará\n" +
+                "y el efecto sera al revés.\n" +
                 "\n" +
-                "This settings is avilable only when\n" +
-                "you uses WASAPI/ASIO.\n",
+                "Este ajuste solo está disponible\n" +
+                "usando WASAPI o ASIO.\n",
             [47] = "Mostrar imágenes del Personaje.\n",
             [48] = "Mostrar imágenes de Dancer.\n",
             [49] = "Mostrar imágenes de Mob.\n",
