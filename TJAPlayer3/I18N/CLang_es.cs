@@ -67,7 +67,7 @@ namespace TJAPlayer3
             [38] = "Tiempo antes de que la música comience. (ms)\n",
             [39] = "Si activas esto, se tomará una captura automaticamente\ncuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\njugando en Discord.",
-            [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
+            [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
             [42] = "Actívalo para guardar info. de depuración\nen TJAPlayer3.log cuando cierres el juego.\nAquí se guarda informacion del rendimiento y\neventuales errores del simulador.",
             [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
                 "Nota: Sal de la configuración\n" +
@@ -75,13 +75,12 @@ namespace TJAPlayer3
             [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el numero mas bajo posible\nevitando problemas como\ncongelamiento de la canción y timing incorrecto.\nDejalo en 0 para usar un valor estimado,\no encuentra el valor correcto para ti a base de\nprueba y error." +
                 "\n" +
                 "Nota: Sal de la configuración\n" +
-                "     the setting take effect.",
-            [45] = "ASIO device:\n" +
-                    "You can choose the sound device\n" +
-                    "used with ASIO.\n" +
+                "     para aplicar los cambios.",
+            [45] = "Dispositivo ASIO:\n" +
+                    "Elige el dispositivo de audio usado con ASIO\n" +
                     "\n" +
-                    "Note: Exit CONFIGURATION to make\n" +
-                "     the setting take effect.",
+                    "Note: Sal de la configuración\n" +
+                "     para aplicar los cambios.",
             [46] = "Usar esto puede hacer que las notas se vean\nmas suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\npero sin ningun tipo de lag.\n" +
                 "\n" +
                 "If OFF, DTXMania uses its original\n" +
@@ -96,9 +95,8 @@ namespace TJAPlayer3
             [51] = "Mostrar imagen del Footer.\n",
             [52] = "Usar texturas pre-renderizadas.\n",
             [53] = "Mostrar imágenes del PuchiChara.\n",
-            [54] = "Skin:\n" +
-                "Cambiar Skin.",
-            [55] = "Settings for the system key/pad inputs.",
+            [54] = "Elige una skin desde la carpeta de skins.",
+            [55] = "Menú secundario para cambiar las teclas que\nusa el juego.",
             [56] = "Juego automático",
             [57] = "Para que el carril de P1\n" +
                 "se juegue automaticamente.",
@@ -117,15 +115,14 @@ namespace TJAPlayer3
             [65] = "Modo Kanpeki:\nElige el numero de fallos antes de\nque se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [66] = "Random",
             [67] = "Notes come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
-            [68] = "Stealth",
-            [69] = "DORON:Hidden for NoteImage.\n" +
-                "STEALTH:Hidden for NoteImage and SeNotes",
-            [70] = "NoInfo",
-            [71] = "Hide the song informations.\n",
-            [72] = "JUST",
-            [73] = "Allow only GOODs, making OKs becoming\n" +
-                    "BADs.",
-            [74] = "Tight",
+            [68] = "Notas ocultas",
+            [69] = "DORON: Las notas estan ocultas.\n" +
+                "STEALTH: Las notas y el texto debajo estan ocultos.",
+            [70] = "Sin información",
+            [71] = "Oculta la información de la canción.\n",
+            [72] = "Modo estricto",
+            [73] = "Solo permite las notas buenas, convirtiendo\nlas OK en fallos.",
+            [74] = "Bloqueo de notas",
             [75] = "Activa si golpear en espacios vacios\ncuenta como una falla.",
             [76] = "Combo minimo",
             [77] = "Numero minimo para mostrar el combo\n" +
