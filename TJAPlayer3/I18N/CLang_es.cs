@@ -69,17 +69,9 @@ namespace TJAPlayer3
             [40] = "Comparte la información del .tja que estas\njugando en Discord.",
             [41] = "To select joystick input method.\n\nON to use buffer input. No lost/lags.\nOFF to use realtime input. It may\n causes lost/lags for input.\n Moreover, input frequency is\n synchronized with FPS.",
             [42] = "Actívalo para guardar info. de depuración\nen TJAPlayer3.log cuando cierres el juego.\nAquí se guarda informacion del rendimiento y\neventuales errores del simulador.",
-            [43] = "Sound output type:\n" +
-                "You can choose WASAPI, ASIO or\n" +
-                "DShow(DirectShow).\n" +
-                "WASAPI can use only after Vista.\n" +
-                "ASIO can use on the\n" +
-                "\"ASIO-supported\" sound device.\n" +
-                "You should use WASAPI or ASIO\n" +
-                "to decrease the sound lag.\n" +
-                "\n" +
-                "Note: Exit CONFIGURATION to make\n" +
-                "     the setting take effect.",
+            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+                "Nota: Sal de la configuracion\n" +
+                "     para aplicar los cambios.",
             [44] = "Sound buffer size for WASAPI:\n" +
                 "You can set from 0 to 99999ms.\n" +
                 "Set 0 to use a default sysytem\n" +
@@ -130,12 +122,8 @@ namespace TJAPlayer3
                 "en el carril de las notas\n" +
                 "Puedes ajustarlo desde x0.1 a x200.0.\n" +
                 "(ScrollSpeed=x0.5 sería la mitad de velocidad)",
-            [64] = "Risky",
-            [65] = "Risky mode:\n" +
-                "Set over 1, in case you'd like to specify\n" +
-                " the number of Poor/Miss times to be\n" +
-                " FAILED.\n" +
-                "Set 0 to disable Risky mode.",
+            [64] = "Modo Kanpeki",
+            [65] = "Modo Kanpeki:\nElige el numero de fallos antes de\nque se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [66] = "Random",
             [67] = "Notes come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
             [68] = "Stealth",
@@ -159,7 +147,7 @@ namespace TJAPlayer3
                 "To decrease input lag, set minus value.",
             [80] = "Dificultad por defecto",
             [81] = "Dificultad seleccionada por defecto.\n",
-            [82] = "ModoPuntuación",
+            [82] = "Modo de puntuación",
             [83] = "Score calculation method\n" +
                     "TYPE-A: Old allotment\n" +
                     "TYPE-B: Old case allotment\n" +
@@ -174,14 +162,10 @@ namespace TJAPlayer3
                     "TYPE-B: Taiko 15+\n" +
                     " \n",
             [89] = "GameMode",
-            [90] = "Game mode:\n" +
-                    "(Not avaliable for 2P mode)\n" +
-                    "TYPE-A: 完走!叩ききりまショー!\n" +
-                    "TYPE-B: 完走!叩ききりまショー!(激辛)\n" +
-                    " \n",
-            [91] = "BigNotesJudge",
+            [90] = "Esta opción no funciona.\nImplementa un contador parecido al de Stepmania,\npero el codigo está incompleto asi que su\nfuncionamiento es limitado.",
+            [91] = "Considerar notas grandes",
             [92] = "Requerir usar los dos lados para golpear las\nnotas grandes.",
-            [93] = "JudgeCountDisp",
+            [93] = "Mostrar conteo de notas",
             [94] = "Show the JudgeCount\n" +
                 "(SinglePlay Only)",
             [95] = "KEY CONFIG",
