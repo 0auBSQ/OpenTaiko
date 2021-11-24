@@ -28,7 +28,7 @@ namespace TJAPlayer3
             [6] = "Número de jugadores",
             [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo\n la pantalla a la mitad.",
             [8] = "Modo Kanpeki",
-            [9] = "Modo Kanpeki:\nElige el numero de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
+            [9] = "Modo Kanpeki:\nElige el número de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [10] = "Velocidad de la canción",
             [11] = "Cambia la velocidad de la canción.\n" +
                 "Por ejemplo, puedes jugar a mitad de\n" +
@@ -45,7 +45,7 @@ namespace TJAPlayer3
                 "2 : Diagonal de abajo hacia arriba\n" +
                 "3 : Medio circulo hacia la derecha\n" +
                 "4 : Medio circulo hacia la izquierda",
-            [18] = "No se está seguro de que hace esto.\nUsa mas capacidad de la CPU,\ny causa lag si la velocidad de juego está\nen menos de x0.9.",
+            [18] = "No se está seguro de que hace esto.\nUsa más capacidad de la CPU,\n y causa lag si la velocidad de juego está\nen menos de x0.9.",
             [19] = "Modo de ventana o pantalla completa.",
             [20] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [21] = "Activar el uso de subcarpetas en la\n SELECCIÓN ALEATORIA.",
@@ -54,25 +54,25 @@ namespace TJAPlayer3
             [25] = "Tiempo de retraso(ms) para empezar a reproducir la\ndemo de la música en la pantalla\nSELECCIONAR CANCIÓN.\nPuedes especificar de 0ms a 10000ms",
             [26] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [27] = "Si está activado se mostrará información extra en\nla zona de BGA. (FPS, BPM, tiempo total, etc)\nPuedes activar o desactivar los indicadores\npresionando [Del] mientras juegas.",
-            [28] = "Ajuste del grado de transparencia del\n juego y fondo.\n\n0=completamente transparente,\n255=sin transparencia",
+            [28] = "Ajuste del grado de transparencia del fondo.\n\n0=completamente transparente,\n255=sin transparencia",
             [29] = "Desactívalo si no quieres que\nse reproduzca música de fondo.",
-            [30] = "Si quieres guardar tus records, actívalo.\nDesactívalo si tus canciones estan en\nun medio de solo lectura (CD-ROM, etc).\nNote that the score files also contain\n 'BGM Adjust' parameter. So if you\n want to keep adjusting parameter,\n you need to set SaveScore=ON.",
-            [31] = "Ajuste relacionado con BS1770GAIN\ny por lo mismo, inutilizable.",
-            [32] = "Ajuste relacionado con BS1770GAIN\ny por lo mismo, inutilizable.",
-            [33] = "Actívalo para usar el valor SONGVOL desde\nel .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
-            [34] = "Ajusta el volumen de los efectos de sonido.\nDebes reiniciar el juego despues de salir\nde la configuraciónfor para aplicar los cambios",
-            [35] = "Ajusta el volumen de las voces de Don-Chan.\nDebes reiniciar el juego despues de salir\nde la configuraciónfor para aplicar los cambios",
-            [36] = "Ajusta el volumen de la música.\nDebes reiniciar el juego despues de salir\nde la configuraciónfor para aplicar los cambios",
+            [30] = "Si quieres guardar tus récords, actívalo.\nDesactívalo si tus canciones están en\n un medio de solo lectura (CD-ROM, etc).\n",
+            [31] = "Ajuste relacionado con BS1770GAIN\n y por lo mismo, inutilizable.",
+            [32] = "Ajuste relacionado con BS1770GAIN\n y por lo mismo, inutilizable.",
+            [33] = "Actívalo para usar el valor SONGVOL desde\n el .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
+            [34] = "Ajusta el volumen de los efectos de sonido.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+            [35] = "Ajusta el volumen de las voces de Don-Chan.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+            [36] = "Ajusta el volumen de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [37] = "La cantidad de volumen que cambia\nal presionar las teclas de control de volumen.\nPuedes especificar desde 1 a 20.",
             [38] = "Tiempo antes de que la música comience. (ms)\n",
-            [39] = "Si activas esto, se tomará una captura automaticamente\n cuando obtengas un nuevo récord.",
+            [39] = "Si activas esto, se tomará una captura automáticamente\n cuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\n jugando en Discord.",
-            [41] = "Cuando se activa, la entrada no tendra pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdídas\n pero se actualizaran con mas frecuencia.",
-            [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda informacion del rendimiento y\n eventuales errores del simulador.",
+            [41] = "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
+            [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
             [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
                 "Nota: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
-            [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el numero mas bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Dejalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error." +
+            [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el número más bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Déjalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error." +
                 "\n" +
                 "Nota: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
@@ -81,10 +81,7 @@ namespace TJAPlayer3
                     "\n" +
                     "Note: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
-            [46] = "Usar esto puede hacer que las notas se vean\n mas suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\n pero sin ningun tipo de lag.\n" +
-                "\n" +
-                "Si se desactiva, OpenTaiko lo ignorará\n" +
-                " y el efecto sera al revés.\n" +
+            [46] = "Usar esto puede hacer que las notas se vean\n más suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\n pero sin ningún tipo de lag.\n" +
                 "\n" +
                 "Este ajuste solo está disponible\n" +
                 " usando WASAPI o ASIO.\n",
@@ -99,10 +96,10 @@ namespace TJAPlayer3
             [55] = "Menú secundario para cambiar las teclas que\nusa el juego.",
             [56] = "Juego automático",
             [57] = "Para que el carril de P1\n" +
-                " se juegue automaticamente.",
+                " se juegue automáticamente.",
             [58] = "Juego Automático P2",
             [59] = "Para que el carril de P2\n" +
-                " se juegue automaticamente.",
+                " se juegue automáticamente.",
             [60] = "Redoble Automático",
             [61] = "Si se desactiva, los redobles\n" +
                     " no se completarán en modo automático.",
@@ -112,20 +109,20 @@ namespace TJAPlayer3
                 "Puedes ajustarlo desde x0.1 a x200.0.\n" +
                 "(ScrollSpeed=x0.5 sería la mitad de velocidad)",
             [64] = "Modo Kanpeki",
-            [65] = "Modo Kanpeki:\nElige el numero de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
+            [65] = "Modo Kanpeki:\nElige el número de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [66] = "Notas aleatorias",
-            [67] = "Las notas Don y Ka se aleatorizan.\nCon las opciones que hay puedes cambiar la tasa\n de aleatorizacion.",
+            [67] = "Las notas Don y Ka se aleatorizan.\nCon las opciones que hay puedes cambiar la tasa\n de aleatorización.",
             [68] = "Notas ocultas",
-            [69] = "DORON: Las notas estan ocultas.\n" +
-                "STEALTH: Las notas y el texto debajo estan ocultos.",
+            [69] = "DORON: Las notas están ocultas.\n" +
+                "STEALTH: Las notas y el texto debajo están ocultos.",
             [70] = "Sin información",
             [71] = "Oculta la información de la canción.\n",
             [72] = "Modo estricto",
             [73] = "Solo permite las notas buenas, convirtiendo\nlas OK en fallos.",
             [74] = "Bloqueo de notas",
-            [75] = "Activa si golpear en espacios vacios\ncuenta como una falla.",
-            [76] = "Combo minimo",
-            [77] = "Numero minimo para mostrar el combo\n" +
+            [75] = "Activa si golpear en espacios vacíos\ncuenta como una falla.",
+            [76] = "Combo mínimo",
+            [77] = "Número mínimo para mostrar el combo\n" +
                 "en el tambor.\n" +
                 "Puedes elegir desde 1 a 99999.",
             [78] = "Ajuste de timing",
@@ -135,20 +132,20 @@ namespace TJAPlayer3
             [80] = "Dificultad por defecto",
             [81] = "Dificultad seleccionada por defecto.\n",
             [82] = "Modo de puntuación",
-            [83] = "Elige el metodo para calcular la puntuación\n" +
+            [83] = "Elige el método para calcular la puntuación\n" +
                     "TYPE-A: Puntuación de Gen-1\n" +
                     "TYPE-B: Puntuación de Gen-2\n" +
                     "TYPE-C: Puntuación de Gen-3\n",
-            [84] = "Hace que todas las notas\n valgan los mismos puntos.\nUsa la formula de Gen-4.",
+            [84] = "Hace que todas las notas\n valgan los mismos puntos.\nUsa la fórmula de Gen-4.",
             [85] = "Guía de divisiones",
-            [86] = "Activa una guía numerica para ver\n que división se elegirá.\nNo se muestra en modo automatíco.",
+            [86] = "Activa una guía numérica para ver\n que división se elegirá.\nNo se muestra en modo automático.",
             [87] = "Animación de división",
             [88] = "Tipo de animación para las divisiones\n" +
                     "TYPE-A: Animación de Gen-2\n" +
                     "TYPE-B: Animación de Gen-3\n" +
                     " \n",
             [89] = "Modo de supervivencia",
-            [90] = "Esta opción no funciona.\nImplementa un contador parecido al de Stepmania,\n pero el codigo está incompleto asi que su\n funcionamiento es limitado.",
+            [90] = "Esta opción no funciona.\nImplementa un contador parecido al de Stepmania,\n pero el código está incompleto así que su\n funcionamiento es limitado.",
             [91] = "Considerar notas grandes",
             [92] = "Requerir usar los dos lados para golpear las\n notas grandes.",
             [93] = "Mostrar conteo de notas",
@@ -201,14 +198,14 @@ namespace TJAPlayer3
             [10042] = "Guardar registros",
             [10043] = "Sistema de sonido",
             [10044] = "Tamaño del buffer WASAPI",
-            [10045] = "DIspositivo ASIO",
+            [10045] = "Dispositivo ASIO",
             [10046] = "Usar timer del sistema",
             [10047] = "Mostrar Personaje",
             [10048] = "Mostrar Dancer",
             [10049] = "Mostrar Mob",
             [10050] = "Mostrar Runner",
             [10051] = "Mostrar Footer",
-            [10052] = "Renderizado Rapido",
+            [10052] = "Renderizado Rápido",
             [10053] = "Mostrar PuchiChara",
             [10054] = "Skin (Full)",
             [10055] = "Teclas del sistema",
@@ -225,7 +222,7 @@ namespace TJAPlayer3
 
             [150] = "¡Juega tus canciones\nfavoritas a tu propio gusto!",
             [151] = "¡Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango Aprobado!",
-            [152] = "¡Juega canciones largas con un\nnumero de vidas limitado y llega\na la punta de la torre!",
+            [152] = "¡Juega canciones largas con un\nnúmero de vidas limitado y llega\na la punta de la torre!",
             [153] = "¡Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando!",
             [154] = "¡Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
             [155] = "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
