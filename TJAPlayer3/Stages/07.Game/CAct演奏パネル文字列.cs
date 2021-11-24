@@ -5,19 +5,42 @@ using System.Drawing;
 using System.Diagnostics;
 using SlimDX;
 using FDK;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏パネル文字列 : CActivity
+
+    internal class CAct演奏パネル文字列 : CActivity
 	{
-
-		// コンストラクタ
-
-		public CAct演奏パネル文字列()
+        public static int tToArgb(int r, int g, int b)
+        {
+            return (r * 65536 + g * 256 + b);
+        }
+        
+        // コンストラクタ
+        public CAct演奏パネル文字列()
 		{
 			base.b活性化してない = true;
 			this.Start();
 		}
+
+        private readonly Dictionary<string, Color4> tTagDict = new Dictionary<string, Color4>
+        {
+            ["アニメ"] = new Color4(tToArgb(253, 145, 208)),
+            ["ナムコオリジナル"] = new Color4(tToArgb(253, 145, 208)),
+            ["クラシック"] = new Color4(tToArgb(221, 172, 4)),
+            ["バラエティ"] = new Color4(tToArgb(32, 218, 56)),
+            ["どうよう"] = new Color4(tToArgb(254, 191, 3)),
+            ["キッズ"] = new Color4(tToArgb(254, 191, 3)),
+            ["ボーカロイド"] = new Color4(tToArgb(204, 207, 222)),
+            ["Vocaloid"] = new Color4(tToArgb(204, 207, 222)),
+            ["ゲームミュージック"] = new Color4(tToArgb(255, 112, 40)),
+            ["ゲームバラエティ"] = new Color4(tToArgb(255, 112, 40)),
+            ["J-POP"] = new Color4(tToArgb(68, 192, 209)),
+            ["ポップス"] = new Color4(tToArgb(68, 192, 209)),
+            ["太鼓タワー"] = new Color4(tToArgb(254, 191, 3)),
+            ["段位道場"] = new Color4(tToArgb(42, 122, 169)),
+        };
 
 
         // メソッド
@@ -90,54 +113,22 @@ namespace TJAPlayer3
 						this.txPanel = null;
 					}
 				}
-                if( !string.IsNullOrEmpty(genreName) )
+
+                this.txGENRE = TJAPlayer3.Tx.TxCGen("Template");
+
+                if (tTagDict != null && tTagDict.ContainsKey(genreName))
                 {
-                    if (genreName.Equals("J-POP"))
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Pops");
-                    }
-                    else if (genreName.Equals( "アニメ" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Anime");
-                    }
-                    else if(genreName.Equals( "ゲームミュージック" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Game");
-                    }
-                    else if(genreName.Equals( "ナムコオリジナル" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Namco");
-                    }
-                    else if(genreName.Equals( "クラシック" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Classic");
-                    }
-                    else if(genreName.Equals( "バラエティ" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Variety");
-                    }
-                    else if(genreName.Equals( "どうよう" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Child");
-                    }
-                    else if(genreName.Equals( "バラエティ" ) )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Variety");
-                    }
-                    else if(genreName.Equals( "ボーカロイド" ) || genreName.Equals("Vocaloid") )
-                    {
-                        this.txGENRE = TJAPlayer3.Tx.TxCGen("Vocaloid");
-                    }
-                    else
-                    {
-                        using (var bmpDummy = new Bitmap( 1, 1 ))
-                        {
-                            this.txGENRE = TJAPlayer3.tテクスチャの生成( bmpDummy, true );
-                        }
-                    }
+                    this.txGENRE.color4 = tTagDict[genreName];
                 }
 
-			    this.ct進行用 = new CCounter( 0, 2000, 2, TJAPlayer3.Timer );
+                if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                    pfGENRE = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.BoxFontName), 12);
+                else
+                    pfGENRE = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 12);
+
+                this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
+
+                this.ct進行用 = new CCounter( 0, 2000, 2, TJAPlayer3.Timer );
 				this.Start();
 
 
@@ -221,6 +212,7 @@ namespace TJAPlayer3
 				TJAPlayer3.t安全にDisposeする( ref this.txPanel );
 				TJAPlayer3.t安全にDisposeする( ref this.txMusicName );
                 TJAPlayer3.t安全にDisposeする( ref this.txGENRE );
+                TJAPlayer3.t安全にDisposeする(ref this.pfGENRE);
                 TJAPlayer3.t安全にDisposeする(ref this.txPanel);
                 TJAPlayer3.t安全にDisposeする(ref this.tx歌詞テクスチャ);
                 TJAPlayer3.t安全にDisposeする(ref this.pfMusicName);
@@ -238,8 +230,12 @@ namespace TJAPlayer3
 			if( !base.b活性化してない && !this.bMute )
 			{
 				this.ct進行用.t進行Loop();
+
                 if( this.txGENRE != null )
-                    this.txGENRE.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y );
+                {
+                    this.txGENRE.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Genre_X + 145, TJAPlayer3.Skin.Game_Genre_Y + 23);
+                }
                 if( this.txStage != null )
                     this.txStage.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y );
 
@@ -328,6 +324,8 @@ namespace TJAPlayer3
         private CTexture txMusicName;
         private CTexture txStage;
         private CTexture txGENRE;
+        private CPrivateFastFont pfGENRE;
+        private TitleTextureKey ttkGENRE;
         private CTexture tx歌詞テクスチャ;
         private CPrivateFastFont pfMusicName;
         private CPrivateFastFont pf歌詞フォント;
