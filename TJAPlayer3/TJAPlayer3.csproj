@@ -9,10 +9,10 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TJAPlayer3</RootNamespace>
-    <AssemblyName>TJAPlayer3-Develop-BSQ</AssemblyName>
+    <AssemblyName>OpenTaiko</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>TJAPlayer3-Develop-ReWrite.ico</ApplicationIcon>
+    <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -71,6 +71,28 @@
   <PropertyGroup>
     <ApplicationManifest>TJAPlayer3.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;_TEST_ENGLISH TEST_Direct3D9Ex_ _WindowedFullscreen MemoryRenderer</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>0219</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;TEST_ENGLISH_ TEST_Direct3D9Ex_ _WindowedFullscreen</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>0219</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bass.Net">
       <HintPath>..\Test\dll\Bass.Net.dll</HintPath>
@@ -106,6 +128,7 @@
     <Compile Include="Common\Discord.cs" />
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="I18N\CLang_es.cs" />
     <Compile Include="I18N\CLang_fr.cs" />
     <Compile Include="I18N\CLang_en.cs" />
     <Compile Include="I18N\CLang_jp.cs" />
@@ -254,6 +277,7 @@
     <Compile Include="Stages\08.Result\CStage結果.cs" />
     <Compile Include="Stages\09.Ending\CStage終了.cs" />
     <Compile Include="Stages\10.ChangeSkin\CStageChangeSkin.cs" />
+    <Compile Include="Stages\11.Heya\CStageHeya.cs" />
     <Compile Include="Stages\CActDFPFont.cs" />
     <Compile Include="Stages\CActFIFOBlack.cs" />
     <Compile Include="Stages\CActFIFOStart.cs" />
@@ -285,7 +309,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dtx.ico" />
-    <Content Include="TJAPlayer3-Develop-ReWrite.ico" />
+    <Content Include="OpenTaiko.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\TJAPlayer3.ico" />
   </ItemGroup>
   <ItemGroup>

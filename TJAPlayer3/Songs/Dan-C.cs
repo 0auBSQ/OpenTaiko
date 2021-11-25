@@ -190,9 +190,9 @@ namespace TJAPlayer3
                 {
                     IsCleared[0] = true;
                     if (GetAmount() >= GetValue(true))
-                    {
                         IsCleared[1] = true;
-                    }
+                    else
+                        IsCleared[1] = false;
                 }
                 else
                 {

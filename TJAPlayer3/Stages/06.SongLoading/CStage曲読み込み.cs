@@ -321,8 +321,11 @@ namespace TJAPlayer3
 				#region [ 段位時の曲読み込み画面　]
 
 				TJAPlayer3.Tx.SongLoading_Bg_Dan.t2D描画(TJAPlayer3.app.Device, 0, 0 - (ct待機.n現在の値 <= 600 ? ct待機.n現在の値 / 10f : 60));
-				if(TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate != null) TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate.Opacity = (int)(ct待機.n現在の値 <= 51 ? ( ct待機.n現在の値 / 0.2f) : 255 - (this.ct待機.n現在の値 - 949) / 0.2);
-				TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate?.t2D中心基準描画(TJAPlayer3.app.Device, 1121, 213);
+
+				CActSelect段位リスト.tDisplayDanPlate(TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate,
+					TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行], 
+					1121, 
+					213);
 
 				if (TJAPlayer3.Tx.Tile_Black != null)
 				{
@@ -344,7 +347,7 @@ namespace TJAPlayer3
 				case CStage.Eフェーズ.共通_フェードイン:
 					//if( this.actFI.On進行描画() != 0 )			    // #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
 																		// 必ず一度「CStaeg.Eフェーズ.共通_フェードイン」フェーズを経由させること。
-																		// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。
+																		// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。 
 						base.eフェーズID = CStage.Eフェーズ.NOWLOADING_DTXファイルを読み込む;
 					return (int) E曲読込画面の戻り値.継続;
 

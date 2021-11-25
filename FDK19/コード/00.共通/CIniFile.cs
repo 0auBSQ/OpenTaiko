@@ -9,6 +9,7 @@ namespace FDK
 	/// <summary>
 	/// 汎用的な .iniファイルを扱う。
 	/// </summary>
+
 	public class CIniFile
 	{
 		// プロパティ
@@ -54,7 +55,7 @@ namespace FDK
 			CSection section = null;
 			try
 			{
-				sr = new StreamReader( this.strファイル名, Encoding.GetEncoding( "Shift_JIS" ) );	// ファイルが存在しない場合は例外発生。
+				sr = new StreamReader( this.strファイル名, Encoding.GetEncoding("Shift_JIS") );	// ファイルが存在しない場合は例外発生。
 
 				string line;
 				while( ( line = sr.ReadLine() ) != null )

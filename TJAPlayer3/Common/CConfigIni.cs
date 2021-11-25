@@ -1360,10 +1360,10 @@ namespace TJAPlayer3
             this.bAuto先生の連打 = true;
 			#endregion
 			this.nヒット範囲ms = new STRANGE();
-			this.nヒット範囲ms.Perfect = 30;
+			this.nヒット範囲ms.Perfect = 25;
 			this.nヒット範囲ms.Great = -1; //使用しません。
-			this.nヒット範囲ms.Good = 100;
-			this.nヒット範囲ms.Poor = 130;
+			this.nヒット範囲ms.Good = 75;
+			this.nヒット範囲ms.Poor = 108;
 			this.ConfigIniファイル名 = "";
 			this.dicJoystick = new Dictionary<int, string>( 10 );
 			this.tデフォルトのキーアサインに設定する();
@@ -1440,7 +1440,7 @@ namespace TJAPlayer3
 			this.TokkunMashInterval = 750;
 			this.bEndingAnime = false;
             this.nPlayerCount = 1; //2017.08.18 kairera0467 マルチプレイ対応
-            ShinuchiMode = false;
+            ShinuchiMode = true; // Enable gen-4 score by default
             FastRender = true;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
@@ -1483,7 +1483,7 @@ namespace TJAPlayer3
 		}
 		public void t書き出し( string iniファイル名 )
 		{
-			StreamWriter sw = new StreamWriter( iniファイル名, false, Encoding.GetEncoding( "Shift_JIS" ) );
+			StreamWriter sw = new StreamWriter( iniファイル名, false, Encoding.GetEncoding(TJAPlayer3.sEncType) );
 			sw.WriteLine( ";-------------------" );
 			
 			#region [ System ]
@@ -2052,7 +2052,7 @@ namespace TJAPlayer3
 			{
 				string str;
 				this.tキーアサインを全部クリアする();
-				using ( StreamReader reader = new StreamReader( this.ConfigIniファイル名, Encoding.GetEncoding( "Shift_JIS" ) ) )
+				using ( StreamReader reader = new StreamReader( this.ConfigIniファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType) ) )
 				{
 					str = reader.ReadToEnd();
 				}

@@ -57,7 +57,7 @@ namespace TJAPlayer3
 
 		public void t読み込み( string boxdefファイル名 )
 		{
-			StreamReader reader = new StreamReader( boxdefファイル名, Encoding.GetEncoding( "Shift_JIS" ) );
+			StreamReader reader = new StreamReader( boxdefファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType) );
 			string str = null;
 			while( ( str = reader.ReadLine() ) != null )
 			{

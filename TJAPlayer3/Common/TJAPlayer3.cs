@@ -288,6 +288,11 @@ namespace TJAPlayer3
 			get;
 			private set;
 		}
+		public static CStageHeya stageHeya
+		{
+			get;
+			private set;
+		}
 		public static CStage曲読み込み stage曲読み込み
 		{
 			get;
@@ -390,6 +395,9 @@ namespace TJAPlayer3
 			this.t起動処理();
 		}
 
+		public static string sEncType = "Shift_JIS";
+
+		
 
 		// メソッド
 
@@ -850,18 +858,31 @@ namespace TJAPlayer3
 								#endregion
 								break;
 
+							case (int)CStageタイトル.E戻り値.HEYA:
+								#region [Heya menu]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Taiko Heya");
+								stageHeya.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageHeya;
+								//-----------------------------
+								#endregion
+								break;
+
 							#region [ OPTION: 廃止済 ]
-//							case 2:									// #24525 OPTIONとCONFIGの統合に伴い、OPTIONは廃止
-//								#region [ *** ]
-//								//-----------------------------
-//								r現在のステージ.On非活性化();
-//								Trace.TraceInformation( "----------------------" );
-//								Trace.TraceInformation( "■ オプション" );
-//								stageオプション.On活性化();
-//								r直前のステージ = r現在のステージ;
-//								r現在のステージ = stageオプション;
-//								//-----------------------------
-//								#endregion
+							//							case 2:									// #24525 OPTIONとCONFIGの統合に伴い、OPTIONは廃止
+							//								#region [ *** ]
+							//								//-----------------------------
+							//								r現在のステージ.On非活性化();
+							//								Trace.TraceInformation( "----------------------" );
+							//								Trace.TraceInformation( "■ オプション" );
+							//								stageオプション.On活性化();
+							//								r直前のステージ = r現在のステージ;
+							//								r現在のステージ = stageオプション;
+							//								//-----------------------------
+							//								#endregion
 							//								break;
 							#endregion
 
@@ -1143,7 +1164,39 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-                    case CStage.Eステージ.曲読み込み:
+					case CStage.Eステージ.Heya:
+						#region [ *** ]
+						switch (this.n進行描画の戻り値)
+						{
+							case (int)CStage選曲.E戻り値.タイトルに戻る:
+								#region [ *** ]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ タイトル");
+								stageタイトル.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageタイトル;
+
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								foreach (STPlugin pg in this.listプラグイン)
+								{
+									Directory.SetCurrentDirectory(pg.strプラグインフォルダ);
+									pg.plugin.Onステージ変更();
+									Directory.SetCurrentDirectory(TJAPlayer3.strEXEのあるフォルダ);
+								}
+
+								this.tガベージコレクションを実行する();
+								break;
+								//-----------------------------
+								#endregion
+						}
+						#endregion
+						break;
+
+					case CStage.Eステージ.曲読み込み:
 						#region [ *** ]
 						//-----------------------------
 						DTXVmode.Refreshed = false;		// 曲のリロード中に発生した再リロードは、無視する。
@@ -1214,18 +1267,6 @@ for (int i = 0; i < 3; i++) {
 
 					case CStage.Eステージ.演奏:
 						#region [ *** ]
-						//-----------------------------
-						//long n1 = FDK.CSound管理.rc演奏用タイマ.nシステム時刻ms;
-						//long n2 = FDK.CSound管理.SoundDevice.n経過時間ms;
-						//long n3 = FDK.CSound管理.SoundDevice.tmシステムタイマ.nシステム時刻ms;
-						//long n4 = FDK.CSound管理.rc演奏用タイマ.n現在時刻;
-						//long n5 = FDK.CSound管理.SoundDevice.n経過時間を更新したシステム時刻ms;
-
-						//swlist1.Add( Convert.ToInt32(n1) );
-						//swlist2.Add( Convert.ToInt32(n2) );
-						//swlist3.Add( Convert.ToInt32( n3 ) );
-						//swlist4.Add( Convert.ToInt32( n4 ) );
-						//swlist5.Add( Convert.ToInt32( n5 ) );
 
 						#region [ DTXVモード中にDTXCreatorから指示を受けた場合の処理 ]
 						if ( DTXVmode.Enabled && DTXVmode.Refreshed )
@@ -1937,6 +1978,7 @@ for (int i = 0; i < 3; i++) {
 			{
 				try
 				{
+					// Load config info
 					ConfigIni.tファイルから読み込み( path );
 				}
 				catch (Exception e)
@@ -1958,7 +2000,7 @@ for (int i = 0; i < 3; i++) {
 			{
 				try
 				{
-					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "TJAPlayer3.log" ), false, Encoding.GetEncoding( "Shift_JIS" ) ) ) );
+					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "TJAPlayer3.log" ), false, Encoding.GetEncoding(TJAPlayer3.sEncType) ) ) );
 				}
 				catch ( System.UnauthorizedAccessException )			// #24481 2011.2.20 yyagi
 				{
@@ -2338,6 +2380,7 @@ for (int i = 0; i < 3; i++) {
 			stageコンフィグ = new CStageコンフィグ();
 			stage選曲 = new CStage選曲();
 			stage段位選択 = new CStage段位選択();
+			stageHeya = new CStageHeya();
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
 			stage結果 = new CStage結果();
@@ -2353,6 +2396,7 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add( stageコンフィグ );
 			this.listトップレベルActivities.Add( stage選曲 );
 			this.listトップレベルActivities.Add( stage段位選択 );
+			this.listトップレベルActivities.Add( stageHeya );
 			this.listトップレベルActivities.Add( stage曲読み込み );
 			this.listトップレベルActivities.Add( stage演奏ドラム画面 );
 			this.listトップレベルActivities.Add( stage結果 );

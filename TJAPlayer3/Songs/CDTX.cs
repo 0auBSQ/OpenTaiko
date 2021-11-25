@@ -10,6 +10,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using FDK;
 using FDK.ExtensionMethods;
+using System.Linq;
 using TJAPlayer3;
 
 namespace TJAPlayer3
@@ -1956,12 +1957,12 @@ namespace TJAPlayer3
                         //TimeSpan span;
                         string[] files = Directory.GetFiles(this.strフォルダ名, "*.tja");
 
-                        StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding("Shift_JIS"));
+                        StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType));
                         string str2 = reader.ReadToEnd();
                         reader.Close();
 
                         //StreamReader reader2 = new StreamReader( this.strフォルダ名 + "test.tja", Encoding.GetEncoding( "Shift_JIS" ) );
-                        StreamReader reader2 = new StreamReader(files[0], Encoding.GetEncoding("Shift_JIS"));
+                        StreamReader reader2 = new StreamReader(files[0], Encoding.GetEncoding(TJAPlayer3.sEncType));
                         string str3 = reader2.ReadToEnd();
                         reader2.Close();
 
@@ -1977,7 +1978,7 @@ namespace TJAPlayer3
                         //DateTime timeBeginLoad = DateTime.Now;
                         //TimeSpan span;
 
-                        StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding("Shift_JIS"));
+                        StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType));
                         string str2 = reader.ReadToEnd();
                         reader.Close();
 
@@ -2963,8 +2964,23 @@ namespace TJAPlayer3
         private object str改行文字を削除する(string strInput, int nMode)
         {
             string str = "";
-            str = strInput.Replace(Environment.NewLine, "\n");
-            str = str.Replace('\t', ' ');
+            str = strInput;
+            // str = strInput.Replace(Environment.NewLine, "\n");
+            // str = str.Replace('\t', ' ');
+
+            unsafe
+            {
+                fixed (char *s = str)
+                {
+                    for (int i = 0; i < str.Length; i++)
+                    {
+                        if (s[i] == '\t')
+                            s[i] = ' ';
+                        else if (s[i] == '\r')
+                            s[i] = '\n';
+                    }
+                }
+            }
 
             if (nMode == 0)
             {
@@ -3028,10 +3044,14 @@ namespace TJAPlayer3
             return strCourseTJA;
         }
 
+        // Regexes
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
              @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
+
+        // private static readonly HashSet<string> valableTokens = new HashSet<string>(@"TIT|LEV|BPM|WAV|OFF|BAL|EXA|DAN|REN|BAL|SON|SEV|SCO|COU|STY|TOW|GAM|LIF|DEM|SID|SUB|GEN|MOV|BGI|BGM|HID|GAU|LYR|#HB|#BM".Split('|'));
+
 
         /// <summary>
         /// 新型。
@@ -3045,16 +3065,6 @@ namespace TJAPlayer3
         {
             if (!String.IsNullOrEmpty(strInput)) //空なら通さない
             {
-                //StreamWriter stream = null;
-                //bool bLog = true;
-                //try
-                //{
-                //    stream = new StreamWriter("noteTest.txt", false);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Trace.TraceError( ex.StackTrace );
-                //}
 
                 //2017.01.31 DD カンマのみの行を0,に置き換え
                 strInput = regexForPrefixingCommaStartingLinesWithZero.Replace(strInput, "0,");
@@ -3067,14 +3077,23 @@ namespace TJAPlayer3
                 }
                 string strInputHeader = strInput.Remove(startIndex);
                 strInput = strInput.Remove(0, startIndex);
-                strInputHeader = regexForStrippingHeadingLines.Replace(strInputHeader, "");
+
+                // Regex called here
+                // strInputHeader = regexForStrippingHeadingLines.Replace(strInputHeader, "");
+                
+
                 strInput = strInputHeader + "\n" + strInput;
 
                 //どうせ使わないので先にSplitしてコメントを削除。
                 var strSplitした譜面 = (string[])this.str改行文字を削除する(strInput, 1);
+
                 for (int i = 0; strSplitした譜面.Length > i; i++)
                 {
-                    strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
+                    // strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
+
+                    int idx = strSplitした譜面[i].IndexOf("//");
+                    if (idx >= 0)
+                        strSplitした譜面[i] = strSplitした譜面[i].Substring(0, idx);
                 }
                 //空のstring配列を詰める
                 strSplitした譜面 = this.t空のstring配列を詰めたstring配列を返す(strSplitした譜面);
@@ -3115,6 +3134,7 @@ namespace TJAPlayer3
                     else
                         this.b譜面が存在する[i] = false;
                 }
+
                 #region[ 読み込ませるコースを決定 ]
                 if (this.b譜面が存在する[difficulty] == false)
                 {
@@ -3144,29 +3164,9 @@ namespace TJAPlayer3
 
                 //命令をすべて消去した譜面
                 var str命令消去譜面 = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
-                //if( bLog && stream != null )
-                //{
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //    stream.WriteLine( ">>this.str命令消去譜面(コマンド削除前)" );
-                //    for( int i = 0; i < this.str命令消去譜面.Length; i++ )
-                //    {
-                //        stream.WriteLine( this.str命令消去譜面[ i ] );
-                //    }
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //}
+
+
                 str命令消去譜面 = this.tコマンド行を削除したTJAを返す(str命令消去譜面, 2);
-
-                //if( bLog && stream != null )
-                //{
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //    stream.WriteLine( ">>this.str命令消去譜面" );
-                //    for( int i = 0; i < this.str命令消去譜面.Length; i++ )
-                //    {
-                //        stream.WriteLine( this.str命令消去譜面[ i ] );
-                //    }
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //}
-
 
                 //ここで1行の文字数をカウント。配列にして返す。
                 var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
@@ -3217,17 +3217,6 @@ namespace TJAPlayer3
                     Trace.TraceError("例外が発生しましたが処理を継続します。 (9e401212-0b78-4073-88d0-f7e791f36a91)");
                 }
 
-                //if( bLog && stream != null )
-                //{
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //    stream.WriteLine( ">>this.str命令消去譜面 (命令消去した後)" );
-                //    for( int i = 0; i < this.str命令消去譜面.Length; i++ )
-                //    {
-                //        stream.WriteLine( this.str命令消去譜面[ i ] );
-                //    }
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //}
-
                 //読み込み部分本体に渡す譜面を作成。
                 //0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
                 var strSplitした後の譜面 = strSplit読み込むコース; //strSplitした譜面[ n読み込むコース ].Split( this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries );
@@ -3235,17 +3224,6 @@ namespace TJAPlayer3
                 //string str命令消去譜面temp = this.StringArrayToString( this.str命令消去譜面 );
                 //string[] strDelimiter = { "," };
                 //this.str命令消去譜面 = str命令消去譜面temp.Split( strDelimiter, StringSplitOptions.RemoveEmptyEntries );
-
-                //if( bLog && stream != null )
-                //{
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //    stream.WriteLine( ">>this.str命令消去譜面 (Splitした後)" );
-                //    for( int i = 0; i < this.str命令消去譜面.Length; i++ )
-                //    {
-                //        stream.WriteLine( this.str命令消去譜面[ i ] );
-                //    }
-                //    stream.WriteLine( "-------------------------------------------------" );
-                //}
 
                 this.n現在の小節数 = 1;
                 try
@@ -3264,6 +3242,8 @@ namespace TJAPlayer3
                         //{
                         //    str = this.strTemp + str;
                         //}
+
+                        // Check line
 
                         this.t入力_行解析譜面_V4(str);
 
@@ -3362,12 +3342,20 @@ namespace TJAPlayer3
             return result.ToArray();
         }
 
+
+        
+
+
+
+
         /// <summary>
         /// 譜面読み込みメソッドV4で使用。
         /// </summary>
         /// <param name="InputText"></param>
         private void t命令を挿入する(string InputText)
         {
+            #region [Split comma and arguments values]
+
             string[] SplitComma(string input)
             {
                 var result = new List<string>();
@@ -3417,6 +3405,8 @@ namespace TJAPlayer3
 
             char[] chDelimiter = new char[] { ' ' };
             string[] strArray = null;
+
+            #endregion
 
             if (command == "#START")
             {
@@ -4194,6 +4184,7 @@ namespace TJAPlayer3
 
                 if (InputText.StartsWith("#"))
                 {
+                    // Call orders here
                     this.t命令を挿入する(InputText);
                     return;
                 }

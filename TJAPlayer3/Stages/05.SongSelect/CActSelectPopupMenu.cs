@@ -326,18 +326,18 @@ namespace TJAPlayer3
 				#region [ ポップアップメニュー 背景描画 ]
 				if ( TJAPlayer3.Tx.Menu_Title != null )
 				{
-                    TJAPlayer3.Tx.Menu_Title.t2D描画( TJAPlayer3.app.Device, 160, 40 );
+                    TJAPlayer3.Tx.Menu_Title.t2D描画( TJAPlayer3.app.Device, 460, 40 );
 				}
 				#endregion
 				#region [ ソートメニュータイトル描画 ]
-				int x = 240, y = 44;
+				int x = 540, y = 44;
 				stqMenuTitle.txName.t2D描画( TJAPlayer3.app.Device, x, y );
 				#endregion
 				#region [ カーソル描画 ]
 				if ( TJAPlayer3.Tx.Menu_Highlight != null )
 				{
 					int height = 32;
-					int curX = 180;
+					int curX = 480;
 					int curY = 46 + ( height * ( this.n現在の選択行 + 1 ) );
                     TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, new Rectangle( 0, 0, 16, 32 ) );
 					curX += 0x10;
@@ -358,7 +358,7 @@ namespace TJAPlayer3
 					if ( lciMenuItems[ i ].txName != null )
 					{
 						int height = lciMenuItems[ i ].rectName.Height;
-						lciMenuItems[ i ].txName.t2D描画( TJAPlayer3.app.Device, 180, 77 + i * 32 );
+						lciMenuItems[ i ].txName.t2D描画( TJAPlayer3.app.Device, 480, 77 + i * 32 );
 					}
 
                     bool bValueBold = (bItemBold || (i == nItemSelecting && bIsSelectingIntItem)) ? true : false;
@@ -391,7 +391,7 @@ namespace TJAPlayer3
                         {
                             using (var ctStr = TJAPlayer3.tテクスチャの生成(bmpStr, false))
                             {
-                                ctStr.t2D描画(TJAPlayer3.app.Device, 330, 77 + i * 32);
+                                ctStr.t2D描画(TJAPlayer3.app.Device, 630, 77 + i * 32);
                             }
                         }
                     }

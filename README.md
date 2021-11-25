@@ -1,8 +1,15 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/58159635/140600257-f712fc48-d09a-4a5e-a78d-e7c65ca19b80.png">
+</p>
+
 # OpenTaiko
-TJAPlayer3-Develop-ReWrite-1のフォーク, .tjaファイルのシミュレーターです。
+
+TJAPlayer3-Develop-ReWriteのフォーク, .tjaファイルのシミュレーターです。
 旧TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： v0.5.0
+- 現在のバージョン： v0.5.1
+
+- Discord : https://discord.gg/aA8scTvZ6B
 
 ## 使用上の注意 （重要）
 
@@ -56,11 +63,11 @@ Issue/Pull Requestへ投稿を送ってくれてありがとうございます�
 
 - **重要** ：Issueを提供したら、リリースバージョンと再現方法を述べてください。クラッシュの場合、TJAPlayer3.logの内容をご添付ください。
 
-- CLang言語翻訳を追加して欲しいなら予めDiscordでご連絡ください： 申しコミ#5734
+- CLang言語翻訳を追加して欲しいなら予めDiscordでご連絡ください.
 
 ### 提案について
 
-特別な機能の実装が希望ならDiscordでご連絡ください： 申しコミ#5734
+特別な機能の実装が希望ならDiscordでご連絡ください.
 
 提案を気に入れば実装する事は可能です。
 
@@ -99,7 +106,31 @@ Pキーを長押ししてください。
 タワーの譜面をやる場合は「演奏ゲーム」選曲画面からお選びください。
 ```
 
+- 「Tower_Floors」が見つからないというエラーが出ます！
+
+```
+System/Graphicsという風ではなく
+System/（スキン名）/Graphicsとしてください。
+```
+
 ## 更新記録
+
+<details>
+	<summary>v0.5.1</summary>
+	
+	- 道場に複数なアニメーションを追加
+	
+	- ゲーム終了画面やメニュアイコンを追加
+	
+	- 様々なバグ修正
+	
+	- 複数な外国語サポートを追加
+	
+	- 様々なUI改善
+	
+	- 演奏選曲画面の複数なレイアウトを追加
+	
+</details>
 
 <details>
 	<summary>v0.5.0</summary>
@@ -190,7 +221,7 @@ Pキーを長押ししてください。
 <details>
 	<summary>v0.3.1</summary>
 	
-	- P2にスコアランクを表示されないバグを修正
+	- P2がスコアランクを表示できないバグを修正
 	
 </details>
 
@@ -222,8 +253,7 @@ Pキーを長押ししてください。
 ## 短期で実装する予定機能
 ```
 ☐ 道場結果画面を実装し切る
-☐ コイン（ドンメダル）を貯蓄可能にする機能を実装＋ドンメダル商店
-☑ タワーを実装し切る (COURSE: 5)
+☐ ドンメダル商店
 ☐ タワー結果画面を実装し切る
 ☐ 複数な背景と踊り子セットを選べる機能を実装
 ☐ ２P結果画面を実装
@@ -232,6 +262,8 @@ Pキーを長押ししてください。
 ```
 ## クレジット
 
+> * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
+> * [cien/OpenTaiko Logo](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
@@ -239,3 +271,4 @@ Pキーを長押ししてください。
 > * [Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
 > * [FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
 > * [Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
+> * [touhourenren/TJAPlayer3-Develop-Rewrite](https://github.com/touhourenren)
