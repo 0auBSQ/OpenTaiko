@@ -1483,7 +1483,8 @@ namespace TJAPlayer3
                     if ((c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE) || (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE_MIDI))
                     {
                         // Don't add Dan/Tower charts for Random
-                        if (c曲リストノード.arスコア[(int)Difficulty.Tower] == null && c曲リストノード.arスコア[(int)Difficulty.Dan] == null)
+                        int diff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+                        if (diff < (int)Difficulty.Tower)
                             list.Add(c曲リストノード);
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
