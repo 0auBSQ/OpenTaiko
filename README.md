@@ -7,7 +7,7 @@
 TJAPlayer3-Develop-ReWriteのフォーク, .tjaファイルのシミュレーターです。
 旧TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： v0.5.1
+- 現在のバージョン： v0.5.2
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -113,7 +113,49 @@ System/Graphicsという風ではなく
 System/（スキン名）/Graphicsとしてください。
 ```
 
+- 「11_Characters」が見つからないというエラーが出ます！
+
+```
+v0.5.2から11_Charactersにキャラクターに関してファイルが読み込みされます。
+
+「（スキン名）/Graphics」フォルダーに11_Charactersフォルダーを作って、「（スキン名）/Graphics/11_Characters/（キャラクター数）」にキャラクターファイルをご挿入ください。
+キャラクター設定のファイルがあれば「CharaConfig.txt」でリネームをしてください。
+キャラクター使用が不希望なら「（スキン名）/Graphics/11_Characters/0」を空っぽでご生成ください。
+```
+
+- OpenTaikoが起動しません
+
+```
+SlimDXを改めてダウンロードしてください：https://code.google.com/archive/p/slimdx/downloads
+(「Runtime for .NET 4.0 x86」又は「Runtime for .NET 2.0 x86」)
+```
+
 ## 更新記録
+
+<details>
+	<summary>v0.5.2</summary>
+	
+	- 太鼓部屋の機能を追加
+	
+	- カスタム名札やキャラクター可能にする機能を実装
+	
+	- メダルを取得可能にする手順を追加
+	
+	- 段位タイトルを解放可能にする機能を追加
+	
+	- 複数な手続き型テクスチャを追加
+	
+	- スペイン語の翻訳を追加
+	
+	- 「おまかせ」オプションを追加
+	
+	- 様々なUI/UX改善
+	
+	- 譜面読み込みの最適化
+	
+	- 分岐譜面を修正
+	
+</details>
 
 <details>
 	<summary>v0.5.1</summary>
