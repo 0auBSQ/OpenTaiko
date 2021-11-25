@@ -1388,8 +1388,6 @@ namespace TJAPlayer3
                 }
             }
 
-            
-
             // Third assignment
             this.r確定された曲 = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
             this.n確定された曲の難易度[0] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
@@ -1506,7 +1504,10 @@ namespace TJAPlayer3
                 {
                     if ((c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE) || (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE_MIDI))
                     {
-                        list.Add(c曲リストノード);
+                        // Don't add Dan/Tower charts for Random
+                        int diff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+                        if (diff < (int)Difficulty.Tower)
+                            list.Add(c曲リストノード);
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
                     {
