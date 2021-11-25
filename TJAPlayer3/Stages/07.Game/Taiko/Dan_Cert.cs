@@ -7,6 +7,7 @@ using FDK;
 using System.IO;
 using TJAPlayer3;
 using System.Linq;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -109,6 +110,17 @@ namespace TJAPlayer3
             songsnotesremain = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
             this.ct虹アニメ = new CCounter(0, TJAPlayer3.Skin.Game_Gauge_Dan_Rainbow_Ptn - 1, 30, TJAPlayer3.Timer);
             this.ct虹透明度 = new CCounter(0, TJAPlayer3.Skin.Game_Gauge_Rainbow_Timer - 1, 1, TJAPlayer3.Timer);
+
+            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                this.pfExamFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+            else
+                this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+
+            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Accuracy + 1];
+            for (int i = 0; i < this.ttkExams.Length; i++)
+            {
+                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
+            }
 
 
             /*
@@ -292,6 +304,8 @@ namespace TJAPlayer3
             }
             for(int i = 0; i < IsEnded.Length; i++)
                 IsEnded[i] = false;
+
+            TJAPlayer3.t安全にDisposeする(ref this.pfExamFont);
 
             base.On非活性化();
         }
@@ -529,6 +543,7 @@ namespace TJAPlayer3
 
                     // Skin X : 70
                     // Skin Y : 292
+
 
                     #region [Gauge base]
 
@@ -888,8 +903,21 @@ namespace TJAPlayer3
                     // Exam type flag
                     TJAPlayer3.Tx.DanC_ExamType?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
                         barXOffset + TJAPlayer3.Skin.Game_DanC_Exam_Offset[0] - TJAPlayer3.Tx.DanC_ExamType.szテクスチャサイズ.Width + 22,
+                        lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 48,
+                        new Rectangle(0, 0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
+
+                    if ((int)dan_C[i].GetExamType() < this.ttkExams.Length)
+                        TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[(int)dan_C[i].GetExamType()]).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
+                            barXOffset + TJAPlayer3.Skin.Game_DanC_Exam_Offset[0] - TJAPlayer3.Tx.DanC_ExamType.szテクスチャサイズ.Width + 144,
+                            lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 55);
+
+
+                    /*
+                    TJAPlayer3.Tx.DanC_ExamType?.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device,
+                        barXOffset + TJAPlayer3.Skin.Game_DanC_Exam_Offset[0] - TJAPlayer3.Tx.DanC_ExamType.szテクスチャサイズ.Width + 22,
                         lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 48, 
                         new Rectangle(0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[1] * (int)dan_C[i].GetExamType(), TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
+                    */
 
                     #endregion
 
@@ -914,6 +942,10 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.DanC_Gauge_Base?.t2D描画(TJAPlayer3.app.Device, 
                         TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 4, 
                         TJAPlayer3.Skin.Game_DanC_Y[0]);
+
+                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[(int)Exam.Type.Gauge]).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
+                            TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 104,
+                            TJAPlayer3.Skin.Game_DanC_Y[0] + 21);
 
                     // Display percentage here
                     DrawNumber(
@@ -1143,6 +1175,9 @@ namespace TJAPlayer3
 
         private CCounter ct虹アニメ;
         private CCounter ct虹透明度;
+
+        private CPrivateFastFont pfExamFont;
+        private TitleTextureKey[] ttkExams;
 
         //-----------------
         #endregion
