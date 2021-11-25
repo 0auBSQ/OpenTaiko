@@ -306,7 +306,7 @@ SlimDXを改めてダウンロードしてください：https://code.google.com
 
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko Logo](https://twitter.com/CienpixeL)(@CienpixeL)
-> * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th)
+> * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
@@ -314,4 +314,4 @@ SlimDXを改めてダウンロードしてください：https://code.google.com
 > * [Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
 > * [FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
 > * [Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
-> * [touhourenren/TJAPlayer3-Develop-Rewrite](https://github.com/touhourenren)
+> * [touhourenren/TJAPlayer3-Develop-Rewrite](https://github.com/touhourenren) (@touhourenren)
