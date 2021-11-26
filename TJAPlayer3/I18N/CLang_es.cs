@@ -97,10 +97,10 @@ namespace TJAPlayer3
             [54] = "Elige una skin desde la carpeta de skins.",
             [55] = "Menú secundario para cambiar las teclas que\nusa el juego.",
             [56] = "Juego automático",
-            [57] = "Para que el carril de P1\n" +
+            [57] = "Para que el carril de J1\n" +
                 " se juegue automáticamente.",
-            [58] = "Juego Automático P2",
-            [59] = "Para que el carril de P2\n" +
+            [58] = "Juego Automático J2",
+            [59] = "Para que el carril de J2\n" +
                 " se juegue automáticamente.",
             [60] = "Redoble Automático",
             [61] = "Si se desactiva, los redobles\n" +
@@ -165,14 +165,14 @@ namespace TJAPlayer3
             [10004] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo.",
             [10005] = "Azul derecho",
             [10006] = "Asigna un botón o un pad para\n el Ka (azul) derecho.",
-            [10007] = "Rojo izquierdo P2",
-            [10008] = "Asigna un botón o un pad para\n el Don (rojo) izquierdo del P2.",
-            [10009] = "Rojo derecho P2",
-            [10010] = "Asigna un botón o un pad para\n el Don (rojo) derecho del P2.",
-            [10011] = "Azul izquierdo P2",
-            [10012] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo del P2.",
-            [10013] = "Azul derecho P2",
-            [10014] = "Asigna un botón o un pad para\n el Ka (azul) derecho del P2.",
+            [10007] = "Rojo izquierdo J2",
+            [10008] = "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J2.",
+            [10009] = "Rojo derecho J2",
+            [10010] = "Asigna un botón o un pad para\n el Don (rojo) derecho del J2.",
+            [10011] = "Azul izquierdo J2",
+            [10012] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J2.",
+            [10013] = "Azul derecho J2",
+            [10014] = "Asigna un botón o un pad para\n el Ka (azul) derecho del J2.",
             [10018] = "TimeStretch",
             [10019] = "Pantalla completa",
             [10020] = "StageFailed",
