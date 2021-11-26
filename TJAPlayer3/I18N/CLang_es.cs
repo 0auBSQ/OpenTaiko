@@ -49,6 +49,7 @@ namespace TJAPlayer3
             [19] = "Modo de ventana o pantalla completa.",
             [20] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [21] = "Activar el uso de subcarpetas en la\n SELECCIÓN ALEATORIA.",
+            [22] = "Activa la sincronización vertical.\nActivarlo bloqueará los FPS a 60, que hará\nel desplazamiento más suave pero\naumentará el retraso de la entrada.\nDesactivarlo hará que el juego tenga FPS ilimitados,\nque disminuirá el retraso de la entrada\npero el desplazamiento se verá peor.",
             [23] = "Usar la reproducción AVI o no.",
             [24] = "Activar BGA (animaciones de fondo) o no.",
             [25] = "Tiempo de retraso(ms) para empezar a reproducir la\ndemo de la música en la pantalla\nSELECCIONAR CANCIÓN.\nPuedes especificar de 0ms a 10000ms",
@@ -65,11 +66,12 @@ namespace TJAPlayer3
             [36] = "Ajusta el volumen de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [37] = "La cantidad de volumen que cambia\nal presionar las teclas de control de volumen.\nPuedes especificar desde 1 a 20.",
             [38] = "Tiempo antes de que la música comience. (ms)\n",
-            [39] = "Si activas esto, se tomará una captura automáticamente\n cuando obtengas un nuevo récord.",
+            [39] = "Si activas esto, se tomará una captura\n cuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\n jugando en Discord.",
             [41] = "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
             [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
-            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+                "\n" +
                 "Nota: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
             [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el número más bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Déjalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error." +
@@ -232,6 +234,7 @@ namespace TJAPlayer3
             [200] = "Regresar",
             [201] = "Canciones jugadas recientemente",
             [202] = "¡Juega las canciones que jugaste recientemente!",
+            [203] = "Canción aleatoria",
 
             [1000] = "Piso alcanzado",
             [1001] = "P",
