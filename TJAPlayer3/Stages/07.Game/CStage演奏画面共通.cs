@@ -1437,9 +1437,9 @@ namespace TJAPlayer3
                             this.b連打中[nPlayer] = true;
                             if (bAutoPlay)
                             {
-                                if (TJAPlayer3.ConfigIni.bAuto先生の連打 && this.bPAUSE == false)
+                                if (this.bPAUSE == false && TJAPlayer3.ConfigIni.nRollsPerSec > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
                                 {
-                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / 15.0) * pChip.nRollCount))
+                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / (double)TJAPlayer3.ConfigIni.nRollsPerSec) * pChip.nRollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
