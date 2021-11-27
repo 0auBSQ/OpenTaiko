@@ -89,8 +89,8 @@ namespace TJAPlayer3
             [57] = "Activer le mode automatique pour\nle joueur 1.\nActivable en appuyant sur F3 dans \nle menu de selection des musiques.",
             [58] = "Joueur 2 Auto",
             [59] = "Activer le mode automatique pour\nle joueur 2.\nActivable en appuyant sur F4 dans \nle menu de selection des musiques.",
-            [60] = "Rolls Auto",
-            [61] = "Activer le mode automatique pour\nles rolls.\nN'a pas d'effet sur les ballons.",
+            [60] = "Vitesse des rolls",
+            [61] = "Nombre de frappes par seconde lors\ndes rolls en mode automatique.\nDésactivé si 0, au maximum une\nfrappe par image.",
             [62] = "Vitesse de défilement",
             [63] = "Changer la vitesse de défilement\ndes notes.\n" +
                 "De x0.1 à x200.0.\n",

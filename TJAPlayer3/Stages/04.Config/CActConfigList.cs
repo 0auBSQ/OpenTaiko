@@ -384,6 +384,7 @@ namespace TJAPlayer3
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
 			#region [ AutoPlay ]
+
 			this.iTaikoAutoPlay = new CItemToggle(CLangManager.LangInstance.GetString(56), TJAPlayer3.ConfigIni.b太鼓パートAutoPlay,
 				CLangManager.LangInstance.GetString(57));
 			this.list項目リスト.Add( this.iTaikoAutoPlay );
@@ -392,9 +393,17 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(59));
 			this.list項目リスト.Add( this.iTaikoAutoPlay2P );
 
+			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
+				CLangManager.LangInstance.GetString(61));
+			this.list項目リスト.Add(this.iRollsPerSec);
+
+			
+			/*
 			this.iTaikoAutoRoll = new CItemToggle(CLangManager.LangInstance.GetString(60), TJAPlayer3.ConfigIni.bAuto先生の連打,
 				CLangManager.LangInstance.GetString(61));
 			this.list項目リスト.Add( this.iTaikoAutoRoll );
+			*/
+
 			#endregion
 
 			this.iDrumsScrollSpeed = new CItemInteger(CLangManager.LangInstance.GetString(62), 0, 0x7cf, TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums,
@@ -1402,7 +1411,10 @@ namespace TJAPlayer3
         private CItemToggle iTaikoAutoPlay;
         private CItemToggle iTaikoAutoPlay2P;
         private CItemToggle iTaikoAutoRoll;
-        private CItemToggle iTaikoBranchGuide;
+
+		private CItemInteger iRollsPerSec;
+        
+		private CItemToggle iTaikoBranchGuide;
         private CItemList iTaikoDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
         private CItemList iTaikoScoreMode;
         private CItemList iTaikoBranchAnime;
@@ -1536,7 +1548,8 @@ namespace TJAPlayer3
 		{
             TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = this.iTaikoAutoPlay.bON;
             TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = this.iTaikoAutoPlay2P.bON;
-            TJAPlayer3.ConfigIni.bAuto先生の連打 = this.iTaikoAutoRoll.bON;
+			//TJAPlayer3.ConfigIni.bAuto先生の連打 = this.iTaikoAutoRoll.bON;
+			TJAPlayer3.ConfigIni.nRollsPerSec = this.iRollsPerSec.n現在の値;
 
 			TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums = this.iDrumsScrollSpeed.n現在の値;
             //CDTXMania.ConfigIni.bドラムコンボ表示 = this.iDrumsComboDisp.bON;

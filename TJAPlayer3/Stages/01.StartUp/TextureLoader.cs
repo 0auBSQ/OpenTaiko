@@ -889,7 +889,7 @@ namespace TJAPlayer3
             #endregion
 
             for (int i = 0; i < 2; i++)
-                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i);
+                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, i == 0);
 
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
                 Characters_Heya_Preview[i] = TxC(CHARACTERS + i.ToString() + @"\Normal\0.png");
@@ -901,7 +901,7 @@ namespace TJAPlayer3
 
 
 
-        public void ReloadCharacter(int old, int newC, int player)
+        public void ReloadCharacter(int old, int newC, int player, bool primary = false)
         {
             if (old == newC)
                 return;
@@ -977,7 +977,7 @@ namespace TJAPlayer3
                 #endregion
             }
 
-            if (newC >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != newC)
+            if ((newC >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != newC) || primary)
             {
                 int i = newC;
 

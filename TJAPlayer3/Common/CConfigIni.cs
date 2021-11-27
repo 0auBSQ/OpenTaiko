@@ -732,9 +732,13 @@ namespace TJAPlayer3
 
 
         public int nPlayerCount; //2017.08.18 kairera0467 マルチプレイ対応
-        public bool b太鼓パートAutoPlay;
+        
+		public bool b太鼓パートAutoPlay;
         public bool b太鼓パートAutoPlay2P; //2017.08.16 kairera0467 マルチプレイ対応
-        public bool bAuto先生の連打;
+        
+		public bool bAuto先生の連打;
+		public int nRollsPerSec;
+
         public bool b大音符判定;
         public int n両手判定の待ち時間;
         public int nBranchAnime;
@@ -1291,6 +1295,7 @@ namespace TJAPlayer3
 			this.n表示可能な最小コンボ数.Guitar = 10;
 			this.n表示可能な最小コンボ数.Bass = 10;
 			this.n表示可能な最小コンボ数.Taiko = 10;
+			this.nRollsPerSec = 15;
             this.FontName = "MS UI Gothic";
             this.BoxFontName = "MS UI Gothic";
 		    this.ApplyLoudnessMetadata = true;
@@ -1811,6 +1816,7 @@ namespace TJAPlayer3
             sw.WriteLine("Taiko={0}", this.b太鼓パートAutoPlay ? 1 : 0);
             sw.WriteLine("Taiko2P={0}", this.b太鼓パートAutoPlay2P ? 1 : 0);
             sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
+			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
             sw.WriteLine();
             sw.WriteLine(";-------------------");
             #endregion
@@ -2548,6 +2554,10 @@ namespace TJAPlayer3
                                         else if (str3.Equals("TaikoAutoRoll"))
                                         {
                                             this.bAuto先生の連打 = C変換.bONorOFF(str4[0]);
+                                        }
+										else if (str3.Equals("RollsPerSec"))
+                                        {
+											this.nRollsPerSec = int.Parse(str4);
                                         }
                                         continue;
                                     //-----------------------------
