@@ -95,8 +95,8 @@ namespace TJAPlayer3
             [57] = "Toggle whether player 1 plays automatically.\nPress F3 on song select to toggle this.",
             [58] = "Player 2 Auto Play",
             [59] = "Toggle whether player 2 plays automatically.\nPress F4 on song select to toggle this.",
-            [60] = "Auto Roll",
-            [61] = "Toggle whether rolls are played automatically.\nBalloons will still be played\nif their respective auto option is enabled.",
+            [60] = "Rolls speed",
+            [61] = "Hits per second during rolls when auto\nis enabled.\nNo effect on balloons.\nDisabled if 0, at most one hit per frame.",
             [62] = "Scroll Speed",
             [63] = "Change the speed the notes travel at.\n" +
                 "You can set it from x0.1 to x200.0.\n" +
