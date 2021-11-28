@@ -102,8 +102,8 @@ namespace TJAPlayer3
             [58] = "Juego Automático J2",
             [59] = "Para que el carril de J2\n" +
                 " se juegue automáticamente.",
-            [60] = "Redoble Automático",
-            [61] = "Si se desactiva, los redobles\n" +
+            [60] = "Velocidad del redoble",
+            [61] = "Redobles por segundo cuando se usa el\nmodo automático.\nNo tiene efecto en los globos.\nDesactivado si está en 0,\nbloqueado a un redoble por frame.",
                     " no se completarán en modo automático.",
             [62] = "VelDesplazamiento",
             [63] = "Cambiar la velocidad de desplazamiento\n" +
