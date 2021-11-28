@@ -826,6 +826,19 @@ namespace TJAPlayer3
 	    {
 	        var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip);
 
+            /*
+            if (TJAPlayer3.ConfigIni.nAILevel > 0)
+            {
+                int dice = TJAPlayer3.Random.Next(1000);
+
+                if (dice < TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nBadOdds)
+                    e判定 = E判定.Poor;
+                else if (dice + TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nBadOdds
+                    < TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nGoodOdds)
+                    e判定 = E判定.Good;
+            }
+            */
+
 	        // When performing calibration, reduce audio distraction from user input.
 	        // For users who play primarily by watching notes cross the judgment position,
 	        // you might think that we want them to see visual judgment feedback during
@@ -849,6 +862,7 @@ namespace TJAPlayer3
 
 		private E判定 e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip )
 		{
+
 			if ( pChip != null )
 			{
 				pChip.nLag = (int) ( nTime - pChip.n発声時刻ms );		// #23580 2011.1.3 yyagi: add "nInputAdjustTime" to add input timing adjust feature
@@ -1397,7 +1411,7 @@ namespace TJAPlayer3
                     bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P;
+                    bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
                     break;
             }
 
@@ -1425,7 +1439,10 @@ namespace TJAPlayer3
                         //連打が短すぎると発声されない
 						eJudgeResult = (bCorrectLane)? this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip ) : E判定.Miss;
 
-					    if (!bAutoPlay && eJudgeResult != E判定.Miss)
+                        // AI judges
+                        eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
+
+                        if (!bAutoPlay && eJudgeResult != E判定.Miss)
 					    {
 					        CLagLogger.Add(nPlayer, pChip);
 					    }
@@ -1437,9 +1454,15 @@ namespace TJAPlayer3
                             this.b連打中[nPlayer] = true;
                             if (bAutoPlay)
                             {
-                                if (this.bPAUSE == false && TJAPlayer3.ConfigIni.nRollsPerSec > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
+                                int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
+                                if (TJAPlayer3.ConfigIni.nAILevel > 0)
+                                    rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
+
+                                if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
                                 {
-                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / (double)TJAPlayer3.ConfigIni.nRollsPerSec) * pChip.nRollCount))
+
+
+                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / (double)rollSpeed) * pChip.nRollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
@@ -1464,22 +1487,6 @@ namespace TJAPlayer3
                                 this.eRollState = E連打State.roll;
                                 this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, nNowInput, 0, nPlayer);
                             }
-
-                            //if ((int)CSound管理.rc演奏用タイマ.n現在時刻ms >= pChip.nノーツ終了時刻ms)
-                            //{
-                            //    if (actChara.CharaAction_Balloon_Breaking.b進行中)
-                            //    {
-                            //        this.actChara.bマイどんアクション中 = false; // 風船終了後、再生されていたアクションがされないようにするために追加。(AioiLight)
-                            //        if (actChara.CharaAction_Balloon_Miss != null)
-                            //        {
-                            //            actChara.アクションタイマーリセット();
-                            //            actChara.bマイどんアクション中 = true;
-                            //            actChara.CharaAction_Balloon_Miss = new CCounter(0, CDTXMania.Skin.Game_Chara_Ptn_Balloon_Miss - 1, CDTXMania.Skin.Game_Chara_Balloon_Timer, CDTXMania.Timer);
-                            //            System.Windows.Forms.MessageBox.Show("");
-                            //        }
-                            //    }
-
-                            //}
 
                             break;
                             //---------------------------
@@ -1547,22 +1554,12 @@ namespace TJAPlayer3
 
                         if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
                         {
-                            this.actJudgeString.Start(nPlayer, bAutoPlay ? E判定.Auto : eJudgeResult);
+
+                            this.actJudgeString.Start(nPlayer, (bAutoPlay && TJAPlayer3.ConfigIni.nAILevel == 0) ? E判定.Auto : eJudgeResult);
                             TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(pChip.nチャンネル番号, eJudgeResult, true, nPlayer);
                             TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(pChip.nチャンネル番号, eJudgeResult, nPlayer);
+                        }
 
-                            if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay ? true : (nNowInput == 2 || nNowInput == 3))
-                            {
-                                //if( pChip.nチャンネル番号 == 0x13 || pChip.nチャンネル番号 == 0x1A )
-                                //    //CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, nPlayer );
-                                //else if( pChip.nチャンネル番号 == 0x14 || pChip.nチャンネル番号 == 0x1B )
-                                //   //CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 1, nPlayer );
-                            }
-                        }
-                        else if (eJudgeResult != E判定.Poor && eJudgeResult != E判定.Bad)
-                        {
-                            //this.actJudgeString.Start( 0,bAutoPlay ? E判定.Auto : eJudgeResult, pChip.nLag, pChip, nPlayer );
-                        }
                     }
 					break;
 			}
@@ -2560,7 +2557,7 @@ namespace TJAPlayer3
             #endregion
 
             #region 過去のノーツが見つかったらそれを返却、そうでなければ未来のノーツを返却
-            if ((pastJudge == E判定.Miss || pastJudge == E判定.Poor) && (pastJudge != E判定.Miss && pastJudge != E判定.Poor))
+            if ((pastJudge == E判定.Miss || pastJudge == E判定.Poor) && (futureJudge != E判定.Miss && futureJudge != E判定.Poor))
             {
                 // 過去の判定が不可で、未来の判定が可以上なら未来を返却。
                 nearestChip = futureChip;
@@ -2771,6 +2768,8 @@ namespace TJAPlayer3
 		protected abstract void ドラムスクロール速度ダウン();
 		protected void tキー入力()
 		{
+            // Inputs 
+
 			IInputDevice keyboard = TJAPlayer3.Input管理.Keyboard;
 			if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.F1 ) &&
 				( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
@@ -2792,6 +2791,7 @@ namespace TJAPlayer3
 			if ( ( !this.bPAUSE && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
 			{
 				this.t入力処理_ドラム();
+
 				if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.UpArrow ) && ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
 				{	// shift (+ctrl) + UpArrow (BGMAdjust)
 					TJAPlayer3.DTX.t各自動再生音チップの再生時刻を変更する( ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftControl ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightControl ) ) ? 1 : 10 );
@@ -3144,7 +3144,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
@@ -3716,9 +3716,9 @@ namespace TJAPlayer3
                                 this.actDancer.ctモブ = new CCounter( 1.0, 16.0, (int)((60.0 / bpm / 16.0 ) * 1000 ), CSound管理.rc演奏用タイマ );
 //#endif
                                */
-                            }
+        }
 
-                        }
+    }
                         break;
 
                     case 0x9D: //SCROLL
@@ -4030,7 +4030,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
@@ -4842,6 +4842,25 @@ namespace TJAPlayer3
                 this.tx背景 = null;
             }
 		}
+
+        private int nDice = 0;
+
+        public E判定 AlterJudgement(int player, E判定 judgement, bool reroll)
+        {
+            int AILevel = TJAPlayer3.ConfigIni.nAILevel;
+            if (AILevel > 0 && player == 1)
+            {
+                if (reroll)
+                    nDice = TJAPlayer3.Random.Next(1000);
+
+                if (nDice < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds)
+                    return E判定.Poor;
+                else if (nDice + TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds
+                    < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nGoodOdds)
+                    return E判定.Good;
+            }
+            return judgement;
+        }
 
         public void ReSetScore(int scoreInit, int scoreDiff)
         {

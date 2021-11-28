@@ -40,6 +40,9 @@ namespace TJAPlayer3
                     this.pfdan = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 12);
                 }
 
+                tNamePlateRefreshTitles(player);
+
+                /*
                 using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
                     txName[player] = TJAPlayer3.tテクスチャの生成(tex);
 
@@ -48,6 +51,7 @@ namespace TJAPlayer3
 
                 using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
                     txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
+                */
             }
 
             ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
@@ -56,13 +60,26 @@ namespace TJAPlayer3
 
         public void tNamePlateRefreshTitles(int player)
         {
-            using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
+            string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
+
+            string name = "AIドン";
+            string title = "デウス・エクス・マキナ";
+            string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
+
+            if (TJAPlayer3.ConfigIni.nAILevel == 0 || player == 0)
+            {
+                name = TJAPlayer3.NamePlateConfig.data.Name[player];
+                title = TJAPlayer3.NamePlateConfig.data.Title[player];
+                dan = TJAPlayer3.NamePlateConfig.data.Dan[player];
+            }
+
+            using (var tex = pfName.DrawPrivateFont(name, Color.White, Color.Black, 25))
                 txName[player] = TJAPlayer3.tテクスチャの生成(tex);
 
-            using (var tex = pfTitle.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Title[player], Color.Black, Color.Empty))
+            using (var tex = pfTitle.DrawPrivateFont(title, Color.Black, Color.Empty))
                 txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
 
-            using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
+            using (var tex = pfdan.DrawPrivateFont(dan, Color.White, Color.Black, 22))
                 txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
         }
 

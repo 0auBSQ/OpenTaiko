@@ -397,7 +397,11 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(61));
 			this.list項目リスト.Add(this.iRollsPerSec);
 
-			
+			this.iAILevel = new CItemInteger(CLangManager.LangInstance.GetString(12), 0, 10, TJAPlayer3.ConfigIni.nAILevel,
+				CLangManager.LangInstance.GetString(13));
+			this.list項目リスト.Add(this.iAILevel);
+
+
 			/*
 			this.iTaikoAutoRoll = new CItemToggle(CLangManager.LangInstance.GetString(60), TJAPlayer3.ConfigIni.bAuto先生の連打,
 				CLangManager.LangInstance.GetString(61));
@@ -1413,6 +1417,7 @@ namespace TJAPlayer3
         private CItemToggle iTaikoAutoRoll;
 
 		private CItemInteger iRollsPerSec;
+		private CItemInteger iAILevel;
         
 		private CItemToggle iTaikoBranchGuide;
         private CItemList iTaikoDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
@@ -1550,6 +1555,9 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = this.iTaikoAutoPlay2P.bON;
 			//TJAPlayer3.ConfigIni.bAuto先生の連打 = this.iTaikoAutoRoll.bON;
 			TJAPlayer3.ConfigIni.nRollsPerSec = this.iRollsPerSec.n現在の値;
+
+			TJAPlayer3.ConfigIni.nAILevel = this.iAILevel.n現在の値;
+			TJAPlayer3.NamePlate.tNamePlateRefreshTitles(1);
 
 			TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums = this.iDrumsScrollSpeed.n現在の値;
             //CDTXMania.ConfigIni.bドラムコンボ表示 = this.iDrumsComboDisp.bON;

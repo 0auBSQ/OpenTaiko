@@ -328,12 +328,15 @@ namespace TJAPlayer3
 			    // other controller, etc. and the sounds of the input calibration audio file.
 			    if (!TJAPlayer3.IsPerformingCalibration)
 			    {
+                    // Oto iro here 
+
 			        this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
 			        this.soundBlue = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\ka.ogg" ), ESoundGroup.SoundEffect );
 			        this.soundAdlib = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect );
                     this.soundRed2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\dong.ogg"), ESoundGroup.SoundEffect);
                     this.soundBlue2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\ka.ogg"), ESoundGroup.SoundEffect);
                     this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect);
+
 
                     if (TJAPlayer3.ConfigIni.nPlayerCount >= 2)//2020.05.06 Mr-Ojii左右に出したかったから、追加。
                     {
@@ -353,25 +356,6 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
-				////CDTXMania.tテクスチャの解放( ref this.tx背景 );
-				//CDTXMania.tテクスチャの解放( ref this.txヒットバー );
-				//CDTXMania.tテクスチャの解放( ref this.txヒットバーGB );
-				//CDTXMania.tテクスチャの解放( ref this.txチップ );
-    //            //CDTXMania.tテクスチャの解放( ref this.tx太鼓ノーツ );
-    //            CDTXMania.tテクスチャの解放( ref this.txHand );
-    //            CDTXMania.tテクスチャの解放( ref this.txSenotes );
-    //            CDTXMania.tテクスチャの解放( ref this.tx小節線 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx小節線_branch );
-				//CDTXMania.tテクスチャの解放( ref this.txレーンフレームGB );
-				////CDTXMania.tテクスチャの解放( ref this.txWailing枠 );
-
-    //            CDTXMania.tテクスチャの解放( ref this.tx判定数表示パネル );
-    //            CDTXMania.tテクスチャの解放( ref this.tx判定数小文字 );
-    //            CDTXMania.tテクスチャの解放( ref this.txNamePlate );
-    //            if (CDTXMania.stage演奏ドラム画面.bDoublePlay)
-    //                CDTXMania.tテクスチャの解放( ref this.txNamePlate2P );
-    //            CDTXMania.tテクスチャの解放( ref this.txPlayerNumber);
-
                 if( this.soundRed != null )
                     this.soundRed.t解放する();
                 if( this.soundBlue != null )
@@ -607,14 +591,6 @@ namespace TJAPlayer3
                     this.actFOClear.tフェードアウト開始();
                 }
 
-
-                //if( bIsFinishedPlaying && ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ) )
-                //{
-                //    this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージクリア;
-                //    base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト;
-                //    this.actFOClear.tフェードアウト開始();
-                //}
-
 				if( bIsFinishedFadeout )
 				{
 					Debug.WriteLine( "Total On進行描画=" + sw.ElapsedMilliseconds + "ms" );
@@ -797,8 +773,11 @@ namespace TJAPlayer3
 			int nPad = index;
 
 			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip );
+
+            e判定 = AlterJudgement(nPlayer, e判定, false);
+
             //if( pChip.nコース == this.n現在のコース )
-                this.actGame.t叩ききりまショー_判定から各数値を増加させる( e判定, (int)( nHitTime - pChip.n発声時刻ms ) );
+            this.actGame.t叩ききりまショー_判定から各数値を増加させる( e判定, (int)( nHitTime - pChip.n発声時刻ms ) );
 			if( e判定 == E判定.Miss )
 			{
 				return false;
@@ -955,6 +934,7 @@ namespace TJAPlayer3
                     CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
                     E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit) : E判定.Miss;
 
+                    e判定 = AlterJudgement(nUsePlayer, e判定, false);
 
                     bool b太鼓音再生フラグ = true;
                     if (chipNoHit != null)
@@ -1380,7 +1360,7 @@ namespace TJAPlayer3
                                 bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
                                 break;
                             case 1:
-                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P;
+                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
                                 break;
                             case 2:
                             case 3:
@@ -1393,10 +1373,12 @@ namespace TJAPlayer3
                             pChip.bHit = true;
                             if (pChip.nチャンネル番号 != 0x1F)
                                 this.FlyingNotes.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
+
                             //this.actChipFireTaiko.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
                             if (pChip.nチャンネル番号 == 0x12 || pChip.nチャンネル番号 == 0x14 || pChip.nチャンネル番号 == 0x1B) nLane = 1;
                             TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start((nLane == 0 ? PlayerLane.FlashType.Red : PlayerLane.FlashType.Blue));
                             TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
+
                             this.actMtaiko.tMtaikoEvent(pChip.nチャンネル番号, this.nHand[nPlayer], nPlayer);
 
                             int n大音符 = (pChip.nチャンネル番号 == 0x11 || pChip.nチャンネル番号 == 0x12 ? 2 : 0);
@@ -2057,7 +2039,7 @@ namespace TJAPlayer3
                 if (pChip.n発声時刻ms < (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && pChip.nノーツ終了時刻ms > (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                 {
                     //時間内でかつ0x9Aじゃないならならヒット処理
-                    if (pChip.nチャンネル番号 != 0x18 && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
+                    if (pChip.nチャンネル番号 != 0x18 && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
                         this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer);
                 }
             }
