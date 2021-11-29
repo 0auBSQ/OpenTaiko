@@ -38,6 +38,11 @@ namespace TJAPlayer3
                 "Nota: También cambia el tono de la canción.\n" +
                 "Si Time Stretch está encendido, puede haber\n" +
                 " lag de audio si se usa en menos de x0.9.",
+            [12] = "Nivel de la IA",
+            [13] = "Determina que tan precisa es la IA.\n" +
+                "Si se deja en 0, se desactiva.\n" +
+                "Si se deja en 1 o mas,\n el J2 se convierte en IA.\n" +
+                "No se usa si Juego Automático J2\n se encuentra activado.",
             [16] = "Tipo de interfaz",
             [17] = "Puedes cambiar la interfaz de las canciones\n mostradas en la pantalla de selección.\n" +
                 "0 : Regular (Diagonal de arriba hacia abajo)\n" +
