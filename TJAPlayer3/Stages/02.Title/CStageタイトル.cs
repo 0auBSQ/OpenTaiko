@@ -567,7 +567,7 @@ namespace TJAPlayer3
 
 					if (ctBarAnimeIn.n現在の値 >= (int)(16 * 16.6f))
 					{
-						TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
+						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
 
 						for (int i = 0; i < this.nbModes; i++)
                         {
@@ -595,7 +595,9 @@ namespace TJAPlayer3
 
 								#endregion
 
-								this.stModeBar[i].BarTexture.Opacity = (int)((ctBarAnimeIn.n現在の値 - (16 * 16.6f)) * 1.23f);
+								// this.stModeBar[i].BarTexture.Opacity = (int)((ctBarAnimeIn.n現在の値 - (16 * 16.6f)) * 1.23f);
+
+								this.stModeBar[i].BarTexture.Opacity = 255;
 
 								this.stModeBar[i].BarTexture.vc拡大縮小倍率.Y = 1.0f;
 								this.stModeBar[i].BarTexture.t2D描画(TJAPlayer3.app.Device, 320, 347 - BarAnime - BarAnime1, new Rectangle(0, 0, 641, 27));
