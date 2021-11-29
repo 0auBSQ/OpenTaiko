@@ -38,6 +38,11 @@ namespace TJAPlayer3
                 "Note: Cette option change aussi le ton de la musique.\n" +
                 "Si TimeStretch=ON, il peut y avoir du\n" +
                 "lag si la vitesse générale est inférieure à x0.900.",
+            [12] = "Niveau de l'IA",
+            [13] = "Determine les performances de l'IA.\n" +
+                "Si 0, l'IA est désactivée.\n" +
+                "Si au moins 1, le J2 est joué par l'IA.\n" +
+                "Non compatible avec le mode AUTO J2.",
             [16] = "Disposition des blocs",
             [17] = "Cette option détermine l'ordonnancement \ndes blocs dans le menu de selection \n des musiques en mode partie rapide.\n" +
                 "0 : Standard (Diagonale haut-bas)\n" +

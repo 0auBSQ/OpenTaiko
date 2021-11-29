@@ -925,7 +925,7 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] >= 2)
                         currentPads[0] = TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[0] - 2;
-                    if (TJAPlayer3.ConfigIni.nPlayerCount > 1 && TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] > 2)
+                    if (TJAPlayer3.ConfigIni.nPlayerCount > 1 && TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] >= 2)
                         currentPads[1] = TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] - 2;
                 }
 

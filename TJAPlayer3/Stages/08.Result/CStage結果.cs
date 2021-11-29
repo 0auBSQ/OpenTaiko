@@ -483,7 +483,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
-				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P)
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)
 					this.nEarnedMedalsCount[1] = 0;
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
@@ -1027,6 +1027,11 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.bgmTowerResult.t停止する();
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							actFI.tフェードアウト開始();
+							
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+								if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
+									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+
 							t後処理();
 							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
