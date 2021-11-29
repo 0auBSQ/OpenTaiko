@@ -95,12 +95,27 @@ namespace TJAPlayer3
 			return (C曲リストノード)MemberwiseClone();
 		}
 
+		public override bool Equals(object other)
+        {
+			if (other.GetType() == typeof(C曲リストノード))
+            {
+				C曲リストノード obj = (C曲リストノード)other;
+				return this.nID == obj.nID;
+			}
+			return this.GetHashCode() == other.GetHashCode();
+        }
 
-		// その他
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
-		#region [ private ]
-		//-----------------
-		private static int id;
+
+        // その他
+
+        #region [ private ]
+        //-----------------
+        private static int id;
 		//-----------------
 		#endregion
 	}

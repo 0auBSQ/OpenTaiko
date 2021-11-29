@@ -42,16 +42,6 @@ namespace TJAPlayer3
 
                 tNamePlateRefreshTitles(player);
 
-                /*
-                using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
-                    txName[player] = TJAPlayer3.tテクスチャの生成(tex);
-
-                using (var tex = pfTitle.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Title[player], Color.Black, Color.Empty))
-                    txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
-
-                using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
-                    txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
-                */
             }
 
             ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);

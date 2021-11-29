@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using FDK;
+using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 using static TJAPlayer3.CActSelect曲リスト;
@@ -1130,7 +1131,17 @@ namespace TJAPlayer3
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 					{
-						song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
+						int lastId = TJAPlayer3.stage選曲.r確定された曲.nID;
+						bool songExists = false;
+
+						foreach (var song2 in song.list子リスト)
+                        {
+							if (song2.nID == lastId)
+								songExists = true;
+                        }
+
+						if (songExists == false)
+							song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
 
 						foreach (var song2 in song.list子リスト)
 						{
@@ -1152,6 +1163,9 @@ namespace TJAPlayer3
 							}
 								
 						}
+
+						// Remove duplicates
+						// song.list子リスト = song.list子リスト.Distinct().ToList();
 
 						if (song.list子リスト.Count >= 6)
 						{
