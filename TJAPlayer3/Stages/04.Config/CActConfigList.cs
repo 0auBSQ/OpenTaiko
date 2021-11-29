@@ -77,7 +77,6 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(5));
 			this.list項目リスト.Add( this.iSystemReloadDTX );
 
-
 			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
 				CLangManager.LangInstance.GetString(0),
 				CLangManager.Languages);
@@ -86,12 +85,6 @@ namespace TJAPlayer3
 			this.iLayoutType = new CItemInteger(CLangManager.LangInstance.GetString(16), 0, (int)eLayoutType.TOTAL - 1, TJAPlayer3.ConfigIni.nLayoutType,
 				CLangManager.LangInstance.GetString(17));
 			this.list項目リスト.Add(this.iLayoutType);
-
-			//this.iCommonDark = new CItemList( "Dark", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.eDark,
-			//    "HALF: 背景、レーン、ゲージが表示\nされなくなります。\nFULL: さらに小節線、拍線、判定ラ\nイン、パッドも表示されなくなります。",
-			//    "OFF: all display parts are shown.\nHALF: wallpaper, lanes and gauge are\n disappeared.\nFULL: additionaly to HALF, bar/beat\n lines, hit bar, pads are disappeared.",
-			//    new string[] { "OFF", "HALF", "FULL" } );
-			//this.list項目リスト.Add( this.iCommonDark );
 
 			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
 				CLangManager.LangInstance.GetString(7));
@@ -109,87 +102,50 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(18));
 			this.list項目リスト.Add( this.iSystemTimeStretch );
 
-
 			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.b全画面モード,
 				CLangManager.LangInstance.GetString(19));
 			this.list項目リスト.Add( this.iSystemFullscreen );
-
-			/*
-			this.iSystemStageFailed = new CItemToggle(CLangManager.LangInstance.GetString(10020), TJAPlayer3.ConfigIni.bSTAGEFAILED有効,
-				CLangManager.LangInstance.GetString(20));
-			this.list項目リスト.Add( this.iSystemStageFailed );
-			*/
 
 			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString(10021), TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする,
 				CLangManager.LangInstance.GetString(21));
 			this.list項目リスト.Add( this.iSystemRandomFromSubBox );
 
-
-	
-			//this.iSystemAdjustWaves = new CItemToggle( "AdjustWaves", CDTXMania.ConfigIni.bWave再生位置自動調整機能有効,
-			//    "サウンド再生位置自動補正：\n" +
-			//	"ハードウェアやOSに起因するサウン\n" +
-			//	"ドのずれを強制的に補正します。\n" +
-			//	"BGM のように再生時間の長い音声\n" +
-			//	"データが使用されている曲で効果が\n" +
-			//	"あります。" +
-			//	"\n" +
-			//	"※ DirectSound使用時のみ有効です。",
-			//    "Automatic wave playing position\n" +
-			//	" adjustment feature. If you turn it ON,\n" +
-			//	" it decrease the lag which comes from\n" +
-			//	" the difference of hardware/OS.\n" +
-			//	"Usually, you should turn it ON." +
-			//	"\n"+
-			//	"Note: This setting is effetive\n" +
-			//	" only when DirectSound is used.");
-			//this.list項目リスト.Add( this.iSystemAdjustWaves );
 			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString(10022), TJAPlayer3.ConfigIni.b垂直帰線待ちを行う,
 				CLangManager.LangInstance.GetString(22));
 			this.list項目リスト.Add( this.iSystemVSyncWait );
+
 			this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString(10023), TJAPlayer3.ConfigIni.bAVI有効,
 				CLangManager.LangInstance.GetString(23));
 			this.list項目リスト.Add( this.iSystemAVI );
+
 			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bBGA有効,
 				CLangManager.LangInstance.GetString(24));
 			this.list項目リスト.Add( this.iSystemBGA );
+
 			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString(10025), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms,
 				CLangManager.LangInstance.GetString(25));
 			this.list項目リスト.Add( this.iSystemPreviewSoundWait );
+
 			this.iSystemPreviewImageWait = new CItemInteger(CLangManager.LangInstance.GetString(10026), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms,
 				CLangManager.LangInstance.GetString(26));
 			this.list項目リスト.Add( this.iSystemPreviewImageWait );
+
 			this.iSystemDebugInfo = new CItemToggle(CLangManager.LangInstance.GetString(10027), TJAPlayer3.ConfigIni.b演奏情報を表示する,
 				CLangManager.LangInstance.GetString(27));
 			this.list項目リスト.Add( this.iSystemDebugInfo );
+
 			this.iSystemBGAlpha = new CItemInteger(CLangManager.LangInstance.GetString(10028), 0, 0xff, TJAPlayer3.ConfigIni.n背景の透過度,
 				CLangManager.LangInstance.GetString(28));
 			this.list項目リスト.Add( this.iSystemBGAlpha );
+
 			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString(10029), TJAPlayer3.ConfigIni.bBGM音を発声する,
 				CLangManager.LangInstance.GetString(29));
 			this.list項目リスト.Add( this.iSystemBGMSound );
-            //this.iSystemAudienceSound = new CItemToggle( "Audience", CDTXMania.ConfigIni.b歓声を発声する,
-            //    "歓声の再生：\nこれをOFFにすると、歓声を再生しな\nくなります。",
-            //    "Turn ON if you want to be cheered\n at the end of fill-in zone or not." );
-            //this.list項目リスト.Add( this.iSystemAudienceSound );
-            //this.iSystemDamageLevel = new CItemList( "DamageLevel", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.eダメージレベル,
-            //    "ゲージ減少割合：\nMiss ヒット時のゲージの減少度合い\nを指定します。\nRiskyが1以上の場合は無効となります",
-            //    "Damage level at missing (and\n recovering level) at playing.\nThis setting is ignored when Risky >= 1.",
-            //    new string[] { "Small", "Normal", "Large" } );
-            //this.list項目リスト.Add( this.iSystemDamageLevel );
+
+
 			this.iSystemSaveScore = new CItemToggle(CLangManager.LangInstance.GetString(10030), TJAPlayer3.ConfigIni.bScoreIniを出力する,
 				CLangManager.LangInstance.GetString(30));
 			this.list項目リスト.Add( this.iSystemSaveScore );
-
-			/*
-		    this.iSystemApplyLoudnessMetadata = new CItemToggle(CLangManager.LangInstance.GetString(10031), TJAPlayer3.ConfigIni.ApplyLoudnessMetadata,
-				CLangManager.LangInstance.GetString(31));
-		    this.list項目リスト.Add( this.iSystemApplyLoudnessMetadata );
-
-		    this.iSystemTargetLoudness = new CItemInteger(CLangManager.LangInstance.GetString(10032), (int)Math.Round(CSound.MinimumLufs.ToDouble() * 10.0), (int)Math.Round(CSound.MaximumLufs.ToDouble() * 10.0), (int)Math.Round(TJAPlayer3.ConfigIni.TargetLoudness * 10.0),
-				CLangManager.LangInstance.GetString(32));
-		    this.list項目リスト.Add( this.iSystemTargetLoudness );
-			*/
 
 		    this.iSystemApplySongVol = new CItemToggle(CLangManager.LangInstance.GetString(10033), TJAPlayer3.ConfigIni.ApplySongVol,
 				CLangManager.LangInstance.GetString(33));
@@ -219,11 +175,7 @@ namespace TJAPlayer3
             //    "ストイック（禁欲）モード：\n以下をまとめて表示ON/OFFします。\n_プレビュー画像/動画\n_リザルト画像/動画\n_NowLoading画像\n_演奏画面の背景画像\n_BGA 画像 / AVI 動画\n_グラフ画像\n",
             //    "Turn ON to disable drawing\n * preview image / movie\n * result image / movie\n * nowloading image\n * wallpaper (in playing screen)\n * BGA / AVI (in playing screen)" );
             //this.list項目リスト.Add( this.iSystemStoicMode );
-            //this.iSystemShowLag = new CItemList( "ShowLagTime", CItemBase.Eパネル種別.通常, CDTXMania.ConfigIni.nShowLagType,
-            //    "ズレ時間表示：\nジャストタイミングからのズレ時間(ms)\nを表示します。\n  OFF: ズレ時間を表示しません。\n  ON: ズレ時間を表示します。\n  GREAT-: PERFECT以外の時のみ\n表示します。",
-            //    "About displaying the lag from\n the \"just timing\".\n  OFF: Don't show it.\n  ON: Show it.\n  GREAT-: Show it except you've\n  gotten PERFECT.",
-            //    new string[] { "OFF", "ON", "GREAT-" } );
-            //this.list項目リスト.Add( this.iSystemShowLag );
+
             this.iSystemAutoResultCapture = new CItemToggle(CLangManager.LangInstance.GetString(10039), TJAPlayer3.ConfigIni.bIsAutoResultCapture,
 				CLangManager.LangInstance.GetString(39));
 			this.list項目リスト.Add( this.iSystemAutoResultCapture );
@@ -232,20 +184,6 @@ namespace TJAPlayer3
                 TJAPlayer3.ConfigIni.SendDiscordPlayingInformation,
 				CLangManager.LangInstance.GetString(40));
             list項目リスト.Add(SendDiscordPlayingInformation);
-
-            //this.iSystemJudgeDispPriority = new CItemList( "JudgePriority", CItemBase.Eパネル種別.通常, (int) CDTXMania.ConfigIni.e判定表示優先度,
-            //    "判定文字列とコンボ表示の優先順位を\n" +
-            //    "指定します。\n" +
-            //    "\n" +
-            //    " Under: チップの下に表示します。\n" +
-            //    " Over:  チップの上に表示します。",
-            //    "The display prioity between chips\n" +
-            //    " and judge mark/combo.\n" +
-            //    "\n" +
-            //    " Under: Show them under the chips.\n" +
-            //    " Over:  Show them over the chips.",
-            //    new string[] { "Under", "Over" } );
-            //this.list項目リスト.Add( this.iSystemJudgeDispPriority );	
 
             this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString(10041), TJAPlayer3.ConfigIni.bバッファ入力を行う,
 				CLangManager.LangInstance.GetString(41));
@@ -271,32 +209,6 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(45),
 				asiodevs );
 			this.list項目リスト.Add( this.iSystemASIODevice );
-
-			// #24820 2013.1.3 yyagi
-			//this.iSystemASIOBufferSizeMs = new CItemInteger("ASIOBuffSize", 0, 99999, CDTXMania.ConfigIni.nASIOBufferSizeMs,
-			//    "ASIO使用時のバッファサイズ:\n" +
-			//    "0～99999ms を指定可能です。\n" +
-			//    "推奨値は0で、サウンドデバイスでの\n" +
-			//    "設定値をそのまま使用します。\n" +
-			//    "(サウンドデバイスのASIO設定は、\n" +
-			//    " ASIO capsなどで行います)\n" +
-			//    "値を小さくするほど発音ラグが\n" +
-			//    "減少しますが、音割れや異常動作を\n" +
-			//    "引き起こす場合があります。\n" +
-			//    "\n" +
-			//    "※ 設定はCONFIGURATION画面の\n" +
-			//    "　終了時に有効になります。",
-			//    "Sound buffer size for ASIO:\n" +
-			//    "You can set from 0 to 99999ms.\n" +
-			//    "You should set it to 0, to use\n" +
-			//    "a default value specified to\n" +
-			//    "the sound device.\n" +
-			//    "Smaller value makes smaller lag,\n" +
-			//    "but it may cause sound troubles.\n" +
-			//    "\n" +
-			//    "Note: Exit CONFIGURATION to make\n" +
-			//    "     the setting take effect." );
-			//this.list項目リスト.Add( this.iSystemASIOBufferSizeMs );
 
 			// #33689 2014.6.17 yyagi
 			this.iSystemSoundTimerType = new CItemToggle(CLangManager.LangInstance.GetString(10046), TJAPlayer3.ConfigIni.bUseOSTimer,
@@ -340,18 +252,7 @@ namespace TJAPlayer3
                 //"スキンに変更されます。",
                 skinNames);
             this.list項目リスト.Add(this.iSystemSkinSubfolder);
-            //this.iSystemUseBoxDefSkin = new CItemToggle( "Skin (Box)", CDTXMania.ConfigIni.bUseBoxDefSkin,
-            //	"Music boxスキンの利用：\n" +
-            //	"特別なスキンが設定されたMusic box\n" +
-            //	"に出入りしたときに、自動でスキンを\n" +
-            //	"切り替えるかどうかを設定します。\n",
-            //	//"\n" +
-            //	//"(Music Boxスキンは、box.defファイル\n" +
-            //	//" で指定できます)\n",
-            //	"Box skin:\n" +
-            //	"Automatically change skin\n" +
-            //	"specified in box.def file." );
-            //this.list項目リスト.Add( this.iSystemUseBoxDefSkin );
+
 
 
             this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10055), CItemBase.Eパネル種別.通常,

@@ -209,17 +209,27 @@ namespace TJAPlayer3
 
 					if (!bバナパス読み込み && !bバナパス読み込み失敗)
 					{
-						if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.P))
+						// Hit 1P banapass
+						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
+                        {
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
-						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.P))
-							ctバナパス読み込み待機.t進行();
-						if (TJAPlayer3.Input管理.Keyboard.bキーが離された((int)SlimDXKeys.Key.P))
-						{
-							this.ctバナパス読み込み待機.t停止();
-							if (this.ctバナパス読み込み待機.n現在の値 < 600 && !bバナパス読み込み失敗)
+							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+						}
+						else
+                        {
+							// Default legacy P press
+							if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.P))
+								this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
+							if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.P))
+								ctバナパス読み込み待機.t進行();
+							if (TJAPlayer3.Input管理.Keyboard.bキーが離された((int)SlimDXKeys.Key.P))
 							{
-								ctバナパス読み込み失敗.t開始(0, 1128, 1, TJAPlayer3.Timer);
-								bバナパス読み込み失敗 = true;
+								this.ctバナパス読み込み待機.t停止();
+								if (this.ctバナパス読み込み待機.n現在の値 < 600 && !bバナパス読み込み失敗)
+								{
+									ctバナパス読み込み失敗.t開始(0, 1128, 1, TJAPlayer3.Timer);
+									bバナパス読み込み失敗 = true;
+								}
 							}
 						}
 					}
