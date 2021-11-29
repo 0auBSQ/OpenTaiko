@@ -377,52 +377,10 @@ namespace FDK
 		}
 
 		private static DateTime lastUpdateTime = DateTime.MinValue;
-		public void t再生中の処理をする( object o )			// #26122 2011.9.1 yyagi; delegate経由の呼び出し用
-		{
-			t再生中の処理をする();
-		}
-		public void t再生中の処理をする()
-		{
-//★★★★★★★★★★★★★★★★★★★★★ダミー★★★★★★★★★★★★★★★★★★
-//			Debug.Write( "再生中の処理をする()" );
-			//DateTime now = DateTime.Now;
-			//TimeSpan ts = now - lastUpdateTime;
-			//if ( ts.Milliseconds > 5 )
-			//{
-			//    bool b = Bass.BASS_Update( 100 * 2 );
-			//    lastUpdateTime = DateTime.Now;
-			//    if ( !b )
-			//    {
-			//        Trace.TraceInformation( "BASS_UPdate() failed: " + Bass.BASS_ErrorGetCode().ToString() );
-			//    }
-			//}
-		}
 
 		public void tサウンドを破棄する( CSound csound )
 		{
 		    csound?.t解放する( true );			// インスタンスは存続→破棄にする。
-		}
-
-		public float GetCPUusage()
-		{
-			float f;
-			switch ( SoundDeviceType )
-			{
-				case ESoundDeviceType.ExclusiveWASAPI:
-				case ESoundDeviceType.SharedWASAPI:
-					f = BassWasapi.BASS_WASAPI_GetCPU();
-					break;
-				case ESoundDeviceType.ASIO:
-					f = BassAsio.BASS_ASIO_GetCPU();
-					break;
-				case ESoundDeviceType.DirectSound:
-					f = 0.0f;
-					break;
-				default:
-					f = 0.0f;
-					break;
-			}
-			return f;
 		}
 
 		public string GetCurrentSoundDeviceType()

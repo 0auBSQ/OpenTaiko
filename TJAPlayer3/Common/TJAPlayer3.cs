@@ -497,13 +497,7 @@ namespace TJAPlayer3
 
 		protected override void Initialize()
 		{
-//			new GCBeep();
-			//sw.Start();
-			//swlist1 = new List<int>( 8192 );
-			//swlist2 = new List<int>( 8192 );
-			//swlist3 = new List<int>( 8192 );
-			//swlist4 = new List<int>( 8192 );
-			//swlist5 = new List<int>( 8192 );
+
 			if ( this.listトップレベルActivities != null )
 			{
 				foreach( CActivity activity in this.listトップレベルActivities )
@@ -601,7 +595,7 @@ namespace TJAPlayer3
 		}
 		protected override void Draw( GameTime gameTime )
 		{
-			Sound管理?.t再生中の処理をする();
+			// Sound管理?.t再生中の処理をする();
             Timer?.t更新();
             CSound管理.rc演奏用タイマ?.t更新();
             Input管理?.tポーリング( this.bApplicationActive, TJAPlayer3.ConfigIni.bバッファ入力を行う );
@@ -1657,11 +1651,13 @@ for (int i = 0; i < 3; i++) {
 #if !GPUFlushAfterPresent
 			actFlushGPU?.On進行描画();		// Flush GPU	// EndScene()～Present()間 (つまりVSync前) でFlush実行
 #endif
+
+			/*
 			if ( Sound管理?.GetCurrentSoundDeviceType() != "DirectSound" )
 			{
 				Sound管理?.t再生中の処理をする();	// サウンドバッファの更新; 画面描画と同期させることで、スクロールをスムーズにする
 			}
-
+			*/
 
 			#region [ 全画面_ウインドウ切り替え ]
 			if ( this.b次のタイミングで全画面_ウィンドウ切り替えを行う )
