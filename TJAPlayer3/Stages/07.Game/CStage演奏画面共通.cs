@@ -3144,7 +3144,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
@@ -4030,7 +4030,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
