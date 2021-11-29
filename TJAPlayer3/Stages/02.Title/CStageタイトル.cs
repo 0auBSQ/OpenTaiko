@@ -226,7 +226,7 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
                     {
-						if(bプレイヤーエントリー && !bプレイヤーエントリー決定)
+						if(bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
                         {
 							if(n現在の選択行プレイヤーエントリー + 1 <= 2)
 							{
@@ -251,7 +251,7 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)||TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
                     {
-						if(bプレイヤーエントリー && !bプレイヤーエントリー決定)
+						if(bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
                         {
 							if(n現在の選択行プレイヤーエントリー - 1 >= 0)
 							{
@@ -277,7 +277,7 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))
 					{
-						if (bプレイヤーエントリー)
+						if (bプレイヤーエントリー && this.ctバナパス読み込み成功.b終了値に達した)
 						{
 							if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2)
 							{
@@ -541,7 +541,9 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
 						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 92 * 2, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
 
-					TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400));
+					Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
+					if (Opacity > 0)
+						TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, Opacity);
 				}
 
                 #endregion
