@@ -1455,7 +1455,7 @@ namespace TJAPlayer3
                             if (bAutoPlay)
                             {
                                 int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
-                                if (TJAPlayer3.ConfigIni.nAILevel > 0)
+                                if (TJAPlayer3.ConfigIni.nAILevel > 0 && nPlayer == 1)
                                     rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
 
                                 if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
