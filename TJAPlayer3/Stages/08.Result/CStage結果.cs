@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using FDK;
+using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 using static TJAPlayer3.CActSelect曲リスト;
@@ -550,7 +551,7 @@ namespace TJAPlayer3
 					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString(1002), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString(1003), pfTowerText, Color.Black, Color.Transparent, 700);
-					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
 
@@ -917,21 +918,26 @@ namespace TJAPlayer3
 
 						this.ctTower_Animation.t進行();
 
-						int xFactor = 0;
-						float yFactor = 1f;
-						if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[0] != null)
+						if (TJAPlayer3.Skin.Game_Tower_Ptn_Result > 0)
                         {
-							xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Width) / 2;
-							yFactor = TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+							int xFactor = 0;
+							float yFactor = 1f;
+
+							int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+
+							if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
+								currentTowerType = 0;
+
+							if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
+							{
+								xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Width) / 2;
+								yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+							}
+
+							TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * this.ctTower_Animation.n現在の値);
+							TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						}
 
-						int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
-
-						if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
-							currentTowerType = 0;
-
-						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * this.ctTower_Animation.n現在の値);
-						TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 						int firstRowY = 394;
@@ -1130,7 +1136,17 @@ namespace TJAPlayer3
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 					{
-						song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
+						int lastId = TJAPlayer3.stage選曲.r確定された曲.nID;
+						bool songExists = false;
+
+						foreach (var song2 in song.list子リスト)
+                        {
+							if (song2.nID == lastId)
+								songExists = true;
+                        }
+
+						if (songExists == false)
+							song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
 
 						foreach (var song2 in song.list子リスト)
 						{
@@ -1152,6 +1168,9 @@ namespace TJAPlayer3
 							}
 								
 						}
+
+						// Remove duplicates
+						// song.list子リスト = song.list子リスト.Distinct().ToList();
 
 						if (song.list子リスト.Count >= 6)
 						{

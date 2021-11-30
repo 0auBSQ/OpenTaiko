@@ -406,7 +406,7 @@ namespace TJAPlayer3
 						t演奏位置の変更( TJAPlayer3.DTXVmode.nStartBar, 0 );
 					}
 
-					TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
+					// TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
 					base.b初めての進行描画 = false;
 				}
 				#endregion
