@@ -32,6 +32,11 @@ namespace TJAPlayer3
             [10] = "Song Playback Speed",
             [11] = "Change song playback speed.\nIf the Time Stretch option is enabled,\nsound issues may occur below 0.9x playback speed.\n" +
                 "Note: It also changes the songs' pitch.",
+            [12] = "AI Level",
+            [13] = "Determines how precise the AI is.\n" +
+                "If 0, AI is disabled.\n" +
+                "If 1 or more, the 2P will play as AI.\n" +
+                "Disabled if AUTO 2P is on.",
             [16] = "Layout type",
             [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +

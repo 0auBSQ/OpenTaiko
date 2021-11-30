@@ -531,7 +531,7 @@ namespace TJAPlayer3
                     currentPosition++;
 
                     // Determines if a small bar will be used to optimise the display layout
-                    bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition);
+                    bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition) || countNoGauge == 6;
 
                     // Y index of the gauge
                     int yIndex = (currentPosition % 3) + 1;

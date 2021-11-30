@@ -605,6 +605,24 @@ namespace TJAPlayer3
 		}
 		// プロパティ
 
+
+		public class CAIPerformances
+        {
+			public int nGoodOdds;
+			public int nPerfectOdds;
+			public int nBadOdds;
+			public int nRollSpeed;
+
+			public CAIPerformances(int po, int go, int bo, int rp)
+            {
+				nGoodOdds = go;
+				nPerfectOdds = po;
+				nBadOdds = bo;
+				nRollSpeed = rp;
+            }
+        }
+
+
 #if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 		//----------------------------------------
 		public float[,] fGaugeFactor = new float[5,2];
@@ -738,6 +756,21 @@ namespace TJAPlayer3
         
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
+		public int nAILevel;
+
+		public CAIPerformances[] apAIPerformances =
+		{
+			new CAIPerformances(500, 400, 100, 7),
+			new CAIPerformances(650, 310, 40, 8),
+			new CAIPerformances(750, 225, 25, 9),
+			new CAIPerformances(800, 180, 20, 10),
+			new CAIPerformances(850, 135, 15, 12),
+			new CAIPerformances(900, 90, 10, 14),
+			new CAIPerformances(910, 85, 5, 16),
+			new CAIPerformances(950, 49, 1, 22),
+			new CAIPerformances(975, 25, 0, 26),
+			new CAIPerformances(1000, 0, 0, 30)
+		};
 
         public bool b大音符判定;
         public int n両手判定の待ち時間;
@@ -1296,6 +1329,7 @@ namespace TJAPlayer3
 			this.n表示可能な最小コンボ数.Bass = 10;
 			this.n表示可能な最小コンボ数.Taiko = 10;
 			this.nRollsPerSec = 15;
+			this.nAILevel = 0;
             this.FontName = "MS UI Gothic";
             this.BoxFontName = "MS UI Gothic";
 		    this.ApplyLoudnessMetadata = true;
@@ -1817,6 +1851,7 @@ namespace TJAPlayer3
             sw.WriteLine("Taiko2P={0}", this.b太鼓パートAutoPlay2P ? 1 : 0);
             sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
+			sw.WriteLine("AILevel={0}", this.nAILevel);
             sw.WriteLine();
             sw.WriteLine(";-------------------");
             #endregion
@@ -2558,6 +2593,10 @@ namespace TJAPlayer3
 										else if (str3.Equals("RollsPerSec"))
                                         {
 											this.nRollsPerSec = int.Parse(str4);
+                                        }
+										else if (str3.Equals("AILevel"))
+                                        {
+											this.nAILevel = int.Parse(str4);
                                         }
                                         continue;
                                     //-----------------------------

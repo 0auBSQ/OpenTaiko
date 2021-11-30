@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using FDK;
+using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 using static TJAPlayer3.CActSelect曲リスト;
@@ -483,7 +484,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
-				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P)
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)
 					this.nEarnedMedalsCount[1] = 0;
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
@@ -1027,6 +1028,11 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.bgmTowerResult.t停止する();
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							actFI.tフェードアウト開始();
+							
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+								if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
+									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+
 							t後処理();
 							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
@@ -1125,7 +1131,17 @@ namespace TJAPlayer3
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 					{
-						song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
+						int lastId = TJAPlayer3.stage選曲.r確定された曲.nID;
+						bool songExists = false;
+
+						foreach (var song2 in song.list子リスト)
+                        {
+							if (song2.nID == lastId)
+								songExists = true;
+                        }
+
+						if (songExists == false)
+							song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
 
 						foreach (var song2 in song.list子リスト)
 						{
@@ -1147,6 +1163,9 @@ namespace TJAPlayer3
 							}
 								
 						}
+
+						// Remove duplicates
+						// song.list子リスト = song.list子リスト.Distinct().ToList();
 
 						if (song.list子リスト.Count >= 6)
 						{
