@@ -2287,36 +2287,19 @@ namespace TJAPlayer3
 
 			var rc = new Rectangle(0, 48, 128, 48);
 
+			int opct = 255;
+
+			if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect && ctDifficultyIn.n現在の値 >= 1000)
+				opct = Math.Max((int)255.0f - (ctDifficultyIn.n現在の値 - 1000), 0);
+
+			TJAPlayer3.Tx.SongSelect_Crown.Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = opct;
 			for (int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Genre_Count; i++)
-			{
-				if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
-				{
-					if (ctDifficultyIn.n現在の値 >= 1000)
-					{
-                        if (ctDifficultyIn.n現在の値 <= 1255)
-                        {
-                            TJAPlayer3.Tx.SongSelect_Crown.Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
-                            TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
-                            TJAPlayer3.Tx.SongSelect_Bar_Genre[i].Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
-                            TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
-                            TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.Opacity = (int)255.0f - (ctDifficultyIn.n現在の値 - 1000);
-                        }
-                        else
-						{
-							TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = 0;
-						}
-					}
-				}
-				else
-				{
-					TJAPlayer3.Tx.SongSelect_Crown.Opacity = (int)255.0f;
-					TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = (int)255.0f;
-					TJAPlayer3.Tx.SongSelect_Bar_Genre[i].Opacity = (int)255.0f;
-					TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = (int)255.0f;
-					TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.Opacity = (int)255.0f;
-				}
-			}
-			
+				TJAPlayer3.Tx.SongSelect_Bar_Genre[i].Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Random.Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.Opacity = opct;
+
 			if (eバー種別 == Eバー種別.Random)
             {
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Random?.t2D描画(TJAPlayer3.app.Device, x, y);
