@@ -1469,10 +1469,6 @@ namespace TJAPlayer3
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Miss++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                     this.actComboVoice.tReset(nPlayer);
-                                    //for (int i = 0; i < 2; i++)
-                                    //{
-                                    //    ctChipAnime[i].t停止();
-                                    //}
                                 }
 			    				break;
 				    		default:
@@ -1485,8 +1481,6 @@ namespace TJAPlayer3
 						switch ( eJudgeResult )
 						{
                             case E判定.Perfect:
-                            case E判定.Great:
-                            case E判定.Good:
                                 {
                                     if( pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18 )
                                     {
@@ -1511,7 +1505,33 @@ namespace TJAPlayer3
                                 }
                                 break;
 
-							default:
+                            case E判定.Great:
+                            case E判定.Good:
+                                {
+                                    if (pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18)
+                                    {
+                                        if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                            this.n可[actDan.NowShowingNumber]++;
+
+                                        this.CBranchScore[nPlayer].nGood++;
+                                        this.CChartScore[nPlayer].nGood++;
+
+                                        if (nPlayer == 0) this.nヒット数_Auto含む.Drums.Great++;
+                                        this.actCombo.n現在のコンボ数[nPlayer]++;
+
+                                        if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
+                                        {
+                                            this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 1;
+                                        }
+                                        else
+                                        {
+                                            this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
+                                        }
+                                    }
+                                }
+                                break;
+
+                            default:
                                 {
                                     if( pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18 && pChip.nチャンネル番号 != 0x1F )
                                     {
@@ -1525,10 +1545,7 @@ namespace TJAPlayer3
 
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                         this.actComboVoice.tReset(nPlayer);
-                                        //for (int i = 0; i < 2; i++)
-                                        //{
-                                        //    ctChipAnime[i].t停止();
-                                        //}
+
                                     }
                                 }
 								break;

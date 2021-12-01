@@ -1073,6 +1073,22 @@ namespace TJAPlayer3
             
             for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
+
+                
+                if (ExamChange[i] == true)
+                {
+                    for (int j = 1; j < CExamInfo.cExamMaxSongs; j++)
+                    {
+                        if (!(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null))
+                            continue;
+
+                        bool rainbowBetterSuccess = GetExamStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success;
+
+                        if (!rainbowBetterSuccess) status = Exam.Status.Success;
+                    }
+                }
+                
+
                 if (dan_C[i] == null || dan_C[i].GetEnable() != true)
                     continue;
 

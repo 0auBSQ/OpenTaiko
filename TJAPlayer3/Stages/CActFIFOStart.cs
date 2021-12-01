@@ -66,7 +66,7 @@ namespace TJAPlayer3
 			}
 			this.counter.t進行();
 
-			if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+			if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] >= (int)Difficulty.Tower)
             {
 				if (TJAPlayer3.Tx.Tile_Black != null)
 				{

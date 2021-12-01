@@ -129,8 +129,15 @@ namespace TJAPlayer3
 			if( !base.b活性化してない )
 			{
 				this.tx背景 = TJAPlayer3.tテクスチャの生成( this.strSTAGEFILE, false );
-                //this.txSongnamePlate = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\6_SongnamePlate.png" ) );
-                this.ct待機 = new CCounter( 0, TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? 1000 : 600, 5, TJAPlayer3.Timer );
+				//this.txSongnamePlate = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\6_SongnamePlate.png" ) );
+
+				float wait = 600f;
+				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+					wait = 1000f;
+				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					wait = 1200f;
+
+                this.ct待機 = new CCounter( 0, wait, 5, TJAPlayer3.Timer );
                 this.ct曲名表示 = new CCounter( 1, 30, 30, TJAPlayer3.Timer );
 				try
 				{
@@ -249,13 +256,51 @@ namespace TJAPlayer3
 			}
 			#endregion
 
-			if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 			{
 				#region [ 背景、音符＋タイトル表示 ]
 				//-----------------------------
 				this.ct曲名表示.t進行();
-				if (TJAPlayer3.Tx.SongLoading_BgWait != null) TJAPlayer3.Tx.SongLoading_BgWait.t2D描画(TJAPlayer3.app.Device, 0, 0);
-				if (TJAPlayer3.Tx.SongLoading_Chara != null) TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+				{
+					#region [Tower loading screen]
+
+					if (TJAPlayer3.Skin.Game_Tower_Ptn_Result > 0)
+					{
+						int xFactor = 0;
+						float yFactor = 1f;
+
+						int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+
+						if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
+							currentTowerType = 0;
+
+						if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
+						{
+							xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Width) / 2;
+							yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+						}
+
+						float pos = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720) -
+							((ct待機.n現在の値 <= 1200 ? ct待機.n現在の値 / 10f : 120) / 120f * (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720));
+
+						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * pos);
+						TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * pos);
+					}
+
+					#endregion
+				}
+				else
+                {
+					#region [Ensou loading screen]
+
+					if (TJAPlayer3.Tx.SongLoading_BgWait != null) TJAPlayer3.Tx.SongLoading_BgWait.t2D描画(TJAPlayer3.app.Device, 0, 0);
+					if (TJAPlayer3.Tx.SongLoading_Chara != null) TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+					#endregion
+				}
+
 				//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.灰, this.ct曲名表示.n現在の値.ToString() );
 
 				if (TJAPlayer3.Tx.SongLoading_Plate != null)
