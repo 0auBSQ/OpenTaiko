@@ -13,7 +13,7 @@ Old TJAPlayer3-Develop-BSQ
 
 ## Cautions before using （IMPORTANT）
 
-- This software does not have a skin.（Only the software is provided.） There will be a copyright following skin later on.
+- This software does not have a skin.（Only the software is provided.） There will be a copyright free skin later on.
 
 - It is **YOUR RESPONSIBILITY** to use this software. The creator will not take responsibilities for any problems you got from using this software.
 
@@ -45,7 +45,7 @@ OpenTaiko license does not apply in this case.
 
 **GOALS**
 
-- Multiple fun ways to play Taiko No Tatsujin.
+- Multiple fun ways to play Taiko.
 
 - More customization for better skinning potential, and make "Everyone could play Taiko easily at their own style" true.
 
@@ -63,15 +63,15 @@ Thank you for posting to Issue/Pull Request. It is very much appreciated.
 
 - **IMPORTANT**: Once you post an issue, please write the release version and recreation steps. If it is a crash, please attach the TJAPlayer3.log file.
 
-- If you want CLand translations, please contact the software author on Discord beforehand.
+- If you want CLang translations, please contact the software author on Discord beforehand.
 
 ### Feature requests
 
-If you want a feature to be added please contact on Discord.
+If you want a feature to be added please contact me on Discord beforehand.
 
 If the feature request is good it might be added.
 
-- **IMPORTANT**: Feature requests such as "Please recreate UI/UX as per following AC Nijiiro Version" will be denied quickly.
+- **IMPORTANT**: Feature requests such as "Please recreate UI/UX as per following AC Nijiiro Version" will be denied and left without answer.
 
 ## Q＆A
 
