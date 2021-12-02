@@ -247,7 +247,7 @@ namespace TJAPlayer3
             
             [1010] = "Indicador de almas",
             [1011] = "Cantidad de Perfectas",
-            [1012] = "Cantidad de Buenas",
+            [1012] = "Cantidad de OK",
             [1013] = "Cantidad de Malas",
             [1014] = "Puntuación",
             [1015] = "Cantidad de redobles",
