@@ -43,6 +43,12 @@ namespace TJAPlayer3
                 "Si 0, l'IA est désactivée.\n" +
                 "Si au moins 1, le J2 est joué par l'IA.\n" +
                 "Non compatible avec le mode AUTO J2.",
+            [14] = "Décalage général",
+            [15] = "Modifie la valeur OFFSET\nlue pour tout les sons.\n" +
+                "Définit entre -99 to 99ms.\n" +
+                "Une valeur négative peut réduire \nles latences d'entrées.\n\n" +
+                "Note: Cette option prend effet\n" +
+                "     après le rechargement des sons.",
             [16] = "Disposition des blocs",
             [17] = "Cette option détermine l'ordonnancement \ndes blocs dans le menu de selection \n des musiques en mode partie rapide.\n" +
                 "0 : Standard (Diagonale haut-bas)\n" +
