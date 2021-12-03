@@ -180,8 +180,8 @@ namespace TJAPlayer3
 								this.st演奏記録[0].nスコアランク[i] = ini.stセクション[0].nスコアランク[i];
 							}
 
-							ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
-							ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
+							// ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
+							// ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
 						}
 					}
 					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
@@ -274,16 +274,6 @@ namespace TJAPlayer3
 						ini.stセクション[0] = this.st演奏記録[0];
 					}
 
-					// Clear & Score rank (Legacy)
-					/*
-					if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-					{
-						if (this.nクリア > ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
-							ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
-						if (this.nスコアランク > ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
-							ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
-					}
-					*/
 
 					// ラストプレイ #23595 2011.1.9 ikanick
 					// オートじゃなければプレイ結果を書き込む
