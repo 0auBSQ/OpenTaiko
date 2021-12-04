@@ -351,7 +351,12 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(79));
 			this.list項目リスト.Add( this.iInputAdjustTimeMs );
 
-            this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nDefaultCourse,
+			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString(14), -99, 99, TJAPlayer3.ConfigIni.nGlobalOffsetMs,
+				CLangManager.LangInstance.GetString(15));
+			this.list項目リスト.Add(this.iGlobalOffsetMs);
+
+
+			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nDefaultCourse,
 				CLangManager.LangInstance.GetString(81),
                 new string[] { "Easy", "Normal", "Hard", "Oni", "Edit" });
             this.list項目リスト.Add(this.iTaikoDefaultCourse);
@@ -1343,6 +1348,8 @@ namespace TJAPlayer3
         CItemInteger MusicPreTimeMs;
 
 		private CItemInteger iInputAdjustTimeMs;
+		private CItemInteger iGlobalOffsetMs;
+
 		private CItemList iSystemSkinSubfolder;				// #28195 2012.5.2 yyagi
 		private CItemBase iSystemReloadDTX;					// #32081 2013.10.21 yyagi
 		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
@@ -1474,6 +1481,8 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.bTight = this.iDrumsTight.bON;
 
 		    TJAPlayer3.ConfigIni.nInputAdjustTimeMs = this.iInputAdjustTimeMs.n現在の値;
+
+			TJAPlayer3.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 
 			TJAPlayer3.ConfigIni.n表示可能な最小コンボ数.Drums = this.iSystemMinComboDrums.n現在の値;
 			TJAPlayer3.ConfigIni.nRisky = this.iSystemRisky.n現在の値;						// #23559 2911.7.27 yyagi

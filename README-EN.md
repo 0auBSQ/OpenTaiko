@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： v0.5.2
+- Current version： v0.5.2.1
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -130,6 +130,19 @@ Download SlimDX again from https://code.google.com/archive/p/slimdx/downloads\.
 ```
 
 ## Update history
+
+<details>
+	<summary>v0.5.2.1</summary>
+	
+	- Fix multiple bugs
+	
+	- Add multiple levels of AI in addition of Auto
+	
+	- Add Global offset
+	
+	- Replace AUTO ROLL by Rolls speed
+	
+</details>
 
 <details>
 	<summary>v0.5.2</summary>
@@ -306,6 +319,7 @@ Download SlimDX again from https://code.google.com/archive/p/slimdx/downloads\.
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko Logo](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
+> * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)

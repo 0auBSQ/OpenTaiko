@@ -20,6 +20,8 @@
 11 : "Song speed" description 
 12 : "AI Level" option title
 13 : "AI Level" description
+14 : "Global offset" option title
+15 : "Global offset" description
 16 : "Layout type" option title
 17 : "Layout type" description
 18 : "Time stretch" description

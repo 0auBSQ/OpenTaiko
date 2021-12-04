@@ -4969,12 +4969,16 @@ namespace TJAPlayer3
             else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam))
             {
                 this.nOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
+
                 this.bOFFSETの値がマイナスである = this.nOFFSET < 0 ? true : false;
 
                 this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
                 if (this.bOFFSETの値がマイナスである == true)
                     this.nOFFSET = this.nOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
                 //tbOFFSET.Text = strCommandParam;
+
+                // Add global offset
+                this.nOFFSET += TJAPlayer3.ConfigIni.nGlobalOffsetMs;
             }
             else if (strCommandName.Equals("MOVIEOFFSET"))
             {
