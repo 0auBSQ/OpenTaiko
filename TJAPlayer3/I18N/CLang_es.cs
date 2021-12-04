@@ -43,6 +43,12 @@ namespace TJAPlayer3
                 "Si se deja en 0, se desactiva.\n" +
                 "Si se deja en 1 o más,\n el J2 se convierte en IA.\n" +
                 "No se usa si Juego Automático J2\n se encuentra activado.",
+            [14] = "Compensación global de sonido",
+            [15] = "Cambia el retardo de la canción\npara todos los charts.\n" +
+                "Puedes elegir entre -99 a 99ms.\n" +
+                "Para disminuir el retraso de la entrada,\n disminuye este valor.\n\n" +
+                "Nota: Recarga las canciones para\n" +
+                "     aplicar los cambios.",
             [16] = "Tipo de interfaz",
             [17] = "Puedes cambiar la interfaz de las canciones\n mostradas en la pantalla de selección.\n" +
                 "0 : Regular (Diagonal de arriba hacia abajo)\n" +
