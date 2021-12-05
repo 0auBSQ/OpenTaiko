@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： v0.5.2
+- Current version： v0.5.2.1
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -130,6 +130,19 @@ Download SlimDX again from https://code.google.com/archive/p/slimdx/downloads\.
 ```
 
 ## Update history
+
+<details>
+	<summary>v0.5.2.1</summary>
+	
+	- Fix multiple bugs
+	
+	- Add multiple levels of AI in addition of Auto
+	
+	- Add Global offset
+	
+	- Replace AUTO ROLL by Rolls speed
+	
+</details>
 
 <details>
 	<summary>v0.5.2</summary>

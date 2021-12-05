@@ -9,7 +9,7 @@ English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
 TJAPlayer3-Develop-ReWriteのフォーク, .tjaファイルのシミュレーターです。
 旧TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： v0.5.2
+- 現在のバージョン： v0.5.2.1
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
