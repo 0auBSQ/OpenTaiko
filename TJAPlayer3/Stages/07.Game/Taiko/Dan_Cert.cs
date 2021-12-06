@@ -531,7 +531,7 @@ namespace TJAPlayer3
                     currentPosition++;
 
                     // Determines if a small bar will be used to optimise the display layout
-                    bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition);
+                    bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition) || countNoGauge == 6;
 
                     // Y index of the gauge
                     int yIndex = (currentPosition % 3) + 1;
@@ -1073,6 +1073,22 @@ namespace TJAPlayer3
             
             for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
+
+                
+                if (ExamChange[i] == true)
+                {
+                    for (int j = 1; j < CExamInfo.cExamMaxSongs; j++)
+                    {
+                        if (!(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null))
+                            continue;
+
+                        bool rainbowBetterSuccess = GetExamStatus(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success;
+
+                        if (!rainbowBetterSuccess) status = Exam.Status.Success;
+                    }
+                }
+                
+
                 if (dan_C[i] == null || dan_C[i].GetEnable() != true)
                     continue;
 

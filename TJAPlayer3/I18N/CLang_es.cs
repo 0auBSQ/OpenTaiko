@@ -38,6 +38,17 @@ namespace TJAPlayer3
                 "Nota: También cambia el tono de la canción.\n" +
                 "Si Time Stretch está encendido, puede haber\n" +
                 " lag de audio si se usa en menos de x0.9.",
+            [12] = "Nivel de la IA",
+            [13] = "Determina que tan precisa es la IA.\n" +
+                "Si se deja en 0, se desactiva.\n" +
+                "Si se deja en 1 o más,\n el J2 se convierte en IA.\n" +
+                "No se usa si Juego Automático J2\n se encuentra activado.",
+            [14] = "Compensación global de sonido",
+            [15] = "Cambia el retardo de la canción\npara todos los charts.\n" +
+                "Puedes elegir entre -99 a 99ms.\n" +
+                "Para disminuir el retraso de la entrada,\n disminuye este valor.\n\n" +
+                "Nota: Recarga las canciones para\n" +
+                "     aplicar los cambios.",
             [16] = "Tipo de interfaz",
             [17] = "Puedes cambiar la interfaz de las canciones\n mostradas en la pantalla de selección.\n" +
                 "0 : Regular (Diagonal de arriba hacia abajo)\n" +
@@ -49,6 +60,7 @@ namespace TJAPlayer3
             [19] = "Modo de ventana o pantalla completa.",
             [20] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [21] = "Activar el uso de subcarpetas en la\n SELECCIÓN ALEATORIA.",
+            [22] = "Activa la sincronización vertical.\nActivarlo bloqueará los FPS a 60, que hará\nel desplazamiento más suave pero\naumentará el retraso de la entrada.\nDesactivarlo hará que el juego tenga FPS ilimitados,\nque disminuirá el retraso de la entrada\npero el desplazamiento se verá peor.",
             [23] = "Usar la reproducción AVI o no.",
             [24] = "Activar BGA (animaciones de fondo) o no.",
             [25] = "Tiempo de retraso(ms) para empezar a reproducir la\ndemo de la música en la pantalla\nSELECCIONAR CANCIÓN.\nPuedes especificar de 0ms a 10000ms",
@@ -65,11 +77,12 @@ namespace TJAPlayer3
             [36] = "Ajusta el volumen de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [37] = "La cantidad de volumen que cambia\nal presionar las teclas de control de volumen.\nPuedes especificar desde 1 a 20.",
             [38] = "Tiempo antes de que la música comience. (ms)\n",
-            [39] = "Si activas esto, se tomará una captura automáticamente\n cuando obtengas un nuevo récord.",
+            [39] = "Si activas esto, se tomará una captura\n cuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\n jugando en Discord.",
             [41] = "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
             [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
-            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\n- Desactiva cualquier fuente de sonido excepto OpenTaiko.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+                "\n" +
                 "Nota: Sal de la configuración\n" +
                 "     para aplicar los cambios.",
             [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el número más bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Déjalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error." +
@@ -95,14 +108,13 @@ namespace TJAPlayer3
             [54] = "Elige una skin desde la carpeta de skins.",
             [55] = "Menú secundario para cambiar las teclas que\nusa el juego.",
             [56] = "Juego automático",
-            [57] = "Para que el carril de P1\n" +
+            [57] = "Para que el carril de J1\n" +
                 " se juegue automáticamente.",
-            [58] = "Juego Automático P2",
-            [59] = "Para que el carril de P2\n" +
+            [58] = "Juego Automático J2",
+            [59] = "Para que el carril de J2\n" +
                 " se juegue automáticamente.",
-            [60] = "Redoble Automático",
-            [61] = "Si se desactiva, los redobles\n" +
-                    " no se completarán en modo automático.",
+            [60] = "Velocidad del redoble",
+            [61] = "Redobles por segundo cuando se usa el\nmodo automático.\nNo tiene efecto en los globos.\nDesactivado si está en 0,\nbloqueado a un redoble por frame.",
             [62] = "VelDesplazamiento",
             [63] = "Cambiar la velocidad de desplazamiento\n" +
                 " en el carril de las notas\n" +
@@ -163,14 +175,14 @@ namespace TJAPlayer3
             [10004] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo.",
             [10005] = "Azul derecho",
             [10006] = "Asigna un botón o un pad para\n el Ka (azul) derecho.",
-            [10007] = "Rojo izquierdo P2",
-            [10008] = "Asigna un botón o un pad para\n el Don (rojo) izquierdo del P2.",
-            [10009] = "Rojo derecho P2",
-            [10010] = "Asigna un botón o un pad para\n el Don (rojo) derecho del P2.",
-            [10011] = "Azul izquierdo",
-            [10012] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo del P2.",
-            [10013] = "Azul derecho",
-            [10014] = "Asigna un botón o un pad para\n el Ka (azul) derecho del P2.",
+            [10007] = "Rojo izquierdo J2",
+            [10008] = "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J2.",
+            [10009] = "Rojo derecho J2",
+            [10010] = "Asigna un botón o un pad para\n el Don (rojo) derecho del J2.",
+            [10011] = "Azul izquierdo J2",
+            [10012] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J2.",
+            [10013] = "Azul derecho J2",
+            [10014] = "Asigna un botón o un pad para\n el Ka (azul) derecho del J2.",
             [10018] = "TimeStretch",
             [10019] = "Pantalla completa",
             [10020] = "StageFailed",
@@ -221,9 +233,9 @@ namespace TJAPlayer3
             [107] = "Salir",
 
             [150] = "¡Juega tus canciones\nfavoritas a tu propio gusto!",
-            [151] = "¡Juega varias canciones seguidas de\npruebas desafiantes\npara obtener el rango Aprobado!",
+            [151] = "¡Juega varias canciones mientras cumples\nretos que te pondrán a prueba\npara completar el desafío!",
             [152] = "¡Juega canciones largas con un\nnúmero de vidas limitado y llega\na la punta de la torre!",
-            [153] = "¡Compra nuevas canciones, petit-chara o personajes\nusando las medallas que ganaste jugando!",
+            [153] = "¡Compra nuevas canciones, Puchi-charas o personajes\nusando las medallas que ganaste jugando!",
             [154] = "¡Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
             [155] = "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
             [156] = "¡Cambia tu estilo de juego\n o ajustes generales!",
@@ -232,6 +244,7 @@ namespace TJAPlayer3
             [200] = "Regresar",
             [201] = "Canciones jugadas recientemente",
             [202] = "¡Juega las canciones que jugaste recientemente!",
+            [203] = "Canción aleatoria",
 
             [1000] = "Piso alcanzado",
             [1001] = "P",
@@ -240,7 +253,7 @@ namespace TJAPlayer3
             
             [1010] = "Indicador de almas",
             [1011] = "Cantidad de Perfectas",
-            [1012] = "Cantidad de Buenas",
+            [1012] = "Cantidad de OK",
             [1013] = "Cantidad de Malas",
             [1014] = "Puntuación",
             [1015] = "Cantidad de redobles",

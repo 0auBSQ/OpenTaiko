@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using FDK;
+using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 using static TJAPlayer3.CActSelect曲リスト;
@@ -179,8 +180,8 @@ namespace TJAPlayer3
 								this.st演奏記録[0].nスコアランク[i] = ini.stセクション[0].nスコアランク[i];
 							}
 
-							ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
-							ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
+							// ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
+							// ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
 						}
 					}
 					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
@@ -273,16 +274,6 @@ namespace TJAPlayer3
 						ini.stセクション[0] = this.st演奏記録[0];
 					}
 
-					// Clear & Score rank (Legacy)
-					/*
-					if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-					{
-						if (this.nクリア > ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
-							ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
-						if (this.nスコアランク > ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]])
-							ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
-					}
-					*/
 
 					// ラストプレイ #23595 2011.1.9 ikanick
 					// オートじゃなければプレイ結果を書き込む
@@ -483,7 +474,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
-				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P)
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)
 					this.nEarnedMedalsCount[1] = 0;
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
@@ -550,7 +541,7 @@ namespace TJAPlayer3
 					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString(1002), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString(1003), pfTowerText, Color.Black, Color.Transparent, 700);
-					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
 
@@ -917,21 +908,26 @@ namespace TJAPlayer3
 
 						this.ctTower_Animation.t進行();
 
-						int xFactor = 0;
-						float yFactor = 1f;
-						if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[0] != null)
+						if (TJAPlayer3.Skin.Game_Tower_Ptn_Result > 0)
                         {
-							xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Width) / 2;
-							yFactor = TJAPlayer3.Tx.TowerResult_Tower[0].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+							int xFactor = 0;
+							float yFactor = 1f;
+
+							int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+
+							if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
+								currentTowerType = 0;
+
+							if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
+							{
+								xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Width) / 2;
+								yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+							}
+
+							TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * this.ctTower_Animation.n現在の値);
+							TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						}
 
-						int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
-
-						if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
-							currentTowerType = 0;
-
-						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * this.ctTower_Animation.n現在の値);
-						TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 						int firstRowY = 394;
@@ -1027,6 +1023,11 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.bgmTowerResult.t停止する();
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							actFI.tフェードアウト開始();
+							
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+								if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
+									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+
 							t後処理();
 							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
@@ -1125,7 +1126,17 @@ namespace TJAPlayer3
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 					{
-						song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
+						int lastId = TJAPlayer3.stage選曲.r確定された曲.nID;
+						bool songExists = false;
+
+						foreach (var song2 in song.list子リスト)
+                        {
+							if (song2.nID == lastId)
+								songExists = true;
+                        }
+
+						if (songExists == false)
+							song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
 
 						foreach (var song2 in song.list子リスト)
 						{
@@ -1147,6 +1158,9 @@ namespace TJAPlayer3
 							}
 								
 						}
+
+						// Remove duplicates
+						// song.list子リスト = song.list子リスト.Distinct().ToList();
 
 						if (song.list子リスト.Count >= 6)
 						{

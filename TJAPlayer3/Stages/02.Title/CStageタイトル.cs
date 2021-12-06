@@ -209,24 +209,34 @@ namespace TJAPlayer3
 
 					if (!bバナパス読み込み && !bバナパス読み込み失敗)
 					{
-						if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.P))
+						// Hit 1P banapass
+						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
+                        {
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
-						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.P))
-							ctバナパス読み込み待機.t進行();
-						if (TJAPlayer3.Input管理.Keyboard.bキーが離された((int)SlimDXKeys.Key.P))
-						{
-							this.ctバナパス読み込み待機.t停止();
-							if (this.ctバナパス読み込み待機.n現在の値 < 600 && !bバナパス読み込み失敗)
+							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+						}
+						else
+                        {
+							// Default legacy P press
+							if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.P))
+								this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
+							if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.P))
+								ctバナパス読み込み待機.t進行();
+							if (TJAPlayer3.Input管理.Keyboard.bキーが離された((int)SlimDXKeys.Key.P))
 							{
-								ctバナパス読み込み失敗.t開始(0, 1128, 1, TJAPlayer3.Timer);
-								bバナパス読み込み失敗 = true;
+								this.ctバナパス読み込み待機.t停止();
+								if (this.ctバナパス読み込み待機.n現在の値 < 600 && !bバナパス読み込み失敗)
+								{
+									ctバナパス読み込み失敗.t開始(0, 1128, 1, TJAPlayer3.Timer);
+									bバナパス読み込み失敗 = true;
+								}
 							}
 						}
 					}
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
                     {
-						if(bプレイヤーエントリー && !bプレイヤーエントリー決定)
+						if(bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
                         {
 							if(n現在の選択行プレイヤーエントリー + 1 <= 2)
 							{
@@ -251,7 +261,7 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)||TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
                     {
-						if(bプレイヤーエントリー && !bプレイヤーエントリー決定)
+						if(bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
                         {
 							if(n現在の選択行プレイヤーエントリー - 1 >= 0)
 							{
@@ -277,7 +287,7 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))
 					{
-						if (bプレイヤーエントリー)
+						if (bプレイヤーエントリー && this.ctバナパス読み込み成功.b終了値に達した)
 						{
 							if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2)
 							{
@@ -541,7 +551,9 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
 						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 92 * 2, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
 
-					TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400));
+					Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
+					if (Opacity > 0)
+						TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, Opacity);
 				}
 
                 #endregion
@@ -567,7 +579,7 @@ namespace TJAPlayer3
 
 					if (ctBarAnimeIn.n現在の値 >= (int)(16 * 16.6f))
 					{
-						TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
+						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
 
 						for (int i = 0; i < this.nbModes; i++)
                         {
@@ -595,7 +607,9 @@ namespace TJAPlayer3
 
 								#endregion
 
-								this.stModeBar[i].BarTexture.Opacity = (int)((ctBarAnimeIn.n現在の値 - (16 * 16.6f)) * 1.23f);
+								// this.stModeBar[i].BarTexture.Opacity = (int)((ctBarAnimeIn.n現在の値 - (16 * 16.6f)) * 1.23f);
+
+								this.stModeBar[i].BarTexture.Opacity = 255;
 
 								this.stModeBar[i].BarTexture.vc拡大縮小倍率.Y = 1.0f;
 								this.stModeBar[i].BarTexture.t2D描画(TJAPlayer3.app.Device, 320, 347 - BarAnime - BarAnime1, new Rectangle(0, 0, 641, 27));

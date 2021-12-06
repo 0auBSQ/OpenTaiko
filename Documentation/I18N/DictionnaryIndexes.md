@@ -18,6 +18,10 @@
 9 : "Risky" description 
 10 : "Song speed" option title
 11 : "Song speed" description 
+12 : "AI Level" option title
+13 : "AI Level" description
+14 : "Global offset" option title
+15 : "Global offset" description
 16 : "Layout type" option title
 17 : "Layout type" description
 18 : "Time stretch" description
@@ -62,8 +66,8 @@
 57 : "Toggle auto play" description
 58 : "Toggle auto play for 2P" option title
 59 : "Toggle auto play for 2P" description
-60 : "Auto roll" option title
-61 : "Auto roll" description
+60 : "Rolls speed" option title
+61 : "Rolls speed" description
 62 : "Scroll speed" option title
 63 : "Scroll speed" description
 64 : "Risky" option title

@@ -40,14 +40,8 @@ namespace TJAPlayer3
                     this.pfdan = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 12);
                 }
 
-                using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
-                    txName[player] = TJAPlayer3.tテクスチャの生成(tex);
+                tNamePlateRefreshTitles(player);
 
-                using (var tex = pfTitle.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Title[player], Color.Black, Color.Empty))
-                    txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
-
-                using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
-                    txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
             }
 
             ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
@@ -56,13 +50,26 @@ namespace TJAPlayer3
 
         public void tNamePlateRefreshTitles(int player)
         {
-            using (var tex = pfName.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Name[player], Color.White, Color.Black, 25))
+            string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
+
+            string name = "AIドン";
+            string title = "デウス・エクス・マキナ";
+            string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
+
+            if (TJAPlayer3.ConfigIni.nAILevel == 0 || player == 0)
+            {
+                name = TJAPlayer3.NamePlateConfig.data.Name[player];
+                title = TJAPlayer3.NamePlateConfig.data.Title[player];
+                dan = TJAPlayer3.NamePlateConfig.data.Dan[player];
+            }
+
+            using (var tex = pfName.DrawPrivateFont(name, Color.White, Color.Black, 25))
                 txName[player] = TJAPlayer3.tテクスチャの生成(tex);
 
-            using (var tex = pfTitle.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Title[player], Color.Black, Color.Empty))
+            using (var tex = pfTitle.DrawPrivateFont(title, Color.Black, Color.Empty))
                 txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
 
-            using (var tex = pfdan.DrawPrivateFont(TJAPlayer3.NamePlateConfig.data.Dan[player], Color.White, Color.Black, 22))
+            using (var tex = pfdan.DrawPrivateFont(dan, Color.White, Color.Black, 22))
                 txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
         }
 
@@ -202,6 +209,7 @@ namespace TJAPlayer3
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
                 {
                     this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 69, y + 44);
+
                     if (TJAPlayer3.NamePlateConfig.data.DanGold[player])
                     {
                         TJAPlayer3.Tx.NamePlateBase.b乗算合成 = true;
@@ -219,13 +227,18 @@ namespace TJAPlayer3
                     }
 
                     txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 22);
+
+                    
                     if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
                         this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 44);
                     else
                         this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 144, y + 44);
                 }
                 else
+                {
                     this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
+                }
+
             }
 
             TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 4 * 54 + 3, 220, 54));

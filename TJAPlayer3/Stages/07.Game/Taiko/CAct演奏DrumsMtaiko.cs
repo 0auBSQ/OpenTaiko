@@ -270,7 +270,21 @@ namespace TJAPlayer3
 
         public void tMtaikoEvent( int nChannel, int nHand, int nPlayer )
         {
-            if( !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay )
+            CConfigIni configIni = TJAPlayer3.ConfigIni;
+            bool bAutoPlay = false;
+            switch (nPlayer)
+            {
+                case 0:
+                    bAutoPlay = configIni.b太鼓パートAutoPlay;
+                    break;
+                case 1:
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
+                    break;
+                default:
+                    break;
+            }
+
+            if ( !bAutoPlay )
             {
                 switch( nChannel )
                 {

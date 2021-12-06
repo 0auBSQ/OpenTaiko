@@ -32,6 +32,17 @@ namespace TJAPlayer3
             [10] = "Song Playback Speed",
             [11] = "Change song playback speed.\nIf the Time Stretch option is enabled,\nsound issues may occur below 0.9x playback speed.\n" +
                 "Note: It also changes the songs' pitch.",
+            [12] = "AI Level",
+            [13] = "Determines how precise the AI is.\n" +
+                "If 0, AI is disabled.\n" +
+                "If 1 or more, the 2P will play as AI.\n" +
+                "Disabled if AUTO 2P is on.",
+            [14] = "Global offset",
+            [15] = "Change the interpreted OFFSET\nvalue for all charts.\n" +
+                "You can set from -99 to 99ms.\n" +
+                "To decrease input lag, set minus value.\n\n" +
+                "Note: Reload songs to make\n" +
+                "     the setting take effect.",
             [16] = "Layout type",
             [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
@@ -95,8 +106,8 @@ namespace TJAPlayer3
             [57] = "Toggle whether player 1 plays automatically.\nPress F3 on song select to toggle this.",
             [58] = "Player 2 Auto Play",
             [59] = "Toggle whether player 2 plays automatically.\nPress F4 on song select to toggle this.",
-            [60] = "Auto Roll",
-            [61] = "Toggle whether rolls are played automatically.\nBalloons will still be played\nif their respective auto option is enabled.",
+            [60] = "Rolls speed",
+            [61] = "Hits per second during rolls when auto\nis enabled.\nNo effect on balloons.\nDisabled if 0, at most one hit per frame.",
             [62] = "Scroll Speed",
             [63] = "Change the speed the notes travel at.\n" +
                 "You can set it from x0.1 to x200.0.\n" +
@@ -192,11 +203,11 @@ namespace TJAPlayer3
             [10044] = "Wasapi Buffer Size",
             [10045] = "Asio Playback Device",
             [10046] = "OS Timer Mode",
-            [10047] = "Draw Characters",
-            [10048] = "Draw Dancers",
-            [10049] = "Draw Mob",
-            [10050] = "Draw Runners",
-            [10051] = "Draw Footer",
+            [10047] = "Display Characters",
+            [10048] = "Display Dancers",
+            [10049] = "Display Mob",
+            [10050] = "Display Runners",
+            [10051] = "Display Footer",
             [10052] = "Fast Render",
             [10053] = "Draw PuchiChara",
             [10054] = "Current Skin",
