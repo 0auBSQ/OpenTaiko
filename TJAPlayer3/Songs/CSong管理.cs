@@ -184,7 +184,7 @@ namespace TJAPlayer3
 									}
 									c曲リストノード.nTotalFloor++;
 
-
+									/*
 									switch (c曲リストノード.strジャンル) 
 									{
 										case "J-POP":
@@ -197,6 +197,8 @@ namespace TJAPlayer3
 											c曲リストノード.strジャンル = "キッズ";
 											break;
 									}
+									*/
+
 									c曲リストノード.str本当のジャンル = c曲リストノード.strジャンル;
 
 
@@ -302,6 +304,7 @@ namespace TJAPlayer3
 									c曲リストノード.str本当のジャンル = c曲リストノード.r親ノード.strジャンル;
 								}
 
+								/*
 								switch (c曲リストノード.strジャンル)
 								{
 									case "J-POP":
@@ -327,6 +330,7 @@ namespace TJAPlayer3
 										c曲リストノード.str本当のジャンル = "キッズ";
 										break;
 								}
+								*/
 
 								if (c曲リストノード.r親ノード != null)
                                 {
@@ -545,6 +549,7 @@ namespace TJAPlayer3
                         }
 					}
 
+					/*
 					switch (c曲リストノード.strジャンル)
 					{
 						case "J-POP":
@@ -559,6 +564,8 @@ namespace TJAPlayer3
 							c曲リストノード.strジャンル = "キッズ";
 							break;
 					}
+					*/
+
 					if ( TJAPlayer3.ConfigIni.bLog曲検索ログ出力 )
 					{
 						Trace.Indent();
@@ -604,6 +611,7 @@ namespace TJAPlayer3
 					c曲リストノード.strタイトル = boxdef.Title;
 					c曲リストノード.strジャンル = boxdef.Genre;
 
+					/*
 					switch (c曲リストノード.strジャンル)
 					{
 						case "J-POP":
@@ -616,6 +624,7 @@ namespace TJAPlayer3
 							c曲リストノード.strジャンル = "キッズ";
 							break;
 					}
+					*/
 
 					if (boxdef.IsChangedForeColor)
                     {

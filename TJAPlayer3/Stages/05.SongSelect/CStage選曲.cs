@@ -770,6 +770,7 @@ namespace TJAPlayer3
                                 {
                                     this.ctキー反復用.Down.tキー反復(TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow), new CCounter.DGキー処理(this.tカーソルを下へ移動する));
                                     //this.ctキー反復用.Down.tキー反復( CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.DownArrow ) || CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.RightArrow ), new CCounter.DGキー処理( this.tカーソルを下へ移動する ) );
+                                    
                                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
                                     {
                                         this.tカーソルを下へ移動する();
@@ -1257,23 +1258,10 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.bgm選曲画面イン.n位置_現在のサウンド = 0;
                 TJAPlayer3.Skin.bgm選曲画面.n位置_現在のサウンド = 0;
 
-                /*
-                TJAPlayer3.Skin.bgm選曲画面イン.t停止する();
-                TJAPlayer3.Skin.bgm選曲画面.t停止する();
-                */
                 CSongSelectSongManager.disable();
             }
             else
             {
-                /*
-                if (!bBGMIn再生した && !TJAPlayer3.Skin.bgm選曲画面イン.b再生中 && !TJAPlayer3.Skin.bgm選曲画面.b再生中)
-                {
-                    TJAPlayer3.stage選曲.bBGM再生済み = false;
-                    if (TJAPlayer3.ConfigIni.bBGM音を発声する)
-                        TJAPlayer3.Skin.bgm選曲画面イン.t再生する();
-                    bBGMIn再生した = true;
-                }
-                */
                 CSongSelectSongManager.enable();
                 CSongSelectSongManager.playSongIfPossible();
             }
@@ -1294,23 +1282,11 @@ namespace TJAPlayer3
             if ((this.act曲リスト.r前の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.r前の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
             {
                 TJAPlayer3.stage選曲.bBGMIn再生した = false;
-                /*
-                TJAPlayer3.Skin.bgm選曲画面.t停止する();
-                TJAPlayer3.Skin.bgm選曲画面イン.t停止する();
-                */
+
                 CSongSelectSongManager.disable();
             }
             else
             {
-                /*
-                if (!bBGMIn再生した && !TJAPlayer3.Skin.bgm選曲画面イン.b再生中 && !TJAPlayer3.Skin.bgm選曲画面.b再生中)
-                {
-                    TJAPlayer3.stage選曲.bBGM再生済み = false;
-                    if (TJAPlayer3.ConfigIni.bBGM音を発声する)
-                        TJAPlayer3.Skin.bgm選曲画面イン.t再生する();
-                    bBGMIn再生した = true;
-                }
-                */
                 CSongSelectSongManager.enable();
                 CSongSelectSongManager.playSongIfPossible();
             }
@@ -1519,27 +1495,7 @@ namespace TJAPlayer3
 
         public int nStrジャンルtoNum(string strジャンル)
         {
-            int nGenre = 8;
-            for(int i = 0; i < TJAPlayer3.Skin.SongSelect_GenreName.Length; i++)
-            {
-                if(TJAPlayer3.Skin.SongSelect_GenreName[i] == strジャンル)
-                {
-                    if (i + 1 >= TJAPlayer3.Skin.SongSelect_Genre_Background_Count)
-                    {
-                        nGenre = 0;
-                    }
-                    else
-                    {
-                        nGenre = i + 1;
-                    }
-                    break;
-                }
-                else
-                {
-                    nGenre = 0;
-                }
-            }
-            return nGenre;
+            return this.act曲リスト.nStrジャンルtoNumBox(strジャンル);
         }
         //-----------------
         #endregion
