@@ -49,7 +49,10 @@
                     return 4;
                 case "クラシック":
                     return 5;
+<<<<<<< HEAD
                 case "ゲームバラエティ":
+=======
+>>>>>>> f7719efde83526e6b3306057e470e9bee339999d
                 case "ゲームミュージック":
                     return 6;
                 case "ナムコオリジナル":
