@@ -45,7 +45,7 @@
                     return 4;
                 case "クラシック":
                     return 5;
-                case "ゲームバラエティ":
+                case "ゲームミュージック":
                     return 6;
                 case "ナムコオリジナル":
                     return 7;
