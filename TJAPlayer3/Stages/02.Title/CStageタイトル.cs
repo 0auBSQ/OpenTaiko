@@ -35,37 +35,11 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				this.ctバナパス読み込み待機 = new CCounter();
-
-				this.ctコインイン待機 = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
-
-				this.ctバナパス読み込み成功 = new CCounter();
-				this.ctバナパス読み込み失敗 = new CCounter();
-
-				this.ctエントリーバー点滅 = new CCounter(0, 510, 2, TJAPlayer3.Timer);
-				this.ctエントリーバー決定点滅 = new CCounter();
-
-				this.ctどんちゃんエントリーループ = new CCounter();
-				this.ctどんちゃんイン = new CCounter();
-				this.ctどんちゃんループ = new CCounter(0, TJAPlayer3.Tx.Entry_Donchan_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
-
-				this.ctBarAnimeIn = new CCounter();
-				this.ctBarMove = new CCounter();
-				this.ctBarMove.n現在の値 = 250;
+				UnloadSaveFile();
 
 				this.PuchiChara.IdleAnimation();
 
-				this.bバナパス読み込み = false;
-				this.bバナパス読み込み失敗 = false;
-				this.bプレイヤーエントリー = false;
-				this.bプレイヤーエントリー決定 = false;
-				this.bモード選択 = false;
-				this.bどんちゃんカウンター初期化 = false;
-
-				this.n現在の選択行プレイヤーエントリー = 1;
-
-				
-
+				SkipSaveFileStep();
 
 				for (int i = 0; i < this.nbModes; i++)
 				{
@@ -73,11 +47,11 @@ namespace TJAPlayer3
 					this.stModeBar[i].n現在存在している行 = i + 1 - n現在の選択行モード選択;
 				}
 
-				TJAPlayer3.Skin.soundEntry.t再生する();
-				TJAPlayer3.Skin.SoundBanapas.bPlayed = false;
+				b音声再生 = false;
+				if (bSaveFileLoaded == false)
+					TJAPlayer3.Skin.soundEntry.t再生する();
 				if (TJAPlayer3.ConfigIni.bBGM音を発声する)
 					TJAPlayer3.Skin.bgmタイトルイン.t再生する();
-				b音声再生 = false;
 				base.On活性化();
 			}
 			finally
@@ -196,7 +170,19 @@ namespace TJAPlayer3
 					&& TJAPlayer3.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
 				{
 					if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
-						return (int)E戻り値.EXIT;
+                    {
+						if (bモード選択)
+                        {
+							TJAPlayer3.Skin.sound取消音.t再生する();
+							bSaveFileLoaded = false;
+							UnloadSaveFile();
+							if (bSaveFileLoaded == false)
+								TJAPlayer3.Skin.soundEntry.t再生する();
+						}
+						else
+							return (int)E戻り値.EXIT;
+					}
+						
 
 					if ((TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightShift) || TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftShift)) && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F1))
 					{
@@ -207,17 +193,27 @@ namespace TJAPlayer3
 						TJAPlayer3.Skin.sound取消音.t再生する();
 					}
 
+					// 1st step (Save file loading)
 					if (!bバナパス読み込み && !bバナパス読み込み失敗)
 					{
-						// Hit 1P banapass
+						
 						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
                         {
+							// Hit 1P banapass
+							TJAPlayer3.SaveFile = 0;
+							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
+							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+						}
+						else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P))
+                        {
+							// Hit 2P banapass
+							TJAPlayer3.SaveFile = 1;
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
 						}
 						else
                         {
-							// Default legacy P press
+							// Default legacy P long press (Don't change the save file, will be deleted soon)
 							if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.P))
 								this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.P))
@@ -285,7 +281,8 @@ namespace TJAPlayer3
                     }
 
 
-					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))
+					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) 
+						|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))
 					{
 						if (bプレイヤーエントリー && this.ctバナパス読み込み成功.b終了値に達した)
 						{
@@ -296,6 +293,10 @@ namespace TJAPlayer3
 									TJAPlayer3.Skin.sound決定音.t再生する();
 									ctエントリーバー決定点滅.t開始(0, 1055, 1, TJAPlayer3.Timer);
 									bプレイヤーエントリー決定 = true;
+									TJAPlayer3.PlayerSide = (n現在の選択行プレイヤーエントリー == 2) ? 1 : 0;
+									if (TJAPlayer3.PlayerSide == 1)
+										TJAPlayer3.ConfigIni.nPlayerCount = 1;
+									bSaveFileLoaded = true;
 								}
 							}
 							else
@@ -367,139 +368,142 @@ namespace TJAPlayer3
 				
                 #endregion
 
-                #region [ バナパス読み込み ]
-
-                if (!bバナパス読み込み && !bバナパス読み込み失敗)
+				if (bSaveFileLoaded == false)
                 {
-					TJAPlayer3.Tx.Entry_Bar.t2D描画(TJAPlayer3.app.Device, 0, 0);
+					#region [ バナパス読み込み ]
 
-					if (this.ctコインイン待機.n現在の値 <= 255)
-						TJAPlayer3.Tx.Entry_Bar_Text.Opacity = this.ctコインイン待機.n現在の値;
-					else if (this.ctコインイン待機.n現在の値 <= 2000 - 355)
-						TJAPlayer3.Tx.Entry_Bar_Text.Opacity = 255;
+					if (!bバナパス読み込み && !bバナパス読み込み失敗)
+					{
+						TJAPlayer3.Tx.Entry_Bar.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+						if (this.ctコインイン待機.n現在の値 <= 255)
+							TJAPlayer3.Tx.Entry_Bar_Text.Opacity = this.ctコインイン待機.n現在の値;
+						else if (this.ctコインイン待機.n現在の値 <= 2000 - 355)
+							TJAPlayer3.Tx.Entry_Bar_Text.Opacity = 255;
+						else
+							TJAPlayer3.Tx.Entry_Bar_Text.Opacity = 255 - (this.ctコインイン待機.n現在の値 - (2000 - 355));
+
+						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 312, new RectangleF(0, 0, 395, 50));
+						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 430, new RectangleF(0, 50, 395, 50));
+					}
 					else
-						TJAPlayer3.Tx.Entry_Bar_Text.Opacity = 255 - (this.ctコインイン待機.n現在の値 - (2000 - 355));
+					{
+						if (this.ctバナパス読み込み成功.n現在の値 <= 1000 && this.ctバナパス読み込み失敗.n現在の値 <= 1128)
+						{
+							if (bバナパス読み込み)
+							{
+								TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み成功.n現在の値 <= 2972 ? 128 : 128 - (this.ctバナパス読み込み成功.n現在の値 - 2972);
 
-					TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 312, new RectangleF(0, 0, 395, 50));
-					TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 430, new RectangleF(0, 50, 395, 50));
+								for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
+									for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
+										TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
+
+								TJAPlayer3.Tx.Banapas_Load[0].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 * 2;
+								TJAPlayer3.Tx.Banapas_Load[0].vc拡大縮小倍率.Y = ctバナパス読み込み成功.n現在の値 <= 100 ? ctバナパス読み込み成功.n現在の値 * 0.01f : 1.0f;
+								TJAPlayer3.Tx.Banapas_Load[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
+
+								TJAPlayer3.Tx.Banapas_Load[1].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 <= 96 ? (int)((ctバナパス読み込み成功.n現在の値 - 96) * 7.96875f) : 255;
+								TJAPlayer3.Tx.Banapas_Load[1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
+
+								for (int i = 0; i < 5; i++)
+								{
+									TJAPlayer3.Tx.Banapas_Load[2].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 <= 96 ? (int)((ctバナパス読み込み成功.n現在の値 - 96) * 7.96875f) : 255;
+									TJAPlayer3.Tx.Banapas_Load[2].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 480 + 90 * i, 410, new Rectangle(0 + 72 * (ctバナパス読み込み成功.n現在の値 >= 200 + (i - 1) * 320 ? ctバナパス読み込み成功.n現在の値 <= (200 + i * 320) ? (ctバナパス読み込み成功.n現在の値 - (200 + i * 320)) / 40 : 0 : 0), 0, 72, 72));
+								}
+							}
+							if (bバナパス読み込み失敗)
+							{
+								TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み失敗.n現在の値 <= 1000 ? 128 : 128 - (this.ctバナパス読み込み失敗.n現在の値 - 1000);
+
+								for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
+									for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
+										TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
+
+								if (!TJAPlayer3.Skin.soundError.bPlayed)
+									TJAPlayer3.Skin.soundError.t再生する();
+
+								int count = this.ctバナパス読み込み失敗.n現在の値;
+								TJAPlayer3.Tx.Banapas_Load_Failure[0].Opacity = count >= 872 ? 255 - (count - 872) * 2 : count * 2;
+								TJAPlayer3.Tx.Banapas_Load_Failure[0].vc拡大縮小倍率.Y = count <= 100 ? count * 0.01f : 1.0f;
+								TJAPlayer3.Tx.Banapas_Load_Failure[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
+
+								if (ctバナパス読み込み失敗.n現在の値 >= 1128)
+								{
+									bバナパス読み込み失敗 = false;
+									TJAPlayer3.Skin.soundError.bPlayed = false;
+								}
+							}
+						}
+						else
+						{
+							if (bバナパス読み込み)
+							{
+								TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み成功.n現在の値 <= 2972 ? 128 : 128 - (this.ctバナパス読み込み成功.n現在の値 - 2972);
+
+								for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
+									for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
+										TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
+
+								if (!TJAPlayer3.Skin.SoundBanapas.bPlayed)
+									TJAPlayer3.Skin.SoundBanapas.t再生する();
+
+								int count = this.ctバナパス読み込み成功.n現在の値 - 1000;
+								TJAPlayer3.Tx.Banapas_Load_Clear[0].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
+								TJAPlayer3.Tx.Banapas_Load_Clear[0].vc拡大縮小倍率.Y = count <= 100 ? count * 0.01f : 1.0f;
+								TJAPlayer3.Tx.Banapas_Load_Clear[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
+
+								float anime = 0f;
+								float scalex = 0f;
+								float scaley = 0f;
+
+								if (count >= 300)
+								{
+									if (count <= 300 + 270)
+									{
+										anime = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 95f;
+										scalex = -(float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.15f;
+										scaley = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.2f;
+									}
+									else if (count <= 300 + 270 + 100)
+									{
+										scalex = (float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.13f;
+										scaley = -(float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.1f;
+										anime = 0;
+									}
+									else if (count <= 300 + 540 + 100)
+									{
+										anime = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 95f;
+										scalex = -(float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.15f;
+										scaley = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.2f;
+									}
+									else if (count <= 300 + 540 + 100 + 100)
+									{
+										scalex = (float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.13f;
+										scaley = -(float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.1f;
+									}
+								}
+
+								TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.X = 1.0f + scalex;
+								TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.Y = 1.0f + scaley;
+								TJAPlayer3.Tx.Banapas_Load_Clear[1].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
+								TJAPlayer3.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, 198, 514 - anime);
+
+								if (ctバナパス読み込み成功.n現在の値 >= 2000)
+								{
+									bプレイヤーエントリー = true;
+								}
+							}
+						}
+					}
+
+					#endregion
 				}
-                else
+
+				#region [ プレイヤーエントリー ]
+
+				if (bプレイヤーエントリー)
 				{
-					if (this.ctバナパス読み込み成功.n現在の値 <= 1000 && this.ctバナパス読み込み失敗.n現在の値 <= 1128)
-					{
-						if (bバナパス読み込み)
-						{
-							TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み成功.n現在の値 <= 2972 ? 128 : 128 - (this.ctバナパス読み込み成功.n現在の値 - 2972);
-
-							for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
-								for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
-									TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
-
-							TJAPlayer3.Tx.Banapas_Load[0].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 * 2;
-							TJAPlayer3.Tx.Banapas_Load[0].vc拡大縮小倍率.Y = ctバナパス読み込み成功.n現在の値 <= 100 ? ctバナパス読み込み成功.n現在の値 * 0.01f : 1.0f;
-							TJAPlayer3.Tx.Banapas_Load[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
-
-							TJAPlayer3.Tx.Banapas_Load[1].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 <= 96 ? (int)((ctバナパス読み込み成功.n現在の値 - 96) * 7.96875f) : 255;
-							TJAPlayer3.Tx.Banapas_Load[1].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
-
-							for (int i = 0; i < 5; i++)
-							{
-								TJAPlayer3.Tx.Banapas_Load[2].Opacity = ctバナパス読み込み成功.n現在の値 >= 872 ? 255 - (ctバナパス読み込み成功.n現在の値 - 872) * 2 : ctバナパス読み込み成功.n現在の値 <= 96 ? (int)((ctバナパス読み込み成功.n現在の値 - 96) * 7.96875f) : 255;
-								TJAPlayer3.Tx.Banapas_Load[2].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 480 + 90 * i, 410, new Rectangle(0 + 72 * (ctバナパス読み込み成功.n現在の値 >= 200 + (i - 1) * 320 ? ctバナパス読み込み成功.n現在の値 <= (200 + i * 320) ? (ctバナパス読み込み成功.n現在の値 - (200 + i * 320)) / 40 : 0 : 0), 0, 72, 72));
-							}
-						}
-						if (bバナパス読み込み失敗)
-						{
-							TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み失敗.n現在の値 <= 1000 ? 128 : 128 - (this.ctバナパス読み込み失敗.n現在の値 - 1000);
-
-							for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
-								for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
-									TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
-
-							if (!TJAPlayer3.Skin.soundError.bPlayed)
-								TJAPlayer3.Skin.soundError.t再生する();
-
-							int count = this.ctバナパス読み込み失敗.n現在の値;
-							TJAPlayer3.Tx.Banapas_Load_Failure[0].Opacity = count >= 872 ? 255 - (count - 872) * 2 : count * 2;
-							TJAPlayer3.Tx.Banapas_Load_Failure[0].vc拡大縮小倍率.Y = count <= 100 ? count * 0.01f : 1.0f;
-							TJAPlayer3.Tx.Banapas_Load_Failure[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
-
-							if (ctバナパス読み込み失敗.n現在の値 >= 1128)
-							{
-								bバナパス読み込み失敗 = false;
-								TJAPlayer3.Skin.soundError.bPlayed = false;
-							}
-						}
-					}
-                    else
-					{
-                        if (bバナパス読み込み)
-						{
-							TJAPlayer3.Tx.Tile_Black.Opacity = this.ctバナパス読み込み成功.n現在の値 <= 2972 ? 128 : 128 - (this.ctバナパス読み込み成功.n現在の値 - 2972);
-
-							for (int i = 0; i < 1280 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width + 1; i++)
-								for (int j = 0; j < 720 / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height + 1; j++)
-									TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
-
-							if (!TJAPlayer3.Skin.SoundBanapas.bPlayed)
-								TJAPlayer3.Skin.SoundBanapas.t再生する();
-
-							int count = this.ctバナパス読み込み成功.n現在の値 - 1000;
-							TJAPlayer3.Tx.Banapas_Load_Clear[0].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
-							TJAPlayer3.Tx.Banapas_Load_Clear[0].vc拡大縮小倍率.Y = count <= 100 ? count * 0.01f : 1.0f;
-							TJAPlayer3.Tx.Banapas_Load_Clear[0].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
-
-							float anime = 0f;
-							float scalex = 0f;
-							float scaley = 0f;
-
-							if (count >= 300)
-							{
-								if (count <= 300 + 270)
-								{
-									anime = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 95f;
-									scalex = -(float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.15f;
-									scaley = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.2f;
-								}
-								else if (count <= 300 + 270 + 100)
-								{
-									scalex = (float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.13f;
-									scaley = -(float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.1f;
-									anime = 0;
-								}
-								else if (count <= 300 + 540 + 100)
-								{
-									anime = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 95f;
-									scalex = -(float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.15f;
-									scaley = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.2f;
-								}
-								else if (count <= 300 + 540 + 100 + 100)
-								{
-									scalex = (float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.13f;
-									scaley = -(float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.1f;
-								}
-							}
-
-							TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.X = 1.0f + scalex;
-							TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.Y = 1.0f + scaley;
-							TJAPlayer3.Tx.Banapas_Load_Clear[1].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
-							TJAPlayer3.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, 198, 514 - anime);
-
-							if (ctバナパス読み込み成功.n現在の値 >= 2000)
-							{
-								bプレイヤーエントリー = true;
-							}
-						}
-					}
-				}
-
-                #endregion
-
-                #region [ プレイヤーエントリー ]
-
-                if (bプレイヤーエントリー)
-                {
-                    if (!this.bどんちゃんカウンター初期化)
+					if (!this.bどんちゃんカウンター初期化)
 					{
 						this.ctどんちゃんエントリーループ = new CCounter(0, TJAPlayer3.Tx.Donchan_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
 						this.bどんちゃんカウンター初期化 = true;
@@ -507,10 +511,10 @@ namespace TJAPlayer3
 
 					int alpha = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
 
-					TJAPlayer3.Tx.Entry_Player[0].Opacity = alpha; 
+					TJAPlayer3.Tx.Entry_Player[0].Opacity = alpha;
 					TJAPlayer3.Tx.Entry_Player[1].Opacity = alpha;
-					
-					
+
+
 					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
 
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
@@ -518,7 +522,7 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
 					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
 
-					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800 ) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
+					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
 						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 0, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
 
@@ -556,11 +560,11 @@ namespace TJAPlayer3
 						TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, Opacity);
 				}
 
-                #endregion
+				#endregion
 
-                #region [ モード選択 ]
+				#region [ モード選択 ]
 
-                if (bモード選択)
+				if (bモード選択)
 				{
 					this.ctBarAnimeIn.t進行();
 
@@ -802,6 +806,65 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
+
+		// Directly propose the different game options if the save file is already loaded, go back to save file select by pressing "Escape"
+		private void SkipSaveFileStep()
+        {
+			if (bSaveFileLoaded == true)
+            {
+				bモード選択 = true;
+				// bプレイヤーエントリー = true;
+				bバナパス読み込み = true;
+				bプレイヤーエントリー決定 = true;
+				bどんちゃんカウンター初期化 = true;
+				
+				this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
+				this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+				ctエントリーバー決定点滅.t開始(0, 1055, 1, TJAPlayer3.Timer);
+				ctエントリーバー決定点滅.n現在の値 = (int)ctエントリーバー決定点滅.n現在の値;
+				ctバナパス読み込み成功.t開始(0, 3655, 1, TJAPlayer3.Timer);
+				ctバナパス読み込み成功.n現在の値 = (int)ctバナパス読み込み成功.n終了値;
+
+				ctどんちゃんイン.t開始(0, 180, 2, TJAPlayer3.Timer);
+				ctBarAnimeIn.t開始(0, 1295, 1, TJAPlayer3.Timer);
+
+				ctコインイン待機.n現在の値 = (int)ctコインイン待機.n終了値;
+				ctエントリーバー点滅.n現在の値 = (int)ctエントリーバー点滅.n終了値;
+
+				TJAPlayer3.Skin.SoundBanapas.bPlayed = true;
+				TJAPlayer3.Skin.soundsanka.bPlayed = true;
+			}
+        }
+
+		// Restore the title screen to the "Taiko hit start" screen
+		private void UnloadSaveFile()
+        {
+			this.ctバナパス読み込み待機 = new CCounter();
+			this.ctコインイン待機 = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
+			this.ctバナパス読み込み成功 = new CCounter();
+			this.ctバナパス読み込み失敗 = new CCounter();
+			this.ctエントリーバー点滅 = new CCounter(0, 510, 2, TJAPlayer3.Timer);
+			this.ctエントリーバー決定点滅 = new CCounter();
+			this.ctどんちゃんエントリーループ = new CCounter();
+			this.ctどんちゃんイン = new CCounter();
+			this.ctどんちゃんループ = new CCounter(0, TJAPlayer3.Tx.Entry_Donchan_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
+			this.ctBarAnimeIn = new CCounter();
+			this.ctBarMove = new CCounter();
+			this.ctBarMove.n現在の値 = 250;
+			
+			this.bバナパス読み込み = false;
+			this.bバナパス読み込み失敗 = false;
+			this.bプレイヤーエントリー = false;
+			this.bプレイヤーエントリー決定 = false;
+			this.bモード選択 = false;
+			this.bどんちゃんカウンター初期化 = false;
+			this.n現在の選択行プレイヤーエントリー = 1;
+
+			TJAPlayer3.Skin.SoundBanapas.bPlayed = false;
+		}
+
+		private static bool bSaveFileLoaded = false;
+
 		private CCounter ctコインイン待機;
 
 		private CCounter ctバナパス読み込み待機;

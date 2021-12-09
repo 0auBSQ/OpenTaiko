@@ -90,9 +90,11 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(7));
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
+			/*
 			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(8), 0, 10, TJAPlayer3.ConfigIni.nRisky,
 				CLangManager.LangInstance.GetString(9));
 			this.list項目リスト.Add( this.iSystemRisky );
+			*/
 
 			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString(10), 5, 400, TJAPlayer3.ConfigIni.n演奏速度,
 				CLangManager.LangInstance.GetString(11));
@@ -366,7 +368,7 @@ namespace TJAPlayer3
                 new string[] { "TYPE-A", "TYPE-B", "TYPE-C"});
             this.list項目リスト.Add(this.iTaikoScoreMode);
 
-            ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString(10084), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.Eパネル種別.通常,
+            this.ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString(10084), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.Eパネル種別.通常,
 				CLangManager.LangInstance.GetString(84));
             this.list項目リスト.Add(this.ShinuchiMode);
 
@@ -1453,7 +1455,9 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.ShowMob = this.ShowMob.bON;
             TJAPlayer3.ConfigIni.ShowFooter = this.ShowFooter.bON;
             TJAPlayer3.ConfigIni.ShowPuchiChara = this.ShowPuchiChara.bON;
-            TJAPlayer3.ConfigIni.nPlayerCount = this.iTaikoPlayerCount.n現在の値;
+
+			TJAPlayer3.ConfigIni.nPlayerCount = this.iTaikoPlayerCount.n現在の値;
+
 			TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
 			TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
 		}
@@ -1468,16 +1472,7 @@ namespace TJAPlayer3
 			TJAPlayer3.NamePlate.tNamePlateRefreshTitles(1);
 
 			TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums = this.iDrumsScrollSpeed.n現在の値;
-            //CDTXMania.ConfigIni.bドラムコンボ表示 = this.iDrumsComboDisp.bON;
-												// "Sudden" || "Sud+Hid"
-            //CDTXMania.ConfigIni.bSudden.Drums = ( this.iDrumsSudHid.n現在選択されている項目番号 == 1 || this.iDrumsSudHid.n現在選択されている項目番号 == 3 ) ? true : false;
-												// "Hidden" || "Sud+Hid"
-            //CDTXMania.ConfigIni.bHidden.Drums = ( this.iDrumsSudHid.n現在選択されている項目番号 == 2 || this.iDrumsSudHid.n現在選択されている項目番号 == 3 ) ? true : false;
-            //if      ( this.iDrumsSudHid.n現在選択されている項目番号 == 4 ) CDTXMania.ConfigIni.eInvisible.Drums = EInvisible.SEMI;	// "S-Invisible"
-            //else if ( this.iDrumsSudHid.n現在選択されている項目番号 == 5 ) CDTXMania.ConfigIni.eInvisible.Drums = EInvisible.FULL;	// "F-Invisible"
-            //else                                                           CDTXMania.ConfigIni.eInvisible.Drums = EInvisible.OFF;
-            //CDTXMania.ConfigIni.bReverse.Drums = this.iDrumsReverse.bON;
-            //CDTXMania.ConfigIni.判定文字表示位置.Drums = (E判定文字表示位置) this.iDrumsPosition.n現在選択されている項目番号;
+            
 			TJAPlayer3.ConfigIni.bTight = this.iDrumsTight.bON;
 
 		    TJAPlayer3.ConfigIni.nInputAdjustTimeMs = this.iInputAdjustTimeMs.n現在の値;

@@ -163,27 +163,8 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
-				//CDTXMania.tテクスチャの解放( ref this.txゲージ );
-				//CDTXMania.tテクスチャの解放( ref this.txゲージ背景 );
-    //            if (CDTXMania.stage演奏ドラム画面.bDoublePlay)
-    //                CDTXMania.tテクスチャの解放( ref this.txゲージ2P );
-    //            if (CDTXMania.stage演奏ドラム画面.bDoublePlay)
-    //                CDTXMania.tテクスチャの解放( ref this.txゲージ背景2P );
-    //            CDTXMania.tテクスチャの解放( ref this.txゲージ線 );
-    //            if (CDTXMania.stage演奏ドラム画面.bDoublePlay)
-    //                CDTXMania.tテクスチャの解放( ref this.txゲージ線2P );
-    //            CDTXMania.tテクスチャの解放( ref this.tx魂 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx炎 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx魂花火 );
-
-
-    //            for( int i = 0; i < 12; i++ )
-    //            {
-    //                CDTXMania.tテクスチャの解放( ref this.txゲージ虹[ i ] );
-    //            }
                 this.ct虹アニメ = null;
 
-                //CDTXMania.tテクスチャの解放(ref this.tx音符);
                 base.OnManagedリソースの解放();
 			}
 		}
@@ -249,16 +230,23 @@ namespace TJAPlayer3
                     {
                         TJAPlayer3.Tx.Gauge_Base[0].t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, 700, 44));
                     }
-                    if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.Tx.Gauge_Base[1] != null)
+                    if (TJAPlayer3.Tx.Gauge_Base[1] != null)
                     {
-                        TJAPlayer3.Tx.Gauge_Base[1].t2D描画(TJAPlayer3.app.Device, 492, 532, new Rectangle(0, 0, 700, 44));
+                        if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                        {
+                            TJAPlayer3.Tx.Gauge_Base[1].t2D上下反転描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, 700, 44));
+                        }
+                        else if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
+                        {
+                            TJAPlayer3.Tx.Gauge_Base[1].t2D描画(TJAPlayer3.app.Device, 492, 532, new Rectangle(0, 0, 700, 44));
+                        }
                     }
+                    
                 }
                 #region[ ゲージ1P ]
                 if( TJAPlayer3.Tx.Gauge[0] != null )
                 {
 
-                    // Adapt gauge to dan
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     {
                         TJAPlayer3.Tx.Gauge_Dan[1]?.t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
@@ -284,7 +272,10 @@ namespace TJAPlayer3
                     }
                     else
                     {
-                        TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
+                        if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                            TJAPlayer3.Tx.Gauge[1].t2D上下反転描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
+                        else
+                            TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, 492, 144, new Rectangle(0, 0, nRectX, 44));
                     }
 
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && db現在のゲージ値[0] >= 80.0 && db現在のゲージ値[0] < 100.0)
