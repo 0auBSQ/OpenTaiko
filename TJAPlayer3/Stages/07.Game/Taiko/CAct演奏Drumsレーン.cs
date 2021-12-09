@@ -26,12 +26,7 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            //this.tx普通譜面[ 0 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_normal_base.png"));
-            //this.tx玄人譜面[ 0 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_expert_base.png"));
-            //this.tx達人譜面[ 0 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_master_base.png"));
-            //this.tx普通譜面[ 1 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_normal.png"));
-            //this.tx玄人譜面[ 1 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_expert.png"));
-            //this.tx達人譜面[ 1 ] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_master.png"));
+
             this.ct分岐アニメ進行 = new CCounter[ 4 ];
             this.nBefore = new CDTX.ECourse[ 4 ];
             this.nAfter = new CDTX.ECourse[ 4 ];
@@ -49,12 +44,7 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの解放()
         {
-            //CDTXMania.tテクスチャの解放( ref this.tx普通譜面[ 0 ] );
-            //CDTXMania.tテクスチャの解放( ref this.tx玄人譜面[ 0 ] );
-            //CDTXMania.tテクスチャの解放( ref this.tx達人譜面[ 0 ] );
-            //CDTXMania.tテクスチャの解放( ref this.tx普通譜面[ 1 ] );
-            //CDTXMania.tテクスチャの解放( ref this.tx玄人譜面[ 1 ] );
-            //CDTXMania.tテクスチャの解放( ref this.tx達人譜面[ 1 ] );
+
 
             base.OnManagedリソースの解放();
         }
