@@ -203,6 +203,8 @@ namespace TJAPlayer3
 							TJAPlayer3.SaveFile = 0;
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+							for (int i = 0; i < 2; i++)
+								TJAPlayer3.NamePlate.tNamePlateRefreshTitles(i);
 						}
 						else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P))
                         {
@@ -210,6 +212,8 @@ namespace TJAPlayer3
 							TJAPlayer3.SaveFile = 1;
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
+							for (int i = 0; i < 2; i++)
+								TJAPlayer3.NamePlate.tNamePlateRefreshTitles(i);
 						}
 						else
                         {

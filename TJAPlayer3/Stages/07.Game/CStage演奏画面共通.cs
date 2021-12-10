@@ -2907,7 +2907,9 @@ namespace TJAPlayer3
                                         ctChipAnime[i] = new CCounter(0, 3, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * 1 / 4 / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0), CSound管理.rc演奏用タイマ);
                                     }
 
-                                    int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[nPlayer], TJAPlayer3.Skin.Characters_Ptn - 1));
+                                    int p = TJAPlayer3.GetActualPlayer(nPlayer);
+
+                                    int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
 
                                     if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                                     {
@@ -3109,7 +3111,9 @@ namespace TJAPlayer3
                                     ctChipAnime[i] = new CCounter(0, 3, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * 1 / 4, CSound管理.rc演奏用タイマ);
                                 }
 
-                                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[nPlayer], TJAPlayer3.Skin.Characters_Ptn - 1));
+                                int p = TJAPlayer3.GetActualPlayer(nPlayer);
+
+                                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
 
                                 if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                                 {

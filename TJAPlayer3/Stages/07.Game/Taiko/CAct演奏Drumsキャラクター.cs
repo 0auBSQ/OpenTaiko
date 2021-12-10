@@ -46,7 +46,9 @@ namespace TJAPlayer3
                 CharaAction_Balloon_Delay[i] = new CCounter();
 
                 // Currently used character
-                this.iCurrentCharacter[i] = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[i], TJAPlayer3.Skin.Characters_Ptn - 1));
+                int p = TJAPlayer3.GetActualPlayer(i);
+
+                this.iCurrentCharacter[i] = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
 
 
                 this.b風船連打中[i] = false;
@@ -70,16 +72,6 @@ namespace TJAPlayer3
                 if (balloonBrokePtn > 1) CharaAction_Balloon_FadeOut_StartMs[i][0] /= balloonBrokePtn - 1;
                 if (balloonMissPtn > 1) CharaAction_Balloon_FadeOut_StartMs[i][1] /= balloonMissPtn - 1; // - 1はタイマー用
             }
-
-            // ふうせん系アニメーションの総再生時間は画像枚数 x Tick間隔なので、
-            // フェードアウトの開始タイミングは、総再生時間 - フェードアウト時間。
-            //var tick = TJAPlayer3.Skin.Game_Chara_Balloon_Timer;
-            //int[] tick = new int[2] { TJAPlayer3.Skin.Characters_Balloon_Timer[this.iCurrentCharacter[0]], TJAPlayer3.Skin.Characters_Balloon_Timer[this.iCurrentCharacter[1]] };
-
-
-            // Ballon broke values
-            //var balloonBrokePtn = TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Broke;
-            //var balloonMissPtn = TJAPlayer3.Skin.Game_Chara_Ptn_Balloon_Miss;
 
             base.On活性化();
         }
@@ -138,7 +130,6 @@ namespace TJAPlayer3
         {
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-
                 int Character = this.iCurrentCharacter[i];
 
                 if (TJAPlayer3.Skin.Characters_Ptn == 0)

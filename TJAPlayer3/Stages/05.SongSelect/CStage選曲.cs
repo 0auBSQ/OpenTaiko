@@ -944,11 +944,13 @@ namespace TJAPlayer3
 
                 }
 
-                if (TJAPlayer3.NamePlateConfig.data.Medals[0] >= 0)
-                    tBoardNumberDraw(this.ptBoardNumber[10].X - 10, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[0].ToString());
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    int p = TJAPlayer3.GetActualPlayer(i);
 
-                if (TJAPlayer3.NamePlateConfig.data.Medals[1] >= 0 && TJAPlayer3.ConfigIni.nPlayerCount > 1)
-                    tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[1].ToString());
+                    if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
+                        tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + i * 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[p].ToString());
+                }
 
                 #endregion
 
