@@ -44,7 +44,7 @@ namespace TJAPlayer3
 
 
             // 1P, configure later for default 2P
-            iPlayer = 0;
+            iPlayer = TJAPlayer3.SaveFile;
 
             #region [Main menu]
 
@@ -538,8 +538,10 @@ namespace TJAPlayer3
 
         private void tResetOpts()
         {
+            // Retrieve titles if they exist
             iTitleCurrent = 0;
             iDanTitleCurrent = 0;
+
             iCharacterCurrent = TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer];
             iPuchiCharaCurrent = TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer];
         }

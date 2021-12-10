@@ -391,6 +391,15 @@ namespace TJAPlayer3
 		// 0 : Hidari, 1 : Migi (1P only)
 		public static int PlayerSide = 0;
 
+		public static int GetActualPlayer(int player)
+        {
+			if (SaveFile == 0)
+				return player;
+			if (player == 0)
+				return 1;
+			return 0;
+        }
+
         #endregion
 
         // コンストラクタ

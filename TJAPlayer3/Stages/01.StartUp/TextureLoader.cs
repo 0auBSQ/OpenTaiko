@@ -395,11 +395,12 @@ namespace TJAPlayer3
 
             #endregion
             #region 太鼓
-            Taiko_Background = new CTexture[4];
+            Taiko_Background = new CTexture[5];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
             Taiko_Background[3] = TxC(GAME + TAIKO + @"Tower_Background.png");
+            Taiko_Background[4] = TxC(GAME + TAIKO + @"1P_Background_Right.png");
             Taiko_Frame = new CTexture[3];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");

@@ -85,7 +85,9 @@ namespace TJAPlayer3
             ** - Yellow light color filter when isGrowing is true
             */
 
-            int puriChar = TJAPlayer3.NamePlateConfig.data.PuchiChara[player];
+            int p = TJAPlayer3.GetActualPlayer(player);
+
+            int puriChar = TJAPlayer3.NamePlateConfig.data.PuchiChara[p];
             
             // To change later
             if (puriChar < 0)

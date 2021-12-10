@@ -1469,7 +1469,8 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.nRollsPerSec = this.iRollsPerSec.n現在の値;
 
 			TJAPlayer3.ConfigIni.nAILevel = this.iAILevel.n現在の値;
-			TJAPlayer3.NamePlate.tNamePlateRefreshTitles(1);
+			for (int i = 0; i < 2; i++)
+				TJAPlayer3.NamePlate.tNamePlateRefreshTitles(i);
 
 			TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums = this.iDrumsScrollSpeed.n現在の値;
             
