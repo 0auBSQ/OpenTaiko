@@ -48,6 +48,19 @@ namespace TJAPlayer3
 		}
 
 		public ST譜面情報 譜面情報;
+
+		// Smaller version of ST譜面情報 to keep the main info for each player (High scores, clear status, score ranks
+		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[2];
+
+		[Serializable]
+		[StructLayout(LayoutKind.Sequential)]
+		public struct STGamePlayInformations
+        {
+			public int[] nHighScore;
+			public int[] nClear;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+			public int[] nScoreRank;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+		}
+
 		[Serializable]
 		[StructLayout( LayoutKind.Sequential )]
 		public struct ST譜面情報
@@ -319,6 +332,14 @@ namespace TJAPlayer3
             this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1};
 			this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
+		
+			for (int i = 0; i < 2; i++)
+            {
+				this.GPInfo[i].nHighScore = new int[(int)Difficulty.Total];
+				this.GPInfo[i].nClear = new int[5];
+				this.GPInfo[i].nScoreRank = new int[5];
+			}
+			
 
 			this.譜面情報.nLife = 5;
 			this.譜面情報.nTotalFloor = 140;

@@ -543,17 +543,24 @@ namespace TJAPlayer3
 				await Task.Delay(100);
 			}
 
-            #region [Reset nodes]
+			#region [Reset nodes]
 
-            for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
-			{
-				CScorePad SPRef = ScorePads[s];
+			for (int pl = 0; pl < 2; pl++)
+            {
+				CScorePad[] SPArrRef = ScorePads;
+				if (TJAPlayer3.GetActualPlayer(pl) == 1)
+					SPArrRef = ScorePads2;
 
-				for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
-					SPRef.ScoreRankCount[i] = 0;
+				for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
+				{
+					CScorePad SPRef = SPArrRef[s];
 
-				for (int i = 0; i < ScorePads[s].CrownCount.Length; i++)
-					SPRef.CrownCount[i] = 0;
+					for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+						SPRef.ScoreRankCount[i] = 0;
+
+					for (int i = 0; i < ScorePads[s].CrownCount.Length; i++)
+						SPRef.CrownCount[i] = 0;
+				}
 			}
 
             #endregion
@@ -561,13 +568,18 @@ namespace TJAPlayer3
             #region [Load notes]
 
             foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
-				{
+			{
+				for (int pl = 0; pl < 2; pl++)
+                {
+					CScorePad[] SPArrRef = ScorePads;
+					if (TJAPlayer3.GetActualPlayer(pl) == 1)
+						SPArrRef = ScorePads2;
 					
 					// All score pads except UraOmote
 					// this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)
 					for (int s = 0; s <= (int)Difficulty.Edit; s++)
 					{
-						CScorePad SPRef = ScorePads[s];
+						CScorePad SPRef = SPArrRef[s];
 
 						if (song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 						{
@@ -577,7 +589,8 @@ namespace TJAPlayer3
 									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 									&& a.strジャンル != "最近遊んだ曲"
 									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+									//&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nScoreRank[s] == (i + 1)).Count();
 							}
 							for (int i = 0; i < SPRef.CrownCount.Length; i++)
 							{
@@ -585,7 +598,7 @@ namespace TJAPlayer3
 									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 									&& a.strジャンル != "最近遊んだ曲"
 									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nClear[s] == (i + 1)).Count();
 							}
 						}
 						else
@@ -598,7 +611,7 @@ namespace TJAPlayer3
 										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 										&& a.strジャンル != "最近遊んだ曲"
 										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nScoreRank[s] == (i + 1)).Count();
 								}
 								for (int i = 0; i < SPRef.CrownCount.Length; i++)
 								{
@@ -606,13 +619,15 @@ namespace TJAPlayer3
 										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 										&& a.strジャンル != "最近遊んだ曲"
 										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nClear[s] == (i + 1)).Count();
 								}
 							}
 						}
 					}
 
-				#endregion
+				}
+
+			#endregion
 
 			#region [UraOmote pad]
 
@@ -620,10 +635,12 @@ namespace TJAPlayer3
 			for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount.Length; i++)
 			{
 				ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount[i] = ScorePads[(int)Difficulty.Edit].ScoreRankCount[i] + ScorePads[(int)Difficulty.Oni].ScoreRankCount[i];
+				ScorePads2[(int)Difficulty.Edit + 1].ScoreRankCount[i] = ScorePads2[(int)Difficulty.Edit].ScoreRankCount[i] + ScorePads2[(int)Difficulty.Oni].ScoreRankCount[i];
 			}
 			for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].CrownCount.Length; i++)
 			{
 				ScorePads[(int)Difficulty.Edit + 1].CrownCount[i] = ScorePads[(int)Difficulty.Edit].CrownCount[i] + ScorePads[(int)Difficulty.Oni].CrownCount[i];
+				ScorePads2[(int)Difficulty.Edit + 1].CrownCount[i] = ScorePads2[(int)Difficulty.Edit].CrownCount[i] + ScorePads2[(int)Difficulty.Oni].CrownCount[i];
 			}
 
 			#endregion
@@ -1964,6 +1981,7 @@ namespace TJAPlayer3
 
 		// Edit + 1 => UraOmote ScorePad, add 2P later
 		public CScorePad[] ScorePads = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
+		public CScorePad[] ScorePads2 = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
 
 		public class CScorePad
         {

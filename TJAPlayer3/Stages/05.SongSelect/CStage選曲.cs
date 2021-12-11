@@ -240,10 +240,6 @@ namespace TJAPlayer3
             this.act曲リスト.Refresh(cs, bRemakeSongTitleBar);
         }
 
-
-
-
-
         public override void On活性化()
         {
             Trace.TraceInformation("選曲ステージを活性化します。");
@@ -328,28 +324,6 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
-                //this.tx背景 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background.jpg" ), false );
-                //this.tx上部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_header_panel.png" ), false );
-                //this.tx下部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_footer panel.png" ) );
-
-                //this.txFLIP = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_skill number on gauge etc.png" ), false );
-                //this.tx難易度名 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_difficulty name.png" ) );
-                //this.txジャンル別背景[0] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Anime.png" ) );
-                //this.txジャンル別背景[1] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_JPOP.png" ) );
-                //this.txジャンル別背景[2] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Game.png" ) );
-                //this.txジャンル別背景[3] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Namco.png" ) );
-                //this.txジャンル別背景[4] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Classic.png" ) );
-                //this.txジャンル別背景[5] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Child.png" ) );
-                //this.txジャンル別背景[6] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Variety.png" ) );
-                //this.txジャンル別背景[7] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_VOCALID.png" ) );
-                //this.txジャンル別背景[8] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Other.png" ) );
-
-                //this.tx難易度別背景[0] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Easy.png" ) );
-                //this.tx難易度別背景[1] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Normal.png" ) );
-                //this.tx難易度別背景[2] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Hard.png" ) );
-                //this.tx難易度別背景[3] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Master.png" ) );
-                //this.tx難易度別背景[4] = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_background_Edit.png" ) );
-                //this.tx下部テキスト = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_footer text.png" ) );
                 this.ct背景スクロール用タイマー = new CCounter(0, TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width, 30, TJAPlayer3.Timer);
                 base.OnManagedリソースの作成();
             }
@@ -358,20 +332,6 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
-                //CDTXMania.tテクスチャの解放( ref this.tx背景 );
-                //CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
-                //CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
-                //CDTXMania.tテクスチャの解放( ref this.txFLIP );
-                //CDTXMania.tテクスチャの解放( ref this.tx難易度名 );
-                //CDTXMania.tテクスチャの解放( ref this.tx下部テキスト );
-                //for( int j = 0; j < 9; j++ )
-                //{
-                //    CDTXMania.tテクスチャの解放( ref this.txジャンル別背景[ j ] );
-                //}
-                //for( int j = 0; j < 5; j++ )
-                //{
-                //    CDTXMania.tテクスチャの解放( ref this.tx難易度別背景[ j ] );
-                //}
                 base.OnManagedリソースの解放();
             }
         }
@@ -513,16 +473,6 @@ namespace TJAPlayer3
                 {
                     CSongSelectSongManager.playSongIfPossible();
                 }
-
-                /*
-                if (TJAPlayer3.ConfigIni.bBGM音を発声する && !this.bBGM再生済み && (base.eフェーズID == CStage.Eフェーズ.共通_通常状態) && !TJAPlayer3.Skin.bgm選曲画面イン.b再生中 && !TJAPlayer3.Skin.bgm選曲画面.b再生中)
-                {
-                    TJAPlayer3.Skin.bgm選曲画面イン.t停止する();
-                    TJAPlayer3.Skin.bgm選曲画面.t再生する();
-                    this.bBGM再生済み = true;
-                }
-                */
-
 
                 if (this.ctDiffSelect移動待ち != null)
                     this.ctDiffSelect移動待ち.t進行();
@@ -921,6 +871,8 @@ namespace TJAPlayer3
 
                 int[] currentPads = new int[2] { (int)Difficulty.Edit + 1, (int)Difficulty.Edit + 1 };
 
+                int tablesGap = 1034;
+
                 //int currentPad = (int)Difficulty.Edit + 1;
                 if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
                 {
@@ -932,21 +884,27 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.SongSelect_Table[currentPads[0]]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
                 if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
-                    TJAPlayer3.Tx.SongSelect_Table[currentPads[1]]?.t2D描画(TJAPlayer3.app.Device, 1034, 0);
+                    TJAPlayer3.Tx.SongSelect_Table[currentPads[1]]?.t2D描画(TJAPlayer3.app.Device, tablesGap, 0);
 
-                // Current board
-                for (int i = 0; i < 10; i++)
-                {
-                    
-                    tBoardNumberDraw(this.ptBoardNumber[i].X - 10, this.ptBoardNumber[i].Y, i < 7 ? 
-                        this.act曲リスト.ScorePads[currentPads[0]].ScoreRankCount[i].ToString() 
-                        : this.act曲リスト.ScorePads[currentPads[0]].CrownCount[i - 7].ToString());
-
-                }
+                
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     int p = TJAPlayer3.GetActualPlayer(i);
+
+                    CActSelect曲リスト.CScorePad[] SPArrRef = this.act曲リスト.ScorePads;
+                    if (p == 1)
+                        SPArrRef = this.act曲リスト.ScorePads2;
+
+                    // Current board
+                    for (int j = 0; j < 10; j++)
+                    {
+
+                        tBoardNumberDraw(this.ptBoardNumber[j].X - 10 + i * tablesGap, this.ptBoardNumber[j].Y, j < 7 ?
+                            SPArrRef[currentPads[i]].ScoreRankCount[j].ToString()
+                            : SPArrRef[currentPads[i]].CrownCount[j - 7].ToString());
+
+                    }
 
                     if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
                         tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + i * 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[p].ToString());

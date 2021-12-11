@@ -935,9 +935,14 @@ namespace TJAPlayer3
 							//-----------------
                             try
                             {
-                                var scoreIniPath = c曲リストノード.arスコア[ i ].ファイル情報.ファイルの絶対パス + ".score.ini";
+								var scoreIniPath = c曲リストノード.arスコア[i].ファイル情報.ファイルの絶対パス;// + ".score.ini";
+
                                 if( File.Exists( scoreIniPath ) )
-                                    this.tScoreIniを読み込んで譜面情報を設定する( scoreIniPath, c曲リストノード.arスコア[ i ] );
+                                {
+									this.tScoreIniを読み込んで譜面情報を設定する(scoreIniPath, c曲リストノード.arスコア[i]);
+								}
+								// Legacy save files from DTX mania
+								/*
                                 else
                                 {
                                     string[] dtxscoreini = Directory.GetFiles(c曲リストノード.arスコア[i].ファイル情報.フォルダの絶対パス, "*.dtx.score.ini");
@@ -946,6 +951,7 @@ namespace TJAPlayer3
                                         this.tScoreIniを読み込んで譜面情報を設定する(dtxscoreini[0], c曲リストノード.arスコア[i]);
                                     }
                                 }
+								*/
                             }
                             catch (Exception e)
                             {
@@ -1743,19 +1749,53 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
         //-----------------
         public void tScoreIniを読み込んで譜面情報を設定する( string strScoreIniファイルパス, Cスコア score )
 		{
-			if( !File.Exists( strScoreIniファイルパス ) )
+			// New format
+			string[] fp =
+			{
+				strScoreIniファイルパス + "1P.score.ini",
+				strScoreIniファイルパス + "2P.score.ini",
+			};
+
+			// Load legacy format if new doesn't exist yet
+			if (!File.Exists(fp[0]))
+				fp[0] = strScoreIniファイルパス + ".score.ini";
+
+
+			/*
+			if ( !File.Exists( strScoreIniファイルパス ) )
 				return;
+			*/
+
+			// Select the main file for the common informations
+			int mainFile = 0;
+			if (!File.Exists(fp[0]))
+				mainFile = 1;
+			if (!File.Exists(fp[1]) && mainFile == 1)
+				return;
+
+			// Only the necessary scores are read from the auxilliary score file
+			int auxFile = mainFile ^ 1;
 
 			try
 			{
-				var ini = new CScoreIni( strScoreIniファイルパス );
-				ini.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
+				//var ini = new CScoreIni( strScoreIniファイルパス );
 
-				for( int n楽器番号 = 0; n楽器番号 < 3; n楽器番号++ )
+				CScoreIni[] csi =
+				{
+					new CScoreIni(fp[mainFile]),
+					File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
+				};
+
+				var ini = csi[0];
+
+				ini.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
+				csi[1]?.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
+
+				for ( int n楽器番号 = 0; n楽器番号 < 3; n楽器番号++ )
 				{
 					int n = ( n楽器番号 * 2 ) + 1;	// n = 0～5
 
-					#region socre.譜面情報.最大ランク[ n楽器番号 ] = ... 
+					#region score.譜面情報.最大ランク[ n楽器番号 ] = ... 
 					//-----------------
 					if( ini.stセクション[ n ].b演奏にMIDI入力を使用した ||
 						ini.stセクション[ n ].b演奏にキーボードを使用した ||
@@ -1781,16 +1821,36 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 					}
 					//-----------------
 					#endregion
+
 					score.譜面情報.最大スキル[ n楽器番号 ] = ini.stセクション[ n ].db演奏型スキル値;
 					score.譜面情報.フルコンボ[ n楽器番号 ] = ini.stセクション[ n ].bフルコンボである;
-                    score.譜面情報.ハイスコア = (int)ini.stセクション.HiScoreDrums.nスコア;
-					score.譜面情報.nクリア = ini.stセクション.HiScoreDrums.nクリア;
-					score.譜面情報.nスコアランク = ini.stセクション.HiScoreDrums.nスコアランク;
-                    for( int i = 0; i < (int)Difficulty.Total; i++ )
-                    {
-                        score.譜面情報.nハイスコア[ i ] = (int)ini.stセクション.HiScoreDrums.nハイスコア[ i ];
-                    }
 				}
+
+				// Legacy
+				score.譜面情報.ハイスコア = (int)ini.stセクション.HiScoreDrums.nスコア;
+				score.譜面情報.nクリア = ini.stセクション.HiScoreDrums.nクリア;
+				score.譜面情報.nスコアランク = ini.stセクション.HiScoreDrums.nスコアランク;
+
+				for (int i = 0; i < (int)Difficulty.Total; i++)
+				{
+					score.譜面情報.nハイスコア[i] = (int)ini.stセクション.HiScoreDrums.nハイスコア[i];
+				}
+
+				// Load GPInfo for each save file
+				for (int i = 0; i < 2; i++)
+                {
+					if (csi[i] == null)
+						continue;
+
+					score.GPInfo[i].nClear = csi[i].stセクション.HiScoreDrums.nクリア;
+					score.GPInfo[i].nScoreRank = csi[i].stセクション.HiScoreDrums.nスコアランク;
+
+					for (int j = 0; j < (int)Difficulty.Total; j++)
+					{
+						score.GPInfo[i].nHighScore[j] = (int)csi[i].stセクション.HiScoreDrums.nハイスコア[j];
+					}
+                }
+
 				score.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
 				score.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
 				score.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
