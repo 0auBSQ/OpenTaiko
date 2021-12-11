@@ -548,7 +548,7 @@ namespace TJAPlayer3
 			for (int pl = 0; pl < 2; pl++)
             {
 				CScorePad[] SPArrRef = ScorePads;
-				if (TJAPlayer3.GetActualPlayer(pl) == 1)
+				if (pl == 1)
 					SPArrRef = ScorePads2;
 
 				for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
@@ -572,7 +572,7 @@ namespace TJAPlayer3
 				for (int pl = 0; pl < 2; pl++)
                 {
 					CScorePad[] SPArrRef = ScorePads;
-					if (TJAPlayer3.GetActualPlayer(pl) == 1)
+					if (pl == 1)
 						SPArrRef = ScorePads2;
 					
 					// All score pads except UraOmote
