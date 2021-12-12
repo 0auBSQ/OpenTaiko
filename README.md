@@ -135,6 +135,19 @@ SlimDXを改めてダウンロードしてください：https://code.google.com
 ## 更新記録
 
 <details>
+	<summary>v0.5.2.1</summary>
+	
+	- バグ修正
+	
+	- オート用のAIレベルを追加
+	
+	- グローバルオフセットを追加
+	
+	- AUTO ROLLをロールスピードに置き換え
+
+</details>
+
+<details>
 	<summary>v0.5.2</summary>
 	
 	- 太鼓部屋の機能を追加
