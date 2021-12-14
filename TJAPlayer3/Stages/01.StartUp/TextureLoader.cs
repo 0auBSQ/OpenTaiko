@@ -435,16 +435,23 @@ namespace TJAPlayer3
             Taiko_Combo_Effect = TxC(GAME + TAIKO + @"Combo_Effect.png");
             Taiko_Combo_Text = TxC(GAME + TAIKO + @"Combo_Text.png");
             #endregion
+
             #region ゲージ
-            Gauge = new CTexture[2];
+
+            Gauge = new CTexture[3];
             Gauge[0] = TxC(GAME + GAUGE + @"1P.png");
             Gauge[1] = TxC(GAME + GAUGE + @"2P.png");
-            Gauge_Base = new CTexture[2];
+            Gauge[2] = TxC(GAME + GAUGE + @"1P_Right.png");
+
+            Gauge_Base = new CTexture[3];
             Gauge_Base[0] = TxC(GAME + GAUGE + @"1P_Base.png");
             Gauge_Base[1] = TxC(GAME + GAUGE + @"2P_Base.png");
+            Gauge_Base[2] = TxC(GAME + GAUGE + @"1P_Base_Right.png");
+
             Gauge_Line = new CTexture[2];
             Gauge_Line[0] = TxC(GAME + GAUGE + @"1P_Line.png");
             Gauge_Line[1] = TxC(GAME + GAUGE + @"2P_Line.png");
+
             TJAPlayer3.Skin.Game_Gauge_Rainbow_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + GAUGE + @"Rainbow\"));
             if (TJAPlayer3.Skin.Game_Gauge_Rainbow_Ptn != 0)
             {
@@ -464,12 +471,15 @@ namespace TJAPlayer3
                     Gauge_Dan_Rainbow[i] = TxC(GAME + DANC + @"Rainbow\" + i.ToString() + ".png");
                 }
             }
-            Gauge_Dan = new CTexture[4];
+
+            Gauge_Dan = new CTexture[6];
 
             Gauge_Dan[0] = TxC(GAME + GAUGE + @"1P_Dan_Base.png");
             Gauge_Dan[1] = TxC(GAME + GAUGE + @"1P_Dan.png");
             Gauge_Dan[2] = TxC(GAME + GAUGE + @"1P_Dan_Clear_Base.png");
             Gauge_Dan[3] = TxC(GAME + GAUGE + @"1P_Dan_Clear.png");
+            Gauge_Dan[4] = TxC(GAME + GAUGE + @"1P_Dan_Base_Right.png");
+            Gauge_Dan[5] = TxC(GAME + GAUGE + @"1P_Dan_Right.png");
 
             Gauge_Soul = TxC(GAME + GAUGE + @"Soul.png");
             Gauge_Flash = TxC(GAME + GAUGE + @"Flash.png");
@@ -477,6 +487,7 @@ namespace TJAPlayer3
             Gauge_Soul_Explosion = new CTexture[2];
             Gauge_Soul_Explosion[0] = TxC(GAME + GAUGE + @"1P_Explosion.png");
             Gauge_Soul_Explosion[1] = TxC(GAME + GAUGE + @"2P_Explosion.png");
+
             #endregion
             #region 吹き出し
             Balloon_Combo = new CTexture[2];

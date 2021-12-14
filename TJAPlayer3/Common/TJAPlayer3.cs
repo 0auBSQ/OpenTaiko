@@ -400,6 +400,11 @@ namespace TJAPlayer3
 			return 0;
         }
 
+		public static bool P1IsBlue()
+        {
+			return (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1);
+		}
+
         #endregion
 
         // コンストラクタ
