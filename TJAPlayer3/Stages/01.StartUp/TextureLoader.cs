@@ -748,6 +748,7 @@ namespace TJAPlayer3
             Result_Header = TxC(RESULT + @"Header.png");
             Result_Number = TxC(RESULT + @"Number.png");
             Result_Panel = TxC(RESULT + @"Panel.png");
+            Result_Panel_2P = TxC(RESULT + @"Panel_2.png");
             Result_Soul_Text = TxC(RESULT + @"Soul_Text.png");
             Result_Soul_Fire = TxC(RESULT + @"Result_Soul_Fire.png");
             Result_Diff_Bar = TxC(RESULT + @"DifficultyBar.png");
@@ -771,10 +772,10 @@ namespace TJAPlayer3
             for (int i = 0; i < 41; i++)
                 Result_Rainbow[i] = TxC(RESULT + @"Rainbow\" + i.ToString() + ".png");
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
                 Result_Background[i] = TxC(RESULT + @"Background_" + i.ToString() + ".png");
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 4; i++)
                 Result_Mountain[i] = TxC(RESULT + @"Background_Mountain_" + i.ToString() + ".png");
 
             for (int i = 0; i < 3; i++)
@@ -1588,6 +1589,7 @@ namespace TJAPlayer3
             Result_Header,
             Result_Number,
             Result_Panel,
+            Result_Panel_2P,
             Result_Soul_Text,
             Result_Soul_Fire,
             Result_Diff_Bar,
@@ -1604,7 +1606,7 @@ namespace TJAPlayer3
             
         public CTexture[]
             Result_Rainbow = new CTexture[41],
-            Result_Background = new CTexture[2],
+            Result_Background = new CTexture[3],
             Result_Crown = new CTexture[3],
             Result_Donchan_Normal = new CTexture[28],
             Result_Donchan_Clear = new CTexture[38],
@@ -1614,7 +1616,7 @@ namespace TJAPlayer3
             Result_Flower_Rotate = new CTexture[5],
             Result_Work = new CTexture[3],
 
-            Result_Mountain = new CTexture[2];
+            Result_Mountain = new CTexture[4];
         #endregion
 
         #region 7_終了画面

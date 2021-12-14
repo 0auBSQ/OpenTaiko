@@ -622,6 +622,9 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.Tx.Result_Background != null)
 					{
+						bool is1P = (TJAPlayer3.ConfigIni.nPlayerCount == 1);
+						bool is2PSide = TJAPlayer3.P1IsBlue();
+						int mountainTexId = (is2PSide && is1P) ? 2 : 0;
 
 						int CloudType = 0;
 						float MountainAppearValue = this.actParameterPanel.MountainAppearValue;
@@ -634,29 +637,32 @@ namespace TJAPlayer3
 
 							if (this.st演奏記録.Drums.fゲージ >= 80.0)
 							{
-								TJAPlayer3.Tx.Result_Background[1].Opacity = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ.n終了値 * 66))) * 3;
-								TJAPlayer3.Tx.Result_Mountain[1].Opacity = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ.n終了値 * 66))) * 3;
-								TJAPlayer3.Tx.Result_Mountain[0].Opacity = 255 - (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ.n終了値 * 66))) * 3;
+								int gaugeAnimationFactor = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ.n終了値 * 66))) * 3;
+
+								TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimationFactor;
+								
+								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].Opacity = gaugeAnimationFactor;
+								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].Opacity = 255 - gaugeAnimationFactor;
 
 								if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 90)
 								{
-									TJAPlayer3.Tx.Result_Mountain[1].vc拡大縮小倍率.Y = 1.0f - (float)Math.Sin((float)this.actParameterPanel.ctMountain_ClearIn.n現在の値 * (Math.PI / 180)) * 0.18f;
+									TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].vc拡大縮小倍率.Y = 1.0f - (float)Math.Sin((float)this.actParameterPanel.ctMountain_ClearIn.n現在の値 * (Math.PI / 180)) * 0.18f;
 								}
 								else if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 225)
 								{
-									TJAPlayer3.Tx.Result_Mountain[1].vc拡大縮小倍率.Y = 0.82f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 90) / 1.5f * (Math.PI / 180)) * 0.58f;
+									TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].vc拡大縮小倍率.Y = 0.82f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 90) / 1.5f * (Math.PI / 180)) * 0.58f;
 								}
 								else if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 245)
 								{
-									TJAPlayer3.Tx.Result_Mountain[1].vc拡大縮小倍率.Y = 1.4f;
+									TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].vc拡大縮小倍率.Y = 1.4f;
 								}
 								else if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 335)
 								{
-									TJAPlayer3.Tx.Result_Mountain[1].vc拡大縮小倍率.Y = 0.9f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 155) * (Math.PI / 180)) * 0.5f;
+									TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].vc拡大縮小倍率.Y = 0.9f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 155) * (Math.PI / 180)) * 0.5f;
 								}
 								else if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 515)
 								{
-									TJAPlayer3.Tx.Result_Mountain[1].vc拡大縮小倍率.Y = 0.9f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 335) * (Math.PI / 180)) * 0.4f;
+									TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].vc拡大縮小倍率.Y = 0.9f + (float)Math.Sin((float)(this.actParameterPanel.ctMountain_ClearIn.n現在の値 - 335) * (Math.PI / 180)) * 0.4f;
 								}
 							}
 
@@ -666,125 +672,162 @@ namespace TJAPlayer3
 						{
 
 							TJAPlayer3.Tx.Result_Background[1].Opacity = 0;
-							TJAPlayer3.Tx.Result_Mountain[0].Opacity = 255;
-							TJAPlayer3.Tx.Result_Mountain[1].Opacity = 0;
+							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].Opacity = 255;
+							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].Opacity = 0;
 						}
 
-						TJAPlayer3.Tx.Result_Background[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
-						TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
-						TJAPlayer3.Tx.Result_Mountain[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
-						TJAPlayer3.Tx.Result_Mountain[1].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, 0, 720);
+						#region [Display background]
 
-						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctShine_Plate.n現在の値.ToString());
-						// TJAPlayer3.act文字コンソール.tPrint(10, 10, C文字コンソール.Eフォント種別.白, this.actParameterPanel.ct全体進行.n現在の値.ToString());
-
-						#region [Background Clouds]
-
-						if (this.st演奏記録.Drums.fゲージ >= 80.0 && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
-						{
-							CloudType = Math.Min(255, Math.Max(0, (int)this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue));
+						if (is1P)
+                        {
+							if (is2PSide)
+								TJAPlayer3.Tx.Result_Background[2].t2D描画(TJAPlayer3.app.Device, 0, 0);
+							else
+								TJAPlayer3.Tx.Result_Background[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
+							TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
 						}
+						else
+                        {
+							TJAPlayer3.Tx.Result_Background[0].t2D描画(TJAPlayer3.app.Device, 0, 0, new Rectangle(0, 0, 640, 720));
+							// Add success condition with jauge just after
+							TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 0, 0, new Rectangle(0, 0, 640, 720));
 
-						for (int i = 10; i >= 0; i--)
-						{
-							int CurMoveRed = (int)((double)CloudMaxMove[i] * Math.Tanh((double)this.actParameterPanel.ct全体進行.n現在の値 / 10000));
-							int CurMoveGold = (int)((double)CloudMaxMove[i] * Math.Tanh(Math.Max(0, (double)this.actParameterPanel.ct全体進行.n現在の値 - (double)MountainAppearValue) / 10000));
-
-							TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.X = 0.65f;
-							TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.Y = 0.65f;
-							TJAPlayer3.Tx.Result_Cloud.Opacity = CloudType;
-
-							TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveGold, CloudYPos[i], new Rectangle(i * 1200, 360, 1200, 360));
-
-							TJAPlayer3.Tx.Result_Cloud.Opacity = 255 - CloudType;
-
-							TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveRed, CloudYPos[i], new Rectangle(i * 1200, 0, 1200, 360));
+							TJAPlayer3.Tx.Result_Background[2].t2D描画(TJAPlayer3.app.Device, 640, 0, new Rectangle(640, 0, 640, 720));
 						}
 
 						#endregion
 
-						if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
-						{
+						if (is1P)
+                        {
+							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].t2D描画(TJAPlayer3.app.Device, 0, 0);
+							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, 0, 720);
 
-							#region [Background shines]
+							// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctShine_Plate.n現在の値.ToString());
+							// TJAPlayer3.act文字コンソール.tPrint(10, 10, C文字コンソール.Eフォント種別.白, this.actParameterPanel.ct全体進行.n現在の値.ToString());
 
-							int ShineTime = (int)ctShine_Plate.n現在の値;
-							int Quadrant500 = ShineTime % 500;
+							#region [Background Clouds]
 
-							for (int i = 0; i < 6; i++)
+							if (this.st演奏記録.Drums.fゲージ >= 80.0 && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
 							{
-								if (i < 2 && ShineTime >= 500 || i >= 2 && ShineTime < 500)
-									TJAPlayer3.Tx.Result_Shine.Opacity = 0;
-								else if (Quadrant500 >= ShinePFade && Quadrant500 <= 500 - ShinePFade)
-									TJAPlayer3.Tx.Result_Shine.Opacity = 255;
+								CloudType = Math.Min(255, Math.Max(0, (int)this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue));
+							}
+
+							for (int i = 10; i >= 0; i--)
+							{
+								int CurMoveRed = (int)((double)CloudMaxMove[i] * Math.Tanh((double)this.actParameterPanel.ct全体進行.n現在の値 / 10000));
+								int CurMoveGold = (int)((double)CloudMaxMove[i] * Math.Tanh(Math.Max(0, (double)this.actParameterPanel.ct全体進行.n現在の値 - (double)MountainAppearValue) / 10000));
+
+								int cloudOffset = (is2PSide) ? 720 : 0;
+
+								TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.X = 0.65f;
+								TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.Y = 0.65f;
+								TJAPlayer3.Tx.Result_Cloud.Opacity = CloudType;
+
+								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveGold, CloudYPos[i], new Rectangle(i * 1200, 360, 1200, 360));
+
+								TJAPlayer3.Tx.Result_Cloud.Opacity = 255 - CloudType;
+
+								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveRed, CloudYPos[i], new Rectangle(i * 1200, cloudOffset, 1200, 360));
+							}
+
+							#endregion
+
+							if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+							{
+
+								#region [Background shines]
+
+								int ShineTime = (int)ctShine_Plate.n現在の値;
+								int Quadrant500 = ShineTime % 500;
+
+								for (int i = 0; i < 6; i++)
+								{
+									if (i < 2 && ShineTime >= 500 || i >= 2 && ShineTime < 500)
+										TJAPlayer3.Tx.Result_Shine.Opacity = 0;
+									else if (Quadrant500 >= ShinePFade && Quadrant500 <= 500 - ShinePFade)
+										TJAPlayer3.Tx.Result_Shine.Opacity = 255;
+									else
+										TJAPlayer3.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
+
+									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = ShinePSize[i];
+									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = ShinePSize[i];
+
+									if (!is2PSide)
+										TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, ShinePXPos[i] + 80, ShinePYPos[i]);
+									else
+										TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, 1280 - (ShinePXPos[i] + 80), ShinePYPos[i]);
+								}
+
+								#endregion
+
+								#region [Fireworks]
+
+								// Primary pop
+								if (this.actParameterPanel.ct全体進行.n現在の値 <= MountainAppearValue + 1000)
+								{
+									for (int i = 0; i < 3; i++)
+									{
+										if (this.actParameterPanel.ct全体進行.n現在の値 <= MountainAppearValue + 255)
+										{
+											int TmpTimer = (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue);
+
+											TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f * ((float)TmpTimer / 225f);
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f * ((float)TmpTimer / 225f);
+										}
+										else
+										{
+											int TmpTimer = Math.Max(0, (2 * 255) - (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue - 255));
+
+											TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
+										}
+
+										if (!is2PSide)
+											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
+										else
+											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 - WorksPosX[i], WorksPosY[i]);
+									}
+								}
 								else
-									TJAPlayer3.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
-
-								TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = ShinePSize[i];
-								TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = ShinePSize[i];
-
-								TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, ShinePXPos[i] + 80, ShinePYPos[i]);
-							}
-
-							#endregion
-
-							#region [Fireworks]
-
-							// Primary pop
-							if (this.actParameterPanel.ct全体進行.n現在の値 <= MountainAppearValue + 1000)
-							{
-								for (int i = 0; i < 3; i++)
 								{
-									if (this.actParameterPanel.ct全体進行.n現在の値 <= MountainAppearValue + 255)
-									{
-										int TmpTimer = (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue);
+									ctWork_Plate.t進行Loop();
 
-										TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f * ((float)TmpTimer / 225f);
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f * ((float)TmpTimer / 225f);
-									}
-									else
+									for (int i = 0; i < 3; i++)
 									{
-										int TmpTimer = Math.Max(0, (2 * 255) - (int)(this.actParameterPanel.ct全体進行.n現在の値 - MountainAppearValue - 255));
+										int TmpStamp = WorksTimeStamp[i];
 
-										TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
+										if (ctWork_Plate.n現在の値 <= TmpStamp + 255)
+										{
+											int TmpTimer = (int)(ctWork_Plate.n現在の値 - TmpStamp);
+
+											TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f * ((float)TmpTimer / 225f);
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f * ((float)TmpTimer / 225f);
+										}
+										else
+										{
+											int TmpTimer = Math.Max(0, (2 * 255) - (int)(ctWork_Plate.n現在の値 - TmpStamp - 255));
+
+											TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
+											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
+										}
+
+										if (!is2PSide)
+											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
+										else
+											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 - WorksPosX[i], WorksPosY[i]);
 									}
-									TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
 								}
+
+								#endregion
+
 							}
-							else
-							{
-								ctWork_Plate.t進行Loop();
-
-								for (int i = 0; i < 3; i++)
-								{
-									int TmpStamp = WorksTimeStamp[i];
-
-									if (ctWork_Plate.n現在の値 <= TmpStamp + 255)
-									{
-										int TmpTimer = (int)(ctWork_Plate.n現在の値 - TmpStamp);
-
-										TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f * ((float)TmpTimer / 225f);
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f * ((float)TmpTimer / 225f);
-									}
-									else
-									{
-										int TmpTimer = Math.Max(0, (2 * 255) - (int)(ctWork_Plate.n現在の値 - TmpStamp - 255));
-
-										TJAPlayer3.Tx.Result_Work[i].Opacity = TmpTimer / 2;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.X = 0.6f;
-										TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
-									}
-									TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
-								}
-							}
-
-							#endregion
-
 						}
+
+						
 
 					}
 
