@@ -1139,8 +1139,11 @@ namespace TJAPlayer3
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 				{
 					// To change while implementing the 2P result screen
+					int pos = i;
+					if (TJAPlayer3.P1IsBlue() && TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower)
+						pos = 1;
 
-					TJAPlayer3.NamePlate.tNamePlateDraw(28, 621, 0);
+					TJAPlayer3.NamePlate.tNamePlateDraw((pos == 1) ? 1280 - 28 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 28, 621, i);
 					// TJAPlayer3.NamePlate.tNamePlateDraw(28, 621, i);
 				}
 				#endregion

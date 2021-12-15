@@ -586,155 +586,163 @@ namespace TJAPlayer3
 					// Alter Mountain appear value/Crown appear value if no Score Rank/no Crown
                 }
 
-                #region [Character related animations]
+				#region [Character related animations]
 
-                #region [Don-chan Animations]
-
-                if (this.ctDonchan_Clear.b進行中)
+				for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
 				{
-					TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear.n現在の値].vc拡大縮小倍率.X = 0.8f;
-					TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear.n現在の値].vc拡大縮小倍率.Y = 0.8f;
+					int pos = p;
+					if (is2PSide)
+						pos = 1;
 
-					TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear.n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, 202, 532);
-				}
-				else if (this.ctDonchan_Failed.b進行中)
-				{
-					TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed.n現在の値].vc拡大縮小倍率.X = 0.8f;
-					TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed.n現在の値].vc拡大縮小倍率.Y = 0.8f;
 
-					TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed.n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, 202, 532);
-				}
-				else if (this.ctDonchan_Failed_In.b進行中)
-                {
-					TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In.n現在の値].vc拡大縮小倍率.X = 0.8f;
-					TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In.n現在の値].vc拡大縮小倍率.Y = 0.8f;
 
-					TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In.n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, 202, 532);
-				}
-				else
-				{
-					TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal.n現在の値].vc拡大縮小倍率.X = 0.8f;
-					TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal.n現在の値].vc拡大縮小倍率.Y = 0.8f;
+					#region [Don-chan Animations]
 
-					TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, 202, 532);
-				}
 
-				#endregion
-
-				#region [PuchiChara]
-
-				this.PuchiChara.On進行描画(202 - 70, 532 + 30, false);
-
-				#endregion
-
-				if (ct全体進行.n現在の値 >= MountainAppearValue)
-                {
-					float AddCount = 135;
-
-					int baseX = 182;
-					int baseY = 602;
-
-					#region [Cherry blossom animation]
-
-					if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
-                    {
-						TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.X = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.Y = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Flower.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 0, 520, 195));
+					if (this.ctDonchan_Clear.b進行中)
+					{
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear.n現在の値], 202, 532, pos, 0.8f);
+					}
+					else if (this.ctDonchan_Failed.b進行中)
+					{
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed.n現在の値], 202, 532, pos, 0.8f);
+					}
+					else if (this.ctDonchan_Failed_In.b進行中)
+					{
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In.n現在の値], 202, 532, pos, 0.8f);
+					}
+					else
+					{
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal.n現在の値], 202, 532, pos, 0.8f);
 					}
 
 					#endregion
 
-					#region [Cherry blossom Rotating flowers]
+					#region [PuchiChara]
 
-					if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
+					int ttdiff = 640 - 152;
+					int ttps = 640 + ((pos == 1) ? ttdiff + 60 : -ttdiff);
+
+					this.PuchiChara.On進行描画(ttps, 562, false, 255, false, p);
+
+					#endregion
+
+					if (ct全体進行.n現在の値 >= MountainAppearValue)
 					{
-						float FlowerTime = ctRotate_Flowers.n現在の値;
+						float AddCount = 135;
 
-						for (int i = 0; i < 5; i++)
-                        {
+						int baseX = (pos == 1) ? 1280 - 182 : 182;
+						int baseY = 602;
+
+						#region [Cherry blossom animation]
+
+						if (gaugeValues[p] >= 80.0f)
+						{
+							TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.X = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.Y = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 							
-							if ((int)FlowerTime < ApparitionTimeStamps[i] || (int)FlowerTime > ApparitionTimeStamps[i] + 2 * ApparitionFade + ApparitionDuration)
-								TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = 0;
-							else if ((int)FlowerTime <= ApparitionTimeStamps[i] + ApparitionDuration + ApparitionFade && (int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade)
-								TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = 255;
-							else
-                            {
-								int CurrentGradiant = 0;
-								if ((int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade + ApparitionDuration)
-									CurrentGradiant = ApparitionFade - ((int)FlowerTime - ApparitionTimeStamps[i] - ApparitionDuration - ApparitionFade);
+							TJAPlayer3.Tx.Result_Flower.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 0, 520, 195));
+						}
+
+						#endregion
+
+						#region [Cherry blossom Rotating flowers]
+
+						if (gaugeValues[p] >= 80.0f)
+						{
+							float FlowerTime = ctRotate_Flowers.n現在の値;
+
+							for (int i = 0; i < 5; i++)
+							{
+
+								if ((int)FlowerTime < ApparitionTimeStamps[i] || (int)FlowerTime > ApparitionTimeStamps[i] + 2 * ApparitionFade + ApparitionDuration)
+									TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = 0;
+								else if ((int)FlowerTime <= ApparitionTimeStamps[i] + ApparitionDuration + ApparitionFade && (int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade)
+									TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = 255;
 								else
-									CurrentGradiant = (int)FlowerTime - ApparitionTimeStamps[i];
+								{
+									int CurrentGradiant = 0;
+									if ((int)FlowerTime >= ApparitionTimeStamps[i] + ApparitionFade + ApparitionDuration)
+										CurrentGradiant = ApparitionFade - ((int)FlowerTime - ApparitionTimeStamps[i] - ApparitionDuration - ApparitionFade);
+									else
+										CurrentGradiant = (int)FlowerTime - ApparitionTimeStamps[i];
 
 
-								TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = (255 * CurrentGradiant) / ApparitionFade;
+									TJAPlayer3.Tx.Result_Flower_Rotate[i].Opacity = (255 * CurrentGradiant) / ApparitionFade;
+								}
+
+								TJAPlayer3.Tx.Result_Flower_Rotate[i].vc拡大縮小倍率.X = 0.6f;
+								TJAPlayer3.Tx.Result_Flower_Rotate[i].vc拡大縮小倍率.Y = 0.6f;
+								TJAPlayer3.Tx.Result_Flower_Rotate[i].fZ軸中心回転 = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
+
+								TJAPlayer3.Tx.Result_Flower_Rotate[i].t2D中心基準描画(TJAPlayer3.app.Device, baseX + FlowerXPos[i] - 20, baseY + FlowerYPos[i] - 20);
 							}
 
-							TJAPlayer3.Tx.Result_Flower_Rotate[i].vc拡大縮小倍率.X = 0.6f;
-							TJAPlayer3.Tx.Result_Flower_Rotate[i].vc拡大縮小倍率.Y = 0.6f;
-							TJAPlayer3.Tx.Result_Flower_Rotate[i].fZ軸中心回転 = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
-
-							TJAPlayer3.Tx.Result_Flower_Rotate[i].t2D中心基準描画(TJAPlayer3.app.Device, baseX + FlowerXPos[i] - 20, baseY + FlowerYPos[i] - 20);
 						}
 
-					}
+						#endregion
 
-					#endregion
+						#region [Panel shines]
 
-					#region [Panel shines]
+						if (gaugeValues[p] >= 80.0f)
+						{
+							int ShineTime = (int)ctShine_Plate.n現在の値;
+							int Quadrant500 = ShineTime % 500;
 
-					if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
-					{
-						int ShineTime = (int)ctShine_Plate.n現在の値;
-						int Quadrant500 = ShineTime % 500;
+							for (int i = 0; i < 6; i++)
+							{
+								if (i < 3 && ShineTime >= 500 || i >= 3 && ShineTime < 500)
+									TJAPlayer3.Tx.Result_Shine.Opacity = 0;
+								else if (Quadrant500 >= ShinePFade && Quadrant500 <= 500 - ShinePFade)
+									TJAPlayer3.Tx.Result_Shine.Opacity = 255;
+								else
+									TJAPlayer3.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
 
-						for (int i = 0; i < 6; i++)
-                        {
-							if (i < 3 && ShineTime >= 500 || i >= 3 && ShineTime < 500)
-								TJAPlayer3.Tx.Result_Shine.Opacity = 0;
-							else if (Quadrant500 >= ShinePFade && Quadrant500 <= 500 - ShinePFade)
-								TJAPlayer3.Tx.Result_Shine.Opacity = 255;
+								TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = 0.15f;
+								TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = 0.15f;
+
+								TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, baseX + ShinePXPos[i] + 62, baseY + ShinePYPos[i] + 52);
+							}
+
+						}
+
+
+						#endregion
+
+						#region [Speech bubble animation]
+						// Speech Bubble
+
+						int Mood = 0;
+
+						if (gaugeValues[p] >= 100.0f)
+							Mood = 3;
+						else if (gaugeValues[p] >= 80.0f)
+							Mood = 2;
+						else if (gaugeValues[p] >= 40.0f)
+							Mood = 1;
+
+
+						TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						TJAPlayer3.Tx.Result_Speech_Bubble.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
+							(pos == 1) ? 1280 - 430 : 430, 
+							526, 
+							new Rectangle(Mood * 358, RandomText * 230, 358, 230));
+
+						if (!b音声再生[9])
+						{
+							if (gaugeValues[p] >= 80.0f)
+								TJAPlayer3.Skin.soundDonClear.t再生する();
 							else
-								TJAPlayer3.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
+								TJAPlayer3.Skin.soundDonFailed.t再生する();
 
-							TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = 0.15f;
-							TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = 0.15f;
-
-							TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, baseX + ShinePXPos[i] + 62, baseY + ShinePYPos[i] + 52);
+							if (p == TJAPlayer3.ConfigIni.nPlayerCount - 1)
+								b音声再生[9] = true;
 						}
 
+						#endregion
 					}
 
-
-					#endregion
-
-					#region [Speech bubble animation]
-					// Speech Bubble
-
-					int Mood = 0;
-
-					if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 100.0f)
-						Mood = 3;
-					else if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
-						Mood = 2;
-					else if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 40.0f)
-						Mood = 1;
-
-
-					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-					TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-					TJAPlayer3.Tx.Result_Speech_Bubble.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 430, 526, new Rectangle(Mood * 358, RandomText * 230, 358, 230));
-
-					if (!b音声再生[9])
-					{
-						if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
-							TJAPlayer3.Skin.soundDonClear.t再生する();
-						else
-							TJAPlayer3.Skin.soundDonFailed.t再生する();
-						b音声再生[9] = true;
-					}
-
-					#endregion
 				}
 
 				#endregion
@@ -837,6 +845,25 @@ namespace TJAPlayer3
 				x += 22;
 			}
 		}
+
+
+		public void DisplayCharacter(CTexture tex, int x, int y, int pos, float ratio)
+        {
+			if (tex == null)
+				return;
+
+			tex.vc拡大縮小倍率.X = ratio;
+			tex.vc拡大縮小倍率.Y = ratio;
+
+			if (pos == 0)
+				tex.t2D中心基準描画(TJAPlayer3.app.Device, x, y);
+			else
+				tex.t2D左右反転描画(TJAPlayer3.app.Device, 
+					1340 - x - tex.szテクスチャサイズ.Width / 2, 
+					y - tex.szテクスチャサイズ.Height / 2);
+		}
+
+
 		private void t大文字表示(int x, int y, string str)
 		{
 			this.t大文字表示(x, y, str, false);
