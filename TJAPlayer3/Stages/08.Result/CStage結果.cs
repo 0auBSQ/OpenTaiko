@@ -1244,11 +1244,13 @@ namespace TJAPlayer3
 								|| (i == 1 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
 								continue;
 
-							if (cScore.GPInfo[i].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nクリア[i])
-								cScore.GPInfo[i].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nクリア[i];
+							int actualPlayer = TJAPlayer3.GetActualPlayer(i);
 
-							if (cScore.GPInfo[i].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
-								cScore.GPInfo[i].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
+							if (cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nクリア[i])
+								cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nクリア[i];
+
+							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
+								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
 
 							/*
 							if (cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nクリア)

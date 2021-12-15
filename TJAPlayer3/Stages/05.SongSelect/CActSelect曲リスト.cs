@@ -1021,25 +1021,26 @@ namespace TJAPlayer3
 								this.stバー情報[index].b分岐 = song.arスコア[f].譜面情報.b譜面分岐;
 						}
 
-						if (stバー情報[index].nクリア == null)
-							this.stバー情報[index].nクリア = new int[5];
+                        #region [Reroll cases]
+
+                        if (stバー情報[index].nクリア == null)
+							this.stバー情報[index].nクリア = new int[2][];
 						if (stバー情報[index].nスコアランク == null)
-							this.stバー情報[index].nスコアランク = new int[5];
+							this.stバー情報[index].nスコアランク = new int[2][];
 
-						this.stバー情報[index].nクリア = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nクリア;
-						this.stバー情報[index].nスコアランク = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nスコアランク;
-
-						/*
-						for (int i = 0; i <= (int)Difficulty.Edit; i++)
+						for (int i = 0; i < 2; i++)
                         {
+							this.stバー情報[index].nクリア[i] = new int[5];
+							this.stバー情報[index].nスコアランク[i] = new int[5];
 
-							if (song.arスコア[i] != null)
-							{
-								this.stバー情報[index].nクリア = song.arスコア[i].譜面情報.nクリア;
-								this.stバー情報[index].nスコアランク = song.arスコア[i].譜面情報.nスコアランク;
-							}
+							int ap = TJAPlayer3.GetActualPlayer(i);
+							var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+
+							this.stバー情報[index].nクリア[i] = sr.GPInfo[ap].nClear;
+							this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
 						}
-						*/
+
+						#endregion
 
 						// stバー情報[] の内容を1行ずつずらす。
 
@@ -1133,6 +1134,7 @@ namespace TJAPlayer3
 								this.stバー情報[index].b分岐 = song.arスコア[f].譜面情報.b譜面分岐;
 						}
 
+						/*
 						if (stバー情報[index].nクリア == null)
 							this.stバー情報[index].nクリア = new int[5];
 						if (stバー情報[index].nスコアランク == null)
@@ -1146,6 +1148,28 @@ namespace TJAPlayer3
 								this.stバー情報[index].nスコアランク = song.arスコア[i].譜面情報.nスコアランク;
 							}
 						}
+						*/
+
+						#region [Reroll cases]
+
+						if (stバー情報[index].nクリア == null)
+							this.stバー情報[index].nクリア = new int[2][];
+						if (stバー情報[index].nスコアランク == null)
+							this.stバー情報[index].nスコアランク = new int[2][];
+
+						for (int i = 0; i < 2; i++)
+						{
+							this.stバー情報[index].nクリア[i] = new int[5];
+							this.stバー情報[index].nスコアランク[i] = new int[5];
+
+							int ap = TJAPlayer3.GetActualPlayer(i);
+							var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+
+							this.stバー情報[index].nクリア[i] = sr.GPInfo[ap].nClear;
+							this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
+						}
+
+						#endregion
 
 						// stバー情報[] の内容を1行ずつずらす。
 
@@ -1561,12 +1585,20 @@ namespace TJAPlayer3
 					}
 					else if (this.r現在選択中の曲.arスコア[3] != null || this.r現在選択中の曲.arスコア[4] != null)
 					{
-						int[] クリア = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nクリア;
-						
-						int[] スコアランク = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nスコアランク;
+						var sr = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)];
 
-						displayRegularCrowns(354, (int)(344 - BarAnimeCount / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
+						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                        {
+							int diff = 640 - 354;
+							int shift = 640 + ((i == 1) ? diff : -diff);
+							int ap = TJAPlayer3.GetActualPlayer(i);
 
+							int[] クリア = sr.GPInfo[ap].nClear;
+
+							int[] スコアランク = sr.GPInfo[ap].nScoreRank;
+
+							displayRegularCrowns(shift, (int)(344 - BarAnimeCount / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
+						}
 					}
 
 					#endregion
@@ -2057,8 +2089,9 @@ namespace TJAPlayer3
             public string strジャンル;
             public string strサブタイトル;
             public TitleTextureKey ttkタイトル;
-			public int[] nクリア;
-			public int[] nスコアランク;
+
+			public int[][] nクリア;
+			public int[][] nスコアランク;
 		}
 
 		public bool bFirstCrownLoad;
@@ -2206,7 +2239,7 @@ namespace TJAPlayer3
                         this.stバー情報[ i ].b分岐 = song.arスコア[ f ].譜面情報.b譜面分岐;
                 }
 
-
+				/*
 				if (stバー情報[i].nクリア == null)
 					this.stバー情報[i].nクリア = new int[5];
 				if (stバー情報[i].nスコアランク == null)
@@ -2215,21 +2248,38 @@ namespace TJAPlayer3
 
 
 				if(this.stバー情報[i].eバー種別 == Eバー種別.Score)
-				{
+				{ 
 					this.stバー情報[i].nクリア = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nクリア;
 					this.stバー情報[i].nスコアランク = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nスコアランク;
 
-					/*
-					for (int j = 0; j <= (int)Difficulty.Edit; j++)
-					{
-						if (song.arスコア[j] != null)
-						{
-							this.stバー情報[i].nクリア = song.arスコア[j].譜面情報.nクリア;
-							this.stバー情報[i].nスコアランク = song.arスコア[j].譜面情報.nスコアランク;
-						}
-					}
-					*/
 				}
+				*/
+
+				#region [Reroll cases]
+
+				if (stバー情報[i].nクリア == null)
+					this.stバー情報[i].nクリア = new int[2][];
+				if (stバー情報[i].nスコアランク == null)
+					this.stバー情報[i].nスコアランク = new int[2][];
+
+				for (int d = 0; d < 2; d++)
+				{
+					this.stバー情報[i].nクリア[d] = new int[5];
+					this.stバー情報[i].nスコアランク[d] = new int[5];
+
+					if (this.stバー情報[i].eバー種別 == Eバー種別.Score)
+					{
+						int ap = TJAPlayer3.GetActualPlayer(d);
+						var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+
+						this.stバー情報[i].nクリア[d] = sr.GPInfo[ap].nClear;
+						this.stバー情報[i].nスコアランク[d] = sr.GPInfo[ap].nScoreRank;
+					}
+				}
+
+				#endregion
+
+
 
 				for ( int j = 0; j < 3; j++ )
 					this.stバー情報[ i ].nスキル値[ j ] = (int) song.arスコア[ this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す( song ) ].譜面情報.最大スキル[ j ];
@@ -2243,7 +2293,7 @@ namespace TJAPlayer3
 		}
 
 		// Song type : 0 - Ensou, 1 - Dan, 2 - Tower
-		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[] クリア, int[] スコアランク, int boxType, int _songType = 0)
+		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[][] クリア, int[][] スコアランク, int boxType, int _songType = 0)
 		{
 			if (x >= SampleFramework.GameWindowSize.Width || y >= SampleFramework.GameWindowSize.Height)
 				return;
@@ -2281,17 +2331,19 @@ namespace TJAPlayer3
 
 			if (eバー種別 == Eバー種別.Score)
 			{
-				switch (_songType)
+				if (_songType == 1)
+					displayDanStatus(x + 30, y + 30, Math.Min(クリア[0][0], 6) - 1, 0.2f);
+				else
                 {
-					case 0:
-						displayRegularCrowns(x + 30, y + 30, クリア, スコアランク, 0.8f);
-						break;
-					case 1:
-						displayDanStatus(x + 30, y + 30, Math.Min(クリア[0], 6) - 1, 0.2f);
-						break;
-					default:
-						displayRegularCrowns(x + 30, y + 30, クリア, スコアランク, 0.8f);
-						break;
+					var sr = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)];
+
+					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+					{
+						int diff = 640 - 354;
+						int shift = 640 + ((i == 1) ? diff : -diff) - 354;
+
+						displayRegularCrowns(x + 30 + shift, y + 30, クリア[i], スコアランク[i], 0.8f);
+					}
 				}
 
 			}
