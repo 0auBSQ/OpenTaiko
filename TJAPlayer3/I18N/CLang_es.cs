@@ -138,7 +138,7 @@ namespace TJAPlayer3
                 "en el tambor.\n" +
                 "Puedes elegir desde 1 a 99999.",
             [78] = "Ajuste del área de juicio",
-            [79] = "Para cambiar el área del circulo de juicio de las notas.\nAumentarlo moverá el área a la derecha, y disminuirlo\n la moverá a la izquierda.\n" +
+            [79] = "Para cambiar la área del circulo de juicio de las notas.\nAumentarlo moverá la área a la derecha, y disminuirlo\n la moverá a la izquierda.\n" +
                 "Puedes dejarlo desde -99 a 99ms.\n" +
                 "Para disminuir el lag de la entrada,\n deja un valor negativo.",
             [80] = "Dificultad por defecto",
