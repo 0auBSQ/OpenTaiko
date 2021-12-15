@@ -1837,7 +1837,8 @@ namespace TJAPlayer3
 
 				case E楽器パート.TAIKO:
 					this.actCombo.n現在のコンボ数.P1 = 0;
-					break;
+                    this.actCombo.n現在のコンボ数.P2 = 0;
+                    break;
 
 				default:
 					return;

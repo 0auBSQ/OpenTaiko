@@ -28,8 +28,11 @@ namespace TJAPlayer3
 		public STDGBVALUE<int> n演奏回数;
 		public STDGBVALUE<int> nScoreRank;
 		public int n総合ランク値;
-		public int nクリア;        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
-		public int nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+
+		public int[] nクリア = { 0, 0 };        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+		public int[] nスコアランク = { 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+		public int[] nHighScore = { 0, 0 };
+
 		public CDTX.CChip[] r空うちドラムチップ;
 		public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
 
@@ -77,19 +80,22 @@ namespace TJAPlayer3
 					this.bIsCheckedWhetherResultScreenShouldSaveOrNot = false;              // #24609 2011.3.14 yyagi
 					this.n最後に再生したHHのWAV番号 = -1;
 					this.n最後に再生したHHのチャンネル番号 = 0;
-					
+
 					for (int i = 0; i < 3; i++)
 					{
 						this.b新記録スキル[i] = false;
 						this.b新記録スコア[i] = false;
 						this.b新記録ランク[i] = false;
 					}
-					//---------------------
-					#endregion
+                    //---------------------
+                    #endregion
 
-					#region [ 結果の計算 ]
-					//---------------------
-					for (int i = 0; i < 3; i++)
+                    #region [ Results calculus ]
+                    //---------------------
+
+                    #region [ Maybe legacy ? ]
+
+                    for (int i = 0; i < 3; i++)
 					{
 						this.nランク値[i] = -1;
 						this.fPerfect率[i] = this.fGreat率[i] = this.fGood率[i] = this.fPoor率[i] = this.fMiss率[i] = 0.0f;  // #28500 2011.5.24 yyagi
@@ -122,44 +128,75 @@ namespace TJAPlayer3
 						}
 					}
 					this.n総合ランク値 = CScoreIni.t総合ランク値を計算して返す(this.st演奏記録.Drums, this.st演奏記録.Guitar, this.st演奏記録.Bass);
+
+					#endregion
+
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 					{
-						this.nクリア = (this.st演奏記録.Drums.nMiss数 == 0 && this.st演奏記録.Drums.fゲージ == 100) ? this.st演奏記録.Drums.nGreat数 == 0 ? 3 : 2 : this.st演奏記録.Drums.fゲージ >= 80 ? 1 : 0;
+						for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
+                        {
+							var ccf = TJAPlayer3.stage演奏ドラム画面.CChartScore[p];
 
-						if (this.st演奏記録.Drums.nスコア < 500000)
-						{
-							this.nスコアランク = 0;
-						}
-						else
-						{
-							for (int i = 0; i < 7; i++)
+							this.nクリア[p] = (ccf.nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[p] == 100) 
+								? ccf.nGood == 0 
+								? 3 : 2 
+								: TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[p] >= 80 
+								? 1 
+								: 0;
+
+							if (ccf.nScore < 500000)
 							{
-								if (this.st演奏記録.Drums.nスコア >= TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[i])
+								this.nスコアランク[p] = 0;
+							}
+							else
+							{
+								var sr = (p == 0) ? TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank : TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank2P;
+
+								for (int i = 0; i < 7; i++)
 								{
-									this.nスコアランク = i + 1;
+									if (ccf.nScore >= sr[i])
+									{
+										this.nスコアランク[p] = i + 1;
+									}
 								}
 							}
 						}
+
+						
 					}
 					//---------------------
 					#endregion
 
-					#region [ .score.ini の作成と出力 ]
+
+
+					#region [ .score.ini file output ]
 					//---------------------
-					string str = TJAPlayer3.DTX.strファイル名の絶対パス + ".score.ini";
-					CScoreIni ini = new CScoreIni(str);
+
+					int currentSaveFile = TJAPlayer3.SaveFile + 1;
+					int secondSaveFile = (currentSaveFile == 1) ? 2 : 1;
+
+					string[] str = {
+						TJAPlayer3.DTX.strファイル名の絶対パス + currentSaveFile.ToString() + "P.score.ini",
+						TJAPlayer3.DTX.strファイル名の絶対パス + secondSaveFile.ToString() + "P.score.ini"
+					};
+					
+
+					CScoreIni[] ini = {
+						new CScoreIni(str[0]),
+						new CScoreIni(str[1])
+					};
 
 					bool[] b今までにフルコンボしたことがある = new bool[] { false, false, false };
 
 					// フルコンボチェックならびに新記録ランクチェックは、ini.Record[] が、スコアチェックや演奏型スキルチェックの IF 内で書き直されてしまうよりも前に行う。(2010.9.10)
 
-					b今までにフルコンボしたことがある[0] = ini.stセクション[0].bフルコンボである | ini.stセクション[0].bフルコンボである;
+					b今までにフルコンボしたことがある[0] = ini[0].stセクション[0].bフルコンボである | ini[0].stセクション[0].bフルコンボである;
 
 					// #24459 上記の条件だと[HiSkill.***]でのランクしかチェックしていないので、BestRankと比較するよう変更。
-					if (this.nランク値[0] >= 0 && ini.stファイル.BestRank[0] > this.nランク値[0])       // #24459 2011.3.1 yyagi update BestRank
+					if (this.nランク値[0] >= 0 && ini[0].stファイル.BestRank[0] > this.nランク値[0])       // #24459 2011.3.1 yyagi update BestRank
 					{
 						this.b新記録ランク[0] = true;
-						ini.stファイル.BestRank[0] = this.nランク値[0];
+						ini[0].stファイル.BestRank[0] = this.nランク値[0];
 					}
 
 
@@ -167,143 +204,211 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
                     {
-						// Regular (Ensou game) Score and Score Rank saves
+                        // Regular (Ensou game) Score and Score Rank saves
 
-						this.st演奏記録[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nクリア);
-						this.st演奏記録[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini.stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nスコアランク);
+                        #region [Regular saves]
+
+                        CScoreIni.C演奏記録[] baseScores =
+						{
+							ini[0].stセクション[0],
+							ini[1].stセクション[0]
+						};
+
+						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                        {
+							var ccf = TJAPlayer3.stage演奏ドラム画面.CChartScore[i];
+
+							int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[i];
+
+							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
+							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
+							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], ccf.nScore);
+
+							if ((i == 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+								|| (i == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
+							{
+								ini[i].stセクション[0].nクリア[diff] = clear;
+								ini[i].stセクション[0].nスコアランク[diff] = scoreRank;
+								ini[i].stセクション[0].nハイスコア[diff] = highscore;
+							}
+
+							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+								ini[i].t書き出し(str[i]);
+
+						}
+
+						#endregion
+
+						#region [Legacy]
+						/*
+
+						this.st演奏記録[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini[0].stセクション[0].nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nクリア);
+						this.st演奏記録[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = Math.Max(ini[0].stセクション[0].nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]], this.nスコアランク);
 
 						for (int i = 0; i < 5; i++)
 						{
 							if (i != TJAPlayer3.stage選曲.n確定された曲の難易度[0])
 							{
-								this.st演奏記録[0].nクリア[i] = ini.stセクション[0].nクリア[i];
-								this.st演奏記録[0].nスコアランク[i] = ini.stセクション[0].nスコアランク[i];
+								this.st演奏記録[0].nクリア[i] = ini[0].stセクション[0].nクリア[i];
+								this.st演奏記録[0].nスコアランク[i] = ini[0].stセクション[0].nスコアランク[i];
 							}
 
 							// ini.stセクション[0].nクリア[i] = this.st演奏記録[0].nクリア[i];
 							// ini.stセクション[0].nスコアランク[i] = this.st演奏記録[0].nスコアランク[i];
 						}
-					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-                    {
-						/* == Specific format for DaniDoujou charts ==
-						**
-						** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
-						**
-						** 0 (Fugoukaku, no insign)
-						** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
-						** Gold Iki (Full Combo) : 3 (Red Goukaku) / 4 (Gold Goukaku)
-						** Rainbow Iki (Donda Full Combo) : 5 (Red Goukaku) / 6 (Gold Goukaku)
-						**
+
 						*/
+						#endregion
+					}
+					else
+                    {
+						#region [Old save file calculation method for Dan/Tower charts, will update those later]
 
-						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
 
-						int clearValue = 0;
-
-						if (examStatus != Exam.Status.Failure)
+						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 						{
-							// Red Goukaku
-							clearValue += 1;
+                            /* == Specific format for DaniDoujou charts ==
+							**
+							** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
+							**
+							** 0 (Fugoukaku, no insign)
+							** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
+							** Gold Iki (Full Combo) : 3 (Red Goukaku) / 4 (Gold Goukaku)
+							** Rainbow Iki (Donda Full Combo) : 5 (Red Goukaku) / 6 (Gold Goukaku)
+							**
+							*/
 
-							// Gold Goukaku
-							if (examStatus == Exam.Status.Better_Success)
+                            #region [Dan scores]
+
+                            Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
+
+							int clearValue = 0;
+
+							if (examStatus != Exam.Status.Failure)
+							{
+								// Red Goukaku
 								clearValue += 1;
 
-							// Gold Iki
-							if (this.st演奏記録.Drums.nMiss数 == 0)
-                            {
-								clearValue += 2;
+								// Gold Goukaku
+								if (examStatus == Exam.Status.Better_Success)
+									clearValue += 1;
 
-								// Rainbow Iki
-								if (this.st演奏記録.Drums.nGreat数 == 0)
+								// Gold Iki
+								if (this.st演奏記録.Drums.nMiss数 == 0)
+								{
 									clearValue += 2;
+
+									// Rainbow Iki
+									if (this.st演奏記録.Drums.nGreat数 == 0)
+										clearValue += 2;
+								}
 							}
+
+							this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
+
+							// Unlock dan grade
+							if (clearValue > 0)
+							{
+								TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
+									clearValue % 2 == 0,
+									(clearValue - 1) / 2,
+									TJAPlayer3.SaveFile);
+							}
+
+							#endregion
+
 						}
-
-						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], clearValue);
-
-						// Unlock dan grade
-						if (clearValue > 0)
-                        {
-							TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
-								clearValue % 2 == 0,
-								(clearValue - 1) / 2,
-								TJAPlayer3.SaveFile);
-                        }
-					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-					{
-						// Clear if top reached, then FC or DFC like any regular chart
-						// Score Rank cointains highest reached floor
-						int tmpClear = 0;
-
-						if (CFloorManagement.CurrentNumberOfLives > 0)
+						else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 						{
-							tmpClear++;
-							if (this.st演奏記録.Drums.nMiss数 == 0)
+                            // Clear if top reached, then FC or DFC like any regular chart
+                            // Score Rank cointains highest reached floor
+
+                            #region [Tower scores]
+
+                            int tmpClear = 0;
+
+							if (CFloorManagement.CurrentNumberOfLives > 0)
 							{
 								tmpClear++;
-								if (this.st演奏記録.Drums.nGreat数 == 0)
+								if (this.st演奏記録.Drums.nMiss数 == 0)
+								{
 									tmpClear++;
+									if (this.st演奏記録.Drums.nGreat数 == 0)
+										tmpClear++;
+								}
 							}
+
+
+							this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
+							this.st演奏記録[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
+
+                            #endregion
+
+                        }
+
+                        // 新記録スコアチェック
+                        if ((this.st演奏記録[0].nスコア > ini[0].stセクション[0].nスコア) && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+						{
+							this.b新記録スコア[0] = true;
+							ini[0].stセクション[0] = this.st演奏記録[0];
+						}
+
+						// Header hi-score
+						/*
+						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+							if (this.st演奏記録[0].nスコア > ini[0].stセクション[0].nスコア)
+								this.st演奏記録[0].nハイスコア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = (int)st演奏記録[0].nスコア;
+						*/
+
+						// 新記録スキルチェック
+						if (this.st演奏記録[0].db演奏型スキル値 > ini[0].stセクション[0].db演奏型スキル値)
+						{
+							this.b新記録スキル[0] = true;
+							ini[0].stセクション[0] = this.st演奏記録[0];
 						}
 
 
-						this.st演奏記録[0].nクリア[0] = Math.Max(ini.stセクション[0].nクリア[0], tmpClear);
-						this.st演奏記録[0].nスコアランク[0] = Math.Max(ini.stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
+						// ラストプレイ #23595 2011.1.9 ikanick
+						// オートじゃなければプレイ結果を書き込む
+						if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == false)
+						{
+							ini[0].stセクション[0] = this.st演奏記録[0];
+						}
+
+						// #23596 10.11.16 add ikanick オートじゃないならクリア回数を1増やす
+						//        11.02.05 bオート to t更新条件を取得する use      ikanick
+						bool[] b更新が必要か否か = new bool[3];
+						CScoreIni.t更新条件を取得する(out b更新が必要か否か[0], out b更新が必要か否か[1], out b更新が必要か否か[2]);
+
+						if (b更新が必要か否か[0])
+						{
+							ini[0].stファイル.ClearCountDrums++;
+						}
+
+						//---------------------------------------------------------------------/
+
+						if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+							ini[0].t書き出し(str[0]);
+
+						#endregion
+
+
 
 					}
 
-					// 新記録スコアチェック
-					if ((this.st演奏記録[0].nスコア > ini.stセクション[0].nスコア) && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+
+
+
+
+                    //---------------------
+                    #endregion
+
+                    #region [ リザルト画面への演奏回数の更新 #24281 2011.1.30 yyagi]
+                    if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
 					{
-						this.b新記録スコア[0] = true;
-						ini.stセクション[0] = this.st演奏記録[0];
-					}
-
-					// Header hi-score
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-						if (this.st演奏記録[0].nスコア > ini.stセクション[0].nスコア)
-							this.st演奏記録[0].nハイスコア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = (int)st演奏記録[0].nスコア;
-
-					// 新記録スキルチェック
-					if (this.st演奏記録[0].db演奏型スキル値 > ini.stセクション[0].db演奏型スキル値)
-					{
-						this.b新記録スキル[0] = true;
-						ini.stセクション[0] = this.st演奏記録[0];
-					}
-
-
-					// ラストプレイ #23595 2011.1.9 ikanick
-					// オートじゃなければプレイ結果を書き込む
-					if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == false)
-					{
-						ini.stセクション[0] = this.st演奏記録[0];
-					}
-
-					// #23596 10.11.16 add ikanick オートじゃないならクリア回数を1増やす
-					//        11.02.05 bオート to t更新条件を取得する use      ikanick
-					bool[] b更新が必要か否か = new bool[3];
-					CScoreIni.t更新条件を取得する(out b更新が必要か否か[0], out b更新が必要か否か[1], out b更新が必要か否か[2]);
-
-					if (b更新が必要か否か[0])
-					{
-						ini.stファイル.ClearCountDrums++;
-					}
-					//---------------------------------------------------------------------/
-					if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-						ini.t書き出し(str);
-
-					//---------------------
-					#endregion
-
-					#region [ リザルト画面への演奏回数の更新 #24281 2011.1.30 yyagi]
-					if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-					{
-						this.n演奏回数.Drums = ini.stファイル.PlayCountDrums;
-						this.n演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
-						this.n演奏回数.Bass = ini.stファイル.PlayCountBass;
+						this.n演奏回数.Drums = ini[0].stファイル.PlayCountDrums;
+						this.n演奏回数.Guitar = ini[0].stファイル.PlayCountGuitar;
+						this.n演奏回数.Bass = ini[0].stファイル.PlayCountBass;
 					}
 					#endregion
 				}
@@ -506,10 +611,6 @@ namespace TJAPlayer3
 			{
 				b音声再生 = false;
 				this.EndAnime = false;
-				//this.tx背景 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\8_background.png" ) );
-				//this.tx上部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\8_header.png" ) );
-				//this.tx下部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\8_footer panel.png" ), true );
-				//this.txオプションパネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Screen option panels.png" ) );
 
 				ctShine_Plate = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
 				ctWork_Plate = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
@@ -579,7 +680,8 @@ namespace TJAPlayer3
 
 				ctShine_Plate.t進行Loop();
 
-				int num;
+				// int num;
+				
 				if (base.b初めての進行描画)
 				{
 					this.ct登場用 = new CCounter(0, 100, 5, TJAPlayer3.Timer);
@@ -628,21 +730,24 @@ namespace TJAPlayer3
 
 						int CloudType = 0;
 						float MountainAppearValue = this.actParameterPanel.MountainAppearValue;
-							
-							//2000 + (this.actParameterPanel.ctゲージアニメ.n終了値 * 66) + 8360 - 85;
 
-						if (this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+						//2000 + (this.actParameterPanel.ctゲージアニメ.n終了値 * 66) + 8360 - 85;
+						int gaugeAnimFactors = 0;
+
+						if (this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue && is1P)
 						{
-							#region [Mountain Bump]
+							#region [Mountain Bump (1P only)]
 
 							if (this.st演奏記録.Drums.fゲージ >= 80.0)
 							{
-								int gaugeAnimationFactor = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ.n終了値 * 66))) * 3;
+								//int gaugeAnimationFactor = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ[0].n終了値 * 66))) * 3;
 
-								TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimationFactor;
+								gaugeAnimFactors = (this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue) * 3;
+
+								TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimFactors;
 								
-								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].Opacity = gaugeAnimationFactor;
-								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].Opacity = 255 - gaugeAnimationFactor;
+								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].Opacity = gaugeAnimFactors;
+								TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].Opacity = 255 - gaugeAnimFactors;
 
 								if (this.actParameterPanel.ctMountain_ClearIn.n現在の値 <= 90)
 								{
@@ -668,7 +773,7 @@ namespace TJAPlayer3
 
 							#endregion
 						}
-						else
+						else if (is1P)
 						{
 
 							TJAPlayer3.Tx.Result_Background[1].Opacity = 0;
@@ -688,11 +793,17 @@ namespace TJAPlayer3
 						}
 						else
                         {
-							TJAPlayer3.Tx.Result_Background[0].t2D描画(TJAPlayer3.app.Device, 0, 0, new Rectangle(0, 0, 640, 720));
-							// Add success condition with jauge just after
-							TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 0, 0, new Rectangle(0, 0, 640, 720));
+							gaugeAnimFactors = (this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue) * 3;
 
-							TJAPlayer3.Tx.Result_Background[2].t2D描画(TJAPlayer3.app.Device, 640, 0, new Rectangle(640, 0, 640, 720));
+							for (int i = 0; i < 2; i++)
+                            {
+								TJAPlayer3.Tx.Result_Background[2 * i].t2D描画(TJAPlayer3.app.Device, 640 * i, 0, new Rectangle(640 * i, 0, 640, 720));
+								if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80.0f)
+                                {
+									TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimFactors;
+									TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 640 * i, 0, new Rectangle(640 * i, 0, 640, 720));
+								}
+							}
 						}
 
 						#endregion
@@ -835,12 +946,15 @@ namespace TJAPlayer3
 					{
 						double num2 = ((double)this.ct登場用.n現在の値) / 100.0;
 						double num3 = Math.Sin(Math.PI / 2 * num2);
-						num = ((int)(TJAPlayer3.Tx.Result_Header.sz画像サイズ.Height * num3)) - TJAPlayer3.Tx.Result_Header.sz画像サイズ.Height;
+						
+						// num = ((int)(TJAPlayer3.Tx.Result_Header.sz画像サイズ.Height * num3)) - TJAPlayer3.Tx.Result_Header.sz画像サイズ.Height;
 					}
+					/*
 					else
 					{
 						num = 0;
 					}
+					*/
 
 					if (!b音声再生 && !TJAPlayer3.Skin.bgmリザルトイン音.b再生中)
 					{
@@ -1122,13 +1236,30 @@ namespace TJAPlayer3
 				{
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 					{
-						Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+						Cスコア cScore = TJAPlayer3.stage選曲.r確定されたスコア;
 
-						if (cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nクリア)
-							cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
+						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                        {
+							if ((i == 0 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+								|| (i == 1 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
+								continue;
 
-						if (cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nスコアランク)
-							cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
+							if (cScore.GPInfo[i].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nクリア[i])
+								cScore.GPInfo[i].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nクリア[i];
+
+							if (cScore.GPInfo[i].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
+								cScore.GPInfo[i].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
+
+							/*
+							if (cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nクリア)
+								cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
+
+							if (cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nスコアランク)
+								cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
+							*/
+						}
+
+						
 					}
 					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     {
@@ -1157,6 +1288,7 @@ namespace TJAPlayer3
 									clearValue += 2;
 							}
 						}
+
 						cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
 					}
 				}

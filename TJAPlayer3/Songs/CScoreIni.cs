@@ -1239,7 +1239,8 @@ namespace TJAPlayer3
 			writer.WriteLine( "History4={0}", this.stファイル.History[ 4 ] );
 			writer.WriteLine( "BGMAdjust={0}", this.stファイル.BGMAdjust );
 			writer.WriteLine();
-			for ( int i = 0; i < 9; i++ )
+			// Was 9 before, but 8 sections are useless and deprecated
+			for ( int i = 0; i < 1; i++ )
 			{
                 string[] strArray = { "HiScore.Drums", "HiSkill.Drums", "HiScore.Guitar", "HiSkill.Guitar", "HiScore.Bass", "HiSkill.Bass", "LastPlay.Drums", "LastPlay.Guitar", "LastPlay.Bass" };
 				writer.WriteLine( "[{0}]", strArray[ i ] );
