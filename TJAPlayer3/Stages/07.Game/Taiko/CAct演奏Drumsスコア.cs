@@ -20,22 +20,8 @@ namespace TJAPlayer3
                     base.b初めての進行描画 = false;
                 }
                 long num = FDK.CSound管理.rc演奏用タイマ.n現在時刻;
-                //if (num < base.n進行用タイマ)
-                //{
-                //    base.n進行用タイマ = num;
-                //}
-                //while ((num - base.n進行用タイマ) >= 10)
-                //{
-                //    for (int j = 0; j < 4; j++)
-                //    {
-                //        this.n現在表示中のスコア[j] += this.nスコアの増分[j];
 
-                //        if (this.n現在表示中のスコア[j] > (long) this.n現在の本当のスコア[j])
-                //            this.n現在表示中のスコア[j] = (long) this.n現在の本当のスコア[j];
-                //    }
-                //    base.n進行用タイマ += 10;
 
-                //}
                 if( !this.ctTimer.b停止中 )
                 {
                     this.ctTimer.t進行();
@@ -199,11 +185,14 @@ namespace TJAPlayer3
                                 alpha = 0;
                             }
 
+                            int pl = stScore[i].nPlayer;
+                            if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                                pl = 1;
 
                             if ( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == false )
-                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_Add_X[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 ? TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] + yAdd : TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), this.stScore[ i ].nPlayer + 1 , alpha, stScore[i].nPlayer);
+                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_Add_X[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 ? TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] + yAdd : TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             if( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == true )
-                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_AddBonus_X[this.stScore[i].nPlayer] + xAdd, TJAPlayer3.Skin.Game_Score_AddBonus_Y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), this.stScore[ i ].nPlayer + 1 , alpha, stScore[i].nPlayer);
+                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_AddBonus_X[this.stScore[i].nPlayer] + xAdd, TJAPlayer3.Skin.Game_Score_AddBonus_Y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             else
                             {
                                 this.n現在表示中のAddScore--;
@@ -216,30 +205,6 @@ namespace TJAPlayer3
                 }
 
 
-                //this.n現在表示中のスコア.Taiko = (long)this.n現在の本当のスコア.Taiko;
-
-                //string str = this.n現在表示中のスコア.Taiko.ToString( "0000000" );
-                //for ( int i = 0; i < 7; i++ )
-                //{
-                //    Rectangle rectangle;
-                //    char ch = str[i];
-                //    if( ch.Equals(' ') )
-                //    {
-                //        rectangle = new Rectangle(0, 0, 24, 34);
-                //    }
-                //    else
-                //    {
-                //        int num4 = int.Parse(str.Substring(i, 1));
-                //        rectangle = new Rectangle(num4 * 24, 0, 24, 34);
-                //    }
-                //    if( base.txScore != null )
-                //    {
-                //        base.txScore.t2D描画(CDTXMania.app.Device, 20 + (i * 20), 192, rectangle);
-                //    }
-                //}
-
-
-                //CDTXMania.act文字コンソール.tPrint( 50, 200, C文字コンソール.Eフォント種別.白, str  );
             }
             return 0;
         }

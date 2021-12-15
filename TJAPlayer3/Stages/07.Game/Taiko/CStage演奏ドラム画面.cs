@@ -210,7 +210,7 @@ namespace TJAPlayer3
             if ( TJAPlayer3.bコンパクトモード )
 			{
 				var score = new Cスコア();
-				TJAPlayer3.Songs管理.tScoreIniを読み込んで譜面情報を設定する( TJAPlayer3.strコンパクトモードファイル + ".score.ini", score );
+                TJAPlayer3.Songs管理.tScoreIniを読み込んで譜面情報を設定する(TJAPlayer3.strコンパクトモードファイル, score);// + ".score.ini", score );
 			}
 			else
 			{
@@ -225,7 +225,9 @@ namespace TJAPlayer3
 
             for(int nPlayer = 0; nPlayer < 2; nPlayer++)
             {
-                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[nPlayer], TJAPlayer3.Skin.Characters_Ptn - 1));
+                int p = TJAPlayer3.GetActualPlayer(nPlayer);
+
+                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
 
                 if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                 {

@@ -26,8 +26,11 @@ namespace TJAPlayer3
                 return;
 
             for (int i = 0; i < 2; i++)
-                data.Medals[i] += amounts[i];
+            {
+                int p = TJAPlayer3.GetActualPlayer(i);
 
+                data.Medals[p] += amounts[i];
+            }
             tSaveFile();
         }
 

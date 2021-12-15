@@ -449,27 +449,7 @@ namespace TJAPlayer3
 
         public int nStrジャンルtoNum(string strジャンル)
         {
-            int nGenre = 8;
-            for (int i = 0; i < TJAPlayer3.Skin.SongSelect_GenreName.Length; i++)
-            {
-                if (TJAPlayer3.Skin.SongSelect_GenreName[i] == strジャンル)
-                {
-                    if (i + 1 >= TJAPlayer3.Skin.SongSelect_Difficulty_Background_Count)
-                    {
-                        nGenre = 0;
-                    }
-                    else
-                    {
-                        nGenre = i + 1;
-                    }
-                    break;
-                }
-                else
-                {
-                    nGenre = 0;
-                }
-            }
-            return nGenre;
+            return TJAPlayer3.stage選曲.act曲リスト.nStrジャンルtoNumBox(strジャンル);
         }
         //-----------------
         #endregion

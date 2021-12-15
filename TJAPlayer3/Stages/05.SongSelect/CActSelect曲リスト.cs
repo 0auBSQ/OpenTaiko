@@ -543,17 +543,24 @@ namespace TJAPlayer3
 				await Task.Delay(100);
 			}
 
-            #region [Reset nodes]
+			#region [Reset nodes]
 
-            for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
-			{
-				CScorePad SPRef = ScorePads[s];
+			for (int pl = 0; pl < 2; pl++)
+            {
+				CScorePad[] SPArrRef = ScorePads;
+				if (pl == 1)
+					SPArrRef = ScorePads2;
 
-				for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
-					SPRef.ScoreRankCount[i] = 0;
+				for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
+				{
+					CScorePad SPRef = SPArrRef[s];
 
-				for (int i = 0; i < ScorePads[s].CrownCount.Length; i++)
-					SPRef.CrownCount[i] = 0;
+					for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+						SPRef.ScoreRankCount[i] = 0;
+
+					for (int i = 0; i < ScorePads[s].CrownCount.Length; i++)
+						SPRef.CrownCount[i] = 0;
+				}
 			}
 
             #endregion
@@ -561,13 +568,18 @@ namespace TJAPlayer3
             #region [Load notes]
 
             foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
-				{
+			{
+				for (int pl = 0; pl < 2; pl++)
+                {
+					CScorePad[] SPArrRef = ScorePads;
+					if (pl == 1)
+						SPArrRef = ScorePads2;
 					
 					// All score pads except UraOmote
 					// this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)
 					for (int s = 0; s <= (int)Difficulty.Edit; s++)
 					{
-						CScorePad SPRef = ScorePads[s];
+						CScorePad SPRef = SPArrRef[s];
 
 						if (song.eノード種別 == C曲リストノード.Eノード種別.BOX)
 						{
@@ -577,7 +589,8 @@ namespace TJAPlayer3
 									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 									&& a.strジャンル != "最近遊んだ曲"
 									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+									//&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nScoreRank[s] == (i + 1)).Count();
 							}
 							for (int i = 0; i < SPRef.CrownCount.Length; i++)
 							{
@@ -585,7 +598,7 @@ namespace TJAPlayer3
 									a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 									&& a.strジャンル != "最近遊んだ曲"
 									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+									&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nClear[s] == (i + 1)).Count();
 							}
 						}
 						else
@@ -598,7 +611,7 @@ namespace TJAPlayer3
 										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 										&& a.strジャンル != "最近遊んだ曲"
 										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nスコアランク[s] == (i + 1)).Count();
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nScoreRank[s] == (i + 1)).Count();
 								}
 								for (int i = 0; i < SPRef.CrownCount.Length; i++)
 								{
@@ -606,13 +619,15 @@ namespace TJAPlayer3
 										a.eノード種別 == C曲リストノード.Eノード種別.SCORE
 										&& a.strジャンル != "最近遊んだ曲"
 										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)] != null
-										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].譜面情報.nクリア[s] == (i + 1)).Count();
+										&& a.arスコア[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(a)].GPInfo[pl].nClear[s] == (i + 1)).Count();
 								}
 							}
 						}
 					}
 
-				#endregion
+				}
+
+			#endregion
 
 			#region [UraOmote pad]
 
@@ -620,10 +635,12 @@ namespace TJAPlayer3
 			for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount.Length; i++)
 			{
 				ScorePads[(int)Difficulty.Edit + 1].ScoreRankCount[i] = ScorePads[(int)Difficulty.Edit].ScoreRankCount[i] + ScorePads[(int)Difficulty.Oni].ScoreRankCount[i];
+				ScorePads2[(int)Difficulty.Edit + 1].ScoreRankCount[i] = ScorePads2[(int)Difficulty.Edit].ScoreRankCount[i] + ScorePads2[(int)Difficulty.Oni].ScoreRankCount[i];
 			}
 			for (int i = 0; i < ScorePads[(int)Difficulty.Edit + 1].CrownCount.Length; i++)
 			{
 				ScorePads[(int)Difficulty.Edit + 1].CrownCount[i] = ScorePads[(int)Difficulty.Edit].CrownCount[i] + ScorePads[(int)Difficulty.Oni].CrownCount[i];
+				ScorePads2[(int)Difficulty.Edit + 1].CrownCount[i] = ScorePads2[(int)Difficulty.Edit].CrownCount[i] + ScorePads2[(int)Difficulty.Oni].CrownCount[i];
 			}
 
 			#endregion
@@ -1390,10 +1407,25 @@ namespace TJAPlayer3
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.vc拡大縮小倍率.X = 1.0f;
 
-				if (n現在のスクロールカウンタ != 0)
-					this.tジャンル別選択されていない曲バーの描画(xAnime - (int)Box, y - ((int)Box * 3), this.stバー情報[nパネル番号].strジャンル, stバー情報[nパネル番号].eバー種別, stバー情報[nパネル番号].nクリア, stバー情報[nパネル番号].nスコアランク, boxType);
+				
+
+
+				if (n現在のスクロールカウンタ != 0 || n見た目の行番号 != 4)
+                {
+					int songType = 0;
+					if (this.stバー情報[nパネル番号].ar難易度[(int)Difficulty.Dan] >= 0)
+						songType = 1;
+
+					this.tジャンル別選択されていない曲バーの描画(xAnime - (int)Box, y - ((int)Box * 3), this.stバー情報[nパネル番号].strジャンル, stバー情報[nパネル番号].eバー種別, stバー情報[nパネル番号].nクリア, stバー情報[nパネル番号].nスコアランク, boxType, songType);
+				}
+
+				/*
+				 
 				else if (n見た目の行番号 != 4)
 					this.tジャンル別選択されていない曲バーの描画(xAnime - (int)Box, y - ((int)Box * 3), this.stバー情報[nパネル番号].strジャンル, stバー情報[nパネル番号].eバー種別, stバー情報[nパネル番号].nクリア, stバー情報[nパネル番号].nスコアランク, boxType);
+				
+				*/
+
 				//-----------------
 				#endregion
 
@@ -1516,41 +1548,25 @@ namespace TJAPlayer3
 
 					#region [ Crown and ScoreRank ]
 
-					if (this.r現在選択中の曲.arスコア[3] != null || this.r現在選択中の曲.arスコア[4] != null)
+					// Mark
+
+					if (this.r現在選択中の曲.arスコア[(int)Difficulty.Dan] != null)
+                    {
+						int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Dan].譜面情報.nクリア;
+
+						int currentRank = Math.Min(clear[0], 6) - 1;
+
+						displayDanStatus(354, (int)(344 - BarAnimeCount / 1.1f), currentRank, 0.2f);
+
+					}
+					else if (this.r現在選択中の曲.arスコア[3] != null || this.r現在選択中の曲.arスコア[4] != null)
 					{
 						int[] クリア = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nクリア;
 						
 						int[] スコアランク = this.r現在選択中の曲.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r現在選択中の曲)].譜面情報.nスコアランク;
 
+						displayRegularCrowns(354, (int)(344 - BarAnimeCount / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
 
-						/*
-						if (this.r現在選択中の曲.arスコア[3] != null)
-						{
-							クリア = this.r現在選択中の曲.arスコア[3].譜面情報.nクリア;
-							スコアランク = this.r現在選択中の曲.arスコア[3].譜面情報.nスコアランク;
-						}
-						else
-						{
-							クリア = this.r現在選択中の曲.arスコア[4].譜面情報.nクリア;
-							スコアランク = this.r現在選択中の曲.arスコア[4].譜面情報.nスコアランク;
-						}
-						*/
-
-						TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.X = 0.8f + BarAnimeCount / 620f;
-						TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.Y = 0.8f + BarAnimeCount / 620f;
-						TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = 0.8f + BarAnimeCount / 620f;
-						TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = 0.8f + BarAnimeCount / 620f;
-
-						// Crowns here
-						if (クリア[3] > 0 && クリア[4] == 0)
-							TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 354, 344 - BarAnimeCount / 1.1f, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
-						else if (クリア[4] > 0)
-							TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 354, 344 - BarAnimeCount / 1.1f, new RectangleF(12 * 43.2f + (クリア[4] - 1) * 43.2f, 0, 43.2f, 39));
-
-						if (スコアランク[3] > 0 && スコアランク[4] == 0)
-							TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 354, 374 - BarAnimeCount / 1.15f, new RectangleF(0, (スコアランク[3] - 1) * 42.71f, 50, 42.71f));
-						else if (スコアランク[4] > 0)
-							TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 354, 374 - BarAnimeCount / 1.15f, new RectangleF(0, (スコアランク[4] - 1) * 42.71f, 50, 42.71f));
 					}
 
 					#endregion
@@ -1965,6 +1981,7 @@ namespace TJAPlayer3
 
 		// Edit + 1 => UraOmote ScorePad, add 2P later
 		public CScorePad[] ScorePads = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
+		public CScorePad[] ScorePads2 = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
 
 		public class CScorePad
         {
@@ -2148,62 +2165,7 @@ namespace TJAPlayer3
 
 			return list[ index - 1 ];
 		}
-		private void tスキル値の描画( int x, int y, int nスキル値 )
-		{
-			if( nスキル値 <= 0 || nスキル値 > 100 )		// スキル値 0 ＝ 未プレイ なので表示しない。
-				return;
 
-			int color = ( nスキル値 == 100 ) ? 3 : ( nスキル値 / 25 );
-
-			int n百の位 = nスキル値 / 100;
-			int n十の位 = ( nスキル値 % 100 ) / 10;
-			int n一の位 = ( nスキル値 % 100 ) % 10;
-
-
-			// 百の位の描画。
-
-			if( n百の位 > 0 )
-				this.tスキル値の描画_１桁描画( x, y, n百の位, color );
-
-
-			// 十の位の描画。
-
-			if( n百の位 != 0 || n十の位 != 0 )
-				this.tスキル値の描画_１桁描画( x + 7, y, n十の位, color );
-
-
-			// 一の位の描画。
-
-			this.tスキル値の描画_１桁描画( x + 14, y, n一の位, color );
-		}
-		private void tスキル値の描画_１桁描画( int x, int y, int n数値, int color )
-		{
-			//int dx = ( n数値 % 5 ) * 9;
-			//int dy = ( n数値 / 5 ) * 12;
-			
-			//switch( color )
-			//{
-			//	case 0:
-			//		if( this.txスキル数字 != null )
-			//			this.txスキル数字.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( 45 + dx, 24 + dy, 9, 12 ) );
-			//		break;
-
-			//	case 1:
-			//		if( this.txスキル数字 != null )
-			//			this.txスキル数字.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( 45 + dx, dy, 9, 12 ) );
-			//		break;
-
-			//	case 2:
-			//		if( this.txスキル数字 != null )
-			//			this.txスキル数字.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( dx, 24 + dy, 9, 12 ) );
-			//		break;
-
-			//	case 3:
-			//		if( this.txスキル数字 != null )
-			//			this.txスキル数字.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( dx, dy, 9, 12 ) );
-			//		break;
-			//}
-		}
 		private void tバーの初期化()
 		{
 			C曲リストノード song = this.r現在選択中の曲;
@@ -2280,7 +2242,8 @@ namespace TJAPlayer3
 			this.n現在の選択行 = 4;
 		}
 
-		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[] クリア, int[] スコアランク, int boxType)
+		// Song type : 0 - Ensou, 1 - Dan, 2 - Tower
+		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[] クリア, int[] スコアランク, int boxType, int _songType = 0)
 		{
 			if (x >= SampleFramework.GameWindowSize.Width || y >= SampleFramework.GameWindowSize.Height)
 				return;
@@ -2318,76 +2281,89 @@ namespace TJAPlayer3
 
 			if (eバー種別 == Eバー種別.Score)
 			{
-				TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.X = 0.8f;
-				TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.Y = 0.8f;
-				TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = 0.8f;
-				TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = 0.8f;
+				switch (_songType)
+                {
+					case 0:
+						displayRegularCrowns(x + 30, y + 30, クリア, スコアランク, 0.8f);
+						break;
+					case 1:
+						displayDanStatus(x + 30, y + 30, Math.Min(クリア[0], 6) - 1, 0.2f);
+						break;
+					default:
+						displayRegularCrowns(x + 30, y + 30, クリア, スコアランク, 0.8f);
+						break;
+				}
 
-				// Other crowns
-				if (クリア[3] > 0 && クリア[4] == 0)
-					TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 30, y + 30, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
-				else if (クリア[4] > 0)
-					TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 30, y + 30, new RectangleF(12 * 43.2f + (クリア[4] - 1) * 43.2f, 0, 43.2f, 39));
-
-				if (スコアランク[3] > 0 && スコアランク[4] == 0)
-					TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 30, y + 60, new RectangleF(0, (スコアランク[3] - 1) * 42.71f, 50, 42.71f));
-				else if (スコアランク[4] > 0)
-					TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 30, y + 60, new RectangleF(0, (スコアランク[4] - 1) * 42.71f, 50, 42.71f));
 			}
+		}
+
+		public void displayDanStatus(int x, int y, int grade, float _resize)
+        {
+			if (grade > 0)
+			{
+				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = _resize;
+				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = _resize;
+				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(334 * grade, 0, 334, 334));
+			}
+		}
+
+		public void displayRegularCrowns(int x, int y, int[] クリア, int[] スコアランク, float _resize)
+        {
+			// To change to include all crowns/score ranks later
+
+			TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.X = _resize;
+			TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.Y = _resize;
+			TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = _resize;
+			TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = _resize;
+
+			// Other crowns
+			if (クリア[3] > 0 && クリア[4] == 0)
+				TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
+			else if (クリア[4] > 0)
+				TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new RectangleF(12 * 43.2f + (クリア[4] - 1) * 43.2f, 0, 43.2f, 39));
+
+			if (スコアランク[3] > 0 && スコアランク[4] == 0)
+				TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[3] - 1) * 42.71f, 50, 42.71f));
+			else if (スコアランク[4] > 0)
+				TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[4] - 1) * 42.71f, 50, 42.71f));
 		}
 
 		public int nStrジャンルtoNum(string strジャンル)
 		{
-			// Magic number to change
-			int nGenre = 8;
-
-			for (int i = 0; i < TJAPlayer3.Skin.SongSelect_GenreName.Length; i++)
-			{
-				if (TJAPlayer3.Skin.SongSelect_GenreName[i] == strジャンル)
-				{
-					if (i + 1 >= TJAPlayer3.Skin.SongSelect_Bar_Genre_Count)
-					{
-						nGenre = 0;
-					}
-					else
-					{
-						nGenre = i + 1;
-					}
-					break;
-				}
-				else
-				{
-					nGenre = 0;
-				}
-			}
-			return nGenre;
+			return this.nStrジャンルtoNumBox(strジャンル);
 		}
 		
 		public int nStrジャンルtoNumBox(string strジャンル)
 		{
-			// Magic number to change
-			int nGenre = 8;
-
-			for (int i = 0; i < TJAPlayer3.Skin.SongSelect_GenreName.Length; i++)
+			switch (strジャンル)
 			{
-				if (TJAPlayer3.Skin.SongSelect_GenreName[i] == strジャンル)
-				{
-					if (i + 1 >= TJAPlayer3.Skin.SongSelect_Box_Chara_Count)
-					{
-						nGenre = 0;
-					}
-					else
-					{
-						nGenre = i + 1;
-					}
-					break;
-				}
-				else
-				{
-					nGenre = 0;
-				}
+				case "ポップス":
+				case "J-POP":
+				case "POPS":
+				case "JPOP":
+					return 1;
+				case "アニメ":
+					return 2;
+				case "ボーカロイド":
+				case "VOCALOID":
+					return 8;
+				case "キッズ":
+				case "どうよう":
+					return 7;
+				case "バラエティ":
+					return 6;
+				case "クラシック":
+					return 5;
+				case "ゲームバラエティ":
+				case "ゲームミュージック":
+					return 3;
+				case "ナムコオリジナル":
+					return 4;
+				case "最近遊んだ曲":
+					return 9;
+				default:
+					return 0;
 			}
-			return nGenre;
 		}
 
 		private TitleTextureKey ttk曲名テクスチャを生成する( string str文字, Color forecolor, Color backcolor, CPrivateFastFont pf)

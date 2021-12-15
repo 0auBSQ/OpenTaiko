@@ -4977,8 +4977,8 @@ namespace TJAPlayer3
                     this.nOFFSET = this.nOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
                 //tbOFFSET.Text = strCommandParam;
 
-                // Add global offset
-                this.nOFFSET += TJAPlayer3.ConfigIni.nGlobalOffsetMs;
+                // Substract global offset
+                this.nOFFSET -= TJAPlayer3.ConfigIni.nGlobalOffsetMs;
             }
             else if (strCommandName.Equals("MOVIEOFFSET"))
             {

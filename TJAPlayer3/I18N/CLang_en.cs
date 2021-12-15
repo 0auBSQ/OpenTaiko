@@ -37,9 +37,9 @@ namespace TJAPlayer3
                 "If 0, AI is disabled.\n" +
                 "If 1 or more, the 2P will play as AI.\n" +
                 "Disabled if AUTO 2P is on.",
-            [14] = "Global offset",
+            [14] = "Global Offset",
             [15] = "Change the interpreted OFFSET\nvalue for all charts.\n" +
-                "You can set from -99 to 99ms.\n" +
+                "Can be set between -99 and 99ms.\n" +
                 "To decrease input lag, set minus value.\n\n" +
                 "Note: Reload songs to make\n" +
                 "     the setting take effect.",
@@ -106,11 +106,11 @@ namespace TJAPlayer3
             [57] = "Toggle whether player 1 plays automatically.\nPress F3 on song select to toggle this.",
             [58] = "Player 2 Auto Play",
             [59] = "Toggle whether player 2 plays automatically.\nPress F4 on song select to toggle this.",
-            [60] = "Rolls speed",
-            [61] = "Hits per second during rolls when auto\nis enabled.\nNo effect on balloons.\nDisabled if 0, at most one hit per frame.",
+            [60] = "Roll Speed",
+            [61] = "When auto is enabled, rolls will be \nautomatically hit this many times per \nsecond. Has no effect on balloons. \n0 disables auto roll, and the \nmaximum value is one hit per frame.",
             [62] = "Scroll Speed",
             [63] = "Change the speed the notes travel at.\n" +
-                "You can set it from x0.1 to x200.0.\n" +
+                "Can be set between x0.1 and x200.0.\n" +
                 "(ScrollSpeed=x0.5 means half speed)",
             [64] = "Kanpeki Mode",
             [65] = "Choose how many BADs are allowed\nbefore a song is automatically failed.\nSet this to 0 to disable the mode.",
@@ -127,18 +127,18 @@ namespace TJAPlayer3
             [75] = "Toggle whether hitting in the space between notes\ncounts as a BAD.",
             [76] = "Minimum Combo Display",
             [77] = "Choose the initial number that combo is displayed at.\n" +
-                "You can specify from 1 to 99999.",
+                "Can be specified between 1 and 99999.",
             [78] = "Hitcircle Adjustment",
             [79] = "Increasing the value will move the note\njudge area further right.\nDecreasing the value will move the note\njudge area further left.\n" +
-                "You can set from -99 to 99ms.\n" +
+                "Can be set between -99 and 99ms.\n" +
                 "To decrease input lag, set minus value.",
             [80] = "Default Difficulty",
             [81] = "Choose the default difficulty to be chosen on song select.\nIf ura is not chosen, it will not be visible\nunless the right arrow key is pressed\non that song’s oni difficulty.",
             [82] = "Score Mode",
             [83] = "Chooses the formula used to determine scores.\n" +
-                    "TYPE-A: (Gen-1) Old allotment\n" +
-                    "TYPE-B: (Gen-2) Old case allotment\n" +
-                    "TYPE-C: (Gen-3) New allotment\n",
+                    "TYPE-A: Gen-1\n" +
+                    "TYPE-B: Gen-2\n" +
+                    "TYPE-C: Gen-3\n",
             [84] = "Makes every note worth\nthe same amount of points.\nUses the Gen-4 formula.",
             [85] = "Branch Guide",
             [86] = "Toggle whether a numerical guide is displayed\nto view which branch is going to be picked.\nIt doesn’t display on auto mode.",

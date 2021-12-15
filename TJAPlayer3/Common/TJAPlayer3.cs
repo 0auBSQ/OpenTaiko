@@ -385,6 +385,26 @@ namespace TJAPlayer3
 			set;
 		}
 
+		// 0 : 1P, 1 : 2P
+		public static int SaveFile = 0;
+
+		// 0 : Hidari, 1 : Migi (1P only)
+		public static int PlayerSide = 0;
+
+		public static int GetActualPlayer(int player)
+        {
+			if (SaveFile == 0)
+				return player;
+			if (player == 0)
+				return 1;
+			return 0;
+        }
+
+		public static bool P1IsBlue()
+        {
+			return (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1);
+		}
+
         #endregion
 
         // コンストラクタ
@@ -2383,6 +2403,7 @@ for (int i = 0; i < 3; i++) {
 			stageChangeSkin = new CStageChangeSkin();
 			stage終了 = new CStage終了();
 			NamePlate = new CNamePlate();
+			SaveFile = 0;
 			this.listトップレベルActivities = new List<CActivity>();
 			this.listトップレベルActivities.Add( actEnumSongs );
 			this.listトップレベルActivities.Add( act文字コンソール );

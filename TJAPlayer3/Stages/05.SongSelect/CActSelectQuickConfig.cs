@@ -151,8 +151,8 @@ namespace TJAPlayer3
                     TJAPlayer3.ConfigIni.ShinuchiMode = !TJAPlayer3.ConfigIni.ShinuchiMode;
                     break;
                 case (int)EOrder.PlayerCount:
-                    TJAPlayer3.ConfigIni.nPlayerCount = (int)GetObj現在値((int) EOrder.PlayerCount );
-                    break;
+					TJAPlayer3.ConfigIni.nPlayerCount = (int)GetObj現在値((int) EOrder.PlayerCount );
+					break;
 				case (int) EOrder.More:
 					SetAutoParameters();			// 簡易CONFIGメニュー脱出に伴い、簡易CONFIG内のAUTOの設定をConfigIniクラスに反映する
 					this.bGotoDetailConfig = true;

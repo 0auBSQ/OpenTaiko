@@ -50,13 +50,15 @@ namespace TJAPlayer3
 
         public void tNamePlateRefreshTitles(int player)
         {
+            int actualPlayer = TJAPlayer3.GetActualPlayer(player);
+
             string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
             string name = "AIドン";
             string title = "デウス・エクス・マキナ";
             string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
 
-            if (TJAPlayer3.ConfigIni.nAILevel == 0 || player == 0)
+            if (TJAPlayer3.ConfigIni.nAILevel == 0 || actualPlayer == 0)
             {
                 name = TJAPlayer3.NamePlateConfig.data.Name[player];
                 title = TJAPlayer3.NamePlateConfig.data.Title[player];
@@ -76,6 +78,9 @@ namespace TJAPlayer3
 
         public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255)
         {
+            int basePlayer = player;
+            player = TJAPlayer3.GetActualPlayer(player);
+
             ctNamePlateEffect.t進行Loop();
             ctAnimatedNamePlateTitle.t進行Loop();
 
@@ -190,7 +195,10 @@ namespace TJAPlayer3
 
                 tNamePlateDraw(player, x, y, Opacity);
 
-                TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, player == 1 ? 2 * 54 : 0, 220, 54));
+                if (TJAPlayer3.PlayerSide == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 1)
+                    TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, basePlayer == 1 ? 2 * 54 : 0, 220, 54));
+                else
+                    TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 1 * 54, 220, 54));
 
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
                 {
