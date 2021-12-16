@@ -137,8 +137,8 @@ namespace TJAPlayer3
             [77] = "Número mínimo para mostrar el combo\n" +
                 "en el tambor.\n" +
                 "Puedes elegir desde 1 a 99999.",
-            [78] = "Ajuste de timing",
-            [79] = "Para cambiar el timing de la entrada.\n" +
+            [78] = "Ajuste del área de juicio",
+            [79] = "Para cambiar la área del circulo de juicio de las notas.\nAumentarlo moverá la área a la derecha, y disminuirlo\n la moverá a la izquierda.\n" +
                 "Puedes dejarlo desde -99 a 99ms.\n" +
                 "Para disminuir el lag de la entrada,\n deja un valor negativo.",
             [80] = "Dificultad por defecto",
@@ -235,7 +235,7 @@ namespace TJAPlayer3
             [150] = "¡Juega tus canciones\nfavoritas a tu propio gusto!",
             [151] = "¡Juega varias canciones mientras cumples\nretos que te pondrán a prueba\npara completar el desafío!",
             [152] = "¡Juega canciones largas con un\nnúmero de vidas limitado y llega\na la punta de la torre!",
-            [153] = "¡Compra nuevas canciones, Puchi-charas o personajes\nusando las medallas que ganaste jugando!",
+            [153] = "¡Compra nuevas canciones, PuchiCharas o personajes\nusando las medallas que ganaste jugando!",
             [154] = "¡Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
             [155] = "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
             [156] = "¡Cambia tu estilo de juego\n o ajustes generales!",
@@ -262,7 +262,7 @@ namespace TJAPlayer3
             [1018] = "Precisión",
 
             [1030] = "Regresar",
-            [1031] = "Petit-Chara",
+            [1031] = "PuchiChara",
             [1032] = "Personaje",
             [1033] = "Título de Dan",
             [1034] = "Título de la Nameplate",
