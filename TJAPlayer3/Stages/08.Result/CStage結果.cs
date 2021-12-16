@@ -179,7 +179,21 @@ namespace TJAPlayer3
 						TJAPlayer3.DTX.strファイル名の絶対パス + currentSaveFile.ToString() + "P.score.ini",
 						TJAPlayer3.DTX.strファイル名の絶対パス + secondSaveFile.ToString() + "P.score.ini"
 					};
-					
+
+					#region [Transfer legacy file format to new file format (P1)]
+
+					string legacyStr = TJAPlayer3.DTX.strファイル名の絶対パス + ".score.ini";
+
+					if (!File.Exists(str[TJAPlayer3.GetActualPlayer(0)]) && File.Exists(legacyStr))
+                    {
+						if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+                        {
+							CScoreIni tmpini = new CScoreIni(legacyStr);
+							tmpini.t書き出し(str[TJAPlayer3.GetActualPlayer(0)]);
+						}
+                    }
+
+					#endregion
 
 					CScoreIni[] ini = {
 						new CScoreIni(str[0]),
@@ -1294,7 +1308,12 @@ namespace TJAPlayer3
 							}
 						}
 
-						cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
+						int actualPlayer = TJAPlayer3.SaveFile;
+
+						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], clearValue);
+
+						//cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
 					}
 				}
 				//---------------------

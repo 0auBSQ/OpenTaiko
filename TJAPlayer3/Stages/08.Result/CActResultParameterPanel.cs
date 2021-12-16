@@ -326,7 +326,7 @@ namespace TJAPlayer3
 
 					TJAPlayer3.Tx.Result_Diff_Bar.t2D描画(TJAPlayer3.app.Device, 18 + totalShift, 101, new RectangleF(0, TJAPlayer3.stage選曲.n確定された曲の難易度[i] * 54, 185, 54));
 
-					TJAPlayer3.Tx.Result_Gauge_Base.t2D描画(TJAPlayer3.app.Device, 55 + totalShift, 140);
+					TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].t2D描画(TJAPlayer3.app.Device, 55 + totalShift, 140);
 
 					if (ct全体進行.n現在の値 >= 2000)
 					{
@@ -346,7 +346,7 @@ namespace TJAPlayer3
 								ctゲージアニメ[i].n現在の値 = (int)ctゲージアニメ[i].n終了値;
 						}
 
-						TJAPlayer3.Tx.Result_Gauge.t2D描画(TJAPlayer3.app.Device, 57 + totalShift, 140, new RectangleF(0, 0, 9.74f * ctゲージアニメ[i].n現在の値, 36));
+						TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, 57 + totalShift, 140, new RectangleF(0, 0, 9.74f * ctゲージアニメ[i].n現在の値, 36));
 
 						// Modify to array for each players using i
 						if (ctゲージアニメ[i].b終了値に達した)
@@ -380,7 +380,7 @@ namespace TJAPlayer3
 						}
 						if (ctゲージアニメ[i].n現在の値 != 50)
 						{
-							TJAPlayer3.Tx.Result_Gauge.t2D描画(TJAPlayer3.app.Device, 441 + totalShift, 142, new RectangleF(ctゲージアニメ[i].n現在の値 < 40 ? 0 : 42, 35, 42, 20));
+							TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, 441 + totalShift, 142, new RectangleF(ctゲージアニメ[i].n現在の値 < 40 ? 0 : 42, 35, 42, 20));
 
 							TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, 575 + totalShift, 159, new Rectangle(37 * (ctゲージアニメ[i].n現在の値 <= 30 ? 0 : 1), 0, 37, 37));
 						}
@@ -722,9 +722,9 @@ namespace TJAPlayer3
 							Mood = 1;
 
 
-						TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Speech_Bubble.vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Speech_Bubble.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
+						TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+						TJAPlayer3.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
 							(pos == 1) ? 1280 - 430 : 430, 
 							526, 
 							new Rectangle(Mood * 358, RandomText * 230, 358, 230));

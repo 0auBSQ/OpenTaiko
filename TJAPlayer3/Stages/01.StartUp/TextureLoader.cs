@@ -743,8 +743,12 @@ namespace TJAPlayer3
 
             #region 6_結果発表
             Result_FadeIn = TxC(RESULT + @"FadeIn.png");
-            Result_Gauge = TxC(RESULT + @"Gauge.png");
-            Result_Gauge_Base = TxC(RESULT + @"Gauge_Base.png");
+
+            Result_Gauge[0] = TxC(RESULT + @"Gauge.png");
+            Result_Gauge_Base[0] = TxC(RESULT + @"Gauge_Base.png");
+            Result_Gauge[1] = TxC(RESULT + @"Gauge_2.png");
+            Result_Gauge_Base[1] = TxC(RESULT + @"Gauge_Base_2.png");
+
             Result_Header = TxC(RESULT + @"Header.png");
             Result_Number = TxC(RESULT + @"Number.png");
             Result_Panel = TxC(RESULT + @"Panel.png");
@@ -759,7 +763,10 @@ namespace TJAPlayer3
             Result_ScoreRankEffect = TxC(RESULT + @"ScoreRankEffect.png");
             Result_Cloud = TxC(RESULT + @"Cloud.png");
             Result_Shine = TxC(RESULT + @"Shine.png");
-            Result_Speech_Bubble = TxC(RESULT + @"Speech_Bubble.png");
+
+            Result_Speech_Bubble[0] = TxC(RESULT + @"Speech_Bubble.png");
+            Result_Speech_Bubble[1] = TxC(RESULT + @"Speech_Bubble_2.png");
+
             Result_Flower = TxC(RESULT + @"Flower\Flower.png");
 
             for (int i = 1; i <= 5; i++)
@@ -1584,8 +1591,7 @@ namespace TJAPlayer3
 
         #region 6_結果発表
         public CTexture Result_FadeIn,
-            Result_Gauge,
-            Result_Gauge_Base,
+            
             Result_Header,
             Result_Number,
             Result_Panel,
@@ -1597,7 +1603,7 @@ namespace TJAPlayer3
 
             Result_CrownEffect,
             Result_ScoreRankEffect,
-            Result_Speech_Bubble,
+            
             Result_Cloud,
             Result_Flower,
             Result_Shine,
@@ -1615,6 +1621,10 @@ namespace TJAPlayer3
 
             Result_Flower_Rotate = new CTexture[5],
             Result_Work = new CTexture[3],
+
+            Result_Gauge = new CTexture[2],
+            Result_Gauge_Base = new CTexture[2],
+            Result_Speech_Bubble = new CTexture[2],
 
             Result_Mountain = new CTexture[4];
         #endregion
