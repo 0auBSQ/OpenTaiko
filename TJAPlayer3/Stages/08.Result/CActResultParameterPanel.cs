@@ -238,10 +238,19 @@ namespace TJAPlayer3
 				ctRotate_Flowers = new CCounter(0, 1500, 1, TJAPlayer3.Timer);
 				ctShine_Plate = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
 
-				ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.Result_Donchan_Normal.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-				ctDonchan_Clear = new CCounter();
-				ctDonchan_Failed = new CCounter();
-				ctDonchan_Failed_In = new CCounter();
+				ctDonchan_Normal = new CCounter[2];
+				ctDonchan_Clear = new CCounter[2];
+				ctDonchan_Failed = new CCounter[2];
+				ctDonchan_Failed_In = new CCounter[2];
+
+				for (int i = 0; i < 2; i++)
+                {
+					ctDonchan_Normal[i] = new CCounter(0, TJAPlayer3.Tx.Result_Donchan_Normal.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+					ctDonchan_Clear[i] = new CCounter();
+					ctDonchan_Failed[i] = new CCounter();
+					ctDonchan_Failed_In[i] = new CCounter();
+				}
+				
 
 				gaugeValues = new int[2];
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
@@ -287,11 +296,15 @@ namespace TJAPlayer3
 			ctEndAnime.t進行();
 			ctBackgroundAnime.t進行Loop();
 			ctMountain_ClearIn.t進行();
-			ctDonchan_Clear.t進行Loop();
-			ctDonchan_Failed.t進行Loop();
-			ctDonchan_Failed_In.t進行();
-			ctDonchan_Normal.t進行Loop();
 
+			for (int i = 0; i < 2; i++)
+            {
+				ctDonchan_Clear[i].t進行Loop();
+				ctDonchan_Failed[i].t進行Loop();
+				ctDonchan_Failed_In[i].t進行();
+				ctDonchan_Normal[i].t進行Loop();
+			}
+			
 			ctFlash_Icon.t進行Loop();
 			ctRotate_Flowers.t進行Loop();
 			ctShine_Plate.t進行Loop();
@@ -349,16 +362,27 @@ namespace TJAPlayer3
 						TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, 57 + totalShift, 140, new RectangleF(0, 0, 9.74f * ctゲージアニメ[i].n現在の値, 36));
 
 						// Modify to array for each players using i
+
+						
+
+
 						if (ctゲージアニメ[i].b終了値に達した)
 						{
 							if (ctゲージアニメ[i].n現在の値 != 50)
-								TJAPlayer3.Skin.soundGauge.t停止する();
+                            {
+								// Gauge didn't reach rainbow
+								if (TJAPlayer3.ConfigIni.nPlayerCount < 2
+									|| ctゲージアニメ[(i == 0) ? 1 : 0].b終了値に達した)
+									TJAPlayer3.Skin.soundGauge.t停止する();
+							}
 							else
 							{
+								// Gauge reached rainbow
 								if (!TJAPlayer3.Skin.soundGauge.b再生中)
+                                {
 									TJAPlayer3.Skin.soundGauge.t停止する();
-
-								// Both gauges should be independent too
+								}
+									
 								if (!ct虹ゲージアニメ.b進行中)
 									ct虹ゲージアニメ.t開始(0, 40, 1000 / 60, TJAPlayer3.Timer);
 
@@ -558,33 +582,7 @@ namespace TJAPlayer3
 
 				// MountainAppearValue = 2000 + (ctゲージアニメ.n終了値 * 66) + 8360 - 85;
 
-				if (ct全体進行.n現在の値 >= MountainAppearValue)
-				{
-                    #region [Mountain animation counter setup]
-
-                    if (!this.ctMountain_ClearIn.b進行中)
-						this.ctMountain_ClearIn.t開始(0, 515, 3, TJAPlayer3.Timer);
-
-					if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f)
-                    {
-						if (!this.ctDonchan_Clear.b進行中)
-							this.ctDonchan_Clear.t開始(0, TJAPlayer3.Tx.Result_Donchan_Clear.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-					}
-					else
-                    {
-						if (!this.ctDonchan_Failed_In.b進行中)
-							this.ctDonchan_Failed_In.t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed_In.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-						else if (this.ctDonchan_Failed_In.b終了値に達した && !this.ctDonchan_Failed.b進行中)
-							this.ctDonchan_Failed.t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed.Length - 1, 1000 / 60, TJAPlayer3.Timer);	
-					}
-						
-
-                    #endregion
-
-					/* TO DO */
-
-					// Alter Mountain appear value/Crown appear value if no Score Rank/no Crown
-                }
+				
 
 				#region [Character related animations]
 
@@ -594,26 +592,52 @@ namespace TJAPlayer3
 					if (is2PSide)
 						pos = 1;
 
-
-
-					#region [Don-chan Animations]
-
-
-					if (this.ctDonchan_Clear.b進行中)
+					if (ct全体進行.n現在の値 >= MountainAppearValue)
 					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear.n現在の値], 202, 532, pos, 0.8f);
+						#region [Mountain animation counter setup]
+
+						if (!this.ctMountain_ClearIn.b進行中)
+							this.ctMountain_ClearIn.t開始(0, 515, 3, TJAPlayer3.Timer);
+
+						if (gaugeValues[p] >= 80.0f)
+						{
+							if (!this.ctDonchan_Clear[p].b進行中)
+								this.ctDonchan_Clear[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Clear.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+						}
+						else
+						{
+							if (!this.ctDonchan_Failed_In[p].b進行中)
+								this.ctDonchan_Failed_In[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed_In.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+							else if (this.ctDonchan_Failed_In[p].b終了値に達した && !this.ctDonchan_Failed[p].b進行中)
+								this.ctDonchan_Failed[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+						}
+
+
+						#endregion
+
+						/* TO DO */
+
+						// Alter Mountain appear value/Crown appear value if no Score Rank/no Crown
 					}
-					else if (this.ctDonchan_Failed.b進行中)
+
+					#region [Character Animations]
+
+
+					if (this.ctDonchan_Clear[p].b進行中)
 					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed.n現在の値], 202, 532, pos, 0.8f);
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear[p].n現在の値], 202, 532, pos, 0.8f);
 					}
-					else if (this.ctDonchan_Failed_In.b進行中)
+					else if (this.ctDonchan_Failed[p].b進行中)
 					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In.n現在の値], 202, 532, pos, 0.8f);
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed[p].n現在の値], 202, 532, pos, 0.8f);
+					}
+					else if (this.ctDonchan_Failed_In[p].b進行中)
+					{
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In[p].n現在の値], 202, 532, pos, 0.8f);
 					}
 					else
 					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal.n現在の値], 202, 532, pos, 0.8f);
+						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal[p].n現在の値], 202, 532, pos, 0.8f);
 					}
 
 					#endregion
@@ -781,10 +805,10 @@ namespace TJAPlayer3
 		public CCounter ctMountain_ClearIn;
 		public CCounter ctBackgroundAnime;
 		public CCounter ctBackgroundAnime_Clear;
-		private CCounter ctDonchan_Normal;
-		private CCounter ctDonchan_Clear;
-		private CCounter ctDonchan_Failed;
-		private CCounter ctDonchan_Failed_In;
+		private CCounter[] ctDonchan_Normal;
+		private CCounter[] ctDonchan_Clear;
+		private CCounter[] ctDonchan_Failed;
+		private CCounter[] ctDonchan_Failed_In;
 
 		private int RandomText;
 
