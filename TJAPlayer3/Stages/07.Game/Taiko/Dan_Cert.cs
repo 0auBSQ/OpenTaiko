@@ -17,7 +17,7 @@ namespace TJAPlayer3
         public static readonly int cMaxExam = 7;
 
         // Max number of songs for a Dan chart
-        public static readonly int cExamMaxSongs = 3;
+        public static readonly int cExamMaxSongs = 9;
     }
 
 
@@ -565,7 +565,7 @@ namespace TJAPlayer3
 
                     if (ExamChange[i] == true)
                     {
-                        for (int j = 1; j < CExamInfo.cExamMaxSongs; j++)
+                        for (int j = 1; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; j++)
                         {
 
                             if (!(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i] != null))
@@ -1077,7 +1077,7 @@ namespace TJAPlayer3
                 
                 if (ExamChange[i] == true)
                 {
-                    for (int j = 1; j < CExamInfo.cExamMaxSongs; j++)
+                    for (int j = 1; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; j++)
                     {
                         if (!(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i] != null))
                             continue;

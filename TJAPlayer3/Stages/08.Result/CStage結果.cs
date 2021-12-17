@@ -505,7 +505,7 @@ namespace TJAPlayer3
 
 					#region [Partial scores]
 
-					for (int i = 0; i < CExamInfo.cExamMaxSongs; i++)
+					for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                     {
 						if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i] != null)
                         {
