@@ -59,6 +59,12 @@ namespace TJAPlayer3
 		}
 
 
+		public bool isAutoDisabled(int player)
+        {
+			return ((player == 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && TJAPlayer3.ConfigIni.nAILevel == 0));
+		}
+
 		// CStage 実装
 
 		public override void On活性化()
@@ -238,17 +244,15 @@ namespace TJAPlayer3
 							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
 							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], ccf.nScore);
 
-							if ((i == 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-								|| (i == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
+							if (isAutoDisabled(i))
 							{
 								ini[i].stセクション[0].nクリア[diff] = clear;
 								ini[i].stセクション[0].nスコアランク[diff] = scoreRank;
 								ini[i].stセクション[0].nハイスコア[diff] = highscore;
+
+								if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+									ini[i].t書き出し(str[i]);
 							}
-
-							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-								ini[i].t書き出し(str[i]);
-
 						}
 
 						#endregion
@@ -1258,7 +1262,7 @@ namespace TJAPlayer3
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
 							if ((i == 0 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-								|| (i == 1 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P))
+								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
 								continue;
 
 							int actualPlayer = TJAPlayer3.GetActualPlayer(i);
@@ -1268,14 +1272,6 @@ namespace TJAPlayer3
 
 							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
 								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
-
-							/*
-							if (cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nクリア)
-								cスコア.譜面情報.nクリア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nクリア;
-
-							if (cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] < nスコアランク)
-								cスコア.譜面情報.nスコアランク[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = this.nスコアランク;
-							*/
 						}
 
 						
