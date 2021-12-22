@@ -426,7 +426,8 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGreat.ToString(),
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood.ToString(),
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss.ToString(),
-							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nRoll.ToString(),
+							//TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nRoll.ToString(),
+							TJAPlayer3.stage演奏ドラム画面.GetRoll(i).ToString(),
 							TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[i].ToString()
 						};
 
@@ -462,7 +463,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 																			  ct全体進行.n現在の値 <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 
-							this.tスコア文字表示(TJAPlayer3.Skin.nResultScoreP1X + totalShift, TJAPlayer3.Skin.nResultScoreP1Y, string.Format("{0,7:######0}", TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+							this.tスコア文字表示(TJAPlayer3.Skin.nResultScoreP1X + totalShift, TJAPlayer3.Skin.nResultScoreP1Y, string.Format("{0,7:######0}", TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i).ToString()));// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
 
 							if (!b音声再生[6])
 							{

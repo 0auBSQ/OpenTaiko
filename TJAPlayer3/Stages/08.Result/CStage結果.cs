@@ -150,7 +150,7 @@ namespace TJAPlayer3
 								? 1 
 								: 0;
 
-							if (ccf.nScore < 500000)
+							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, p) < 500000)
 							{
 								this.nスコアランク[p] = 0;
 							}
@@ -160,7 +160,7 @@ namespace TJAPlayer3
 
 								for (int i = 0; i < 7; i++)
 								{
-									if (ccf.nScore >= sr[i])
+									if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, p) >= sr[i])
 									{
 										this.nスコアランク[p] = i + 1;
 									}
@@ -242,7 +242,7 @@ namespace TJAPlayer3
 
 							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
 							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
-							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], ccf.nScore);
+							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));
 
 							if (isAutoDisabled(i))
 							{
