@@ -278,91 +278,122 @@ namespace TJAPlayer3
 						*/
 						#endregion
 					}
-					else
-                    {
-						#region [Old save file calculation method for Dan/Tower charts, will update those later]
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+					{
+						/* == Specific format for DaniDoujou charts ==
+						**
+						** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
+						**
+						** 0 (Fugoukaku, no insign)
+						** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
+						** Gold Iki (Full Combo) : 3 (Red Goukaku) / 4 (Gold Goukaku)
+						** Rainbow Iki (Donda Full Combo) : 5 (Red Goukaku) / 6 (Gold Goukaku)
+						**
+						*/
 
+						#region [Dan scores]
 
-						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
+
+						int clearValue = 0;
+
+						if (examStatus != Exam.Status.Failure)
 						{
-                            /* == Specific format for DaniDoujou charts ==
-							**
-							** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
-							**
-							** 0 (Fugoukaku, no insign)
-							** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
-							** Gold Iki (Full Combo) : 3 (Red Goukaku) / 4 (Gold Goukaku)
-							** Rainbow Iki (Donda Full Combo) : 5 (Red Goukaku) / 6 (Gold Goukaku)
-							**
-							*/
+							// Red Goukaku
+							clearValue += 1;
 
-                            #region [Dan scores]
-
-                            Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
-
-							int clearValue = 0;
-
-							if (examStatus != Exam.Status.Failure)
-							{
-								// Red Goukaku
+							// Gold Goukaku
+							if (examStatus == Exam.Status.Better_Success)
 								clearValue += 1;
 
-								// Gold Goukaku
-								if (examStatus == Exam.Status.Better_Success)
-									clearValue += 1;
+							// Gold Iki
+							if (this.st演奏記録.Drums.nMiss数 == 0)
+							{
+								clearValue += 2;
 
-								// Gold Iki
-								if (this.st演奏記録.Drums.nMiss数 == 0)
-								{
+								// Rainbow Iki
+								if (this.st演奏記録.Drums.nGreat数 == 0)
 									clearValue += 2;
-
-									// Rainbow Iki
-									if (this.st演奏記録.Drums.nGreat数 == 0)
-										clearValue += 2;
-								}
 							}
-
-							this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
-
-							// Unlock dan grade
-							if (clearValue > 0)
-							{
-								TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
-									clearValue % 2 == 0,
-									(clearValue - 1) / 2,
-									TJAPlayer3.SaveFile);
-							}
-
-							#endregion
-
 						}
-						else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+
+						if (isAutoDisabled(0))
 						{
-                            // Clear if top reached, then FC or DFC like any regular chart
-                            // Score Rank cointains highest reached floor
+							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
+							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
 
-                            #region [Tower scores]
+							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+								ini[0].t書き出し(str[0]);
+						}
 
-                            int tmpClear = 0;
+						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
-							if (CFloorManagement.CurrentNumberOfLives > 0)
-							{
+						// Unlock dan grade
+						if (clearValue > 0)
+						{
+							TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
+								clearValue % 2 == 0,
+								(clearValue - 1) / 2,
+								TJAPlayer3.SaveFile);
+						}
+
+						#endregion
+
+					}
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					{
+						// Clear if top reached, then FC or DFC like any regular chart
+						// Score Rank cointains highest reached floor
+
+						#region [Tower scores]
+
+						int tmpClear = 0;
+						double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+
+						// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
+						bool[] conditions =
+						{
+							progress >= 0.1,
+							progress >= 0.25,
+							progress >= 0.5,
+							progress >= 0.75,
+							CFloorManagement.CurrentNumberOfLives > 0,
+							this.st演奏記録.Drums.nMiss数 == 0,
+							this.st演奏記録.Drums.nGreat数 == 0
+						};
+
+						for (int i = 0; i < conditions.Length; i++)
+                        {
+							if (conditions[i] == true)
 								tmpClear++;
-								if (this.st演奏記録.Drums.nMiss数 == 0)
-								{
-									tmpClear++;
-									if (this.st演奏記録.Drums.nGreat数 == 0)
-										tmpClear++;
-								}
-							}
-
-
-							this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
-							this.st演奏記録[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
-
-                            #endregion
-
+							else
+								break;
                         }
+
+						if (isAutoDisabled(0))
+						{
+							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
+							ini[0].stセクション[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
+							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
+
+							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
+								ini[0].t書き出し(str[0]);
+						}
+
+
+						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
+						// this.st演奏記録[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
+
+						#endregion
+
+					}
+					else
+                    {
+						#region [Legacy]
+
+
+						
+						/*
 
                         // 新記録スコアチェック
                         if ((this.st演奏記録[0].nスコア > ini[0].stセクション[0].nスコア) && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
@@ -372,11 +403,10 @@ namespace TJAPlayer3
 						}
 
 						// Header hi-score
-						/*
-						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-							if (this.st演奏記録[0].nスコア > ini[0].stセクション[0].nスコア)
-								this.st演奏記録[0].nハイスコア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = (int)st演奏記録[0].nスコア;
-						*/
+						//if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+						//	if (this.st演奏記録[0].nスコア > ini[0].stセクション[0].nスコア)
+						//		this.st演奏記録[0].nハイスコア[TJAPlayer3.stage選曲.n確定された曲の難易度[0]] = (int)st演奏記録[0].nスコア;
+
 
 						// 新記録スキルチェック
 						if (this.st演奏記録[0].db演奏型スキル値 > ini[0].stセクション[0].db演奏型スキル値)
@@ -407,6 +437,8 @@ namespace TJAPlayer3
 
 						if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
 							ini[0].t書き出し(str[0]);
+
+						*/
 
 						#endregion
 
@@ -675,10 +707,7 @@ namespace TJAPlayer3
 				{
 					this.ct登場用 = null;
 				}
-				//CDTXMania.tテクスチャの解放( ref this.tx背景 );
-				//CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
-				//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
-				//CDTXMania.tテクスチャの解放( ref this.txオプションパネル );
+
 				Dan_Plate?.Dispose();
 
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
@@ -1257,7 +1286,9 @@ namespace TJAPlayer3
 				{
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 					{
-						Cスコア cScore = TJAPlayer3.stage選曲.r確定されたスコア;
+                        #region [Update status]
+
+                        Cスコア cScore = TJAPlayer3.stage選曲.r確定されたスコア;
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
@@ -1272,13 +1303,19 @@ namespace TJAPlayer3
 
 							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
 								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
+
+							if (cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i))
+								cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i);
 						}
 
-						
+						#endregion
+
 					}
 					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     {
-						Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+                        #region [Dan update status]
+
+                        Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
 
 						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
 
@@ -1307,9 +1344,58 @@ namespace TJAPlayer3
 						int actualPlayer = TJAPlayer3.SaveFile;
 
 						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+                        {
 							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], clearValue);
 
+							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0))
+								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0);
+						}
+
+						#endregion
+
 						//cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
+					}
+					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					{
+                        #region [Update Tower status]
+
+                        Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+						int actualPlayer = TJAPlayer3.SaveFile;
+
+						int tmpClear = 0;
+						double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+
+						// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
+						bool[] conditions =
+						{
+							progress >= 0.1,
+							progress >= 0.25,
+							progress >= 0.5,
+							progress >= 0.75,
+							CFloorManagement.CurrentNumberOfLives > 0,
+							this.st演奏記録.Drums.nMiss数 == 0,
+							this.st演奏記録.Drums.nGreat数 == 0
+						};
+
+						for (int i = 0; i < conditions.Length; i++)
+						{
+							if (conditions[i] == true)
+								tmpClear++;
+							else
+								break;
+						}
+
+
+						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
+						{
+							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], tmpClear);
+							cスコア.GPInfo[actualPlayer].nScoreRank[0] = Math.Max(cスコア.GPInfo[actualPlayer].nScoreRank[0], CFloorManagement.LastRegisteredFloor);
+
+							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0))
+								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0);
+						}
+
+						#endregion
 					}
 				}
 				//---------------------
