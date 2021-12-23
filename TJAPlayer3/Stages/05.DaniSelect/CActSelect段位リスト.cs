@@ -514,12 +514,15 @@ namespace TJAPlayer3
 
                 // Two char header, will be used for grade unlocking too
                 string tmp = song.strタイトル.Substring(0, 2);
+
                 stバー情報[i].ttkタイトル[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
                 stバー情報[i].nDanTick = song.arスコア[6].譜面情報.nDanTick;
                 stバー情報[i].cDanTickColor = song.arスコア[6].譜面情報.cDanTickColor;
 
-                stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
+                //stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
+                stバー情報[i].clearGrade = song.arスコア[6].GPInfo[TJAPlayer3.SaveFile].nClear[0];
+
                 stバー情報[i].txBarCenter = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Bar_Center.png");
                 stバー情報[i].txDanPlate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @"\Dan_Plate.png");
             }

@@ -882,15 +882,19 @@ namespace TJAPlayer3
                         currentPads[1] = TJAPlayer3.stage選曲.act難易度選択画面.n現在の選択行[1] - 2;
                 }
 
+
+                /*
                 TJAPlayer3.Tx.SongSelect_Table[currentPads[0]]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
                 if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
                     TJAPlayer3.Tx.SongSelect_Table[currentPads[1]]?.t2D描画(TJAPlayer3.app.Device, tablesGap, 0);
-
+                */
                 
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     int p = TJAPlayer3.GetActualPlayer(i);
+
+                    TJAPlayer3.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(TJAPlayer3.app.Device, i * tablesGap, 0);
 
                     CActSelect曲リスト.CScorePad[] SPArrRef = this.act曲リスト.ScorePads;
                     if (p == 1)
@@ -899,15 +903,43 @@ namespace TJAPlayer3
                     // Current board
                     for (int j = 0; j < 10; j++)
                     {
-
                         tBoardNumberDraw(this.ptBoardNumber[j].X - 10 + i * tablesGap, this.ptBoardNumber[j].Y, j < 7 ?
                             SPArrRef[currentPads[i]].ScoreRankCount[j].ToString()
                             : SPArrRef[currentPads[i]].CrownCount[j - 7].ToString());
-
                     }
 
                     if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
                         tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + i * 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[p].ToString());
+
+                    #region [HiScore plate]
+
+                    int posx = (i == 1) ? 1280 - this.ptBoardNumber[11].X : this.ptBoardNumber[11].X;
+
+                    TJAPlayer3.Tx.SongSelect_High_Score.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
+
+                    var song = this.r現在選択中の曲;
+                    int displayedScore = 0;
+
+                    if (song != null && song.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+                    {
+                        var closest = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
+                        var score = song.arスコア[closest];
+
+                        if (score != null)
+                        {
+                            if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
+                                displayedScore = score.GPInfo[p].nHighScore[0];
+                            else if (currentPads[i] <= (int)Difficulty.Edit)
+                                displayedScore = score.GPInfo[p].nHighScore[currentPads[i]];
+                            else
+                                displayedScore = score.GPInfo[p].nHighScore[closest];
+                        }
+                        
+                    }
+
+                    tBoardNumberDraw(posx - 10, this.ptBoardNumber[11].Y + 6, displayedScore.ToString());
+
+                    #endregion
                 }
 
                 #endregion
@@ -1073,7 +1105,7 @@ namespace TJAPlayer3
         }
 
         private Point[] ptBoardNumber =
-            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(84, 360) };
+            { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(84, 360), new Point(120, 412) };
 
         public void tBoardNumberDraw(int x, int y, string str)
         {

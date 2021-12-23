@@ -336,7 +336,7 @@ namespace TJAPlayer3
         /// <summary>
         /// 曲ごとの条件を格納する
         /// </summary>
-        public Dan_C[] SongExam = new Dan_C[3];
+        // public Dan_C[] SongExam = new Dan_C[3];
 
         /// <summary>
         /// 条件の達成見込みがなくなったら、真になる。
