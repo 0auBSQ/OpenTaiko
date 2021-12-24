@@ -937,10 +937,11 @@ namespace TJAPlayer3
 
                             displayedScore = score.GPInfo[p].nHighScore[table];
 
-                            TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, 
-                                posx - 78, 
-                                this.ptBoardNumber[11].Y + 2,
-                                new Rectangle(table * 53, 0, 53, 53));
+                            if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit)
+                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, 
+                                    posx - 78, 
+                                    this.ptBoardNumber[11].Y + 2,
+                                    new Rectangle(table * 53, 0, 53, 53));
 
                             tBoardNumberDraw(posx - 10, this.ptBoardNumber[11].Y + 6, displayedScore.ToString());
                         }
