@@ -39,84 +39,196 @@ namespace TJAPlayer3
             base.On非活性化();
         }
 
+        private void displayScoreRank(int i, int player, float x, int mode = 0)
+        {
+            CCounter cct = this.counter[i];
+            if (player == 1)
+                cct = this.counterJ2[i];
+
+            CTexture tex = TJAPlayer3.Tx.ScoreRank;
+            if (mode == 1) // tower
+                tex = TJAPlayer3.Tx.TowerResult_ScoreRankEffect;
+
+            if (tex == null)
+                return;
+
+            if (!cct.b進行中)
+            {
+                cct.t開始(0, 3000, 1, TJAPlayer3.Timer);
+            }
+            if (cct.n現在の値 <= 255)
+            {
+                tex.Opacity = cct.n現在の値;
+                x = 51 - (cct.n現在の値 / 5.0f);
+            }
+            if (cct.n現在の値 > 255 && cct.n現在の値 <= 255 + 180)
+            {
+                tex.Opacity = 255;
+
+                float newSize = 1.0f + (float)Math.Sin((cct.n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
+                tex.vc拡大縮小倍率.X = newSize;
+                tex.vc拡大縮小倍率.Y = newSize;
+                x = 0;
+            }
+            if (cct.n現在の値 > 255 + 180 && cct.n現在の値 <= 2745)
+            {
+                tex.Opacity = 255;
+                tex.vc拡大縮小倍率.X = 1.0f;
+                tex.vc拡大縮小倍率.Y = 1.0f;
+                x = 0;
+            }
+            if (cct.n現在の値 >= 2745 && cct.n現在の値 <= 3000)
+            {
+                tex.Opacity = 255 - ((cct.n現在の値 - 2745));
+                x = -((cct.n現在の値 - 2745) / 5.0f);
+            }
+
+            var ypos = (player == 0) ? 98 + (int)x : 720 - (98 + (int)x);
+
+            if (mode == 0)
+                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, ypos, new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+            else if (mode == 1 && player == 0)
+                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, ypos, new System.Drawing.Rectangle(i * 229, 0, 229, 194));
+        }
+
         public override int On進行描画()
         {
-            if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
             {
                 float x = 0;
+
                 for (int i = 0; i < 7; i++)
                 {
-                    counter[i].t進行();
-                    if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0) >= ScoreRank[i])
+                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
                     {
-                        if (!this.counter[i].b進行中)
+                        #region [Ensou score ranks]
+
+                        counter[i].t進行();
+                        if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0) >= ScoreRank[i])
                         {
-                            this.counter[i].t開始(0, 3000, 1, TJAPlayer3.Timer);
-                        }
-                        if (counter[i].n現在の値 <= 255)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = counter[i].n現在の値;
-                            x = 51 - (counter[i].n現在の値 / 5.0f);
-                        }
-                        if (counter[i].n現在の値 > 255 && counter[i].n現在の値 <= 255 + 180)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((counter[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((counter[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                            x = 0;
-                        }
-                        if (counter[i].n現在の値 > 255 + 180 && counter[i].n現在の値 <= 2745)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f;
-                            x = 0;
-                        }
-                        if (counter[i].n現在の値 >= 2745 && counter[i].n現在の値 <= 3000)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255 - ((counter[i].n現在の値 - 2745));
-                            x = -((counter[i].n現在の値 - 2745) / 5.0f);
+                            displayScoreRank(i, 0, x);
+
+                            #region [Legacy]
+
+                                /*
+                                if (!this.counter[i].b進行中)
+                                {
+                                    this.counter[i].t開始(0, 3000, 1, TJAPlayer3.Timer);
+                                }
+                                if (counter[i].n現在の値 <= 255)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = counter[i].n現在の値;
+                                    x = 51 - (counter[i].n現在の値 / 5.0f);
+                                }
+                                if (counter[i].n現在の値 > 255 && counter[i].n現在の値 <= 255 + 180)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((counter[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((counter[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
+                                    x = 0;
+                                }
+                                if (counter[i].n現在の値 > 255 + 180 && counter[i].n現在の値 <= 2745)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f;
+                                    x = 0;
+                                }
+                                if (counter[i].n現在の値 >= 2745 && counter[i].n現在の値 <= 3000)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255 - ((counter[i].n現在の値 - 2745));
+                                    x = -((counter[i].n現在の値 - 2745) / 5.0f);
+                                }
+
+                                TJAPlayer3.Tx.ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, 98 + (int)x, new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+                                */
+
+                                #endregion
                         }
 
-                        TJAPlayer3.Tx.ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, 98 + (int)x, new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+                        x = 0;
+                        counterJ2[i].t進行();
+                        if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank2P[i])
+                        {
+                            displayScoreRank(i, 1, x);
+
+                            #region [Legacy]
+
+                                /*
+                                if (!this.counterJ2[i].b進行中)
+                                {
+                                    this.counterJ2[i].t開始(0, 3000, 1, TJAPlayer3.Timer);
+                                }
+                                if (counterJ2[i].n現在の値 <= 255)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = counterJ2[i].n現在の値;
+                                    x = 51 - (counterJ2[i].n現在の値 / 5.0f);
+                                }
+                                if (counterJ2[i].n現在の値 > 255 && counterJ2[i].n現在の値 <= 255 + 180)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
+                                    x = 0;
+                                }
+                                if (counterJ2[i].n現在の値 > 255 + 180 && counterJ2[i].n現在の値 <= 2745)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f;
+                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f;
+                                    x = 0;
+                                }
+                                if (counterJ2[i].n現在の値 >= 2745 && counterJ2[i].n現在の値 <= 3000)
+                                {
+                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255 - ((counterJ2[i].n現在の値 - 2745));
+                                    x = -((counterJ2[i].n現在の値 - 2745) / 5.0f);
+                                }
+
+                                TJAPlayer3.Tx.ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, 720 - (98 + (int)x), new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+                                */
+
+                                #endregion
+                        }
+                        #endregion
                     }
-
-                    x = 0;
-                    counterJ2[i].t進行();
-                    if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank2P[i])
+                    else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                     {
-                        if (!this.counterJ2[i].b進行中)
+                        #region [Tower score ranks]
+
+                        double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+
+                        bool[] conditions =
                         {
-                            this.counterJ2[i].t開始(0, 3000, 1, TJAPlayer3.Timer);
-                        }
-                        if (counterJ2[i].n現在の値 <= 255)
+                            progress >= 0.1,
+                            progress >= 0.25,
+                            progress >= 0.5,
+                            progress >= 0.75,
+                            progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
+                            TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0,
+                            TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0
+                        };
+
+                        counter[i].t進行();
+
+                        bool satisfied = true;
+                        for (int j = 0; j <= i; j++)
+                            if (conditions[j] == false)
+                            {
+                                satisfied = false;
+                                break;
+                            }
+                                
+
+                        if (satisfied == true)
                         {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = counterJ2[i].n現在の値;
-                            x = 51 - (counterJ2[i].n現在の値 / 5.0f);
-                        }
-                        if (counterJ2[i].n現在の値 > 255 && counterJ2[i].n現在の値 <= 255 + 180)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                            x = 0;
-                        }
-                        if (counterJ2[i].n現在の値 > 255 + 180 && counterJ2[i].n現在の値 <= 2745)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f;
-                            TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f;
-                            x = 0;
-                        }
-                        if (counterJ2[i].n現在の値 >= 2745 && counterJ2[i].n現在の値 <= 3000)
-                        {
-                            TJAPlayer3.Tx.ScoreRank.Opacity = 255 - ((counterJ2[i].n現在の値 - 2745));
-                            x = -((counterJ2[i].n現在の値 - 2745) / 5.0f);
+                            displayScoreRank(i, 0, x, 1);
                         }
 
-                        TJAPlayer3.Tx.ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, 720 - (98 + (int)x), new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+                        #endregion
                     }
                 }
+                
+                
             }
 
             //TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ScoreRank[6].ToString());

@@ -183,6 +183,8 @@ namespace TJAPlayer3
             #region 3_選曲画面
             SongSelect_Background = TxC(SONGSELECT + @"Background.png");
             SongSelect_Header = TxC(SONGSELECT + @"Header.png");
+            SongSelect_Coin_Slot = TxC(SONGSELECT + @"Coin_Slot.png");
+
             SongSelect_Auto = TxC(SONGSELECT + @"Auto.png");
             SongSelect_Level = TxC(SONGSELECT + @"Level.png");
             SongSelect_Branch = TxC(SONGSELECT + @"Branch.png");
@@ -828,6 +830,8 @@ namespace TJAPlayer3
             TowerResult_Background = TxC(TOWERRESULT + @"Background.png");
             TowerResult_Panel = TxC(TOWERRESULT + @"Panel.png");
 
+            TowerResult_ScoreRankEffect = TxC(TOWERRESULT + @"ScoreRankEffect.png");
+
             for (int i = 0; i < TJAPlayer3.Skin.Game_Tower_Ptn_Result; i++)
             {
                 TowerResult_Tower[i] = TxC(TOWERRESULT + @"Tower\" + i.ToString() + ".png");
@@ -1319,6 +1323,7 @@ namespace TJAPlayer3
 
         public CTexture SongSelect_Background,
             SongSelect_Header,
+            SongSelect_Coin_Slot,
             SongSelect_Auto,
             SongSelect_Level,
             SongSelect_Branch,
@@ -1655,6 +1660,7 @@ namespace TJAPlayer3
         #region [8_TowerResults]
 
         public CTexture TowerResult_Background,
+            TowerResult_ScoreRankEffect,
             TowerResult_Panel;
         public CTexture[]
             TowerResult_Tower;

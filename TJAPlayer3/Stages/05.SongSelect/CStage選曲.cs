@@ -417,8 +417,12 @@ namespace TJAPlayer3
                     double dbY表示割合 = Math.Sin(Math.PI / 2 * db登場割合);
                     y = ((int)(TJAPlayer3.Tx.SongSelect_Header.sz画像サイズ.Height * dbY表示割合)) - TJAPlayer3.Tx.SongSelect_Header.sz画像サイズ.Height;
                 }
-                if (TJAPlayer3.Tx.SongSelect_Header != null)
-                    TJAPlayer3.Tx.SongSelect_Header.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                
+                TJAPlayer3.Tx.SongSelect_Header?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                
+                TJAPlayer3.Tx.SongSelect_Coin_Slot?.t2D描画(TJAPlayer3.app.Device, 0, 0,
+                    new Rectangle(0, 0, 640 + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? 640 : 0), 720));
+
 
                 tTimerDraw((100 - ctTimer.n現在の値).ToString());
 

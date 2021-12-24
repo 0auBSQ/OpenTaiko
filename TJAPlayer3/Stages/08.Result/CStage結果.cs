@@ -1372,7 +1372,7 @@ namespace TJAPlayer3
 							progress >= 0.25,
 							progress >= 0.5,
 							progress >= 0.75,
-							CFloorManagement.CurrentNumberOfLives > 0,
+							progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
 							this.st演奏記録.Drums.nMiss数 == 0,
 							this.st演奏記録.Drums.nGreat数 == 0
 						};
