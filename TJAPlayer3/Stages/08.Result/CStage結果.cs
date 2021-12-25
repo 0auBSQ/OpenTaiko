@@ -65,6 +65,35 @@ namespace TJAPlayer3
 					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && TJAPlayer3.ConfigIni.nAILevel == 0));
 		}
 
+
+		public int GetTowerScoreRank()
+        {
+			int tmpClear = 0;
+			double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+
+			// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
+			bool[] conditions =
+			{
+				progress >= 0.1,
+				progress >= 0.25,
+				progress >= 0.5,
+				progress >= 0.75,
+				progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
+				this.st演奏記録.Drums.nMiss数 == 0,
+				this.st演奏記録.Drums.nGreat数 == 0
+			};
+
+			for (int i = 0; i < conditions.Length; i++)
+			{
+				if (conditions[i] == true)
+					tmpClear++;
+				else
+					break;
+			}
+
+			return tmpClear;
+		}
+
 		// CStage 実装
 
 		public override void On活性化()
@@ -170,6 +199,7 @@ namespace TJAPlayer3
 
 						
 					}
+
 					//---------------------
 					#endregion
 
@@ -282,7 +312,7 @@ namespace TJAPlayer3
 					{
 						/* == Specific format for DaniDoujou charts ==
 						**
-						** Higher is better, takes the Clear1 spot (Usually the spot allocated for Kantan Clear crowns)
+						** Higher is better, takes the Clear0 spot (Usually the spot allocated for Kantan Clear crowns)
 						**
 						** 0 (Fugoukaku, no insign)
 						** Silver Iki (Clear) : 1 (Red Goukaku) / 2 (Gold Goukaku)
@@ -347,28 +377,7 @@ namespace TJAPlayer3
 
 						#region [Tower scores]
 
-						int tmpClear = 0;
-						double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
-
-						// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
-						bool[] conditions =
-						{
-							progress >= 0.1,
-							progress >= 0.25,
-							progress >= 0.5,
-							progress >= 0.75,
-							CFloorManagement.CurrentNumberOfLives > 0,
-							this.st演奏記録.Drums.nMiss数 == 0,
-							this.st演奏記録.Drums.nGreat数 == 0
-						};
-
-						for (int i = 0; i < conditions.Length; i++)
-                        {
-							if (conditions[i] == true)
-								tmpClear++;
-							else
-								break;
-                        }
+						int tmpClear = GetTowerScoreRank();
 
 						if (isAutoDisabled(0))
 						{
@@ -1112,7 +1121,9 @@ namespace TJAPlayer3
 
 						this.ctTower_Animation.t進行();
 
-						if (TJAPlayer3.Skin.Game_Tower_Ptn_Result > 0)
+                        #region [Tower background]
+
+                        if (TJAPlayer3.Skin.Game_Tower_Ptn_Result > 0)
                         {
 							int xFactor = 0;
 							float yFactor = 1f;
@@ -1132,7 +1143,32 @@ namespace TJAPlayer3
 							TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * this.ctTower_Animation.n現在の値);
 						}
 
+						#endregion
+
 						TJAPlayer3.Tx.TowerResult_Panel?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+						#region [Score Rank]
+
+						int sc = GetTowerScoreRank() - 1;
+
+						TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, sc.ToString());
+
+						if (sc >= 0 && TJAPlayer3.Tx.TowerResult_ScoreRankEffect != null)
+                        {
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
+								1000,
+								220,
+								new Rectangle(sc * 229, 0, 229, 194));
+						}
+							
+
+						#endregion
+
+
+						#region [Text elements]
 
 						int firstRowY = 394;
 						int secondRowY = firstRowY + 96;
@@ -1151,6 +1187,8 @@ namespace TJAPlayer3
 						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpRemainingLifes.szテクスチャサイズ.Width + 54, secondRowY);
 
 						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, 248, secondRowY - 16, new Rectangle(0, 0, 80, 80));
+
+						#endregion
 
 						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
 						{
@@ -1362,7 +1400,9 @@ namespace TJAPlayer3
                         Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
 						int actualPlayer = TJAPlayer3.SaveFile;
 
-						int tmpClear = 0;
+						int tmpClear = GetTowerScoreRank();
+
+						/*
 						double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
 
 						// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
@@ -1384,7 +1424,7 @@ namespace TJAPlayer3
 							else
 								break;
 						}
-
+						*/
 
 						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 						{
@@ -1521,6 +1561,7 @@ namespace TJAPlayer3
 		private CPrivateFastFont pfTowerText;
 		private CPrivateFastFont pfTowerText48;
 		private CPrivateFastFont pfTowerText72;
+		private int TowerScoreRank;
 
 		// Don medals information 
 		private int[] nEarnedMedalsCount = { 0, 0 };
