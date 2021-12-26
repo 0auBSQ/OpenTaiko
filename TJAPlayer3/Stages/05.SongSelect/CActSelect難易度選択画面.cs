@@ -347,13 +347,34 @@ namespace TJAPlayer3
                 if (!avaliable)
                     continue;
 
-                Cスコア.ST譜面情報 idx = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報;
 
-                TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + screenPos * 144, 284, new RectangleF(idx.nクリア[i] * 24.5f, 0, 24.5f, 26));
+                for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                {
+                    int p = TJAPlayer3.GetActualPlayer(j);
 
-                if (idx.nスコアランク[i] != 0)
-                    TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + screenPos * 144, 281, new RectangleF(0, (idx.nスコアランク[i] - 1) * 42.71f, 50, 42.71f));
+                    Cスコア.ST譜面情報 idx = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報;
 
+                    var GPInfo = TJAPlayer3.stage選曲.r現在選択中のスコア.GPInfo[p];
+
+                    //TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 445 + screenPos * 144, 284, new RectangleF(idx.nクリア[i] * 24.5f, 0, 24.5f, 26));
+
+                    TJAPlayer3.Tx.Difficulty_Crown.t2D描画(TJAPlayer3.app.Device, 
+                        445 + screenPos * 144 + 74 * j, 
+                        284, 
+                        new RectangleF(GPInfo.nClear[i] * 24.5f, 0, 24.5f, 26));
+
+                    if (GPInfo.nScoreRank[i] != 0)
+                        TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 
+                            467 + screenPos * 144 + 24 * j, 
+                            281, 
+                            new RectangleF(0, (GPInfo.nScoreRank[i] - 1) * 42.71f, 50, 42.71f));
+
+                    /*
+                    if (idx.nスコアランク[i] != 0)
+                        TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(TJAPlayer3.app.Device, 467 + screenPos * 144, 281, new RectangleF(0, (idx.nスコアランク[i] - 1) * 42.71f, 50, 42.71f));
+                    */
+                }
+                
                 if (level > 0)
                     t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i].ToString(), 498 + screenPos * 143, 434.5f);
 
