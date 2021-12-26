@@ -190,7 +190,10 @@ namespace TJAPlayer3
             SongSelect_Branch = TxC(SONGSELECT + @"Branch.png");
             SongSelect_Branch_Text = TxC(SONGSELECT + @"Branch_Text.png");
             SongSelect_Bar_Center = TxC(SONGSELECT + @"Bar_Center.png");
-            SongSelect_Frame_Score = TxC(SONGSELECT + @"Frame_Score.png");
+
+            SongSelect_Frame_Score[0] = TxC(SONGSELECT + @"Frame_Score.png");
+            SongSelect_Frame_Score[1] = TxC(SONGSELECT + @"Frame_Score_Tower.png");
+
             SongSelect_Frame_Box = TxC(SONGSELECT + @"Frame_Box.png");
             SongSelect_Frame_BackBox = TxC(SONGSELECT + @"Frame_BackBox.png");
             SongSelect_Frame_Random = TxC(SONGSELECT + @"Frame_Random.png");
@@ -1328,7 +1331,7 @@ namespace TJAPlayer3
             SongSelect_Level,
             SongSelect_Branch,
             SongSelect_Branch_Text,
-            SongSelect_Frame_Score,
+            
             SongSelect_Frame_Box,
             SongSelect_Frame_BackBox,
             SongSelect_Frame_Random,
@@ -1354,6 +1357,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre,
             SongSelect_Box_Chara,
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
+            SongSelect_Frame_Score = new CTexture[2],
             SongSelect_Donchan_Select = new CTexture[47],
             SongSelect_Donchan_Normal = new CTexture[49],
             SongSelect_Donchan_Jump = new CTexture[18],
