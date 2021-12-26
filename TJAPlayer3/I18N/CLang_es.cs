@@ -60,7 +60,7 @@ namespace TJAPlayer3
             [19] = "Modo de ventana o pantalla completa.",
             [20] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [21] = "Activar el uso de subcarpetas en la\n SELECCIÓN ALEATORIA.",
-            [22] = "Activa la sincronización vertical.\nActivarlo bloqueará los FPS a 60, que hará\nel desplazamiento más suave pero\naumentará el retraso de la entrada.\nDesactivarlo hará que el juego tenga FPS ilimitados,\nque disminuirá el retraso de la entrada\npero el desplazamiento se verá peor.",
+            [22] = "Activa la sincronización vertical.\nActivarlo limitará los FPS a 60, aumentará\nel retraso de entrada y suavizará el desplazamiento.\nDesactivarlo no limitará los FPS,\ndisminuirá el retraso de la entrada pero\nel desplazamiento se verá afectado.",
             [23] = "Usar la reproducción AVI o no.",
             [24] = "Activar BGA (animaciones de fondo) o no.",
             [25] = "Tiempo de retraso(ms) para empezar a reproducir la\ndemo de la música en la pantalla\nSELECCIONAR CANCIÓN.\nPuedes especificar de 0ms a 10000ms",
@@ -68,7 +68,7 @@ namespace TJAPlayer3
             [27] = "Si está activado se mostrará información extra en\nla zona de BGA. (FPS, BPM, tiempo total, etc)\nPuedes activar o desactivar los indicadores\npresionando [Del] mientras juegas.",
             [28] = "Ajuste del grado de transparencia del fondo.\n\n0=completamente transparente,\n255=sin transparencia",
             [29] = "Desactívalo si no quieres que\nse reproduzca música de fondo.",
-            [30] = "Si quieres guardar tus récords, actívalo.\nDesactívalo si tus canciones están en\n un medio de solo lectura (CD-ROM, etc).\n",
+            [30] = "Guarda tus récords en el juego.\nDesactívalo si prefieres que tus puntajes no\nse guarden automáticamente.\n",
             [31] = "Ajuste relacionado con BS1770GAIN\n y por lo mismo, inutilizable.",
             [32] = "Ajuste relacionado con BS1770GAIN\n y por lo mismo, inutilizable.",
             [33] = "Actívalo para usar el valor SONGVOL desde\n el .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
@@ -104,15 +104,15 @@ namespace TJAPlayer3
             [50] = "Mostrar imágenes de Runner.\n",
             [51] = "Mostrar imagen del Footer.\n",
             [52] = "Usar texturas pre-renderizadas.\n",
-            [53] = "Mostrar imágenes del PuchiChara.\n",
+            [53] = "Mostrar imágenes del Puchi-Chara.\n",
             [54] = "Elige una skin desde la carpeta de skins.",
             [55] = "Menú secundario para cambiar las teclas que\nusa el juego.",
             [56] = "Juego automático",
-            [57] = "Para que el carril de J1\n" +
-                " se juegue automáticamente.",
+            [57] = "Al activarlo, el carril de J1\n" +
+                " se jugará automáticamente.",
             [58] = "Juego Automático J2",
-            [59] = "Para que el carril de J2\n" +
-                " se juegue automáticamente.",
+            [59] = "Al activarlo, el carril de J2\n" +
+                " se jugará automáticamente.",
             [60] = "Velocidad del redoble",
             [61] = "Redobles por segundo cuando se usa el\nmodo automático.\nNo tiene efecto en los globos.\nDesactivado si está en 0,\nbloqueado a un redoble por frame.",
             [62] = "VelDesplazamiento",
@@ -218,13 +218,13 @@ namespace TJAPlayer3
             [10050] = "Mostrar Runner",
             [10051] = "Mostrar Footer",
             [10052] = "Renderizado Rápido",
-            [10053] = "Mostrar PuchiChara",
+            [10053] = "Mostrar Puchi-Chara",
             [10054] = "Skin (Full)",
             [10055] = "Teclas del sistema",
             [10084] = "Modo Shinuchi",
 
             [100] = "Modo Taiko",
-            [101] = "Desafíos del Dojo",
+            [101] = "Dan-i Dojo",
             [102] = "Torres Taiko",
             [103] = "Tienda",
             [104] = "Aventura Taiko",
@@ -262,10 +262,10 @@ namespace TJAPlayer3
             [1018] = "Precisión",
 
             [1030] = "Regresar",
-            [1031] = "PuchiChara",
+            [1031] = "Puchi-Chara",
             [1032] = "Personaje",
             [1033] = "Título de Dan",
-            [1034] = "Título de la Nameplate",
+            [1034] = "Título de la placa",
         };
     }
 }
