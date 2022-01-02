@@ -313,7 +313,7 @@ namespace TJAPlayer3
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 			{
-				#region [ 通常時リザルト ]
+				#region [ Ensou result contents ]
 
 				int AnimeCount = 3000 + GaugeFactor * 59;
 				int ScoreApparitionTimeStamp = AnimeCount + 420 * 4 + 840;
@@ -439,6 +439,9 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 
 								this.t小文字表示(TJAPlayer3.Skin.nResultNumberP1X + totalShift, TJAPlayer3.Skin.nResultNumberY + TJAPlayer3.Skin.nResultNumberYPadding * k, string.Format("{0,4:###0}", scoresArr[k]));
+
+								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = 1f;
+								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = 1f;
 
 								if (!this.b音声再生[1 + k])
 								{
@@ -846,7 +849,7 @@ namespace TJAPlayer3
 		private readonly ST文字位置[] st大文字位置;
 		private ST文字位置[] stScoreFont;
 
-		private void t小文字表示(int x, int y, string str)
+		public void t小文字表示(int x, int y, string str)
 		{
 			foreach (char ch in str)
 			{

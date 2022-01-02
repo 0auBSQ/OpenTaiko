@@ -704,6 +704,30 @@ namespace TJAPlayer3
 					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
+				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan) 
+				{
+					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+					{
+						this.pfDanTitles = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 24);
+					}
+					else
+					{
+						this.pfDanTitles = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 16);
+					}
+
+					this.ttkDanTitles = new TitleTextureKey[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+
+					for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+					{
+						this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].bTitleShow 
+							? "???" 
+							: TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Title, 
+							pfDanTitles, 
+							Color.White, 
+							Color.Black, 
+							700);
+					}
+				}
 
 				base.OnManagedリソースの作成();
 			}
@@ -724,6 +748,10 @@ namespace TJAPlayer3
 					TJAPlayer3.t安全にDisposeする(ref pfTowerText);
 					TJAPlayer3.t安全にDisposeする(ref pfTowerText48);
 					TJAPlayer3.t安全にDisposeする(ref pfTowerText72);
+				}
+				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+				{
+					TJAPlayer3.t安全にDisposeする(ref pfDanTitles);
 				}
 
 				base.OnManagedリソースの解放();
@@ -1048,6 +1076,11 @@ namespace TJAPlayer3
 
 						Dan_Plate?.t2D中心基準描画(TJAPlayer3.app.Device, 138, 220);
 
+						CActSelect段位リスト.tDisplayDanPlate(Dan_Plate,
+							TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行],
+							138,
+							220);
+
 						#endregion
 
 						#region [Charts Individual Results]
@@ -1055,11 +1088,8 @@ namespace TJAPlayer3
 						for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                         {
 							// To alter in order to shift the whole tab
-							int baseX = 255;
 
-							int baseY = 100 + 183 * i;
-
-							TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
+							ftDanDisplaySongInfo(i);
 						}
 
 						#endregion
@@ -1313,6 +1343,43 @@ namespace TJAPlayer3
 			return 0;
 		}
 
+
+        #region [Dan result individual song information]
+
+        private void ftDanDisplaySongInfo(int i)
+        {
+			int baseX = 255;
+
+			int baseY = 100 + 183 * i;
+
+			var song = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i];
+
+			// TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 377, 180 + i * 73, new Rectangle(song.Difficulty * 53, 0, 53, 53));
+
+			TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
+
+			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, baseX + 122, baseY + 46, new Rectangle(song.Difficulty * 53, 0, 53, 53));
+
+			TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(baseX + 128, baseY + 73, song.Level.ToString());
+
+			string[] scoresArr =
+			{
+				TJAPlayer3.stage演奏ドラム画面.n良[i].ToString(),
+				TJAPlayer3.stage演奏ドラム画面.n可[i].ToString(),
+				TJAPlayer3.stage演奏ドラム画面.n不可[i].ToString(),
+				TJAPlayer3.stage演奏ドラム画面.n連打[i].ToString()
+			};
+
+			for (int j = 0; j < 4; j++)
+				this.actParameterPanel.t小文字表示(baseX + 200 + 211 * j, baseY + 104, string.Format("{0,4:###0}", scoresArr[j]));
+
+			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.app.Device, baseX + 146, baseY + 39);
+
+		}
+
+		#endregion
+
+
 		public void t後処理()
         {
 
@@ -1401,30 +1468,6 @@ namespace TJAPlayer3
 						int actualPlayer = TJAPlayer3.SaveFile;
 
 						int tmpClear = GetTowerScoreRank();
-
-						/*
-						double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
-
-						// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
-						bool[] conditions =
-						{
-							progress >= 0.1,
-							progress >= 0.25,
-							progress >= 0.5,
-							progress >= 0.75,
-							progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-							this.st演奏記録.Drums.nMiss数 == 0,
-							this.st演奏記録.Drums.nGreat数 == 0
-						};
-
-						for (int i = 0; i < conditions.Length; i++)
-						{
-							if (conditions[i] == true)
-								tmpClear++;
-							else
-								break;
-						}
-						*/
 
 						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 						{
@@ -1548,6 +1591,8 @@ namespace TJAPlayer3
 
 		// Dan informations
 		private CTexture Dan_Plate;
+		private TitleTextureKey[] ttkDanTitles;
+		private CPrivateFastFont pfDanTitles;
 
 		// Tower informations
 		private CCounter ctTower_Animation;
