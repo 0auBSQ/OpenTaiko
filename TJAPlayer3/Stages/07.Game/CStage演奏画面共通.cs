@@ -391,7 +391,11 @@ namespace TJAPlayer3
         public void ftDanReSetBranches(bool hasBranches)
         {
             this.tBranchReset(0);
-            TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.b譜面分岐[(int)Difficulty.Dan] = hasBranches;
+
+            TJAPlayer3.stage演奏ドラム画面.nレーン用表示コース[0] = CDTX.ECourse.eNormal;
+            TJAPlayer3.stage演奏ドラム画面.bUseBranch[0] = hasBranches;
+
+            // TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.b譜面分岐[(int)Difficulty.Dan] = hasBranches;
         }
 
 
