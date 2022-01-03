@@ -374,6 +374,27 @@ namespace TJAPlayer3
             this.ListDan_Number = 0;
             this.IsDanFailed = false;
 		}
+
+
+        public void ftDanReSetScoreNiji(int songNotes, int ballons)
+        {
+            if (songNotes == 0 && ballons == 0)
+            {
+                nAddScoreNiji[0] = 1000000;
+            }
+            else
+            {
+                nAddScoreNiji[0] = (double)Math.Ceiling((decimal)(1000000 - (ballons * 100)) / songNotes / 10) * 10;
+            }
+        }
+
+        public void ftDanReSetBranches(bool hasBranches)
+        {
+            this.tBranchReset(0);
+            TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.b譜面分岐[(int)Difficulty.Dan] = hasBranches;
+        }
+
+
 		public override void On非活性化()
 		{
             this.bgmlength = 1;

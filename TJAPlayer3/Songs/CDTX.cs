@@ -1246,14 +1246,20 @@ namespace TJAPlayer3
         private bool bMOVIEOFFSETの値がマイナスである = false;
         private double dbNowBPM = 120.0;
         private int nDELAY = 0;
+
         public bool[] bHasBranch = new bool[(int)Difficulty.Total] { false, false, false, false, false, false, false };
+
+        public bool[] bHasBranchDan = new bool[1] { false };
 
         //分岐関連
         private ECourse n現在のコース = ECourse.eNormal;
 
         private bool b最初の分岐である;
         public int[] nノーツ数 = new int[4]; //3:共通
+        
         public int[] nDan_NotesCount = new int[1];
+        // public int[] nDan_BallonCount = new int[1];
+
         public int[] nノーツ数_Branch = new int[4]; //
         public CChip[] pDan_LastChip;
         public int[] n風船数 = new int[4]; //0～2:各コース 3:共通
@@ -4073,6 +4079,9 @@ namespace TJAPlayer3
 
                 this.listWAV[1].strファイル名 = "";
 
+                Array.Resize(ref bHasBranchDan, List_DanSongs.Count);
+                bHasBranchDan[bHasBranchDan.Length - 1] = false; 
+
                 // チップを配置。
                 this.listChip.Add(nextSongnextSongChip);
 
@@ -4505,12 +4514,19 @@ namespace TJAPlayer3
                                     //風船はこのままでも機能しているので何もしない.
 
                                     if (this.b最初の分岐である == false)
+                                    {
                                         this.n風船数[(int)this.n現在のコース]++;
+                                    }
                                     else
+                                    {
                                         this.n風船数[3]++;
+                                    }
+                                        
                                 }
                                 
                                 Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
+                                // Array.Resize(ref nDan_BallonCount, nDan_BallonCount.Length + 1);
+
                                 this.listChip.Add(chip);
 
                                 if(IsEndedBranching)
@@ -4804,6 +4820,11 @@ namespace TJAPlayer3
                 //本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
                 //Lengthのチェックをされる前ににif文を入れています。
                 this.bHasBranch[this.n参照中の難易度] = true;
+
+                if (this.n参照中の難易度 == (int)Difficulty.Dan)
+                {
+                    this.bHasBranchDan[this.bHasBranchDan.Length - 1] = true;
+                }
             }
 
             //まずは「:」でSplitして割り当てる。

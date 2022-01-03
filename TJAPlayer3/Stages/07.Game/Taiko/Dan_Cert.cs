@@ -76,11 +76,20 @@ namespace TJAPlayer3
             }
 
             ScreenPoint = new double[] { TJAPlayer3.Skin.nScrollFieldBGX[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, 1280 };
+
             TJAPlayer3.stage演奏ドラム画面.ReSetScore(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreInit, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
+
+            TJAPlayer3.stage演奏ドラム画面.ftDanReSetScoreNiji(TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber], 0);
+            TJAPlayer3.stage演奏ドラム画面.ftDanReSetBranches(TJAPlayer3.DTX.bHasBranchDan[NowShowingNumber]);
+
             IsAnimating = true;
+
             //段位道場
             //TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
-            TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, "段位道場", 1 + NowShowingNumber + "曲目");
+            TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, 
+                CLangManager.LangInstance.GetString(101), 
+                1 + NowShowingNumber + "曲目");
+            
             if (number == 0) Sound_Section_First?.t再生を開始する();
             else Sound_Section?.t再生を開始する();
         }
@@ -261,6 +270,8 @@ namespace TJAPlayer3
 
                     // 音源が終了したやつの分岐。
                     // ( CDTXMania.DTX.listChip.Count > 0 ) ? CDTXMania.DTX.listChip[ CDTXMania.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
+
+                    // Bug here when charts have an extra roll ?
                     if(!IsEnded[NowShowingNumber])
                     {
                         if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
@@ -501,6 +512,7 @@ namespace TJAPlayer3
             return base.On進行描画();
         }
 
+        // Regular ingame exams draw
         public void DrawExam(Dan_C[] dan_C)
         {
             int count = 0;
