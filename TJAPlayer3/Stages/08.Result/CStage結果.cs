@@ -359,7 +359,7 @@ namespace TJAPlayer3
 						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
 						// Unlock dan grade
-						if (clearValue > 0)
+						if (clearValue > 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 						{
 							TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
 								clearValue % 2 == 0,

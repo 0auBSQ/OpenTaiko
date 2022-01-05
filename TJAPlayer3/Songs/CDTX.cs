@@ -4084,7 +4084,6 @@ namespace TJAPlayer3
 
                 // チップを配置。
                 this.listChip.Add(nextSongnextSongChip);
-
             }
         }
         void t現在のチップ情報を記録する(bool bInPut)
@@ -4503,8 +4502,11 @@ namespace TJAPlayer3
                                     }
 
 
-                                    if(this.n参照中の難易度 == (int)Difficulty.Dan)
+                                    if (this.n参照中の難易度 == (int)Difficulty.Dan)
+                                    {
                                         this.nDan_NotesCount[DanSongs.Number - 1]++;
+                                    }
+                                        
 
                                     this.nノーツ数[3]++;
                                     #endregion

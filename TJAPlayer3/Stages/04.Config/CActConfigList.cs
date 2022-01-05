@@ -90,6 +90,10 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(7));
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
+			this.iDanTowerHide = new CItemToggle(CLangManager.LangInstance.GetString(10056), TJAPlayer3.ConfigIni.bDanTowerHide,
+				CLangManager.LangInstance.GetString(10056));
+			this.list項目リスト.Add(this.iDanTowerHide);
+
 			/*
 			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(8), 0, 10, TJAPlayer3.ConfigIni.nRisky,
 				CLangManager.LangInstance.GetString(9));
@@ -1269,6 +1273,7 @@ namespace TJAPlayer3
 		private CItemList iSystemSoundType;                 // #24820 2013.1.3 yyagi
 
 		private CItemList iSystemLanguage;
+		private CItemToggle iDanTowerHide;
 		
 		private CItemInteger iSystemWASAPIBufferSizeMs;		// #24820 2013.1.15 yyagi
 //		private CItemInteger iSystemASIOBufferSizeMs;		// #24820 2013.1.3 yyagi
@@ -1408,6 +1413,8 @@ namespace TJAPlayer3
 			//CDTXMania.ConfigIni.b歓声を発声する = this.iSystemAudienceSound.bON;
 			//CDTXMania.ConfigIni.eダメージレベル = (Eダメージレベル) this.iSystemDamageLevel.n現在選択されている項目番号;
 			TJAPlayer3.ConfigIni.bScoreIniを出力する = this.iSystemSaveScore.bON;
+
+			TJAPlayer3.ConfigIni.bDanTowerHide = this.iDanTowerHide.bON;
 
 		    // TJAPlayer3.ConfigIni.ApplyLoudnessMetadata = this.iSystemApplyLoudnessMetadata.bON;
 		    // TJAPlayer3.ConfigIni.TargetLoudness = this.iSystemTargetLoudness.n現在の値 / 10.0;

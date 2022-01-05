@@ -644,6 +644,9 @@ namespace TJAPlayer3
 		public E判定表示優先度 e判定表示優先度;
 		public STDGBVALUE<E判定位置> e判定位置;			// #33891 2014.6.26 yyagi
 		public bool bScoreIniを出力する;
+
+		public bool bDanTowerHide;
+
 		public bool bSTAGEFAILED有効;
 		public STDGBVALUE<bool> bSudden;
 		public bool bTight;
@@ -1323,6 +1326,9 @@ namespace TJAPlayer3
 			this.bWave再生位置自動調整機能有効 = false;
 			this.bBGM音を発声する = true;
 			this.bScoreIniを出力する = true;
+
+			this.bDanTowerHide = false;
+
 			this.bランダムセレクトで子BOXを検索対象とする = true;
 			this.n表示可能な最小コンボ数 = new STDGBVALUE<int>();
 			this.n表示可能な最小コンボ数.Drums = 10;
@@ -1750,7 +1756,10 @@ namespace TJAPlayer3
 			sw.WriteLine( "; 演奏記録（～.score.ini）の出力 (0:OFF, 1:ON)" );
 			sw.WriteLine( "SaveScoreIni={0}", this.bScoreIniを出力する ? 1 : 0 );
 			sw.WriteLine();
-            sw.WriteLine("; 最小表示コンボ数");
+			sw.WriteLine("; Hide Dan and Tower charts from the ensou song select screen (0:OFF, 1:ON)");
+			sw.WriteLine("DanTowerHide={0}", this.bDanTowerHide ? 1 : 0);
+			sw.WriteLine();
+			sw.WriteLine("; 最小表示コンボ数");
             sw.WriteLine("MinComboDrums={0}", this.n表示可能な最小コンボ数.Drums);
             sw.WriteLine();
 			sw.WriteLine( "; RANDOM SELECT で子BOXを検索対象に含める (0:OFF, 1:ON)" );
@@ -2419,6 +2428,10 @@ namespace TJAPlayer3
 											else if( str3.Equals( "SaveScoreIni" ) )
 											{
 												this.bScoreIniを出力する = C変換.bONorOFF( str4[ 0 ] );
+											}
+											else if (str3.Equals("DanTowerHide"))
+											{
+												this.bDanTowerHide = C変換.bONorOFF(str4[0]);
 											}
 											else if( str3.Equals( "RandomFromSubBox" ) )
 											{
