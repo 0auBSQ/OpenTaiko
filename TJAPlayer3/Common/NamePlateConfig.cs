@@ -54,8 +54,10 @@ namespace TJAPlayer3
 
         #region [Dan titles]
 
-        public void tUpdateDanTitle(string title, bool isGold, int clearStatus, int player)
+        public bool tUpdateDanTitle(string title, bool isGold, int clearStatus, int player)
         {
+            bool changed = false;
+
             bool iG = isGold;
             int cs = clearStatus;
 
@@ -72,20 +74,25 @@ namespace TJAPlayer3
 
             // Automatically set the dan to nameplate if new
             // Add a function within the NamePlate.cs file to update the title texture 
-            /*
+
             if (!TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title) || cs != clearStatus || iG != isGold)
             {
+                changed = true;
+                /*
                 TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
                 TJAPlayer3.NamePlateConfig.data.DanGold[player] = iG;
                 TJAPlayer3.NamePlateConfig.data.DanType[player] = cs;
+                */
             }
-            */
+
 
             CDanTitle danTitle = new CDanTitle(iG, cs);
 
             TJAPlayer3.NamePlateConfig.data.DanTitles[player][title] = danTitle;
 
             tSaveFile();
+
+            return changed;
         }
 
         #endregion
