@@ -212,6 +212,10 @@ namespace TJAPlayer3
             [10053] = "Draw PuchiChara",
             [10054] = "Current Skin",
             [10055] = "System Key Config",
+            [10056] = "Hide Dan/Tower",
+            [10057] = "Hide Dan and Tower charts\nin the Taiko Mode menu.\n" +
+                    "Note: Reload songs to make\n" +
+                "     the setting take effect.",
             [10084] = "Shin'uchi Mode",
 
             [100] = "Taiko Mode",
