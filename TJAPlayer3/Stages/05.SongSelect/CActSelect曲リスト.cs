@@ -2475,7 +2475,7 @@ namespace TJAPlayer3
 				TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = _resize;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = _resize;
-				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(334 * grade, 0, 334, 334));
+				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(334 * (grade + 1), 0, 334, 334));
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
 			}

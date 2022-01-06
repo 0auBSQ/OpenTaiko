@@ -1104,6 +1104,9 @@ namespace TJAPlayer3
 
 						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
 
+						TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
+						TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
+
 						if (examStatus != Exam.Status.Failure)
                         {
 							int successType = 0;
@@ -1120,10 +1123,13 @@ namespace TJAPlayer3
 									comboType += 1;
 							}
 
-							TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
-							TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
-							TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(334 * (2 * comboType + successType), 0, 334, 334));
+							
+							TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(334 * (2 * comboType + successType + 1), 0, 334, 334));
 
+						}
+						else
+                        {
+							TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(0, 0, 334, 334));
 						}
 
 						#endregion
@@ -1250,17 +1256,17 @@ namespace TJAPlayer3
 					this.bアニメが完了 = false;
 				}
 
-				#region ネームプレート
+				#region Nameplate
+
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 				{
-					// To change while implementing the 2P result screen
 					int pos = i;
 					if (TJAPlayer3.P1IsBlue() && TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower)
 						pos = 1;
 
 					TJAPlayer3.NamePlate.tNamePlateDraw((pos == 1) ? 1280 - 28 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 28, 621, i);
-					// TJAPlayer3.NamePlate.tNamePlateDraw(28, 621, i);
 				}
+
 				#endregion
 
 				if (base.eフェーズID == CStage.Eフェーズ.共通_フェードイン)
@@ -1299,7 +1305,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							actFI.tフェードアウト開始();
 							
-							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+							if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 								if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
 									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
 
@@ -1320,7 +1326,7 @@ namespace TJAPlayer3
                             {
 								actFI.tフェードアウト開始();
 
-								if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+								if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)//  TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 									if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
 										TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
 
@@ -1385,7 +1391,7 @@ namespace TJAPlayer3
 
 			if (!b最近遊んだ曲追加済み)
 			{
-				#region [ 選曲画面の譜面情報の更新 ]
+				#region [ Apply new local status for song select screens ]
 				//---------------------
 				if (!TJAPlayer3.bコンパクトモード)
 				{
@@ -1560,9 +1566,6 @@ namespace TJAPlayer3
 		private CActオプションパネル actOption;
 		private CActResultParameterPanel actParameterPanel;
 
-		private CActResultRank actRank;
-		private CActResultImage actResultImage;
-
 		private CActResultSongBar actSongBar;
 		private bool bアニメが完了;
 		private bool bIsCheckedWhetherResultScreenShouldSaveOrNot;              // #24509 2011.3.14 yyagi
@@ -1606,16 +1609,9 @@ namespace TJAPlayer3
 		private CPrivateFastFont pfTowerText;
 		private CPrivateFastFont pfTowerText48;
 		private CPrivateFastFont pfTowerText72;
-		private int TowerScoreRank;
 
 		// Don medals information 
 		private int[] nEarnedMedalsCount = { 0, 0 };
-
-		private CCounter ctAutoReturn;
-		//private CTexture txオプションパネル;
-		//private CTexture tx下部パネル;
-		//private CTexture tx上部パネル;
-		//private CTexture tx背景;
 
 		#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
 		/// <summary>

@@ -215,7 +215,7 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.20f;
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.20f;
-                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(334 * currentRank, 0, 334, 334));
+                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(334 * (currentRank + 1), 0, 334, 334));
                 }
 
                 #endregion
@@ -356,7 +356,7 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.8f;
                 TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.8f;
-                TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 422, new Rectangle(334 * currentRank, 0, 334, 334));
+                TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 422, new Rectangle(334 * (currentRank + 1), 0, 334, 334));
             }
 
             #endregion
