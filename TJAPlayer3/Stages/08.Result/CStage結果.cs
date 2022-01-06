@@ -1537,7 +1537,7 @@ namespace TJAPlayer3
 
 			#region [ Display exams ]
 
-			TJAPlayer3.stage演奏ドラム画面.actDan.DrawExam(TJAPlayer3.stage演奏ドラム画面.actDan.GetExam(), true);
+			TJAPlayer3.stage演奏ドラム画面.actDan.DrawExam(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C, true, offset);
 
 			#endregion
 		}
