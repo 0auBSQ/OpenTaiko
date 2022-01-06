@@ -1073,11 +1073,12 @@ namespace TJAPlayer3
 						**	1600 => Dan plate 
 						**  3200 + 300 * count => Songs display
 						**  5500 + 300 * count => Exams plate display
-						**	7000 + 300 * count => Goukaku/Fugoukaku display => Step 2 (Prompt the user to tap enter and let them swaping between informations hitting kas)
+						**	8200 + 300 * count => Goukaku/Fugoukaku display => Step 2 (Prompt the user to tap enter and let them swaping between informations hitting kas)
+						**  ??? => Success/Fail animation
 						*/
 						if (ctPhase1 == null)
                         {
-							ctPhase1 = new CCounter(0, 7000 + songCount * 300, 0.5f, TJAPlayer3.Timer);
+							ctPhase1 = new CCounter(0, 8200 + songCount * 300, 0.5f, TJAPlayer3.Timer);
 							ctPhase1.n現在の値 = 0;
 						}
 							
@@ -1133,7 +1134,7 @@ namespace TJAPlayer3
 						if (ctPhase2 != null && examsShift != 0)
 							examsOffset = (examsShift < 0) ? 1280 - ctPhase2.n現在の値 : ctPhase2.n現在の値;
 						else if (ctPhase1.b終了値に達してない)
-							examsOffset = Math.Max(0, 5500 + 300 * songCount - ctPhase1.n現在の値);
+							examsOffset = Math.Max(0, 5500 + 300 * songCount - ctPhase1.n現在の値) * 2;
 
 						ftDanDisplayExamInfo(examsOffset);
 
@@ -1143,7 +1144,7 @@ namespace TJAPlayer3
 
 						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
 
-						int unitsBeforeAppearance = Math.Max(0, 7000 + 300 * songCount - ctPhase1.n現在の値);
+						int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.n現在の値);
 
 						if (unitsBeforeAppearance <= 270)
                         {
@@ -1174,7 +1175,7 @@ namespace TJAPlayer3
 
 								#endregion
 
-								#region [ Goukaku plate type calculus]
+								#region [ Goukaku plate type calculus ]
 
 								int successType = 0;
 
@@ -1487,18 +1488,66 @@ namespace TJAPlayer3
 		private void ftDanDisplayExamInfo(int offset = 0)
         {
 			int baseX = offset;
-			int baseY = 0;
+			int baseY = -4;
 
 			TJAPlayer3.Tx.DanResult_StatePanel_Base.t2D描画(TJAPlayer3.app.Device, baseX, baseY);
 			TJAPlayer3.Tx.DanResult_StatePanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY);
+
+			#region [ Global scores ]
+
+			int smoothBaseX = baseX;
+			int smoothBaseY = 0;
+
+			int totalHit = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat
+				+ TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood
+				+ TJAPlayer3.stage演奏ドラム画面.GetRoll(0);
+
+			string[] scoresArr = 
+			{
+				TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0).ToString(),
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat.ToString(),
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood.ToString(),
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss.ToString(),
+				TJAPlayer3.stage演奏ドラム画面.GetRoll(0).ToString(),
+				TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0].ToString(),
+				totalHit.ToString()
+			};
+
+			var totalZahyou = new Point[]
+			{
+				new Point(smoothBaseX + 584, smoothBaseY + 124),
+				new Point(smoothBaseX + 842, smoothBaseY + 106),
+				new Point(smoothBaseX + 842, smoothBaseY + 148),
+				new Point(smoothBaseX + 842, smoothBaseY + 190),
+				new Point(smoothBaseX + 1144, smoothBaseY + 106),
+				new Point(smoothBaseX + 1144, smoothBaseY + 148),
+				new Point(smoothBaseX + 1144, smoothBaseY + 190),
+			};
+
+			// Small digits
+			for (int i = 1; i < 7; i++)
+            {
+				this.actParameterPanel.t小文字表示(totalZahyou[i].X - 122, totalZahyou[i].Y - 11, string.Format("{0,5:####0}", scoresArr[i]));
+			}
+
+			// Large digits
+			this.actParameterPanel.tスコア文字表示(totalZahyou[0].X - 18, totalZahyou[0].Y - 5, string.Format("{0,7:######0}", scoresArr[0]));
+
+			#endregion
+
+			#region [ Display exams ]
+
+			TJAPlayer3.stage演奏ドラム画面.actDan.DrawExam(TJAPlayer3.stage演奏ドラム画面.actDan.GetExam(), true);
+
+			#endregion
 		}
 
-		#endregion
+        #endregion
 
 
-		#region [Dan result individual song information]
+        #region [Dan result individual song information]
 
-		private void ftDanDisplaySongInfo(int i, int offset = 0)
+        private void ftDanDisplaySongInfo(int i, int offset = 0)
         {
 			int baseX = 255 + offset;
 			int baseY = 100 + 183 * i;

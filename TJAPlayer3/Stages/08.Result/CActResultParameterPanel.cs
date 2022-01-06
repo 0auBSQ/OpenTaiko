@@ -921,7 +921,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		protected void tスコア文字表示(int x, int y, string str)
+		public void tスコア文字表示(int x, int y, string str)
 		{
 			foreach (char ch in str)
 			{

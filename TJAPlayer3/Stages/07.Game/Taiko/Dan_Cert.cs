@@ -513,7 +513,7 @@ namespace TJAPlayer3
         }
 
         // Regular ingame exams draw
-        public void DrawExam(Dan_C[] dan_C)
+        public void DrawExam(Dan_C[] dan_C, bool isResult = false)
         {
             int count = 0;
             int countNoGauge = 0;
@@ -538,7 +538,8 @@ namespace TJAPlayer3
                 if (dan_C[i] == null || dan_C[i].GetEnable() != true)
                     continue ;
 
-                if (dan_C[i].GetExamType() != Exam.Type.Gauge)
+                if (dan_C[i].GetExamType() != Exam.Type.Gauge
+                    || isResult)
                 {
                     currentPosition++;
 
@@ -548,9 +549,19 @@ namespace TJAPlayer3
                     // Y index of the gauge
                     int yIndex = (currentPosition % 3) + 1;
 
+                    // Specific case for gauge
+                    if (dan_C[i].GetExamType() == Exam.Type.Gauge)
+                        yIndex = -1;
+
+                    // Panel origin
+                    int xOrigin = (isResult) ? 236 : TJAPlayer3.Skin.Game_DanC_X[1];
+                    int yOrigin = (isResult) ? 306 : TJAPlayer3.Skin.Game_DanC_Y[1];
+
                     // Origin position which will be used as a reference for bar elements
-                    int barXOffset = TJAPlayer3.Skin.Game_DanC_X[1] + (currentPosition >= 3 ? 503 : 0);
-                    int barYOffset = TJAPlayer3.Skin.Game_DanC_Y[1] + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    int barXOffset = xOrigin + (currentPosition >= 3 ? 503 : 0);
+                    int barYOffset = yOrigin + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    
+                    // Small bar
                     int lowerBarYOffset = barYOffset + TJAPlayer3.Skin.Game_DanC_Size[1] + TJAPlayer3.Skin.Game_DanC_Padding;
 
                     // Skin X : 70
