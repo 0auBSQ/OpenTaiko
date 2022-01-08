@@ -3108,6 +3108,8 @@ namespace TJAPlayer3
                                         IsDanFailed = true;
                                         return true;
                                     }
+
+                                    // Play next song here
                                     this.actDan.Start(this.ListDan_Number);
                                     ListDan_Number++;
                                 }

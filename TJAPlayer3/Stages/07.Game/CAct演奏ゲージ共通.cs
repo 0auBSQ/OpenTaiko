@@ -211,24 +211,12 @@ namespace TJAPlayer3
 
             double nGaugeRankValue = 0D;
             double[] nGaugeRankValue_branch = new double[] { 0D, 0D, 0D };
-            /*
-            if (this.DTX[nPlayer].GaugeIncreaseMode == GaugeIncreaseMode.Normal)
+
+            nGaugeRankValue = 10000.0f / dbGaugeMaxComboValue;
+            for (int i = 0; i < 3; i++)
             {
-                nGaugeRankValue = Math.Floor(10000.0f / dbGaugeMaxComboValue);
-                for (int i = 0; i < 3; i++)
-                {
-                    nGaugeRankValue_branch[i] = Math.Floor(10000.0f / dbGaugeMaxComboValue_branch[i]);
-                }
+                nGaugeRankValue_branch[i] = 10000.0f / dbGaugeMaxComboValue_branch[i];
             }
-            else
-            {
-                */
-                nGaugeRankValue = 10000.0f / dbGaugeMaxComboValue;
-                for (int i = 0; i < 3; i++)
-                {
-                    nGaugeRankValue_branch[i] = 10000.0f / dbGaugeMaxComboValue_branch[i];
-                }
-            // }
 
             //ゲージ値計算
             //実機に近い計算

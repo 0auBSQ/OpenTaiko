@@ -131,15 +131,6 @@ namespace TJAPlayer3
                 this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
             }
 
-
-            /*
-            for (int i = 0; i < CExamInfo.cMaxExam; i++)
-            {
-                if (Challenge[i] != null && Challenge[i].GetEnable() == true)
-                    this.ExamCount++;
-            }
-            */
-
             NowCymbolShowingNumber = 0;
             bExamChangeCheck = false;
 
@@ -162,6 +153,8 @@ namespace TJAPlayer3
             for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 if (Challenge[i] == null || !Challenge[i].GetEnable()) continue;
+                if (ExamChange[i] && Challenge[i] != TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i]) continue;
+
                 var oldReached = Challenge[i].GetReached();
                 var isChangedAmount = false;
 
