@@ -221,6 +221,10 @@ namespace TJAPlayer3
             [10053] = "Mostrar Puchi-Chara",
             [10054] = "Skin (Full)",
             [10055] = "Teclas del sistema",
+            [10056] = "Ocultar Dans/Torres",
+            [10057] = "Ocultar charts de Dans y torres\nen el menú de Modo Taiko.\n" +
+                    "Nota: Recarga las canciones para\n" +
+                "     aplicar los cambios.",
             [10084] = "Modo Shinuchi",
 
             [100] = "Modo Taiko",
