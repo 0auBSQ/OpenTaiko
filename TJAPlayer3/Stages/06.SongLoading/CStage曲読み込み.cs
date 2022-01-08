@@ -367,8 +367,12 @@ namespace TJAPlayer3
 
 				TJAPlayer3.Tx.SongLoading_Bg_Dan.t2D描画(TJAPlayer3.app.Device, 0, 0 - (ct待機.n現在の値 <= 600 ? ct待機.n現在の値 / 10f : 60));
 
-				CActSelect段位リスト.tDisplayDanPlate(TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate,
-					TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行], 
+				CTexture dp = (TJAPlayer3.stage段位選択.段位リスト.stバー情報 != null)
+					? TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate
+					: null;
+
+				CActSelect段位リスト.tDisplayDanPlate(dp,
+					null, 
 					1121, 
 					213);
 

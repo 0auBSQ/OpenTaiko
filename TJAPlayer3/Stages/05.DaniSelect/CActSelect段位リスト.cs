@@ -270,7 +270,7 @@ namespace TJAPlayer3
 
         static CPrivateFastFont pfDanPlateTitle = null;
 
-        public static void tDisplayDanPlate(CTexture givenPlate, STバー情報 songNode, int x, int y)
+        public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y)
         {
             if (givenPlate != null)
             {
@@ -280,8 +280,18 @@ namespace TJAPlayer3
             else
             {
                 // Default Dan Plate
-                int danTick = songNode.nDanTick;
-                Color danTickColor = songNode.cDanTickColor;
+
+                int danTick = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.nDanTick;
+                Color danTickColor = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.cDanTickColor;
+
+                if (songNode != null)
+                {
+                    STバー情報 stNode = (STバー情報)songNode;
+
+                    danTick = stNode.nDanTick;
+                    danTickColor = stNode.cDanTickColor;
+                }
+                
 
                 int unit = TJAPlayer3.Tx.Dani_DanPlates.szテクスチャサイズ.Width / 6;
 
@@ -300,7 +310,16 @@ namespace TJAPlayer3
                 if (pfDanPlateTitle == null)
                     pfDanPlateTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 60);
 
-                TitleTextureKey ttkTmp = new TitleTextureKey(songNode.ttkタイトル[songNode.ttkタイトル.Length - 1].str文字, pfDanPlateTitle, Color.White, Color.Black, 1000);
+                string titleTmp = TJAPlayer3.stage選曲.r確定された曲.strタイトル;
+
+                if (songNode != null)
+                {
+                    STバー情報 stNode = (STバー情報)songNode;
+
+                    titleTmp = stNode.ttkタイトル[stNode.ttkタイトル.Length - 1].str文字;
+                }
+
+                TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp, pfDanPlateTitle, Color.White, Color.Black, 1000);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x, y - 50);
             }
         }

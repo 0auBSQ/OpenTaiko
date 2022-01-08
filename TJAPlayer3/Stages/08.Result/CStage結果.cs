@@ -1110,7 +1110,7 @@ namespace TJAPlayer3
 						int plateOffset = Math.Max(0, 1600 - ctPhase1.n現在の値) * 2;
 
 						CActSelect段位リスト.tDisplayDanPlate(Dan_Plate,
-							TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行],
+							null,
 							138,
 							220 - plateOffset);
 
@@ -1213,7 +1213,7 @@ namespace TJAPlayer3
 
 								#endregion
 
-								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380 - (unitsBeforeAppearance / 3f), new Rectangle(0, 0, 334, 334));
+								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380 - (unitsBeforeAppearance / 10f), new Rectangle(0, 0, 334, 334));
 
 								#endregion
 							}

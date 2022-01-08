@@ -428,7 +428,7 @@ namespace TJAPlayer3
                                 for (int i = 0; i < CExamInfo.cMaxExam; i++)
                                     ExamChange[i] = false;
 
-                                for (int j = 0; j < CExamInfo.cMaxExam; j++)  // EXAM1 check for individual conditions added back, so gauge can be EXAM2, 5, 7 whatever
+                                for (int j = 0; j < CExamInfo.cMaxExam; j++)
                                 {
                                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                                     {
@@ -491,7 +491,7 @@ namespace TJAPlayer3
             #region [Dan Plate]
 
             CActSelect段位リスト.tDisplayDanPlate(Dan_Plate, 
-                TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行], 
+                null, 
                 TJAPlayer3.Skin.Game_DanC_Dan_Plate[0], 
                 TJAPlayer3.Skin.Game_DanC_Dan_Plate[1]);
 
