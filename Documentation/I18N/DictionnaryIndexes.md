@@ -159,6 +159,8 @@
 10053 : "Show petit-character image" option title
 10054 : "Change skin" option title
 10055 : "System key input configuration" option title
+10056 : "Hide Dan/Tower" option title
+10057 : "Hide Dan/Tower" description
 10084 : "Shin-uchi toggle" option title
 
 # Main Menu text (001XX)

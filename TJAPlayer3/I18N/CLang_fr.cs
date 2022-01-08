@@ -202,6 +202,10 @@ namespace TJAPlayer3
             [10053] = "Afficher les PuchiCharas",
             [10054] = "Skin actuel",
             [10055] = "Touches systeme",
+            [10056] = "Masquer Dan/Tour",
+            [10057] = "Masque les sons de type Dan ou\nTour dans le menu Partie rapide.\n" +
+            "Note: Cette option prend effet\n" +
+                "     après le rechargement des sons.",
             [10084] = "Mode Shin'uchi",
 
 

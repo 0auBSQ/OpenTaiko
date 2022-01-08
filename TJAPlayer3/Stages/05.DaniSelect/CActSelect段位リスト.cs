@@ -215,7 +215,7 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.20f;
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.20f;
-                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(334 * currentRank, 0, 334, 334));
+                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(334 * (currentRank + 1), 0, 334, 334));
                 }
 
                 #endregion
@@ -270,7 +270,7 @@ namespace TJAPlayer3
 
         static CPrivateFastFont pfDanPlateTitle = null;
 
-        public static void tDisplayDanPlate(CTexture givenPlate, STバー情報 songNode, int x, int y)
+        public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y)
         {
             if (givenPlate != null)
             {
@@ -280,8 +280,18 @@ namespace TJAPlayer3
             else
             {
                 // Default Dan Plate
-                int danTick = songNode.nDanTick;
-                Color danTickColor = songNode.cDanTickColor;
+
+                int danTick = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.nDanTick;
+                Color danTickColor = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.cDanTickColor;
+
+                if (songNode != null)
+                {
+                    STバー情報 stNode = (STバー情報)songNode;
+
+                    danTick = stNode.nDanTick;
+                    danTickColor = stNode.cDanTickColor;
+                }
+                
 
                 int unit = TJAPlayer3.Tx.Dani_DanPlates.szテクスチャサイズ.Width / 6;
 
@@ -300,7 +310,16 @@ namespace TJAPlayer3
                 if (pfDanPlateTitle == null)
                     pfDanPlateTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 60);
 
-                TitleTextureKey ttkTmp = new TitleTextureKey(songNode.ttkタイトル[songNode.ttkタイトル.Length - 1].str文字, pfDanPlateTitle, Color.White, Color.Black, 1000);
+                string titleTmp = TJAPlayer3.stage選曲.r確定された曲.strタイトル;
+
+                if (songNode != null)
+                {
+                    STバー情報 stNode = (STバー情報)songNode;
+
+                    titleTmp = stNode.ttkタイトル[stNode.ttkタイトル.Length - 1].str文字;
+                }
+
+                TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp, pfDanPlateTitle, Color.White, Color.Black, 1000);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x, y - 50);
             }
         }
@@ -356,7 +375,7 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.8f;
                 TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.8f;
-                TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 422, new Rectangle(334 * currentRank, 0, 334, 334));
+                TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll + 173 + Anime, 422, new Rectangle(334 * (currentRank + 1), 0, 334, 334));
             }
 
             #endregion

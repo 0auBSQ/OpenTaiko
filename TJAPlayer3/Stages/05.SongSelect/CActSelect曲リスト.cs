@@ -63,6 +63,11 @@ namespace TJAPlayer3
 			private set;
 		}
 
+		public void ResetSongIndex()
+        {
+			this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[0];
+		}
+
 		public int nスクロールバー相対y座標
 		{
 			get;
@@ -1884,7 +1889,7 @@ namespace TJAPlayer3
 									int xOffset = (diff - 5) * 244;
 
 									TJAPlayer3.Tx.SongSelect_Frame_Score[1].t2D下中央基準描画(TJAPlayer3.app.Device, 494
-										 - 31, TJAPlayer3.Skin.SongSelect_Overall_Y + 465, new Rectangle(122 * xOffset, 0, 122, 360));
+										 - 31, TJAPlayer3.Skin.SongSelect_Overall_Y + 465, new Rectangle(xOffset, 0, 122, 360));
 
 									if (avaliable)
 										t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff] < 10 ? 497
@@ -1969,7 +1974,8 @@ namespace TJAPlayer3
 						break;
 				}
 
-				if (TJAPlayer3.Tx.SongSelect_Branch_Text != null && TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.b譜面分岐[TJAPlayer3.stage選曲.n現在選択中の曲の難易度])
+				if (TJAPlayer3.Tx.SongSelect_Branch_Text != null 
+					&& TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.b譜面分岐[TJAPlayer3.stage選曲.n現在選択中の曲の難易度])
 					TJAPlayer3.Tx.SongSelect_Branch_Text.t2D描画(TJAPlayer3.app.Device, 483, TJAPlayer3.Skin.SongSelect_Overall_Y + 21);
 
 			}
@@ -2290,7 +2296,9 @@ namespace TJAPlayer3
 			for( int i = 0; i < 4; i++ )
 				song = this.r前の曲( song );
 
-			for( int i = 0; i < 9; i++ )
+			//
+
+			for ( int i = 0; i < 9; i++ )
 			{
 				this.stバー情報[ i ].strタイトル文字列 = song.strタイトル;
                 this.stバー情報[ i ].strジャンル = song.strジャンル;
@@ -2474,7 +2482,7 @@ namespace TJAPlayer3
 				TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = _resize;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = _resize;
-				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(334 * grade, 0, 334, 334));
+				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(334 * (grade + 1), 0, 334, 334));
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
 				TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
 			}

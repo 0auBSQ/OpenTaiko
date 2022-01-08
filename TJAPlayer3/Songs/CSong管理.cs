@@ -1020,13 +1020,16 @@ namespace TJAPlayer3
 
 			foreach (C曲リストノード c曲リストノード in list曲ルート)
 			{
-				if(c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
+				if (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
 					// Dojo node removed here, add an option soonish to put it off
 
-					if (c曲リストノード.strタイトル == "段位道場")
+					if (c曲リストノード.strジャンル == "段位道場")
 					{
-						list曲ルート.Remove(c曲リストノード);
+						if (TJAPlayer3.ConfigIni.bDanTowerHide)
+							list曲ルート.Remove(c曲リストノード);
+
+						// Add to dojo
 						for (int i = 0; i < c曲リストノード.list子リスト.Count; i++)
 						{
 							if(c曲リストノード.list子リスト[i].eノード種別 == C曲リストノード.Eノード種別.SCORE)
@@ -1043,7 +1046,10 @@ namespace TJAPlayer3
 							if(c曲リストノード.list子リスト[i].arスコア[6] != null)
 							{
 								list曲ルート_Dan.Add(c曲リストノード.list子リスト[i]);
-								c曲リストノード.list子リスト.Remove(c曲リストノード.list子リスト[i]);
+
+								if (TJAPlayer3.ConfigIni.bDanTowerHide)
+									c曲リストノード.list子リスト.Remove(c曲リストノード.list子リスト[i]);
+								
 								continue;
 							}
                         }
@@ -1051,12 +1057,16 @@ namespace TJAPlayer3
 				}
                 else
 				{
+					// ???????
+
+					/*
 					if (c曲リストノード.arスコア[5] != null)
 					{
 						c曲リストノード.list子リスト.Remove(c曲リストノード);
 						list曲ルート_Dan.Add(c曲リストノード);
 						continue;
 					}
+					*/
 				}
 			}
 

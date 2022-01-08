@@ -76,11 +76,20 @@ namespace TJAPlayer3
             }
 
             ScreenPoint = new double[] { TJAPlayer3.Skin.nScrollFieldBGX[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, 1280 };
+
             TJAPlayer3.stage演奏ドラム画面.ReSetScore(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreInit, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
+
+            TJAPlayer3.stage演奏ドラム画面.ftDanReSetScoreNiji(TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber], 0);
+            TJAPlayer3.stage演奏ドラム画面.ftDanReSetBranches(TJAPlayer3.DTX.bHasBranchDan[NowShowingNumber]);
+
             IsAnimating = true;
+
             //段位道場
             //TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
-            TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, "段位道場", 1 + NowShowingNumber + "曲目");
+            TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, 
+                CLangManager.LangInstance.GetString(101), 
+                1 + NowShowingNumber + "曲目");
+            
             if (number == 0) Sound_Section_First?.t再生を開始する();
             else Sound_Section?.t再生を開始する();
         }
@@ -122,15 +131,6 @@ namespace TJAPlayer3
                 this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
             }
 
-
-            /*
-            for (int i = 0; i < CExamInfo.cMaxExam; i++)
-            {
-                if (Challenge[i] != null && Challenge[i].GetEnable() == true)
-                    this.ExamCount++;
-            }
-            */
-
             NowCymbolShowingNumber = 0;
             bExamChangeCheck = false;
 
@@ -153,6 +153,8 @@ namespace TJAPlayer3
             for (int i = 0; i < CExamInfo.cMaxExam; i++)
             {
                 if (Challenge[i] == null || !Challenge[i].GetEnable()) continue;
+                if (ExamChange[i] && Challenge[i] != TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[i]) continue;
+
                 var oldReached = Challenge[i].GetReached();
                 var isChangedAmount = false;
 
@@ -261,6 +263,8 @@ namespace TJAPlayer3
 
                     // 音源が終了したやつの分岐。
                     // ( CDTXMania.DTX.listChip.Count > 0 ) ? CDTXMania.DTX.listChip[ CDTXMania.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
+
+                    // Bug here when charts have an extra roll ?
                     if(!IsEnded[NowShowingNumber])
                     {
                         if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
@@ -374,15 +378,6 @@ namespace TJAPlayer3
                 Status[i].Timer_Amount?.t進行();
             }
 
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    if (Challenge[i] != null && Challenge[i].GetEnable())
-            //        CDTXMania.act文字コンソール.tPrint(0, 20 * i, C文字コンソール.Eフォント種別.白, Challenge[i].ToString());
-            //    else
-            //        CDTXMania.act文字コンソール.tPrint(0, 20 * i, C文字コンソール.Eフォント種別.白, "None");
-            //}
-            //CDTXMania.act文字コンソール.tPrint(0, 80, C文字コンソール.Eフォント種別.白, String.Format("Notes Remain: {0}", CDTXMania.DTX.nノーツ数[3] - (CDTXMania.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + CDTXMania.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect) - (CDTXMania.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + CDTXMania.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great) - (CDTXMania.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Miss + CDTXMania.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss)));
-
             // 背景を描画する。
 
             TJAPlayer3.Tx.DanC_Background?.t2D描画(TJAPlayer3.app.Device, 0, 0);
@@ -426,7 +421,7 @@ namespace TJAPlayer3
                                 for (int i = 0; i < CExamInfo.cMaxExam; i++)
                                     ExamChange[i] = false;
 
-                                for (int j = 0; j < CExamInfo.cMaxExam; j++)  // EXAM1 check for individual conditions added back, so gauge can be EXAM2, 5, 7 whatever
+                                for (int j = 0; j < CExamInfo.cMaxExam; j++)
                                 {
                                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                                     {
@@ -489,7 +484,7 @@ namespace TJAPlayer3
             #region [Dan Plate]
 
             CActSelect段位リスト.tDisplayDanPlate(Dan_Plate, 
-                TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行], 
+                null, 
                 TJAPlayer3.Skin.Game_DanC_Dan_Plate[0], 
                 TJAPlayer3.Skin.Game_DanC_Dan_Plate[1]);
 
@@ -501,7 +496,8 @@ namespace TJAPlayer3
             return base.On進行描画();
         }
 
-        public void DrawExam(Dan_C[] dan_C)
+        // Regular ingame exams draw
+        public void DrawExam(Dan_C[] dan_C, bool isResult = false, int offX = 0)
         {
             int count = 0;
             int countNoGauge = 0;
@@ -526,9 +522,11 @@ namespace TJAPlayer3
                 if (dan_C[i] == null || dan_C[i].GetEnable() != true)
                     continue ;
 
-                if (dan_C[i].GetExamType() != Exam.Type.Gauge)
+                if (dan_C[i].GetExamType() != Exam.Type.Gauge
+                    || isResult)
                 {
-                    currentPosition++;
+                    if (dan_C[i].GetExamType() != Exam.Type.Gauge)
+                        currentPosition++;
 
                     // Determines if a small bar will be used to optimise the display layout
                     bool isSmallGauge = currentPosition >= 3 || (countNoGauge > 3 && countNoGauge % 3 > currentPosition) || countNoGauge == 6;
@@ -536,9 +534,23 @@ namespace TJAPlayer3
                     // Y index of the gauge
                     int yIndex = (currentPosition % 3) + 1;
 
+                    // Specific case for gauge
+                    if (dan_C[i].GetExamType() == Exam.Type.Gauge)
+                    {
+                        yIndex = 0;
+                        isSmallGauge = false;
+                    }
+                        
+
+                    // Panel origin
+                    int xOrigin = (isResult) ? 232 + offX : TJAPlayer3.Skin.Game_DanC_X[1];
+                    int yOrigin = (isResult) ? 254 : TJAPlayer3.Skin.Game_DanC_Y[1];
+
                     // Origin position which will be used as a reference for bar elements
-                    int barXOffset = TJAPlayer3.Skin.Game_DanC_X[1] + (currentPosition >= 3 ? 503 : 0);
-                    int barYOffset = TJAPlayer3.Skin.Game_DanC_Y[1] + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    int barXOffset = xOrigin + (currentPosition >= 3 ? 503 : 0);
+                    int barYOffset = yOrigin + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    
+                    // Small bar
                     int lowerBarYOffset = barYOffset + TJAPlayer3.Skin.Game_DanC_Size[1] + TJAPlayer3.Skin.Game_DanC_Padding;
 
                     // Skin X : 70
@@ -868,7 +880,7 @@ namespace TJAPlayer3
                         lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Number_Small_Number_Offset[1],
                         numberPadding, 
                         true, 
-                        Challenge[i], 
+                        dan_C[i], 
                         numberXScale, 
                         numberYScale, 
                         (Status[i].Timer_Amount != null ? ScoreScale[Status[i].Timer_Amount.n現在の値] : 0f));
@@ -896,8 +908,8 @@ namespace TJAPlayer3
                         barXOffset + offset - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
                         lowerBarYOffset - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] - 1, 
                         (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale), 
-                        false, 
-                        Challenge[i]);
+                        false,
+                        dan_C[i]);
 
 
                     // Exam type flag
@@ -954,7 +966,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_DanC_Y[0] - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] + 64,
                         (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
                         false,
-                        Challenge[i]);
+                        dan_C[i]);
 
                     #endregion
                 }

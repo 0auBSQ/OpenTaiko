@@ -52,6 +52,12 @@ namespace TJAPlayer3
         //public static readonly string D3DXDLL = "d3dx9_42.dll";	// February 2010
         //public static readonly string D3DXDLL = "d3dx9_41.dll";	// March 2009
 
+		public static CStage latestSongSelect
+        {
+			get;
+			private set;
+        }
+
 		public static TJAPlayer3 app
 		{
 			get;
@@ -855,6 +861,8 @@ namespace TJAPlayer3
 								stage選曲.On活性化();
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage選曲;
+
+								TJAPlayer3.latestSongSelect = stage選曲;
 								//-----------------------------
 								#endregion
 								break;
@@ -865,9 +873,11 @@ namespace TJAPlayer3
 								r現在のステージ.On非活性化();
 								Trace.TraceInformation( "----------------------" );
 								Trace.TraceInformation( "■ 段位選択" );
-								stage段位選択.On活性化();
+								stage段位選択.On活性化();								
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage段位選択;
+
+								TJAPlayer3.latestSongSelect = stage段位選択;
 								//-----------------------------
 								#endregion
 								break;
@@ -1224,6 +1234,10 @@ namespace TJAPlayer3
 								//DTX.t全チップの再生停止();
 								if( DTX != null )
                                     DTX.On非活性化();
+
+								// ???
+
+								/*
 								if (stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 								{
 									Trace.TraceInformation("----------------------");
@@ -1240,12 +1254,23 @@ namespace TJAPlayer3
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stage選曲;
 								}
+								*/
+
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Return to song select menu");
+								TJAPlayer3.latestSongSelect.On活性化();
+								r直前のステージ = r現在のステージ;
+
+								// Seek latest registered song select screen
+								r現在のステージ = TJAPlayer3.latestSongSelect;
+
 								foreach ( STPlugin pg in this.listプラグイン )
 								{
 									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
 									pg.plugin.Onステージ変更();
 									Directory.SetCurrentDirectory( TJAPlayer3.strEXEのあるフォルダ );
 								}
+
 								break;
 							}
 							#endregion
@@ -1397,6 +1422,10 @@ for (int i = 0; i < 3; i++) {
 								}
 								else
 								{
+
+									// Play cancelled return screen
+
+									/*
 									if(stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 									{
 										Trace.TraceInformation("----------------------");
@@ -1413,6 +1442,15 @@ for (int i = 0; i < 3; i++) {
 										r直前のステージ = r現在のステージ;
 										r現在のステージ = stage選曲;
 									}
+									*/
+
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation("■ Return to song select menu");
+									TJAPlayer3.latestSongSelect.On活性化();
+									r直前のステージ = r現在のステージ;
+
+									// Seek latest registered song select screen
+									r現在のステージ = TJAPlayer3.latestSongSelect;
 
 									#region [ プラグイン Onステージ変更() の呼び出し ]
 									//---------------------
@@ -1579,6 +1617,10 @@ for (int i = 0; i < 3; i++) {
                             this.tガベージコレクションを実行する();
                             if ( !bコンパクトモード )
 							{
+
+								// After result screen
+
+								/*
 								if (stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 								{
 									Trace.TraceInformation("----------------------");
@@ -1595,6 +1637,16 @@ for (int i = 0; i < 3; i++) {
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stage選曲;
 								}
+								*/
+
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Return to song select menu");
+								TJAPlayer3.latestSongSelect.On活性化();
+								r直前のステージ = r現在のステージ;
+
+								// Seek latest registered song select screen
+								r現在のステージ = TJAPlayer3.latestSongSelect;
+
 								stage選曲.NowSong++;
 
 								foreach( STPlugin pg in this.listプラグイン )
