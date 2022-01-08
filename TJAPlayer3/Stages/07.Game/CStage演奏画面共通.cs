@@ -1107,11 +1107,13 @@ namespace TJAPlayer3
                 }
 
                 this.b連打中[ player ] = true;
-                if(actChara.CharaAction_Balloon_Breaking != null)
+                if(actChara.CharaAction_Balloon_Breaking[player] != null)
                 {
                     actChara.アクションタイマーリセット(player);
                     actChara.bマイどんアクション中[player] = true;
-                    actChara.CharaAction_Balloon_Breaking[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[actChara.iCurrentCharacter[player]] - 1, TJAPlayer3.Skin.Game_Chara_Balloon_Timer, TJAPlayer3.Timer);
+                    actChara.CharaAction_Balloon_Breaking[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[actChara.iCurrentCharacter[player]] - 1, 
+                        //TJAPlayer3.Skin.Game_Chara_Balloon_Timer
+                        TJAPlayer3.Skin.Characters_Balloon_Timer[actChara.iCurrentCharacter[player]], TJAPlayer3.Timer);
                    
                 }
 
@@ -1124,7 +1126,9 @@ namespace TJAPlayer3
                 {
                     this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
                 }
+                
                 this.eRollState = E連打State.balloon;
+
                 pChip.nRollCount++;
                 this.n風船残り[ player ]--;
 
@@ -1155,12 +1159,12 @@ namespace TJAPlayer3
                     //this.actChara.b風船連打中 = false;
                     pChip.b可視 = false;
                     this.actChara.bマイどんアクション中[player] = false; // 風船終了後、再生されていたアクションがされないようにするために追加。(AioiLight)
-                    if (actChara.CharaAction_Balloon_Broke != null)
+                    if (actChara.CharaAction_Balloon_Broke[player] != null)
                     {
                         actChara.アクションタイマーリセット(player);
                         actChara.bマイどんアクション中[player] = true;
                         actChara.CharaAction_Balloon_Broke[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[actChara.iCurrentCharacter[player]] - 1, TJAPlayer3.Skin.Characters_Balloon_Timer[actChara.iCurrentCharacter[player]], TJAPlayer3.Timer);
-                        if(actChara.CharaAction_Balloon_Delay != null )actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
+                        if(actChara.CharaAction_Balloon_Delay[player] != null )actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
                     }
                     this.eRollState = E連打State.none;
                 }
@@ -1329,7 +1333,9 @@ namespace TJAPlayer3
                             if (pChip.nノーツ終了時刻ms <= (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                             {
                                 this.b連打中[nPlayer] = false;
-                                //this.actChara.b風船連打中 = false;
+                                
+                                // this.actChara.b風船連打中[nPlayer] = false;
+
                                 pChip.bHit = true;
                                 pChip.IsHitted = true;
                                 break;
@@ -2848,14 +2854,25 @@ namespace TJAPlayer3
                                 if( chip現在処理中の連打チップ[ nPlayer ] != null )
                                 {
                                     chip現在処理中の連打チップ[ nPlayer ].bHit = true;
-                                    if (nPlayer == 0 && chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount && chip現在処理中の連打チップ[nPlayer].nRollCount > 0 && actChara.CharaAction_Balloon_Miss != null)
+                                    if (nPlayer == 0 
+                                        && chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount 
+                                        && chip現在処理中の連打チップ[nPlayer].nRollCount > 0 
+                                        && actChara.CharaAction_Balloon_Miss[nPlayer] != null)
                                     {
                                         if (TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[actChara.iCurrentCharacter[nPlayer]] > 0)
                                         {
                                             actChara.アクションタイマーリセット(nPlayer);
                                             actChara.bマイどんアクション中[nPlayer] = true;
-                                            actChara.CharaAction_Balloon_Miss[nPlayer] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[actChara.iCurrentCharacter[nPlayer]] - 1, TJAPlayer3.Skin.Characters_Balloon_Timer[actChara.iCurrentCharacter[nPlayer]], TJAPlayer3.Timer);
-                                            if (actChara.CharaAction_Balloon_Delay != null) actChara.CharaAction_Balloon_Delay[nPlayer] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[nPlayer]] - 1, 1, TJAPlayer3.Timer);
+
+                                            actChara.CharaAction_Balloon_Miss[nPlayer] = new CCounter(0, 
+                                                TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[actChara.iCurrentCharacter[nPlayer]] - 1, 
+                                                TJAPlayer3.Skin.Characters_Balloon_Timer[actChara.iCurrentCharacter[nPlayer]], 
+                                                TJAPlayer3.Timer);
+
+                                            if (actChara.CharaAction_Balloon_Delay != null) actChara.CharaAction_Balloon_Delay[nPlayer] = new CCounter(0, 
+                                                TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[nPlayer]] - 1, 
+                                                1, 
+                                                TJAPlayer3.Timer);
                                         }
                                     }
                                     chip現在処理中の連打チップ[nPlayer] = null;

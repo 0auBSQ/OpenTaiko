@@ -169,54 +169,6 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
                 TJAPlayer3.stage演奏ドラム画面.b連打中[player] = false;
-                //this.tEnd();
-                ////this.ct風船終了.n現在の値 = 0;
-                //if (this.ct風船終了.b進行中)
-                //{
-                //    this.ct風船終了.t進行db();
-                //    if (this.ct風船終了.b終了値に達した)
-                //    {
-                //        this.ct風船終了.t停止();
-                //        this.ct風船終了.n現在の値 = 0D;
-                //        CDTXMania.stage演奏ドラム画面.actChara.b風船連打中 = false;
-                //        CDTXMania.stage演奏ドラム画面.b連打中[player] = false;
-                //    }
-                //}
-
-                //if (this.ct風船終了.b進行中)
-                //{
-                //    int nY = 0;
-                //    int nT = 255;
-
-
-                //    if (this.ct風船終了.n現在の値 <= 10)
-                //    {
-                //        nY = (int)this.ct風船終了.n現在の値;
-                //    }
-                //    else if (this.ct風船終了.n現在の値 > 10)
-                //    {
-                //        nY = 100;
-                //    }
-                //    //else if( this.ct風船終了.n現在の値 > 800 )
-                //    {
-                //        //nY = 100;
-                //        //nT = 0;
-                //    }
-
-                //    if (CDTXMania.Tx.Chara_Balloon_Broken != null)
-                //        CDTXMania.Tx.Chara_Balloon_Broken.t2D描画(CDTXMania.app.Device, 240, 140 - nY);
-                //    //this.txキャラクター_風船終了.n透明度 = nT;
-                //    CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.赤, this.ct風船終了.n現在の値.ToString() );
-
-                    
-                //}
-                //if (!this.ct風船終了.b終了値に達してないdb)
-                //{
-                //    //CDTXMania.stage演奏ドラム画面.actChara.b風船連打中 = false;
-                //    //CDTXMania.stage演奏ドラム画面.b連打中[player] = false;
-                //}
-                ////CDTXMania.stage演奏ドラム画面.actChara.b風船連打中 = false;
-
 
             }
 

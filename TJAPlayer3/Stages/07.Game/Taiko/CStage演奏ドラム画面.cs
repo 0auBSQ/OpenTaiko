@@ -206,6 +206,9 @@ namespace TJAPlayer3
             base.On活性化();
             base.eフェーズID = CStage.Eフェーズ.共通_通常状態;//初期化すれば、リザルト変遷は止まる。
 
+            ifp[0] = false;
+            ifp[1] = false;
+
             // MODIFY_BEGIN #25398 2011.06.07 FROM
             if ( TJAPlayer3.bコンパクトモード )
 			{
@@ -479,12 +482,21 @@ namespace TJAPlayer3
 
                 this.actLaneTaiko.ゴーゴー炎();
 
+                // bIsFinishedPlaying was dependent on 2P in this case
+
+                
 
                 for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                 {
-				    bIsFinishedPlaying = this.t進行描画_チップ( E楽器パート.DRUMS, i );
+                    // bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
+                    bool btmp = this.t進行描画_チップ(E楽器パート.DRUMS, i);
+                    if (btmp == true)
+                        ifp[i] = true;
+
                     this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
                 }
+
+                bIsFinishedPlaying = (TJAPlayer3.ConfigIni.nPlayerCount > 1 ) ? ifp[0] && ifp[1] : ifp[0];
 
                 this.actDan.On進行描画();
 
@@ -573,11 +585,13 @@ namespace TJAPlayer3
                             int Character = this.actChara.iCurrentCharacter[i];
                             if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                             {
-                                if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
+                                if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100)
                                 {
                                     double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM))));
                                     this.actChara.アクションタイマーリセット(i);
-                                    this.actChara.ctキャラクターアクション_10コンボMAX[i] = new CCounter(0, TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] - 1, (dbUnit / TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character]) * 2, CSound管理.rc演奏用タイマ);
+                                    this.actChara.ctキャラクターアクション_10コンボMAX[i] = new CCounter(0, 
+                                        TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] - 1, 
+                                        (dbUnit / TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character]) * 2, CSound管理.rc演奏用タイマ);
                                     this.actChara.ctキャラクターアクション_10コンボMAX[i].t進行db();
                                     this.actChara.ctキャラクターアクション_10コンボMAX[i].n現在の値 = 0;
                                     this.actChara.bマイどんアクション中[i] = true;
@@ -624,7 +638,9 @@ namespace TJAPlayer3
 		}
 		public CAct演奏DrumsチップファイアD actChipFireD;
 
-		private CAct演奏Drumsグラフ actGraph;   // #24074 2011.01.23 add ikanick
+        private bool[] ifp = { false, false };
+
+        private CAct演奏Drumsグラフ actGraph;   // #24074 2011.01.23 add ikanick
 		private CAct演奏Drumsパッド actPad;
         public CAct演奏Drumsレーン actLane;
         public CAct演奏DrumsMtaiko actMtaiko;
