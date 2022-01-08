@@ -63,6 +63,11 @@ namespace TJAPlayer3
 			private set;
 		}
 
+		public void ResetSongIndex()
+        {
+			this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[0];
+		}
+
 		public int nスクロールバー相対y座標
 		{
 			get;
@@ -2291,7 +2296,9 @@ namespace TJAPlayer3
 			for( int i = 0; i < 4; i++ )
 				song = this.r前の曲( song );
 
-			for( int i = 0; i < 9; i++ )
+			//
+
+			for ( int i = 0; i < 9; i++ )
 			{
 				this.stバー情報[ i ].strタイトル文字列 = song.strタイトル;
                 this.stバー情報[ i ].strジャンル = song.strジャンル;

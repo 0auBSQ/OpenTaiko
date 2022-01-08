@@ -584,6 +584,9 @@ namespace TJAPlayer3
 					TJAPlayer3.EnumSongs.ChangeEnumeratePriority( ThreadPriority.Normal );
 					TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 = true;
 					TJAPlayer3.actEnumSongs.On活性化();
+					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
+
+					TJAPlayer3.stage選曲.act曲リスト.ResetSongIndex();
 				}
 				#endregion
 			}
