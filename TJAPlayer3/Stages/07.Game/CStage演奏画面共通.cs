@@ -2854,8 +2854,7 @@ namespace TJAPlayer3
                                 if( chip現在処理中の連打チップ[ nPlayer ] != null )
                                 {
                                     chip現在処理中の連打チップ[ nPlayer ].bHit = true;
-                                    if (nPlayer == 0 
-                                        && chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount 
+                                    if (chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount 
                                         && chip現在処理中の連打チップ[nPlayer].nRollCount > 0 
                                         && actChara.CharaAction_Balloon_Miss[nPlayer] != null)
                                     {
@@ -2869,7 +2868,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Skin.Characters_Balloon_Timer[actChara.iCurrentCharacter[nPlayer]], 
                                                 TJAPlayer3.Timer);
 
-                                            if (actChara.CharaAction_Balloon_Delay != null) actChara.CharaAction_Balloon_Delay[nPlayer] = new CCounter(0, 
+                                            if (actChara.CharaAction_Balloon_Delay[nPlayer] != null) actChara.CharaAction_Balloon_Delay[nPlayer] = new CCounter(0, 
                                                 TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[nPlayer]] - 1, 
                                                 1, 
                                                 TJAPlayer3.Timer);
