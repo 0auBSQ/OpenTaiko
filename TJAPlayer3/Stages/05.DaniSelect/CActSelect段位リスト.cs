@@ -319,7 +319,7 @@ namespace TJAPlayer3
                     titleTmp = stNode.ttkタイトル[stNode.ttkタイトル.Length - 1].str文字;
                 }
 
-                TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp, pfDanPlateTitle, Color.White, Color.Black, 1000);
+                TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.Substring(0, 2), pfDanPlateTitle, Color.White, Color.Black, 1000);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x, y - 50);
             }
         }

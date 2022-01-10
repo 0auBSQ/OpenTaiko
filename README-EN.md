@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： v0.5.2.1
+- Current version： Pre v0.5.3
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -130,6 +130,23 @@ Download SlimDX again from https://code.google.com/archive/p/slimdx/downloads\.
 ```
 
 ## Update history
+
+<details>
+	<summary>Pre v0.5.3</summary>
+	
+	- Fix multiple bugs
+	
+	- 1st version of the Dan result screen
+	
+	- Dan chart supporting any count of songs
+	
+	- Support of 2P Side
+	
+	- Major 2P update (Please check discord for more details about it)
+	
+	- Dan charts are now also selectable from the Taiko mode song select screen
+	
+</details>
 
 <details>
 	<summary>v0.5.2.1</summary>
