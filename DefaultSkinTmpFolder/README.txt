@@ -15,10 +15,13 @@ BoxFontName=851テガキカクット
 
 Credits : 
 
+- Font : http://pm85122.onamae.jp/851H_kktt.html
+
 Menu SFX : 
 
-Hitrison - https://hitrison.itch.io/menu-sfx-pack
+- Hitrison - https://hitrison.itch.io/menu-sfx-pack
 
 In-Game textures :
 
-TJAPlayer3 Default skin
+- TJAPlayer3 Default skin
+- vector_corp / Freepik (Patterns)
