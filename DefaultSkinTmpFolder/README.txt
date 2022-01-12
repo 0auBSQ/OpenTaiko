@@ -6,11 +6,11 @@ Before using :
 
 ; フォントレンダリングに使用するフォント名
 ; Font name used for font rendering.
-FontName=851テガキカクット
+FontName=マキナス 4 Square
 
 ; Boxの説明文のフォントレンダリングに使用するフォント名
 ; Font name used for font rendering.
-BoxFontName=851テガキカクット
+BoxFontName=マキナス 4 Square
 
 
 Credits : 
@@ -24,4 +24,4 @@ Menu SFX :
 In-Game textures :
 
 - TJAPlayer3 Default skin
-- vector_corp / Freepik (Patterns)
+- starline / vector_corp / Freepik (Patterns)
