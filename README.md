@@ -320,7 +320,7 @@ SlimDXを改めてダウンロードしてください：https://code.google.com
 ## クレジット
 
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
-> * [cien/OpenTaiko Logo/Nameplate Assets](https://twitter.com/CienpixeL)(@CienpixeL)
+> * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 > * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
