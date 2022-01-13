@@ -25,3 +25,6 @@ In-Game textures :
 
 - TJAPlayer3 Default skin
 - starline / vector_corp / Freepik (Patterns)
+- cien (@CienpixeL) (Nameplates, Rainbox result screen gauge)
+- Waldo - https://pressstart.vip/assets (Tower result screen background)
+- PNG Egg (Fireworks) (Non-commercial)
