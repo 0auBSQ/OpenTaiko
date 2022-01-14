@@ -281,9 +281,14 @@ namespace TJAPlayer3
             {
                 // Default Dan Plate
 
-                int danTick = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.nDanTick;
-                Color danTickColor = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.cDanTickColor;
+                int danTick = 0;
+                Color danTickColor = Color.White;
 
+                if (TJAPlayer3.stage選曲.r確定されたスコア != null)
+                {
+                    danTick = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.nDanTick;
+                    danTickColor = TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.cDanTickColor;
+                }
                 if (songNode != null)
                 {
                     STバー情報 stNode = (STバー情報)songNode;
@@ -310,8 +315,10 @@ namespace TJAPlayer3
                 if (pfDanPlateTitle == null)
                     pfDanPlateTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 60);
 
-                string titleTmp = TJAPlayer3.stage選曲.r確定された曲.strタイトル;
+                string titleTmp = "";
 
+                if (TJAPlayer3.stage選曲.r確定されたスコア != null)
+                    titleTmp = TJAPlayer3.stage選曲.r確定された曲.strタイトル;
                 if (songNode != null)
                 {
                     STバー情報 stNode = (STバー情報)songNode;
