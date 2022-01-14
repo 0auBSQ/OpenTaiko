@@ -1,0 +1,21 @@
+Folders done :
+
+Graphics :
+
+5_Game :
+- 1_Chara (Empty)
+- 2_Dancer (Empty)
+- 3_Mob (Empty)
+- 7_Gauge
+- 12_Lane
+- 13_GENRE
+- 14_GameMode
+
+8_TowerResult
+9_NamePlateEffect
+
+Sounds :
+
+Combo_1P (Empty)
+Tower_Combo (Empty)
+Taiko
