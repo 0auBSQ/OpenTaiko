@@ -91,7 +91,7 @@ namespace TJAPlayer3
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
 			this.iDanTowerHide = new CItemToggle(CLangManager.LangInstance.GetString(10056), TJAPlayer3.ConfigIni.bDanTowerHide,
-				CLangManager.LangInstance.GetString(10056));
+				CLangManager.LangInstance.GetString(10057));
 			this.list項目リスト.Add(this.iDanTowerHide);
 
 			/*
