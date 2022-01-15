@@ -2,6 +2,9 @@ Folders done :
 
 Graphics :
 
+2_Config
+4_SongLoading
+
 5_Game :
 - 1_Chara (Empty)
 - 2_Dancer (Empty)
@@ -14,8 +17,11 @@ Graphics :
 - 14_GameMode
 - 18_PuchiChara (Blank)
 
+7_Exit
 8_TowerResult
 9_NamePlateEffect
+10_Heya
+11_Characters (Blank)
 
 Sounds :
 

@@ -420,10 +420,6 @@ namespace TJAPlayer3
                 
                 TJAPlayer3.Tx.SongSelect_Header?.t2D描画(TJAPlayer3.app.Device, 0, 0);
                 
-                TJAPlayer3.Tx.SongSelect_Coin_Slot?.t2D描画(TJAPlayer3.app.Device, 0, 0,
-                    new Rectangle(0, 0, 640 + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? 640 : 0), 720));
-
-
                 tTimerDraw((100 - ctTimer.n現在の値).ToString());
 
                 tSongNumberDraw(1097, 167, NowSong.ToString());
@@ -912,13 +908,22 @@ namespace TJAPlayer3
                             : SPArrRef[currentPads[i]].CrownCount[j - 7].ToString());
                     }
 
+                }
+
+                TJAPlayer3.Tx.SongSelect_Coin_Slot?.t2D描画(TJAPlayer3.app.Device, 0, 0,
+                    new Rectangle(0, 0, 640 + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? 640 : 0), 720));
+
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    int p = TJAPlayer3.GetActualPlayer(i);
+
                     if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
                         tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + i * 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[p].ToString());
 
                     #region [HiScore plate]
- 
+
                     var song = this.r現在選択中の曲;
-                    
+
                     if (song != null && song.eノード種別 == C曲リストノード.Eノード種別.SCORE)
                     {
                         var closest = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
@@ -929,7 +934,7 @@ namespace TJAPlayer3
                             int posx = (i == 1) ? 1280 - this.ptBoardNumber[11].X : this.ptBoardNumber[11].X;
                             int displayedScore = 0;
                             int table = 0;
-                            
+
                             TJAPlayer3.Tx.SongSelect_High_Score.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
 
                             if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
@@ -942,8 +947,8 @@ namespace TJAPlayer3
                             displayedScore = score.GPInfo[p].nHighScore[table];
 
                             if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit)
-                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, 
-                                    posx - 78, 
+                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
+                                    posx - 78,
                                     this.ptBoardNumber[11].Y + 2,
                                     new Rectangle(table * 53, 0, 53, 53));
 
