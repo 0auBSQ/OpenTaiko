@@ -2471,6 +2471,10 @@ namespace TJAPlayer3
 											{
 												this.SongPreviewLevel = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel );
 											}
+											else if ( str3.Equals( nameof(SongPlaybackLevel) ) )
+											{
+												this.SongPlaybackLevel = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel );
+											}
 											else if( str3.Equals( nameof(KeyboardSoundLevelIncrement) ) )
 											{
 												this.KeyboardSoundLevelIncrement = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement );
