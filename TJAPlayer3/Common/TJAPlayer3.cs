@@ -668,7 +668,7 @@ namespace TJAPlayer3
 									this.previewSound.Dispose();
 									this.previewSound = null;
 								}
-								this.previewSound = TJAPlayer3.Sound管理.tサウンドを生成する( strPreviewFilename, ESoundGroup.SongPlayback );
+								this.previewSound = TJAPlayer3.Sound管理.tサウンドを生成する( strPreviewFilename, ESoundGroup.SongPreview );
 
 							    // 2018-08-23 twopointzero: DTXVmode previewVolume will always set
 							    // Gain since in this mode it should override the application of
