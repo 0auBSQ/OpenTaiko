@@ -206,6 +206,8 @@ namespace TJAPlayer3
             [10057] = "Masque les sons de type Dan ou\nTour dans le menu Partie rapide.\n" +
             "Note: Cette option prend effet\n" +
                 "     après le rechargement des sons.",
+            [10058] = "Volume de la prévisualisation de la musique",
+            [10059] = "Ajuste le volume de la prévisualisation de la musique.\nVous devez redemarrer le jeu pour que\ncette option prenne effet.",
             [10084] = "Mode Shin'uchi",
 
 
