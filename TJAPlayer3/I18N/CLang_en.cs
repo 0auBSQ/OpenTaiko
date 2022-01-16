@@ -216,6 +216,8 @@ namespace TJAPlayer3
             [10057] = "Hide Dan and Tower charts\nin the Taiko Mode menu.\n" +
                     "Note: Reload songs to make\n" +
                 "     the setting take effect.",
+            [10058] = "Song Preview Volume",
+            [10059] = "Adjust the volume of song preview.\nYou must restart the game after leaving config\nfor this setting to save.",
             [10084] = "Shin'uchi Mode",
 
             [100] = "Taiko Mode",
