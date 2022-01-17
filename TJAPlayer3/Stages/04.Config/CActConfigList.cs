@@ -165,7 +165,11 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(35));
 		    this.list項目リスト.Add( this.iSystemVoiceLevel );
 
-		    this.iSystemSongPlaybackLevel = new CItemInteger(CLangManager.LangInstance.GetString(10036), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPlaybackLevel,
+		    this.iSystemSongPreviewLevel = new CItemInteger(CLangManager.LangInstance.GetString(10058), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPreviewLevel,
+				CLangManager.LangInstance.GetString(10059));
+		    this.list項目リスト.Add( this.iSystemSongPreviewLevel );
+			
+			this.iSystemSongPlaybackLevel = new CItemInteger(CLangManager.LangInstance.GetString(10036), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPlaybackLevel,
 				CLangManager.LangInstance.GetString(36));
 		    this.list項目リスト.Add( this.iSystemSongPlaybackLevel );
 
@@ -1253,6 +1257,7 @@ namespace TJAPlayer3
 		private CItemToggle iSystemApplySongVol;
 		private CItemInteger iSystemSoundEffectLevel;
 		private CItemInteger iSystemVoiceLevel;
+	    private CItemInteger iSystemSongPreviewLevel;
 	    private CItemInteger iSystemSongPlaybackLevel;
 		private CItemInteger iSystemKeyboardSoundLevelIncrement;
 		private CItemToggle iSystemAVI;
@@ -1424,6 +1429,7 @@ namespace TJAPlayer3
 		    TJAPlayer3.ConfigIni.ApplySongVol = this.iSystemApplySongVol.bON;
 		    TJAPlayer3.ConfigIni.SoundEffectLevel = this.iSystemSoundEffectLevel.n現在の値;
 		    TJAPlayer3.ConfigIni.VoiceLevel = this.iSystemVoiceLevel.n現在の値;
+		    TJAPlayer3.ConfigIni.SongPreviewLevel = this.iSystemSongPreviewLevel.n現在の値;
 		    TJAPlayer3.ConfigIni.SongPlaybackLevel = this.iSystemSongPlaybackLevel.n現在の値;
 		    TJAPlayer3.ConfigIni.KeyboardSoundLevelIncrement = this.iSystemKeyboardSoundLevelIncrement.n現在の値;
             TJAPlayer3.ConfigIni.MusicPreTimeMs = this.MusicPreTimeMs.n現在の値;

@@ -16,7 +16,7 @@ namespace TJAPlayer3
         {
             soundGroupLevelController.SetLevel(ESoundGroup.SoundEffect, configIni.SoundEffectLevel);
             soundGroupLevelController.SetLevel(ESoundGroup.Voice, configIni.VoiceLevel);
-            soundGroupLevelController.SetLevel(ESoundGroup.SongPreview, configIni.SongPlaybackLevel);
+            soundGroupLevelController.SetLevel(ESoundGroup.SongPreview, configIni.SongPreviewLevel);
             soundGroupLevelController.SetLevel(ESoundGroup.SongPlayback, configIni.SongPlaybackLevel);
             soundGroupLevelController.SetKeyboardSoundLevelIncrement(configIni.KeyboardSoundLevelIncrement);
 
@@ -31,7 +31,7 @@ namespace TJAPlayer3
                         soundGroupLevelController.SetLevel(ESoundGroup.Voice, configIni.VoiceLevel);
                         break;
                     case nameof(CConfigIni.SongPreviewLevel):
-                        soundGroupLevelController.SetLevel(ESoundGroup.SongPreview, configIni.SongPlaybackLevel);
+                        soundGroupLevelController.SetLevel(ESoundGroup.SongPreview, configIni.SongPreviewLevel);
                         break;
                     case nameof(CConfigIni.SongPlaybackLevel):
                         soundGroupLevelController.SetLevel(ESoundGroup.SongPlayback, configIni.SongPlaybackLevel);
@@ -53,7 +53,7 @@ namespace TJAPlayer3
                         configIni.VoiceLevel = args.Level;
                         break;
                     case ESoundGroup.SongPreview:
-                        configIni.SongPlaybackLevel = args.Level;
+                        configIni.SongPreviewLevel = args.Level;
                         break;
                     case ESoundGroup.SongPlayback:
                         configIni.SongPlaybackLevel = args.Level;
