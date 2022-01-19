@@ -308,24 +308,56 @@ namespace TJAPlayer3
 			//Trace.TraceInformation( "SKIN変更System  : "+  CSkin.strSystemSkinSubfolderFullName );
 			//Trace.TraceInformation( "SKIN変更BoxDef  : "+  CSkin.strBoxDefSkinSubfolderFullName );
 
+			// Complete list of songs
 			List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+
+			// Reinsert parent node
 			list.Insert(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.r親ノード);
+
+			// Reindex the parent node
 			this.r現在選択中の曲.r親ノード.Openindex = r現在選択中の曲.r親ノード.list子リスト.IndexOf(this.r現在選択中の曲);
+
+			// Move song pointer back to the folder
 			this.r現在選択中の曲 = this.r次の曲(r現在選択中の曲);
+
+			// Flatten folder
+			var flattened = flattenList(this.r現在選択中の曲.list子リスト);
+
+			// Remove recursively the included songs that are contained in the folder
 			for (int index = 0; index < list.Count; index++)
 			{
-				if (this.r現在選択中の曲.list子リスト.Contains(list[index]))
+				if (flattened.Contains(list[index]))
 				{
 					list.RemoveAt(index);
 					index--;
 				}
 			}
+
 			this.t現在選択中の曲を元に曲バーを再構成する();
 			this.t選択曲が変更された(false);                                 // #27648 項目数変更を反映させる
 			this.b選択曲が変更された = true;
 
 			return ret;
 		}
+
+
+		public List<C曲リストノード> flattenList(List<C曲リストノード> list)
+        {
+			List<C曲リストノード> ret = new List<C曲リストノード>();
+
+			ret.AddRange(list);
+
+			foreach (var e in list)
+            {
+				if (e.eノード種別 == C曲リストノード.Eノード種別.BOX)
+                {
+					ret.AddRange(flattenList(e.list子リスト));
+                }
+            }
+
+			return (ret);
+        }
+
 		public void t現在選択中の曲を元に曲バーを再構成する()
 		{
 			this.tバーの初期化();
