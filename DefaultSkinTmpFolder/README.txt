@@ -24,7 +24,7 @@ Menu SFX :
 In-Game textures :
 
 - TJAPlayer3 Default skin
-- starline / vector_corp / Freepik (Patterns)
+- Freepik (starline / vector_corp / Harryarts) (Patterns)
 - cien (@CienpixeL) (Nameplates, Rainbox result screen gauge, Drum textures)
 - Waldo - https://pressstart.vip/assets (Tower result screen background and skyboxes)
 - PNG Egg (Fireworks) (Non-commercial)

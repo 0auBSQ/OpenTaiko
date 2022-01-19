@@ -1087,18 +1087,22 @@ namespace TJAPlayer3
 			Array.Sort( ba );
 			TJAPlayer3.Skin.strBoxDefSkinSubfolders = ba;
 		}
-		private void t曲リストへ後処理を適用する( List<C曲リストノード> ノードリスト )
+
+
+		private void t曲リストへ後処理を適用する( List<C曲リストノード> ノードリスト, string parentName = "/", bool isGlobal = true )
 		{
 
 
-			#region [ リストに１つ以上の曲があるなら RANDOM BOX を入れる ]
+			#region [ If there is at least one song within the list add a random song node ]
 
 			//-----------------------------
 			if (ノードリスト.Count > 0)
 			{
 				C曲リストノード itemRandom = new C曲リストノード();
 				itemRandom.eノード種別 = C曲リストノード.Eノード種別.RANDOM;
-				itemRandom.strタイトル = CLangManager.LangInstance.GetString(203);
+
+				itemRandom.strタイトル = CLangManager.LangInstance.GetString(203) + " (" + parentName + ")"; ;
+
 				itemRandom.nスコア数 = (int)Difficulty.Total;
 				itemRandom.r親ノード = ノードリスト[0].r親ノード;
 
@@ -1144,18 +1148,22 @@ namespace TJAPlayer3
 			{
 				SlowOrSuspendSearchTask();      // #27060 中断要求があったら、解除要求が来るまで待機, #PREMOVIE再生中は検索負荷を落とす
 
-				#region [ BOXノードなら子リストに <<BACK を入れ、子リストに後処理を適用する ]
+				#region [ Append "Back" buttons to the included folders ]
 				//-----------------------------
 				if ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX )
 				{
 					int 曲数 = c曲リストノード.list子リスト.Count;
+					string newPath = parentName + c曲リストノード.strタイトル + "/";
+
+
 					for (int index = 0; index < (曲数 / 7) + 1; index++)
 					{
 						C曲リストノード itemBack = new C曲リストノード();
 						itemBack.eノード種別 = C曲リストノード.Eノード種別.BACKBOX;
 
+					
 						// とじる
-						itemBack.strタイトル = CLangManager.LangInstance.GetString(200);
+						itemBack.strタイトル = CLangManager.LangInstance.GetString(200) + " (" + newPath + ")";
 
 						itemBack.BackColor = ColorTranslator.FromHtml("#513009");
 						itemBack.BoxColor = Color.White;
@@ -1189,7 +1197,9 @@ namespace TJAPlayer3
 
 						c曲リストノード.list子リスト.Insert(Math.Min(index * (7 + 1), c曲リストノード.list子リスト.Count), itemBack);
 
-						#region [ ログ出力 ]
+						
+
+						#region [ Log output ]
 						//-----------------------------
 						if (TJAPlayer3.ConfigIni.bLog曲検索ログ出力)
 						{
@@ -1210,12 +1220,16 @@ namespace TJAPlayer3
 						#endregion
 					}
 
+					// Process subfolders recussively
+					t曲リストへ後処理を適用する(c曲リストノード.list子リスト, newPath, false);
+
 					continue;
 				}
+
 				//-----------------------------
 				#endregion
 
-				#region [ ノードにタイトルがないなら、最初に見つけたスコアのタイトルを設定する ]
+				#region [ If no node title found, try to fetch it within the score objects ]
 				//-----------------------------
 				if ( string.IsNullOrEmpty( c曲リストノード.strタイトル ) )
 				{
@@ -1234,24 +1248,33 @@ namespace TJAPlayer3
 				}
 				//-----------------------------
 				#endregion
+
+
+
 			}
 
-            #region [ ノードをソートする ]
-            //-----------------------------
-            if ( TJAPlayer3.ConfigIni.nDefaultSongSort == 0 )
+			// Don't sort songs if the folder isn't global
+			if (isGlobal)
             {
-			    t曲リストのソート1_絶対パス順( ノードリスト );
-            }
-            else if( TJAPlayer3.ConfigIni.nDefaultSongSort == 1 )
-            {
-                t曲リストのソート9_ジャンル順( ノードリスト, E楽器パート.TAIKO, 1, 0 );
-            }
-            else if( TJAPlayer3.ConfigIni.nDefaultSongSort == 2 )
-            {
-                t曲リストのソート9_ジャンル順( ノードリスト, E楽器パート.TAIKO, 2, 0 );
-            }
-			//-----------------------------
-			#endregion
+				#region [ Sort nodes ]
+				//-----------------------------
+				if (TJAPlayer3.ConfigIni.nDefaultSongSort == 0)
+				{
+					t曲リストのソート1_絶対パス順(ノードリスト);
+				}
+				else if (TJAPlayer3.ConfigIni.nDefaultSongSort == 1)
+				{
+					t曲リストのソート9_ジャンル順(ノードリスト, E楽器パート.TAIKO, 1, 0);
+				}
+				else if (TJAPlayer3.ConfigIni.nDefaultSongSort == 2)
+				{
+					t曲リストのソート9_ジャンル順(ノードリスト, E楽器パート.TAIKO, 2, 0);
+				}
+				//-----------------------------
+				#endregion
+			}
+
+
 		}
 		//-----------------
 		#endregion
