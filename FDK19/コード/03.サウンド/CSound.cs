@@ -696,7 +696,8 @@ namespace FDK
 	            if (this.bBASSサウンドである)
 	            {
 	                var db音量 = ((value.ToDouble() / 100.0) + 1.0).Clamp(0, 1);
-	                Bass.BASS_ChannelSetAttribute(this.hBassStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
+	                Bass.BASS_ChannelSetAttribute(this._hBassStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
+	                Bass.BASS_ChannelSetAttribute(this._hTempoStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
 	            }
 	            else if (this.bDirectSoundである)
 	            {
