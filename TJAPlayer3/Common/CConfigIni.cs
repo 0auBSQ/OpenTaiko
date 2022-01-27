@@ -1342,7 +1342,7 @@ namespace TJAPlayer3
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
 			this.sLang = "jp";
-			this.nLayoutType = 0;
+			this.nLayoutType = 1;
 
 			// 2018-08-28 twopointzero:
 			// There exists a particular large, well-known, well-curated, and
