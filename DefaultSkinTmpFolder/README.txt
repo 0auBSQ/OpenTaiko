@@ -10,8 +10,10 @@ FontName=マキナス 4 Square
 
 ; Boxの説明文のフォントレンダリングに使用するフォント名
 ; Font name used for font rendering.
-BoxFontName=マキナス 4 Square
+BoxFontName=廻想体 ネクスト UP B
 
+; Feel free to use only one of those fonts if you don't like one of them (both are blocky, the second one is more standard for English), Kaisoutai contains less kanji than Makinas.
+; If you don't like both fonts, keep the default ones (MS Gothic), but keep in mind that the skin is built around the given fonts.
 
 Credits : 
 
