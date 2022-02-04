@@ -474,7 +474,7 @@ namespace TJAPlayer3
 				}
 
 				// Discord Presenseの更新
-				Discord.UpdatePresence(TJAPlayer3.DTX.TITLE + ".tja", Properties.Discord.Stage_Result + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == true ? " (" + Properties.Discord.Info_IsAuto + ")" : ""), TJAPlayer3.StartupTime);
+				Discord.UpdatePresence(TJAPlayer3.DTX.strファイル名 + ".tja", Properties.Discord.Stage_Result + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == true ? " (" + Properties.Discord.Info_IsAuto + ")" : ""), TJAPlayer3.StartupTime);
 
 
 				#region [Earned medals]
