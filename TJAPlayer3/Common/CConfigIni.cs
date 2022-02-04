@@ -622,6 +622,21 @@ namespace TJAPlayer3
             }
         }
 
+		public class CTimingZones
+        {
+			public int nGoodZone;
+			public int nOkZone;
+			public int nBadZone;
+
+			public CTimingZones(int gz, int oz, int bz)
+            {
+				nGoodZone = gz;
+				nOkZone = oz;
+				nBadZone = bz;
+            }
+
+        }
+
 
 #if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 		//----------------------------------------
@@ -773,6 +788,16 @@ namespace TJAPlayer3
 			new CAIPerformances(950, 49, 1, 22),
 			new CAIPerformances(975, 25, 0, 26),
 			new CAIPerformances(1000, 0, 0, 30)
+		};
+
+		public CTimingZones[] tzLevels =
+		{
+			new CTimingZones(75, 114, 125),
+			new CTimingZones(55, 108, 125), // (New) Easy ?
+			new CTimingZones(42, 108, 125), // Normal / Tower Normal (Ama-kuchi)
+			new CTimingZones(33, 86, 115), // (New) Hard ?
+			new CTimingZones(25, 75, 108), // Extreme / Tower Ex (Kara-kuchi) / Dan
+			new CTimingZones(25, 58, 108) // Extreme + Hard timing (Tatsu)
 		};
 
         public bool b大音符判定;
@@ -2650,6 +2675,7 @@ namespace TJAPlayer3
                                             this.nヒット範囲ms.Poor = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Poor);
                                         }
                                         continue;
+
                                     //-----------------------------
                                     #endregion
 

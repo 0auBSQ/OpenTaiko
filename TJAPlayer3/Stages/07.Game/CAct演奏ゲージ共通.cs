@@ -116,7 +116,7 @@ namespace TJAPlayer3
             //ゲージのMAXまでの最低コンボ数を計算
             float dbGaugeMaxComboValue = 0;
             float[] dbGaugeMaxComboValue_branch = new float[3];
-            float dbDamageRate = 2.0f;
+            
 
             if (nRiskyTimes_InitialVal > 0)
             {
@@ -125,8 +125,14 @@ namespace TJAPlayer3
                 this.nRiskyTimes_Initial = TJAPlayer3.ConfigIni.nRisky;
             }
 
-            switch (this.DTX[nPlayer].LEVELtaiko[TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer]])
+            float gaugeRate = 0f;
+            float dbDamageRate = 2.0f;
+
+            int nanidou = TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer];
+
+            switch (this.DTX[nPlayer].LEVELtaiko[nanidou])
             {
+                case 0:
                 case 1:
                 case 2:
                 case 3:
@@ -134,88 +140,85 @@ namespace TJAPlayer3
                 case 5:
                 case 6:
                 case 7:
-                    {
-                        if (this.DTX[nPlayer].bチップがある.Branch)
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[0] / 100.0f);
-                            for (int i = 0; i < 3; i++)
-                            {
-                                dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (this.fGaugeMaxRate[0] / 100.0f);
-                            }
-                            dbDamageRate = 0.625f;
-                        }
-                        else
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[0] / 100.0f);
-                            dbDamageRate = 0.625f;
-                        }
-                        break;
-                    }
+                    gaugeRate = this.fGaugeMaxRate[0];
+                    dbDamageRate = 0.625f;
+                    break;
 
 
                 case 8:
-                    {
-                        if (this.DTX[nPlayer].bチップがある.Branch)
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[1] / 100.0f);
-                            for (int i = 0; i < 3; i++)
-                            {
-                                dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (this.fGaugeMaxRate[1] / 100.0f);
-                            }
-                            dbDamageRate = 0.625f;
-                        }
-                        else
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[1] / 100.0f);
-                            dbDamageRate = 0.625f;
-                        }
-                        break;
-                    }
+                    gaugeRate = this.fGaugeMaxRate[1];
+                    dbDamageRate = 0.625f;
+                    break;
 
                 case 9:
                 case 10:
-                    {
-                        if (this.DTX[nPlayer].bチップがある.Branch)
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[2] / 100.0f);
-                            for (int i = 0; i < 3; i++)
-                            {
-                                dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (this.fGaugeMaxRate[2] / 100.0f);
-                            }
-                        }
-                        else
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[2] / 100.0f);
-                        }
-                        break;
-                    }
+                    gaugeRate = this.fGaugeMaxRate[2];
+                    dbDamageRate = 2.0f;
+                    break;
+
+                case 11:
+                    gaugeRate = this.fGaugeMaxRate[3];
+                    dbDamageRate = 2.2f;
+                    break;
+
+                case 12:
+                    gaugeRate = this.fGaugeMaxRate[4];
+                    dbDamageRate = 2.4f;
+                    break;
 
                 default:
-                    {
-                        if (this.DTX[nPlayer].bチップがある.Branch)
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[2] / 100.0f);
-                            for (int i = 0; i < 3; i++)
-                            {
-                                dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数[i] * (this.fGaugeMaxRate[2] / 100.0f);
-                            }
-                        }
-                        else
-                        {
-                            dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (this.fGaugeMaxRate[2] / 100.0f);
-                        }
-                        break;
-                    }
+                    gaugeRate = this.fGaugeMaxRate[5];
+                    dbDamageRate = 2.6f;
+                    break;
 
             }
+
+            #region [(Unbloated) Gauge max combo values]
+
+            if (this.DTX[nPlayer].bチップがある.Branch)
+            {
+                dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (gaugeRate / 100.0f);
+                for (int i = 0; i < 3; i++)
+                {
+                    dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (gaugeRate / 100.0f);
+                }
+            }
+            else
+            {
+                dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (gaugeRate / 100.0f);
+            }
+
+            #endregion
+
+            #region [Change the weights depending on the choosen difficulty (More lenient for easier diffs, set to 0 for Tower charts)]
+
+            float multiplicationFactor = 1f;
+
+            if (nanidou <= (int)Difficulty.Edit)
+            {
+                float[] factors =
+                {
+                    1.6f,
+                    1.33f,
+                    1.14f,
+                    1f,
+                    1f,
+                };
+
+                multiplicationFactor = factors[nanidou];
+            }
+            else if (nanidou == (int)Difficulty.Tower)
+                multiplicationFactor = 0f;
+
+            #endregion
 
             double nGaugeRankValue = 0D;
             double[] nGaugeRankValue_branch = new double[] { 0D, 0D, 0D };
 
-            nGaugeRankValue = 10000.0f / dbGaugeMaxComboValue;
+            nGaugeRankValue = (10000.0f / dbGaugeMaxComboValue) * multiplicationFactor;
             for (int i = 0; i < 3; i++)
             {
-                nGaugeRankValue_branch[i] = 10000.0f / dbGaugeMaxComboValue_branch[i];
+                nGaugeRankValue_branch[i] = (10000.0f / dbGaugeMaxComboValue_branch[i]) * multiplicationFactor;
             }
 
             //ゲージ値計算
@@ -238,7 +241,7 @@ namespace TJAPlayer3
 
             //2015.03.26 kairera0467 計算を初期化時にするよう修正。
 
-            #region [ 計算結果がInfintyだった場合も考えて ]
+            #region [ Handling infinity cases ]
             float fIsDontInfinty = 0.4f;//適当に0.4で
             float[] fAddVolume = new float[] { 1.0f, 0.5f, dbDamageRate };
 
@@ -266,7 +269,8 @@ namespace TJAPlayer3
             }
             #endregion
 
-            #region ゲージの丸め処理
+            #region [Rounding process]
+
             var increase = new float[] { dbゲージ増加量[0][nPlayer], dbゲージ増加量[1][nPlayer], dbゲージ増加量[2][nPlayer] };
             var increaseBranch = new float[3, 3];
             for (int i = 0; i < 3; i++)
@@ -360,9 +364,12 @@ namespace TJAPlayer3
 
         public float[] fGaugeMaxRate =
         {
-            70.7f,//1～7
-            70f,  //8
-            75.0f //9～10
+            70.7f, // 1～7
+            70f,   // 8
+            75.0f, // 9～10
+            78.5f, // 11
+            80.5f, // 12
+            82f,   // 13+
         };//おおよその値。
 
         // ----------------------------------
