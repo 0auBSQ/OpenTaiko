@@ -486,7 +486,7 @@ namespace TJAPlayer3
 				this.nEarnedMedalsCount[0] = 0;
 				this.nEarnedMedalsCount[1] = 0;
 
-				// Medals (implement P2 later)
+				// Medals
 
 				int nTotalHits = this.st演奏記録.Drums.nGreat数 + this.st演奏記録.Drums.nMiss数 + this.st演奏記録.Drums.nPerfect数;
 

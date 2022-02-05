@@ -1,0 +1,26 @@
+{
+	0: {
+		"name" : "Empty0",
+        "rarity": "Common",
+	},
+	1: {
+		"name" : "Empty1",
+        "rarity": "Common",
+	},
+	2: {
+		"name" : "Empty2",
+        "rarity": "Uncommon",
+	},
+	3: {
+		"name" : "Empty3",
+        "rarity": "Rare",
+	},
+	4: {
+		"name" : "Empty4",
+        "rarity": "Epic",
+	},
+	5: {
+		"name" : "Empty5",
+        "rarity": "Legendary",
+	},
+}

@@ -6,12 +6,13 @@ Before using :
 
 ; フォントレンダリングに使用するフォント名
 ; Font name used for font rendering.
-FontName=マキナス 4 Square
+FontName=廻想体 ネクスト UP B
 
 ; Boxの説明文のフォントレンダリングに使用するフォント名
 ; Font name used for font rendering.
 BoxFontName=廻想体 ネクスト UP B
 
+; Use " マキナス 4 Square " if you want to use the font used on the skin assets (but letters are wider and more blocky on it)
 ; Feel free to use only one of those fonts if you don't like one of them (both are blocky, the second one is more standard for English), Kaisoutai contains less kanji than Makinas.
 ; If you don't like both fonts, keep the default ones (MS Gothic), but keep in mind that the skin is built around the given fonts.
 

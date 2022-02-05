@@ -264,6 +264,12 @@ namespace TJAPlayer3
 			private set;
 		}
 
+		public static Databases Databases
+		{
+			get;
+			private set;
+		}
+
 		public static CStage起動 stage起動 
 		{
 			get; 
@@ -2040,6 +2046,10 @@ for (int i = 0; i < 3; i++) {
 			//---------------------
 			NamePlateConfig = new NamePlateConfig();
 			NamePlateConfig.tNamePlateConfig();
+
+			Databases = new Databases();
+			Databases.tDatabases();
+
 			ConfigIni = new CConfigIni();
 			string path = strEXEのあるフォルダ + "Config.ini";
 			if( File.Exists( path ) )

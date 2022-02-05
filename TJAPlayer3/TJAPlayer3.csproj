@@ -125,6 +125,8 @@
     <Compile Include="Common\Discord.cs" />
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="Databases\Databases.cs" />
+    <Compile Include="Databases\DBPuchichara.cs" />
     <Compile Include="I18N\CLang_es.cs" />
     <Compile Include="I18N\CLang_fr.cs" />
     <Compile Include="I18N\CLang_en.cs" />

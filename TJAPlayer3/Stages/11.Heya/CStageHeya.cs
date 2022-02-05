@@ -110,8 +110,41 @@ namespace TJAPlayer3
             iCurrentMenu = -1;
             iMainMenuCurrent = 0;
 
+            #region [PuchiChara stuff]
+
             // Tmp variables
             iPuchiCharaCount = 120;
+
+            ttkPuchiCharaNames = new TitleTextureKey[iPuchiCharaCount];
+
+            var RarityToColor = new Dictionary<string, Color>
+            {
+                ["Common"] = Color.White,
+                ["Uncommon"] = Color.Lime,
+                ["Rare"] = Color.Blue,
+                ["Epic"] = Color.Purple,
+                ["Legendary"] = Color.Orange,
+            };
+
+            var dbData = TJAPlayer3.Databases.DBPuchichara.data;
+
+            for (int i = 0; i < iPuchiCharaCount; i++)
+            {
+                if (dbData.ContainsKey(i))
+                {
+                    Color textColor = Color.White;
+
+                    string rarity = dbData[i].Rarity;
+
+                    if (RarityToColor.ContainsKey(rarity))
+                        textColor = RarityToColor[rarity];
+
+                    ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                }
+            }
+
+            #endregion
+
             iCharacterCount = TJAPlayer3.Skin.Characters_Ptn;
 
             this.tResetOpts();
@@ -199,6 +232,13 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
                     TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+
+                    if (ttkPuchiCharaNames[pos] != null)
+                    {
+                        CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
+
+                        tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 448);
+                    }
                 }
             }
 
@@ -530,6 +570,9 @@ namespace TJAPlayer3
 
         private int iMainMenuCurrent;
         private int iPuchiCharaCurrent;
+
+        private TitleTextureKey[] ttkPuchiCharaNames;
+
         private int iCharacterCurrent;
         private int iDanTitleCurrent;
         private int iTitleCurrent;
