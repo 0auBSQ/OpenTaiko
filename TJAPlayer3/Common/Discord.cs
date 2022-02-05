@@ -69,6 +69,24 @@ namespace TJAPlayer3
 
     public static class Discord
     {
+        public static string DiffToString(int diff)
+        {
+            string[] diffArr =
+            {
+                " Easy ",
+                " Normal ",
+                " Hard ",
+                " Extreme ",
+                " Extra ",
+                " Tower ",
+                " Dan "
+            };
+
+            int level = TJAPlayer3.stage選曲.r確定された曲.nLevel[diff];
+
+            return (diffArr[Math.Min(diff, 6)] + "Lv." + level);
+        }
+
 
         private static readonly List<IntPtr> _buffers = new List<IntPtr>(10);
 
@@ -104,7 +122,7 @@ namespace TJAPlayer3
 
             if (startTimeStamp != 0) presence.startTimestamp = startTimeStamp;
             if (endTimeStamp != 0) presence.endTimestamp = endTimeStamp;
-            presence.largeImageKey = StrToPtr("OpenTaiko".ToLowerInvariant());
+            presence.largeImageKey = StrToPtr("logo".ToLowerInvariant());
             presence.largeImageText = StrToPtr(TJAPlayer3.AppDisplayThreePartVersion);
             if (!string.IsNullOrEmpty(smallImageKey)) presence.smallImageKey = StrToPtr(smallImageKey);
             if (!string.IsNullOrEmpty(smallImageText)) presence.smallImageText = StrToPtr(smallImageText);
