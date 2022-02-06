@@ -254,6 +254,13 @@ namespace TJAPlayer3
             [1032] = "Personnage",
             [1033] = "Titre Dan",
             [1034] = "Titre",
+
+            [90000] = "[ERREUR] Condition invalide",
+            [90001] = "L'article n'est disponible que dans le Magasin.",
+            [90002] = "Prix en pièces : ",
+            [90003] = "Article acheté !",
+            [90004] = "Nombre de pièces insuffisant !",
+            [90005] = "La condition suivante : ",
         };
     }
 }

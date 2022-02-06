@@ -216,4 +216,13 @@
 1032 : Character
 1033 : Dan title
 1034 : Plate title
+
+# Feature specific errors (9XXXX)
+
+90000 : "Invalid condition" error message
+90001 : "You can buy it at the Shop" condition/failed condition message (cs)
+90002 : "Coin price : " condition message (ch)
+90003 : "Item bought !" succeed condition message (ch)
+90004 : "Not enough coins !" failed condition message (ch)
+90005 : "The following condition : " missing arguments error message 
 ```

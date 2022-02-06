@@ -16,6 +16,8 @@ namespace TJAPlayer3
                 ObjectCreationHandling = ObjectCreationHandling.Auto,
                 DefaultValueHandling = DefaultValueHandling.Include,
                 // ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                NullValueHandling = NullValueHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore,
                 Converters = new StringEnumConverter[] { new StringEnumConverter() }
             };
 

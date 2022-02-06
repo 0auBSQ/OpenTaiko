@@ -263,6 +263,13 @@ namespace TJAPlayer3
             [1032] = "Character",
             [1033] = "Dan Title",
             [1034] = "Nameplate Title",
+
+            [90000] = "[ERROR] Invalid condition",
+            [90001] = "Item only avaliable at the Shop.",
+            [90002] = "Coin price : ",
+            [90003] = "Item bought !",
+            [90004] = "Not enough coins !",
+            [90005] = "The following condition : ",
         };
     }
 }

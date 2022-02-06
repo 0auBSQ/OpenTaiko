@@ -8,9 +8,13 @@ namespace TJAPlayer3
         public void tDatabases()
         {
             DBPuchichara = new DBPuchichara();
+            DBUnlockables = new DBUnlockables();
+
             DBPuchichara.tDBPuchichara();
+            DBUnlockables.tDBUnlockables();
         }
 
         public DBPuchichara DBPuchichara;
+        public DBUnlockables DBUnlockables;
     }
 }
