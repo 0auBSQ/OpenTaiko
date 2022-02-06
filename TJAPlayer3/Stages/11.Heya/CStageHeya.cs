@@ -469,6 +469,12 @@ namespace TJAPlayer3
                         iCurrentMenu = -1;
                         this.tResetOpts();
                     }
+                    else if (ess == ESelectStatus.SUCCESS)
+                    {
+                        TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(iPuchiCharaCurrent);
+
+                        TJAPlayer3.NamePlateConfig.tSpendCoins(puchiUnlockables[iPuchiCharaCurrent].Values[0], iPlayer);
+                    }
                 }
 
                 else if (iCurrentMenu == 1)
@@ -639,7 +645,8 @@ namespace TJAPlayer3
         {
             #region [Check unlockable]
 
-            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent))
+            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent)
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
             {
                 // To update then when bought unlockables will be implemented
                 this.ttkInfoSection = new TitleTextureKey(puchiUnlockables[iPuchiCharaCurrent].tConditionMessage()
@@ -654,8 +661,10 @@ namespace TJAPlayer3
         private ESelectStatus tSelectPuchi()
         {
             // Add "If unlocked" to select directly
-            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent))
+            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent) 
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
             {
+
                 (bool, string) response = puchiUnlockables[iPuchiCharaCurrent].tConditionMet(new int[]{ TJAPlayer3.NamePlateConfig.data.Medals[TJAPlayer3.SaveFile] } );
                 Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 
@@ -666,7 +675,7 @@ namespace TJAPlayer3
                 return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
             }
 
-
+            this.ttkInfoSection = null;
             return ESelectStatus.SELECTED;
         }
 
