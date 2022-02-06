@@ -622,6 +622,21 @@ namespace TJAPlayer3
             }
         }
 
+		public class CTimingZones
+        {
+			public int nGoodZone;
+			public int nOkZone;
+			public int nBadZone;
+
+			public CTimingZones(int gz, int oz, int bz)
+            {
+				nGoodZone = gz;
+				nOkZone = oz;
+				nBadZone = bz;
+            }
+
+        }
+
 
 #if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 		//----------------------------------------
@@ -719,7 +734,7 @@ namespace TJAPlayer3
 	    public int SongPreviewLevel
 	    {
 	        get => _songPreviewLevel;
-	        set => SetProperty(ref _songPreviewLevel, value, nameof(SongPlaybackLevel));
+	        set => SetProperty(ref _songPreviewLevel, value, nameof(SongPreviewLevel));
 	    }
 
 	    private int _songPlaybackLevel;
@@ -773,6 +788,16 @@ namespace TJAPlayer3
 			new CAIPerformances(950, 49, 1, 22),
 			new CAIPerformances(975, 25, 0, 26),
 			new CAIPerformances(1000, 0, 0, 30)
+		};
+
+		public CTimingZones[] tzLevels =
+		{
+			new CTimingZones(75, 114, 125),
+			new CTimingZones(55, 108, 125), // (New) Easy ?
+			new CTimingZones(42, 108, 125), // Normal / Tower Normal (Ama-kuchi)
+			new CTimingZones(33, 86, 115), // (New) Hard ?
+			new CTimingZones(25, 75, 108), // Extreme / Tower Ex (Kara-kuchi) / Dan
+			new CTimingZones(25, 58, 108) // Extreme + Hard timing (Tatsu)
 		};
 
         public bool b大音符判定;
@@ -1342,7 +1367,7 @@ namespace TJAPlayer3
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
 			this.sLang = "jp";
-			this.nLayoutType = 0;
+			this.nLayoutType = 1;
 
 			// 2018-08-28 twopointzero:
 			// There exists a particular large, well-known, well-curated, and
@@ -1364,7 +1389,7 @@ namespace TJAPlayer3
 		    this.ApplySongVol = false;
 		    this.SoundEffectLevel = CSound.DefaultSoundEffectLevel;
 		    this.VoiceLevel = CSound.DefaultVoiceLevel;
-		    this.SongPreviewLevel = CSound.DefaultSongPlaybackLevel;
+		    this.SongPreviewLevel = CSound.DefaultSongPreviewLevel;
 		    this.SongPlaybackLevel = CSound.DefaultSongPlaybackLevel;
 		    this.KeyboardSoundLevelIncrement = DefaultKeyboardSoundLevelIncrement;
 			this.bログ出力 = true;
@@ -1789,7 +1814,11 @@ namespace TJAPlayer3
 		    sw.WriteLine( $"; Voice level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
 		    sw.WriteLine( "{0}={1}", nameof(VoiceLevel), VoiceLevel );
 		    sw.WriteLine();
-		    sw.WriteLine( $"; ゲーム中の音源の音量 ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
+		    sw.WriteLine( $"; 選曲画面のプレビュー時の音量 ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
+		    sw.WriteLine( $"; Song preview level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
+		    sw.WriteLine( "{0}={1}", nameof(SongPreviewLevel), SongPreviewLevel );
+			sw.WriteLine();
+			sw.WriteLine( $"; ゲーム中の音源の音量 ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
 		    sw.WriteLine( $"; Song playback level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)" );
 		    sw.WriteLine( "{0}={1}", nameof(SongPlaybackLevel), SongPlaybackLevel );
 			sw.WriteLine();
@@ -2471,6 +2500,10 @@ namespace TJAPlayer3
 											{
 												this.SongPreviewLevel = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel );
 											}
+											else if ( str3.Equals( nameof(SongPlaybackLevel) ) )
+											{
+												this.SongPlaybackLevel = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel );
+											}
 											else if( str3.Equals( nameof(KeyboardSoundLevelIncrement) ) )
 											{
 												this.KeyboardSoundLevelIncrement = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement );
@@ -2642,6 +2675,7 @@ namespace TJAPlayer3
                                             this.nヒット範囲ms.Poor = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Poor);
                                         }
                                         continue;
+
                                     //-----------------------------
                                     #endregion
 

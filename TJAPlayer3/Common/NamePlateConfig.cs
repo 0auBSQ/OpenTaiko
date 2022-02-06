@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace TJAPlayer3
 {
@@ -107,7 +108,10 @@ namespace TJAPlayer3
                 clearStatus = cs;
             }
 
+            [JsonProperty("isGold")]
             public bool isGold;
+
+            [JsonProperty("clearStatus")]
             public int clearStatus;
         }
 
@@ -118,6 +122,7 @@ namespace TJAPlayer3
                 iType = type;
             }
 
+            [JsonProperty("iType")]
             public int iType;
         }
 
@@ -134,24 +139,46 @@ namespace TJAPlayer3
 
         public class Data
         {
+            [JsonProperty("name")]
             public string[] Name = { "プレイヤー1", "プレイヤー2" };
+
+            [JsonProperty("title")]
             public string[] Title = { "初心者", "初心者" };
+
+            [JsonProperty("dan")]
             public string[] Dan = { "新人", "新人" };
 
+            [JsonProperty("danGold")]
             public bool[] DanGold = { false, false };
 
+            [JsonProperty("danType")]
             public int[] DanType = { 0, 0 };
+
+            [JsonProperty("titleType")]
             public int[] TitleType = { 0, 0 };
 
-            public int[] PuchiChara = { 2, 11 };
+            [JsonProperty("puchiChara")]
+            public int[] PuchiChara = { 0, 0 };
 
+            [JsonProperty("medals")]
             public int[] Medals = { 0, 0 };
 
+            [JsonProperty("character")]
             public int[] Character = { 0, 0 };
 
+            [JsonProperty("danTitles")]
             public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[2];
 
+            [JsonProperty("namePlateTitles")]
             public Dictionary<string, CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, CNamePlateTitle>[2];
+
+            [JsonProperty("unlockedPuchicharas")]
+            public List<int>[] UnlockedPuchicharas = new List<int>[2]
+            {
+                new List<int>(),
+                new List<int>()
+            };
+
         }
 
         public Data data = new Data();

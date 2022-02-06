@@ -158,21 +158,21 @@ namespace TJAPlayer3
             int[] y = new int[] { 0, 176 };
 
             this.ctEnd_ClearFailed.t進行();
-            if (this.ctEnd_ClearFailed.n現在の値 <= 20)
+            if (this.ctEnd_ClearFailed.n現在の値 <= 20 || TJAPlayer3.Tx.ClearFailed == null)
             {
-                TJAPlayer3.Tx.End_ClearFailed[this.ctEnd_ClearFailed.n現在の値].t2D描画(TJAPlayer3.app.Device, 505, y[i] + 145);
+                TJAPlayer3.Tx.End_ClearFailed[Math.Min(this.ctEnd_ClearFailed.n現在の値, TJAPlayer3.Tx.End_ClearFailed.Length - 1)]?.t2D描画(TJAPlayer3.app.Device, 505, y[i] + 145);
             }
-            if (this.ctEnd_ClearFailed.n現在の値 >= 20 && this.ctEnd_ClearFailed.n現在の値 <= 67)
+            else if (this.ctEnd_ClearFailed.n現在の値 >= 20 && this.ctEnd_ClearFailed.n現在の値 <= 67)
             {
-                TJAPlayer3.Tx.ClearFailed.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+                TJAPlayer3.Tx.ClearFailed?.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
             }
             else if (this.ctEnd_ClearFailed.n現在の値 == 68)
             {
-                TJAPlayer3.Tx.ClearFailed1.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+                TJAPlayer3.Tx.ClearFailed1?.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
             }
             else if (this.ctEnd_ClearFailed.n現在の値 >= 69)
             {
-                TJAPlayer3.Tx.ClearFailed2.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
+                TJAPlayer3.Tx.ClearFailed2?.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
             }
         }
         private void showEndEffect_Clear(int i)
@@ -338,7 +338,8 @@ namespace TJAPlayer3
 
             this.ctEnd_FullCombo.t進行();
             TJAPlayer3.Tx.End_FullCombo[this.ctEnd_FullCombo.n現在の値].t2D描画(TJAPlayer3.app.Device, 330, y[i] + 50);
-            if (this.ctEnd_FullCombo.b終了値に達した)
+
+            if (this.ctEnd_FullCombo.b終了値に達した && TJAPlayer3.Tx.End_FullComboLoop[0] != null)
             {
                 this.ctEnd_FullComboLoop.t進行Loop();
                 TJAPlayer3.Tx.End_FullComboLoop[this.ctEnd_FullComboLoop.n現在の値].t2D描画(TJAPlayer3.app.Device, 330, y[i] + 196);

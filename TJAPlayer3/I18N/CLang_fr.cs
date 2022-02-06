@@ -206,6 +206,8 @@ namespace TJAPlayer3
             [10057] = "Masque les sons de type Dan ou\nTour dans le menu Partie rapide.\n" +
             "Note: Cette option prend effet\n" +
                 "     après le rechargement des sons.",
+            [10058] = "Volume de la prévisualisation de la musique",
+            [10059] = "Ajuste le volume de la prévisualisation de la musique.\nVous devez redemarrer le jeu pour que\ncette option prenne effet.",
             [10084] = "Mode Shin'uchi",
 
 
@@ -252,6 +254,13 @@ namespace TJAPlayer3
             [1032] = "Personnage",
             [1033] = "Titre Dan",
             [1034] = "Titre",
+
+            [90000] = "[ERREUR] Condition invalide",
+            [90001] = "L'article n'est disponible que dans le Magasin.",
+            [90002] = "Prix en pièces : ",
+            [90003] = "Article acheté !",
+            [90004] = "Nombre de pièces insuffisant !",
+            [90005] = "La condition suivante : ",
         };
     }
 }

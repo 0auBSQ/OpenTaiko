@@ -4256,7 +4256,7 @@ namespace TJAPlayer3
 
                 if (nDice < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds)
                     return E判定.Poor;
-                else if (nDice + TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds
+                else if (nDice - TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds
                     < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nGoodOdds)
                     return E判定.Good;
             }

@@ -436,10 +436,11 @@ namespace TJAPlayer3
             Taiko_Score[0] = TxC(GAME + TAIKO + @"Score.png");
             Taiko_Score[1] = TxC(GAME + TAIKO + @"Score_1P.png");
             Taiko_Score[2] = TxC(GAME + TAIKO + @"Score_2P.png");
-            Taiko_Combo = new CTexture[3];
+            Taiko_Combo = new CTexture[4];
             Taiko_Combo[0] = TxC(GAME + TAIKO + @"Combo.png");
             Taiko_Combo[1] = TxC(GAME + TAIKO + @"Combo_Big.png");
             Taiko_Combo[2] = TxC(GAME + TAIKO + @"Combo_Midium.png");
+            Taiko_Combo[3] = TxC(GAME + TAIKO + @"Combo_Huge.png");
             Taiko_Combo_Effect = TxC(GAME + TAIKO + @"Combo_Effect.png");
             Taiko_Combo_Text = TxC(GAME + TAIKO + @"Combo_Text.png");
             #endregion

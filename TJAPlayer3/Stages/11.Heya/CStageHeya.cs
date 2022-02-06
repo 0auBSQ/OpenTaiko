@@ -110,8 +110,41 @@ namespace TJAPlayer3
             iCurrentMenu = -1;
             iMainMenuCurrent = 0;
 
+            #region [PuchiChara stuff]
+
             // Tmp variables
             iPuchiCharaCount = 120;
+
+            ttkPuchiCharaNames = new TitleTextureKey[iPuchiCharaCount];
+
+            var RarityToColor = new Dictionary<string, Color>
+            {
+                ["Common"] = Color.White,
+                ["Uncommon"] = Color.Lime,
+                ["Rare"] = Color.Blue,
+                ["Epic"] = Color.Purple,
+                ["Legendary"] = Color.Orange,
+            };
+
+            var dbData = TJAPlayer3.Databases.DBPuchichara.data;
+
+            for (int i = 0; i < iPuchiCharaCount; i++)
+            {
+                if (dbData.ContainsKey(i))
+                {
+                    Color textColor = Color.White;
+
+                    string rarity = dbData[i].Rarity;
+
+                    if (RarityToColor.ContainsKey(rarity))
+                        textColor = RarityToColor[rarity];
+
+                    ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                }
+            }
+
+            #endregion
+
             iCharacterCount = TJAPlayer3.Skin.Characters_Ptn;
 
             this.tResetOpts();
@@ -199,6 +232,21 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
                     TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+
+                    if (ttkPuchiCharaNames[pos] != null)
+                    {
+                        CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
+
+                        tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 448);
+                    }
+
+                    #region [Unlockable information zone]
+
+                    if (i == 0 && this.ttkInfoSection != null)
+                        TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkInfoSection)
+                            .t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620, 560);
+
+                    #endregion
                 }
             }
 
@@ -389,7 +437,7 @@ namespace TJAPlayer3
 
                 #region [Decide]
 
-                TJAPlayer3.Skin.soundŒˆ’è‰¹.tÄ¶‚·‚é();
+                ESelectStatus ess = ESelectStatus.SELECTED;
 
                 // Return to main menu
                 if (iCurrentMenu == -1 && iMainMenuCurrent == 0)
@@ -403,16 +451,30 @@ namespace TJAPlayer3
                 else if (iCurrentMenu == -1)
                 {
                     iCurrentMenu = iMainMenuCurrent - 1;
+
+                    if (iCurrentMenu == 0)
+                        this.tUpdateUnlockableTextPuchi();
                 }
 
                 else if (iCurrentMenu == 0)
                 {
-                    TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
+                    ess = this.tSelectPuchi();
 
-                    TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+                    if (ess == ESelectStatus.SELECTED)
+                    {
+                        TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
 
-                    iCurrentMenu = -1;
-                    this.tResetOpts();
+                        TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+
+                        iCurrentMenu = -1;
+                        this.tResetOpts();
+                    }
+                    else if (ess == ESelectStatus.SUCCESS)
+                    {
+                        TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(iPuchiCharaCurrent);
+
+                        TJAPlayer3.NamePlateConfig.tSpendCoins(puchiUnlockables[iPuchiCharaCurrent].Values[0], iPlayer);
+                    }
                 }
 
                 else if (iCurrentMenu == 1)
@@ -470,6 +532,13 @@ namespace TJAPlayer3
                     iCurrentMenu = -1;
                     this.tResetOpts();
                 }
+
+                if (ess == ESelectStatus.SELECTED)
+                    TJAPlayer3.Skin.soundŒˆ’è‰¹.tÄ¶‚·‚é();
+                else if (ess == ESelectStatus.FAILED)
+                    TJAPlayer3.Skin.soundError.tÄ¶‚·‚é();
+                else
+                    TJAPlayer3.Skin.SoundBanapas.tÄ¶‚·‚é(); // To change with a more appropriate sfx sooner or later
 
                 #endregion
             }
@@ -530,6 +599,10 @@ namespace TJAPlayer3
 
         private int iMainMenuCurrent;
         private int iPuchiCharaCurrent;
+
+        private TitleTextureKey[] ttkPuchiCharaNames;
+        private TitleTextureKey ttkInfoSection;
+
         private int iCharacterCurrent;
         private int iDanTitleCurrent;
         private int iTitleCurrent;
@@ -551,7 +624,10 @@ namespace TJAPlayer3
             if (iCurrentMenu == -1)
                 iMainMenuCurrent = (this.ttkMainMenuOpt.Length + iMainMenuCurrent + off) % this.ttkMainMenuOpt.Length;
             else if (iCurrentMenu == 0)
+            {
                 iPuchiCharaCurrent = (iPuchiCharaCount + iPuchiCharaCurrent + off) % iPuchiCharaCount;
+                tUpdateUnlockableTextPuchi();
+            }
             else if (iCurrentMenu == 1)
                 iCharacterCurrent = (iCharacterCount + iCharacterCurrent + off) % iCharacterCount;
             else if (iCurrentMenu == 2)
@@ -564,8 +640,63 @@ namespace TJAPlayer3
             return true;
         }
 
+        #region [Puchi unlockables]
+        private void tUpdateUnlockableTextPuchi()
+        {
+            #region [Check unlockable]
+
+            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent)
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
+            {
+                // To update then when bought unlockables will be implemented
+                this.ttkInfoSection = new TitleTextureKey(puchiUnlockables[iPuchiCharaCurrent].tConditionMessage()
+                    , this.pfHeyaFont, Color.White, Color.Black, 1000);
+            }
+            else
+                this.ttkInfoSection = null;
+
+            #endregion
+        }
+
+        private ESelectStatus tSelectPuchi()
+        {
+            // Add "If unlocked" to select directly
+            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent) 
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
+            {
+
+                (bool, string) response = puchiUnlockables[iPuchiCharaCurrent].tConditionMet(new int[]{ TJAPlayer3.NamePlateConfig.data.Medals[TJAPlayer3.SaveFile] } );
+                Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
+
+                // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
+
+                this.ttkInfoSection = new TitleTextureKey(response.Item2, this.pfHeyaFont, responseColor, Color.Black, 1000);
+
+                return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
+            }
+
+            this.ttkInfoSection = null;
+            return ESelectStatus.SELECTED;
+        }
+
+        /*
+         *  FAILED : Selection/Purchase failed (failed condition)
+         *  SUCCESS : Purchase succeed (without selection)
+         *  SELECTED : Selection succeed
+        */
+        private enum ESelectStatus
+        {
+            FAILED,
+            SUCCESS,
+            SELECTED
+        };
+
+        #endregion
+
         private TitleTextureKey[] ttkMainMenuOpt;
         private CPrivateFastFont pfHeyaFont;
+
+        private Dictionary<int, DBUnlockables.CUnlockConditions> puchiUnlockables = TJAPlayer3.Databases.DBUnlockables.data.Puchichara;
 
         private TitleTextureKey[] ttkDanTitles;
 

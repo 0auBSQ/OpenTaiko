@@ -474,7 +474,11 @@ namespace TJAPlayer3
 				}
 
 				// Discord Presenseの更新
-				Discord.UpdatePresence(TJAPlayer3.DTX.TITLE + ".tja", Properties.Discord.Stage_Result + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == true ? " (" + Properties.Discord.Info_IsAuto + ")" : ""), TJAPlayer3.StartupTime);
+				Discord.UpdatePresence(TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stage選曲.r確定された曲.strタイトル
+					+ Discord.DiffToString(TJAPlayer3.stage選曲.n確定された曲の難易度[0])
+					: "",
+					Properties.Discord.Stage_Result + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay == true ? " (" + Properties.Discord.Info_IsAuto + ")" : ""), 
+					TJAPlayer3.StartupTime);
 
 
 				#region [Earned medals]
@@ -482,7 +486,7 @@ namespace TJAPlayer3
 				this.nEarnedMedalsCount[0] = 0;
 				this.nEarnedMedalsCount[1] = 0;
 
-				// Medals (implement P2 later)
+				// Medals
 
 				int nTotalHits = this.st演奏記録.Drums.nGreat数 + this.st演奏記録.Drums.nMiss数 + this.st演奏記録.Drums.nPerfect数;
 

@@ -225,6 +225,8 @@ namespace TJAPlayer3
             [10057] = "Ocultar charts de Dans y torres\nen el menú de Modo Taiko.\n" +
                     "Nota: Recarga las canciones para\n" +
                 "     aplicar los cambios.",
+            [10058] = "Volumen de la demo",
+            [10059] = "Ajusta el volumen de la demo de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [10084] = "Modo Shinuchi",
 
             [100] = "Modo Taiko",

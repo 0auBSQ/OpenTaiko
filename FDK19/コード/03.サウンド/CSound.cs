@@ -441,6 +441,7 @@ namespace FDK
 	    public const int DefaultGroupLevel = 100;
 	    public const int DefaultSoundEffectLevel = 80;
 	    public const int DefaultVoiceLevel = 90;
+	    public const int DefaultSongPreviewLevel = 90;
 	    public const int DefaultSongPlaybackLevel = 90;
 
 	    public static readonly Lufs MinimumLufs = new Lufs(-100.0);
@@ -695,7 +696,8 @@ namespace FDK
 	            if (this.bBASSサウンドである)
 	            {
 	                var db音量 = ((value.ToDouble() / 100.0) + 1.0).Clamp(0, 1);
-	                Bass.BASS_ChannelSetAttribute(this.hBassStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
+	                Bass.BASS_ChannelSetAttribute(this._hBassStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
+	                Bass.BASS_ChannelSetAttribute(this._hTempoStream, BASSAttribute.BASS_ATTRIB_VOL, (float) db音量);
 	            }
 	            else if (this.bDirectSoundである)
 	            {

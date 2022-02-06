@@ -50,21 +50,43 @@ namespace TJAPlayer3
         [DllImport("discord-rpc", EntryPoint = "Discord_Shutdown", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Shutdown();
 
+        /*
         [DllImport("discord-rpc", EntryPoint = "Discord_RunCallbacks", CallingConvention = CallingConvention.Cdecl)]
         public static extern void RunCallbacks();
+        */
 
         [DllImport("discord-rpc", EntryPoint = "Discord_UpdatePresence", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdatePresence(ref RichPresence presence);
 
+        /*
         [DllImport("discord-rpc", EntryPoint = "Discord_ClearPresence", CallingConvention = CallingConvention.Cdecl)]
         public static extern void ClearPresence();
 
         [DllImport("discord-rpc", EntryPoint = "Discord_UpdateHandlers", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdateHandlers(ref EventHandlers handlers);
+        */
     }
 
     public static class Discord
     {
+        public static string DiffToString(int diff)
+        {
+            string[] diffArr =
+            {
+                " Easy ",
+                " Normal ",
+                " Hard ",
+                " Extreme ",
+                " Extra ",
+                " Tower ",
+                " Dan "
+            };
+
+            int level = TJAPlayer3.stage選曲.r確定された曲.nLevel[diff];
+
+            return (diffArr[Math.Min(diff, 6)] + "Lv." + level);
+        }
+
 
         private static readonly List<IntPtr> _buffers = new List<IntPtr>(10);
 
@@ -100,8 +122,8 @@ namespace TJAPlayer3
 
             if (startTimeStamp != 0) presence.startTimestamp = startTimeStamp;
             if (endTimeStamp != 0) presence.endTimestamp = endTimeStamp;
-            presence.largeImageKey = StrToPtr("rewrite");
-            presence.largeImageText = StrToPtr("Ver." + TJAPlayer3.VERSION);
+            presence.largeImageKey = StrToPtr("logo".ToLowerInvariant());
+            presence.largeImageText = StrToPtr(TJAPlayer3.AppDisplayThreePartVersion);
             if (!string.IsNullOrEmpty(smallImageKey)) presence.smallImageKey = StrToPtr(smallImageKey);
             if (!string.IsNullOrEmpty(smallImageText)) presence.smallImageText = StrToPtr(smallImageText);
 
