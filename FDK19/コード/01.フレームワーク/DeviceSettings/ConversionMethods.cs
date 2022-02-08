@@ -19,9 +19,9 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
-using SlimDX;
-using SlimDX.Direct3D9;
-using DXGI = SlimDX.DXGI;
+using SharpDX;
+using SharpDX.Direct3D9;
+using DXGI = SharpDX.DXGI;
 
 namespace SampleFramework
 {
@@ -139,7 +139,7 @@ namespace SampleFramework
                 case DXGI.Format.R8G8B8A8_Typeless:
                 case DXGI.Format.R8G8B8A8_UInt:
                 case DXGI.Format.R8G8B8A8_UNorm:
-                case DXGI.Format.R8G8B8A8_UNorm_SRGB:
+                case DXGI.Format.R8G8B8A8_UNorm_SRgb:
                     return 8;
 
                 case DXGI.Format.B5G5R5A1_UNorm:
@@ -193,7 +193,7 @@ namespace SampleFramework
             return Format.Unknown;
         }
 
-        public static float ToFloat(Rational rational)
+        public static float ToFloat(DXGI.Rational rational)
         {
             float denom = 1;
             if (rational.Denominator != 0)

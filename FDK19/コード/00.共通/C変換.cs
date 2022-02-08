@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SlimDX;
+using SharpDX;
 
 namespace FDK
 {
@@ -237,7 +237,12 @@ namespace FDK
             float fG = n255ToParsent( nG );
             float fB = n255ToParsent( nB );
 
-            return new Color4( fR, fG, fB );
+            return new Color4( fR, fG, fB, 1f );
+        }
+
+		public static Color4 ColorToColor4(System.Drawing.Color col)
+        {
+			return new Color4(col.ToArgb());
         }
 
 		#region [ private ]

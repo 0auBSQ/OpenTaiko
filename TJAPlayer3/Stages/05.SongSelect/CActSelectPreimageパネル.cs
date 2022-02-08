@@ -4,9 +4,12 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using System.Diagnostics;
-using SlimDX;
-using SlimDX.Direct3D9;
+using SharpDX;
+using SharpDX.Direct3D9;
 using FDK;
+
+using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
 
 namespace TJAPlayer3
 {
@@ -63,7 +66,7 @@ namespace TJAPlayer3
 				//this.txセンサ光 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_sensor light.png" ), false );
 				this.txプレビュー画像 = null;
 				this.txプレビュー画像がないときの画像 = TJAPlayer3.tテクスチャの生成( CSkin.Path( @"Graphics\5_preimage default.png" ), false );
-				this.sfAVI画像 = Surface.CreateOffscreenPlain( TJAPlayer3.app.Device.UnderlyingDevice, 0xcc, 0x10d, TJAPlayer3.app.GraphicsDeviceManager.CurrentSettings.BackBufferFormat, Pool.SystemMemory );
+				this.sfAVI画像 = Surface.CreateOffscreenPlain( TJAPlayer3.app.Device, 0xcc, 0x10d, TJAPlayer3.app.GraphicsDeviceManager.CurrentSettings.BackBufferFormat, Pool.SystemMemory );
 				this.nAVI再生開始時刻 = -1;
 				this.n前回描画したフレーム番号 = -1;
 				this.b動画フレームを作成した = false;
@@ -183,8 +186,8 @@ namespace TJAPlayer3
 		private unsafe void tサーフェイスをクリアする( Surface sf )
 		{
 			DataRectangle rectangle = sf.LockRectangle( LockFlags.None );
-			DataStream data = rectangle.Data;
-			switch( ( rectangle.Pitch / sf.Description.Width ) )
+			DataStream data = new DataStream(rectangle.DataPointer, sf.Description.Width * rectangle.Pitch, true, false);
+			switch ( ( rectangle.Pitch / sf.Description.Width ) )
 			{
 				case 4:
 					{
@@ -524,7 +527,7 @@ namespace TJAPlayer3
 					if( this.b動画フレームを作成した && ( this.pAVIBmp != IntPtr.Zero ) )
 					{
 						DataRectangle rectangle = this.sfAVI画像.LockRectangle( LockFlags.None );
-						DataStream data = rectangle.Data;
+						DataStream data = new DataStream(rectangle.DataPointer, this.sfAVI画像.Description.Width * rectangle.Pitch, true, false); ;
 						int num5 = rectangle.Pitch / this.sfAVI画像.Description.Width;
 						BitmapUtil.BITMAPINFOHEADER* pBITMAPINFOHEADER = (BitmapUtil.BITMAPINFOHEADER*) this.pAVIBmp.ToPointer();
 						if( pBITMAPINFOHEADER->biBitCount == 0x18 )
@@ -547,7 +550,7 @@ namespace TJAPlayer3
 					{
 						try
 						{
-							TJAPlayer3.app.Device.UpdateSurface( this.sfAVI画像, new Rectangle( 0, 0, this.sfAVI画像.Description.Width, this.sfAVI画像.Description.Height ), surface, new Point( x, y ) );
+							TJAPlayer3.app.Device.UpdateSurface( this.sfAVI画像, new SharpDX.Rectangle( 0, 0, this.sfAVI画像.Description.Width, this.sfAVI画像.Description.Height ), surface, new SharpDX.Point( x, y ) );
 						}
 						catch( Exception e )	// #32335 2013.10.26 yyagi: codecがないと、D3DERR_INVALIDCALLが発生する場合がある
 						{

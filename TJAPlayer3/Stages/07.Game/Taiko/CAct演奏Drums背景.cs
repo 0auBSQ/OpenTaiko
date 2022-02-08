@@ -1,8 +1,11 @@
 ﻿using System;
 using FDK;
 using System.Drawing;
-using SlimDX;
+using SharpDX;
 using static TJAPlayer3.CActSelect曲リスト;
+
+using Color = System.Drawing.Color;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3
 {
@@ -253,9 +256,9 @@ namespace TJAPlayer3
                 {
                     float colorTmp = 0.5f + (1f - currentFloorPositionMax140) * 0.5f;
 
-                    TJAPlayer3.Tx.Background_Up_Tower[1].color4 = new Color4(colorTmp, colorTmp, colorTmp);
-                    TJAPlayer3.Tx.Background_Up_Tower[2].color4 = new Color4(colorTmp, colorTmp, colorTmp);
-                    TJAPlayer3.Tx.Background_Up_Tower[3].color4 = new Color4(colorTmp, colorTmp, colorTmp);
+                    TJAPlayer3.Tx.Background_Up_Tower[1].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
+                    TJAPlayer3.Tx.Background_Up_Tower[2].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
+                    TJAPlayer3.Tx.Background_Up_Tower[3].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
 
                     TJAPlayer3.Tx.Background_Up_Tower[1].Opacity = (int)(255f * colorTmp);
                     TJAPlayer3.Tx.Background_Up_Tower[2].Opacity = (int)(255f * colorTmp);
@@ -309,7 +312,7 @@ namespace TJAPlayer3
 
                     int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Width / 10;
 
-                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f);
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
                     TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.4f;
                     TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.4f;
 
@@ -350,9 +353,9 @@ namespace TJAPlayer3
                     bool lifeSpecialCase = CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1;
                     float lifeRatio = CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives;
 
-                    Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f)
-                            : ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f)
-                            : new Color4(1f, 0.2f, 0.2f));
+                    Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f, 1f)
+                            : ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f, 1f)
+                            : new Color4(1f, 0.2f, 0.2f, 1f));
 
                     TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
                     TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.1f;
@@ -368,7 +371,7 @@ namespace TJAPlayer3
                                 digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
                     }
 
-                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f);
+                    TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
 
                     #endregion
 

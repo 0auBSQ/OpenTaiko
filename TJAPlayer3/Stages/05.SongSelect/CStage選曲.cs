@@ -394,13 +394,13 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                             {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = this.NowBgColor;
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = C変換.ColorToColor4(this.NowBgColor);
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].Opacity = 255;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack] != null)
                             {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = this.OldBgColor;
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = C変換.ColorToColor4(this.OldBgColor);
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].Opacity = 600 - ctBackgroundFade.n現在の値;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }

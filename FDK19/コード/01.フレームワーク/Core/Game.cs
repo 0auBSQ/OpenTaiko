@@ -23,8 +23,8 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Forms;
-using SlimDX;
-using SlimDX.Direct3D9;
+using SharpDX;
+using SharpDX.Direct3D9;
 using System.Collections.ObjectModel;
 
 namespace SampleFramework
@@ -182,15 +182,15 @@ namespace SampleFramework
         static Game()
         {
             // configure SlimDX
-            Configuration.ThrowOnError = true;
-            Configuration.AddResultWatch(ResultCode.DeviceLost, ResultWatchFlags.AlwaysIgnore);
-            Configuration.AddResultWatch(ResultCode.WasStillDrawing, ResultWatchFlags.AlwaysIgnore);
+            //Configuration.ThrowOnError = true;
+            //Configuration.AddResultWatch(ResultCode.DeviceLost, ResultWatchFlags.AlwaysIgnore);
+            //Configuration.AddResultWatch(ResultCode.WasStillDrawing, ResultWatchFlags.AlwaysIgnore);
 
 #if DEBUG
-            Configuration.DetectDoubleDispose = true;
+            //Configuration.DetectDoubleDispose = true;
             Configuration.EnableObjectTracking = true;
 #else
-            Configuration.DetectDoubleDispose = false;
+            //Configuration.DetectDoubleDispose = false;
             Configuration.EnableObjectTracking = false;
 #endif
 

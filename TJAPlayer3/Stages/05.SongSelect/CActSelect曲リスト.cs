@@ -8,9 +8,14 @@ using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Drawing.Text;
 using System.Threading.Tasks;
-using SlimDX;
+using SharpDX;
 using FDK;
 using System.Linq;
+
+using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
+using RectangleF = System.Drawing.RectangleF;
 
 namespace TJAPlayer3
 {
@@ -1462,7 +1467,7 @@ namespace TJAPlayer3
 				if (!stバー情報[nパネル番号].BoxTypeChanged)
 					boxType = nStrジャンルtoNum(stバー情報[nパネル番号].strジャンル);
 
-				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = stバー情報[nパネル番号].BoxColor;
+				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = C変換.ColorToColor4(stバー情報[nパネル番号].BoxColor);
 
 				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].vc拡大縮小倍率.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f;
@@ -1574,7 +1579,7 @@ namespace TJAPlayer3
 					if (!r現在選択中の曲.isChangedBoxType)
 						boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
 
-					TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = r現在選択中の曲.BoxColor;
+					TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = C変換.ColorToColor4(r現在選択中の曲.BoxColor);
 
 					if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
 					{
@@ -1680,7 +1685,7 @@ namespace TJAPlayer3
 					if (!r現在選択中の曲.isChangedBoxType)
 						boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
 
-					TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = r現在選択中の曲.BoxColor;
+					TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = C変換.ColorToColor4(r現在選択中の曲.BoxColor);
 
 					if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
                     {
@@ -1798,9 +1803,9 @@ namespace TJAPlayer3
 											bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
 
 											if (avaliable)
-												TJAPlayer3.Tx.SongSelect_Frame_Score[0].color4 = new Color4(1f, 1f, 1f);
+												TJAPlayer3.Tx.SongSelect_Frame_Score[0].color4 = new Color4(1f, 1f, 1f, 1f);
 											else
-												TJAPlayer3.Tx.SongSelect_Frame_Score[0].color4 = new Color4(0.5f, 0.5f, 0.5f);
+												TJAPlayer3.Tx.SongSelect_Frame_Score[0].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
 
 											#endregion
 
@@ -1876,9 +1881,9 @@ namespace TJAPlayer3
 									bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff] >= 0;
 
 									if (avaliable)
-										TJAPlayer3.Tx.SongSelect_Frame_Score[1].color4 = new Color4(1f, 1f, 1f);
+										TJAPlayer3.Tx.SongSelect_Frame_Score[1].color4 = new Color4(1f, 1f, 1f, 1f);
 									else
-										TJAPlayer3.Tx.SongSelect_Frame_Score[1].color4 = new Color4(0.5f, 0.5f, 0.5f);
+										TJAPlayer3.Tx.SongSelect_Frame_Score[1].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
 
 									#endregion
 

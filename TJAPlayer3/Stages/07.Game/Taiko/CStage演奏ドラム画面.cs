@@ -7,9 +7,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
-using SlimDX;
+using SharpDX;
 using FDK;
-using TJAPlayer3;
+
+using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -1923,8 +1926,8 @@ namespace TJAPlayer3
                         }
 
                         float f減少するカラー = 1.0f - ((0.95f / 100) * pChip.RollEffectLevel);
-                        var effectedColor = new Color4(1.0f, f減少するカラー, f減少するカラー);
-                        var normalColor = new Color4(1.0f, 1.0f, 1.0f);
+                        var effectedColor = new Color4(1.0f, f減少するカラー, f減少するカラー, 1f);
+                        var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
                         float f末端ノーツのテクスチャ位置調整 = 65f;
 
                         if (pChip.nチャンネル番号 == 0x15 && pChip.bShow) //連打(小)
