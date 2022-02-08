@@ -56,8 +56,8 @@ namespace TJAPlayer3
              * l : "Less than"
              * le : "Less or equal"
              * e : "Equal"
-             * me : "More or equal"
-             * m : "More than" (Default)
+             * me : "More or equal"  (Default)
+             * m : "More than"
              * d : "Different"
             */
             public bool tValueRequirementMet(int val1, int val2)
@@ -77,7 +77,7 @@ namespace TJAPlayer3
                     case "d":
                         return (val1 != val2);
                     default:
-                        return (val1 > val2);
+                        return (val1 >= val2);
                 }
             }
 
