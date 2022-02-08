@@ -934,7 +934,7 @@ namespace TJAPlayer3
                             int displayedScore = 0;
                             int table = 0;
 
-                            TJAPlayer3.Tx.SongSelect_High_Score.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
+                            TJAPlayer3.Tx.SongSelect_High_Score?.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
 
                             if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
                                 table = 0;
