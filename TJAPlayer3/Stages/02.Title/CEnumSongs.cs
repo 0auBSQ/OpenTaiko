@@ -6,10 +6,6 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
-using SlimDX;
-using SlimDX.Direct3D9;
-using FDK;
-using SampleFramework;
 
 namespace TJAPlayer3
 {

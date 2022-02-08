@@ -8,7 +8,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using SlimDX;
-using SlimDX.Direct3D9;
 using FDK;
 using TJAPlayer3;
 
@@ -2207,7 +2206,7 @@ namespace TJAPlayer3
 
             string strNull = "Found";
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDX.DirectInput.Key.F1))
+            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F1))
             {
                 if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
                 {

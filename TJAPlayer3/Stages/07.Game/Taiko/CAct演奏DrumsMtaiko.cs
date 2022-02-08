@@ -4,6 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using FDK;
+using SlimDX;
 
 namespace TJAPlayer3
 {
@@ -184,9 +185,9 @@ namespace TJAPlayer3
                         fScale = 1.0f;
                     }
 
-                    SlimDX.Matrix mat = SlimDX.Matrix.Identity;
-                    mat *= SlimDX.Matrix.Scaling( fScale, fScale, 1.0f );
-                    mat *= SlimDX.Matrix.Translation( -329, fY[ i ], 0 );
+                    Matrix mat = Matrix.Identity;
+                    mat *= Matrix.Scaling( fScale, fScale, 1.0f );
+                    mat *= Matrix.Translation( -329, fY[ i ], 0 );
                     if( this.After[ i ] - this.Before[ i ] >= 0 )
                     {
                         //レベルアップ

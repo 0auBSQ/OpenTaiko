@@ -4,8 +4,8 @@ using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using FDK;
+using SlimDX;
 using System.IO;
-using TJAPlayer3;
 using System.Linq;
 using static TJAPlayer3.CActSelect曲リスト;
 
@@ -1169,7 +1169,7 @@ namespace TJAPlayer3
         [StructLayout(LayoutKind.Sequential)]
         struct ChallengeStatus
         {
-            public SlimDX.Color4 Color;
+            public Color4 Color;
             public CCounter Timer_Gauge;
             public CCounter Timer_Amount;
             public CCounter Timer_Failed;

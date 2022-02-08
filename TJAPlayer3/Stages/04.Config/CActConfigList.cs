@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Text;
 using System.Drawing;
 using System.Threading;
-using SlimDX;
 using FDK;
 
 namespace TJAPlayer3

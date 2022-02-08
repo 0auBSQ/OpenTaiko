@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FDK;
-using SlimDX.DirectInput;
 
 namespace TJAPlayer3
 {
@@ -52,7 +51,7 @@ namespace TJAPlayer3
 
                 if (ctBarIn.b終了値に達した && !TJAPlayer3.stage段位選択.b選択した)
                 {
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.RightArrow) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
                     {
                         if (n現在の選択行 - 1 >= 0)
@@ -62,7 +61,7 @@ namespace TJAPlayer3
                         }
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.LeftArrow) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
                     TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
                     {
                         if (n現在の選択行 + 1 <= 2)
@@ -72,7 +71,7 @@ namespace TJAPlayer3
                         }
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Return) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
                     {

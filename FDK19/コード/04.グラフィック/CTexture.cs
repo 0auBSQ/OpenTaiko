@@ -1145,34 +1145,34 @@ namespace FDK
         {
             if (this.b加算合成)
             {
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.SourceAlpha);             // 5
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);                    // 2
+                device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);             // 5
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);                    // 2
             }
             else if (this.b乗算合成)
             {
                 //参考:http://sylphylunar.seesaa.net/article/390331341.html
                 //C++から引っ張ってきたのでちょっと不安。
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.DestinationColor);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.Zero);
+                device.SetRenderState(RenderState.SourceBlend, Blend.DestinationColor);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.Zero);
             }
             else if (this.b減算合成)
             {
                 //参考:http://www3.pf-x.net/~chopper/home2/DirectX/MD20.html
-                device.SetRenderState(RenderState.BlendOperation, SlimDX.Direct3D9.BlendOperation.Subtract);
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.One);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);
+                device.SetRenderState(RenderState.BlendOperation, BlendOperation.Subtract);
+                device.SetRenderState(RenderState.SourceBlend, Blend.One);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);
             }
             else if (this.bスクリーン合成)
             {
                 //参考:http://sylphylunar.seesaa.net/article/390331341.html
                 //C++から引っ張ってきたのでちょっと不安。
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.InverseDestinationColor);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);
+                device.SetRenderState(RenderState.SourceBlend, Blend.InverseDestinationColor);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);
             }
             else
             {
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.SourceAlpha);             // 5
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.InverseSourceAlpha); // 6
+                device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);             // 5
+                device.SetRenderState(RenderState.DestinationBlend, Blend.InverseSourceAlpha); // 6
             }
         }
         private Size t指定されたサイズを超えない最適なテクスチャサイズを返す(Device device, Size sz指定サイズ)

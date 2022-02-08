@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using FDK;
-using SlimDX.DirectInput;
 using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
@@ -147,19 +146,19 @@ namespace TJAPlayer3
 
                 if (!this.段位リスト.bスクロール中 && !b選択した && !bDifficultyIn)
                 {
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)Key.RightArrow) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
                     {
                         this.段位リスト.t右に移動();
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)Key.LeftArrow) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow) ||
                     TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
                     {
                         this.段位リスト.t左に移動();
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Return) ||
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
                     {
@@ -169,7 +168,7 @@ namespace TJAPlayer3
                         this.段位挑戦選択画面.ctBarIn.t開始(0, 255, 1, TJAPlayer3.Timer);
                     }
 
-                    if(TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Escape))
+                    if(TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
                     {
                         TJAPlayer3.Skin.soundDanSelectBGM.t停止する();
                         TJAPlayer3.Skin.sound取消音.t再生する();

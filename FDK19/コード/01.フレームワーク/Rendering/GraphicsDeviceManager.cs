@@ -27,7 +27,6 @@ using System.Threading;
 using System.Windows.Forms;
 using SlimDX;
 using SlimDX.Direct3D9;
-using SlimDX.DXGI;
 using System.Diagnostics;
 
 namespace SampleFramework
@@ -252,12 +251,12 @@ namespace SampleFramework
             }
 
             // check if the device can be reset, or if we need to completely recreate it
-            Result result = SlimDX.Direct3D9.ResultCode.Success;
+            Result result = ResultCode.Success;
             bool canReset = CanDeviceBeReset(oldSettings, settings);
             if (canReset)
                 result = ResetDevice();
 
-            if (result == SlimDX.Direct3D9.ResultCode.DeviceLost)
+            if (result == ResultCode.DeviceLost)
                 deviceLost = true;
             else if (!canReset || result.IsFailure)
             {
@@ -409,7 +408,7 @@ namespace SampleFramework
 
 		void game_FrameEnd( object sender, EventArgs e )
 		{
-			Result result = SlimDX.Direct3D9.ResultCode.Success;
+			Result result = ResultCode.Success;
 			try
 			{
 				result = Direct3D9.Device.Present();
@@ -418,7 +417,7 @@ namespace SampleFramework
 			{
 				deviceLost = true;
 			}
-			if( result == SlimDX.Direct3D9.ResultCode.DeviceLost )
+			if( result == ResultCode.DeviceLost )
 				deviceLost = true;
 		}
         void game_FrameStart(object sender, CancelEventArgs e)
@@ -438,7 +437,7 @@ namespace SampleFramework
             if (deviceLost)
             {
                 Result result = Direct3D9.Device.TestCooperativeLevel();
-                if (result == SlimDX.Direct3D9.ResultCode.DeviceLost)
+                if (result == ResultCode.DeviceLost)
                 {
                     e.Cancel = true;
                     return;
@@ -515,11 +514,11 @@ namespace SampleFramework
 				}
 				Direct3D9.Device.MaximumFrameLatency = 1;
 #else
-				Direct3D9.Device = new DeviceCache( new SlimDX.Direct3D9.Device( Direct3D9Object, CurrentSettings.Direct3D9.AdapterOrdinal,
+				Direct3D9.Device = new DeviceCache( new Device( Direct3D9Object, CurrentSettings.Direct3D9.AdapterOrdinal,
 					CurrentSettings.Direct3D9.DeviceType, game.Window.Handle,
 					CurrentSettings.Direct3D9.CreationFlags, CurrentSettings.Direct3D9.PresentParameters ) );
 #endif
-				if ( Result.Last == SlimDX.Direct3D9.ResultCode.DeviceLost )
+				if ( Result.Last == ResultCode.DeviceLost )
 				{
 					deviceLost = true;
 					return;
@@ -546,7 +545,7 @@ namespace SampleFramework
 			game.UnloadContent();
 
 			Result result = Direct3D9.Device.Reset( CurrentSettings.Direct3D9.PresentParameters );
-			if( result == SlimDX.Direct3D9.ResultCode.DeviceLost )
+			if( result == ResultCode.DeviceLost )
 				return result;
 
 			PropogateSettings();
@@ -654,13 +653,13 @@ namespace SampleFramework
 			builder.AppendFormat( " ({0}x{1}), ", CurrentSettings.Direct3D9.PresentParameters.BackBufferWidth, CurrentSettings.Direct3D9.PresentParameters.BackBufferHeight );
 
 			if( CurrentSettings.Direct3D9.AdapterFormat == CurrentSettings.Direct3D9.PresentParameters.BackBufferFormat )
-				builder.Append( Enum.GetName( typeof( SlimDX.Direct3D9.Format ), CurrentSettings.Direct3D9.AdapterFormat ) );
+				builder.Append( Enum.GetName( typeof( Format ), CurrentSettings.Direct3D9.AdapterFormat ) );
 			else
 				builder.AppendFormat( "backbuf {0}, adapter {1}",
-					Enum.GetName( typeof( SlimDX.Direct3D9.Format ), CurrentSettings.Direct3D9.AdapterFormat ),
-					Enum.GetName( typeof( SlimDX.Direct3D9.Format ), CurrentSettings.Direct3D9.PresentParameters.BackBufferFormat ) );
+					Enum.GetName( typeof( Format ), CurrentSettings.Direct3D9.AdapterFormat ),
+					Enum.GetName( typeof( Format ), CurrentSettings.Direct3D9.PresentParameters.BackBufferFormat ) );
 
-			builder.AppendFormat( " ({0})", Enum.GetName( typeof( SlimDX.Direct3D9.Format ), CurrentSettings.Direct3D9.PresentParameters.AutoDepthStencilFormat ) );
+			builder.AppendFormat( " ({0})", Enum.GetName( typeof( Format ), CurrentSettings.Direct3D9.PresentParameters.AutoDepthStencilFormat ) );
 
 			if( CurrentSettings.Direct3D9.PresentParameters.Multisample == MultisampleType.NonMaskable )
 				builder.Append( " (Nonmaskable Multisample)" );

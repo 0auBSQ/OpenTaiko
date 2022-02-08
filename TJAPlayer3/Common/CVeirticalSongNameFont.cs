@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Diagnostics;
-using SlimDX;
 using FDK;
 
 namespace TJAPlayer3
