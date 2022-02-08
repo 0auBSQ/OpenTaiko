@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Diagnostics;
-using SlimDX;
+using SharpDX;
 using FDK;
 using static TJAPlayer3.CActSelect曲リスト;
+
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -128,7 +130,7 @@ namespace TJAPlayer3
                 }
                 else
                 {
-                    this.txGENRE.color4 = stageColor;
+                    this.txGENRE.color4 = C変換.ColorToColor4(stageColor);
                 }
 
                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))

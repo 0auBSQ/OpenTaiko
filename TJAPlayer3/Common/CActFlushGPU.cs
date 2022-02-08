@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using SlimDX.Direct3D9;
+using SharpDX.Direct3D9;
 using FDK;
 
 namespace TJAPlayer3
@@ -23,7 +23,7 @@ namespace TJAPlayer3
 			{
 				try			// #xxxxx 2012.12.31 yyagi: to prepare flush, first of all, I create q queue to the GPU.
 				{
-					IDirect3DQuery9 = new Query(TJAPlayer3.app.Device.UnderlyingDevice, QueryType.Occlusion);
+					IDirect3DQuery9 = new Query(TJAPlayer3.app.Device, QueryType.Occlusion);
 				}
 				catch ( Exception e )
 				{
@@ -45,7 +45,7 @@ namespace TJAPlayer3
 			{
 				IDirect3DQuery9.Issue( Issue.End );
 				DWM.Flush();
-				IDirect3DQuery9.GetData<int>( true );	// flush GPU queue
+				IDirect3DQuery9.GetData<int>( out int _, true );	// flush GPU queue
 			}
 			return 0;
 		}

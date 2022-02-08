@@ -8,8 +8,12 @@ using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Drawing.Text;
 
-using SlimDX;
+using SharpDX;
 using FDK;
+
+using Rectangle = System.Drawing.Rectangle;
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -312,7 +316,7 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.n現在の値 - 1255);
             TJAPlayer3.Tx.Difficulty_Star.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.n現在の値 - 1255);
 
-            TJAPlayer3.Tx.Difficulty_Back[boxType].color4 = TJAPlayer3.stage選曲.r現在選択中の曲.BoxColor;
+            TJAPlayer3.Tx.Difficulty_Back[boxType].color4 = C変換.ColorToColor4(TJAPlayer3.stage選曲.r現在選択中の曲.BoxColor);
 
             TJAPlayer3.Tx.Difficulty_Back[boxType].t2D中心基準描画(TJAPlayer3.app.Device, 640, 290);
 
@@ -322,7 +326,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Difficulty_Select_Bar[i].t2D描画(TJAPlayer3.app.Device, (float)this.BarX[n現在の選択行[i]], 242, new RectangleF(0, (n現在の選択行[i] >= 2 ? 114 : 387), 259, 275 - (n現在の選択行[i] >= 2 ? 0 : 164)));
             }
 
-            TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
+            TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
             TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 255, 270, new RectangleF(0, 0, 171, 236));    //閉じる、演奏オプション
 
 
@@ -338,9 +342,9 @@ namespace TJAPlayer3
                 bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > 0;
 
                 if (avaliable)
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f);
+                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
                 else
-                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(0.5f, 0.5f, 0.5f);
+                    TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
 
                 TJAPlayer3.Tx.Difficulty_Bar.t2D描画(TJAPlayer3.app.Device, 255 + 171 + 143 * screenPos, 270, new RectangleF(171 + 143 * i, 0, 138, 236));
 
@@ -382,12 +386,12 @@ namespace TJAPlayer3
                 {
                     if (level > g + 10)
                     {
-                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 0.2f, 0.2f);
+                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 0.2f, 0.2f, 1.0f);
                         TJAPlayer3.Tx.Difficulty_Star?.t2D描画(TJAPlayer3.app.Device, 444 + screenPos * 143 + g * 10, 459);
                     }
                     else if (level > g)
                     {
-                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 1f, 1f);
+                        TJAPlayer3.Tx.Difficulty_Star.color4 = new Color4(1f, 1f, 1f, 1.0f);
                         TJAPlayer3.Tx.Difficulty_Star?.t2D描画(TJAPlayer3.app.Device, 444 + screenPos * 143 + g * 10, 459);
                     }
                         

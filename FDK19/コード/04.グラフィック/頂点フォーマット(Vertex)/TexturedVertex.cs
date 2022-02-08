@@ -24,7 +24,7 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-using SlimDX;
+using SharpDX;
 
 namespace FDK {
     /// <summary>

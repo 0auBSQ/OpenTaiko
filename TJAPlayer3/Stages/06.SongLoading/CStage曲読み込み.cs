@@ -4,9 +4,12 @@ using System.Text;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using SlimDX;
+using SharpDX;
 using System.Drawing.Text;
 using FDK;
+
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {

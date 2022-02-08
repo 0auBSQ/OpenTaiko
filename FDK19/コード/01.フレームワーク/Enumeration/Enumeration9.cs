@@ -21,7 +21,7 @@
 */
 using System.Collections.Generic;
 using System.Globalization;
-using SlimDX.Direct3D9;
+using SharpDX.Direct3D9;
 
 namespace SampleFramework
 {
@@ -315,7 +315,7 @@ namespace SampleFramework
 					if (deviceInfo.DeviceSettings.Count > 0)
 						info.Devices.Add(deviceInfo);
 				}
-				catch (Direct3D9Exception)
+				catch
 				{
 					// #23681 2010.11.17 yyagi: GetDeviceCaps()で例外が発生するモニタに対しては、enumerateをスキップする。
 				}

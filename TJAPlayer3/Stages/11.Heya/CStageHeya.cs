@@ -5,7 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using FDK;
+using SharpDX;
 using static TJAPlayer3.CActSelectã»ÉäÉXÉg;
+
+using Rectangle = System.Drawing.Rectangle;
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -185,13 +190,13 @@ namespace TJAPlayer3
 
                 if (iCurrentMenu != -1 || iMainMenuCurrent != i)
                 {
-                    tmpTex.color4 = Color.DarkGray;
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                    tmpTex.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
                 }
                 else
                 {
-                    tmpTex.color4 = Color.White;
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                    tmpTex.color4 = Cïœä∑.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.White);
                 }
 
                 TJAPlayer3.Tx.Heya_Side_Menu.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 164, 26 + 80 * i);
@@ -210,13 +215,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.PuchiChara.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                        TJAPlayer3.Tx.PuchiChara.color4 = Cïœä∑.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cïœä∑.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
@@ -230,7 +235,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+                    TJAPlayer3.Tx.PuchiChara.color4 = Cïœä∑.ColorToColor4(Color.White);
 
                     if (ttkPuchiCharaNames[pos] != null)
                     {
@@ -262,14 +267,14 @@ namespace TJAPlayer3
                     if (i != 0)
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cïœä∑.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cïœä∑.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
@@ -277,7 +282,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2DägëÂó¶çló∂íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 620 + 302 * i, 320);
 
                     if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cïœä∑.ColorToColor4(Color.White);
                 }
             }
 
@@ -295,15 +300,15 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.DarkGray;
+                        tmpTex.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
-                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+                        tmpTex.color4 = Cïœä∑.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Cïœä∑.ColorToColor4(Color.White);
                     }
 
                     int danGrade = 0;
@@ -318,7 +323,7 @@ namespace TJAPlayer3
                         718 + -10 * Math.Abs(i),
                         331 + 70 * i,
                         new RectangleF(0, (8 + danGrade) * 54, 220, 54));
-                    TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+                    TJAPlayer3.Tx.NamePlateBase.color4 = Cïœä∑.ColorToColor4(Color.White);
 
                     tmpTex.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
 
@@ -340,13 +345,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                        tmpTex.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                        tmpTex.color4 = Cïœä∑.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cïœä∑.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Side_Menu.t2DägëÂó¶çló∂è„íÜâõäÓèÄï`âÊ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);

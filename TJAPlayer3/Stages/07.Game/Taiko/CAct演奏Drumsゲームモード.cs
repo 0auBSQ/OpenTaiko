@@ -5,7 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using FDK;
-using SlimDX;
+using SharpDX;
+
+using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {

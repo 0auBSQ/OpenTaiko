@@ -6,8 +6,8 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading;
-using SlimDX;
-using SlimDX.Direct3D9;
+using SharpDX;
+using SharpDX.Direct3D9;
 using SharpDX.Multimedia;
 using DirectShowLib;
 
@@ -502,7 +502,7 @@ namespace FDK
 				{
 					#region [ (A) ピッチが合うので、テクスチャに直接転送する。]
 					//-----------------
-					hr = this.memoryRenderer.GetCurrentBuffer( dr.Data.DataPointer, this.nデータサイズbyte );
+					hr = this.memoryRenderer.GetCurrentBuffer( dr.DataPointer, this.nデータサイズbyte );
 					DsError.ThrowExceptionForHR( hr );
 					//-----------------
 					#endregion
@@ -546,7 +546,7 @@ namespace FDK
 
 					this.ptrSnap = (byte*) this.ip.ToPointer();
 					var ptr = stackalloc UInt32*[ CDirectShow.n並列度 ];	// stackalloc（GC対象外、メソッド終了時に自動開放）は、スタック変数相手にしか使えない。
-					ptr[ 0 ] = (UInt32*) dr.Data.DataPointer.ToPointer();	//		↓
+					ptr[ 0 ] = (UInt32*) dr.DataPointer.ToPointer();	//		↓
 					for( int i = 1; i < CDirectShow.n並列度; i++ )			// スタック変数で確保、初期化して…
 						ptr[ i ] = ptr[ i - 1 ] + this.n幅px;				//		↓
 					this.ptrTexture = ptr;									// スタック変数をクラスメンバに渡す（これならOK）。

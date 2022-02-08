@@ -20,7 +20,7 @@
 * THE SOFTWARE.
 */
 using System;
-using SlimDX.Direct3D9;
+using SharpDX.Direct3D9;
 
 namespace SampleFramework
 {
