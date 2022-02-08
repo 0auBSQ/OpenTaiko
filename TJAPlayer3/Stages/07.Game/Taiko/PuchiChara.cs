@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using SharpDX;
+
+using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3
 {
@@ -75,7 +78,7 @@ namespace TJAPlayer3
 
             // TJAPlayer3.act文字コンソール.tPrint(700, 580, C文字コンソール.Eフォント種別.白, sineY.ToString());
 
-            TJAPlayer3.Tx.PuchiChara.vc拡大縮小倍率 = new SlimDX.Vector3((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] : TJAPlayer3.Skin.Game_PuchiChara_Scale[0]));
+            TJAPlayer3.Tx.PuchiChara.vc拡大縮小倍率 = new Vector3((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] : TJAPlayer3.Skin.Game_PuchiChara_Scale[0]));
             TJAPlayer3.Tx.PuchiChara.Opacity = alpha;
 
             // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SharpDX;
 
 namespace FDK
 {
@@ -230,13 +231,18 @@ namespace FDK
             return (int)(100.0 / num);
         }
 
-        public static SlimDX.Color4 n255ToColor4( int nR, int nG, int nB )
+        public static Color4 n255ToColor4( int nR, int nG, int nB )
         {
             float fR = n255ToParsent( nR );
             float fG = n255ToParsent( nG );
             float fB = n255ToParsent( nB );
 
-            return new SlimDX.Color4( fR, fG, fB );
+            return new Color4( fR, fG, fB, 1f );
+        }
+
+		public static Color4 ColorToColor4(System.Drawing.Color col)
+        {
+			return new Color4(col.ToArgb());
         }
 
 		#region [ private ]

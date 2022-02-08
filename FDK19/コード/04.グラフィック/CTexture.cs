@@ -5,10 +5,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Diagnostics;
-using SlimDX;
-using SlimDX.Direct3D9;
+using SharpDX;
+using SharpDX.Direct3D9;
 
-using Device = SampleFramework.DeviceCache;
+using Rectangle = System.Drawing.Rectangle;
+using RectangleF = System.Drawing.RectangleF;
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
 
 namespace FDK
 {
@@ -136,7 +139,7 @@ namespace FDK
                     bitmap.Save(stream, ImageFormat.Bmp);
                     stream.Seek(0L, SeekOrigin.Begin);
                     int colorKey = unchecked((int)0xFF000000);
-                    this.texture = Texture.FromStream(device.UnderlyingDevice, stream, this.szテクスチャサイズ.Width, this.szテクスチャサイズ.Height, 1, Usage.None, format, poolvar, Filter.Point, Filter.None, colorKey);
+                    this.texture = Texture.FromStream(device, stream, this.szテクスチャサイズ.Width, this.szテクスチャサイズ.Height, 1, Usage.None, format, poolvar, Filter.Point, Filter.None, colorKey);
                 }
             }
             catch (Exception e)
@@ -229,7 +232,7 @@ namespace FDK
 						pool = poolvar;
 #endif
                         // 中で更にメモリ読み込みし直していて無駄なので、Streamを使うのは止めたいところ
-                        this.texture = Texture.FromStream(device.UnderlyingDevice, stream, n幅, n高さ, 1, usage, format, pool, Filter.Point, Filter.None, 0);
+                        this.texture = Texture.FromStream(device, stream, n幅, n高さ, 1, usage, format, pool, Filter.Point, Filter.None, 0);
                     }
                 }
             }
@@ -288,7 +291,7 @@ namespace FDK
                 //				lock ( lockobj )
                 //				{
                 //Trace.TraceInformation( "CTexture() start: " );
-                this.texture = Texture.FromMemory(device.UnderlyingDevice, txData, this.sz画像サイズ.Width, this.sz画像サイズ.Height, 1, Usage.None, format, pool, Filter.Point, Filter.None, colorKey);
+                this.texture = Texture.FromMemory(device, txData, this.sz画像サイズ.Width, this.sz画像サイズ.Height, 1, Usage.None, format, pool, Filter.Point, Filter.None, colorKey);
                 //Trace.TraceInformation( "CTexture() end:   " );
                 //				}
             }
@@ -329,7 +332,7 @@ namespace FDK
 #if TEST_Direct3D9Ex
 					this.texture = new Texture( device, tw, this.sz画像サイズ.Height, 1, Usage.Dynamic, format, Pool.Default );
 #else
-                    this.texture = new Texture(device.UnderlyingDevice, this.sz画像サイズ.Width, this.sz画像サイズ.Height, 1, Usage.None, format, pool);
+                    this.texture = new Texture(device, this.sz画像サイズ.Width, this.sz画像サイズ.Height, 1, Usage.None, format, pool);
 #endif
                     BitmapData srcBufData = bitmap.LockBits(new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                     DataRectangle destDataRectangle = texture.LockRectangle(0, LockFlags.Discard);  // None
@@ -350,7 +353,8 @@ namespace FDK
 					}
 #else
                     IntPtr src_scan0 = (IntPtr)((Int64)srcBufData.Scan0);
-                    destDataRectangle.Data.WriteRange(src_scan0, this.sz画像サイズ.Width * 4 * this.sz画像サイズ.Height);
+                    //destDataRectangle.Data.WriteRange(src_scan0, this.sz画像サイズ.Width * 4 * this.sz画像サイズ.Height);
+                    Buffer.MemoryCopy(src_scan0.ToPointer(), destDataRectangle.DataPointer.ToPointer(), this.sz画像サイズ.Width * 4 * this.sz画像サイズ.Height, srcBufData.Width * 4 * srcBufData.Height);
 #endif
                     texture.UnlockRectangle(0);
                     bitmap.UnlockBits(srcBufData);
@@ -550,7 +554,7 @@ namespace FDK
                 float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
                 float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
                 this.color4.Alpha = ((float)this._opacity) / 255f;
-                int color = this.color4.ToArgb();
+                int color = ToArgb(this.color4);
 
                 if (this.cvTransformedColoredVertexies == null)
                     this.cvTransformedColoredVertexies = new TransformedColoredTexturedVertex[4];
@@ -591,7 +595,7 @@ namespace FDK
 
                 device.SetTexture(0, this.texture);
                 device.VertexFormat = TransformedColoredTexturedVertex.Format;
-                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 0, 2, in this.cvTransformedColoredVertexies);
+                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 0, 2, this.cvTransformedColoredVertexies);
                 //-----------------
                 #endregion
             }
@@ -608,7 +612,7 @@ namespace FDK
                 float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
                 float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
                 this.color4.Alpha = ((float)this._opacity) / 255f;
-                int color = this.color4.ToArgb();
+                int color = ToArgb(this.color4);
 
                 if (this.cvPositionColoredVertexies == null)
                     this.cvPositionColoredVertexies = new PositionColoredTexturedVertex[4];
@@ -654,7 +658,7 @@ namespace FDK
 
                 device.SetTexture(0, this.texture);
                 device.VertexFormat = PositionColoredTexturedVertex.Format;
-                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, in this.cvPositionColoredVertexies);
+                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, this.cvPositionColoredVertexies);
                 //-----------------
                 #endregion
             }
@@ -679,7 +683,7 @@ namespace FDK
                 float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
                 float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
                 this.color4.Alpha = ((float)this._opacity) / 255f;
-                int color = this.color4.ToArgb();
+                int color = ToArgb(this.color4);
 
                 if (this.cvTransformedColoredVertexies == null)
                     this.cvTransformedColoredVertexies = new TransformedColoredTexturedVertex[4];
@@ -720,7 +724,7 @@ namespace FDK
 
                 device.SetTexture(0, this.texture);
                 device.VertexFormat = TransformedColoredTexturedVertex.Format;
-                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 0, 2, in this.cvTransformedColoredVertexies);
+                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 0, 2, this.cvTransformedColoredVertexies);
                 //-----------------
                 #endregion
             }
@@ -737,7 +741,7 @@ namespace FDK
                 float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
                 float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
                 this.color4.Alpha = ((float)this._opacity) / 255f;
-                int color = this.color4.ToArgb();
+                int color = ToArgb(this.color4);
 
                 if (this.cvPositionColoredVertexies == null)
                     this.cvPositionColoredVertexies = new PositionColoredTexturedVertex[4];
@@ -783,7 +787,7 @@ namespace FDK
 
                 device.SetTexture(0, this.texture);
                 device.VertexFormat = PositionColoredTexturedVertex.Format;
-                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, in this.cvPositionColoredVertexies);
+                device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, this.cvPositionColoredVertexies);
                 //-----------------
                 #endregion
             }
@@ -824,7 +828,7 @@ namespace FDK
             float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
             float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
             this.color4.Alpha = ((float)this._opacity) / 255f;
-            int color = this.color4.ToArgb();
+            int color = ToArgb(this.color4);
 
 
             if (this.cvTransformedColoredVertexies == null)
@@ -884,7 +888,7 @@ namespace FDK
             float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
             float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
             this.color4.Alpha = ((float)this._opacity) / 255f;
-            int color = this.color4.ToArgb();
+            int color = ToArgb(this.color4);
 
             if (this.cvTransformedColoredVertexies == null)
                 this.cvTransformedColoredVertexies = new TransformedColoredTexturedVertex[4];
@@ -925,7 +929,7 @@ namespace FDK
 
             device.SetTexture(0, this.texture);
             device.VertexFormat = TransformedColoredTexturedVertex.Format;
-            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, in this.cvTransformedColoredVertexies);
+            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, this.cvTransformedColoredVertexies);
         }
         public void t2D上下反転描画(Device device, Point pt)
         {
@@ -984,7 +988,7 @@ namespace FDK
             float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
             float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
             this.color4.Alpha = ((float)this._opacity) / 255f;
-            int color = this.color4.ToArgb();
+            int color = ToArgb(this.color4);
 
             if (this.cvPositionColoredVertexies == null)
                 this.cvPositionColoredVertexies = new PositionColoredTexturedVertex[4];
@@ -1024,7 +1028,7 @@ namespace FDK
             device.SetTransform(TransformState.World, mat);
             device.SetTexture(0, this.texture);
             device.VertexFormat = PositionColoredTexturedVertex.Format;
-            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, in this.cvPositionColoredVertexies);
+            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, this.cvPositionColoredVertexies);
         }
 
         public void t3D左上基準描画(Device device, Matrix mat)
@@ -1051,7 +1055,7 @@ namespace FDK
             float f上V値 = ((float)rc画像内の描画領域.Top) / ((float)this.szテクスチャサイズ.Height);
             float f下V値 = ((float)rc画像内の描画領域.Bottom) / ((float)this.szテクスチャサイズ.Height);
             this.color4.Alpha = ((float)this._opacity) / 255f;
-            int color = this.color4.ToArgb();
+            int color = ToArgb(this.color4);
 
             if (this.cvPositionColoredVertexies == null)
                 this.cvPositionColoredVertexies = new PositionColoredTexturedVertex[4];
@@ -1091,7 +1095,7 @@ namespace FDK
             device.SetTransform(TransformState.World, mat);
             device.SetTexture(0, this.texture);
             device.VertexFormat = PositionColoredTexturedVertex.Format;
-            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, in this.cvPositionColoredVertexies);
+            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, 2, this.cvPositionColoredVertexies);
         }
 
         #region [ IDisposable 実装 ]
@@ -1145,34 +1149,34 @@ namespace FDK
         {
             if (this.b加算合成)
             {
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.SourceAlpha);             // 5
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);                    // 2
+                device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);             // 5
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);                    // 2
             }
             else if (this.b乗算合成)
             {
                 //参考:http://sylphylunar.seesaa.net/article/390331341.html
                 //C++から引っ張ってきたのでちょっと不安。
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.DestinationColor);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.Zero);
+                device.SetRenderState(RenderState.SourceBlend, Blend.DestinationColor);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.Zero);
             }
             else if (this.b減算合成)
             {
                 //参考:http://www3.pf-x.net/~chopper/home2/DirectX/MD20.html
-                device.SetRenderState(RenderState.BlendOperation, SlimDX.Direct3D9.BlendOperation.Subtract);
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.One);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);
+                device.SetRenderState(RenderState.BlendOperation, BlendOperation.Subtract);
+                device.SetRenderState(RenderState.SourceBlend, Blend.One);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);
             }
             else if (this.bスクリーン合成)
             {
                 //参考:http://sylphylunar.seesaa.net/article/390331341.html
                 //C++から引っ張ってきたのでちょっと不安。
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.InverseDestinationColor);
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.One);
+                device.SetRenderState(RenderState.SourceBlend, Blend.InverseDestinationColor);
+                device.SetRenderState(RenderState.DestinationBlend, Blend.One);
             }
             else
             {
-                device.SetRenderState(RenderState.SourceBlend, SlimDX.Direct3D9.Blend.SourceAlpha);             // 5
-                device.SetRenderState(RenderState.DestinationBlend, SlimDX.Direct3D9.Blend.InverseSourceAlpha); // 6
+                device.SetRenderState(RenderState.SourceBlend, Blend.SourceAlpha);             // 5
+                device.SetRenderState(RenderState.DestinationBlend, Blend.InverseSourceAlpha); // 6
             }
         }
         private Size t指定されたサイズを超えない最適なテクスチャサイズを返す(Device device, Size sz指定サイズ)
@@ -1227,6 +1231,21 @@ namespace FDK
             }
 
             return szサイズ;
+        }
+
+        private int ToArgb(Color4 col4)
+        {
+            uint a = (uint)(col4.Alpha * 255.0f) & 255;
+            uint r = (uint)(col4.Red * 255.0f) & 255;
+            uint g = (uint)(col4.Green * 255.0f) & 255;
+            uint b = (uint)(col4.Blue * 255.0f) & 255;
+
+            uint value = b;
+            value |= g << 8;
+            value |= r << 16;
+            value |= a << 24;
+
+            return (int)value;
         }
 
 

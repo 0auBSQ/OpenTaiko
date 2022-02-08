@@ -4,10 +4,14 @@ using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using FDK;
+using SharpDX;
 using System.IO;
-using TJAPlayer3;
 using System.Linq;
 using static TJAPlayer3.CActSelect曲リスト;
+
+using Rectangle = System.Drawing.Rectangle;
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -991,13 +995,13 @@ namespace TJAPlayer3
 
             if (value == 0)
             {
-                TJAPlayer3.Tx.DanC_Number.color4 = Color.Gray;
-                TJAPlayer3.Tx.DanC_Small_Number.color4 = Color.Gray;
+                TJAPlayer3.Tx.DanC_Number.color4 = C変換.ColorToColor4(Color.Gray);
+                TJAPlayer3.Tx.DanC_Small_Number.color4 = C変換.ColorToColor4(Color.Gray);
             }
             else
             {
-                TJAPlayer3.Tx.DanC_Number.color4 = Color.White;
-                TJAPlayer3.Tx.DanC_Small_Number.color4 = Color.White;
+                TJAPlayer3.Tx.DanC_Number.color4 = C変換.ColorToColor4(Color.White);
+                TJAPlayer3.Tx.DanC_Small_Number.color4 = C変換.ColorToColor4(Color.White);
             }
                 
             if (bBig)
@@ -1169,7 +1173,7 @@ namespace TJAPlayer3
         [StructLayout(LayoutKind.Sequential)]
         struct ChallengeStatus
         {
-            public SlimDX.Color4 Color;
+            public Color4 Color;
             public CCounter Timer_Gauge;
             public CCounter Timer_Amount;
             public CCounter Timer_Failed;

@@ -122,13 +122,6 @@ Rename character config files to "CharaConfig.txt".
 If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty.
 ```
 
-- OpenTaiko does not start.
-
-```
-Download SlimDX again from https://code.google.com/archive/p/slimdx/downloads\.
-("Runtime for .NET 4.0 x86" or "Runtime for .NET 2.0 x86")
-```
-
 ## Update history
 
 <details>

@@ -19,9 +19,9 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
-using SlimDX;
-using SlimDX.Direct3D9;
-using DXGI = SlimDX.DXGI;
+using SharpDX;
+using SharpDX.Direct3D9;
+using DXGI = SharpDX.DXGI;
 
 namespace SampleFramework
 {
@@ -111,39 +111,39 @@ namespace SampleFramework
         {
             switch (format)
             {
-                case SlimDX.DXGI.Format.R32G32B32A32_Float:
-                case SlimDX.DXGI.Format.R32G32B32A32_SInt:
-                case SlimDX.DXGI.Format.R32G32B32A32_Typeless:
-                case SlimDX.DXGI.Format.R32G32B32A32_UInt:
-                case SlimDX.DXGI.Format.R32G32B32_Float:
-                case SlimDX.DXGI.Format.R32G32B32_SInt:
-                case SlimDX.DXGI.Format.R32G32B32_Typeless:
-                case SlimDX.DXGI.Format.R32G32B32_UInt:
+                case DXGI.Format.R32G32B32A32_Float:
+                case DXGI.Format.R32G32B32A32_SInt:
+                case DXGI.Format.R32G32B32A32_Typeless:
+                case DXGI.Format.R32G32B32A32_UInt:
+                case DXGI.Format.R32G32B32_Float:
+                case DXGI.Format.R32G32B32_SInt:
+                case DXGI.Format.R32G32B32_Typeless:
+                case DXGI.Format.R32G32B32_UInt:
                     return 32;
 
-                case SlimDX.DXGI.Format.R16G16B16A16_Float:
-                case SlimDX.DXGI.Format.R16G16B16A16_SInt:
-                case SlimDX.DXGI.Format.R16G16B16A16_SNorm:
-                case SlimDX.DXGI.Format.R16G16B16A16_Typeless:
-                case SlimDX.DXGI.Format.R16G16B16A16_UInt:
-                case SlimDX.DXGI.Format.R16G16B16A16_UNorm:
+                case DXGI.Format.R16G16B16A16_Float:
+                case DXGI.Format.R16G16B16A16_SInt:
+                case DXGI.Format.R16G16B16A16_SNorm:
+                case DXGI.Format.R16G16B16A16_Typeless:
+                case DXGI.Format.R16G16B16A16_UInt:
+                case DXGI.Format.R16G16B16A16_UNorm:
                     return 16;
 
-                case SlimDX.DXGI.Format.R10G10B10A2_Typeless:
-                case SlimDX.DXGI.Format.R10G10B10A2_UInt:
-                case SlimDX.DXGI.Format.R10G10B10A2_UNorm:
+                case DXGI.Format.R10G10B10A2_Typeless:
+                case DXGI.Format.R10G10B10A2_UInt:
+                case DXGI.Format.R10G10B10A2_UNorm:
                     return 10;
 
-                case SlimDX.DXGI.Format.R8G8B8A8_SInt:
-                case SlimDX.DXGI.Format.R8G8B8A8_SNorm:
-                case SlimDX.DXGI.Format.R8G8B8A8_Typeless:
-                case SlimDX.DXGI.Format.R8G8B8A8_UInt:
-                case SlimDX.DXGI.Format.R8G8B8A8_UNorm:
-                case SlimDX.DXGI.Format.R8G8B8A8_UNorm_SRGB:
+                case DXGI.Format.R8G8B8A8_SInt:
+                case DXGI.Format.R8G8B8A8_SNorm:
+                case DXGI.Format.R8G8B8A8_Typeless:
+                case DXGI.Format.R8G8B8A8_UInt:
+                case DXGI.Format.R8G8B8A8_UNorm:
+                case DXGI.Format.R8G8B8A8_UNorm_SRgb:
                     return 8;
 
-                case SlimDX.DXGI.Format.B5G5R5A1_UNorm:
-                case SlimDX.DXGI.Format.B5G6R5_UNorm:
+                case DXGI.Format.B5G5R5A1_UNorm:
+                case DXGI.Format.B5G6R5_UNorm:
                     return 5;
 
                 default:
@@ -160,40 +160,40 @@ namespace SampleFramework
         {
             switch (format)
             {
-                case SlimDX.DXGI.Format.R8G8B8A8_UNorm:
+                case DXGI.Format.R8G8B8A8_UNorm:
                     return Format.A8R8G8B8;
-                case SlimDX.DXGI.Format.B5G6R5_UNorm:
+                case DXGI.Format.B5G6R5_UNorm:
                     return Format.R5G6B5;
-                case SlimDX.DXGI.Format.B5G5R5A1_UNorm:
+                case DXGI.Format.B5G5R5A1_UNorm:
                     return Format.A1R5G5B5;
-                case SlimDX.DXGI.Format.A8_UNorm:
+                case DXGI.Format.A8_UNorm:
                     return Format.A8;
-                case SlimDX.DXGI.Format.R10G10B10A2_UNorm:
+                case DXGI.Format.R10G10B10A2_UNorm:
                     return Format.A2B10G10R10;
-                case SlimDX.DXGI.Format.B8G8R8A8_UNorm:
+                case DXGI.Format.B8G8R8A8_UNorm:
                     return Format.A8B8G8R8;
-                case SlimDX.DXGI.Format.R16G16_UNorm:
+                case DXGI.Format.R16G16_UNorm:
                     return Format.G16R16;
-                case SlimDX.DXGI.Format.R16G16B16A16_UNorm:
+                case DXGI.Format.R16G16B16A16_UNorm:
                     return Format.A16B16G16R16;
-                case SlimDX.DXGI.Format.R16_Float:
+                case DXGI.Format.R16_Float:
                     return Format.R16F;
-                case SlimDX.DXGI.Format.R16G16_Float:
+                case DXGI.Format.R16G16_Float:
                     return Format.G16R16F;
-                case SlimDX.DXGI.Format.R16G16B16A16_Float:
+                case DXGI.Format.R16G16B16A16_Float:
                     return Format.A16B16G16R16F;
-                case SlimDX.DXGI.Format.R32_Float:
+                case DXGI.Format.R32_Float:
                     return Format.R32F;
-                case SlimDX.DXGI.Format.R32G32_Float:
+                case DXGI.Format.R32G32_Float:
                     return Format.G32R32F;
-                case SlimDX.DXGI.Format.R32G32B32A32_Float:
+                case DXGI.Format.R32G32B32A32_Float:
                     return Format.A32B32G32R32F;
             }
 
             return Format.Unknown;
         }
 
-        public static float ToFloat(Rational rational)
+        public static float ToFloat(DXGI.Rational rational)
         {
             float denom = 1;
             if (rational.Denominator != 0)

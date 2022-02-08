@@ -5,7 +5,6 @@ using FDK;
 using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
-using SlimDX.DirectInput;
 using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
@@ -1456,9 +1455,9 @@ namespace TJAPlayer3
 							#endregion
 
 						}
-						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)Key.LeftArrow) ||
+						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow) ||
 								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue) ||
-							TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)Key.RightArrow) ||
+							TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow) ||
 								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
 						{
 							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)

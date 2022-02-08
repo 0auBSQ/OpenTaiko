@@ -181,11 +181,11 @@ namespace TJAPlayer3
                 Color tickColor = stバー情報[currentSong].cDanTickColor;
 
                 TJAPlayer3.Tx.Dani_Plate.Opacity = 255;
-                TJAPlayer3.Tx.Dani_Plate.color4 = tickColor;
+                TJAPlayer3.Tx.Dani_Plate.color4 = C変換.ColorToColor4(tickColor);
                 TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
 
                 // Reset color for plate flash
-                TJAPlayer3.Tx.Dani_Plate.color4 = Color.White;
+                TJAPlayer3.Tx.Dani_Plate.color4 = C変換.ColorToColor4(Color.White);
 
                 #endregion
 
@@ -303,7 +303,7 @@ namespace TJAPlayer3
                 if (TJAPlayer3.Tx.Dani_DanPlates != null)
                 {
                     TJAPlayer3.Tx.Dani_DanPlates.Opacity = 255;
-                    TJAPlayer3.Tx.Dani_DanPlates.color4 = danTickColor;
+                    TJAPlayer3.Tx.Dani_DanPlates.color4 = C変換.ColorToColor4(danTickColor);
                 }
                 TJAPlayer3.Tx.Dani_DanPlates?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(
                     unit * danTick,
@@ -350,7 +350,7 @@ namespace TJAPlayer3
             else
             {
                 int unit = TJAPlayer3.Tx.Dani_DanSides.szテクスチャサイズ.Width / 6;
-                TJAPlayer3.Tx.Dani_DanSides.color4 = danTickColor;
+                TJAPlayer3.Tx.Dani_DanSides.color4 = C変換.ColorToColor4(danTickColor);
 
                 TJAPlayer3.Tx.Dani_Bar_Center.t2D描画(TJAPlayer3.app.Device, scroll + Anime, 0);
 

@@ -5,8 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using FDK;
-using SlimDX.DirectInput;
+using SharpDX;
 using static TJAPlayer3.CActSelect曲リスト;
+
+using Rectangle = System.Drawing.Rectangle;
+using RectangleF = System.Drawing.RectangleF;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -186,13 +190,13 @@ namespace TJAPlayer3
 
                 if (iCurrentMenu != -1 || iMainMenuCurrent != i)
                 {
-                    tmpTex.color4 = Color.DarkGray;
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                    tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.DarkGray);
                 }
                 else
                 {
-                    tmpTex.color4 = Color.White;
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                    tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.White);
                 }
 
                 TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 26 + 80 * i);
@@ -211,13 +215,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                        TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                        TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
@@ -231,7 +235,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara.color4 = Color.White;
+                    TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.White);
 
                     if (ttkPuchiCharaNames[pos] != null)
                     {
@@ -263,14 +267,14 @@ namespace TJAPlayer3
                     if (i != 0)
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.DarkGray;
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Color.White;
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
@@ -278,7 +282,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320);
 
                     if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Color.White;
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.White);
                 }
             }
 
@@ -296,15 +300,15 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.DarkGray;
+                        tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = C変換.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
-                        TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+                        tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = C変換.ColorToColor4(Color.White);
                     }
 
                     int danGrade = 0;
@@ -319,7 +323,7 @@ namespace TJAPlayer3
                         718 + -10 * Math.Abs(i),
                         331 + 70 * i,
                         new RectangleF(0, (8 + danGrade) * 54, 220, 54));
-                    TJAPlayer3.Tx.NamePlateBase.color4 = Color.White;
+                    TJAPlayer3.Tx.NamePlateBase.color4 = C変換.ColorToColor4(Color.White);
 
                     tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
 
@@ -341,13 +345,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = Color.DarkGray;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.DarkGray;
+                        tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = Color.White;
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Color.White;
+                        tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
@@ -412,7 +416,7 @@ namespace TJAPlayer3
 
             #region [ キー関連 ]
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.RightArrow) ||
+            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
             {
                 if (this.tMove(1))
@@ -421,7 +425,7 @@ namespace TJAPlayer3
                 }
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.LeftArrow) ||
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
             {
                 if (this.tMove(-1))
@@ -430,7 +434,7 @@ namespace TJAPlayer3
                 }
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Return) ||
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
             {
@@ -543,7 +547,7 @@ namespace TJAPlayer3
                 #endregion
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)Key.Escape))
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
             {
                 
                 TJAPlayer3.Skin.sound取消音.t再生する();

@@ -600,17 +600,17 @@ namespace TJAPlayer3
 
                                 if (restricted1p[i] == true && TJAPlayer3.ConfigIni.nPlayerCount > 1)
 								{
-									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.DarkGray;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.DarkGray;
-									this.stModeBar[i].BarTexture.color4 = Color.DarkGray;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = Color.DarkGray;
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = C変換.ColorToColor4(Color.DarkGray);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = C変換.ColorToColor4(Color.DarkGray);
+									this.stModeBar[i].BarTexture.color4 = C変換.ColorToColor4(Color.DarkGray);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = C変換.ColorToColor4(Color.DarkGray);
 								}
 								else
                                 {
-									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.White;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.White;
-									this.stModeBar[i].BarTexture.color4 = Color.White;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = Color.White;
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = C変換.ColorToColor4(Color.White);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = C変換.ColorToColor4(Color.White);
+									this.stModeBar[i].BarTexture.color4 = C変換.ColorToColor4(Color.White);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkBoxText[i]).color4 = C変換.ColorToColor4(Color.White);
 								}
 
 								#endregion
@@ -688,15 +688,15 @@ namespace TJAPlayer3
 
 								if (restricted1p[i] == true && TJAPlayer3.ConfigIni.nPlayerCount > 1)
 								{
-									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.DarkGray;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.DarkGray;
-									this.stModeBar[i].BarTexture.color4 = Color.DarkGray;
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = C変換.ColorToColor4(Color.DarkGray);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = C変換.ColorToColor4(Color.DarkGray);
+									this.stModeBar[i].BarTexture.color4 = C変換.ColorToColor4(Color.DarkGray);
 								}
 								else
 								{
-									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = Color.White;
-									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = Color.White;
-									this.stModeBar[i].BarTexture.color4 = Color.White;
+									TJAPlayer3.Tx.ModeSelect_Bar_Chara[i].color4 = C変換.ColorToColor4(Color.White);
+									TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(idxToTex(i)).color4 = C変換.ColorToColor4(Color.White);
+									this.stModeBar[i].BarTexture.color4 = C変換.ColorToColor4(Color.White);
 								}
 
 								#endregion

@@ -125,13 +125,6 @@ v0.5.2から11_Charactersにキャラクターに関してファイルが読み�
 キャラクター使用が不希望なら「（スキン名）/Graphics/11_Characters/0」を空っぽでご生成ください。
 ```
 
-- OpenTaikoが起動しません
-
-```
-SlimDXを改めてダウンロードしてください：https://code.google.com/archive/p/slimdx/downloads
-(「Runtime for .NET 4.0 x86」又は「Runtime for .NET 2.0 x86」)
-```
-
 ## 更新記録
 
 <details>

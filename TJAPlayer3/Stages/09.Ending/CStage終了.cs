@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using DirectShowLib;
-using SlimDX;
 using FDK;
 
 namespace TJAPlayer3

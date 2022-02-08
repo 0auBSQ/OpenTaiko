@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using SlimDX;
 
 namespace TJAPlayer3
 {
@@ -395,13 +394,13 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                             {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = this.NowBgColor;
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = C変換.ColorToColor4(this.NowBgColor);
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].Opacity = 255;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack] != null)
                             {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = this.OldBgColor;
+                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = C変換.ColorToColor4(this.OldBgColor);
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].Opacity = 600 - ctBackgroundFade.n現在の値;
                                 TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
                             }
@@ -935,7 +934,7 @@ namespace TJAPlayer3
                             int displayedScore = 0;
                             int table = 0;
 
-                            TJAPlayer3.Tx.SongSelect_High_Score.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
+                            TJAPlayer3.Tx.SongSelect_High_Score?.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
 
                             if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
                                 table = 0;
