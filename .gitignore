@@ -15,6 +15,7 @@
 /Test/bs1770gain**
 /Test/dll/CSharpTest.Net.Collections.*
 /Test/dll/SlimDX.*
+/Test/dll/FDK.dll
 /Test/NamePlate.json
 /Test/Songs/*
 /Test/System/*
