@@ -242,7 +242,7 @@ namespace FDK
 
 		public static Color4 ColorToColor4(System.Drawing.Color col)
         {
-			return new Color4(col.ToArgb());
+			return new Color4(col.R / 255f, col.G / 255f, col.B / 255f, col.A / 255f);
         }
 
 		#region [ private ]
