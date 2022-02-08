@@ -68,9 +68,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationManifest>TJAPlayer3.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -93,6 +91,7 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Bass.Net">
       <HintPath>..\Test\dll\Bass.Net.dll</HintPath>
@@ -154,8 +153,6 @@
     </Compile>
     <None Include="app.config" />
     <Compile Include="I18N\ILang.cs" />
-    <None Include="TJAPlayer3.manifest" />
-    <None Include="DTXManiaGR.exe.x86.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
