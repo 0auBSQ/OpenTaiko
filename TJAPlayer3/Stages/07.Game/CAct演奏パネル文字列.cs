@@ -16,7 +16,7 @@ namespace TJAPlayer3
 	{
         public static int tToArgb(int r, int g, int b)
         {
-            return (r * 65536 + g * 256 + b);
+            return (b * 65536 + g * 256 + r);
         }
         
         // コンストラクタ
@@ -29,7 +29,6 @@ namespace TJAPlayer3
         private readonly Dictionary<string, Color4> tTagDict = new Dictionary<string, Color4>
         {
             ["アニメ"] = new Color4(tToArgb(253, 145, 208)),
-            ["ナムコオリジナル"] = new Color4(tToArgb(255, 112, 40)),
             ["クラシック"] = new Color4(tToArgb(221, 172, 4)),
             ["バラエティ"] = new Color4(tToArgb(32, 218, 56)),
             ["どうよう"] = new Color4(tToArgb(254, 191, 3)),
