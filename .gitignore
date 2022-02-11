@@ -17,8 +17,7 @@
 /Test/dll/SlimDX.*
 /Test/dll/FDK.dll
 /Test/NamePlate.json
-/Test/Songs/*
-/Test/System/*
+/Test/SongsIgnored/*
 /Test/xadec.dll
 /Test/SoundDecoder.dll
 /Test/msvcr90.dll
@@ -31,4 +30,5 @@
 /Test/bassenc.dll
 /Test/bassmix.dll
 /Test/basswasapi.dll
-/Test/09-段位道場/
+/Test/System/0.JpnNijiiro
+/Test/System/OpenSkin
