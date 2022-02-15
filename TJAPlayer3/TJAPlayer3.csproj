@@ -131,6 +131,7 @@
     <Compile Include="I18N\CLang_fr.cs" />
     <Compile Include="I18N\CLang_en.cs" />
     <Compile Include="I18N\CLang_jp.cs" />
+    <Compile Include="I18N\CLang_zh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>

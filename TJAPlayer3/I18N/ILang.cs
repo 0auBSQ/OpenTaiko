@@ -16,6 +16,9 @@ namespace TJAPlayer3
         public static void langAttach(string lang)
         {
             switch (lang) {
+                case "zh":
+                    CLangManager.LangInstance = new CLang_zh();
+                    break;
                 case "es":
                     CLangManager.LangInstance = new CLang_es();
                     break;
@@ -36,6 +39,8 @@ namespace TJAPlayer3
         {
             switch (lang)
             {
+                case "zh":
+                    return 4;
                 case "es":
                     return 3;
                 case "fr":
@@ -52,6 +57,8 @@ namespace TJAPlayer3
         {
             switch (idx)
             {
+                case 4:
+                    return "zh";
                 case 3:
                     return "es";
                 case 2:
@@ -64,7 +71,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static readonly string[] Languages = new string[] { "日本語", "English", "Français", "Español" };
+        public static readonly string[] Languages = new string[] { "日本語", "English", "Français", "Español", "中文" };
         public static ILang LangInstance { get; private set; }  = new CLang_jp();
     }
 }
