@@ -5,42 +5,40 @@
 # OpenTaiko
 
 TJAPlayer3-Develop-ReWrite的分叉项目，一个使用.tja文件的模拟器
+
 前身：TJAPlayer3-Develop-BSQ
 
 - 当前版本：Pre v0.5.3
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/2/14）
+（译者注：由README-EN翻译。最近一次更新时间：2022/2/15）
 
 ## 使用前注意事项（重要！！！）
 
-- 本软件没有提供皮肤（仅提供软件本体）。晚些会提供版权自由皮肤。
+- 本软件尚未提供皮肤（仅提供软件本体）。晚些会提供版权自由皮肤。
 
 - 您**全权**对您对本软件的使用负责。开发者不为您使用本软件造成的任何问题承担任何责任。
 
-- 当前本软件无“官方”皮肤。若您使用的非官方皮肤有任何Bug，请先联系皮肤作者再联系本软件开发者。本软件不提供任何类AC皮肤或他们的分叉。
+- 当前本软件无“官方”皮肤。若您使用的非官方皮肤有任何Bug，请先联系皮肤作者再联系本软件开发者。本软件不提供任何类AC皮肤或它们的分叉。
 
-- 请在向他人寻求帮助前先自行研究。
+- 在向他人寻求帮助前请先自行研究。
 
-- 若您的计算机不能维持稳定60Hz帧率，则本软件不适合它。
+- 若您的计算机不能维持稳定60fps帧率，则本软件不适合它。
 
-- 以上列出版本以外的版本不会得到任何支持。注意若您在使用预发布版本，由于其非正式版本，我们不为造成的任何问题承担任何责任。
+- 以上列出版本以外的版本不会得到任何支持。注意若您在使用pre版本，由于其非正式版本，我们不为造成的任何问题承担任何责任。
 
 ### 在直播或视频中使用本软件
 
-若您在视频共享网站、直播服务、网站或博客上使用本软件，请确保您明确说明本软件不是万代南梦宫官方软件，并确保其不备与其它太鼓模拟器混淆。
+若您在视频共享网站、直播服务、网站或博客上使用本软件，请确保您明确说明本软件不是万代南梦宫官方软件，并确保其不被与其它太鼓模拟器混淆。
 
-此外，若你使用的网站上有标签功能，请打上“OpenTaiko”“TJAPlayer3-Develop-BSQ”或“TJAP3-BSQ”标签以防止与其它模拟器混淆。这也会使您的视频与其它类似视频一同归类，因此我们强烈建议您打上这些标签。
+此外，若你使用的网站有标签功能，请打上“OpenTaiko”“TJAPlayer3-Develop-BSQ”或“TJAP3-BSQ”标签以防止与其它模拟器混淆。这也会使您的视频与其它类似视频被一同归类，因此我们强烈建议您打上这些标签。
 
-本软件作者并不支持违反版权法律。请您遵守您所在国家的版权法律。
+本软件作者并不支持违反版权法律的行为。请您遵守您所在国家的版权法律。
 
 ### 编辑源代码/再发布
 
-OpenTaiko是一个使用MIT许可证的开源软件。
-在MIT许可证下，您可以编辑或再发布。但您须**自行承担**全部责任。
-此外，再编辑或再发布时**请**将"License"文件夹包含在您的库许可证内。
-请同样遵守其它皮肤或曲目包作者的许可证。OpenTaiko许可不适用于这些情况。
+OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您可以编辑或再发布。但您须**自行承担**全部责任。此外，再编辑或再发布时**请**将"License"文件夹包含在您的库许可证内。请同样遵守其它皮肤或曲目包作者的许可证。OpenTaiko许可不适用于这些情况。
 
 ### 目标/非目标
 
@@ -54,7 +52,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 
 **非目标**
 
-- 精准复制其它游戏或商业许可（例如AC二次郎版本）。
+- 精准复制其它游戏或商业许可（例如AC虹色版）。
 
 ## 关于发布Issue或Pull Request的规则
 
@@ -62,19 +60,19 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 
 - **请**遵守日本和法国版权法律。
 
-- **重要！！！**：当您发布issue时，请写下你使用的版本和问题的复现步骤。如果是游戏崩溃，请附上TJAPlayer3.log文件。
+- **重要！！！**：当您发布issue时，请写下您使用的版本和问题的复现步骤。如果是游戏崩溃，请附上TJAPlayer3.log文件。
 
 - 如果您需要翻译，请提前在Discord上联系作者。
 
 ### 功能需求
 
-如果您需要添加功能，请先在Discord上联系我。
+如果您需要添加功能，请先在Discord上联系作者。
 
 需求的功能如果很好的话会被添加。
 
-- **重要！！！**：类似于“请重建与AC二次郎版本完全一致的用户界面”的请求将会被直接否决，不会得到回答。
+- **重要！！！**：类似于“请重建与AC虹色版完全一致的用户界面”的请求会被直接否决，不会得到回答。
 
-## 问答
+## 常见问题与
 
 - 段位选择界面上的所有曲目都是10星魔王！
 
@@ -88,7 +86,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 现：#NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
-- 我没法进入入口界面的下一步
+- 我被卡在了入口界面
 
 ```
 按住P键
@@ -97,7 +95,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 - 我发现了Bug。我该做什么？
 
 ```
-当你发现Bug时请提issue。
+当你发现Bug时请提交issue。
 ```
 
 - 我无法进入“太鼓塔”菜单。
@@ -107,18 +105,18 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 请从演奏模式中选择塔曲目。
 ```
 
-- 游戏报“Tower_Floors”未找到的错误。
+- 游戏报“Tower_Floors”未找到错误。
 
 ```
-文件夹结构不应为System/Graphics
-而是System/(Skin name)/Graphics。
+文件夹结构不应为“System/Graphics”，
+而是“System/(Skin name)/Graphics”。
 ```
 
-- 游戏报“11_Characters”未找到的错误！
+- 游戏报“11_Characters”未找到错误！
 
 ```
 从0.5.2版本开始，角色由11_Characters读取。
-在“(Skin name)/Graphics”文件夹内传建一个“11_Characters”文件夹。将角色文件放入“(Skin name)/Graphics/11_Characters/(Character number)”。
+在“(Skin name)/Graphics”文件夹内创建一个“11_Characters”文件夹。将角色文件放入“(Skin name)/Graphics/11_Characters/(Character number)”。
 将角色设置文件重命名为“CharaConfig.txt”。
 如果您不想使用角色，将“(Skin name)/Graphics/11_Characters/0”留空。
 ```
@@ -127,32 +125,32 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 
 <details>
 	<summary>Pre v0.5.3</summary>
-	
+
 	- 修复了多个Bug
-	
+
 	- 段位结果界面的第一个版本
-	
+
 	- 段位扑面支持任意数量的曲目
-	
+
 	- 对2P Side的支持
-	
+
 	- 重大2P更新（请在Discord中查看更多信息）
-	
+
 	- 现可在演奏模式的选曲界面选择段位谱面
-	
+
 </details>
 
 <details>
 	<summary>v0.5.2.1</summary>
-	
+
 	- 修复了多个Bug
-	
+
 	- 在自动模式之外添加了多个AI级别
-	
+
 	- 添加了全局偏移量设置
-	
+
 	- 将自动滚奏替换为了滚奏速度
-	
+
 </details>
 
 （译者注：剩下的懒得翻了）
@@ -317,17 +315,18 @@ OpenTaiko是一个使用MIT许可证的开源软件。
 	
 </details>
 
-## Features being implemented
+## 正在实现的功能
+
 ```
-☐ Dan-i dojo result screen
-☐ Don medal shop
-☐ Tower result screen
-☐ Multiple background and characters
-☐ ２P result screen
-☐ Program optimization and fix memory leak
-☐ 4 or more songs on dan-i dojo
+☐ 段位道场结果界面
+☐ 咚奖牌商店
+☐ 塔模式结果界面
+☐ 多个背景与角色
+☐ 玩家2结果界面
+☐ 程序优化与内存泄露修复
+☐ 段位道场中支持4首或更多曲目
 ```
-## Credits
+## 致谢
 
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)

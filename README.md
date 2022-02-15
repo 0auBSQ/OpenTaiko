@@ -3,6 +3,7 @@
 </p>
 
 English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
+
 中文：https://github.com/0auBSQ/OpenTaiko/blob/main/README-ZH.md
 
 # OpenTaiko
