@@ -8,7 +8,7 @@ English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
 
 # OpenTaiko
 
-TJAPlayer3-Develop-ReWriteの改造版, 太鼓の達人シミュレーターです。
+TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
 旧名称 TJAPlayer3-Develop-BSQ
 
 - 現在のバージョン： Pre v0.5.3
@@ -57,7 +57,7 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 
 **目標ではない**
 
-- 本家(太鼓の達人ニジイロver など)を再現すること。
+- 本家(ニジイロver など)を再現すること。
 
 ## IssueとPull Request投稿上の注意 （重要）
 

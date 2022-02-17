@@ -46,7 +46,7 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 最適化、バグ修正、ＱＯＬ機能を改善すること。
 
 **目標ではない**
-本家(太鼓の達人ニジイロver など)を再現すること。
+本家(ニジイロver など)を再現すること。
 
 
 === Q＆A ===
@@ -55,7 +55,7 @@ MITライセンスのルールのもと、改造・再配布を行うことは�
 
 === 各連絡先 ===
 不具合報告、新規機能追加のリクエスト等、大歓迎です。
-GitHub: https://github.com/Takkkom/OpenTaiko
+GitHub: https://github.com/0auBSQ/OpenTaiko
 Discord: https://discord.gg/aA8scTvZ6B
 
 
