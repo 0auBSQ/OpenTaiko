@@ -382,15 +382,20 @@ namespace TJAPlayer3
 			//int y = 212;
 			//int y = CDTXMania.Skin.nComboNumberY[ nPlayer ];
 
-			#region[ コンボ文字 ]
-			if (n桁数 <= 2)
-			{
-				TJAPlayer3.Tx.Taiko_Combo_Text?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Combo_Text_X[nPlayer], TJAPlayer3.Skin.Game_Taiko_Combo_Text_Y[nPlayer]);
-			}
-			else
-			{
-				TJAPlayer3.Tx.Taiko_Combo_Text?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Combo_Text_X[nPlayer], TJAPlayer3.Skin.Game_Taiko_Combo_Text_Y[nPlayer]);
-			}
+			#region[ Combo text & Combo guides ]
+			
+			TJAPlayer3.Tx.Taiko_Combo_Text?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Combo_Text_X[nPlayer], TJAPlayer3.Skin.Game_Taiko_Combo_Text_Y[nPlayer]);
+
+			int guide = 2;
+			var ccf = TJAPlayer3.stage演奏ドラム画面.CChartScore[nPlayer];
+
+			if (ccf.nGood > 0)
+				guide = 1;
+			if (ccf.nMiss > 0)
+				guide = 0;
+
+			TJAPlayer3.Tx.Taiko_Combo_Guide[guide]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Combo_Text_X[nPlayer], TJAPlayer3.Skin.Game_Taiko_Combo_Text_Y[nPlayer]);
+
 			#endregion
 
 			int rightX = 0;

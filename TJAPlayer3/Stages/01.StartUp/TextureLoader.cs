@@ -443,6 +443,12 @@ namespace TJAPlayer3
             Taiko_Combo[3] = TxC(GAME + TAIKO + @"Combo_Huge.png");
             Taiko_Combo_Effect = TxC(GAME + TAIKO + @"Combo_Effect.png");
             Taiko_Combo_Text = TxC(GAME + TAIKO + @"Combo_Text.png");
+
+            Taiko_Combo_Guide = new CTexture[3];
+            for (int i = 0; i < Taiko_Combo_Guide.Length; i++)
+            {
+                Taiko_Combo_Guide[i] = TxC(GAME + TAIKO + @"Combo_Guide" + i.ToString() + ".png");
+            }
             #endregion
 
             #region ゲージ
@@ -1472,7 +1478,8 @@ namespace TJAPlayer3
             Taiko_PlayerNumber,
             Taiko_NamePlate; // ネームプレート
         public CTexture[] Taiko_Score,
-            Taiko_Combo;
+            Taiko_Combo,
+            Taiko_Combo_Guide;
         #endregion
         #region ゲージ
         public CTexture[] Gauge,
