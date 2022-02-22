@@ -856,6 +856,8 @@ namespace TJAPlayer3
             Heya_Center_Menu_Box = TxC(HEYA + @"Center_Menu_Box.png");
             Heya_Center_Menu_Box_Slot = TxC(HEYA + @"Center_Menu_Box_Slot.png");
             Heya_Side_Menu = TxC(HEYA + @"Side_Menu.png");
+            Heya_Box = TxC(HEYA + @"Box.png");
+            Heya_Lock = TxC(HEYA + @"Lock.png");
 
             #endregion
 
@@ -1685,7 +1687,9 @@ namespace TJAPlayer3
             Heya_Center_Menu_Bar,
             Heya_Center_Menu_Box,
             Heya_Center_Menu_Box_Slot,
-            Heya_Side_Menu;
+            Heya_Side_Menu,
+            Heya_Box,
+            Heya_Lock;
 
         #endregion
 

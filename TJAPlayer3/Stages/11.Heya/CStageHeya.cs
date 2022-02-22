@@ -217,11 +217,13 @@ namespace TJAPlayer3
                     {
                         TJAPlayer3.Tx.PuchiChara.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Lock.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
                         TJAPlayer3.Tx.PuchiChara.color4 = C•ÏŠ·.ColorToColor4(Color.White);
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Lock.color4 = C•ÏŠ·.ColorToColor4(Color.White);
                     }
 
                     TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
@@ -244,13 +246,11 @@ namespace TJAPlayer3
                         tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 448);
                     }
 
-                    #region [Unlockable information zone]
+                    if (puchiUnlockables.ContainsKey(pos)
+                        && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
+                        TJAPlayer3.Tx.Heya_Lock.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
-                    if (i == 0 && this.ttkInfoSection != null)
-                        TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkInfoSection)
-                            .t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620, 560);
 
-                    #endregion
                 }
             }
 
@@ -378,6 +378,20 @@ namespace TJAPlayer3
 
             #endregion
 
+
+            #endregion
+
+            #region [Unlockable information zone]
+
+            if (iCurrentMenu >= 0)
+            {
+                if (this.ttkInfoSection != null && this.ttkInfoSection.str•¶š != "")
+                    TJAPlayer3.Tx.Heya_Box.t2D•`‰æ(TJAPlayer3.app.Device, 0, 0);
+
+                if (this.ttkInfoSection != null)
+                    TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkInfoSection)
+                        .t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620, 560);
+            }
 
             #endregion
 
@@ -562,6 +576,7 @@ namespace TJAPlayer3
                 else
                 {
                     iCurrentMenu = -1;
+                    this.ttkInfoSection = null;
                     this.tResetOpts();
                 }
                     
