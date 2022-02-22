@@ -248,7 +248,7 @@ namespace TJAPlayer3
 
                     if (puchiUnlockables.ContainsKey(pos)
                         && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
-                        TJAPlayer3.Tx.Heya_Lock.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                        TJAPlayer3.Tx.Heya_Lock?.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
 
                 }
@@ -386,7 +386,7 @@ namespace TJAPlayer3
             if (iCurrentMenu >= 0)
             {
                 if (this.ttkInfoSection != null && this.ttkInfoSection.str•¶Žš != "")
-                    TJAPlayer3.Tx.Heya_Box.t2D•`‰æ(TJAPlayer3.app.Device, 0, 0);
+                    TJAPlayer3.Tx.Heya_Box?.t2D•`‰æ(TJAPlayer3.app.Device, 0, 0);
 
                 if (this.ttkInfoSection != null)
                     TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkInfoSection)
