@@ -1,4 +1,4 @@
-// Created by WHMHammer on Feb. 14th, 2022
+﻿// Created by WHMHammer on Feb. 14th, 2022
 // Translated from CLang_en.cs
 
 using System;
