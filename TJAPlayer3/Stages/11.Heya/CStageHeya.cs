@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using FDK;
 using SharpDX;
-using static TJAPlayer3.CActSelect‹ÈƒŠƒXƒg;
+using static TJAPlayer3.CActSelectæ›²ãƒªã‚¹ãƒˆ;
 
 using Rectangle = System.Drawing.Rectangle;
 using RectangleF = System.Drawing.RectangleF;
@@ -18,22 +18,22 @@ namespace TJAPlayer3
     {
         public CStageHeya()
         {
-            base.eƒXƒe[ƒWID = EƒXƒe[ƒW.Heya;
-            base.eƒtƒF[ƒYID = CStage.EƒtƒF[ƒY.‹¤’Ê_’Êíó‘Ô;
+            base.eã‚¹ãƒ†ãƒ¼ã‚¸ID = Eã‚¹ãƒ†ãƒ¼ã‚¸.Heya;
+            base.eãƒ•ã‚§ãƒ¼ã‚ºID = CStage.Eãƒ•ã‚§ãƒ¼ã‚º.å…±é€š_é€šå¸¸çŠ¶æ…‹;
 
-            base.listqActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
+            base.listå­Activities.Add(this.actFOtoTitle = new CActFIFOBlack());
 
-            base.listqActivities.Add(this.PuchiChara = new PuchiChara());
+            base.listå­Activities.Add(this.PuchiChara = new PuchiChara());
         }
 
 
-        public override void OnŠˆ«‰»()
+        public override void Onæ´»æ€§åŒ–()
         {
-            if (base.bŠˆ«‰»‚µ‚Ä‚é)
+            if (base.bæ´»æ€§åŒ–ã—ã¦ã‚‹)
                 return;
 
-            base.eƒtƒF[ƒYID = CStage.EƒtƒF[ƒY.‹¤’Ê_’Êíó‘Ô;
-            this.eƒtƒF[ƒhƒAƒEƒgŠ®—¹‚Ì–ß‚è’l = E–ß‚è’l.Œp‘±;
+            base.eãƒ•ã‚§ãƒ¼ã‚ºID = CStage.Eãƒ•ã‚§ãƒ¼ã‚º.å…±é€š_é€šå¸¸çŠ¶æ…‹;
+            this.eãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®æˆ»ã‚Šå€¤ = Eæˆ»ã‚Šå€¤.ç¶™ç¶š;
 
             ctDonchan_In = new CCounter();
             ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
@@ -70,7 +70,7 @@ namespace TJAPlayer3
             this.ttkDanTitles = new TitleTextureKey[amount];
 
             // Silver Shinjin (default rank) always avaliable by default
-            this.ttkDanTitles[0] = new TitleTextureKey("Vl", this.pfHeyaFont, Color.White, Color.Black, 1000);
+            this.ttkDanTitles[0] = new TitleTextureKey("æ–°äºº", this.pfHeyaFont, Color.White, Color.Black, 1000);
 
             int idx = 1;
             if (TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer] != null)
@@ -96,7 +96,7 @@ namespace TJAPlayer3
             this.ttkTitles = new TitleTextureKey[amount];
 
             // Wood shojinsha (default title) always avaliable by default
-            this.ttkTitles[0] = new TitleTextureKey("‰SÒ", this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+            this.ttkTitles[0] = new TitleTextureKey("åˆå¿ƒè€…", this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
 
             idx = 1;
             if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null)
@@ -155,30 +155,30 @@ namespace TJAPlayer3
 
             this.PuchiChara.IdleAnimation();
 
-            base.OnŠˆ«‰»();
+            base.Onæ´»æ€§åŒ–();
         }
 
-        public override void On”ñŠˆ«‰»()
+        public override void Onéæ´»æ€§åŒ–()
         {
-            base.On”ñŠˆ«‰»();
+            base.Onéæ´»æ€§åŒ–();
         }
 
-        public override void OnManagedƒŠƒ\[ƒX‚Ìì¬()
+        public override void OnManagedãƒªã‚½ãƒ¼ã‚¹ã®ä½œæˆ()
         {
-            base.OnManagedƒŠƒ\[ƒX‚Ìì¬();
+            base.OnManagedãƒªã‚½ãƒ¼ã‚¹ã®ä½œæˆ();
         }
 
-        public override void OnManagedƒŠƒ\[ƒX‚Ì‰ğ•ú()
+        public override void OnManagedãƒªã‚½ãƒ¼ã‚¹ã®è§£æ”¾()
         {
-            base.OnManagedƒŠƒ\[ƒX‚Ì‰ğ•ú();
+            base.OnManagedãƒªã‚½ãƒ¼ã‚¹ã®è§£æ”¾();
         }
 
-        public override int Onis•`‰æ()
+        public override int Oné€²è¡Œæç”»()
         {
-            ctDonchan_Normal.tisLoop();
-            ctDonchan_In.tis();
+            ctDonchan_Normal.té€²è¡ŒLoop();
+            ctDonchan_In.té€²è¡Œ();
 
-            TJAPlayer3.Tx.Heya_Background.t2D•`‰æ(TJAPlayer3.app.Device, 0, 0);
+            TJAPlayer3.Tx.Heya_Background.t2Dæç”»(TJAPlayer3.app.Device, 0, 0);
 
             #region [Menus display]
 
@@ -186,21 +186,21 @@ namespace TJAPlayer3
 
             for (int i = 0; i < this.ttkMainMenuOpt.Length; i++)
             {
-                CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
+                CTexture tmpTex = TJAPlayer3.stageé¸æ›².actæ›²ãƒªã‚¹ãƒˆ.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
 
                 if (iCurrentMenu != -1 || iMainMenuCurrent != i)
                 {
-                    tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                    tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
                 }
                 else
                 {
-                    tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                    tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                 }
 
-                TJAPlayer3.Tx.Heya_Side_Menu.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 164, 26 + 80 * i);
-                tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 164, 40 + 80 * i);
+                TJAPlayer3.Tx.Heya_Side_Menu.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 164, 26 + 80 * i);
+                tmpTex.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 164, 40 + 80 * i);
             }
 
             #endregion
@@ -215,40 +215,40 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Lock.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.PuchiChara.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Lock.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Lock.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.PuchiChara.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Lock.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
                     
-                    TJAPlayer3.Tx.PuchiChara.t2DŠg‘å—¦l—¶’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
-                        new Rectangle((PuchiChara.Counter.nŒ»İ‚Ì’l + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
+                    TJAPlayer3.Tx.PuchiChara.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
+                        new Rectangle((PuchiChara.Counter.nç¾åœ¨ã®å€¤ + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                         puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.PuchiChara.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
 
                     if (ttkPuchiCharaNames[pos] != null)
                     {
-                        CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
+                        CTexture tmpTex = TJAPlayer3.stageé¸æ›².actæ›²ãƒªã‚¹ãƒˆ.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
-                        tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 448);
+                        tmpTex.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 448);
                     }
 
                     if (puchiUnlockables.ContainsKey(pos)
                         && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
-                        TJAPlayer3.Tx.Heya_Lock?.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                        TJAPlayer3.Tx.Heya_Lock?.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
 
                 }
@@ -267,22 +267,22 @@ namespace TJAPlayer3
                     if (i != 0)
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
                         if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
-                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2DŠg‘å—¦l—¶’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620 + 302 * i, 320);
+                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620 + 302 * i, 320);
 
                     if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                 }
             }
 
@@ -296,36 +296,36 @@ namespace TJAPlayer3
                 {
                     int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
 
-                    CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkDanTitles[pos]);
+                    CTexture tmpTex = TJAPlayer3.stageé¸æ›².actæ›²ãƒªã‚¹ãƒˆ.ResolveTitleTexture(this.ttkDanTitles[pos]);
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.NamePlateBase.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                        tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.NamePlateBase.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                        tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.NamePlateBase.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                     }
 
                     int danGrade = 0;
                     if (pos > 0)
                     {
-                        danGrade = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[pos].str•¶š].clearStatus;
+                        danGrade = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[pos].stræ–‡å­—].clearStatus;
                     }
 
-                    TJAPlayer3.Tx.Heya_Side_Menu.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+                    TJAPlayer3.Tx.Heya_Side_Menu.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
 
-                    TJAPlayer3.Tx.NamePlateBase.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device,
+                    TJAPlayer3.Tx.NamePlateBase.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device,
                         718 + -10 * Math.Abs(i),
                         331 + 70 * i,
                         new RectangleF(0, (8 + danGrade) * 54, 220, 54));
-                    TJAPlayer3.Tx.NamePlateBase.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.NamePlateBase.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
 
-                    tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+                    tmpTex.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
 
                     
                 }
@@ -341,37 +341,37 @@ namespace TJAPlayer3
                 {
                     int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
 
-                    CTexture tmpTex = TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkTitles[pos]);
+                    CTexture tmpTex = TJAPlayer3.stageé¸æ›².actæ›²ãƒªã‚¹ãƒˆ.ResolveTitleTexture(this.ttkTitles[pos]);
 
                     if (i != 0)
                     {
-                        tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.DarkGray);
+                        tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
-                        tmpTex.color4 = C•ÏŠ·.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = C•ÏŠ·.ColorToColor4(Color.White);
+                        tmpTex.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Heya_Side_Menu.color4 = Cå¤‰æ›.ColorToColor4(Color.White);
                     }
 
-                    TJAPlayer3.Tx.Heya_Side_Menu.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+                    TJAPlayer3.Tx.Heya_Side_Menu.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
 
                     int iType = -1;
 
                     if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null &&
-                        TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].str•¶š))
-                        iType = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[pos].str•¶š].iType;
+                        TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[pos].stræ–‡å­—))
+                        iType = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[pos].stræ–‡å­—].iType;
                     else if (pos == 0)
                         iType = 0;
 
                     if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
                     {
-                        TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.nŒ»İ‚Ì’l % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device,
+                        TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.nç¾åœ¨ã®å€¤ % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device,
                             730 + -10 * Math.Abs(i),
                             348 + 70 * i);
                     } 
 
-                    tmpTex.t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+                    tmpTex.t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
 
                 }
             }
@@ -385,41 +385,41 @@ namespace TJAPlayer3
 
             if (iCurrentMenu >= 0)
             {
-                if (this.ttkInfoSection != null && this.ttkInfoSection.str•¶š != "")
-                    TJAPlayer3.Tx.Heya_Box?.t2D•`‰æ(TJAPlayer3.app.Device, 0, 0);
+                if (this.ttkInfoSection != null && this.ttkInfoSection.stræ–‡å­— != "")
+                    TJAPlayer3.Tx.Heya_Box?.t2Dæç”»(TJAPlayer3.app.Device, 0, 0);
 
                 if (this.ttkInfoSection != null)
-                    TJAPlayer3.stage‘I‹È.act‹ÈƒŠƒXƒg.ResolveTitleTexture(this.ttkInfoSection)
-                        .t2DŠg‘å—¦l—¶ã’†‰›Šî€•`‰æ(TJAPlayer3.app.Device, 620, 560);
+                    TJAPlayer3.stageé¸æ›².actæ›²ãƒªã‚¹ãƒˆ.ResolveTitleTexture(this.ttkInfoSection)
+                        .t2Dæ‹¡å¤§ç‡è€ƒæ…®ä¸Šä¸­å¤®åŸºæº–æç”»(TJAPlayer3.app.Device, 620, 560);
             }
 
             #endregion
 
             #region [General Don animations]
 
-            if (!ctDonchan_In.bŠJn‚µ‚½)
+            if (!ctDonchan_In.bé–‹å§‹ã—ãŸ)
             {
-                TJAPlayer3.Skin.soundHeyaBGM.tÄ¶‚·‚é();
-                ctDonchan_In.tŠJn(0, 180, 1.25f, TJAPlayer3.Timer);    
+                TJAPlayer3.Skin.soundHeyaBGM.tå†ç”Ÿã™ã‚‹();
+                ctDonchan_In.té–‹å§‹(0, 180, 1.25f, TJAPlayer3.Timer);    
             }
 
             TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
 
-            #region [ ‚Ç‚ñ‚¿‚á‚ñŠÖ˜A ]
+            #region [ ã©ã‚“ã¡ã‚ƒã‚“é–¢é€£ ]
 
-            if (ctDonchan_In.nŒ»İ‚Ì’l != 90)
+            if (ctDonchan_In.nç¾åœ¨ã®å€¤ != 90)
                 {
                     float DonchanX = 0f, DonchanY = 0f;
 
-                    DonchanX = (float)Math.Sin(ctDonchan_In.nŒ»İ‚Ì’l / 2 * (Math.PI / 180)) * 200f;
-                    DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.nŒ»İ‚Ì’l / 2)) * (Math.PI / 180)) * 150f);
+                    DonchanX = (float)Math.Sin(ctDonchan_In.nç¾åœ¨ã®å€¤ / 2 * (Math.PI / 180)) * 200f;
+                    DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.nç¾åœ¨ã®å€¤ / 2)) * (Math.PI / 180)) * 150f);
 
-                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.nŒ»İ‚Ì’l].Opacity = ctDonchan_In.nŒ»İ‚Ì’l * 2;
-                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.nŒ»İ‚Ì’l].t2D•`‰æ(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
+                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.nç¾åœ¨ã®å€¤].Opacity = ctDonchan_In.nç¾åœ¨ã®å€¤ * 2;
+                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.nç¾åœ¨ã®å€¤].t2Dæç”»(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
 
                     #region [PuchiChara]
 
-                    this.PuchiChara.Onis•`‰æ(0 + 100, 336 + 230, false);
+                    this.PuchiChara.Oné€²è¡Œæç”»(0 + 100, 336 + 230, false);
 
                     #endregion
                 }
@@ -428,29 +428,29 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region [ ƒL[ŠÖ˜A ]
+            #region [ ã‚­ãƒ¼é–¢é€£ ]
 
-            if (TJAPlayer3.InputŠÇ—.Keyboard.bƒL[‚ª‰Ÿ‚³‚ê‚½((int)SlimDXKeys.Key.RightArrow) ||
-                TJAPlayer3.Pad.b‰Ÿ‚³‚ê‚½(EŠyŠíƒp[ƒg.DRUMS, Eƒpƒbƒh.RBlue))
+            if (TJAPlayer3.Inputç®¡ç†.Keyboard.bã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ((int)SlimDXKeys.Key.RightArrow) ||
+                TJAPlayer3.Pad.bæŠ¼ã•ã‚ŒãŸ(Eæ¥½å™¨ãƒ‘ãƒ¼ãƒˆ.DRUMS, Eãƒ‘ãƒƒãƒ‰.RBlue))
             {
                 if (this.tMove(1))
                 {
-                    TJAPlayer3.Skin.sound•ÏX‰¹.tÄ¶‚·‚é();
+                    TJAPlayer3.Skin.soundå¤‰æ›´éŸ³.tå†ç”Ÿã™ã‚‹();
                 }
             }
 
-            else if (TJAPlayer3.InputŠÇ—.Keyboard.bƒL[‚ª‰Ÿ‚³‚ê‚½((int)SlimDXKeys.Key.LeftArrow) ||
-                TJAPlayer3.Pad.b‰Ÿ‚³‚ê‚½(EŠyŠíƒp[ƒg.DRUMS, Eƒpƒbƒh.LBlue))
+            else if (TJAPlayer3.Inputç®¡ç†.Keyboard.bã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ((int)SlimDXKeys.Key.LeftArrow) ||
+                TJAPlayer3.Pad.bæŠ¼ã•ã‚ŒãŸ(Eæ¥½å™¨ãƒ‘ãƒ¼ãƒˆ.DRUMS, Eãƒ‘ãƒƒãƒ‰.LBlue))
             {
                 if (this.tMove(-1))
                 {
-                    TJAPlayer3.Skin.sound•ÏX‰¹.tÄ¶‚·‚é();
+                    TJAPlayer3.Skin.soundå¤‰æ›´éŸ³.tå†ç”Ÿã™ã‚‹();
                 }
             }
 
-            else if (TJAPlayer3.InputŠÇ—.Keyboard.bƒL[‚ª‰Ÿ‚³‚ê‚½((int)SlimDXKeys.Key.Return) ||
-                TJAPlayer3.Pad.b‰Ÿ‚³‚ê‚½(EŠyŠíƒp[ƒg.DRUMS, Eƒpƒbƒh.LRed) ||
-                TJAPlayer3.Pad.b‰Ÿ‚³‚ê‚½(EŠyŠíƒp[ƒg.DRUMS, Eƒpƒbƒh.RRed))
+            else if (TJAPlayer3.Inputç®¡ç†.Keyboard.bã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ((int)SlimDXKeys.Key.Return) ||
+                TJAPlayer3.Pad.bæŠ¼ã•ã‚ŒãŸ(Eæ¥½å™¨ãƒ‘ãƒ¼ãƒˆ.DRUMS, Eãƒ‘ãƒƒãƒ‰.LRed) ||
+                TJAPlayer3.Pad.bæŠ¼ã•ã‚ŒãŸ(Eæ¥½å™¨ãƒ‘ãƒ¼ãƒˆ.DRUMS, Eãƒ‘ãƒƒãƒ‰.RRed))
             {
 
                 #region [Decide]
@@ -460,10 +460,10 @@ namespace TJAPlayer3
                 // Return to main menu
                 if (iCurrentMenu == -1 && iMainMenuCurrent == 0)
                 {
-                    TJAPlayer3.Skin.soundHeyaBGM.t’â~‚·‚é();
-                    this.eƒtƒF[ƒhƒAƒEƒgŠ®—¹‚Ì–ß‚è’l = E–ß‚è’l.ƒ^ƒCƒgƒ‹‚É–ß‚é;
-                    this.actFOtoTitle.tƒtƒF[ƒhƒAƒEƒgŠJn();
-                    base.eƒtƒF[ƒYID = CStage.EƒtƒF[ƒY.‹¤’Ê_ƒtƒF[ƒhƒAƒEƒg;
+                    TJAPlayer3.Skin.soundHeyaBGM.tåœæ­¢ã™ã‚‹();
+                    this.eãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®æˆ»ã‚Šå€¤ = Eæˆ»ã‚Šå€¤.ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹;
+                    this.actFOtoTitle.tãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆé–‹å§‹();
+                    base.eãƒ•ã‚§ãƒ¼ã‚ºID = CStage.Eãƒ•ã‚§ãƒ¼ã‚º.å…±é€š_ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ;
                 }
 
                 else if (iCurrentMenu == -1)
@@ -515,11 +515,11 @@ namespace TJAPlayer3
 
                     if (iDanTitleCurrent > 0)
                     {
-                        iG = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].str•¶š].isGold;
-                        cs = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].str•¶š].clearStatus;
+                        iG = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].stræ–‡å­—].isGold;
+                        cs = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[iDanTitleCurrent].stræ–‡å­—].clearStatus;
                     }
 
-                    TJAPlayer3.NamePlateConfig.data.Dan[iPlayer] = this.ttkDanTitles[iDanTitleCurrent].str•¶š;
+                    TJAPlayer3.NamePlateConfig.data.Dan[iPlayer] = this.ttkDanTitles[iDanTitleCurrent].stræ–‡å­—;
                     TJAPlayer3.NamePlateConfig.data.DanGold[iPlayer] = iG;
                     TJAPlayer3.NamePlateConfig.data.DanType[iPlayer] = cs;
 
@@ -533,11 +533,11 @@ namespace TJAPlayer3
 
                 else if (iCurrentMenu == 3)
                 {
-                    TJAPlayer3.NamePlateConfig.data.Title[iPlayer] = this.ttkTitles[iTitleCurrent].str•¶š;
+                    TJAPlayer3.NamePlateConfig.data.Title[iPlayer] = this.ttkTitles[iTitleCurrent].stræ–‡å­—;
 
                     if (TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer] != null
-                        && TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].str•¶š))
-                        TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[iTitleCurrent].str•¶š].iType;
+                        && TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer].ContainsKey(this.ttkTitles[iTitleCurrent].stræ–‡å­—))
+                        TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[iPlayer][this.ttkTitles[iTitleCurrent].stræ–‡å­—].iType;
                     else if (iTitleCurrent == 0)
                         TJAPlayer3.NamePlateConfig.data.TitleType[iPlayer] = 0;
                     else
@@ -552,26 +552,26 @@ namespace TJAPlayer3
                 }
 
                 if (ess == ESelectStatus.SELECTED)
-                    TJAPlayer3.Skin.soundŒˆ’è‰¹.tÄ¶‚·‚é();
+                    TJAPlayer3.Skin.soundæ±ºå®šéŸ³.tå†ç”Ÿã™ã‚‹();
                 else if (ess == ESelectStatus.FAILED)
-                    TJAPlayer3.Skin.soundError.tÄ¶‚·‚é();
+                    TJAPlayer3.Skin.soundError.tå†ç”Ÿã™ã‚‹();
                 else
-                    TJAPlayer3.Skin.SoundBanapas.tÄ¶‚·‚é(); // To change with a more appropriate sfx sooner or later
+                    TJAPlayer3.Skin.SoundBanapas.tå†ç”Ÿã™ã‚‹(); // To change with a more appropriate sfx sooner or later
 
                 #endregion
             }
 
-            else if (TJAPlayer3.InputŠÇ—.Keyboard.bƒL[‚ª‰Ÿ‚³‚ê‚½((int)SlimDXKeys.Key.Escape))
+            else if (TJAPlayer3.Inputç®¡ç†.Keyboard.bã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ((int)SlimDXKeys.Key.Escape))
             {
                 
-                TJAPlayer3.Skin.soundæÁ‰¹.tÄ¶‚·‚é();
+                TJAPlayer3.Skin.soundå–æ¶ˆéŸ³.tå†ç”Ÿã™ã‚‹();
 
                 if (iCurrentMenu == -1)
                 {
-                    TJAPlayer3.Skin.soundHeyaBGM.t’â~‚·‚é();
-                    this.eƒtƒF[ƒhƒAƒEƒgŠ®—¹‚Ì–ß‚è’l = E–ß‚è’l.ƒ^ƒCƒgƒ‹‚É–ß‚é;
-                    this.actFOtoTitle.tƒtƒF[ƒhƒAƒEƒgŠJn();
-                    base.eƒtƒF[ƒYID = CStage.EƒtƒF[ƒY.‹¤’Ê_ƒtƒF[ƒhƒAƒEƒg;
+                    TJAPlayer3.Skin.soundHeyaBGM.tåœæ­¢ã™ã‚‹();
+                    this.eãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®æˆ»ã‚Šå€¤ = Eæˆ»ã‚Šå€¤.ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹;
+                    this.actFOtoTitle.tãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆé–‹å§‹();
+                    base.eãƒ•ã‚§ãƒ¼ã‚ºID = CStage.Eãƒ•ã‚§ãƒ¼ã‚º.å…±é€š_ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ;
                 }
                 else
                 {
@@ -586,25 +586,25 @@ namespace TJAPlayer3
 
             #endregion
 
-            switch (base.eƒtƒF[ƒYID)
+            switch (base.eãƒ•ã‚§ãƒ¼ã‚ºID)
             {
-                case CStage.EƒtƒF[ƒY.‹¤’Ê_ƒtƒF[ƒhƒAƒEƒg:
-                    if (this.actFOtoTitle.Onis•`‰æ() == 0)
+                case CStage.Eãƒ•ã‚§ãƒ¼ã‚º.å…±é€š_ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ:
+                    if (this.actFOtoTitle.Oné€²è¡Œæç”»() == 0)
                     {
                         break;
                     }
-                    return (int)this.eƒtƒF[ƒhƒAƒEƒgŠ®—¹‚Ì–ß‚è’l;
+                    return (int)this.eãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®æˆ»ã‚Šå€¤;
 
             }
 
             return 0;
         }
 
-        public enum E–ß‚è’l : int
+        public enum Eæˆ»ã‚Šå€¤ : int
         {
-            Œp‘±,
-            ƒ^ƒCƒgƒ‹‚É–ß‚é,
-            ‘I‹È‚µ‚½
+            ç¶™ç¶š,
+            ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹,
+            é¸æ›²ã—ãŸ
         }
 
         public bool bInSongPlayed;
@@ -724,7 +724,7 @@ namespace TJAPlayer3
         private int iPuchiCharaCount;
         private int iCharacterCount;
 
-        public E–ß‚è’l eƒtƒF[ƒhƒAƒEƒgŠ®—¹‚Ì–ß‚è’l;
+        public Eæˆ»ã‚Šå€¤ eãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®æˆ»ã‚Šå€¤;
 
         public CActFIFOBlack actFOtoTitle;
     }
