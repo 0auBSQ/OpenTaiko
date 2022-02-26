@@ -1,79 +1,76 @@
 ﻿############
-TJAPlayer3 Readme.txt
+OpenTaiko Readme.txt
 ############
 公開日:2018/5/5
-更新日:2018/12/21
+更新日:2022/02/17
+
 
 == はじめに ==
-TJAPlayer3をダウンロードしていただき、ありがとうございます。
+OpenTaikoをダウンロードしていただき、ありがとうございます。
 このシミュレータは、アーケード/家庭用ゲーム「太鼓の達人」シリーズのシミュレータです。
-このシミュレータは、TJAPlayer2 forPCというシミュレーターを改造したものです。
+このシミュレータは、TJAPlayer3-Develop-ReWriteというシミュレーターを改造したものです。
 太鼓さん次郎・TJAPlayer等で使われている.tjaファイルを読み込み、プレイすることができます。
-(すべての.tjaファイルが読み込めるわけではありません。また、TJAPlayer3側で追加した命令もあります。)
+(すべての.tjaファイルが読み込めるわけではありません。また、OpenTaiko側で追加した命令もあります。)
 開発途中のシミュレータのため、不具合やバグがある場合があります。ご了承ください。
-(もし不具合を見つけた場合は、GitHubのissueやTwitterで連絡してくださると、大変助かります。)
+
 
 == 使用上の注意 ==
-・TJAPlayer3はオープンソースソフトウェア(MIT)です。
-・このシミュレータを使用する場合は、**全て自己責任**でお願いします。
-・説明書や、ドキュメントを見れば解決できる質問がよく来ます。人に質問する前に、まずは自分で調べることをしてください。
-・プログラムの制作者(AioiLight)は、TJAPlayer3本体(AioiLight.spaceからダウンロードしたもの)とデフォルトのスキン「SimpleStyle」のサポートのみ行います。
-　その他のスキン(例:本家風スキン)や、TJAPlayer3の改造品(派生ビルド)のサポートは原則行いませんのでご了承ください。
-・すべての環境で動作確認はできない(できるはずがない)ので、動いたら運がいい、程度でお願いします。
-　ドキュメントを読んでも解決しなかったら、諦めましょう。諦めも肝心です。
-・常時60fpsを保てないPCでの動作は期待できません。
+現時点では通常リリースにはスキンが同梱してません(CommitのPreリリースには同梱しています)
+このシミュレータを使用する場合は、**全て自己責任**でお願いします。
+本家風スキンや派生ビルドのサポートは原則行いませんのでご了承ください。
+質問する前に、まずは自分で調べたりしてください。
+常時60fpsを保てないPCでの動作は快適なプレイは期待できません。
+上記のリリースのバージョン以外でサポートは行いませんので自己責任でお願いします。
 
-== 操作方法、曲の追加方法、更新情報など ==
-https://aioilight.space/taiko/tjap3/
-ドキュメントに情報が集められているので、それをお読みください。随時更新しています。
 
-== デフォルトスキン(SimpleStyle)について ==
-一部画像はTJAPlayer2 forPCのデフォルトスキンから流用しています。
-ライセンスはMITのもと運用しています。MITライセンスを厳守する場合、改変、配布等OKです。
-作成ツール: Photoshop/After Effects
+== 動画、配信等でのご利用について == 
 
-== 動画、配信等でのご利用について ==
-TJAPlayer3を動画共有サイトやライブ配信サービス、ウェブサイトやブログ等でご利用になられる場合、
-バンダイナムコエンターテインメント公式のものでないこと、他の太鼓の達人シミュレーターと混同しないよう配慮をお願いいたします。
-また、タグ機能のあるサイトの場合、「TJAPlayer3」「TJAP3」といったタグを付けることで、
-他シミュレータとの誤解を防ぐとともに、関連動画として出やすくなるメリットがあるため、推奨します。
+OpenTaikoを動画共有サイトやライブ配信サービス、ウェブサイトやブログ等でご利用になられる場合、バンダイナムコエンターテインメント公式のものでないこと、他の太鼓の達人シミュレーターと混同しないよう配慮をお願いいたします。
+また、タグ機能のあるサイトの場合、「OpenTaiko」「TJAPlayer3-Develop-BSQ」「TJAP3-BSQ」といったタグを付けることで、他シミュレータとの誤解を防ぐとともに、関連動画として出やすくなるメリットがあるため、推奨します。
+知的所有権侵害は支援しておりませんので、自国の著作権規則に基づいて行動してください。
 
-== TJAPlayer3の改造・再配布(二次配布)を行う場合について ==
-TJAPlayer3、デフォルトスキンはMITライセンスで制作されています。
+
+== OpenTaikoの改造・再配布(二次配布)を行う場合について ==
+OpenTaikoはオープンソースソフトウェア(MIT)です。
 MITライセンスのルールのもと、改造・再配布を行うことは自由ですが、**全て自己責任**でお願いします。
 また、使用しているライブラリのライセンス上、**必ず**「Licenses」フォルダを同梱の上、改造・再配布をお願いします。
 外部スキンや、譜面パッケージを同梱する場合は、それぞれの制作者のルールや規約を守ってください。
-これらにTJAPlayer3のライセンスは適用されません。
-
-== スペシャルサンクス ==
-FROM氏/yyagi氏 - DTXMania 開発者
-kairera0467氏 - TJAPlayer2 forPC 開発者
-ろみゅ～？氏 - バグ報告、不具合報告
-コーシー氏 - バグ報告、不具合報告
-twopointzero氏 - プログラムの最適化
+これらにOpenTaikoのライセンスは適用されません。
 
 
-== 不具合報告、連絡先など ==
+== 目標・目標ではない物事 == 
 
-=== 既知の問題点 ===
-・日本語環境でもプログラム内部では英語環境と認識されてシステムメッセージがほぼ英語です。 →Ver.1.5.6から日本語環境の場合は日本語で表示されるようになりました。
-・ダンサー、モブ、ランナー画像のサイズが大きいと瞬間的にカクつくかもしれません。これについては一度再生すると直ります。→FastRenderをONにすれば大抵のPCではカクつかずに再生されます。
-・命令と値の間に半角スペースが入ってないと正常に再生されません。(e.g. #SCROLL1.5)
-・一曲再生後の曲のソートができません。→修正されました。
-・やり直し時にふうせんが消えます。
-・譜面分岐の不具合がいくつか残ったままです。
+**目標**
+様々な楽しい太鼓のプレイ手段を設けること。
+より多くのスキンのカスタマイズを可能にすること、「色々な見た目のスキンを簡単に作れる」ということを可能にすること。
+最適化、バグ修正、ＱＯＬ機能を改善すること。
 
-=== 質問をする前に ===
-質問をする前に、
-1.調べる前に考える
-2.人に聞く前に調べる
-3.過去に同じような質問がなかったか調べる
-4.使用しているパソコンの環境、どういう動作をしたら不具合を起こしたかの過程等を添えて連絡する
-この4つのルールを守っていただければ幸いです。どうかよろしくおねがいします。
+**目標ではない**
+本家(ニジイロver など)を再現すること。
+
+
+=== Q＆A ===
+各連絡先のGithubを参照してください
+
 
 === 各連絡先 ===
 不具合報告、新規機能追加のリクエスト等、大歓迎です。
-Twitter: @TJAPlayer3
-メール: info@aioilight.space
-Discord: AioiLight#7839
-GitHub: https://github.com/AioiLight/TJAPlayer3
+GitHub: https://github.com/0auBSQ/OpenTaiko
+Discord: https://discord.gg/aA8scTvZ6B
+
+
+== スペシャルサンクス ==
+
+[AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
+[cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
+[funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
+[basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
+[Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
+[Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
+[TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
+[KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
+[Mr-Ojii/TJAPlayer3-f](https://github.com/Mr-Ojii/TJAPlayer3-f)(@Mr-Ojii)
+[Akasoko/TJAPlayer3](https://github.com/Akasoko-Master/TJAPlayer3)(@AkasokoR)
+[FROM/DTXMaina](https://github.com/DTXMania)(@DTXMania)
+[Kairera0467/TJAP2fPC](https://github.com/kairera0467/TJAP2fPC)(@Kairera0467)
+[touhourenren/TJAPlayer3-Develop-Rewrite](https://github.com/touhourenren)
