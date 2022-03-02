@@ -17,6 +17,7 @@
 /Test/dll/SlimDX.*
 /Test/dll/FDK.dll
 /Test/NamePlate.json
+/Test/Favorite.json
 /Test/SongsIgnored/*
 /Test/xadec.dll
 /Test/SoundDecoder.dll

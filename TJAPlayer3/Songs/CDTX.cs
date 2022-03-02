@@ -1186,6 +1186,7 @@ namespace TJAPlayer3
         public STDGBVALUE<int> LEVEL;
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+        public CSongUniqueID uniqueID;
         
         // Tower lifes
         public int LIFE;
@@ -1457,7 +1458,9 @@ namespace TJAPlayer3
             Dan_C = new Dan_C[CExamInfo.cMaxExam];
             pDan_LastChip = new CChip[1];
             DanSongs.Number = 0;
+
         }
+        /*
         public CDTX(string str全入力文字列, int difficulty)
             : this()
         {
@@ -1476,18 +1479,21 @@ namespace TJAPlayer3
             this.On活性化();
             this.t入力_全入力文字列から(str全入力文字列, str全入力文字列, db再生速度, nBGMAdjust, difficulty);
         }
+        */
         public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int difficulty)
             : this()
         {
             this.On活性化();
             this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, 0, 0, false, difficulty);
         }
+        /*
         public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersion, int difficulty)
             : this()
         {
             this.On活性化();
             this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, nReadVersion, 0, false, difficulty);
         }
+        */
         public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersion, int nPlayerSide, bool bSession, int difficulty)
             : this()
         {
@@ -1949,6 +1955,10 @@ namespace TJAPlayer3
             this.strファイル名の絶対パス = Path.GetFullPath(strファイル名);
             this.strファイル名 = Path.GetFileName(this.strファイル名の絶対パス);
             this.strフォルダ名 = Path.GetDirectoryName(this.strファイル名の絶対パス) + @"\";
+
+            // Unique ID parsing/generation
+            this.uniqueID = new CSongUniqueID(this.strフォルダ名 + @"\uniqueID.json");
+
             //if ( this.e種別 != E種別.SMF )
             {
                 try

@@ -120,6 +120,7 @@
     <Compile Include="Animations\FadeOut.cs" />
     <Compile Include="Animations\IAnimatable.cs" />
     <Compile Include="Animations\Linear.cs" />
+    <Compile Include="Common\CCrypto.cs" />
     <Compile Include="Common\Favorites.cs" />
     <Compile Include="Common\ConfigManager.cs" />
     <Compile Include="Common\Discord.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Songs\CDTX.cs" />
     <Compile Include="Songs\CDTXCompanionFileFinder.cs" />
     <Compile Include="Songs\CDTXStyleExtractor.cs" />
+    <Compile Include="Songs\CSongUniqueID.cs" />
     <Compile Include="Songs\CScoreIni.cs" />
     <Compile Include="Songs\CStrジャンルtoNum.cs" />
     <Compile Include="Songs\C曲リストノードComparers\ComparerChain.cs" />

@@ -60,6 +60,7 @@ namespace TJAPlayer3
 			        string strDTXファイルパス = TJAPlayer3.strコンパクトモードファイル;
 				
 			        CDTX cdtx = new CDTX( strDTXファイルパス, true, 1.0, 0, 0 );
+
 			        if( File.Exists( cdtx.strフォルダ名 + @"set.def" ) )
 			            cdtx = new CDTX( strDTXファイルパス, true, 1.0, 0, 1 );
 

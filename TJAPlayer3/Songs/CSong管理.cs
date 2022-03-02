@@ -141,7 +141,9 @@ namespace TJAPlayer3
                             }
 
                             #region[ 新処理 ]
+
                             CDTX dtx = new CDTX( fileinfo.FullName, false, 1.0, 0, 1 );
+
                             C曲リストノード c曲リストノード = new C曲リストノード();
                             c曲リストノード.eノード種別 = C曲リストノード.Eノード種別.SCORE;
 
