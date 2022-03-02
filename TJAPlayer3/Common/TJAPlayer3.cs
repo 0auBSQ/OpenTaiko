@@ -268,6 +268,12 @@ namespace TJAPlayer3
 			private set;
 		}
 
+		public static Favorites Favorites
+        {
+			get;
+			private set;
+        }
+
 		public static Databases Databases
 		{
 			get;
@@ -2046,10 +2052,13 @@ for (int i = 0; i < 3; i++) {
 			//-----------------
 			#endregion
 
-			#region [ Config.ini の読込み ]
+			#region [ Read Config.ini and Database files ]
 			//---------------------
 			NamePlateConfig = new NamePlateConfig();
 			NamePlateConfig.tNamePlateConfig();
+
+			Favorites = new Favorites();
+			Favorites.tFavorites();
 
 			Databases = new Databases();
 			Databases.tDatabases();

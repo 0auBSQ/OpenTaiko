@@ -37,6 +37,7 @@ namespace TJAPlayer3
 			public int HistoryCount;
 			public string[] History;
 			public int BGMAdjust;
+
 		}
 
 		// 演奏記録セクション（9種類）
