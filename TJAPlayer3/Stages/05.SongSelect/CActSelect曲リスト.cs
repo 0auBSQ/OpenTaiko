@@ -1082,6 +1082,8 @@ namespace TJAPlayer3
 							this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
 						}
 
+						this.stバー情報[index].csu = song.uniqueId;
+
 						#endregion
 
 						// stバー情報[] の内容を1行ずつずらす。
@@ -1210,6 +1212,8 @@ namespace TJAPlayer3
 							this.stバー情報[index].nクリア[i] = sr.GPInfo[ap].nClear;
 							this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
 						}
+
+						this.stバー情報[index].csu = song.uniqueId;
 
 						#endregion
 
@@ -1486,7 +1490,18 @@ namespace TJAPlayer3
 
 					// TJAPlayer3.act文字コンソール.tPrint(x + -470, y + 30, C文字コンソール.Eフォント種別.白, (this.stバー情報[nパネル番号].ar難易度[(int)Difficulty.Tower]).ToString());
 
-					this.tジャンル別選択されていない曲バーの描画(xAnime - (int)Box, y - ((int)Box * 3), this.stバー情報[nパネル番号].strジャンル, stバー情報[nパネル番号].eバー種別, stバー情報[nパネル番号].nクリア, stバー情報[nパネル番号].nスコアランク, boxType, songType);
+
+					// Very disgusting, to improve and unbloat asap
+					this.tジャンル別選択されていない曲バーの描画(
+						xAnime - (int)Box, 
+						y - ((int)Box * 3), 
+						this.stバー情報[nパネル番号].strジャンル, 
+						stバー情報[nパネル番号].eバー種別, 
+						stバー情報[nパネル番号].nクリア, 
+						stバー情報[nパネル番号].nスコアランク, 
+						boxType, 
+						songType,
+						stバー情報[nパネル番号].csu);
 				}
 
 				/*
@@ -1668,8 +1683,16 @@ namespace TJAPlayer3
 							int[] スコアランク = sr.GPInfo[ap].nScoreRank;
 
 							displayRegularCrowns(shift, (int)(344 - BarAnimeCount / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
+							
 						}
 					}
+
+
+					#endregion
+
+					#region [Favorite status]
+
+					displayFavoriteStatus(414, (int)(344 - BarAnimeCount / 1.1f), this.r現在選択中の曲.uniqueId, 1f + BarAnimeCount / 620f);
 
 					#endregion
 
@@ -2216,6 +2239,8 @@ namespace TJAPlayer3
 
 			public int[][] nクリア;
 			public int[][] nスコアランク;
+
+			public CSongUniqueID csu;
 		}
 
 		public bool bFirstCrownLoad;
@@ -2365,22 +2390,6 @@ namespace TJAPlayer3
                         this.stバー情報[ i ].b分岐 = song.arスコア[ f ].譜面情報.b譜面分岐;
                 }
 
-				/*
-				if (stバー情報[i].nクリア == null)
-					this.stバー情報[i].nクリア = new int[5];
-				if (stバー情報[i].nスコアランク == null)
-					this.stバー情報[i].nスコアランク = new int[5];
-
-
-
-				if(this.stバー情報[i].eバー種別 == Eバー種別.Score)
-				{ 
-					this.stバー情報[i].nクリア = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nクリア;
-					this.stバー情報[i].nスコアランク = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.nスコアランク;
-
-				}
-				*/
-
 				#region [Reroll cases]
 
 				if (stバー情報[i].nクリア == null)
@@ -2403,6 +2412,8 @@ namespace TJAPlayer3
 					}
 				}
 
+				this.stバー情報[i].csu = song.uniqueId;
+
 				#endregion
 
 
@@ -2419,7 +2430,7 @@ namespace TJAPlayer3
 		}
 
 		// Song type : 0 - Ensou, 1 - Dan, 2 - Tower
-		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[][] クリア, int[][] スコアランク, int boxType, int _songType = 0)
+		private void tジャンル別選択されていない曲バーの描画(int x, int y, string strジャンル, Eバー種別 eバー種別, int[][] クリア, int[][] スコアランク, int boxType, int _songType = 0, CSongUniqueID csu = null)
 		{
 			if (x >= SampleFramework.GameWindowSize.Width || y >= SampleFramework.GameWindowSize.Height)
 				return;
@@ -2496,6 +2507,8 @@ namespace TJAPlayer3
 					}
 				}
 
+				displayFavoriteStatus(x + 90, y + 30, csu, 1f);
+
 			}
 		}
 
@@ -2527,6 +2540,10 @@ namespace TJAPlayer3
 
 		public void displayRegularCrowns(int x, int y, int[] クリア, int[] スコアランク, float _resize)
         {
+			// Don't display if one of the 2 textures is missing (to avoid crashes)
+			if (TJAPlayer3.Tx.SongSelect_Crown == null || TJAPlayer3.Tx.SongSelect_ScoreRank == null)
+				return;
+
 			// To change to include all crowns/score ranks later
 
 			TJAPlayer3.Tx.SongSelect_Crown.vc拡大縮小倍率.X = _resize;
@@ -2545,6 +2562,18 @@ namespace TJAPlayer3
 			else if (スコアランク[4] > 0)
 				TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[4] - 1) * 42.71f, 50, 42.71f));
 		}
+
+		public void displayFavoriteStatus(int x, int y, CSongUniqueID csu, float _resize)
+        {
+			if (csu != null
+				&& TJAPlayer3.Tx.SongSelect_Favorite != null
+				&& TJAPlayer3.Favorites.tIsFavorite(csu.data.id))
+            {
+				TJAPlayer3.Tx.SongSelect_Favorite.vc拡大縮小倍率.X = _resize;
+				TJAPlayer3.Tx.SongSelect_Favorite.vc拡大縮小倍率.Y = _resize;
+				TJAPlayer3.Tx.SongSelect_Favorite.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
+			}
+        }
 
 		public int nStrジャンルtoNum(string strジャンル)
 		{
