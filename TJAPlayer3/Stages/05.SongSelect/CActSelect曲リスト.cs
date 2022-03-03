@@ -2449,6 +2449,9 @@ namespace TJAPlayer3
 			TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = opct;
 			TJAPlayer3.Tx.SongSelect_Bar_Genre_Random.Opacity = opct;
 			TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_Favorite.Opacity = opct; 
+			TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = opct;
+			TJAPlayer3.Tx.DanResult_Rank.Opacity = opct;
 
 			if (eバー種別 == Eバー種別.Random)
             {
@@ -2571,6 +2574,7 @@ namespace TJAPlayer3
             {
 				TJAPlayer3.Tx.SongSelect_Favorite.vc拡大縮小倍率.X = _resize;
 				TJAPlayer3.Tx.SongSelect_Favorite.vc拡大縮小倍率.Y = _resize;
+				TJAPlayer3.Tx.SongSelect_Favorite.Opacity = 255;
 				TJAPlayer3.Tx.SongSelect_Favorite.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
 			}
         }

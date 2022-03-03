@@ -1729,7 +1729,7 @@ namespace TJAPlayer3
 						// Remove duplicates
 						// song.list子リスト = song.list子リスト.Distinct().ToList();
 
-						if (song.list子リスト.Count >= 6)
+						if (song.list子リスト.Count >= 8)
 						{
 							song.list子リスト.RemoveAt(1);
 						}

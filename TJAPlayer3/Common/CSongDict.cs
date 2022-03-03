@@ -28,6 +28,8 @@ namespace TJAPlayer3
         public static List<C曲リストノード> tFetchFavoriteFolder(C曲リストノード parent)
         {
             List<C曲リストノード> childList = new List<C曲リストノード>();
+            int increment = 0;
+
             
             foreach (string id in TJAPlayer3.Favorites.data.favorites[TJAPlayer3.SaveFile])
             {
@@ -39,6 +41,12 @@ namespace TJAPlayer3
                     node.isChangedBgColor = parent.isChangedBgColor;
                     node.isChangedBoxType = parent.isChangedBoxType;
                     node.isChangedBoxColor = parent.isChangedBoxColor;
+
+                    node.ForeColor = parent.ForeColor;
+                    node.BackColor = parent.BackColor;
+                    node.BoxColor = parent.BoxColor;
+                    node.BgColor = parent.BgColor;
+
                     childList.Add(node);
                 }
                     
