@@ -306,34 +306,6 @@ namespace TJAPlayer3
 									c曲リストノード.str本当のジャンル = c曲リストノード.r親ノード.strジャンル;
 								}
 
-								/*
-								switch (c曲リストノード.strジャンル)
-								{
-									case "J-POP":
-										c曲リストノード.strジャンル = "ポップス";
-										break;
-									case "ゲームミュージック":
-										c曲リストノード.strジャンル = "ゲームバラエティ";
-										break;
-									case "どうよう":
-										c曲リストノード.strジャンル = "キッズ";
-										break;
-								}
-
-								switch (c曲リストノード.str本当のジャンル)
-								{
-									case "J-POP":
-										c曲リストノード.str本当のジャンル = "ポップス";
-										break;
-									case "ゲームミュージック":
-										c曲リストノード.str本当のジャンル = "ゲームバラエティ";
-										break;
-									case "どうよう":
-										c曲リストノード.str本当のジャンル = "キッズ";
-										break;
-								}
-								*/
-
 								if (c曲リストノード.r親ノード != null)
                                 {
                                     if (c曲リストノード.r親ノード.IsChangedForeColor)
@@ -414,6 +386,7 @@ namespace TJAPlayer3
 
 
                                 c曲リストノード.nLevel = dtx.LEVELtaiko;
+								c曲リストノード.uniqueId = dtx.uniqueID;
 
                                 c曲リストノード.arスコア[ n ] = new Cスコア();
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス = str基点フォルダ + fileinfo.Name;
@@ -1024,7 +997,6 @@ namespace TJAPlayer3
 			{
 				if (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
-					// Dojo node removed here, add an option soonish to put it off
 
 					if (c曲リストノード.strジャンル == "段位道場")
 					{
@@ -1280,6 +1252,8 @@ namespace TJAPlayer3
 		}
 		//-----------------
 		#endregion
+
+		// Songs DB here
 
 		/*#region [ スコアキャッシュをSongsDBに出力する ]
 		//-----------------
@@ -1780,6 +1754,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 #endif
         //-----------------
         #endregion
+
         #region [ .score.ini を読み込んで Cスコア.譜面情報に設定する ]
         //-----------------
         public void tScoreIniを読み込んで譜面情報を設定する( string strScoreIniファイルパス, Cスコア score )

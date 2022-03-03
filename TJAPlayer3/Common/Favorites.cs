@@ -17,9 +17,29 @@ namespace TJAPlayer3
             tLoadFile();
         }
 
+        #region [Auxiliary methods]
+
+        public void tToggleFavorite(string chartID)
+        {
+            if (tIsFavorite(chartID))
+                data.favorites[TJAPlayer3.SaveFile].Remove(chartID);
+            else
+                data.favorites[TJAPlayer3.SaveFile].Add(chartID);
+
+            tSaveFile();
+        }
+
+        public bool tIsFavorite(string chartID)
+        {
+            return (data.favorites[TJAPlayer3.SaveFile].Contains(chartID));
+        }
+        
+
+        #endregion
+
         public class Data
         {
-
+            public HashSet<string>[] favorites = new HashSet<string>[2] { new HashSet<string>(), new HashSet<string>() };
         }
 
         public Data data = new Data();

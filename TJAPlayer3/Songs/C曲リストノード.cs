@@ -80,6 +80,9 @@ namespace TJAPlayer3
 		public int nTotalFloor = 140;
 		public int nTowerType = 0;
 
+		// Unique id
+		public CSongUniqueID uniqueId;
+
 		public int nDanTick = 0;
 		public Color cDanTickColor = Color.White;
 		
