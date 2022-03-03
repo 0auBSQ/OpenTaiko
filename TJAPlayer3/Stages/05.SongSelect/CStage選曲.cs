@@ -658,6 +658,13 @@ namespace TJAPlayer3
                                                     break;
                                                 case C曲リストノード.Eノード種別.BOX:
                                                     {
+
+                                                        // Pre-generate the favorite folder if the folder's genre is "Favorite"
+                                                        if (this.act曲リスト.r現在選択中の曲.strジャンル == "Favorite")
+                                                        {
+                                                            this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchFavoriteFolder(this.act曲リスト.r現在選択中の曲);
+                                                        }
+
                                                         CSongSelectSongManager.disable();
 
                                                         TJAPlayer3.Skin.sound決定音.t再生する();

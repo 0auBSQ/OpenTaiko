@@ -388,7 +388,9 @@ namespace TJAPlayer3
                                 c曲リストノード.nLevel = dtx.LEVELtaiko;
 								c曲リストノード.uniqueId = dtx.uniqueID;
 
-                                c曲リストノード.arスコア[ n ] = new Cスコア();
+								CSongDict.tAddSongNode(c曲リストノード.uniqueId.data.id, c曲リストノード);
+
+								c曲リストノード.arスコア[ n ] = new Cスコア();
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス = str基点フォルダ + fileinfo.Name;
                                 c曲リストノード.arスコア[ n ].ファイル情報.フォルダの絶対パス = str基点フォルダ;
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルサイズ = fileinfo.Length;
@@ -957,6 +959,9 @@ namespace TJAPlayer3
 				}
 			}
 
+			// Removed the pre-made recently played songs folder, so players will have total control on it's shape and visuals
+
+			/*
 			#region [ "最近遊んだ曲"BOXを生成する ]
 
 			if(list曲ルート.Count > 0)
@@ -990,6 +995,7 @@ namespace TJAPlayer3
 			}
 
 			#endregion
+			*/
 
 			this.t曲リストへ後処理を適用する(this.list曲ルート);
 
