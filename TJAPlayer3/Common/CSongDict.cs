@@ -126,6 +126,8 @@ namespace TJAPlayer3
                     node.BackColor = parent.BackColor;
                     node.BoxColor = parent.BoxColor;
                     node.BgColor = parent.BgColor;
+                    node.BgType = parent.BgType;
+                    node.BoxType = parent.BoxType;
 
                     childList.Add(node);
                 }

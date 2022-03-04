@@ -1122,6 +1122,13 @@ namespace TJAPlayer3
 
 			*/
 
+			if (isGlobal)
+            {
+				var randomNode = CSongDict.tGenerateRandomButton(ノードリスト[0].r親ノード, parentName);
+				ノードリスト.Add(randomNode);
+
+			}
+
 			// すべてのノードについて…
 			foreach ( C曲リストノード c曲リストノード in ノードリスト )
 			{

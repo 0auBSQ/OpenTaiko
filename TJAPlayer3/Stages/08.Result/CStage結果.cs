@@ -1721,6 +1721,8 @@ namespace TJAPlayer3
 								song2.BackColor = song.BackColor;
 								song2.BoxColor = song.BoxColor;
 								song2.BgColor = song.BgColor;
+								song2.BgType = song.BgType;
+								song2.BoxType = song.BoxType;
 								// song2.BackColor = ColorTranslator.FromHtml("#164748");
 							}
 								
