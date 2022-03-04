@@ -1071,7 +1071,7 @@ namespace TJAPlayer3
 
 		private void t曲リストへ後処理を適用する( List<C曲リストノード> ノードリスト, string parentName = "/", bool isGlobal = true )
 		{
-
+			/*
 
 			#region [ If there is at least one song within the list add a random song node ]
 
@@ -1090,12 +1090,11 @@ namespace TJAPlayer3
 					itemRandom.strタイトル : itemRandom.r親ノード.strBreadcrumbs + " > " + itemRandom.strタイトル;
 
 				itemRandom.arスコア[0] = new Cスコア();
-				/*
+				
 				for (int i = 0; i < (int)Difficulty.Total; i++)
 				{
 					itemRandom.arスコア[0].譜面情報.タイトル = string.Format("< RANDOM SELECT Lv.{0} >", i + 1);
 				}
-				*/
 				ノードリスト.Add(itemRandom);
 
 				#region [ ログ出力 ]
@@ -1121,7 +1120,7 @@ namespace TJAPlayer3
 			//-----------------------------
 			#endregion
 
-
+			*/
 
 			// すべてのノードについて…
 			foreach ( C曲リストノード c曲リストノード in ノードリスト )
@@ -1132,12 +1131,19 @@ namespace TJAPlayer3
 				//-----------------------------
 				if ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX )
 				{
-					int 曲数 = c曲リストノード.list子リスト.Count;
+					
 					string newPath = parentName + c曲リストノード.strタイトル + "/";
 
+					CSongDict.tReinsertBackButtons(c曲リストノード, c曲リストノード.list子リスト, newPath, listStrBoxDefSkinSubfolderFullName);
 
+					/*
+					int 曲数 = c曲リストノード.list子リスト.Count;
 					for (int index = 0; index < (曲数 / 7) + 1; index++)
 					{
+						C曲リストノード itemBack = CSongDict.tGenerateBackButton(c曲リストノード, newPath, listStrBoxDefSkinSubfolderFullName);
+
+						
+						 
 						C曲リストノード itemBack = new C曲リストノード();
 						itemBack.eノード種別 = C曲リストノード.Eノード種別.BACKBOX;
 
@@ -1175,7 +1181,9 @@ namespace TJAPlayer3
 							"BOX を出ます。" :
 							"Exit from the BOX.";
 
-						c曲リストノード.list子リスト.Insert(Math.Min(index * (7 + 1), c曲リストノード.list子リスト.Count), itemBack);
+						
+
+					c曲リストノード.list子リスト.Insert(Math.Min(index * (7 + 1), c曲リストノード.list子リスト.Count), itemBack);
 
 						
 
@@ -1199,6 +1207,8 @@ namespace TJAPlayer3
 						//-----------------------------
 						#endregion
 					}
+
+					*/
 
 					// Process subfolders recussively
 					t曲リストへ後処理を適用する(c曲リストノード.list子リスト, newPath, false);
@@ -1234,6 +1244,7 @@ namespace TJAPlayer3
 			}
 
 			// Don't sort songs if the folder isn't global
+			// Call back reinsert back folders if sort called ?
 			if (isGlobal)
             {
 				#region [ Sort nodes ]
