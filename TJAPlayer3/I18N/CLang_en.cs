@@ -283,7 +283,7 @@ namespace TJAPlayer3
             [9007] = "Null",
             [9008] = "Speed",
             [9009] = "DORON",
-            [9010] = "あべこべ",
+            [9010] = "Flip Notes",
             [9011] = "Random",
             [9012] = "Game Mode",
             [9013] = "Auto",
