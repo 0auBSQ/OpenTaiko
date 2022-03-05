@@ -209,6 +209,9 @@ namespace TJAPlayer3
             [10058] = "Volume de la prévisualisation de la musique",
             [10059] = "Ajuste le volume de la prévisualisation de la musique.\nVous devez redemarrer le jeu pour que\ncette option prenne effet.",
             [10084] = "Mode Shin'uchi",
+            [10091] = "Settings for an overall systems.",
+            [10092] = "Settings to play the drums.",
+            [10093] = "Save the settings and exit from CONFIGURATION menu.",
 
 
             [100] = "Partie rapide",
@@ -261,6 +264,26 @@ namespace TJAPlayer3
             [90003] = "Article acheté !",
             [90004] = "Nombre de pièces insuffisant !",
             [90005] = "La condition suivante : ",
+
+            [900] = "Continuez",
+            [901] = "Redémarrage",
+            [902] = "Sortir",
+
+            [9000] = "しない",
+            [9001] = "する",
+            [9002] = "なし",
+            [9003] = "きまぐれ",
+            [9004] = "でたらめ",
+            [9006] = "特訓モード",
+            [9007] = "使用不可",
+            [9008] = "はやさ",
+            [9009] = "ドロン",
+            [9010] = "あべこべ",
+            [9011] = "ランダム",
+            [9012] = "ゲームモード",
+            [9013] = "オート",
+            [9014] = "ボイス",
+            [9015] = "音色",
         };
     }
 }

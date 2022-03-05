@@ -555,36 +555,21 @@ namespace TJAPlayer3
 				var graphics = Graphics.FromImage( image );
 				graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-				
-				string[,] str = new string[ 2, 2 ];
+
 				switch( this.n現在のメニュー番号 )
 				{
 					case 0:
-						str[ 0, 0 ] = "システムに関係する項目を設定します。";
-						str[ 0, 1 ] = "";
-						str[ 1, 0 ] = "Settings for an overall systems.";
+                        graphics.DrawString(CLangManager.LangInstance.GetString(10091), this.ftフォント, Brushes.White, new PointF(8f, 0f));
 						break;
 
 					case 1:
-						str[ 0, 0 ] = "ドラムの演奏に関する項目を設定します。";
-						str[ 0, 1 ] = "";
-						str[ 1, 0 ] = "Settings to play the drums.";
-						str[ 1, 1 ] = "";
+                        graphics.DrawString(CLangManager.LangInstance.GetString(10092), this.ftフォント, Brushes.White, new PointF(8f, 0f));
 						break;
 
 					case 2:
-						str[ 0, 0 ] = "設定を保存し、コンフィグ画面を終了します。";
-						str[ 0, 1 ] = "";
-						str[ 1, 0 ] = "Save the settings and exit from";
-						str[ 1, 1 ] = "CONFIGURATION menu.";
+                        graphics.DrawString(CLangManager.LangInstance.GetString(10093), this.ftフォント, Brushes.White, new PointF(8f, 0f));
 						break;
-				}
-				
-				int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
-				for (int i = 0; i < 2; i++)
-				{
-					graphics.DrawString( str[ c, i ], this.ftフォント, Brushes.White, new PointF( 8f, ( i * 30 ) * 1.5f ) );
-				}
+                }
 				graphics.Dispose();
 				if( this.tx説明文パネル != null )
 				{

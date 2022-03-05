@@ -228,6 +228,9 @@ namespace TJAPlayer3
             [10058] = "Volumen de la demo",
             [10059] = "Ajusta el volumen de la demo de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [10084] = "Modo Shinuchi",
+            [10091] = "Settings for an overall systems.",
+            [10092] = "Settings to play the drums.",
+            [10093] = "Save the settings and exit from CONFIGURATION menu.",
 
             [100] = "Modo Taiko",
             [101] = "Dan-i Dojo",
@@ -279,6 +282,26 @@ namespace TJAPlayer3
             [90003] = "Item comprado!",
             [90004] = "Monedas insuficientes!",
             [90005] = "Esta condición: ",
+
+            [900] = "Continuar",
+            [901] = "Reiniciar",
+            [902] = "Salida",
+
+            [9000] = "しない",
+            [9001] = "する",
+            [9002] = "なし",
+            [9003] = "きまぐれ",
+            [9004] = "でたらめ",
+            [9006] = "特訓モード",
+            [9007] = "使用不可",
+            [9008] = "はやさ",
+            [9009] = "ドロン",
+            [9010] = "あべこべ",
+            [9011] = "ランダム",
+            [9012] = "ゲームモード",
+            [9013] = "オート",
+            [9014] = "ボイス",
+            [9015] = "音色",
         };
     }
 }
