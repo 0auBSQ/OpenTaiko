@@ -56,3 +56,13 @@ Spanish : funnymoth - https://github.com/funnym0th
 English : Meowgister - https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ
 Chinese : WHMHammer - https://github.com/WHMHammer
 ```
+
+## Development
+
+### Credits
+
+```
+Main developer : 0AuBSQ - https://github.com/0auBSQ/OpenTaiko
+Several bug fixes and improvements : l1m0n3 - https://github.com/l1m0n3
+Complete removal of the SlimDX dependency : Mr-Oiji https://github.com/Mr-Ojii
+```
