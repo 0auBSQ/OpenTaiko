@@ -2,25 +2,31 @@
 	0: {
 		"name" : "Empty0",
         "rarity": "Common",
+		"author": "申しコミ",
 	},
 	1: {
 		"name" : "Empty1",
         "rarity": "Common",
+		"author": "申しコミ",
 	},
 	2: {
 		"name" : "Empty2",
         "rarity": "Uncommon",
+		"author": "申しコミ",
 	},
 	3: {
 		"name" : "Empty3",
         "rarity": "Rare",
+		"author": "申しコミ",
 	},
 	4: {
 		"name" : "Empty4",
         "rarity": "Epic",
+		"author": "申しコミ",
 	},
 	5: {
 		"name" : "Empty5",
         "rarity": "Legendary",
+		"author": "申しコミ",
 	},
 }

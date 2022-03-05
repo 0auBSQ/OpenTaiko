@@ -120,6 +120,7 @@ namespace TJAPlayer3
             iPuchiCharaCount = 120;
 
             ttkPuchiCharaNames = new TitleTextureKey[iPuchiCharaCount];
+            ttkPuchiCharaAuthors = new TitleTextureKey[iPuchiCharaCount];
 
             var RarityToColor = new Dictionary<string, Color>
             {
@@ -144,6 +145,7 @@ namespace TJAPlayer3
                         textColor = RarityToColor[rarity];
 
                     ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                    ttkPuchiCharaAuthors[i] = new TitleTextureKey(dbData[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
                 }
             }
 
@@ -239,16 +241,27 @@ namespace TJAPlayer3
 
                     TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.White);
 
+                    #region [Database related values]
+
                     if (ttkPuchiCharaNames[pos] != null)
                     {
                         CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
-                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 448);
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 434);
+                    }
+
+                    if (ttkPuchiCharaAuthors[pos] != null)
+                    {
+                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
+
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 460);
                     }
 
                     if (puchiUnlockables.ContainsKey(pos)
                         && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
                         TJAPlayer3.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+
+                    #endregion
 
 
                 }
@@ -620,6 +633,7 @@ namespace TJAPlayer3
         private int iPuchiCharaCurrent;
 
         private TitleTextureKey[] ttkPuchiCharaNames;
+        private TitleTextureKey[] ttkPuchiCharaAuthors;
         private TitleTextureKey ttkInfoSection;
 
         private int iCharacterCurrent;

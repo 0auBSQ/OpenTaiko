@@ -19,10 +19,11 @@ namespace TJAPlayer3
 
         public class PuchicharaData
         {
-            public PuchicharaData(string pcn, string pcr)
+            public PuchicharaData(string pcn, string pcr, string pca)
             {
                 Name = pcn;
                 Rarity = pcr;
+                Author = pca;
             }
 
 
@@ -31,6 +32,9 @@ namespace TJAPlayer3
 
             [JsonProperty("rarity")]
             public string Rarity;
+
+            [JsonProperty("author")]
+            public string Author;
         }
 
         #endregion
