@@ -45,26 +45,26 @@ namespace TJAPlayer3
 
             #endregion
 
-            txSwitch[0] = OptionTypeTx("しない", Color.White, Color.Black);
-            txSwitch[1] = OptionTypeTx("する", Color.White, Color.Black);
+            txSwitch[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
+            txSwitch[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9001), Color.White, Color.Black);
 
-            txRandom[0] = OptionTypeTx("なし", Color.White, Color.Black);
-            txRandom[1] = OptionTypeTx("きまぐれ", Color.White, Color.Black);
-            txRandom[2] = OptionTypeTx("でたらめ", Color.White, Color.Black);
+            txRandom[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
+            txRandom[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9003), Color.White, Color.Black);
+            txRandom[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9004), Color.White, Color.Black);
 
-            txGameMode[0] = OptionTypeTx("なし", Color.White, Color.Black);
-            txGameMode[1] = OptionTypeTx("特訓モード", Color.White, Color.Black);
+            txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
+            txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
-            txNone = OptionTypeTx("使用不可" ,Color.White, Color.Black);
+            txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
 
-            OptionType[0] = OptionTypeTx("はやさ", Color.White, Color.Black);
-            OptionType[1] = OptionTypeTx("ドロン", Color.White, Color.Black);
-            OptionType[2] = OptionTypeTx("あべこべ", Color.White, Color.Black);
-            OptionType[3] = OptionTypeTx("ランダム", Color.White, Color.Black);
-            OptionType[4] = OptionTypeTx("ゲームモード", Color.White, Color.Black);
-            OptionType[5] = OptionTypeTx("オート", Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx("ボイス", Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx("音色", Color.White, Color.Black);
+            OptionType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9008), Color.White, Color.Black);
+            OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
+            OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9010), Color.White, Color.Black);
+            OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
+            OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
+            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
 
             for (int i = 0; i < OptionType.Length; i++)
                 OptionType[i].vc拡大縮小倍率.X = 0.96f;

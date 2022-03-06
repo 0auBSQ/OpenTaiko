@@ -66,6 +66,7 @@ Discord: https://discord.gg/aA8scTvZ6B
 [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
+[WHMHammer/OpenTaiko Chinese Translation](https://github.com/whmhammer)(@WHMHammer)
 [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)

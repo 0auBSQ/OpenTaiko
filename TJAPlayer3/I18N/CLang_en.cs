@@ -219,6 +219,9 @@ namespace TJAPlayer3
             [10058] = "Song Preview Volume",
             [10059] = "Adjust the volume of song preview.\nYou must restart the game after leaving config\nfor this setting to save.",
             [10084] = "Shin'uchi Mode",
+            [10091] = "Settings for an overall systems.",
+            [10092] = "Settings to play the drums.",
+            [10093] = "Save the settings and exit from CONFIGURATION menu.",
 
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",
@@ -270,6 +273,22 @@ namespace TJAPlayer3
             [90003] = "Item bought !",
             [90004] = "Not enough coins !",
             [90005] = "The following condition : ",
+
+            [9000] = "Off",
+            [9001] = "On",
+            [9002] = "None",
+            [9003] = "きまぐれ",
+            [9004] = "でたらめ",
+            [9006] = "Special Training Mode",
+            [9007] = "Null",
+            [9008] = "Speed",
+            [9009] = "DORON",
+            [9010] = "Flip Notes",
+            [9011] = "Random",
+            [9012] = "Game Mode",
+            [9013] = "Auto",
+            [9014] = "Voice",
+            [9015] = "Sound Type",
         };
     }
 }

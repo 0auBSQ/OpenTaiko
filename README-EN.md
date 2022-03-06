@@ -13,7 +13,7 @@ Old TJAPlayer3-Develop-BSQ
 
 ## Cautions before using （IMPORTANT）
 
-- This software does not have a skin.（Only the software is provided.） There will be a copyright free skin later on.
+- This software does not have a skin (A copyright free skin is provided with the pre-release for testing).
 
 - It is **YOUR RESPONSIBILITY** to use this software. The creator will not take responsibilities for any problems you got from using this software.
 
@@ -331,6 +331,7 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 > * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
+> * [WHMHammer/OpenTaiko Chinese Translation](https://github.com/whmhammer)(@WHMHammer)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)

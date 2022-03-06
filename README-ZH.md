@@ -12,11 +12,11 @@ TJAPlayer3-Develop-ReWrite的分叉项目，一个使用.tja文件的模拟器
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/2/15）
+（译者注：由README-EN翻译。最近一次更新时间：2022/3/5）
 
 ## 使用前注意事项（重要！！！）
 
-- 本软件尚未提供皮肤（仅提供软件本体）。晚些会提供版权自由皮肤。
+- 本软件尚未提供皮肤（预发布版本包含了一个测试用版权自由皮肤）。
 
 - 您**全权**对您对本软件的使用负责。开发者不为您使用本软件造成的任何问题承担任何责任。
 
@@ -333,6 +333,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 > * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
+> * [WHMHammer/OpenTaiko Chinese Translation](https://github.com/whmhammer)(@WHMHammer)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
