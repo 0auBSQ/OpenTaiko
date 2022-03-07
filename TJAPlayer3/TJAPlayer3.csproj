@@ -121,6 +121,7 @@
     <Compile Include="Animations\IAnimatable.cs" />
     <Compile Include="Animations\Linear.cs" />
     <Compile Include="Common\CCrypto.cs" />
+    <Compile Include="Common\ModalQueue.cs" />
     <Compile Include="Common\Modal.cs" />
     <Compile Include="Common\CSongDict.cs" />
     <Compile Include="Common\Favorites.cs" />

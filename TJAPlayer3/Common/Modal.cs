@@ -10,18 +10,15 @@ namespace TJAPlayer3
 {
     internal class Modal
     {
-        public Modal(EModalType mt, int ra, int re, EModalFormat mf, int p = 0)
+        public Modal(EModalType mt, int ra, int re)
         {
             modalType = mt;
-            modalFormat = mf;
             rarity = ra;
             reference = re;
-            player = p;
-
-            tSetupModal();
+            _isSet = false;
         }
 
-        private void tSetupModal()
+        public void tSetupModal()
         {
             CTexture[] arrRef;
 
@@ -47,13 +44,16 @@ namespace TJAPlayer3
                     ? 1280
                     : 640,
                 720);
+
+            _isSet = true;
         }
 
         public void tDisplayModal()
         {
-            
-
-            _box?.t2D描画(TJAPlayer3.app.Device, 0, 0, _boxRect);
+            if (_isSet == true)
+            {
+                _box?.t2D描画(TJAPlayer3.app.Device, 640 * player, 0, _boxRect);
+            }
         }
 
         public enum EModalType
@@ -84,5 +84,7 @@ namespace TJAPlayer3
 
         private CTexture _box;
         private Rectangle _boxRect;
+
+        private bool _isSet;
     }
 }

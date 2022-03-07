@@ -647,6 +647,25 @@ namespace TJAPlayer3
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
 
+                #endregion
+
+                #region [Modals preprocessing]
+
+                mqModals = new ModalQueue((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? Modal.EModalFormat.Half : Modal.EModalFormat.Full);
+
+				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+					if (this.nEarnedMedalsCount[i] > 0)
+						mqModals.tAddModal(
+							new Modal(
+								Modal.EModalType.Coin, 
+								0,
+								this.nEarnedMedalsCount[i]), 
+							i);
+                }
+
+				displayedModals = new Modal[] { null, null };
+
 				#endregion
 
 				TJAPlayer3.stage選曲.act曲リスト.bFirstCrownLoad = false;
@@ -1359,6 +1378,18 @@ namespace TJAPlayer3
 
 				#endregion
 
+
+				#region [Display modals]
+
+				// Display modal is present
+				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+				{
+					if (displayedModals[i] != null)
+						displayedModals[i].tDisplayModal();
+				}
+
+				#endregion
+
 				if (base.eフェーズID == CStage.Eフェーズ.共通_フェードイン)
 				{
 					if (this.actFI.On進行描画() != 0)
@@ -1431,30 +1462,55 @@ namespace TJAPlayer3
 
 							#endregion
 
-							#region [ Return to song select screen ]
-
 							else
 							{
-                                actFI.tフェードアウト開始();
-
-								if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)//  TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-									if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
-										TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
-
-								t後処理();
-
+								if (!mqModals.tIsQueueEmpty(0) 
+									&& (
+										TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed)
+										|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed)
+										|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)
+										)
+									)
 								{
-									base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
-									this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-									TJAPlayer3.Skin.bgmリザルト音.t停止する();
-									TJAPlayer3.Skin.bgmDanResult.t停止する();
-									TJAPlayer3.Skin.bgmTowerResult.t停止する();
+									displayedModals[0] = mqModals.tPopModal(0);
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 1 || mqModals.tIsQueueEmpty(1))
+								{
+									#region [ Return to song select screen ]
+
+									actFI.tフェードアウト開始();
+
+									if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)
+										if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
+											TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+
+									t後処理();
+
+									{
+										base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+										TJAPlayer3.Skin.bgmリザルト音.t停止する();
+										TJAPlayer3.Skin.bgmDanResult.t停止する();
+										TJAPlayer3.Skin.bgmTowerResult.t停止する();
+									}
+
+									#endregion
 								}
 							}
-
-							#endregion
-
 						}
+						else if ((TJAPlayer3.ConfigIni.nPlayerCount > 1 && (
+								TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed2P)
+								|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed2P)
+							))) {
+							if (!mqModals.tIsQueueEmpty(1) && this.actParameterPanel.ct全体進行.n現在の値 >= this.actParameterPanel.MountainAppearValue)
+							{
+								TJAPlayer3.Skin.sound決定音.t再生する();
+
+								displayedModals[1] = mqModals.tPopModal(1);
+							}
+						}
+
+
 						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow) ||
 								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue) ||
 							TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow) ||
@@ -1814,7 +1870,11 @@ namespace TJAPlayer3
 		private CPrivateFastFont pfTowerText48;
 		private CPrivateFastFont pfTowerText72;
 
-		// Don medals information 
+		// Modal queues
+		private ModalQueue mqModals;
+		private Modal[] displayedModals;
+
+		// Coins information 
 		private int[] nEarnedMedalsCount = { 0, 0 };
 
 		#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
