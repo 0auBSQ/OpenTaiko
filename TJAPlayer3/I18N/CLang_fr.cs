@@ -237,6 +237,15 @@ namespace TJAPlayer3
             [202] = "Rejouez les sons joués précedement !",
             [203] = "Surprend moi !",
 
+            [300] = "Jetons obtenus !",
+            [301] = "Personnage obtenu !",
+            [302] = "Petit personnage obtenu !",
+            [303] = "Titre obtenu !",
+            [304] = "Notification",
+            [305] = "Confirmation",
+            [306] = "Jetons",
+            [307] = "Total",
+
             [1000] = "Étage atteint",
             [1001] = "",
             [1002] = "P",
@@ -260,9 +269,9 @@ namespace TJAPlayer3
 
             [90000] = "[ERREUR] Condition invalide",
             [90001] = "L'article n'est disponible que dans le Magasin.",
-            [90002] = "Prix en pièces : ",
+            [90002] = "Prix en jetons : ",
             [90003] = "Article acheté !",
-            [90004] = "Nombre de pièces insuffisant !",
+            [90004] = "Nombre de jetons insuffisant !",
             [90005] = "La condition suivante : ",
 
             [900] = "Reprendre",

@@ -246,6 +246,15 @@ namespace TJAPlayer3
             [202] = "Play recently played songs !",
             [203] = "Random song",
 
+            [300] = "Coins got !",
+            [301] = "Character got !",
+            [302] = "Puchichara got !",
+            [303] = "Title got !",
+            [304] = "Notice",
+            [305] = "Confirm",
+            [306] = "Coins",
+            [307] = "Total",
+
             [1000] = "Reached floor",
             [1001] = "F",
             [1002] = "P",

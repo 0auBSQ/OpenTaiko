@@ -193,6 +193,17 @@
 202 : Ensou recently played songs description
 203 : Ensou randomly select song
 
+# Modal specific text (0030X)
+
+300 : Coins got !
+301 : Character got !
+302 : Puchichara got !
+303 : Title got !
+304 : Notice
+305 : Confirm
+306 : Coins
+307 : Total (coins)
+
 # Tower text (0100X)
 
 1000 : Reached floor (Tower)
@@ -240,8 +251,8 @@
 9000 : Off
 9001 : On
 9002 : None
-9003 : きまぐれ
-9004 : でたらめ
+9003 : Kimagure (きまぐれ)
+9004 : Detarame (でたらめ)
 9006 : Special Training Mode
 9007 : Null
 9008 : Speed

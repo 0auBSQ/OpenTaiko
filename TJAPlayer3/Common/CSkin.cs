@@ -365,6 +365,8 @@ namespace TJAPlayer3
 
         public Cシステムサウンド soundHeyaBGM = null;
 
+        public Cシステムサウンド[] soundModal = null;
+
         public Cシステムサウンド soundCrownIn = null;
         public Cシステムサウンド soundRankIn = null;
         public Cシステムサウンド soundDonClear = null;
@@ -714,9 +716,10 @@ namespace TJAPlayer3
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
 
-            this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-            this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
+
             this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
 
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -743,6 +746,14 @@ namespace TJAPlayer3
             this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+
+            soundModal = new Cシステムサウンド[6];
+            for (int i = 0; i < soundModal.Length - 1; i++)
+            {
+                soundModal[i] = new Cシステムサウンド(@"Sounds\Modals\" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
+            }
+            soundModal[soundModal.Length - 1] = new Cシステムサウンド(@"Sounds\Modals\Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
+
             ReloadSkin();
             tReadSkinConfig();
         }

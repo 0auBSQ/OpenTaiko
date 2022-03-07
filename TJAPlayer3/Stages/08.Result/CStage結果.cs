@@ -1473,6 +1473,7 @@ namespace TJAPlayer3
 									)
 								{
 									displayedModals[0] = mqModals.tPopModal(0);
+									displayedModals[0]?.tPlayModalSfx();
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 1 || mqModals.tIsQueueEmpty(1))
 								{
@@ -1507,6 +1508,7 @@ namespace TJAPlayer3
 								TJAPlayer3.Skin.sound決定音.t再生する();
 
 								displayedModals[1] = mqModals.tPopModal(1);
+								displayedModals[1]?.tPlayModalSfx();
 							}
 						}
 
