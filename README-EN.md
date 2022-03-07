@@ -13,8 +13,6 @@ Old TJAPlayer3-Develop-BSQ
 
 ## Cautions before using （IMPORTANT）
 
-- This software does not have a skin (A copyright free skin is provided with the pre-release for testing).
-
 - It is **YOUR RESPONSIBILITY** to use this software. The creator will not take responsibilities for any problems you got from using this software.
 
 - Currently this software does not have an "Official" skin. if there is any bugs with non-official skin, contact the skin creator first and then contact the author of this software. There will be no support for AC-like skins and forks of this software.
@@ -125,7 +123,7 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 ## Update history
 
 <details>
-	<summary>Pre v0.5.3</summary>
+	<summary>v0.5.3</summary>
 	
 	- Fix multiple bugs
 	
@@ -139,6 +137,26 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 	
 	- Dan charts are now also selectable from the Taiko mode song select screen
 	
+	- Add Modals
+	
+	- 1st unlockables update
+	
+	- Add Favorite songs folder
+	
+	- Add Database files (Name and Author names for Characters and Puchichara)
+	
+	- Chinese language support (WHMHammer)
+	
+	- Remove SlimDX dependencies (Mr Oiji)
+	
+	- Add SimpleStyle skin (feat. cien)
+	
+	- Automatically generated unique ID addition for each song
+	
+	- Fix Discord RPC
+	
+	- Fix several config options issues (l1m0n3)
+
 </details>
 
 <details>
@@ -167,7 +185,7 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 	
 	- Add multiple step textures
 	
-	- Add Spanish translation
+	- Add Spanish translation (funnym0th)
 	
 	- Add "Random option"
 	
@@ -314,16 +332,6 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 	
 </details>
 
-## Features being implemented
-```
-☐ Dan-i dojo result screen
-☐ Don medal shop
-☐ Tower result screen
-☐ Multiple background and characters
-☐ ２P result screen
-☐ Program optimization and fix memory leak
-☐ 4 or more songs on dan-i dojo
-```
 ## Credits
 
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
