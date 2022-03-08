@@ -284,6 +284,7 @@
     <Compile Include="Stages\09.Ending\CStage終了.cs" />
     <Compile Include="Stages\10.ChangeSkin\CStageChangeSkin.cs" />
     <Compile Include="Stages\11.Heya\CStageHeya.cs" />
+    <Compile Include="Stages\12.OnlineLounge\API.cs" />
     <Compile Include="Stages\CActDFPFont.cs" />
     <Compile Include="Stages\CActFIFOBlack.cs" />
     <Compile Include="Stages\CActFIFOStart.cs" />
@@ -379,6 +380,9 @@
     <PackageReference Include="SharpDX.Mathematics">
       <Version>4.2.0</Version>
     </PackageReference>
+    <PackageReference Include="System.Net.Http">
+      <Version>4.3.4</Version>
+    </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
     </PackageReference>
@@ -394,19 +398,35 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>move /y "$(TargetDir)FDK.dll" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)FDK.pdb" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)Hnx8.ReadJEnc.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)Newtonsoft.Json.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)SharpDX.Direct3D9.*" "$(SolutionDir)Test\dll\"
-move /y "$(TargetDir)SharpDX.DirectInput.*" "$(SolutionDir)Test\dll\"
+
+move /y "$(TargetDir)SharpDX.DirectInput.*" "$(SolutionDir)Test\dll"
 move /y "$(TargetDir)SharpDX.DirectSound.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)SharpDX.DXGI.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)SharpDX.Mathematics.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)SharpDX.*" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)Bass.Net.dll" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)DirectShowLib-2005.dll" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)SlimDX.dll" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
+
+move /y "$(TargetDir)System.*" "$(SolutionDir)Test\dll\"
+
+
 copy /y "$(SolutionDir)Readme.txt" "$(SolutionDir)Test\"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('packages\SharpDX.2.6.3\build\SharpDX.targets')" />

@@ -116,20 +116,10 @@ namespace TJAPlayer3
 
             #region [PuchiChara stuff]
 
-            // Tmp variables
-            iPuchiCharaCount = 120;
+            iPuchiCharaCount = TJAPlayer3.Skin.Puchichara_Ptn;
 
             ttkPuchiCharaNames = new TitleTextureKey[iPuchiCharaCount];
             ttkPuchiCharaAuthors = new TitleTextureKey[iPuchiCharaCount];
-
-            var RarityToColor = new Dictionary<string, Color>
-            {
-                ["Common"] = Color.White,
-                ["Uncommon"] = Color.Lime,
-                ["Rare"] = Color.Blue,
-                ["Epic"] = Color.Purple,
-                ["Legendary"] = Color.Orange,
-            };
 
             var dbData = TJAPlayer3.Databases.DBPuchichara.data;
 
@@ -137,12 +127,9 @@ namespace TJAPlayer3
             {
                 if (dbData.ContainsKey(i))
                 {
-                    Color textColor = Color.White;
-
                     string rarity = dbData[i].Rarity;
 
-                    if (RarityToColor.ContainsKey(rarity))
-                        textColor = RarityToColor[rarity];
+                    var textColor = tRarityToColor(rarity);
 
                     ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
                     ttkPuchiCharaAuthors[i] = new TitleTextureKey(dbData[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
@@ -151,7 +138,29 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [Character stuff]
+
             iCharacterCount = TJAPlayer3.Skin.Characters_Ptn;
+
+            ttkCharacterAuthors = new TitleTextureKey[iCharacterCount];
+            ttkCharacterNames = new TitleTextureKey[iCharacterCount];
+
+            var dbDataChara = TJAPlayer3.Databases.DBCharacter.data;
+
+            for (int i = 0; i < iCharacterCount; i++)
+            {
+                if (dbDataChara.ContainsKey(i))
+                {
+                    string rarity = dbDataChara[i].Rarity;
+
+                    var textColor = tRarityToColor(rarity);
+
+                    ttkCharacterNames[i] = new TitleTextureKey(dbDataChara[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                    ttkCharacterAuthors[i] = new TitleTextureKey(dbDataChara[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
+                }
+            }
+
+            #endregion
 
             this.tResetOpts();
 
@@ -193,15 +202,15 @@ namespace TJAPlayer3
                 if (iCurrentMenu != -1 || iMainMenuCurrent != i)
                 {
                     tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.DarkGray);
+                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                 }
                 else
                 {
                     tmpTex.color4 = C変換.ColorToColor4(Color.White);
-                    TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                 }
 
-                TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 26 + 80 * i);
+                TJAPlayer3.Tx.Heya_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 26 + 80 * i);
                 tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 164, 40 + 80 * i);
             }
 
@@ -217,29 +226,29 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Lock.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                        TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Lock.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                        TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
                     
-                    TJAPlayer3.Tx.PuchiChara.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
+                    TJAPlayer3.Tx.PuchiChara?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                         puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara.color4 = C変換.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.White));
 
                     #region [Database related values]
 
@@ -279,23 +288,38 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     }
                     else
                     {
-                        if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                            TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                        TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
 
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320);
 
-                    if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].color4 = C変換.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+
+                    #region [Database related values]
+
+                    if (ttkCharacterNames[pos] != null)
+                    {
+                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterNames[pos]);
+
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 434);
+                    }
+
+                    if (ttkCharacterAuthors[pos] != null)
+                    {
+                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterAuthors[pos]);
+
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 460);
+                    }
+
+                    #endregion
                 }
             }
 
@@ -634,6 +658,8 @@ namespace TJAPlayer3
 
         private TitleTextureKey[] ttkPuchiCharaNames;
         private TitleTextureKey[] ttkPuchiCharaAuthors;
+        private TitleTextureKey[] ttkCharacterNames;
+        private TitleTextureKey[] ttkCharacterAuthors;
         private TitleTextureKey ttkInfoSection;
 
         private int iCharacterCurrent;
@@ -648,8 +674,30 @@ namespace TJAPlayer3
             iTitleCurrent = 0;
             iDanTitleCurrent = 0;
 
-            iCharacterCurrent = TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer];
-            iPuchiCharaCurrent = TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer];
+            iCharacterCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Characters_Ptn - 1, TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer]));
+            iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
+        }
+
+        private Dictionary<string, Color> RarityToColor = new Dictionary<string, Color>
+        {
+            ["Poor"] = Color.Gray,
+            ["Common"] = Color.White,
+            ["Uncommon"] = Color.Lime,
+            ["Rare"] = Color.Blue,
+            ["Epic"] = Color.Purple,
+            ["Legendary"] = Color.Orange,
+        };
+
+        private Color tRarityToColor(string rarity)
+        {
+
+            Color textColor = Color.White;
+
+            if (RarityToColor.ContainsKey(rarity))
+                textColor = RarityToColor[rarity];
+
+            return textColor;
+
         }
 
         private bool tMove(int off)
@@ -662,7 +710,10 @@ namespace TJAPlayer3
                 tUpdateUnlockableTextPuchi();
             }
             else if (iCurrentMenu == 1)
+            {
                 iCharacterCurrent = (iCharacterCount + iCharacterCurrent + off) % iCharacterCount;
+
+            }
             else if (iCurrentMenu == 2)
                 iDanTitleCurrent = (this.ttkDanTitles.Length + iDanTitleCurrent + off) % this.ttkDanTitles.Length;
             else if (iCurrentMenu == 3)
@@ -672,6 +723,21 @@ namespace TJAPlayer3
 
             return true;
         }
+
+
+        #region [Unlockables]
+
+        /*
+         *  FAILED : Selection/Purchase failed (failed condition)
+         *  SUCCESS : Purchase succeed (without selection)
+         *  SELECTED : Selection succeed
+        */
+        private enum ESelectStatus
+        {
+            FAILED,
+            SUCCESS,
+            SELECTED
+        };
 
         #region [Puchi unlockables]
         private void tUpdateUnlockableTextPuchi()
@@ -712,17 +778,9 @@ namespace TJAPlayer3
             return ESelectStatus.SELECTED;
         }
 
-        /*
-         *  FAILED : Selection/Purchase failed (failed condition)
-         *  SUCCESS : Purchase succeed (without selection)
-         *  SELECTED : Selection succeed
-        */
-        private enum ESelectStatus
-        {
-            FAILED,
-            SUCCESS,
-            SELECTED
-        };
+        
+
+        #endregion
 
         #endregion
 

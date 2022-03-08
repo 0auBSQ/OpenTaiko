@@ -658,9 +658,16 @@ namespace TJAPlayer3
             DanC_ExamCymbol = TxC(GAME + DANC + @"ExamCymbol.png");
             DanC_MiniNumber = TxC(GAME + DANC + @"MiniNumber.png");
             #endregion
+
             #region PuichiChara
+
             PuchiChara = TxC(GAME + PUCHICHARA + @"0.png");
+
+            TJAPlayer3.Skin.Puchichara_Ptn = 5 * Math.Max(1, (PuchiChara.szテクスチャサイズ.Height / 256));
+
+
             #endregion
+
             #region Training
             Tokkun_DownBG = TxC(GAME + TRAINING + @"Down.png");
             Tokkun_BigTaiko = TxC(GAME + TRAINING + @"BigTaiko.png");

@@ -1253,6 +1253,11 @@ namespace FDK
 
         protected Rectangle rc全画像;                              // テクスチャ作ったらあとは不変
         public Color4 color4 = new Color4(1f, 1f, 1f, 1f);  // アルファ以外は不変
+
+        public void tUpdateColor4(Color4 c4)
+        {
+            this.color4 = c4;
+        }
                                                             //-----------------
         #endregion
     }

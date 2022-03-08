@@ -90,14 +90,8 @@ namespace TJAPlayer3
 
             int p = TJAPlayer3.GetActualPlayer(player);
 
-            int puriChar = TJAPlayer3.NamePlateConfig.data.PuchiChara[p];
+            int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
             
-            // To change later
-            if (puriChar < 0)
-                puriChar = 0;
-            else if (puriChar >= 120)
-                puriChar = 119;
-
             int puriColumn = puriChar % 5;
             int puriRow = puriChar / 5;
 

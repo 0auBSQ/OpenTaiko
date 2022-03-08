@@ -2630,6 +2630,12 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region Puchichara
+
+        public int Puchichara_Ptn;
+
+        #endregion
+
         #region Characters
 
         public int Characters_Ptn;
