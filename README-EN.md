@@ -147,7 +147,7 @@ If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty
 	
 	- Chinese language support (WHMHammer)
 	
-	- Remove SlimDX dependencies (Mr Oiji)
+	- Remove SlimDX dependencies (Mr Ojii)
 	
 	- Add SimpleStyle skin (feat. cien)
 	
