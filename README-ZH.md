@@ -4,7 +4,7 @@
 
 # OpenTaiko
 
-TJAPlayer3-Develop-ReWrite的分叉项目，一个使用.tja文件的模拟器
+TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
@@ -12,11 +12,9 @@ TJAPlayer3-Develop-ReWrite的分叉项目，一个使用.tja文件的模拟器
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/3/5）
+（译者注：由README-EN翻译。最近一次更新时间：2022/3/8）
 
 ## 使用前注意事项（重要！！！）
-
-- 本软件尚未提供皮肤（预发布版本包含了一个测试用版权自由皮肤）。
 
 - 您**全权**对您对本软件的使用负责。开发者不为您使用本软件造成的任何问题承担任何责任。
 
@@ -124,7 +122,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 ## 更新历史
 
 <details>
-	<summary>Pre v0.5.3</summary>
+	<summary>v0.5.3</summary>
 
 	- 修复了多个Bug
 
@@ -137,6 +135,26 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 	- 重大2P更新（请在Discord中查看更多信息）
 
 	- 现可在演奏模式的选曲界面选择段位谱面
+
+	- 添加了弹出框
+
+	- 第一次【可解锁内容】更新
+
+	- 添加了最爱曲目文件夹
+
+	- 添加了数据库文件（角色与小角色的名称及作者名称）
+
+	- 中文支持（WHMHammer）
+
+	- 移除了SlimDX依赖（Mr Ojii）
+
+	- 添加了简单风格皮肤（由cien制作）
+
+	- 自动为每首歌生成唯一标识符
+
+	- 修复了Discord RPC
+
+	- 修复了几个配置文件问题（l1m0n3）
 
 </details>
 
@@ -168,7 +186,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 	
 	- Add multiple step textures
 	
-	- Add Spanish translation
+	- Add Spanish translation (funnym0th)
 	
 	- Add "Random option"
 	
@@ -315,17 +333,6 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 	
 </details>
 
-## 正在实现的功能
-
-```
-☐ 段位道场结果界面
-☐ 咚奖牌商店
-☐ 塔模式结果界面
-☐ 多个背景与角色
-☐ 玩家2结果界面
-☐ 程序优化与内存泄露修复
-☐ 段位道场中支持4首或更多曲目
-```
 ## 致谢
 
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
