@@ -1,32 +1,52 @@
 {
 	0: {
-		"name" : "Empty0",
+		"name" : "None",
         "rarity": "Common",
-		"author": "申しコミ",
+		"author": "",
 	},
 	1: {
-		"name" : "Empty1",
+		"name" : "Placeholder",
         "rarity": "Common",
-		"author": "申しコミ",
+		"author": "[Author]",
 	},
 	2: {
-		"name" : "Empty2",
-        "rarity": "Uncommon",
-		"author": "申しコミ",
+		"name" : "Placeholder",
+        "rarity": "Poor",
+		"author": "[Author]",
 	},
 	3: {
-		"name" : "Empty3",
-        "rarity": "Rare",
-		"author": "申しコミ",
+		"name" : "Placeholder",
+        "rarity": "Uncommon",
+		"author": "[Author]",
 	},
 	4: {
-		"name" : "Empty4",
-        "rarity": "Epic",
-		"author": "申しコミ",
+		"name" : "Placeholder",
+        "rarity": "Common",
+		"author": "[Author]",
 	},
 	5: {
-		"name" : "Empty5",
+		"name" : "Placeholder",
+        "rarity": "Epic",
+		"author": "[Author]",
+	},
+	6: {
+		"name" : "Placeholder",
+        "rarity": "Common",
+		"author": "[Author]",
+	},
+	7: {
+		"name" : "Placeholder",
+        "rarity": "Rare",
+		"author": "[Author]",
+	},
+	8: {
+		"name" : "Placeholder",
+        "rarity": "Uncommon",
+		"author": "[Author]",
+	},
+	9: {
+		"name" : "Placeholder",
         "rarity": "Legendary",
-		"author": "申しコミ",
+		"author": "[Author]",
 	},
 }

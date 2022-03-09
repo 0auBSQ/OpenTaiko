@@ -1,17 +1,24 @@
 {
 	"puchichara": {
-		2: {
+		7: {
 			"condition": "ch",
 			"type": "me",
 			"values": [
-				200,
+				450,
 			],
 		},
-		4: {
-			"condition": "cs",
+		5: {
+			"condition": "ch",
 			"type": "me",
 			"values": [
 				1400,
+			],
+		},
+		9: {
+			"condition": "cs",
+			"type": "me",
+			"values": [
+				5000,
 			],
 		},
 	},

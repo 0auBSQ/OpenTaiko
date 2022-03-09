@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： Pre v0.5.3
+- Current version： v0.5.3
 
 - Discord : https://discord.gg/aA8scTvZ6B
 

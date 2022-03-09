@@ -11,7 +11,7 @@ English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
 TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
 旧名称 TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： Pre v0.5.3
+- 現在のバージョン： v0.5.3
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -128,6 +128,43 @@ v0.5.2から11_Charactersにキャラクターに関してファイルが読み�
 ```
 
 ## 更新記録
+
+<details>
+	<summary>v0.5.3</summary>
+	
+	- バグ修正
+	
+	- 段結果画面を実装（１／２）
+	
+	- 曲数の３つ以外の段譜面のクラッシュを修正
+	
+	- ２P側対応を追加
+	
+	- 主要な２P更新を追加
+	
+	- 演奏選曲画面に段及びタワーの譜面を選べるオプションを追加
+	
+	- Modal（注目ボックス）を追加
+	
+	- コインを使ってコンテンツを解除できる機能を追加（１／２）
+	
+	- 「お気に入りの曲」のフォルダーを追加（選曲画面にCTRLを押したら現在選択中の曲を「お気に入り」にする）
+	
+	- キャラクター及びプチキャラのメタデータファイル対応を追加
+	
+	- 中国語を追加 (WHMHammer)
+	
+	- SlimDXの依存を排除 (Mr Ojii)
+	
+	- SimpleStyleスキンを追加 (feat. cien)
+	
+	- 各曲に自動作成のユニークIDを追加
+	
+	- Discord RPCを修正
+	
+	- 様々な設定画面項目を修正 (l1m0n3)
+
+</details>
 
 <details>
 	<summary>v0.5.2.1</summary>
