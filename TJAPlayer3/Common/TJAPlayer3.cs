@@ -274,6 +274,12 @@ namespace TJAPlayer3
 			private set;
         }
 
+		public static RecentlyPlayedSongs RecentlyPlayedSongs
+        {
+			get;
+			private set;
+        }
+
 		public static Databases Databases
 		{
 			get;
@@ -2059,6 +2065,9 @@ for (int i = 0; i < 3; i++) {
 
 			Favorites = new Favorites();
 			Favorites.tFavorites();
+
+			RecentlyPlayedSongs = new RecentlyPlayedSongs();
+			RecentlyPlayedSongs.tRecentlyPlayedSongs();
 
 			Databases = new Databases();
 			Databases.tDatabases();

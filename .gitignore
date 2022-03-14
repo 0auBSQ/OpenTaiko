@@ -18,6 +18,7 @@
 /Test/dll/FDK.dll
 /Test/NamePlate.json
 /Test/Favorite.json
+/Test/RecentlyPlayedSongs.json
 /Test/SongsIgnored/*
 /Test/xadec.dll
 /Test/SoundDecoder.dll

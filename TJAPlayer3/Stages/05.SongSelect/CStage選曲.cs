@@ -664,6 +664,10 @@ namespace TJAPlayer3
                                                         {
                                                             this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchFavoriteFolder(this.act曲リスト.r現在選択中の曲);
                                                         }
+                                                        else if (this.act曲リスト.r現在選択中の曲.strジャンル == "最近遊んだ曲")
+                                                        {
+                                                            this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchRecentlyPlayedSongsFolder(this.act曲リスト.r現在選択中の曲);
+                                                        }
 
                                                         CSongSelectSongManager.disable();
 

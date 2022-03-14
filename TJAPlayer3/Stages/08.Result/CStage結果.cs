@@ -1747,6 +1747,9 @@ namespace TJAPlayer3
 
 				// Song added to recently added songs here
 
+				TJAPlayer3.RecentlyPlayedSongs.tAddChart(TJAPlayer3.stage選曲.r確定された曲.uniqueId.data.id);
+
+				/*
 				foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
 				{
 					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
@@ -1795,6 +1798,8 @@ namespace TJAPlayer3
 						}
 					}
 				}
+
+				*/
 
 				b最近遊んだ曲追加済み = true;
 			}

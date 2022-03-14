@@ -106,6 +106,29 @@ namespace TJAPlayer3
             return songList;
         }
 
+
+        private static C曲リストノード tReadaptChildNote(C曲リストノード parent, C曲リストノード node)
+        {
+            if (node != null)
+            {
+                node.r親ノード = parent;
+                node.isChangedBgType = parent.isChangedBgType;
+                node.isChangedBgColor = parent.isChangedBgColor;
+                node.isChangedBoxType = parent.isChangedBoxType;
+                node.isChangedBoxColor = parent.isChangedBoxColor;
+
+                node.ForeColor = parent.ForeColor;
+                node.BackColor = parent.BackColor;
+                node.BoxColor = parent.BoxColor;
+                node.BgColor = parent.BgColor;
+                node.BgType = parent.BgType;
+                node.BoxType = parent.BoxType;
+
+                return node;
+            }
+            return null;
+        }
+
         // Generate the favorite folder content
         public static List<C曲リストノード> tFetchFavoriteFolder(C曲リストノード parent)
         {
@@ -113,22 +136,9 @@ namespace TJAPlayer3
 
             foreach (string id in TJAPlayer3.Favorites.data.favorites[TJAPlayer3.SaveFile])
             {
-                var node = tGetNodeFromID(id);
+                var node = tReadaptChildNote(parent, tGetNodeFromID(id));
                 if (node != null)
                 {
-                    node.r親ノード = parent;
-                    node.isChangedBgType = parent.isChangedBgType;
-                    node.isChangedBgColor = parent.isChangedBgColor;
-                    node.isChangedBoxType = parent.isChangedBoxType;
-                    node.isChangedBoxColor = parent.isChangedBoxColor;
-
-                    node.ForeColor = parent.ForeColor;
-                    node.BackColor = parent.BackColor;
-                    node.BoxColor = parent.BoxColor;
-                    node.BgColor = parent.BgColor;
-                    node.BgType = parent.BgType;
-                    node.BoxType = parent.BoxType;
-
                     childList.Add(node);
                 }
                     
@@ -136,6 +146,29 @@ namespace TJAPlayer3
 
             // Generate back buttons
             
+            string favPath = "./" + parent.strタイトル + "/";
+
+            tReinsertBackButtons(parent, childList, favPath);
+
+            return childList;
+        }
+
+        public static List<C曲リストノード> tFetchRecentlyPlayedSongsFolder(C曲リストノード parent)
+        {
+            List<C曲リストノード> childList = new List<C曲リストノード>();
+
+            foreach (string id in TJAPlayer3.RecentlyPlayedSongs.data.recentlyplayedsongs[TJAPlayer3.SaveFile])
+            {
+                var node = tReadaptChildNote(parent, tGetNodeFromID(id));
+                if (node != null)
+                {
+                    childList.Add(node);
+                }
+
+            }
+
+            // Generate back buttons
+
             string favPath = "./" + parent.strタイトル + "/";
 
             tReinsertBackButtons(parent, childList, favPath);
