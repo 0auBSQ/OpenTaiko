@@ -952,7 +952,7 @@ namespace TJAPlayer3
                 this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, i == 0);
 
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
-                Characters_Heya_Preview[i] = TxC(CHARACTERS + i.ToString() + @"\Normal\0.png");
+                Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + i.ToString() + @"\Normal\0.png");
 
             #endregion
 
