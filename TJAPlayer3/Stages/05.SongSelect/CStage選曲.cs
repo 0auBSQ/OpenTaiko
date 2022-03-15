@@ -659,7 +659,8 @@ namespace TJAPlayer3
                                                 case C曲リストノード.Eノード種別.BOX:
                                                     {
 
-                                                        // Pre-generate the favorite folder if the folder's genre is "Favorite"
+                                                        #region [Pre-generated folders]
+
                                                         if (this.act曲リスト.r現在選択中の曲.strジャンル == "Favorite")
                                                         {
                                                             this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchFavoriteFolder(this.act曲リスト.r現在選択中の曲);
@@ -668,6 +669,13 @@ namespace TJAPlayer3
                                                         {
                                                             this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchRecentlyPlayedSongsFolder(this.act曲リスト.r現在選択中の曲);
                                                         }
+                                                        else if (this.act曲リスト.r現在選択中の曲.strジャンル == "SearchD")
+                                                        {
+                                                            // Todo : Add a small prompt to choose the difficulty
+                                                            this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
+                                                        }
+
+                                                        #endregion
 
                                                         CSongSelectSongManager.disable();
 

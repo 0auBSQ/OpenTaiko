@@ -168,11 +168,12 @@ namespace TJAPlayer3
             return childList;
         }
 
+        // Generate recently played songs folder
         public static List<C曲リストノード> tFetchRecentlyPlayedSongsFolder(C曲リストノード parent)
         {
             List<C曲リストノード> childList = new List<C曲リストノード>();
 
-            foreach (string id in TJAPlayer3.RecentlyPlayedSongs.data.recentlyplayedsongs[TJAPlayer3.SaveFile])
+            foreach (string id in TJAPlayer3.RecentlyPlayedSongs.data.recentlyplayedsongs[TJAPlayer3.SaveFile].Reverse())
             {
                 var node = tReadaptChildNote(parent, tGetNodeFromID(id));
                 if (node != null)
@@ -180,6 +181,34 @@ namespace TJAPlayer3
                     childList.Add(node);
                 }
 
+            }
+
+            // Generate back buttons
+
+            string favPath = "./" + parent.strタイトル + "/";
+
+            tReinsertBackButtons(parent, childList, favPath);
+
+            return childList;
+        }
+
+        // Generate search by difficulty folder
+        public static List<C曲リストノード> tFetchSongsByDifficulty(C曲リストノード parent, int difficulty = (int)Difficulty.Oni, int level = 8)
+        {
+            List<C曲リストノード> childList = new List<C曲リストノード>();
+
+            foreach (C曲リストノード nodeT in nodes.Values)
+            {
+                var score = nodeT.nLevel;
+                if (score[difficulty] == level
+                    || (difficulty == (int)Difficulty.Oni && score[(int)Difficulty.Edit] == level)) // Oni includes Ura
+                {
+                    var node = tReadaptChildNote(parent, nodeT);
+                    if (node != null)
+                    {
+                        childList.Add(node);
+                    }
+                }
             }
 
             // Generate back buttons
