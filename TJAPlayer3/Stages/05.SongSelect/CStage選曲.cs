@@ -927,9 +927,7 @@ namespace TJAPlayer3
 
                     TJAPlayer3.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(TJAPlayer3.app.Device, i * tablesGap, 0);
 
-                    CActSelect曲リスト.CScorePad[] SPArrRef = this.act曲リスト.ScorePads;
-                    if (p == 1)
-                        SPArrRef = this.act曲リスト.ScorePads2;
+                    CActSelect曲リスト.CScorePad[] SPArrRef = CSongDict.ScorePads[p];
 
                     // Current board
                     for (int j = 0; j < 10; j++)

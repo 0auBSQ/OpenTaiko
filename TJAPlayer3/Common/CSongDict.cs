@@ -11,6 +11,19 @@ namespace TJAPlayer3
     {
         private static Dictionary<string, C曲リストノード> nodes = new Dictionary<string, C曲リストノード>();
 
+        public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[2][]
+        {
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() }
+        };
+
+        public static int tGetNodesCount()
+        {
+            return nodes.Count();
+        }
+
+        #region [General song dict methods]
+
         public static C曲リストノード tGetNodeFromID(string id)
         {
             if (nodes.ContainsKey(id))
@@ -23,6 +36,8 @@ namespace TJAPlayer3
             if (!nodes.ContainsKey(id))
                 nodes.Add(id, node.Clone());
         }
+
+        #endregion
 
         #region [Extra methods]
 
@@ -178,5 +193,82 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [Score tables methods]
+
+        public static void tRefreshScoreTables()
+        {
+            #region [Reset nodes]
+
+            for (int pl = 0; pl < 2; pl++)
+            {
+                CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
+
+                for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
+                {
+                    CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
+
+                    for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+                        SPRef.ScoreRankCount[i] = 0;
+
+                    for (int i = 0; i < SPRef.CrownCount.Length; i++)
+                        SPRef.CrownCount[i] = 0;
+                }
+            }
+
+            #endregion
+
+            #region [Load nodes]
+
+            foreach (C曲リストノード song in nodes.Values)
+            {
+                for (int pl = 0; pl < 2; pl++)
+                {
+                    CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
+
+                    if (song.eノード種別 == C曲リストノード.Eノード種別.SCORE
+                        && song.strジャンル != "最近遊んだ曲"
+                        && song.strジャンル != "Favorite")
+                    {
+                        var score = song.arスコア[TJAPlayer3.stage選曲.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+
+                        if (score != null)
+                        {
+                            var gp = score.GPInfo[pl];
+
+                            for (int s = 0; s <= (int)Difficulty.Edit; s++)
+                            {
+                                CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
+
+                                for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
+                                {
+                                    int increment = (gp.nScoreRank[s] == i + 1) ? 1 : 0;
+
+                                    SPRef.ScoreRankCount[i] += increment;
+                                    if (s >= (int)Difficulty.Oni)
+                                        SPArrRef[(int)Difficulty.Edit + 1].ScoreRankCount[i] += increment;
+                                }
+                                for (int i = 0; i < SPRef.CrownCount.Length; i++)
+                                {
+                                    int increment = (gp.nClear[s] == i + 1) ? 1 : 0;
+
+                                    SPRef.CrownCount[i] += increment;
+                                    if (s >= (int)Difficulty.Oni)
+                                        SPArrRef[(int)Difficulty.Edit + 1].CrownCount[i] += increment;
+                                }
+                                
+                            }
+
+                            
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+
+        }
+
+        #endregion
     }
 }

@@ -1350,7 +1350,7 @@ namespace TJAPlayer3
 
 				// Display medals debug
 
-				TJAPlayer3.act文字コンソール.tPrint(0, 12, C文字コンソール.Eフォント種別.白, this.nEarnedMedalsCount[0].ToString());
+				// TJAPlayer3.act文字コンソール.tPrint(0, 12, C文字コンソール.Eフォント種別.白, this.nEarnedMedalsCount[0].ToString());
 				TJAPlayer3.act文字コンソール.tPrint(0, 25, C文字コンソール.Eフォント種別.白, this.nEarnedMedalsCount[1].ToString());
 
 
@@ -1748,58 +1748,6 @@ namespace TJAPlayer3
 				// Song added to recently added songs here
 
 				TJAPlayer3.RecentlyPlayedSongs.tAddChart(TJAPlayer3.stage選曲.r確定された曲.uniqueId.data.id);
-
-				/*
-				foreach (var song in TJAPlayer3.Songs管理.list曲ルート)
-				{
-					if (song.strジャンル == "最近遊んだ曲" && song.eノード種別 == C曲リストノード.Eノード種別.BOX)
-					{
-						int lastId = TJAPlayer3.stage選曲.r確定された曲.nID;
-						bool songExists = false;
-
-						foreach (var song2 in song.list子リスト)
-                        {
-							if (song2.nID == lastId)
-								songExists = true;
-                        }
-
-						if (songExists == false)
-							song.list子リスト.Add(TJAPlayer3.stage選曲.r確定された曲.Clone());
-
-						foreach (var song2 in song.list子リスト)
-						{
-							song2.r親ノード = song;
-							song2.strジャンル = "最近遊んだ曲";
-
-							song2.isChangedBgType = song.isChangedBgType;
-							song2.isChangedBgColor = song.isChangedBgColor;
-							song2.isChangedBoxType = song.isChangedBoxType;
-							song2.isChangedBoxColor = song.isChangedBoxColor;
-
-							if (song2.eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
-                            {
-								song2.ForeColor = song.ForeColor;
-								song2.BackColor = song.BackColor;
-								song2.BoxColor = song.BoxColor;
-								song2.BgColor = song.BgColor;
-								song2.BgType = song.BgType;
-								song2.BoxType = song.BoxType;
-								// song2.BackColor = ColorTranslator.FromHtml("#164748");
-							}
-								
-						}
-
-						// Remove duplicates
-						// song.list子リスト = song.list子リスト.Distinct().ToList();
-
-						if (song.list子リスト.Count >= 8)
-						{
-							song.list子リスト.RemoveAt(1);
-						}
-					}
-				}
-
-				*/
 
 				b最近遊んだ曲追加済み = true;
 			}
