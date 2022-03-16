@@ -192,6 +192,14 @@ namespace TJAPlayer3
             return childList;
         }
 
+        // 13 includes any higher difficulty
+        private static bool tLevelMatches(int check, int level)
+        {
+            if (level == 13)
+                return check >= level;
+            return check == level;
+        }
+
         // Generate search by difficulty folder
         public static List<C曲リストノード> tFetchSongsByDifficulty(C曲リストノード parent, int difficulty = (int)Difficulty.Oni, int level = 8)
         {
@@ -200,8 +208,8 @@ namespace TJAPlayer3
             foreach (C曲リストノード nodeT in nodes.Values)
             {
                 var score = nodeT.nLevel;
-                if (score[difficulty] == level
-                    || (difficulty == (int)Difficulty.Oni && score[(int)Difficulty.Edit] == level)) // Oni includes Ura
+                if (tLevelMatches(score[difficulty], level)
+                    || (difficulty == (int)Difficulty.Oni && tLevelMatches(score[(int)Difficulty.Edit], level))) // Oni includes Ura
                 {
                     var node = tReadaptChildNote(parent, nodeT);
                     if (node != null)
