@@ -292,9 +292,9 @@ namespace TJAPlayer3
             [90004] = "Monedas insuficientes!",
             [90005] = "Esta condición: ",
 
-            [900] = "Continuar",
+            [900] = "Reanudar",
             [901] = "Reiniciar",
-            [902] = "Salida",
+            [902] = "Salir",
 
             [9000] = "No",
             [9001] = "Sí",
