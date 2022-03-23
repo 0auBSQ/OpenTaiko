@@ -45,7 +45,7 @@ BoxFontName=廻想体 ネクスト UP B
 
 ```
 CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001
-Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by Bol : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
+Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by Bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
 Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by Bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 ```
 
