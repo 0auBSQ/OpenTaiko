@@ -494,6 +494,7 @@ namespace TJAPlayer3
                         return 0;
                     }
                     #endregion
+
                     if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.act難易度選択画面.bIsDifficltSelect)
                     {
                         #region [ ESC ]
@@ -810,6 +811,9 @@ namespace TJAPlayer3
                             #endregion
                         }
                     }
+
+
+
 
                     #region [ Minus & Equals Sound Group Level ]
                     KeyboardSoundGroupLevelControlHandler.Handle(
