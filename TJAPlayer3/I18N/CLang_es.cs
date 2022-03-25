@@ -228,9 +228,9 @@ namespace TJAPlayer3
             [10058] = "Volumen de la demo",
             [10059] = "Ajusta el volumen de la demo de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
             [10084] = "Modo Shinuchi",
-            [10091] = "Settings for an overall systems.",
-            [10092] = "Settings to play the drums.",
-            [10093] = "Save the settings and exit from CONFIGURATION menu.",
+            [10091] = "Ajustes generales del simulador.",
+            [10092] = "Ajustes para los controles.",
+            [10093] = "Guarda los cambios y sal del menú de configuración.",
 
             [100] = "Modo Taiko",
             [101] = "Dan-i Dojo",
