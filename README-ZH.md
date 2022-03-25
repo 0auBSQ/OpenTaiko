@@ -8,11 +8,11 @@ TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
-- 当前版本：Pre v0.5.3
+- 当前版本：v0.5.3
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/3/8）
+（译者注：由README-EN翻译。最近一次更新时间：2022/3/25）
 
 ## 使用前注意事项（重要！！！）
 
