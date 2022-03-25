@@ -136,7 +136,7 @@ namespace TJAPlayer3
 			#endregion
 
 			this.r現在選択中の曲 = null;
-            this.n現在のアンカ難易度レベル = TJAPlayer3.ConfigIni.nDefaultCourse;
+            this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, TJAPlayer3.ConfigIni.nDefaultCourse);
 			base.b活性化してない = true;
 			this.bIsEnumeratingSongs = false;
 		}
@@ -287,6 +287,14 @@ namespace TJAPlayer3
 			}
 			return ret;
 		}
+
+		public void tReturnToRootBox()
+        {
+			while (this.r現在選択中の曲.r親ノード != null)
+				tBOXを出る();
+        }
+
+
 		public bool tBOXを出る()
 		{
 //Trace.TraceInformation( "box exit" );

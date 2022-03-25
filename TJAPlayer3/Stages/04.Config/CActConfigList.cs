@@ -367,7 +367,13 @@ namespace TJAPlayer3
 
 			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nDefaultCourse,
 				CLangManager.LangInstance.GetString(81),
-                new string[] { "Easy", "Normal", "Hard", "Oni", "Edit" });
+                new string[] {
+					CLangManager.LangInstance.GetString(1040),
+					CLangManager.LangInstance.GetString(1041),
+					CLangManager.LangInstance.GetString(1042),
+					CLangManager.LangInstance.GetString(1043),
+					CLangManager.LangInstance.GetString(1044),
+					CLangManager.LangInstance.GetString(1045) });
             this.list項目リスト.Add(this.iTaikoDefaultCourse);
 
             this.iTaikoScoreMode = new CItemList(CLangManager.LangInstance.GetString(82), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nScoreMode,

@@ -267,6 +267,13 @@ namespace TJAPlayer3
             [1033] = "Titre Dan",
             [1034] = "Titre",
 
+            [1040] = "Facile",
+            [1041] = "Normal",
+            [1042] = "Difficile",
+            [1043] = "Extrême",
+            [1044] = "Extra",
+            [1045] = "Extrême / Extra",
+
             [90000] = "[ERREUR] Condition invalide",
             [90001] = "L'article n'est disponible que dans le Magasin.",
             [90002] = "Prix en jetons : ",

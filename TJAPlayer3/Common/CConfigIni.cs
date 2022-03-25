@@ -1486,7 +1486,7 @@ namespace TJAPlayer3
 
             this.bBranchGuide = false;
             this.nScoreMode = 2;
-            this.nDefaultCourse = 3;
+            this.nDefaultCourse = (int)Difficulty.Edit + 1;
             this.nBranchAnime = 1;
 
             this.b大音符判定 = false;

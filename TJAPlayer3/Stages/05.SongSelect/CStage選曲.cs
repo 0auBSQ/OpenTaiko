@@ -912,7 +912,11 @@ namespace TJAPlayer3
 
                 #region [Pad displayables]
 
-                int[] currentPads = new int[2] { (int)Difficulty.Edit + 1, (int)Difficulty.Edit + 1 };
+                int defaultTable = Math.Max(0, Math.Min((int)Difficulty.Edit + 1, TJAPlayer3.ConfigIni.nDefaultCourse));
+
+                int[] currentPads = new int[2] {
+                    defaultTable,
+                    defaultTable };
 
                 int tablesGap = 1034;
 
