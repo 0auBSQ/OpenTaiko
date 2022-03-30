@@ -228,6 +228,9 @@ namespace TJAPlayer3
             SongSelect_High_Score = TxC(SONGSELECT + @"High_Score.png");
 
             SongSelect_Level_Icons = TxC(SONGSELECT + @"Level_Icons.png");
+            SongSelect_Search_Arrow = TxC(SONGSELECT + @"Search\Search_Arrow.png");
+            SongSelect_Search_Arrow_Glow = TxC(SONGSELECT + @"Search\Search_Arrow_Glow.png");
+            SongSelect_Search_Window = TxC(SONGSELECT + @"Search\Search_Window.png");
 
             for (int i = 0; i < (int)Difficulty.Total; i++)
             {
@@ -1415,6 +1418,9 @@ namespace TJAPlayer3
             SongSelect_High_Score,
 
             SongSelect_Level_Icons,
+            SongSelect_Search_Arrow,
+            SongSelect_Search_Arrow_Glow,
+            SongSelect_Search_Window,
 
             SongSelect_ScoreWindow_Text;
         public CTexture[] SongSelect_GenreBack,

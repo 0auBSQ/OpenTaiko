@@ -495,7 +495,36 @@ namespace TJAPlayer3
                     }
                     #endregion
 
-                    if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.act難易度選択画面.bIsDifficltSelect)
+                    if (this.act曲リスト.isContextBoxOpened == true)
+                    {
+                        // Handle menu contexts
+                        bool __done = this.act曲リスト.tMenuContextController(this.act曲リスト.latestContext);
+                        if (__done == true)
+                        {
+                            if (this.act曲リスト.latestContext == eMenuContext.SearchByDifficulty)
+                            {
+                                #region [Trigger context box]
+
+                                this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(
+                                    this.act曲リスト.r現在選択中の曲,
+                                    this.act曲リスト.tMenuContextGetVar(0),
+                                    this.act曲リスト.tMenuContextGetVar(1));
+
+                                CSongSelectSongManager.disable();
+
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
+                                this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
+                                this.act曲リスト.bBoxOpen = true;
+                                this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+
+                                #endregion
+                            }
+
+                            this.act曲リスト.tMenuContextDisable();
+                        }
+                    }
+                    else if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.act難易度選択画面.bIsDifficltSelect)
                     {
                         #region [ ESC ]
                         if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape) && (this.act曲リスト.r現在選択中の曲 != null))// && (  ) ) )
@@ -611,6 +640,7 @@ namespace TJAPlayer3
 
                         if (this.act曲リスト.r現在選択中の曲 != null)
                         {
+                            
                             if (this.act曲リスト.ctBoxOpen.b終了値に達した || this.act曲リスト.ctBoxOpen.n現在の値 == 0)
                             {
                                 if (!this.bスクロール中)
@@ -673,7 +703,9 @@ namespace TJAPlayer3
                                                         else if (this.act曲リスト.r現在選択中の曲.strジャンル == "SearchD")
                                                         {
                                                             // Todo : Add a small prompt to choose the difficulty
-                                                            this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
+                                                            this.act曲リスト.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
+                                                            goto Decided;
+                                                            //this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
                                                         }
 
                                                         #endregion
