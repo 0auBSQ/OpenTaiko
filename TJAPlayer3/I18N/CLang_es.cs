@@ -285,6 +285,13 @@ namespace TJAPlayer3
             [1033] = "Título de Dan",
             [1034] = "Título de la placa",
             
+            [1040] = "Fácil",
+            [1041] = "Normal",
+            [1042] = "Difícil",
+            [1043] = "Extremo",
+            [1044] = "Extra",
+            [1045] = "Extremo / Extra",
+            
             [90000] = "[ERROR] Condicion no valida",
             [90001] = "Item solamente disponible en la tienda.",
             [90002] = "Precio: ",
