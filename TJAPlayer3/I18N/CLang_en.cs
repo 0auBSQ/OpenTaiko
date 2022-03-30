@@ -276,6 +276,13 @@ namespace TJAPlayer3
             [1033] = "Dan Title",
             [1034] = "Nameplate Title",
 
+            [1040] = "Easy",
+            [1041] = "Normal",
+            [1042] = "Hard",
+            [1043] = "Extreme",
+            [1044] = "Extra",
+            [1045] = "Extreme / Extra",
+
             [90000] = "[ERROR] Invalid condition",
             [90001] = "Item only avaliable at the Shop.",
             [90002] = "Coin price : ",

@@ -136,7 +136,7 @@ namespace TJAPlayer3
 			#endregion
 
 			this.r現在選択中の曲 = null;
-            this.n現在のアンカ難易度レベル = TJAPlayer3.ConfigIni.nDefaultCourse;
+            this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, TJAPlayer3.ConfigIni.nDefaultCourse);
 			base.b活性化してない = true;
 			this.bIsEnumeratingSongs = false;
 		}
@@ -273,13 +273,25 @@ namespace TJAPlayer3
 			if(r現在選択中の曲.list子リスト.Count != 1)
 			{
 				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+
+				// Fill list songs
 				list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
+
+				// Previous index 
 				int n回数 = this.r現在選択中の曲.Openindex;
+				if (this.r現在選択中の曲.Openindex >= this.r現在選択中の曲.list子リスト.Count())
+					n回数 = 0;
+
+
 				for (int index = 0; index <= n回数; index++)
 					this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
+
+				// Remove main box
 				list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));
+				
 				this.t現在選択中の曲を元に曲バーを再構成する();
 				this.t選択曲が変更された(false);
+				
 				TJAPlayer3.stage選曲.t選択曲変更通知();                          // #27648 項目数変更を反映させる
 				this.b選択曲が変更された = true;
 				// TJAPlayer3.Skin.bgm選曲画面.t停止する();
@@ -287,6 +299,14 @@ namespace TJAPlayer3
 			}
 			return ret;
 		}
+
+		public void tReturnToRootBox()
+        {
+			while (this.r現在選択中の曲.r親ノード != null)
+				tBOXを出る();
+        }
+
+
 		public bool tBOXを出る()
 		{
 //Trace.TraceInformation( "box exit" );
@@ -2050,13 +2070,173 @@ namespace TJAPlayer3
 
 			return 0;
 		}
-		
 
-		// その他
+		public void tMenuContextView(eMenuContext emc)
+        {
+			// Context vars :
+			// 0 - Selected difficulty
+			// 1 - Selected star rating
+			// 2 - Current menu (0 : select difficulty, 1 : select star rating)
+			if (emc == eMenuContext.SearchByDifficulty)
+            {
+				TJAPlayer3.Tx.SongSelect_Search_Window?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
-		#region [ private ]
-		//-----------------
-		private enum Eバー種別 { Score, Box, Other, BackBox, Random }
+				int tileSize = 0;
+				if (TJAPlayer3.Tx.Dani_Difficulty_Cymbol != null)
+                {
+					tileSize = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
+					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320,
+						new Rectangle(tileSize * _contextVars[0],
+						0,
+						(_contextVars[0] == (int)Difficulty.Oni ? 2 : 1) * tileSize,
+						tileSize));
+				}
+				
+
+				if (_contextVars[2] == 0)
+                {
+					TJAPlayer3.Tx.SongSelect_Search_Arrow_Glow?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320);
+				}
+				else if (_contextVars[2] == 1)
+                {
+					TJAPlayer3.Tx.SongSelect_Search_Arrow?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320);
+					TJAPlayer3.Tx.SongSelect_Search_Arrow_Glow?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 520);
+
+					if (TJAPlayer3.Tx.SongSelect_Level_Icons != null)
+                    {
+						tileSize = TJAPlayer3.Tx.SongSelect_Level_Icons.szテクスチャサイズ.Height;
+						TJAPlayer3.Tx.SongSelect_Level_Icons.t2D中心基準描画(TJAPlayer3.app.Device, 640, 520,
+							new Rectangle(tileSize * _contextVars[1],
+							0,
+							tileSize,
+							tileSize));
+					}
+					
+				}
+
+
+				
+            }
+        }
+
+		public bool tMenuContextController(eMenuContext emc)
+        {
+			tMenuContextView(emc);
+
+			#region [Inputs]
+
+			#region [Decide]
+
+			if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) || (TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed) || TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed)) ||
+			((TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)))))
+            {
+				if (emc == eMenuContext.SearchByDifficulty)
+                {
+					TJAPlayer3.Skin.sound決定音.t再生する();
+
+					_contextVars[2]++;
+					if (_contextVars[2] >= 2)
+                    {
+						//tMenuContextDisable();
+						return true;
+					}
+					else if (_contextVars[2] == 1)
+                    {
+						// Set default level for each difficulty
+						switch (_contextVars[0])
+                        {
+							case (int)Difficulty.Easy:
+								_contextVars[1] = 1;
+								break;
+							case (int)Difficulty.Normal:
+								_contextVars[1] = 3;
+								break;
+							case (int)Difficulty.Hard:
+								_contextVars[1] = 6;
+								break;
+							default:
+								_contextVars[1] = 8;
+								break;
+						}
+                    }
+						
+                }
+
+			}
+
+            #endregion
+
+            #region [Left]
+
+            else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)
+				|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
+            {
+				if (emc == eMenuContext.SearchByDifficulty)
+				{
+					TJAPlayer3.Skin.sound変更音.t再生する();
+
+					_contextVars[_contextVars[2]]--;
+					// Clamp values
+					_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
+					_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
+				}
+			}
+
+			#endregion
+
+			#region [Right]
+
+			else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue)
+				|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
+			{
+				if (emc == eMenuContext.SearchByDifficulty)
+				{
+					TJAPlayer3.Skin.sound変更音.t再生する();
+
+					_contextVars[_contextVars[2]]++;
+					// Clamp values
+					_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
+					_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
+				}
+			}
+
+			#endregion
+
+			#endregion
+
+			return false;
+		}
+
+        public void tMenuContextTrigger(eMenuContext emc)
+        {
+			_contextVars = new int[10];
+			isContextBoxOpened = true;
+			latestContext = emc;
+        }
+
+		public void tMenuContextDisable()
+        {
+			isContextBoxOpened = false;
+			latestContext = eMenuContext.NONE;
+        }
+
+		public int tMenuContextGetVar(int i)
+        {
+			if (i < 0 || i >= 10)
+				return -1;
+			return _contextVars[i];
+        }
+
+		public bool isContextBoxOpened = false;
+		public eMenuContext latestContext = eMenuContext.NONE;
+		private int[] _contextVars = new int[10];
+
+
+        // その他
+
+        #region [ private ]
+        //-----------------
+        private enum Eバー種別 { Score, Box, Other, BackBox, Random }
 
 		// Edit + 1 => UraOmote ScorePad
 		// public CScorePad[] ScorePads = new CScorePad[(int)Difficulty.Edit + 2] { new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad(), new CScorePad() };
@@ -2454,16 +2634,55 @@ namespace TJAPlayer3
 			TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.X = _resize;
 			TJAPlayer3.Tx.SongSelect_ScoreRank.vc拡大縮小倍率.Y = _resize;
 
-			// Other crowns
-			if (クリア[3] > 0 && クリア[4] == 0)
-				TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new RectangleF(9 * 43.2f + (クリア[3] - 1) * 43.2f, 0, 43.2f, 39));
-			else if (クリア[4] > 0)
-				TJAPlayer3.Tx.SongSelect_Crown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new RectangleF(12 * 43.2f + (クリア[4] - 1) * 43.2f, 0, 43.2f, 39));
+			int bestCrown = -1;
+			int bestScoreRank = -1;
 
-			if (スコアランク[3] > 0 && スコアランク[4] == 0)
-				TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[3] - 1) * 42.71f, 50, 42.71f));
-			else if (スコアランク[4] > 0)
-				TJAPlayer3.Tx.SongSelect_ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[4] - 1) * 42.71f, 50, 42.71f));
+			for (int i = 0; i <= (int)Difficulty.Edit; i++)
+            {
+				if (クリア[i] > 0)
+					bestCrown = i;
+				if (スコアランク[i] > 0)
+					bestScoreRank = i;
+            }
+
+			if (bestCrown >= 0)
+            {
+				TJAPlayer3.Tx.SongSelect_Crown?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, new RectangleF(12 * 43.2f + (クリア[bestCrown] - 1) * 43.2f, 0, 43.2f, 39));
+			}
+
+			if (bestScoreRank >= 0)
+            {
+				TJAPlayer3.Tx.SongSelect_ScoreRank?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y + 30, new RectangleF(0, (スコアランク[bestScoreRank] - 1) * 42.71f, 50, 42.71f));
+			}
+
+			if (TJAPlayer3.Tx.Dani_Difficulty_Cymbol != null)
+            {
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = TJAPlayer3.Tx.SongSelect_Favorite.Opacity;
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.X = 0.5f;
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.Y = 0.5f;
+
+				if (bestCrown >= 0)
+				{
+					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
+										x + 22,
+										y + 22,
+										new Rectangle(bestCrown * 53, 0, 53, 53));
+				}
+
+				if (bestScoreRank >= 0)
+				{
+					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
+										x + 22,
+										y + 52,
+										new Rectangle(bestScoreRank * 53, 0, 53, 53));
+				}
+
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.X = 1f;
+				TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.Y = 1f;
+			}
+
+
 		}
 
 		public void displayFavoriteStatus(int x, int y, CSongUniqueID csu, float _resize)
@@ -2723,6 +2942,12 @@ namespace TJAPlayer3
 		#endregion
 	}
 
+	public enum eMenuContext
+    {
+		NONE,
+		SearchByDifficulty,
+		Random,
+    }
 
 	public enum eLayoutType
     {

@@ -737,9 +737,9 @@ namespace TJAPlayer3
 			}
 		}
 
-	    internal E判定 e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip)
+	    internal E判定 e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip, int player = 0)
 	    {
-	        var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip);
+	        var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player);
 
 	        // When performing calibration, reduce audio distraction from user input.
 	        // For users who play primarily by watching notes cross the judgment position,
@@ -762,7 +762,7 @@ namespace TJAPlayer3
 	        }
 	    }
 
-		private E判定 e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip )
+		private E判定 e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip, int player = 0 )
 		{
 
 			if ( pChip != null )
@@ -784,17 +784,25 @@ namespace TJAPlayer3
                         return E判定.Perfect;
 				    }
                 }
-                if (nDeltaTime <= TJAPlayer3.nPerfect範囲ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
+
+                int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
+                
+                // To change later to adapt to Tower Ama-kuchi
+                diff = Math.Min(diff, (int)Difficulty.Oni);
+                // To do : Add -2 ~ +2 mod modifiers
+                CConfigIni.CTimingZones tz = (diff <= (int)Difficulty.Normal) ? TJAPlayer3.ConfigIni.tzLevels[2] : TJAPlayer3.ConfigIni.tzLevels[4];
+
+                if (nDeltaTime <= tz.nGoodZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
                     return E判定.Perfect;
 				}
-                if (nDeltaTime <= TJAPlayer3.nGood範囲ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
+                if (nDeltaTime <= tz.nOkZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
                     if ( TJAPlayer3.ConfigIni.bJust )
                         return E判定.Poor;
 					return E判定.Good;
 				}
-                if (nDeltaTime <= TJAPlayer3.nPoor範囲ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
+                if (nDeltaTime <= tz.nBadZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
                     return E判定.Poor;
 				}
@@ -1242,7 +1250,7 @@ namespace TJAPlayer3
 				case E楽器パート.TAIKO:
 					{
                         //連打が短すぎると発声されない
-						eJudgeResult = (bCorrectLane)? this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip ) : E判定.Miss;
+						eJudgeResult = (bCorrectLane)? this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer ) : E判定.Miss;
 
                         // AI judges
                         eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
@@ -2053,7 +2061,7 @@ namespace TJAPlayer3
                 {
                     if (don ? GetDon(processingChip) : GetKatsu(processingChip)) // 音符のチャンネルである
                     {
-                        var thisChipJudge = pastJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip);
+                        var thisChipJudge = pastJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip, player);
                         if (thisChipJudge != E判定.Miss)
                         {
                             // 判定が見過ごし不可ではない(=たたいて不可以上)
@@ -2097,7 +2105,7 @@ namespace TJAPlayer3
                 {
                     if (don ? GetDon(processingChip) : GetKatsu(processingChip)) // 音符のチャンネルである
                     {
-                        var thisChipJudge = futureJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip);
+                        var thisChipJudge = futureJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip, player);
                         if (thisChipJudge != E判定.Miss)
                         {
                             // 判定が見過ごし不可ではない(=たたいて不可以上)
@@ -2725,7 +2733,7 @@ namespace TJAPlayer3
                         //こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
                         if (time <= 0)
                         {
-                            if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip) == E判定.Miss)
+                            if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == E判定.Miss)
                             {
                                 pChip.IsMissed = true;
                                 pChip.eNoteState = ENoteState.bad;
@@ -3552,7 +3560,7 @@ namespace TJAPlayer3
                         int instIndex = (int) pChip.e楽器パート;
                         if( pChip.nバーからの距離dot[instIndex] < -40 )
                         {
-                            if ( this.e指定時刻からChipのJUDGEを返す( n現在時刻ms, pChip ) == E判定.Miss )
+                            if ( this.e指定時刻からChipのJUDGEを返す( n現在時刻ms, pChip, nPlayer ) == E判定.Miss )
                             {
                                 this.tチップのヒット処理( n現在時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer );
                             }

@@ -231,6 +231,15 @@
 1033 : Dan title
 1034 : Plate title
 
+# Difficulties (0104X)
+
+1040 : Easy
+1041 : Normal
+1042 : Hard
+1043 : Extreme (Oni)
+1044 : Extra (Ura)
+1045 : Extreme / Extra
+
 # Feature specific errors (9XXXX)
 
 90000 : "Invalid condition" error message
