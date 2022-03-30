@@ -274,7 +274,7 @@ namespace TJAPlayer3
 			{
 				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
 				list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
-				int n回数 = this.r現在選択中の曲.Openindex;
+				int n回数 = Math.Min(list.Count() - 1, this.r現在選択中の曲.Openindex);
 				for (int index = 0; index <= n回数; index++)
 					this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
 				list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));

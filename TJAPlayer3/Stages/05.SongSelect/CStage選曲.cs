@@ -620,7 +620,7 @@ namespace TJAPlayer3
                         #region [ F7 TokkunMode ]
                         if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F7))
                         {
-                            if (TJAPlayer3.ConfigIni.nPlayerCount != 2)
+                            if (TJAPlayer3.ConfigIni.nPlayerCount < 2)
                             {
                                 TJAPlayer3.Skin.sound変更音.t再生する();
                                 C共通.bToggleBoolian(ref TJAPlayer3.ConfigIni.bTokkunMode);
@@ -704,6 +704,7 @@ namespace TJAPlayer3
                                                         {
                                                             // Todo : Add a small prompt to choose the difficulty
                                                             this.act曲リスト.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
+                                                            TJAPlayer3.Skin.sound決定音.t再生する();
                                                             goto Decided;
                                                             //this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
                                                         }
