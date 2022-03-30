@@ -273,13 +273,25 @@ namespace TJAPlayer3
 			if(r現在選択中の曲.list子リスト.Count != 1)
 			{
 				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+
+				// Fill list songs
 				list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
-				int n回数 = Math.Min(list.Count() - 1, this.r現在選択中の曲.Openindex);
+
+				// Previous index 
+				int n回数 = this.r現在選択中の曲.Openindex;
+				if (this.r現在選択中の曲.Openindex >= list.Count())
+					n回数 = 0;
+
+
 				for (int index = 0; index <= n回数; index++)
 					this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
+
+				// Remove main box
 				list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));
+				
 				this.t現在選択中の曲を元に曲バーを再構成する();
 				this.t選択曲が変更された(false);
+				
 				TJAPlayer3.stage選曲.t選択曲変更通知();                          // #27648 項目数変更を反映させる
 				this.b選択曲が変更された = true;
 				// TJAPlayer3.Skin.bgm選曲画面.t停止する();
