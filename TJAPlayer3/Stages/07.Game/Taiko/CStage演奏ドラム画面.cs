@@ -798,7 +798,7 @@ namespace TJAPlayer3
 			int nLane = index;
 			int nPad = index;
 
-			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip );
+			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer );
 
             e判定 = AlterJudgement(nPlayer, e判定, false);
 
@@ -960,7 +960,7 @@ namespace TJAPlayer3
                     var isDon = padTo < 2 ? true : false;
 
                     CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
-                    E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit) : E判定.Miss;
+                    E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : E判定.Miss;
 
                     e判定 = AlterJudgement(nUsePlayer, e判定, false);
 

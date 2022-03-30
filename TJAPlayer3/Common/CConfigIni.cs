@@ -792,12 +792,13 @@ namespace TJAPlayer3
 
 		public CTimingZones[] tzLevels =
 		{
-			new CTimingZones(75, 114, 125),
-			new CTimingZones(55, 108, 125), // (New) Easy ?
-			new CTimingZones(42, 108, 125), // Normal / Tower Normal (Ama-kuchi)
-			new CTimingZones(33, 86, 115), // (New) Hard ?
-			new CTimingZones(25, 75, 108), // Extreme / Tower Ex (Kara-kuchi) / Dan
-			new CTimingZones(25, 58, 108) // Extreme + Hard timing (Tatsu)
+			new CTimingZones(75, 108, 125), // Lv0 (Easy-Normal + "Loose" mod)
+			new CTimingZones(58, 108, 125), // Lv1 (Easy-Normal + "Lenient" mod)
+			new CTimingZones(42, 108, 125), // Lv2 (Easy-Normal / Tower Ama-kuchi or Hard-Extreme + "Loose" mod)
+			new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
+			new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
+			new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
+			new CTimingZones(25, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
 
         public bool b大音符判定;
