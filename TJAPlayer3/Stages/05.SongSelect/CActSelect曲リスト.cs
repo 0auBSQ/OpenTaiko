@@ -279,7 +279,7 @@ namespace TJAPlayer3
 
 				// Previous index 
 				int n回数 = this.r現在選択中の曲.Openindex;
-				if (this.r現在選択中の曲.Openindex >= list.Count())
+				if (this.r現在選択中の曲.Openindex >= this.r現在選択中の曲.list子リスト.Count())
 					n回数 = 0;
 
 
