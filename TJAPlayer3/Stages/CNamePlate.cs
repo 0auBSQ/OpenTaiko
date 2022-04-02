@@ -54,8 +54,8 @@ namespace TJAPlayer3
 
             string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
-            string name = "AIドン";
-            string title = "デウス・エクス・マキナ";
+            string name = CLangManager.LangInstance.GetString(910);
+            string title = CLangManager.LangInstance.GetString(911);
             string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
 
             if (TJAPlayer3.ConfigIni.nAILevel == 0 || actualPlayer == 0)

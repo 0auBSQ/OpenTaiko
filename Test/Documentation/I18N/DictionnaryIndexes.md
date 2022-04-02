@@ -255,6 +255,11 @@
 901 : Restart
 902 : Exit
 
+# AI nameplate informations (91X)
+
+910 : AI
+911 : Deus-ex-machina
+
 # Song selection page options (900X)
 
 9000 : Off

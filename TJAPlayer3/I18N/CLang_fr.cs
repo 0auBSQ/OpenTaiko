@@ -285,6 +285,9 @@ namespace TJAPlayer3
             [901] = "Recommencer",
             [902] = "Quitter",
 
+            [910] = "IA",
+            [911] = "Deus-Ex-Machina",
+
             [9000] = "Non",
             [9001] = "Oui",
             [9002] = "Aucun",

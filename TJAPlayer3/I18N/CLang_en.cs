@@ -294,6 +294,9 @@ namespace TJAPlayer3
             [901] = "Restart",
             [902] = "Quit",
 
+            [910] = "AI",
+            [911] = "Deus-Ex-Machina",
+
             [9000] = "Off",
             [9001] = "On",
             [9002] = "None",
