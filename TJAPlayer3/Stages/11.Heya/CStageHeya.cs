@@ -540,9 +540,9 @@ namespace TJAPlayer3
                 {
                     // Reload character, a bit time expensive but with a O(N) memory complexity instead of O(N * M)
                     TJAPlayer3.Tx.ReloadCharacter(TJAPlayer3.NamePlateConfig.data.Character[iPlayer], iCharacterCurrent, iPlayer);
-                    CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
-
                     TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
+
+                    CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
 
