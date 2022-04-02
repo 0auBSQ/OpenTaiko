@@ -2653,12 +2653,15 @@ namespace TJAPlayer3
             Characters_Balloon_Breaking_Ptn,
             Characters_Balloon_Broke_Ptn,
             Characters_Balloon_Miss_Ptn,
-            Characters_Title_Donchan_Entry_Ptn,
-            Characters_Title_Donchan_Normal_Ptn,
-            Characters_Result_Donchan_Clear_Ptn,
-            Characters_Result_Donchan_Failed_Ptn,
-            Characters_Result_Donchan_Failed_In_Ptn,
-            Characters_Result_Donchan_Normal_Ptn;
+            Characters_Title_Entry_Ptn,
+            Characters_Title_Normal_Ptn,
+            Characters_Menu_Loop_Ptn,
+            Characters_Menu_Select_Ptn,
+            Characters_Menu_Start_Ptn,
+            Characters_Result_Clear_Ptn,
+            Characters_Result_Failed_Ptn,
+            Characters_Result_Failed_In_Ptn,
+            Characters_Result_Normal_Ptn;
 
         // Config
 

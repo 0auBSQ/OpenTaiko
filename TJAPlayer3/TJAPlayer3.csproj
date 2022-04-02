@@ -120,6 +120,7 @@
     <Compile Include="Animations\FadeOut.cs" />
     <Compile Include="Animations\IAnimatable.cs" />
     <Compile Include="Animations\Linear.cs" />
+    <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
     <Compile Include="Common\ModalQueue.cs" />
@@ -260,7 +261,7 @@
     <Compile Include="Stages\07.Game\Taiko\CAct演奏Drums連打キャラ.cs" />
     <Compile Include="Stages\07.Game\Taiko\FlyingNotes.cs" />
     <Compile Include="Stages\07.Game\Taiko\LaneFlash.cs" />
-    <Compile Include="Stages\07.Game\Taiko\PuchiChara.cs" />
+    <Compile Include="Character\PuchiChara.cs" />
     <Compile Include="Stages\07.Game\Taiko\Rainbow.cs" />
     <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsチップファイアD.cs" />
     <Compile Include="Stages\07.Game\CAct演奏PauseMenu.cs" />

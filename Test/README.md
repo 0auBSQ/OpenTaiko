@@ -49,6 +49,7 @@ Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.tw
 Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by Bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 WTF?! : MooX - https://soundcloud.com/themoox/wtf (Chart by MooX & bol)
+Athazagoraphobia : Derpikarp - https://youtube.com/channel/UCrURywBu-fDA5KQaDPc3GOg (Chart by Colin & bol)
 ```
 
 ## Translations
