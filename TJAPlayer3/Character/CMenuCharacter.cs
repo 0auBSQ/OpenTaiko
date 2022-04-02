@@ -9,9 +9,9 @@ namespace TJAPlayer3
 {
     class CMenuCharacter
     {
-        private static CCounter[] ctCharacterNormal = new CCounter[4];
-        private static CCounter[] ctCharacterSelect = new CCounter[4];
-        private static CCounter[] ctCharacterStart = new CCounter[4];
+        private static CCounter[] ctCharacterNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterSelect = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterStart = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
         public enum ECharacterAnimation
         {
@@ -22,9 +22,7 @@ namespace TJAPlayer3
 
         private static CTexture[] _getReferenceArray(int player, ECharacterAnimation eca)
         {
-            CTexture[] _ref = null;
-
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[player];
+            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
 
             if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn)
             {
@@ -32,27 +30,27 @@ namespace TJAPlayer3
                 {
                     case (ECharacterAnimation.NORMAL):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Loop[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_Menu_Loop[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_Menu_Loop[_charaId];
-                            if (TJAPlayer3.Tx.Characters_Normal[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_Normal[_charaId];
                             break;
                         }
                     case (ECharacterAnimation.START):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Start[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_Menu_Start[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_Menu_Start[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
                         }
                     case (ECharacterAnimation.SELECT):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_Menu_Select[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId] != null)
+                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length < 1)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
                         }
@@ -60,7 +58,7 @@ namespace TJAPlayer3
             }
 
             
-            return _ref;
+            return null;
         }
 
         public static CCounter[] _getReferenceCounter(ECharacterAnimation eca)
@@ -115,9 +113,9 @@ namespace TJAPlayer3
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
 
-            if (_ref != null && _ref.Length > 0 && _ctref != null)
+            if (_ref != null &&_ref.Length > 0 && _ctref != null)
             {
-                _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / _ref.Length, TJAPlayer3.Timer);
+                _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / (float)_ref.Length, TJAPlayer3.Timer);
             }
         }
 
