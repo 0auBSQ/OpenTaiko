@@ -269,6 +269,8 @@ namespace TJAPlayer3
                             TJAPlayer3.Skin.sound決定音.t再生する();
                             TJAPlayer3.stage選曲.act曲リスト.ctBarOpen.t開始(100, 260, 2, TJAPlayer3.Timer);
                             this.bIsDifficltSelect = false;
+                            CMenuCharacter.tDisableCounter(CMenuCharacter.ECharacterAnimation.START);
+
                         }
                         else if (n現在の選択行[1] == 1)
                         {

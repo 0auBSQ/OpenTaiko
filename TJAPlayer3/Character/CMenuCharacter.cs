@@ -48,8 +48,8 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Menu_Select[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length > 0)
-                                return TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId];
+                            //if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length > 0)
+                            //    return TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId];
                             if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
