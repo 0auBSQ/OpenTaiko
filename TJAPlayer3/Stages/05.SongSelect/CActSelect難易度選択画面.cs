@@ -227,7 +227,9 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[0] - 2] > 0)
                             {
-                                TJAPlayer3.stage選曲.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                //TJAPlayer3.stage選曲.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                CMenuCharacter.tMenuResetTimer(0, CMenuCharacter.ECharacterAnimation.START);
+
                                 this.bSelect[0] = true;
                                 TJAPlayer3.Skin.sound曲決定音.t再生する();
 
@@ -277,7 +279,9 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[1] - 2] > 0)
                             {
-                                TJAPlayer3.stage選曲.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                //TJAPlayer3.stage選曲.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                CMenuCharacter.tMenuResetTimer(1, CMenuCharacter.ECharacterAnimation.START);
+
                                 this.bSelect[1] = true;
                                 TJAPlayer3.Skin.sound曲決定音.t再生する();
 

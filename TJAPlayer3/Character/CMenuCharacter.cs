@@ -63,7 +63,7 @@ namespace TJAPlayer3
             return _ref;
         }
 
-        private static CCounter[] _getReferenceCounter(ECharacterAnimation eca)
+        public static CCounter[] _getReferenceCounter(ECharacterAnimation eca)
         {
             switch (eca)
             {
@@ -83,6 +83,32 @@ namespace TJAPlayer3
             return null;
         }
 
+        public static void tDisableCounter(ECharacterAnimation eca)
+        {
+            switch (eca)
+            {
+                case (ECharacterAnimation.NORMAL):
+                    {
+                        for (int i = 0; i < 4; i++)
+                            ctCharacterNormal[i] = new CCounter();
+                        break;
+                    }
+                case (ECharacterAnimation.START):
+                    {
+                        for (int i = 0; i < 4; i++)
+                            ctCharacterStart[i] = new CCounter();
+                        break;
+                    }
+                case (ECharacterAnimation.SELECT):
+                    {
+                        for (int i = 0; i < 4; i++)
+                            ctCharacterSelect[i] = new CCounter();
+                        break;
+                    }
+            }
+
+        }
+
 
         public static void tMenuResetTimer(int player, ECharacterAnimation eca)
         {
@@ -92,6 +118,14 @@ namespace TJAPlayer3
             if (_ref != null && _ref.Length > 0 && _ctref != null)
             {
                 _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / _ref.Length, TJAPlayer3.Timer);
+            }
+        }
+
+        public static void tMenuResetTimer(ECharacterAnimation eca)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                tMenuResetTimer(i, eca);
             }
         }
 

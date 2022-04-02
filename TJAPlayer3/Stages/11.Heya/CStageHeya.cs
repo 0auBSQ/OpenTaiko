@@ -36,7 +36,9 @@ namespace TJAPlayer3
             this.eフェードアウト完了時の戻り値 = E戻り値.継続;
 
             ctDonchan_In = new CCounter();
-            ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+            //ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+
+            CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
             bInSongPlayed = false;
 
@@ -186,7 +188,7 @@ namespace TJAPlayer3
 
         public override int On進行描画()
         {
-            ctDonchan_Normal.t進行Loop();
+            //ctDonchan_Normal.t進行Loop();
             ctDonchan_In.t進行();
 
             TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
@@ -445,21 +447,23 @@ namespace TJAPlayer3
             #region [ どんちゃん関連 ]
 
             if (ctDonchan_In.n現在の値 != 90)
-                {
-                    float DonchanX = 0f, DonchanY = 0f;
+            {
+                float DonchanX = 0f, DonchanY = 0f;
 
-                    DonchanX = (float)Math.Sin(ctDonchan_In.n現在の値 / 2 * (Math.PI / 180)) * 200f;
-                    DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
+                DonchanX = (float)Math.Sin(ctDonchan_In.n現在の値 / 2 * (Math.PI / 180)) * 200f;
+                DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
 
-                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
-                    TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
+                //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
+                //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
 
-                    #region [PuchiChara]
+                CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
 
-                    this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                #region [PuchiChara]
+
+                this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
 
                     #endregion
-                }
+            }
 
             #endregion
 
@@ -647,7 +651,7 @@ namespace TJAPlayer3
         public bool bInSongPlayed;
 
         private CCounter ctDonchan_In;
-        private CCounter ctDonchan_Normal;
+        //private CCounter ctDonchan_Normal;
 
         private PuchiChara PuchiChara;
 

@@ -255,10 +255,16 @@ namespace TJAPlayer3
                 for (int i = 0; i < 2; i++)
                     this.ctキー反復用[i] = new CCounter(0, 0, 0, TJAPlayer3.Timer);
 
-                ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-                ctDonchan_Select = new CCounter();
-                ctDonchan_Jump[0] = new CCounter();
-                ctDonchan_Jump[1] = new CCounter();
+                //ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
+
+                //ctDonchan_Select = new CCounter();
+                //ctDonchan_Jump[0] = new CCounter();
+                //ctDonchan_Jump[1] = new CCounter();
+
+                CMenuCharacter.tDisableCounter(CMenuCharacter.ECharacterAnimation.SELECT);
+                CMenuCharacter.tDisableCounter(CMenuCharacter.ECharacterAnimation.START);
+
                 ctBackgroundFade = new CCounter();
                 ctCreditAnime = new CCounter(0, 4500, 1, TJAPlayer3.Timer);
                 ctTimer = new CCounter(0, 100, 1000, TJAPlayer3.Timer);
@@ -364,10 +370,11 @@ namespace TJAPlayer3
                 ctTimer.t進行();
                 ctCreditAnime.t進行Loop();
                 ctBackgroundFade.t進行();
-                ctDonchan_Select.t進行();
-                ctDonchan_Jump[0].t進行();
-                ctDonchan_Jump[1].t進行();
-                ctDonchan_Normal.t進行Loop();
+
+                //ctDonchan_Select.t進行();
+                //ctDonchan_Jump[0].t進行();
+                //ctDonchan_Jump[1].t進行();
+                //ctDonchan_Normal.t進行Loop();
 
                 this.ct登場時アニメ用共通.t進行();
 
@@ -516,7 +523,9 @@ namespace TJAPlayer3
                                 this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                 this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
                                 this.act曲リスト.bBoxOpen = true;
-                                this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+
+                                //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
                                 #endregion
                             }
@@ -550,7 +559,8 @@ namespace TJAPlayer3
                                     this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                     this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
                                     this.act曲リスト.bBoxClose = true;
-                                    this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                    //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                    CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                 }
                             }
                         #endregion
@@ -683,7 +693,8 @@ namespace TJAPlayer3
                                                             this.act難易度選択画面.t選択画面初期化();
                                                             this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                                             this.act曲リスト.ctDifficultyIn.t開始(0, 3200, 1, TJAPlayer3.Timer);
-                                                            this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                            //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                            CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                                         }
                                                     }
                                                     break;
@@ -717,7 +728,8 @@ namespace TJAPlayer3
                                                         this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                                         this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
                                                         this.act曲リスト.bBoxOpen = true;
-                                                        this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                                     }
                                                     break;
                                                 case C曲リストノード.Eノード種別.BACKBOX:
@@ -729,14 +741,16 @@ namespace TJAPlayer3
                                                         this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
                                                         this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
                                                         this.act曲リスト.bBoxClose = true;
-                                                        this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                                     }
                                                     break;
                                                 case C曲リストノード.Eノード種別.RANDOM:
                                                     {
                                                         this.t曲をランダム選択する();
 
-                                                        this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                                     }
                                                     break;
                                             }
@@ -781,8 +795,10 @@ namespace TJAPlayer3
                                 {
                                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
                                     {
-                                        this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-                                        this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        //this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        //this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.START);
+
                                         for (int i = 0; i < 7; i++) tカーソルスキップ(true);
                                     }
                                 }
@@ -803,8 +819,10 @@ namespace TJAPlayer3
                                 {
                                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
                                     {
-                                        this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-                                        this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        //this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        //this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
+                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.START);
+
                                         for (int i = 0; i < 7; i++) tカーソルスキップ(false);
                                     }
                                 }
@@ -867,8 +885,6 @@ namespace TJAPlayer3
                 }
                 //------------------------------
 
-                
-
 
                 if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
                 {
@@ -885,15 +901,21 @@ namespace TJAPlayer3
 
                     TJAPlayer3.Tx.SongSelect_Credit.t2D描画(TJAPlayer3.app.Device, 0, 0);
                 }
-                for(int i = 0; i < 2; i++)
+
+                for (int i = 0; i < 2; i++)
                 {
-                    if (this.ctDonchan_Jump[i].n現在の値 >= this.ctDonchan_Jump[i].n終了値)
+                    CCounter ___cs = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.START)[i];
+
+                    //if (this.ctDonchan_Jump[i].n現在の値 >= this.ctDonchan_Jump[i].n終了値)
+                    if (___cs != null && ___cs.n現在の値 >= ___cs.n終了値)
                     {
-                        this.ctDonchan_Jump[i].t停止();
+                        //this.ctDonchan_Jump[i].t停止();
+                        ___cs.t停止();
 
                         if (!this.act難易度選択画面.bIsDifficltSelect)
                         {
-                            this.ctDonchan_Jump[i].n現在の値 = 0;
+                            //this.ctDonchan_Jump[i].n現在の値 = 0;
+                            ___cs.n現在の値 = 0;
                         }
                     }
                 }
@@ -902,40 +924,61 @@ namespace TJAPlayer3
                 #region [Donchan & PuchiChara]
 
 
-                if (this.ctDonchan_Select.b終了値に達してない)
+                //if (this.ctDonchan_Select.b終了値に達してない)
+                CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[0];
+
+                if (___cc != null && ___cc.b終了値に達してない)
                 {
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
                     {
-                        TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.SELECT);
+
                         this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player : 1);
                     }
 
-                    TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                    //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                    CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.SELECT);
+
                     this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
                 }
                 else
                 {
+                    CCounter[] ___cj = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.START);
+
+
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
                     {
-                        if (this.ctDonchan_Jump[1].n現在の値 > 0)
+                        //if (this.ctDonchan_Jump[1].n現在の値 > 0)
+                        if (___cj[1] != null && ___cj[1].n終了値 > 0)
                         {
-                            TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[1].n現在の値 >= 17 ? 17 : ctDonchan_Jump[1].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[1].n現在の値 >= 17 ? 17 : ctDonchan_Jump[1].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.START);
+
                             this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
                         }
                         else
                         {
-                            TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
+
                             this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
                         }
                     }
-                    if (this.ctDonchan_Jump[0].n現在の値 > 0)
+
+                    //if (this.ctDonchan_Jump[0].n現在の値 > 0)
+                    if (___cj[0] != null && ___cj[0].n終了値 > 0)
                     {
-                        TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[0].n現在の値 >= 17 ? 17 : ctDonchan_Jump[0].n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[0].n現在の値 >= 17 ? 17 : ctDonchan_Jump[0].n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.START);
+
                         this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
                     }
                     else
                     {
-                        TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
+
                         this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
                     }
                 }
@@ -1160,9 +1203,9 @@ namespace TJAPlayer3
         private const int MaxSong = 3;
         public int NowSong = 1;
 
-        private CCounter ctDonchan_Normal;
-        private CCounter ctDonchan_Select;
-        public CCounter[] ctDonchan_Jump = new CCounter[2];
+        //private CCounter ctDonchan_Normal;
+        //private CCounter ctDonchan_Select;
+        //public CCounter[] ctDonchan_Jump = new CCounter[2];
 
         private PuchiChara PuchiChara;
 
