@@ -477,6 +477,78 @@ namespace TJAPlayer3
                     this.ctDiffSelect移動待ち.t進行();
 
 
+                #region [ Nameplate ]
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[i], TJAPlayer3.Skin.SongSelect_NamePlate_Y[i], i);
+                }
+                #endregion
+
+                #region [Character & PuchiChara]
+
+
+                //if (this.ctDonchan_Select.b終了値に達してない)
+                CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[0];
+
+                if (___cc != null && ___cc.b終了値に達してない)
+                {
+                    if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
+                    {
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.SELECT);
+
+                        this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
+                    }
+
+                    //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                    CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.SELECT);
+
+                    this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
+                }
+                else
+                {
+                    CCounter[] ___cj = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.START);
+
+
+                    if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
+                    {
+                        //if (this.ctDonchan_Jump[1].n現在の値 > 0)
+                        if (___cj[1] != null && ___cj[1].n終了値 > 0)
+                        {
+                            //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[1].n現在の値 >= 17 ? 17 : ctDonchan_Jump[1].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.START);
+
+                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
+                        }
+                        else
+                        {
+                            //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
+                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
+
+                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
+                        }
+                    }
+
+                    //if (this.ctDonchan_Jump[0].n現在の値 > 0)
+                    if (___cj[0] != null && ___cj[0].n終了値 > 0)
+                    {
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[0].n現在の値 >= 17 ? 17 : ctDonchan_Jump[0].n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.START);
+
+                        this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
+                    }
+                    else
+                    {
+                        //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
+                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
+
+                        this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
+                    }
+                }
+
+
+                #endregion
+
                 #region [Pad displayables]
 
                 int defaultTable = Math.Max(0, Math.Min((int)Difficulty.Edit + 1, TJAPlayer3.ConfigIni.nDefaultCourse));
@@ -573,7 +645,6 @@ namespace TJAPlayer3
                 }
 
                 #endregion
-
 
                 #region [ Inputs ]
 
@@ -1013,80 +1084,6 @@ namespace TJAPlayer3
                         }
                     }
                 }
-
-                #region [ Nameplate ]
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                {
-                    TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[i], TJAPlayer3.Skin.SongSelect_NamePlate_Y[i], i);
-                }
-                #endregion
-
-                #region [Character & PuchiChara]
-
-
-                //if (this.ctDonchan_Select.b終了値に達してない)
-                CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[0];
-
-                if (___cc != null && ___cc.b終了値に達してない)
-                {
-                    if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
-                    {
-                        //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                        CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.SELECT);
-
-                        this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player : 1);
-                    }
-
-                    //TJAPlayer3.Tx.SongSelect_Donchan_Select[ctDonchan_Select.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
-                    CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.SELECT);
-
-                    this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
-                }
-                else
-                {
-                    CCounter[] ___cj = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.START);
-
-
-                    if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
-                    {
-                        //if (this.ctDonchan_Jump[1].n現在の値 > 0)
-                        if (___cj[1] != null && ___cj[1].n終了値 > 0)
-                        {
-                            //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[1].n現在の値 >= 17 ? 17 : ctDonchan_Jump[1].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.START);
-
-                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
-                        }
-                        else
-                        {
-                            //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, 981, 330);
-                            CMenuCharacter.tMenuDisplayCharacter(1, 981, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
-
-                            this.PuchiChara.On進行描画(981 + 250, 330 + 230, false, player: 1);
-                        }
-                    }
-
-                    //if (this.ctDonchan_Jump[0].n現在の値 > 0)
-                    if (___cj[0] != null && ___cj[0].n終了値 > 0)
-                    {
-                        //TJAPlayer3.Tx.SongSelect_Donchan_Jump[ctDonchan_Jump[0].n現在の値 >= 17 ? 17 : ctDonchan_Jump[0].n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
-                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.START);
-
-                        this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
-                    }
-                    else
-                    {
-                        //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, 0, 330);
-                        CMenuCharacter.tMenuDisplayCharacter(0, 0, 330, CMenuCharacter.ECharacterAnimation.NORMAL);
-
-                        this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
-                    }
-                }
-
-
-                #endregion
-
-                
 
                 if (act難易度選択画面.bOption[0]) actPlayOption.On進行描画(0);
                 if (act難易度選択画面.bOption[1]) actPlayOption.On進行描画(1);
