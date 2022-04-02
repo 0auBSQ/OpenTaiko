@@ -469,7 +469,7 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region [ キー関連 ]
+            #region [ Inputs ]
 
             if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
@@ -540,6 +540,7 @@ namespace TJAPlayer3
                 {
                     // Reload character, a bit time expensive but with a O(N) memory complexity instead of O(N * M)
                     TJAPlayer3.Tx.ReloadCharacter(TJAPlayer3.NamePlateConfig.data.Character[iPlayer], iCharacterCurrent, iPlayer);
+                    CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
 

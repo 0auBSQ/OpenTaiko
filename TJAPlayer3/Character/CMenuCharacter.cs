@@ -140,9 +140,19 @@ namespace TJAPlayer3
                     _ctref[player].t進行();
 
                 if (player % 2 == 0)
-                    _ref[_ctref[player].n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
+                {
+                    //_ref[_ctref[player].n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
+
+                    _ref[_ctref[player].n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, x + 150, y + 156);
+                }
                 else
-                    _ref[_ctref[player].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, x, y);
+                {
+                    //_ref[_ctref[player].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, x, y);
+
+
+                    _ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(TJAPlayer3.app.Device, x + 150, y + 156);
+                }
+                    
             }
 
         }
