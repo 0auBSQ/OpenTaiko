@@ -30,27 +30,27 @@ namespace TJAPlayer3
                 {
                     case (ECharacterAnimation.NORMAL):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Loop[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_Menu_Loop[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Menu_Loop[_charaId];
-                            if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Normal[_charaId];
                             break;
                         }
                     case (ECharacterAnimation.START):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Start[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_Menu_Start[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Menu_Start[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
                         }
                     case (ECharacterAnimation.SELECT):
                         {
-                            if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Menu_Select[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId];
-                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length < 1)
+                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
                         }
