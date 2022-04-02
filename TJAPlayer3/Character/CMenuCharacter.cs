@@ -176,8 +176,8 @@ namespace TJAPlayer3
                 // Expend if substitute to match menu size
                 if (_substitute)
                 {
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1.4f;
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1.4f;
+                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1.3f;
+                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1.3f;
                 }
                     
 
@@ -186,14 +186,20 @@ namespace TJAPlayer3
                     //_ref[_ctref[player].n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
                     //_ref[_ctref[player].n現在の値].t2D中心基準描画(TJAPlayer3.app.Device, x + 150, y + 156);
 
-                    _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, x + 150, y + 312);
+                    _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, 
+                        x + 150, 
+                        y + ((_substitute == true) ? 290 : 312)
+                        );
                 }
                 else
                 {
                     //_ref[_ctref[player].n現在の値].t2D左右反転描画(TJAPlayer3.app.Device, x, y);
                     //_ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(TJAPlayer3.app.Device, x + 150, y + 156);
 
-                    _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画Mirrored(TJAPlayer3.app.Device, x + 150, y + 312);
+                    _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画Mirrored(TJAPlayer3.app.Device, 
+                        x + 150, 
+                        y + ((_substitute == true) ? 290 : 312)
+                        );
                 }
 
                 // Restore if substitute to avoid breaking in-game display
