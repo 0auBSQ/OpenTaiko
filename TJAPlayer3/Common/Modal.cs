@@ -157,7 +157,7 @@ namespace TJAPlayer3
                     : _pfModalTitleHalf, 
                 Color.White, 
                 Color.Black, 
-                700);
+                1800);
 
             string content = "";
 
@@ -178,7 +178,7 @@ namespace TJAPlayer3
                     : _pfModalContentHalf,
                 Color.White,
                 Color.Black,
-                700);
+                1800);
 
             _ModalText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_content);
             _ModalTitle = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_title);
