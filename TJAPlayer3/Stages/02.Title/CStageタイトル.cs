@@ -201,6 +201,7 @@ namespace TJAPlayer3
                         {
 							// Hit 1P banapass
 							TJAPlayer3.SaveFile = 0;
+							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
 							for (int i = 0; i < 2; i++)
@@ -210,6 +211,7 @@ namespace TJAPlayer3
                         {
 							// Hit 2P banapass
 							TJAPlayer3.SaveFile = 1;
+							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 							this.ctバナパス読み込み待機.t開始(0, 600, 1, TJAPlayer3.Timer);
 							this.ctバナパス読み込み待機.n現在の値 = (int)this.ctバナパス読み込み待機.n終了値;
 							for (int i = 0; i < 2; i++)
