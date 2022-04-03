@@ -395,7 +395,7 @@ namespace TJAPlayer3
                 tSoulDraw(scroll + 370 + Anime, 462, stバー情報[currentSong].List_DanSongs[0].Dan_C[0].Value[0].ToString());
 
             //TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D下中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 396 + Anime), 452);
-            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 396 + Anime), 427);
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 396 + Anime), 429);
 
             #endregion
 
@@ -514,7 +514,7 @@ namespace TJAPlayer3
                     tmpTex.Opacity = opacity;
                     //tmpTex.t2D下中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 614 + Anime), 452 + index * 88);
 
-                    tmpTex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 614 + Anime), 427 + index * 88);
+                    tmpTex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)(scroll + 614 + Anime), 429 + index * 88);
                 }
 
                 #endregion
