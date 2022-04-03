@@ -1868,9 +1868,9 @@ namespace TJAPlayer3
 		    sw.WriteLine();
 
 			#region [ Adjust ]
-			sw.WriteLine( "; 判定タイミング調整(-99～99)[ms]" );
-			sw.WriteLine("; Revision value to adjust judgment timing.");	//
-			sw.WriteLine("InputAdjustTime={0}", this.nInputAdjustTimeMs);       //
+			//sw.WriteLine( "; 判定タイミング調整(-9999～9999)[ms]" );
+			//sw.WriteLine("; Revision value to adjust judgment timing.");	//
+			//sw.WriteLine("InputAdjustTime={0}", this.nInputAdjustTimeMs);       //
 			sw.WriteLine("GlobalOffset={0}", this.nGlobalOffsetMs);
 			sw.WriteLine();
 
@@ -1898,6 +1898,7 @@ namespace TJAPlayer3
             sw.WriteLine(";-------------------");
             #endregion
 
+			/*
             #region [ HitRange ]
             sw.WriteLine("[HitRange]");
             sw.WriteLine();
@@ -1908,6 +1909,7 @@ namespace TJAPlayer3
             sw.WriteLine();
             sw.WriteLine(";-------------------");
             #endregion
+			*/
 
             #region [ Log ]
             sw.WriteLine( "[Log]" );
@@ -2534,13 +2536,15 @@ namespace TJAPlayer3
 												this.bTimeStretch = C変換.bONorOFF( str4[ 0 ] );
 											}
 											#region [ AdjustTime ]
+											/*
 											else if( str3.Equals( "InputAdjustTime" ) )
 											{
-												this.nInputAdjustTimeMs = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, -99, 99, this.nInputAdjustTimeMs );
+												this.nInputAdjustTimeMs = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, -9999, 9999, this.nInputAdjustTimeMs );
 											}
+											*/
 											else if (str3.Equals("GlobalOffset"))
                                             {
-												this.nGlobalOffsetMs = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, -99, 99, this.nGlobalOffsetMs);
+												this.nGlobalOffsetMs = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, -9999, 9999, this.nGlobalOffsetMs);
 											}
 											else if ( str3.Equals( "JudgeLinePosOffsetDrums" ) )		// #31602 2013.6.23 yyagi
 											{

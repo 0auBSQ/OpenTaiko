@@ -356,11 +356,14 @@ namespace TJAPlayer3
 
 
 			// #23580 2011.1.3 yyagi
-			this.iInputAdjustTimeMs = new CItemInteger(CLangManager.LangInstance.GetString(78), -99, 99, TJAPlayer3.ConfigIni.nInputAdjustTimeMs,
+			
+			/*
+			this.iInputAdjustTimeMs = new CItemInteger(CLangManager.LangInstance.GetString(78), -9999, 9999, TJAPlayer3.ConfigIni.nInputAdjustTimeMs,
 				CLangManager.LangInstance.GetString(79));
 			this.list項目リスト.Add( this.iInputAdjustTimeMs );
+			*/
 
-			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString(14), -99, 99, TJAPlayer3.ConfigIni.nGlobalOffsetMs,
+			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString(14), -9999, 9999, TJAPlayer3.ConfigIni.nGlobalOffsetMs,
 				CLangManager.LangInstance.GetString(15));
 			this.list項目リスト.Add(this.iGlobalOffsetMs);
 

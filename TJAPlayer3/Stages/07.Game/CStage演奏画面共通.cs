@@ -2345,28 +2345,37 @@ namespace TJAPlayer3
 			{
 				this.t入力処理_ドラム();
 
-				if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.UpArrow ) && ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
+
+                // Individual offset
+				if (keyboard.bキーが押された( (int)SlimDXKeys.Key.UpArrow ) && ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
 				{	// shift (+ctrl) + UpArrow (BGMAdjust)
 					TJAPlayer3.DTX.t各自動再生音チップの再生時刻を変更する( ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftControl ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightControl ) ) ? 1 : 10 );
 					TJAPlayer3.DTX.tWave再生位置自動補正();
 				}
-				else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.DownArrow ) && ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
+				else if (keyboard.bキーが押された( (int)SlimDXKeys.Key.DownArrow ) && ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightShift ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftShift ) ) )
 				{	// shift + DownArrow (BGMAdjust)
 					TJAPlayer3.DTX.t各自動再生音チップの再生時刻を変更する( ( keyboard.bキーが押されている( (int)SlimDXKeys.Key.LeftControl ) || keyboard.bキーが押されている( (int)SlimDXKeys.Key.RightControl ) ) ? -1 : -10 );
 					TJAPlayer3.DTX.tWave再生位置自動補正();
 				}
-				else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.UpArrow ) )
+                // Tokkun only
+                else if (TJAPlayer3.ConfigIni.bTokkunMode && 
+                    keyboard.bキーが押された( (int)SlimDXKeys.Key.UpArrow ) )
 				{	// UpArrow(scrollspeed up)
 					ドラムスクロール速度アップ();
 				}
-				else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.DownArrow ) )
+				else if (TJAPlayer3.ConfigIni.bTokkunMode && 
+                    keyboard.bキーが押された( (int)SlimDXKeys.Key.DownArrow ) )
 				{	// DownArrow (scrollspeed down)
 					ドラムスクロール速度ダウン();
 				}
-				else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.Delete ) )
+				else if (TJAPlayer3.ConfigIni.bTokkunMode &&
+                    keyboard.bキーが押された( (int)SlimDXKeys.Key.Delete ) )
 				{	// del (debug info)
 					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
 				}
+
+                
+                /*
 				else if ( keyboard.bキーが押された( (int)SlimDXKeys.Key.LeftArrow ) )		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
 				{
 					ChangeInputAdjustTimeInPlaying( keyboard, -1 );
@@ -2375,6 +2384,8 @@ namespace TJAPlayer3
 				{
 					ChangeInputAdjustTimeInPlaying( keyboard, +1 );
 				}
+                */
+                
 				else if ( ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ) && ( keyboard.bキーが押された( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) ) && !this.actPauseMenu.bIsActivePopupMenu )
 				{	// escape (exit)
                     if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
