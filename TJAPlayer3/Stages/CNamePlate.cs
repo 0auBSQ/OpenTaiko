@@ -77,7 +77,7 @@ namespace TJAPlayer3
                 txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
             */
 
-            txTitle[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(name, pfTitle, Color.Black, Color.Empty, 1000));
+            txTitle[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(title, pfTitle, Color.Black, Color.Empty, 1000));
             txName[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(name, pfName, Color.White, Color.Black, 1000));
             txdan[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
 
