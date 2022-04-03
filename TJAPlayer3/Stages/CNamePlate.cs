@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -65,14 +66,22 @@ namespace TJAPlayer3
                 dan = TJAPlayer3.NamePlateConfig.data.Dan[player];
             }
 
+            /*
             using (var tex = pfName.DrawPrivateFont(name, Color.White, Color.Black, 25))
                 txName[player] = TJAPlayer3.tテクスチャの生成(tex);
-
+            */
+            
             using (var tex = pfTitle.DrawPrivateFont(title, Color.Black, Color.Empty))
                 txTitle[player] = TJAPlayer3.tテクスチャの生成(tex);
-
+            
+            /*
             using (var tex = pfdan.DrawPrivateFont(dan, Color.White, Color.Black, 22))
                 txdan[player] = TJAPlayer3.tテクスチャの生成(tex);
+            */
+
+            txName[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(name, pfName, Color.White, Color.Black, 1000));
+            txdan[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
+
         }
 
 

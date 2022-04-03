@@ -204,6 +204,17 @@
 306 : Coins
 307 : Total (coins)
 
+# In-game pause menu (0090X)
+
+900 : Continue
+901 : Restart
+902 : Exit
+
+# AI nameplate informations (0091X)
+
+910 : AI
+911 : Deus-ex-machina
+
 # Tower text (0100X)
 
 1000 : Reached floor (Tower)
@@ -240,27 +251,7 @@
 1044 : Extra (Ura)
 1045 : Extreme / Extra
 
-# Feature specific errors (9XXXX)
-
-90000 : "Invalid condition" error message
-90001 : "You can buy it at the Shop" condition/failed condition message (cs)
-90002 : "Coin price : " condition message (ch)
-90003 : "Item bought !" succeed condition message (ch)
-90004 : "Not enough coins !" failed condition message (ch)
-90005 : "The following condition : " missing arguments error message
-
-# In-game pause menu (90X)
-
-900 : Continue
-901 : Restart
-902 : Exit
-
-# AI nameplate informations (91X)
-
-910 : AI
-911 : Deus-ex-machina
-
-# Song selection page options (900X)
+# Song selection page options (0900X)
 
 9000 : Off
 9001 : On
@@ -277,4 +268,21 @@
 9013 : Auto
 9014 : Voice
 9015 : Sound Type
+
+# Song selection context boxes (091XX)
+
+9100 : Search (Difficulty)
+9101 : Difficulty
+9102 : Level
+
+# Feature specific errors (9XXXX)
+
+90000 : "Invalid condition" error message
+90001 : "You can buy it at the Shop" condition/failed condition message (cs)
+90002 : "Coin price : " condition message (ch)
+90003 : "Item bought !" succeed condition message (ch)
+90004 : "Not enough coins !" failed condition message (ch)
+90005 : "The following condition : " missing arguments error message
+
+
 ```

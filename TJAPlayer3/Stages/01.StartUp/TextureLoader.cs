@@ -158,16 +158,6 @@ namespace TJAPlayer3
             Entry_Player[1] = TxC(TITLE + @"Entry_Player_Select_Bar.png");
             Entry_Player[2] = TxC(TITLE + @"Entry_Player_Select.png");
 
-            for(int i = 0; i < Donchan_Entry.Length; i++)
-            {
-                Donchan_Entry[i] = TxC(TITLE + @"Donchan_Entry\" + i.ToString() + ".png");
-            }
-
-            for(int i = 0; i < Entry_Donchan_Normal.Length; i++)
-            {
-                Entry_Donchan_Normal[i] = TxC(TITLE + @"Donchan_Normal\" + i.ToString() + ".png");
-            }
-
             for(int i = 0; i < 8; i++)
             {
                 ModeSelect_Bar[i] = TxC(TITLE + @"ModeSelect_Bar_" + i.ToString() + ".png");
@@ -236,21 +226,6 @@ namespace TJAPlayer3
             {
                 SongSelect_ScoreWindow[i] = TxC(SONGSELECT + @"ScoreWindow_" + i.ToString() + ".png");
             }
-
-            /*
-            for (int i = 0; i < SongSelect_Donchan_Select.Length; i++)
-            {
-                SongSelect_Donchan_Select[i] = TxC(SONGSELECT + @"Donchan\Select\" + i.ToString() + ".png");
-            }
-            for (int i = 0; i < SongSelect_Donchan_Normal.Length; i++)
-            {
-                SongSelect_Donchan_Normal[i] = TxC(SONGSELECT + @"Donchan\Loop\" + i.ToString() + ".png");
-            }
-            for (int i = 0; i < SongSelect_Donchan_Jump.Length; i++)
-            {
-                SongSelect_Donchan_Jump[i] = TxC(SONGSELECT + @"Donchan\Start\" + i.ToString() + ".png");
-            }
-            */
 
             SongSelect_ScoreWindow_Text = TxC(SONGSELECT + @"ScoreWindow_Text.png");
 
@@ -1397,12 +1372,6 @@ namespace TJAPlayer3
         public CTexture[] Banapas_Load_Clear = new CTexture[2];
         public CTexture[] Banapas_Load_Failure = new CTexture[2];
         public CTexture[] Entry_Player = new CTexture[3];
-        
-        // To remove soon
-        public CTexture[] Donchan_Entry = new CTexture[44];
-        public CTexture[] Entry_Donchan_Normal = new CTexture[13];
-
-
         public CTexture[] ModeSelect_Bar = new CTexture[9];
         public CTexture[] ModeSelect_Bar_Chara = new CTexture[8];
 
@@ -1461,11 +1430,6 @@ namespace TJAPlayer3
             SongSelect_Box_Chara,
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[2],
-            /*
-            SongSelect_Donchan_Select = new CTexture[47],
-            SongSelect_Donchan_Normal = new CTexture[49],
-            SongSelect_Donchan_Jump = new CTexture[18],
-            */
             SongSelect_NamePlate = new CTexture[1],
             SongSelect_Table = new CTexture[6];
 
@@ -1526,22 +1490,8 @@ namespace TJAPlayer3
             Bar,
             Bar_Branch;
         #endregion
-        #region キャラクター
-        public CTexture[] Chara_Normal,
-            Chara_Normal_Cleared,
-            Chara_Normal_Maxed,
-            Chara_GoGoTime,
-            Chara_GoGoTime_Maxed,
-            Chara_10Combo,
-            Chara_10Combo_Maxed,
-            Chara_GoGoStart,
-            Chara_GoGoStart_Maxed,
-            Chara_Become_Cleared,
-            Chara_Become_Maxed,
-            Chara_Balloon_Breaking,
-            Chara_Balloon_Broke,
-            Chara_Balloon_Miss;
-        #endregion
+
+
         #region 踊り子
         public CTexture[][] Dancer;
         #endregion
