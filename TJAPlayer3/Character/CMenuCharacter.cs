@@ -220,7 +220,7 @@ namespace TJAPlayer3
             CCounter[] _ctref = _getReferenceCounter(eca);
             bool _substitute = _usesSubstituteTexture(player, eca);
 
-            if (_ctref[player] != null)
+            if (_ctref[player] != null && _ref != null && _ctref[player].n現在の値 < _ref.Length)
             {
                 if (eca == ECharacterAnimation.NORMAL
                     || eca == ECharacterAnimation.ENTRY

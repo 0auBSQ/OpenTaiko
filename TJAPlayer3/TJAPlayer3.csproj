@@ -120,6 +120,7 @@
     <Compile Include="Animations\FadeOut.cs" />
     <Compile Include="Animations\IAnimatable.cs" />
     <Compile Include="Animations\Linear.cs" />
+    <Compile Include="Character\CResultCharacter.cs" />
     <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
