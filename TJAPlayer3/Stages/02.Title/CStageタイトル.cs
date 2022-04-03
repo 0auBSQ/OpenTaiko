@@ -149,8 +149,8 @@ namespace TJAPlayer3
 				this.ctエントリーバー点滅.t進行Loop();
 				this.ctエントリーバー決定点滅.t進行();
 				this.ctどんちゃんイン.t進行();
-				this.ctどんちゃんループ.t進行Loop();
-				this.ctどんちゃんエントリーループ.t進行Loop();
+				//this.ctどんちゃんループ.t進行Loop();
+				//this.ctどんちゃんエントリーループ.t進行Loop();
 				this.ctBarMove.t進行();
 
 				if (!TJAPlayer3.Skin.bgmタイトルイン.b再生中)
@@ -509,7 +509,9 @@ namespace TJAPlayer3
 				{
 					if (!this.bどんちゃんカウンター初期化)
 					{
-						this.ctどんちゃんエントリーループ = new CCounter(0, TJAPlayer3.Tx.Donchan_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+						//this.ctどんちゃんエントリーループ = new CCounter(0, TJAPlayer3.Tx.Donchan_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
+
 						this.bどんちゃんカウンター初期化 = true;
 					}
 
@@ -518,12 +520,20 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Entry_Player[0].Opacity = alpha;
 					TJAPlayer3.Tx.Entry_Player[1].Opacity = alpha;
 
+					var ___ttx = CMenuCharacter._getReferenceArray(0, CMenuCharacter.ECharacterAnimation.ENTRY)
+						[CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.ENTRY)[0].n現在の値];
+					___ttx.Opacity = alpha;
 
-					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
+					//TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
 
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
-					TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
+					//TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
+					CMenuCharacter.tMenuDisplayCharacter(0, 485, 140, CMenuCharacter.ECharacterAnimation.ENTRY);
+
+					___ttx.Opacity = 255;
+
+
 					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
 
 					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
@@ -579,7 +589,8 @@ namespace TJAPlayer3
 					DonchanX = (float)Math.Sin(ctどんちゃんイン.n現在の値 / 2 * (Math.PI / 180)) * 200f;
 					DonchanY = ( (float)Math.Sin((90 + (ctどんちゃんイン.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
 
-					TJAPlayer3.Tx.Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 341 - DonchanY);
+					//TJAPlayer3.Tx.Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 341 - DonchanY);
+					CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(341 - DonchanY), CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 
 					this.PuchiChara.On進行描画(0 + 100, 330 + 230, false);
 
@@ -849,9 +860,14 @@ namespace TJAPlayer3
 			this.ctバナパス読み込み失敗 = new CCounter();
 			this.ctエントリーバー点滅 = new CCounter(0, 510, 2, TJAPlayer3.Timer);
 			this.ctエントリーバー決定点滅 = new CCounter();
-			this.ctどんちゃんエントリーループ = new CCounter();
+
+			//this.ctどんちゃんエントリーループ = new CCounter();
+			CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
 			this.ctどんちゃんイン = new CCounter();
-			this.ctどんちゃんループ = new CCounter(0, TJAPlayer3.Tx.Entry_Donchan_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
+			//this.ctどんちゃんループ = new CCounter(0, TJAPlayer3.Tx.Entry_Donchan_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
+			CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
+
+
 			this.ctBarAnimeIn = new CCounter();
 			this.ctBarMove = new CCounter();
 			this.ctBarMove.n現在の値 = 250;
@@ -879,9 +895,9 @@ namespace TJAPlayer3
 		private CCounter ctエントリーバー点滅;
 		private CCounter ctエントリーバー決定点滅;
 
-		private CCounter ctどんちゃんエントリーループ;
+		//private CCounter ctどんちゃんエントリーループ;
 		private CCounter ctどんちゃんイン;
-		private CCounter ctどんちゃんループ;
+		//private CCounter ctどんちゃんループ;
 
 		private CCounter ctBarAnimeIn;
 		private CCounter ctBarMove;

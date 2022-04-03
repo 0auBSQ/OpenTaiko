@@ -12,12 +12,18 @@ namespace TJAPlayer3
         private static CCounter[] ctCharacterNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterSelect = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterStart = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntry = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntryNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
         public enum ECharacterAnimation
         {
+            // Song select
             NORMAL,
             START,
-            SELECT
+            SELECT,
+            // Main menu
+            ENTRY,
+            ENTRY_NORMAL,
         }
 
 
@@ -47,13 +53,25 @@ namespace TJAPlayer3
                                 return false;
                             break;
                         }
+                    case (ECharacterAnimation.ENTRY):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Title_Entry[_charaId].Length > 0)
+                                return false;
+                            break;
+                        }
+                    case (ECharacterAnimation.ENTRY_NORMAL):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Title_Normal[_charaId].Length > 0)
+                                return false;
+                            break;
+                        }
                 }
             }
 
             return true;
         }
 
-        private static CTexture[] _getReferenceArray(int player, ECharacterAnimation eca)
+        public static CTexture[] _getReferenceArray(int player, ECharacterAnimation eca)
         {
             int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
 
@@ -87,6 +105,22 @@ namespace TJAPlayer3
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
                             break;
                         }
+                    case (ECharacterAnimation.ENTRY):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Title_Entry[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_Title_Entry[_charaId];
+                            if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_10Combo[_charaId];
+                            break;
+                        }
+                    case (ECharacterAnimation.ENTRY_NORMAL):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Title_Normal[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_Title_Normal[_charaId];
+                            if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_Normal[_charaId];
+                            break;
+                        }
                 }
             }
 
@@ -109,6 +143,14 @@ namespace TJAPlayer3
                 case (ECharacterAnimation.SELECT):
                     {
                         return ctCharacterSelect;
+                    }
+                case (ECharacterAnimation.ENTRY):
+                    {
+                        return ctCharacterEntry;
+                    }
+                case (ECharacterAnimation.ENTRY_NORMAL):
+                    {
+                        return ctCharacterEntryNormal;
                     }
             }
             return null;
@@ -134,6 +176,18 @@ namespace TJAPlayer3
                     {
                         for (int i = 0; i < 4; i++)
                             ctCharacterSelect[i] = new CCounter();
+                        break;
+                    }
+                case (ECharacterAnimation.ENTRY):
+                    {
+                        for (int i = 0; i < 4; i++)
+                            ctCharacterEntry[i] = new CCounter();
+                        break;
+                    }
+                case (ECharacterAnimation.ENTRY_NORMAL):
+                    {
+                        for (int i = 0; i < 4; i++)
+                            ctCharacterEntryNormal[i] = new CCounter();
                         break;
                     }
             }
@@ -168,7 +222,9 @@ namespace TJAPlayer3
 
             if (_ctref[player] != null)
             {
-                if (eca == ECharacterAnimation.NORMAL)
+                if (eca == ECharacterAnimation.NORMAL
+                    || eca == ECharacterAnimation.ENTRY
+                    || eca == ECharacterAnimation.ENTRY_NORMAL)
                     _ctref[player].t進行Loop();
                 else
                     _ctref[player].t進行();

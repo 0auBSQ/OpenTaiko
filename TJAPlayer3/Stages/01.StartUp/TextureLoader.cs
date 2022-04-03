@@ -236,6 +236,8 @@ namespace TJAPlayer3
             {
                 SongSelect_ScoreWindow[i] = TxC(SONGSELECT + @"ScoreWindow_" + i.ToString() + ".png");
             }
+
+            /*
             for (int i = 0; i < SongSelect_Donchan_Select.Length; i++)
             {
                 SongSelect_Donchan_Select[i] = TxC(SONGSELECT + @"Donchan\Select\" + i.ToString() + ".png");
@@ -248,6 +250,7 @@ namespace TJAPlayer3
             {
                 SongSelect_Donchan_Jump[i] = TxC(SONGSELECT + @"Donchan\Start\" + i.ToString() + ".png");
             }
+            */
 
             SongSelect_ScoreWindow_Text = TxC(SONGSELECT + @"ScoreWindow_Text.png");
 
@@ -1458,9 +1461,11 @@ namespace TJAPlayer3
             SongSelect_Box_Chara,
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[2],
+            /*
             SongSelect_Donchan_Select = new CTexture[47],
             SongSelect_Donchan_Normal = new CTexture[49],
             SongSelect_Donchan_Jump = new CTexture[18],
+            */
             SongSelect_NamePlate = new CTexture[1],
             SongSelect_Table = new CTexture[6];
 
