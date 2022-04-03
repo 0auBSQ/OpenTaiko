@@ -214,7 +214,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterAnimation eca)
+        public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterAnimation eca, int opacity = 255)
         {
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
@@ -235,7 +235,8 @@ namespace TJAPlayer3
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1.3f;
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1.3f;
                 }
-                    
+
+                _ref[_ctref[player].n現在の値].Opacity = opacity;
 
                 if (player % 2 == 0)
                 {
@@ -244,7 +245,7 @@ namespace TJAPlayer3
 
                     _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, 
                         x + 150, 
-                        y + ((_substitute == true) ? 290 : 312)
+                        y + ((_substitute == true) ? 290 : _ref[_ctref[player].n現在の値].szテクスチャサイズ.Height) // 312
                         );
                 }
                 else
@@ -254,7 +255,7 @@ namespace TJAPlayer3
 
                     _ref[_ctref[player].n現在の値].t2D拡大率考慮下中心基準描画Mirrored(TJAPlayer3.app.Device, 
                         x + 150, 
-                        y + ((_substitute == true) ? 290 : 312)
+                        y + ((_substitute == true) ? 290 : _ref[_ctref[player].n現在の値].szテクスチャサイズ.Height) // 312
                         );
                 }
 
@@ -264,6 +265,8 @@ namespace TJAPlayer3
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1f;
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1f;
                 }
+
+                _ref[_ctref[player].n現在の値].Opacity = 255;
 
             }
 

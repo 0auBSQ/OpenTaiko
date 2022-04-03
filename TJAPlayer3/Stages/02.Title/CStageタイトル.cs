@@ -520,18 +520,20 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Entry_Player[0].Opacity = alpha;
 					TJAPlayer3.Tx.Entry_Player[1].Opacity = alpha;
 
+					/*
 					var ___ttx = CMenuCharacter._getReferenceArray(0, CMenuCharacter.ECharacterAnimation.ENTRY)
 						[CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.ENTRY)[0].n現在の値];
 					___ttx.Opacity = alpha;
+					*/
 
 					//TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
 
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 					//TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
-					CMenuCharacter.tMenuDisplayCharacter(0, 485, 140, CMenuCharacter.ECharacterAnimation.ENTRY);
+					CMenuCharacter.tMenuDisplayCharacter(0, 485, 140, CMenuCharacter.ECharacterAnimation.ENTRY, alpha);
 
-					___ttx.Opacity = 255;
+					//___ttx.Opacity = 255;
 
 
 					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
