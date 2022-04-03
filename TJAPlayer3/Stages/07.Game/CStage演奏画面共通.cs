@@ -2368,8 +2368,8 @@ namespace TJAPlayer3
 				{	// DownArrow (scrollspeed down)
 					ドラムスクロール速度ダウン();
 				}
-				else if (TJAPlayer3.ConfigIni.bTokkunMode &&
-                    keyboard.bキーが押された( (int)SlimDXKeys.Key.Delete ) )
+                // Debug mode
+				else if (keyboard.bキーが押された( (int)SlimDXKeys.Key.Delete ) )
 				{	// del (debug info)
 					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
 				}
