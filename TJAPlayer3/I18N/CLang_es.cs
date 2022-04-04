@@ -321,6 +321,10 @@ namespace TJAPlayer3
             [9013] = "Auto",
             [9014] = "Voz",
             [9015] = "Instrumento",
+            
+            [9100] = "Buscar (Dificultad)",
+            [9101] = "Dificultad",
+            [9102] = "Nivel",
         };
     }
 }
