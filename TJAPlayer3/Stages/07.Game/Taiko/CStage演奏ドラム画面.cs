@@ -907,8 +907,8 @@ namespace TJAPlayer3
 
 		protected override void t入力処理_ドラム()
 		{
-            // Input adjust here
-		    var nInputAdjustTimeMs = TJAPlayer3.ConfigIni.nInputAdjustTimeMs;
+            // Input adjust deprecated
+            var nInputAdjustTimeMs = 0; // TJAPlayer3.ConfigIni.nInputAdjustTimeMs;
 
 			for( int nPad = 0; nPad < (int) Eパッド.MAX; nPad++ )		// #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																		//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
