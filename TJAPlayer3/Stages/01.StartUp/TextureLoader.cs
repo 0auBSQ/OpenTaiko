@@ -807,18 +807,6 @@ namespace TJAPlayer3
             for (int i = 0; i < 3; i++)
                 Result_Crown[i] = TxC(RESULT + @"Crown\Crown_" + i.ToString() + ".png");
 
-            for (int i = 0; i < Result_Donchan_Normal.Length; i++)
-                Result_Donchan_Normal[i] = TxC(RESULT + @"Result_Donchan_Normal\" + i.ToString() + ".png");
-
-            for (int i = 0; i < Result_Donchan_Clear.Length; i++)
-                Result_Donchan_Clear[i] = TxC(RESULT + @"Result_Donchan_Clear\" + i.ToString() + ".png");
-
-            for (int i = 0; i < Result_Donchan_Failed.Length; i++)
-                Result_Donchan_Failed[i] = TxC(RESULT + @"Result_Donchan_Failed\" + i.ToString() + ".png");
-
-            for (int i = 0; i < Result_Donchan_Failed_In.Length; i++)
-                Result_Donchan_Failed_In[i] = TxC(RESULT + @"Result_Donchan_Failed_In\" + i.ToString() + ".png");
-
             #endregion
 
             #region 7_終了画面
@@ -1686,10 +1674,6 @@ namespace TJAPlayer3
             Result_Rainbow = new CTexture[41],
             Result_Background = new CTexture[3],
             Result_Crown = new CTexture[3],
-            Result_Donchan_Normal = new CTexture[28],
-            Result_Donchan_Clear = new CTexture[38],
-            Result_Donchan_Failed = new CTexture[29],
-            Result_Donchan_Failed_In = new CTexture[15],
 
             Result_Flower_Rotate = new CTexture[5],
             Result_Work = new CTexture[3],

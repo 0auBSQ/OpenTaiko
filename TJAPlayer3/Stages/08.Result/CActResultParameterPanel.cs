@@ -237,22 +237,8 @@ namespace TJAPlayer3
 				ctRotate_Flowers = new CCounter(0, 1500, 1, TJAPlayer3.Timer);
 				ctShine_Plate = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
 
-				/*
-				ctDonchan_Normal = new CCounter[2];
-				ctDonchan_Clear = new CCounter[2];
-				ctDonchan_Failed = new CCounter[2];
-				ctDonchan_Failed_In = new CCounter[2];
-				*/
-
 				for (int i = 0; i < 2; i++)
                 {
-					/*
-					ctDonchan_Normal[i] = new CCounter(0, TJAPlayer3.Tx.Result_Donchan_Normal.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-					ctDonchan_Clear[i] = new CCounter();
-					ctDonchan_Failed[i] = new CCounter();
-					ctDonchan_Failed_In[i] = new CCounter();
-					*/
-
 					CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
 					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.CLEAR);
 					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.FAILED);
@@ -305,16 +291,6 @@ namespace TJAPlayer3
 			ctBackgroundAnime.t進行Loop();
 			ctMountain_ClearIn.t進行();
 
-			/*
-			for (int i = 0; i < 2; i++)
-            {
-				ctDonchan_Clear[i].t進行Loop();
-				ctDonchan_Failed[i].t進行Loop();
-				ctDonchan_Failed_In[i].t進行();
-				ctDonchan_Normal[i].t進行Loop();
-			}
-			*/
-			
 			ctFlash_Icon.t進行Loop();
 			ctRotate_Flowers.t進行Loop();
 			ctShine_Plate.t進行Loop();
@@ -615,23 +591,11 @@ namespace TJAPlayer3
 
 						if (gaugeValues[p] >= 80.0f)
 						{
-							/*
-							if (!this.ctDonchan_Clear[p].b進行中)
-								this.ctDonchan_Clear[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Clear.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-							*/
-
 							if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 								CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.CLEAR);
 						}
 						else
 						{
-							/*
-							if (!this.ctDonchan_Failed_In[p].b進行中)
-								this.ctDonchan_Failed_In[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed_In.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-							else if (this.ctDonchan_Failed_In[p].b終了値に達した && !this.ctDonchan_Failed[p].b進行中)
-								this.ctDonchan_Failed[p].t開始(0, TJAPlayer3.Tx.Result_Donchan_Failed.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-							*/
-
 							if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED_IN))
 								CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.FAILED_IN);
 							else if (CResultCharacter.tIsCounterEnded(p, CResultCharacter.ECharacterResult.FAILED_IN)
@@ -648,25 +612,6 @@ namespace TJAPlayer3
 					}
 
 					#region [Character Animations]
-
-					/*
-					if (this.ctDonchan_Clear[p].b進行中)
-					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Clear[ctDonchan_Clear[p].n現在の値], 202, 532, pos, 0.8f);
-					}
-					else if (this.ctDonchan_Failed[p].b進行中)
-					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed[ctDonchan_Failed[p].n現在の値], 202, 532, pos, 0.8f);
-					}
-					else if (this.ctDonchan_Failed_In[p].b進行中)
-					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Failed_In[ctDonchan_Failed_In[p].n現在の値], 202, 532, pos, 0.8f);
-					}
-					else
-					{
-						DisplayCharacter(TJAPlayer3.Tx.Result_Donchan_Normal[ctDonchan_Normal[p].n現在の値], 202, 532, pos, 0.8f);
-					}
-					*/
 
 					if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 						CResultCharacter.tMenuDisplayCharacter(p, 202, 532, CResultCharacter.ECharacterResult.CLEAR, pos);
@@ -844,13 +789,6 @@ namespace TJAPlayer3
 		public CCounter ctBackgroundAnime;
 		public CCounter ctBackgroundAnime_Clear;
 
-		/*
-		private CCounter[] ctDonchan_Normal;
-		private CCounter[] ctDonchan_Clear;
-		private CCounter[] ctDonchan_Failed;
-		private CCounter[] ctDonchan_Failed_In;
-		*/
-
 		private int RandomText;
 
 		private CCounter ctFlash_Icon;
@@ -910,26 +848,6 @@ namespace TJAPlayer3
 				x += 22;
 			}
 		}
-
-		/*
-		public void DisplayCharacter(CTexture tex, int x, int y, int pos, float ratio)
-        {
-			if (tex == null)
-				return;
-
-			tex.vc拡大縮小倍率.X = ratio;
-			tex.vc拡大縮小倍率.Y = ratio;
-
-			if (pos == 0)
-				tex.t2D中心基準描画(TJAPlayer3.app.Device, x, y);
-			else
-				tex.t2D左右反転描画(TJAPlayer3.app.Device, 
-					1340 - x - tex.szテクスチャサイズ.Width / 2, 
-					y - tex.szテクスチャサイズ.Height / 2);
-		}
-		*/
-
-
 		private void t大文字表示(int x, int y, string str)
 		{
 			this.t大文字表示(x, y, str, false);
