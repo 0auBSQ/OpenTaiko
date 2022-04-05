@@ -218,6 +218,9 @@ namespace TJAPlayer3
                 else
                     _ctref[player].t進行();
 
+                // Quick fix
+                if (_ctref[player].n現在の値 >= _ref.Length) return;
+
                 // x0.8 if not substitute
                 if (!_substitute)
                 {
@@ -230,15 +233,15 @@ namespace TJAPlayer3
                 if (pos % 2 == 0)
                 {
                     _ref[_ctref[player].n現在の値].t2D中心基準描画(TJAPlayer3.app.Device,
-                        x,
-                        y + ((_substitute == true) ? 90 : 0)
+                        x - ((_substitute == true) ? 20 : 0),
+                        y - ((_substitute == true) ? 20 : 0)
                         );
                 }
                 else
                 {
                     _ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(TJAPlayer3.app.Device,
-                        1340 - x,
-                        y + ((_substitute == true) ? 90 : 0)
+                        1340 - x - ((_substitute == true) ? 20 : 0),
+                        y - ((_substitute == true) ? 20 : 0)
                         );
                 }
 

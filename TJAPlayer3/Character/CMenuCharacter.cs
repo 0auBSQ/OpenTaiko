@@ -229,6 +229,9 @@ namespace TJAPlayer3
                 else
                     _ctref[player].t進行();
 
+                // Quick fix
+                if (_ctref[player].n現在の値 >= _ref.Length) return;
+
                 // Expend if substitute to match menu size
                 if (_substitute)
                 {
