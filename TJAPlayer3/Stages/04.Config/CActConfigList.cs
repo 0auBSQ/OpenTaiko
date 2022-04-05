@@ -1500,7 +1500,7 @@ namespace TJAPlayer3
             
 			TJAPlayer3.ConfigIni.bTight = this.iDrumsTight.bON;
 
-		    TJAPlayer3.ConfigIni.nInputAdjustTimeMs = this.iInputAdjustTimeMs.n現在の値;
+		    //TJAPlayer3.ConfigIni.nInputAdjustTimeMs = this.iInputAdjustTimeMs.n現在の値;
 
 			TJAPlayer3.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 
