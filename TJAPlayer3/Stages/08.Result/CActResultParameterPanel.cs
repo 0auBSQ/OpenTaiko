@@ -254,6 +254,9 @@ namespace TJAPlayer3
 					*/
 
 					CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
+					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.CLEAR);
+					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.FAILED);
+					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.FAILED_IN);
 				}
 				
 
