@@ -11,7 +11,7 @@ English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
 TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
 旧名称 TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： v0.5.3
+- 現在のバージョン： v0.5.3.1
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -117,17 +117,30 @@ System/Graphicsではなく
 System/（スキン名）/Graphicsにフォルダを配置してください。
 ```
 
-- 「11_Characters」が見つからないというエラーが出ます！
+- 追加したキャラクター・プチキャラが表示されていません。
 
 ```
-v0.5.2から11_Charactersにキャラクターに関してファイルが読み込みされます。
-
-「（スキン名）/Graphics」フォルダーに11_Charactersフォルダーを作って、「（スキン名）/Graphics/11_Characters/（キャラクター数）」にキャラクターファイルをご挿入ください。
-キャラクター設定が必要なら「CharaConfig.txt」を変更してください。
-キャラクターを使用しないなら「（スキン名）/Graphics/11_Characters/0」を空っぽにしてください。
+v0.5.3.1からキャラクターおよびプチキャラはGlobalフォルダに読み込まれます（スキンフォルダ以外）、そこに入れてください。
 ```
 
 ## 更新記録
+
+<details>
+	<summary>v0.5.3.1</summary>
+	
+	- バグ修正
+	
+	- グローバルキャラクター・プチキャラ
+	
+	- 「最近遊んだ曲」のフォルダデータを保存する機能を実装 
+	
+	- かんたん・ふつうの適当な判断範囲を実装
+	
+	- 選曲画面および結果画面にカスタムキャラクターの対応
+	
+	- 難易度に基づいての曲検索機能を実装
+	
+</details>
 
 <details>
 	<summary>v0.5.3</summary>
