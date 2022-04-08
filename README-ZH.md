@@ -8,11 +8,11 @@ TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
-- 当前版本：v0.5.3
+- 当前版本：v0.5.3.1
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/3/25）
+（译者注：由README-EN翻译。最近一次更新时间：2022/4/8）
 
 ## 使用前注意事项（重要！！！）
 
@@ -110,16 +110,30 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 而是“System/(Skin name)/Graphics”。
 ```
 
-- 游戏报“11_Characters”未找到错误！
+- 我找不到我自行添加的角色和小角色
 
 ```
-从0.5.2版本开始，角色由11_Characters读取。
-在“(Skin name)/Graphics”文件夹内创建一个“11_Characters”文件夹。将角色文件放入“(Skin name)/Graphics/11_Characters/(Character number)”。
-将角色设置文件重命名为“CharaConfig.txt”。
-如果您不想使用角色，将“(Skin name)/Graphics/11_Characters/0”留空。
+从0.5.3版本开始，角色和小角色将由skin文件夹外的全局文件夹读取。请把它们放在那里。
 ```
 
 ## 更新历史
+
+<details>
+	<summary>v0.5.3.1</summary>
+
+	- 修复了多个问题
+
+	- 全局角色和小角色
+
+	- 永久性的“最近演奏的曲目”文件夹
+
+	- 简单/普通难度计时区
+
+	- 主菜单及结果画面上的角色
+
+	- 按难度搜索曲目
+
+</details>
 
 <details>
 	<summary>v0.5.3</summary>
