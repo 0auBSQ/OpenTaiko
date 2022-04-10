@@ -176,6 +176,12 @@
 105 : Heya main menu button 
 106 : Settings main menu button 
 107 : Quit main menu button
+108 : Online lounge main menu button 
+109 : Open encyclopedia main menu button
+110 : AI Battle main menu button
+111 : Player stats main menu button
+112 : Chart editor main menu button
+113 : Open Toolbox main menu button
 
 150 : Ensou main menu box text
 151 : Dan main menu box text
@@ -185,6 +191,12 @@
 155 : Heya main menu box text
 156 : Settings main menu box text
 157 : Quit main menu box text
+158 : Online lounge main menu box text
+159 : Open encyclopedia main menu box text
+160 : AI Battle main menu box text
+161 : Player stats main menu box text
+162 : Chart editor main menu box text
+163 : Open Toolbox main menu box text
 
 # Special items (002XX)
 

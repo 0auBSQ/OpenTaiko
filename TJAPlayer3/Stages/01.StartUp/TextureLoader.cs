@@ -158,17 +158,20 @@ namespace TJAPlayer3
             Entry_Player[1] = TxC(TITLE + @"Entry_Player_Select_Bar.png");
             Entry_Player[2] = TxC(TITLE + @"Entry_Player_Select.png");
 
-            for(int i = 0; i < 8; i++)
+            ModeSelect_Bar = new CTexture[CMainMenuTab.__MenuCount + 1];
+            ModeSelect_Bar_Chara = new CTexture[CMainMenuTab.__MenuCount];
+
+            for (int i = 0; i < CMainMenuTab.__MenuCount; i++)
             {
                 ModeSelect_Bar[i] = TxC(TITLE + @"ModeSelect_Bar_" + i.ToString() + ".png");
             }
             
-            for(int i = 0; i < 8; i++)
+            for(int i = 0; i < CMainMenuTab.__MenuCount; i++)
             {
                 ModeSelect_Bar_Chara[i] = TxC(TITLE + @"ModeSelect_Bar_Chara_" + i.ToString() + ".png");
             }
 
-            ModeSelect_Bar[8] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
+            ModeSelect_Bar[CMainMenuTab.__MenuCount] = TxC(TITLE + @"ModeSelect_Bar_Overlay.png");
 
             #endregion
 
@@ -1360,8 +1363,8 @@ namespace TJAPlayer3
         public CTexture[] Banapas_Load_Clear = new CTexture[2];
         public CTexture[] Banapas_Load_Failure = new CTexture[2];
         public CTexture[] Entry_Player = new CTexture[3];
-        public CTexture[] ModeSelect_Bar = new CTexture[9];
-        public CTexture[] ModeSelect_Bar_Chara = new CTexture[8];
+        public CTexture[] ModeSelect_Bar;
+        public CTexture[] ModeSelect_Bar_Chara;
 
         #endregion
 

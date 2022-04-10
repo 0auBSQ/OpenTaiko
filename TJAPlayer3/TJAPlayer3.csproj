@@ -124,6 +124,7 @@
     <Compile Include="Character\CResultCharacter.cs" />
     <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
+    <Compile Include="Common\CVersionList.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
     <Compile Include="Common\ModalQueue.cs" />
     <Compile Include="Common\Modal.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Songs\C曲リストノード.cs" />
     <Compile Include="Stages\01.StartUp\CStage起動.cs" />
     <Compile Include="Stages\02.Title\CActEnumSongs.cs" />
+    <Compile Include="Stages\02.Title\CMainMenuTab.cs" />
     <Compile Include="Stages\02.Title\CStageタイトル.cs" />
     <Compile Include="Stages\04.Config\CActConfigKeyAssign.cs" />
     <Compile Include="Stages\04.Config\CActConfigList.cs" />
