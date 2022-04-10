@@ -4924,6 +4924,10 @@ namespace TJAPlayer3
                 var life = (int)Convert.ToDouble(strCommandParam);
                 this.LIFE = life;
             }
+            else if (strCommandName.Equals("PREIMAGE"))
+            {
+                this.PREIMAGE = strCommandParam;
+            }
             else if (strCommandName.Equals("TOWERTYPE"))
             {
                 var tt = (int)Convert.ToDouble(strCommandParam);

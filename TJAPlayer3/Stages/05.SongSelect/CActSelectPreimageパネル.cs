@@ -507,7 +507,10 @@ namespace TJAPlayer3
 				double num = ( (double) this.ct登場アニメ用.n現在の値 ) / 100.0;
 				double num2 = Math.Cos( ( 1.5 + ( 0.5 * num ) ) * Math.PI );
 				this.n本体X = 8;
-				this.n本体Y = 0x39 - ( (int) ( this.txパネル本体.sz画像サイズ.Height * ( 1.0 - ( num2 * num2 ) ) ) );
+				if (this.txパネル本体 != null)
+					this.n本体Y = 0x39 - ( (int) ( this.txパネル本体.sz画像サイズ.Height * ( 1.0 - ( num2 * num2 ) ) ) );
+				else
+					this.n本体Y = 8;
 			}
 			if( this.txパネル本体 != null )
 			{

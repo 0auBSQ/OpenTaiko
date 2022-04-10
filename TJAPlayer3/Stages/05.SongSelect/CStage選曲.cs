@@ -461,6 +461,8 @@ namespace TJAPlayer3
 
                 #endregion
 
+                this.actPreimageパネル.On進行描画();
+
                 this.actPresound.On進行描画();
 
                 this.act演奏履歴パネル.On進行描画();

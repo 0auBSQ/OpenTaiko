@@ -41,16 +41,6 @@ namespace TJAPlayer3
 
 				SkipSaveFileStep();
 
-				/*
-				this.stModeBar = new STModeBar[CMainMenuTab.__MenuCount];
-
-				for (int i = 0; i < this.stModeBar.Length; i++)
-				{
-					this.stModeBar[i].BarTexture = TJAPlayer3.Tx.ModeSelect_Bar[i];
-					this.stModeBar[i].n現在存在している行 = i + 1 - n現在の選択行モード選択;
-				}
-				*/
-
 				usedMenus = new int[] {
 					0,
 					1,
