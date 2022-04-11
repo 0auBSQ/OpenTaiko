@@ -566,6 +566,7 @@ namespace TJAPlayer3
 				}
 				if( this.r表示するプレビュー画像 != null )
 				{
+					/*
 					int width = this.r表示するプレビュー画像.sz画像サイズ.Width;
 					int height = this.r表示するプレビュー画像.sz画像サイズ.Height;
 					if( width > 400 )
@@ -576,12 +577,26 @@ namespace TJAPlayer3
 					{
 						height = 400;
 					}
+					*/
+
+					// Placeholder
+					int width = 200;
+					int height = 200;
+
+					float xRatio = width / (float)this.r表示するプレビュー画像.sz画像サイズ.Width;
+					float yRatio = height / (float)this.r表示するプレビュー画像.sz画像サイズ.Height;
+
 					x += ( 400 - ( (int) ( width * num4 ) ) ) / 2;
 					y += ( 400 - ( (int) ( height * num4 ) ) ) / 2;
+
 					this.r表示するプレビュー画像.Opacity = (int) ( 255f * num3 );
-					this.r表示するプレビュー画像.vc拡大縮小倍率.X = num4;
-					this.r表示するプレビュー画像.vc拡大縮小倍率.Y = num4;
-					this.r表示するプレビュー画像.t2D描画( TJAPlayer3.app.Device, x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
+					this.r表示するプレビュー画像.vc拡大縮小倍率.X = num4 * xRatio;
+					this.r表示するプレビュー画像.vc拡大縮小倍率.Y = num4 * xRatio;
+
+					// this.r表示するプレビュー画像.t2D描画( TJAPlayer3.app.Device, x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
+
+					// Temporary addition
+					this.r表示するプレビュー画像.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 120, 110);
 				}
 			}
 		}
