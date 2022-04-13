@@ -50,6 +50,7 @@ Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q 
 Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 WTF?! : MooX - https://soundcloud.com/themoox/wtf (Chart by MooX & bol)
 Athazagoraphobia : Derpikarp - https://youtube.com/channel/UCrURywBu-fDA5KQaDPc3GOg (Chart by Colin & bol)
+Gewissenbisse : Sukima Altera vs ALTERNATiVE THEORY - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by 0AuBSQ)
 ```
 
 ## Translations
