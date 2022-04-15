@@ -216,6 +216,17 @@
 306 : Coins
 307 : Total (coins)
 
+# Online Lounge submenus (0040X)
+
+400 : Return to main menu button
+401 : Return button
+402 : Select CDN menu button
+403 : Select a CDN
+404 : Download songs button
+405 : Download characters button
+406 : Download puchicharas button
+407 : Online multiplayer button
+
 # In-game pause menu (0090X)
 
 900 : Continue

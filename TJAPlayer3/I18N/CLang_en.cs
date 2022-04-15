@@ -267,6 +267,15 @@ namespace TJAPlayer3
             [306] = "Coins",
             [307] = "Total",
 
+            [400] = "Return to main menu",
+            [401] = "Return",
+            [402] = "Download content",
+            [403] = "Select a CDN",
+            [404] = "Download Songs",
+            [405] = "Download Characters",
+            [406] = "Download Puchicharas",
+            [407] = "Online Multiplayer",
+
             [1000] = "Reached floor",
             [1001] = "F",
             [1002] = "P",

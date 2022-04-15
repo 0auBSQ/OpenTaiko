@@ -258,6 +258,15 @@ namespace TJAPlayer3
             [306] = "Jetons",
             [307] = "Total",
 
+            [400] = "Retour au menu principal",
+            [401] = "Retour",
+            [402] = "Télécharger du contenu",
+            [403] = "Choisir un CDN",
+            [404] = "Télécharger des Sons",
+            [405] = "Télécharger des Personnages",
+            [406] = "Télécharger des Puchicharas",
+            [407] = "Multijoueur en ligne",
+
             [1000] = "Étage atteint",
             [1001] = "",
             [1002] = "P",

@@ -25,16 +25,26 @@ namespace TJAPlayer3
 		{
 			何もしない,
 			起動,
-			タイトル,
+			タイトル,	// Title screen
 			オプション,
 			コンフィグ,
-			選曲,
-			段位選択,
+			選曲,		// Ensou song select
+			段位選択,	// Dan-i dojo menu
 			曲読み込み,
-			演奏,
-			結果,
+			演奏,		// In-game
+			結果,		// Result screen
 			ChangeSkin,						// #28195 2011.5.4 yyagi
 			Heya,
+			TaikoTowers,
+			BoukenTitle,
+			BoukenMap,
+			OnlineLounge,
+			Encyclopedia,
+			AIBattleMode,
+			PlayerStats,
+			ChartEditor,
+			Toolbox,
+			Template,			// No effect, for template class
 			終了
 		}
 		
