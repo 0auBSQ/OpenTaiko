@@ -507,7 +507,10 @@ namespace TJAPlayer3
 				double num = ( (double) this.ct登場アニメ用.n現在の値 ) / 100.0;
 				double num2 = Math.Cos( ( 1.5 + ( 0.5 * num ) ) * Math.PI );
 				this.n本体X = 8;
-				this.n本体Y = 0x39 - ( (int) ( this.txパネル本体.sz画像サイズ.Height * ( 1.0 - ( num2 * num2 ) ) ) );
+				if (this.txパネル本体 != null)
+					this.n本体Y = 0x39 - ( (int) ( this.txパネル本体.sz画像サイズ.Height * ( 1.0 - ( num2 * num2 ) ) ) );
+				else
+					this.n本体Y = 8;
 			}
 			if( this.txパネル本体 != null )
 			{
@@ -563,6 +566,7 @@ namespace TJAPlayer3
 				}
 				if( this.r表示するプレビュー画像 != null )
 				{
+					/*
 					int width = this.r表示するプレビュー画像.sz画像サイズ.Width;
 					int height = this.r表示するプレビュー画像.sz画像サイズ.Height;
 					if( width > 400 )
@@ -573,12 +577,26 @@ namespace TJAPlayer3
 					{
 						height = 400;
 					}
+					*/
+
+					// Placeholder
+					int width = 200;
+					int height = 200;
+
+					float xRatio = width / (float)this.r表示するプレビュー画像.sz画像サイズ.Width;
+					float yRatio = height / (float)this.r表示するプレビュー画像.sz画像サイズ.Height;
+
 					x += ( 400 - ( (int) ( width * num4 ) ) ) / 2;
 					y += ( 400 - ( (int) ( height * num4 ) ) ) / 2;
+
 					this.r表示するプレビュー画像.Opacity = (int) ( 255f * num3 );
-					this.r表示するプレビュー画像.vc拡大縮小倍率.X = num4;
-					this.r表示するプレビュー画像.vc拡大縮小倍率.Y = num4;
-					this.r表示するプレビュー画像.t2D描画( TJAPlayer3.app.Device, x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
+					this.r表示するプレビュー画像.vc拡大縮小倍率.X = num4 * xRatio;
+					this.r表示するプレビュー画像.vc拡大縮小倍率.Y = num4 * xRatio;
+
+					// this.r表示するプレビュー画像.t2D描画( TJAPlayer3.app.Device, x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
+
+					// Temporary addition
+					this.r表示するプレビュー画像.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 120, 110);
 				}
 			}
 		}

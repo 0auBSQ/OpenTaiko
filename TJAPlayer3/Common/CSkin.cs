@@ -364,6 +364,9 @@ namespace TJAPlayer3
         public Cシステムサウンド soundDanSongSelect = null;
 
         public Cシステムサウンド soundHeyaBGM = null;
+        public Cシステムサウンド soundOnlineLoungeBGM = null;
+        public Cシステムサウンド soundEncyclopediaBGM = null;
+        public Cシステムサウンド soundTowerSelectBGM = null;
 
         public Cシステムサウンド[] soundModal = null;
 
@@ -746,6 +749,9 @@ namespace TJAPlayer3
             this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+            this.soundOnlineLoungeBGM = new Cシステムサウンド(@"Sounds\OnlineLounge\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+            this.soundEncyclopediaBGM = new Cシステムサウンド(@"Sounds\Encyclopedia\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+            this.soundTowerSelectBGM = new Cシステムサウンド(@"Sounds\Tower\DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
             soundModal = new Cシステムサウンド[6];
             for (int i = 0; i < soundModal.Length - 1; i++)

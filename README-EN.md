@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： v0.5.3
+- Current version： v0.5.3.1
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -111,16 +111,30 @@ Make the folder structure not System/Graphics
 but System/(Skin name)/Graphics.
 ```
 
-- I get an error saying "11_Characters" is not found!
+- I cannot find the characters/puchicharas I added
 
 ```
-From version 0.5.2, characters are read from 11_Characters.
-In "(Skin name)/Graphics" folder, make a "11_Characters" folder, and insert character files in "(Skin name)/Graphics/11_Characters/(Character number)".
-Rename character config files to "CharaConfig.txt".
-If you do not want characters, make "(Skin name)/Graphics/11_Characters/0" empty.
+From version 0.5.3.1, Characters and Puchicharas are loaded from the Global folder (outside of skins), please add them there.
 ```
 
 ## Update history
+
+<details>
+	<summary>v0.5.3.1</summary>
+	
+	- Fix multiple bugs
+	
+	- Global characters and puchicharas
+	
+	- Permanent recently played songs folder 
+	
+	- Easy/Normal timing zones
+	
+	- Characters on menus and result screens
+	
+	- Song search by difficulty feature
+	
+</details>
 
 <details>
 	<summary>v0.5.3</summary>
