@@ -264,27 +264,27 @@ namespace TJAPlayer3
 
             if (nSpeedCount == 0)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = 4;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 4;
             }
             else if (nSpeedCount > 0 && nSpeedCount <= 11)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = nSpeedCount + 8;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = nSpeedCount + 8;
             }
             else if (nSpeedCount == 12)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = 20 + 4;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 24;
             }
             else if (nSpeedCount == 13)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = 20 + 9;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 29;
             }
             else if (nSpeedCount == 14)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = 20 + 14;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 34;
             }
             else if (nSpeedCount == 15)
             {
-                TJAPlayer3.ConfigIni.n譜面スクロール速度[0] = 20 + 19;
+                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 39;
             }
 
             #endregion

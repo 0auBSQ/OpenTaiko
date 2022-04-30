@@ -320,7 +320,7 @@ namespace TJAPlayer3
 
 			#endregion
 
-			this.iDrumsScrollSpeed = new CItemInteger(CLangManager.LangInstance.GetString(62), 0, 0x7cf, TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums,
+			this.iDrumsScrollSpeed = new CItemInteger(CLangManager.LangInstance.GetString(62), 0, 0x7cf, TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile],
 				CLangManager.LangInstance.GetString(63));
 			this.list項目リスト.Add( this.iDrumsScrollSpeed );
 
@@ -1496,7 +1496,7 @@ namespace TJAPlayer3
 			for (int i = 0; i < 2; i++)
 				TJAPlayer3.NamePlate.tNamePlateRefreshTitles(i);
 
-			TJAPlayer3.ConfigIni.n譜面スクロール速度.Drums = this.iDrumsScrollSpeed.n現在の値;
+			TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile] = this.iDrumsScrollSpeed.n現在の値;
             
 			TJAPlayer3.ConfigIni.bTight = this.iDrumsTight.bON;
 

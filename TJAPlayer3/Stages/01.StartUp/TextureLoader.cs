@@ -52,7 +52,8 @@ namespace TJAPlayer3
         const string TRAINING = @"19_Training\";
         const string DANC = @"17_DanC\";
         const string TOWER = @"20_Tower\";
-        const string HSOPTION = @"HSOption\";
+        const string MODICONS = @"21_ModIcons\";
+
         // Tower infos
         const string TOWERDON = @"Tower_Don\";
         const string TOWERFLOOR = @"Tower_Floors\";
@@ -432,23 +433,7 @@ namespace TJAPlayer3
             {
                 Couse_Symbol[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + ".png");
             }
-            
-            HiSp = new CTexture[14];
-            HiSp[0] = TxC(GAME + COURSESYMBOL + HSOPTION + @"0.png");
-            HiSp[1] = TxC(GAME + COURSESYMBOL + HSOPTION + @"1.png");
-            HiSp[2] = TxC(GAME + COURSESYMBOL + HSOPTION + @"2.png");
-            HiSp[3] = TxC(GAME + COURSESYMBOL + HSOPTION + @"3.png");
-            HiSp[4] = TxC(GAME + COURSESYMBOL + HSOPTION + @"4.png");
-            HiSp[5] = TxC(GAME + COURSESYMBOL + HSOPTION + @"5.png");
-            HiSp[6] = TxC(GAME + COURSESYMBOL + HSOPTION + @"6.png");
-            HiSp[7] = TxC(GAME + COURSESYMBOL + HSOPTION + @"7.png");
-            HiSp[8] = TxC(GAME + COURSESYMBOL + HSOPTION + @"8.png");
-            HiSp[9] = TxC(GAME + COURSESYMBOL + HSOPTION + @"9.png");
-            HiSp[10] = TxC(GAME + COURSESYMBOL + HSOPTION + @"10.png");
-            HiSp[11] = TxC(GAME + COURSESYMBOL + HSOPTION + @"11.png");
-            HiSp[12] = TxC(GAME + COURSESYMBOL + HSOPTION + @"12.png");
-            HiSp[13] = TxC(GAME + COURSESYMBOL + HSOPTION + @"13.png");
-            
+
             Taiko_Score = new CTexture[3];
             Taiko_Score[0] = TxC(GAME + TAIKO + @"Score.png");
             Taiko_Score[1] = TxC(GAME + TAIKO + @"Score_1P.png");
@@ -774,6 +759,16 @@ namespace TJAPlayer3
                 {
                     Tower_Don_Jump[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @"\Jump\Jump" + j.ToString() + ".png");
                 }
+            }
+
+            #endregion
+
+            #region [21_ModIcons]
+
+            HiSp = new CTexture[14];
+            for (int i = 0; i < HiSp.Length; i++)
+            {
+                HiSp[i] = TxC(GAME + MODICONS + @"HS\" + i.ToString() + @".png");
             }
 
             #endregion
@@ -1532,7 +1527,6 @@ namespace TJAPlayer3
             Taiko_Combo_Text;
         public CTexture[] Couse_Symbol, // コースシンボル
             Taiko_PlayerNumber,
-            HiSp,
             Taiko_NamePlate; // ネームプレート
         public CTexture[] Taiko_Score,
             Taiko_Combo,
@@ -1664,6 +1658,12 @@ namespace TJAPlayer3
             Tower_Don_Climbing,
             Tower_Don_Jump;
 
+
+        #endregion
+
+        #region [21_ModIcons]
+
+        public CTexture[] HiSp;
 
         #endregion
 
