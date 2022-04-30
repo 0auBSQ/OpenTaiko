@@ -236,7 +236,7 @@ namespace TJAPlayer3
                 //        this.txオプションパネル_特殊.t2D描画( CDTXMania.app.Device, 0, 300, new Rectangle( 0, 44, 162, 44 ) );
                 //}
 
-                ModIcons.tDisplayMods(114, 236 + i * 190, TJAPlayer3.GetActualPlayer(i));
+                ModIcons.tDisplayMods(80, 236 + i * 190, i);
 
                 if (TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
                 {
