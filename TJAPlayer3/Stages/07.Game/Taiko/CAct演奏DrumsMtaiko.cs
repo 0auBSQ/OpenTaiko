@@ -242,7 +242,75 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_CourseSymbol_Y[i]
                         );
                 }
+		//でたらめ、気まぐれとあべこべは併用できない
+                //でたらめ
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM))
+                {
+                    TJAPlayer3.Tx.Option[3].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 || TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON) || (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))
+                {
+                    TJAPlayer3.Tx.Option[3].t2D描画(TJAPlayer3.app.Device, 144, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && ((TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON))))
+                {
+                    TJAPlayer3.Tx.Option[3].t2D描画(TJAPlayer3.app.Device, 174, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))))
+                {
+                    TJAPlayer3.Tx.Option[3].t2D描画(TJAPlayer3.app.Device, 174, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON) && (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))
+                {
+                    TJAPlayer3.Tx.Option[3].t2D描画(TJAPlayer3.app.Device, 114, 266);
+                }
 
+                //きまぐれ
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM))
+                {
+                    TJAPlayer3.Tx.Option[2].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 || TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON) || (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))
+                {
+                    TJAPlayer3.Tx.Option[2].t2D描画(TJAPlayer3.app.Device, 144, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && ((TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON))))
+                {
+                    TJAPlayer3.Tx.Option[2].t2D描画(TJAPlayer3.app.Device, 174, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))))
+                {
+                    TJAPlayer3.Tx.Option[2].t2D描画(TJAPlayer3.app.Device, 174, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON) && (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR))
+                {
+                    TJAPlayer3.Tx.Option[2].t2D描画(TJAPlayer3.app.Device, 114, 266);
+                }
+
+                //あべこべ
+                if (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR)
+                {
+                    TJAPlayer3.Tx.Option[1].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 || TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON))
+                {
+                    TJAPlayer3.Tx.Option[1].t2D描画(TJAPlayer3.app.Device, 144, 236);
+                }
+                if ((TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR) && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9 && TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON))
+                {
+                    TJAPlayer3.Tx.Option[1].t2D描画(TJAPlayer3.app.Device, 174, 236);
+                }
+
+                //ドロン
+                if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON)
+                {
+                    TJAPlayer3.Tx.Option[0].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON && (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] != 9))
+                {
+                    TJAPlayer3.Tx.Option[0].t2D描画(TJAPlayer3.app.Device, 144, 236);
+                }
+		
                 //強引な実装すまぬ1P用
                 if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 10)
                 {
