@@ -432,6 +432,11 @@ namespace TJAPlayer3
             {
                 Couse_Symbol[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + ".png");
             }
+            Option = new CTexture[4];
+            Option[0] = TxC(GAME + COURSESYMBOL + OPTION + @"Doron.png");
+            Option[1] = TxC(GAME + COURSESYMBOL + OPTION + @"Mirror.png");
+            Option[2] = TxC(GAME + COURSESYMBOL + OPTION + @"Random.png");
+            Option[3] = TxC(GAME + COURSESYMBOL + OPTION + @"Super.png");
             
             HiSp = new CTexture[14];
             HiSp[0] = TxC(GAME + COURSESYMBOL + HSOPTION + @"0.png");
@@ -1533,6 +1538,7 @@ namespace TJAPlayer3
         public CTexture[] Couse_Symbol, // コースシンボル
             Taiko_PlayerNumber,
             HiSp,
+            Option,
             Taiko_NamePlate; // ネームプレート
         public CTexture[] Taiko_Score,
             Taiko_Combo,
