@@ -243,6 +243,64 @@ namespace TJAPlayer3
                         );
                 }
 
+                //強引な実装すまぬ1P用
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 10)
+                {
+                    TJAPlayer3.Tx.HiSp[0].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 11)
+                {
+                    TJAPlayer3.Tx.HiSp[1].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 12)
+                {
+                    TJAPlayer3.Tx.HiSp[2].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 13)
+                {
+                    TJAPlayer3.Tx.HiSp[3].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 14)
+                {
+                    TJAPlayer3.Tx.HiSp[4].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 15)
+                {
+                    TJAPlayer3.Tx.HiSp[5].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 16)
+                {
+                    TJAPlayer3.Tx.HiSp[6].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 17)
+                {
+                    TJAPlayer3.Tx.HiSp[7].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 18)
+                {
+                    TJAPlayer3.Tx.HiSp[8].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 19)
+                {
+                    TJAPlayer3.Tx.HiSp[9].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 24)
+                {
+                    TJAPlayer3.Tx.HiSp[10].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 39)
+                {
+                    TJAPlayer3.Tx.HiSp[11].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 44)
+                {
+                    TJAPlayer3.Tx.HiSp[12].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+                if (TJAPlayer3.ConfigIni.n譜面スクロール速度[0] == 49)
+                {
+                    TJAPlayer3.Tx.HiSp[13].t2D描画(TJAPlayer3.app.Device, 114, 236);
+                }
+		
                 if (TJAPlayer3.ConfigIni.ShinuchiMode)
                 {
                     if (TJAPlayer3.Tx.Couse_Symbol[(int)Difficulty.Total] != null)
