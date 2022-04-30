@@ -770,7 +770,14 @@ namespace TJAPlayer3
             {
                 HiSp[i] = TxC(GAME + MODICONS + @"HS\" + i.ToString() + @".png");
             }
-
+            
+            Option = new CTexture[4];
+            string[] Options = new string[4] { "Doron", "Mirror", "Random", "Super" };
+            for (int i = 0; i < 4; i++)
+            {
+                Option[i] = TxC(GAME + MODICONS + @"Option\" + Options[i] + ".png");
+            }
+            
             #endregion
 
             #endregion
@@ -1664,7 +1671,8 @@ namespace TJAPlayer3
         #region [21_ModIcons]
 
         public CTexture[] HiSp;
-
+        public CTexture[] Option;
+        
         #endregion
 
 
