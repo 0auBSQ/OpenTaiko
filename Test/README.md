@@ -55,6 +55,7 @@ DON'T LOOK BACK : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yt
 Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 BassBoL : InterChan - https://www.youtube.com/c/InterChan374 (Chart by bol)
 Liberation : DeBisco - https://soundcloud.com/debisco | https://twitter.com/debiscomusic (Chart by Colin & 0AuBSQ)
+Deceiver's Terminus : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 ```
 
 ## Translations
