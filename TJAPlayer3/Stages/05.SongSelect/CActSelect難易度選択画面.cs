@@ -250,7 +250,7 @@ namespace TJAPlayer3
                     }
                 }
 
-                if (!bSelect[1] && !bOption[1])
+                if (!bSelect[1] && !bOption[1] && TJAPlayer3.ConfigIni.nPlayerCount > 1)
                 {
                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P))
                     {
