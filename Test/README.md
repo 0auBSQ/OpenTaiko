@@ -54,6 +54,7 @@ Gewissenbisse : Sukima Altera vs ALTERNATiVE THEORY - https://youtube.com/c/Suki
 DON'T LOOK BACK : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
 Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 BassBoL : InterChan - https://www.youtube.com/c/InterChan374 (Chart by bol)
+Liberation : DeBisco - https://soundcloud.com/debisco | https://twitter.com/debiscomusic (Chart by Colin & 0AuBSQ)
 ```
 
 ## Translations
