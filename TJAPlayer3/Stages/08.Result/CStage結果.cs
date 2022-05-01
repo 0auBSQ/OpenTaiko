@@ -492,8 +492,8 @@ namespace TJAPlayer3
 				double dAccuracyRate = Math.Pow((50 * this.st演奏記録.Drums.nGreat数 + 100 * this.st演奏記録.Drums.nPerfect数) / (double)(100 * nTotalHits), 3);
 
 				int diffModifier;
-				int starRate;
-				int redStarRate;
+				float starRate;
+				float redStarRate;
 
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 				{
@@ -504,26 +504,26 @@ namespace TJAPlayer3
 					starRate = Math.Min(10, stars) / 2;
 					redStarRate = Math.Max(0, stars - 10) * 4;
 
+					int maxFloors = TJAPlayer3.stage選曲.r確定された曲.arスコア[(int)Difficulty.Tower].譜面情報.nTotalFloor;
+
+					double floorRate = Math.Pow(CFloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
+					double lengthBonus = Math.Max(1, maxFloors / 140.0);
+
 					#region [Clear modifier]
 
 					int clearModifier = 0;
 
 					if (this.st演奏記録.Drums.nMiss数 == 0)
 					{
-						clearModifier = 4;
+						clearModifier = (int)(5 * lengthBonus);
 						if (this.st演奏記録.Drums.nGreat数 == 0)
-							clearModifier = 6;
+							clearModifier = (int)(12 * lengthBonus);
 					}
 
 					#endregion
 
-					int maxFloors = TJAPlayer3.stage選曲.r確定された曲.arスコア[(int)Difficulty.Tower].譜面情報.nTotalFloor;
-
-					double floorRate = Math.Pow(CFloorManagement.LastRegisteredFloor / (double)maxFloors, 2.4);
-					double lengthBonus = Math.Max(1, maxFloors / 140.0);
-
 					// this.nEarnedMedalsCount[0] = stars;
-					this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (dAccuracyRate * floorRate * lengthBonus)) + clearModifier;
+					this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
 				}
 				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 				{
@@ -566,7 +566,7 @@ namespace TJAPlayer3
 							starRate = Math.Min(10, stars) / 2;
 							redStarRate = Math.Max(0, stars - 10) * 4;
 
-							partialScore += diffModifier * (starRate + redStarRate);
+							partialScore += (int)(diffModifier * (starRate + redStarRate));
 						}
 
 					}
