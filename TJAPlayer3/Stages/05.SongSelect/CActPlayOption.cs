@@ -66,10 +66,11 @@ namespace TJAPlayer3
             OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9010), Color.White, Color.Black);
             OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
             OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(500), Color.White, Color.Black);
-            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
-            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(72), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
+            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
+            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
 
             for (int i = 0; i < 5; i++)
             {
@@ -141,6 +142,7 @@ namespace TJAPlayer3
                 txSwitch[nAbekobe],
                 txRandom[nRandom],
                 txTiming[nTiming],
+                txSwitch[nJust],
                 txGameMode[nGameMode],
                 txSwitch[nAutoMode],
                 txNone,
@@ -212,11 +214,11 @@ namespace TJAPlayer3
             return 0;
         }
 
-        public int nOptionCount = 8;
+        public int nOptionCount = 9;
 
         public CCounter ctOpen;
         public CCounter ctClose;
-        public CTexture[] OptionType = new CTexture[9];
+        public CTexture[] OptionType = new CTexture[10];
 
         public int NowCount;
         public int[] NowCountType = new int[8];
@@ -244,6 +246,8 @@ namespace TJAPlayer3
 
         public CTexture[] txTiming = new CTexture[5];
         public int nTiming = 2;
+
+        public int nJust = 0;
 
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
         {
@@ -288,10 +292,13 @@ namespace TJAPlayer3
                     ShiftVal(left, ref nTiming, 4, 0);
                     break;
                 case 5:
+                    ShiftVal(left, ref nJust, 1, 0);
+                    break;
+                case 6:
                     if (nGameMode == 0) nGameMode = 1;
                     else nGameMode = 0;
                     break;
-                case 6:
+                case 7:
                     if (nAutoMode == 0) nAutoMode = 1;
                     else nAutoMode = 0;
                     break;
@@ -363,6 +370,12 @@ namespace TJAPlayer3
             #region [ Timing ]
 
             nTiming = TJAPlayer3.ConfigIni.nTimingZones[actual];
+
+            #endregion
+
+            #region [Just]
+
+            nJust = TJAPlayer3.ConfigIni.bJust[actual] == true ? 1 : 0;
 
             #endregion
 
@@ -461,6 +474,12 @@ namespace TJAPlayer3
             #region [ Timing ]
 
             TJAPlayer3.ConfigIni.nTimingZones[actual] = nTiming;
+
+            #endregion
+
+            #region [Just]
+
+            TJAPlayer3.ConfigIni.bJust[actual] = nJust == 1;
 
             #endregion
 

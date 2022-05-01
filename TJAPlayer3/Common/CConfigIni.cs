@@ -839,7 +839,7 @@ namespace TJAPlayer3
 		public int TokkunMashInterval;
 		public bool bSuperHard = false;
         public bool bTokkunMode = false;
-        public bool bJust;
+        public bool[] bJust = new bool[4] { false, false, false, false };
 
         public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
@@ -2064,7 +2064,10 @@ namespace TJAPlayer3
 			sw.WriteLine("{1}={0}", this.TokkunMashInterval, nameof(this.TokkunMashInterval));
 			sw.WriteLine();
 			sw.WriteLine( "; JUST(0:OFF, 1:ON)" );
-			sw.WriteLine( "Just={0}", this.bJust ? 1 : 0 );
+			sw.WriteLine( "Just1P={0}", this.bJust[0] ? 1 : 0 );
+			sw.WriteLine("Just2P={0}", this.bJust[1] ? 1 : 0);
+			sw.WriteLine("Just3P={0}", this.bJust[2] ? 1 : 0);
+			sw.WriteLine("Just4P={0}", this.bJust[3] ? 1 : 0);
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
@@ -2827,7 +2830,6 @@ namespace TJAPlayer3
 
 											#endregion
 
-
 											#region [Timing Zones]
 
 											else if (str3.Equals("TimingZones1P"))
@@ -2847,6 +2849,27 @@ namespace TJAPlayer3
 												this.nTimingZones[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[3]);
 											}
 
+
+											#endregion
+
+											#region [Just]
+
+											else if (str3.Equals("Just") || str3.Equals("Just1P"))
+											{
+												this.bJust[0] = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("Just2P"))
+											{
+												this.bJust[1] = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("Just3P"))
+											{
+												this.bJust[2] = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("Just4P"))
+											{
+												this.bJust[3] = C変換.bONorOFF(str4[0]);
+											}
 
 											#endregion
 
@@ -2943,11 +2966,10 @@ namespace TJAPlayer3
 											{
 												this.bJudgeCountDisplay = C変換.bONorOFF( str4[ 0 ] );
 											}
-											else if( str3.Equals( "Just" ) )
-											{
-												this.bJust = C変換.bONorOFF( str4[ 0 ] );
-											}
-                                            else if( str3.Equals( "PlayerCount" ) )
+
+                                            
+
+											else if ( str3.Equals( "PlayerCount" ) )
                                             {
                                                 this.nPlayerCount = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 2, this.nPlayerCount );
                                             }

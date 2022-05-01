@@ -1374,9 +1374,17 @@ namespace TJAPlayer3
 						pos = 1;
 
 					TJAPlayer3.NamePlate.tNamePlateDraw((pos == 1) ? 1280 - 28 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 28, 621, i);
+
+					#region Mods
+
+					ModIcons.tDisplayModsMenu((pos == 1) ? 1280 - 32 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 32, 678, i);
+
+					#endregion
 				}
 
 				#endregion
+
+
 
 
 				#region [Display modals]

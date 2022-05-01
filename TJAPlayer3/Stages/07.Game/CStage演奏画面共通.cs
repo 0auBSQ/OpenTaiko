@@ -802,7 +802,7 @@ namespace TJAPlayer3
 				}
                 if (nDeltaTime <= tz.nOkZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
-                    if ( TJAPlayer3.ConfigIni.bJust )
+                    if ( TJAPlayer3.ConfigIni.bJust[player] )
                         return E判定.Poor;
 					return E判定.Good;
 				}
