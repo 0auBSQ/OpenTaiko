@@ -451,7 +451,7 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-                    ModIcons.tDisplayModsMenu(40 + i * 980, 672, i);
+                    ModIcons.tDisplayModsMenu(78 + i * 980, 672, i);
                 }
 
                 
