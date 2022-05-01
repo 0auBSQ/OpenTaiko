@@ -87,7 +87,7 @@ namespace TJAPlayer3
                         }
                     }
 
-                    if( TJAPlayer3.Tx.Balloon_Combo[ i ] != null )
+                    if( TJAPlayer3.Tx.Balloon_Combo[ j ] != null && TJAPlayer3.Tx.Balloon_Number_Combo != null)
                     {
                         //半透明4f
                         if( this.ct進行[ i ].n現在の値 == 1 || this.ct進行[ i ].n現在の値 == 42 )
@@ -194,7 +194,9 @@ namespace TJAPlayer3
 						break;
 					}
 				}
-                x += (int)(45 * TJAPlayer3.Tx.Balloon_Number_Combo.vc拡大縮小倍率.X);
+
+                if (TJAPlayer3.Tx.Balloon_Number_Combo != null)
+                    x += (int)(45 * TJAPlayer3.Tx.Balloon_Number_Combo.vc拡大縮小倍率.X);
 			}
 		}
 		//-----------------

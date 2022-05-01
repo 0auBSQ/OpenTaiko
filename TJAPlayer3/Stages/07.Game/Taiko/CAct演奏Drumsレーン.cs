@@ -70,7 +70,23 @@ namespace TJAPlayer3
             {
                 if( TJAPlayer3.stage演奏ドラム画面.bUseBranch[ i ] == true )
                 {
-                    if( this.ct分岐アニメ進行[ i ].b進行中 )
+
+                    #region NullCheck
+
+                    bool _laneNull = false;
+
+                    for (int j = 0; j < TJAPlayer3.Tx.Lane_Base.Length; j++)
+                    {
+                        if (TJAPlayer3.Tx.Lane_Base[j] == null)
+                        {
+                            _laneNull = true;
+                            break;
+                        }
+                    }
+
+                    #endregion
+
+                    if( this.ct分岐アニメ進行[ i ].b進行中 && !_laneNull)
                     {
                         #region[ 普通譜面_レベルアップ ]
                         //普通→玄人
@@ -102,6 +118,7 @@ namespace TJAPlayer3
                             }
                         }
                         #endregion
+
                         #region[ 玄人譜面_レベルアップ ]
                         if (nBefore[i] == CDTX.ECourse.eExpert && nAfter[i] == CDTX.ECourse.eMaster)
                         {
@@ -110,6 +127,7 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Lane_Base[2].t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[ i ], TJAPlayer3.Skin.nScrollFieldY[ i ] );
                         }
                         #endregion
+
                         #region[ 玄人譜面_レベルダウン ]
                         if (nBefore[i] == CDTX.ECourse.eExpert && nAfter[i] == CDTX.ECourse.eNormal)
                         {
@@ -118,6 +136,7 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Lane_Base[0].t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[ i ], TJAPlayer3.Skin.nScrollFieldY[ i ] );
                         }
                         #endregion
+
                         #region[ 達人譜面_レベルダウン ]
                         if (nBefore[i] == CDTX.ECourse.eMaster && nAfter[i] == CDTX.ECourse.eNormal)
                         {

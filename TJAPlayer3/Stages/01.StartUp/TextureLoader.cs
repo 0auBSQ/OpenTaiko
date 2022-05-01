@@ -332,7 +332,9 @@ namespace TJAPlayer3
             #endregion
 
             #region 5_演奏画面
-            #region 共通
+
+            #region General
+
             Notes = TxC(GAME + @"Notes.png");
             Judge_Frame = TxC(GAME + @"Notes.png");
             SENotes = TxC(GAME + @"SENotes.png");
@@ -347,7 +349,8 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region 踊り子
+            #region Dancer
+
             TJAPlayer3.Skin.Game_Dancer_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + DANCER + @"1\"));
             if (TJAPlayer3.Skin.Game_Dancer_Ptn != 0)
             {
@@ -361,19 +364,27 @@ namespace TJAPlayer3
                     }
                 }
             }
+
             #endregion
-            #region モブ
+            
+            #region Mob
+
             TJAPlayer3.Skin.Game_Mob_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + MOB));
             Mob = new CTexture[TJAPlayer3.Skin.Game_Mob_Ptn];
             for (int i = 0; i < TJAPlayer3.Skin.Game_Mob_Ptn; i++)
             {
                 Mob[i] = TxC(GAME + MOB + i.ToString() + ".png");
             }
+
             #endregion
-            #region フッター
+            
+            #region Footer
+
             Mob_Footer = TxC(GAME + FOOTER + @"0.png");
+            
             #endregion
-            #region 背景
+
+            #region Background
 
             Background = TxC(GAME + Background + @"0\" + @"Background.png");
 
@@ -403,7 +414,9 @@ namespace TJAPlayer3
             Background_Down_Scroll = TxC(GAME + BACKGROUND + @"0\" + @"Down_Scroll.png");
 
             #endregion
-            #region 太鼓
+
+            #region Taiko
+
             Taiko_Background = new CTexture[5];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
@@ -417,9 +430,9 @@ namespace TJAPlayer3
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
-            Taiko_NamePlate = new CTexture[2];
-            Taiko_NamePlate[0] = TxC(GAME + TAIKO + @"1P_NamePlate.png");
-            Taiko_NamePlate[1] = TxC(GAME + TAIKO + @"2P_NamePlate.png");
+            //Taiko_NamePlate = new CTexture[2];
+            //Taiko_NamePlate[0] = TxC(GAME + TAIKO + @"1P_NamePlate.png");
+            //Taiko_NamePlate[1] = TxC(GAME + TAIKO + @"2P_NamePlate.png");
             Taiko_Base = TxC(GAME + TAIKO + @"Base.png");
             Taiko_Don_Left = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Don_Right = TxC(GAME + TAIKO + @"Don.png");
@@ -451,9 +464,10 @@ namespace TJAPlayer3
             {
                 Taiko_Combo_Guide[i] = TxC(GAME + TAIKO + @"Combo_Guide" + i.ToString() + ".png");
             }
+
             #endregion
 
-            #region ゲージ
+            #region Gauge
 
             Gauge = new CTexture[3];
             Gauge[0] = TxC(GAME + GAUGE + @"1P.png");
@@ -506,7 +520,9 @@ namespace TJAPlayer3
             Gauge_Soul_Explosion[1] = TxC(GAME + GAUGE + @"2P_Explosion.png");
 
             #endregion
-            #region 吹き出し
+
+            #region Balloon
+
             Balloon_Combo = new CTexture[2];
             Balloon_Combo[0] = TxC(GAME + BALLOON + @"Combo_1P.png");
             Balloon_Combo[1] = TxC(GAME + BALLOON + @"Combo_2P.png");
@@ -520,8 +536,11 @@ namespace TJAPlayer3
             {
                 Balloon_Breaking[i] = TxC(GAME + BALLOON + @"Breaking_" + i.ToString() + ".png");
             }
+
             #endregion
-            #region エフェクト
+            
+            #region Effects
+
             Effects_Hit_Explosion = TxCAf(GAME + EFFECTS + @"Hit\Explosion.png");
             if (Effects_Hit_Explosion != null) Effects_Hit_Explosion.b加算合成 = TJAPlayer3.Skin.Game_Effect_HitExplosion_AddBlend;
             Effects_Hit_Explosion_Big = TxC(GAME + EFFECTS + @"Hit\Explosion_Big.png");
@@ -554,8 +573,11 @@ namespace TJAPlayer3
             {
                 Effects_Roll[i] = TxC(GAME + EFFECTS + @"Roll\" + i.ToString() + ".png");
             }
+
             #endregion
-            #region レーン
+            
+            #region Lane
+
             Lane_Base = new CTexture[3];
             Lane_Text = new CTexture[3];
             string[] Lanes = new string[3] { "Normal", "Expert", "Master" };
@@ -572,7 +594,9 @@ namespace TJAPlayer3
             Lane_Background_GoGo = TxC(GAME + LANE + @"Background_GoGo.png");
 
             #endregion
+
             #region 終了演出
+
             End_Clear_Chara = TxC(GAME + END + @"Clear_Chara.png");
             End_Star = TxC(GAME + END + @"Star.png");
 
@@ -586,6 +610,7 @@ namespace TJAPlayer3
             {
                 End_Clear_L[i] = TxC(GAME + END + @"Clear\" + @"Clear_L_" + i.ToString() + ".png");
                 End_Clear_R[i] = TxC(GAME + END + @"Clear\" + @"Clear_R_" + i.ToString() + ".png");
+            
             }
             End_Clear_Text_ = TxC(GAME + END + @"Clear\" + @"Clear_Text.png");
             End_Clear_Text_Effect = TxC(GAME + END + @"Clear\" + @"Clear_Text_Effect.png");
@@ -594,6 +619,7 @@ namespace TJAPlayer3
             ClearFailed = TxC(GAME + END + @"ClearFailed\" + "Clear_Failed.png");
             ClearFailed1 = TxC(GAME + END + @"ClearFailed\" + "Clear_Failed1.png");
             ClearFailed2 = TxC(GAME + END + @"ClearFailed\" + "Clear_Failed2.png");
+
             End_ClearFailed = new CTexture[26];
             for (int i = 0; i < 26; i++)
                 End_ClearFailed[i] = TxC(GAME + END + @"ClearFailed\" + i.ToString() + ".png");
@@ -601,14 +627,17 @@ namespace TJAPlayer3
             End_FullCombo = new CTexture[67];
             for (int i = 0; i < 67; i++)
                 End_FullCombo[i] = TxC(GAME + END + @"FullCombo\" + i.ToString() + ".png");
+            
             End_FullComboLoop = new CTexture[3];
             for (int i = 0; i < 3; i++)
                 End_FullComboLoop[i] = TxC(GAME + END + @"FullCombo\" + "loop_" + i.ToString() + ".png");
 
             End_DondaFullComboBg = TxC(GAME + END + @"DondaFullCombo\" + "bg.png");
+            
             End_DondaFullCombo = new CTexture[62];
             for (int i = 0; i < 62; i++)
                 End_DondaFullCombo[i] = TxC(GAME + END + @"DondaFullCombo\" + i.ToString() + ".png");
+
             End_DondaFullComboLoop = new CTexture[3];
             for (int i = 0; i < 3; i++)
                 End_DondaFullComboLoop[i] = TxC(GAME + END + @"DondaFullCombo\" + "loop_" + i.ToString() + ".png");
@@ -622,18 +651,29 @@ namespace TJAPlayer3
             }
 
             #endregion
-            #region ゲームモード
+
+            #region GameMode
+
             GameMode_Timer_Tick = TxC(GAME + GAMEMODE + @"Timer_Tick.png");
             GameMode_Timer_Frame = TxC(GAME + GAMEMODE + @"Timer_Frame.png");
+            
             #endregion
-            #region ステージ失敗
+
+            #region ClearFailed
+
             Failed_Game = TxC(GAME + FAILED + @"Game.png");
             Failed_Stage = TxC(GAME + FAILED + @"Stage.png");
+            
             #endregion
-            #region ランナー
+
+            #region Runner
+
             Runner = TxC(GAME + RUNNER + @"0.png");
+
             #endregion
+
             #region DanC
+
             DanC_Background = TxC(GAME + DANC + @"Background.png");
             DanC_Gauge = new CTexture[4];
             var type = new string[] { "Normal", "Reach", "Clear", "Flush" };
@@ -656,9 +696,10 @@ namespace TJAPlayer3
             DanC_Small_ExamCymbol = TxC(GAME + DANC + @"Small_ExamCymbol.png");
             DanC_ExamCymbol = TxC(GAME + DANC + @"ExamCymbol.png");
             DanC_MiniNumber = TxC(GAME + DANC + @"MiniNumber.png");
+            
             #endregion
 
-            #region PuichiChara
+            #region PuchiChara
 
             PuchiChara = TxCGlobal(PUCHICHARA + @"0.png");
 
@@ -668,6 +709,7 @@ namespace TJAPlayer3
             #endregion
 
             #region Training
+
             Tokkun_DownBG = TxC(GAME + TRAINING + @"Down.png");
             Tokkun_BigTaiko = TxC(GAME + TRAINING + @"BigTaiko.png");
             Tokkun_ProgressBar = TxC(GAME + TRAINING + @"ProgressBar_Red.png");
@@ -678,6 +720,7 @@ namespace TJAPlayer3
             Tokkun_BigNumber = TxC(GAME + TRAINING + @"BigNumber.png");
             Tokkun_SmallNumber = TxC(GAME + TRAINING + @"SmallNumber.png");
             Tokkun_Speed_Measure = TxC(GAME + TRAINING + @"Speed_Measure.png");
+            
             #endregion
 
             #region [20_Tower]

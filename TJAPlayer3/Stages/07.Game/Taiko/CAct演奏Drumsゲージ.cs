@@ -276,8 +276,13 @@ namespace TJAPlayer3
                         if (this.ctGaugeFlash.n現在の値 <= 365) Opacity = 0;
                         else if (this.ctGaugeFlash.n現在の値 <= 448) Opacity = (int)((this.ctGaugeFlash.n現在の値 - 365) / 83f * 255f);
                         else if (this.ctGaugeFlash.n現在の値 <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.n現在の値 - 448) / 83f * 255f);
-                        TJAPlayer3.Tx.Gauge_Flash.Opacity = Opacity;
-                        TJAPlayer3.Tx.Gauge_Flash.t2D描画(TJAPlayer3.app.Device, 492, 144);
+
+                        if (TJAPlayer3.Tx.Gauge_Flash != null)
+                        {
+                            TJAPlayer3.Tx.Gauge_Flash.Opacity = Opacity;
+                            TJAPlayer3.Tx.Gauge_Flash.t2D描画(TJAPlayer3.app.Device, 492, 144);
+                        }
+                        
                     }
 
 
@@ -358,7 +363,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D上下反転描画(TJAPlayer3.app.Device, 492, 532);
                             }
                         }
-                        TJAPlayer3.Tx.Gauge_Line[1].t2D描画( TJAPlayer3.app.Device, 492, 532 );
+                        TJAPlayer3.Tx.Gauge_Line[1]?.t2D描画( TJAPlayer3.app.Device, 492, 532 );
                     }
                     #region[ 「クリア」文字 ]
                     if( this.db現在のゲージ値[ 1 ] >= 80.0 )

@@ -93,18 +93,22 @@ namespace TJAPlayer3
                             break;
                     }
 
-                    if (this.st[i].ctChipEffect.n現在の値 < 12)
+                    if (TJAPlayer3.Tx.ChipEffect != null)
                     {
-                        TJAPlayer3.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                        TJAPlayer3.Tx.ChipEffect.Opacity = (int)(this.st[i].ctChipEffect.n現在の値 * (float)(225 / 11));
-                        TJAPlayer3.Tx.ChipEffect.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * 130, 0, 130, 130));
+                        if (this.st[i].ctChipEffect.n現在の値 < 12)
+                        {
+                            TJAPlayer3.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
+                            TJAPlayer3.Tx.ChipEffect.Opacity = (int)(this.st[i].ctChipEffect.n現在の値 * (float)(225 / 11));
+                            TJAPlayer3.Tx.ChipEffect.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * 130, 0, 130, 130));
+                        }
+                        if (this.st[i].ctChipEffect.n現在の値 > 12 && this.st[i].ctChipEffect.n現在の値 < 24)
+                        {
+                            TJAPlayer3.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
+                            TJAPlayer3.Tx.ChipEffect.Opacity = 255 - (int)((this.st[i].ctChipEffect.n現在の値 - 10) * (float)(255 / 14));
+                            TJAPlayer3.Tx.ChipEffect.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * 130, 0, 130, 130));
+                        }
                     }
-                    if (this.st[i].ctChipEffect.n現在の値 > 12 && this.st[i].ctChipEffect.n現在の値 < 24)
-                    {
-                        TJAPlayer3.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-                        TJAPlayer3.Tx.ChipEffect.Opacity = 255 - (int)((this.st[i].ctChipEffect.n現在の値 - 10) * (float)(255 / 14));
-                        TJAPlayer3.Tx.ChipEffect.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * 130, 0, 130, 130));
-                    }
+                    
                 }
             }
             return 0;
