@@ -792,8 +792,9 @@ namespace TJAPlayer3
                 
                 // To change later to adapt to Tower Ama-kuchi
                 diff = Math.Min(diff, (int)Difficulty.Oni);
-                // To do : Add -2 ~ +2 mod modifiers
-                CConfigIni.CTimingZones tz = (diff <= (int)Difficulty.Normal) ? TJAPlayer3.ConfigIni.tzLevels[2] : TJAPlayer3.ConfigIni.tzLevels[4];
+
+                int timingShift = TJAPlayer3.ConfigIni.nTimingZones[player];                
+                CConfigIni.CTimingZones tz = (diff <= (int)Difficulty.Normal) ? TJAPlayer3.ConfigIni.tzLevels[timingShift] : TJAPlayer3.ConfigIni.tzLevels[2 + timingShift];
 
                 if (nDeltaTime <= tz.nGoodZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {

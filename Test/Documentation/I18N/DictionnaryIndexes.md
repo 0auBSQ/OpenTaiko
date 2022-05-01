@@ -227,6 +227,15 @@
 406 : Download puchicharas button
 407 : Online multiplayer button
 
+# Mod specific (005XX)
+
+500 : "Timing" mod name
+501 : "Loose" timing mod option
+502 : "Lenient" timing mod option
+503 : "Normal" timing mod option
+504 : "Strict" timing mod option
+505 : "Rigorous" timing mod option
+
 # In-game pause menu (0090X)
 
 900 : Continue

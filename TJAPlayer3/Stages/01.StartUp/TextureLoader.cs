@@ -777,6 +777,12 @@ namespace TJAPlayer3
                 Mod_Timing[i] = TxC(GAME + MODICONS + @"Timing\" + i.ToString() + @".png");
             }
 
+            Mod_SongSpeed = new CTexture[2];
+            for (int i = 0; i < Mod_SongSpeed.Length; i++)
+            {
+                Mod_SongSpeed[i] = TxC(GAME + MODICONS + @"SongSpeed\" + i.ToString() + @".png");
+            }
+
             Mod_Auto = TxC(GAME + MODICONS + @"Auto.png");
             Mod_None = TxC(GAME + MODICONS + @"None.png");
 
@@ -1672,7 +1678,8 @@ namespace TJAPlayer3
 
         #region [21_ModIcons]
 
-        public CTexture[]   Mod_Timing,
+        public CTexture[] Mod_Timing,
+            Mod_SongSpeed,
             HiSp;
         public CTexture     Mod_None,
             Mod_Auto;

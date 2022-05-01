@@ -18,8 +18,8 @@ namespace TJAPlayer3
             PLACEHOLDER_tDisplayNoneIcon(x + 60, y, player); // 3rd icon
             PLACEHOLDER_tDisplayNoneIcon(x + 90, y, player); // 4th icon
             PLACEHOLDER_tDisplayNoneIcon(x, y + 30, player); // 5th icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 30, y + 30, player); // 6th icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 60, y + 30, player); // 7th icon
+            tDisplayTimingIcon(x + 30, y + 30, actual); // 6th icon
+            tDisplaySongSpeedIcon(x + 60, y + 30, player); // 7th icon
             tDisplayAutoIcon(x + 90, y + 30, player); // 8th icon
         }
 
@@ -35,8 +35,8 @@ namespace TJAPlayer3
             PLACEHOLDER_tDisplayNoneIcon(x + 60, y, player); // 3rd icon
             PLACEHOLDER_tDisplayNoneIcon(x + 90, y, player); // 4th icon
             PLACEHOLDER_tDisplayNoneIcon(x + 120, y, player); // 5th icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 150, y, player); // 6th icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 180, y, player); // 7th icon
+            tDisplayTimingIcon(x + 150, y, actual); // 6th icon
+            tDisplaySongSpeedIcon(x + 180, y, player); // 7th icon
             tDisplayAutoIcon(x + 210, y, player); // 8th icon
 
             if (TJAPlayer3.Tx.Mod_None != null)
@@ -73,6 +73,26 @@ namespace TJAPlayer3
 
             if (_displayed == true)
                 TJAPlayer3.Tx.Mod_Auto?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else
+                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
+        }
+
+        static private void tDisplaySongSpeedIcon(int x, int y, int player)
+        {
+            if (TJAPlayer3.ConfigIni.n演奏速度 > 20)
+                TJAPlayer3.Tx.Mod_SongSpeed[1]?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (TJAPlayer3.ConfigIni.n演奏速度 < 20)
+                TJAPlayer3.Tx.Mod_SongSpeed[0]?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else
+                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
+        }
+
+        static private void tDisplayTimingIcon(int x, int y, int player)
+        {
+            int zones = TJAPlayer3.ConfigIni.nTimingZones[player];
+
+            if (zones != 2)
+                TJAPlayer3.Tx.Mod_Timing[zones]?.t2D描画(TJAPlayer3.app.Device, x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
         }

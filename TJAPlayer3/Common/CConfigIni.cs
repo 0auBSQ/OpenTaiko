@@ -758,6 +758,7 @@ namespace TJAPlayer3
 
 	    public STDGBVALUE<int> n表示可能な最小コンボ数;
 		public int[] nScrollSpeed;
+		public int[] nTimingZones;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
         public string FontName;
@@ -798,7 +799,7 @@ namespace TJAPlayer3
 			new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
 			new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
 			new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
-			new CTimingZones(25, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
+			new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
 
         public bool b大音符判定;
@@ -1403,6 +1404,7 @@ namespace TJAPlayer3
 			this.e判定位置 = new STDGBVALUE<E判定位置>();		// #33891 2014.6.26 yyagi
 			this.判定文字表示位置 = new STDGBVALUE<E判定文字表示位置>();
 			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
+			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -1427,6 +1429,7 @@ namespace TJAPlayer3
 			for (int i = 0; i < 4; i++)
             {
 				this.nScrollSpeed[i] = 9;
+				this.nTimingZones[i] = 2;
 			} 
 
 			this.n演奏速度 = 20;
@@ -1998,6 +2001,12 @@ namespace TJAPlayer3
 			sw.WriteLine("DrumsScrollSpeed2P={0}", this.nScrollSpeed[1]);
 			sw.WriteLine("DrumsScrollSpeed3P={0}", this.nScrollSpeed[2]);
 			sw.WriteLine("DrumsScrollSpeed4P={0}", this.nScrollSpeed[3]);
+			sw.WriteLine();
+			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict");
+			sw.WriteLine("TimingZones1P={0}", this.nTimingZones[0]);
+			sw.WriteLine("TimingZones2P={0}", this.nTimingZones[1]);
+			sw.WriteLine("TimingZones3P={0}", this.nTimingZones[2]);
+			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2794,16 +2803,14 @@ namespace TJAPlayer3
 											{
 												this.判定文字表示位置.Drums = (E判定文字表示位置) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.判定文字表示位置.Drums );
 											}
-                                            
+
+											#region [Mods]
+
 											#region [Scroll Speed]
 
-                                            else if ( str3.Equals( "DrumsScrollSpeed" ) )
+											else if (str3.Equals("DrumsScrollSpeed") || str3.Equals("DrumsScrollSpeed1P"))
 											{
 												this.nScrollSpeed[0] = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 0x7cf, this.nScrollSpeed[0] );
-											}
-											else if (str3.Equals("DrumsScrollSpeed1P"))
-											{
-												this.nScrollSpeed[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[0]);
 											}
 											else if (str3.Equals("DrumsScrollSpeed2P"))
 											{
@@ -2820,7 +2827,35 @@ namespace TJAPlayer3
 
 											#endregion
 
-											else if( str3.Equals( "PlaySpeed" ) )
+
+											#region [Timing Zones]
+
+											else if (str3.Equals("TimingZones1P"))
+											{
+												this.nTimingZones[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[0]);
+											}
+											else if (str3.Equals("TimingZones2P"))
+											{
+												this.nTimingZones[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[1]);
+											}
+											else if (str3.Equals("TimingZones3P"))
+											{
+												this.nTimingZones[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[2]);
+											}
+											else if (str3.Equals("TimingZones4P"))
+											{
+												this.nTimingZones[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[3]);
+											}
+
+
+											#endregion
+
+
+											#endregion
+
+
+
+											else if ( str3.Equals( "PlaySpeed" ) )
 											{
 												this.n演奏速度 = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 5, 400, this.n演奏速度 );
 											}

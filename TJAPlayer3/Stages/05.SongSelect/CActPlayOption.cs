@@ -61,10 +61,16 @@ namespace TJAPlayer3
             OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
             OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9010), Color.White, Color.Black);
             OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
-            OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
-            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+            OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(500), Color.White, Color.Black);
+            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
+            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+
+            for (int i = 0; i < 5; i++)
+            {
+                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), Color.White, Color.Black);
+            }
 
             for (int i = 0; i < OptionType.Length; i++)
                 OptionType[i].vc拡大縮小倍率.X = 0.96f;
@@ -93,6 +99,9 @@ namespace TJAPlayer3
             if (this.b活性化してない)
                 return 0;
 
+            if (ctOpen.n現在の値 == 0)
+                Init(player);
+
             ctOpen.t進行();
             ctClose.t進行();
 
@@ -114,31 +123,41 @@ namespace TJAPlayer3
 
             #endregion
 
+            // Temporary textures, to reimplement to fit the new menu
             TJAPlayer3.Tx.Difficulty_Option.t2D描画(TJAPlayer3.app.Device, 0, y);
+            
 
-            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, 0, y + NowCount * 40.7f);
+            float baseX = (player == 0) ? 200 : 1180;
+            float baseY = 659.9f + y - nOptionCount * 40.7f;
 
+            var _textures = new CTexture[]
+            {
+                txSpeed[nSpeedCount],
+                txSwitch[nStealth],
+                txSwitch[nAbekobe],
+                txRandom[nRandom],
+                txTiming[nTiming],
+                txGameMode[nGameMode],
+                txSwitch[nAutoMode],
+                txNone,
+                txNone,
+            };
+
+            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, baseX - 200, baseY - 375 + NowCount * 40.7f);
 
             for (int i = 0; i < OptionType.Length; i++)
             {
-                OptionType[i].t2D描画(TJAPlayer3.app.Device, 16, 379 + i * 40.8f + y);
+                OptionType[i].t2D描画(TJAPlayer3.app.Device, baseX - 184, baseY + 4 + i * 40.8f);
             }
 
-            txSpeed[nSpeedCount].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y);
-            txSwitch[nStealth].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + 1 * 40.7f);
-            txSwitch[nAbekobe].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + 2 * 40.7f);
-            txRandom[nRandom].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + 3 * 40.7f);
-            txGameMode[nGameMode].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + 4 * 40.7f);
-            txSwitch[nAutoMode].t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + 5 * 40.7f);
-
-            for (int i = 6; i < 8; i++)
+            for (int i = 0; i < _textures.Length; i++)
             {
-                txNone.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, 200, 375 + y + i * 40.7f);
+                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX, baseY + i * 40.7f);
             }
 
             if (ctClose.n現在の値 >= 50)
             {
-                Decision();
+                Decision(player);
                 NowCount = 0;
                 ctOpen.t停止();
                 ctOpen.n現在の値 = 0;
@@ -152,17 +171,30 @@ namespace TJAPlayer3
 
             if (!ctClose.b進行中)
             {
-                if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)) { OptionSelect(true); TJAPlayer3.Skin.sound変更音.t再生する(); };
-                if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue)) { OptionSelect(false); TJAPlayer3.Skin.sound変更音.t再生する(); };
+                bool _leftDrum = (player == 0)
+                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)
+                    : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P);
 
-                if ((TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed)) && ctOpen.n現在の値 >= ctOpen.n終了値)
+                bool _rightDrum = (player == 0)
+                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue)
+                    : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P);
+
+                bool _centerDrum = (player == 0)
+                    ? (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+                    : (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+
+
+                if (_leftDrum) { OptionSelect(true); TJAPlayer3.Skin.sound変更音.t再生する(); };
+                if (_rightDrum) { OptionSelect(false); TJAPlayer3.Skin.sound変更音.t再生する(); };
+
+                if (_centerDrum && ctOpen.n現在の値 >= ctOpen.n終了値)
                 {
                     TJAPlayer3.Skin.sound決定音.t再生する();
-                    if (NowCount < 7)
+                    if (NowCount < nOptionCount)
                     {
                         NowCount++;
                     }
-                    else if (NowCount >= 7 && !bEnd)
+                    else if (NowCount >= nOptionCount && !bEnd)
                     {
                         bEnd = true;
                         ctClose.t開始(0, 50, 6, TJAPlayer3.Timer);
@@ -172,13 +204,15 @@ namespace TJAPlayer3
 
            
             #endregion
+
             return 0;
         }
 
+        public int nOptionCount = 8;
 
         public CCounter ctOpen;
         public CCounter ctClose;
-        public CTexture[] OptionType = new CTexture[8];
+        public CTexture[] OptionType = new CTexture[9];
 
         public int NowCount;
         public int[] NowCountType = new int[8];
@@ -203,6 +237,9 @@ namespace TJAPlayer3
 
         public CTexture[] txSwitch = new CTexture[2];
 
+        public CTexture[] txTiming = new CTexture[5];
+        public int nTiming = 2;
+
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
         {
             using (var bmp = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 13).DrawPrivateFont(str文字, forecolor, backcolor))
@@ -211,21 +248,26 @@ namespace TJAPlayer3
             }
         }
 
+        private void ShiftVal(bool left, ref int value, int capUp, int capDown)
+        {
+            if (left)
+            {
+                if (value > capDown) value--;
+                else value = capUp;
+            }
+            else
+            {
+                if (value < capUp) value++;
+                else value = capDown;
+            }
+        }
+
         public void OptionSelect(bool left)
         {
             switch (NowCount)
             {
                 case 0:
-                    if (left)
-                    {
-                        if (nSpeedCount > 0) nSpeedCount--;
-                        else nSpeedCount = 15;
-                    }
-                    else
-                    {
-                        if (nSpeedCount < 15) nSpeedCount++;
-                        else nSpeedCount = 0;
-                    }
+                    ShiftVal(left, ref nSpeedCount, 15, 0);
                     break;
                 case 1:
                     if (nStealth == 0) nStealth = 1;
@@ -236,59 +278,152 @@ namespace TJAPlayer3
                     else nAbekobe = 0;
                     break;
                 case 3:
-                    if (left)
-                    {
-                        if (nRandom > 0) nRandom--;
-                        else nRandom = 2;
-                    }
-                    else
-                    {
-                        if (nRandom < 2) nRandom++;
-                        else nRandom = 0;
-                    }
+                    ShiftVal(left, ref nRandom, 2, 0);
                     break;
                 case 4:
+                    ShiftVal(left, ref nTiming, 4, 0);
+                    break;
+                case 5:
                     if (nGameMode == 0) nGameMode = 1;
                     else nGameMode = 0;
                     break;
-                case 5:
+                case 6:
                     if (nAutoMode == 0) nAutoMode = 1;
                     else nAutoMode = 0;
                     break;
 
             }
         }
-        public void Decision()
+
+        public void Init(int player)
         {
+            int actual = TJAPlayer3.GetActualPlayer(player);
+
+            #region [ Speed ]
+
+            int speed = TJAPlayer3.ConfigIni.nScrollSpeed[actual];
+
+            if (speed <= 4)
+                nSpeedCount = 0;
+            else if (speed <= 19)
+                nSpeedCount = speed - 8;
+            else if (speed <= 24)
+                nSpeedCount = 12;
+            else if (speed <= 29)
+                nSpeedCount = 13;
+            else if (speed <= 34)
+                nSpeedCount = 14;
+            else
+                nSpeedCount = 15;
+
+            #endregion
+
+            #region [ Doron ]
+
+            if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.OFF)
+                nStealth = 0;
+            else if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON)
+                nStealth = 1;
+
+            #endregion
+
+            #region [ Random ]
+
+            var rand_ = TJAPlayer3.ConfigIni.eRandom.Taiko;
+
+            if (rand_ == Eランダムモード.HYPERRANDOM)
+            {
+                nRandom = 2;
+                nAbekobe = 1;
+            }
+            else if (rand_ == Eランダムモード.SUPERRANDOM)
+            {
+                nRandom = 2;
+                nAbekobe = 0;
+            }
+            else if (rand_ == Eランダムモード.RANDOM)
+            {
+                nRandom = 1;
+                nAbekobe = 0;
+            }
+            else if (rand_ == Eランダムモード.MIRROR)
+            {
+                nRandom = 0;
+                nAbekobe = 1;
+            }
+            else if (rand_ == Eランダムモード.OFF)
+            {
+                nRandom = 0;
+                nAbekobe = 0;
+            }
+
+            #endregion
+
+            #region [ Timing ]
+
+            nTiming = TJAPlayer3.ConfigIni.nTimingZones[actual];
+
+            #endregion
+
+            #region [ GameMode ]
+
+            if (TJAPlayer3.ConfigIni.bTokkunMode == true)
+                nGameMode = 1;
+            else
+                nGameMode = 0;
+
+            #endregion
+
+            #region [ AutoMode ]
+
+            bool _auto = (player == 0)
+                ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay
+                : TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P;
+
+            if (_auto == true)
+                nAutoMode = 1;
+            else
+                nAutoMode = 0;
+
+            #endregion
+
+        }
+
+        public void Decision(int player)
+        {
+            int actual = TJAPlayer3.GetActualPlayer(player);
+
             #region [ Speed ]
 
             if (nSpeedCount == 0)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 4;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 4;
             }
             else if (nSpeedCount > 0 && nSpeedCount <= 11)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = nSpeedCount + 8;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = nSpeedCount + 8;
             }
             else if (nSpeedCount == 12)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 24;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 24;
             }
             else if (nSpeedCount == 13)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 29;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 29;
             }
             else if (nSpeedCount == 14)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 34;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 34;
             }
             else if (nSpeedCount == 15)
             {
-                TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(0)] = 39;
+                TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 39;
             }
 
             #endregion
+
             #region [ Doron ]
+
             if (nStealth == 0)
             {
                 TJAPlayer3.ConfigIni.eSTEALTH = Eステルスモード.OFF;
@@ -297,9 +432,12 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.ConfigIni.eSTEALTH = Eステルスモード.DORON;
             }
+
             #endregion
+
             #region [ Random ]
-            if(nRandom == 2 && nAbekobe == 1)
+
+            if (nRandom == 2 && nAbekobe == 1)
             {
                 TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.HYPERRANDOM;
             }
@@ -323,9 +461,18 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.OFF;
             }
+
             #endregion
+
+            #region [ Timing ]
+
+            TJAPlayer3.ConfigIni.nTimingZones[actual] = nTiming;
+
+            #endregion
+
             #region [ GameMode ]
-            if(nGameMode == 0)
+
+            if (nGameMode == 0)
             {
                 TJAPlayer3.ConfigIni.bTokkunMode = false;
             }
@@ -333,16 +480,26 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.ConfigIni.bTokkunMode = true;
             }
+
             #endregion
+
             #region [ AutoMode ]
-            if(nAutoMode == 1)
+
+            if (nAutoMode == 1)
             {
-                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = true;
+                if (player == 0)
+                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = true;
+                else
+                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = true;
             }
             else
             {
-                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = false;
+                if (player == 0)
+                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = false;
+                else
+                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = false;
             }
+
             #endregion
         }
 

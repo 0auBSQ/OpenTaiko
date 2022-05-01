@@ -197,7 +197,7 @@ namespace TJAPlayer3
 
             if (this.ctBarAnimeIn.b終了値に達した)
             {
-                if (!bSelect[0] && !bOption[0])
+                if (!bSelect[0] && !isOnOption())
                 {
                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
                     {
@@ -250,7 +250,7 @@ namespace TJAPlayer3
                     }
                 }
 
-                if (!bSelect[1] && !bOption[1] && TJAPlayer3.ConfigIni.nPlayerCount > 1)
+                if (!bSelect[1] && !isOnOption() && TJAPlayer3.ConfigIni.nPlayerCount > 1)
                 {
                     if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P))
                     {
@@ -476,6 +476,11 @@ namespace TJAPlayer3
                 }
                 x += 11;
             }
+        }
+
+        private bool isOnOption()
+        {
+            return bOption[1] || bOption[0];
         }
 
         public int nStrジャンルtoNum(string strジャンル)

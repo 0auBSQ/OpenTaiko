@@ -267,6 +267,13 @@ namespace TJAPlayer3
             [406] = "Télécharger des Puchicharas",
             [407] = "Multijoueur en ligne",
 
+            [500] = "Timing",
+            [501] = "Laxiste",
+            [502] = "Permissif",
+            [503] = "Normal",
+            [504] = "Strict",
+            [505] = "Rigoureux",
+
             [1000] = "Étage atteint",
             [1001] = "",
             [1002] = "P",
