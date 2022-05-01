@@ -13,14 +13,12 @@ namespace TJAPlayer3
             // +30 x/y
             int actual = TJAPlayer3.GetActualPlayer(player);
 
-            tDisplayHSIcon(x, y, actual); // 1st icon
+            tDisplayHSIcon(x , y, actual); // 1st icon
             tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
             tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 90, y, player); // 4th icon
-            PLACEHOLDER_tDisplayNoneIcon(x, y + 30, player); // 5th icon
-            tDisplayTimingIcon(x + 30, y + 30, actual); // 6th icon
-            tDisplaySongSpeedIcon(x + 60, y + 30, player); // 7th icon
-            tDisplayAutoIcon(x + 90, y + 30, player); // 8th icon
+            tDisplayTimingIcon(x, y + 30, actual); // 4th icon
+            tDisplaySongSpeedIcon(x + 30, y + 30, player); // 5th icon
+            tDisplayAutoIcon(x + 60, y + 30, player); // 6th icon
         }
 
         static public void tDisplayModsMenu(int x, int y, int player)
@@ -30,15 +28,14 @@ namespace TJAPlayer3
 
             int actual = TJAPlayer3.GetActualPlayer(player);
 
+
             tDisplayHSIcon(x, y, actual); // 1st icon
             tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
             tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 60, y, player); // 4th icon
-            PLACEHOLDER_tDisplayNoneIcon(x + 120, y, player); // 5th icon
-            tDisplayTimingIcon(x + 150, y, actual); // 6th icon
-            tDisplaySongSpeedIcon(x + 180, y, player); // 7th icon
-            tDisplayAutoIcon(x + 210, y, player); // 8th icon
-
+            tDisplayTimingIcon(x + 90, y, actual); // 4th icon
+            tDisplaySongSpeedIcon(x + 120, y, player); // 5th icon
+            tDisplayAutoIcon(x + 150, y, player); // 6th icon
+            
             if (TJAPlayer3.Tx.Mod_None != null)
                 TJAPlayer3.Tx.Mod_None.Opacity = 255;
         }
