@@ -14,10 +14,10 @@ namespace TJAPlayer3
             int actual = TJAPlayer3.GetActualPlayer(player);
 
             tDisplayHSIcon(x, y, actual); // 1st icon
-            tDisplayDoronIcon(x + 30, y, player); // 2nd icon
-            tDisplayMirrorIcon(x + 60, y, player); // 3rd icon
-            tDisplayRandomIcon(x + 90, y, player); // 4th icon
-            tDisplaySuperIcon(x, y + 30, player); // 5th icon
+            tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
+            tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
+            PLACEHOLDER_tDisplayNoneIcon(x + 90, y, player); // 4th icon
+            PLACEHOLDER_tDisplayNoneIcon(x, y + 30, player); // 5th icon
             tDisplayTimingIcon(x + 30, y + 30, actual); // 6th icon
             tDisplaySongSpeedIcon(x + 60, y + 30, player); // 7th icon
             tDisplayAutoIcon(x + 90, y + 30, player); // 8th icon
@@ -31,10 +31,10 @@ namespace TJAPlayer3
             int actual = TJAPlayer3.GetActualPlayer(player);
 
             tDisplayHSIcon(x, y, actual); // 1st icon
-            tDisplayDoronIcon(x + 30, y, player); // 2nd icon
-            tDisplayMirrorIcon(x + 60, y, player); // 3rd icon
-            tDisplayRandomIcon(x + 90, y, player); // 4th icon
-            tDisplaySuperIcon(x + 120, y, player); // 5th icon
+            tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
+            tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
+            PLACEHOLDER_tDisplayNoneIcon(x + 60, y, player); // 4th icon
+            PLACEHOLDER_tDisplayNoneIcon(x + 120, y, player); // 5th icon
             tDisplayTimingIcon(x + 150, y, actual); // 6th icon
             tDisplaySongSpeedIcon(x + 180, y, player); // 7th icon
             tDisplayAutoIcon(x + 210, y, player); // 8th icon
@@ -45,7 +45,7 @@ namespace TJAPlayer3
 
         static private void tDisplayHSIcon(int x, int y, int player)
         {
-            var _vals = new int[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 24, 29, 34, 39, 44, 49 };
+            var _vals = new int[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 24, 29, 34, 39 };
             int _i = -1;
 
             for (int j = 0; j < _vals.Length; j++)
@@ -77,38 +77,34 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
         }
         
-                static private void tDisplayDoronIcon(int x, int y, int player)
+        static private void tDisplayDoronIcon(int x, int y, int player)
         {
-            if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON)
-                TJAPlayer3.Tx.Mod_Doron.t2D描画(TJAPlayer3.app.Device, x, y);
-            else
-                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
-        }
-        
-        static private void tDisplayMirrorIcon(int x, int y, int player)
-        {
-            if (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.MIRROR)
-                TJAPlayer3.Tx.Mod_Mirror.t2D描画(TJAPlayer3.app.Device, x, y);
-            else
-                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
-        }
-        
-        static private void tDisplayRandomIcon(int x, int y, int player)
-        {
-            if (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.RANDOM)
-                TJAPlayer3.Tx.Mod_Random.t2D描画(TJAPlayer3.app.Device, x, y);
-            else
-                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
-        }
-        
-        static private void tDisplaySuperIcon(int x, int y, int player)
-        {
-            if (TJAPlayer3.ConfigIni.eRandom.Taiko == Eランダムモード.SUPERRANDOM)
-                TJAPlayer3.Tx.Mod_Super.t2D描画(TJAPlayer3.app.Device, x, y);
+            var conf_ = TJAPlayer3.ConfigIni.eSTEALTH;
+
+            if (conf_ == Eステルスモード.DORON)
+                TJAPlayer3.Tx.Mod_Doron?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (conf_ == Eステルスモード.STEALTH)
+                TJAPlayer3.Tx.Mod_Stealth?.t2D描画(TJAPlayer3.app.Device, x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
         }
 
+        static private void tDisplayRandomIcon(int x, int y, int player)
+        {
+            var rand_ = TJAPlayer3.ConfigIni.eRandom.Taiko;
+
+            if (rand_ == Eランダムモード.MIRROR)
+                TJAPlayer3.Tx.Mod_Mirror?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (rand_ == Eランダムモード.RANDOM)
+                TJAPlayer3.Tx.Mod_Random?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (rand_ == Eランダムモード.SUPERRANDOM)
+                TJAPlayer3.Tx.Mod_Super?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (rand_ == Eランダムモード.HYPERRANDOM)
+                TJAPlayer3.Tx.Mod_Hyper?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else
+                TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
+        }
+        
         static private void tDisplaySongSpeedIcon(int x, int y, int player)
         {
             if (TJAPlayer3.ConfigIni.n演奏速度 > 20)

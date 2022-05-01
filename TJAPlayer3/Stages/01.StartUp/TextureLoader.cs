@@ -784,8 +784,10 @@ namespace TJAPlayer3
             }
 
             Mod_Doron = TxC(GAME + MODICONS + @"Doron.png");
+            Mod_Stealth = TxC(GAME + MODICONS + @"Stealth.png");
             Mod_Mirror = TxC(GAME + MODICONS + @"Mirror.png");
             Mod_Super = TxC(GAME + MODICONS + @"Super.png");
+            Mod_Hyper = TxC(GAME + MODICONS + @"Hyper.png");
             Mod_Random = TxC(GAME + MODICONS + @"Random.png");
             Mod_Auto = TxC(GAME + MODICONS + @"Auto.png");
             Mod_None = TxC(GAME + MODICONS + @"None.png");
@@ -1687,9 +1689,11 @@ namespace TJAPlayer3
             HiSp;
         public CTexture     Mod_None,
             Mod_Doron,
+            Mod_Stealth,
             Mod_Mirror,
             Mod_Random,
             Mod_Super,
+            Mod_Hyper,
             Mod_Auto;
 
         #endregion

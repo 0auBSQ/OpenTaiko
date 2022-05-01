@@ -283,7 +283,7 @@
 1044 : Extra (Ura)
 1045 : Extreme / Extra
 
-# Song selection page options (0900X)
+# Song selection page options (090XX)
 
 9000 : Off
 9001 : On
@@ -300,6 +300,7 @@
 9013 : Auto
 9014 : Voice
 9015 : Sound Type
+9016 : Stealth
 
 # Song selection context boxes (091XX)
 

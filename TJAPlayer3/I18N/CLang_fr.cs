@@ -331,6 +331,7 @@ namespace TJAPlayer3
             [9013] = "Auto",
             [9014] = "Voix",
             [9015] = "Instrument",
+            [9016] = "STEALTH",
 
             [9100] = "Rechercher (Difficulté)",
             [9101] = "Difficulté",

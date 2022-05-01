@@ -52,6 +52,10 @@ namespace TJAPlayer3
             txRandom[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9003), Color.White, Color.Black);
             txRandom[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9004), Color.White, Color.Black);
 
+            txStealth[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
+            txStealth[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
+            txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9016), Color.White, Color.Black);
+
             txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
             txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
@@ -133,7 +137,7 @@ namespace TJAPlayer3
             var _textures = new CTexture[]
             {
                 txSpeed[nSpeedCount],
-                txSwitch[nStealth],
+                txStealth[nStealth],
                 txSwitch[nAbekobe],
                 txRandom[nRandom],
                 txTiming[nTiming],
@@ -222,6 +226,7 @@ namespace TJAPlayer3
         public CTexture[] txSpeed = new CTexture[16];
         public int nSpeedCount = 1;
 
+        public CTexture[] txStealth = new CTexture[3];
         public int nStealth = 0;
         public int nAbekobe = 0;
 
@@ -270,8 +275,7 @@ namespace TJAPlayer3
                     ShiftVal(left, ref nSpeedCount, 15, 0);
                     break;
                 case 1:
-                    if (nStealth == 0) nStealth = 1;
-                    else nStealth = 0;
+                    ShiftVal(left, ref nStealth, 2, 0);
                     break;
                 case 2:
                     if (nAbekobe == 0) nAbekobe = 1;
@@ -320,10 +324,7 @@ namespace TJAPlayer3
 
             #region [ Doron ]
 
-            if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.OFF)
-                nStealth = 0;
-            else if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.DORON)
-                nStealth = 1;
+            nStealth = (int)TJAPlayer3.ConfigIni.eSTEALTH;
 
             #endregion
 
@@ -424,14 +425,7 @@ namespace TJAPlayer3
 
             #region [ Doron ]
 
-            if (nStealth == 0)
-            {
-                TJAPlayer3.ConfigIni.eSTEALTH = Eステルスモード.OFF;
-            }
-            else
-            {
-                TJAPlayer3.ConfigIni.eSTEALTH = Eステルスモード.DORON;
-            }
+            TJAPlayer3.ConfigIni.eSTEALTH = (Eステルスモード)nStealth;
 
             #endregion
 
