@@ -99,12 +99,7 @@ namespace TJAPlayer3
                 else
                     TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
-            if (TJAPlayer3.ConfigIni.bTokkunMode == true)
-                TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-            if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
-                TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-
-
+            
             if(TJAPlayer3.Tx.Taiko_Base != null )
             {
                 TJAPlayer3.Tx.Taiko_Base.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[0], TJAPlayer3.Skin.Game_Taiko_Y[0]);
