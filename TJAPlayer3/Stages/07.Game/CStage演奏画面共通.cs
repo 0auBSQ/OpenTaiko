@@ -793,7 +793,9 @@ namespace TJAPlayer3
                 // To change later to adapt to Tower Ama-kuchi
                 diff = Math.Min(diff, (int)Difficulty.Oni);
 
-                int timingShift = TJAPlayer3.ConfigIni.nTimingZones[player];                
+                int actual = TJAPlayer3.GetActualPlayer(player);
+
+                int timingShift = TJAPlayer3.ConfigIni.nTimingZones[actual];                
                 CConfigIni.CTimingZones tz = (diff <= (int)Difficulty.Normal) ? TJAPlayer3.ConfigIni.tzLevels[timingShift] : TJAPlayer3.ConfigIni.tzLevels[2 + timingShift];
 
                 if (nDeltaTime <= tz.nGoodZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
@@ -802,12 +804,14 @@ namespace TJAPlayer3
 				}
                 if (nDeltaTime <= tz.nOkZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
-                    if ( TJAPlayer3.ConfigIni.bJust[player] )
+                    if ( TJAPlayer3.ConfigIni.bJust[actual] == 1 ) // Just
                         return E判定.Poor;
 					return E判定.Good;
 				}
                 if (nDeltaTime <= tz.nBadZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {
+                    if (TJAPlayer3.ConfigIni.bJust[actual] == 2) // Safe
+                        return E判定.Good;
                     return E判定.Poor;
 				}
 			}

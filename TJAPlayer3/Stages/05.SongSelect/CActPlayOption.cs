@@ -56,6 +56,10 @@ namespace TJAPlayer3
             txStealth[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
             txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9016), Color.White, Color.Black);
 
+            txJust[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
+            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.White, Color.Black);
+            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.White, Color.Black);
+
             txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
             txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
@@ -142,7 +146,7 @@ namespace TJAPlayer3
                 txSwitch[nAbekobe],
                 txRandom[nRandom],
                 txTiming[nTiming],
-                txSwitch[nJust],
+                txJust[nJust],
                 txGameMode[nGameMode],
                 txSwitch[nAutoMode],
                 txNone,
@@ -247,6 +251,7 @@ namespace TJAPlayer3
         public CTexture[] txTiming = new CTexture[5];
         public int nTiming = 2;
 
+        public CTexture[] txJust = new CTexture[3];
         public int nJust = 0;
 
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
@@ -292,7 +297,7 @@ namespace TJAPlayer3
                     ShiftVal(left, ref nTiming, 4, 0);
                     break;
                 case 5:
-                    ShiftVal(left, ref nJust, 1, 0);
+                    ShiftVal(left, ref nJust, 2, 0);
                     break;
                 case 6:
                     if (nGameMode == 0) nGameMode = 1;
@@ -375,7 +380,7 @@ namespace TJAPlayer3
 
             #region [Just]
 
-            nJust = TJAPlayer3.ConfigIni.bJust[actual] == true ? 1 : 0;
+            nJust = TJAPlayer3.ConfigIni.bJust[actual];
 
             #endregion
 
@@ -479,7 +484,7 @@ namespace TJAPlayer3
 
             #region [Just]
 
-            TJAPlayer3.ConfigIni.bJust[actual] = nJust == 1;
+            TJAPlayer3.ConfigIni.bJust[actual] = nJust;
 
             #endregion
 

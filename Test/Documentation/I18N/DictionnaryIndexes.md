@@ -304,6 +304,8 @@
 9014 : Voice
 9015 : Sound Type
 9016 : Stealth
+9017 : Safe
+9018 : Just
 
 # Song selection context boxes (091XX)
 

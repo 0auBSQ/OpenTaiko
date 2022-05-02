@@ -114,7 +114,7 @@ namespace TJAPlayer3
                 "STEALTH: Le notes et le texte en \ndessous sont cachés.",
             [70] = "Pas d'informations",
             [71] = "Activer ou non l'affichage \ndes informations des musiques.",
-            [72] = "Mode punitif",
+            [72] = "Mode Punitif",
             [73] = "Remplace les OK par des MAUVAIS.",
             [74] = "Notes vérouillées",
             [75] = "Si activé, taper le tambour entre\ndeux notes ajoute un MAUVAIS.",
@@ -335,6 +335,8 @@ namespace TJAPlayer3
             [9014] = "Voix",
             [9015] = "Instrument",
             [9016] = "STEALTH",
+            [9017] = "Protegé",
+            [9018] = "Punitif",
 
             [9100] = "Rechercher (Difficulté)",
             [9101] = "Difficulté",

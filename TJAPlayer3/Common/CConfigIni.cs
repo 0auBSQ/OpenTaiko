@@ -839,7 +839,7 @@ namespace TJAPlayer3
 		public int TokkunMashInterval;
 		public bool bSuperHard = false;
         public bool bTokkunMode = false;
-        public bool[] bJust = new bool[4] { false, false, false, false };
+        public int[] bJust = new int[4] { 0, 0, 0, 0 };
 
         public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
@@ -2064,10 +2064,10 @@ namespace TJAPlayer3
 			sw.WriteLine("{1}={0}", this.TokkunMashInterval, nameof(this.TokkunMashInterval));
 			sw.WriteLine();
 			sw.WriteLine( "; JUST(0:OFF, 1:ON)" );
-			sw.WriteLine( "Just1P={0}", this.bJust[0] ? 1 : 0 );
-			sw.WriteLine("Just2P={0}", this.bJust[1] ? 1 : 0);
-			sw.WriteLine("Just3P={0}", this.bJust[2] ? 1 : 0);
-			sw.WriteLine("Just4P={0}", this.bJust[3] ? 1 : 0);
+			sw.WriteLine( "Just1P={0}", this.bJust[0] );
+			sw.WriteLine("Just2P={0}", this.bJust[1] );
+			sw.WriteLine("Just3P={0}", this.bJust[2] );
+			sw.WriteLine("Just4P={0}", this.bJust[3] );
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
@@ -2856,19 +2856,19 @@ namespace TJAPlayer3
 
 											else if (str3.Equals("Just") || str3.Equals("Just1P"))
 											{
-												this.bJust[0] = C変換.bONorOFF(str4[0]);
+												this.bJust[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[0]);
 											}
 											else if (str3.Equals("Just2P"))
 											{
-												this.bJust[1] = C変換.bONorOFF(str4[0]);
+												this.bJust[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[1]);
 											}
 											else if (str3.Equals("Just3P"))
 											{
-												this.bJust[2] = C変換.bONorOFF(str4[0]);
+												this.bJust[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[2]);
 											}
 											else if (str3.Equals("Just4P"))
 											{
-												this.bJust[3] = C変換.bONorOFF(str4[0]);
+												this.bJust[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[3]);
 											}
 
 											#endregion

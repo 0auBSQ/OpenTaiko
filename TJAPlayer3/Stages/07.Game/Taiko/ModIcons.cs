@@ -93,8 +93,10 @@ namespace TJAPlayer3
         {
             var conf_ = TJAPlayer3.ConfigIni.bJust[player];
 
-            if (conf_ == true)
+            if (conf_ == 1)
                 TJAPlayer3.Tx.Mod_Just?.t2D描画(TJAPlayer3.app.Device, x, y);
+            else if (conf_ == 2)
+                TJAPlayer3.Tx.Mod_Safe?.t2D描画(TJAPlayer3.app.Device, x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(TJAPlayer3.app.Device, x, y);
         }
