@@ -378,7 +378,7 @@ namespace TJAPlayer3
                 {
                     //仮置き
                     int[] nSoulFire = new int[] { 52, 443, 0, 0 };
-                    for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
+                    for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ TJAPlayer3.ConfigIni.bTokkunMode == false)
                     {
                         if( this.db現在のゲージ値[ i ] >= 100.0 )
                         {
@@ -393,7 +393,7 @@ namespace TJAPlayer3
                     int[] nSoulY = new int[] { 125, 516, 0, 0 };
                     for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                     {
-                        if( this.db現在のゲージ値[ i ] >= 80.0 )
+                        if( this.db現在のゲージ値[ i ] >= 80.0 == TJAPlayer3.ConfigIni.bTokkunMode == false)
                         {
                             TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, 1184, nSoulY[ i ], new Rectangle( 0, 0, 80, 80 ) );
                         }
