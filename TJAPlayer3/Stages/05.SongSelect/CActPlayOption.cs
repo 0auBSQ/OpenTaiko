@@ -132,8 +132,7 @@ namespace TJAPlayer3
 
             #endregion
 
-            // Temporary textures, to reimplement to fit the new menu
-            TJAPlayer3.Tx.Difficulty_Option.t2D描画(TJAPlayer3.app.Device, 0, y);
+            
             
 
             float baseX = (player == 0) ? 200 : 1180;
@@ -153,7 +152,11 @@ namespace TJAPlayer3
                 txNone,
             };
 
-            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, baseX - 200, baseY - 375 + NowCount * 40.7f);
+            var _shift = player == 1 ? 640 : 0;
+            var _rect = new Rectangle(_shift, 0, 640, 720);
+
+            TJAPlayer3.Tx.Difficulty_Option.t2D描画(TJAPlayer3.app.Device, _shift, y, _rect);
+            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, _shift, baseY - 375 + NowCount * 40.8f, _rect);
 
             for (int i = 0; i < OptionType.Length; i++)
             {
@@ -162,7 +165,7 @@ namespace TJAPlayer3
 
             for (int i = 0; i < _textures.Length; i++)
             {
-                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX, baseY + i * 40.7f);
+                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX, baseY + 4 + i * 40.8f);
             }
 
             if (ctClose.n現在の値 >= 50)
