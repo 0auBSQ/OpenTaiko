@@ -162,8 +162,11 @@
 10056 : "Hide Dan/Tower" option title
 10057 : "Hide Dan/Tower" description
 10084 : "Shin-uchi toggle" option title
+10085 : "System options" menu title
+10086 : "Gameplay options" menu title
+10087 : "Exit" menu title
 10090 : "System" description
-10091 : "Drums" description
+10091 : "Gameplay options" description
 10092 : "Exit" description
 
 # Main Menu text (001XX)

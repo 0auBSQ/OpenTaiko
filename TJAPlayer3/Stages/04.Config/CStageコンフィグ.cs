@@ -121,12 +121,15 @@ namespace TJAPlayer3
 			if( !base.b活性化してない )
 			{
 				ctBackgroundAnime = new CCounter(0, 1280, 20, TJAPlayer3.Timer);
-				//this.tx背景 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_background.jpg" ), false );
-				//this.tx上部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_header panel.png" ) );
-				//this.tx下部パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_footer panel.png" ) );
-				//this.txMenuカーソル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\ScreenConfig menu cursor.png" ) );
-				string[] strMenuItem = {"System", "Drums", "Exit"};
-			    txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
+
+				string[] strMenuItem = {
+					CLangManager.LangInstance.GetString(10085),
+					CLangManager.LangInstance.GetString(10086),
+					CLangManager.LangInstance.GetString(10087)
+				};
+			    
+				txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
+
 			    using (var prvFont = new CPrivateFastFont(CSkin.Path(@"mplus-1p-heavy.ttf"), 20))
 			    {
 			        for (int i = 0; i < strMenuItem.Length; i++)
@@ -189,7 +192,8 @@ namespace TJAPlayer3
 
 			// 描画
 
-			#region [ 背景 ]
+			#region [ Background ]
+			
 			//---------------------
 			for(int i = 0; i < 2; i++)
 				if (TJAPlayer3.Tx.Config_Background != null )
@@ -197,8 +201,10 @@ namespace TJAPlayer3
 			if(TJAPlayer3.Tx.Config_Header != null )
                 TJAPlayer3.Tx.Config_Header.t2D描画( TJAPlayer3.app.Device, 0, 0 );
 			//---------------------
+
 			#endregion
-			#region [ メニューカーソル ]
+
+			#region [ Menu Cursor ]
 			//---------------------
 			if( TJAPlayer3.Tx.Config_Cursor != null )
 			{
@@ -223,7 +229,8 @@ namespace TJAPlayer3
 			}
 			//---------------------
 			#endregion
-			#region [ メニュー ]
+			
+			#region [ Menu ]
 			//---------------------
 			int menuY = 162 - 22 + 13;
 			int stepY = 39;
@@ -241,13 +248,15 @@ namespace TJAPlayer3
 			}
 			//---------------------
 			#endregion
-			#region [ 説明文パネル ]
+			
+			#region [ Explanation Panel ]
 			//---------------------
 			if( this.tx説明文パネル != null )
 				this.tx説明文パネル.t2D描画( TJAPlayer3.app.Device, 67, 382 );
 			//---------------------
 			#endregion
-			#region [ アイテム ]
+			
+			#region [ Item ]
 			//---------------------
 			switch( this.eItemPanelモード )
 			{
@@ -261,6 +270,7 @@ namespace TJAPlayer3
 			}
 			//---------------------
 			#endregion
+			
 			//#region [ 上部パネル ]
 			////---------------------
 			//if( this.tx上部パネル != null )
@@ -273,12 +283,14 @@ namespace TJAPlayer3
 			//	this.tx下部パネル.t2D描画( CDTXMania.app.Device, 0, 720 - this.tx下部パネル.szテクスチャサイズ.Height );
 			////---------------------
 			//#endregion
-			#region [ オプションパネル ]
+
+			#region [ Option Panel ]
 			//---------------------
             //this.actオプションパネル.On進行描画();
 			//---------------------
 			#endregion
-			#region [ フェードイン_アウト ]
+
+			#region [ FadeOut ]
 			//---------------------
 			switch( base.eフェーズID )
 			{

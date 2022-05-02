@@ -59,8 +59,9 @@ namespace TJAPlayer3
 		public int n現在の選択項目;
 
 
-		// メソッド
+		// General system options
 		#region [ t項目リストの設定_System() ]
+
 		public void t項目リストの設定_System(bool refresh = true)
 		{
 			this.tConfigIniへ記録する();
@@ -279,7 +280,7 @@ namespace TJAPlayer3
 		#endregion
 
 
-
+		// Gameplay options 
 		#region [ t項目リストの設定_Drums() ]
 
 		public void t項目リストの設定_Drums()
@@ -293,14 +294,6 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
-			/*this.iTaikoAutoPlay = new CItemToggle(CLangManager.LangInstance.GetString(56), TJAPlayer3.ConfigIni.b太鼓パートAutoPlay,
-				CLangManager.LangInstance.GetString(57));
-			this.list項目リスト.Add( this.iTaikoAutoPlay );
-
-			this.iTaikoAutoPlay2P = new CItemToggle(CLangManager.LangInstance.GetString(58), TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P,
-				CLangManager.LangInstance.GetString(59));
-			this.list項目リスト.Add( this.iTaikoAutoPlay2P );*/
-
 			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
 				CLangManager.LangInstance.GetString(61));
 			this.list項目リスト.Add(this.iRollsPerSec);
@@ -309,38 +302,13 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(13));
 			this.list項目リスト.Add(this.iAILevel);
 
-			/*
-			this.iTaikoAutoRoll = new CItemToggle(CLangManager.LangInstance.GetString(60), TJAPlayer3.ConfigIni.bAuto先生の連打,
-				CLangManager.LangInstance.GetString(61));
-			this.list項目リスト.Add( this.iTaikoAutoRoll );
-			*/
-
-			/*this.iDrumsScrollSpeed = new CItemInteger(CLangManager.LangInstance.GetString(62), 0, 0x7cf, TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile],
-				CLangManager.LangInstance.GetString(63));
-			this.list項目リスト.Add( this.iDrumsScrollSpeed );*/
-
 			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(64), 0, 10, TJAPlayer3.ConfigIni.nRisky,
 				CLangManager.LangInstance.GetString(65));
 			this.list項目リスト.Add( this.iSystemRisky );
 
-			/*this.iTaikoRandom = new CItemList(CLangManager.LangInstance.GetString(66), CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eRandom.Taiko,
-				CLangManager.LangInstance.GetString(67),
-				new string[] { "OFF", "RANDOM", "MIRROR", "SUPER", "HYPER" } );
-			this.list項目リスト.Add( this.iTaikoRandom );*/
-
-
-			/*this.iTaikoStealth = new CItemList(CLangManager.LangInstance.GetString(68), CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eSTEALTH,
-				CLangManager.LangInstance.GetString(69),
-				new string[] { "OFF", "DORON", "STEALTH" } );
-			this.list項目リスト.Add( this.iTaikoStealth );*/
-
 			this.iTaikoNoInfo = new CItemToggle(CLangManager.LangInstance.GetString(70), TJAPlayer3.ConfigIni.bNoInfo,
 				CLangManager.LangInstance.GetString(71));
 			this.list項目リスト.Add( this.iTaikoNoInfo );
-
-			/*this.iTaikoJust = new CItemToggle(CLangManager.LangInstance.GetString(72), TJAPlayer3.ConfigIni.bJust,
-				CLangManager.LangInstance.GetString(73));
-			this.list項目リスト.Add( this.iTaikoJust );*/
 
 			this.iDrumsTight = new CItemToggle(CLangManager.LangInstance.GetString(74), TJAPlayer3.ConfigIni.bTight,
 				CLangManager.LangInstance.GetString(75));
