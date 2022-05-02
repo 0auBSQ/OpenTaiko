@@ -100,6 +100,11 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
             
+            if (TJAPlayer3.ConfigIni.bTokkunMode == true)
+                TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+            if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+
             if(TJAPlayer3.Tx.Taiko_Base != null )
             {
                 TJAPlayer3.Tx.Taiko_Base.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[0], TJAPlayer3.Skin.Game_Taiko_Y[0]);
@@ -206,35 +211,6 @@ namespace TJAPlayer3
 
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
-                // 2018/7/1 一時的にオプション画像の廃止。オプション画像については後日作り直します。(AioiLight)
-                //if( !CDTXMania.ConfigIni.bNoInfo && CDTXMania.Skin.eDiffDispMode != E難易度表示タイプ.mtaikoに画像で表示 )
-                //{
-                //    this.txオプションパネル_HS.t2D描画( CDTXMania.app.Device, 0, 230, new Rectangle( 0, this.nHS * 44, 162, 44 ) );
-                //    switch( CDTXMania.ConfigIni.eRandom.Taiko )
-                //    {
-                //        case Eランダムモード.RANDOM:
-                //            if( this.txオプションパネル_RANMIR != null )
-                //                this.txオプションパネル_RANMIR.t2D描画( CDTXMania.app.Device, 0, 264, new Rectangle( 0, 0, 162, 44 ) );
-                //            break;
-                //        case Eランダムモード.HYPERRANDOM:
-                //            if( this.txオプションパネル_RANMIR != null )
-                //                this.txオプションパネル_RANMIR.t2D描画( CDTXMania.app.Device, 0, 264, new Rectangle( 0, 88, 162, 44 ) );
-                //            break;
-                //        case Eランダムモード.SUPERRANDOM:
-                //            if( this.txオプションパネル_RANMIR != null )
-                //                this.txオプションパネル_RANMIR.t2D描画( CDTXMania.app.Device, 0, 264, new Rectangle( 0, 132, 162, 44 ) );
-                //            break;
-                //        case Eランダムモード.MIRROR:
-                //            if( this.txオプションパネル_RANMIR != null )
-                //                this.txオプションパネル_RANMIR.t2D描画( CDTXMania.app.Device, 0, 264, new Rectangle( 0, 44, 162, 44 ) );
-                //            break;
-                //    }
-
-                //    if( CDTXMania.ConfigIni.eSTEALTH == Eステルスモード.STEALTH )
-                //        this.txオプションパネル_特殊.t2D描画( CDTXMania.app.Device, 0, 300, new Rectangle( 0, 0, 162, 44 ) );
-                //    else if( CDTXMania.ConfigIni.eSTEALTH == Eステルスモード.DORON )
-                //        this.txオプションパネル_特殊.t2D描画( CDTXMania.app.Device, 0, 300, new Rectangle( 0, 44, 162, 44 ) );
-                //}
 
                 ModIcons.tDisplayMods(80, 236 + i * 190, i);
 
