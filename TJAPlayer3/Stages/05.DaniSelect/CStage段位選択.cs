@@ -21,7 +21,7 @@ namespace TJAPlayer3
             base.list子Activities.Add(this.actFOtoNowLoading = new CActFIFOStart());
             base.list子Activities.Add(this.段位挑戦選択画面 = new CActSelect段位挑戦選択画面());
             base.list子Activities.Add(this.actFOtoTitle = new CActFIFOBlack());
-
+            base.list子Activities.Add(this.actPlayOption = new CActPlayOption());
             base.list子Activities.Add(this.PuchiChara = new PuchiChara());
         }
 
@@ -79,7 +79,6 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
 
             this.段位リスト.On進行描画();
-
 
             if (stamp < 6000)
             {
@@ -144,6 +143,7 @@ namespace TJAPlayer3
                 }
 
                 TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
+                ModIcons.tDisplayModsMenu(40, 672, 0);
 
                 #region [ キー関連 ]
 
@@ -210,7 +210,9 @@ namespace TJAPlayer3
                 this.段位挑戦選択画面.On進行描画();
             }
 
-            if(ct待機.n現在の値 >= 3000)
+            if (段位挑戦選択画面.bOption) actPlayOption.On進行描画(0);
+
+            if (ct待機.n現在の値 >= 3000)
             {
                 TJAPlayer3.stage段位選択.t段位を選択する();
                 ct待機.n現在の値 = 0;
@@ -280,5 +282,6 @@ namespace TJAPlayer3
         public CActFIFOBlack actFOtoTitle;
         public CActSelect段位リスト 段位リスト;
         public CActSelect段位挑戦選択画面 段位挑戦選択画面;
+        public CActPlayOption actPlayOption;
     }
 }

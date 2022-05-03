@@ -138,6 +138,10 @@ namespace TJAPlayer3
                 {
                     this.txGENRE.color4 = tTagDict[genreName];
                 }
+                else if (genreName == CLangManager.LangInstance.GetString(101))
+                {
+                    this.txGENRE.color4 = tTagDict["段位道場"];
+                }
                 else
                 {
                     this.txGENRE.color4 = C変換.ColorToColor4(stageColor);
@@ -331,6 +335,15 @@ namespace TJAPlayer3
 			}
 			return 0;
 		}
+
+        public enum ESongType
+        {
+            REGULAR,
+            DAN,
+            TOWER,
+            BOSS,
+            TOTAL,
+        }
 
 
 		// その他

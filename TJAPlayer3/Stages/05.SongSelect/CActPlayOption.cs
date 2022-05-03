@@ -117,6 +117,7 @@ namespace TJAPlayer3
             if (!ctOpen.b進行中) ctOpen.t開始(0, 50, 6, TJAPlayer3.Timer);
 
             var act難易度 = TJAPlayer3.stage選曲.act難易度選択画面;
+            var danAct = TJAPlayer3.stage段位選択.段位挑戦選択画面;
 
             #region [ Open & Close ]
 
@@ -135,7 +136,7 @@ namespace TJAPlayer3
             
             
 
-            float baseX = (player == 0) ? 200 : 1180;
+            float baseX = (player == 0) ? 200 : 1188;
             float baseY = 659.9f + y - nOptionCount * 40.7f;
 
             var _textures = new CTexture[]
@@ -178,6 +179,7 @@ namespace TJAPlayer3
                 ctClose.n現在の値 = 0;
                 bEnd = false;
                 act難易度.bOption[player] = false;
+                danAct.bOption = false;
             }
 
             #region [ Key ]

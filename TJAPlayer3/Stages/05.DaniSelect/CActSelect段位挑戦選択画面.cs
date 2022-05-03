@@ -17,6 +17,7 @@ namespace TJAPlayer3
             ctBarOut = new CCounter();
             ctBarOut.n現在の値 = 255;
             TJAPlayer3.stage段位選択.bDifficultyIn = false;
+            bOption = false;
 
             base.On活性化();
         }
@@ -49,7 +50,7 @@ namespace TJAPlayer3
 
                 #region [Key bindings]
 
-                if (ctBarIn.b終了値に達した && !TJAPlayer3.stage段位選択.b選択した)
+                if (ctBarIn.b終了値に達した && !TJAPlayer3.stage段位選択.b選択した && bOption == false)
                 {
                     if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
                         TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
@@ -86,6 +87,10 @@ namespace TJAPlayer3
                             TJAPlayer3.Skin.soundDanSongSelect.t再生する();
                             TJAPlayer3.stage段位選択.ct待機.t開始(0, 3000, 1, TJAPlayer3.Timer);
                         }
+                        else if (n現在の選択行 == 2)
+                        {
+                            bOption = true;
+                        }
                     }
                 }
 
@@ -97,6 +102,8 @@ namespace TJAPlayer3
 
         public CCounter ctBarIn;
         public CCounter ctBarOut;
+
+        public bool bOption;
 
         private int n現在の選択行;
     }
