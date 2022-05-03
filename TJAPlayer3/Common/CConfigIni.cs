@@ -757,7 +757,8 @@ namespace TJAPlayer3
 	    }
 
 	    public STDGBVALUE<int> n表示可能な最小コンボ数;
-		public STDGBVALUE<int> n譜面スクロール速度;
+		public int[] nScrollSpeed;
+		public int[] nTimingZones;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
         public string FontName;
@@ -798,7 +799,7 @@ namespace TJAPlayer3
 			new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
 			new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
 			new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
-			new CTimingZones(25, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
+			new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
 
         public bool b大音符判定;
@@ -838,7 +839,7 @@ namespace TJAPlayer3
 		public int TokkunMashInterval;
 		public bool bSuperHard = false;
         public bool bTokkunMode = false;
-        public bool bJust;
+        public int[] bJust = new int[4] { 0, 0, 0, 0 };
 
         public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
@@ -1402,7 +1403,8 @@ namespace TJAPlayer3
 			this.bLeft = new STDGBVALUE<bool>();
 			this.e判定位置 = new STDGBVALUE<E判定位置>();		// #33891 2014.6.26 yyagi
 			this.判定文字表示位置 = new STDGBVALUE<E判定文字表示位置>();
-			this.n譜面スクロール速度 = new STDGBVALUE<int>();
+			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
+			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -1416,13 +1418,20 @@ namespace TJAPlayer3
 				this.bLight[ i ] = false;
 				this.bLeft[ i ] = false;
 				this.判定文字表示位置[ i ] = E判定文字表示位置.レーン上;
-				this.n譜面スクロール速度[ i ] = 9;
 				this.nJudgeLinePosOffset[ i ] = 0;
 				this.eInvisible[ i ] = EInvisible.OFF;
-				this.nViewerScrollSpeed[ i ] = 1;
+				//this.nViewerScrollSpeed[ i ] = 1;
 				this.e判定位置[ i ] = E判定位置.標準;
 				//this.e判定表示優先度[ i ] = E判定表示優先度.Chipより下;
 			}
+
+
+			for (int i = 0; i < 4; i++)
+            {
+				this.nScrollSpeed[i] = 9;
+				this.nTimingZones[i] = 2;
+			} 
+
 			this.n演奏速度 = 20;
 			this.b演奏速度が一倍速であるとき以外音声を再生しない = false;
 			#region [ AutoPlay ]
@@ -1988,7 +1997,16 @@ namespace TJAPlayer3
 			sw.WriteLine( "DrumsTight={0}", this.bTight ? 1 : 0 );
 			sw.WriteLine();
 			sw.WriteLine("; ドラム譜面スクロール速度(0:x0.1, 9:x1.0, 14:x1.5,…,1999:x200.0)");
-			sw.WriteLine( "DrumsScrollSpeed={0}", this.n譜面スクロール速度.Drums );
+			sw.WriteLine("DrumsScrollSpeed1P={0}", this.nScrollSpeed[0] );
+			sw.WriteLine("DrumsScrollSpeed2P={0}", this.nScrollSpeed[1]);
+			sw.WriteLine("DrumsScrollSpeed3P={0}", this.nScrollSpeed[2]);
+			sw.WriteLine("DrumsScrollSpeed4P={0}", this.nScrollSpeed[3]);
+			sw.WriteLine();
+			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict");
+			sw.WriteLine("TimingZones1P={0}", this.nTimingZones[0]);
+			sw.WriteLine("TimingZones2P={0}", this.nTimingZones[1]);
+			sw.WriteLine("TimingZones3P={0}", this.nTimingZones[2]);
+			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2046,7 +2064,10 @@ namespace TJAPlayer3
 			sw.WriteLine("{1}={0}", this.TokkunMashInterval, nameof(this.TokkunMashInterval));
 			sw.WriteLine();
 			sw.WriteLine( "; JUST(0:OFF, 1:ON)" );
-			sw.WriteLine( "Just={0}", this.bJust ? 1 : 0 );
+			sw.WriteLine( "Just1P={0}", this.bJust[0] );
+			sw.WriteLine("Just2P={0}", this.bJust[1] );
+			sw.WriteLine("Just3P={0}", this.bJust[2] );
+			sw.WriteLine("Just4P={0}", this.bJust[3] );
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
@@ -2785,11 +2806,79 @@ namespace TJAPlayer3
 											{
 												this.判定文字表示位置.Drums = (E判定文字表示位置) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.判定文字表示位置.Drums );
 											}
-											else if( str3.Equals( "DrumsScrollSpeed" ) )
+
+											#region [Mods]
+
+											#region [Scroll Speed]
+
+											else if (str3.Equals("DrumsScrollSpeed") || str3.Equals("DrumsScrollSpeed1P"))
 											{
-												this.n譜面スクロール速度.Drums = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 0x7cf, this.n譜面スクロール速度.Drums );
+												this.nScrollSpeed[0] = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 0x7cf, this.nScrollSpeed[0] );
 											}
-											else if( str3.Equals( "PlaySpeed" ) )
+											else if (str3.Equals("DrumsScrollSpeed2P"))
+											{
+												this.nScrollSpeed[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[1]);
+											}
+											else if (str3.Equals("DrumsScrollSpeed3P"))
+											{
+												this.nScrollSpeed[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[2]);
+											}
+											else if (str3.Equals("DrumsScrollSpeed4P"))
+											{
+												this.nScrollSpeed[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[3]);
+											}
+
+											#endregion
+
+											#region [Timing Zones]
+
+											else if (str3.Equals("TimingZones1P"))
+											{
+												this.nTimingZones[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[0]);
+											}
+											else if (str3.Equals("TimingZones2P"))
+											{
+												this.nTimingZones[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[1]);
+											}
+											else if (str3.Equals("TimingZones3P"))
+											{
+												this.nTimingZones[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[2]);
+											}
+											else if (str3.Equals("TimingZones4P"))
+											{
+												this.nTimingZones[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[3]);
+											}
+
+
+											#endregion
+
+											#region [Just]
+
+											else if (str3.Equals("Just") || str3.Equals("Just1P"))
+											{
+												this.bJust[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[0]);
+											}
+											else if (str3.Equals("Just2P"))
+											{
+												this.bJust[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[1]);
+											}
+											else if (str3.Equals("Just3P"))
+											{
+												this.bJust[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[2]);
+											}
+											else if (str3.Equals("Just4P"))
+											{
+												this.bJust[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[3]);
+											}
+
+											#endregion
+
+
+											#endregion
+
+
+
+											else if ( str3.Equals( "PlaySpeed" ) )
 											{
 												this.n演奏速度 = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 5, 400, this.n演奏速度 );
 											}
@@ -2877,11 +2966,10 @@ namespace TJAPlayer3
 											{
 												this.bJudgeCountDisplay = C変換.bONorOFF( str4[ 0 ] );
 											}
-											else if( str3.Equals( "Just" ) )
-											{
-												this.bJust = C変換.bONorOFF( str4[ 0 ] );
-											}
-                                            else if( str3.Equals( "PlayerCount" ) )
+
+                                            
+
+											else if ( str3.Equals( "PlayerCount" ) )
                                             {
                                                 this.nPlayerCount = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 2, this.nPlayerCount );
                                             }
@@ -2898,6 +2986,7 @@ namespace TJAPlayer3
 									//-----------------------------
 									case Eセクション種別.ViewerOption:
 										{
+											/*
 											if ( str3.Equals( "ViewerDrumsScrollSpeed" ) )
 											{
 												this.nViewerScrollSpeed.Drums = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 1999, this.nViewerScrollSpeed.Drums );
@@ -2910,7 +2999,8 @@ namespace TJAPlayer3
 											{
 												this.nViewerScrollSpeed.Bass = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 1999, this.nViewerScrollSpeed.Bass );
 											}
-											else if ( str3.Equals( "ViewerVSyncWait" ) )
+											*/
+											if ( str3.Equals( "ViewerVSyncWait" ) )
 											{
 												this.bViewerVSyncWait = C変換.bONorOFF( str4[ 0 ] );
 											}

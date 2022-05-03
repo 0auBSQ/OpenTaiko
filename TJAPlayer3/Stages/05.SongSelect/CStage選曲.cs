@@ -435,6 +435,7 @@ namespace TJAPlayer3
 
                 #region[ 下部テキスト ]
 
+                /*
                 if (TJAPlayer3.Tx.SongSelect_Auto != null)
                 {
                     if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
@@ -446,6 +447,17 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.SongSelect_Auto.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Auto_X[1], TJAPlayer3.Skin.SongSelect_Auto_Y[1]);
                     }
                 }
+                */
+
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    ModIcons.tDisplayModsMenu(40 + i * 980, 672, i);
+                }
+
+                
+
+
+
                 if (TJAPlayer3.ConfigIni.bTokkunMode)
                     TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, "GAME: TRAINING MODE");
                 if (TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー)

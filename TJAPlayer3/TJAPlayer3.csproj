@@ -268,6 +268,7 @@
     <Compile Include="Stages\07.Game\Taiko\FlyingNotes.cs" />
     <Compile Include="Stages\07.Game\Taiko\LaneFlash.cs" />
     <Compile Include="Character\PuchiChara.cs" />
+    <Compile Include="Stages\07.Game\Taiko\ModIcons.cs" />
     <Compile Include="Stages\07.Game\Taiko\Rainbow.cs" />
     <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsチップファイアD.cs" />
     <Compile Include="Stages\07.Game\CAct演奏PauseMenu.cs" />

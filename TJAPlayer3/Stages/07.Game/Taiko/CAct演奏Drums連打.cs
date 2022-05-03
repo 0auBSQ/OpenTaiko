@@ -153,7 +153,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 255;
                     }
 
-                    TJAPlayer3.Tx.Balloon_Roll.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Roll_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * 334, 0, 334, 204)); ;
+                    TJAPlayer3.Tx.Balloon_Roll?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Roll_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * 334, 0, 334, 204)); ;
                     this.t文字表示(TJAPlayer3.Skin.Game_Balloon_Roll_Number_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Number_Y[player], n連打数.ToString(), n連打数, player);
                 }
             }

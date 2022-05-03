@@ -188,18 +188,26 @@ namespace TJAPlayer3
                             RollCharas[i].X += RollCharas[i].XAdd;
                             RollCharas[i].Y += RollCharas[i].YAdd;
                         }
-                        TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(TJAPlayer3.app.Device, RollCharas[i].X, RollCharas[i].Y);
-                        // 画面外にいたら描画をやめさせる
-                        if(RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Width || RollCharas[i].X > 1280)
+
+                        if (TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type] != null)
                         {
-                            RollCharas[i].Counter.t停止();
-                            RollCharas[i].IsUsing = false;
+                            TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(TJAPlayer3.app.Device, RollCharas[i].X, RollCharas[i].Y);
+                            
+                            // 画面外にいたら描画をやめさせる
+                            if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Width || RollCharas[i].X > 1280)
+                            {
+                                RollCharas[i].Counter.t停止();
+                                RollCharas[i].IsUsing = false;
+                            }
+                            
+                            if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Height || RollCharas[i].Y > 720)
+                            {
+                                RollCharas[i].Counter.t停止();
+                                RollCharas[i].IsUsing = false;
+                            }
                         }
-                        if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Height || RollCharas[i].Y > 720)
-                        {
-                            RollCharas[i].Counter.t停止();
-                            RollCharas[i].IsUsing = false;
-                        }
+
+                        
                     }
                 }
 			}

@@ -493,10 +493,12 @@ namespace TJAPlayer3
                         mat *= Matrix.Translation( 280 - 640, -( 134 - 360 ), 0 );
                     }
 
-                    TJAPlayer3.Tx.GameMode_Timer_Tick.t3D描画( TJAPlayer3.app.Device, mat );
+                    TJAPlayer3.Tx.GameMode_Timer_Tick?.t3D描画( TJAPlayer3.app.Device, mat );
 
                     string str表示する残り時間 = ( this.st叩ききりまショー.ct残り時間.n現在の値 < 1000 ) ? "25" : ( ( 26000 - this.st叩ききりまショー.ct残り時間.n現在の値 ) / 1000 ).ToString();
-                    this.t小文字表示( 230 + (str表示する残り時間.Length * TJAPlayer3.Skin.Game_Taiko_Combo_Size[0] / 4 ), 84 + TJAPlayer3.Tx.GameMode_Timer_Frame.szテクスチャサイズ.Height / 2 , string.Format("{0,2:#0}", str表示する残り時間 ));
+                    
+                    if (TJAPlayer3.Tx.GameMode_Timer_Frame != null)
+                        this.t小文字表示( 230 + (str表示する残り時間.Length * TJAPlayer3.Skin.Game_Taiko_Combo_Size[0] / 4 ), 84 + TJAPlayer3.Tx.GameMode_Timer_Frame.szテクスチャサイズ.Height / 2 , string.Format("{0,2:#0}", str表示する残り時間 ));
                 }
 
                 if( !this.st叩ききりまショー.ct加算審査中.b停止中 )

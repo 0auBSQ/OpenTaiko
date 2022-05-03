@@ -357,7 +357,23 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.stage演奏ドラム画面.bUseBranch[i] == true)
                 {
-                    if (TJAPlayer3.ConfigIni.nBranchAnime == 0)
+                    #region NullCheck
+
+                    bool _laneNull = false;
+
+                    for (int j = 0; j < TJAPlayer3.Tx.Lane_Text.Length; j++)
+                    {
+                        if (TJAPlayer3.Tx.Lane_Text[j] == null)
+                        {
+                            _laneNull = true;
+                            break;
+                        }
+                    }
+
+                    #endregion
+
+
+                    if (TJAPlayer3.ConfigIni.nBranchAnime == 0 && !_laneNull)
                     {
                         if (!this.stBranch[i].ct分岐アニメ進行.b進行中)
                         {
@@ -542,7 +558,7 @@ namespace TJAPlayer3
                             #endregion
                         }
                     }
-                    else
+                    else if (!_laneNull)
                     {
                         if (this.stBranch[i].nY座標 == 21)
                         {
@@ -568,7 +584,6 @@ namespace TJAPlayer3
                             }
                         }
 
-                        //fuck
                         if (this.stBranch[i].nY座標 != 0)
                         {
                             #region[ 普通譜面_レベルアップ ]
@@ -644,9 +659,9 @@ namespace TJAPlayer3
             {
                 // Tower frame (without tamashii jauge) if playing a tower chart
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
-                    TJAPlayer3.Tx.Taiko_Frame[2].t2D描画(TJAPlayer3.app.Device, 329, 136);
+                    TJAPlayer3.Tx.Taiko_Frame[2]?.t2D描画(TJAPlayer3.app.Device, 329, 136);
                 else
-                    TJAPlayer3.Tx.Taiko_Frame[0].t2D描画(TJAPlayer3.app.Device, 329, 136);
+                    TJAPlayer3.Tx.Taiko_Frame[0]?.t2D描画(TJAPlayer3.app.Device, 329, 136);
 
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
                     TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.app.Device, 329, 360);

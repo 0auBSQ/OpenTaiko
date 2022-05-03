@@ -162,8 +162,11 @@
 10056 : "Hide Dan/Tower" option title
 10057 : "Hide Dan/Tower" description
 10084 : "Shin-uchi toggle" option title
+10085 : "System options" menu title
+10086 : "Gameplay options" menu title
+10087 : "Exit" menu title
 10090 : "System" description
-10091 : "Drums" description
+10091 : "Gameplay options" description
 10092 : "Exit" description
 
 # Main Menu text (001XX)
@@ -227,6 +230,15 @@
 406 : Download puchicharas button
 407 : Online multiplayer button
 
+# Mod specific (005XX)
+
+500 : "Timing" mod name
+501 : "Loose" timing mod option
+502 : "Lenient" timing mod option
+503 : "Normal" timing mod option
+504 : "Strict" timing mod option
+505 : "Rigorous" timing mod option
+
 # In-game pause menu (0090X)
 
 900 : Continue
@@ -274,7 +286,7 @@
 1044 : Extra (Ura)
 1045 : Extreme / Extra
 
-# Song selection page options (0900X)
+# Song selection page options (090XX)
 
 9000 : Off
 9001 : On
@@ -291,6 +303,9 @@
 9013 : Auto
 9014 : Voice
 9015 : Sound Type
+9016 : Stealth
+9017 : Safe
+9018 : Just
 
 # Song selection context boxes (091XX)
 

@@ -219,6 +219,9 @@ namespace TJAPlayer3
             [10058] = "Song Preview Volume",
             [10059] = "Adjust the volume of song preview.\nYou must restart the game after leaving config\nfor this setting to save.",
             [10084] = "Shin'uchi Mode",
+            [10085] = "System options",
+            [10086] = "Gameplay options",
+            [10087] = "Exit",
             [10091] = "Settings for an overall systems.",
             [10092] = "Settings to play the drums.",
             [10093] = "Save the settings and exit from CONFIGURATION menu.",
@@ -275,6 +278,13 @@ namespace TJAPlayer3
             [405] = "Download Characters",
             [406] = "Download Puchicharas",
             [407] = "Online Multiplayer",
+
+            [500] = "Timing",
+            [501] = "Loose",
+            [502] = "Lenient",
+            [503] = "Normal",
+            [504] = "Strict",
+            [505] = "Rigorous",
 
             [1000] = "Reached floor",
             [1001] = "F",
@@ -333,6 +343,9 @@ namespace TJAPlayer3
             [9013] = "Auto",
             [9014] = "Voice",
             [9015] = "Sound Type",
+            [9016] = "STEALTH",
+            [9017] = "Safe",
+            [9018] = "Just",
 
             [9100] = "Search (Difficulty)",
             [9101] = "Difficulty",

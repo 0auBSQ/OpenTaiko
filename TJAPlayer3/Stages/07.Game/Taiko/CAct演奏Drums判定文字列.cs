@@ -49,10 +49,15 @@ namespace TJAPlayer3
 					{
 						if (JudgeAnimes[j, i].counter.b停止中) continue;
 						JudgeAnimes[j, i].counter.t進行();
-						float x = TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width / 2;
-						float y = (TJAPlayer3.Skin.nScrollFieldY[j] - 53 + CubicEaseOut((float)(JudgeAnimes[j, i].counter.n現在の値 >= 180 ? 180 : JudgeAnimes[j, i].counter.n現在の値) / 180f) * 20f) - 10;
-						TJAPlayer3.Tx.Judge.Opacity = (int)(255f - (JudgeAnimes[j, i].counter.n現在の値 >= 360 ? ((JudgeAnimes[j, i].counter.n現在の値 - 360) / 50.0f) * 255f : 0f));
-						TJAPlayer3.Tx.Judge.t2D描画(TJAPlayer3.app.Device, x, y, JudgeAnimes[j, i].rc);
+
+						if (TJAPlayer3.Tx.Judge != null)
+                        {
+							float x = TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width / 2;
+							float y = (TJAPlayer3.Skin.nScrollFieldY[j] - 53 + CubicEaseOut((float)(JudgeAnimes[j, i].counter.n現在の値 >= 180 ? 180 : JudgeAnimes[j, i].counter.n現在の値) / 180f) * 20f) - 10;
+							TJAPlayer3.Tx.Judge.Opacity = (int)(255f - (JudgeAnimes[j, i].counter.n現在の値 >= 360 ? ((JudgeAnimes[j, i].counter.n現在の値 - 360) / 50.0f) * 255f : 0f));
+							TJAPlayer3.Tx.Judge.t2D描画(TJAPlayer3.app.Device, x, y, JudgeAnimes[j, i].rc);
+                        }
+						
 					}
 				}
 			}
