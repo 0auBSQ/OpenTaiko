@@ -841,7 +841,9 @@ namespace TJAPlayer3
         public bool bTokkunMode = false;
         public int[] bJust = new int[4] { 0, 0, 0, 0 };
 
-        public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
+		public int[] nHitSounds = new int[4] { 0, 0, 0, 0 };
+
+		public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
 		public STDGBVALUE<E判定文字表示位置> 判定文字表示位置;
 //		public int nハイハット切り捨て下限Velocity;
@@ -2063,11 +2065,17 @@ namespace TJAPlayer3
 			sw.WriteLine("; 指定ms以内に5回縁を叩きましょう");
 			sw.WriteLine("{1}={0}", this.TokkunMashInterval, nameof(this.TokkunMashInterval));
 			sw.WriteLine();
-			sw.WriteLine( "; JUST(0:OFF, 1:ON)" );
+			sw.WriteLine( "; JUST(0:OFF, 1:JUST, 2:SAFE)" );
 			sw.WriteLine( "Just1P={0}", this.bJust[0] );
 			sw.WriteLine("Just2P={0}", this.bJust[1] );
 			sw.WriteLine("Just3P={0}", this.bJust[2] );
 			sw.WriteLine("Just4P={0}", this.bJust[3] );
+			sw.WriteLine();
+			sw.WriteLine("; Hitsounds index (音色)");
+			sw.WriteLine("HitSounds1P={0}", this.nHitSounds[0]);
+			sw.WriteLine("HitSounds2P={0}", this.nHitSounds[1]);
+			sw.WriteLine("HitSounds3P={0}", this.nHitSounds[2]);
+			sw.WriteLine("HitSounds4P={0}", this.nHitSounds[3]);
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
@@ -2869,6 +2877,27 @@ namespace TJAPlayer3
 											else if (str3.Equals("Just4P"))
 											{
 												this.bJust[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[3]);
+											}
+
+											#endregion
+
+											#region [Hitsounds]
+
+											else if (str3.Equals("HitSounds1P"))
+											{
+												this.nHitSounds[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[0]);
+											}
+											else if (str3.Equals("HitSounds2P"))
+											{
+												this.nHitSounds[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[1]);
+											}
+											else if (str3.Equals("HitSounds3P"))
+											{
+												this.nHitSounds[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[2]);
+											}
+											else if (str3.Equals("HitSounds4P"))
+											{
+												this.nHitSounds[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[3]);
 											}
 
 											#endregion

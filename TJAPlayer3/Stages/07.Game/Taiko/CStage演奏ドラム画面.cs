@@ -342,13 +342,28 @@ namespace TJAPlayer3
 			    if (!TJAPlayer3.IsPerformingCalibration)
 			    {
                     // Oto iro here 
+                    int actual1 = TJAPlayer3.GetActualPlayer(0);
+                    int actual2 = TJAPlayer3.GetActualPlayer(1);
 
-			        this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
+                    var hs = TJAPlayer3.Skin.hsHitSoundsInformations;
+
+                    this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual1]), ESoundGroup.SoundEffect);
+                    this.soundBlue = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual1]), ESoundGroup.SoundEffect);
+                    this.soundAdlib = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual1]), ESoundGroup.SoundEffect);
+
+                    this.soundRed2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual2]), ESoundGroup.SoundEffect);
+                    this.soundBlue2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual2]), ESoundGroup.SoundEffect);
+                    this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual2]), ESoundGroup.SoundEffect);
+
+                    /*
+                    this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
 			        this.soundBlue = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\ka.ogg" ), ESoundGroup.SoundEffect );
 			        this.soundAdlib = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect );
+
                     this.soundRed2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\dong.ogg"), ESoundGroup.SoundEffect);
                     this.soundBlue2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\ka.ogg"), ESoundGroup.SoundEffect);
                     this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect);
+                    */
 
 
                     if (TJAPlayer3.ConfigIni.nPlayerCount >= 2)//2020.05.06 Mr-Ojii左右に出したかったから、追加。

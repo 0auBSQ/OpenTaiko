@@ -124,6 +124,7 @@
     <Compile Include="Character\CResultCharacter.cs" />
     <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
+    <Compile Include="Common\CHitSounds.cs" />
     <Compile Include="Common\CVersionList.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
     <Compile Include="Common\ModalQueue.cs" />

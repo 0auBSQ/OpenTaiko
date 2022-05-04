@@ -311,6 +311,8 @@ namespace TJAPlayer3
 
         // プロパティ
 
+        public CHitSounds hsHitSoundsInformations = null;
+
         public Cシステムサウンド bgmオプション画面 = null;
         public Cシステムサウンド bgmコンフィグ画面 = null;
         public Cシステムサウンド bgm起動画面 = null;
@@ -762,6 +764,8 @@ namespace TJAPlayer3
 
             ReloadSkin();
             tReadSkinConfig();
+
+            hsHitSoundsInformations = new CHitSounds(Path(@"Sounds\HitSounds\HitSounds.json"));
         }
 
         public void ReloadSkin()
@@ -1016,7 +1020,7 @@ namespace TJAPlayer3
                             strCommand = strArray[0].Trim();
                             strParam = strArray[1].Trim();
 
-                            #region スキン設定
+                            #region [Skin Settings]
 
                             void ParseInt32(Action<int> setValue)
                             {
@@ -1044,7 +1048,8 @@ namespace TJAPlayer3
                             }
                             #endregion
 
-                            #region 背景(スクロール)
+                            #region [Background Scroll]
+
                             else if (strCommand == "Background_Scroll_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1053,9 +1058,10 @@ namespace TJAPlayer3
                                     this.Background_Scroll_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+
                             #endregion
 
-                            #region[ 演奏 ]
+                            #region [Taiko Mode]
                             //-----------------------------
                             else if (strCommand == "ScrollFieldP1Y")
                             {
@@ -1093,7 +1099,8 @@ namespace TJAPlayer3
 
                             //-----------------------------
                             #endregion
-                            #region[ 成績発表 ]
+
+                            #region [Result screen]
                             //-----------------------------
                             else if (strCommand == "ResultPanelP1X")
                             {
@@ -1121,10 +1128,10 @@ namespace TJAPlayer3
                             }
                             //-----------------------------
                             #endregion
-                            #region[ その他 ]
-                            #endregion
+
 
                             #region 新・SkinConfig
+                            
                             #region Config
                             else if (strCommand == nameof(Config_ItemText_Correction_X))
                             {
@@ -1135,6 +1142,7 @@ namespace TJAPlayer3
                                 Config_ItemText_Correction_Y = int.Parse(strParam);
                             }
                             #endregion
+                            
                             #region SongSelect
                             else if (strCommand == "SongSelect_Overall_Y")
                             {
@@ -1284,6 +1292,7 @@ namespace TJAPlayer3
                                 SongSelect_Rotate_Chara = strParam.Split(',').ToArray();
                             }
                             #endregion
+                            
                             #region SongLoading
                             else if (strCommand == nameof(SongLoading_Plate_X))
                             {
@@ -1353,6 +1362,7 @@ namespace TJAPlayer3
                                 SongLoading_Plate_ScreenBlend = C変換.bONorOFF(strParam[0]);
                             }
                             #endregion
+
                             #region Game
                             else if (strCommand == "Game_Notes_Anime")
                             {
@@ -1389,6 +1399,7 @@ namespace TJAPlayer3
                                 }
                             }
                             #endregion
+
                             #region PanelFont
                             else if (strCommand == nameof(Game_MusicName_X))
                             {
@@ -1539,6 +1550,7 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            
                             #region Dancer
                             else if (strCommand == "Game_Dancer_X")
                             {
@@ -1574,6 +1586,7 @@ namespace TJAPlayer3
                                 }
                             }
                             #endregion
+
                             #region Mob
                             else if (strCommand == "Game_Mob_Beat")
                             {
@@ -1584,6 +1597,7 @@ namespace TJAPlayer3
                                 ParseInt32(value => Game_Mob_Ptn_Beat = value);
                             }
                             #endregion
+                            
                             #region Score
                             else if (strCommand == "Game_Score_X")
                             {
@@ -1647,6 +1661,7 @@ namespace TJAPlayer3
                                 }
                             }
                             #endregion
+                            
                             #region Taiko
                             else if (strCommand == "Game_Taiko_NamePlate_X")
                             {
@@ -1808,6 +1823,7 @@ namespace TJAPlayer3
                                 Game_Taiko_Combo_Ex_IsJumping = C変換.bONorOFF(strParam[0]);
                             }
                             #endregion
+                            
                             #region Gauge
                             else if (strCommand == "Game_Gauge_Rainbow_Timer")
                             {
@@ -1817,6 +1833,7 @@ namespace TJAPlayer3
                                 }
                             }
                             #endregion
+                            
                             #region Balloon
                             else if (strCommand == "Game_Balloon_Combo_X")
                             {
@@ -2003,6 +2020,7 @@ namespace TJAPlayer3
                             }
 
                             #endregion
+                            
                             #region Effects
                             else if (strCommand == nameof(Game_Effect_Roll_StartPoint_X))
                             {
@@ -2145,6 +2163,7 @@ namespace TJAPlayer3
                                 Game_Effect_FireWorks_Timing = int.Parse(strParam);
                             }
                             #endregion
+                            
                             #region Runner
                             else if (strCommand == "Game_Runner_Size")
                             {
@@ -2186,6 +2205,7 @@ namespace TJAPlayer3
                                 }
                             }
                             #endregion
+                           
                             #region Dan_C
                             else if (strCommand == nameof(Game_DanC_Title_ForeColor))
                             {
@@ -2287,6 +2307,7 @@ namespace TJAPlayer3
                             }
 
                             #endregion
+
                             #region PuchiChara
                             else if (strCommand == nameof(Game_PuchiChara_X))
                             {
@@ -2325,6 +2346,7 @@ namespace TJAPlayer3
                                 Game_PuchiChara_SineTimer = double.Parse(strParam);
                             }
                             #endregion
+
                             #region Training
                             else if (strCommand == nameof(Game_Training_ScrollTime))
                             {
@@ -2365,6 +2387,7 @@ namespace TJAPlayer3
                             #endregion
 
                             #endregion
+                            
                             #region Result
                             else if (strCommand == nameof(Result_MusicName_X))
                             {
@@ -2457,6 +2480,7 @@ namespace TJAPlayer3
                             }
 
                             #endregion
+                            
                             #region Font
                             else if (strCommand == nameof(Font_Edge_Ratio)) //Config画面や簡易メニューのフォントについて(rhimm)
                             {
@@ -2477,6 +2501,7 @@ namespace TJAPlayer3
                                 Text_Correction_Y = int.Parse(strParam);
                             }
                             #endregion
+
                             #endregion
                         }
                         continue;
@@ -3042,6 +3067,7 @@ namespace TJAPlayer3
         public int Text_Correction_X = 0;
         public int Text_Correction_Y = 0;
         #endregion
+
         #endregion
     }
 }

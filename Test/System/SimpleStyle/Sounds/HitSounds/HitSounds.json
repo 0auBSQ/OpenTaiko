@@ -1,0 +1,12 @@
+[
+	{
+		"name": "Taiko",
+		"path": "Sounds\\Taiko\\",
+		"format": "OGG",
+	},
+	{
+		"name": "Electro",
+		"path": "Sounds\\HitSounds\\Electro\\",
+		"format": "WAV",
+	},
+]

@@ -57,13 +57,32 @@ namespace TJAPlayer3
             txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9016), Color.White, Color.Black);
 
             txJust[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.White, Color.Black);
-            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.White, Color.Black);
+            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.Red, Color.Black);
+            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.LimeGreen, Color.Black);
 
             txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
             txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
             txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
+
+            hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
+
+            txOtoiro = new CTexture[hsInfo.names.Length];
+
+            if (txOtoiro.Length > 0)
+            {
+                for (int i = 0; i < txOtoiro.Length; i++)
+                {
+                    txOtoiro[i] = OptionTypeTx(hsInfo.names[i], Color.White, Color.Black);
+                }
+            }
+            else
+            {
+                txOtoiro = new CTexture[1];
+                txOtoiro[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
+            }
+            
+
 
             OptionType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9008), Color.White, Color.Black);
             OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
@@ -76,9 +95,10 @@ namespace TJAPlayer3
             OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
             OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
 
+            var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
             for (int i = 0; i < 5; i++)
             {
-                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), Color.White, Color.Black);
+                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), _timingColors[i], Color.Black);
             }
 
             for (int i = 0; i < OptionType.Length; i++)
@@ -150,7 +170,7 @@ namespace TJAPlayer3
                 txGameMode[nGameMode],
                 txSwitch[nAutoMode],
                 txNone,
-                txNone,
+                txOtoiro[nOtoiro],
             };
 
             var _shift = player == 1 ? 640 : 0;
@@ -259,6 +279,10 @@ namespace TJAPlayer3
         public CTexture[] txJust = new CTexture[3];
         public int nJust = 0;
 
+        public CTexture[] txOtoiro;
+        public CHitSounds hsInfo;
+        public int nOtoiro = 0;
+
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
         {
             using (var bmp = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 13).DrawPrivateFont(str文字, forecolor, backcolor))
@@ -311,6 +335,9 @@ namespace TJAPlayer3
                 case 7:
                     if (nAutoMode == 0) nAutoMode = 1;
                     else nAutoMode = 0;
+                    break;
+                case 9:
+                    ShiftVal(left, ref nOtoiro, txOtoiro.Length - 1, 0);
                     break;
 
             }
@@ -408,6 +435,12 @@ namespace TJAPlayer3
                 nAutoMode = 1;
             else
                 nAutoMode = 0;
+
+            #endregion
+
+            #region [ Hitsounds ]
+
+            nOtoiro = Math.Min(txOtoiro.Length - 1,  TJAPlayer3.ConfigIni.nHitSounds[actual]);
 
             #endregion
 
@@ -522,6 +555,13 @@ namespace TJAPlayer3
                 else
                     TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = false;
             }
+
+            #endregion
+
+            #region [ Hitsounds ]
+
+            TJAPlayer3.ConfigIni.nHitSounds[actual] = nOtoiro;
+            hsInfo.tReloadHitSounds(nOtoiro, actual);
 
             #endregion
         }
