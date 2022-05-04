@@ -238,6 +238,8 @@
 503 : "Normal" timing mod option
 504 : "Strict" timing mod option
 505 : "Rigorous" timing mod option
+510 : "Score Multiplier : " (For modifiers)
+511 : "Coins Multiplier : " (For modifiers)
 
 # In-game pause menu (0090X)
 

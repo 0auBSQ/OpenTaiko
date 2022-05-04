@@ -285,6 +285,8 @@ namespace TJAPlayer3
             [503] = "Normal",
             [504] = "Strict",
             [505] = "Rigorous",
+            [510] = "Score Multiplier : ",
+            [511] = "Coins Multiplier : ",
 
             [1000] = "Reached floor",
             [1001] = "F",

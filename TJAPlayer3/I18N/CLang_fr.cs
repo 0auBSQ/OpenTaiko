@@ -276,6 +276,8 @@ namespace TJAPlayer3
             [503] = "Normal",
             [504] = "Strict",
             [505] = "Rigoureux",
+            [510] = "Multiplicateur de score : ",
+            [511] = "Multiplicateur de pièces : ",
 
             [1000] = "Étage atteint",
             [1001] = "",

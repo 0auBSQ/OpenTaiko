@@ -121,8 +121,8 @@ namespace TJAPlayer3
         {
             var scoreMult = tGetModMultiplier(EBalancingType.SCORE, true, player);
             var coinMult = tGetModMultiplier(EBalancingType.COINS, true, player);
-            txModMults[0] = OptionTypeTx("Score Multiplier : " + scoreMult.ToString("n2"), Color.White, Color.Black);
-            txModMults[1] = OptionTypeTx("Coins Multiplier : " + coinMult.ToString("n2"), Color.White, Color.Black);
+            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString(510) + scoreMult.ToString("n2"), Color.White, Color.Black);
+            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString(511) + coinMult.ToString("n2"), Color.White, Color.Black);
         }
 
         public override void On非活性化()
@@ -677,7 +677,7 @@ namespace TJAPlayer3
             float factor = 1f;
             int actual = TJAPlayer3.GetActualPlayer(player);
 
-            factor *= tGetScrollSpeedFactor(ebt, isMenu, actual);
+            //factor *= tGetScrollSpeedFactor(ebt, isMenu, actual);
             factor *= tGetSongSpeedFactor(ebt, isMenu, actual);
             factor *= tGetJustFactor(ebt, isMenu, actual);
             factor *= tGetTimingFactor(ebt, isMenu, actual);
