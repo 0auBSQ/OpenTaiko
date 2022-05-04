@@ -495,6 +495,12 @@ namespace TJAPlayer3
 				float starRate;
 				float redStarRate;
 
+				float[] modMultipliers =
+				{
+					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 0),
+					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 1)
+				};
+
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 				{
 					diffModifier = 3;
@@ -524,6 +530,7 @@ namespace TJAPlayer3
 
 					// this.nEarnedMedalsCount[0] = stars;
 					this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
+					this.nEarnedMedalsCount[0] = Math.Max(5, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0]));
 				}
 				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 				{
@@ -576,7 +583,10 @@ namespace TJAPlayer3
 					if (clearModifier < 0)
 						this.nEarnedMedalsCount[0] = 10;
 					else
+					{
 						this.nEarnedMedalsCount[0] = 10 + goukakuModifier + clearModifier + (int)(partialScore * dAccuracyRate);
+						this.nEarnedMedalsCount[0] = Math.Max(10, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0]));
+					}
 				}
 				else
 				{
@@ -636,7 +646,10 @@ namespace TJAPlayer3
 						if (clearModifier < 0)
 							this.nEarnedMedalsCount[i] = 5;
 						else
+						{
 							this.nEarnedMedalsCount[i] = 5 + (int)((diffModifier * (starRate + redStarRate)) * dAccuracyRate) + clearModifier + scoreRankModifier;
+							this.nEarnedMedalsCount[i] = Math.Max(5, (int)(this.nEarnedMedalsCount[i] * modMultipliers[i]));
+						}
 					}
 				}
 

@@ -341,7 +341,6 @@ namespace TJAPlayer3
 			    // other controller, etc. and the sounds of the input calibration audio file.
 			    if (!TJAPlayer3.IsPerformingCalibration)
 			    {
-                    // Oto iro here 
                     int actual1 = TJAPlayer3.GetActualPlayer(0);
                     int actual2 = TJAPlayer3.GetActualPlayer(1);
 
