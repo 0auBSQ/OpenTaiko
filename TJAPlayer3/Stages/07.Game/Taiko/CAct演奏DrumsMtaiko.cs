@@ -90,23 +90,23 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Taiko_Background[2]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 TJAPlayer3.Tx.Taiko_Background[3]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-            else
+            else if (!TJAPlayer3.ConfigIni.bTokkunMode 
+	                || TJAPlayer3.Tx.Taiko_Background[5] == null 
+	                || TJAPlayer3.Tx.Taiko_Background[6] == null)
             {
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
                     TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
                 if (TJAPlayer3.P1IsBlue())
-                    TJAPlayer3.Tx.Taiko_Background[4]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                     TJAPlayer3.Tx.Taiko_Background[4]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
                 else
                     TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
-            if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.Tx.Taiko_Background[5] != null && TJAPlayer3.Tx.Taiko_Background[6] != null)
-            switch (TJAPlayer3.P1IsBlue()){
-                case false :
-                TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-                break;
-                case true:
-                TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-                break;
+            else {
+
+	                if (TJAPlayer3.P1IsBlue())
+                        TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                    else
+                        TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
             
             if(TJAPlayer3.Tx.Taiko_Base != null )
