@@ -1035,6 +1035,7 @@ namespace TJAPlayer3
             OnlineLounge_Center_Menu_Bar = TxC(ONLINELOUNGE + @"Center_Menu_Bar.png");
             OnlineLounge_Center_Menu_Box_Slot = TxC(ONLINELOUNGE + @"Center_Menu_Box_Slot.png");
             OnlineLounge_Side_Menu = TxC(ONLINELOUNGE + @"Side_Menu.png");
+            OnlineLounge_Context = TxC(ONLINELOUNGE + @"Context.png");
             OnlineLounge_Song_Box = TxC(ONLINELOUNGE + @"Song_Box.png");
 
             #endregion
@@ -1866,6 +1867,7 @@ namespace TJAPlayer3
             OnlineLounge_Center_Menu_Bar,
             OnlineLounge_Center_Menu_Box_Slot,
             OnlineLounge_Side_Menu,
+            OnlineLounge_Context,
             OnlineLounge_Song_Box;
 
         #endregion

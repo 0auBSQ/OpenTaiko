@@ -44,9 +44,16 @@ namespace TJAPlayer3
 
 
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+            {
                 this.pfOLFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
+            }
             else
+            {
                 this.pfOLFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
+            }
+                
 
 
             dbCDN = TJAPlayer3.Databases.DBCDN;
@@ -188,20 +195,58 @@ namespace TJAPlayer3
                     int pos = (_ref.Length * 5 + _selector + i) % _ref.Length;
 
                     CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[pos]);
+                    CTexture tmpSubtitle = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
 
-                    if (_selector != pos)
+                    if (i != 0)
                     {
                         tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        tmpSubtitle.color4 = C変換.ColorToColor4(Color.DarkGray);
                         TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     }
                     else
                     {
                         tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                        tmpSubtitle.color4 = C変換.ColorToColor4(Color.White);
                         TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
                     TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
                     tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 18 + 100 * i);
+                    tmpSubtitle.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 46 + 100 * i);
+
+                    if (pos != 0 && i == 0)
+                    {
+                        TJAPlayer3.Tx.OnlineLounge_Context.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+                        var song_ = apiMethods.FetchedSongsList[pos - 1];
+
+                        int[] diffs = new int[]
+                        {
+                            song_.D0,
+                            song_.D1,
+                            song_.D2,
+                            song_.D3,
+                            song_.D4,
+                            song_.D5,
+                            song_.D6,
+                        };
+
+                        for (int k = 0; k < (int)Difficulty.Total; k++)
+                        {
+                            if (diffs[k] > 0)
+                            {
+                                TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(TJAPlayer3.app.Device, 800, 300 + 60 * k);
+
+                                var difnb_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                                    new TitleTextureKey(diffs[k].ToString(), this.pfOLFontLarge, Color.White, Color.Black, 1000));
+                                difnb_?.t2D中心基準描画(TJAPlayer3.app.Device, 900, 300 + 14 + 60 * k);
+                            }
+                            
+                        }
+                        
+
+                    }
+                        
                 }
             }
 
@@ -325,12 +370,19 @@ namespace TJAPlayer3
                             #region [Generate song list values]
 
                             this.ttkCDNSongList = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
+                            this.ttkCDNSongSubtitles = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
 
                             this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+                            this.ttkCDNSongSubtitles[0] = new TitleTextureKey("", this.pfOLFont, Color.White, Color.DarkRed, 1000);
 
                             for (int i = 0; i < apiMethods.FetchedSongsList.Length; i++)
                             {
                                 this.ttkCDNSongList[i + 1] = new TitleTextureKey(apiMethods.FetchedSongsList[i].SongTitle, this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+                                string subtitle_ = apiMethods.FetchedSongsList[i].SongSubtitle;
+                                if (subtitle_.Length >= 2)
+                                    subtitle_ = subtitle_.Substring(2);
+                                this.ttkCDNSongSubtitles[i + 1] = new TitleTextureKey(subtitle_, this.pfOLFont, Color.White, Color.DarkRed, 1000);
                             }
 
                             this.cdnSongListIndex = 0;
@@ -430,6 +482,7 @@ namespace TJAPlayer3
 
 
         private CPrivateFastFont pfOLFont;
+        private CPrivateFastFont pfOLFontLarge;
 
         private DBCDN dbCDN;
         private DBCDN.CDNData dbCDNData;
@@ -451,6 +504,7 @@ namespace TJAPlayer3
 
         // CDN List songs option
         private TitleTextureKey[] ttkCDNSongList;
+        private TitleTextureKey[] ttkCDNSongSubtitles;
         private int cdnSongListIndex;
 
         private class CMenuInfo
