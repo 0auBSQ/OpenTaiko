@@ -1,6 +1,6 @@
 {
 	"Pidgey's TJADB CDN" : {
-		"baseUrl": "https://dev.pidgey.net:8443/",
+		"baseUrl": "https://dev.pidgey.net/",
 		"download": {
 			"en": "download/en/",
 			"default": "download/orig/",

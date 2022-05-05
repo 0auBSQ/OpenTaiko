@@ -174,6 +174,39 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [Song list menu]
+
+            if (currentMenu == ECurrentMenu.CDN_SONGS)
+            {
+                _ref = this.ttkCDNSongList;
+                _selector = cdnSongListIndex;
+
+                int baseY = 360;
+
+                for (int i = -4; i < 4; i++)
+                {
+                    int pos = (_ref.Length * 5 + _selector + i) % _ref.Length;
+
+                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[pos]);
+
+                    if (_selector != pos)
+                    {
+                        tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                    }
+                    else
+                    {
+                        tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                    }
+
+                    TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 18 + 100 * i);
+                }
+            }
+
+            #endregion
+
 
 
             #endregion
@@ -284,6 +317,26 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.sound取消音.t再生する();
                     else
                     {
+                        if (currentMenu == ECurrentMenu.CDN_SONGS)
+                        {
+                            apiMethods = new API(dbCDNData);
+                            apiMethods.tLoadSongsFromInternalCDN();
+
+                            #region [Generate song list values]
+
+                            this.ttkCDNSongList = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
+
+                            this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+                            for (int i = 0; i < apiMethods.FetchedSongsList.Length; i++)
+                            {
+                                this.ttkCDNSongList[i + 1] = new TitleTextureKey(apiMethods.FetchedSongsList[i].SongTitle, this.pfOLFont, Color.White, Color.DarkRed, 1000);
+                            }
+
+                            this.cdnSongListIndex = 0;
+
+                            #endregion
+                        }
                         TJAPlayer3.Skin.sound決定音.t再生する();
                     }
 
@@ -338,6 +391,10 @@ namespace TJAPlayer3
 
                 cdnOptMenuIndex += val;
             }
+            else if (currentMenu == ECurrentMenu.CDN_SONGS)
+            {
+                cdnSongListIndex = (ttkCDNSongList.Length + cdnSongListIndex + val) % ttkCDNSongList.Length;
+            }
 
             return true;
         }
@@ -376,6 +433,7 @@ namespace TJAPlayer3
 
         private DBCDN dbCDN;
         private DBCDN.CDNData dbCDNData;
+        private API apiMethods;
 
         // Main Menu
         private TitleTextureKey[] ttkMainMenuOpt;
@@ -390,6 +448,10 @@ namespace TJAPlayer3
         private TitleTextureKey[] ttkCDNOptionOpt;
         private ECurrentMenu[] cdnOptMenu;
         private int cdnOptMenuIndex;
+
+        // CDN List songs option
+        private TitleTextureKey[] ttkCDNSongList;
+        private int cdnSongListIndex;
 
         private class CMenuInfo
         {
