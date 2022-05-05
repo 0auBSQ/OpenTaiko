@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Linq;
+using FDK;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -39,6 +43,60 @@ namespace TJAPlayer3
                 this.menus[i] = new CMenuInfo(CLangManager.LangInstance.GetString(400 + i));
 
 
+            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                this.pfOLFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+            else
+                this.pfOLFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+
+
+            dbCDN = TJAPlayer3.Databases.DBCDN;
+            dbCDNData = null;
+
+            #region [Main menu]
+
+            this.ttkMainMenuOpt = new TitleTextureKey[3];
+
+            this.ttkMainMenuOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(400), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkMainMenuOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString(402), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkMainMenuOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString(407) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+            this.mainMenu = new ECurrentMenu[] { ECurrentMenu.RETURN, ECurrentMenu.CDN_SELECT, ECurrentMenu.MULTI_SELECT };
+
+            this.mainMenuIndex = 0;
+
+            #endregion
+
+            #region [CDN Select]
+
+            int keyCount = dbCDN.data.Count;
+
+            this.ttkCDNSelectOpt = new TitleTextureKey[keyCount + 1];
+
+            this.ttkCDNSelectOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+            for (int i = 0; i < keyCount; i++)
+            {
+                this.ttkCDNSelectOpt[i + 1] = new TitleTextureKey(dbCDN.data.ElementAt(i).Key, this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            }
+
+            this.CDNSelectIndex = 0;
+
+            #endregion
+
+            #region [CDN Option]
+
+            this.ttkCDNOptionOpt = new TitleTextureKey[4];
+
+            this.ttkCDNOptionOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString(404), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString(405) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[3] = new TitleTextureKey(CLangManager.LangInstance.GetString(406) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+            this.cdnOptMenu = new ECurrentMenu[] { ECurrentMenu.CDN_SELECT, ECurrentMenu.CDN_SONGS, ECurrentMenu.CDN_CHARACTERS, ECurrentMenu.CDN_PUCHICHARAS };
+
+            this.cdnOptMenuIndex = 0;
+
+            #endregion
 
             base.On活性化();
         }
@@ -68,6 +126,60 @@ namespace TJAPlayer3
         {
             TJAPlayer3.Tx.OnlineLounge_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+            #region [Menus]
+
+
+            #region [Base Menus]
+
+            TitleTextureKey[] _ref = this.ttkMainMenuOpt;
+            int _selector = mainMenuIndex;
+
+            if (currentMenu == ECurrentMenu.CDN_SELECT)
+            {
+                _ref = this.ttkCDNSelectOpt;
+                _selector = CDNSelectIndex;
+            }
+            else if (currentMenu == ECurrentMenu.CDN_OPTION)
+            {
+                _ref = this.ttkCDNOptionOpt;
+                _selector = cdnOptMenuIndex;
+            }
+                
+
+            if (currentMenu == ECurrentMenu.MAIN
+                || currentMenu == ECurrentMenu.CDN_SELECT
+                || currentMenu == ECurrentMenu.CDN_OPTION)
+            {
+                int baseY = 360 - _ref.Length * 40;
+
+                for (int i = 0; i < _ref.Length; i++)
+                {
+                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[i]);
+
+                    if (_selector != i)
+                    {
+                        tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
+                        TJAPlayer3.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                    }
+                    else
+                    {
+                        tmpTex.color4 = C変換.ColorToColor4(Color.White);
+                        TJAPlayer3.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                    }
+
+                    TJAPlayer3.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 640, baseY + 80 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 640, baseY + 18 + 80 * i);
+                }
+            }
+
+            #endregion
+
+
+
+            #endregion
+
+
+
             #region [Input]
 
             if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
@@ -91,30 +203,103 @@ namespace TJAPlayer3
             else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
             {
 
+                #region [Fast return (Escape)]
+
                 TJAPlayer3.Skin.sound取消音.t再生する();
 
                 if (currentMenu == ECurrentMenu.MAIN)
                 {
+                    // Return to title screen
                     TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
                     this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                     this.actFOtoTitle.tフェードアウト開始();
                     base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
                 }
-                else
+                else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT)
                 {
+                    // Return to base menu
+                    currentMenu = ECurrentMenu.MAIN;
+                }
+                else if (currentMenu == ECurrentMenu.CDN_OPTION)
+                {
+                    // Return to CDN select menu
+                    currentMenu = ECurrentMenu.CDN_SELECT;
+                }
+                else if (currentMenu == ECurrentMenu.CDN_SONGS || currentMenu == ECurrentMenu.CDN_CHARACTERS || currentMenu == ECurrentMenu.CDN_PUCHICHARAS)
+                {
+                    // Return to CDN select option
+                    currentMenu = ECurrentMenu.CDN_OPTION;
+                }
+
+                return 0;
+
+                #endregion
+            }
+
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+            {
+
+                #region [Decide]
+
+                if (currentMenu == ECurrentMenu.MAIN)
+                {
+                    // Base menu
+                    currentMenu = mainMenu[mainMenuIndex];
+                    if (currentMenu == ECurrentMenu.RETURN)
+                    {
+                        // Quit
+                        TJAPlayer3.Skin.sound取消音.t再生する();
+                        TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
+                        this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                        this.actFOtoTitle.tフェードアウト開始();
+                        base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                    }
+                    else
+                    {
+                        TJAPlayer3.Skin.sound決定音.t再生する();
+                    }
+                }
+                else if (currentMenu == ECurrentMenu.CDN_SELECT)
+                {
+                    // CDN Select Menu
+                    if (CDNSelectIndex > 0)
+                    {
+                        currentMenu = ECurrentMenu.CDN_OPTION;
+                        dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
+                        TJAPlayer3.Skin.sound決定音.t再生する();
+                    }
+                    else
+                    {
+                        currentMenu = ECurrentMenu.MAIN;
+                        TJAPlayer3.Skin.sound取消音.t再生する();
+                    }
+                }
+                else if (currentMenu == ECurrentMenu.CDN_OPTION)
+                {
+                    // CDN Option Menu
+                    currentMenu = cdnOptMenu[cdnOptMenuIndex];
+                    if (currentMenu == ECurrentMenu.CDN_SELECT)
+                        TJAPlayer3.Skin.sound取消音.t再生する();
+                    else
+                    {
+                        TJAPlayer3.Skin.sound決定音.t再生する();
+                    }
 
                 }
 
 
-                return 0;
+                #endregion
             }
+
 
             #endregion
 
             // Menu exit fade out transition
             #region [FadeOut]
 
-            switch (base.eフェーズID)
+                switch (base.eフェーズID)
             {
                 case CStage.Eフェーズ.共通_フェードアウト:
                     if (this.actFOtoTitle.On進行描画() == 0)
@@ -132,6 +317,27 @@ namespace TJAPlayer3
 
         public bool tMove(int val)
         {
+            if (currentMenu == ECurrentMenu.MAIN)
+            {
+                if (mainMenuIndex + val < 0 || mainMenuIndex + val >= mainMenu.Length)
+                    return false;
+
+                mainMenuIndex += val;
+            }
+            else if (currentMenu == ECurrentMenu.CDN_SELECT)
+            {
+                if (CDNSelectIndex + val < 0 || CDNSelectIndex + val >= ttkCDNSelectOpt.Length)
+                    return false;
+
+                CDNSelectIndex += val;
+            }
+            else if (currentMenu == ECurrentMenu.CDN_OPTION)
+            {
+                if (cdnOptMenuIndex + val < 0 || cdnOptMenuIndex + val >= cdnOptMenu.Length)
+                    return false;
+
+                cdnOptMenuIndex += val;
+            }
 
             return true;
         }
@@ -164,6 +370,26 @@ namespace TJAPlayer3
         private CMenuInfo[] menus;
         public E戻り値 eフェードアウト完了時の戻り値;
         public CActFIFOBlack actFOtoTitle;
+
+
+        private CPrivateFastFont pfOLFont;
+
+        private DBCDN dbCDN;
+        private DBCDN.CDNData dbCDNData;
+
+        // Main Menu
+        private TitleTextureKey[] ttkMainMenuOpt;
+        private ECurrentMenu[] mainMenu;
+        private int mainMenuIndex;
+
+        // CDN Select
+        private TitleTextureKey[] ttkCDNSelectOpt;
+        private int CDNSelectIndex;
+
+        // CDN Option
+        private TitleTextureKey[] ttkCDNOptionOpt;
+        private ECurrentMenu[] cdnOptMenu;
+        private int cdnOptMenuIndex;
 
         private class CMenuInfo
         {
