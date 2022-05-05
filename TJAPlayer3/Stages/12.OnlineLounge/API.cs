@@ -13,7 +13,7 @@ namespace TJAPlayer3
     {
         public class APICharterInfo
         {
-            string charter_name;
+            public string charter_name;
         }
 
 

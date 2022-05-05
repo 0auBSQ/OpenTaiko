@@ -231,19 +231,39 @@ namespace TJAPlayer3
                             song_.D6,
                         };
 
+                        #region [Charter Name]
+
+                        if (song_.charter != null && song_.charter.charter_name != null && song_.charter.charter_name != "")
+                        {
+                            var charter_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                                    new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
+                            charter_?.t2D中心基準描画(TJAPlayer3.app.Device, 980, 300);
+                        }
+
+                        #endregion
+
+                        #region [Difficulties]
+
                         for (int k = 0; k < (int)Difficulty.Total; k++)
                         {
-                            if (diffs[k] > 0)
+                            int diff = diffs[k];
+
+                            int column = (k >= 3) ? 240 : 0;
+                            int row = 60 * (k % 3);
+
+                            if (diff > 0)
                             {
-                                TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(TJAPlayer3.app.Device, 800, 300 + 60 * k);
+                                TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(TJAPlayer3.app.Device, 800 + column, 480 + row);
 
                                 var difnb_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                                    new TitleTextureKey(diffs[k].ToString(), this.pfOLFontLarge, Color.White, Color.Black, 1000));
-                                difnb_?.t2D中心基準描画(TJAPlayer3.app.Device, 900, 300 + 14 + 60 * k);
+                                    new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
+                                difnb_?.t2D中心基準描画(TJAPlayer3.app.Device, 900 + column, 480 + 14 + row);
                             }
                             
                         }
-                        
+
+                        #endregion
+
 
                     }
                         
