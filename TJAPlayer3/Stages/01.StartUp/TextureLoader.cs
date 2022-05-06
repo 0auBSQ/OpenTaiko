@@ -417,16 +417,19 @@ namespace TJAPlayer3
 
             #region Taiko
 
-            Taiko_Background = new CTexture[5];
+            Taiko_Background = new CTexture[7];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
             Taiko_Background[3] = TxC(GAME + TAIKO + @"Tower_Background.png");
             Taiko_Background[4] = TxC(GAME + TAIKO + @"1P_Background_Right.png");
-            Taiko_Frame = new CTexture[3];
+            Taiko_Background[5] = TxC(GAME + TAIKO + @"1P_Background_Tokkun.png");
+            Taiko_Background[6] = TxC(GAME + TAIKO + @"2P_Background_Tokkun.png");
+            Taiko_Frame = new CTexture[4];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
+            Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");

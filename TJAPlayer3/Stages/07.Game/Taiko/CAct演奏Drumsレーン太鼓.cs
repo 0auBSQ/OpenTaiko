@@ -658,7 +658,9 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Taiko_Frame[0] != null)
             {
                 // Tower frame (without tamashii jauge) if playing a tower chart
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
+                if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.Tx.Taiko_Frame[3] != null)
+                TJAPlayer3.Tx.Taiko_Frame[3]?.t2D描画(TJAPlayer3.app.Device, 329, 136);
+                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
                     TJAPlayer3.Tx.Taiko_Frame[2]?.t2D描画(TJAPlayer3.app.Device, 329, 136);
                 else
                     TJAPlayer3.Tx.Taiko_Frame[0]?.t2D描画(TJAPlayer3.app.Device, 329, 136);

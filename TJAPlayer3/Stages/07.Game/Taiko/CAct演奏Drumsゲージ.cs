@@ -183,7 +183,7 @@ namespace TJAPlayer3
                 */
 
                 // No gauge if tower
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.ConfigIni.bTokkunMode)
                     return 0;
 
                 #region [Gauge base]
@@ -385,7 +385,7 @@ namespace TJAPlayer3
                     int[] nSoulFire = new int[] { 52, 443, 0, 0 };
                     for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                     {
-                        if( this.db現在のゲージ値[ i ] >= 100.0 )
+                        if( this.db現在のゲージ値[ i ] >= 100.0)
                         {
                             this.ct炎.t進行Loop();
                             TJAPlayer3.Tx.Gauge_Soul_Fire.t2D描画( TJAPlayer3.app.Device, 1112, nSoulFire[ i ], new Rectangle( 230 * ( this.ct炎.n現在の値 ), 0, 230, 230 ) );
@@ -398,7 +398,7 @@ namespace TJAPlayer3
                     int[] nSoulY = new int[] { 125, 516, 0, 0 };
                     for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                     {
-                        if( this.db現在のゲージ値[ i ] >= 80.0 )
+                        if( this.db現在のゲージ値[ i ] >= 80.0)
                         {
                             TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, 1184, nSoulY[ i ], new Rectangle( 0, 0, 80, 80 ) );
                         }
