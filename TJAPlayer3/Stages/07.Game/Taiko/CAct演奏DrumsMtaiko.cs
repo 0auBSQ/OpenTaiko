@@ -86,27 +86,35 @@ namespace TJAPlayer3
 
             //this.nHS = TJAPlayer3.ConfigIni.nScrollSpeed.Drums < 8 ? TJAPlayer3.ConfigIni.nScrollSpeed.Drums : 7;
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)  // Dan-i Dojo
                 TJAPlayer3.Tx.Taiko_Background[2]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower) // Taiko Towers 
                 TJAPlayer3.Tx.Taiko_Background[3]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             else if (!TJAPlayer3.ConfigIni.bTokkunMode 
 	                || TJAPlayer3.Tx.Taiko_Background[5] == null 
 	                || TJAPlayer3.Tx.Taiko_Background[6] == null)
             {
+                // Taiko Mode
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
-                    TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
+                {
+                    // 2P
+                    if (TJAPlayer3.ConfigIni.nAILevel == 0 || TJAPlayer3.Tx.Taiko_Background[9] == null)
+                        TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
+                    else
+                        TJAPlayer3.Tx.Taiko_Background[9]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
+                }
                 if (TJAPlayer3.P1IsBlue())
                      TJAPlayer3.Tx.Taiko_Background[4]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
                 else
                     TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
-            else {
-
-	                if (TJAPlayer3.P1IsBlue())
-                        TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
-                    else
-                        TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+            else 
+            {
+                // Training Mode
+	            if (TJAPlayer3.P1IsBlue())
+                    TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                else
+                    TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
             }
             
             if(TJAPlayer3.Tx.Taiko_Base != null )

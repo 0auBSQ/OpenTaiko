@@ -417,7 +417,7 @@ namespace TJAPlayer3
 
             #region Taiko
 
-            Taiko_Background = new CTexture[7];
+            Taiko_Background = new CTexture[11];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
@@ -425,17 +425,25 @@ namespace TJAPlayer3
             Taiko_Background[4] = TxC(GAME + TAIKO + @"1P_Background_Right.png");
             Taiko_Background[5] = TxC(GAME + TAIKO + @"1P_Background_Tokkun.png");
             Taiko_Background[6] = TxC(GAME + TAIKO + @"2P_Background_Tokkun.png");
+            Taiko_Background[7] = TxC(GAME + TAIKO + @"3P_Background.png");
+            Taiko_Background[8] = TxC(GAME + TAIKO + @"4P_Background.png");
+            Taiko_Background[9] = TxC(GAME + TAIKO + @"AI_Background.png");
+            Taiko_Background[10] = TxC(GAME + TAIKO + @"Boss_Background.png");
+
             Taiko_Frame = new CTexture[4];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
             Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
+
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
+
             //Taiko_NamePlate = new CTexture[2];
             //Taiko_NamePlate[0] = TxC(GAME + TAIKO + @"1P_NamePlate.png");
             //Taiko_NamePlate[1] = TxC(GAME + TAIKO + @"2P_NamePlate.png");
+
             Taiko_Base = TxC(GAME + TAIKO + @"Base.png");
             Taiko_Don_Left = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Don_Right = TxC(GAME + TAIKO + @"Don.png");
@@ -593,6 +601,7 @@ namespace TJAPlayer3
             Lane_Blue = TxC(GAME + LANE + @"Blue.png");
             Lane_Yellow = TxC(GAME + LANE + @"Yellow.png");
             Lane_Background_Main = TxC(GAME + LANE + @"Background_Main.png");
+            Lane_Background_AI = TxC(GAME + LANE + @"Background_AI.png");
             Lane_Background_Sub = TxC(GAME + LANE + @"Background_Sub.png");
             Lane_Background_GoGo = TxC(GAME + LANE + @"Background_GoGo.png");
 
@@ -1643,6 +1652,7 @@ namespace TJAPlayer3
             Lane_Blue,
             Lane_Yellow;
         public CTexture Lane_Background_Main,
+            Lane_Background_AI,
             Lane_Background_Sub,
             Lane_Background_GoGo;
         #endregion

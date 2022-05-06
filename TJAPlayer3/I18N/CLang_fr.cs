@@ -329,7 +329,7 @@ namespace TJAPlayer3
             [9006] = "Mode entraînement",
             [9007] = "-",
             [9008] = "Vitesse",
-            [9009] = "Doron",
+            [9009] = "Discret",
             [9010] = "Inverse",
             [9011] = "Hasard",
             [9012] = "Mode de jeu",

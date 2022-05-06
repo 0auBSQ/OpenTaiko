@@ -67,78 +67,11 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            //this.txLane = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_fieldbgA.png"));
-            //this.txLaneB = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_fieldbgB.png"));
-            //this.txゴーゴー = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_fieldbgC.png"));
-            //this.tx普通譜面[0] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_normal_base.png"));
-            //this.tx玄人譜面[0] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_expert_base.png"));
-            //this.tx達人譜面[0] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_master_base.png"));
-            //this.tx普通譜面[1] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_normal.png"));
-            //this.tx玄人譜面[1] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_expert.png"));
-            //this.tx達人譜面[1] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_field_master.png"));
-            //this.tx枠線 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_mtaiko_B.png"));
-            //this.tx判定枠 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_taiko_notes.png"));
-            //this.txアタックエフェクトLower = CDTXMania.tテクスチャの生成Af( CSkin.Path( @"Graphics\7_explosion_lower.png" ) );
-
-            //this.txゴーゴー炎 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_gogo_fire.png"));
-
-            //this.txゴーゴースプラッシュ = new CTexture[29];
-            //for (int i = 0; i < 29; i++)
-            //{
-            //    this.txゴーゴースプラッシュ[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Dancer\gogo_splash\" + i.ToString() + ".png"));
-            //    this.txゴーゴースプラッシュ[i].b加算合成 = true;
-            //}
-
-            //this.txArアタックエフェクトLower_A = new CTexture[15];
-            //this.txArアタックエフェクトLower_B = new CTexture[15];
-            //this.txArアタックエフェクトLower_C = new CTexture[15];
-            //this.txArアタックエフェクトLower_D = new CTexture[15];
-            //for (int i = 0; i < 15; i++)
-            //{
-            //    this.txArアタックエフェクトLower_A[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Effect\lower_1_" + i.ToString() + ".png"));
-            //    this.txArアタックエフェクトLower_B[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Effect\lower_2_" + i.ToString() + ".png"));
-            //    this.txArアタックエフェクトLower_C[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Effect\lower_3_" + i.ToString() + ".png"));
-            //    this.txArアタックエフェクトLower_D[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Effect\lower_4_" + i.ToString() + ".png"));
-
-            //    //this.txArアタックエフェクトLower_A[ i ].b加算合成 = true;
-            //    //this.txArアタックエフェクトLower_B[ i ].b加算合成 = true;
-            //    //this.txArアタックエフェクトLower_C[ i ].b加算合成 = true;
-            //    //this.txArアタックエフェクトLower_D[ i ].b加算合成 = true;
-            //}
             base.OnManagedリソースの作成();
         }
 
         public override void OnManagedリソースの解放()
         {
-            //CDTXMania.tテクスチャの解放(ref this.txLane);
-            //CDTXMania.tテクスチャの解放(ref this.txLaneB);
-            //CDTXMania.tテクスチャの解放(ref this.txゴーゴー);
-            //CDTXMania.tテクスチャの解放(ref this.tx普通譜面[0]);
-            //CDTXMania.tテクスチャの解放(ref this.tx玄人譜面[0]);
-            //CDTXMania.tテクスチャの解放(ref this.tx達人譜面[0]);
-            //CDTXMania.tテクスチャの解放(ref this.tx普通譜面[1]);
-            //CDTXMania.tテクスチャの解放(ref this.tx玄人譜面[1]);
-            //CDTXMania.tテクスチャの解放(ref this.tx達人譜面[1]);
-
-            //CDTXMania.tテクスチャの解放(ref this.tx枠線);
-            //CDTXMania.tテクスチャの解放(ref this.tx判定枠);
-            ////CDTXMania.tテクスチャの解放( ref this.txアタックエフェクトLower );
-
-            //CDTXMania.tテクスチャの解放(ref this.txゴーゴー炎);
-
-            //for (int i = 0; i < 29; i++)
-            //{
-            //    CDTXMania.tテクスチャの解放(ref this.txゴーゴースプラッシュ[i]);
-            //}
-
-            //for (int i = 0; i < 15; i++)
-            //{
-            //    CDTXMania.tテクスチャの解放(ref this.txArアタックエフェクトLower_A[i]);
-            //    CDTXMania.tテクスチャの解放(ref this.txArアタックエフェクトLower_B[i]);
-            //    CDTXMania.tテクスチャの解放(ref this.txArアタックエフェクトLower_C[i]);
-            //    CDTXMania.tテクスチャの解放(ref this.txArアタックエフェクトLower_D[i]);
-            //}
-
             base.OnManagedリソースの解放();
         }
 
@@ -153,15 +86,19 @@ namespace TJAPlayer3
 
             //それぞれが独立したレイヤーでないといけないのでforループはパーツごとに分離すること。
 
+            
             #region[ レーン本体 ]
-            if (TJAPlayer3.Tx.Lane_Background_Main != null)
+            
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                {
-                    TJAPlayer3.Tx.Lane_Background_Main.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[i], TJAPlayer3.Skin.nScrollFieldY[i]);
-                }
+                if (i == 1 && TJAPlayer3.ConfigIni.nAILevel > 0 && TJAPlayer3.Tx.Lane_Background_AI != null)
+                    TJAPlayer3.Tx.Lane_Background_AI?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[i], TJAPlayer3.Skin.nScrollFieldY[i]);
+                else
+                    TJAPlayer3.Tx.Lane_Background_Main?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[i], TJAPlayer3.Skin.nScrollFieldY[i]);
             }
+
             #endregion
+
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 #region[ 分岐アニメ制御タイマー ]
@@ -314,6 +251,7 @@ namespace TJAPlayer3
                 }
             }
             #endregion
+
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 #region[ ゴーゴータイムレーン背景レイヤー ]
@@ -718,78 +656,18 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listAVI.Count > 0)
             {
                 if (TJAPlayer3.Tx.Lane_Background_Main != null) TJAPlayer3.Tx.Lane_Background_Main.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
-                if(TJAPlayer3.Tx.Lane_Background_Sub != null) TJAPlayer3.Tx.Lane_Background_Sub.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
+                if (TJAPlayer3.Tx.Lane_Background_AI != null) TJAPlayer3.Tx.Lane_Background_AI.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
+                if (TJAPlayer3.Tx.Lane_Background_Sub != null) TJAPlayer3.Tx.Lane_Background_Sub.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
                 if (TJAPlayer3.Tx.Lane_Background_GoGo != null) TJAPlayer3.Tx.Lane_Background_GoGo.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
             }
             else
             {
                 if (TJAPlayer3.Tx.Lane_Background_Main != null) TJAPlayer3.Tx.Lane_Background_Main.Opacity = 255;
+                if (TJAPlayer3.Tx.Lane_Background_AI != null) TJAPlayer3.Tx.Lane_Background_AI.Opacity = 255;
                 if (TJAPlayer3.Tx.Lane_Background_Sub != null) TJAPlayer3.Tx.Lane_Background_Sub.Opacity = 255;
                 if (TJAPlayer3.Tx.Lane_Background_GoGo != null) TJAPlayer3.Tx.Lane_Background_GoGo.Opacity = 255;
             }
 
-            //CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.nBranchレイヤー透明度.ToString());
-            //CDTXMania.act文字コンソール.tPrint(0, 16, C文字コンソール.Eフォント種別.白, this.ct分岐アニメ進行.n現在の値.ToString());
-            //CDTXMania.act文字コンソール.tPrint(0, 32, C文字コンソール.Eフォント種別.白, this.ct分岐アニメ進行.n終了値.ToString());
-
-            //CDTXMania.act文字コンソール.tPrint(0, 32, C文字コンソール.Eフォント種別.白, this.ctゴーゴースプラッシュ.n現在の値.ToString());
-
-            /*#region[ ゴーゴースプラッシュ ]
-            for (int i = 0; i < CDTXMania.ConfigIni.nPlayerCount; i++)
-            {
-                if (CDTXMania.stage演奏ドラム画面.bIsGOGOTIME[i])
-                {
-
-                    if (this.txゴーゴースプラッシュ != null)
-                    {
-                        this.txゴーゴースプラッシュ[(int)this.ctゴーゴースプラッシュ.n現在の値].t2D描画(CDTXMania.app.Device, 0, 260);
-                        this.ctゴーゴースプラッシュ.n現在の値++;
-                        if(this.ctゴーゴースプラッシュ.b終了値に達した)
-                        {
-                            this.ctゴーゴースプラッシュ.t停止();
-                            this.ctゴーゴースプラッシュ.n現在の値 = 0;
-                        }
-                    }
-                    
-         
-                    this.ctゴーゴースプラッシュ.t進行Loop();
-                if (this.txゴーゴースプラッシュ != null)
-                {
-                    if (this.ctゴーゴースプラッシュ.b終了値に達してない)
-                    {
-                        this.txゴーゴースプラッシュ[(int)this.ctゴーゴースプラッシュ.n現在の値].t2D描画(CDTXMania.app.Device, 0, 260);
-                    }
-
-                }
-                }
-            }
-            #endregion */
-            /*
-            for (int i = 0; i < CDTXMania.ConfigIni.nPlayerCount; i++)
-            {
-                #region[ ゴーゴースプラッシュ ]
-                if (this.txゴーゴースプラッシュ != null && CDTXMania.stage演奏ドラム画面.bIsGOGOTIME[i])
-                {
-                    if (!this.ctゴーゴースプラッシュ.b停止中)
-                    {
-                        this.ctゴーゴースプラッシュ.t進行();
-                    }
-                    if (this.ctゴーゴースプラッシュ.n現在の値 < 28)
-                    {
-                        for (int v = 0; v < 6; v++)
-                        {
-                            this.txゴーゴースプラッシュ[this.ctゴーゴースプラッシュ.n現在の値].t2D描画(CDTXMania.app.Device, 0 + (v * 213), 260);
-                        }
-
-                    }
-                    else
-                    {
-                        this.txゴーゴースプラッシュ[this.ctゴーゴースプラッシュ.n現在の値].n透明度 = 100;
-                    }
-
-                }
-                #endregion
-            } */
             return base.On進行描画();
         }
 
