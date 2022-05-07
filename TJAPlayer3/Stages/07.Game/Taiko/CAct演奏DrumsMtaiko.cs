@@ -121,6 +121,7 @@ namespace TJAPlayer3
             {
                 int _actual = TJAPlayer3.GetActualPlayer(i);
                 EGameType _gt = TJAPlayer3.ConfigIni.nGameType[_actual];
+                int playerShift = i * 5;
 
                 // Drum base
                 TJAPlayer3.Tx.Taiko_Base[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[i], TJAPlayer3.Skin.Game_Taiko_Y[i]);
@@ -130,10 +131,10 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.Tx.Taiko_Don_Left != null && TJAPlayer3.Tx.Taiko_Don_Right != null && TJAPlayer3.Tx.Taiko_Ka_Left != null && TJAPlayer3.Tx.Taiko_Ka_Right != null)
                     {
-                        TJAPlayer3.Tx.Taiko_Ka_Left.Opacity = this.stパッド状態[4 * i].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Ka_Right.Opacity = this.stパッド状態[1 + 4 * i].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Don_Left.Opacity = this.stパッド状態[2 + 4 * i].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Don_Right.Opacity = this.stパッド状態[3 + 4 * i].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Ka_Left.Opacity = this.stパッド状態[playerShift].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Ka_Right.Opacity = this.stパッド状態[1 + playerShift].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Don_Left.Opacity = this.stパッド状態[2 + playerShift].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Don_Right.Opacity = this.stパッド状態[3 + playerShift].n明るさ * 73;
 
                         TJAPlayer3.Tx.Taiko_Ka_Left.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[i], TJAPlayer3.Skin.Game_Taiko_Y[i], new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
                         TJAPlayer3.Tx.Taiko_Ka_Right.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[i] + TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.Game_Taiko_Y[i], new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
@@ -145,9 +146,9 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.Tx.Taiko_Konga_Clap != null && TJAPlayer3.Tx.Taiko_Konga_Don != null && TJAPlayer3.Tx.Taiko_Konga_Ka != null)
                     {
-                        TJAPlayer3.Tx.Taiko_Konga_Clap.Opacity = 0; // Not yet implemented
-                        TJAPlayer3.Tx.Taiko_Konga_Don.Opacity = Math.Max(this.stパッド状態[2 + 4 * i].n明るさ, this.stパッド状態[3 + 4 * i].n明るさ) * 73;
-                        TJAPlayer3.Tx.Taiko_Konga_Ka.Opacity = Math.Max(this.stパッド状態[4 * i].n明るさ, this.stパッド状態[1 + 4 * i].n明るさ) * 73;
+                        TJAPlayer3.Tx.Taiko_Konga_Clap.Opacity = this.stパッド状態[4 + playerShift].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Konga_Don.Opacity = Math.Max(this.stパッド状態[2 + playerShift].n明るさ, this.stパッド状態[3 + playerShift].n明るさ) * 73;
+                        TJAPlayer3.Tx.Taiko_Konga_Ka.Opacity = Math.Max(this.stパッド状態[playerShift].n明るさ, this.stパッド状態[1 + playerShift].n明るさ) * 73;
 
                         TJAPlayer3.Tx.Taiko_Konga_Ka.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[i], TJAPlayer3.Skin.Game_Taiko_Y[i]);
                         TJAPlayer3.Tx.Taiko_Konga_Don.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_X[i], TJAPlayer3.Skin.Game_Taiko_Y[i]);
@@ -315,6 +316,9 @@ namespace TJAPlayer3
         {
             CConfigIni configIni = TJAPlayer3.ConfigIni;
             bool bAutoPlay = false;
+            int playerShift = 5 * nPlayer;
+            var _gt = configIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+
             switch (nPlayer)
             {
                 case 0:
@@ -337,13 +341,24 @@ namespace TJAPlayer3
                     case 0x16:
                     case 0x17:
                         {
-                            this.stパッド状態[ 2 + nHand + ( 4 * nPlayer ) ].n明るさ = 8;
+                            this.stパッド状態[ 2 + nHand + playerShift].n明るさ = 8;
                         }
                         break;
                     case 0x12:
+                        {
+                            this.stパッド状態[nHand + playerShift].n明るさ = 8;
+                        }
+                        break;
                     case 0x14:
                         {
-                            this.stパッド状態[ nHand + ( 4 * nPlayer ) ].n明るさ = 8;
+                            if (_gt == EGameType.KONGA)
+                            {
+                                this.stパッド状態[4 + playerShift].n明るさ = 8;
+                            }
+                            else
+                            {
+                                this.stパッド状態[nHand + playerShift].n明るさ = 8;
+                            }
                         }
                         break;
 
@@ -358,27 +373,43 @@ namespace TJAPlayer3
                     case 0x16:
                     case 0x17:
                         {
-                            this.stパッド状態[ 2 + nHand + ( 4 * nPlayer ) ].n明るさ = 8;
+                            this.stパッド状態[ 2 + nHand + playerShift].n明るさ = 8;
                         }
                         break;
                             
                     case 0x13:
                         {
-                            this.stパッド状態[ 2 + ( 4 * nPlayer ) ].n明るさ = 8;
-                            this.stパッド状態[ 3 + ( 4 * nPlayer ) ].n明るさ = 8;
+                            if (_gt == EGameType.KONGA)
+                            {
+                                this.stパッド状態[0 + playerShift].n明るさ = 8;
+                                this.stパッド状態[2 + playerShift].n明るさ = 8;
+                            }
+                            else
+                            {
+                                this.stパッド状態[2 + playerShift].n明るさ = 8;
+                                this.stパッド状態[3 + playerShift].n明るさ = 8;
+                            }
                         }
                         break;
 
                     case 0x12:
                         {
-                            this.stパッド状態[ nHand + ( 4 * nPlayer ) ].n明るさ = 8;
+                            this.stパッド状態[ nHand + playerShift].n明るさ = 8;
                         }
                         break;
 
                     case 0x14:
                         {
-                            this.stパッド状態[ 0 + ( 4 * nPlayer ) ].n明るさ = 8;
-                            this.stパッド状態[ 1 + ( 4 * nPlayer ) ].n明るさ = 8;
+                            if (_gt == EGameType.KONGA)
+                            {
+                                this.stパッド状態[4 + playerShift].n明るさ = 8;
+                            }
+                            else
+                            {
+                                this.stパッド状態[0 + playerShift].n明るさ = 8;
+                                this.stパッド状態[1 + playerShift].n明るさ = 8;
+                            }
+                            
                         }
                         break;
                 }
@@ -406,7 +437,7 @@ namespace TJAPlayer3
         }
 
         //太鼓
-        private STパッド状態[] stパッド状態 = new STパッド状態[ 4 * 4 ];
+        private STパッド状態[] stパッド状態 = new STパッド状態[ 4 * 5 ];
         private long nフラッシュ制御タイマ;
 
         //private CTexture[] txコースシンボル = new CTexture[ 6 ];

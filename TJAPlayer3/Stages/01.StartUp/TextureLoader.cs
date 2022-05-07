@@ -605,8 +605,21 @@ namespace TJAPlayer3
                 Lane_Base[i] = TxC(GAME + LANE + "Base_" + Lanes[i] + ".png");
                 Lane_Text[i] = TxC(GAME + LANE + "Text_" + Lanes[i] + ".png");
             }
-            Lane_Red = TxC(GAME + LANE + @"Red.png");
-            Lane_Blue = TxC(GAME + LANE + @"Blue.png");
+
+            Lane_Red = new CTexture[2];
+            Lane_Blue = new CTexture[2];
+            Lane_Clap = new CTexture[2];
+
+            var _suffixes = new string[] { "", "_Konga" };
+
+            for (int i = 0; i < Lane_Red.Length; i++)
+            {
+                Lane_Red[i] = TxC(GAME + LANE + @"Red" + _suffixes[i] + @".png");
+                Lane_Blue[i] = TxC(GAME + LANE + @"Blue" + _suffixes[i] + @".png");
+                Lane_Clap[i] = TxC(GAME + LANE + @"Clap" + _suffixes[i] + @".png");
+            }
+            
+
             Lane_Yellow = TxC(GAME + LANE + @"Yellow.png");
             Lane_Background_Main = TxC(GAME + LANE + @"Background_Main.png");
             Lane_Background_AI = TxC(GAME + LANE + @"Background_AI.png");
@@ -1657,11 +1670,12 @@ namespace TJAPlayer3
         public CTexture[] Effects_Roll;
         #endregion
         #region レーン
-        public CTexture[] Lane_Base,
-            Lane_Text;
-        public CTexture Lane_Red,
+        public CTexture[] Lane_Red,
             Lane_Blue,
-            Lane_Yellow;
+            Lane_Clap,
+            Lane_Base,
+            Lane_Text;
+        public CTexture Lane_Yellow;
         public CTexture Lane_Background_Main,
             Lane_Background_AI,
             Lane_Background_Sub,

@@ -979,6 +979,8 @@ namespace TJAPlayer3
                     var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
                     var isDon = padTo < 2 ? true : false;
 
+                    #region [ADLIB]
+
                     CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
                     E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : E判定.Miss;
 
@@ -999,6 +1001,10 @@ namespace TJAPlayer3
                                 this.soundAdlib2?.t再生を開始する();
                             }
                     }
+
+                    #endregion
+
+                    #region [Visual effects]
 
                     switch (nPad)
                     {
@@ -1067,10 +1073,45 @@ namespace TJAPlayer3
                             if (b太鼓音再生フラグ)
                                 this.soundBlue2?.t再生を開始する();
                             break;
+                        // Clap
+                        case (int)Eパッド.CLAP:
+                            if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(0)] == EGameType.KONGA)
+                            {
+                                nLane = (int)PlayerLane.FlashType.Clap;
+                                nHand = 0;
+                                nChannel = 0x14;
+                                if (b太鼓音再生フラグ)
+                                {
+                                    this.soundClap?.t再生を開始する();
+                                }
+                            }
+                            else
+                            {
+                                nLane = (int)PlayerLane.FlashType.Total;
+                            }
+                            break;
+                        case (int)Eパッド.CLAP2P:
+                            if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(1)] == EGameType.KONGA)
+                            {
+                                nLane = (int)PlayerLane.FlashType.Clap;
+                                nHand = 0;
+                                nChannel = 0x14;
+                                if (b太鼓音再生フラグ)
+                                {
+                                    this.soundClap2?.t再生を開始する();
+                                }
+                            }
+                            else
+                            {
+                                nLane = (int)PlayerLane.FlashType.Total;
+                            }
+                            break;
                     }
 
                     TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
+
+                    #endregion
 
                     if (this.b連打中[nUsePlayer])
                     {
@@ -1391,7 +1432,7 @@ namespace TJAPlayer3
 		}
 		protected override void t進行描画_チップ_Taiko( CConfigIni configIni, ref CDTX dTX, ref CDTX.CChip pChip, int nPlayer )
         {
-            int nLane = 0;
+            int nLane = (int)PlayerLane.FlashType.Red;
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
 
@@ -1426,8 +1467,11 @@ namespace TJAPlayer3
                                 this.FlyingNotes.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
 
                             //this.actChipFireTaiko.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
-                            if (pChip.nチャンネル番号 == 0x12 || pChip.nチャンネル番号 == 0x14 || pChip.nチャンネル番号 == 0x1B) nLane = 1;
-                            TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start((nLane == 0 ? PlayerLane.FlashType.Red : PlayerLane.FlashType.Blue));
+                            if (pChip.nチャンネル番号 == 0x12 || pChip.nチャンネル番号 == 0x14 || pChip.nチャンネル番号 == 0x1B) nLane = (int)PlayerLane.FlashType.Blue;
+
+                            if (pChip.nチャンネル番号 == 0x14 && _gt == EGameType.KONGA) nLane = (int)PlayerLane.FlashType.Clap;
+
+                            TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start((PlayerLane.FlashType)nLane);
                             TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
 
                             this.actMtaiko.tMtaikoEvent(pChip.nチャンネル番号, this.nHand[nPlayer], nPlayer);

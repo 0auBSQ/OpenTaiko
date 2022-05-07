@@ -913,7 +913,9 @@ namespace TJAPlayer3
 		}
 		protected void tサウンド再生( CDTX.CChip pChip, int nPlayer )
 		{
+            var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 			int index = pChip.nチャンネル番号;
+            
             if (index == 0x11 || index == 0x13 || index == 0x1A)
             {
                 if (pChip.nPlayerSide == 0)
@@ -924,19 +926,44 @@ namespace TJAPlayer3
                 {
                     this.soundRed2?.t再生を開始する();
                 }
+                if (index == 0x13 && _gt == EGameType.KONGA)
+                {
+                    if (pChip.nPlayerSide == 0)
+                    {
+                        this.soundBlue?.t再生を開始する();
+                    }
+                    else
+                    {
+                        this.soundBlue2?.t再生を開始する();
+                    }
+                }
             }
             else if (index == 0x12 || index == 0x14 || index == 0x1B)
             {
-
-
-                if (pChip.nPlayerSide == 0)
+                if (index == 0x14 && _gt == EGameType.KONGA)
                 {
-                    this.soundBlue?.t再生を開始する();
+                    if (pChip.nPlayerSide == 0)
+                    {
+                        this.soundClap?.t再生を開始する();
+                    }
+                    else
+                    {
+                        this.soundClap2?.t再生を開始する();
+                    }
                 }
                 else
                 {
-                    this.soundBlue2?.t再生を開始する();
+                    if (pChip.nPlayerSide == 0)
+                    {
+                        this.soundBlue?.t再生を開始する();
+                    }
+                    else
+                    {
+                        this.soundBlue2?.t再生を開始する();
+                    }
                 }
+
+                
             }
             else if (index == 0x1F)
             {
