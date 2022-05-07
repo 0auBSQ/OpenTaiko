@@ -331,6 +331,31 @@ namespace TJAPlayer3
 						this.padRBlue2P = value;
 					}
                 }
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap
+				{
+					get
+					{
+						return this.padClap;
+					}
+					set
+					{
+						this.padClap = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap2P
+				{
+					get
+					{
+						return this.padClap2P;
+					}
+					set
+					{
+						this.padClap2P = value;
+					}
+				}
+
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[ int index ]
 				{
 					get
@@ -396,6 +421,12 @@ namespace TJAPlayer3
 
 							case (int) EKeyConfigPad.RBlue2P:
 								return this.padRBlue2P;
+
+							case (int)EKeyConfigPad.Clap:
+								return this.padClap;
+
+							case (int)EKeyConfigPad.Clap2P:
+								return this.padClap2P;
 
 							case (int) EKeyConfigPad.Capture:
 								return this.padCapture;
@@ -486,6 +517,14 @@ namespace TJAPlayer3
                                 this.padRBlue2P = value;
                                 return;
 
+							case (int)EKeyConfigPad.Clap:
+								this.padClap = value;
+								return;
+
+							case (int)EKeyConfigPad.Clap2P:
+								this.padClap2P = value;
+								return;
+
 							case (int) EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
@@ -516,6 +555,8 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue2P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap2P;
 
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
 				//-----------------
@@ -2151,7 +2192,13 @@ namespace TJAPlayer3
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.LeftBlue2P );	//
 			sw.WriteLine();											        //
 			sw.Write( "RightBlue2P=" );										// #27029 2012.1.4 from
-			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue2P );	//
+			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue2P );  //
+			sw.WriteLine();
+			sw.Write("Clap=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap);
+			sw.WriteLine();
+			sw.Write("Clap2P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap2P);
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -3130,6 +3177,15 @@ namespace TJAPlayer3
 											else if( str3.Equals( "RightBlue2P" ) )										// #27029 2012.1.4 from
 											{																	//
 												this.tキーの読み出しと設定( str4, this.KeyAssign.Drums.RightBlue2P );	//
+											}
+
+											else if (str3.Equals("Clap"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap);
+											}
+											else if (str3.Equals("Clap2P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap2P);
 											}
 
 											continue;

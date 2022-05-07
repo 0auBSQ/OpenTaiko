@@ -927,6 +927,8 @@ namespace TJAPlayer3
             }
             else if (index == 0x12 || index == 0x14 || index == 0x1B)
             {
+
+
                 if (pChip.nPlayerSide == 0)
                 {
                     this.soundBlue?.t再生を開始する();

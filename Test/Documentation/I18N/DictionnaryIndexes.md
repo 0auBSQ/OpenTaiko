@@ -161,6 +161,10 @@
 10055 : "System key input configuration" option title
 10056 : "Hide Dan/Tower" option title
 10057 : "Hide Dan/Tower" description
+10058 : "Konga clap key settings" option title
+10059 : "Konga clap key settings" description
+10060 : "Konga clap key settings for 2P" option title
+10061 : "Konga clap key settings for 2P" description
 10084 : "Shin-uchi toggle" option title
 10085 : "System options" menu title
 10086 : "Gameplay options" menu title

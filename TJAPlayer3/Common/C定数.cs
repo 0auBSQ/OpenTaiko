@@ -98,6 +98,8 @@ namespace TJAPlayer3
         RRed2P  = 17,
         LBlue2P = 18,
         RBlue2P = 19,
+		CLAP	= 20,
+		CLAP2P	= 21,
 		MAX,			// 門番用として定義
 		UNKNOWN = 99
 	}
@@ -130,6 +132,8 @@ namespace TJAPlayer3
         RRed2P  = Eパッド.RRed2P,
         LBlue2P = Eパッド.LBlue2P,
         RBlue2P = Eパッド.RBlue2P,
+		Clap	= Eパッド.CLAP,
+		Clap2P	= Eパッド.CLAP2P,
 		Capture,
 		UNKNOWN = Eパッド.UNKNOWN
 	}
