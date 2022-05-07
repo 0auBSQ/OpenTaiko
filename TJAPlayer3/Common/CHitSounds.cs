@@ -32,6 +32,7 @@ namespace TJAPlayer3
             don[player] = data[id].path + "dong" + ext;
             ka[player] = data[id].path + "ka" + ext;
             adlib[player] = data[id].path + "Adlib" + ext;
+            clap[player] = data[id].path + "clap" + ext;
 
             return true;
         }
@@ -41,6 +42,7 @@ namespace TJAPlayer3
         public string[] don = new string[4];
         public string[] ka = new string[4];
         public string[] adlib = new string[4];
+        public string[] clap = new string[4];
 
         #region [private]
 

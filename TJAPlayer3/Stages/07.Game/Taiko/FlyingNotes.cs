@@ -20,7 +20,10 @@ namespace TJAPlayer3
         // メソッド
         public virtual void Start(int nLane, int nPlayer, bool isRoll = false)
         {
-            if (TJAPlayer3.Tx.Notes != null)
+
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+
+            if (TJAPlayer3.Tx.Notes[(int)_gt] != null)
             {
                 for (int i = 0; i < 128; i++)
                 {
@@ -141,15 +144,21 @@ namespace TJAPlayer3
                         }
                         //Flying[i].OldValue = Flying[i].Counter.n現在の値;
 
+                        EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(Flying[i].Player)];
+
+                        TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, (int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
+
+                        /*
                         if (Flying[i].Player == 0)
                         {
-                            TJAPlayer3.Tx.Notes?.t2D中心基準描画(TJAPlayer3.app.Device, (int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
+                            
                         }
                         else if (Flying[i].Player == 1)
                         {
                             //
                             TJAPlayer3.Tx.Notes?.t2D中心基準描画(TJAPlayer3.app.Device, (int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
                         }
+                        */
                     }
                 }
             }

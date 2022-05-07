@@ -349,10 +349,12 @@ namespace TJAPlayer3
                     this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual1]), ESoundGroup.SoundEffect);
                     this.soundBlue = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual1]), ESoundGroup.SoundEffect);
                     this.soundAdlib = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual1]), ESoundGroup.SoundEffect);
+                    this.soundClap = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual1]), ESoundGroup.SoundEffect);
 
                     this.soundRed2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual2]), ESoundGroup.SoundEffect);
                     this.soundBlue2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual2]), ESoundGroup.SoundEffect);
                     this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual2]), ESoundGroup.SoundEffect);
+                    this.soundClap2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual2]), ESoundGroup.SoundEffect);
 
                     /*
                     this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
@@ -389,12 +391,16 @@ namespace TJAPlayer3
                     this.soundBlue.t解放する();
                 if( this.soundAdlib != null )
                     this.soundAdlib.t解放する();
+                if (this.soundClap != null)
+                    this.soundClap.t解放する();
                 if (this.soundRed2 != null)
                     this.soundRed2.t解放する();
                 if (this.soundBlue2 != null)
                     this.soundBlue2.t解放する();
                 if (this.soundAdlib2 != null)
                     this.soundAdlib2.t解放する();
+                if (this.soundClap2 != null)
+                    this.soundClap2.t解放する();
                 base.OnManagedリソースの解放();
 			}
 		}
@@ -1386,8 +1392,11 @@ namespace TJAPlayer3
 		protected override void t進行描画_チップ_Taiko( CConfigIni configIni, ref CDTX dTX, ref CDTX.CChip pChip, int nPlayer )
         {
             int nLane = 0;
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+
 
             #region[ 作り直したもの ]
+
             if (pChip.b可視)
             {
                 if (!pChip.bHit)
@@ -1548,7 +1557,7 @@ namespace TJAPlayer3
 
                     if(( 1400 > x ))
                     {
-                        if( TJAPlayer3.Tx.Notes != null )
+                        if( TJAPlayer3.Tx.Notes[(int)_gt] != null )
                         {
                             //int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
                             int num9 = 0;
@@ -1621,27 +1630,27 @@ namespace TJAPlayer3
 
 
                             x = ( x ) - ( ( int ) ( ( 130.0 * pChip.dbチップサイズ倍率 ) / 2.0 ) );
-                            TJAPlayer3.Tx.Notes.b加算合成 = false;
+                            TJAPlayer3.Tx.Notes[(int)_gt].b加算合成 = false;
                             TJAPlayer3.Tx.SENotes.b加算合成 = false;
                             var device = TJAPlayer3.app.Device;
                             switch ( pChip.nチャンネル番号 )
                             {
                                 case 0x11:
 
-                                    if( TJAPlayer3.Tx.Notes != null && pChip.bShow)
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null && pChip.bShow)
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 130, num9, 130, 130 ) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 130, num9, 130, 130 ) );
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 30 * pChip.nSenote, 136, 30 ) );
                                         //CDTXMania.act文字コンソール.tPrint( x + 60, y + 140, C文字コンソール.Eフォント種別.白, pChip.nSenote.ToString() );
                                     }
                                     break;
 
                                 case 0x12:
-                                    if( TJAPlayer3.Tx.Notes != null && pChip.bShow)
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null && pChip.bShow)
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 260, num9, 130, 130) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 260, num9, 130, 130) );
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 30 * pChip.nSenote, 136, 30 ) );
                                         //CDTXMania.act文字コンソール.tPrint( x + 60, y + 140, C文字コンソール.Eフォント種別.白, pChip.nSenote.ToString() );
                                     }
@@ -1649,11 +1658,11 @@ namespace TJAPlayer3
                                     break;
                                   
                                 case 0x13:
-                                    if( TJAPlayer3.Tx.Notes != null && pChip.bShow)
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null && pChip.bShow)
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                         {
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 390, num9, 130, 130 ) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 390, num9, 130, 130 ) );
                                             //CDTXMania.Tx.Notes.t3D描画( device, mat, new Rectangle( 390, num9, 130, 130 ) );
                                         }
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 30 * pChip.nSenote, 136, 30 ) );
@@ -1662,10 +1671,10 @@ namespace TJAPlayer3
                                     break;
 
                                 case 0x14:
-                                    if( TJAPlayer3.Tx.Notes != null && pChip.bShow)
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null && pChip.bShow)
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 520, num9, 130, 130 ) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 520, num9, 130, 130 ) );
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 30 * pChip.nSenote, 136, 30 ) );
                                         //CDTXMania.act文字コンソール.tPrint( x + 60, y + 140, C文字コンソール.Eフォント種別.白, pChip.nSenote.ToString() );
                                     }
@@ -1673,7 +1682,7 @@ namespace TJAPlayer3
                                     break;
 
                                 case 0x1A:
-                                    if( TJAPlayer3.Tx.Notes != null )
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null )
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                         {
@@ -1687,7 +1696,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Tx.Notes_Arm.t2D描画( device, x + 25, ( y - 44 ) + nHand );
                                                 TJAPlayer3.Tx.Notes_Arm.t2D描画( device, x + 60, ( y - 14 ) - nHand );
                                             }
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 1690, num9, 130, 130 ) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 1690, num9, 130, 130 ) );
                                             //CDTXMania.Tx.Notes.t3D描画( device, mat, new Rectangle( 390, num9, 130, 130 ) );
                                         }
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 390, 136, 30 ) );
@@ -1695,7 +1704,7 @@ namespace TJAPlayer3
                                     break;
 
                                 case 0x1B:
-                                    if( TJAPlayer3.Tx.Notes != null )
+                                    if( TJAPlayer3.Tx.Notes[(int)_gt] != null )
                                     {
                                         if( TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                         {
@@ -1709,7 +1718,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Tx.Notes_Arm.t2D描画( device, x + 25, ( y - 44 ) + nHand );
                                                 TJAPlayer3.Tx.Notes_Arm.t2D描画( device, x + 60, ( y - 14 ) - nHand );
                                             }
-                                            TJAPlayer3.Tx.Notes.t2D描画( device, x, y, new Rectangle( 1820, num9, 130, 130 ) );
+                                            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画( device, x, y, new Rectangle( 1820, num9, 130, 130 ) );
                                         }
                                         TJAPlayer3.Tx.SENotes.t2D描画( device, x - 2, y + nSenotesY, new Rectangle( 0, 420, 136, 30 ) );
                                     }
@@ -1740,6 +1749,8 @@ namespace TJAPlayer3
             int nノート座標 = 0;
             int nノート末端座標 = 0;
             int n先頭発声位置 = 0;
+
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
             // 2016.11.2 kairera0467
             // 黄連打音符を赤くするやつの実装方法メモ
@@ -1847,7 +1858,7 @@ namespace TJAPlayer3
 
                 if ((1400 > x))
                 {
-                    if (TJAPlayer3.Tx.Notes != null)
+                    if (TJAPlayer3.Tx.Notes[(int)_gt] != null)
                     {
                         //int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
                         //int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? base.n現在の音符の顔番号 * 130 : 0;
@@ -1963,20 +1974,20 @@ namespace TJAPlayer3
                                 #region[末端をテクスチャ側でつなげる場合の方式]
 
                                 if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
-                                    TJAPlayer3.Tx.Notes.color4 = effectedColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
                                 else
-                                    TJAPlayer3.Tx.Notes.color4 = normalColor;
-                                TJAPlayer3.Tx.Notes.vc拡大縮小倍率.X = (index - 65.0f + f末端ノーツのテクスチャ位置調整 + 1) / 128.0f;
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(781, 0, 128, 130));
-                                TJAPlayer3.Tx.Notes.vc拡大縮小倍率.X = 1.0f;
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x末端 + f末端ノーツのテクスチャ位置調整, y, 0, new Rectangle(910, num9, 130, 130));
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+                                TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - 65.0f + f末端ノーツのテクスチャ位置調整 + 1) / 128.0f;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(781, 0, 128, 130));
+                                TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + f末端ノーツのテクスチャ位置調整, y, 0, new Rectangle(910, num9, 130, 130));
                                 if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
-                                    TJAPlayer3.Tx.Notes.color4 = effectedColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
                                 else
-                                    TJAPlayer3.Tx.Notes.color4 = normalColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
 
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(650, num9, 130, 130));
-                                TJAPlayer3.Tx.Notes.color4 = normalColor;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(650, num9, 130, 130));
+                                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
                                 #endregion
                             }
                             TJAPlayer3.Tx.SENotes.vc拡大縮小倍率.X = index - 44;
@@ -2005,22 +2016,22 @@ namespace TJAPlayer3
                                 #region[末端をテクスチャ側でつなげる場合の方式]
 
                                 if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
-                                    TJAPlayer3.Tx.Notes.color4 = effectedColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
                                 else
-                                    TJAPlayer3.Tx.Notes.color4 = normalColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
 
-                                TJAPlayer3.Tx.Notes.vc拡大縮小倍率.X = (index - 65 + f末端ノーツのテクスチャ位置調整 + 1) / 128f;
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(1171, 0, 128, 130));
+                                TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - 65 + f末端ノーツのテクスチャ位置調整 + 1) / 128f;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(1171, 0, 128, 130));
 
-                                TJAPlayer3.Tx.Notes.vc拡大縮小倍率.X = 1.0f;
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x末端 + f末端ノーツのテクスチャ位置調整, y, 0, new Rectangle(1300, num9, 130, 130));
+                                TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + f末端ノーツのテクスチャ位置調整, y, 0, new Rectangle(1300, num9, 130, 130));
                                 if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
-                                    TJAPlayer3.Tx.Notes.color4 = effectedColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
                                 else
-                                    TJAPlayer3.Tx.Notes.color4 = normalColor;
+                                    TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
 
-                                TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(1040, num9, 130, 130));
-                                TJAPlayer3.Tx.Notes.color4 = normalColor;
+                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(1040, num9, 130, 130));
+                                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
                                 #endregion
                             }
                             TJAPlayer3.Tx.SENotes.vc拡大縮小倍率.X = index - 70;
@@ -2039,7 +2050,7 @@ namespace TJAPlayer3
                                     x = (349 + pChip.nバーからのノーツ末端距離dot);
 
                                 if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON)
-                                    TJAPlayer3.Tx.Notes.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(1430, num9, 260, 130));
+                                    TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(1430, num9, 260, 130));
 
                                 TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
                             }
@@ -2047,7 +2058,7 @@ namespace TJAPlayer3
                         if (pChip.nチャンネル番号 == 0x18)
                         {
                             //大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
-                            TJAPlayer3.Tx.Notes.vc拡大縮小倍率.X = 1.0f;
+                            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
                             int n = 0;
                             switch (pChip.n連打音符State)
                             {

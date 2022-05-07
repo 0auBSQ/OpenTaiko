@@ -9,4 +9,14 @@
 		"path": "Sounds\\HitSounds\\Electro\\",
 		"format": "WAV",
 	},
+	{
+		"name": "Konga",
+		"path": "Sounds\\HitSounds\\Konga\\",
+		"format": "WAV",
+	},
+	{
+		"name": "None",
+		"path": "Sounds\\HitSounds\\None\\",
+		"format": "WAV",
+	},
 ]

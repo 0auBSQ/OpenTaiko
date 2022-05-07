@@ -75,6 +75,9 @@ namespace TJAPlayer3
             txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
             txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
+            txGameType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(513), Color.White, Color.Black);
+            txGameType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(514), Color.White, Color.Black);
+
             txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
 
             hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
@@ -100,10 +103,11 @@ namespace TJAPlayer3
             OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
             OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(500), Color.White, Color.Black);
             OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(72), Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
-            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(10), Color.White, Color.Black);
-            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(512), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
+            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
+            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(10), Color.White, Color.Black);
+            OptionType[10] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
 
             var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
             for (int i = 0; i < 5; i++)
@@ -186,6 +190,7 @@ namespace TJAPlayer3
                 txRandom[nRandom],
                 txTiming[nTiming],
                 txJust[nJust],
+                txGameType[nGameType],
                 txGameMode[nGameMode],
                 txSwitch[nAutoMode],
                 txSongSpeed[nSongSpeed],
@@ -276,11 +281,11 @@ namespace TJAPlayer3
             return 0;
         }
 
-        public int nOptionCount = 9;
+        public int nOptionCount = 10;
 
         public CCounter ctOpen;
         public CCounter ctClose;
-        public CTexture[] OptionType = new CTexture[10];
+        public CTexture[] OptionType = new CTexture[11];
 
         public int NowCount;
         public int[] NowCountType = new int[8];
@@ -318,6 +323,9 @@ namespace TJAPlayer3
 
         public CTexture[] txSongSpeed = new CTexture[16];
         public int nSongSpeed = 5;
+
+        public CTexture[] txGameType = new CTexture[2];
+        public int nGameType = 0;
 
         public CTexture[] txModMults = new CTexture[2];
 
@@ -367,17 +375,20 @@ namespace TJAPlayer3
                     ShiftVal(left, ref nJust, 2, 0);
                     break;
                 case 6:
+                    ShiftVal(left, ref nGameType, 1, 0);
+                    break;
+                case 7:
                     if (nGameMode == 0) nGameMode = 1;
                     else nGameMode = 0;
                     break;
-                case 7:
+                case 8:
                     if (nAutoMode == 0) nAutoMode = 1;
                     else nAutoMode = 0;
                     break;
-                case 8:
+                case 9:
                     ShiftVal(left, ref nSongSpeed, txSongSpeed.Length - 1, 0);
                     break;
-                case 9:
+                case 10:
                     ShiftVal(left, ref nOtoiro, txOtoiro.Length - 1, 0);
                     break;
 
@@ -454,6 +465,12 @@ namespace TJAPlayer3
             #region [Just]
 
             nJust = TJAPlayer3.ConfigIni.bJust[actual];
+
+            #endregion
+
+            #region [GameType]
+
+            nGameType = (int)TJAPlayer3.ConfigIni.nGameType[actual];
 
             #endregion
 
@@ -572,6 +589,12 @@ namespace TJAPlayer3
             #region [Just]
 
             TJAPlayer3.ConfigIni.bJust[actual] = nJust;
+
+            #endregion
+
+            #region [GameType]
+
+            TJAPlayer3.ConfigIni.nGameType[actual] = (EGameType)nGameType;
 
             #endregion
 

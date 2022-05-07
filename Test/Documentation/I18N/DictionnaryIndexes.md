@@ -240,6 +240,9 @@
 505 : "Rigorous" timing mod option
 510 : "Score Multiplier : " (For modifiers)
 511 : "Coins Multiplier : " (For modifiers)
+512 : "Game Type" mod name
+513 : "Taiko" game type mod option
+514 : "Konga" game type mod option
 
 # In-game pause menu (0090X)
 

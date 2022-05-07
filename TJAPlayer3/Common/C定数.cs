@@ -174,6 +174,13 @@ namespace TJAPlayer3
 		SUPERRANDOM,
 		HYPERRANDOM
 	}
+
+	public enum EGameType
+    {
+		TAIKO = 0,
+		KONGA = 1,
+    }
+
 	public enum E楽器パート		// ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
 	{
 		DRUMS	= 0,

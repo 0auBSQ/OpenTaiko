@@ -674,7 +674,7 @@ namespace TJAPlayer3
         public void ゴーゴー炎()
         {
             //判定枠
-            if (TJAPlayer3.Tx.Notes != null)
+            if (TJAPlayer3.Tx.Notes[0] != null)
             {
                 int nJudgeX = TJAPlayer3.Skin.nScrollFieldX[0] - (130 / 2); //元の値は349なんだけど...
                 int nJudgeY = TJAPlayer3.Skin.nScrollFieldY[0]; //元の値は349なんだけど...

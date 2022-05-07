@@ -335,7 +335,10 @@ namespace TJAPlayer3
 
             #region General
 
-            Notes = TxC(GAME + @"Notes.png");
+            Notes = new CTexture[2];
+            Notes[0] = TxC(GAME + @"Notes.png");
+            Notes[1] = TxC(GAME + @"Notes_Konga.png");
+
             Judge_Frame = TxC(GAME + @"Notes.png");
             SENotes = TxC(GAME + @"SENotes.png");
             Notes_Arm = TxC(GAME + @"Notes_Arm.png");
@@ -440,15 +443,20 @@ namespace TJAPlayer3
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
 
-            //Taiko_NamePlate = new CTexture[2];
-            //Taiko_NamePlate[0] = TxC(GAME + TAIKO + @"1P_NamePlate.png");
-            //Taiko_NamePlate[1] = TxC(GAME + TAIKO + @"2P_NamePlate.png");
 
-            Taiko_Base = TxC(GAME + TAIKO + @"Base.png");
+            Taiko_Base = new CTexture[2];
+            Taiko_Base[0] = TxC(GAME + TAIKO + @"Base.png");
+            Taiko_Base[1] = TxC(GAME + TAIKO + @"Base_Konga.png");
+
             Taiko_Don_Left = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Don_Right = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Ka_Left = TxC(GAME + TAIKO + @"Ka.png");
             Taiko_Ka_Right = TxC(GAME + TAIKO + @"Ka.png");
+
+            Taiko_Konga_Don = TxC(GAME + TAIKO + @"Don_Konga.png");
+            Taiko_Konga_Ka = TxC(GAME + TAIKO + @"Ka_Konga.png");
+            Taiko_Konga_Clap = TxC(GAME + TAIKO + @"Clap.png");
+
             Taiko_LevelUp = TxC(GAME + TAIKO + @"LevelUp.png");
             Taiko_LevelDown = TxC(GAME + TAIKO + @"LevelDown.png");
             Couse_Symbol = new CTexture[(int)Difficulty.Total + 1]; // +1は真打ちモードの分
@@ -1561,8 +1569,7 @@ namespace TJAPlayer3
 
         #region 5_演奏画面
         #region 共通
-        public CTexture Notes,
-            Judge_Frame,
+        public CTexture Judge_Frame,
             SENotes,
             Notes_Arm,
             ChipEffect,
@@ -1571,6 +1578,7 @@ namespace TJAPlayer3
         public CTexture Judge_Meter,
             Bar,
             Bar_Branch;
+        public CTexture[] Notes;
         #endregion
 
 
@@ -1593,13 +1601,16 @@ namespace TJAPlayer3
                           Background_Up_Tower = new CTexture[8];
         #endregion
         #region 太鼓
-        public CTexture[] Taiko_Frame, // MTaiko下敷き
+        public CTexture[] Taiko_Base,
+            Taiko_Frame, // MTaiko下敷き
             Taiko_Background;
-        public CTexture Taiko_Base,
-            Taiko_Don_Left,
+        public CTexture Taiko_Don_Left,
             Taiko_Don_Right,
             Taiko_Ka_Left,
             Taiko_Ka_Right,
+            Taiko_Konga_Don,
+            Taiko_Konga_Ka,
+            Taiko_Konga_Clap,
             Taiko_LevelUp,
             Taiko_LevelDown,
             Taiko_Combo_Effect,

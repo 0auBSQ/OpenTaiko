@@ -678,9 +678,11 @@ namespace TJAPlayer3
         protected CSound soundRed;
         protected CSound soundBlue;
         protected CSound soundAdlib;
+        protected CSound soundClap;
         protected CSound soundRed2;
         protected CSound soundBlue2;
         protected CSound soundAdlib2;
+        protected CSound soundClap2;
         public bool bDoublePlay; // 2016.08.21 kairera0467 表示だけ。
 		protected Stopwatch sw;		// 2011.6.13 最適化検討用のストップウォッチ
         public int ListDan_Number;

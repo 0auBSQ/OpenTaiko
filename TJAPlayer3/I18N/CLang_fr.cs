@@ -278,6 +278,9 @@ namespace TJAPlayer3
             [505] = "Rigoureux",
             [510] = "Multiplicateur de score : ",
             [511] = "Multiplicateur de pièces : ",
+            [512] = "Type de jeu",
+            [513] = "Taiko",
+            [514] = "Konga",
 
             [1000] = "Étage atteint",
             [1001] = "",

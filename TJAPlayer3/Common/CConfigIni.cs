@@ -759,6 +759,7 @@ namespace TJAPlayer3
 	    public STDGBVALUE<int> n表示可能な最小コンボ数;
 		public int[] nScrollSpeed;
 		public int[] nTimingZones;
+		public EGameType[] nGameType;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
         public string FontName;
@@ -1407,6 +1408,7 @@ namespace TJAPlayer3
 			this.判定文字表示位置 = new STDGBVALUE<E判定文字表示位置>();
 			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
 			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
+			this.nGameType = new EGameType[4] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -2004,11 +2006,17 @@ namespace TJAPlayer3
 			sw.WriteLine("DrumsScrollSpeed3P={0}", this.nScrollSpeed[2]);
 			sw.WriteLine("DrumsScrollSpeed4P={0}", this.nScrollSpeed[3]);
 			sw.WriteLine();
-			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict");
+			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict)");
 			sw.WriteLine("TimingZones1P={0}", this.nTimingZones[0]);
 			sw.WriteLine("TimingZones2P={0}", this.nTimingZones[1]);
 			sw.WriteLine("TimingZones3P={0}", this.nTimingZones[2]);
 			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
+			sw.WriteLine();
+			sw.WriteLine("; Gametype (0 : Taiko, 1 : Konga)");
+			sw.WriteLine("Gametype1P={0}", (int)this.nGameType[0]);
+			sw.WriteLine("Gametype2P={0}", (int)this.nGameType[1]);
+			sw.WriteLine("Gametype3P={0}", (int)this.nGameType[2]);
+			sw.WriteLine("Gametype4P={0}", (int)this.nGameType[3]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2898,6 +2906,27 @@ namespace TJAPlayer3
 											else if (str3.Equals("HitSounds4P"))
 											{
 												this.nHitSounds[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[3]);
+											}
+
+											#endregion
+
+											#region [Gametype]
+
+											else if (str3.Equals("Gametype1P"))
+											{
+												this.nGameType[0] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[0]);
+											}
+											else if (str3.Equals("Gametype2P"))
+											{
+												this.nGameType[1] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[1]);
+											}
+											else if (str3.Equals("Gametype3P"))
+											{
+												this.nGameType[2] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[2]);
+											}
+											else if (str3.Equals("Gametype4P"))
+											{
+												this.nGameType[3] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[3]);
 											}
 
 											#endregion
