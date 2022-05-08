@@ -780,6 +780,10 @@ namespace TJAPlayer3
                     if( b両手入力 )
                         nInput = 3;
                     break;
+                case Eパッド.CLAP:
+                case Eパッド.CLAP2P:
+                    nInput = 3;
+                    break;
             }
 
 
@@ -818,6 +822,8 @@ namespace TJAPlayer3
 			int nLane = index;
 			int nPad = index;
 
+            var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+
 			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer );
 
             e判定 = AlterJudgement(nPlayer, e判定, false);
@@ -848,7 +854,7 @@ namespace TJAPlayer3
                         break;
                     case 0x14:
                     case 0x1B:
-                        nFly = b両手入力 ? 4 : 2;
+                        nFly = (b両手入力 || _gt == EGameType.KONGA) ? 4 : 2;
                         break;
                     case 0x1F:
                         nFly = nInput == 0 ? 1 : 2;
@@ -1113,6 +1119,14 @@ namespace TJAPlayer3
 
                     #endregion
 
+                    // Chip bools
+                    EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nUsePlayer)];
+                    bool _isBigKaTaiko = NotesManager.IsBigKaTaiko(chipNoHit, _gt);
+                    bool _isBigDonTaiko = NotesManager.IsBigDonTaiko(chipNoHit, _gt);
+                    bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, _gt);
+                    bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
+                    
+
                     if (this.b連打中[nUsePlayer])
                     {
                         chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer];
@@ -1124,9 +1138,132 @@ namespace TJAPlayer3
                         break;
                     }
 
+                    switch (((Eパッド)nPad))
+                    {
+                        case Eパッド.LRed:
+                        case Eパッド.LRed2P:
+                        case Eパッド.RRed:
+                        case Eパッド.RRed2P:
+                        case Eパッド.LBlue:
+                        case Eパッド.LBlue2P:
+                        case Eパッド.RBlue:
+                        case Eパッド.RBlue2P:
+                            {
+
+                                // Regular notes
+
+                                #region [Fetch values]
+
+                                // Flatten pads from 8 to 4
+                                var _pad = (Eパッド)nPad;
+                                if ((Eパッド)nPad == Eパッド.LRed2P) _pad = Eパッド.LRed;
+                                if ((Eパッド)nPad == Eパッド.RRed2P) _pad = Eパッド.RRed;
+                                if ((Eパッド)nPad == Eパッド.LBlue2P) _pad = Eパッド.LBlue;
+                                if ((Eパッド)nPad == Eパッド.RBlue2P) _pad = Eパッド.RBlue;
+
+                                bool _isLeftPad = _pad == Eパッド.LRed || _pad == Eパッド.LBlue;
+                                bool _isBlue = _pad == Eパッド.RBlue || _pad == Eパッド.LBlue;
+
+                                int waitInstr = _isLeftPad ? 2 : 1;
+                                int waitRec = waitInstr == 2 ? 1 : 2;
+
+                                bool _isBigNoteTaiko = _isBlue ? _isBigKaTaiko : _isBigDonTaiko;
+                                bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, _isBlue);
+
+                                #endregion
+
+                                // Process small note
+                                if (e判定 != E判定.Miss && _isSmallNote)
+                                {
+                                    this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
+                                    bHitted = true;
+                                }
+
+                                // Process big notes (judge big notes off)
+                                if (e判定 != E判定.Miss && _isBigNoteTaiko && !TJAPlayer3.ConfigIni.b大音符判定)
+                                {
+                                    this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
+                                    bHitted = true;
+                                    this.nWaitButton = 0;
+                                    break;
+                                }
+
+                                // Process big notes (judge big notes on)
+                                if (e判定 != E判定.Miss && ((_isBigNoteTaiko && TJAPlayer3.ConfigIni.b大音符判定) || _isPinkKonga))
+                                {
+                                    double divided_songspeed = (double)TJAPlayer3.ConfigIni.n演奏速度 / 20.0;
+                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed);
+                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
+
+                                    if (chipNoHit.eNoteState == ENoteState.none)
+                                    {
+                                        if (time <= 110)
+                                        {
+                                            chipNoHit.nProcessTime = (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed);
+                                            chipNoHit.eNoteState = ENoteState.wait;
+                                            this.nWaitButton = waitInstr;
+                                        }
+                                    }
+                                    else if (chipNoHit.eNoteState == ENoteState.wait)
+                                    {
+                                        if (this.nWaitButton == waitRec && time <= 110 && chipNoHit.nProcessTime 
+                                            + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+                                        {
+                                            this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
+                                            bHitted = true;
+                                            this.nWaitButton = 0;
+                                        }
+                                        else if (this.nWaitButton == waitInstr && time <= 110 && chipNoHit.nProcessTime 
+                                            + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+                                        {
+                                            this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
+                                            bHitted = true;
+                                            this.nWaitButton = 0;
+                                        }
+                                    }
+                                }
+
+                                // Judge rolls
+                                if (e判定 != E判定.Miss 
+                                    && (chipNoHit.nチャンネル番号 == 0x15 || chipNoHit.nチャンネル番号 == 0x16 
+                                    || chipNoHit.nチャンネル番号 == 0x17 && !_isBlue))
+                                {
+                                    this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
+                                }
+
+                                if (!bHitted)
+                                    break;
+                                continue;
+
+                            }
+
+                        case Eパッド.CLAP:
+                        case Eパッド.CLAP2P:
+                            {
+
+                                // Process konga clap
+                                if (e判定 != E判定.Miss && _isClapKonga)
+                                {
+                                    this.tドラムヒット処理(nTime, Eパッド.CLAP, chipNoHit, false, nUsePlayer);
+                                    bHitted = true;
+                                }
+
+
+                                if (!bHitted)
+                                    break;
+                                continue;
+                            }
+
+                    }
+
+
 
                     #region [ (A) ヒットしていればヒット処理して次の inputEvent へ ]
                     //-----------------------------
+
+                    #region [Legacy]
+
+                    /*
                     switch (((Eパッド)nPad))
                     {
                         case Eパッド.LRed:
@@ -1139,14 +1276,14 @@ namespace TJAPlayer3
                                     this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, false, nUsePlayer);
                                     bHitted = true;
                                 }
-                                if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x13 || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
+                                if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
                                 {
                                     this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, true, nUsePlayer);
                                     bHitted = true;
                                     this.nWaitButton = 0;
                                     break;
                                 }
-                                if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x13 || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
+                                if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
                                 {
                                     if (chipNoHit.eNoteState == ENoteState.none)
                                     {
@@ -1197,14 +1334,14 @@ namespace TJAPlayer3
                                     this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, false, nUsePlayer);
                                     bHitted = true;
                                 }
-                                if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x13 || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
+                                if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
                                 {
                                     this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, true, nUsePlayer);
                                     bHitted = true;
                                     this.nWaitButton = 0;
                                     break;
                                 }
-                                if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x13 || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
+                                if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
                                 {
                                     if (chipNoHit.eNoteState == ENoteState.none)
                                     {
@@ -1254,6 +1391,9 @@ namespace TJAPlayer3
                             #region[ ふちのヒット処理 ]
                             //-----------------------------
                             {
+
+                                
+
                             if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x12)
                             {
                                     this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, false, nUsePlayer);
@@ -1369,6 +1509,10 @@ namespace TJAPlayer3
                             //-----------------------------
                             #endregion
                     }
+                    */
+
+                    #endregion
+
                     //2016.07.14 kairera0467 Adlibの場合、一括して処理を行う。
                     if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x1F)
                     {
@@ -1378,6 +1522,8 @@ namespace TJAPlayer3
 
                     //-----------------------------
                     #endregion
+
+
                     #region [ (B) ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
                     //-----------------------------
                     int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
