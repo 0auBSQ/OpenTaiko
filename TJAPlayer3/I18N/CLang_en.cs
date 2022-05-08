@@ -352,7 +352,7 @@ namespace TJAPlayer3
             [9013] = "Auto",
             [9014] = "Voice",
             [9015] = "Sound Type",
-            [9016] = "Blindfolded",
+            [9016] = "Stealth",
             [9017] = "Safe",
             [9018] = "Just",
 
