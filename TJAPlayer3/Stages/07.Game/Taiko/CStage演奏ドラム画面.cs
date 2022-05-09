@@ -966,31 +966,35 @@ namespace TJAPlayer3
                     //発声 < 現在時刻 && 終わり > 現在時刻
 
                     //2015.03.19 kairera0467 Chipを1つにまとめて1つのレーン扱いにする。
+
+                    bool isPad1P = (nPad >= 12 && nPad <= 15) || nPad == 20;
+                    bool isPad2P = (nPad >= 16 && nPad <= 19) || nPad == 21;
+
                     int nUsePlayer = 0;
-                    if (nPad >= 12 && nPad <= 15)
+                    if (isPad1P)
                     {
                         nUsePlayer = 0;
                     }
-                    else if (nPad >= 16 && nPad <= 19)
+                    else if (isPad2P)
                     {
                         nUsePlayer = 1;
                         if (TJAPlayer3.ConfigIni.nPlayerCount < 2) //プレイ人数が2人以上でなければ入力をキャンセル
                             break;
                     }
 
-                    if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay && (nPad >= 12 && nPad <= 15))//2020.05.18 Mr-Ojii オート時の入力キャンセル
+                    if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
                         break;
-                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0) && (nPad >= 16 && nPad <= 19))
+                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0) && isPad2P)
                         break;
                     var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
                     var isDon = padTo < 2 ? true : false;
-
-                    #region [ADLIB]
 
                     CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
                     E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : E判定.Miss;
 
                     e判定 = AlterJudgement(nUsePlayer, e判定, false);
+
+                    #region [ADLIB]
 
                     bool b太鼓音再生フラグ = true;
                     if (chipNoHit != null)
@@ -1206,6 +1210,7 @@ namespace TJAPlayer3
                                     }
                                     else if (chipNoHit.eNoteState == ENoteState.wait)
                                     {
+                                        // Double tap success
                                         if (this.nWaitButton == waitRec && time <= 110 && chipNoHit.nProcessTime 
                                             + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
                                         {
@@ -1213,6 +1218,8 @@ namespace TJAPlayer3
                                             bHitted = true;
                                             this.nWaitButton = 0;
                                         }
+
+                                        // Double tap failure
                                         else if (this.nWaitButton == waitInstr && time <= 110 && chipNoHit.nProcessTime 
                                             + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
                                         {
