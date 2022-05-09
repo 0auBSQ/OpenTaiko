@@ -2411,12 +2411,16 @@ namespace TJAPlayer3
             {
                 CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), i);
 
+                EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(i)];
+                bool _isBigKaTaiko = NotesManager.IsBigKaTaiko(chipNoHit, _gt);
+                bool _isBigDonTaiko = NotesManager.IsBigDonTaiko(chipNoHit, _gt);
 
-                if (chipNoHit != null && (chipNoHit.nチャンネル番号 == 0x13 || chipNoHit.nチャンネル番号 == 0x14 || chipNoHit.nチャンネル番号 == 0x1A || chipNoHit.nチャンネル番号 == 0x1B))
+                if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko))
                 {
                     float timeC = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
                     int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
-                    if (chipNoHit.eNoteState == ENoteState.wait && timeC <= 110 && chipNoHit.nProcessTime + nWaitTime <= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
+                    if (chipNoHit.eNoteState == ENoteState.wait && timeC <= 110 
+                        && chipNoHit.nProcessTime + nWaitTime <= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                     {
                         this.tドラムヒット処理(chipNoHit.nProcessTime, Eパッド.RRed, chipNoHit, false, i);
                         this.nWaitButton = 0;
