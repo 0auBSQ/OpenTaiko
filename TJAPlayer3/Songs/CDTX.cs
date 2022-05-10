@@ -502,7 +502,7 @@ namespace TJAPlayer3
 
                     //太鼓1P(移動予定)
 					"??", "ドン", "カツ", "ドン(大)", "カツ(大)", "連打", "連打(大)", "ふうせん連打",
-                    "連打終点", "芋", "ドン(手)", "カッ(手)", "??", "??", "??", "AD-LIB",
+                    "連打終点", "芋", "ドン(手)", "カッ(手)", "Mine", "??", "??", "AD-LIB",
 
                     //太鼓予備
 					"??", "??", "??", "??", "??", "??", "??", "??",
@@ -552,7 +552,12 @@ namespace TJAPlayer3
                     "", "", "", "", "", "", "", "",
 
                     "0xF0", "歌詞", "??", "SUDDEN", "??", "??", "??", "??",
-                    "??", "??", "??", "??", "??", "??", "??", "??", "譜面終了"
+                    "??", "??", "??", "??", "??", "??", "??", "??", "譜面終了",
+
+                    // Extra notes
+
+                    "KaDon", "??", "??", "??", "??", "??", "??", "??",
+                    "??", "??", "??", "??", "??", "??", "??", "??",
                 };
                 return string.Format("CChip: 位置:{0:D4}.{1:D3}, 時刻{2:D6}, Ch:{3:X2}({4}), Pn:{5}({11})(内部{6}), Pd:{7}, Sz:{8}, BMScroll:{9}, Auto:{10}, コース:{11}",
                     this.n発声位置 / 384, this.n発声位置 % 384,
@@ -621,6 +626,7 @@ namespace TJAPlayer3
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 4, 4, //0xD0
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xE0
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xF0
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
 		    };
 
             public int CompareTo(CDTX.CChip other)
@@ -4375,7 +4381,7 @@ namespace TJAPlayer3
                                 chip.nPlayerSide = this.nPlayerSide;
                                 chip.bGOGOTIME = this.bGOGOTIME;
 
-                                if (nObjectNum == 7 || nObjectNum == 9)
+                                if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
                                 {
                                     //this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 
@@ -4443,7 +4449,7 @@ namespace TJAPlayer3
                                             break;
                                     }
                                 }
-                                if (nObjectNum == 8)
+                                if (NotesManager.IsRollEnd(chip))
                                 {
                                     chip.nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
                                     chip.nノーツ終了時刻ms = (int)this.dbNowTime;
@@ -4501,7 +4507,8 @@ namespace TJAPlayer3
                                 }
                                 #endregion
 
-                                if (nObjectNum < 5)
+                                
+                                if (NotesManager.IsMissableNote(chip))
                                 {
                                     #region [ 作り直し ]
                                     //譜面分岐がない譜面でも値は加算されてしまうがしゃあない
@@ -4527,7 +4534,7 @@ namespace TJAPlayer3
                                     this.nノーツ数[3]++;
                                     #endregion
                                 }
-                                else if (nObjectNum == 7)
+                                else if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
                                 {
                                     //風船はこのままでも機能しているので何もしない.
 

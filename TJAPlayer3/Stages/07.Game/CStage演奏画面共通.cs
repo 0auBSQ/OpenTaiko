@@ -919,7 +919,7 @@ namespace TJAPlayer3
             var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 			int index = pChip.nチャンネル番号;
             
-            if (index == 0x11 || index == 0x13 || index == 0x1A)
+            if (index == 0x11 || index == 0x13 || index == 0x1A || index == 0x101)
             {
                 if (pChip.nPlayerSide == 0)
                 {
@@ -929,7 +929,7 @@ namespace TJAPlayer3
                 {
                     this.soundRed2?.t再生を開始する();
                 }
-                if (index == 0x13 && _gt == EGameType.KONGA)
+                if ((index == 0x13 && _gt == EGameType.KONGA) || index == 0x101)
                 {
                     if (pChip.nPlayerSide == 0)
                     {

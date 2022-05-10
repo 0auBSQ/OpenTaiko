@@ -1816,6 +1816,8 @@ namespace TJAPlayer3
                                 case 0x12:
                                 case 0x13:
                                 case 0x14:
+                                case 0x1C:
+                                case 0x101:
                                     {
                                         NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
                                         TJAPlayer3.Tx.SENotes?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));

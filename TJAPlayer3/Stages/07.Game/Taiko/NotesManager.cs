@@ -253,14 +253,7 @@ namespace TJAPlayer3
             }
             else if (IsPurpleNote(chip))
             {
-                if (TJAPlayer3.Tx.Notes[0] != null)
-                {
-                    int _oldOp = TJAPlayer3.Tx.Notes[0].Opacity;
-                    TJAPlayer3.Tx.Notes[0]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(130, frame, length, 130));
-                    TJAPlayer3.Tx.Notes[0].Opacity = 127;
-                    TJAPlayer3.Tx.Notes[0]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(260, frame, length, 130));
-                    TJAPlayer3.Tx.Notes[0].Opacity = _oldOp;
-                }
+                TJAPlayer3.Tx.Note_Swap?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, 130, 130));
                 return;
             }
 

@@ -336,12 +336,14 @@ namespace TJAPlayer3
                     case 0x15:
                     case 0x16:
                     case 0x17:
+                    case 0x1F:
                         {
                             this.stパッド状態[ 2 + nHand + playerShift].n明るさ = 8;
                         }
                         break;
                             
                     case 0x13:
+                    case 0x1A:
                         {
                             if (_gt == EGameType.KONGA)
                             {
@@ -363,6 +365,7 @@ namespace TJAPlayer3
                         break;
 
                     case 0x14:
+                    case 0x1B:
                         {
                             if (_gt == EGameType.KONGA)
                             {
@@ -376,6 +379,13 @@ namespace TJAPlayer3
                             
                         }
                         break;
+
+                    case 0x101:
+                        {
+                            this.stパッド状態[nHand + playerShift].n明るさ = 8;
+                            this.stパッド状態[2 + (nHand == 0 ? 1 : 0) + playerShift].n明るさ = 8;
+                            break;
+                        }
                 }
             }
 
