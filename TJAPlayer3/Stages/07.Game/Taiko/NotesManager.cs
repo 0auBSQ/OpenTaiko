@@ -29,9 +29,9 @@ namespace TJAPlayer3
             ["9"] = 7, // Kusudama (Currently treated as balloon)
             ["A"] = 10, // Joint Big Don (2P)
             ["B"] = 11, // Joint Big Ka (2P)
-            ["C"] = 0, // Mine (Coming soon)
+            ["C"] = 12, // Mine (Coming soon)
             ["D"] = 0, // Unused
-            ["E"] = 14, // Konga clap roll (Coming soon)
+            ["E"] = 5, // Konga clap roll (Coming soon)
             ["F"] = 15, // ADLib
             ["G"] = 0xF1, // Green (Purple) double hit note (Coming soon)
             ["H"] = 5, // Konga red roll (Coming soon)
@@ -103,6 +103,18 @@ namespace TJAPlayer3
             return blue ? chip.nチャンネル番号 == 0x12 : chip.nチャンネル番号 == 0x11;
         }
 
+        public static bool IsSmallNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x12 || chip.nチャンネル番号 == 0x11;
+        }
+
+        public static bool IsBigNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1A || chip.nチャンネル番号 == 0x1B);
+        }
+
         public static bool IsBigKaTaiko(CDTX.CChip chip, EGameType gt)
         {
             if (chip == null) return false;
@@ -142,10 +154,16 @@ namespace TJAPlayer3
             return (chip.nチャンネル番号 == 0x101);
         }
 
-        public static bool IsMineNote(CDTX.CChip chip)
+        public static bool IsKusudama(CDTX.CChip chip)
         {
             if (chip == null) return false;
-            return chip.nチャンネル番号 == 0x1E;
+            return chip.nチャンネル番号 == 0x19;
+        }
+
+        public static bool IsRollEnd(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x18;
         }
 
         public static bool IsBalloon(CDTX.CChip chip)
@@ -166,10 +184,22 @@ namespace TJAPlayer3
             return chip.nチャンネル番号 == 0x15;
         }
 
+        public static bool IsADLIB(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x1F;
+        }
+
         public static bool IsRoll(CDTX.CChip chip)
         {
             if (chip == null) return false;
             return IsBigRoll(chip) || IsSmallRoll(chip);
+        }
+
+        public static bool IsGenericRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return 0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19;
         }
 
         public static bool IsMissableNote(CDTX.CChip chip)
@@ -179,6 +209,15 @@ namespace TJAPlayer3
                 || chip.nチャンネル番号 == 0x1A 
                 || chip.nチャンネル番号 == 0x1B
                 || chip.nチャンネル番号 == 0x101;
+        }
+
+        public static bool IsHittableNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return IsMissableNote(chip)
+                || IsGenericRoll(chip)
+                || IsADLIB(chip)
+                || IsMine(chip);
         }
 
         #endregion
@@ -207,7 +246,7 @@ namespace TJAPlayer3
             else if (IsBigKaTaiko(chip, _gt) || IsClapKonga(chip, _gt)) noteType = 4;
             else if (IsBalloon(chip)) noteType = 11;
 
-            else if (IsMineNote(chip))
+            else if (IsMine(chip))
             {
                 TJAPlayer3.Tx.Note_Mine?.t2D描画(TJAPlayer3.app.Device, x, y);
                 return;

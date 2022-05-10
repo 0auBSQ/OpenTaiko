@@ -3482,7 +3482,8 @@ namespace TJAPlayer3
                 {
                     for (int i = listChip.Count - 1; i >= 0; i--)
                     {
-                        if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                        //if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                        if (NotesManager.IsHittableNote(listChip[i]))
                         {
                             if (DanSongs.Number != 0)
                             {
@@ -4027,7 +4028,8 @@ namespace TJAPlayer3
 
                 for (int i = listChip.Count - 1; i >= 0; i--)
                 {
-                    if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                    //if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                    if (NotesManager.IsHittableNote(listChip[i]))
                     {
                         if(DanSongs.Number != 0)
                         {
@@ -4151,7 +4153,8 @@ namespace TJAPlayer3
             {
                 if (b分岐前の連打開始)
                 {
-                    if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
+                    //if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
+                    if (NotesManager.IsRoll(listChips[i]))
                     {
                         if (nReturnChip == null)
                             nReturnChip = i;

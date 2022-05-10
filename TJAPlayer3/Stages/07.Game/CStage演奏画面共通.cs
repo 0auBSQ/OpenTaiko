@@ -117,7 +117,8 @@ namespace TJAPlayer3
                     foreach (CDTX.CChip chip in listChip[i])
                     {
                         chip.nList上の位置 = n整数値管理;
-                        if ((chip.nチャンネル番号 == 0x15 || chip.nチャンネル番号 == 0x16) && (n整数値管理 < this.listChip[i].Count - 1))
+                        //if ((chip.nチャンネル番号 == 0x15 || chip.nチャンネル番号 == 0x16) && (n整数値管理 < this.listChip[i].Count - 1))
+                        if (NotesManager.IsRoll(chip) && (n整数値管理 < this.listChip[i].Count - 1))
                         {
                             if (chip.db発声時刻ms < r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(0, i).db発声時刻ms)
                             {
@@ -130,13 +131,13 @@ namespace TJAPlayer3
             }
 
             
-
+            
 
             if (TJAPlayer3.DTX.bチップがある.Branch)
             {
                 for (int i = 0; i < TJAPlayer3.DTX.listChip_Branch[2].Count; i++)
                 {
-                    nNoteCount[0] = TJAPlayer3.DTX.listChip_Branch[2].Where(num => num.nチャンネル番号 > 16 && num.nチャンネル番号 < 21).Count();
+                    nNoteCount[0] = TJAPlayer3.DTX.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
                     nBalloonCount[0] += TJAPlayer3.DTX.listChip_Branch[2][i].nRollCount;
                 }
             }
@@ -144,7 +145,7 @@ namespace TJAPlayer3
             {
                 for (int i = 0; i < TJAPlayer3.DTX.listChip.Count; i++)
                 {
-                    nNoteCount[0] = TJAPlayer3.DTX.listChip.Where(num => num.nチャンネル番号 > 16 && num.nチャンネル番号 < 21).Count();
+                    nNoteCount[0] = TJAPlayer3.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
                     nBalloonCount[0] += TJAPlayer3.DTX.listChip[i].nRollCount;
                 }
             }
@@ -156,7 +157,7 @@ namespace TJAPlayer3
                 {
                     for (int i = 0; i < TJAPlayer3.DTX_2P.listChip_Branch[2].Count; i++)
                     {
-                        nNoteCount[1] = TJAPlayer3.DTX_2P.listChip_Branch[2].Where(num => num.nチャンネル番号 > 16 && num.nチャンネル番号 < 21).Count();
+                        nNoteCount[1] = TJAPlayer3.DTX_2P.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
                         nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip_Branch[2][i].nRollCount;
                     }
                 }
@@ -164,7 +165,7 @@ namespace TJAPlayer3
                 {
                     for (int i = 0; i < TJAPlayer3.DTX_2P.listChip.Count; i++)
                     {
-                        nNoteCount[1] = TJAPlayer3.DTX_2P.listChip.Where(num => num.nチャンネル番号 > 16 && num.nチャンネル番号 < 21).Count();
+                        nNoteCount[1] = TJAPlayer3.DTX_2P.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
                         nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip[i].nRollCount;
                     }
                 }
@@ -777,14 +778,14 @@ namespace TJAPlayer3
 				pChip.nLag = (int) ( nTime - pChip.n発声時刻ms );		// #23580 2011.1.3 yyagi: add "nInputAdjustTime" to add input timing adjust feature
 				int nDeltaTime = Math.Abs( pChip.nLag );
                 //Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime + nInputAdjustTime - pChip.n発声時刻ms));
-                if( pChip.nチャンネル番号 == 0x15 || pChip.nチャンネル番号 == 0x16 )
+                if(NotesManager.IsRoll(pChip))
                 {
                     if ((CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > pChip.n発声時刻ms && (CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
                     {
                         return E判定.Perfect;
 				    }
                 }
-                else if( pChip.nチャンネル番号 == 0x17 )
+                else if(NotesManager.IsBalloon(pChip))
                 {
                     if ((CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.n発声時刻ms - 17 && (CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
                     {
@@ -1272,7 +1273,7 @@ namespace TJAPlayer3
             if (!pChip.b可視)
                 return E判定.Auto;
 
-            if (pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18)
+            if (!NotesManager.IsGenericRoll(pChip))
             {
                 if (!pChip.IsMissed)//通り越したチップでなければ判定！
                 {
@@ -1301,9 +1302,9 @@ namespace TJAPlayer3
 					        CLagLogger.Add(nPlayer, pChip);
 					    }
 
-                        if (pChip.nチャンネル番号 == 0x15 || pChip.nチャンネル番号 == 0x16)
+                        if (NotesManager.IsRoll(pChip))
                         {
-                            #region[ 連打 ]
+                            #region[ Drumroll ]
                             //---------------------------
                             this.b連打中[nPlayer] = true;
                             if (bAutoPlay)
@@ -1346,9 +1347,10 @@ namespace TJAPlayer3
                             //---------------------------
                             #endregion
                         }
-                        else if (pChip.nチャンネル番号 == 0x17)
+                        else if (NotesManager.IsBalloon(pChip))
                         {
-                            #region[ 風船 ]
+                            #region [ Balloon ]
+
                             this.b連打中[nPlayer] = true;
                             this.actChara.b風船連打中[nPlayer] = true;
 
@@ -1377,7 +1379,7 @@ namespace TJAPlayer3
                             break;
                             #endregion
                         }
-                        else if (pChip.nチャンネル番号 == 0x18)
+                        else if (NotesManager.IsRollEnd(pChip))
                         {
                             if (pChip.nノーツ終了時刻ms <= (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                             {
@@ -1390,7 +1392,7 @@ namespace TJAPlayer3
                                 break;
                             }
                         }
-                        else if (pChip.nチャンネル番号 == 0x1F)
+                        else if (NotesManager.IsADLIB(pChip))
                         {
                             if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
                             {
@@ -1421,7 +1423,7 @@ namespace TJAPlayer3
 			}
             if ((pChip.e楽器パート != E楽器パート.UNKNOWN))
             {
-                if (pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18 && pChip.nチャンネル番号 != 0x1F)
+                if (!NotesManager.IsGenericRoll(pChip) && !NotesManager.IsADLIB(pChip))
                 {
                     actGauge.Damage(screenmode, pChip.e楽器パート, eJudgeResult, nPlayer);
                 }
@@ -1482,7 +1484,7 @@ namespace TJAPlayer3
                 case E楽器パート.TAIKO:
                     if( !bAutoPlay )
                     {
-                        if( pChip.nチャンネル番号 == 0x15 || pChip.nチャンネル番号 == 0x16 || pChip.nチャンネル番号 == 0x17 || pChip.nチャンネル番号 == 0x18 )
+                        if(NotesManager.IsGenericRoll(pChip))
                             break;
 
 					    switch ( eJudgeResult )
@@ -1535,7 +1537,7 @@ namespace TJAPlayer3
 		    				case E判定.Miss:
 			    			case E判定.Bad:
                                 {
-                                    if( pChip.nチャンネル番号 == 0x1F )
+                                    if(NotesManager.IsADLIB(pChip))
                                         break;
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
@@ -1562,7 +1564,7 @@ namespace TJAPlayer3
 						{
                             case E判定.Perfect:
                                 {
-                                    if( pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18 )
+                                    if(!NotesManager.IsGenericRoll(pChip))
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n良[actDan.NowShowingNumber]++;
@@ -1588,7 +1590,7 @@ namespace TJAPlayer3
                             case E判定.Great:
                             case E判定.Good:
                                 {
-                                    if (pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18)
+                                    if (!NotesManager.IsGenericRoll(pChip))
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n可[actDan.NowShowingNumber]++;
@@ -1613,7 +1615,7 @@ namespace TJAPlayer3
 
                             default:
                                 {
-                                    if( pChip.nチャンネル番号 != 0x15 && pChip.nチャンネル番号 != 0x16 && pChip.nチャンネル番号 != 0x17 && pChip.nチャンネル番号 != 0x18 && pChip.nチャンネル番号 != 0x1F )
+                                    if(!NotesManager.IsGenericRoll(pChip) && !NotesManager.IsADLIB(pChip))
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n不可[actDan.NowShowingNumber]++;
@@ -1633,8 +1635,9 @@ namespace TJAPlayer3
 					}
                     actDan.Update();
                 
-                    #region[ コンボ音声 ]
-                    if( pChip.nチャンネル番号 < 0x15 || ( pChip.nチャンネル番号 >= 0x1A ) )
+                    #region[ Combo voice ]
+
+                    if(!NotesManager.IsGenericRoll(pChip))
                     {
                         if((this.actCombo.n現在のコンボ数[ nPlayer ] % 100 == 0 || this.actCombo.n現在のコンボ数[nPlayer] == 50) && this.actCombo.n現在のコンボ数[ nPlayer ] > 0 )
                         {
@@ -1708,7 +1711,7 @@ namespace TJAPlayer3
 				default:
 					break;
 			}
-			if ( ( ( pChip.e楽器パート != E楽器パート.UNKNOWN ) ) && ( eJudgeResult != E判定.Miss ) && ( eJudgeResult != E判定.Bad ) && ( eJudgeResult != E判定.Poor ) && ( pChip.nチャンネル番号 <= 0x14 || pChip.nチャンネル番号 == 0x1A || pChip.nチャンネル番号 == 0x1B ) )
+			if ( ( ( pChip.e楽器パート != E楽器パート.UNKNOWN ) ) && ( eJudgeResult != E判定.Miss ) && ( eJudgeResult != E判定.Bad ) && ( eJudgeResult != E判定.Poor ) && (NotesManager.IsMissableNote(pChip)) )
 			{
                 int nCombos = this.actCombo.n現在のコンボ数[nPlayer];
                 long nInit = TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer]];
@@ -1954,7 +1957,7 @@ namespace TJAPlayer3
 				CDTX.CChip chip = listChip[ nPlayer ][ nIndex_NearestChip_Future ];
 				if ( !chip.bHit && chip.b可視 )
 				{
-					if ( ( ( 0x11 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x18 ) ) || chip.nチャンネル番号 == 0x1A || chip.nチャンネル番号 == 0x1B || chip.nチャンネル番号 == 0x1F )
+					if (NotesManager.IsHittableNote(chip))
 					{
 						if ( chip.n発声時刻ms > nTime )
 						{
@@ -1965,7 +1968,7 @@ namespace TJAPlayer3
 				}
                 if( chip.bHit && chip.b可視 ) // 2015.11.5 kairera0467 連打対策
                 {
-                    if( ( 0x15 <= chip.nチャンネル番号) && ( chip.nチャンネル番号 <= 0x17 ) )
+                    if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip))
                     {
                         if (chip.nノーツ終了時刻ms > nTime)
                         {
@@ -1983,13 +1986,16 @@ namespace TJAPlayer3
 			for ( ; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past-- )
 			{
 				CDTX.CChip chip = listChip[ nPlayer ][ nIndex_NearestChip_Past ];
-				//if ( (!chip.bHit && chip.b可視 ) && ( (  0x93 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x99 ) ) )
-                if ( (!chip.bHit && chip.b可視 ) && ( (  0x11 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x17 ) ) || chip.nチャンネル番号 == 0x1A || chip.nチャンネル番号 == 0x1B || chip.nチャンネル番号 == 0x1F )
+                //if ( (!chip.bHit && chip.b可視 ) && ( (  0x93 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x99 ) ) )
+
+                
+
+                if ( (!chip.bHit && chip.b可視 ) && NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip) )
 					{
 						break;
 					}
                 //2015.11.5 kairera0467 連打対策
-				else if ( ( chip.b可視 ) && ( (  0x15 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x17 ) ) )
+				else if ( ( chip.b可視 ) && NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) 
 					{
 						break;
 					}
@@ -2031,8 +2037,10 @@ namespace TJAPlayer3
 //					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
 				}
 
+                var __tmpchp = listChip[nPlayer][nIndex_NearestChip_Future];
+
                 //2015.11.5 kairera0467　連打音符の判定
-                if( listChip[ nPlayer ][ nIndex_NearestChip_Future ].nチャンネル番号 >= 0x15 && listChip[ nPlayer ][ nIndex_NearestChip_Future ].nチャンネル番号 <= 0x17 )
+                if (NotesManager.IsGenericRoll(__tmpchp) && !NotesManager.IsRollEnd(__tmpchp))
                 {
                     if( listChip[ nPlayer ][ nIndex_NearestChip_Future ].n発声時刻ms <= nTime && listChip[ nPlayer ][ nIndex_NearestChip_Future ].nノーツ終了時刻ms >= nTime )
                     {
@@ -2262,6 +2270,9 @@ namespace TJAPlayer3
 				}
 //				nIndex_NearestChip_Future++;
 			}
+
+            // Channel is always 50, following code is unreachable
+
 			int nIndex_NearestChip_Past = nIndex_InitialPositionSearchingToPast;
 //			while ( nIndex_NearestChip_Past >= 0 )		// 過去方向への検索
 			for ( ; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past-- )
@@ -2344,7 +2355,7 @@ namespace TJAPlayer3
 				CDTX.CChip chip = listChip[ nPlayer ][ i ];
 				if ( !chip.bHit )
 				{
-					if ( ( ( 0x11 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x14 ) ) || chip.nチャンネル番号 == 0x1A || chip.nチャンネル番号 == 0x1B )
+					if (NotesManager.IsMissableNote(chip))
 					{
 						if ( chip.n発声時刻ms < nTime + n検索範囲時間ms )
 						{
@@ -2783,7 +2794,7 @@ namespace TJAPlayer3
 
                 if (!pChip.IsMissed && !pChip.bHit)
                 {
-                    if ( pChip.nチャンネル番号 >= 0x11 && pChip.nチャンネル番号 <= 0x14 || pChip.nチャンネル番号 == 0x1A || pChip.nチャンネル番号 == 0x1B )//|| pChip.nチャンネル番号 == 0x9A )
+                    if (NotesManager.IsMissableNote(pChip))//|| pChip.nチャンネル番号 == 0x9A )
                     {
                         //こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
                         if (time <= 0)
@@ -2800,7 +2811,7 @@ namespace TJAPlayer3
 
                 if( pChip.nバーからの距離dot[ instIndex ] < -150 )
                 {
-                    if( !( pChip.nチャンネル番号 >= 0x11 && pChip.nチャンネル番号 <= 0x14 ) || pChip.nチャンネル番号 == 0x1A || pChip.nチャンネル番号 == 0x1B )
+                    if( !(NotesManager.IsMissableNote(pChip)))
                     {
                         //2016.02.11 kairera0467
                         //太鼓の単音符の場合は座標による判定を行わない。
@@ -2812,7 +2823,9 @@ namespace TJAPlayer3
                 var cChipCurrentlyInProcess = chip現在処理中の連打チップ[ nPlayer ];
                 if( cChipCurrentlyInProcess != null && !cChipCurrentlyInProcess.bHit )
                 {
-                    if( cChipCurrentlyInProcess.nチャンネル番号 >= 0x13 && cChipCurrentlyInProcess.nチャンネル番号 <= 0x15 )//|| pChip.nチャンネル番号 == 0x9A )
+
+                    //if( cChipCurrentlyInProcess.nチャンネル番号 >= 0x13 && cChipCurrentlyInProcess.nチャンネル番号 <= 0x15 )//|| pChip.nチャンネル番号 == 0x9A )
+                    if (NotesManager.IsBigNote(cChipCurrentlyInProcess))
                     {
 				        if ( ( ( cChipCurrentlyInProcess.nバーからの距離dot.Taiko < -500 ) && ( cChipCurrentlyInProcess.n発声時刻ms <= n現在時刻ms && cChipCurrentlyInProcess.nノーツ終了時刻ms >= n現在時刻ms ) ) )
                            //( ( chip現在処理中の連打チップ.nバーからのノーツ末端距離dot.Taiko < -500 ) && ( chip現在処理中の連打チップ.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && chip現在処理中の連打チップ.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
@@ -2872,11 +2885,13 @@ namespace TJAPlayer3
 						break;
 #endregion
 
-#region [ 11-1f: 太鼓1P ]
+#region [ 11-1f & 101-: Taiko ]
 					case 0x11:
 					case 0x12:
 					case 0x13:
 					case 0x14:
+                    case 0x1C:
+                    case 0x101:
                         {
                             this.t進行描画_チップ_Taiko( configIni, ref dTX, ref pChip, nPlayer );
                         }
@@ -2885,6 +2900,7 @@ namespace TJAPlayer3
 					case 0x15:
 					case 0x16:
 					case 0x17:
+                    case 0x19:
                         {
                             //2015.03.28 kairera0467
                             //描画順序を変えるため、メイン処理だけをこちらに残して描画処理は分離。
@@ -2947,8 +2963,7 @@ namespace TJAPlayer3
                         }
 
                         break;
-					case 0x19:
-                    case 0x1c:
+
                     case 0x1d:
                     case 0x1e:
                         break;
@@ -3609,7 +3624,7 @@ namespace TJAPlayer3
 
                 if ( !pChip.bHit )
                 {
-                    bool bRollChip = pChip.nチャンネル番号 >= 0x15 && pChip.nチャンネル番号 <= 0x19;
+                    bool bRollChip = NotesManager.IsGenericRoll(pChip);// pChip.nチャンネル番号 >= 0x15 && pChip.nチャンネル番号 <= 0x19;
                     if( bRollChip && ( ( pChip.e楽器パート != E楽器パート.UNKNOWN ) ) )
                     {
                         int instIndex = (int) pChip.e楽器パート;
@@ -3625,7 +3640,7 @@ namespace TJAPlayer3
 
 				switch ( pChip.nチャンネル番号 )
 				{
-#region[ 15-19: 連打 ]
+#region[ 15-19: Rolls ]
                     case 0x15: //連打
                     case 0x16: //連打(大)
                     case 0x17: //風船
@@ -3812,10 +3827,13 @@ namespace TJAPlayer3
             for (int A = 0; A < dTX.listChip.Count; A++)
             {
                 var Chip = dTX.listChip[A].nチャンネル番号;
-                var bDontDeleteFlag = Chip >= 0x11 && Chip <= 0x19;
-                var bRollAllFlag = Chip >= 0x15 && Chip <= 0x19;
-                var bBalloonOnlyFlag = Chip == 0x17;
-                var bRollOnlyFlag = Chip >= 0x15 && Chip <= 0x16;
+                var _chip = dTX.listChip[A];
+
+                var bDontDeleteFlag = NotesManager.IsHittableNote(_chip);// Chip >= 0x11 && Chip <= 0x19;
+                var bRollAllFlag = NotesManager.IsGenericRoll(_chip);//Chip >= 0x15 && Chip <= 0x19;
+                var bBalloonOnlyFlag = NotesManager.IsBalloon(_chip) || NotesManager.IsKusudama(_chip);//Chip == 0x17;
+                var bRollOnlyFlag = NotesManager.IsRoll(_chip);//Chip >= 0x15 && Chip <= 0x16;
+
                 if (bDontDeleteFlag)
                 {
                     if (dTX.listChip[A].n発声時刻ms > n発声位置)
