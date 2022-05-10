@@ -2058,6 +2058,7 @@ namespace TJAPlayer3
         /// <param name="player">プレイヤー。</param>
         /// <param name="don">ドンかどうか。</param>
         /// <returns>最も判定枠に近いノーツ。</returns>
+        /*
         protected CDTX.CChip GetChipOfNearest(long nowTime, int player, bool don)
         {
             var nearestChip = new CDTX.CChip();
@@ -2191,6 +2192,7 @@ namespace TJAPlayer3
 
             return nearestChip;
         }
+        */
 
 
         protected CDTX.CChip r指定時刻に一番近い未ヒットChip( long nTime, int nChannel, int nInputAdjustTime, int n検索範囲時間ms, int nPlayer )

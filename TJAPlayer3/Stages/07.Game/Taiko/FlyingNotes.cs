@@ -144,9 +144,13 @@ namespace TJAPlayer3
                         }
                         //Flying[i].OldValue = Flying[i].Counter.n現在の値;
 
+                        NotesManager.DisplayNote(Flying[i].Player, (int)Flying[i].X, (int)Flying[i].Y, Flying[i].Lane);
+
+                        /*
                         EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(Flying[i].Player)];
 
                         TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, (int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
+                        */
 
                         /*
                         if (Flying[i].Player == 0)

@@ -79,20 +79,27 @@ namespace TJAPlayer3
                         st[i].b使用中 = false;
                     }
 
-                    EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(st[i].nプレイヤー)];
-
                     switch (st[i].nプレイヤー)
                     {
                         case 0:
                             TJAPlayer3.Tx.Gauge_Soul_Explosion[TJAPlayer3.P1IsBlue() ? 1 : 0]?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[0], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0], new Rectangle(st[i].ct進行.n現在の値 * TJAPlayer3.Skin.Game_Effect_NotesFlash[0], 0, TJAPlayer3.Skin.Game_Effect_NotesFlash[0], TJAPlayer3.Skin.Game_Effect_NotesFlash[1]));
+                            
                             if (this.st[i].ctChipEffect.n現在の値 < 13)
-                                TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[0], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0], new Rectangle(st[i].Lane * 130, 390, 130, 130));
+                                NotesManager.DisplayNote(
+                                    st[i].nプレイヤー,
+                                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[0],
+                                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0],
+                                    st[i].Lane);
                             break;
 
                         case 1:
                             TJAPlayer3.Tx.Gauge_Soul_Explosion[1]?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[1], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1], new Rectangle(st[i].ct進行.n現在の値 * TJAPlayer3.Skin.Game_Effect_NotesFlash[0], 0, TJAPlayer3.Skin.Game_Effect_NotesFlash[0], TJAPlayer3.Skin.Game_Effect_NotesFlash[1]));
                             if (this.st[i].ctChipEffect.n現在の値 < 13)
-                                TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[1], TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1], new Rectangle(st[i].Lane * 130, 390, 130, 130));
+                                NotesManager.DisplayNote(
+                                    st[i].nプレイヤー,
+                                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[1],
+                                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1],
+                                    st[i].Lane);
                             break;
                     }
 

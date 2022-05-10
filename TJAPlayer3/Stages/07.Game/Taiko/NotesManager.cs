@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using FDK;
 
 namespace TJAPlayer3
 {
@@ -10,6 +12,9 @@ namespace TJAPlayer3
     // Simple class containing functions to simplify readability of CChip elements
     class NotesManager
     {
+
+        #region [Parsing]
+
         public static Dictionary<string, int> NoteCorrespondanceDictionnary = new Dictionary<string, int>()
         {
             ["0"] = 0, // Empty
@@ -26,9 +31,9 @@ namespace TJAPlayer3
             ["B"] = 11, // Joint Big Ka (2P)
             ["C"] = 0, // Mine (Coming soon)
             ["D"] = 0, // Unused
-            ["E"] = 6, // Konga clap roll (Coming soon)
+            ["E"] = 14, // Konga clap roll (Coming soon)
             ["F"] = 15, // ADLib
-            ["G"] = 3, // Green (Purple) double hit note (Coming soon)
+            ["G"] = 0xF1, // Green (Purple) double hit note (Coming soon)
             ["H"] = 5, // Konga red roll (Coming soon)
             ["I"] = 5, // Konga yellow roll (Coming soon)
         };
@@ -39,6 +44,10 @@ namespace TJAPlayer3
                 return NoteCorrespondanceDictionnary[chr];
             return -1;
         }
+
+        #endregion
+
+        #region [Gameplay]
 
         public static bool IsExpectedPad(int stored, int hit, CDTX.CChip chip, EGameType gt)
         {
@@ -72,6 +81,10 @@ namespace TJAPlayer3
 
             return false;
         }
+
+        #endregion
+
+        #region [General]
 
         public static bool IsCommonNote(CDTX.CChip chip)
         {
@@ -112,18 +125,141 @@ namespace TJAPlayer3
         {
             if (chip == null) return false;
             return (
-                ((chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A) && gt == EGameType.KONGA)        // Konga Pink note
-                || IsPurpleNote(chip, gt)                                                                      // Purple (Green) note
+                IsKongaPink(chip, gt)                           // Konga Pink note
+                || IsPurpleNote(chip)                       // Purple (Green) note
                 );
         }
 
-        // Not implemented yet
-        public static bool IsPurpleNote(CDTX.CChip chip, EGameType gt)
+        public static bool IsKongaPink(CDTX.CChip chip, EGameType gt)
         {
             if (chip == null) return false;
-            return false;
+            // Purple notes are treated as Pink in Konga
+            return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A || IsPurpleNote(chip)) && gt == EGameType.KONGA;
+        }
+        public static bool IsPurpleNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return (chip.nチャンネル番号 == 0x101);
         }
 
+        public static bool IsMineNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x1E;
+        }
+
+        public static bool IsBalloon(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x17;
+        }
+
+        public static bool IsBigRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x16;
+        }
+
+        public static bool IsSmallRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x15;
+        }
+
+        public static bool IsRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return IsBigRoll(chip) || IsSmallRoll(chip);
+        }
+
+        public static bool IsMissableNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return (0x11 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x14) 
+                || chip.nチャンネル番号 == 0x1A 
+                || chip.nチャンネル番号 == 0x1B
+                || chip.nチャンネル番号 == 0x101;
+        }
+
+        #endregion
+
+        #region [Displayables]
+
+        // Flying notes
+        public static void DisplayNote(int player, int x, int y, int Lane)
+        {
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+
+            TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(Lane * 130, 390, 130, 130));
+        }
+
+        // Regular display
+        public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = 130)
+        {
+            if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.OFF || !chip.bShow)
+                return;
+
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+
+            int noteType = 1;
+            if (IsSmallNote(chip, true)) noteType = 2;
+            else if (IsBigDonTaiko(chip, _gt) || IsKongaPink(chip, _gt)) noteType = 3;
+            else if (IsBigKaTaiko(chip, _gt) || IsClapKonga(chip, _gt)) noteType = 4;
+            else if (IsBalloon(chip)) noteType = 11;
+
+            else if (IsMineNote(chip))
+            {
+                TJAPlayer3.Tx.Note_Mine?.t2D描画(TJAPlayer3.app.Device, x, y);
+                return;
+            }
+            else if (IsPurpleNote(chip))
+            {
+                if (TJAPlayer3.Tx.Notes[0] != null)
+                {
+                    int _oldOp = TJAPlayer3.Tx.Notes[0].Opacity;
+                    TJAPlayer3.Tx.Notes[0]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(130, frame, length, 130));
+                    TJAPlayer3.Tx.Notes[0].Opacity = 127;
+                    TJAPlayer3.Tx.Notes[0]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(260, frame, length, 130));
+                    TJAPlayer3.Tx.Notes[0].Opacity = _oldOp;
+                }
+                return;
+            }
+
+            TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(noteType * 130, frame, length, 130));
+        }
+
+        // Roll display
+        public static void DisplayRoll(int player, int x, int y, CDTX.CChip chip, int frame, 
+            SharpDX.Color4 normalColor, SharpDX.Color4 effectedColor, int x末端)
+        {
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+
+            if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
+                return;
+
+            int _offset = IsBigRoll(chip) ? 390 : 0;
+            float _adjust = 65f;
+            int index = x末端 - x;
+
+            if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
+                TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
+            else
+                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - 65.0f + _adjust + 1) / 128.0f;
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(781 + _offset, 0, 128, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + _adjust, y, 0, new Rectangle(910 + _offset, frame, 130, 130));
+            if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
+                TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
+            else
+                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(650 + _offset, frame, 130, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+        }
+
+
+        #endregion
 
     }
 }
