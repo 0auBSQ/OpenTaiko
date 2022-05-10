@@ -339,6 +339,8 @@ namespace TJAPlayer3
             Notes[0] = TxC(GAME + @"Notes.png");
             Notes[1] = TxC(GAME + @"Notes_Konga.png");
 
+            Note_Mine = TxC(GAME + @"Mine.png");
+
             Judge_Frame = TxC(GAME + @"Notes.png");
             SENotes = TxC(GAME + @"SENotes.png");
             Notes_Arm = TxC(GAME + @"Notes_Arm.png");
@@ -1583,6 +1585,7 @@ namespace TJAPlayer3
         #region 5_演奏画面
         #region 共通
         public CTexture Judge_Frame,
+            Note_Mine,
             SENotes,
             Notes_Arm,
             ChipEffect,

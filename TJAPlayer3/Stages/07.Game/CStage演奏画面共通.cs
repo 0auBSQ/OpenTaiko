@@ -668,6 +668,8 @@ namespace TJAPlayer3
 
         protected int nWaitButton;
 
+        protected int[] nStoredHit;
+
 
         public CDTX.CChip[] chip現在処理中の連打チップ = new CDTX.CChip[ 4 ];
 

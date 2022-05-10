@@ -4341,7 +4341,9 @@ namespace TJAPlayer3
                                 chip.b可視 = true;
                                 chip.bShow = true;
                                 chip.bShowRoll = true;
+
                                 chip.nチャンネル番号 = 0x10 + nObjectNum;
+                                
                                 //chip.n発声位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
                                 chip.n発声位置 = (int)((this.n現在の小節数 * 384.0) + ((384.0 * n) / n文字数));
                                 chip.db発声位置 = this.dbNowTime;
@@ -5280,6 +5282,9 @@ namespace TJAPlayer3
         /// </summary>
         private int CharConvertNote(string str)
         {
+            return (NotesManager.GetNoteValueFromChar(str));
+            
+            /*
             switch (str)
             {
                 case "0":
@@ -5311,6 +5316,7 @@ namespace TJAPlayer3
                 default:
                     return -1;
             }
+            */
         }
 
         private int strConvertCourse(string str)
@@ -5447,7 +5453,7 @@ namespace TJAPlayer3
 
             foreach (CChip chip in this.listChip)
             {
-                if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 < 0x18)
+                if (NotesManager.IsCommonNote(chip))
                 {
                     list音符のみのリスト.Add(chip);
                 }
@@ -5821,7 +5827,7 @@ namespace TJAPlayer3
 
             foreach (CChip chip in this.listChip)
             {
-                if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 < 0x18)
+                if (NotesManager.IsCommonNote(chip))
                 {
                     list音符のみのリスト.Add(chip);
 

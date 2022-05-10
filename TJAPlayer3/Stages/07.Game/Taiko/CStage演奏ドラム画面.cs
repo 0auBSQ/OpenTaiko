@@ -211,6 +211,8 @@ namespace TJAPlayer3
             ifp[0] = false;
             ifp[1] = false;
 
+            this.nStoredHit = new int[TJAPlayer3.ConfigIni.nPlayerCount];
+
             // MODIFY_BEGIN #25398 2011.06.07 FROM
             if ( TJAPlayer3.bコンパクトモード )
 			{
@@ -1188,7 +1190,8 @@ namespace TJAPlayer3
                                 {
                                     this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
                                     bHitted = true;
-                                    this.nWaitButton = 0;
+                                    //this.nWaitButton = 0;
+                                    this.nStoredHit[nUsePlayer] = 0;
                                     break;
                                 }
 
@@ -1199,33 +1202,50 @@ namespace TJAPlayer3
                                     float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed);
                                     int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
 
+                                    bool _timeB110 = time <= 110;
+
                                     if (chipNoHit.eNoteState == ENoteState.none)
                                     {
-                                        if (time <= 110)
+                                        if (_timeB110)
                                         {
                                             chipNoHit.nProcessTime = (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed);
                                             chipNoHit.eNoteState = ENoteState.wait;
-                                            this.nWaitButton = waitInstr;
+                                            //this.nWaitButton = waitInstr;
+                                            this.nStoredHit[nUsePlayer] = (int)_pad;
                                         }
                                     }
                                     else if (chipNoHit.eNoteState == ENoteState.wait)
                                     {
+
+                                        bool _isExpected = NotesManager.IsExpectedPad(this.nStoredHit[nUsePlayer], (int)_pad, chipNoHit, _gt);
+
                                         // Double tap success
-                                        if (this.nWaitButton == waitRec && time <= 110 && chipNoHit.nProcessTime 
-                                            + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+                                        // (this.nWaitButton == waitRec && _timeB110 && chipNoHit.nProcessTime 
+                                        //   + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+
+                                        if (_isExpected && _timeB110 && chipNoHit.nProcessTime
+                                           + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
                                         {
                                             this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
                                             bHitted = true;
-                                            this.nWaitButton = 0;
+                                            //this.nWaitButton = 0;
+                                            this.nStoredHit[nUsePlayer] = 0;
                                         }
 
                                         // Double tap failure
-                                        else if (this.nWaitButton == waitInstr && time <= 110 && chipNoHit.nProcessTime 
-                                            + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+                                        // else if (this.nWaitButton == waitInstr && _timeB110 && chipNoHit.nProcessTime 
+                                        //    + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
+                                        else if (!_isExpected || (_timeB110 && chipNoHit.nProcessTime
+                                            + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed)))
                                         {
-                                            this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-                                            bHitted = true;
-                                            this.nWaitButton = 0;
+                                            if (!_isPinkKonga)
+                                            {
+                                                this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
+                                                bHitted = true;
+                                            }
+                                            
+                                            //this.nWaitButton = 0;
+                                            this.nStoredHit[nUsePlayer] = 0;
                                         }
                                     }
                                 }
@@ -2414,6 +2434,7 @@ namespace TJAPlayer3
                 EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(i)];
                 bool _isBigKaTaiko = NotesManager.IsBigKaTaiko(chipNoHit, _gt);
                 bool _isBigDonTaiko = NotesManager.IsBigDonTaiko(chipNoHit, _gt);
+                bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
 
                 if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko))
                 {
@@ -2422,11 +2443,17 @@ namespace TJAPlayer3
                     if (chipNoHit.eNoteState == ENoteState.wait && timeC <= 110 
                         && chipNoHit.nProcessTime + nWaitTime <= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                     {
-                        this.tドラムヒット処理(chipNoHit.nProcessTime, Eパッド.RRed, chipNoHit, false, i);
-                        this.nWaitButton = 0;
+                        if (!_isSwapNote)
+                        {
+                            this.tドラムヒット処理(chipNoHit.nProcessTime, Eパッド.RRed, chipNoHit, false, i);
+                            //this.nWaitButton = 0;
+                            this.nStoredHit[i] = 0;
+                            chipNoHit.bHit = true;
+                            chipNoHit.IsHitted = true;
+                        }
+                        
+
                         chipNoHit.eNoteState = ENoteState.none;
-                        chipNoHit.bHit = true;
-                        chipNoHit.IsHitted = true;
                     }
                 }
             }
