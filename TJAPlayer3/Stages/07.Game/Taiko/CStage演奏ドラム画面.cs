@@ -2424,7 +2424,7 @@ namespace TJAPlayer3
                     }
                 }
             }
-            #region[ 片手判定をこっちに持ってきてみる。]
+            #region [ Treat big notes hit with a single hand ]
             //常時イベントが発生しているメソッドのほうがいいんじゃないかという予想。
             //CDTX.CChip chipNoHit = this.r指定時刻に一番近い未ヒットChip((int)CSound管理.rc演奏用タイマ.n現在時刻ms, 0);
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
