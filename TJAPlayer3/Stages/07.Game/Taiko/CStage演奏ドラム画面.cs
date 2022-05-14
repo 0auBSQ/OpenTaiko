@@ -1211,9 +1211,22 @@ namespace TJAPlayer3
 
                                 // Judge rolls
                                 if (e判定 != E判定.Miss 
-                                    && (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit) && !_isBlue))
+                                    && NotesManager.IsGenericRoll(chipNoHit) 
+                                    && !NotesManager.IsRollEnd(chipNoHit))
                                 {
-                                    this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
+                                    bool _isBalloon = NotesManager.IsBalloon(chipNoHit);
+                                    bool _isKusudama = NotesManager.IsKusudama(chipNoHit);
+                                    bool _isKongaRedRoll = NotesManager.IsRoll(chipNoHit) && _gt == EGameType.KONGA;
+
+                                    bool _isRedOnly = _isBalloon || _isKongaRedRoll || _isKusudama;
+
+                                    // To be added later
+                                    bool _isKongaPinkRoll = NotesManager.IsBigRoll(chipNoHit) && _gt == EGameType.KONGA;
+
+                                    bool _isBlueOnly = false;
+
+                                    if ((!_isRedOnly || !_isBlue) && (!_isBlueOnly || _isBlue))
+                                        this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                 }
 
                                 if (!bHitted)
