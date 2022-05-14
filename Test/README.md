@@ -58,6 +58,8 @@ Liberation : DeBisco - https://soundcloud.com/debisco | https://twitter.com/debi
 Deceiver's Terminus : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 Corrupted Angel : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
 Startup Parade! : Ryuto Setsujin - https://youtube.com/c/ArGameOfficial (Chart by bol)
+White Heart : 9C feat. Cusi - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol)
+Summer Overload! : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
 ```
 
 ## Translations
