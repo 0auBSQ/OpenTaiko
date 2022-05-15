@@ -31,10 +31,10 @@ namespace TJAPlayer3
             ["B"] = 11, // Joint Big Ka (2P)
             ["C"] = 12, // Mine (Coming soon)
             ["D"] = 0, // Unused
-            ["E"] = 5, // Konga clap roll (Coming soon)
+            //["E"] = 5, // Removed, makes dans crash
             ["F"] = 15, // ADLib
             ["G"] = 0xF1, // Green (Purple) double hit note (Coming soon)
-            ["H"] = 5, // Konga red roll (Coming soon)
+            ["H"] = 5, // Konga clap roll (Coming soon)
             ["I"] = 5, // Konga yellow roll (Coming soon)
         };
 
