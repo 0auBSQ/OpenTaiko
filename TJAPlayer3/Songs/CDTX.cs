@@ -2841,14 +2841,14 @@ namespace TJAPlayer3
             {
                 if (nMode == 0)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+                    if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
                     {
                         sb.Append(input[n] + "\n");
                     }
                 }
                 else if (nMode == 1)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && (input[n].Substring(0, 1) == "#" || this.CharConvertNote(input[n].Substring(0, 1)) != -1))
+                    if (!string.IsNullOrEmpty(input[n]) && (input[n].Substring(0, 1) == "#" || NotesManager.FastFlankedParsing(input[n])))//this.CharConvertNote(input[n].Substring(0, 1)) != -1))
                     {
                         if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM"))
                         {
@@ -2862,7 +2862,7 @@ namespace TJAPlayer3
                 }
                 else if (nMode == 2)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+                    if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
                     {
                         if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM"))
                         {
@@ -3224,7 +3224,7 @@ namespace TJAPlayer3
                                 this.t1小節の文字数をカウントしてリストに追加する(str + str命令消去譜面[i]);
                             }
 
-                            if (this.CharConvertNote(str命令消去譜面[i].Substring(0, 1)) != -1)
+                            if (NotesManager.FastFlankedParsing(str命令消去譜面[i]))//this.CharConvertNote(str命令消去譜面[i].Substring(0, 1)) != -1)
                                 str += str命令消去譜面[i];
                         }
                         else
