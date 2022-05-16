@@ -796,12 +796,36 @@ namespace TJAPlayer3
                 int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
                 
                 // To change later to adapt to Tower Ama-kuchi
-                diff = Math.Min(diff, (int)Difficulty.Oni);
+                //diff = Math.Min(diff, (int)Difficulty.Oni);
 
                 int actual = TJAPlayer3.GetActualPlayer(player);
 
-                int timingShift = TJAPlayer3.ConfigIni.nTimingZones[actual];                
-                CConfigIni.CTimingZones tz = (diff <= (int)Difficulty.Normal) ? TJAPlayer3.ConfigIni.tzLevels[timingShift] : TJAPlayer3.ConfigIni.tzLevels[2 + timingShift];
+                int timingShift = TJAPlayer3.ConfigIni.nTimingZones[actual];
+
+                bool _timingzonesAreEasy = false;
+
+                // Diff = Normal or Easy
+                if (diff <= (int)Difficulty.Normal)
+                {
+                    _timingzonesAreEasy = true;
+                }
+
+                // Diff = Dan and current song is Normal or Easy
+                if (diff == (int)Difficulty.Dan)
+                {
+                    int _nb = TJAPlayer3.stage演奏ドラム画面.actDan.NowShowingNumber;
+                    var _danSongs = TJAPlayer3.stage選曲.r確定された曲.DanSongs;
+
+                    if (_nb < _danSongs.Count)
+                    {
+                        var _currentDiff = _danSongs[_nb].Difficulty;
+                        if (_currentDiff <= (int)Difficulty.Normal)
+                            _timingzonesAreEasy = true;
+
+                    }
+                }
+
+                CConfigIni.CTimingZones tz = (_timingzonesAreEasy == true) ? TJAPlayer3.ConfigIni.tzLevels[timingShift] : TJAPlayer3.ConfigIni.tzLevels[2 + timingShift];
 
                 if (nDeltaTime <= tz.nGoodZone * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
                 {

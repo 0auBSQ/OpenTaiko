@@ -45,7 +45,8 @@ namespace TJAPlayer3
 
             for (int i = 0; i < s.Length; i++)
             {
-                if (GetNoteValueFromChar(s.Substring(i, 1)) == -1)
+                if (GetNoteValueFromChar(s.Substring(i, 1)) == -1
+                    && s.Substring(i, 1) != ",")
                     return false;
             }
 
@@ -302,6 +303,25 @@ namespace TJAPlayer3
 
             TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(650 + _offset, frame, 130, 130));
             TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+        }
+
+        // SENotes
+        public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip)
+        {
+            EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+
+            if (IsMine(chip))
+            {
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 30, 136, 30));
+            }
+            else if (IsPurpleNote(chip) && _gt != EGameType.KONGA)
+            {
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, 136, 30));
+            }
+            else
+            {
+                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 30 * chip.nSenote, 136, 30));
+            }
         }
 
 

@@ -84,6 +84,13 @@ namespace TJAPlayer3
             return tex;
         }
 
+        internal CTexture TxCAbsolute(string FileName)
+        {
+            var tex = TJAPlayer3.tテクスチャの生成(FileName);
+            listTexture.Add(tex);
+            return tex;
+        }
+
         internal CTextureAf TxCAf(string FileName)
         {
             var tex = TJAPlayer3.tテクスチャの生成Af(CSkin.Path(BASE + FileName));
@@ -343,7 +350,13 @@ namespace TJAPlayer3
             Note_Swap = TxC(GAME + @"Swap.png");
 
             Judge_Frame = TxC(GAME + @"Notes.png");
-            SENotes = TxC(GAME + @"SENotes.png");
+
+            SENotes = new CTexture[2];
+            SENotes[0] = TxC(GAME + @"SENotes.png");
+            SENotes[1] = TxC(GAME + @"SENotes_Konga.png");
+
+            SENotesExtension = TxC(GAME + @"SENotes_Extension.png");
+
             Notes_Arm = TxC(GAME + @"Notes_Arm.png");
             Judge = TxC(GAME + @"Judge.png");
             ChipEffect = TxC(GAME + @"ChipEffect.png");
@@ -1588,7 +1601,7 @@ namespace TJAPlayer3
         public CTexture Judge_Frame,
             Note_Mine,
             Note_Swap,
-            SENotes,
+            SENotesExtension,
             Notes_Arm,
             ChipEffect,
             ScoreRank,
@@ -1596,7 +1609,8 @@ namespace TJAPlayer3
         public CTexture Judge_Meter,
             Bar,
             Bar_Branch;
-        public CTexture[] Notes;
+        public CTexture[] Notes,
+            SENotes;
         #endregion
 
 

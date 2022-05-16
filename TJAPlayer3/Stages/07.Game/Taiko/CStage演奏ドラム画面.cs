@@ -1833,7 +1833,9 @@ namespace TJAPlayer3
                                 case 0x101:
                                     {
                                         NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-                                        TJAPlayer3.Tx.SENotes?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
+                                        NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
+                                        
+                                        //TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
                                         break;
                                     }
 
@@ -1853,7 +1855,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, x + 60, (y - 14) - nHand);
                                             }
                                             NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-                                            TJAPlayer3.Tx.SENotes?.t2D描画(device, x - 2, y + nSenotesY,
+                                            TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY,
                                                 new Rectangle(0, pChip.nチャンネル番号 == 0x1A ? 390 : 420, 136, 30));
                                         }
                                         break;
@@ -2088,15 +2090,15 @@ namespace TJAPlayer3
                         {
                             NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端);
 
-                            if (TJAPlayer3.Tx.SENotes != null)
+                            if (TJAPlayer3.Tx.SENotes[(int)_gt] != null)
                             {
                                 int _shift = NotesManager.IsBigRoll(pChip) ? 26 : 0;
 
-                                TJAPlayer3.Tx.SENotes.vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
-                                TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(60, 240, 1, 30));
-                                TJAPlayer3.Tx.SENotes.vc拡大縮小倍率.X = 1.0f;
-                                TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 240, 60, 30));
-                                TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(60, 240, 1, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 240, 60, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
                             }
                             
                         }
@@ -2111,13 +2113,14 @@ namespace TJAPlayer3
                                     x = (349 + pChip.nバーからのノーツ末端距離dot);
 
                                 NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, 260);
+                                NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
 
                                 /*
                                 if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON)
                                     TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(1430, num9, 260, 130));
                                 */
 
-                                TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
+                                //TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
                             }
                         }
                         if (NotesManager.IsRollEnd(pChip))
@@ -2142,7 +2145,7 @@ namespace TJAPlayer3
                             {
                                 //if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                 //    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
-                                TJAPlayer3.Tx.SENotes.t2D描画(TJAPlayer3.app.Device, x + 56, y + nSenotesY, new Rectangle(58, 270, 78, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x + 56, y + nSenotesY, new Rectangle(58, 270, 78, 30));
                             }
 
                         }
