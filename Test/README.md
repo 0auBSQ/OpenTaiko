@@ -39,7 +39,7 @@ BoxFontName=廻想体 ネクスト UP B
 - PNG Egg (Fireworks) (Non-commercial)
 ```
 
-## OpenTaiko Original songs
+## OpenTaiko Original soundtrack
 
 ### Credits
 
@@ -60,6 +60,7 @@ Corrupted Angel : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yt
 Startup Parade! : Ryuto Setsujin - https://youtube.com/c/ArGameOfficial (Chart by bol)
 White Heart : 9C feat. Cusi - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol)
 Summer Overload! : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
+Halcyon : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
 ```
 
 ## Translations
