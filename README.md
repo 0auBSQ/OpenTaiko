@@ -22,7 +22,7 @@ TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
 - 本家風スキンや派生ビルドのサポートは原則行いませんのでご了承ください。
 
 - 質問する前に、まずは自分で調べたりしてください。
-また、[取扱説明書](ux.getuploader.com/Aoi_Tomoe/download/90)もご確認ください。
+また、[取扱説明書](https://drive.google.com/file/d/1VJoia2M_EWrf58xsATL7udIJ0ozR2YFf/view?usp=sharing)や[Wiki](https://seesaawiki.jp/opentaiko-unofficial/)もご確認ください。
 
 - 常時60fpsを保てないPCでの動作は快適なプレイは期待できません。
 
