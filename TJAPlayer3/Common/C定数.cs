@@ -226,6 +226,7 @@ namespace TJAPlayer3
 		Bad		= 5,
 		Auto	= 6,
 		ADLIB	= 7,
+		Mine	= 8,
 	}
 	internal enum E判定文字表示位置
 	{

@@ -375,6 +375,13 @@ namespace TJAPlayer3
         #endregion
 #endif
 
+
+
+        public void MineDamage(int nPlayer)
+        {
+            this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - 4);
+        }
+
         public void Damage(E楽器パート screenmode, E楽器パート part, E判定 e今回の判定, int nPlayer)
         {
             float fDamage;

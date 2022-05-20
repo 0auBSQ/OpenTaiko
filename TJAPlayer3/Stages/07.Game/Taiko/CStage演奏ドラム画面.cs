@@ -789,14 +789,16 @@ namespace TJAPlayer3
 
             e判定 = AlterJudgement(nPlayer, e判定, false);
 
-            //if( pChip.nコース == this.n現在のコース )
             this.actGame.t叩ききりまショー_判定から各数値を増加させる( e判定, (int)( nHitTime - pChip.n発声時刻ms ) );
+
 			if( e判定 == E判定.Miss )
 			{
 				return false;
 			}
+
 			this.tチップのヒット処理( nHitTime, pChip, E楽器パート.TAIKO, true, nInput, nPlayer );
-			if( ( e判定 != E判定.Poor ) && ( e判定 != E判定.Miss ) )
+			
+            if( ( e判定 != E判定.Poor ) && ( e判定 != E判定.Miss ) )
 			{
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start( pChip.nチャンネル番号, e判定, b両手入力, nPlayer );
 
@@ -1255,6 +1257,19 @@ namespace TJAPlayer3
                     }
 
 
+                    if (e判定 != E判定.Miss && NotesManager.IsADLIB(chipNoHit))
+                    {
+                        this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
+                        bHitted = true;
+                    }
+
+                    if (e判定 != E判定.Miss && NotesManager.IsMine(chipNoHit))
+                    {
+                        this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
+                        bHitted = true;
+                    }
+
+
 
                     #region [ (A) ヒットしていればヒット処理して次の inputEvent へ ]
                     //-----------------------------
@@ -1512,11 +1527,7 @@ namespace TJAPlayer3
                     #endregion
 
                     //2016.07.14 kairera0467 Adlibの場合、一括して処理を行う。
-                    if (e判定 != E判定.Miss && NotesManager.IsADLIB(chipNoHit))
-                    {
-                        this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
-                        bHitted = true;
-                    }
+
 
                     //-----------------------------
                     #endregion
