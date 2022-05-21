@@ -79,7 +79,7 @@ namespace TJAPlayer3
         
         static private void tDisplayDoronIcon(int x, int y, int player)
         {
-            var conf_ = TJAPlayer3.ConfigIni.eSTEALTH;
+            var conf_ = TJAPlayer3.ConfigIni.eSTEALTH[player];
 
             if (conf_ == Eステルスモード.DORON)
                 TJAPlayer3.Tx.Mod_Doron?.t2D描画(TJAPlayer3.app.Device, x, y);
@@ -103,7 +103,7 @@ namespace TJAPlayer3
 
         static private void tDisplayRandomIcon(int x, int y, int player)
         {
-            var rand_ = TJAPlayer3.ConfigIni.eRandom.Taiko;
+            var rand_ = TJAPlayer3.ConfigIni.eRandom[player];
 
             if (rand_ == Eランダムモード.MIRROR)
                 TJAPlayer3.Tx.Mod_Mirror?.t2D描画(TJAPlayer3.app.Device, x, y);

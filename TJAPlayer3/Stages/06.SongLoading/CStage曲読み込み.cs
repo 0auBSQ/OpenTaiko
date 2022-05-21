@@ -248,7 +248,7 @@ namespace TJAPlayer3
 			#endregion
             this.ct待機.t進行();
 
-			#region [ ESC押下時は選曲画面に戻る ]
+			#region [ Cancel loading with esc ]
 			if ( tキー入力() )
 			{
 				if ( this.sd読み込み音 != null )
@@ -367,7 +367,7 @@ namespace TJAPlayer3
 			}
             else
             {
-				#region [ 段位時の曲読み込み画面　]
+				#region [ Dan Loading screen　]
 
 				TJAPlayer3.Tx.SongLoading_Bg_Dan.t2D描画(TJAPlayer3.app.Device, 0, 0 - (ct待機.n現在の値 <= 600 ? ct待機.n現在の値 / 10f : 60));
 
@@ -488,25 +488,6 @@ namespace TJAPlayer3
                             }
                         }
 
-                        //2017.01.28 DD Config.iniに反映しないように変更
-                        /*
-                        switch( CDTXMania.DTX.nScoreModeTmp )
-                        {
-                            case 0:
-                                CDTXMania.ConfigIni.nScoreMode = 0;
-                                break;
-                            case 1:
-                                CDTXMania.ConfigIni.nScoreMode = 1;
-                                break;
-                            case 2:
-                                CDTXMania.ConfigIni.nScoreMode = 2;
-                                break;
-                            case -1:
-                                CDTXMania.ConfigIni.nScoreMode = 1;
-                                break;
-                        }
-                        */
-
                         base.eフェーズID = CStage.Eフェーズ.NOWLOADING_WAV読み込み待機;
 						timeBeginLoadWAV = DateTime.Now;
 						return (int) E曲読込画面の戻り値.継続;
@@ -550,7 +531,12 @@ namespace TJAPlayer3
 							{
 								TJAPlayer3.DTX.PlanToAddMixerChannel();
 							}
-                            TJAPlayer3.DTX.t太鼓チップのランダム化( TJAPlayer3.ConfigIni.eRandom.Taiko );
+							
+							for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                            {
+								TJAPlayer3.DTX.tRandomizeTaikoChips(i);
+							}
+								
 
 							TJAPlayer3.stage演奏ドラム画面.On活性化();
 
@@ -611,9 +597,6 @@ namespace TJAPlayer3
 //						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) > ( this.nBGMの総再生時間ms - 1000 ) )
 						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) >= ( this.nBGMの総再生時間ms ) )	// #27787 2012.3.10 yyagi 1000ms == フェードイン分の時間
 						{
-							if ( !TJAPlayer3.DTXVmode.Enabled )
-							{
-							}
 							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 						}
 						return (int) E曲読込画面の戻り値.継続;

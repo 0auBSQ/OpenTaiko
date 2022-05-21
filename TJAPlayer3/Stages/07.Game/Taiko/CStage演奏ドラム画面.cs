@@ -195,6 +195,7 @@ namespace TJAPlayer3
             this.n待機中の大音符の座標 = 0;
             this.actGame.t叩ききりまショー_初期化();
             base.ReSetScore(TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stage選曲.n確定された曲の難易度[0]], TJAPlayer3.DTX.nScoreDiff[TJAPlayer3.stage選曲.n確定された曲の難易度[0]]);
+            
             #region [ branch ]
             for (int i = 0; i < 2; i++)
             {
@@ -282,19 +283,12 @@ namespace TJAPlayer3
             this.ct手つなぎ = new CCounter( 0, 60, 20, TJAPlayer3.Timer );
             this.ShownLyric2 = 0;
 
-            //try
-            //{
-            //    this.stream = new StreamWriter("noteTest.txt", false);
-            //}
-            //catch (Exception ex)
-            //{
-            //    this.stream.Close();
-            //    this.stream = new StreamWriter("noteTest.txt", false);
-            //}
+
             // Discord Presence の更新
             var endTimeStamp = TJAPlayer3.DTX.listChip.Count == 0
                 ? 0
-                : Discord.GetUnixTime() + (long)TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms / 1000;
+                : Discord.GetUnixTime() + (long)((TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms / 1000) / (TJAPlayer3.ConfigIni.n演奏速度 / 20f));
+
             var difficultyName = TJAPlayer3.DifficultyNumberToEnum(TJAPlayer3.stage選曲.n確定された曲の難易度[0]).ToString();
 
             Discord.UpdatePresence(TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stage選曲.r確定された曲.strタイトル
@@ -1723,7 +1717,7 @@ namespace TJAPlayer3
                     #endregion
 
                     #region[ HIDSUD & STEALTH ]
-                    if( TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.STEALTH )
+                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH )
                     {
                         pChip.bShow = false;
                     }
@@ -1853,7 +1847,7 @@ namespace TJAPlayer3
                                 case 0x1A:
                                 case 0x1B:
                                     {
-                                        if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.OFF && pChip.bShow)
+                                        if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.OFF && pChip.bShow)
                                         {
                                             if (nPlayer == 0)
                                             {
@@ -1986,7 +1980,7 @@ namespace TJAPlayer3
 
                 #region[ HIDSUD & STEALTH ]
 
-                if (TJAPlayer3.ConfigIni.eSTEALTH == Eステルスモード.STEALTH)
+                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH)
                 {
                     pChip.bShow = false;
                 }

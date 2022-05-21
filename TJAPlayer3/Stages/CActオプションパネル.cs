@@ -33,30 +33,10 @@ namespace TJAPlayer3
 			{
 				Device device = TJAPlayer3.app.Device;
 				CConfigIni configIni = TJAPlayer3.ConfigIni;
+				/*
 				if( this.txオプションパネル != null )
 				{
-					/*
-					#region [ ScrollSpeed ]
-					int drums = configIni.nScrollSpeed[TJAPlayer3.SaveFile];
-					if( drums > 15 )
-					{
-						drums = 15;
-					}
-					this.txオプションパネル.t2D描画( device, 0x171, 12, this.rc譜面スピード[ drums ] );
-					int guitar = configIni.nScrollSpeed[TJAPlayer3.SaveFile];
-					if( guitar > 15 )
-					{
-						guitar = 15;
-					}
-					this.txオプションパネル.t2D描画( device, 0x171, 0x18, this.rc譜面スピード[ guitar ] );
-					int bass = configIni.nScrollSpeed[TJAPlayer3.SaveFile];
-					if( bass > 15 )
-					{
-						bass = 15;
-					}
-					this.txオプションパネル.t2D描画( device, 0x171, 0x24, this.rc譜面スピード[ bass ] );
-					#endregion
-					*/
+
 					
 					#region [ Sud/Hid/Invisible ]
 					this.txオプションパネル.t2D描画( device, 0x189, 12, this.rcHS[ ( configIni.bHidden.Drums ? 1 : 0 ) + ( configIni.bSudden.Drums ? 2 : 0 ) +
@@ -103,6 +83,7 @@ namespace TJAPlayer3
 					this.txオプションパネル.t2D描画( device, 0x219, 0x24, this.rcLeft[ configIni.bLeft.Bass ? 1 : 0 ] );
 					#endregion
 				}
+				*/
 			}
 			return 0;
 		}

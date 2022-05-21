@@ -420,13 +420,13 @@ namespace TJAPlayer3
 
             #region [ Doron ]
 
-            nStealth = (int)TJAPlayer3.ConfigIni.eSTEALTH;
+            nStealth = (int)TJAPlayer3.ConfigIni.eSTEALTH[actual];
 
             #endregion
 
             #region [ Random ]
 
-            var rand_ = TJAPlayer3.ConfigIni.eRandom.Taiko;
+            var rand_ = TJAPlayer3.ConfigIni.eRandom[actual];
 
             if (rand_ == Eランダムモード.HYPERRANDOM)
             {
@@ -547,7 +547,7 @@ namespace TJAPlayer3
 
             #region [ Doron ]
 
-            TJAPlayer3.ConfigIni.eSTEALTH = (Eステルスモード)nStealth;
+            TJAPlayer3.ConfigIni.eSTEALTH[actual] = (Eステルスモード)nStealth;
 
             #endregion
 
@@ -555,27 +555,27 @@ namespace TJAPlayer3
 
             if (nRandom == 2 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.HYPERRANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.HYPERRANDOM;
             }
             else if (nRandom == 2 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.SUPERRANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.SUPERRANDOM;
             }
             else if (nRandom == 1 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.RANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.RANDOM;
             }
             else if (nRandom == 1 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.RANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.RANDOM;
             }
             else if (nRandom == 0 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.MIRROR;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.MIRROR;
             }
             else if (nRandom == 0 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom.Taiko = Eランダムモード.OFF;
+                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.OFF;
             }
 
             #endregion
@@ -686,7 +686,7 @@ namespace TJAPlayer3
 
         public float tGetDoronFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
         {
-            var _compare = (isMenu) ? nStealth : (int)TJAPlayer3.ConfigIni.eSTEALTH;
+            var _compare = (isMenu) ? nStealth : (int)TJAPlayer3.ConfigIni.eSTEALTH[actual];
 
             if (ebt == EBalancingType.SCORE || _compare == 0)
                 return 1f;

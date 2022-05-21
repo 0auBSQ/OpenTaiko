@@ -74,11 +74,11 @@ namespace TJAPlayer3
 				"Note: It also changes the songs' pitch." ) );
 			#endregion
 			#region [ 個別 Sud/Hid ]
-            l.Add( new CItemList( "ランダム", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eRandom.Taiko,
+            l.Add( new CItemList( "ランダム", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
 				"いわゆるランダム。\n  RANDOM: ちょっと変わる\n  MIRROR: あべこべ \n  SUPER: そこそこヤバい\n  HYPER: 結構ヤバい\nなお、実装は適当な模様",
 				"Guitar chips come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
 				new string[] { "OFF", "RANDOM", "あべこべ", "SUPER", "HYPER" } ) );
-            l.Add( new CItemList( "ドロン", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eSTEALTH,
+            l.Add( new CItemList( "ドロン", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
 				"",
 				new string[] { "OFF", "ドロン", "ステルス" } ) );
             l.Add( new CItemList( "ゲーム", CItemBase.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eGameMode,
@@ -131,10 +131,10 @@ namespace TJAPlayer3
 					TJAPlayer3.ConfigIni.n演奏速度 = (int) GetObj現在値( (int) EOrder.PlaySpeed );
 					break;
 				case (int) EOrder.Random:
-                    TJAPlayer3.ConfigIni.eRandom.Taiko = (Eランダムモード)GetIndex( (int)EOrder.Random );
+                    TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile] = (Eランダムモード)GetIndex( (int)EOrder.Random );
 					break;
 				case (int) EOrder.Stealth:
-                    TJAPlayer3.ConfigIni.eSTEALTH = (Eステルスモード)GetIndex( (int)EOrder.Stealth );
+                    TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile] = (Eステルスモード)GetIndex( (int)EOrder.Stealth );
 					break;
 				case (int) EOrder.GameMode:
                     EGame game = EGame.OFF;

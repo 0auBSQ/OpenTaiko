@@ -872,7 +872,7 @@ namespace TJAPlayer3
         public bool bスクロールモードを上書き = false;
 
         public bool bHispeedRandom;
-        public Eステルスモード eSTEALTH;
+        public Eステルスモード[] eSTEALTH;
         public bool bNoInfo;
 
         public int nDefaultSongSort;
@@ -1460,7 +1460,6 @@ namespace TJAPlayer3
 				this.bSudden[ i ] = false;
 				this.bHidden[ i ] = false;
 				this.bReverse[ i ] = false;
-				this.eRandom[ i ] = Eランダムモード.OFF;
 				this.bLight[ i ] = false;
 				this.bLeft[ i ] = false;
 				this.判定文字表示位置[ i ] = E判定文字表示位置.レーン上;
@@ -1474,6 +1473,7 @@ namespace TJAPlayer3
 
 			for (int i = 0; i < 4; i++)
             {
+				this.eRandom[i] = Eランダムモード.OFF;
 				this.nScrollSpeed[i] = 9;
 				this.nTimingZones[i] = 2;
 			} 
@@ -1557,7 +1557,11 @@ namespace TJAPlayer3
             ShowMob = true;
             ShowPuchiChara = true;
 
-            this.eSTEALTH = Eステルスモード.OFF;
+			this.eSTEALTH = new Eステルスモード[4];
+
+			for (int i = 0; i < 4; i++) 
+				this.eSTEALTH[i] = Eステルスモード.OFF;
+
             this.bNoInfo = false;
 
 			//this.bNoMP3Streaming = false;
@@ -2098,11 +2102,17 @@ namespace TJAPlayer3
             sw.WriteLine( "0:Path, 1:GenreName(AC8～AC14), 2GenreName(AC15～)" );
             sw.WriteLine( "DefaultSongSort={0}", this.nDefaultSongSort );
             sw.WriteLine();
-            sw.WriteLine( "; RANDOMモード(0:OFF, 1:Random, 2:Mirorr 3:SuperRandom, 4:HyperRandom)" );
-			sw.WriteLine( "TaikoRandom={0}", (int) this.eRandom.Taiko );
+            sw.WriteLine( "; RANDOMモード(0:OFF, 1:Random (Kimagure), 2:Mirror (Abekobe) 3:SuperRandom (Detarame), 4:HyperRandom (Abekobe + Kimagure))" );
+			sw.WriteLine( "TaikoRandom1P={0}", (int) this.eRandom[0] );
+			sw.WriteLine("TaikoRandom2P={0}", (int)this.eRandom[1]);
+			sw.WriteLine("TaikoRandom3P={0}", (int)this.eRandom[2]);
+			sw.WriteLine("TaikoRandom4P={0}", (int)this.eRandom[3]);
 			sw.WriteLine();
             sw.WriteLine( "; STEALTHモード(0:OFF, 1:ドロン, 2:ステルス)" );
-			sw.WriteLine( "TaikoStealth={0}", (int) this.eSTEALTH );
+			sw.WriteLine( "TaikoStealth1P={0}", (int) this.eSTEALTH[0] );
+			sw.WriteLine("TaikoStealth2P={0}", (int)this.eSTEALTH[1]);
+			sw.WriteLine("TaikoStealth3P={0}", (int)this.eSTEALTH[2]);
+			sw.WriteLine("TaikoStealth4P={0}", (int)this.eSTEALTH[3]);
 			sw.WriteLine();
             sw.WriteLine( "; ゲーム(0:OFF, 1:完走!叩ききりまショー!, 2:完走!叩ききりまショー!(激辛) )" );
 			sw.WriteLine( "GameMode={0}", (int) this.eGameMode );
@@ -2800,58 +2810,58 @@ namespace TJAPlayer3
 									//-----------------------------
 									case Eセクション種別.PlayOption:
 										{
-                                            if (str3.Equals("ShowChara"))
-                                            {
-                                                ShowChara = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if( str3.Equals("ShowDancer"))
-                                            {
-                                                ShowDancer = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if (str3.Equals("ShowRunner"))
-                                            {
-                                                ShowRunner = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if (str3.Equals("ShowMob"))
-                                            {
-                                                ShowMob = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if (str3.Equals("ShowFooter"))
-                                            {
-                                                ShowFooter = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if (str3.Equals("ShowPuchiChara"))
-                                            {
-                                                ShowPuchiChara = C変換.bONorOFF(str4[0]);
-                                            }
-                                            else if( str3.Equals( "Dark" ) )
+											if (str3.Equals("ShowChara"))
 											{
-												this.eDark = (Eダークモード) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.eDark );
+												ShowChara = C変換.bONorOFF(str4[0]);
 											}
-                                            else if( str3.Equals( "ScrollMode" ) )
-                                            {
-                                                this.eScrollMode = ( EScrollMode )C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, 0 );
-                                            }
+											else if (str3.Equals("ShowDancer"))
+											{
+												ShowDancer = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("ShowRunner"))
+											{
+												ShowRunner = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("ShowMob"))
+											{
+												ShowMob = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("ShowFooter"))
+											{
+												ShowFooter = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("ShowPuchiChara"))
+											{
+												ShowPuchiChara = C変換.bONorOFF(str4[0]);
+											}
+											else if (str3.Equals("Dark"))
+											{
+												this.eDark = (Eダークモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.eDark);
+											}
+											else if (str3.Equals("ScrollMode"))
+											{
+												this.eScrollMode = (EScrollMode)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, 0);
+											}
 											else if (str3.Equals("EnableCountDownTimer"))
 											{
 												this.bEnableCountdownTimer = C変換.bONorOFF(str4[0]);
 											}
 											#region [ Sudden ]
-											else if( str3.Equals( "DrumsSudden" ) )
+											else if (str3.Equals("DrumsSudden"))
 											{
-												this.bSudden.Drums = C変換.bONorOFF( str4[ 0 ] );
+												this.bSudden.Drums = C変換.bONorOFF(str4[0]);
 											}
 											#endregion
 											#region [ Hidden ]
-											else if( str3.Equals( "DrumsHidden" ) )
+											else if (str3.Equals("DrumsHidden"))
 											{
-												this.bHidden.Drums = C変換.bONorOFF( str4[ 0 ] );
+												this.bHidden.Drums = C変換.bONorOFF(str4[0]);
 											}
 											#endregion
 											#region [ Invisible ]
-											else if ( str3.Equals( "DrumsInvisible" ) )
+											else if (str3.Equals("DrumsInvisible"))
 											{
-												this.eInvisible.Drums = (EInvisible) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.eInvisible.Drums );
+												this.eInvisible.Drums = (EInvisible)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.eInvisible.Drums);
 											}
 											//else if ( str3.Equals( "InvisibleDisplayTimeMs" ) )
 											//{
@@ -2862,13 +2872,13 @@ namespace TJAPlayer3
 											//    this.nFadeoutTimeMs = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 9999999, (int) this.nFadeoutTimeMs );
 											//}
 											#endregion
-											else if ( str3.Equals( "DrumsReverse" ) )
+											else if (str3.Equals("DrumsReverse"))
 											{
-												this.bReverse.Drums = C変換.bONorOFF( str4[ 0 ] );
+												this.bReverse.Drums = C変換.bONorOFF(str4[0]);
 											}
-											else if( str3.Equals( "DrumsPosition" ) )
+											else if (str3.Equals("DrumsPosition"))
 											{
-												this.判定文字表示位置.Drums = (E判定文字表示位置) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.判定文字表示位置.Drums );
+												this.判定文字表示位置.Drums = (E判定文字表示位置)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.判定文字表示位置.Drums);
 											}
 
 											#region [Mods]
@@ -2877,7 +2887,7 @@ namespace TJAPlayer3
 
 											else if (str3.Equals("DrumsScrollSpeed") || str3.Equals("DrumsScrollSpeed1P"))
 											{
-												this.nScrollSpeed[0] = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 0x7cf, this.nScrollSpeed[0] );
+												this.nScrollSpeed[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[0]);
 											}
 											else if (str3.Equals("DrumsScrollSpeed2P"))
 											{
@@ -2979,6 +2989,48 @@ namespace TJAPlayer3
 
 											#endregion
 
+											#region [Stealh]
+
+											else if (str3.Equals("TaikoStealth1P") || str3.Equals("TaikoStealth"))
+											{
+												this.eSTEALTH[0] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[0]);
+											}
+											else if (str3.Equals("TaikoStealth2P"))
+											{
+												this.eSTEALTH[1] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[1]);
+											}
+											else if (str3.Equals("TaikoStealth3P"))
+											{
+												this.eSTEALTH[2] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[2]);
+											}
+											else if (str3.Equals("TaikoStealth4P"))
+											{
+												this.eSTEALTH[3] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[3]);
+											}
+
+											#endregion
+
+											#region [Random/Mirror]
+
+											else if (str3.Equals("TaikoRandom1P") || str3.Equals("TaikoRandom"))
+											{
+												this.eRandom[0] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[0]);
+											}
+											else if (str3.Equals("TaikoRandom2P"))
+											{
+												this.eRandom[1] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[1]);
+											}
+											else if (str3.Equals("TaikoRandom3P"))
+											{
+												this.eRandom[2] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[2]);
+											}
+											else if (str3.Equals("TaikoRandom4P"))
+											{
+												this.eRandom[3] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[3]);
+											}
+
+											#endregion
+
 
 											#endregion
 
@@ -3048,14 +3100,6 @@ namespace TJAPlayer3
                                             {
                                                 this.nDefaultSongSort = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, this.nDefaultSongSort );
                                             }
-											else if( str3.Equals( "TaikoRandom" ) )
-											{
-												this.eRandom.Taiko = (Eランダムモード) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 4, (int) this.eRandom.Taiko );
-											}
-											else if( str3.Equals( "TaikoStealth" ) )
-											{
-												this.eSTEALTH = (Eステルスモード) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 3, (int) this.eSTEALTH );
-											}
 											else if( str3.Equals( "GameMode" ) )
 											{
 												this.eGameMode = (EGame) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.eGameMode );

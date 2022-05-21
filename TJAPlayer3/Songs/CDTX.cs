@@ -1698,14 +1698,15 @@ namespace TJAPlayer3
             string str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return new string(new char[] { str[n / 36], str[n % 36] });
         }
-        public void tギターとベースのランダム化(E楽器パート part, Eランダムモード eRandom)
-        {
-        }
-        public void t太鼓チップのランダム化(Eランダムモード eRandom)
+
+
+        public void tRandomizeTaikoChips(int player = 0)
         {
             //2016.02.11 kairera0467
-            //なんだよこのクソ実装は(怒)
+
             Random rnd = new System.Random();
+
+            var eRandom = TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.GetActualPlayer(player)];
 
             switch (eRandom)
             {
@@ -1734,9 +1735,9 @@ namespace TJAPlayer3
                 case Eランダムモード.RANDOM:
                     foreach (var chip in this.listChip)
                     {
-                        int n = rnd.Next(50);
+                        int n = rnd.Next(100);
 
-                        if (n >= 5 && n <= 10)
+                        if (n >= 0 && n <= 20)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1761,9 +1762,9 @@ namespace TJAPlayer3
                 case Eランダムモード.SUPERRANDOM:
                     foreach (var chip in this.listChip)
                     {
-                        int n = rnd.Next(80);
+                        int n = rnd.Next(100);
 
-                        if (n >= 3 && n <= 43)
+                        if (n >= 0 && n <= 50)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1790,7 +1791,7 @@ namespace TJAPlayer3
                     {
                         int n = rnd.Next(100);
 
-                        if (n >= 20 && n <= 80)
+                        if (n >= 0 && n <= 80)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1816,6 +1817,7 @@ namespace TJAPlayer3
                 default:
                     break;
             }
+
             if (eRandom != Eランダムモード.OFF)
             {
                 #region[ list作成 ]
