@@ -656,7 +656,7 @@ namespace TJAPlayer3
 				// ADLIB bonuses : 1 coin per ADLIB
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					this.nEarnedMedalsCount[i] += TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB;
+					this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
                 }
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
