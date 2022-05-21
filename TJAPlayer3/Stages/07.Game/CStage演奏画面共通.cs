@@ -365,6 +365,8 @@ namespace TJAPlayer3
                 n可 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
                 n不可 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
                 n連打 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+                nADLIB = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+                nMine = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
             }
 
 
@@ -610,6 +612,9 @@ namespace TJAPlayer3
         public int[] n可;
         public int[] n不可;
         public int[] n連打;
+        public int[] nADLIB;
+        public int[] nMine;
+
         public int n現在のトップChip = -1;
         protected int[] n最後に再生したBGMの実WAV番号 = new int[ 50 ];
 		protected int n最後に再生したHHのチャンネル番号;
@@ -1442,6 +1447,8 @@ namespace TJAPlayer3
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
                                 this.CChartScore[nPlayer].nADLIB++;
                                 this.CBranchScore[nPlayer].nADLIB++;
+                                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                    this.nADLIB[actDan.NowShowingNumber]++;
                             }
                             break;
                         }
@@ -1458,6 +1465,8 @@ namespace TJAPlayer3
                                 actGauge.MineDamage(nPlayer);
                                 this.CChartScore[nPlayer].nMine++;
                                 this.CBranchScore[nPlayer].nMine++;
+                                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                    this.nMine[actDan.NowShowingNumber]++;
                             }
                             break;
                         }

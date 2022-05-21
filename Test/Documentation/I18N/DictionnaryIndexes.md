@@ -277,6 +277,8 @@
 1016 : Notes hit count
 1017 : Combo 
 1018 : Accuracy
+1019 : ADLIB count
+1020 : Bombs hit
 
 # Heya buttons (0103X)
 

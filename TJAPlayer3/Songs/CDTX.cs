@@ -4755,6 +4755,12 @@ namespace TJAPlayer3
                         case "a":
                             examType = Exam.Type.Accuracy;
                             break;
+                        case "ja":
+                            examType = Exam.Type.JudgeADLIB;
+                            break;
+                        case "jm":
+                            examType = Exam.Type.JudgeMine;
+                            break;
                         default:
                             examType = Exam.Type.Gauge;
                             break;

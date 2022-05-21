@@ -62,7 +62,7 @@ namespace TJAPlayer3
             else
                 this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 13);
 
-            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Accuracy + 1];
+            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < this.ttkExams.Length; i++)
             {
                 this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
