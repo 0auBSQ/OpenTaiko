@@ -583,6 +583,8 @@ namespace TJAPlayer3
             Effects_Hit_FireWorks = TxC(GAME + EFFECTS + @"Hit\FireWorks.png");
             if (Effects_Hit_FireWorks != null) Effects_Hit_FireWorks.b加算合成 = TJAPlayer3.Skin.Game_Effect_FireWorks_AddBlend;
 
+            Effects_Hit_Bomb = TxCAf(GAME + EFFECTS + @"Hit\Bomb.png");
+
 
             Effects_Fire = TxC(GAME + EFFECTS + @"Fire.png");
             if (Effects_Fire != null) Effects_Fire.b加算合成 = TJAPlayer3.Skin.Game_Effect_Fire_AddBlend;
@@ -1677,6 +1679,7 @@ namespace TJAPlayer3
         #endregion
         #region エフェクト
         public CTexture Effects_Hit_Explosion,
+            Effects_Hit_Bomb,
             Effects_Hit_Explosion_Big,
             Effects_Fire,
             Effects_Rainbow,

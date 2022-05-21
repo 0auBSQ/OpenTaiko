@@ -282,6 +282,9 @@ namespace TJAPlayer3
                                         else
                                             TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(TJAPlayer3.app.Device, nX, nY, new Rectangle(this.st状態[i].ct進行.n現在の値 * 260, n + 260, 260, 260));
                                         break;
+                                    case E判定.Mine:
+                                        TJAPlayer3.Tx.Effects_Hit_Bomb?.t2D描画(TJAPlayer3.app.Device, nX, nY, new Rectangle(this.st状態[i].ct進行.n現在の値 * 260, 0, 260, 260));
+                                        break;
                                     case E判定.Miss:
                                     case E判定.Bad:
                                         break;

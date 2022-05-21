@@ -332,6 +332,7 @@ namespace TJAPlayer3
         public Cシステムサウンド soundEntry = null;
         public Cシステムサウンド soundError = null;
         public Cシステムサウンド soundsanka = null;
+        public Cシステムサウンド soundBomb = null;
         //add
         public Cシステムサウンド sound曲決定音 = null;
         public Cシステムサウンド bgmリザルトイン音 = null;
@@ -708,6 +709,7 @@ namespace TJAPlayer3
             this.soundEntry = new Cシステムサウンド(@"Sounds\Entry.ogg", true, false, false, ESoundGroup.Voice);
             this.soundError = new Cシステムサウンド(@"Sounds\Error.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundsanka = new Cシステムサウンド(@"Sounds\sanka.ogg", false, false, false, ESoundGroup.Voice);
+            this.soundBomb = new Cシステムサウンド(@"Sounds\Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
 
             //this.soundRed               = new Cシステムサウンド( @"Sounds\dong.ogg",            false, false, true, ESoundType.SoundEffect );
             //this.soundBlue              = new Cシステムサウンド( @"Sounds\ka.ogg",              false, false, true, ESoundType.SoundEffect );

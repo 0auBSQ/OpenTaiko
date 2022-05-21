@@ -1435,9 +1435,10 @@ namespace TJAPlayer3
                             if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
                             {
                                 this.actJudgeString.Start(nPlayer, eJudgeResult != E判定.Bad ? E判定.ADLIB : E判定.Bad);
+                                eJudgeResult = E判定.Perfect; // Prevent ADLIB notes breaking DFC runs
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
-                                eJudgeResult = E判定.Perfect; // Prevent ADLIB notes breaking DFC runs
+                                
                             }
                             break;
                         }
@@ -1446,10 +1447,11 @@ namespace TJAPlayer3
                             if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
                             {
                                 this.actJudgeString.Start(nPlayer, eJudgeResult != E判定.Bad ? E判定.Mine : E判定.Bad);
-                                TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
-                                TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
                                 bBombHit = true;
                                 eJudgeResult = E判定.Bad;
+                                TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
+                                TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, E判定.Mine, nPlayer);
+                                TJAPlayer3.Skin.soundBomb?.t再生する();
                                 actGauge.MineDamage(nPlayer);
                             }
                             break;
