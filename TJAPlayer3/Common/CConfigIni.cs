@@ -646,20 +646,21 @@ namespace TJAPlayer3
 		}
 		// プロパティ
 
-
 		public class CAIPerformances
         {
 			public int nGoodOdds;
 			public int nPerfectOdds;
 			public int nBadOdds;
 			public int nRollSpeed;
+			public int nMineHitOdds;
 
-			public CAIPerformances(int po, int go, int bo, int rp)
+			public CAIPerformances(int po, int go, int bo, int rp, int mho = 0)
             {
 				nGoodOdds = go;
 				nPerfectOdds = po;
 				nBadOdds = bo;
 				nRollSpeed = rp;
+				nMineHitOdds = mho;
             }
         }
 
@@ -821,16 +822,16 @@ namespace TJAPlayer3
 
 		public CAIPerformances[] apAIPerformances =
 		{
-			new CAIPerformances(500, 400, 100, 7),
-			new CAIPerformances(650, 310, 40, 8),
-			new CAIPerformances(750, 225, 25, 9),
-			new CAIPerformances(800, 180, 20, 10),
-			new CAIPerformances(850, 135, 15, 12),
-			new CAIPerformances(900, 90, 10, 14),
-			new CAIPerformances(910, 85, 5, 16),
-			new CAIPerformances(950, 49, 1, 22),
-			new CAIPerformances(975, 25, 0, 26),
-			new CAIPerformances(1000, 0, 0, 30)
+			new CAIPerformances(500, 400, 100, 7, 200),
+			new CAIPerformances(650, 310, 40, 8, 150),
+			new CAIPerformances(750, 225, 25, 9, 100),
+			new CAIPerformances(800, 180, 20, 10, 70),
+			new CAIPerformances(850, 135, 15, 12, 50),
+			new CAIPerformances(900, 90, 10, 14, 30),
+			new CAIPerformances(910, 85, 5, 16, 20),
+			new CAIPerformances(950, 49, 1, 22, 10),
+			new CAIPerformances(975, 25, 0, 26, 5),
+			new CAIPerformances(1000, 0, 0, 30, 0)
 		};
 
 		public CTimingZones[] tzLevels =

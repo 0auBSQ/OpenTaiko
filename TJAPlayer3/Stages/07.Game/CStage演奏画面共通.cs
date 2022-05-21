@@ -546,6 +546,8 @@ namespace TJAPlayer3
             public int nGood;
             public int nMiss;
             public int nScore;
+            public int nADLIB;
+            public int nMine;
         }
 
         public CAct演奏AVI actAVI;
@@ -1438,7 +1440,8 @@ namespace TJAPlayer3
                                 eJudgeResult = E判定.Perfect; // Prevent ADLIB notes breaking DFC runs
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
-                                
+                                this.CChartScore[nPlayer].nADLIB++;
+                                this.CBranchScore[nPlayer].nADLIB++;
                             }
                             break;
                         }
@@ -1453,6 +1456,8 @@ namespace TJAPlayer3
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, E判定.Mine, nPlayer);
                                 TJAPlayer3.Skin.soundBomb?.t再生する();
                                 actGauge.MineDamage(nPlayer);
+                                this.CChartScore[nPlayer].nMine++;
+                                this.CBranchScore[nPlayer].nMine++;
                             }
                             break;
                         }
@@ -1546,13 +1551,16 @@ namespace TJAPlayer3
 					    {
                             case E判定.Perfect:
                                 {
+                                    if (NotesManager.IsADLIB(pChip))
+                                        break;
+
                                     this.CBranchScore[nPlayer].nGreat++;
                                     this.CChartScore[nPlayer].nGreat++;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Perfect++;
                                     this.actCombo.n現在のコンボ数[nPlayer]++;
 
-                                    if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                         this.n良[actDan.NowShowingNumber]++;
 
                                     if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
@@ -1597,6 +1605,7 @@ namespace TJAPlayer3
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                         this.n不可[actDan.NowShowingNumber]++;
+
                                     else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                                         CFloorManagement.damage();
 
@@ -1621,6 +1630,9 @@ namespace TJAPlayer3
                                 {
                                     if(!NotesManager.IsGenericRoll(pChip))
                                     {
+                                        if (NotesManager.IsADLIB(pChip))
+                                            break;
+
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n良[actDan.NowShowingNumber]++;
 
@@ -1670,8 +1682,11 @@ namespace TJAPlayer3
 
                             default:
                                 {
-                                    if(!NotesManager.IsGenericRoll(pChip) && !NotesManager.IsADLIB(pChip))
+                                    if(!NotesManager.IsGenericRoll(pChip))
                                     {
+                                        if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
+                                            break;
+
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.n不可[actDan.NowShowingNumber]++;
                                         else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
