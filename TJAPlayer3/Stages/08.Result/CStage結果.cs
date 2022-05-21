@@ -1595,7 +1595,7 @@ namespace TJAPlayer3
 				TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat.ToString(),
 				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood.ToString(),
-				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss.ToString(),
+				(TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss - TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.GetRoll(0).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0].ToString(),
 				totalHit.ToString()
@@ -1654,7 +1654,7 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.stage演奏ドラム画面.n良[i].ToString(),
 				TJAPlayer3.stage演奏ドラム画面.n可[i].ToString(),
-				TJAPlayer3.stage演奏ドラム画面.n不可[i].ToString(),
+				(TJAPlayer3.stage演奏ドラム画面.n不可[i] - TJAPlayer3.stage演奏ドラム画面.nMine[i]).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.n連打[i].ToString()
 			};
 
