@@ -129,7 +129,7 @@ namespace TJAPlayer3
             else
                 this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
 
-            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Accuracy + 1];
+            this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < this.ttkExams.Length; i++)
             {
                 this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
@@ -170,6 +170,12 @@ namespace TJAPlayer3
                 int individualOks = TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber];
                 int individualBads = TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber];
 
+                int totalADLIBs = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nADLIB;
+                int totalMines = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine;
+
+                int individualADLIBs = TJAPlayer3.stage演奏ドラム画面.nADLIB[NowShowingNumber];
+                int individualMines = TJAPlayer3.stage演奏ドラム画面.nMine[NowShowingNumber];
+
                 double accuracy = (totalGoods * 100 + totalOks * 50) / (double)(totalGoods + totalOks + totalBads);
                 double individualAccuracy = (individualGoods * 100 + individualOks * 50) / (double)(individualGoods + individualOks + individualBads);
 
@@ -186,6 +192,12 @@ namespace TJAPlayer3
                         break;
                     case Exam.Type.JudgeBad:
                         isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualBads : totalBads);
+                        break;
+                    case Exam.Type.JudgeADLIB:
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualADLIBs : totalADLIBs);
+                        break;
+                    case Exam.Type.JudgeMine:
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualMines : totalMines);
                         break;
                     case Exam.Type.Score:
                         isChangedAmount = Challenge[i].Update((int)TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0));

@@ -502,7 +502,7 @@ namespace TJAPlayer3
 
                     //太鼓1P(移動予定)
 					"??", "ドン", "カツ", "ドン(大)", "カツ(大)", "連打", "連打(大)", "ふうせん連打",
-                    "連打終点", "芋", "ドン(手)", "カッ(手)", "??", "??", "??", "AD-LIB",
+                    "連打終点", "芋", "ドン(手)", "カッ(手)", "Mine", "??", "??", "AD-LIB",
 
                     //太鼓予備
 					"??", "??", "??", "??", "??", "??", "??", "??",
@@ -552,7 +552,12 @@ namespace TJAPlayer3
                     "", "", "", "", "", "", "", "",
 
                     "0xF0", "歌詞", "??", "SUDDEN", "??", "??", "??", "??",
-                    "??", "??", "??", "??", "??", "??", "??", "??", "譜面終了"
+                    "??", "??", "??", "??", "??", "??", "??", "??", "譜面終了",
+
+                    // Extra notes
+
+                    "KaDon", "??", "??", "??", "??", "??", "??", "??",
+                    "??", "??", "??", "??", "??", "??", "??", "??",
                 };
                 return string.Format("CChip: 位置:{0:D4}.{1:D3}, 時刻{2:D6}, Ch:{3:X2}({4}), Pn:{5}({11})(内部{6}), Pd:{7}, Sz:{8}, BMScroll:{9}, Auto:{10}, コース:{11}",
                     this.n発声位置 / 384, this.n発声位置 % 384,
@@ -621,6 +626,7 @@ namespace TJAPlayer3
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 4, 4, //0xD0
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xE0
 		        5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xF0
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
 		    };
 
             public int CompareTo(CDTX.CChip other)
@@ -2835,14 +2841,14 @@ namespace TJAPlayer3
             {
                 if (nMode == 0)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+                    if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
                     {
                         sb.Append(input[n] + "\n");
                     }
                 }
                 else if (nMode == 1)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && (input[n].Substring(0, 1) == "#" || this.CharConvertNote(input[n].Substring(0, 1)) != -1))
+                    if (!string.IsNullOrEmpty(input[n]) && (input[n].Substring(0, 1) == "#" || NotesManager.FastFlankedParsing(input[n])))//this.CharConvertNote(input[n].Substring(0, 1)) != -1))
                     {
                         if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM"))
                         {
@@ -2856,7 +2862,7 @@ namespace TJAPlayer3
                 }
                 else if (nMode == 2)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+                    if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
                     {
                         if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM"))
                         {
@@ -3218,7 +3224,7 @@ namespace TJAPlayer3
                                 this.t1小節の文字数をカウントしてリストに追加する(str + str命令消去譜面[i]);
                             }
 
-                            if (this.CharConvertNote(str命令消去譜面[i].Substring(0, 1)) != -1)
+                            if (NotesManager.FastFlankedParsing(str命令消去譜面[i]))//this.CharConvertNote(str命令消去譜面[i].Substring(0, 1)) != -1)
                                 str += str命令消去譜面[i];
                         }
                         else
@@ -3482,7 +3488,8 @@ namespace TJAPlayer3
                 {
                     for (int i = listChip.Count - 1; i >= 0; i--)
                     {
-                        if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                        //if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                        if (NotesManager.IsHittableNote(listChip[i]))
                         {
                             if (DanSongs.Number != 0)
                             {
@@ -4027,7 +4034,8 @@ namespace TJAPlayer3
 
                 for (int i = listChip.Count - 1; i >= 0; i--)
                 {
-                    if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                    //if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
+                    if (NotesManager.IsHittableNote(listChip[i]))
                     {
                         if(DanSongs.Number != 0)
                         {
@@ -4151,7 +4159,8 @@ namespace TJAPlayer3
             {
                 if (b分岐前の連打開始)
                 {
-                    if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
+                    //if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
+                    if (NotesManager.IsRoll(listChips[i]))
                     {
                         if (nReturnChip == null)
                             nReturnChip = i;
@@ -4370,7 +4379,7 @@ namespace TJAPlayer3
                                 chip.nPlayerSide = this.nPlayerSide;
                                 chip.bGOGOTIME = this.bGOGOTIME;
 
-                                if (nObjectNum == 7 || nObjectNum == 9)
+                                if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
                                 {
                                     //this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 
@@ -4438,7 +4447,7 @@ namespace TJAPlayer3
                                             break;
                                     }
                                 }
-                                if (nObjectNum == 8)
+                                if (NotesManager.IsRollEnd(chip))
                                 {
                                     chip.nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
                                     chip.nノーツ終了時刻ms = (int)this.dbNowTime;
@@ -4496,7 +4505,8 @@ namespace TJAPlayer3
                                 }
                                 #endregion
 
-                                if (nObjectNum < 5)
+                                
+                                if (NotesManager.IsMissableNote(chip))
                                 {
                                     #region [ 作り直し ]
                                     //譜面分岐がない譜面でも値は加算されてしまうがしゃあない
@@ -4522,7 +4532,7 @@ namespace TJAPlayer3
                                     this.nノーツ数[3]++;
                                     #endregion
                                 }
-                                else if (nObjectNum == 7)
+                                else if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
                                 {
                                     //風船はこのままでも機能しているので何もしない.
 
@@ -4744,6 +4754,12 @@ namespace TJAPlayer3
                             break;
                         case "a":
                             examType = Exam.Type.Accuracy;
+                            break;
+                        case "ja":
+                            examType = Exam.Type.JudgeADLIB;
+                            break;
+                        case "jm":
+                            examType = Exam.Type.JudgeMine;
                             break;
                         default:
                             examType = Exam.Type.Gauge;
@@ -5280,6 +5296,9 @@ namespace TJAPlayer3
         /// </summary>
         private int CharConvertNote(string str)
         {
+            return (NotesManager.GetNoteValueFromChar(str));
+            
+            /*
             switch (str)
             {
                 case "0":
@@ -5311,6 +5330,8 @@ namespace TJAPlayer3
                 default:
                     return -1;
             }
+            */
+            
         }
 
         private int strConvertCourse(string str)
@@ -5447,7 +5468,7 @@ namespace TJAPlayer3
 
             foreach (CChip chip in this.listChip)
             {
-                if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 < 0x18)
+                if (NotesManager.IsCommonNote(chip))
                 {
                     list音符のみのリスト.Add(chip);
                 }
@@ -5821,7 +5842,7 @@ namespace TJAPlayer3
 
             foreach (CChip chip in this.listChip)
             {
-                if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 < 0x18)
+                if (NotesManager.IsCommonNote(chip))
                 {
                     list音符のみのリスト.Add(chip);
 

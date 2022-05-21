@@ -452,7 +452,9 @@ namespace TJAPlayer3
 
 			for (int i = 0; i < dTX.listChip.Count; i++)
 			{
-				if (i < n演奏開始Chip && (dTX.listChip[i].nチャンネル番号 > 0x10 && dTX.listChip[i].nチャンネル番号 < 0x20)) //2020.07.08 ノーツだけ消す。 null参照回避のために順番変更
+				
+				//if (i < n演奏開始Chip && (dTX.listChip[i].nチャンネル番号 > 0x10 && dTX.listChip[i].nチャンネル番号 < 0x20)) //2020.07.08 ノーツだけ消す。 null参照回避のために順番変更
+				if (i < n演奏開始Chip && NotesManager.IsHittableNote(dTX.listChip[i]))
 				{
 					dTX.listChip[i].bHit = true;
 					dTX.listChip[i].IsHitted = true;

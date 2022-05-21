@@ -491,6 +491,17 @@ namespace TJAPlayer3
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue2P );
 			}
 
+			// Konga claps
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap2P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap2P);
+			}
+
+
 			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemCapture )
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.Capture);
@@ -661,7 +672,15 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(10014));
 			this.list項目リスト.Add( this.iKeyAssignTaikoRBlue2P );
 
-            OnListMenuの初期化();
+			this.iKeyAssignKongaClap = new CItemBase(CLangManager.LangInstance.GetString(10060),
+				CLangManager.LangInstance.GetString(10061));
+			this.list項目リスト.Add(this.iKeyAssignKongaClap);
+
+			this.iKeyAssignKongaClap2P = new CItemBase(CLangManager.LangInstance.GetString(10062),
+				CLangManager.LangInstance.GetString(10063));
+			this.list項目リスト.Add(this.iKeyAssignKongaClap2P);
+
+			OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignDrums;
 		}
@@ -1228,6 +1247,9 @@ namespace TJAPlayer3
 		private CItemBase iKeyAssignTaikoRRed2P;
 		private CItemBase iKeyAssignTaikoLBlue2P;
 		private CItemBase iKeyAssignTaikoRBlue2P;
+
+		private CItemBase iKeyAssignKongaClap;
+		private CItemBase iKeyAssignKongaClap2P;
 
 		#endregion
 		private CItemToggle iLogOutputLog;

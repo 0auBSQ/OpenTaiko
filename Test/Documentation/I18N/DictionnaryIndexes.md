@@ -161,6 +161,10 @@
 10055 : "System key input configuration" option title
 10056 : "Hide Dan/Tower" option title
 10057 : "Hide Dan/Tower" description
+10060 : "Konga clap key settings" option title
+10061 : "Konga clap key settings" description
+10062 : "Konga clap key settings for 2P" option title
+10063 : "Konga clap key settings for 2P" description
 10084 : "Shin-uchi toggle" option title
 10085 : "System options" menu title
 10086 : "Gameplay options" menu title
@@ -238,6 +242,11 @@
 503 : "Normal" timing mod option
 504 : "Strict" timing mod option
 505 : "Rigorous" timing mod option
+510 : "Score Multiplier : " (For modifiers)
+511 : "Coins Multiplier : " (For modifiers)
+512 : "Game Type" mod name
+513 : "Taiko" game type mod option
+514 : "Konga" game type mod option
 
 # In-game pause menu (0090X)
 
@@ -268,6 +277,8 @@
 1016 : Notes hit count
 1017 : Combo 
 1018 : Accuracy
+1019 : ADLIB count
+1020 : Bombs hit
 
 # Heya buttons (0103X)
 

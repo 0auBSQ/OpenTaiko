@@ -45,6 +45,18 @@ namespace TJAPlayer3
 
             #endregion
 
+            for (int i = 0; i < txSongSpeed.Length; i++)
+            {
+                Color _c = Color.White;
+
+                if (i < 5)
+                    _c = Color.LimeGreen;
+                else if (i > 5)
+                    _c = Color.Red;
+
+                txSongSpeed[i] = OptionTypeTx((0.5f + i * 0.1f).ToString("n1"), _c, Color.Black);
+            }
+
             txSwitch[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
             txSwitch[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9001), Color.White, Color.Black);
 
@@ -57,28 +69,50 @@ namespace TJAPlayer3
             txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9016), Color.White, Color.Black);
 
             txJust[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.White, Color.Black);
-            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.White, Color.Black);
+            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.Red, Color.Black);
+            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.LimeGreen, Color.Black);
 
             txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
             txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
 
+            txGameType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(513), Color.White, Color.Black);
+            txGameType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(514), Color.White, Color.Black);
+
             txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
 
+            hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
+
+            txOtoiro = new CTexture[hsInfo.names.Length];
+
+            if (txOtoiro.Length > 0)
+            {
+                for (int i = 0; i < txOtoiro.Length; i++)
+                {
+                    txOtoiro[i] = OptionTypeTx(hsInfo.names[i], Color.White, Color.Black);
+                }
+            }
+            else
+            {
+                txOtoiro = new CTexture[1];
+                txOtoiro[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
+            }
+            
             OptionType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9008), Color.White, Color.Black);
             OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
             OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9010), Color.White, Color.Black);
             OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
             OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(500), Color.White, Color.Black);
             OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(72), Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
-            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9014), Color.White, Color.Black);
-            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(512), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
+            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
+            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(10), Color.White, Color.Black);
+            OptionType[10] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
 
+            var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
             for (int i = 0; i < 5; i++)
             {
-                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), Color.White, Color.Black);
+                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), _timingColors[i], Color.Black);
             }
 
             for (int i = 0; i < OptionType.Length; i++)
@@ -87,9 +121,16 @@ namespace TJAPlayer3
             base.On活性化();
         }
 
+        public void tFetchMults(int player)
+        {
+            var scoreMult = tGetModMultiplier(EBalancingType.SCORE, true, player);
+            var coinMult = tGetModMultiplier(EBalancingType.COINS, true, player);
+            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString(510) + scoreMult.ToString("n2"), Color.White, Color.Black);
+            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString(511) + coinMult.ToString("n2"), Color.White, Color.Black);
+        }
+
         public override void On非活性化()
         {
-
             base.On非活性化();
         }
         public override void OnManagedリソースの作成()
@@ -102,6 +143,8 @@ namespace TJAPlayer3
                 return;
             base.OnManagedリソースの解放();
         }
+
+        
 
         public int On進行描画(int player)
         {
@@ -147,10 +190,11 @@ namespace TJAPlayer3
                 txRandom[nRandom],
                 txTiming[nTiming],
                 txJust[nJust],
+                txGameType[nGameType],
                 txGameMode[nGameMode],
                 txSwitch[nAutoMode],
-                txNone,
-                txNone,
+                txSongSpeed[nSongSpeed],
+                txOtoiro[nOtoiro],
             };
 
             var _shift = player == 1 ? 640 : 0;
@@ -163,6 +207,9 @@ namespace TJAPlayer3
             {
                 OptionType[i].t2D描画(TJAPlayer3.app.Device, baseX - 184, baseY + 4 + i * 40.8f);
             }
+
+            txModMults[0]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX - 92, baseY + 4 - 5 * 40.8f);
+            txModMults[1]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX - 92, baseY + 4 - 4 * 40.8f);
 
             for (int i = 0; i < _textures.Length; i++)
             {
@@ -199,8 +246,19 @@ namespace TJAPlayer3
                     : (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
 
 
-                if (_leftDrum) { OptionSelect(true); TJAPlayer3.Skin.sound変更音.t再生する(); };
-                if (_rightDrum) { OptionSelect(false); TJAPlayer3.Skin.sound変更音.t再生する(); };
+                if (_leftDrum) 
+                { 
+                    OptionSelect(true);
+                    tFetchMults(player);
+                    TJAPlayer3.Skin.sound変更音.t再生する(); 
+                }
+
+                if (_rightDrum) 
+                { 
+                    OptionSelect(false);
+                    tFetchMults(player);
+                    TJAPlayer3.Skin.sound変更音.t再生する(); 
+                }
 
                 if (_centerDrum && ctOpen.n現在の値 >= ctOpen.n終了値)
                 {
@@ -223,11 +281,11 @@ namespace TJAPlayer3
             return 0;
         }
 
-        public int nOptionCount = 9;
+        public int nOptionCount = 10;
 
         public CCounter ctOpen;
         public CCounter ctClose;
-        public CTexture[] OptionType = new CTexture[10];
+        public CTexture[] OptionType = new CTexture[11];
 
         public int NowCount;
         public int[] NowCountType = new int[8];
@@ -258,6 +316,18 @@ namespace TJAPlayer3
 
         public CTexture[] txJust = new CTexture[3];
         public int nJust = 0;
+
+        public CTexture[] txOtoiro;
+        public CHitSounds hsInfo;
+        public int nOtoiro = 0;
+
+        public CTexture[] txSongSpeed = new CTexture[16];
+        public int nSongSpeed = 5;
+
+        public CTexture[] txGameType = new CTexture[2];
+        public int nGameType = 0;
+
+        public CTexture[] txModMults = new CTexture[2];
 
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
         {
@@ -305,12 +375,21 @@ namespace TJAPlayer3
                     ShiftVal(left, ref nJust, 2, 0);
                     break;
                 case 6:
+                    ShiftVal(left, ref nGameType, 1, 0);
+                    break;
+                case 7:
                     if (nGameMode == 0) nGameMode = 1;
                     else nGameMode = 0;
                     break;
-                case 7:
+                case 8:
                     if (nAutoMode == 0) nAutoMode = 1;
                     else nAutoMode = 0;
+                    break;
+                case 9:
+                    ShiftVal(left, ref nSongSpeed, txSongSpeed.Length - 1, 0);
+                    break;
+                case 10:
+                    ShiftVal(left, ref nOtoiro, txOtoiro.Length - 1, 0);
                     break;
 
             }
@@ -389,6 +468,12 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [GameType]
+
+            nGameType = (int)TJAPlayer3.ConfigIni.nGameType[actual];
+
+            #endregion
+
             #region [ GameMode ]
 
             if (TJAPlayer3.ConfigIni.bTokkunMode == true)
@@ -410,6 +495,20 @@ namespace TJAPlayer3
                 nAutoMode = 0;
 
             #endregion
+
+            #region [ Hitsounds ]
+
+            nOtoiro = Math.Min(txOtoiro.Length - 1,  TJAPlayer3.ConfigIni.nHitSounds[actual]);
+
+            #endregion
+
+            #region [ Song speed ]
+
+            nSongSpeed = Math.Max(0, Math.Min(txSongSpeed.Length - 1, (TJAPlayer3.ConfigIni.n演奏速度 / 2) - 5));
+
+            #endregion
+
+            tFetchMults(player);
 
         }
 
@@ -493,6 +592,12 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [GameType]
+
+            TJAPlayer3.ConfigIni.nGameType[actual] = (EGameType)nGameType;
+
+            #endregion
+
             #region [ GameMode ]
 
             if (nGameMode == 0)
@@ -524,7 +629,93 @@ namespace TJAPlayer3
             }
 
             #endregion
+
+            #region [ Hitsounds ]
+
+            TJAPlayer3.ConfigIni.nHitSounds[actual] = nOtoiro;
+            hsInfo.tReloadHitSounds(nOtoiro, actual);
+
+            #endregion
+
+            #region [ Song speed ]
+
+            TJAPlayer3.ConfigIni.n演奏速度 = (nSongSpeed + 5) * 2;
+
+            #endregion
         }
+
+        #region [ Balancing functions ]
+
+        public float tGetScrollSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
+        {
+            var _compare = (isMenu) ? nSpeedCount != 1 : TJAPlayer3.ConfigIni.nScrollSpeed[actual] != 9;
+
+            if (ebt == EBalancingType.SCORE)
+                return (_compare) ? 0.9f : 1f;
+            return 1f;
+        }
+
+        public float tGetSongSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
+        {
+            var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : TJAPlayer3.ConfigIni.n演奏速度) / 20f;
+
+            if (ebt == EBalancingType.SCORE || _compare <= 1f)
+                return Math.Min(1f, (float)Math.Pow(_compare, 1.3));
+            return Math.Max(1f, (float)Math.Pow(_compare, 0.7));
+        }
+
+        public float tGetJustFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
+        {
+            var _compare = (isMenu) ? nJust : TJAPlayer3.ConfigIni.bJust[actual];
+
+            if (ebt == EBalancingType.SCORE)
+                return (_compare == 2) ? 0.6f : 1f;
+
+            return (_compare > 0) ? ((_compare > 1) ? 0.5f : 1.3f) : 1f;
+        }
+
+        public float tGetTimingFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
+        {
+            var _compare = (isMenu) ? nTiming - 2 : TJAPlayer3.ConfigIni.nTimingZones[actual] - 2;
+
+            if (ebt == EBalancingType.SCORE)
+                return (_compare < 0) ? (1f + 0.2f * _compare) : 1f;
+
+            return 1f + 0.2f * _compare;
+        }
+
+        public float tGetDoronFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
+        {
+            var _compare = (isMenu) ? nStealth : (int)TJAPlayer3.ConfigIni.eSTEALTH;
+
+            if (ebt == EBalancingType.SCORE || _compare == 0)
+                return 1f;
+
+            // Doron : x1.1 coins, Stealth : x1.4 coins
+            return 1f + 0.1f * (float)Math.Pow(_compare, 2);
+        }
+
+        public float tGetModMultiplier(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int player = 0)
+        {
+            float factor = 1f;
+            int actual = TJAPlayer3.GetActualPlayer(player);
+
+            //factor *= tGetScrollSpeedFactor(ebt, isMenu, actual);
+            factor *= tGetSongSpeedFactor(ebt, isMenu, actual);
+            factor *= tGetJustFactor(ebt, isMenu, actual);
+            factor *= tGetTimingFactor(ebt, isMenu, actual);
+            factor *= tGetDoronFactor(ebt, isMenu, actual);
+
+            return ebt == EBalancingType.SCORE ? Math.Min(factor, 1f) : factor;
+        }
+
+        public enum EBalancingType
+        {
+            SCORE,
+            COINS
+        }
+
+        #endregion
 
     }
 }

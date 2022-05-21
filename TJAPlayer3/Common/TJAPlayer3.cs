@@ -25,9 +25,9 @@ namespace TJAPlayer3
 {
 	internal class TJAPlayer3 : Game
 	{
-        // プロパティ
-        #region [ properties ]
-        public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString().Substring(0, Assembly.GetExecutingAssembly().GetName().Version.ToString().Length - 2);
+		// プロパティ
+		#region [ properties ]
+		public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();//.Substring(0, Assembly.GetExecutingAssembly().GetName().Version.ToString().Length - 2);
 		public static readonly string AppDisplayThreePartVersion = GetAppDisplayThreePartVersion();
 		public static readonly string AppNumericThreePartVersion = GetAppNumericThreePartVersion();
 
@@ -321,6 +321,12 @@ namespace TJAPlayer3
 			get;
 			private set;
 		}
+
+		public static CStageOnlineLounge stageOnlineLounge
+        {
+			get;
+			private set;
+        }
 		public static CStage曲読み込み stage曲読み込み
 		{
 			get;
@@ -917,22 +923,35 @@ namespace TJAPlayer3
 								#endregion
 								break;
 
-							#region [ OPTION: 廃止済 ]
-							//							case 2:									// #24525 OPTIONとCONFIGの統合に伴い、OPTIONは廃止
-							//								#region [ *** ]
-							//								//-----------------------------
-							//								r現在のステージ.On非活性化();
-							//								Trace.TraceInformation( "----------------------" );
-							//								Trace.TraceInformation( "■ オプション" );
-							//								stageオプション.On活性化();
-							//								r直前のステージ = r現在のステージ;
-							//								r現在のステージ = stageオプション;
-							//								//-----------------------------
-							//								#endregion
-							//								break;
-							#endregion
+							case (int)CStageタイトル.E戻り値.ONLINELOUNGE:
+								#region [Online Lounge]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Online Lounge");
+								stageOnlineLounge.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageOnlineLounge;
+								//-----------------------------
+								#endregion
+								break;
 
-							case (int)CStageタイトル.E戻り値.CONFIG:
+                            #region [ OPTION: 廃止済 ]
+                            //							case 2:									// #24525 OPTIONとCONFIGの統合に伴い、OPTIONは廃止
+                            //								#region [ *** ]
+                            //								//-----------------------------
+                            //								r現在のステージ.On非活性化();
+                            //								Trace.TraceInformation( "----------------------" );
+                            //								Trace.TraceInformation( "■ オプション" );
+                            //								stageオプション.On活性化();
+                            //								r直前のステージ = r現在のステージ;
+                            //								r現在のステージ = stageオプション;
+                            //								//-----------------------------
+                            //								#endregion
+                            //								break;
+                            #endregion
+
+                            case (int)CStageタイトル.E戻り値.CONFIG:
 								#region [ *** ]
 								//-----------------------------
 								r現在のステージ.On非活性化();
@@ -1716,6 +1735,38 @@ for (int i = 0; i < 3; i++) {
 						//-----------------------------
 						#endregion
 						break;
+
+					default:
+						#region [ *** ]
+						switch (this.n進行描画の戻り値)
+						{
+							case (int)CStage選曲.E戻り値.タイトルに戻る:
+								#region [ *** ]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ タイトル");
+								stageタイトル.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageタイトル;
+
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								foreach (STPlugin pg in this.listプラグイン)
+								{
+									Directory.SetCurrentDirectory(pg.strプラグインフォルダ);
+									pg.plugin.Onステージ変更();
+									Directory.SetCurrentDirectory(TJAPlayer3.strEXEのあるフォルダ);
+								}
+
+								this.tガベージコレクションを実行する();
+								break;
+								//-----------------------------
+								#endregion
+						}
+						#endregion
+						break;
 				}
 
 			    actScanningLoudness.On進行描画();
@@ -2484,6 +2535,7 @@ for (int i = 0; i < 3; i++) {
 			stage選曲 = new CStage選曲();
 			stage段位選択 = new CStage段位選択();
 			stageHeya = new CStageHeya();
+			stageOnlineLounge = new CStageOnlineLounge();
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
 			stage結果 = new CStage結果();
@@ -2501,6 +2553,7 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add( stage選曲 );
 			this.listトップレベルActivities.Add( stage段位選択 );
 			this.listトップレベルActivities.Add( stageHeya );
+			this.listトップレベルActivities.Add( stageOnlineLounge );
 			this.listトップレベルActivities.Add( stage曲読み込み );
 			this.listトップレベルActivities.Add( stage演奏ドラム画面 );
 			this.listトップレベルActivities.Add( stage結果 );

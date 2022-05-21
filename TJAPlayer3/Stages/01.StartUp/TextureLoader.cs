@@ -84,6 +84,13 @@ namespace TJAPlayer3
             return tex;
         }
 
+        internal CTexture TxCAbsolute(string FileName)
+        {
+            var tex = TJAPlayer3.tテクスチャの生成(FileName);
+            listTexture.Add(tex);
+            return tex;
+        }
+
         internal CTextureAf TxCAf(string FileName)
         {
             var tex = TJAPlayer3.tテクスチャの生成Af(CSkin.Path(BASE + FileName));
@@ -335,9 +342,21 @@ namespace TJAPlayer3
 
             #region General
 
-            Notes = TxC(GAME + @"Notes.png");
+            Notes = new CTexture[2];
+            Notes[0] = TxC(GAME + @"Notes.png");
+            Notes[1] = TxC(GAME + @"Notes_Konga.png");
+
+            Note_Mine = TxC(GAME + @"Mine.png");
+            Note_Swap = TxC(GAME + @"Swap.png");
+
             Judge_Frame = TxC(GAME + @"Notes.png");
-            SENotes = TxC(GAME + @"SENotes.png");
+
+            SENotes = new CTexture[2];
+            SENotes[0] = TxC(GAME + @"SENotes.png");
+            SENotes[1] = TxC(GAME + @"SENotes_Konga.png");
+
+            SENotesExtension = TxC(GAME + @"SENotes_Extension.png");
+
             Notes_Arm = TxC(GAME + @"Notes_Arm.png");
             Judge = TxC(GAME + @"Judge.png");
             ChipEffect = TxC(GAME + @"ChipEffect.png");
@@ -417,27 +436,43 @@ namespace TJAPlayer3
 
             #region Taiko
 
-            Taiko_Background = new CTexture[5];
+            Taiko_Background = new CTexture[11];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
             Taiko_Background[3] = TxC(GAME + TAIKO + @"Tower_Background.png");
             Taiko_Background[4] = TxC(GAME + TAIKO + @"1P_Background_Right.png");
-            Taiko_Frame = new CTexture[3];
+            Taiko_Background[5] = TxC(GAME + TAIKO + @"1P_Background_Tokkun.png");
+            Taiko_Background[6] = TxC(GAME + TAIKO + @"2P_Background_Tokkun.png");
+            Taiko_Background[7] = TxC(GAME + TAIKO + @"3P_Background.png");
+            Taiko_Background[8] = TxC(GAME + TAIKO + @"4P_Background.png");
+            Taiko_Background[9] = TxC(GAME + TAIKO + @"AI_Background.png");
+            Taiko_Background[10] = TxC(GAME + TAIKO + @"Boss_Background.png");
+
+            Taiko_Frame = new CTexture[4];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
+            Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
+
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
-            //Taiko_NamePlate = new CTexture[2];
-            //Taiko_NamePlate[0] = TxC(GAME + TAIKO + @"1P_NamePlate.png");
-            //Taiko_NamePlate[1] = TxC(GAME + TAIKO + @"2P_NamePlate.png");
-            Taiko_Base = TxC(GAME + TAIKO + @"Base.png");
+
+
+            Taiko_Base = new CTexture[2];
+            Taiko_Base[0] = TxC(GAME + TAIKO + @"Base.png");
+            Taiko_Base[1] = TxC(GAME + TAIKO + @"Base_Konga.png");
+
             Taiko_Don_Left = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Don_Right = TxC(GAME + TAIKO + @"Don.png");
             Taiko_Ka_Left = TxC(GAME + TAIKO + @"Ka.png");
             Taiko_Ka_Right = TxC(GAME + TAIKO + @"Ka.png");
+
+            Taiko_Konga_Don = TxC(GAME + TAIKO + @"Don_Konga.png");
+            Taiko_Konga_Ka = TxC(GAME + TAIKO + @"Ka_Konga.png");
+            Taiko_Konga_Clap = TxC(GAME + TAIKO + @"Clap.png");
+
             Taiko_LevelUp = TxC(GAME + TAIKO + @"LevelUp.png");
             Taiko_LevelDown = TxC(GAME + TAIKO + @"LevelDown.png");
             Couse_Symbol = new CTexture[(int)Difficulty.Total + 1]; // +1は真打ちモードの分
@@ -548,6 +583,8 @@ namespace TJAPlayer3
             Effects_Hit_FireWorks = TxC(GAME + EFFECTS + @"Hit\FireWorks.png");
             if (Effects_Hit_FireWorks != null) Effects_Hit_FireWorks.b加算合成 = TJAPlayer3.Skin.Game_Effect_FireWorks_AddBlend;
 
+            Effects_Hit_Bomb = TxCAf(GAME + EFFECTS + @"Hit\Bomb.png");
+
 
             Effects_Fire = TxC(GAME + EFFECTS + @"Fire.png");
             if (Effects_Fire != null) Effects_Fire.b加算合成 = TJAPlayer3.Skin.Game_Effect_Fire_AddBlend;
@@ -586,10 +623,24 @@ namespace TJAPlayer3
                 Lane_Base[i] = TxC(GAME + LANE + "Base_" + Lanes[i] + ".png");
                 Lane_Text[i] = TxC(GAME + LANE + "Text_" + Lanes[i] + ".png");
             }
-            Lane_Red = TxC(GAME + LANE + @"Red.png");
-            Lane_Blue = TxC(GAME + LANE + @"Blue.png");
+
+            Lane_Red = new CTexture[2];
+            Lane_Blue = new CTexture[2];
+            Lane_Clap = new CTexture[2];
+
+            var _suffixes = new string[] { "", "_Konga" };
+
+            for (int i = 0; i < Lane_Red.Length; i++)
+            {
+                Lane_Red[i] = TxC(GAME + LANE + @"Red" + _suffixes[i] + @".png");
+                Lane_Blue[i] = TxC(GAME + LANE + @"Blue" + _suffixes[i] + @".png");
+                Lane_Clap[i] = TxC(GAME + LANE + @"Clap" + _suffixes[i] + @".png");
+            }
+            
+
             Lane_Yellow = TxC(GAME + LANE + @"Yellow.png");
             Lane_Background_Main = TxC(GAME + LANE + @"Background_Main.png");
+            Lane_Background_AI = TxC(GAME + LANE + @"Background_AI.png");
             Lane_Background_Sub = TxC(GAME + LANE + @"Background_Sub.png");
             Lane_Background_GoGo = TxC(GAME + LANE + @"Background_GoGo.png");
 
@@ -1035,6 +1086,7 @@ namespace TJAPlayer3
             OnlineLounge_Center_Menu_Bar = TxC(ONLINELOUNGE + @"Center_Menu_Bar.png");
             OnlineLounge_Center_Menu_Box_Slot = TxC(ONLINELOUNGE + @"Center_Menu_Box_Slot.png");
             OnlineLounge_Side_Menu = TxC(ONLINELOUNGE + @"Side_Menu.png");
+            OnlineLounge_Context = TxC(ONLINELOUNGE + @"Context.png");
             OnlineLounge_Song_Box = TxC(ONLINELOUNGE + @"Song_Box.png");
 
             #endregion
@@ -1548,9 +1600,10 @@ namespace TJAPlayer3
 
         #region 5_演奏画面
         #region 共通
-        public CTexture Notes,
-            Judge_Frame,
-            SENotes,
+        public CTexture Judge_Frame,
+            Note_Mine,
+            Note_Swap,
+            SENotesExtension,
             Notes_Arm,
             ChipEffect,
             ScoreRank,
@@ -1558,6 +1611,8 @@ namespace TJAPlayer3
         public CTexture Judge_Meter,
             Bar,
             Bar_Branch;
+        public CTexture[] Notes,
+            SENotes;
         #endregion
 
 
@@ -1580,13 +1635,16 @@ namespace TJAPlayer3
                           Background_Up_Tower = new CTexture[8];
         #endregion
         #region 太鼓
-        public CTexture[] Taiko_Frame, // MTaiko下敷き
+        public CTexture[] Taiko_Base,
+            Taiko_Frame, // MTaiko下敷き
             Taiko_Background;
-        public CTexture Taiko_Base,
-            Taiko_Don_Left,
+        public CTexture Taiko_Don_Left,
             Taiko_Don_Right,
             Taiko_Ka_Left,
             Taiko_Ka_Right,
+            Taiko_Konga_Don,
+            Taiko_Konga_Ka,
+            Taiko_Konga_Clap,
             Taiko_LevelUp,
             Taiko_LevelDown,
             Taiko_Combo_Effect,
@@ -1621,6 +1679,7 @@ namespace TJAPlayer3
         #endregion
         #region エフェクト
         public CTexture Effects_Hit_Explosion,
+            Effects_Hit_Bomb,
             Effects_Hit_Explosion_Big,
             Effects_Fire,
             Effects_Rainbow,
@@ -1633,12 +1692,14 @@ namespace TJAPlayer3
         public CTexture[] Effects_Roll;
         #endregion
         #region レーン
-        public CTexture[] Lane_Base,
-            Lane_Text;
-        public CTexture Lane_Red,
+        public CTexture[] Lane_Red,
             Lane_Blue,
-            Lane_Yellow;
+            Lane_Clap,
+            Lane_Base,
+            Lane_Text;
+        public CTexture Lane_Yellow;
         public CTexture Lane_Background_Main,
+            Lane_Background_AI,
             Lane_Background_Sub,
             Lane_Background_GoGo;
         #endregion
@@ -1866,6 +1927,7 @@ namespace TJAPlayer3
             OnlineLounge_Center_Menu_Bar,
             OnlineLounge_Center_Menu_Box_Slot,
             OnlineLounge_Side_Menu,
+            OnlineLounge_Context,
             OnlineLounge_Song_Box;
 
         #endregion

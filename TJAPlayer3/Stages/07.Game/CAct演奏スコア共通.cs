@@ -220,6 +220,9 @@ namespace TJAPlayer3
 		public void Add( E楽器パート part, STAUTOPLAY bAutoPlay, long delta, int player )
 		{
 			double rev = 1.0;
+
+            delta = (long)(delta * TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
+
 			switch ( part )
 			{
 				#region [ Unknown ]
@@ -227,6 +230,7 @@ namespace TJAPlayer3
 					throw new ArgumentException();
 				#endregion
 			}
+
             this.ctTimer = new CCounter( 0, 400, 1, TJAPlayer3.Timer );
 
             for( int sc = 0; sc < 1; sc++ )

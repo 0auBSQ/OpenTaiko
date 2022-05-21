@@ -39,12 +39,12 @@ BoxFontName=廻想体 ネクスト UP B
 - PNG Egg (Fireworks) (Non-commercial)
 ```
 
-## OpenTaiko Original songs
+## OpenTaiko Original soundtrack
 
 ### Credits
 
 ```
-CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001
+CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
 Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by Bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
 Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by Bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
@@ -56,6 +56,11 @@ Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
 BassBoL : InterChan - https://www.youtube.com/c/InterChan374 (Chart by bol)
 Liberation : DeBisco - https://soundcloud.com/debisco | https://twitter.com/debiscomusic (Chart by Colin & 0AuBSQ)
 Deceiver's Terminus : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ)
+Corrupted Angel : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
+Startup Parade! : Ryuto Setsujin - https://youtube.com/c/ArGameOfficial (Chart by bol)
+White Heart : 9C feat. Cusi - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol)
+Summer Overload! : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
+Halcyon : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
 ```
 
 ## Translations

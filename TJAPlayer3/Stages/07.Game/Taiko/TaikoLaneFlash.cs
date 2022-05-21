@@ -56,15 +56,20 @@ namespace TJAPlayer3
         public PlayerLane(int player)
         {
             Flash = new LaneFlash[(int)FlashType.Total];
+            var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+
             for (int i = 0; i < (int)FlashType.Total; i++)
             {
                 switch (i)
                 {
                     case (int)FlashType.Red:
-                        Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Red, player);
+                        Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Red[(int)_gt], player);
                         break;
                     case (int)FlashType.Blue:
-                        Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Blue, player);
+                        Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Blue[(int)_gt], player);
+                        break;
+                    case (int)FlashType.Clap:
+                        Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Clap[(int)_gt], player);
                         break;
                     case (int)FlashType.Hit:
                         Flash[i] = new LaneFlash(ref TJAPlayer3.Tx.Lane_Yellow, player);
@@ -86,6 +91,7 @@ namespace TJAPlayer3
         {
             Red,
             Blue,
+            Clap,
             Hit,
             Total
         }

@@ -53,31 +53,17 @@ namespace TJAPlayer3
             switch (GetExamType())
             {
                 case Exam.Type.Gauge:
-                    SetCleared();
-                    break;
                 case Exam.Type.JudgePerfect:
-                        SetCleared();
-                    break;
                 case Exam.Type.JudgeGood:
-                        SetCleared();
-                    break;
                 case Exam.Type.JudgeBad:
-                        SetCleared();
-                    break;
                 case Exam.Type.Score:
-                        SetCleared();
-                    break;
                 case Exam.Type.Roll:
-                        SetCleared();
-                    break;
                 case Exam.Type.Hit:
-                        SetCleared();
-                    break;
                 case Exam.Type.Combo:
-                        SetCleared();
-                    break;
                 case Exam.Type.Accuracy:
-                        SetCleared();
+                case Exam.Type.JudgeADLIB:
+                case Exam.Type.JudgeMine:
+                    SetCleared();
                     break;
                 default:
                     break;
@@ -240,6 +226,8 @@ namespace TJAPlayer3
                     case Exam.Type.JudgePerfect:
                     case Exam.Type.JudgeGood:
                     case Exam.Type.JudgeBad:
+                    case Exam.Type.JudgeADLIB:
+                    case Exam.Type.JudgeMine:
                     case Exam.Type.Score:
                     case Exam.Type.Roll:
                     case Exam.Type.Hit:
@@ -259,6 +247,8 @@ namespace TJAPlayer3
                     case Exam.Type.JudgePerfect:
                     case Exam.Type.JudgeGood:
                     case Exam.Type.JudgeBad:
+                    case Exam.Type.JudgeADLIB:
+                    case Exam.Type.JudgeMine:
                     case Exam.Type.Score:
                     case Exam.Type.Roll:
                     case Exam.Type.Hit:
@@ -361,7 +351,10 @@ namespace TJAPlayer3
             Roll,
             Hit,
             Combo,
-            Accuracy
+            Accuracy,
+            JudgeADLIB,
+            JudgeMine,
+            Total,
         }
 
         /// <summary>

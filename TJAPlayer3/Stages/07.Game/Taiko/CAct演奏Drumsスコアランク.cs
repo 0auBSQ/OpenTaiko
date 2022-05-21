@@ -14,7 +14,8 @@ namespace TJAPlayer3
             double RollTimems = 0;
             foreach (var chip in TJAPlayer3.DTX.listChip)
             {
-                if (chip.nチャンネル番号 == 21 || chip.nチャンネル番号 == 22)
+                //if (chip.nチャンネル番号 == 21 || chip.nチャンネル番号 == 22)
+                if (NotesManager.IsRoll(chip))
                 {
                     RollTimems += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
                 }

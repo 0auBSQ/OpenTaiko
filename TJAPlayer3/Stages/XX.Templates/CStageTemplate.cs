@@ -16,6 +16,9 @@ namespace TJAPlayer3
 
             // Load CActivity objects here
             // base.list子Activities.Add(this.act = new CAct());
+
+            base.list子Activities.Add(this.actFOtoTitle = new CActFIFOBlack());
+
         }
 
         public override void On活性化()

@@ -495,6 +495,12 @@ namespace TJAPlayer3
 				float starRate;
 				float redStarRate;
 
+				float[] modMultipliers =
+				{
+					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 0),
+					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 1)
+				};
+
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 				{
 					diffModifier = 3;
@@ -524,6 +530,7 @@ namespace TJAPlayer3
 
 					// this.nEarnedMedalsCount[0] = stars;
 					this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
+					this.nEarnedMedalsCount[0] = Math.Max(5, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0]));
 				}
 				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 				{
@@ -576,7 +583,10 @@ namespace TJAPlayer3
 					if (clearModifier < 0)
 						this.nEarnedMedalsCount[0] = 10;
 					else
+					{
 						this.nEarnedMedalsCount[0] = 10 + goukakuModifier + clearModifier + (int)(partialScore * dAccuracyRate);
+						this.nEarnedMedalsCount[0] = Math.Max(10, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0]));
+					}
 				}
 				else
 				{
@@ -636,9 +646,18 @@ namespace TJAPlayer3
 						if (clearModifier < 0)
 							this.nEarnedMedalsCount[i] = 5;
 						else
+						{
 							this.nEarnedMedalsCount[i] = 5 + (int)((diffModifier * (starRate + redStarRate)) * dAccuracyRate) + clearModifier + scoreRankModifier;
+							this.nEarnedMedalsCount[i] = Math.Max(5, (int)(this.nEarnedMedalsCount[i] * modMultipliers[i]));
+						}
 					}
 				}
+
+				// ADLIB bonuses : 1 coin per ADLIB
+				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+					this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
+                }
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
@@ -1576,7 +1595,7 @@ namespace TJAPlayer3
 				TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat.ToString(),
 				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood.ToString(),
-				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss.ToString(),
+				(TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss - TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.GetRoll(0).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0].ToString(),
 				totalHit.ToString()
@@ -1635,7 +1654,7 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.stage演奏ドラム画面.n良[i].ToString(),
 				TJAPlayer3.stage演奏ドラム画面.n可[i].ToString(),
-				TJAPlayer3.stage演奏ドラム画面.n不可[i].ToString(),
+				(TJAPlayer3.stage演奏ドラム画面.n不可[i] - TJAPlayer3.stage演奏ドラム画面.nMine[i]).ToString(),
 				TJAPlayer3.stage演奏ドラム画面.n連打[i].ToString()
 			};
 

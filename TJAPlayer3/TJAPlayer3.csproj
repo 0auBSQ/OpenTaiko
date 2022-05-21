@@ -124,6 +124,7 @@
     <Compile Include="Character\CResultCharacter.cs" />
     <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
+    <Compile Include="Common\CHitSounds.cs" />
     <Compile Include="Common\CVersionList.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
     <Compile Include="Common\ModalQueue.cs" />
@@ -145,6 +146,8 @@
     <Compile Include="I18N\CLang_jp.cs" />
     <Compile Include="I18N\CLang_zh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
+    <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Discord.Designer.cs</LastGenOutput>
@@ -294,6 +297,7 @@
     <Compile Include="Stages\10.ChangeSkin\CStageChangeSkin.cs" />
     <Compile Include="Stages\11.Heya\CStageHeya.cs" />
     <Compile Include="Stages\12.OnlineLounge\API.cs" />
+    <Compile Include="Stages\12.OnlineLounge\CStageOnlineLounge.cs" />
     <Compile Include="Stages\CActDFPFont.cs" />
     <Compile Include="Stages\CActFIFOBlack.cs" />
     <Compile Include="Stages\CActFIFOStart.cs" />

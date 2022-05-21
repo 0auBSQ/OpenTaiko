@@ -98,6 +98,8 @@ namespace TJAPlayer3
         RRed2P  = 17,
         LBlue2P = 18,
         RBlue2P = 19,
+		CLAP	= 20,
+		CLAP2P	= 21,
 		MAX,			// 門番用として定義
 		UNKNOWN = 99
 	}
@@ -130,6 +132,8 @@ namespace TJAPlayer3
         RRed2P  = Eパッド.RRed2P,
         LBlue2P = Eパッド.LBlue2P,
         RBlue2P = Eパッド.RBlue2P,
+		Clap	= Eパッド.CLAP,
+		Clap2P	= Eパッド.CLAP2P,
 		Capture,
 		UNKNOWN = Eパッド.UNKNOWN
 	}
@@ -174,6 +178,13 @@ namespace TJAPlayer3
 		SUPERRANDOM,
 		HYPERRANDOM
 	}
+
+	public enum EGameType
+    {
+		TAIKO = 0,
+		KONGA = 1,
+    }
+
 	public enum E楽器パート		// ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
 	{
 		DRUMS	= 0,
@@ -213,7 +224,9 @@ namespace TJAPlayer3
 		Poor	= 3,
 		Miss	= 4,
 		Bad		= 5,
-		Auto
+		Auto	= 6,
+		ADLIB	= 7,
+		Mine	= 8,
 	}
 	internal enum E判定文字表示位置
 	{

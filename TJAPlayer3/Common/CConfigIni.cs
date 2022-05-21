@@ -331,6 +331,31 @@ namespace TJAPlayer3
 						this.padRBlue2P = value;
 					}
                 }
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap
+				{
+					get
+					{
+						return this.padClap;
+					}
+					set
+					{
+						this.padClap = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap2P
+				{
+					get
+					{
+						return this.padClap2P;
+					}
+					set
+					{
+						this.padClap2P = value;
+					}
+				}
+
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[ int index ]
 				{
 					get
@@ -396,6 +421,12 @@ namespace TJAPlayer3
 
 							case (int) EKeyConfigPad.RBlue2P:
 								return this.padRBlue2P;
+
+							case (int)EKeyConfigPad.Clap:
+								return this.padClap;
+
+							case (int)EKeyConfigPad.Clap2P:
+								return this.padClap2P;
 
 							case (int) EKeyConfigPad.Capture:
 								return this.padCapture;
@@ -486,6 +517,14 @@ namespace TJAPlayer3
                                 this.padRBlue2P = value;
                                 return;
 
+							case (int)EKeyConfigPad.Clap:
+								this.padClap = value;
+								return;
+
+							case (int)EKeyConfigPad.Clap2P:
+								this.padClap2P = value;
+								return;
+
 							case (int) EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
@@ -516,6 +555,8 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue2P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap2P;
 
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
 				//-----------------
@@ -605,20 +646,21 @@ namespace TJAPlayer3
 		}
 		// プロパティ
 
-
 		public class CAIPerformances
         {
 			public int nGoodOdds;
 			public int nPerfectOdds;
 			public int nBadOdds;
 			public int nRollSpeed;
+			public int nMineHitOdds;
 
-			public CAIPerformances(int po, int go, int bo, int rp)
+			public CAIPerformances(int po, int go, int bo, int rp, int mho = 0)
             {
 				nGoodOdds = go;
 				nPerfectOdds = po;
 				nBadOdds = bo;
 				nRollSpeed = rp;
+				nMineHitOdds = mho;
             }
         }
 
@@ -759,6 +801,7 @@ namespace TJAPlayer3
 	    public STDGBVALUE<int> n表示可能な最小コンボ数;
 		public int[] nScrollSpeed;
 		public int[] nTimingZones;
+		public EGameType[] nGameType;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
         public string FontName;
@@ -779,16 +822,16 @@ namespace TJAPlayer3
 
 		public CAIPerformances[] apAIPerformances =
 		{
-			new CAIPerformances(500, 400, 100, 7),
-			new CAIPerformances(650, 310, 40, 8),
-			new CAIPerformances(750, 225, 25, 9),
-			new CAIPerformances(800, 180, 20, 10),
-			new CAIPerformances(850, 135, 15, 12),
-			new CAIPerformances(900, 90, 10, 14),
-			new CAIPerformances(910, 85, 5, 16),
-			new CAIPerformances(950, 49, 1, 22),
-			new CAIPerformances(975, 25, 0, 26),
-			new CAIPerformances(1000, 0, 0, 30)
+			new CAIPerformances(500, 400, 100, 7, 200),
+			new CAIPerformances(650, 310, 40, 8, 150),
+			new CAIPerformances(750, 225, 25, 9, 100),
+			new CAIPerformances(800, 180, 20, 10, 70),
+			new CAIPerformances(850, 135, 15, 12, 50),
+			new CAIPerformances(900, 90, 10, 14, 30),
+			new CAIPerformances(910, 85, 5, 16, 20),
+			new CAIPerformances(950, 49, 1, 22, 10),
+			new CAIPerformances(975, 25, 0, 26, 5),
+			new CAIPerformances(1000, 0, 0, 30, 0)
 		};
 
 		public CTimingZones[] tzLevels =
@@ -841,7 +884,9 @@ namespace TJAPlayer3
         public bool bTokkunMode = false;
         public int[] bJust = new int[4] { 0, 0, 0, 0 };
 
-        public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
+		public int[] nHitSounds = new int[4] { 0, 0, 0, 0 };
+
+		public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
 		public STDGBVALUE<E判定文字表示位置> 判定文字表示位置;
 //		public int nハイハット切り捨て下限Velocity;
@@ -1405,6 +1450,7 @@ namespace TJAPlayer3
 			this.判定文字表示位置 = new STDGBVALUE<E判定文字表示位置>();
 			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
 			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
+			this.nGameType = new EGameType[4] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -2002,11 +2048,17 @@ namespace TJAPlayer3
 			sw.WriteLine("DrumsScrollSpeed3P={0}", this.nScrollSpeed[2]);
 			sw.WriteLine("DrumsScrollSpeed4P={0}", this.nScrollSpeed[3]);
 			sw.WriteLine();
-			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict");
+			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict)");
 			sw.WriteLine("TimingZones1P={0}", this.nTimingZones[0]);
 			sw.WriteLine("TimingZones2P={0}", this.nTimingZones[1]);
 			sw.WriteLine("TimingZones3P={0}", this.nTimingZones[2]);
 			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
+			sw.WriteLine();
+			sw.WriteLine("; Gametype (0 : Taiko, 1 : Konga)");
+			sw.WriteLine("Gametype1P={0}", (int)this.nGameType[0]);
+			sw.WriteLine("Gametype2P={0}", (int)this.nGameType[1]);
+			sw.WriteLine("Gametype3P={0}", (int)this.nGameType[2]);
+			sw.WriteLine("Gametype4P={0}", (int)this.nGameType[3]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2063,11 +2115,17 @@ namespace TJAPlayer3
 			sw.WriteLine("; 指定ms以内に5回縁を叩きましょう");
 			sw.WriteLine("{1}={0}", this.TokkunMashInterval, nameof(this.TokkunMashInterval));
 			sw.WriteLine();
-			sw.WriteLine( "; JUST(0:OFF, 1:ON)" );
+			sw.WriteLine( "; JUST(0:OFF, 1:JUST, 2:SAFE)" );
 			sw.WriteLine( "Just1P={0}", this.bJust[0] );
 			sw.WriteLine("Just2P={0}", this.bJust[1] );
 			sw.WriteLine("Just3P={0}", this.bJust[2] );
 			sw.WriteLine("Just4P={0}", this.bJust[3] );
+			sw.WriteLine();
+			sw.WriteLine("; Hitsounds index (音色)");
+			sw.WriteLine("HitSounds1P={0}", this.nHitSounds[0]);
+			sw.WriteLine("HitSounds2P={0}", this.nHitSounds[1]);
+			sw.WriteLine("HitSounds3P={0}", this.nHitSounds[2]);
+			sw.WriteLine("HitSounds4P={0}", this.nHitSounds[3]);
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
@@ -2135,7 +2193,13 @@ namespace TJAPlayer3
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.LeftBlue2P );	//
 			sw.WriteLine();											        //
 			sw.Write( "RightBlue2P=" );										// #27029 2012.1.4 from
-			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue2P );	//
+			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue2P );  //
+			sw.WriteLine();
+			sw.Write("Clap=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap);
+			sw.WriteLine();
+			sw.Write("Clap2P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap2P);
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -2873,6 +2937,48 @@ namespace TJAPlayer3
 
 											#endregion
 
+											#region [Hitsounds]
+
+											else if (str3.Equals("HitSounds1P"))
+											{
+												this.nHitSounds[0] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[0]);
+											}
+											else if (str3.Equals("HitSounds2P"))
+											{
+												this.nHitSounds[1] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[1]);
+											}
+											else if (str3.Equals("HitSounds3P"))
+											{
+												this.nHitSounds[2] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[2]);
+											}
+											else if (str3.Equals("HitSounds4P"))
+											{
+												this.nHitSounds[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[3]);
+											}
+
+											#endregion
+
+											#region [Gametype]
+
+											else if (str3.Equals("Gametype1P"))
+											{
+												this.nGameType[0] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[0]);
+											}
+											else if (str3.Equals("Gametype2P"))
+											{
+												this.nGameType[1] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[1]);
+											}
+											else if (str3.Equals("Gametype3P"))
+											{
+												this.nGameType[2] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[2]);
+											}
+											else if (str3.Equals("Gametype4P"))
+											{
+												this.nGameType[3] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[3]);
+											}
+
+											#endregion
+
 
 											#endregion
 
@@ -3072,6 +3178,15 @@ namespace TJAPlayer3
 											else if( str3.Equals( "RightBlue2P" ) )										// #27029 2012.1.4 from
 											{																	//
 												this.tキーの読み出しと設定( str4, this.KeyAssign.Drums.RightBlue2P );	//
+											}
+
+											else if (str3.Equals("Clap"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap);
+											}
+											else if (str3.Equals("Clap2P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap2P);
 											}
 
 											continue;
