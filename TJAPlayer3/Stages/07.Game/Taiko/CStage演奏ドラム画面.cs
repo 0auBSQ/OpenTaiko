@@ -1866,8 +1866,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, x + 60, (y - 14) - nHand);
                                             }
                                             NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-                                            TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY,
-                                                new Rectangle(0, pChip.nチャンネル番号 == 0x1A ? 390 : 420, 136, 30));
+                                            NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
                                         }
                                         break;
                                     }

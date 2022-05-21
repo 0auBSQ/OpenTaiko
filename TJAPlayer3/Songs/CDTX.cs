@@ -4494,13 +4494,16 @@ namespace TJAPlayer3
                                         chip.nSenote = 0xC;
                                         break;
                                     case 9:
-                                        chip.nSenote = 0xD;
+                                        chip.nSenote = 0xB;
                                         break;
-                                    case 10:
-                                        chip.nSenote = 0xE;
+                                    case 0xA:
+                                        chip.nSenote = 5;
                                         break;
-                                    case 11:
-                                        chip.nSenote = 0xF;
+                                    case 0xB:
+                                        chip.nSenote = 6;
+                                        break;
+                                    case 0xF1:
+                                        chip.nSenote = 5;
                                         break;
                                 }
                                 #endregion
@@ -5987,7 +5990,7 @@ namespace TJAPlayer3
                         }
 
                         //ドコドコドン
-                        if (time[DATA - 3] >= 3.4 && time[DATA - 2] == 2 && time[DATA - 1] == 1 && time[DATA + 1] == 1 && time[DATA + 2] == 2 && time[DATA + 3] >= 3.4 && sort[DATA - 2] == 0x93 && sort[DATA - 1] == 0x11 && sort[DATA + 1] == 0x11 && sort[DATA + 2] == 0x11)
+                        if (time[DATA - 3] >= 3.4 && time[DATA - 2] == 2 && time[DATA - 1] == 1 && time[DATA + 1] == 1 && time[DATA + 2] == 2 && time[DATA + 3] >= 3.4 && sort[DATA - 2] == 0x11 && sort[DATA - 1] == 0x11 && sort[DATA + 1] == 0x11 && sort[DATA + 2] == 0x11)
                         {
                             list音符のみのリスト[i - 2].nSenote = 1;
                             list音符のみのリスト[i - 1].nSenote = 2;
