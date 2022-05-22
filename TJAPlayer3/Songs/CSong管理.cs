@@ -93,7 +93,7 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		#region [ 曲を検索してリストを作成する ]
+		#region [ Fetch song list ]
 		//-----------------
 		public void t曲を検索してリストを作成する( string str基点フォルダ, bool b子BOXへ再帰する )
 		{

@@ -531,10 +531,13 @@ namespace TJAPlayer3
 							{
 								TJAPlayer3.DTX.PlanToAddMixerChannel();
 							}
+
+							var _dtx = new CDTX[4]{ TJAPlayer3.DTX, TJAPlayer3.DTX_2P, null, null };
 							
 							for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                             {
-								TJAPlayer3.DTX.tRandomizeTaikoChips(i);
+								_dtx[i]?.tRandomizeTaikoChips(i);
+
 							}
 								
 
