@@ -1699,6 +1699,59 @@ namespace TJAPlayer3
             return new string(new char[] { str[n / 36], str[n % 36] });
         }
 
+        public void tApplyFunMods(int player = 0)
+        {
+            Random rnd = new System.Random();
+
+            var eFun = EFunMods.NONE;
+
+            // Placeholder
+            /*
+            if (player == 1)
+                eFun = EFunMods.AVALANCHE;
+            else
+                eFun = EFunMods.MINESWEEPER;
+            */
+
+            switch (eFun)
+            {
+                case EFunMods.MINESWEEPER:
+                    foreach (var chip in this.listChip)
+                    {
+                        int n = rnd.Next(100);
+
+                        if (n >= 0 && n <= 20)
+                        {
+                            if (NotesManager.IsMissableNote(chip))
+                            {
+                                chip.nチャンネル番号 = 0x1C;
+                            }
+
+                            /*
+                            switch (chip.nチャンネル番号)
+                            {
+                                case 0x10:
+                                    chip.nチャンネル番号 = 0x1C;
+                                    break;
+                            }
+                            */
+                        }
+                    }
+                    break;
+                case EFunMods.AVALANCHE:
+                    foreach (var chip in this.listChip)
+                    {
+                        int n = rnd.Next(100);
+
+
+                        chip.dbSCROLL *= (n + 50) / (double)100;
+                    }
+                    break;
+                case EFunMods.NONE:
+                default:
+                    break;
+            }
+        }
 
         public void tRandomizeTaikoChips(int player = 0)
         {

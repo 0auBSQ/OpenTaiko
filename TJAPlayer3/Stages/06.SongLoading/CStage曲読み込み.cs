@@ -537,7 +537,7 @@ namespace TJAPlayer3
 							for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                             {
 								_dtx[i]?.tRandomizeTaikoChips(i);
-
+								_dtx[i]?.tApplyFunMods(i);
 							}
 								
 
