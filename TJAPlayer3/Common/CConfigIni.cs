@@ -802,6 +802,7 @@ namespace TJAPlayer3
 		public int[] nScrollSpeed;
 		public int[] nTimingZones;
 		public EGameType[] nGameType;
+		public EFunMods[] nFunMods;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
         public string FontName;
@@ -1451,6 +1452,7 @@ namespace TJAPlayer3
 			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
 			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
 			this.nGameType = new EGameType[4] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
+			this.nFunMods = new EFunMods[4] { EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -2063,6 +2065,12 @@ namespace TJAPlayer3
 			sw.WriteLine("Gametype2P={0}", (int)this.nGameType[1]);
 			sw.WriteLine("Gametype3P={0}", (int)this.nGameType[2]);
 			sw.WriteLine("Gametype4P={0}", (int)this.nGameType[3]);
+			sw.WriteLine();
+			sw.WriteLine("; Fun Mods (0 : None, 1 : Avalanche (random scroll speed per note/chip), 2 : Minesweeper (replace randomly notes by bombs))");
+			sw.WriteLine("FunMods1P={0}", (int)this.nFunMods[0]);
+			sw.WriteLine("FunMods2P={0}", (int)this.nFunMods[1]);
+			sw.WriteLine("FunMods3P={0}", (int)this.nFunMods[2]);
+			sw.WriteLine("FunMods4P={0}", (int)this.nFunMods[3]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2985,6 +2993,27 @@ namespace TJAPlayer3
 											else if (str3.Equals("Gametype4P"))
 											{
 												this.nGameType[3] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[3]);
+											}
+
+											#endregion
+
+											#region [Fun mods]
+
+											else if (str3.Equals("FunMods1P"))
+											{
+												this.nFunMods[0] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[0]);
+											}
+											else if (str3.Equals("FunMods2P"))
+											{
+												this.nFunMods[1] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[1]);
+											}
+											else if (str3.Equals("FunMods3P"))
+											{
+												this.nFunMods[2] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[2]);
+											}
+											else if (str3.Equals("FunMods4P"))
+											{
+												this.nFunMods[3] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[3]);
 											}
 
 											#endregion

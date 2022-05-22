@@ -294,6 +294,9 @@ namespace TJAPlayer3
             [512] = "Game Type",
             [513] = "Taiko",
             [514] = "Konga",
+            [515] = "Fun mods",
+            [516] = "Avalanche",
+            [517] = "Minesweeper",
 
             [1000] = "Reached floor",
             [1001] = "F",

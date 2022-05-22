@@ -184,6 +184,7 @@ namespace TJAPlayer3
 		NONE,
 		AVALANCHE,
 		MINESWEEPER,
+		TOTAL,
     }
 
 	public enum EGameType

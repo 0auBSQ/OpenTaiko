@@ -78,6 +78,10 @@ namespace TJAPlayer3
             txGameType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(513), Color.White, Color.Black);
             txGameType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(514), Color.White, Color.Black);
 
+            txFunMods[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
+            txFunMods[1] = OptionTypeTx(CLangManager.LangInstance.GetString(516), Color.White, Color.Black);
+            txFunMods[2] = OptionTypeTx(CLangManager.LangInstance.GetString(517), Color.White, Color.Black);
+
             txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
 
             hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
@@ -108,6 +112,7 @@ namespace TJAPlayer3
             OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
             OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(10), Color.White, Color.Black);
             OptionType[10] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
+            OptionType[11] = OptionTypeTx(CLangManager.LangInstance.GetString(515), Color.White, Color.Black);
 
             var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
             for (int i = 0; i < 5; i++)
@@ -195,6 +200,7 @@ namespace TJAPlayer3
                 txSwitch[nAutoMode],
                 txSongSpeed[nSongSpeed],
                 txOtoiro[nOtoiro],
+                txFunMods[nFunMods],
             };
 
             var _shift = player == 1 ? 640 : 0;
@@ -281,11 +287,11 @@ namespace TJAPlayer3
             return 0;
         }
 
-        public int nOptionCount = 10;
+        public int nOptionCount = 11;
 
         public CCounter ctOpen;
         public CCounter ctClose;
-        public CTexture[] OptionType = new CTexture[11];
+        public CTexture[] OptionType = new CTexture[12];
 
         public int NowCount;
         public int[] NowCountType = new int[8];
@@ -326,6 +332,9 @@ namespace TJAPlayer3
 
         public CTexture[] txGameType = new CTexture[2];
         public int nGameType = 0;
+
+        public CTexture[] txFunMods = new CTexture[3];
+        public int nFunMods = 0;
 
         public CTexture[] txModMults = new CTexture[2];
 
@@ -391,7 +400,9 @@ namespace TJAPlayer3
                 case 10:
                     ShiftVal(left, ref nOtoiro, txOtoiro.Length - 1, 0);
                     break;
-
+                case 11:
+                    ShiftVal(left, ref nFunMods, txFunMods.Length - 1, 0);
+                    break;
             }
         }
 
@@ -473,6 +484,12 @@ namespace TJAPlayer3
             nGameType = (int)TJAPlayer3.ConfigIni.nGameType[actual];
 
             #endregion
+
+            #region [Fun mods]
+
+            nFunMods = (int)TJAPlayer3.ConfigIni.nFunMods[actual];
+
+            #endregion 
 
             #region [ GameMode ]
 
@@ -597,6 +614,12 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.nGameType[actual] = (EGameType)nGameType;
 
             #endregion
+
+            #region [Fun mods]
+
+            TJAPlayer3.ConfigIni.nFunMods[actual] = (EFunMods)nFunMods;
+
+            #endregion 
 
             #region [ GameMode ]
 

@@ -285,6 +285,9 @@ namespace TJAPlayer3
             [512] = "Type de jeu",
             [513] = "Taiko",
             [514] = "Konga",
+            [515] = "Extras",
+            [516] = "Avalanche",
+            [517] = "Démineur",
 
             [1000] = "Étage atteint",
             [1001] = "",

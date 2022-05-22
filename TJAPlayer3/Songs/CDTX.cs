@@ -1703,15 +1703,7 @@ namespace TJAPlayer3
         {
             Random rnd = new System.Random();
 
-            var eFun = EFunMods.NONE;
-
-            // Placeholder
-            /*
-            if (player == 1)
-                eFun = EFunMods.AVALANCHE;
-            else
-                eFun = EFunMods.MINESWEEPER;
-            */
+            var eFun = TJAPlayer3.ConfigIni.nFunMods[TJAPlayer3.GetActualPlayer(player)];
 
             switch (eFun)
             {

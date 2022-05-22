@@ -247,6 +247,9 @@
 512 : "Game Type" mod name
 513 : "Taiko" game type mod option
 514 : "Konga" game type mod option
+515 : "Fun mods" mod name
+516 : "Avalanche" fun mod option
+517 : "Minesweeper" fun mod option
 
 # In-game pause menu (0090X)
 
