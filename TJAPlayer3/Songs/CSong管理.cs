@@ -95,6 +95,27 @@ namespace TJAPlayer3
 
 		#region [ Fetch song list ]
 		//-----------------
+
+		public void UpdateDownloadBox()
+		{
+			C曲リストノード downloadBox = null;
+			for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
+			{
+				if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+					downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+			}
+			for (int i = 0; i < downloadBox.list子リスト.Count; i++)
+			{
+				if (downloadBox.list子リスト[i].eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
+                {
+					downloadBox.list子リスト.Remove(downloadBox.list子リスト[i]);
+					i--;
+				}
+			}
+
+			t曲を検索してリストを作成する(@"Songs\S3 Download", true, downloadBox.list子リスト, downloadBox);
+			tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
+		}
 		public void t曲を検索してリストを作成する( string str基点フォルダ, bool b子BOXへ再帰する )
 		{
 			this.t曲を検索してリストを作成する( str基点フォルダ, b子BOXへ再帰する, this.list曲ルート, null );

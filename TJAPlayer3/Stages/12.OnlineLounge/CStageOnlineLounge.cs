@@ -59,6 +59,8 @@ namespace TJAPlayer3
             dbCDN = TJAPlayer3.Databases.DBCDN;
             dbCDNData = null;
 
+            IsDownloading = false;
+
             #region [Main menu]
 
             this.ttkMainMenuOpt = new TitleTextureKey[3];
@@ -111,6 +113,8 @@ namespace TJAPlayer3
         public override void On非活性化()
         {
             // On de-activation
+
+            TJAPlayer3.Songs管理.UpdateDownloadBox();
 
             base.On非活性化();
         }
@@ -272,7 +276,14 @@ namespace TJAPlayer3
 
             #endregion
 
+            if (IsDownloading)
+            {
+                TJAPlayer3.Tx.OnlineLounge_Box.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+                var text = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                                    new TitleTextureKey("DownloadNow", this.pfOLFontLarge, Color.White, Color.Black, 1000));
+                text.t2D中心基準描画(TJAPlayer3.app.Device, 640, 605);
+            }
 
             #endregion
 
@@ -280,145 +291,175 @@ namespace TJAPlayer3
 
             #region [Input]
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
+            if (!IsDownloading)
             {
-                if (this.tMove(1))
+                if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
+                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
-                }
-            }
-
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
-            {
-                if (this.tMove(-1))
-                {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
-                }
-            }
-
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
-            {
-
-                #region [Fast return (Escape)]
-
-                TJAPlayer3.Skin.sound取消音.t再生する();
-
-                if (currentMenu == ECurrentMenu.MAIN)
-                {
-                    // Return to title screen
-                    TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
-                    this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
-                    this.actFOtoTitle.tフェードアウト開始();
-                    base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
-                }
-                else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT)
-                {
-                    // Return to base menu
-                    currentMenu = ECurrentMenu.MAIN;
-                }
-                else if (currentMenu == ECurrentMenu.CDN_OPTION)
-                {
-                    // Return to CDN select menu
-                    currentMenu = ECurrentMenu.CDN_SELECT;
-                }
-                else if (currentMenu == ECurrentMenu.CDN_SONGS || currentMenu == ECurrentMenu.CDN_CHARACTERS || currentMenu == ECurrentMenu.CDN_PUCHICHARAS)
-                {
-                    // Return to CDN select option
-                    currentMenu = ECurrentMenu.CDN_OPTION;
-                }
-
-                return 0;
-
-                #endregion
-            }
-
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
-            {
-
-                #region [Decide]
-
-                if (currentMenu == ECurrentMenu.MAIN)
-                {
-                    // Base menu
-                    currentMenu = mainMenu[mainMenuIndex];
-                    if (currentMenu == ECurrentMenu.RETURN)
+                    if (this.tMove(1))
                     {
-                        // Quit
-                        TJAPlayer3.Skin.sound取消音.t再生する();
+                        TJAPlayer3.Skin.sound変更音.t再生する();
+                    }
+                }
+
+                else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
+                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
+                {
+                    if (this.tMove(-1))
+                    {
+                        TJAPlayer3.Skin.sound変更音.t再生する();
+                    }
+                }
+
+                else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
+                {
+
+                    #region [Fast return (Escape)]
+
+                    TJAPlayer3.Skin.sound取消音.t再生する();
+
+                    if (currentMenu == ECurrentMenu.MAIN)
+                    {
+                        // Return to title screen
                         TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
                         this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                         this.actFOtoTitle.tフェードアウト開始();
                         base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
                     }
-                    else
+                    else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT)
                     {
-                        TJAPlayer3.Skin.sound決定音.t再生する();
-                    }
-                }
-                else if (currentMenu == ECurrentMenu.CDN_SELECT)
-                {
-                    // CDN Select Menu
-                    if (CDNSelectIndex > 0)
-                    {
-                        currentMenu = ECurrentMenu.CDN_OPTION;
-                        dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
-                        TJAPlayer3.Skin.sound決定音.t再生する();
-                    }
-                    else
-                    {
+                        // Return to base menu
                         currentMenu = ECurrentMenu.MAIN;
-                        TJAPlayer3.Skin.sound取消音.t再生する();
                     }
-                }
-                else if (currentMenu == ECurrentMenu.CDN_OPTION)
-                {
-                    // CDN Option Menu
-                    currentMenu = cdnOptMenu[cdnOptMenuIndex];
-                    if (currentMenu == ECurrentMenu.CDN_SELECT)
-                        TJAPlayer3.Skin.sound取消音.t再生する();
-                    else
+                    else if (currentMenu == ECurrentMenu.CDN_OPTION)
                     {
-                        if (currentMenu == ECurrentMenu.CDN_SONGS)
-                        {
-                            apiMethods = new API(dbCDNData);
-                            apiMethods.tLoadSongsFromInternalCDN();
-
-                            #region [Generate song list values]
-
-                            this.ttkCDNSongList = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
-                            this.ttkCDNSongSubtitles = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
-
-                            this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
-                            this.ttkCDNSongSubtitles[0] = new TitleTextureKey("", this.pfOLFont, Color.White, Color.DarkRed, 1000);
-
-                            for (int i = 0; i < apiMethods.FetchedSongsList.Length; i++)
-                            {
-                                this.ttkCDNSongList[i + 1] = new TitleTextureKey(apiMethods.FetchedSongsList[i].SongTitle, this.pfOLFont, Color.White, Color.DarkRed, 1000);
-
-                                string subtitle_ = apiMethods.FetchedSongsList[i].SongSubtitle;
-                                if (subtitle_.Length >= 2)
-                                    subtitle_ = subtitle_.Substring(2);
-                                this.ttkCDNSongSubtitles[i + 1] = new TitleTextureKey(subtitle_, this.pfOLFont, Color.White, Color.DarkRed, 1000);
-                            }
-
-                            this.cdnSongListIndex = 0;
-
-                            #endregion
-                        }
-                        TJAPlayer3.Skin.sound決定音.t再生する();
+                        // Return to CDN select menu
+                        currentMenu = ECurrentMenu.CDN_SELECT;
+                    }
+                    else if (currentMenu == ECurrentMenu.CDN_SONGS || currentMenu == ECurrentMenu.CDN_CHARACTERS || currentMenu == ECurrentMenu.CDN_PUCHICHARAS)
+                    {
+                        // Return to CDN select option
+                        currentMenu = ECurrentMenu.CDN_OPTION;
                     }
 
+                    return 0;
+
+                    #endregion
                 }
 
+                else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
+                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
+                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+                {
 
-                #endregion
+                    #region [Decide]
+
+                    if (currentMenu == ECurrentMenu.MAIN)
+                    {
+                        // Base menu
+                        currentMenu = mainMenu[mainMenuIndex];
+                        if (currentMenu == ECurrentMenu.RETURN)
+                        {
+                            // Quit
+                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
+                            this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                            this.actFOtoTitle.tフェードアウト開始();
+                            base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                        }
+                        else
+                        {
+                            TJAPlayer3.Skin.sound決定音.t再生する();
+                        }
+                    }
+                    else if (currentMenu == ECurrentMenu.CDN_SELECT)
+                    {
+                        // CDN Select Menu
+                        if (CDNSelectIndex > 0)
+                        {
+                            currentMenu = ECurrentMenu.CDN_OPTION;
+                            dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
+                            TJAPlayer3.Skin.sound決定音.t再生する();
+                        }
+                        else
+                        {
+                            currentMenu = ECurrentMenu.MAIN;
+                            TJAPlayer3.Skin.sound取消音.t再生する();
+                        }
+                    }
+                    else if (currentMenu == ECurrentMenu.CDN_OPTION)
+                    {
+                        // CDN Option Menu
+                        currentMenu = cdnOptMenu[cdnOptMenuIndex];
+                        if (currentMenu == ECurrentMenu.CDN_SELECT)
+                            TJAPlayer3.Skin.sound取消音.t再生する();
+                        else
+                        {
+                            if (currentMenu == ECurrentMenu.CDN_SONGS)
+                            {
+                                apiMethods = new API(dbCDNData);
+                                apiMethods.tLoadSongsFromInternalCDN();
+
+                                #region [Generate song list values]
+
+                                this.ttkCDNSongList = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
+                                this.ttkCDNSongSubtitles = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
+
+                                this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+                                this.ttkCDNSongSubtitles[0] = new TitleTextureKey("", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+                                for (int i = 0; i < apiMethods.FetchedSongsList.Length; i++)
+                                {
+                                    this.ttkCDNSongList[i + 1] = new TitleTextureKey(apiMethods.FetchedSongsList[i].SongTitle, this.pfOLFont, Color.White, Color.DarkRed, 1000);
+
+                                    string subtitle_ = apiMethods.FetchedSongsList[i].SongSubtitle;
+                                    if (subtitle_.Length >= 2)
+                                        subtitle_ = subtitle_.Substring(2);
+                                    this.ttkCDNSongSubtitles[i + 1] = new TitleTextureKey(subtitle_, this.pfOLFont, Color.White, Color.DarkRed, 1000);
+                                }
+
+                                this.cdnSongListIndex = 0;
+
+                                #endregion
+                            }
+                            TJAPlayer3.Skin.sound決定音.t再生する();
+                        }
+
+                    }
+                    else if (currentMenu == ECurrentMenu.CDN_SONGS)
+                    {
+                        if (this.cdnSongListIndex == 0)
+                        {
+                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            currentMenu = ECurrentMenu.CDN_OPTION;
+                        }
+                        else
+                        {
+                            if (this.cdnSongListIndex < apiMethods.FetchedSongsList.Length)
+                            {
+                                var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
+                                var zipPath = $@"Cache\{song.Md5}.zip";
+
+                                if (System.IO.Directory.Exists($@"Songs\S3 Download\{song.Md5}"))
+                                {
+                                    TJAPlayer3.Skin.soundError.t再生する();
+                                }
+                                else
+                                {
+                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    System.Threading.Thread download =
+                                        new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
+                                    download.Start();
+                                }
+
+                            }
+                        }
+                    }
+
+
+                    #endregion
+                }
             }
-
-
             #endregion
 
             // Menu exit fade out transition
@@ -469,6 +510,25 @@ namespace TJAPlayer3
             }
 
             return true;
+        }
+
+        private void DownloadSong()
+        {
+            IsDownloading = true;
+
+            System.IO.Directory.CreateDirectory($@"Cache\");
+
+            var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
+            var zipPath = $@"Cache\{song.Md5}.zip";
+
+            System.Net.WebClient wc = new System.Net.WebClient();
+
+            wc.DownloadFile($"{dbCDNData.BaseUrl}{dbCDNData.Download["default"]}{song.Id}", zipPath);
+            wc.Dispose();
+
+            System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
+
+            IsDownloading = false;
         }
 
 
@@ -526,6 +586,8 @@ namespace TJAPlayer3
         private TitleTextureKey[] ttkCDNSongList;
         private TitleTextureKey[] ttkCDNSongSubtitles;
         private int cdnSongListIndex;
+
+        private bool IsDownloading;
 
         private class CMenuInfo
         {
