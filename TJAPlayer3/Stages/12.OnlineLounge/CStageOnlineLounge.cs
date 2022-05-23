@@ -516,6 +516,8 @@ namespace TJAPlayer3
         {
             IsDownloading = true;
 
+            System.IO.Directory.CreateDirectory($@"Cache\");
+
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
             var zipPath = $@"Cache\{song.Md5}.zip";
 
