@@ -10,6 +10,7 @@
 *.swp
 *.DotSettings.user
 /packages
+/Test/Cache
 /Test/Capture_img
 /Test/Config.ini
 /Test/bs1770gain**

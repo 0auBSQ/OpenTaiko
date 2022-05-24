@@ -516,17 +516,35 @@ namespace TJAPlayer3
         {
             IsDownloading = true;
 
+            // Create Cache folder if does not exist
             System.IO.Directory.CreateDirectory($@"Cache\");
 
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
             var zipPath = $@"Cache\{song.Md5}.zip";
 
+            // Download zip from cdn
             System.Net.WebClient wc = new System.Net.WebClient();
 
             wc.DownloadFile($"{dbCDNData.BaseUrl}{dbCDNData.Download["default"]}{song.Id}", zipPath);
             wc.Dispose();
 
-            System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
+            // Fetch closest Download folder node
+            C曲リストノード downloadBox = null;
+            for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
+            {
+                if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                    downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+            }
+
+            // If there is at least one download folder, transfer the zip contents in it
+            if (downloadBox != null)
+            {
+                var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
+
+                System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"{path}{song.Md5}");
+            }
+
+            //System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
 
             IsDownloading = false;
         }
