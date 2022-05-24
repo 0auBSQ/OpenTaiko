@@ -9,7 +9,7 @@ namespace TJAPlayer3
 {
     class TextureLoader
     {
-        const string BASE = @"Graphics\";
+        public const string BASE = @"Graphics\";
         const string GLOBAL = @"Global\";
 
         // Global assets 
@@ -22,7 +22,7 @@ namespace TJAPlayer3
         const string SONGSELECT = @"3_SongSelect\";
         const string DANISELECT = @"3_DaniSelect\";
         const string SONGLOADING = @"4_SongLoading\";
-        const string GAME = @"5_Game\";
+        public const string GAME = @"5_Game\";
         const string RESULT = @"6_Result\";
         const string EXIT = @"7_Exit\";
         const string DANRESULT = @"7_DanResult\";
@@ -37,10 +37,10 @@ namespace TJAPlayer3
         const string DANCER = @"2_Dancer\";
         const string MOB = @"3_Mob\";
         const string COURSESYMBOL = @"4_CourseSymbol\";
-        const string BACKGROUND = @"5_Background\";
+        public const string BACKGROUND = @"5_Background\";
         const string TAIKO = @"6_Taiko\";
         const string GAUGE = @"7_Gauge\";
-        const string FOOTER = @"8_Footer\";
+        public const string FOOTER = @"8_Footer\";
         const string END = @"9_End\";
         const string EFFECTS = @"10_Effects\";
         const string BALLOON = @"11_Balloon\";
@@ -394,43 +394,6 @@ namespace TJAPlayer3
             {
                 Mob[i] = TxC(GAME + MOB + i.ToString() + ".png");
             }
-
-            #endregion
-            
-            #region Footer
-
-            Mob_Footer = TxC(GAME + FOOTER + @"0.png");
-            
-            #endregion
-
-            #region Background
-
-            Background = TxC(GAME + Background + @"0\" + @"Background.png");
-
-            Background_Up_1st = new CTexture[3];
-            Background_Up_1st[0] = TxC(GAME + BACKGROUND + @"0\" + @"1P_Up_1st.png");
-            Background_Up_1st[1] = TxC(GAME + BACKGROUND + @"0\" + @"2P_Up_1st.png");
-            Background_Up_1st[2] = TxC(GAME + BACKGROUND + @"0\" + @"Clear_Up_1st.png");
-
-            Background_Up_2nd = new CTexture[3];
-            Background_Up_2nd[0] = TxC(GAME + BACKGROUND + @"0\" + @"1P_Up_2nd.png");
-            Background_Up_2nd[1] = TxC(GAME + BACKGROUND + @"0\" + @"2P_Up_2nd.png");
-            Background_Up_2nd[2] = TxC(GAME + BACKGROUND + @"0\" + @"Clear_Up_2nd.png");
-
-            Background_Up_3rd = new CTexture[3];
-            Background_Up_3rd[0] = TxC(GAME + BACKGROUND + @"0\" + @"1P_Up_3rd.png");
-            Background_Up_3rd[1] = TxC(GAME + BACKGROUND + @"0\" + @"2P_Up_3rd.png");
-            Background_Up_3rd[2] = TxC(GAME + BACKGROUND + @"0\" + @"Clear_Up_3rd.png");
-
-            for(int i = 0; i < Background_Up_Dan.Length; i++)
-                Background_Up_Dan[i] = TxC(GAME + BACKGROUND + @"1\" + i.ToString() + @".png");
-
-            for (int i = 0; i < Background_Up_Tower.Length; i++)
-                Background_Up_Tower[i] = TxC(GAME + BACKGROUND + @"2\" + i.ToString() + @".png");
-
-            Background_Down = TxC(GAME + BACKGROUND + @"0\" + @"Down.png");
-            Background_Down_Clear = TxC(GAME + BACKGROUND + @"0\" + @"Down_Clear.png");
-            Background_Down_Scroll = TxC(GAME + BACKGROUND + @"0\" + @"Down_Scroll.png");
 
             #endregion
 
@@ -1627,18 +1590,6 @@ namespace TJAPlayer3
         #endregion
         #region モブ
         public CTexture[] Mob;
-        public CTexture Mob_Footer;
-        #endregion
-        #region 背景
-        public CTexture Background,
-            Background_Down,
-            Background_Down_Clear,
-            Background_Down_Scroll;
-        public CTexture[] Background_Up_1st,
-                          Background_Up_2nd,
-                          Background_Up_3rd,
-                          Background_Up_Dan = new CTexture[6],
-                          Background_Up_Tower = new CTexture[8];
         #endregion
         #region 太鼓
         public CTexture[] Taiko_Base,

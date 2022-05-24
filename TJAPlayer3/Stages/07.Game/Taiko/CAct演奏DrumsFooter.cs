@@ -29,25 +29,40 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
+            var footerDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.FOOTER}");
+
+            if (System.IO.Directory.Exists(footerDir))
+            {
+                Random random = new Random();
+
+                var upDirs = System.IO.Directory.GetFiles(footerDir);
+                var upPath = upDirs[random.Next(0, upDirs.Length)];
+
+                Mob_Footer = TJAPlayer3.tテクスチャの生成(upPath);
+            }
+
             base.OnManagedリソースの作成();
         }
 
         public override void OnManagedリソースの解放()
         {
+            TJAPlayer3.t安全にDisposeする(ref Mob_Footer);
+
             base.OnManagedリソースの解放();
         }
 
         public override int On進行描画()
         {
-            if (TJAPlayer3.Tx.Mob_Footer != null)
+            if (this.Mob_Footer != null)
             {
-                TJAPlayer3.Tx.Mob_Footer.t2D描画(TJAPlayer3.app.Device, 0, 720 - TJAPlayer3.Tx.Mob_Footer.szテクスチャサイズ.Height);
+                this.Mob_Footer.t2D描画(TJAPlayer3.app.Device, 0, 720 - this.Mob_Footer.szテクスチャサイズ.Height);
             }
             return base.On進行描画();
         }
 
         #region[ private ]
         //-----------------
+        public CTexture Mob_Footer;
         //-----------------
         #endregion
     }
