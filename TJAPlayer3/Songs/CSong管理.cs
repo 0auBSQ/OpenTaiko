@@ -102,11 +102,16 @@ namespace TJAPlayer3
 			for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
 			{
 				if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+				{
 					downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+					if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
+				}
+				
 			}
 
 			if (downloadBox != null)
             {
+				int oldCount = downloadBox.list子リスト.Count;
 				for (int i = 0; i < downloadBox.list子リスト.Count; i++)
 				{
 					if (downloadBox.list子リスト[i].eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
@@ -118,10 +123,28 @@ namespace TJAPlayer3
 
 				var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
 
+				if (!this.list曲ルート.Contains(downloadBox))//Openだったら
+				{
+					if (downloadBox.list子リスト.Count > 0)
+					{
+						var index = this.list曲ルート.IndexOf(downloadBox.list子リスト[0]);
+						this.list曲ルート.RemoveRange(index, oldCount);
+
+						this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
+						t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
+						tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
+
+						list曲ルート.InsertRange(index, downloadBox.list子リスト);
+					}
+				}
+                else
+				{
+					this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
+					t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
+					tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
+				}
 
 				//t曲を検索してリストを作成する(@"Songs\S3 Download", true, downloadBox.list子リスト, downloadBox);
-				t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
-				tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
 			}
 			
 		}
