@@ -40,7 +40,7 @@ namespace TJAPlayer3
         public const string BACKGROUND = @"5_Background\";
         const string TAIKO = @"6_Taiko\";
         const string GAUGE = @"7_Gauge\";
-        const string FOOTER = @"8_Footer\";
+        public const string FOOTER = @"8_Footer\";
         const string END = @"9_End\";
         const string EFFECTS = @"10_Effects\";
         const string BALLOON = @"11_Balloon\";
@@ -395,12 +395,6 @@ namespace TJAPlayer3
                 Mob[i] = TxC(GAME + MOB + i.ToString() + ".png");
             }
 
-            #endregion
-            
-            #region Footer
-
-            Mob_Footer = TxC(GAME + FOOTER + @"0.png");
-            
             #endregion
 
             #region Taiko
@@ -1596,7 +1590,6 @@ namespace TJAPlayer3
         #endregion
         #region モブ
         public CTexture[] Mob;
-        public CTexture Mob_Footer;
         #endregion
         #region 太鼓
         public CTexture[] Taiko_Base,
