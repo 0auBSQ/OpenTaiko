@@ -549,11 +549,11 @@ namespace TJAPlayer3
             {
                 // Download zip from cdn
 
-                if (!System.IO.File.Exists(zipPath))
+                if (!File.Exists(zipPath))
                 {
                     System.Net.WebClient wc = new System.Net.WebClient();
-    
-                    wc.DownloadFile($"{dbCDNData.BaseUrl}{dbCDNData.Download["default"]}{song.Id}", zipPath);
+
+                    wc.DownloadFile($"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}", zipPath);
                     wc.Dispose();
                 }
 
@@ -561,10 +561,10 @@ namespace TJAPlayer3
                 C曲リストノード downloadBox = null;
                 for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                 {
-                   if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                   if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download"
+                        && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
                    {
                        downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
-                       if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
                    }
                 }
 
