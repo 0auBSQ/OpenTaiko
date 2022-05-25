@@ -98,6 +98,7 @@ namespace TJAPlayer3
 
 		public void UpdateDownloadBox()
 		{
+
 			C曲リストノード downloadBox = null;
 			for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
 			{
@@ -106,45 +107,44 @@ namespace TJAPlayer3
 					downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
 					if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
 				}
-				
+
+			}
+
+			//無いかもしれないが万が一Boxのを選んだ状態でダウンロードした場合のために
+			while (TJAPlayer3.stage選曲.act曲リスト.r現在選択中の曲.r親ノード != null)
+			{
+				TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
 			}
 
 			if (downloadBox != null)
             {
-				int oldCount = downloadBox.list子リスト.Count;
+				var flatten = TJAPlayer3.stage選曲.act曲リスト.flattenList(downloadBox.list子リスト);
 				for (int i = 0; i < downloadBox.list子リスト.Count; i++)
 				{
-					if (downloadBox.list子リスト[i].eノード種別 != C曲リストノード.Eノード種別.BACKBOX)
-					{
-						downloadBox.list子リスト.Remove(downloadBox.list子リスト[i]);
-						i--;
-					}
+					downloadBox.list子リスト.Remove(downloadBox.list子リスト[i]);
+					i--;
 				}
 
 				var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
 
-				if (!this.list曲ルート.Contains(downloadBox))//Openだったら
+				if (flatten.Count > 0)
 				{
-					if (downloadBox.list子リスト.Count > 0)
+					int index = list曲ルート.IndexOf(flatten[0]);
+
+					if (!list曲ルート.Contains(downloadBox))
 					{
-						var index = this.list曲ルート.IndexOf(downloadBox.list子リスト[0]);
-						this.list曲ルート.RemoveRange(index, oldCount);
-
-						this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
-						t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
-						tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
-
-						list曲ルート.InsertRange(index, downloadBox.list子リスト);
+						for (int i = 0; i < flatten.Count; i++)
+						{
+							this.list曲ルート.Remove(flatten[i]);
+						}
+						list曲ルート.Insert(index, downloadBox);
 					}
-				}
-                else
-				{
-					this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
-					t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
-					tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
-				}
 
-				//t曲を検索してリストを作成する(@"Songs\S3 Download", true, downloadBox.list子リスト, downloadBox);
+					t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
+					this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
+					tSongsDBになかった曲をファイルから読み込んで反映する(downloadBox.list子リスト);
+					downloadBox.list子リスト.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.strタイトル}/"));
+				}
 			}
 			
 		}
