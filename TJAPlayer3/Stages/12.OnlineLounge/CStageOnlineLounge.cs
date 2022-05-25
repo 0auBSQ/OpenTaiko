@@ -557,7 +557,8 @@ namespace TJAPlayer3
                 C曲リストノード downloadBox = null;
                 for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                 {
-                    if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                    if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download"
+                        && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
                         downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
                 }
 
@@ -572,23 +573,46 @@ namespace TJAPlayer3
                         // Create Genre sub-folder if does not exist
                         Directory.CreateDirectory(genredPath);
 
-                        // Generate box.def
+                        // Search a corresponding box-def if exists
+                        C曲リストノード correspondingBox = null;
+                        for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
+                        {
+                            if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
+                                && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
+                                correspondingBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                        }
+
                         var newBoxDef = $@"{genredPath}\box.def";
-                        //File.Create(newBoxDef);
 
-                        StreamWriter sw = new StreamWriter(newBoxDef, false, Encoding.GetEncoding(TJAPlayer3.sEncType));
+                        if (correspondingBox == null)
+                        {
+                            // Generate box.def if none available
+                            
+                            //File.Create(newBoxDef);
 
-                        sw.WriteLine($@"#TITLE:{song.Genre.genre}");
-                        sw.WriteLine($@"#GENRE:{song.Genre.genre}");
-                        sw.WriteLine($@"#BOXEXPLANATION1:");
-                        sw.WriteLine($@"#BOXEXPLANATION2:");
-                        sw.WriteLine($@"#BOXEXPLANATION3:");
-                        sw.WriteLine($@"#BGCOLOR:#ff00a2");
-                        sw.WriteLine($@"#BOXCOLOR:#ff00a2");
-                        sw.WriteLine($@"#BOXTYPE:0");
-                        sw.WriteLine($@"#BGTYPE:1");
-                        sw.WriteLine($@"#BOXCHARA:0");
-                        sw.Close();
+                            StreamWriter sw = new StreamWriter(newBoxDef, false, Encoding.GetEncoding(TJAPlayer3.sEncType));
+
+                            sw.WriteLine($@"#TITLE:{song.Genre.genre}");
+                            sw.WriteLine($@"#GENRE:{song.Genre.genre}");
+                            sw.WriteLine($@"#BOXEXPLANATION1:");
+                            sw.WriteLine($@"#BOXEXPLANATION2:");
+                            sw.WriteLine($@"#BOXEXPLANATION3:");
+                            sw.WriteLine($@"#BGCOLOR:#ff00a2");
+                            sw.WriteLine($@"#BOXCOLOR:#ff00a2");
+                            sw.WriteLine($@"#BOXTYPE:0");
+                            sw.WriteLine($@"#BGTYPE:1");
+                            sw.WriteLine($@"#BOXCHARA:0");
+                            sw.Close();
+                        }
+                        else
+                        {
+                            // Copy the existing box.def if available
+                            var corPath = correspondingBox.arスコア[0].ファイル情報.フォルダの絶対パス;
+
+                            File.Copy($@"{corPath}\box.def", newBoxDef);
+                        }
+
+                        
                     }
                     
 
