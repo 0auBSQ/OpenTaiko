@@ -110,12 +110,6 @@ namespace TJAPlayer3
 
 			}
 
-			//無いかもしれないが万が一Boxのを選んだ状態でダウンロードした場合のために
-			while (TJAPlayer3.stage選曲.act曲リスト.r現在選択中の曲.r親ノード != null)
-			{
-				TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
-			}
-
 			if (downloadBox != null)
             {
 				var flatten = TJAPlayer3.stage選曲.act曲リスト.flattenList(downloadBox.list子リスト);
