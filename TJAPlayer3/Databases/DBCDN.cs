@@ -37,6 +37,12 @@ namespace TJAPlayer3
             {
                 ["default"] = "md5",
             };
+            public string genre = "genre";
+            public Dictionary<string, string> genreSub = new Dictionary<string, string>()
+            {
+                ["default"] = "name",
+            };
+
             public string charter = "charter";
         }
 

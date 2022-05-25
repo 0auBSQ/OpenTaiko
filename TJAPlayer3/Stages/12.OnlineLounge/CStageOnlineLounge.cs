@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using System.Linq;
+using System.Diagnostics;
+using System.IO;
 using FDK;
 using static TJAPlayer3.CActSelect曲リスト;
 
@@ -246,6 +247,17 @@ namespace TJAPlayer3
 
                         #endregion
 
+                        #region [Song Genre]
+
+                        if (song_.Genre != null && song_.Genre.genre != null && song_.Genre.genre != "")
+                        {
+                            var genre_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                                    new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
+                            genre_?.t2D中心基準描画(TJAPlayer3.app.Device, 980, 340);
+                        }
+
+                        #endregion
+
                         #region [Difficulties]
 
                         for (int k = 0; k < (int)Difficulty.Total; k++)
@@ -402,8 +414,10 @@ namespace TJAPlayer3
 
                                 #region [Generate song list values]
 
-                                this.ttkCDNSongList = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
-                                this.ttkCDNSongSubtitles = new TitleTextureKey[apiMethods.FetchedSongsList.Length + 1];
+                                int songCountPlusOne = apiMethods.FetchedSongsList.Length + 1;
+
+                                this.ttkCDNSongList = new TitleTextureKey[songCountPlusOne];
+                                this.ttkCDNSongSubtitles = new TitleTextureKey[songCountPlusOne];
 
                                 this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
                                 this.ttkCDNSongSubtitles[0] = new TitleTextureKey("", this.pfOLFont, Color.White, Color.DarkRed, 1000);
@@ -512,43 +526,92 @@ namespace TJAPlayer3
             return true;
         }
 
+        #region [Song Downloading]
+
+        private string GetAssignedLanguageValue(Dictionary<string, string> ens)
+        {
+            if (ens.ContainsKey(TJAPlayer3.ConfigIni.sLang))
+                return ens[TJAPlayer3.ConfigIni.sLang];
+            return ens["default"];
+        }
+
         private void DownloadSong()
         {
             IsDownloading = true;
 
             // Create Cache folder if does not exist
-            System.IO.Directory.CreateDirectory($@"Cache\");
+            Directory.CreateDirectory($@"Cache\");
 
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
-            var zipPath = $@"Cache\{song.Md5}.zip";
+            var zipPath = $@"Cache\{song.SongTitle}-{song.Md5}.zip";
 
-            // Download zip from cdn
-            System.Net.WebClient wc = new System.Net.WebClient();
-
-            wc.DownloadFile($"{dbCDNData.BaseUrl}{dbCDNData.Download["default"]}{song.Id}", zipPath);
-            wc.Dispose();
-
-            // Fetch closest Download folder node
-            C曲リストノード downloadBox = null;
-            for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
+            try
             {
-                if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
-                    downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                // Download zip from cdn
+                System.Net.WebClient wc = new System.Net.WebClient();
+
+                wc.DownloadFile($"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}", zipPath);
+                wc.Dispose();
+
+                // Fetch closest Download folder node
+                C曲リストノード downloadBox = null;
+                for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
+                {
+                    if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                        downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                }
+
+                // If there is at least one download folder, transfer the zip contents in it
+                if (downloadBox != null)
+                {
+                    var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
+                    var genredPath = $@"{path}\{song.Genre.genre}\";
+
+                    if (!Directory.Exists(genredPath))
+                    {
+                        // Create Genre sub-folder if does not exist
+                        Directory.CreateDirectory(genredPath);
+
+                        // Generate box.def
+                        var newBoxDef = $@"{genredPath}\box.def";
+                        //File.Create(newBoxDef);
+
+                        StreamWriter sw = new StreamWriter(newBoxDef, false, Encoding.GetEncoding(TJAPlayer3.sEncType));
+
+                        sw.WriteLine($@"#TITLE:{song.Genre.genre}");
+                        sw.WriteLine($@"#GENRE:{song.Genre.genre}");
+                        sw.WriteLine($@"#BOXEXPLANATION1:");
+                        sw.WriteLine($@"#BOXEXPLANATION2:");
+                        sw.WriteLine($@"#BOXEXPLANATION3:");
+                        sw.WriteLine($@"#BGCOLOR:#ff00a2");
+                        sw.WriteLine($@"#BOXCOLOR:#ff00a2");
+                        sw.WriteLine($@"#BOXTYPE:0");
+                        sw.WriteLine($@"#BGTYPE:1");
+                        sw.WriteLine($@"#BOXCHARA:0");
+                        sw.Close();
+                    }
+                    
+
+                    var songPath = $@"{genredPath}{song.SongTitle}-{song.Md5}";
+
+                    System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, songPath);
+                }
+
+                //System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceInformation(e.ToString());
+                TJAPlayer3.Skin.soundError.t再生する();
             }
 
-            // If there is at least one download folder, transfer the zip contents in it
-            if (downloadBox != null)
-            {
-                var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
-
-                System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"{path}{song.Md5}");
-            }
-
-            //System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
 
             IsDownloading = false;
         }
 
+        #endregion
+
+        #region [Enums]
 
         public enum E戻り値 : int
         {
@@ -569,6 +632,8 @@ namespace TJAPlayer3
             MULTI_SELECT,   // Main online multiplayer menu
             TOTAL,          // Submenus count
         }
+
+        #endregion
 
         #region [Private]
 
