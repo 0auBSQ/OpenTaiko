@@ -454,7 +454,7 @@ namespace TJAPlayer3
                                 var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
                                 var zipPath = $@"Cache\{song.Md5}.zip";
 
-                                if (System.IO.Directory.Exists($@"Songs\S3 Download\{song.Md5}"))
+                                if (System.IO.Directory.Exists($@"Songs\X4 Downloaded Songs\{song.Md5}"))
                                 {
                                     TJAPlayer3.Skin.soundError.t再生する();
                                 }
@@ -544,22 +544,28 @@ namespace TJAPlayer3
 
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
             var zipPath = $@"Cache\{song.SongTitle}-{song.Md5}.zip";
-
+            
             try
             {
                 // Download zip from cdn
-                System.Net.WebClient wc = new System.Net.WebClient();
 
-                wc.DownloadFile($"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}", zipPath);
-                wc.Dispose();
+                if (!System.IO.File.Exists(zipPath))
+                {
+                    System.Net.WebClient wc = new System.Net.WebClient();
+    
+                    wc.DownloadFile($"{dbCDNData.BaseUrl}{dbCDNData.Download["default"]}{song.Id}", zipPath);
+                    wc.Dispose();
+                }
 
                 // Fetch closest Download folder node
                 C曲リストノード downloadBox = null;
                 for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                 {
-                    if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download"
-                        && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
-                        downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                   if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                   {
+                       downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                       if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
+                   }
                 }
 
                 // If there is at least one download folder, transfer the zip contents in it
