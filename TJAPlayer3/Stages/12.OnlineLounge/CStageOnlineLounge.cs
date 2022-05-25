@@ -535,6 +535,11 @@ namespace TJAPlayer3
             return ens["default"];
         }
 
+        private string GetDownloadLink(API.APISongData song)
+        {
+            return $"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}";
+        }
+
         private void DownloadSong()
         {
             IsDownloading = true;
@@ -544,6 +549,7 @@ namespace TJAPlayer3
 
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
             var zipPath = $@"Cache\{song.SongTitle}-{song.Md5}.zip";
+            var downloadLink = GetDownloadLink(song);
             
             try
             {
@@ -553,7 +559,7 @@ namespace TJAPlayer3
                 {
                     System.Net.WebClient wc = new System.Net.WebClient();
 
-                    wc.DownloadFile($"{dbCDNData.BaseUrl}{GetAssignedLanguageValue(dbCDNData.Download)}{song.Id}", zipPath);
+                    wc.DownloadFile(downloadLink, zipPath);
                     wc.Dispose();
                 }
 
@@ -625,6 +631,21 @@ namespace TJAPlayer3
                     var songPath = $@"{genredPath}{song.SongTitle}-{song.Md5}";
 
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, songPath);
+
+                    // Generate Unique ID with URL
+                    var idPath = songPath;
+                    while (1 == 1)
+                    {
+                        var directories = Directory.GetDirectories(idPath);
+                        if (directories.Length < 1)
+                            break;
+
+                        idPath = directories[0];
+                    }
+
+                    var uid = new CSongUniqueID(idPath + @"\uniqueID.json");
+                    uid.tAttachOnlineAddress(downloadLink);
+                    
                 }
 
                 //System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs\S3 Download\{song.Md5}");
