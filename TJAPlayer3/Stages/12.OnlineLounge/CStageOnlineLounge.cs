@@ -454,18 +454,10 @@ namespace TJAPlayer3
                                 var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
                                 var zipPath = $@"Cache\{song.Md5}.zip";
 
-                                if (System.IO.Directory.Exists($@"Songs\X4 Downloaded Songs\{song.Md5}"))
-                                {
-                                    TJAPlayer3.Skin.soundError.t再生する();
-                                }
-                                else
-                                {
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
-                                    System.Threading.Thread download =
-                                        new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
-                                    download.Start();
-                                }
-
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                System.Threading.Thread download =
+                                    new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
+                                download.Start();
                             }
                         }
                     }
