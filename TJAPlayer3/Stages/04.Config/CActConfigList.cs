@@ -205,7 +205,7 @@ namespace TJAPlayer3
 			// #24820 2013.1.3 yyagi
 			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
 				CLangManager.LangInstance.GetString(43),
-				new string[] { "DSound", "ASIO", "WASAPI" });
+				new string[] { "DSound", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
 			this.list項目リスト.Add(this.iSystemSoundType);
 
 			// #24820 2013.1.15 yyagi
@@ -813,6 +813,9 @@ namespace TJAPlayer3
 						break;
 					case 2:
 						soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
+						break;
+					case 3:
+						soundDeviceType = ESoundDeviceType.SharedWASAPI;
 						break;
 					default:
 						soundDeviceType = ESoundDeviceType.Unknown;
