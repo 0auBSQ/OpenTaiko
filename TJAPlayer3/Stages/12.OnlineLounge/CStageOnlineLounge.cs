@@ -559,11 +559,12 @@ namespace TJAPlayer3
                 C曲リストノード downloadBox = null;
                 for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                 {
-                   if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download"
-                        && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
-                   {
-                       downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
-                   }
+                    if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
+                    {
+                        downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+                        if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
+                        break;
+                    }
                 }
 
                 // If there is at least one download folder, transfer the zip contents in it
