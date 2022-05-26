@@ -641,8 +641,8 @@ namespace TJAPlayer3
 			ACM = 0,
 			// DirectSound,
 			ASIO,
-			WASAPI_Shared,
 			WASAPI_Exclusive,
+			WASAPI_Shared,
 			Unknown =99
 		}
 		// プロパティ
