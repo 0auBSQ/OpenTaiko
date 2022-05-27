@@ -2,6 +2,24 @@
 
 - This document describes the new commands this simulator adds to tja files and `box.def`.
 
+Current version : v0.5.4
+
+## Notes
+
+- `A` : Partner big Don (Equivalent to `3`)
+
+- `B` : Partner big Ka (Equivalent to `4`)
+
+- `C` : Bomb/Mine, hitting it breaks the combo and substracts 4% to the soul gauge
+
+- `F` : ADLIB invisible note, has no effect on score nor combo but adds 1 to the count of coins earned at the end of the game (+10 coins max per game)
+
+- `G` : (Taiko) Purple note, require to hit both Ka and Don (Konga) Pink note (Equivalent to `A` and `3`)
+
+## General Metadata
+
+- `PREIMAGE` : ((Relative) Path) Song cover jacket image 
+
 ## Tower
 
 - `LIFE` : (Int) Life count in-game, missing a note takes you one and triggers 2 seconds of invincibility frames. (Default : 5)
@@ -14,9 +32,17 @@
 
 - `DANTICKCOLOR` : (Hex) Color filter to apply on the dan tick, works especially well using a grayscale default texture.
 
-- `EXAM(x):a,(y),(z),m` : (With (x) EXAM number between `]1, 7]`¹, (y) and (z) respectively red and gold pass criterias) Accuracy exam type, in percent. 
+- `EXAM(x):a,(y),(z),m` : (With (x) EXAM number between `]1, 7]`(1), (y) and (z) respectively red and gold pass criterias) Accuracy exam type, in percent. 
 
-¹: `EXAM1` slot is gauge exclusive.
+(1): `EXAM1` slot is gauge exclusive.
+
+### Extra Exams
+
+- `a` : Accuracy, in percent
+
+- `jm` : Judge mines, number of mines hit
+
+- `ja` : Judge ADLIBs, number of ADLIBs hit
  
 ## box.def
 
