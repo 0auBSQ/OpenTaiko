@@ -4039,6 +4039,9 @@ namespace TJAPlayer3
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
                 this.chip現在処理中の連打チップ[ i ] = null;
+                this.actChara.b風船連打中[i] = false;
+                this.actChara.bマイどんアクション中[i] = false;
+                this.actChara.アクションタイマーリセット(i);
             }
             this.bPAUSE = false;
         }
