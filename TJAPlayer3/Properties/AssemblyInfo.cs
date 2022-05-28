@@ -33,8 +33,8 @@ using System.Resources;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.3.2")]
-[assembly: AssemblyFileVersion("0.5.3.2")]
+[assembly: AssemblyVersion("0.5.4")]
+[assembly: AssemblyFileVersion("0.5.4")]
 [assembly: NeutralResourcesLanguage("ja-JP")]
 
 // このアセンブリは「ライブラリ」である（難読化ツールへの指示）。

@@ -206,7 +206,7 @@ namespace TJAPlayer3
 				{
 					return 0;
 				}
-				int time = (int) ( ( CSound管理.rc演奏用タイマ.n現在時刻 - this.n移動開始時刻ms ) * ( ( (double) TJAPlayer3.ConfigIni.n演奏速度 ) / 20.0 ) );
+				int time = (int) (( CSound管理.rc演奏用タイマ.n現在時刻 - this.n移動開始時刻ms) * ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
                 int frameNoFromTime = 0;
 
                 #region[ frameNoFromTime ]
@@ -215,7 +215,7 @@ namespace TJAPlayer3
                     if ( this.fAVIアスペクト比 > 1.77f )
                     {
                         this.dsBGV.dshow.MediaSeeking.GetPositions(out this.lDshowPosition, out this.lStopPosition);
-                        frameNoFromTime = (int)lDshowPosition;
+                        frameNoFromTime = (int)(lDshowPosition);
                     }
                     else
                     {
@@ -224,7 +224,7 @@ namespace TJAPlayer3
                 }
                 #endregion
 
-				if ( ( this.n総移動時間ms != 0 ) && ( this.n総移動時間ms < time ) )
+                if ( ( this.n総移動時間ms != 0 ) && ( this.n総移動時間ms < time ) )
 				{
 					this.n総移動時間ms = 0;
 					this.n移動開始時刻ms = -1;

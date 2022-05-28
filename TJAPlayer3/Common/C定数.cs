@@ -179,6 +179,14 @@ namespace TJAPlayer3
 		HYPERRANDOM
 	}
 
+	public enum EFunMods
+    {
+		NONE,
+		AVALANCHE,
+		MINESWEEPER,
+		TOTAL,
+    }
+
 	public enum EGameType
     {
 		TAIKO = 0,

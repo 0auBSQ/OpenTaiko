@@ -31,6 +31,7 @@ namespace TJAPlayer3
         public void tAttachOnlineAddress(string url)
         {
             data.url = url;
+            tSaveFile();
         }
 
         public void tGenerateUniqueID()

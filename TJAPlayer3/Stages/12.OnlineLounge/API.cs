@@ -16,6 +16,10 @@ namespace TJAPlayer3
             public string charter_name;
         }
 
+        public class APIGenreInfo
+        {
+            public string genre;
+        }
 
         public class APISongData
         {
@@ -34,6 +38,7 @@ namespace TJAPlayer3
 
             // Additional
             public APICharterInfo charter;
+            public APIGenreInfo Genre;
         }
 
         #region [ContractResolver override for properties]
@@ -67,6 +72,8 @@ namespace TJAPlayer3
                     {"D5", cdnData.Hooks.difficulties[5]},
                     {"D6", cdnData.Hooks.difficulties[6]},
                     {"Tower", cdnData.Hooks.life},
+                    {"Genre", cdnData.Hooks.genre},
+                    {"genre", GetAssignedLanguageValue(cdnData.Hooks.genreSub)},
                 };
             }
 

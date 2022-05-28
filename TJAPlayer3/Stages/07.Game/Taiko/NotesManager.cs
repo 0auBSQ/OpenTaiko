@@ -250,7 +250,7 @@ namespace TJAPlayer3
         // Regular display
         public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = 130)
         {
-            if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.OFF || !chip.bShow)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow)
                 return;
 
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
@@ -281,7 +281,7 @@ namespace TJAPlayer3
         {
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
-            if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
                 return;
 
             int _offset = IsBigRoll(chip) ? 390 : 0;

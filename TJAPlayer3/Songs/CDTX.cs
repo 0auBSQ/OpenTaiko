@@ -1698,14 +1698,60 @@ namespace TJAPlayer3
             string str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return new string(new char[] { str[n / 36], str[n % 36] });
         }
-        public void tギターとベースのランダム化(E楽器パート part, Eランダムモード eRandom)
+
+        public void tApplyFunMods(int player = 0)
         {
+            Random rnd = new System.Random();
+
+            var eFun = TJAPlayer3.ConfigIni.nFunMods[TJAPlayer3.GetActualPlayer(player)];
+
+            switch (eFun)
+            {
+                case EFunMods.MINESWEEPER:
+                    foreach (var chip in this.listChip)
+                    {
+                        int n = rnd.Next(100);
+
+                        if (n >= 0 && n <= 20)
+                        {
+                            if (NotesManager.IsMissableNote(chip))
+                            {
+                                chip.nチャンネル番号 = 0x1C;
+                            }
+
+                            /*
+                            switch (chip.nチャンネル番号)
+                            {
+                                case 0x10:
+                                    chip.nチャンネル番号 = 0x1C;
+                                    break;
+                            }
+                            */
+                        }
+                    }
+                    break;
+                case EFunMods.AVALANCHE:
+                    foreach (var chip in this.listChip)
+                    {
+                        int n = rnd.Next(100);
+
+
+                        chip.dbSCROLL *= (n + 50) / (double)100;
+                    }
+                    break;
+                case EFunMods.NONE:
+                default:
+                    break;
+            }
         }
-        public void t太鼓チップのランダム化(Eランダムモード eRandom)
+
+        public void tRandomizeTaikoChips(int player = 0)
         {
             //2016.02.11 kairera0467
-            //なんだよこのクソ実装は(怒)
+
             Random rnd = new System.Random();
+
+            var eRandom = TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.GetActualPlayer(player)];
 
             switch (eRandom)
             {
@@ -1734,9 +1780,9 @@ namespace TJAPlayer3
                 case Eランダムモード.RANDOM:
                     foreach (var chip in this.listChip)
                     {
-                        int n = rnd.Next(50);
+                        int n = rnd.Next(100);
 
-                        if (n >= 5 && n <= 10)
+                        if (n >= 0 && n <= 20)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1761,9 +1807,9 @@ namespace TJAPlayer3
                 case Eランダムモード.SUPERRANDOM:
                     foreach (var chip in this.listChip)
                     {
-                        int n = rnd.Next(80);
+                        int n = rnd.Next(100);
 
-                        if (n >= 3 && n <= 43)
+                        if (n >= 0 && n <= 50)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1790,7 +1836,7 @@ namespace TJAPlayer3
                     {
                         int n = rnd.Next(100);
 
-                        if (n >= 20 && n <= 80)
+                        if (n >= 0 && n <= 80)
                         {
                             switch (chip.nチャンネル番号)
                             {
@@ -1816,6 +1862,7 @@ namespace TJAPlayer3
                 default:
                     break;
             }
+
             if (eRandom != Eランダムモード.OFF)
             {
                 #region[ list作成 ]
@@ -4494,13 +4541,16 @@ namespace TJAPlayer3
                                         chip.nSenote = 0xC;
                                         break;
                                     case 9:
-                                        chip.nSenote = 0xD;
+                                        chip.nSenote = 0xB;
                                         break;
-                                    case 10:
-                                        chip.nSenote = 0xE;
+                                    case 0xA:
+                                        chip.nSenote = 5;
                                         break;
-                                    case 11:
-                                        chip.nSenote = 0xF;
+                                    case 0xB:
+                                        chip.nSenote = 6;
+                                        break;
+                                    case 0xF1:
+                                        chip.nSenote = 5;
                                         break;
                                 }
                                 #endregion
@@ -5987,7 +6037,7 @@ namespace TJAPlayer3
                         }
 
                         //ドコドコドン
-                        if (time[DATA - 3] >= 3.4 && time[DATA - 2] == 2 && time[DATA - 1] == 1 && time[DATA + 1] == 1 && time[DATA + 2] == 2 && time[DATA + 3] >= 3.4 && sort[DATA - 2] == 0x93 && sort[DATA - 1] == 0x11 && sort[DATA + 1] == 0x11 && sort[DATA + 2] == 0x11)
+                        if (time[DATA - 3] >= 3.4 && time[DATA - 2] == 2 && time[DATA - 1] == 1 && time[DATA + 1] == 1 && time[DATA + 2] == 2 && time[DATA + 3] >= 3.4 && sort[DATA - 2] == 0x11 && sort[DATA - 1] == 0x11 && sort[DATA + 1] == 0x11 && sort[DATA + 2] == 0x11)
                         {
                             list音符のみのリスト[i - 2].nSenote = 1;
                             list音符のみのリスト[i - 1].nSenote = 2;
