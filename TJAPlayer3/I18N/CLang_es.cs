@@ -354,8 +354,8 @@ namespace TJAPlayer3
             [9014] = "Voz",
             [9015] = "Instrumento",
             [9016] = "Cauteloso",
-            [9017] = "Safe",
-            [9018] = "Just",
+            [9017] = "Seguro",
+            [9018] = "Exacto",
             
             [9100] = "Buscar (Dificultad)",
             [9101] = "Dificultad",
