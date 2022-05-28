@@ -280,8 +280,8 @@ namespace TJAPlayer3
             [407] = "Multijugador en línea",
 
             [500] = "Timing",
-            [501] = "Loose",
-            [502] = "Lenient",
+            [501] = "Relajado",
+            [502] = "Leve",
             [503] = "Normal",
             [504] = "Estricto",
             [505] = "Rigoroso",
