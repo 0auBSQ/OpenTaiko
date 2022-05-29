@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using TJAPlayer3.C曲リストノードComparers;
 using FDK;
@@ -112,12 +113,17 @@ namespace TJAPlayer3
 
 			if (downloadBox != null)
             {
+
 				var flatten = TJAPlayer3.stage選曲.act曲リスト.flattenList(downloadBox.list子リスト);
+				
+				// Works because flattenList creates a new List
 				for (int i = 0; i < downloadBox.list子リスト.Count; i++)
 				{
+					CSongDict.tRemoveSongNode(downloadBox.list子リスト[i].uniqueId);
 					downloadBox.list子リスト.Remove(downloadBox.list子リスト[i]);
 					i--;
 				}
+				
 
 				var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
 
@@ -125,12 +131,20 @@ namespace TJAPlayer3
 				{
 					int index = list曲ルート.IndexOf(flatten[0]);
 
+					/*
 					if (!list曲ルート.Contains(downloadBox))
 					{
 						for (int i = 0; i < flatten.Count; i++)
 						{
 							this.list曲ルート.Remove(flatten[i]);
 						}
+						list曲ルート.Insert(index, downloadBox);
+					}
+					*/
+
+					if (!list曲ルート.Contains(downloadBox))
+					{
+						this.list曲ルート = this.list曲ルート.Except(flatten).ToList();
 						list曲ルート.Insert(index, downloadBox);
 					}
 
@@ -436,6 +450,7 @@ namespace TJAPlayer3
 								c曲リストノード.uniqueId = dtx.uniqueID;
 
 								CSongDict.tAddSongNode(c曲リストノード.uniqueId.data.id, c曲リストノード);
+								CSongDict.tAddSongUrl(c曲リストノード.uniqueId.data.url, c曲リストノード);
 
 								c曲リストノード.arスコア[ n ] = new Cスコア();
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス = str基点フォルダ + fileinfo.Name;

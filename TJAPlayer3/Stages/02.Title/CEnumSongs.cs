@@ -370,6 +370,7 @@ namespace TJAPlayer3
 				{
 					if ( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.str曲データ検索パス ) )
 					{
+						CSongDict.tClearSongNodes();
 						string[] strArray = TJAPlayer3.ConfigIni.str曲データ検索パス.Split( new char[] { ';' } );
 						if ( strArray.Length > 0 )
 						{

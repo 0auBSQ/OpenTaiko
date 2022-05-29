@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace TJAPlayer3
 {
+    [Serializable()]
     internal class CSongUniqueID
     {
         public CSongUniqueID(string path)

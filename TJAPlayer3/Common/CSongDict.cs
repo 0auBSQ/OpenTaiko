@@ -37,6 +37,24 @@ namespace TJAPlayer3
                 nodes.Add(id, node.Clone());
         }
 
+        public static void tAddSongUrl(string url, C曲リストノード node)
+        {
+
+        }
+
+        public static void tRemoveSongNode(CSongUniqueID sid)
+        {
+            if (sid != null && nodes.ContainsKey(sid.data.id))
+            {
+                nodes.Remove(sid.data.id);
+            }
+        }
+
+        public static void tClearSongNodes()
+        {
+            nodes.Clear();
+        }
+
         #endregion
 
         #region [Extra methods]
