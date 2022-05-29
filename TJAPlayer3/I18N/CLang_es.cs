@@ -183,15 +183,15 @@ namespace TJAPlayer3
             [10012] = "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J2.",
             [10013] = "Azul derecho J2",
             [10014] = "Asigna un botón o un pad para\n el Ka (azul) derecho del J2.",
-            [10018] = "TimeStretch",
+            [10018] = "Time Stretch",
             [10019] = "Pantalla completa",
-            [10020] = "StageFailed",
+            [10020] = "Fin del juego",
             [10021] = "Usar subcarpetas en random",
             [10022] = "Sincronización vertical",
-            [10023] = "AVI",
+            [10023] = "Reproducción de video",
             [10024] = "BGA",
             [10025] = "Delay de la demo",
-            [10026] = "PreImageWait",
+            [10026] = "Delay de la imagen",
             [10027] = "Informacion Debug",
             [10028] = "Transparencia del fondo",
             [10029] = "Volumen de música de fondo",
@@ -227,6 +227,10 @@ namespace TJAPlayer3
                 "     aplicar los cambios.",
             [10058] = "Volumen de la demo",
             [10059] = "Ajusta el volumen de la demo de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+            [10060] = "Aplauso",
+            [10061] = "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso.",
+            [10062] = "AplausoP2",
+            [10063] = "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso P2.",
             [10084] = "Modo Shinuchi",
             [10091] = "Ajustes generales del simulador.",
             [10092] = "Ajustes para los controles.",
@@ -255,7 +259,7 @@ namespace TJAPlayer3
             [155] = "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
             [156] = "¡Cambia tu estilo de juego\n o ajustes generales!",
             [157] = "Salir del juego.\n¡Hasta la próxima!",
-            
+
             [200] = "Regresar",
             [201] = "Canciones jugadas recientemente",
             [202] = "¡Juega las canciones que jugaste recientemente!",
@@ -298,7 +302,7 @@ namespace TJAPlayer3
             [1001] = "P",
             [1002] = "P",
             [1003] = "Puntuación",
-            
+
             [1010] = "Indicador de almas",
             [1011] = "Cantidad de Perfectas",
             [1012] = "Cantidad de OK",
@@ -316,14 +320,14 @@ namespace TJAPlayer3
             [1032] = "Personaje",
             [1033] = "Título de Dan",
             [1034] = "Título de la placa",
-            
+
             [1040] = "Fácil",
             [1041] = "Normal",
             [1042] = "Difícil",
             [1043] = "Extremo",
             [1044] = "Extra",
             [1045] = "Extremo / Extra",
-            
+
             [90000] = "[ERROR] Condicion no valida",
             [90001] = "Item solamente disponible en la tienda.",
             [90002] = "Precio: ",
@@ -334,7 +338,7 @@ namespace TJAPlayer3
             [900] = "Reanudar",
             [901] = "Reiniciar",
             [902] = "Salir",
-            
+
             [910] = "AI",
             [911] = "Deus-Ex-Machina",
 
@@ -356,7 +360,7 @@ namespace TJAPlayer3
             [9016] = "Cauteloso",
             [9017] = "Seguro",
             [9018] = "Exacto",
-            
+
             [9100] = "Buscar (Dificultad)",
             [9101] = "Dificultad",
             [9102] = "Nivel",
