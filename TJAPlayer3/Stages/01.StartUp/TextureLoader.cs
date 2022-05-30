@@ -1348,7 +1348,7 @@ namespace TJAPlayer3
                                 strCommand = strArray[0].Trim();
                                 strParam = strArray[1].Trim();
 
-                                if (strCommand == "Title_Entry_Chara_X")
+                                if (strCommand == "Title_Chara_Entry_X")
                                 {
                                     string[] strSplit = strParam.Split(',');
                                     for (int k = 0; k < 2; k++)
