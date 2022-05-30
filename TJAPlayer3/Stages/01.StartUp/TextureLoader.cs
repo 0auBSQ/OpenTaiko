@@ -1300,14 +1300,15 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Skin.Characters_Title_Entry_X[i] = new int[] { 485, 485 };
                 TJAPlayer3.Skin.Characters_Title_Entry_Y[i] = new int[] { 140, 140 };
+
                 TJAPlayer3.Skin.Characters_Title_Normal_X[i] = new int[] { 0, 981 };
                 TJAPlayer3.Skin.Characters_Title_Normal_Y[i] = new int[] { 341, 341 };
+
                 TJAPlayer3.Skin.Characters_Menu_X[i] = new int[] { 0, 981 };
                 TJAPlayer3.Skin.Characters_Menu_Y[i] = new int[] { 330, 330 };
+
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
-                TJAPlayer3.Skin.Characters_Result_X[i] = new int[] { 202, 1138 };
-                TJAPlayer3.Skin.Characters_Result_Y[i] = new int[] { 532, 532 };
                 TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
@@ -1319,6 +1320,9 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Timer[i] = 28;
                 TJAPlayer3.Skin.Characters_Balloon_Delay[i] = 500;
                 TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = 84;
+
+                TJAPlayer3.Skin.Characters_Result_X[i] = new int[] { 202, 1138 };
+                TJAPlayer3.Skin.Characters_Result_Y[i] = new int[] { 532, 532 };
 
                 #endregion
 
@@ -1352,7 +1356,7 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Title_Entry_X[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
-                                else if (strCommand == "Title_Entry_Chara_Y")
+                                else if (strCommand == "Title_Chara_Entry_Y")
                                 {
                                     string[] strSplit = strParam.Split(',');
                                     for (int k = 0; k < 2; k++)
@@ -1360,7 +1364,8 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Title_Entry_Y[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
-                                else if (strCommand == "Title_Normal_Chara_X")
+
+                                else if (strCommand == "Title_Chara_Normal_X")
                                 {
                                     string[] strSplit = strParam.Split(',');
                                     for (int k = 0; k < 2; k++)
@@ -1368,7 +1373,7 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Title_Normal_X[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
-                                else if (strCommand == "Title_Normal_Chara_Y")
+                                else if (strCommand == "Title_Chara_Normal_Y")
                                 {
                                     string[] strSplit = strParam.Split(',');
                                     for (int k = 0; k < 2; k++)
@@ -1376,6 +1381,7 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Title_Normal_Y[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
+
                                 else if (strCommand == "Menu_Chara_X")
                                 {
                                     string[] strSplit = strParam.Split(',');
@@ -1406,22 +1412,6 @@ namespace TJAPlayer3
                                     for (int k = 0; k < 2; k++)
                                     {
                                         TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
-                                    }
-                                }
-                                else if (strCommand == "Result_Chara_X")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        TJAPlayer3.Skin.Characters_Result_X[i][k] = int.Parse(strSplit[k]);
-                                    }
-                                }
-                                else if (strCommand == "Result_Chara_Y")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        TJAPlayer3.Skin.Characters_Result_Y[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
                                 else if (strCommand == "Game_Chara_Balloon_X")
@@ -1479,6 +1469,22 @@ namespace TJAPlayer3
                                 else if (strCommand == "Game_Chara_Beat_GoGo")
                                 {
                                     TJAPlayer3.Skin.Characters_Beat_GoGo[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Result_Chara_X")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_X[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Result_Chara_Y")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
                                 }
 
                             }
