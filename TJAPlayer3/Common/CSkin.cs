@@ -2698,6 +2698,17 @@ namespace TJAPlayer3
 
         // Config
 
+        public int[][] Characters_Title_Entry_X;
+        public int[][] Characters_Title_Entry_Y;
+        public int[][] Characters_Title_Normal_X;
+        public int[][] Characters_Title_Normal_Y;
+
+        public int[][] Characters_Menu_X;
+        public int[][] Characters_Menu_Y;
+
+        public int[][] Characters_Result_X;
+        public int[][] Characters_Result_Y;
+
         public int[][] Characters_X;
         public int[][] Characters_Y;
         public int[][] Characters_Balloon_X;

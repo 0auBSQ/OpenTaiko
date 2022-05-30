@@ -613,14 +613,19 @@ namespace TJAPlayer3
 
 					#region [Character Animations]
 
+					int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(p)];
+
+					int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][p];
+					int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][p];
+
 					if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
-						CResultCharacter.tMenuDisplayCharacter(p, 202, 532, CResultCharacter.ECharacterResult.CLEAR, pos);
+						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.CLEAR, pos);
 					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
-						CResultCharacter.tMenuDisplayCharacter(p, 202, 532, CResultCharacter.ECharacterResult.FAILED, pos);
+						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.FAILED, pos);
 					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED_IN))
-						CResultCharacter.tMenuDisplayCharacter(p, 202, 532, CResultCharacter.ECharacterResult.FAILED_IN, pos);
+						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.FAILED_IN, pos);
 					else
-						CResultCharacter.tMenuDisplayCharacter(p, 202, 532, CResultCharacter.ECharacterResult.NORMAL, pos);
+						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.NORMAL, pos);
 
 					#endregion
 

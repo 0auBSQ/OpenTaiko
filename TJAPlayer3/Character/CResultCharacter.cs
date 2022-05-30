@@ -240,7 +240,7 @@ namespace TJAPlayer3
                 else
                 {
                     _ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(TJAPlayer3.app.Device,
-                        1340 - x - ((_substitute == true) ? 20 : 0),
+                        x - ((_substitute == true) ? 20 : 0),
                         y - ((_substitute == true) ? 20 : 0)
                         );
                 }
