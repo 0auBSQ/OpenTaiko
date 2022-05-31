@@ -964,6 +964,7 @@ namespace TJAPlayer3
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Missed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Normal_MissedDown = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Cleared = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Maxed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_GoGoTime = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -990,6 +991,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.Skin.Characters_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_Missed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_GoGoTime_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1028,10 +1030,12 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Balloon_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Motion_Normal = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Motion_Miss = new string[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Motion_MissDown = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Motion_Clear = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Motion_GoGo = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Normal = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Miss = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_MissDown = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Clear = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_GoGo = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Timer = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1128,6 +1132,9 @@ namespace TJAPlayer3
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i]; j++)
                     Characters_Normal_Missed[i][j]?.Dispose();
 
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i]; j++)
+                    Characters_Normal_MissedDown[i][j]?.Dispose();
+
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]; j++)
                     Characters_Normal_Cleared[i][j]?.Dispose();
 
@@ -1185,6 +1192,7 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Skin.Characters_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Normal\");
                 TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Miss\");
+                TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\MissDown\");
                 TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Clear\");
                 TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Clear_Max\");
                 TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\GoGo\");
@@ -1211,6 +1219,7 @@ namespace TJAPlayer3
 
                 Characters_Normal[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Ptn[i]];
                 Characters_Normal_Missed[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i]];
+                Characters_Normal_MissedDown[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i]];
                 Characters_Normal_Cleared[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]];
                 Characters_Normal_Maxed[i] = new CTexture[TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]];
                 Characters_GoGoTime[i] = new CTexture[TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]];
@@ -1271,6 +1280,9 @@ namespace TJAPlayer3
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i]; j++)
                     Characters_Normal_Missed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Miss\" + j.ToString() + @".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i]; j++)
+                    Characters_Normal_MissedDown[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\MissDown\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]; j++)
                     Characters_Normal_Cleared[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Clear\" + j.ToString() + @".png");
@@ -1335,10 +1347,12 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
                 TJAPlayer3.Skin.Characters_Motion_Miss[i] = "0";
+                TJAPlayer3.Skin.Characters_Motion_MissDown[i] = "0";
                 TJAPlayer3.Skin.Characters_Motion_Clear[i] = "0";
                 TJAPlayer3.Skin.Characters_Motion_GoGo[i] = "0";
                 TJAPlayer3.Skin.Characters_Beat_Normal[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Miss[i] = 1;
+                TJAPlayer3.Skin.Characters_Beat_MissDown[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Clear[i] = 2;
                 TJAPlayer3.Skin.Characters_Beat_GoGo[i] = 2;
                 TJAPlayer3.Skin.Characters_Balloon_Timer[i] = 28;
@@ -1478,6 +1492,10 @@ namespace TJAPlayer3
                                 {
                                     TJAPlayer3.Skin.Characters_Motion_Miss[i] = strParam;
                                 }
+                                else if (strCommand == "Game_Chara_Motion_MissDown")
+                                {
+                                    TJAPlayer3.Skin.Characters_Motion_MissDown[i] = strParam;
+                                }
                                 else if (strCommand == "Game_Chara_Motion_Clear")
                                 {
                                     TJAPlayer3.Skin.Characters_Motion_Clear[i] = strParam;
@@ -1493,6 +1511,10 @@ namespace TJAPlayer3
                                 else if (strCommand == "Game_Chara_Beat_Miss")
                                 {
                                     TJAPlayer3.Skin.Characters_Beat_Miss[i] = int.Parse(strParam);
+                                }
+                                else if (strCommand == "Game_Chara_Beat_MissDown")
+                                {
+                                    TJAPlayer3.Skin.Characters_Beat_MissDown[i] = int.Parse(strParam);
                                 }
                                 else if (strCommand == "Game_Chara_Beat_Clear")
                                 {
@@ -1963,6 +1985,7 @@ namespace TJAPlayer3
 
         public CTexture[][] Characters_Normal,
             Characters_Normal_Missed,
+            Characters_Normal_MissedDown,
             Characters_Normal_Cleared,
             Characters_Normal_Maxed,
             Characters_GoGoTime,

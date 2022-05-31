@@ -288,6 +288,7 @@ namespace TJAPlayer3
             this.n現在の連打数 = new int[]{ 0, 0, 0, 0 };
             this.n合計連打数 = new int[]{ 0, 0, 0, 0 };
             this.n分岐した回数 = new int[ 4 ];
+            this.Chara_MissCount = new int[4];
             for (int i = 0; i < 2; i++)
             {
                 ShownLyric[i] = 0;
@@ -671,6 +672,7 @@ namespace TJAPlayer3
         private int[] n合計連打数 = new int[ 4 ];
         protected int[] n風船残り = new int[ 4 ];
         protected int[] n現在の連打数 = new int[ 4 ];
+        public int[] Chara_MissCount;
         protected E連打State eRollState;
 
         protected int nタイマ番号;
@@ -1590,6 +1592,7 @@ namespace TJAPlayer3
 
                                     this.CBranchScore[nPlayer].nGreat++;
                                     this.CChartScore[nPlayer].nGreat++;
+                                    this.Chara_MissCount[nPlayer] = 0;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Perfect++;
                                     this.actCombo.n現在のコンボ数[nPlayer]++;
@@ -1619,6 +1622,7 @@ namespace TJAPlayer3
                                 {
                                     this.CBranchScore[nPlayer].nGood++;
                                     this.CChartScore[nPlayer].nGood++;
+                                    this.Chara_MissCount[nPlayer] = 0;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Great++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ]++;
@@ -1658,6 +1662,7 @@ namespace TJAPlayer3
 
                                     this.CBranchScore[nPlayer].nMiss++;
                                     this.CChartScore[nPlayer].nMiss++;
+                                    this.Chara_MissCount[nPlayer]++;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Miss++;
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
@@ -1687,6 +1692,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nGreat++;
                                         this.CChartScore[nPlayer].nGreat++;
+                                        this.Chara_MissCount[nPlayer] = 0;
 
                                         if ( nPlayer == 0 ) this.nヒット数_Auto含む.Drums.Perfect++;
                                         this.actCombo.n現在のコンボ数[ nPlayer ]++;
@@ -1720,6 +1726,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nGood++;
                                         this.CChartScore[nPlayer].nGood++;
+                                        this.Chara_MissCount[nPlayer] = 0;
 
                                         if (nPlayer == 0) this.nヒット数_Auto含む.Drums.Great++;
                                         this.actCombo.n現在のコンボ数[nPlayer]++;
@@ -1757,6 +1764,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nMiss++;
                                         this.CChartScore[nPlayer].nMiss++;
+                                        this.Chara_MissCount[nPlayer]++;
 
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                         this.actComboVoice.tReset(nPlayer);
@@ -3190,6 +3198,16 @@ namespace TJAPlayer3
                                         this.actChara.ctChara_Miss[nPlayer] = new CCounter();
                                     }
 
+                                    if (TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[chara] != 0)
+                                    {
+                                        double dbPtn_MissDown = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_MissDown[chara] / this.actChara.arMissDownモーション番号[nPlayer].Length / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
+                                        this.actChara.ctChara_MissDown[nPlayer] = new CCounter(0, this.actChara.arMissDownモーション番号[nPlayer].Length - 1, dbPtn_MissDown, CSound管理.rc演奏用タイマ);
+                                    }
+                                    else
+                                    {
+                                        this.actChara.ctChara_MissDown[nPlayer] = new CCounter();
+                                    }
+
                                     if (TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[chara] != 0)
                                     {
                                         double dbPtn_Clear = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_Clear[chara] / this.actChara.arクリアモーション番号[nPlayer].Length / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
@@ -3402,6 +3420,15 @@ namespace TJAPlayer3
                                 else
                                 {
                                     this.actChara.ctChara_Miss[nPlayer] = new CCounter();
+                                }
+                                if (TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[chara] != 0)
+                                {
+                                    double dbPtn_MissDown = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_MissDown[chara] / this.actChara.arMissDownモーション番号[nPlayer].Length / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0);
+                                    this.actChara.ctChara_MissDown[nPlayer] = new CCounter(0, this.actChara.arMissDownモーション番号[nPlayer].Length - 1, dbPtn_MissDown, CSound管理.rc演奏用タイマ);
+                                }
+                                else
+                                {
+                                    this.actChara.ctChara_MissDown[nPlayer] = new CCounter();
                                 }
                                 if (TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[chara] != 0)
                                 {

@@ -31,6 +31,7 @@ namespace TJAPlayer3
             {
                 ctChara_Normal[i] = new CCounter();
                 ctChara_Miss[i] = new CCounter();
+                ctChara_MissDown[i] = new CCounter();
                 ctChara_GoGo[i] = new CCounter();
                 ctChara_Clear[i] = new CCounter();
 
@@ -84,6 +85,7 @@ namespace TJAPlayer3
             {
                 ctChara_Normal[i] = null;
                 ctChara_Miss[i] = null;
+                ctChara_MissDown[i] = null;
                 ctChara_GoGo[i] = null;
                 ctChara_Clear[i] = null;
                 this.ctキャラクターアクション_10コンボ[i] = null;
@@ -111,16 +113,19 @@ namespace TJAPlayer3
             {
                 this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Normal[this.iCurrentCharacter[i]]);
                 this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Miss[this.iCurrentCharacter[i]]);
+                this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_MissDown[this.iCurrentCharacter[i]]);
                 this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_GoGo[this.iCurrentCharacter[i]]);
                 this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Clear[this.iCurrentCharacter[i]]);
 
                 if (arモーション番号[i] == null) this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
                 if (arMissモーション番号[i] == null) this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                if (arMissDownモーション番号[i] == null) this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
                 if (arゴーゴーモーション番号[i] == null) this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
                 if (arクリアモーション番号[i] == null) this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
 
                 ctChara_Normal[i] = new CCounter(0, arモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 ctChara_Miss[i] = new CCounter(0, arMissモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
+                ctChara_MissDown[i] = new CCounter(0, arMissDownモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 ctChara_GoGo[i] = new CCounter(0, arゴーゴーモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 ctChara_Clear[i] = new CCounter(0, arクリアモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].n現在の値 = (int)CharaAction_Balloon_Delay[i].n終了値;
@@ -144,6 +149,7 @@ namespace TJAPlayer3
 
                 if (ctChara_Normal != null || TJAPlayer3.Skin.Characters_Normal_Ptn[Character] != 0) ctChara_Normal[i].t進行LoopDb();
                 if (ctChara_Miss != null || TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[Character] != 0) ctChara_Miss[i].t進行LoopDb();
+                if (ctChara_MissDown != null || TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[Character] != 0) ctChara_MissDown[i].t進行LoopDb();
                 if (ctChara_GoGo != null || TJAPlayer3.Skin.Characters_GoGoTime_Ptn[Character] != 0) ctChara_GoGo[i].t進行LoopDb();
                 if (ctChara_Clear != null || TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0) ctChara_Clear[i].t進行LoopDb();
 
@@ -192,9 +198,13 @@ namespace TJAPlayer3
                         }
                         else
                         {
-                            //if (TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[Character] != 0)
+                            if (TJAPlayer3.stage演奏ドラム画面.Chara_MissCount[i] < 6 || TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[Character] == 0)
                             {
                                 TJAPlayer3.Tx.Characters_Normal_Missed[Character][this.arMissモーション番号[i][(int)this.ctChara_Miss[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][this.arMissDownモーション番号[i][(int)this.ctChara_MissDown[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
                             }
                         }
                     }
@@ -427,6 +437,7 @@ namespace TJAPlayer3
 
         public int[][] arモーション番号 = new int[2][];
         public int[][] arMissモーション番号 = new int[2][];
+        public int[][] arMissDownモーション番号 = new int[2][];
         public int[][] arゴーゴーモーション番号 = new int[2][];
         public int[][] arクリアモーション番号 = new int[2][];
 
@@ -444,6 +455,7 @@ namespace TJAPlayer3
 
         public CCounter[] ctChara_Normal = new CCounter[2];
         public CCounter[] ctChara_Miss = new CCounter[2];
+        public CCounter[] ctChara_MissDown = new CCounter[2];
         public CCounter[] ctChara_GoGo = new CCounter[2];
         public CCounter[] ctChara_Clear = new CCounter[2];
 
