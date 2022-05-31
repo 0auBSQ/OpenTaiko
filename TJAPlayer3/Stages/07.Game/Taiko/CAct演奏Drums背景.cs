@@ -626,9 +626,9 @@ namespace TJAPlayer3
                             float thirdy = 0;
                             float thirdx = 0;
 
-                            if (this.ct上背景スクロール用タイマー3rd[j].n現在の値 <= 270)
+                            if (this.ct上背景スクロール用タイマー3rd[i].n現在の値 <= 270)
                             {
-                                thirdx = this.ct上背景スクロール用タイマー3rd[j].n現在の値 * 0.9258f;
+                                thirdx = this.ct上背景スクロール用タイマー3rd[i].n現在の値 * 0.9258f;
                                 thirdy = (float)Math.Sin((float)this.ct上背景スクロール用タイマー3rd[j].n現在の値 * (Math.PI / 270.0f)) * 40.0f;
                             }
                             else
@@ -639,7 +639,7 @@ namespace TJAPlayer3
                                 else thirdy = -((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f) + (float)(((this.ct上背景スクロール用タイマー3rd[j].n現在の値 - 490) / 110f) * ((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f));
                             }
 
-                            this.Background_Up_3rd[2].t2D描画(TJAPlayer3.app.Device, 0 - thirdx, 0 + i * 540 - thirdy);
+                            this.Background_Up_3rd[2].t2D描画(TJAPlayer3.app.Device, 0 - thirdx, 0 + j * 540 - thirdy);
 
                             for (int l = 1; l < ForLoopF + 1; l++)
                             {
