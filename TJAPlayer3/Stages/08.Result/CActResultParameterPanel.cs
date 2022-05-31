@@ -615,8 +615,8 @@ namespace TJAPlayer3
 
 					int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(p)];
 
-					int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][p];
-					int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][p];
+					int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
+					int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
 					if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.CLEAR, pos);
