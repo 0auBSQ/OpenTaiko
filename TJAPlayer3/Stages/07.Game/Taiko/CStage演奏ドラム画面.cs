@@ -246,6 +246,24 @@ namespace TJAPlayer3
                 {
                     this.actChara.ctChara_Normal[nPlayer] = new CCounter();
                 }
+                if (TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[chara] != 0)
+                {
+                    double dbPtn_Miss = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_Miss[chara] / this.actChara.arMissモーション番号[nPlayer].Length;
+                    this.actChara.ctChara_Miss[nPlayer] = new CCounter(0, this.actChara.arMissモーション番号[nPlayer].Length - 1, dbPtn_Miss, CSound管理.rc演奏用タイマ);
+                }
+                else
+                {
+                    this.actChara.ctChara_Miss[nPlayer] = new CCounter();
+                }
+                if (TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[chara] != 0)
+                {
+                    double dbPtn_MissDown = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_MissDown[chara] / this.actChara.arMissDownモーション番号[nPlayer].Length;
+                    this.actChara.ctChara_MissDown[nPlayer] = new CCounter(0, this.actChara.arMissDownモーション番号[nPlayer].Length - 1, dbPtn_MissDown, CSound管理.rc演奏用タイマ);
+                }
+                else
+                {
+                    this.actChara.ctChara_MissDown[nPlayer] = new CCounter();
+                }
                 if (TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[chara] != 0)
                 {
                     double dbPtn_Clear = (60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM) * TJAPlayer3.Skin.Characters_Beat_Clear[chara] / this.actChara.arクリアモーション番号[nPlayer].Length;

@@ -2673,6 +2673,8 @@ namespace TJAPlayer3
 
         public int Characters_Ptn;
         public int[] Characters_Normal_Ptn,
+            Characters_Normal_Missed_Ptn,
+            Characters_Normal_MissedDown_Ptn,
             Characters_Normal_Cleared_Ptn,
             Characters_Normal_Maxed_Ptn,
             Characters_GoGoTime_Ptn,
@@ -2683,6 +2685,7 @@ namespace TJAPlayer3
             Characters_GoGoStart_Maxed_Ptn,
             Characters_Become_Cleared_Ptn,
             Characters_Become_Maxed_Ptn,
+            Characters_Return_Ptn,
             Characters_Balloon_Breaking_Ptn,
             Characters_Balloon_Broke_Ptn,
             Characters_Balloon_Miss_Ptn,
@@ -2714,9 +2717,13 @@ namespace TJAPlayer3
         public int[][] Characters_Balloon_X;
         public int[][] Characters_Balloon_Y;
         public string[] Characters_Motion_Normal,
+            Characters_Motion_Miss,
+            Characters_Motion_MissDown,
             Characters_Motion_Clear,
             Characters_Motion_GoGo;
         public int[] Characters_Beat_Normal;
+        public int[] Characters_Beat_Miss;
+        public int[] Characters_Beat_MissDown;
         public int[] Characters_Beat_Clear;
         public int[] Characters_Beat_GoGo;
         public int[] Characters_Balloon_Timer;

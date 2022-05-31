@@ -30,6 +30,8 @@ namespace TJAPlayer3
             for(int i = 0; i < 2; i++)
             {
                 ctChara_Normal[i] = new CCounter();
+                ctChara_Miss[i] = new CCounter();
+                ctChara_MissDown[i] = new CCounter();
                 ctChara_GoGo[i] = new CCounter();
                 ctChara_Clear[i] = new CCounter();
 
@@ -39,6 +41,7 @@ namespace TJAPlayer3
                 this.ctキャラクターアクション_ゴーゴースタートMAX[i] = new CCounter();
                 this.ctキャラクターアクション_ノルマ[i] = new CCounter();
                 this.ctキャラクターアクション_魂MAX[i] = new CCounter();
+                this.ctキャラクターアクション_Return[i] = new CCounter();
 
                 CharaAction_Balloon_Breaking[i] = new CCounter();
                 CharaAction_Balloon_Broke[i] = new CCounter();
@@ -81,6 +84,8 @@ namespace TJAPlayer3
             for (int i = 0; i < 2; i++)
             {
                 ctChara_Normal[i] = null;
+                ctChara_Miss[i] = null;
+                ctChara_MissDown[i] = null;
                 ctChara_GoGo[i] = null;
                 ctChara_Clear[i] = null;
                 this.ctキャラクターアクション_10コンボ[i] = null;
@@ -89,6 +94,7 @@ namespace TJAPlayer3
                 this.ctキャラクターアクション_ゴーゴースタートMAX[i] = null;
                 this.ctキャラクターアクション_ノルマ[i] = null;
                 this.ctキャラクターアクション_魂MAX[i] = null;
+                this.ctキャラクターアクション_Return[i] = null;
 
                 CharaAction_Balloon_Breaking[i] = null;
                 CharaAction_Balloon_Broke[i] = null;
@@ -106,14 +112,20 @@ namespace TJAPlayer3
             for (int i = 0; i < 2; i++)
             {
                 this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Normal[this.iCurrentCharacter[i]]);
+                this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Miss[this.iCurrentCharacter[i]]);
+                this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_MissDown[this.iCurrentCharacter[i]]);
                 this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_GoGo[this.iCurrentCharacter[i]]);
                 this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Clear[this.iCurrentCharacter[i]]);
 
                 if (arモーション番号[i] == null) this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                if (arMissモーション番号[i] == null) this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                if (arMissDownモーション番号[i] == null) this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
                 if (arゴーゴーモーション番号[i] == null) this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
                 if (arクリアモーション番号[i] == null) this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
 
                 ctChara_Normal[i] = new CCounter(0, arモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
+                ctChara_Miss[i] = new CCounter(0, arMissモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
+                ctChara_MissDown[i] = new CCounter(0, arMissDownモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 ctChara_GoGo[i] = new CCounter(0, arゴーゴーモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 ctChara_Clear[i] = new CCounter(0, arクリアモーション番号[i].Length - 1, 10, CSound管理.rc演奏用タイマ);
                 if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].n現在の値 = (int)CharaAction_Balloon_Delay[i].n終了値;
@@ -136,6 +148,8 @@ namespace TJAPlayer3
                     break;
 
                 if (ctChara_Normal != null || TJAPlayer3.Skin.Characters_Normal_Ptn[Character] != 0) ctChara_Normal[i].t進行LoopDb();
+                if (ctChara_Miss != null || TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[Character] != 0) ctChara_Miss[i].t進行LoopDb();
+                if (ctChara_MissDown != null || TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[Character] != 0) ctChara_MissDown[i].t進行LoopDb();
                 if (ctChara_GoGo != null || TJAPlayer3.Skin.Characters_GoGoTime_Ptn[Character] != 0) ctChara_GoGo[i].t進行LoopDb();
                 if (ctChara_Clear != null || TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0) ctChara_Clear[i].t進行LoopDb();
 
@@ -145,6 +159,7 @@ namespace TJAPlayer3
                 if (this.ctキャラクターアクション_ゴーゴースタートMAX != null || TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0) this.ctキャラクターアクション_ゴーゴースタートMAX[i].t進行db();
                 if (this.ctキャラクターアクション_ノルマ != null || TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0) this.ctキャラクターアクション_ノルマ[i].t進行db();
                 if (this.ctキャラクターアクション_魂MAX != null || TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[Character] != 0) this.ctキャラクターアクション_魂MAX[i].t進行db();
+                if (this.ctキャラクターアクション_Return != null || TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0) this.ctキャラクターアクション_Return[i].t進行db();
 
                 // Blinking animation during invincibility frames
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
@@ -157,25 +172,39 @@ namespace TJAPlayer3
                 {
                     if (!TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i])
                     {
-                        if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100.0 && TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
+                        if (!TJAPlayer3.stage演奏ドラム画面.bIsMiss[i] || TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[Character] == 0)
                         {
-                            if (TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[Character] != 0)
+                            if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100.0 && TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
                             {
-                                TJAPlayer3.Tx.Characters_Normal_Maxed[Character][this.arクリアモーション番号[i][(int)this.ctChara_Clear[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                if (TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[Character] != 0)
+                                {
+                                    TJAPlayer3.Tx.Characters_Normal_Maxed[Character][this.arクリアモーション番号[i][(int)this.ctChara_Clear[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                }
                             }
-                        }
-                        else if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80.0 && TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
-                        {
-                            if (TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
+                            else if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80.0 && TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
                             {
-                                TJAPlayer3.Tx.Characters_Normal_Cleared[Character][this.arクリアモーション番号[i][(int)this.ctChara_Clear[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                if (TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[Character] != 0)
+                                {
+                                    TJAPlayer3.Tx.Characters_Normal_Cleared[Character][this.arクリアモーション番号[i][(int)this.ctChara_Clear[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                }
+                            }
+                            else
+                            {
+                                if (TJAPlayer3.Skin.Characters_Normal_Ptn[Character] != 0)
+                                {
+                                    TJAPlayer3.Tx.Characters_Normal[Character][this.arモーション番号[i][(int)this.ctChara_Normal[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                }
                             }
                         }
                         else
                         {
-                            if (TJAPlayer3.Skin.Characters_Normal_Ptn[Character] != 0)
+                            if (TJAPlayer3.stage演奏ドラム画面.Chara_MissCount[i] < 6 || TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[Character] == 0)
                             {
-                                TJAPlayer3.Tx.Characters_Normal[Character][this.arモーション番号[i][(int)this.ctChara_Normal[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                                TJAPlayer3.Tx.Characters_Normal_Missed[Character][this.arMissモーション番号[i][(int)this.ctChara_Miss[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][this.arMissDownモーション番号[i][(int)this.ctChara_MissDown[i].n現在の値]].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
                             }
                         }
                     }
@@ -283,6 +312,20 @@ namespace TJAPlayer3
                             this.ctキャラクターアクション_魂MAX[i].n現在の値 = 0;
                         }
                     }
+
+                    if (this.ctキャラクターアクション_Return[i].b進行中)
+                    {
+                        if (TJAPlayer3.Tx.Characters_Return[Character] != null && TJAPlayer3.Skin.Characters_Return_Ptn[Character] != 0)
+                        {
+                            TJAPlayer3.Tx.Characters_Return[Character][(int)this.ctキャラクターアクション_Return[i].n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_X[Character][i], TJAPlayer3.Skin.Characters_Y[Character][i]);
+                        }
+                        if (this.ctキャラクターアクション_Return[i].b終了値に達した)
+                        {
+                            this.bマイどんアクション中[i] = false;
+                            this.ctキャラクターアクション_Return[i].t停止();
+                            this.ctキャラクターアクション_Return[i].n現在の値 = 0;
+                        }
+                    }
                 }
                 if (this.b風船連打中[i] != true && CharaAction_Balloon_Delay[i].b終了値に達した)
                 {
@@ -374,12 +417,14 @@ namespace TJAPlayer3
                 ctキャラクターアクション_ゴーゴースタートMAX[player].t停止();
                 ctキャラクターアクション_ノルマ[player].t停止();
                 ctキャラクターアクション_魂MAX[player].t停止();
+                ctキャラクターアクション_Return[player].t停止();
                 ctキャラクターアクション_10コンボ[player].n現在の値 = 0;
                 ctキャラクターアクション_10コンボMAX[player].n現在の値 = 0;
                 ctキャラクターアクション_ゴーゴースタート[player].n現在の値 = 0;
                 ctキャラクターアクション_ゴーゴースタートMAX[player].n現在の値 = 0;
                 ctキャラクターアクション_ノルマ[player].n現在の値 = 0;
                 ctキャラクターアクション_魂MAX[player].n現在の値 = 0;
+                ctキャラクターアクション_Return[player].n現在の値 = 0;
                 CharaAction_Balloon_Breaking[player]?.t停止();
                 CharaAction_Balloon_Broke[player]?.t停止();
                 CharaAction_Balloon_Miss[player]?.t停止();
@@ -391,6 +436,8 @@ namespace TJAPlayer3
         }
 
         public int[][] arモーション番号 = new int[2][];
+        public int[][] arMissモーション番号 = new int[2][];
+        public int[][] arMissDownモーション番号 = new int[2][];
         public int[][] arゴーゴーモーション番号 = new int[2][];
         public int[][] arクリアモーション番号 = new int[2][];
 
@@ -400,12 +447,15 @@ namespace TJAPlayer3
         public CCounter[] ctキャラクターアクション_ゴーゴースタートMAX = new CCounter[2];
         public CCounter[] ctキャラクターアクション_ノルマ = new CCounter[2];
         public CCounter[] ctキャラクターアクション_魂MAX = new CCounter[2];
+        public CCounter[] ctキャラクターアクション_Return = new CCounter[2];
         public CCounter[] CharaAction_Balloon_Breaking = new CCounter[2];
         public CCounter[] CharaAction_Balloon_Broke = new CCounter[2];
         public CCounter[] CharaAction_Balloon_Miss = new CCounter[2];
         public CCounter[] CharaAction_Balloon_Delay = new CCounter[2];
 
         public CCounter[] ctChara_Normal = new CCounter[2];
+        public CCounter[] ctChara_Miss = new CCounter[2];
+        public CCounter[] ctChara_MissDown = new CCounter[2];
         public CCounter[] ctChara_GoGo = new CCounter[2];
         public CCounter[] ctChara_Clear = new CCounter[2];
 
