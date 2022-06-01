@@ -34,7 +34,7 @@ namespace TJAPlayer3
         const string TOWERSELECT = @"13_TowerSelect\";
 
         // InGame
-        const string DANCER = @"2_Dancer\";
+        public const string DANCER = @"2_Dancer\";
         const string MOB = @"3_Mob\";
         const string COURSESYMBOL = @"4_CourseSymbol\";
         public const string BACKGROUND = @"5_Background\";
@@ -365,24 +365,6 @@ namespace TJAPlayer3
             Judge_Meter = TxC(GAME + @"Judge_Meter.png");
             Bar = TxC(GAME + @"Bar.png");
             Bar_Branch = TxC(GAME + @"Bar_Branch.png");
-
-            #endregion
-
-            #region Dancer
-
-            TJAPlayer3.Skin.Game_Dancer_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + DANCER + @"1\"));
-            if (TJAPlayer3.Skin.Game_Dancer_Ptn != 0)
-            {
-                Dancer = new CTexture[5][];
-                for (int i = 0; i < 5; i++)
-                {
-                    Dancer[i] = new CTexture[TJAPlayer3.Skin.Game_Dancer_Ptn];
-                    for (int p = 0; p < TJAPlayer3.Skin.Game_Dancer_Ptn; p++)
-                    {
-                        Dancer[i][p] = TxC(GAME + DANCER + (i + 1) + @"\" + p.ToString() + ".png");
-                    }
-                }
-            }
 
             #endregion
             
@@ -1725,9 +1707,6 @@ namespace TJAPlayer3
         #endregion
 
 
-        #region 踊り子
-        public CTexture[][] Dancer;
-        #endregion
         #region モブ
         public CTexture[] Mob;
         #endregion
