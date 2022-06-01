@@ -52,7 +52,6 @@ namespace TJAPlayer3
                             Dancer[i] = new CTexture[TJAPlayer3.Skin.Game_Dancer_Ptn];
                             for (int p = 0; p < TJAPlayer3.Skin.Game_Dancer_Ptn; p++)
                             {
-                                //Dancer[i][p] = TJAPlayer3.tテクスチャの生成(GAME + DANCER + (i + 1) + @"\" + p.ToString() + ".png");
                                 Dancer[i][p] = TJAPlayer3.tテクスチャの生成($@"{path}\{(i + 1)}\{p}.png");
                             }
                         }
