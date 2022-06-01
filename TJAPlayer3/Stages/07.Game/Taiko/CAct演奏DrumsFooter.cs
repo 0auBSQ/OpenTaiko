@@ -36,9 +36,12 @@ namespace TJAPlayer3
                 Random random = new Random();
 
                 var upDirs = System.IO.Directory.GetFiles(footerDir);
-                var upPath = upDirs[random.Next(0, upDirs.Length)];
+                if (upDirs.Length > 0)
+                {
+                    var upPath = upDirs[random.Next(0, upDirs.Length)];
 
-                Mob_Footer = TJAPlayer3.tテクスチャの生成(upPath);
+                    Mob_Footer = TJAPlayer3.tテクスチャの生成(upPath);
+                }
             }
 
             base.OnManagedリソースの作成();
