@@ -1552,43 +1552,6 @@ namespace TJAPlayer3
                             }
                             #endregion
 
-                            
-                            #region Dancer
-                            else if (strCommand == "Game_Dancer_X")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    Game_Dancer_X[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Dancer_Y")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    Game_Dancer_Y[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Dancer_Motion")
-                            {
-                                Game_Dancer_Motion = strParam;
-                            }
-                            // Game_Dancer_PtnはTextrueLoader.csで反映されます。
-                            else if (strCommand == "Game_Dancer_Beat")
-                            {
-                                ParseInt32(value => Game_Dancer_Beat = value);
-                            }
-                            else if (strCommand == "Game_Dancer_Gauge")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    Game_Dancer_Gauge[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            #endregion
-
                             #region Mob
                             else if (strCommand == "Game_Mob_Beat")
                             {

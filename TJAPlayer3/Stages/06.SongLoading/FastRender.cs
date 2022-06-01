@@ -15,13 +15,13 @@ namespace TJAPlayer3
 
         public void Render()
         {
-            for (int i = 0; i < 5; i++)
+            /*for (int i = 0; i < 5; i++)
             {
                 for (int k = 0; k < TJAPlayer3.Skin.Game_Dancer_Ptn; k++)
                 {
                     NullCheckAndRender(ref TJAPlayer3.Tx.Dancer[i][k]);
                 }
-            }
+            }*/
 
             NullCheckAndRender(ref TJAPlayer3.Tx.Effects_GoGoSplash);
             NullCheckAndRender(ref TJAPlayer3.Tx.Runner);
