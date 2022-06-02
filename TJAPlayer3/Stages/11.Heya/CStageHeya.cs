@@ -477,7 +477,7 @@ namespace TJAPlayer3
             #region [ Inputs ]
 
             if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
             {
                 if (this.tMove(1))
                 {
@@ -486,7 +486,7 @@ namespace TJAPlayer3
             }
 
             else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
             {
                 if (this.tMove(-1))
                 {
@@ -495,8 +495,7 @@ namespace TJAPlayer3
             }
 
             else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
             {
 
                 #region [Decide]
@@ -608,7 +607,8 @@ namespace TJAPlayer3
                 #endregion
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape) ||
+                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
             {
                 
                 TJAPlayer3.Skin.sound取消音.t再生する();

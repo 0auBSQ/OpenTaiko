@@ -1468,9 +1468,8 @@ namespace TJAPlayer3
 						if (((TJAPlayer3.Pad.b押されたDGB(Eパッド.CY) 
 							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RD)) 
 							|| (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LC) 
-							|| (TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed) 
-							|| (TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed) 
-							|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))))))
+							|| (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) 
+							|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)))))
 						{
 							TJAPlayer3.Skin.sound決定音.t再生する();
 
@@ -1493,8 +1492,7 @@ namespace TJAPlayer3
 							{
 								if (!mqModals.tIsQueueEmpty(0) 
 									&& (
-										TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed)
-										|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed)
+										TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide)
 										|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)
 										)
 									)
@@ -1541,9 +1539,9 @@ namespace TJAPlayer3
 
 
 						if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow) ||
-								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue) ||
+								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) ||
 							TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow) ||
-								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
+								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
 						{
 							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                             {

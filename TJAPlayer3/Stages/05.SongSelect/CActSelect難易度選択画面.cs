@@ -199,17 +199,17 @@ namespace TJAPlayer3
             {
                 if (!bSelect[0] && !isOnOption())
                 {
-                    if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
+                    if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
                     {
                         TJAPlayer3.Skin.sound変更音.t再生する();
                         this.t次に移動(0);
                     }
-                    else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
+                    else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
                     {
                         TJAPlayer3.Skin.sound変更音.t再生する();
                         this.t前に移動(0);
                     }
-                    if (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) ||
+                    if (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) ||
                              (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)))
                     {
                         if (n現在の選択行[0] == 0)
@@ -247,6 +247,12 @@ namespace TJAPlayer3
                                 }
                             }
                         }
+                    }
+                    if (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
+                    {
+                        TJAPlayer3.Skin.sound決定音.t再生する();
+                        TJAPlayer3.stage選曲.act曲リスト.ctBarOpen.t開始(100, 260, 2, TJAPlayer3.Timer);
+                        this.bIsDifficltSelect = false;
                     }
                 }
 
