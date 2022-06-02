@@ -206,7 +206,8 @@ namespace TJAPlayer3
 					if (!bバナパス読み込み && !bバナパス読み込み失敗)
 					{
 
-						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
+						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide) ||
+							TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
 						{
 							// Hit 1P banapass
 							TJAPlayer3.SaveFile = 0;

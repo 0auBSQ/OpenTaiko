@@ -1633,12 +1633,19 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス DeviceType, int nID, int nCode )
+		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス DeviceType, int nID, int nCode, EKeyConfigPad pad )
 		{
+			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
 				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
 				{
+					if (isMenu ? 
+						(j != (int)EKeyConfigPad.LeftChange && j != (int)EKeyConfigPad.RightChange &&
+						j != (int)EKeyConfigPad.Decide) :
+
+						(j == (int)EKeyConfigPad.LeftChange || j == (int)EKeyConfigPad.RightChange ||
+						j == (int)EKeyConfigPad.Decide)) continue;
 					for( int k = 0; k < 0x10; k++ )
 					{
 						if( ( ( this.KeyAssign[ i ][ j ][ k ].入力デバイス == DeviceType ) && ( this.KeyAssign[ i ][ j ][ k ].ID == nID ) ) && ( this.KeyAssign[ i ][ j ][ k ].コード == nCode ) )
