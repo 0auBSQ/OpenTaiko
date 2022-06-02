@@ -91,8 +91,11 @@ namespace TJAPlayer3
 	    private void ConditionallyInitializePrvFont()
 	    {
 	        if (prvFont == null)
-	        {
-	            prvFont = new CPrivateFastFont(CSkin.Path(@"Graphics\ipag.ttf"), 18);
+			{
+				if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+					prvFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 18);
+				else
+					prvFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 18);
 	        }
 	    }
 
