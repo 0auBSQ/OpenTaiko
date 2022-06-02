@@ -173,7 +173,7 @@ namespace TJAPlayer3
 				if (base.eフェーズID == CStage.Eフェーズ.共通_通常状態        // 通常状態、かつ
 					&& TJAPlayer3.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
 				{
-					if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape))
+					if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
 					{
 						if (bモード選択)
 						{
@@ -206,7 +206,8 @@ namespace TJAPlayer3
 					if (!bバナパス読み込み && !bバナパス読み込み失敗)
 					{
 
-						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
+						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide) ||
+							TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed))
 						{
 							// Hit 1P banapass
 							TJAPlayer3.SaveFile = 0;
@@ -245,7 +246,7 @@ namespace TJAPlayer3
 						}
 					}
 
-					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
+					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
 					{
 						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
 						{
@@ -274,7 +275,7 @@ namespace TJAPlayer3
 						}
 					}
 
-					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
+					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
 					{
 						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctバナパス読み込み成功.b終了値に達した)
 						{
@@ -303,7 +304,7 @@ namespace TJAPlayer3
 					}
 
 
-					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed)
+					if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide)
 						|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))
 					{
 						if (bプレイヤーエントリー && this.ctバナパス読み込み成功.b終了値に達した)

@@ -501,6 +501,22 @@ namespace TJAPlayer3
 				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap2P);
 			}
 
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Decide);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignCancel)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Cancel);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignLeftChange)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LeftChange);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignRightChange)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RightChange);
+			}
 
 			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemCapture )
 			{
@@ -679,6 +695,20 @@ namespace TJAPlayer3
 			this.iKeyAssignKongaClap2P = new CItemBase(CLangManager.LangInstance.GetString(10062),
 				CLangManager.LangInstance.GetString(10063));
 			this.list項目リスト.Add(this.iKeyAssignKongaClap2P);
+
+			this.iKeyAssignDecide = new CItemBase(CLangManager.LangInstance.GetString(10064),
+				CLangManager.LangInstance.GetString(10065));
+			this.list項目リスト.Add(this.iKeyAssignDecide);
+			this.iKeyAssignCancel = new CItemBase(CLangManager.LangInstance.GetString(10066),
+				CLangManager.LangInstance.GetString(10067));
+			this.list項目リスト.Add(this.iKeyAssignCancel);
+
+			this.iKeyAssignLeftChange = new CItemBase(CLangManager.LangInstance.GetString(10068),
+				CLangManager.LangInstance.GetString(10069));
+			this.list項目リスト.Add(this.iKeyAssignLeftChange);
+			this.iKeyAssignRightChange = new CItemBase(CLangManager.LangInstance.GetString(10070),
+				CLangManager.LangInstance.GetString(10071));
+			this.list項目リスト.Add(this.iKeyAssignRightChange);
 
 			OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
@@ -1253,6 +1283,11 @@ namespace TJAPlayer3
 
 		private CItemBase iKeyAssignKongaClap;
 		private CItemBase iKeyAssignKongaClap2P;
+
+		private CItemBase iKeyAssignDecide;
+		private CItemBase iKeyAssignCancel;
+		private CItemBase iKeyAssignLeftChange;
+		private CItemBase iKeyAssignRightChange;
 
 		#endregion
 		private CItemToggle iLogOutputLog;

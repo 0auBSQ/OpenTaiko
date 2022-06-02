@@ -240,15 +240,15 @@ namespace TJAPlayer3
             if (!ctClose.b進行中)
             {
                 bool _leftDrum = (player == 0)
-                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)
+                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange)
                     : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P);
 
                 bool _rightDrum = (player == 0)
-                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue)
+                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange)
                     : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P);
 
                 bool _centerDrum = (player == 0)
-                    ? (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+                    ? (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
                     : (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
 
 

@@ -356,6 +356,30 @@ namespace TJAPlayer3
 					}
 				}
 
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftChange
+				{
+					get
+					{
+						return this.padLeftChange;
+					}
+					set
+					{
+						this.padLeftChange = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightChange
+				{
+					get
+					{
+						return this.padRightChange;
+					}
+					set
+					{
+						this.padRightChange = value;
+					}
+				}
+
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[ int index ]
 				{
 					get
@@ -427,6 +451,12 @@ namespace TJAPlayer3
 
 							case (int)EKeyConfigPad.Clap2P:
 								return this.padClap2P;
+
+							case (int)EKeyConfigPad.LeftChange:
+								return this.padLeftChange;
+
+							case (int)EKeyConfigPad.RightChange:
+								return this.padRightChange;
 
 							case (int) EKeyConfigPad.Capture:
 								return this.padCapture;
@@ -525,6 +555,14 @@ namespace TJAPlayer3
 								this.padClap2P = value;
 								return;
 
+							case (int)EKeyConfigPad.LeftChange:
+								this.padLeftChange = value;
+								return;
+
+							case (int)EKeyConfigPad.RightChange:
+								this.padRightChange = value;
+								return;
+
 							case (int) EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
@@ -557,6 +595,8 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap2P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLeftChange;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRightChange;
 
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
 				//-----------------
@@ -1593,12 +1633,19 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス DeviceType, int nID, int nCode )
+		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス DeviceType, int nID, int nCode, EKeyConfigPad pad )
 		{
+			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
 				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
 				{
+					if (isMenu ? 
+						(j != (int)EKeyConfigPad.LeftChange && j != (int)EKeyConfigPad.RightChange &&
+						j != (int)EKeyConfigPad.Decide) :
+
+						(j == (int)EKeyConfigPad.LeftChange || j == (int)EKeyConfigPad.RightChange ||
+						j == (int)EKeyConfigPad.Decide)) continue;
 					for( int k = 0; k < 0x10; k++ )
 					{
 						if( ( ( this.KeyAssign[ i ][ j ][ k ].入力デバイス == DeviceType ) && ( this.KeyAssign[ i ][ j ][ k ].ID == nID ) ) && ( this.KeyAssign[ i ][ j ][ k ].コード == nCode ) )
@@ -2219,6 +2266,18 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.Write("Clap2P=");
 			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap2P);
+			sw.WriteLine();
+			sw.Write("Decide=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Decide);
+			sw.WriteLine();
+			sw.Write("Cancel=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Cancel);
+			sw.WriteLine();
+			sw.Write("LeftChange=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftChange);
+			sw.WriteLine();
+			sw.Write("RightChange=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightChange);
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -3251,7 +3310,7 @@ namespace TJAPlayer3
 											}																	//
 											else if( str3.Equals( "RightBlue2P" ) )										// #27029 2012.1.4 from
 											{																	//
-												this.tキーの読み出しと設定( str4, this.KeyAssign.Drums.RightBlue2P );	//
+												this.tキーの読み出しと設定( str4, this.KeyAssign.Drums.RightBlue2P ); //
 											}
 
 											else if (str3.Equals("Clap"))
@@ -3261,6 +3320,23 @@ namespace TJAPlayer3
 											else if (str3.Equals("Clap2P"))
 											{
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap2P);
+											}
+
+											else if (str3.Equals("Decide"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Decide);
+											}
+											else if (str3.Equals("Cancel"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Cancel);
+											}
+											else if (str3.Equals("LeftChange"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftChange);
+											}
+											else if (str3.Equals("RightChange"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightChange);
 											}
 
 											continue;
@@ -3443,7 +3519,7 @@ namespace TJAPlayer3
 				id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".IndexOf( str[ 1 ] );	// #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
 				if( ( ( id >= 0 ) && int.TryParse( str.Substring( 2 ), out code ) ) && ( ( code >= 0 ) && ( code <= 0xff ) ) )
 				{
-					this.t指定した入力が既にアサイン済みである場合はそれを全削除する( e入力デバイス, id, code );
+					//this.t指定した入力が既にアサイン済みである場合はそれを全削除する( e入力デバイス, id, code );
 					assign[ i ].入力デバイス = e入力デバイス;
 					assign[ i ].ID = id;
 					assign[ i ].コード = code;
@@ -3464,6 +3540,12 @@ LeftRed2P=K011
 RightRed2P=K023
 LeftBlue2P=K012
 RightBlue2P=K047
+Clap=
+Clap2P=
+Decide=K015,K019
+Cancel=
+LeftChange=K013
+RightChange=K020
 
 [SystemKeyAssign]
 Capture=K065
