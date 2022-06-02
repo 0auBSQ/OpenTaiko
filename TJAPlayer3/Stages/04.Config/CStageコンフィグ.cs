@@ -130,7 +130,7 @@ namespace TJAPlayer3
 			    
 				txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
 
-			    using (var prvFont = new CPrivateFastFont(CSkin.Path(@"mplus-1p-heavy.ttf"), 20))
+			    using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" :  TJAPlayer3.ConfigIni.FontName), 20))
 			    {
 			        for (int i = 0; i < strMenuItem.Length; i++)
 			        {
