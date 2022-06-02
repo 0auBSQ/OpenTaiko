@@ -2635,6 +2635,7 @@ namespace TJAPlayer3
         #region Characters
 
         public int Characters_Ptn;
+        public string[] Characters_DirName;
         public int[] Characters_Normal_Ptn,
             Characters_Normal_Missed_Ptn,
             Characters_Normal_MissedDown_Ptn,

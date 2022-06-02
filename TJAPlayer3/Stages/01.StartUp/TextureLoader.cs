@@ -940,7 +940,8 @@ namespace TJAPlayer3
 
             #region [Character count initialisations]
 
-            TJAPlayer3.Skin.Characters_Ptn = System.IO.Directory.GetDirectories(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS).Length;
+            var charaDirs = System.IO.Directory.GetDirectories(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS);
+            TJAPlayer3.Skin.Characters_Ptn = charaDirs.Length;
 
             Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
 
@@ -971,6 +972,7 @@ namespace TJAPlayer3
             Characters_Menu_Start = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Menu_Select = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
 
+            TJAPlayer3.Skin.Characters_DirName = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_Missed_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1023,6 +1025,11 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Balloon_Timer = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Delay = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_FadeOut = new int[TJAPlayer3.Skin.Characters_Ptn];
+
+            for (int i = 0; i < charaDirs.Length; i++)
+            {
+                TJAPlayer3.Skin.Characters_DirName[i] = System.IO.Path.GetFileName(charaDirs[i]);
+            }
 
             #endregion
 
@@ -1170,7 +1177,7 @@ namespace TJAPlayer3
 
                 #region [Character individual values count initialisation]
 
-                string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + i.ToString();
+                string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i];
 
                 TJAPlayer3.Skin.Characters_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Normal\");
                 TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Miss\");
@@ -1231,82 +1238,82 @@ namespace TJAPlayer3
                 #region [Characters asset loading]
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Menu_Loop_Ptn[i]; j++)
-                    Characters_Menu_Loop[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Menu_Loop\" + j.ToString() + @".png");
+                    Characters_Menu_Loop[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Menu_Loop\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Menu_Select_Ptn[i]; j++)
-                    Characters_Menu_Select[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Menu_Select\" + j.ToString() + @".png");
+                    Characters_Menu_Select[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Menu_Select\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Menu_Start_Ptn[i]; j++)
-                    Characters_Menu_Start[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Menu_Start\" + j.ToString() + @".png");
+                    Characters_Menu_Start[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Menu_Start\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Normal_Ptn[i]; j++)
-                    Characters_Result_Normal[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Result_Normal\" + j.ToString() + @".png");
+                    Characters_Result_Normal[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Result_Normal\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Failed_In_Ptn[i]; j++)
-                    Characters_Result_Failed_In[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Result_Failed_In\" + j.ToString() + @".png");
+                    Characters_Result_Failed_In[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Result_Failed_In\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Failed_Ptn[i]; j++)
-                    Characters_Result_Failed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Result_Failed\" + j.ToString() + @".png");
+                    Characters_Result_Failed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Result_Failed\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Result_Clear_Ptn[i]; j++)
-                    Characters_Result_Clear[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Result_Clear\" + j.ToString() + @".png");
+                    Characters_Result_Clear[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Result_Clear\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Normal_Ptn[i]; j++)
-                    Characters_Title_Normal[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Title_Normal\" + j.ToString() + @".png");
+                    Characters_Title_Normal[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Title_Normal\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Title_Entry_Ptn[i]; j++)
-                    Characters_Title_Entry[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Title_Entry\" + j.ToString() + @".png");
+                    Characters_Title_Entry[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Title_Entry\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Ptn[i]; j++)
-                    Characters_Normal[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Normal\" + j.ToString() + @".png");
+                    Characters_Normal[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Normal\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i]; j++)
-                    Characters_Normal_Missed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Miss\" + j.ToString() + @".png");
+                    Characters_Normal_Missed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Miss\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i]; j++)
-                    Characters_Normal_MissedDown[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\MissDown\" + j.ToString() + @".png");
+                    Characters_Normal_MissedDown[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\MissDown\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]; j++)
-                    Characters_Normal_Cleared[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Clear\" + j.ToString() + @".png");
+                    Characters_Normal_Cleared[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Clear\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]; j++)
-                    Characters_Normal_Maxed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Clear_Max\" + j.ToString() + @".png");
+                    Characters_Normal_Maxed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Clear_Max\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]; j++)
-                    Characters_GoGoTime[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\GoGo\" + j.ToString() + @".png");
+                    Characters_GoGoTime[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\GoGo\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i]; j++)
-                    Characters_GoGoTime_Maxed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\GoGo_Max\" + j.ToString() + @".png");
+                    Characters_GoGoTime_Maxed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\GoGo_Max\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i]; j++)
-                    Characters_GoGoStart[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\GoGoStart\" + j.ToString() + @".png");
+                    Characters_GoGoStart[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\GoGoStart\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i]; j++)
-                    Characters_GoGoStart_Maxed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\GoGoStart_Max\" + j.ToString() + @".png");
+                    Characters_GoGoStart_Maxed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\GoGoStart_Max\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Ptn[i]; j++)
-                    Characters_10Combo[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\10combo\" + j.ToString() + @".png");
+                    Characters_10Combo[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\10combo\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i]; j++)
-                    Characters_10Combo_Maxed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\10combo_Max\" + j.ToString() + @".png");
+                    Characters_10Combo_Maxed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\10combo_Max\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i]; j++)
-                    Characters_Become_Cleared[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Clearin\" + j.ToString() + @".png");
+                    Characters_Become_Cleared[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Clearin\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i]; j++)
-                    Characters_Become_Maxed[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Soulin\" + j.ToString() + @".png");
+                    Characters_Become_Maxed[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Soulin\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Return_Ptn[i]; j++)
-                    Characters_Return[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Return\" + j.ToString() + @".png");
+                    Characters_Return[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Return\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i]; j++)
-                    Characters_Balloon_Breaking[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Balloon_Breaking\" + j.ToString() + @".png");
+                    Characters_Balloon_Breaking[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Balloon_Breaking\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i]; j++)
-                    Characters_Balloon_Broke[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Balloon_Broke\" + j.ToString() + @".png");
+                    Characters_Balloon_Broke[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Balloon_Broke\" + j.ToString() + @".png");
 
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]; j++)
-                    Characters_Balloon_Miss[i][j] = TxCGlobal(CHARACTERS + i.ToString() + @"\Balloon_Miss\" + j.ToString() + @".png");
+                    Characters_Balloon_Miss[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Balloon_Miss\" + j.ToString() + @".png");
 
                 #endregion
 
