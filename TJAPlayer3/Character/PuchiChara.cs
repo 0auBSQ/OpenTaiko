@@ -60,7 +60,9 @@ namespace TJAPlayer3
             Counter.t進行Loop();
             SineCounter.t進行LoopDb();
             SineCounterIdle.t進行Loop();
-            
+
+            int p = TJAPlayer3.GetActualPlayer(player);
+
             /*
             TJAPlayer3.act文字コンソール.tPrint(700, 500, C文字コンソール.Eフォント種別.白, Counter.n現在の値.ToString());
             TJAPlayer3.act文字コンソール.tPrint(700, 520, C文字コンソール.Eフォント種別.白, SineCounter.n現在の値.ToString());
@@ -78,30 +80,28 @@ namespace TJAPlayer3
 
             // TJAPlayer3.act文字コンソール.tPrint(700, 580, C文字コンソール.Eフォント種別.白, sineY.ToString());
 
-            TJAPlayer3.Tx.PuchiChara.vc拡大縮小倍率 = new Vector3((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] : TJAPlayer3.Skin.Game_PuchiChara_Scale[0]));
-            TJAPlayer3.Tx.PuchiChara.Opacity = alpha;
-
-            // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height
-
-            /* To do :
-            **
-            ** - Yellow light color filter when isGrowing is true
-            */
-
-            int p = TJAPlayer3.GetActualPlayer(player);
-
             int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
-            
-            int puriColumn = puriChar % 5;
-            int puriRow = puriChar / 5;
 
-            int adjustedX = x - 32;
-            int adjustedY = y - 32;
+            var chara = TJAPlayer3.Tx.PuchiChara[puriChar];
 
-            TJAPlayer3.Tx.PuchiChara.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], TJAPlayer3.Skin.Game_PuchiChara[0], TJAPlayer3.Skin.Game_PuchiChara[1]));
+            if (chara != null)
+            {
+                chara.vc拡大縮小倍率 = new Vector3((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] : TJAPlayer3.Skin.Game_PuchiChara_Scale[0]));
+                chara.Opacity = alpha;
 
-            // TJAPlayer3.Tx.PuchiChara.t2D中心基準描画(TJAPlayer3.app.Device, x, y + (int)sineY, new Rectangle((Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], TJAPlayer3.Skin.Game_PuchiChara[0], TJAPlayer3.Skin.Game_PuchiChara[1]));
-            
+                // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height
+
+                /* To do :
+                **
+                ** - Yellow light color filter when isGrowing is true
+                */
+
+                int adjustedX = x - 32;
+                int adjustedY = y - 32;
+
+                chara.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.n現在の値 + 2) * TJAPlayer3.Skin.Game_PuchiChara[0], 0, TJAPlayer3.Skin.Game_PuchiChara[0], TJAPlayer3.Skin.Game_PuchiChara[1]));
+            }
+
             return base.On進行描画();
         }
 

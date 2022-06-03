@@ -30,7 +30,7 @@ namespace TJAPlayer3
                 NullCheckAndRender(ref TJAPlayer3.Tx.Mob[i]);
             }
 
-            NullCheckAndRender(ref TJAPlayer3.Tx.PuchiChara);
+            //NullCheckAndRender(ref TJAPlayer3.Tx.PuchiChara);
             
         }
 
