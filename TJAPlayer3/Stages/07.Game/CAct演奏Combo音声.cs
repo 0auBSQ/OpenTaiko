@@ -81,7 +81,9 @@ namespace TJAPlayer3
                 {
                     #region [Combo voices]
 
-                    var currentDir = CSkin.Path(string.Format(@"Sounds\Combo_{0}P\", i + 1));
+                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(i)];
+
+                    var currentDir = ($@"{TJAPlayer3.strEXEのあるフォルダ}Global\Characters\{TJAPlayer3.Skin.Characters_DirName[_charaId]}\Sounds\Combo\");
                     if (Directory.Exists(currentDir))
                     {
                         foreach (var item in Directory.GetFiles(currentDir))
