@@ -1091,6 +1091,11 @@ namespace TJAPlayer3
                                 nLane = (int)PlayerLane.FlashType.Total;
                             }
                             break;
+                        default:
+                            {
+                                continue;
+                            }
+                            break;
                     }
 
                     TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
