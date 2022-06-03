@@ -692,14 +692,26 @@ namespace TJAPlayer3
             DanC_Small_ExamCymbol = TxC(GAME + DANC + @"Small_ExamCymbol.png");
             DanC_ExamCymbol = TxC(GAME + DANC + @"ExamCymbol.png");
             DanC_MiniNumber = TxC(GAME + DANC + @"MiniNumber.png");
-            
+
             #endregion
 
             #region PuchiChara
 
-            PuchiChara = TxCGlobal(PUCHICHARA + @"0.png");
+            var puchicharaDirs = System.IO.Directory.GetDirectories(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + PUCHICHARA);
+            TJAPlayer3.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
-            TJAPlayer3.Skin.Puchichara_Ptn = 5 * Math.Max(1, (PuchiChara.szテクスチャサイズ.Height / 256));
+            PuchiChara = new CTexture[TJAPlayer3.Skin.Puchichara_Ptn];
+            TJAPlayer3.Skin.Puchicharas_Name = new string[TJAPlayer3.Skin.Puchichara_Ptn];
+
+            for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++)
+            {
+                PuchiChara[i] = TxCAbsolute($@"{puchicharaDirs[i]}\Chara.png");
+                PuchiChara[i].vc拡大縮小倍率 = new SharpDX.Vector3(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
+
+                TJAPlayer3.Skin.Puchicharas_Name[i] = System.IO.Path.GetFileName(puchicharaDirs[i]);
+            }
+
+            ///TJAPlayer3.Skin.Puchichara_Ptn = 5 * Math.Max(1, (PuchiChara.szテクスチャサイズ.Height / 256));
 
 
             #endregion
@@ -1839,7 +1851,7 @@ namespace TJAPlayer3
         public CTexture DanC_Screen;
         #endregion
         #region PuchiChara
-        public CTexture PuchiChara;
+        public CTexture[] PuchiChara;
         #endregion
         #region Training
         public CTexture Tokkun_DownBG,

@@ -228,13 +228,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                        TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                         TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                        TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                         TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
@@ -244,13 +244,13 @@ namespace TJAPlayer3
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
                     
-                    TJAPlayer3.Tx.PuchiChara?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
+                    TJAPlayer3.Tx.PuchiChara[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                         puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                    TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
 
                     #region [Database related values]
 
