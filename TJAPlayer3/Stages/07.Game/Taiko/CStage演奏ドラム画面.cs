@@ -750,6 +750,40 @@ namespace TJAPlayer3
             this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, E楽器パート.DRUMS);
         }
 
+        private int ChannelNumToFlyNoteNum(CDTX.CChip pChip, int nPlayer, bool b両手入力 = false, int nInput = 0)
+        {
+            var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+
+            int nFly = 0;
+            switch (pChip.nチャンネル番号)
+            {
+                case 0x11:
+                    nFly = 1;
+                    break;
+                case 0x12:
+                    nFly = 2;
+                    break;
+                case 0x13:
+                case 0x1A:
+                    nFly = b両手入力 ? 3 : 1;
+                    break;
+                case 0x14:
+                case 0x1B:
+                    nFly = (b両手入力 || _gt == EGameType.KONGA) ? 4 : 2;
+                    break;
+                case 0x1F:
+                    nFly = nInput == 0 ? 1 : 2;
+                    break;
+                case 0x101:
+                    nFly = 5;
+                    break;
+                default:
+                    nFly = 1;
+                    break;
+            }
+            return nFly;
+        }
+
         private bool tドラムヒット処理( long nHitTime, Eパッド type, CDTX.CChip pChip, bool b両手入力, int nPlayer )
 		{
             int nInput = 0;
@@ -794,8 +828,6 @@ namespace TJAPlayer3
             {
                 return false;
             }
-            
-            var _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
 			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer );
 
@@ -814,30 +846,7 @@ namespace TJAPlayer3
 			{
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start( pChip.nチャンネル番号, e判定, b両手入力, nPlayer );
 
-                int nFly = 0;
-                switch(pChip.nチャンネル番号)
-                {
-                    case 0x11:
-                        nFly = 1;
-                        break;
-                    case 0x12:
-                        nFly = 2;
-                        break;
-                    case 0x13:
-                    case 0x1A:
-                        nFly = b両手入力 ? 3 : 1;
-                        break;
-                    case 0x14:
-                    case 0x1B:
-                        nFly = (b両手入力 || _gt == EGameType.KONGA) ? 4 : 2;
-                        break;
-                    case 0x1F:
-                        nFly = nInput == 0 ? 1 : 2;
-                        break;
-                    default:
-                        nFly = 1;
-                        break;
-                }
+                int nFly = ChannelNumToFlyNoteNum(pChip, nPlayer, b両手入力, nInput);
 
 
                 //this.actChipFireTaiko.Start( nFly, nPlayer );
@@ -1635,8 +1644,8 @@ namespace TJAPlayer3
                         if (bAutoPlay && !this.bPAUSE)
                         {
                             pChip.bHit = true;
-                            if (!NotesManager.IsADLIB(pChip) && pChip.nチャンネル番号 < 0x20) // Provisional, to avoid crash on 0x101
-                                this.FlyingNotes.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
+                            if (!NotesManager.IsADLIB(pChip)) // Provisional, to avoid crash on 0x101
+                                this.FlyingNotes.Start(ChannelNumToFlyNoteNum(pChip, nPlayer), nPlayer);
 
                             //this.actChipFireTaiko.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
                             if (pChip.nチャンネル番号 == 0x12 || pChip.nチャンネル番号 == 0x14 || pChip.nチャンネル番号 == 0x1B) nLane = (int)PlayerLane.FlashType.Blue;

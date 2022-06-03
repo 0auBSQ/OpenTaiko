@@ -244,7 +244,18 @@ namespace TJAPlayer3
         {
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
-            TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(Lane * 130, 390, 130, 130));
+            switch (Lane)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(Lane * 130, 390, 130, 130));
+                    break;
+                case 5:
+                    TJAPlayer3.Tx.Note_Swap?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 390, 130, 130));
+                    break;
+            }
         }
 
         // Regular display
