@@ -701,7 +701,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
             PuchiChara = new CTexture[TJAPlayer3.Skin.Puchichara_Ptn];
-            TJAPlayer3.Skin.Puchicharas_Name = new string[puchicharaDirs.Length];
+            TJAPlayer3.Skin.Puchicharas_Name = new string[TJAPlayer3.Skin.Puchichara_Ptn];
 
             for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++)
             {
