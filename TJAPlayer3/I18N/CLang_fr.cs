@@ -212,6 +212,16 @@ namespace TJAPlayer3
             [10061] = "Assignation de la touche \nClap pour les bongos.",
             [10062] = "Clap 2P",
             [10063] = "Assignation de la touche \nClap pour les bongos. \n(2P)",
+
+            [10064] = "Decide",
+            [10065] = "Touche de selection \ndans les menus.",
+            [10066] = "Cancel",
+            [10067] = "Touche d'annulation \ndans les menus.",
+            [10068] = "LeftChange",
+            [10069] = "Touche de navigation (gauche) \ndans les menus.",
+            [10070] = "RightChange",
+            [10071] = "Touche de navigation (droite) \ndans les menus.",
+
             [10084] = "Mode Shin'uchi",
             [10085] = "Options système",
             [10086] = "Options de jeu",

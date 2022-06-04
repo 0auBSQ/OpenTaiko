@@ -449,8 +449,7 @@ namespace TJAPlayer3
                                 c曲リストノード.nLevel = dtx.LEVELtaiko;
 								c曲リストノード.uniqueId = dtx.uniqueID;
 
-								CSongDict.tAddSongNode(c曲リストノード.uniqueId.data.id, c曲リストノード);
-								CSongDict.tAddSongUrl(c曲リストノード.uniqueId.data.url, c曲リストノード);
+								CSongDict.tAddSongNode(c曲リストノード.uniqueId, c曲リストノード);
 
 								c曲リストノード.arスコア[ n ] = new Cスコア();
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス = str基点フォルダ + fileinfo.Name;

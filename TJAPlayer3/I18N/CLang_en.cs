@@ -222,6 +222,16 @@ namespace TJAPlayer3
             [10061] = "Konga key assign:\nTo assign key/pads for Clap\n button.",
             [10062] = "Clap2P",
             [10063] = "Konga key assign:\nTo assign key/pads for Clap2P\n button.",
+
+            [10064] = "Decide",
+            [10065] = "Menu decide key.",
+            [10066] = "Cancel",
+            [10067] = "Menu cancel key.",
+            [10068] = "LeftChange",
+            [10069] = "Menu left change key.",
+            [10070] = "RightChange",
+            [10071] = "Menu right change key.",
+
             [10084] = "Shin'uchi Mode",
             [10085] = "System options",
             [10086] = "Gameplay options",

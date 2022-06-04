@@ -10,6 +10,7 @@ namespace TJAPlayer3
     internal class CSongDict
     {
         private static Dictionary<string, C曲リストノード> nodes = new Dictionary<string, C曲リストノード>();
+        private static HashSet<string> urls = new HashSet<string>();
 
         public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[2][]
         {
@@ -31,21 +32,39 @@ namespace TJAPlayer3
             return null;
         }
 
-        public static void tAddSongNode(string id, C曲リストノード node)
+        public static void tAddSongNode(CSongUniqueID sid, C曲リストノード node)
         {
-            if (!nodes.ContainsKey(id))
-                nodes.Add(id, node.Clone());
+            if (sid != null && sid.data.id != null && sid.data.id != "" && !nodes.ContainsKey(sid.data.id))
+                nodes.Add(sid.data.id, node.Clone());
+            tAddSongUrl(sid);
         }
 
-        public static void tAddSongUrl(string url, C曲リストノード node)
+        public static bool tContainsSongUrl(string url)
         {
+            return urls.Contains(url);
+        }
 
+        public static void tAddSongUrl(CSongUniqueID sid)
+        {
+            var url = sid.data.url;
+
+            if (url != null && url != "" && !urls.Contains(url))
+                urls.Add(url);
+        }
+
+        public static void tRemoveSongUrl(CSongUniqueID sid)
+        {
+            var url = sid.data.url;
+
+            if (url != null && url != "" && urls.Contains(url))
+                urls.Remove(url);
         }
 
         public static void tRemoveSongNode(CSongUniqueID sid)
         {
             if (sid != null && nodes.ContainsKey(sid.data.id))
             {
+                tRemoveSongUrl(sid);
                 nodes.Remove(sid.data.id);
             }
         }
@@ -53,6 +72,7 @@ namespace TJAPlayer3
         public static void tClearSongNodes()
         {
             nodes.Clear();
+            urls.Clear();
         }
 
         #endregion

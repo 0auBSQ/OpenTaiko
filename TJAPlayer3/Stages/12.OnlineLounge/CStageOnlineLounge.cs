@@ -202,18 +202,22 @@ namespace TJAPlayer3
                     CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[pos]);
                     CTexture tmpSubtitle = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
 
-                    if (i != 0)
-                    {
-                        tmpTex.color4 = C変換.ColorToColor4(Color.DarkGray);
-                        tmpSubtitle.color4 = C変換.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                    var _color = C変換.ColorToColor4(Color.DarkGray);
+
+                    if (i == 0)
+                        _color = C変換.ColorToColor4(Color.White);
+                    if (pos > 0 && i != 0) {
+                        var song = apiMethods.FetchedSongsList[pos - 1];
+                        var downloadLink = GetDownloadLink(song);
+
+                        if (CSongDict.tContainsSongUrl(downloadLink))
+                            _color = C変換.ColorToColor4(Color.DimGray);
                     }
-                    else
-                    {
-                        tmpTex.color4 = C変換.ColorToColor4(Color.White);
-                        tmpSubtitle.color4 = C変換.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(C変換.ColorToColor4(Color.White));
-                    }
+
+
+                    tmpTex.color4 = _color;
+                    tmpSubtitle.color4 = _color;
+                    TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
 
                     TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
                     tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 18 + 100 * i);
@@ -293,7 +297,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.OnlineLounge_Box.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
                 var text = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                                    new TitleTextureKey("DownloadNow", this.pfOLFontLarge, Color.White, Color.Black, 1000));
+                                    new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
                 text.t2D中心基準描画(TJAPlayer3.app.Device, 640, 605);
             }
 
@@ -453,11 +457,19 @@ namespace TJAPlayer3
                             {
                                 var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
                                 var zipPath = $@"Cache\{song.Md5}.zip";
+                                var downloadLink = GetDownloadLink(song);
 
-                                TJAPlayer3.Skin.sound決定音.t再生する();
-                                System.Threading.Thread download =
-                                    new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
-                                download.Start();
+                                if (CSongDict.tContainsSongUrl(downloadLink))
+                                {
+                                    TJAPlayer3.Skin.soundError.t再生する();
+                                }
+                                else
+                                {
+                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    System.Threading.Thread download =
+                                        new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
+                                    download.Start();
+                                }
                             }
                         }
                     }
@@ -638,6 +650,7 @@ namespace TJAPlayer3
 
                     var uid = new CSongUniqueID(idPath + @"\uniqueID.json");
                     uid.tAttachOnlineAddress(downloadLink);
+                    CSongDict.tAddSongUrl(uid);
                     
                 }
 
