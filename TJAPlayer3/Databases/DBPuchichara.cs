@@ -19,6 +19,13 @@ namespace TJAPlayer3
 
         public class PuchicharaData
         {
+            public PuchicharaData()
+            {
+                Name = "(None)";
+                Rarity = "Common";
+                Author = "(None)";
+            }
+
             public PuchicharaData(string pcn, string pcr, string pca)
             {
                 Name = pcn;

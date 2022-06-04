@@ -24,6 +24,13 @@ namespace TJAPlayer3
 
         public class CUnlockConditions
         {
+            public CUnlockConditions()
+            {
+                Condition = "";
+                Values = new int[]{ 0 };
+                Type = "me";
+                Reference = "";
+            }
             public CUnlockConditions(string cd, int[] vl, string tp, string rf)
             {
                 Condition = cd;
@@ -50,6 +57,11 @@ namespace TJAPlayer3
 
             [JsonIgnore]
             private int RequiredArgCount = -1;
+
+            public bool tHasCondition()
+            {
+                return Condition != "";
+            }
 
             /*
              * == Types of conditions ==

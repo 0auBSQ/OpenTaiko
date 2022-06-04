@@ -128,6 +128,11 @@ namespace TJAPlayer3
 
             for (int i = 0; i < iPuchiCharaCount; i++)
             {
+                var textColor = tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
+                ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
+
+                /*
                 if (dbData.ContainsKey(i))
                 {
                     string rarity = dbData[i].Rarity;
@@ -137,6 +142,7 @@ namespace TJAPlayer3
                     ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
                     ttkPuchiCharaAuthors[i] = new TitleTextureKey(dbData[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
                 }
+                */
             }
 
             #endregion
@@ -231,13 +237,13 @@ namespace TJAPlayer3
 
                     if (i != 0)
                     {
-                        TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
+                        TJAPlayer3.Tx.Puchichara[pos].tx?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                         TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     }
                     else
                     {
-                        TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                        TJAPlayer3.Tx.Puchichara[pos].tx?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                         TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
@@ -247,13 +253,13 @@ namespace TJAPlayer3
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
                     
-                    TJAPlayer3.Tx.PuchiChara[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 320 + (int)(PuchiChara.sineY), 
+                    TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 320 + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                         puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
-                    TJAPlayer3.Tx.PuchiChara[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
+                    TJAPlayer3.Tx.Puchichara[pos].tx?.tUpdateColor4(C変換.ColorToColor4(Color.White));
 
                     #region [Database related values]
 
@@ -271,8 +277,8 @@ namespace TJAPlayer3
                         tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 460);
                     }
 
-                    if (puchiUnlockables.ContainsKey(pos)
-                        && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
+                    if (TJAPlayer3.Tx.Puchichara[pos].unlock != null
+                        && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(TJAPlayer3.Skin.Puchicharas_Name[pos]))
                         TJAPlayer3.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 200);
 
                     #endregion
@@ -529,17 +535,16 @@ namespace TJAPlayer3
                     if (ess == ESelectStatus.SELECTED)
                     {
                         TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
-
                         TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
+                        TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].welcome.t再生する();
 
                         iCurrentMenu = -1;
                         this.tResetOpts();
                     }
                     else if (ess == ESelectStatus.SUCCESS)
                     {
-                        TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(iPuchiCharaCurrent);
-
-                        TJAPlayer3.NamePlateConfig.tSpendCoins(puchiUnlockables[iPuchiCharaCurrent].Values[0], iPlayer);
+                        TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
+                        TJAPlayer3.NamePlateConfig.tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0], iPlayer);
                     }
                 }
 
@@ -783,11 +788,18 @@ namespace TJAPlayer3
         {
             #region [Check unlockable]
 
-            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent)
+            /*if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent)
                 && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
             {
                 // To update then when bought unlockables will be implemented
                 this.ttkInfoSection = new TitleTextureKey(puchiUnlockables[iPuchiCharaCurrent].tConditionMessage()
+                    , this.pfHeyaFont, Color.White, Color.Black, 1000);
+            }
+            */
+            if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
+            {
+                this.ttkInfoSection = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMessage()
                     , this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
             else
@@ -799,11 +811,27 @@ namespace TJAPlayer3
         private ESelectStatus tSelectPuchi()
         {
             // Add "If unlocked" to select directly
+            /*
             if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent) 
                 && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
             {
 
                 (bool, string) response = puchiUnlockables[iPuchiCharaCurrent].tConditionMet(new int[]{ TJAPlayer3.NamePlateConfig.data.Medals[TJAPlayer3.SaveFile] } );
+                Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
+
+                // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
+
+                this.ttkInfoSection = new TitleTextureKey(response.Item2, this.pfHeyaFont, responseColor, Color.Black, 1000);
+
+                return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
+            }
+            */
+
+            if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
+                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
+            {
+                (bool, string) response = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMet(
+                    new int[] { TJAPlayer3.NamePlateConfig.data.Medals[TJAPlayer3.SaveFile] });
                 Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
@@ -826,7 +854,7 @@ namespace TJAPlayer3
         private TitleTextureKey[] ttkMainMenuOpt;
         private CPrivateFastFont pfHeyaFont;
 
-        private Dictionary<int, DBUnlockables.CUnlockConditions> puchiUnlockables = TJAPlayer3.Databases.DBUnlockables.data.Puchichara;
+        //private Dictionary<int, DBUnlockables.CUnlockConditions> puchiUnlockables = TJAPlayer3.Databases.DBUnlockables.data.Puchichara;
 
         private TitleTextureKey[] ttkDanTitles;
 

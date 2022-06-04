@@ -700,13 +700,18 @@ namespace TJAPlayer3
             var puchicharaDirs = System.IO.Directory.GetDirectories(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + PUCHICHARA);
             TJAPlayer3.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
-            PuchiChara = new CTexture[TJAPlayer3.Skin.Puchichara_Ptn];
+            // Legacy
+            //PuchiChara = new CTexture[TJAPlayer3.Skin.Puchichara_Ptn];
+
+            Puchichara = new CPuchichara[TJAPlayer3.Skin.Puchichara_Ptn];
             TJAPlayer3.Skin.Puchicharas_Name = new string[TJAPlayer3.Skin.Puchichara_Ptn];
 
             for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++)
             {
-                PuchiChara[i] = TxCAbsolute($@"{puchicharaDirs[i]}\Chara.png");
-                PuchiChara[i].vc拡大縮小倍率 = new SharpDX.Vector3(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
+                Puchichara[i] = new CPuchichara(puchicharaDirs[i]);
+
+                //PuchiChara[i] = TxCAbsolute($@"{puchicharaDirs[i]}\Chara.png");
+                //PuchiChara[i].vc拡大縮小倍率 = new SharpDX.Vector3(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
 
                 TJAPlayer3.Skin.Puchicharas_Name[i] = System.IO.Path.GetFileName(puchicharaDirs[i]);
             }
@@ -1851,7 +1856,10 @@ namespace TJAPlayer3
         public CTexture DanC_Screen;
         #endregion
         #region PuchiChara
-        public CTexture[] PuchiChara;
+
+        //public CTexture[] PuchiChara;
+        public CPuchichara[] Puchichara;
+        
         #endregion
         #region Training
         public CTexture Tokkun_DownBG,

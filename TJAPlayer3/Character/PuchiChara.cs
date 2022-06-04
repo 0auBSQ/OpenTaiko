@@ -56,7 +56,7 @@ namespace TJAPlayer3
         public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0)
         {
             if (!TJAPlayer3.ConfigIni.ShowPuchiChara) return base.On進行描画();
-            if (Counter == null || SineCounter == null || TJAPlayer3.Tx.PuchiChara == null) return base.On進行描画();
+            if (Counter == null || SineCounter == null || TJAPlayer3.Tx.Puchichara == null) return base.On進行描画();
             Counter.t進行Loop();
             SineCounter.t進行LoopDb();
             SineCounterIdle.t進行Loop();
@@ -82,7 +82,9 @@ namespace TJAPlayer3
 
             int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
 
-            var chara = TJAPlayer3.Tx.PuchiChara[puriChar];
+
+            var chara = TJAPlayer3.Tx.Puchichara[puriChar].tx;
+            //TJAPlayer3.Tx.PuchiChara[puriChar];
 
             if (chara != null)
             {

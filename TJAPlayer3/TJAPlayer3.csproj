@@ -147,6 +147,7 @@
     <Compile Include="I18N\CLang_jp.cs" />
     <Compile Include="I18N\CLang_zh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
