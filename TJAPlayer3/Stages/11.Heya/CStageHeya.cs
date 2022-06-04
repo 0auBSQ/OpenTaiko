@@ -48,6 +48,7 @@ namespace TJAPlayer3
             else
                 this.pfHeyaFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
 
+            ScrollCounter = new CCounter(0, 1000, 0.15f, TJAPlayer3.Timer);
 
             // 1P, configure later for default 2P
             iPlayer = TJAPlayer3.SaveFile;
@@ -191,6 +192,8 @@ namespace TJAPlayer3
             //ctDonchan_Normal.t進行Loop();
             ctDonchan_In.t進行();
 
+            ScrollCounter.t進行();
+
             TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
             #region [Menus display]
@@ -239,12 +242,12 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Heya_Lock?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    var scroll = DrawBox_Slot(i);
 
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
                     
-                    TJAPlayer3.Tx.PuchiChara[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320 + (int)(PuchiChara.sineY), 
+                    TJAPlayer3.Tx.PuchiChara[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 320 + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                         puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                         TJAPlayer3.Skin.Game_PuchiChara[0], 
@@ -258,19 +261,19 @@ namespace TJAPlayer3
                     {
                         CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
-                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 434);
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 434);
                     }
 
                     if (ttkPuchiCharaAuthors[pos] != null)
                     {
                         CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
 
-                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 460);
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 460);
                     }
 
                     if (puchiUnlockables.ContainsKey(pos)
                         && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(pos))
-                        TJAPlayer3.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                        TJAPlayer3.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 200);
 
                     #endregion
 
@@ -299,9 +302,9 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
-                    TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 200);
+                    var scroll = DrawBox_Slot(i);
 
-                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 320);
+                    TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 320);
 
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.White));
 
@@ -311,14 +314,14 @@ namespace TJAPlayer3
                     {
                         CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterNames[pos]);
 
-                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 434);
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 434);
                     }
 
                     if (ttkCharacterAuthors[pos] != null)
                     {
                         CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterAuthors[pos]);
 
-                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 620 + 302 * i, 460);
+                        tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + 302 * i) + scroll, 460);
                     }
 
                     #endregion
@@ -331,7 +334,7 @@ namespace TJAPlayer3
 
             if (iCurrentMenu == 2)
             {
-                for (int i = -5; i < 6; i++)
+                for (int i = -6; i < 7; i++)
                 {
                     int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
 
@@ -356,17 +359,17 @@ namespace TJAPlayer3
                         danGrade = TJAPlayer3.NamePlateConfig.data.DanTitles[iPlayer][this.ttkDanTitles[pos].str文字].clearStatus;
                     }
 
-                    TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+                    var scroll = DrawSide_Menu(i);
 
                     TJAPlayer3.Tx.NamePlateBase.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device,
-                        718 + -10 * Math.Abs(i),
-                        331 + 70 * i,
+                        (718 + -10 * Math.Abs(i)) + scroll.Item1,
+                        (331 + 70 * i) + scroll.Item2,
                         new RectangleF(0, (8 + danGrade) * 54, 220, 54));
                     TJAPlayer3.Tx.NamePlateBase.color4 = C変換.ColorToColor4(Color.White);
 
-                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (730 + -10 * Math.Abs(i)) + scroll.Item1, (354 + 70 * i) + scroll.Item2);
 
-                    
+
                 }
             }
 
@@ -376,7 +379,7 @@ namespace TJAPlayer3
 
             if (iCurrentMenu == 3)
             {
-                for (int i = -5; i < 6; i++)
+                for (int i = -6; i < 7; i++)
                 {
                     int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
 
@@ -393,7 +396,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Heya_Side_Menu.color4 = C変換.ColorToColor4(Color.White);
                     }
 
-                    TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 340 + 70 * i);
+                    var scroll = DrawSide_Menu(i);
 
                     int iType = -1;
 
@@ -406,11 +409,11 @@ namespace TJAPlayer3
                     if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
                     {
                         TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device,
-                            730 + -10 * Math.Abs(i),
-                            348 + 70 * i);
+                            (730 + -10 * Math.Abs(i)) + scroll.Item1,
+                            (348 + 70 * i) + scroll.Item2);
                     } 
 
-                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 + -10 * Math.Abs(i), 354 + 70 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (730 + -10 * Math.Abs(i)) + scroll.Item1, (354 + 70 * i) + scroll.Item2);
 
                 }
             }
@@ -712,6 +715,9 @@ namespace TJAPlayer3
 
         private bool tMove(int off)
         {
+            ScrollMode = off;
+            ScrollCounter.n現在の値 = 0;
+
             if (iCurrentMenu == -1)
                 iMainMenuCurrent = (this.ttkMainMenuOpt.Length + iMainMenuCurrent + off) % this.ttkMainMenuOpt.Length;
             else if (iCurrentMenu == 0)
@@ -734,6 +740,24 @@ namespace TJAPlayer3
             return true;
         }
 
+        private int DrawBox_Slot(int i)
+        {
+            double value = (1.0 - Math.Sin((((ScrollCounter.n現在の値) / 2000.0)) * Math.PI)) * ScrollMode;
+            int scroll = (int)(value * BoxInterval);
+            TJAPlayer3.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, (620 + BoxInterval * i) + scroll, 200);
+            return scroll;
+        }
+
+        private (int, int) DrawSide_Menu(int i)
+        {
+            double value = (1.0 - Math.Sin((((ScrollCounter.n現在の値) / 2000.0)) * Math.PI)) * ScrollMode;
+            var x = (int)(value * SideInterval_X);
+            var modeFlag = ScrollMode == -1 ? i > 0 : i >= 0;
+            (int, int) scroll = (modeFlag ? -x : x, 
+                (int)(value * SideInterval_Y));
+            TJAPlayer3.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 730 - (SideInterval_X * Math.Abs(i)) + scroll.Item1, 340 + (SideInterval_Y * i) + scroll.Item2);
+            return scroll;
+        }
 
         #region [Unlockables]
 
@@ -805,6 +829,12 @@ namespace TJAPlayer3
 
         private int iPuchiCharaCount;
         private int iCharacterCount;
+
+        private CCounter ScrollCounter;
+        private const int BoxInterval = 302;
+        private const int SideInterval_X = 10;
+        private const int SideInterval_Y = 70;
+        private int ScrollMode;
 
         public E戻り値 eフェードアウト完了時の戻り値;
 
