@@ -479,7 +479,7 @@ namespace TJAPlayer3
 
             #region [ Inputs ]
 
-            if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
+            if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
             {
                 if (this.tMove(1))
@@ -488,7 +488,7 @@ namespace TJAPlayer3
                 }
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow) ||
+            else if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow) ||
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
             {
                 if (this.tMove(-1))
@@ -715,6 +715,11 @@ namespace TJAPlayer3
 
         private bool tMove(int off)
         {
+            if (ScrollCounter.n現在の値 < ScrollCounter.n終了値
+                && (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightArrow)
+                || TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftArrow)))
+                return false;
+
             ScrollMode = off;
             ScrollCounter.n現在の値 = 0;
 
