@@ -111,7 +111,7 @@ namespace TJAPlayer3
 
 			}
 
-			if (downloadBox != null)
+			if (downloadBox != null && downloadBox.list子リスト != null)
             {
 
 				var flatten = TJAPlayer3.stage選曲.act曲リスト.flattenList(downloadBox.list子リスト);
@@ -1134,7 +1134,7 @@ namespace TJAPlayer3
 		private void t曲リストへ後処理を適用する( List<C曲リストノード> ノードリスト, string parentName = "/", bool isGlobal = true )
 		{
 			
-			if (isGlobal)
+			if (isGlobal && ノードリスト.Count > 0)
             {
 				var randomNode = CSongDict.tGenerateRandomButton(ノードリスト[0].r親ノード, parentName);
 				ノードリスト.Add(randomNode);
