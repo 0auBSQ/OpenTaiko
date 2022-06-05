@@ -353,6 +353,7 @@ namespace TJAPlayer3
 				{
 					if ( this.n現在のメニュー番号 == 2 )
 					{
+						// Exit
 						TJAPlayer3.Skin.sound決定音.t再生する();
 						this.actFIFO.tフェードアウト開始();
 						base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;

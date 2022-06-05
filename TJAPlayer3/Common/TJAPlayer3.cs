@@ -1004,6 +1004,7 @@ namespace TJAPlayer3
 									Trace.TraceInformation( "----------------------" );
 									Trace.TraceInformation( "■ タイトル" );
 									stageタイトル.On活性化();
+									stageタイトル.tReloadMenus();
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stageタイトル;
 

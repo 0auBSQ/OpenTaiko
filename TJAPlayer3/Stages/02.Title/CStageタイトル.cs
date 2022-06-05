@@ -96,6 +96,13 @@ namespace TJAPlayer3
 			}
 			base.On非活性化();
 		}
+
+		public void tReloadMenus()
+        {
+			if (this.pfMenuTitle != null && this.pfBoxText != null)
+				CMainMenuTab.tInitMenus(this.pfMenuTitle, this.pfBoxText);
+		}
+
 		public override void OnManagedリソースの作成()
 		{
 			if (base.b活性化してない)
@@ -112,7 +119,7 @@ namespace TJAPlayer3
 				this.pfBoxText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 15);
 
 			// Init Menus
-			CMainMenuTab.tInitMenus(this.pfMenuTitle, this.pfBoxText);
+			tReloadMenus();
 
 			base.OnManagedリソースの作成();
 		}

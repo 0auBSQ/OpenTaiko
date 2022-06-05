@@ -49,7 +49,8 @@ namespace TJAPlayer3
             {
                 __Menus = new CMainMenuTab[__MenuCount];
 
-                __BoxesProcessed = true;
+                // Removed to avoid having to reload the game when changing language
+                //__BoxesProcessed = true;
 
                 #region [Menu Colors]
 
@@ -66,7 +67,7 @@ namespace TJAPlayer3
                     Color.FromArgb(199, 8, 119), // Online lounge red/pink
                     Color.FromArgb(181, 186, 28),  // Encyclopedia yellow
                     Color.FromArgb(78, 166, 171), // AI battle mode blue
-                    Color.FromArgb(230, 230, 230), // Player stars white
+                    Color.FromArgb(230, 230, 230), // Player stats white
                     Color.FromArgb(40, 40, 40), // Chart editor black
                     Color.FromArgb(120, 104, 56), // Toolbox brown
                 };
