@@ -33,6 +33,17 @@ namespace TJAPlayer3
             SineCounterIdle = null;
             base.On非活性化();
         }
+
+        public static int tGetPuchiCharaIndexByName(int p)
+        {
+            var _pc = TJAPlayer3.NamePlateConfig.data.PuchiChara[p];
+            var _pcs = TJAPlayer3.Skin.Puchicharas_Name;
+            int puriChar = 0;
+            if (_pcs.Contains(_pc))
+                puriChar = _pcs.ToList().IndexOf(_pc);
+
+            return puriChar;
+        }
         
         public void ChangeBPM(double bpm)
         {
@@ -80,8 +91,9 @@ namespace TJAPlayer3
 
             // TJAPlayer3.act文字コンソール.tPrint(700, 580, C文字コンソール.Eフォント種別.白, sineY.ToString());
 
-            int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
+            //int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
 
+            int puriChar = PuchiChara.tGetPuchiCharaIndexByName(p);
 
             var chara = TJAPlayer3.Tx.Puchichara[puriChar].tx;
             //TJAPlayer3.Tx.PuchiChara[puriChar];

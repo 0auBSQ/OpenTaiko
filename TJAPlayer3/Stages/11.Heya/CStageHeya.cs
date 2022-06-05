@@ -520,7 +520,8 @@ namespace TJAPlayer3
 
                     if (ess == ESelectStatus.SELECTED)
                     {
-                        TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = iPuchiCharaCurrent;
+                        //PuchiChara.tGetPuchiCharaIndexByName(p);
+                        TJAPlayer3.NamePlateConfig.data.PuchiChara[iPlayer] = TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent];// iPuchiCharaCurrent;
                         TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
                         TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].welcome.t再生する();
 
@@ -691,7 +692,8 @@ namespace TJAPlayer3
                 iDanTitleCurrent = _dans.Keys.ToList().IndexOf(_dan) + 1;
 
             iCharacterCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Characters_Ptn - 1, TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer]));
-            iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
+            //iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
+            iPuchiCharaCurrent = PuchiChara.tGetPuchiCharaIndexByName(this.iPlayer);
         }
 
         private Dictionary<string, Color> RarityToColor = new Dictionary<string, Color>

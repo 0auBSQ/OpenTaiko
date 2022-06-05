@@ -158,7 +158,7 @@ namespace TJAPlayer3
             public int[] TitleType = { 0, 0 };
 
             [JsonProperty("puchiChara")]
-            public int[] PuchiChara = { 0, 0 };
+            public string[] PuchiChara = { "0", "0" };
 
             [JsonProperty("medals")]
             public int[] Medals = { 0, 0 };
