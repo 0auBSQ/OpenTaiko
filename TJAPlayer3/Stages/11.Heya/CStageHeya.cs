@@ -124,25 +124,11 @@ namespace TJAPlayer3
             ttkPuchiCharaNames = new TitleTextureKey[iPuchiCharaCount];
             ttkPuchiCharaAuthors = new TitleTextureKey[iPuchiCharaCount];
 
-            var dbData = TJAPlayer3.Databases.DBPuchichara.data;
-
             for (int i = 0; i < iPuchiCharaCount; i++)
             {
                 var textColor = tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
                 ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
                 ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
-
-                /*
-                if (dbData.ContainsKey(i))
-                {
-                    string rarity = dbData[i].Rarity;
-
-                    var textColor = tRarityToColor(rarity);
-
-                    ttkPuchiCharaNames[i] = new TitleTextureKey(dbData[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
-                    ttkPuchiCharaAuthors[i] = new TitleTextureKey(dbData[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
-                }
-                */
             }
 
             #endregion
@@ -689,8 +675,20 @@ namespace TJAPlayer3
         private void tResetOpts()
         {
             // Retrieve titles if they exist
+            var _titles = TJAPlayer3.NamePlateConfig.data.NamePlateTitles[this.iPlayer];
+            var _title = TJAPlayer3.NamePlateConfig.data.Title[this.iPlayer];
+            var _dans = TJAPlayer3.NamePlateConfig.data.DanTitles[this.iPlayer];
+            var _dan = TJAPlayer3.NamePlateConfig.data.Dan[this.iPlayer];
+
             iTitleCurrent = 0;
+
+            if (_titles != null && _titles.ContainsKey(_title))
+                iTitleCurrent = _titles.Keys.ToList().IndexOf(_title) + 1;
+
             iDanTitleCurrent = 0;
+
+            if (_dans != null && _dans.ContainsKey(_dan))
+                iDanTitleCurrent = _dans.Keys.ToList().IndexOf(_dan) + 1;
 
             iCharacterCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Characters_Ptn - 1, TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer]));
             iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
@@ -788,14 +786,6 @@ namespace TJAPlayer3
         {
             #region [Check unlockable]
 
-            /*if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent)
-                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
-            {
-                // To update then when bought unlockables will be implemented
-                this.ttkInfoSection = new TitleTextureKey(puchiUnlockables[iPuchiCharaCurrent].tConditionMessage()
-                    , this.pfHeyaFont, Color.White, Color.Black, 1000);
-            }
-            */
             if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
                 && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
             {
@@ -811,21 +801,6 @@ namespace TJAPlayer3
         private ESelectStatus tSelectPuchi()
         {
             // Add "If unlocked" to select directly
-            /*
-            if (puchiUnlockables.ContainsKey(iPuchiCharaCurrent) 
-                && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(iPuchiCharaCurrent))
-            {
-
-                (bool, string) response = puchiUnlockables[iPuchiCharaCurrent].tConditionMet(new int[]{ TJAPlayer3.NamePlateConfig.data.Medals[TJAPlayer3.SaveFile] } );
-                Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
-
-                // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
-
-                this.ttkInfoSection = new TitleTextureKey(response.Item2, this.pfHeyaFont, responseColor, Color.Black, 1000);
-
-                return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
-            }
-            */
 
             if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
                 && !TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
@@ -853,8 +828,6 @@ namespace TJAPlayer3
 
         private TitleTextureKey[] ttkMainMenuOpt;
         private CPrivateFastFont pfHeyaFont;
-
-        //private Dictionary<int, DBUnlockables.CUnlockConditions> puchiUnlockables = TJAPlayer3.Databases.DBUnlockables.data.Puchichara;
 
         private TitleTextureKey[] ttkDanTitles;
 
