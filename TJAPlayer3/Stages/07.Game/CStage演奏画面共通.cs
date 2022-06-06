@@ -1544,6 +1544,7 @@ namespace TJAPlayer3
                 if ((int)actGauge.db現在のゲージ値[nPlayer] < 80 && this.bIsAlreadyCleared[nPlayer] == true)
                 {
                     this.bIsAlreadyCleared[nPlayer] = false;
+                    TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
                     //CDTXMania.stage演奏ドラム画面.actBackground.ClearIn(nPlayer);
                 }
                 cInvisibleChip.ShowChipTemporally( pChip.e楽器パート );
