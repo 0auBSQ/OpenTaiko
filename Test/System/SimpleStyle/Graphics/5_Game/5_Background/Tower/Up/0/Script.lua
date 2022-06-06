@@ -1,12 +1,13 @@
 local fps = 0
 local deltaTime = 0
-local isClear = { false, false, false, false }
-local towerNightOpacity = 0
+local isClear = { false, false }
+local towerNightNum = 0
 
-function updateValues(_deltaTime, _fps, _isClear, _towerNightOpacity)
+function updateValues(_deltaTime, _fps, _isClear, _towerNightNum)
     deltaTime = _deltaTime
     fps = _fps
-    towerNightOpacity = _towerNightOpacity
+    isClear = _isClear
+    towerNightNum = _towerNightNum
     deltaTime = _deltaTime
 end
 
@@ -68,8 +69,19 @@ end
 
 function draw()
     func:DrawGraph(0, 0, "0.png");
-    func:SetOpacity(towerNightOpacity, "7.png");
+    func:SetOpacity((towerNightNum * 255.0), "7.png");
     func:DrawGraph(0, 0, "7.png");
+
+    colorTmp = 0.5 + (1 - towerNightNum) * 0.5;
+
+    func:SetColor(colorTmp, colorTmp, colorTmp, "1.png");
+    func:SetColor(colorTmp, colorTmp, colorTmp, "2.png");
+    func:SetColor(colorTmp, colorTmp, colorTmp, "3.png");
+
+    func:SetOpacity(colorTmp * 255.0, "1.png");
+    func:SetOpacity(colorTmp * 255.0, "2.png");
+    func:SetOpacity(colorTmp * 255.0, "3.png");
+
     for i = 0, 4 do
         func:DrawGraph((i * bgWidth_1) - bgScrollX_1, 0, "1.png");
         func:DrawGraph((i * bgWidth_2) - bgScrollX_2, 0, "2.png");

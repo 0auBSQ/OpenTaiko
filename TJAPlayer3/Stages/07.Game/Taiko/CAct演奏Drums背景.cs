@@ -88,14 +88,14 @@ namespace TJAPlayer3
             this.ct上背景クリアインタイマー[player].n現在の値 = 0;
             this.ct上背景FIFOタイマー = new CCounter(0, 100, 2, TJAPlayer3.Timer);
             this.ct上背景FIFOタイマー.n現在の値 = 0;*/
-            UpScript.ClearIn(player);
-            DownScript.ClearIn(player);
+            UpScript?.ClearIn(player);
+            DownScript?.ClearIn(player);
         }
 
         public void ClearOut(int player)
         {
-            UpScript.ClearOut(player);
-            DownScript.ClearOut(player);
+            UpScript?.ClearOut(player);
+            DownScript?.ClearOut(player);
         }
 
         public override void On活性化()

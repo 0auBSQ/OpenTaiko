@@ -52,6 +52,13 @@ namespace TJAPlayer3
                 Textures[fileName].vc拡大縮小倍率.Y = (float)yscale;
             }
         }
+        public void SetColor(double r, double g, double b, string fileName)
+        {
+            if (Textures[fileName] != null)
+            {
+                Textures[fileName].color4 = new SharpDX.Color4((float)r, (float)g, (float)b, 1f);
+            }
+        }
     }
     class ScriptBG : IDisposable
     {
@@ -107,7 +114,6 @@ namespace TJAPlayer3
             if (LuaScript == null) return;
             try
             {
-                LuaScript["isClear"] = TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared;
                 LuaClearIn.Call(player);
             }
             catch (Exception ex)
@@ -121,7 +127,6 @@ namespace TJAPlayer3
             if (LuaScript == null) return;
             try
             {
-                LuaScript["isClear"] = TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared;
                 LuaClearOut.Call(player);
             }
             catch (Exception ex)
@@ -166,7 +171,7 @@ namespace TJAPlayer3
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
                 }
 
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)(255 * currentFloorPositionMax140));
+                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);

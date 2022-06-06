@@ -1,12 +1,13 @@
 local fps = 0
 local deltaTime = 0
-local isClear = { false, false, false, false }
-local towerNightOpacity = 0
+local isClear = { false, false }
+local towerNightNum = 0
 
-function updateValues(_deltaTime, _fps, _isClear, _towerNightOpacity)
+function updateValues(_deltaTime, _fps, _isClear, _towerNightNum)
     deltaTime = _deltaTime
     fps = _fps
-    towerNightOpacity = _towerNightOpacity
+    isClear = _isClear
+    towerNightNum = _towerNightNum
     deltaTime = _deltaTime
 end
 
@@ -29,7 +30,7 @@ function init()
 end
 
 function update()
-    if isClear[1] then
+    if isClear[0] then
         bgClearFade = bgClearFade + (2000 * deltaTime);
     else
         bgClearFade = bgClearFade - (2000 * deltaTime); 
