@@ -86,8 +86,14 @@ namespace TJAPlayer3
 
 
 
-
-            LuaScript.DoFile(filePath);
+            using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8))
+            {
+                using (var stream = new StreamReader(filePath, Encoding.UTF8))
+                {
+                    var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
+                    LuaScript.DoString(text);
+                }
+            }
 
             LuaUpdateValues = LuaScript.GetFunction("updateValues");
             LuaClearIn = LuaScript.GetFunction("clearIn");
