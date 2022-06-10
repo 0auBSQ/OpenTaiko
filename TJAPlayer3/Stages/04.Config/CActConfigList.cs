@@ -541,6 +541,7 @@ namespace TJAPlayer3
 					TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
 					CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
 					t項目リストの設定_System(refresh : false);
+					TJAPlayer3.stageコンフィグ.ReloadMenus();
 				}
                 //}
 

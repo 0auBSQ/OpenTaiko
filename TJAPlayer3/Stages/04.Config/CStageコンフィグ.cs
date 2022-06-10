@@ -116,12 +116,44 @@ namespace TJAPlayer3
 				Trace.Unindent();
 			}
 		}
+
+		public void ReloadMenus()
+        {
+			string[] strMenuItem = {
+					CLangManager.LangInstance.GetString(10085),
+					CLangManager.LangInstance.GetString(10086),
+					CLangManager.LangInstance.GetString(10087)
+			};
+
+			txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
+
+			using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" : TJAPlayer3.ConfigIni.FontName), 20))
+			{
+				for (int i = 0; i < strMenuItem.Length; i++)
+				{
+					using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black))
+					{
+						txMenuItemLeft[i, 0]?.Dispose();
+						txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
+					}
+					using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
+					{
+						txMenuItemLeft[i, 1]?.Dispose();
+						txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
+					}
+				}
+			}
+		}
+
 		public override void OnManagedリソースの作成()											// OPTIONと画像以外共通
 		{
 			if( !base.b活性化してない )
 			{
 				ctBackgroundAnime = new CCounter(0, 1280, 20, TJAPlayer3.Timer);
 
+				ReloadMenus();
+
+				/*
 				string[] strMenuItem = {
 					CLangManager.LangInstance.GetString(10085),
 					CLangManager.LangInstance.GetString(10086),
@@ -144,6 +176,7 @@ namespace TJAPlayer3
 			            }
 			        }
 			    }
+				*/
 
 			    if( this.bメニューにフォーカス中 )
 				{
