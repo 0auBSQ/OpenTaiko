@@ -130,6 +130,20 @@ namespace TJAPlayer3
 
         #region [Heya]
 
+        public void tReindexCharacter(int p, string[] characterNamesList)
+        {
+            string character = this.data.CharacterName[p];
+
+            if (characterNamesList.Contains(character))
+                this.data.Character[p] = characterNamesList.ToList().IndexOf(character);
+
+        }
+
+        public void tUpdateCharacterName(int p, string newChara)
+        {
+            this.data.CharacterName[p] = newChara;
+        }
+
         public void tApplyHeyaChanges()
         {
             this.tSaveFile();
@@ -165,6 +179,9 @@ namespace TJAPlayer3
 
             [JsonProperty("character")]
             public int[] Character = { 0, 0 };
+
+            [JsonProperty("characterName")]
+            public string[] CharacterName = { "0", "0" };
 
             [JsonProperty("danTitles")]
             public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[2];

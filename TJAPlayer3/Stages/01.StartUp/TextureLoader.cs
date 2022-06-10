@@ -1046,7 +1046,11 @@ namespace TJAPlayer3
             #endregion
 
             for (int i = 0; i < 2; i++)
+            {
+                TJAPlayer3.NamePlateConfig.tReindexCharacter(i, TJAPlayer3.Skin.Characters_DirName);
                 this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, i == 0);
+            }
+                
 
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
             {

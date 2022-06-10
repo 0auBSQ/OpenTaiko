@@ -533,6 +533,9 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.ReloadCharacter(TJAPlayer3.NamePlateConfig.data.Character[iPlayer], iCharacterCurrent, iPlayer);
                     TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
 
+                    // Update the character
+                    TJAPlayer3.NamePlateConfig.tUpdateCharacterName(iPlayer, TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
+
                     CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
