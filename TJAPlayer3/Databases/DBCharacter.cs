@@ -19,6 +19,13 @@ namespace TJAPlayer3
 
         public class CharacterData
         {
+            public CharacterData()
+            {
+                Name = "(None)";
+                Rarity = "Common";
+                Author = "(None)";
+            }
+
             public CharacterData(string pcn, string pcr, string pca)
             {
                 Name = pcn;

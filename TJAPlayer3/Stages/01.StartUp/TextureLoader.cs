@@ -700,18 +700,12 @@ namespace TJAPlayer3
             var puchicharaDirs = System.IO.Directory.GetDirectories(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + PUCHICHARA);
             TJAPlayer3.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
-            // Legacy
-            //PuchiChara = new CTexture[TJAPlayer3.Skin.Puchichara_Ptn];
-
             Puchichara = new CPuchichara[TJAPlayer3.Skin.Puchichara_Ptn];
             TJAPlayer3.Skin.Puchicharas_Name = new string[TJAPlayer3.Skin.Puchichara_Ptn];
 
             for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++)
             {
                 Puchichara[i] = new CPuchichara(puchicharaDirs[i]);
-
-                //PuchiChara[i] = TxCAbsolute($@"{puchicharaDirs[i]}\Chara.png");
-                //PuchiChara[i].vc拡大縮小倍率 = new SharpDX.Vector3(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
 
                 TJAPlayer3.Skin.Puchicharas_Name[i] = System.IO.Path.GetFileName(puchicharaDirs[i]);
             }
@@ -961,6 +955,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Ptn = charaDirs.Length;
 
             Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters = new CCharacter[TJAPlayer3.Skin.Characters_Ptn];
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Normal_Missed = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1054,7 +1049,11 @@ namespace TJAPlayer3
                 this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, i == 0);
 
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
+            {
                 Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Normal\0.png");
+                Characters[i] = new CCharacter(charaDirs[i]);
+            }
+                
 
             #endregion
 
@@ -1857,7 +1856,6 @@ namespace TJAPlayer3
         #endregion
         #region PuchiChara
 
-        //public CTexture[] PuchiChara;
         public CPuchichara[] Puchichara;
         
         #endregion
@@ -2017,6 +2015,7 @@ namespace TJAPlayer3
             Characters_Result_Normal;
 
         public CTexture[] Characters_Heya_Preview;
+        public CCharacter[] Characters;
 
         #endregion
 

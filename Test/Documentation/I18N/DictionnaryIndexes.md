@@ -165,6 +165,14 @@
 10061 : "Konga clap key settings" description
 10062 : "Konga clap key settings for 2P" option title
 10063 : "Konga clap key settings for 2P" description
+10064 : "Decide key settings" option title
+10065 : "Decide key settings" description
+10066 : "Cancel key settings" option title
+10067 : "Cancel key settings" description
+10068 : "Left Change key settings" option title
+10069 : "Left Change key settings" description
+10070 : "Right Change key settings" option title
+10071 : "Right Change key settings" description
 10084 : "Shin-uchi toggle" option title
 10085 : "System options" menu title
 10086 : "Gameplay options" menu title

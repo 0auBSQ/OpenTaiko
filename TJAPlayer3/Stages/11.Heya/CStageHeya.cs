@@ -140,19 +140,11 @@ namespace TJAPlayer3
             ttkCharacterAuthors = new TitleTextureKey[iCharacterCount];
             ttkCharacterNames = new TitleTextureKey[iCharacterCount];
 
-            var dbDataChara = TJAPlayer3.Databases.DBCharacter.data;
-
             for (int i = 0; i < iCharacterCount; i++)
             {
-                if (dbDataChara.ContainsKey(i))
-                {
-                    string rarity = dbDataChara[i].Rarity;
-
-                    var textColor = tRarityToColor(rarity);
-
-                    ttkCharacterNames[i] = new TitleTextureKey(dbDataChara[i].Name, this.pfHeyaFont, textColor, Color.Black, 1000);
-                    ttkCharacterAuthors[i] = new TitleTextureKey(dbDataChara[i].Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
-                }
+                var textColor = tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
+                ttkCharacterNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
+                ttkCharacterAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
 
             #endregion
@@ -692,6 +684,7 @@ namespace TJAPlayer3
                 iDanTitleCurrent = _dans.Keys.ToList().IndexOf(_dan) + 1;
 
             iCharacterCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Characters_Ptn - 1, TJAPlayer3.NamePlateConfig.data.Character[this.iPlayer]));
+
             //iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
             iPuchiCharaCurrent = PuchiChara.tGetPuchiCharaIndexByName(this.iPlayer);
         }

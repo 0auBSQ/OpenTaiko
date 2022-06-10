@@ -147,9 +147,10 @@
     <Compile Include="I18N\CLang_jp.cs" />
     <Compile Include="I18N\CLang_zh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stages\01.StartUp\CCharacter.cs" />
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
-    <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
+    <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
     <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -441,17 +442,13 @@ move /y "$(TargetDir)DirectShowLib-2005.dll" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)SlimDX.dll" "$(SolutionDir)Test\dll\"
 
-
-move /y "$(TargetDir)KeraLua.dll" "$(SolutionDir)Test\dll\"
-
-
-move /y "$(TargetDir)liblua54.dylib" "$(SolutionDir)Test\dll\"
-
+move /y "$(TargetDir)NLua.dll" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)lua54.dll" "$(SolutionDir)Test\dll\"
 
+move /y "$(TargetDir)KeraLua.dll" "$(SolutionDir)Test\dll\"
 
-move /y "$(TargetDir)NLua.dll" "$(SolutionDir)Test\dll\"
+move /y "$(TargetDir)liblua54.dylib" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
 

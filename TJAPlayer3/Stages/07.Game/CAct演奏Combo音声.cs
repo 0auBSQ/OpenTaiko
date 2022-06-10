@@ -113,7 +113,7 @@ namespace TJAPlayer3
 
                     #region [Floor voices]
 
-                    currentDir = CSkin.Path(string.Format(@"Sounds\Tower_Combo\"));
+                    currentDir = ($@"{TJAPlayer3.strEXEのあるフォルダ}Global\Characters\{TJAPlayer3.Skin.Characters_DirName[_charaId]}\Sounds\Tower_Combo\");
                     if (Directory.Exists(currentDir))
                     {
                         foreach (var item in Directory.GetFiles(currentDir))

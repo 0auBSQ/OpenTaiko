@@ -7,20 +7,20 @@ namespace TJAPlayer3
     {
         public void tDatabases()
         {
-            DBPuchichara = new DBPuchichara();
+            //DBPuchichara = new DBPuchichara();
             DBUnlockables = new DBUnlockables();
-            DBCharacter = new DBCharacter();
+            //DBCharacter = new DBCharacter();
             DBCDN = new DBCDN();
 
-            DBPuchichara.tDBPuchichara();
+            //DBPuchichara.tDBPuchichara();
             DBUnlockables.tDBUnlockables();
-            DBCharacter.tDBCharacter();
+            //DBCharacter.tDBCharacter();
             DBCDN.tDBCDN();
         }
 
-        public DBPuchichara DBPuchichara;
+        //public DBPuchichara DBPuchichara;
         public DBUnlockables DBUnlockables;
-        public DBCharacter DBCharacter;
+        //public DBCharacter DBCharacter;
         public DBCDN DBCDN;
     }
 }

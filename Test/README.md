@@ -63,6 +63,7 @@ Summer Overload! : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by 
 Halcyon : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
 Chasing the Wind : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & bol)
 Back Where I'm From : NetroAki - https://soundcloud.com/netroaki | https://twitter.com/netroaki | https://instagram.com/netroaki | https://netroaki.audio/ (Chart by 0AuBSQ)
+Slayer of. : Aden Mayo - https://www.youtube.com/channel/UCXEd-dVZGZDf6plBmGd8cig (Chart by bol)
 ```
 
 ### About the OpenTaiko Original Soundtrack
@@ -107,6 +108,6 @@ Chinese : WHMHammer - https://github.com/WHMHammer
 Main developer : 0AuBSQ - https://github.com/0auBSQ/OpenTaiko
 Several bug fixes and improvements : l1m0n3 - https://github.com/l1m0n3
 Complete removal of the SlimDX dependency : Mr-Oiji https://github.com/Mr-Ojii
-Several skinning extensions and improvements : Takkkom - https://github.com/Takkkom
+Several features and major improvements : Takkkom - https://github.com/Takkkom
 Mod icons : FAKEYJSNPI - https://github.com/FAKEYJSNPI 
 ```
