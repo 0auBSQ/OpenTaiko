@@ -919,7 +919,7 @@ namespace TJAPlayer3
 			//while ( nIndex_NearestChip_Past >= 0 )			// 過去方向への検索
 			for ( ; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past-- )
 			{
-				if ( ( 0x15 <= nChannel ) && ( nChannel <= 0x17 ) )
+				if ( (( 0x15 <= nChannel ) && ( nChannel <= 0x17 ) || (nChannel == 0x20 || nChannel == 0x21)) )
 				{
                     CDTX.CChip chip = playerListChip[ nIndex_NearestChip_Past ];
 
@@ -1141,15 +1141,17 @@ namespace TJAPlayer3
                     }
                 }
 
+                EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
                 //赤か青かの分岐
-                if( sort == 0 )
+                if ( sort == 0|| sort == 2 )
                 {
                     if (pChip.nPlayerSide == 0)
                         this.soundRed?.t再生を開始する();
                     else
                         this.soundRed2?.t再生を開始する();
-                    if (pChip.nチャンネル番号 == 0x15)
+
+                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA)
                     {
                         //CDTXMania.Skin.soundRed.t再生する();
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 1, nPlayer );
@@ -1162,13 +1164,14 @@ namespace TJAPlayer3
                         TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(3, nPlayer, true);
                     }
                 }
-                else
+                else if (sort == 1 || sort == 3)
                 {
                     if (pChip.nPlayerSide == 0)
                         this.soundBlue?.t再生を開始する();
                     else
                         this.soundBlue2?.t再生を開始する();
-                    if (pChip.nチャンネル番号 == 0x15)
+
+                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA)
                     {
                         //CDTXMania.Skin.soundBlue.t再生する();
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 2, nPlayer );
@@ -1180,6 +1183,14 @@ namespace TJAPlayer3
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 4, nPlayer );
                         TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(4, nPlayer, true);
                     }
+                }
+                else if (sort == 4)
+                {
+                    if (pChip.nPlayerSide == 0)
+                        this.soundClap?.t再生を開始する();
+                    else
+                        this.soundClap2?.t再生を開始する();
+                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(4, nPlayer, true);
                 }
 
                 //TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
@@ -3127,7 +3138,18 @@ namespace TJAPlayer3
 #region [ 20-2F: EmptySlot ]
 					case 0x20:
 					case 0x21:
-					case 0x22:
+                        {
+                            if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nノーツ終了時刻ms >= (int)n現在時刻ms))
+                            {
+                                //if( this.n現在のコース == pChip.nコース )
+                                if (pChip.b可視 == true)
+                                    this.chip現在処理中の連打チップ[nPlayer] = pChip;
+                            }
+                            if (pChip.n描画優先度 <= 0)
+                                this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+                        }
+                        break;
+                    case 0x22:
 					case 0x23:
 					case 0x24:
 					case 0x25:

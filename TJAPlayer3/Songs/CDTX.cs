@@ -2448,6 +2448,8 @@ namespace TJAPlayer3
                                 case 0x15:
                                 case 0x16:
                                 case 0x17:
+                                case 0x20:
+                                case 0x21:
                                     {
                                         if (this.bOFFSETの値がマイナスである)
                                         {
@@ -4372,7 +4374,7 @@ namespace TJAPlayer3
 
                         if (nObjectNum != 0)
                         {
-                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9)
+                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 16 || nObjectNum == 17)
                             {
                                 if (nNowRoll != 0)
                                 {
