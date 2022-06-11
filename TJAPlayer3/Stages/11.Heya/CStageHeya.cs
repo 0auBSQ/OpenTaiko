@@ -536,6 +536,9 @@ namespace TJAPlayer3
                     // Update the character
                     TJAPlayer3.NamePlateConfig.tUpdateCharacterName(iPlayer, TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
 
+                    // Welcome voice using Sanka
+                    TJAPlayer3.Skin.voiceTitleSanka[iPlayer]?.t再生する();
+
                     CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();

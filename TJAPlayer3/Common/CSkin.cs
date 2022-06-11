@@ -311,7 +311,46 @@ namespace TJAPlayer3
 
         // プロパティ
 
+        // Hitsounds
+
         public CHitSounds hsHitSoundsInformations = null;
+
+        // Character specific voice samples
+
+        // Sounds\Clear
+
+        public Cシステムサウンド[] voiceClearFailed = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceClearClear = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceClearFullCombo = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceClearAllPerfect = new Cシステムサウンド[4];
+
+        // Sounds\Menu
+
+        public Cシステムサウンド[] voiceMenuSongSelect = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuSongDecide = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuDiffSelect = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuDanSelectStart = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuDanSelectPrompt = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuDanSelectConfirm = new Cシステムサウンド[4];
+
+        // Sounds\Title
+
+        public Cシステムサウンド[] voiceTitleSanka = new Cシステムサウンド[4];
+
+        // Sounds\Tower
+
+        public Cシステムサウンド[] voiceTowerMiss = new Cシステムサウンド[4];
+
+        // Sounds\Result
+
+        public Cシステムサウンド[] voiceResultBestScore = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultClearFailed = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultClearSuccess = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultDanFailed = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultDanRedPass = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultDanGoldPass = new Cシステムサウンド[4];
+
+        // General sound effects (Skin specific)
 
         public Cシステムサウンド bgmオプション画面 = null;
         public Cシステムサウンド bgmコンフィグ画面 = null;
@@ -702,13 +741,13 @@ namespace TJAPlayer3
             this.bgm起動画面 = new Cシステムサウンド(@"Sounds\Setup BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\Option BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\Config BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            //this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
+            this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
+            //this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
             this.soundSkip = new Cシステムサウンド(@"Sounds\Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.SoundBanapas = new Cシステムサウンド(@"Sounds\Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundEntry = new Cシステムサウンド(@"Sounds\Entry.ogg", true, false, false, ESoundGroup.Voice);
             this.soundError = new Cシステムサウンド(@"Sounds\Error.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.soundsanka = new Cシステムサウンド(@"Sounds\sanka.ogg", false, false, false, ESoundGroup.Voice);
+            //this.soundsanka = new Cシステムサウンド(@"Sounds\sanka.ogg", false, false, false, ESoundGroup.Voice);
             this.soundBomb = new Cシステムサウンド(@"Sounds\Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
 
             //this.soundRed               = new Cシステムサウンド( @"Sounds\dong.ogg",            false, false, true, ESoundType.SoundEffect );
@@ -727,7 +766,7 @@ namespace TJAPlayer3
 
             this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-            this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
+            //this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
 
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundRankIn = new Cシステムサウンド(@"Sounds\ResultScreen\RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -743,9 +782,9 @@ namespace TJAPlayer3
             this.soundPon = new Cシステムサウンド(@"Sounds\Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundGauge = new Cシステムサウンド(@"Sounds\Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundScoreDon = new Cシステムサウンド(@"Sounds\ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.soundChallengeVoice = new Cシステムサウンド(@"Sounds\Dan\ChallengeVoice.wav", false, false, false, ESoundGroup.SoundEffect);
-            this.soundDanSelectStart = new Cシステムサウンド(@"Sounds\Dan\DanSelectStart.wav", false, false, false, ESoundGroup.SoundEffect);
-            this.soundDanSongSelectCheck = new Cシステムサウンド(@"Sounds\Dan\DanSongSelectCheck.wav", false, false, false, ESoundGroup.SoundEffect);
+            //this.soundChallengeVoice = new Cシステムサウンド(@"Sounds\Dan\ChallengeVoice.wav", false, false, false, ESoundGroup.SoundEffect);
+            //this.soundDanSelectStart = new Cシステムサウンド(@"Sounds\Dan\DanSelectStart.wav", false, false, false, ESoundGroup.SoundEffect);
+            //this.soundDanSongSelectCheck = new Cシステムサウンド(@"Sounds\Dan\DanSongSelectCheck.wav", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundDanSongSelectIn = new Cシステムサウンド(@"Sounds\Dan\Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
 
@@ -755,7 +794,7 @@ namespace TJAPlayer3
             this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundOnlineLoungeBGM = new Cシステムサウンド(@"Sounds\OnlineLounge\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundEncyclopediaBGM = new Cシステムサウンド(@"Sounds\Encyclopedia\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-            this.soundTowerSelectBGM = new Cシステムサウンド(@"Sounds\Tower\DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+            this.soundTowerSelectBGM = new Cシステムサウンド(@"Sounds\Tower\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
             soundModal = new Cシステムサウンド[6];
             for (int i = 0; i < soundModal.Length - 1; i++)

@@ -744,10 +744,16 @@ namespace TJAPlayer3
 						if (!b音声再生[9])
 						{
 							if (gaugeValues[p] >= 80.0f)
-								TJAPlayer3.Skin.soundDonClear.t再生する();
+                            {
+								//TJAPlayer3.Skin.soundDonClear.t再生する();
+								TJAPlayer3.Skin.voiceResultClearSuccess[TJAPlayer3.GetActualPlayer(p)]?.t再生する();
+							}
 							else
-								TJAPlayer3.Skin.soundDonFailed.t再生する();
-
+                            {
+								//TJAPlayer3.Skin.soundDonFailed.t再生する();
+								TJAPlayer3.Skin.voiceResultClearFailed[TJAPlayer3.GetActualPlayer(p)]?.t再生する();
+							}
+								
 							if (p == TJAPlayer3.ConfigIni.nPlayerCount - 1)
 								b音声再生[9] = true;
 						}

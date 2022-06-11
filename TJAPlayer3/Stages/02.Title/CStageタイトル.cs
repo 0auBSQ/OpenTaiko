@@ -378,8 +378,13 @@ namespace TJAPlayer3
 					{
 						if (!bモード選択)
 						{
+							/*
 							if (!TJAPlayer3.Skin.soundsanka.bPlayed)
 								TJAPlayer3.Skin.soundsanka.t再生する();
+							*/
+
+							if (TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile] != null && !TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile].bPlayed)
+								TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile]?.t再生する();
 
 							ctどんちゃんイン.t開始(0, 180, 2, TJAPlayer3.Timer);
 							ctBarAnimeIn.t開始(0, 1295, 1, TJAPlayer3.Timer);
@@ -792,7 +797,7 @@ namespace TJAPlayer3
 #if DEBUG
 
 				//string strVersion = "KTT:J:A:I:2017072200";
-				string strCreator = "https://github.com/AioiLight/TJAPlayer3";
+				string strCreator = "https://github.com/0AuBSQ/OpenTaiko";
 				AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
 				TJAPlayer3.act文字コンソール.tPrint(4, 44, C文字コンソール.Eフォント種別.白, "DEBUG BUILD");
 				TJAPlayer3.act文字コンソール.tPrint(4, 4, C文字コンソール.Eフォント種別.白, asmApp.Name + " Ver." + TJAPlayer3.VERSION + " (" + strCreator + ")");
@@ -887,7 +892,10 @@ namespace TJAPlayer3
 				ctエントリーバー点滅.n現在の値 = (int)ctエントリーバー点滅.n終了値;
 
 				TJAPlayer3.Skin.SoundBanapas.bPlayed = true;
-				TJAPlayer3.Skin.soundsanka.bPlayed = true;
+				//TJAPlayer3.Skin.soundsanka.bPlayed = true;
+				
+				if (TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile] != null)
+					TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile].bPlayed = true;
 			}
 		}
 

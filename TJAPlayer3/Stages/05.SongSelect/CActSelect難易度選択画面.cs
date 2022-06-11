@@ -180,7 +180,8 @@ namespace TJAPlayer3
             {
                 ctBarAnimeIn = new CCounter(0, 170, 4, TJAPlayer3.Timer);
                 // this.soundSelectAnnounce?.tサウンドを再生する();
-                TJAPlayer3.Skin.soundSelectAnnounce.t再生する();
+                //TJAPlayer3.Skin.soundSelectAnnounce.t再生する();
+                TJAPlayer3.Skin.voiceMenuDiffSelect[TJAPlayer3.SaveFile]?.t再生する();
                 base.b初めての進行描画 = false;
             }
             //-----------------
@@ -231,7 +232,8 @@ namespace TJAPlayer3
                                 CMenuCharacter.tMenuResetTimer(0, CMenuCharacter.ECharacterAnimation.START);
 
                                 this.bSelect[0] = true;
-                                TJAPlayer3.Skin.sound曲決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
 
                                 if(TJAPlayer3.ConfigIni.nPlayerCount == 2)
                                 {
@@ -291,7 +293,8 @@ namespace TJAPlayer3
                                 CMenuCharacter.tMenuResetTimer(1, CMenuCharacter.ECharacterAnimation.START);
 
                                 this.bSelect[1] = true;
-                                TJAPlayer3.Skin.sound曲決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(1)]?.t再生する();
 
                                 if (bSelect[0])
                                 {

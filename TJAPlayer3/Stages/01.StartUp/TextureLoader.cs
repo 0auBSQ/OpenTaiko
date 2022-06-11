@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace TJAPlayer3
 {
@@ -1095,7 +1096,15 @@ namespace TJAPlayer3
 
 
 
-    public void ReloadCharacter(int old, int newC, int player, bool primary = false)
+        public CSkin.Cシステムサウンド VoiceSelectOggOrWav(string basePath)
+        {
+            if (File.Exists(basePath + @".ogg"))
+                return new CSkin.Cシステムサウンド(basePath + @".ogg", false, false, true, ESoundGroup.Voice);
+            else
+                return new CSkin.Cシステムサウンド(basePath + @".wav", false, false, true, ESoundGroup.Voice);
+        }
+
+        public void ReloadCharacter(int old, int newC, int player, bool primary = false)
         {
             if (old == newC)
                 return;
@@ -1189,6 +1198,8 @@ namespace TJAPlayer3
                 #endregion
             }
 
+            string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + TJAPlayer3.Skin.Characters_DirName[newC];
+
             if ((newC >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != newC) || primary)
             {
                 int i = newC;
@@ -1196,8 +1207,6 @@ namespace TJAPlayer3
                 #region [Allocate the new character]
 
                 #region [Character individual values count initialisation]
-
-                string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i];
 
                 TJAPlayer3.Skin.Characters_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Normal\");
                 TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @"\Miss\");
@@ -1567,6 +1576,57 @@ namespace TJAPlayer3
                 #endregion
             }
 
+            #region [Voice samples]
+
+            var _skin = TJAPlayer3.Skin;
+
+            #region [Dispose previously allocated sound effects]
+
+            _skin.voiceClearFailed[player]?.Dispose();
+            _skin.voiceClearClear[player]?.Dispose();
+            _skin.voiceClearFullCombo[player]?.Dispose();
+            _skin.voiceClearAllPerfect[player]?.Dispose();
+            _skin.voiceMenuSongSelect[player]?.Dispose();
+            _skin.voiceMenuSongDecide[player]?.Dispose();
+            _skin.voiceMenuDiffSelect[player]?.Dispose();
+            _skin.voiceMenuDanSelectStart[player]?.Dispose();
+            _skin.voiceMenuDanSelectPrompt[player]?.Dispose();
+            _skin.voiceMenuDanSelectConfirm[player]?.Dispose();
+            _skin.voiceTitleSanka[player]?.Dispose();
+            _skin.voiceTowerMiss[player]?.Dispose();
+            _skin.voiceResultBestScore[player]?.Dispose();
+            _skin.voiceResultClearFailed[player]?.Dispose();
+            _skin.voiceResultClearSuccess[player]?.Dispose();
+            _skin.voiceResultDanFailed[player]?.Dispose();
+            _skin.voiceResultDanRedPass[player]?.Dispose();
+            _skin.voiceResultDanGoldPass[player]?.Dispose();
+
+            #endregion
+
+            #region [Allocate and load the new samples]
+
+            _skin.voiceClearFailed[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\Failed");
+            _skin.voiceClearClear[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\Clear");
+            _skin.voiceClearFullCombo[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\FullCombo");
+            _skin.voiceClearAllPerfect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\AllPerfect");
+            _skin.voiceMenuSongSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongSelect");
+            _skin.voiceMenuSongDecide[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongDecide");
+            _skin.voiceMenuDiffSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DiffSelect");
+            _skin.voiceMenuDanSelectStart[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DanSelectStart");
+            _skin.voiceMenuDanSelectPrompt[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DanSelectPrompt");
+            _skin.voiceMenuDanSelectConfirm[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DanSelectConfirm");
+            _skin.voiceTitleSanka[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Title\Sanka");
+            _skin.voiceTowerMiss[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Tower\Miss");
+            _skin.voiceResultBestScore[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\BestScore");
+            _skin.voiceResultClearFailed[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\ClearFailed");
+            _skin.voiceResultClearSuccess[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\ClearSuccess");
+            _skin.voiceResultDanFailed[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\DanFailed");
+            _skin.voiceResultDanRedPass[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\DanRedPass");
+            _skin.voiceResultDanGoldPass[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Result\DanGoldPass");
+
+            #endregion
+
+            #endregion
         }
 
         public void DisposeTexture()

@@ -250,6 +250,8 @@ namespace TJAPlayer3
 
                 // BGM played
                 this.bBGM再生済み = false;
+
+                TJAPlayer3.Skin.voiceMenuSongSelect[TJAPlayer3.SaveFile]?.t再生する();
                 
                 this.ftフォント = new Font("MS UI Gothic", 26f, GraphicsUnit.Pixel);
                 for (int i = 0; i < 2; i++)
@@ -795,6 +797,7 @@ namespace TJAPlayer3
                             }
                         }
                         #endregion
+                        /*
                         #region [ F8 ランダム選曲 ]
                         if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F8))
                         {
@@ -804,7 +807,8 @@ namespace TJAPlayer3
                                 TJAPlayer3.Skin.sound決定音.t再生する();
                             this.t曲をランダム選択する();
                         }
-                        #endregion 
+                        #endregion
+                        */
 
                         if (this.act曲リスト.r現在選択中の曲 != null)
                         {
@@ -833,8 +837,9 @@ namespace TJAPlayer3
                                                                 // Init tower variables 
                                                                 if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
                                                                     CFloorManagement.reinitialize(this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
-                                                                
-                                                                TJAPlayer3.Skin.sound曲決定音.t再生する();
+
+                                                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
 
                                                                 this.t曲を選択する();
                                                             }
@@ -905,6 +910,7 @@ namespace TJAPlayer3
                                                     break;
                                                 case C曲リストノード.Eノード種別.RANDOM:
                                                     {
+                                                        TJAPlayer3.Skin.sound決定音.t再生する();
                                                         this.t曲をランダム選択する();
 
                                                         //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
@@ -1495,15 +1501,18 @@ namespace TJAPlayer3
             // Third assignment
             this.r確定された曲 = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
             this.n確定された曲の難易度[0] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+
+            TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
             if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
             {
                 this.n確定された曲の難易度[1] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(1)]?.t再生する();
             }
                 
             this.r確定されたスコア = this.r確定された曲.arスコア[this.n確定された曲の難易度[0]];
             this.str確定された曲のジャンル = this.r確定された曲.strジャンル;
 
-            TJAPlayer3.Skin.sound曲決定音.t再生する();
+            //TJAPlayer3.Skin.sound曲決定音.t再生する();
 
             this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
             this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
