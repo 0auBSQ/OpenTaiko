@@ -1036,7 +1036,9 @@ namespace TJAPlayer3
         public bool FastRender; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
 
-		
+		public bool TJAP3FolderMode { get; private set; }
+
+
 
 		/// <summary>
 		/// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
@@ -1616,7 +1618,8 @@ namespace TJAPlayer3
 			this.bEndingAnime = false;
             this.nPlayerCount = 1; //2017.08.18 kairera0467 マルチプレイ対応
             ShinuchiMode = true; // Enable gen-4 score by default
-            FastRender = true;
+			TJAP3FolderMode = false;
+			FastRender = true;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
             #region[ Ver.K追加 ]
@@ -1970,7 +1973,7 @@ namespace TJAPlayer3
 			//sw.WriteLine( "; (If you feel illegal seek with mp3, please set it to 1.)" );	//
 			//sw.WriteLine( "NoMP3Streaming={0}", this.bNoMP3Streaming ? 1 : 0 );				//
 			//sw.WriteLine();
-            sw.WriteLine( "; 動画再生にDirectShowを使用する(0:OFF, 1:ON)" );
+			sw.WriteLine( "; 動画再生にDirectShowを使用する(0:OFF, 1:ON)" );
 			sw.WriteLine( "; 動画再生にDirectShowを使うことによって、再生時の負担を軽減できます。");
 			sw.WriteLine( "; ただし使用時にはセットアップが必要になるのでご注意ください。");
 			sw.WriteLine( "DirectShowMode={0}", this.bDirectShowMode ? 1 : 0 );
@@ -1988,7 +1991,10 @@ namespace TJAPlayer3
 			sw.WriteLine( "JudgeLinePosOffsetDrums={0}",  this.nJudgeLinePosOffset.Drums );		//		
 			sw.WriteLine();
 			#endregion
-            sw.WriteLine( "; 「また遊んでね」画面(0:OFF, 1:ON)" );
+			sw.WriteLine("; TJAPlayer3のboxの表示をするかどうか (0:OFF, 1:ON)");
+			sw.WriteLine("{0}={1}", nameof(TJAP3FolderMode), TJAP3FolderMode ? 1 : 0);
+			sw.WriteLine();
+			sw.WriteLine( "; 「また遊んでね」画面(0:OFF, 1:ON)" );
             sw.WriteLine( "EndingAnime={0}", this.bEndingAnime ? 1 : 0 );
             sw.WriteLine();
 			sw.WriteLine( ";-------------------" );
@@ -2785,8 +2791,12 @@ namespace TJAPlayer3
 											{
                                                 this.bDirectShowMode = C変換.bONorOFF( str4[ 0 ] ); ;
 											}
-                                            #endregion
-                                            else if( str3.Equals( "EndingAnime" ) )
+											#endregion
+											else if (str3.Equals(nameof(TJAP3FolderMode)))
+											{
+												TJAP3FolderMode = C変換.bONorOFF(str4[0]);
+											}
+											else if( str3.Equals( "EndingAnime" ) )
                                             {
                                                 this.bEndingAnime = C変換.bONorOFF( str4[ 0 ] );
                                             }

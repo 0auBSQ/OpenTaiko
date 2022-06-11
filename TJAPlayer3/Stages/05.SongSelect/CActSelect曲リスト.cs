@@ -82,7 +82,6 @@ namespace TJAPlayer3
 		// t選択曲が変更された()内で使う、直前の選曲の保持
 		// (前と同じ曲なら選択曲変更に掛かる再計算を省略して高速化するため)
 		private C曲リストノード song_last = null;
-
 		
 		// コンストラクタ
 
@@ -272,23 +271,30 @@ namespace TJAPlayer3
 			//Trace.TraceInformation( "Skin変更BoxDef  : "+  CSkin.strBoxDefSkinSubfolderFullName );
 			if(r現在選択中の曲.list子リスト.Count != 1)
 			{
-				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+				if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
+				{
+					this.r現在選択中の曲 = this.r現在選択中の曲.list子リスト[0];
+				}
+				else
+				{
+					List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
 
-				// Fill list songs
-				list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
+					// Fill list songs
+					list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
 
-				// Previous index 
-				int n回数 = this.r現在選択中の曲.Openindex;
-				if (this.r現在選択中の曲.Openindex >= this.r現在選択中の曲.list子リスト.Count())
-					n回数 = 0;
+					// Previous index 
+					int n回数 = this.r現在選択中の曲.Openindex;
+					if (this.r現在選択中の曲.Openindex >= this.r現在選択中の曲.list子リスト.Count())
+						n回数 = 0;
 
 
-				for (int index = 0; index <= n回数; index++)
-					this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
+					for (int index = 0; index <= n回数; index++)
+						this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
 
-				// Remove main box
-				list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));
-				
+					// Remove main box
+					list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));
+				}
+
 				this.t現在選択中の曲を元に曲バーを再構成する();
 				this.t選択曲が変更された(false);
 				
@@ -322,28 +328,38 @@ namespace TJAPlayer3
 			TJAPlayer3.Skin.SetCurrentSkinSubfolderFullName(
 				( this.r現在選択中の曲.strSkinPath == "" ) ? "" : TJAPlayer3.Skin.GetSkinSubfolderFullNameFromSkinName( CSkin.GetSkinName( this.r現在選択中の曲.strSkinPath ) ), false );
 
-			// Complete list of songs
-			List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
-
-			// Reinsert parent node
-			list.Insert(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.r親ノード);
-
-			// Reindex the parent node
-			this.r現在選択中の曲.r親ノード.Openindex = r現在選択中の曲.r親ノード.list子リスト.IndexOf(this.r現在選択中の曲);
-
-			// Move song pointer back to the folder
-			this.r現在選択中の曲 = this.r次の曲(r現在選択中の曲);
-
-			// Flatten folder
-			var flattened = flattenList(this.r現在選択中の曲.list子リスト);
-
-			// Remove recursively the included songs that are contained in the folder
-			for (int index = 0; index < list.Count; index++)
+			if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 			{
-				if (flattened.Contains(list[index]))
+				if (this.r現在選択中の曲.r親ノード  != null)
 				{
-					list.RemoveAt(index);
-					index--;
+					this.r現在選択中の曲 = this.r現在選択中の曲.r親ノード;
+				}
+			}
+			else
+			{
+				// Complete list of songs
+				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+
+				// Reinsert parent node
+				list.Insert(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.r親ノード);
+
+				// Reindex the parent node
+				this.r現在選択中の曲.r親ノード.Openindex = r現在選択中の曲.r親ノード.list子リスト.IndexOf(this.r現在選択中の曲);
+
+				// Move song pointer back to the folder
+				this.r現在選択中の曲 = this.r次の曲(r現在選択中の曲);
+
+				// Flatten folder
+				var flattened = flattenList(this.r現在選択中の曲.list子リスト);
+
+				// Remove recursively the included songs that are contained in the folder
+				for (int index = 0; index < list.Count; index++)
+				{
+					if (flattened.Contains(list[index]))
+					{
+						list.RemoveAt(index);
+						index--;
+					}
 				}
 			}
 
@@ -2387,7 +2403,7 @@ namespace TJAPlayer3
 			if( song == null )
 				return null;
 
-			List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && song.r親ノード != null) ? song.r親ノード.list子リスト : TJAPlayer3.Songs管理.list曲ルート;
 
 			int index = list.IndexOf( song );
 
@@ -2404,7 +2420,7 @@ namespace TJAPlayer3
 			if( song == null )
 				return null;
 
-			List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && song.r親ノード != null) ? song.r親ノード.list子リスト : TJAPlayer3.Songs管理.list曲ルート;
 
 			int index = list.IndexOf( song );
 	
