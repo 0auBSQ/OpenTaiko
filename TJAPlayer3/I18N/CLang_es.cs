@@ -231,6 +231,16 @@ namespace TJAPlayer3
             [10061] = "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso.",
             [10062] = "AplausoP2",
             [10063] = "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso P2.",
+            
+            [10064] = "Confirmar",
+            [10065] = "Tecla de confirmacion en los menus.",
+            [10066] = "Cancelar",
+            [10067] = "Tecla para cancelar en los menus.",
+            [10068] = "LeftChange",
+            [10069] = "Menu left change key.",
+            [10070] = "RightChange",
+            [10071] = "Menu right change key.",
+            
             [10084] = "Modo Shinuchi",
             [10091] = "Ajustes generales del simulador.",
             [10092] = "Ajustes para los controles.",
