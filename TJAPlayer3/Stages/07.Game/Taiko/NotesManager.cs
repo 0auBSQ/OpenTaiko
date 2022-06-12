@@ -308,7 +308,25 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
                 return;
 
-            int _offset = IsBigRoll(chip) ? 390 : IsClapRoll(chip) ? 1430 : IsYellowRoll(chip) ? 1040 : 0;
+            int _offset = 0;
+
+            if (IsSmallRoll(chip) || (_gt == EGameType.TAIKO && IsYellowRoll(chip)))
+            {
+                _offset = 0;
+            }
+            if (IsBigRoll(chip) || (_gt == EGameType.TAIKO && IsClapRoll(chip)))
+            {
+                _offset = 390;
+            }
+            else if (IsClapRoll(chip) && _gt == EGameType.KONGA)
+            {
+                _offset = 1430;
+            }
+            else if (IsYellowRoll(chip) && _gt == EGameType.KONGA)
+            {
+                _offset = 1040;
+            }
+
             float _adjust = 65f;
             int index = x末端 - x;
 

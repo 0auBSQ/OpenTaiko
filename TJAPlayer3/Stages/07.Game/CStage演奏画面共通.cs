@@ -1151,7 +1151,7 @@ namespace TJAPlayer3
                     else
                         this.soundRed2?.t再生を開始する();
 
-                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA)
+                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA || (_gt == EGameType.TAIKO && pChip.nチャンネル番号 == 0x21))
                     {
                         //CDTXMania.Skin.soundRed.t再生する();
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 1, nPlayer );
@@ -1171,7 +1171,7 @@ namespace TJAPlayer3
                     else
                         this.soundBlue2?.t再生を開始する();
 
-                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA)
+                    if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA || (_gt == EGameType.TAIKO && pChip.nチャンネル番号 == 0x21))
                     {
                         //CDTXMania.Skin.soundBlue.t再生する();
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 2, nPlayer );
@@ -1375,10 +1375,11 @@ namespace TJAPlayer3
 
                                 if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
                                 {
-
-
                                     if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / (double)rollSpeed) * pChip.nRollCount))
                                     {
+                                        EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
+                                        int nLane = 0;
+
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
                                         else
@@ -1393,7 +1394,10 @@ namespace TJAPlayer3
                                         TJAPlayer3.stage演奏ドラム画面.actMtaiko.tMtaikoEvent(pChip.nチャンネル番号, this.nHand[nPlayer], nPlayer);
 
 
-                                        this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, 0, 0, nPlayer);
+                                        if (pChip.nチャンネル番号 == 0x20 && _gt == EGameType.KONGA) nLane = 4;
+                                        else if (pChip.nチャンネル番号 == 0x21 && _gt == EGameType.KONGA) nLane = 1;
+
+                                        this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, nLane, 0, nPlayer);
                                     }
                                 }
                             }
@@ -3854,6 +3858,8 @@ namespace TJAPlayer3
                     case 0x17: //風船
                     case 0x18: //連打終了
                     case 0x19:
+                    case 0x20:
+                    case 0x21:
                         {
                             if( pChip.n描画優先度 >= 1 )
                                 this.t進行描画_チップ_Taiko連打( configIni, ref dTX, ref pChip, nPlayer );
