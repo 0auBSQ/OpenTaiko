@@ -812,7 +812,7 @@ namespace TJAPlayer3
                     break;
                 case Eパッド.CLAP:
                 case Eパッド.CLAP2P:
-                    nInput = 3;
+                    nInput = 4;
                     break;
             }
 
@@ -1248,16 +1248,16 @@ namespace TJAPlayer3
                                 {
                                     bool _isBalloon = NotesManager.IsBalloon(chipNoHit);
                                     bool _isKusudama = NotesManager.IsKusudama(chipNoHit);
-                                    bool _isKongaRedRoll = NotesManager.IsRoll(chipNoHit) && _gt == EGameType.KONGA;
+                                    bool _isKongaRedRoll = (NotesManager.IsSmallRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO;
 
                                     bool _isRedOnly = _isBalloon || _isKongaRedRoll || _isKusudama;
 
                                     // To be added later
                                     bool _isKongaPinkRoll = NotesManager.IsBigRoll(chipNoHit) && _gt == EGameType.KONGA;
 
-                                    bool _isBlueOnly = false;
+                                    bool _isBlueOnly = (NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO;
 
-                                    if ((!_isRedOnly || !_isBlue) && (!_isBlueOnly || _isBlue))
+                                    if ((_isRedOnly && !_isBlue) || (_isBlueOnly && _isBlue))
                                         this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                 }
 
@@ -1270,12 +1270,24 @@ namespace TJAPlayer3
                         case Eパッド.CLAP:
                         case Eパッド.CLAP2P:
                             {
+                                var _pad = (Eパッド)nPad;
 
                                 // Process konga clap
                                 if (e判定 != E判定.Miss && _isClapKonga)
                                 {
-                                    this.tドラムヒット処理(nTime, Eパッド.CLAP, chipNoHit, false, nUsePlayer);
+                                    this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                     bHitted = true;
+                                }
+
+                                // Judge rolls
+                                if (e判定 != E判定.Miss
+                                    && NotesManager.IsGenericRoll(chipNoHit)
+                                    && !NotesManager.IsRollEnd(chipNoHit))
+                                {
+                                    bool _isKongaClapRoll = NotesManager.IsClapRoll(chipNoHit) && _gt == EGameType.KONGA;
+
+                                    if (_isKongaClapRoll)
+                                        this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                 }
 
 
