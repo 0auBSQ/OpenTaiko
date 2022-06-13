@@ -242,6 +242,9 @@ namespace TJAPlayer3
             [10071] = "Tecla para cambiar a la derecha en los menus.",
             
             [10084] = "Modo Shinuchi",
+            [10085] = "Opciones principales",
+            [10086] = "Opciones del juego",
+            [10087] = "Salir",
             [10091] = "Ajustes generales del simulador.",
             [10092] = "Ajustes para los controles.",
             [10093] = "Guarda los cambios y sal del menú de configuración.",
