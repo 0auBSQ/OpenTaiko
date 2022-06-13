@@ -64,6 +64,7 @@ Halcyon : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
 Chasing the Wind : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & bol)
 Back Where I'm From : NetroAki - https://soundcloud.com/netroaki | https://twitter.com/netroaki | https://instagram.com/netroaki | https://netroaki.audio/ (Chart by 0AuBSQ)
 Slayer of. : Aden Mayo - https://www.youtube.com/channel/UCXEd-dVZGZDf6plBmGd8cig (Chart by bol)
+Welcome To The Cafe : Sukima Altera feat. ALTERNATiVE THEORY - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
