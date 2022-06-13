@@ -354,7 +354,7 @@ namespace TJAPlayer3
 
                 int screenPos = Math.Min((int)Difficulty.Oni, i);
                 int level = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i];
-                bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] > 0;
+                bool avaliable = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
 
                 if (avaliable)
                     TJAPlayer3.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);

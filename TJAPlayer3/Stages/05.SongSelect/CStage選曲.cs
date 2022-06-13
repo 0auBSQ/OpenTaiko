@@ -689,6 +689,17 @@ namespace TJAPlayer3
 
                                 #endregion
                             }
+                            else if (this.act曲リスト.latestContext == eMenuContext.Random)
+                            {
+                                #region [Trigger context box]
+
+                                this.tSelectSongRandomly();
+
+                                //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+
+                                #endregion
+                            }
 
                             this.act曲リスト.tMenuContextDisable();
                         }
@@ -876,7 +887,6 @@ namespace TJAPlayer3
                                                         }
                                                         else if (this.act曲リスト.r現在選択中の曲.strジャンル == "SearchD")
                                                         {
-                                                            // Todo : Add a small prompt to choose the difficulty
                                                             this.act曲リスト.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
                                                             TJAPlayer3.Skin.sound決定音.t再生する();
                                                             goto Decided;
@@ -911,10 +921,16 @@ namespace TJAPlayer3
                                                 case C曲リストノード.Eノード種別.RANDOM:
                                                     {
                                                         TJAPlayer3.Skin.sound決定音.t再生する();
+
+                                                        this.act曲リスト.tMenuContextTrigger(eMenuContext.Random);
+                                                        goto Decided;
+
+                                                        /*
                                                         this.t曲をランダム選択する();
 
                                                         //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                                         CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+                                                        */
                                                     }
                                                     break;
                                             }
@@ -1454,14 +1470,58 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.soundSkip.t再生する();
         }
 
-        private void t曲をランダム選択する()
+        private int tGetRandomSongDifficulty(int contextDiff)
         {
+            var song = this.r確定された曲;
+
+            int baseDiff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+
+            if (contextDiff >= 0)
+            {
+                if (contextDiff < (int)Difficulty.Oni)
+                    return contextDiff;
+                else if (contextDiff == (int)Difficulty.Oni)
+                {
+                    var score = song.arスコア[baseDiff];
+                    if (score.譜面情報.nレベル[(int)Difficulty.Oni] >= 0 && score.譜面情報.nレベル[(int)Difficulty.Edit] >= 0)
+                        return (new Random().Next(0, 2) == 0 ? (int)Difficulty.Oni : (int)Difficulty.Edit);
+                    return (int)Difficulty.Oni;
+                }
+            }
+
+            return baseDiff;
+        }
+
+        private void tSelectSongRandomly()
+        {
+            var usedDiffs = new int[] { -1, -1, -1, -1 };
+            var mandatoryDiffs = new List<int>();
+
+            #region [Fetch context informations]
+
+            if (this.act曲リスト.latestContext == eMenuContext.Random)
+            {
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    var diff = this.act曲リスト.tMenuContextGetVar(i);
+                    usedDiffs[i] = diff;
+                    if (!mandatoryDiffs.Contains(diff))
+                        mandatoryDiffs.Add(diff);
+                }
+            }
+
+            #endregion
+
             C曲リストノード song = this.act曲リスト.r現在選択中の曲;
+
+            song.stackランダム演奏番号.Clear();
+            song.listランダム用ノードリスト = null;
+
             if ((song.stackランダム演奏番号.Count == 0) || (song.listランダム用ノードリスト == null))
             {
                 if (song.listランダム用ノードリスト == null)
                 {
-                    song.listランダム用ノードリスト = this.t指定された曲が存在する場所の曲を列挙する_子リスト含む(song);
+                    song.listランダム用ノードリスト = this.t指定された曲が存在する場所の曲を列挙する_子リスト含む(song, ref mandatoryDiffs);
                 }
                 int count = song.listランダム用ノードリスト.Count;
                 if (count == 0)
@@ -1500,16 +1560,28 @@ namespace TJAPlayer3
 
             // Third assignment
             this.r確定された曲 = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
+
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+            {
+                this.n確定された曲の難易度[i] = tGetRandomSongDifficulty(usedDiffs[i]);
+                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+            }
+
+            /*
             this.n確定された曲の難易度[0] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
 
             TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
+
             if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
             {
+
                 this.n確定された曲の難易度[1] = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲);
+                
                 TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(1)]?.t再生する();
             }
+            */
                 
-            this.r確定されたスコア = this.r確定された曲.arスコア[this.n確定された曲の難易度[0]];
+            this.r確定されたスコア = this.r確定された曲.arスコア[this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.r確定された曲)];
             this.str確定された曲のジャンル = this.r確定された曲.strジャンル;
 
             //TJAPlayer3.Skin.sound曲決定音.t再生する();
@@ -1583,7 +1655,7 @@ namespace TJAPlayer3
         }
 
         // Foreach randomly selectable songs
-        private List<C曲リストノード> t指定された曲が存在する場所の曲を列挙する_子リスト含む(C曲リストノード song)
+        private List<C曲リストノード> t指定された曲が存在する場所の曲を列挙する_子リスト含む(C曲リストノード song, ref List<int> mandatory)
         {
             List<C曲リストノード> list = new List<C曲リストノード>();
             song = song.r親ノード;
@@ -1595,21 +1667,40 @@ namespace TJAPlayer3
                     {
                         // Don't add Dan/Tower charts for Random
                         int diff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
-                        if (diff < (int)Difficulty.Tower)
-                            list.Add(c曲リストノード);
+                        if (diff < (int)Difficulty.Tower) 
+                        {
+                            // Check if mandatory diffs are present
+                            var score = c曲リストノード.arスコア[diff];
+                            bool requiredDiffsExist = true;
+                            foreach (int df in mandatory)
+                            {
+                                if (score.譜面情報.nレベル[df] < 0)
+                                {
+                                    requiredDiffsExist = false;
+                                    break;
+                                }
+                            }
+
+                            if (requiredDiffsExist == true)
+                            {
+                                list.Add(c曲リストノード);
+                            }
+                            
+                        }
+                            
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
                     {
-                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list);
+                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory);
                     }
                 }
                 return list;
             }
-            this.t指定された曲の子リストの曲を列挙する_孫リスト含む(song, ref list);
+            this.t指定された曲の子リストの曲を列挙する_孫リスト含む(song, ref list, ref mandatory);
             return list;
         }
 
-        private void t指定された曲の子リストの曲を列挙する_孫リスト含む(C曲リストノード r親, ref List<C曲リストノード> list)
+        private void t指定された曲の子リストの曲を列挙する_孫リスト含む(C曲リストノード r親, ref List<C曲リストノード> list, ref List<int> mandatory)
         {
             if ((r親 != null) && (r親.list子リスト != null))
             {
@@ -1619,12 +1710,31 @@ namespace TJAPlayer3
                     {
                         // Don't add Dan/Tower charts for Random
                         int diff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+
                         if (diff < (int)Difficulty.Tower)
-                            list.Add(c曲リストノード);
+                        {
+                            // Check if mandatory diffs are present
+                            var score = c曲リストノード.arスコア[diff];
+                            bool requiredDiffsExist = true;
+                            foreach (int df in mandatory)
+                            {
+                                if (score.譜面情報.nレベル[df] < 0)
+                                {
+                                    requiredDiffsExist = false;
+                                    break;
+                                }
+                            }
+
+                            if (requiredDiffsExist == true)
+                            {
+                                list.Add(c曲リストノード);
+                            }
+
+                        }
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
                     {
-                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list);
+                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory);
                     }
                 }
             }

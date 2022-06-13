@@ -2118,9 +2118,33 @@ namespace TJAPlayer3
 					}
 					
 				}
+            }
+			// Context vars :
+			// 0~3 - Selected difficulty (1~4P)
+			// 4 - Current menu (0~3 for each player)
+			else if (emc == eMenuContext.Random)
+            {
+				// To change with a new texture
+				TJAPlayer3.Tx.SongSelect_Search_Window?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+				for (int i = 0; i <= _contextVars[4]; i++)
+                {
+					if (TJAPlayer3.Tx.Dani_Difficulty_Cymbol != null)
+					{
+						var tileSize = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
+						TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320 + 100 * i,
+							new Rectangle(tileSize * _contextVars[i],
+							0,
+							(_contextVars[i] == (int)Difficulty.Oni ? 2 : 1) * tileSize,
+							tileSize));
 
-				
+					}
+
+					if (i < _contextVars[4])
+						TJAPlayer3.Tx.SongSelect_Search_Arrow?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320 + 100 * i);
+					else if (i == _contextVars[4])
+						TJAPlayer3.Tx.SongSelect_Search_Arrow_Glow?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 320 + 100 * i);
+				}
             }
         }
 
@@ -2132,8 +2156,8 @@ namespace TJAPlayer3
 
 			#region [Decide]
 
-			if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) || (TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed) || TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed)) ||
-			((TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)))))
+			if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide)) ||
+			((TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))))
             {
 				if (emc == eMenuContext.SearchByDifficulty)
                 {
@@ -2166,6 +2190,15 @@ namespace TJAPlayer3
                     }
 						
                 }
+				else if (emc == eMenuContext.Random)
+                {
+					TJAPlayer3.Skin.sound決定音.t再生する();
+
+					_contextVars[4]++;
+					if (_contextVars[4] >= TJAPlayer3.ConfigIni.nPlayerCount)
+						return true;
+					_contextVars[_contextVars[4]] = Math.Min((int)Difficulty.Oni, TJAPlayer3.ConfigIni.nDefaultCourse);
+                }
 
 			}
 
@@ -2173,7 +2206,7 @@ namespace TJAPlayer3
 
             #region [Left]
 
-            else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue)
+            else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange)
 				|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
             {
 				if (emc == eMenuContext.SearchByDifficulty)
@@ -2185,13 +2218,21 @@ namespace TJAPlayer3
 					_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 					_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
 				}
+				else if (emc == eMenuContext.Random)
+				{
+					TJAPlayer3.Skin.sound変更音.t再生する();
+
+					_contextVars[_contextVars[4]]--;
+					// Clamp values
+					_contextVars[_contextVars[4]] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[_contextVars[4]]));
+				}
 			}
 
 			#endregion
 
 			#region [Right]
 
-			else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue)
+			else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange)
 				|| TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow))
 			{
 				if (emc == eMenuContext.SearchByDifficulty)
@@ -2202,6 +2243,14 @@ namespace TJAPlayer3
 					// Clamp values
 					_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 					_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
+				}
+				else if (emc == eMenuContext.Random)
+				{
+					TJAPlayer3.Skin.sound変更音.t再生する();
+
+					_contextVars[_contextVars[4]]++;
+					// Clamp values
+					_contextVars[_contextVars[4]] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[_contextVars[4]]));
 				}
 			}
 
