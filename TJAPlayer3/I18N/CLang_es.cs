@@ -237,7 +237,7 @@ namespace TJAPlayer3
             [10066] = "Cancelar",
             [10067] = "Tecla para cancelar en los menus.",
             [10068] = "MenuIzquierda",
-            [10069] = "Tecla para cambiar a la derecha en los menus.",
+            [10069] = "Tecla para cambiar a la izquierda en los menus.",
             [10070] = "MenuDerecha",
             [10071] = "Tecla para cambiar a la derecha en los menus.",
             
