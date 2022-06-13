@@ -273,7 +273,7 @@ namespace TJAPlayer3
             [156] = "¡Cambia tu estilo de juego\no ajustes generales!",
             [157] = "Salir del juego.\n¡Hasta la próxima!",
             [158] = "¡Descarga nuevos charts\ny contenido desde\n internet!",
-            [159] = "Learn about OpenTaiko\nrelated features and\nhow to install new content !",
+            [159] = "¡Aprende sobre las funciones relacionadas\na OpenTaiko y como instalar\nnuevo contenido!",
             [160] = "¡Lucha contra una IA en\nmultiples secciones y\nhazte con la victoria!",
             [161] = "¡Revisa tu progreso!",
             [162] = "¡Crea tus propios charts .tja\ncon tus canciones favoritas!",
