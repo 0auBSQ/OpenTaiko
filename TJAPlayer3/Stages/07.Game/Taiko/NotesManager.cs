@@ -34,8 +34,8 @@ namespace TJAPlayer3
             ["E"] = 5, // Unused
             ["F"] = 15, // ADLib
             ["G"] = 0xF1, // Green (Purple) double hit note (Coming soon)
-            ["H"] = 5, // Konga clap roll (Coming soon)
-            ["I"] = 5, // Konga yellow roll (Coming soon)
+            ["H"] = 16, // Konga clap roll (Coming soon)
+            ["I"] = 17, // Konga yellow roll (Coming soon)
         };
 
         public static bool FastFlankedParsing(string s)
@@ -169,6 +169,18 @@ namespace TJAPlayer3
             return (chip.nチャンネル番号 == 0x101);
         }
 
+        public static bool IsYellowRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x21;
+        }
+
+        public static bool IsClapRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x20;
+        }
+
         public static bool IsKusudama(CDTX.CChip chip)
         {
             if (chip == null) return false;
@@ -208,13 +220,14 @@ namespace TJAPlayer3
         public static bool IsRoll(CDTX.CChip chip)
         {
             if (chip == null) return false;
-            return IsBigRoll(chip) || IsSmallRoll(chip);
+            return IsBigRoll(chip) || IsSmallRoll(chip) || IsClapRoll(chip) || IsYellowRoll(chip);
         }
 
         public static bool IsGenericRoll(CDTX.CChip chip)
         {
             if (chip == null) return false;
-            return 0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19;
+            return (0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19) || 
+                (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21);
         }
 
         public static bool IsMissableNote(CDTX.CChip chip)
@@ -295,7 +308,25 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
                 return;
 
-            int _offset = IsBigRoll(chip) ? 390 : 0;
+            int _offset = 0;
+
+            if (IsSmallRoll(chip) || (_gt == EGameType.TAIKO && IsYellowRoll(chip)))
+            {
+                _offset = 0;
+            }
+            if (IsBigRoll(chip) || (_gt == EGameType.TAIKO && IsClapRoll(chip)))
+            {
+                _offset = 390;
+            }
+            else if (IsClapRoll(chip) && _gt == EGameType.KONGA)
+            {
+                _offset = 1430;
+            }
+            else if (IsYellowRoll(chip) && _gt == EGameType.KONGA)
+            {
+                _offset = 1040;
+            }
+
             float _adjust = 65f;
             int index = x末端 - x;
 
