@@ -268,7 +268,7 @@ namespace TJAPlayer3
                         this.stScore[ i ].nAddScore = 10000;
                         this.stScore[ i ].ctTimer = new CCounter( 0, 100, 4, TJAPlayer3.Timer );
                         this.stScore[ i ].bBonusScore = true;
-                        this.stScore[ i ].bAddEnd = true;
+                        this.stScore[ i ].bAddEnd = false;
                         this.stScore[ i ].nPlayer = player;
                         this.n現在表示中のAddScore++;
                         break;
