@@ -1248,6 +1248,24 @@ namespace TJAPlayer3
                 //分岐のための処理。実装してない。
 
                 //赤か青かの分岐
+
+
+
+                if (pChip.bGOGOTIME && !TJAPlayer3.ConfigIni.ShinuchiMode)
+                {
+                    this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 360L, player);
+                }
+                else
+                {
+                    this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, player);
+                }
+                //CDTXMania.Skin.soundRed.t再生する();
+                if (pChip.nPlayerSide == 0)
+                    this.soundRed?.t再生を開始する();
+                else
+                    this.soundRed2?.t再生を開始する();
+
+
                 if ( pChip.nBalloon == pChip.nRollCount )
                 {
                     //ﾊﾟｧｰﾝ
@@ -1276,21 +1294,12 @@ namespace TJAPlayer3
                     }
                     this.eRollState = E連打State.none;
                 }
+                /*
                 else
                 {
-                    if(pChip.bGOGOTIME && !TJAPlayer3.ConfigIni.ShinuchiMode)
-                    {
-                        this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 360L, player);
-                    } else
-                    {
-                        this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, player);
-                    }
-                    //CDTXMania.Skin.soundRed.t再生する();
-                    if (pChip.nPlayerSide == 0)
-                        this.soundRed?.t再生を開始する();
-                    else
-                        this.soundRed2?.t再生を開始する();
+                    
                 }
+                */
                 //TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[player].Start(PlayerLane.FlashType.Hit);
             }
             else
