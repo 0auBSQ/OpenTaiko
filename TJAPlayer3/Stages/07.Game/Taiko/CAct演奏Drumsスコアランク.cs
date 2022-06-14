@@ -12,20 +12,22 @@ namespace TJAPlayer3
         public override void On活性化()
         {
             double RollTimems = 0;
+
+            /*
             foreach (var chip in TJAPlayer3.DTX.listChip)
             {
-                //if (chip.nチャンネル番号 == 21 || chip.nチャンネル番号 == 22)
                 if (NotesManager.IsRoll(chip))
                 {
                     RollTimems += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
                 }
             }
+            */
 
             this.ScoreRank = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)) };
+                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[0] * 16.6 / 10) * 100 * 10)) };
 
             this.ScoreRank2P = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(RollTimems * 16.6 / 10) * 100 * 10)) };
+                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[1] * 16.6 / 10) * 100 * 10)) };
 
             for (int i = 0; i < 7; i++)
             {
