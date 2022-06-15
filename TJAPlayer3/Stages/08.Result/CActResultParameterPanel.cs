@@ -411,7 +411,7 @@ namespace TJAPlayer3
 						{
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGreat.ToString(),
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood.ToString(),
-							(TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss - TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMine).ToString(),
+							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss.ToString(),
 							//TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nRoll.ToString(),
 							TJAPlayer3.stage演奏ドラム画面.GetRoll(i).ToString(),
 							TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[i].ToString()

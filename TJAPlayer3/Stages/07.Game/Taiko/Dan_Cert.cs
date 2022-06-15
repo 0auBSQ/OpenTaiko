@@ -239,19 +239,28 @@ namespace TJAPlayer3
                 }
                 else
                 {
-                    songsnotesremain[NowShowingNumber] = TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber] - (TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber] + TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber] + TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber]);
-                    notesremain = TJAPlayer3.DTX.nノーツ数[3] - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect) - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great) - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Miss + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss);
+                    songsnotesremain[NowShowingNumber] = TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber] 
+                        - (TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber] 
+                            + TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber] 
+                            + TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber]);
+
+                    notesremain = TJAPlayer3.DTX.nノーツ数[3] 
+                        - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect 
+                            + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect) 
+                        - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great 
+                            + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great) 
+                        - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Miss 
+                            + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss);
                     
                     // 残り音符数が0になったときに判断されるやつ
+
+                    // Challenges that are judged when there are no remaining notes (janky ?)
                     if (ExamChange[i] ? songsnotesremain[NowShowingNumber] <= 0 : notesremain <= 0)
                     {
                         // 残り音符数ゼロ
                         switch (Challenge[i].GetExamType())
                         {
                             case Exam.Type.Gauge:
-                                if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
-                                break;
-                            case Exam.Type.Score:
                                 if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
                                 break;
                             case Exam.Type.Accuracy:
@@ -263,16 +272,19 @@ namespace TJAPlayer3
                         }
                     }
                     
-                    // 常に監視されるやつ。
+                    // Challenges that are monitored in live
                     switch (Challenge[i].GetExamType())
                     {
                         case Exam.Type.JudgePerfect:
                         case Exam.Type.JudgeGood:
                         case Exam.Type.JudgeBad:
-                            if (ExamChange[i] ? songsnotesremain[NowShowingNumber] < (Challenge[i].Value[0] - Challenge[i].Amount) : notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
+                            if (ExamChange[i] 
+                                ? songsnotesremain[NowShowingNumber] < (Challenge[i].Value[0] - Challenge[i].Amount) 
+                                : notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
                             break;
                         case Exam.Type.Combo:
-                            if (notesremain + TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.P1 < ((Challenge[i].Value[0])) && TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
+                            if (notesremain + TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.P1 < ((Challenge[i].Value[0])) 
+                                && TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
                             break;
                         default:
                             break;
@@ -282,18 +294,20 @@ namespace TJAPlayer3
                     // ( CDTXMania.DTX.listChip.Count > 0 ) ? CDTXMania.DTX.listChip[ CDTXMania.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
 
                     // Bug here when charts have an extra roll ?
+
+                    // Challenges that are judged when the song stops
                     if(!IsEnded[NowShowingNumber])
                     {
                         if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
-                        if (ExamChange[i] ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻 : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻)
+                        if (ExamChange[i] 
+                            ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻 
+                            : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻)
                         {
                             switch (Challenge[i].GetExamType())
                             {
                                 case Exam.Type.Score:
                                 case Exam.Type.Hit:
-                                    if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
-                                    break;
-                                case Exam.Type.Roll:
+                                case Exam.Type.Roll: // Should be checked in live "If no remaining roll"
                                     if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
                                     break;
                                 default:

@@ -1710,17 +1710,21 @@ namespace TJAPlayer3
                                     if(!NotesManager.IsMissableNote(pChip) && !bBombHit)
                                         break;
 
-                                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-                                        this.n不可[actDan.NowShowingNumber]++;
-
-                                    else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                                         CFloorManagement.damage();
 
-                                    this.CBranchScore[nPlayer].nMiss++;
-                                    this.CChartScore[nPlayer].nMiss++;
-                                    this.Chara_MissCount[nPlayer]++;
+                                    if (!bBombHit)
+                                    {
+                                        if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                            this.n不可[actDan.NowShowingNumber]++;
 
-                                    if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Miss++;
+                                        this.CBranchScore[nPlayer].nMiss++;
+                                        this.CChartScore[nPlayer].nMiss++;
+                                        this.Chara_MissCount[nPlayer]++;
+
+                                        if (nPlayer == 0) this.nヒット数_Auto含まない.Drums.Miss++;
+                                    }
+                                    
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                     this.actComboVoice.tReset(nPlayer);
 
@@ -1813,14 +1817,18 @@ namespace TJAPlayer3
                                         if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
                                             break;
 
-                                        if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-                                            this.n不可[actDan.NowShowingNumber]++;
-                                        else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                        if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                                             CFloorManagement.damage();
 
-                                        this.CBranchScore[nPlayer].nMiss++;
-                                        this.CChartScore[nPlayer].nMiss++;
-                                        this.Chara_MissCount[nPlayer]++;
+                                        if (!bBombHit)
+                                        {
+                                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                                this.n不可[actDan.NowShowingNumber]++;
+
+                                            this.CBranchScore[nPlayer].nMiss++;
+                                            this.CChartScore[nPlayer].nMiss++;
+                                            this.Chara_MissCount[nPlayer]++;
+                                        }
 
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
                                         this.actComboVoice.tReset(nPlayer);

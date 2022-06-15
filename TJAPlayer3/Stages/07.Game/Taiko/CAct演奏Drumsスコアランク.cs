@@ -198,7 +198,7 @@ namespace TJAPlayer3
                     {
                         #region [Tower score ranks]
 
-                        double progress = CFloorManagement.LastRegisteredFloor / (double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+                        double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor);
 
                         bool[] conditions =
                         {
@@ -207,7 +207,7 @@ namespace TJAPlayer3
                             progress >= 0.5,
                             progress >= 0.75,
                             progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-                            TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0,
+                            TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0,
                             TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0
                         };
 

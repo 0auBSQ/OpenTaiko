@@ -391,7 +391,7 @@ namespace TJAPlayer3
 
 			if (ccf.nGood > 0)
 				guide = 1;
-			if (ccf.nMiss > 0)
+			if (ccf.nMiss > 0 || ccf.nMine > 0)
 				guide = 0;
 
 			TJAPlayer3.Tx.Taiko_Combo_Guide[guide]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Combo_Text_X[nPlayer], TJAPlayer3.Skin.Game_Taiko_Combo_Text_Y[nPlayer]);
