@@ -301,15 +301,13 @@ namespace TJAPlayer3
                     // 音源が終了したやつの分岐。
                     // ( CDTXMania.DTX.listChip.Count > 0 ) ? CDTXMania.DTX.listChip[ CDTXMania.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
 
-                    // Bug here when charts have an extra roll ?
+                    // Check challenge fails at the end of each songs
 
-                    // Challenges that are judged when the song stops
-                    if(!IsEnded[NowShowingNumber])
+                    if (TJAPlayer3.DTX.listChip.Count > 0)
                     {
-                        if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
-                        if (ExamChange[i] 
-                            ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻 
-                            : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= TJAPlayer3.Timer.n現在時刻)
+                        if (ExamChange[i]
+                            ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻//TJAPlayer3.Timer.n現在時刻 
+                            : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻)//TJAPlayer3.Timer.n現在時刻)
                         {
                             switch (Challenge[i].GetExamType())
                             {
@@ -320,23 +318,28 @@ namespace TJAPlayer3
                                 // Should be checked in live "If no remaining ADLIB/Mine"
                                 case Exam.Type.JudgeADLIB:
                                 case Exam.Type.JudgeMine:
-                                // Catch normaly already checked cases that would be forgotten before (ex : for charts with branches)
-                                case Exam.Type.JudgePerfect: 
-                                case Exam.Type.JudgeGood:
-                                case Exam.Type.JudgeBad:
-                                case Exam.Type.Gauge:
-                                case Exam.Type.Accuracy:
-                                case Exam.Type.Combo:
                                     if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
                                     break;
                                 default:
                                     break;
                             }
+                        }
+                    }
+
+                    /*
+                    if (!IsEnded[NowShowingNumber])
+                    {
+                        if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
+                        if (ExamChange[i] 
+                            ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻//TJAPlayer3.Timer.n現在時刻 
+                            : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻)//TJAPlayer3.Timer.n現在時刻)
+                        {
                             IsEnded[NowShowingNumber] = true;
                         }
                     }
+                    */
                 }
-                if(oldReached == false && Challenge[i].GetReached() == true)
+                if (oldReached == false && Challenge[i].GetReached() == true)
                 {
                     Sound_Failed?.t再生を開始する();
                 }
@@ -540,8 +543,15 @@ namespace TJAPlayer3
 
             #endregion
 
+            /*
             TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms + " / " + CSound管理.rc演奏用タイマ.n現在時刻);
 
+            TJAPlayer3.act文字コンソール.tPrint(100, 20, C文字コンソール.Eフォント種別.白, TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms.ToString());
+            TJAPlayer3.act文字コンソール.tPrint(100, 40, C文字コンソール.Eフォント種別.白, TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms.ToString());
+            TJAPlayer3.act文字コンソール.tPrint(100, 60, C文字コンソール.Eフォント種別.白, TJAPlayer3.Timer.n現在時刻.ToString());
+            */
+
+            // Challenges that are judged when the song stops
 
             return base.On進行描画();
         }

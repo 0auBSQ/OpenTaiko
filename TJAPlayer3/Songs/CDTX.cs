@@ -3322,13 +3322,9 @@ namespace TJAPlayer3
 
                         this.t入力_行解析譜面_V4(str);
 
-                        /*
-                        if (!String.IsNullOrEmpty(strSplit読み込むコース[i]))
-                            this.tDanExamLoad(strSplit読み込むコース[i]);
-                        */
-
                     }
 
+                    // Retrieve all the global exams (non individual) at the end
                     if (DanSongs.Number > 0)
                     {
                         for (int i = 0; i < CExamInfo.cMaxExam; i++)
@@ -4104,7 +4100,7 @@ namespace TJAPlayer3
                     //if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
                     if (NotesManager.IsHittableNote(listChip[i]))
                     {
-                        if(DanSongs.Number != 0)
+                        if (DanSongs.Number != 0)
                         {
                             Array.Resize(ref this.pDan_LastChip, this.pDan_LastChip.Length + 1);
                             this.pDan_LastChip[DanSongs.Number - 1] = listChip[i];

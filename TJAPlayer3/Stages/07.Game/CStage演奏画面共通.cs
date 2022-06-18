@@ -3436,7 +3436,8 @@ namespace TJAPlayer3
                             this.actPanel.t歌詞テクスチャを削除する();
                             if (pChip.nコース == this.n現在のコース[nPlayer])
                             {
-                                if(ListDan_Number != 0 && actDan.FirstSectionAnime)
+                                this.actDan.Update();
+                                if (ListDan_Number != 0 && actDan.FirstSectionAnime)
                                 {
                                     if (this.actDan.GetFailedAllChallenges())
                                     {
