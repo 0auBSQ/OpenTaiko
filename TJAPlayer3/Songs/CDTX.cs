@@ -2897,7 +2897,10 @@ namespace TJAPlayer3
                 }
                 else if (nMode == 1)
                 {
-                    if (!string.IsNullOrEmpty(input[n]) && (input[n].Substring(0, 1) == "#" || NotesManager.FastFlankedParsing(input[n])))//this.CharConvertNote(input[n].Substring(0, 1)) != -1))
+                    if (!string.IsNullOrEmpty(input[n]) && 
+                        (input[n].Substring(0, 1) == "#" 
+                        || input[n].StartsWith("EXAM")
+                        || NotesManager.FastFlankedParsing(input[n])))//this.CharConvertNote(input[n].Substring(0, 1)) != -1))
                     {
                         if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM"))
                         {
@@ -3319,9 +3322,24 @@ namespace TJAPlayer3
 
                         this.t入力_行解析譜面_V4(str);
 
+                        /*
                         if (!String.IsNullOrEmpty(strSplit読み込むコース[i]))
                             this.tDanExamLoad(strSplit読み込むコース[i]);
+                        */
+
                     }
+
+                    if (DanSongs.Number > 0)
+                    {
+                        for (int i = 0; i < CExamInfo.cMaxExam; i++)
+                        {
+                            if (Dan_C[i] != null && List_DanSongs[0].Dan_C[i] == null)
+                            {
+                                List_DanSongs[0].Dan_C[i] = Dan_C[i];
+                            }
+                        }
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
@@ -4265,6 +4283,11 @@ namespace TJAPlayer3
                     this.t命令を挿入する(InputText);
                     return;
                 }
+                else if (InputText.StartsWith("EXAM"))
+                {
+                    this.tDanExamLoad(InputText);
+                    return;
+                }
                 else
                 {
                     if (this.b小節線を挿入している == false)
@@ -4769,8 +4792,7 @@ namespace TJAPlayer3
 
             // Adapt to EXAM until 7, optimise condition
 
-            if (strCommandName.Equals("EXAM1") || strCommandName.Equals("EXAM2") || strCommandName.Equals("EXAM3") || strCommandName.Equals("EXAM4")
-                || strCommandName.Equals("EXAM5") || strCommandName.Equals("EXAM6") || strCommandName.Equals("EXAM7"))
+            if (strCommandName.StartsWith("EXAM"))
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
@@ -4778,6 +4800,11 @@ namespace TJAPlayer3
                     int[] examValue;
                     Exam.Range examRange;
                     var splitExam = strCommandParam.Split(',');
+                    int examNumber = int.Parse(strCommandName.Substring(4)) - 1;
+
+                    if (examNumber > CExamInfo.cMaxExam)
+                        return;
+
                     switch (splitExam[0])
                     {
                         case "g":
@@ -4838,10 +4865,11 @@ namespace TJAPlayer3
                             break;
                     }
 
-                    if(Dan_C[int.Parse(strCommandName.Substring(4)) - 1] == null)
-                        Dan_C[int.Parse(strCommandName.Substring(4)) - 1] = new Dan_C(examType, examValue, examRange);
+                    if(Dan_C[examNumber] == null)
+                        Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
 
-                    List_DanSongs[DanSongs.Number - 1].Dan_C[int.Parse(strCommandName.Substring(4)) - 1] = new Dan_C(examType, examValue, examRange);
+                    if (DanSongs.Number > 0)
+                        List_DanSongs[DanSongs.Number - 1].Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
                 }
             }
         }

@@ -61,7 +61,8 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                     {
-                        if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count - 1].Dan_C[j] != null) //個別の条件がありますよー
+                        if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count - 1].Dan_C[j] != null
+                            && TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
                         {
                             if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[j].GetExamRange() == Exam.Range.Less)
                             {
@@ -244,6 +245,7 @@ namespace TJAPlayer3
                             + TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber] 
                             + TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber]);
 
+                    /*
                     notesremain = TJAPlayer3.DTX.nノーツ数[3] 
                         - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect 
                             + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect) 
@@ -251,10 +253,16 @@ namespace TJAPlayer3
                             + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great) 
                         - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Miss 
                             + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss);
-                    
+                    */
+
+                    notesremain = TJAPlayer3.DTX.nノーツ数[3]
+                        - (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood
+                            + TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat
+                            + TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss);
+
                     // 残り音符数が0になったときに判断されるやつ
 
-                    // Challenges that are judged when there are no remaining notes (janky ?)
+                    // Challenges that are judged when there are no remaining notes
                     if (ExamChange[i] ? songsnotesremain[NowShowingNumber] <= 0 : notesremain <= 0)
                     {
                         // 残り音符数ゼロ
@@ -307,7 +315,18 @@ namespace TJAPlayer3
                             {
                                 case Exam.Type.Score:
                                 case Exam.Type.Hit:
-                                case Exam.Type.Roll: // Should be checked in live "If no remaining roll"
+                                // Should be checked in live "If no remaining roll"
+                                case Exam.Type.Roll:
+                                // Should be checked in live "If no remaining ADLIB/Mine"
+                                case Exam.Type.JudgeADLIB:
+                                case Exam.Type.JudgeMine:
+                                // Catch normaly already checked cases that would be forgotten before (ex : for charts with branches)
+                                case Exam.Type.JudgePerfect: 
+                                case Exam.Type.JudgeGood:
+                                case Exam.Type.JudgeBad:
+                                case Exam.Type.Gauge:
+                                case Exam.Type.Accuracy:
+                                case Exam.Type.Combo:
                                     if (Challenge[i].Amount < Challenge[i].Value[0]) Challenge[i].SetReached(true);
                                     break;
                                 default:

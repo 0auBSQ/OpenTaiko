@@ -439,47 +439,15 @@ namespace TJAPlayer3
                     switch (this.Mode[i])
                     {
                         case EndMode.StageFailed:
-                            //this.ct進行メイン.n現在の値 = 18;
-                            /*
-                            if (this.soundFailed != null && !this.b再生済み)
-                            {
-                                this.soundFailed.t再生を開始する();
-                                this.b再生済み = true;
-                            }
-                            */
                             this.showEndEffect_Failed(i);
                             break;
                         case EndMode.StageCleared:
-                            //this.ct進行メイン.n現在の値 = 18;
-                            /*
-                            if (this.soundClear != null && !this.b再生済み)
-                            {
-                                this.soundClear.t再生を開始する();
-                                this.b再生済み = true;
-                            }
-                            */
                             this.showEndEffect_Clear(i);
                             break;
                         case EndMode.StageFullCombo:
-                            //this.ct進行メイン.n現在の値 = 18;
-                            /*
-                            if (this.soundFullCombo != null && !this.b再生済み)
-                            {
-                                this.soundFullCombo.t再生を開始する();
-                                this.b再生済み = true;
-                            }
-                            */
                             this.showEndEffect_FullCombo(i);
                             break;
                         case EndMode.StageDondaFullCombo:
-                            //this.ct進行メイン.n現在の値 = 18;
-                            /*
-                            if (this.soundDondaFullCombo != null && !this.b再生済み)
-                            {
-                                this.soundDondaFullCombo.t再生を開始する();
-                                this.b再生済み = true;
-                            }
-                            */
                             this.showEndEffect_DondaFullCombo(i);
                             break;
                         default:
