@@ -456,7 +456,7 @@ namespace TJAPlayer3
                             if (this.cdnSongListIndex < apiMethods.FetchedSongsList.Length)
                             {
                                 var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
-                                var zipPath = $@"Cache\{song.Md5}.zip";
+                                //var zipPath = $@"Cache\{song.Md5}.zip";
                                 var downloadLink = GetDownloadLink(song);
 
                                 if (CSongDict.tContainsSongUrl(downloadLink))
@@ -532,6 +532,16 @@ namespace TJAPlayer3
 
         #region [Song Downloading]
 
+        public string ReplaceInvalidChars(string filename, string substitute = "_")
+        {
+            return string.Join(substitute, filename.Split(Path.GetInvalidFileNameChars()));
+        }
+
+        public string TruncateString(string s, int length)
+        {
+            return s.Substring(0, Math.Min(length, s.Length));
+        }
+
         private string GetAssignedLanguageValue(Dictionary<string, string> ens)
         {
             if (ens.ContainsKey(TJAPlayer3.ConfigIni.sLang))
@@ -551,8 +561,10 @@ namespace TJAPlayer3
             // Create Cache folder if does not exist
             Directory.CreateDirectory($@"Cache\");
 
+            
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
-            var zipPath = $@"Cache\{song.SongTitle}-{song.Md5}.zip";
+            var zipName = ReplaceInvalidChars($@"{TruncateString(song.SongTitle, 16)}-{TruncateString(song.Md5, 10)}");
+            var zipPath = $@"Cache\{zipName}.zip";
             var downloadLink = GetDownloadLink(song);
             
             try
@@ -633,7 +645,7 @@ namespace TJAPlayer3
                     }
                     
 
-                    var songPath = $@"{genredPath}{song.SongTitle}-{song.Md5}";
+                    var songPath = $@"{genredPath}{zipName}";
 
                     System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, songPath);
 

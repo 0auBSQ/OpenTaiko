@@ -110,6 +110,7 @@ namespace TJAPlayer3
             Menu_Title = TxC(@"Menu_Title.png");
             Menu_Highlight = TxC(@"Menu_Highlight.png");
             Enum_Song = TxC(@"Enum_Song.png");
+            Loading = TxC(@"Loading.png");
             Scanning_Loudness = TxC(@"Scanning_Loudness.png");
             Overlay = TxC(@"Overlay.png");
             Network_Connection = TxC(@"Network_Connection.png");
@@ -1646,6 +1647,7 @@ namespace TJAPlayer3
             Menu_Title,
             Menu_Highlight,
             Enum_Song,
+            Loading,
             Scanning_Loudness,
             NamePlateBase,
             Overlay,

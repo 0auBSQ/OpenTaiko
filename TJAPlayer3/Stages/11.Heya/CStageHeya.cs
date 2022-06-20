@@ -529,6 +529,8 @@ namespace TJAPlayer3
 
                 else if (iCurrentMenu == 1)
                 {
+                    //TJAPlayer3.Tx.Loading?.t2D描画(TJAPlayer3.app.Device, 18, 7);
+
                     // Reload character, a bit time expensive but with a O(N) memory complexity instead of O(N * M)
                     TJAPlayer3.Tx.ReloadCharacter(TJAPlayer3.NamePlateConfig.data.Character[iPlayer], iCharacterCurrent, iPlayer);
                     TJAPlayer3.NamePlateConfig.data.Character[iPlayer] = iCharacterCurrent;
