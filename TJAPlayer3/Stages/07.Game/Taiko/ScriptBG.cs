@@ -66,6 +66,7 @@ namespace TJAPlayer3
 
         private Lua LuaScript;
 
+        private LuaFunction LuaSetConstValues;
         private LuaFunction LuaUpdateValues;
         private LuaFunction LuaClearIn;
         private LuaFunction LuaClearOut;
@@ -95,6 +96,7 @@ namespace TJAPlayer3
                 }
             }
 
+            LuaSetConstValues = LuaScript.GetFunction("setConstValues");
             LuaUpdateValues = LuaScript.GetFunction("updateValues");
             LuaClearIn = LuaScript.GetFunction("clearIn");
             LuaClearOut = LuaScript.GetFunction("clearOut");
@@ -104,15 +106,28 @@ namespace TJAPlayer3
         }
         public void Dispose()
         {
-            var texs = Textures.ToArray();
-            for (int i = 0; i < texs.Length; i++)
+            List<CTexture> texs = new List<CTexture>();
+            foreach(var tex in Textures.Values)
             {
-                TJAPlayer3.t安全にDisposeする(ref texs[i]);
+                texs.Add(tex);
+            }
+            for (int i = 0; i < texs.Count; i++)
+            {
+                var tex = texs[i];
+                TJAPlayer3.tテクスチャの解放(ref tex);
             }
 
             Textures.Clear();
 
             LuaScript?.Dispose();
+
+            LuaSetConstValues?.Dispose();
+            LuaUpdateValues?.Dispose();
+            LuaClearIn?.Dispose();
+            LuaClearOut?.Dispose();
+            LuaInit?.Dispose();
+            LuaUpdate?.Dispose();
+            LuaDraw?.Dispose();
         }
 
         public void ClearIn(int player)
@@ -146,12 +161,7 @@ namespace TJAPlayer3
             if (LuaScript == null) return;
             try
             {
-                LuaScript["playerCount"] = TJAPlayer3.ConfigIni.nPlayerCount;
-                LuaScript["p1IsBlue"] = TJAPlayer3.P1IsBlue();
-                //LuaScript["isClear"] = new bool[4] { false, false, false, false };
-                //LuaScript["towerNightOpacity"] = 0;
-                //LuaScript["towerNightOpacity"] = (double)(255 * currentFloorPositionMax140);
-
+                LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, TJAPlayer3.P1IsBlue());
                 LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, 0);
 
                 LuaInit.Call();
