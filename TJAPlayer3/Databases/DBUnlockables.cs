@@ -6,17 +6,7 @@ namespace TJAPlayer3
 {
     class DBUnlockables
     {
-        public void tDBUnlockables()
-        {
-            if (!File.Exists(@".\Databases\Unlockables.json"))
-                tSaveFile();
-
-            tLoadFile();
-        }
-
-        #region [Auxilliary classes]
-
-        public Dictionary<string, int> RequiredArgs = new Dictionary<string, int>()
+        public static Dictionary<string, int> RequiredArgs = new Dictionary<string, int>()
         {
             ["ch"] = 1,
             ["cs"] = 1,
@@ -104,8 +94,8 @@ namespace TJAPlayer3
             */
             public (bool, string) tConditionMet(int[] inputValues)
             {
-                if (RequiredArgCount < 0 && TJAPlayer3.Databases.DBUnlockables.RequiredArgs.ContainsKey(Condition))
-                    RequiredArgCount = TJAPlayer3.Databases.DBUnlockables.RequiredArgs[Condition];
+                if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
+                    RequiredArgCount = RequiredArgs[Condition];
 
                 if (this.Values.Length < this.RequiredArgCount)
                     return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
@@ -126,8 +116,8 @@ namespace TJAPlayer3
 
             public string tConditionMessage()
             {
-                if (RequiredArgCount < 0 && TJAPlayer3.Databases.DBUnlockables.RequiredArgs.ContainsKey(Condition))
-                    RequiredArgCount = TJAPlayer3.Databases.DBUnlockables.RequiredArgs[Condition];
+                if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
+                    RequiredArgCount = RequiredArgs[Condition];
 
                 if (this.Values.Length < this.RequiredArgCount)
                     return (CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
@@ -144,30 +134,6 @@ namespace TJAPlayer3
 
         }
 
-        #endregion
-
-
-        public class CUnlockables
-        {
-            [JsonProperty("puchichara")]
-            public Dictionary<int, CUnlockConditions> Puchichara = new Dictionary<int, CUnlockConditions>();
-        }
-
-        public CUnlockables data = new CUnlockables();
-
-        #region [private]
-
-        private void tSaveFile()
-        {
-            ConfigManager.SaveConfig(data, @".\Databases\Unlockables.json");
-        }
-
-        private void tLoadFile()
-        {
-            data = ConfigManager.GetConfig<CUnlockables>(@".\Databases\Unlockables.json");
-        }
-
-        #endregion
     }
 
 
