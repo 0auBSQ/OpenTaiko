@@ -370,7 +370,7 @@ namespace TJAPlayer3
 				if (e.eノード種別 == C曲リストノード.Eノード種別.BOX && 
 					(!useOpenFlag || e.bIsOpenFolder))
 				{
-					ret.AddRange(flattenList(e.list子リスト));
+					ret.AddRange(flattenList(e.list子リスト, useOpenFlag));
 				}
             }
 
