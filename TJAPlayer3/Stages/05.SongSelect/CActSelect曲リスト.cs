@@ -62,6 +62,11 @@ namespace TJAPlayer3
 				return null;
 			}
 		}
+		public int nSelectSongIndex
+        {
+			get;
+			private set;
+        }
 		public C曲リストノード r現在選択中の曲 
 		{
 			get;
@@ -70,7 +75,8 @@ namespace TJAPlayer3
 
 		public void ResetSongIndex()
         {
-			this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[0];
+			nSelectSongIndex = 0;
+			this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[nSelectSongIndex];
 		}
 
 		public int nスクロールバー相対y座標
@@ -134,8 +140,10 @@ namespace TJAPlayer3
 			this.st小文字位置 = stレベル数字Ar;
 			#endregion
 
+			this.nSelectSongIndex = 0;
 			this.r現在選択中の曲 = null;
-            this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, TJAPlayer3.ConfigIni.nDefaultCourse);
+
+			this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, TJAPlayer3.ConfigIni.nDefaultCourse);
 			base.b活性化してない = true;
 			this.bIsEnumeratingSongs = false;
 		}
@@ -274,25 +282,21 @@ namespace TJAPlayer3
 				if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 				{
 					this.r現在選択中の曲 = this.r現在選択中の曲.list子リスト[0];
+					nSelectSongIndex = 0;
+					tChangeSong(this.r現在選択中の曲.r親ノード.Openindex);
 				}
 				else
 				{
-					List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
+					//実際には親フォルダを消さないように変更
 
-					// Fill list songs
-					list.InsertRange(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.list子リスト);
+					this.r現在選択中の曲.bIsOpenFolder = true;
 
 					// Previous index 
 					int n回数 = this.r現在選択中の曲.Openindex;
 					if (this.r現在選択中の曲.Openindex >= this.r現在選択中の曲.list子リスト.Count())
 						n回数 = 0;
 
-
-					for (int index = 0; index <= n回数; index++)
-						this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
-
-					// Remove main box
-					list.RemoveAt(list.IndexOf(this.r現在選択中の曲.r親ノード));
+					tChangeSong(n回数);
 				}
 
 				this.t現在選択中の曲を元に曲バーを再構成する();
@@ -333,34 +337,16 @@ namespace TJAPlayer3
 				if (this.r現在選択中の曲.r親ノード  != null)
 				{
 					this.r現在選択中の曲 = this.r現在選択中の曲.r親ノード;
+					this.r現在選択中の曲.Openindex = nSelectSongIndex;
+					tChangeSong(TJAPlayer3.Songs管理.list曲ルート.IndexOf(this.r現在選択中の曲) - nSelectSongIndex);
 				}
 			}
 			else
 			{
-				// Complete list of songs
-				List<C曲リストノード> list = TJAPlayer3.Songs管理.list曲ルート;
-
-				// Reinsert parent node
-				list.Insert(list.IndexOf(this.r現在選択中の曲) + 1, this.r現在選択中の曲.r親ノード);
-
+				this.r現在選択中の曲.r親ノード.bIsOpenFolder = false;
 				// Reindex the parent node
 				this.r現在選択中の曲.r親ノード.Openindex = r現在選択中の曲.r親ノード.list子リスト.IndexOf(this.r現在選択中の曲);
-
-				// Move song pointer back to the folder
-				this.r現在選択中の曲 = this.r次の曲(r現在選択中の曲);
-
-				// Flatten folder
-				var flattened = flattenList(this.r現在選択中の曲.list子リスト);
-
-				// Remove recursively the included songs that are contained in the folder
-				for (int index = 0; index < list.Count; index++)
-				{
-					if (flattened.Contains(list[index]))
-					{
-						list.RemoveAt(index);
-						index--;
-					}
-				}
+				tChangeSong(-this.r現在選択中の曲.r親ノード.Openindex);
 			}
 
 			this.t現在選択中の曲を元に曲バーを再構成する();
@@ -371,18 +357,21 @@ namespace TJAPlayer3
 		}
 
 
-		public List<C曲リストノード> flattenList(List<C曲リストノード> list)
+		public List<C曲リストノード> flattenList(List<C曲リストノード> list, bool useOpenFlag = false)
         {
 			List<C曲リストノード> ret = new List<C曲リストノード>();
 
-			ret.AddRange(list);
-
-			foreach (var e in list)
+			//foreach (var e in list)
+			for(int i = 0; i < list.Count; i++)
             {
-				if (e.eノード種別 == C曲リストノード.Eノード種別.BOX)
-                {
-					ret.AddRange(flattenList(e.list子リスト));
-                }
+				var e = list[i];
+				if (!useOpenFlag || !e.bIsOpenFolder) ret.Add(e);
+
+				if (e.eノード種別 == C曲リストノード.Eノード種別.BOX && 
+					(!useOpenFlag || e.bIsOpenFolder))
+				{
+					ret.AddRange(flattenList(e.list子リスト, useOpenFlag));
+				}
             }
 
 			return (ret);
@@ -436,18 +425,14 @@ namespace TJAPlayer3
 
 			// 曲毎に表示しているスキル値を、新しい難易度レベルに合わせて取得し直す。（表示されている13曲全部。）
 
-			C曲リストノード song = this.r現在選択中の曲;
-			for( int i = 0; i < 4; i++ )
-				song = this.r前の曲( song );
-
 			for( int i = this.n現在の選択行 - 4; i < ( ( this.n現在の選択行 - 4 ) + 9 ); i++ )
 			{
+				var song = this.rGetSideSong(i);
 				int index = ( i + 9 ) % 9;
 				for( int m = 0; m < 3; m++ )
 				{
 					this.stバー情報[ index ].nスキル値[ m ] = (int) song.arスコア[ this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す( song ) ].譜面情報.最大スキル[ m ];
 				}
-				song = this.r次の曲( song );
 			}
 
 
@@ -499,18 +484,14 @@ namespace TJAPlayer3
 
 			// 曲毎に表示しているスキル値を、新しい難易度レベルに合わせて取得し直す。（表示されている13曲全部。）
 
-			C曲リストノード song = this.r現在選択中の曲;
-			for( int i = 0; i < 4; i++ )
-				song = this.r前の曲( song );
-
 			for( int i = this.n現在の選択行 - 4; i < ( ( this.n現在の選択行 - 4 ) + 9 ); i++ )
 			{
+				C曲リストノード song = this.rGetSideSong(i);
 				int index = ( i + 9 ) % 9;
 				for( int m = 0; m < 3; m++ )
 				{
 					this.stバー情報[ index ].nスキル値[ m ] = (int) song.arスコア[ this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す( song ) ].譜面情報.最大スキル[ m ];
 				}
-				song = this.r次の曲( song );
 			}
 
 
@@ -546,6 +527,7 @@ namespace TJAPlayer3
 			{
 				this.On非活性化();
 				this.r現在選択中の曲 = null;
+				this.nSelectSongIndex = 0;
 				this.On活性化();
 			}
 		}
@@ -841,7 +823,10 @@ namespace TJAPlayer3
 			// まだ選択中の曲が決まってなければ、曲ツリールートの最初の曲にセットする。
 
 			if ((this.r現在選択中の曲 == null) && (TJAPlayer3.Songs管理.list曲ルート.Count > 0))
-				this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[0];
+            {
+				nSelectSongIndex = 0;
+				this.r現在選択中の曲 = TJAPlayer3.Songs管理.list曲ルート[nSelectSongIndex];
+			}
 
 			// 描画。
 			if (this.r現在選択中の曲 == null)
@@ -951,14 +936,12 @@ namespace TJAPlayer3
 
 						// 選択曲と選択行を１つ下の行に移動。
 
-						this.r現在選択中の曲 = this.r次の曲(this.r現在選択中の曲);
+						tChangeSong(1);
 						this.n現在の選択行 = (this.n現在の選択行 + 1) % 9;
 
 						// 選択曲から７つ下のパネル（＝新しく最下部に表示されるパネル。消えてしまう一番上のパネルを再利用する）に、新しい曲の情報を記載する。
 
-						C曲リストノード song = this.r現在選択中の曲;
-						for (int i = 0; i < 4; i++)
-							song = this.r次の曲(song);
+						var song = this.rGetSideSong(4);
 
 						int index = (this.n現在の選択行 + 4) % 9; // 新しく最下部に表示されるパネルのインデックス（0～12）。
 						this.stバー情報[index].strタイトル文字列 = song.strタイトル;
@@ -1011,15 +994,12 @@ namespace TJAPlayer3
 
 						// stバー情報[] の内容を1行ずつずらす。
 
-						C曲リストノード song2 = this.r現在選択中の曲;
-						for (int i = 0; i < 4; i++)
-							song2 = this.r前の曲(song2);
 
 						for (int i = 0; i < 9; i++)
 						{
+							C曲リストノード song2 = this.rGetSideSong(i - 4);
 							int n = (((this.n現在の選択行 - 4) + i) + 9) % 9;
 							this.stバー情報[n].eバー種別 = this.e曲のバー種別を返す(song2);
-							song2 = this.r次の曲(song2);
 							this.stバー情報[n].ttkタイトル = this.ttk曲名テクスチャを生成する(this.stバー情報[n].strタイトル文字列, this.stバー情報[n].ForeColor, this.stバー情報[n].BackColor, stバー情報[n].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
 						}
 
@@ -1065,15 +1045,13 @@ namespace TJAPlayer3
 
 						// 選択曲と選択行を１つ上の行に移動。
 
-						this.r現在選択中の曲 = this.r前の曲(this.r現在選択中の曲);
+						tChangeSong(-1);
 						this.n現在の選択行 = ((this.n現在の選択行 - 1) + 9) % 9;
 
 
 						// 選択曲から５つ上のパネル（＝新しく最上部に表示されるパネル。消えてしまう一番下のパネルを再利用する）に、新しい曲の情報を記載する。
 
-						C曲リストノード song = this.r現在選択中の曲;
-						for (int i = 0; i < 4; i++)
-							song = this.r前の曲(song);
+						var song = this.rGetSideSong(-4);
 
 						int index = ((this.n現在の選択行 - 4) + 9) % 9;   // 新しく最上部に表示されるパネルのインデックス（0～12）。
 						this.stバー情報[index].strタイトル文字列 = song.strタイトル;
@@ -1142,15 +1120,11 @@ namespace TJAPlayer3
 
 						// stバー情報[] の内容を1行ずつずらす。
 
-						C曲リストノード song2 = this.r現在選択中の曲;
-						for (int i = 0; i < 4; i++)
-							song2 = this.r前の曲(song2);
-
 						for (int i = 0; i < 9; i++)
 						{
 							int n = (((this.n現在の選択行 - 4) + i) + 9) % 9;
+							var song2 = this.rGetSideSong(i - 4);
 							this.stバー情報[n].eバー種別 = this.e曲のバー種別を返す(song2);
-							song2 = this.r次の曲(song2);
 							this.stバー情報[n].ttkタイトル = this.ttk曲名テクスチャを生成する(this.stバー情報[n].strタイトル文字列, this.stバー情報[n].ForeColor, this.stバー情報[n].BackColor, stバー情報[n].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
 						}
 
@@ -2447,55 +2421,48 @@ namespace TJAPlayer3
 			}
 			return Eバー種別.Other;
 		}
-		public C曲リストノード r次の曲( C曲リストノード song )
+		private void tChangeSong(int change)
 		{
-			if( song == null )
-				return null;
+			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && r現在選択中の曲.r親ノード != null) ? r現在選択中の曲.r親ノード.list子リスト : flattenList(TJAPlayer3.Songs管理.list曲ルート, true);
 
-			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && song.r親ノード != null) ? song.r親ノード.list子リスト : TJAPlayer3.Songs管理.list曲ルート;
+			int index = nSelectSongIndex + change;
 
-			int index = list.IndexOf( song );
-
-			if( index < 0 )
-				return null;
-
-			if( index == ( list.Count - 1 ) )
-				return list[ 0 ];
-
-			return list[ index + 1 ];
+			while (index >= list.Count)
+			{
+				index -= list.Count;
+			}
+			while (index < 0)
+			{
+				index += list.Count;
+			}
+			nSelectSongIndex = index;
+			r現在選択中の曲 = list[index];
 		}
-		public C曲リストノード r前の曲( C曲リストノード song )
+		public C曲リストノード rGetSideSong(int change)
 		{
-			if( song == null )
-				return null;
+			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && r現在選択中の曲.r親ノード != null) ? r現在選択中の曲.r親ノード.list子リスト : flattenList(TJAPlayer3.Songs管理.list曲ルート, true);
 
-			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && song.r親ノード != null) ? song.r親ノード.list子リスト : TJAPlayer3.Songs管理.list曲ルート;
+			if (list.Count <= 0) return null;
 
-			int index = list.IndexOf( song );
-	
-			if( index < 0 )
-				return null;
+			int index = nSelectSongIndex + change;
 
-			if( index == 0 )
-				return list[ list.Count - 1 ];
+			while (index >= list.Count)
+            {
+				index -= list.Count;
+			}
+			while (index < 0)
+			{
+				index += list.Count;
+			}
 
-			return list[ index - 1 ];
+			return list[index];
 		}
 
 		private void tバーの初期化()
 		{
-			C曲リストノード song = this.r現在選択中の曲;
-			
-			if( song == null )
-				return;
-
-			for( int i = 0; i < 4; i++ )
-				song = this.r前の曲( song );
-
-			//
-
 			for ( int i = 0; i < 9; i++ )
 			{
+				C曲リストノード song = this.rGetSideSong(i - 4);
 				this.stバー情報[ i ].strタイトル文字列 = song.strタイトル;
                 this.stバー情報[ i ].strジャンル = song.strジャンル;
 				this.stバー情報[ i ].col文字色 = song.col文字色;
@@ -2556,8 +2523,6 @@ namespace TJAPlayer3
 					this.stバー情報[ i ].nスキル値[ j ] = (int) song.arスコア[ this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す( song ) ].譜面情報.最大スキル[ j ];
 
                 this.stバー情報[ i ].ttkタイトル = this.ttk曲名テクスチャを生成する( this.stバー情報[ i ].strタイトル文字列, this.stバー情報[i].ForeColor, this.stバー情報[i].BackColor, stバー情報[i].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
-
-				song = this.r次の曲( song );
 			}
 
 			this.n現在の選択行 = 4;

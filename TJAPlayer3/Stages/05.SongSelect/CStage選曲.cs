@@ -1402,7 +1402,7 @@ namespace TJAPlayer3
 
         private void tカーソルを下へ移動する()
         {
-            if ((this.act曲リスト.r次の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.r次の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
+            if ((this.act曲リスト.rGetSideSong(1).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.rGetSideSong(1).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
             {
                 TJAPlayer3.stage選曲.bBGMIn再生した = false;
                 TJAPlayer3.Skin.bgm選曲画面イン.n位置_現在のサウンド = 0;
@@ -1429,7 +1429,7 @@ namespace TJAPlayer3
         }
         private void tカーソルを上へ移動する()
         {
-            if ((this.act曲リスト.r前の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.r前の曲(r現在選択中の曲).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
+            if ((this.act曲リスト.rGetSideSong(-1).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.rGetSideSong(-1).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
             {
                 TJAPlayer3.stage選曲.bBGMIn再生した = false;
 

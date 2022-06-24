@@ -63,6 +63,7 @@ namespace TJAPlayer3
 		public C曲リストノード r親ノード;
 		
 		public int Openindex;
+		public bool bIsOpenFolder;
 		public Stack<int> stackランダム演奏番号 = new Stack<int>();
 		public string strジャンル = "";
 		public string str本当のジャンル = "";
