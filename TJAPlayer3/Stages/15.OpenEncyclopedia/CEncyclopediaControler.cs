@@ -49,11 +49,11 @@ namespace TJAPlayer3
             return _default;
         }
 
-        private string _GetSectionContents(ref KeyValuePair<int, DBEncyclopediaMenus.EncyclopediaMenu> menu)
+        private string _GetSectionContents(ref KeyValuePair<int, DBEncyclopediaMenus.EncyclopediaMenu> menu, bool _fetchingMenus)
         {
             try
             {
-                string _path = _GetPathTextFile(@".\Encyclopedia\" + (tIsMenu(menu.Value) ? @"Menus\" : @"Pages\") + menu.Key.ToString());
+                string _path = _GetPathTextFile(@".\Encyclopedia\" + (_fetchingMenus ? @"Menus\" : @"Pages\") + menu.Key.ToString());
 
                 return File.ReadAllText(_path);
             }
@@ -85,7 +85,7 @@ namespace TJAPlayer3
                 var _menu = _current.Menus[_idx];
                 Submenus[i].Item1 = _menu.Key;
                 Submenus[i].Item2 = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                          new TitleTextureKey(_GetSectionContents(ref _menu), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
+                          new TitleTextureKey(_GetSectionContents(ref _menu, true), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
             }
         }
 
