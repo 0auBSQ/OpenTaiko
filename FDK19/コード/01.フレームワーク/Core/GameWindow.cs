@@ -293,8 +293,20 @@ namespace SampleFramework
 
 		#region #23510 2010.11.14 yyagi add: 縦横比固定でのウインドウサイズ変更 定数定義 from http://www.vcskicks.com/maintain-aspect-ratio.php
 		//double so division keeps decimal points
-		const double widthRatio = SampleFramework.GameWindowSize.Width;
-		const double heightRatio = SampleFramework.GameWindowSize.Height;
+		double widthRatio
+        {
+            get
+            {
+                return SampleFramework.GameWindowSize.Width;
+            }
+        }
+		double heightRatio
+        {
+            get
+            {
+                return SampleFramework.GameWindowSize.Height;
+            }
+        }
 		const int WM_SIZING = 0x214;
 		const int WMSZ_LEFT = 1;
 		const int WMSZ_RIGHT = 2;
