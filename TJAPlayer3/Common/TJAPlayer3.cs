@@ -1042,6 +1042,7 @@ namespace TJAPlayer3
 								//-----------------------------
 									#endregion
 							}
+							return;
 						}
 						//-----------------------------
 						#endregion
@@ -2282,7 +2283,10 @@ for (int i = 0; i < 3; i++) {
 			try
 			{
 				Skin = new CSkin( TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName, false);
-				TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName = TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName( true );	// 旧指定のSkinフォルダが消滅していた場合に備える
+				TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName = TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName( true );  // 旧指定のSkinフォルダが消滅していた場合に備える
+
+				ChangeResolution(TJAPlayer3.Skin.Resolution[0], TJAPlayer3.Skin.Resolution[1]);
+
 				Trace.TraceInformation( "スキンの初期化を完了しました。" );
 			}
 			catch (Exception e)
@@ -3071,7 +3075,29 @@ for (int i = 0; i < 3; i++) {
 				Trace.TraceInformation( this.listプラグイン.Count + " 個のプラグインを読み込みました。" );
 		}
 
-        public void RefleshSkin()
+		private void ChangeResolution(int nWidth, int nHeight)
+		{
+			if (base.GraphicsDeviceManager.CurrentSettings.BackBufferWidth == nWidth ||
+				base.GraphicsDeviceManager.CurrentSettings.BackBufferHeight == nHeight)
+				return;
+
+			currentClientSize = this.Window.ClientSize;
+
+			var state = base.Window.WindowState;
+
+			SampleFramework.GameWindowSize.Width = nWidth;
+			SampleFramework.GameWindowSize.Height = nHeight;
+
+			base.GraphicsDeviceManager.CurrentSettings.BackBufferWidth = nWidth;
+			base.GraphicsDeviceManager.CurrentSettings.BackBufferHeight = nHeight;
+
+			base.GraphicsDeviceManager.ChangeDevice(base.GraphicsDeviceManager.CurrentSettings);
+
+			base.Window.ClientSize = new Size(currentClientSize.Width, currentClientSize.Height);
+			base.Window.WindowState = state;
+		}
+
+		public void RefleshSkin()
         {
             Trace.TraceInformation("スキン変更:" + TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName(false));
 
@@ -3081,9 +3107,11 @@ for (int i = 0; i < 3; i++) {
             TJAPlayer3.Skin = null;
             TJAPlayer3.Skin = new CSkin(TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName, false);
 
+			TJAPlayer3.Tx.DisposeTexture();
 
-            TJAPlayer3.Tx.DisposeTexture();
-            TJAPlayer3.Tx.LoadTexture();
+			ChangeResolution(TJAPlayer3.Skin.Resolution[0], TJAPlayer3.Skin.Resolution[1]);
+
+			TJAPlayer3.Tx.LoadTexture();
 
             TJAPlayer3.act文字コンソール.On活性化();
         }
