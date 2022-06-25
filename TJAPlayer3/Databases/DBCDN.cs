@@ -4,9 +4,15 @@ using Newtonsoft.Json;
 
 namespace TJAPlayer3
 {
-    class DBCDN
+    class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>>
     {
+        public DBCDN()
+        {
+            _fn = @".\Databases\CDN.json";
+            base.tDBInitSavable();
+        }
 
+        /*
         public void tDBCDN()
         {
             if (!File.Exists(@".\Databases\CDN.json"))
@@ -14,6 +20,7 @@ namespace TJAPlayer3
 
             tLoadFile();
         }
+        */
 
         #region [Auxiliary classes]
 
@@ -67,8 +74,10 @@ namespace TJAPlayer3
 
         #endregion
 
+        /*
         public Dictionary<string, CDNData> data = new Dictionary<string, CDNData>();
 
+        
         #region [private]
 
         private void tSaveFile()
@@ -82,5 +91,6 @@ namespace TJAPlayer3
         }
 
         #endregion
+        */
     }
 }

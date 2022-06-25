@@ -8,8 +8,6 @@ namespace TJAPlayer3
         public void tDatabases()
         {
             DBCDN = new DBCDN();
-
-            DBCDN.tDBCDN();
         }
 
         public DBCDN DBCDN;

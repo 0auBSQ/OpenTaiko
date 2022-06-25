@@ -126,6 +126,7 @@
     <Compile Include="Character\CMenuCharacter.cs" />
     <Compile Include="Common\CCrypto.cs" />
     <Compile Include="Common\CHitSounds.cs" />
+    <Compile Include="Common\CSavableT.cs" />
     <Compile Include="Common\CVersionList.cs" />
     <Compile Include="Common\RecentlyPlayedSongs.cs" />
     <Compile Include="Common\ModalQueue.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
     <Compile Include="Databases\DBCDN.cs" />
+    <Compile Include="Databases\DBEncyclopediaMenus.cs" />
     <Compile Include="Databases\DBPuchichara.cs" />
     <Compile Include="Databases\DBUnlockables.cs" />
     <Compile Include="Databases\Databases.cs" />
@@ -407,7 +409,9 @@
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Stages\15.OpenEncyclopedia\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
