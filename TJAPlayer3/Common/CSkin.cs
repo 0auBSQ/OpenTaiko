@@ -1087,6 +1087,14 @@ namespace TJAPlayer3
                             {
                                 this.Skin_Creator = strParam;
                             }
+                            /*else if (strCommand == "Resolution")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Resolution[i] = int.Parse(strSplit[i]);
+                                }
+                            }*/
                             #endregion
 
                             #region [Background Scroll]
@@ -2653,8 +2661,9 @@ namespace TJAPlayer3
         public string Skin_Name = "Unknown";
         public string Skin_Version = "Unknown";
         public string Skin_Creator = "Unknown";
+        public int[] Resolution = new int[] { 1280, 720 };
         #endregion
-        
+
         #region Config
 
         public int Config_ItemText_Correction_X = 0;
