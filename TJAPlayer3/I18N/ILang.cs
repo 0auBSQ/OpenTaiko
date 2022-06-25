@@ -13,6 +13,8 @@ namespace TJAPlayer3
     static internal class CLangManager
     {
         // Cheap factory-like design pattern
+
+        public static (string, int) DefaultLanguage = ("jp", 0);
         public static void langAttach(string lang)
         {
             switch (lang) {
@@ -49,8 +51,23 @@ namespace TJAPlayer3
                     return 1;
                 case "jp":
                 default:
-                    return 0;
+                    return DefaultLanguage.Item2;
             }
+        }
+
+        public static string fetchLang()
+        {
+            if (LangInstance is CLang_jp)
+                return "jp";
+            else if (LangInstance is CLang_en)
+                return "en";
+            else if (LangInstance is CLang_fr)
+                return "fr";
+            else if (LangInstance is CLang_es)
+                return "es";
+            else if (LangInstance is CLang_zh)
+                return "zh";
+            return DefaultLanguage.Item1;
         }
 
         public static string intToLang(int idx)
@@ -67,7 +84,7 @@ namespace TJAPlayer3
                     return "en";
                 case 0:
                 default:
-                    return "jp";
+                    return DefaultLanguage.Item1;
             }
         }
 

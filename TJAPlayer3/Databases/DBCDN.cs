@@ -12,16 +12,6 @@ namespace TJAPlayer3
             base.tDBInitSavable();
         }
 
-        /*
-        public void tDBCDN()
-        {
-            if (!File.Exists(@".\Databases\CDN.json"))
-                tSaveFile();
-
-            tLoadFile();
-        }
-        */
-
         #region [Auxiliary classes]
 
         public class CDNHooks
@@ -74,23 +64,5 @@ namespace TJAPlayer3
 
         #endregion
 
-        /*
-        public Dictionary<string, CDNData> data = new Dictionary<string, CDNData>();
-
-        
-        #region [private]
-
-        private void tSaveFile()
-        {
-            ConfigManager.SaveConfig(data, @".\Databases\CDN.json");
-        }
-
-        private void tLoadFile()
-        {
-            data = ConfigManager.GetConfig<Dictionary<string, CDNData>>(@".\Databases\CDN.json");
-        }
-
-        #endregion
-        */
     }
 }

@@ -8,8 +8,10 @@ namespace TJAPlayer3
         public void tDatabases()
         {
             DBCDN = new DBCDN();
+            DBEncyclopediaMenus = new DBEncyclopediaMenus();
         }
 
         public DBCDN DBCDN;
+        public DBEncyclopediaMenus DBEncyclopediaMenus;
     }
 }
