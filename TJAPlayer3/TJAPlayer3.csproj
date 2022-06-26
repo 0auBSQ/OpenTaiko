@@ -153,6 +153,7 @@
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
+    <Compile Include="Stages\15.OpenEncyclopedia\CEncyclopediaControler.cs" />
     <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -409,9 +410,7 @@
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Stages\15.OpenEncyclopedia\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
