@@ -2463,6 +2463,7 @@ namespace TJAPlayer3
 			for ( int i = 0; i < 9; i++ )
 			{
 				C曲リストノード song = this.rGetSideSong(i - 4);
+				if (song == null) continue;
 				this.stバー情報[ i ].strタイトル文字列 = song.strタイトル;
                 this.stバー情報[ i ].strジャンル = song.strジャンル;
 				this.stバー情報[ i ].col文字色 = song.col文字色;
