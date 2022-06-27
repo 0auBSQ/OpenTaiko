@@ -86,18 +86,7 @@ namespace TJAPlayer3
                 {
                     for (int i = 0; i < Pages.Length; i++)
                     {
-                        Pages[i].Item2?.Dispose(); // Text
-                        Pages[i].Item3?.Dispose(); // Image
-                    }
-                }
-            }
-            else
-            {
-                if (Submenus != null)
-                {
-                    for (int i = 0; i < Submenus.Length; i++)
-                    {
-                        Submenus[i].Item2?.Dispose();
+                        Pages[i].Item3?.Dispose();
                     }
                 }
             }
