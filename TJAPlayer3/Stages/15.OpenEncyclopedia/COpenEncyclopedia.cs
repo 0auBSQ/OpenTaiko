@@ -95,16 +95,21 @@ namespace TJAPlayer3
 
                 if (i != 0)
                 {
+                    TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                     _menu.Item2?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
                 }
                 else
                 {
+                    TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     _menu.Item2?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                 }
 
-                TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
+                if (_pos == 0)
+                    TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
+                else
+                    TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
                 _menu.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
             }
 
@@ -140,7 +145,7 @@ namespace TJAPlayer3
                 _backToMain = _b2;
 
                 if (_b1)
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound決定音.t再生する();
                 else
                     TJAPlayer3.Skin.sound取消音.t再生する();
             }

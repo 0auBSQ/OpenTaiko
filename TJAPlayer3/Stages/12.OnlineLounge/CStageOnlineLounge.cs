@@ -219,9 +219,19 @@ namespace TJAPlayer3
 
                     tmpTex.color4 = _color;
                     tmpSubtitle.color4 = _color;
-                    TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
 
-                    TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                    if (pos == 0)
+                    {
+                        TJAPlayer3.Tx.OnlineLounge_Return_Box?.tUpdateColor4(_color);
+                        TJAPlayer3.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                    }
+                    else
+                    {
+                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
+                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                    }
+                    
+
                     tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 18 + 100 * i);
                     tmpSubtitle.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 46 + 100 * i);
 

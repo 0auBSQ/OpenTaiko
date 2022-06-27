@@ -1087,6 +1087,7 @@ namespace TJAPlayer3
             OnlineLounge_Side_Menu = TxC(ONLINELOUNGE + @"Side_Menu.png");
             OnlineLounge_Context = TxC(ONLINELOUNGE + @"Context.png");
             OnlineLounge_Song_Box = TxC(ONLINELOUNGE + @"Song_Box.png");
+            OnlineLounge_Return_Box = TxC(ONLINELOUNGE + @"Return_Box.png");
 
             #endregion
 
@@ -1099,6 +1100,7 @@ namespace TJAPlayer3
             OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
             OpenEncyclopedia_Context = TxC(OPENENCYCLOPEDIA + @"Context.png");
             OpenEncyclopedia_Side_Menu = TxC(OPENENCYCLOPEDIA + @"Side_Menu.png");
+            OpenEncyclopedia_Return_Box = TxC(OPENENCYCLOPEDIA + @"Return_Box.png");
 
             #endregion
 
@@ -2109,6 +2111,7 @@ namespace TJAPlayer3
             OnlineLounge_Center_Menu_Box_Slot,
             OnlineLounge_Side_Menu,
             OnlineLounge_Context,
+            OnlineLounge_Return_Box,
             OnlineLounge_Song_Box;
 
         #endregion
@@ -2121,6 +2124,7 @@ namespace TJAPlayer3
 
         public CTexture OpenEncyclopedia_Background,
             OpenEncyclopedia_Context,
+            OpenEncyclopedia_Return_Box,
             OpenEncyclopedia_Side_Menu;
 
         #endregion

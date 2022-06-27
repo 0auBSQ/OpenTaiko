@@ -65,7 +65,7 @@ namespace TJAPlayer3
             }
             catch
             {
-                return "[File fetching failed]";
+                return "[File not found]";
             }
         }
 
@@ -101,7 +101,7 @@ namespace TJAPlayer3
 
             Submenus[0].Item1 = -1;
             Submenus[0].Item2 = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                          new TitleTextureKey(CLangManager.LangInstance.GetString(401), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
+                          new TitleTextureKey(CLangManager.LangInstance.GetString(401), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
 
             for (int i = 1; i < _count; i++)
             {
@@ -109,7 +109,7 @@ namespace TJAPlayer3
                 var _menu = _current.Menus[_idx];
                 Submenus[i].Item1 = _menu.Key;
                 Submenus[i].Item2 = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                          new TitleTextureKey(_GetSectionContents(_menu.Key, true), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
+                          new TitleTextureKey(_GetSectionContents(_menu.Key, true), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
             }
         }
 
