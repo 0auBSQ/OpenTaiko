@@ -327,6 +327,12 @@ namespace TJAPlayer3
 			get;
 			private set;
         }
+
+		public static COpenEncyclopedia stageOpenEncyclopedia
+		{
+			get;
+			private set;
+		}
 		public static CStage曲読み込み stage曲読み込み
 		{
 			get;
@@ -936,22 +942,20 @@ namespace TJAPlayer3
 								#endregion
 								break;
 
-                            #region [ OPTION: 廃止済 ]
-                            //							case 2:									// #24525 OPTIONとCONFIGの統合に伴い、OPTIONは廃止
-                            //								#region [ *** ]
-                            //								//-----------------------------
-                            //								r現在のステージ.On非活性化();
-                            //								Trace.TraceInformation( "----------------------" );
-                            //								Trace.TraceInformation( "■ オプション" );
-                            //								stageオプション.On活性化();
-                            //								r直前のステージ = r現在のステージ;
-                            //								r現在のステージ = stageオプション;
-                            //								//-----------------------------
-                            //								#endregion
-                            //								break;
-                            #endregion
+							case (int)CStageタイトル.E戻り値.ENCYCLOPEDIA:
+								#region [Online Lounge]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Open Encyclopedia");
+								stageOpenEncyclopedia.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageOpenEncyclopedia;
+								//-----------------------------
+								#endregion
+								break;
 
-                            case (int)CStageタイトル.E戻り値.CONFIG:
+							case (int)CStageタイトル.E戻り値.CONFIG:
 								#region [ *** ]
 								//-----------------------------
 								r現在のステージ.On非活性化();
@@ -2149,6 +2153,7 @@ for (int i = 0; i < 3; i++) {
 
 			//---------------------
 			#endregion
+
 			#region [ ログ出力開始 ]
 			//---------------------
 			Trace.AutoFlush = true;
@@ -2180,6 +2185,7 @@ for (int i = 0; i < 3; i++) {
 			Trace.TraceInformation( "CLR Version: " + Environment.Version.ToString() );
 			//---------------------
 			#endregion
+			
 			#region [ DTXVmodeクラス の初期化 ]
 			//---------------------
 			//Trace.TraceInformation( "DTXVモードの初期化を行います。" );
@@ -2532,7 +2538,7 @@ for (int i = 0; i < 3; i++) {
 			Random = new Random( (int) Timer.nシステム時刻 );
 			//---------------------
 			#endregion
-			#region [ ステージの初期化 ]
+			#region [ Stages initialisation ]
 			//---------------------
 			r現在のステージ = null;
 			r直前のステージ = null;
@@ -2544,6 +2550,7 @@ for (int i = 0; i < 3; i++) {
 			stage段位選択 = new CStage段位選択();
 			stageHeya = new CStageHeya();
 			stageOnlineLounge = new CStageOnlineLounge();
+			stageOpenEncyclopedia = new COpenEncyclopedia();
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
 			stage結果 = new CStage結果();
@@ -2562,6 +2569,7 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add( stage段位選択 );
 			this.listトップレベルActivities.Add( stageHeya );
 			this.listトップレベルActivities.Add( stageOnlineLounge );
+			this.listトップレベルActivities.Add( stageOpenEncyclopedia );
 			this.listトップレベルActivities.Add( stage曲読み込み );
 			this.listトップレベルActivities.Add( stage演奏ドラム画面 );
 			this.listトップレベルActivities.Add( stage結果 );

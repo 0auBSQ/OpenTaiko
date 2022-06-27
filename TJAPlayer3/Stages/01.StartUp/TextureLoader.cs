@@ -33,6 +33,7 @@ namespace TJAPlayer3
         const string MODALS = @"11_Modals\";
         const string ONLINELOUNGE = @"12_OnlineLounge\";
         const string TOWERSELECT = @"13_TowerSelect\";
+        const string OPENENCYCLOPEDIA = @"15_OpenEncyclopedia\";
 
         // InGame
         public const string DANCER = @"2_Dancer\";
@@ -1093,6 +1094,14 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [15_OpenEncyclopedia]
+
+            OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
+            OpenEncyclopedia_Context = TxC(OPENENCYCLOPEDIA + @"Context.png");
+            OpenEncyclopedia_Side_Menu = TxC(OPENENCYCLOPEDIA + @"Side_Menu.png");
+
+            #endregion
+
         }
 
 
@@ -2105,6 +2114,14 @@ namespace TJAPlayer3
         #endregion
 
         #region [13_TowerSelect]
+
+        #endregion
+
+        #region [15_OpenEncyclopedia]
+
+        public CTexture OpenEncyclopedia_Background,
+            OpenEncyclopedia_Context,
+            OpenEncyclopedia_Side_Menu;
 
         #endregion
 

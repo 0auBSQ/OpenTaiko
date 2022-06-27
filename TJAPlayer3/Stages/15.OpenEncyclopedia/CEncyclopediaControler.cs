@@ -128,6 +128,12 @@ namespace TJAPlayer3
         {
             tFreeRessources(true);
 
+            if (_current.Pages == null)
+            {
+                Pages = new (int, CTexture, CTexture)[0];
+                return; // Menus and Pages are null
+            }
+
             int _count = _current.Pages.Length;
             Pages = new (int, CTexture, CTexture)[_count];
 
@@ -151,9 +157,13 @@ namespace TJAPlayer3
             if (_callStack.Count() <= 0)
                 return true;
 
+            if (tArePagesOpened())
+                PageIndex = 0;
+            else
+                tResetIndexes();
+
             _current = _callStack.Pop();
 
-            tResetIndexes();
             tReallocateCurrentAccordingly();
 
             return false;
@@ -168,7 +178,11 @@ namespace TJAPlayer3
                 _callStack.Push(_current);
                 _current = _current.Menus[MenuIndex - 1].Value;
                 
-                tResetIndexes();
+                if (tArePagesOpened())
+                    PageIndex = 0;
+                else
+                    tResetIndexes();
+
                 tReallocateCurrentAccordingly();
 
                 return (true, false);
@@ -196,11 +210,13 @@ namespace TJAPlayer3
         {
             if (pages)
             {
-                PageIndex = (PageIndex + count + Pages.Length) % Pages.Length;
+                if (Pages.Length > 0)
+                    PageIndex = (PageIndex + count + Pages.Length) % Pages.Length;
             }
             else
             {
-                MenuIndex = (MenuIndex + count + Submenus.Length) % Submenus.Length;
+                if (Submenus.Length > 0)
+                    MenuIndex = (MenuIndex + count + Submenus.Length) % Submenus.Length;
             }
         }
 

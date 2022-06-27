@@ -34,7 +34,9 @@ namespace TJAPlayer3
                 return;
 
             base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
-            this.eフェードアウト完了時の戻り値 = E戻り値.継続;
+            this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
+
+            TJAPlayer3.Skin.soundOnlineLoungeBGM?.t再生する();
 
             this.currentMenu = ECurrentMenu.MAIN;
             this.menuPointer = ECurrentMenu.CDN_SELECT;
@@ -338,8 +340,8 @@ namespace TJAPlayer3
                     if (currentMenu == ECurrentMenu.MAIN)
                     {
                         // Return to title screen
-                        TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
-                        this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                        TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                        this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                         this.actFOtoTitle.tフェードアウト開始();
                         base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
                     }
@@ -378,8 +380,8 @@ namespace TJAPlayer3
                         {
                             // Quit
                             TJAPlayer3.Skin.sound取消音.t再生する();
-                            TJAPlayer3.Skin.soundOnlineLoungeBGM.t停止する();
-                            this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+                            TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                            this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                             this.actFOtoTitle.tフェードアウト開始();
                             base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
                         }
@@ -682,13 +684,6 @@ namespace TJAPlayer3
 
         #region [Enums]
 
-        public enum E戻り値 : int
-        {
-            継続,
-            タイトルに戻る,
-            選曲した
-        }
-
         public enum ECurrentMenu : int
         {
             RETURN,         // Return button
@@ -709,7 +704,7 @@ namespace TJAPlayer3
         private ECurrentMenu currentMenu;
         private ECurrentMenu menuPointer;
         private CMenuInfo[] menus;
-        public E戻り値 eフェードアウト完了時の戻り値;
+        public EReturnValue eフェードアウト完了時の戻り値;
         public CActFIFOBlack actFOtoTitle;
 
 

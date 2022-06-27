@@ -771,8 +771,15 @@ namespace TJAPlayer3
 		}
     }
 
-    #region[Ver.K追加]
-    public enum Eレーンタイプ
+	public enum EReturnValue : int
+	{
+		Continuation,
+		ReturnToTitle,
+		SongChoosen
+	}
+
+	#region[Ver.K追加]
+	public enum Eレーンタイプ
     {
         TypeA,
         TypeB,

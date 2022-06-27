@@ -29,7 +29,7 @@ namespace TJAPlayer3
                 return;
 
             base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
-            this.eフェードアウト完了時の戻り値 = E戻り値.継続;
+            this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
             
 
@@ -79,18 +79,10 @@ namespace TJAPlayer3
             return 0;
         }
 
-
-        public enum E戻り値 : int
-        {
-            継続,
-            タイトルに戻る,
-            選曲した
-        }
-
         #region [Private]
 
 
-        public E戻り値 eフェードアウト完了時の戻り値;
+        public EReturnValue eフェードアウト完了時の戻り値;
         public CActFIFOBlack actFOtoTitle;
 
         #endregion

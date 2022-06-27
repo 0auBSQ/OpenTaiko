@@ -154,6 +154,7 @@
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
     <Compile Include="Stages\15.OpenEncyclopedia\CEncyclopediaControler.cs" />
+    <Compile Include="Stages\15.OpenEncyclopedia\COpenEncyclopedia.cs" />
     <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />
     <EmbeddedResource Include="Properties\Discord.resx">
       <Generator>ResXFileCodeGenerator</Generator>
