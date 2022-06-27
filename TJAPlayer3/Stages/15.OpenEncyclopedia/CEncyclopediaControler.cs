@@ -17,14 +17,16 @@ namespace TJAPlayer3
         {
             _callStack = new Stack<DBEncyclopediaMenus.EncyclopediaMenu>();
 
-            _callStack.Push(TJAPlayer3.Databases.DBEncyclopediaMenus.data);
-            _current = _callStack.Peek();
+            _current = TJAPlayer3.Databases.DBEncyclopediaMenus.data;
 
-            MenuIndex = 0;
             _lang = CLangManager.fetchLang();
+
+            tResetIndexes();
             tReloadFonts();
-            tReallocateSubMenus();
+            tReallocateCurrentAccordingly();
         }
+
+        #region [Fonts]
 
         private void tReloadFonts()
         {
@@ -39,6 +41,10 @@ namespace TJAPlayer3
             }
         }
 
+        #endregion
+
+        #region [Menu files parsing]
+
         private string _GetPathTextFile(string parent)
         {
             string _expected = parent + @"\" + _lang + ".txt";
@@ -49,11 +55,11 @@ namespace TJAPlayer3
             return _default;
         }
 
-        private string _GetSectionContents(ref KeyValuePair<int, DBEncyclopediaMenus.EncyclopediaMenu> menu, bool _fetchingMenus)
+        private string _GetSectionContents(int key, bool _fetchingMenus)
         {
             try
             {
-                string _path = _GetPathTextFile(@".\Encyclopedia\" + (_fetchingMenus ? @"Menus\" : @"Pages\") + menu.Key.ToString());
+                string _path = _GetPathTextFile(@".\Encyclopedia\" + (_fetchingMenus ? @"Menus\" : @"Pages\") + key.ToString());
 
                 return File.ReadAllText(_path);
             }
@@ -62,15 +68,44 @@ namespace TJAPlayer3
                 return "[File fetching failed]";
             }
         }
-        private void tReallocateSubMenus()
+
+        private string _GetImagePath(int key)
         {
-            if (Submenus != null)
+            return @".\Encyclopedia\Images\" + key.ToString() + @".png";
+        }
+
+        #endregion
+
+        #region [Memory management]
+
+        private void tFreeRessources(bool pages)
+        {
+            if (pages)
             {
-                for (int i = 0; i < Submenus.Length; i++)
+                if (Pages != null)
                 {
-                    Submenus[i].Item2?.Dispose();
+                    for (int i = 0; i < Pages.Length; i++)
+                    {
+                        Pages[i].Item2?.Dispose(); // Text
+                        Pages[i].Item3?.Dispose(); // Image
+                    }
                 }
             }
+            else
+            {
+                if (Submenus != null)
+                {
+                    for (int i = 0; i < Submenus.Length; i++)
+                    {
+                        Submenus[i].Item2?.Dispose();
+                    }
+                }
+            }
+        }
+
+        private void tReallocateSubMenus()
+        {
+            tFreeRessources(false);
 
             int _count = _current.Menus.Length + 1;
             Submenus = new (int, CTexture)[_count];
@@ -85,24 +120,130 @@ namespace TJAPlayer3
                 var _menu = _current.Menus[_idx];
                 Submenus[i].Item1 = _menu.Key;
                 Submenus[i].Item2 = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
-                          new TitleTextureKey(_GetSectionContents(ref _menu, true), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
+                          new TitleTextureKey(_GetSectionContents(_menu.Key, true), _pfEncyclopediaMenu, Color.White, Color.DarkOrange, 1000));
             }
         }
 
-        // Verify if submenu has pages or not
-        public bool tIsMenu(DBEncyclopediaMenus.EncyclopediaMenu menu)
+        private void tReallocatePages()
         {
-            return (menu.Menus == null || menu.Menus.Length == 0);
+            tFreeRessources(true);
+
+            int _count = _current.Pages.Length;
+            Pages = new (int, CTexture, CTexture)[_count];
+
+            for (int i = 0; i < _count; i++)
+            {
+                var _page = _current.Pages[i];
+                Pages[i].Item1 = _page;
+                Pages[i].Item2 = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                          new TitleTextureKey(_GetSectionContents(_page, false), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
+                Pages[i].Item3 = TJAPlayer3.tテクスチャの生成(_GetImagePath(_page));
+            }
         }
-
-        #region [public]
-
-        public (int, CTexture)[] Submenus;
-        public int MenuIndex;
 
         #endregion
 
-        #region [private]
+        #region [Input handlers]
+
+        // Bool return value = "Back to main menu ?"
+        public bool tHandleBack()
+        {
+            if (_callStack.Count() <= 0)
+                return true;
+
+            _current = _callStack.Pop();
+
+            tResetIndexes();
+            tReallocateCurrentAccordingly();
+
+            return false;
+        }
+
+        // Bool return value = ("Went forward ?", "Back to main menu ?"
+        public (bool, bool) tHandleEnter()
+        {
+            // If not page and not return button
+            if (!tArePagesOpened() && MenuIndex != 0)
+            {
+                _callStack.Push(_current);
+                _current = _current.Menus[MenuIndex - 1].Value;
+                
+                tResetIndexes();
+                tReallocateCurrentAccordingly();
+
+                return (true, false);
+            }
+            var _mainMenu = tHandleBack();
+            return (false, _mainMenu);
+        }
+
+        public void tHandleLeft()
+        {
+            tMove(tArePagesOpened(), -1);
+        }
+
+        public void tHandleRight()
+        {
+            tMove(tArePagesOpened(), 1);
+        }
+
+
+        #endregion
+
+        #region [private utils methods]
+
+        private void tMove(bool pages, int count)
+        {
+            if (pages)
+            {
+                PageIndex += (PageIndex + count + Pages.Length) % Pages.Length;
+            }
+            else
+            {
+                MenuIndex = (MenuIndex + count + Submenus.Length) % Submenus.Length;
+            }
+        }
+
+        private void tResetIndexes()
+        {
+            MenuIndex = 0;
+            PageIndex = 0;
+        }
+
+        private void tReallocateCurrentAccordingly()
+        {
+            if (tIsMenu(_current))
+                tReallocateSubMenus();
+            else
+                tReallocatePages();
+        }
+
+        #endregion
+
+        #region [public utils methods]
+
+        public bool tArePagesOpened()
+        {
+            return (!tIsMenu(_current));
+        }
+
+        public bool tIsMenu(DBEncyclopediaMenus.EncyclopediaMenu menu)
+        {
+            return (!(menu.Menus == null || menu.Menus.Length == 0));
+        }
+
+        #endregion
+
+        #region [public variables]
+
+        public (int, CTexture)[] Submenus;
+        public (int, CTexture, CTexture)[] Pages;
+        public int MenuIndex;
+        public int PageIndex;
+
+        #endregion
+
+        #region [private variables]
 
         private Stack<DBEncyclopediaMenus.EncyclopediaMenu> _callStack;
         private DBEncyclopediaMenus.EncyclopediaMenu _current;
