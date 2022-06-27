@@ -196,7 +196,7 @@ namespace TJAPlayer3
         {
             if (pages)
             {
-                PageIndex += (PageIndex + count + Pages.Length) % Pages.Length;
+                PageIndex = (PageIndex + count + Pages.Length) % Pages.Length;
             }
             else
             {
