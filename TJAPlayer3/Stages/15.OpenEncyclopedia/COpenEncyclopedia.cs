@@ -82,9 +82,9 @@ namespace TJAPlayer3
                 {
                     var _page = _controler.Pages[_controler.PageIndex];
 
-                    // To adapt for future 1080p update
-                    _page.Item2?.t2D描画(TJAPlayer3.app.Device, 640, 0);
+                    _page.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, 960, 180);
                     _page.Item3?.t2D描画(TJAPlayer3.app.Device, 640, 360);
+                    _controler.PageText?.t2D下中央基準描画(TJAPlayer3.app.Device, 960, 720);
                 }
             }
 

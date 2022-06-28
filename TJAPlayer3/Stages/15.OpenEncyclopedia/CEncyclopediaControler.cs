@@ -16,6 +16,7 @@ namespace TJAPlayer3
         public CEncyclopediaControler()
         {
             _callStack = new Stack<DBEncyclopediaMenus.EncyclopediaMenu>();
+            _idxStack = new Stack<int>();
 
             _current = TJAPlayer3.Databases.DBEncyclopediaMenus.data;
 
@@ -146,11 +147,13 @@ namespace TJAPlayer3
             if (_callStack.Count() <= 0)
                 return true;
 
+            var _oldIndex = _idxStack.Pop();
+
             if (tArePagesOpened())
                 PageIndex = 0;
             else
-                tResetIndexes();
-
+                MenuIndex = _oldIndex;
+                
             _current = _callStack.Pop();
 
             tReallocateCurrentAccordingly();
@@ -165,14 +168,20 @@ namespace TJAPlayer3
             if (!tArePagesOpened() && MenuIndex != 0)
             {
                 _callStack.Push(_current);
+                _idxStack.Push(MenuIndex);
                 _current = _current.Menus[MenuIndex - 1].Value;
+
+                bool _hasPages = tArePagesOpened();
                 
-                if (tArePagesOpened())
+                if (_hasPages)
                     PageIndex = 0;
                 else
                     tResetIndexes();
 
                 tReallocateCurrentAccordingly();
+
+                if (_hasPages)
+                    tUpdatePageIndex();
 
                 return (true, false);
             }
@@ -195,12 +204,22 @@ namespace TJAPlayer3
 
         #region [private utils methods]
 
+        private void tUpdatePageIndex()
+        {
+            PageText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                          new TitleTextureKey((PageIndex + 1).ToString() + "/" + Pages.Length.ToString(), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
+        }
+
         private void tMove(bool pages, int count)
         {
             if (pages)
             {
                 if (Pages.Length > 0)
+                {
                     PageIndex = (PageIndex + count + Pages.Length) % Pages.Length;
+                    tUpdatePageIndex();
+                }
+                    
             }
             else
             {
@@ -243,6 +262,7 @@ namespace TJAPlayer3
 
         public (int, CTexture)[] Submenus;
         public (int, CTexture, CTexture)[] Pages;
+        public CTexture PageText;
         public int MenuIndex;
         public int PageIndex;
 
@@ -251,6 +271,7 @@ namespace TJAPlayer3
         #region [private variables]
 
         private Stack<DBEncyclopediaMenus.EncyclopediaMenu> _callStack;
+        private Stack<int> _idxStack;
         private DBEncyclopediaMenus.EncyclopediaMenu _current;
         private string _lang;
         private static CPrivateFastFont _pfEncyclopediaMenu;
