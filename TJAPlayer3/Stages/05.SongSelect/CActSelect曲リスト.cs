@@ -2440,6 +2440,8 @@ namespace TJAPlayer3
 		}
 		public C曲リストノード rGetSideSong(int change)
 		{
+			if (r現在選択中の曲 == null) return null; 
+
 			List<C曲リストノード> list = (TJAPlayer3.ConfigIni.TJAP3FolderMode && r現在選択中の曲.r親ノード != null) ? r現在選択中の曲.r親ノード.list子リスト : flattenList(TJAPlayer3.Songs管理.list曲ルート, true);
 
 			if (list.Count <= 0) return null;
