@@ -1133,42 +1133,64 @@ namespace TJAPlayer3
                 if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
                 //2017.01.28 DD CDTXから直接呼び出す
-                if (pChip.bGOGOTIME && !TJAPlayer3.ConfigIni.ShinuchiMode) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
+                if (!TJAPlayer3.ConfigIni.ShinuchiMode) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
                 {
-                    // 旧配点・旧筐体配点
-                    if( TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1 )
+                    if (pChip.bGOGOTIME) //non-Shin'uchi / GoGo-Time　／　真打OFF・ゴーゴータイム
                     {
-                        if( pChip.nチャンネル番号 == 0x15 )
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, (long)( 300 * 1.2f ), nPlayer );
+                        // 旧配点・旧筐体配点
+                        if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
+                        {
+                            if (pChip.nチャンネル番号 == 0x15)
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(300 * 1.2f), nPlayer);
+                            else
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(360 * 1.2f), nPlayer);
+                        }
+                        // 新配点
                         else
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, (long)( 360 * 1.2f ), nPlayer );
+                        {
+                            if (pChip.nチャンネル番号 == 0x15)
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(100 * 1.2f), nPlayer);
+                            else
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(200 * 1.2f), nPlayer);
+                        }
                     }
-                    // 新配点
-                    else
+                    else //non-Shin'uchi / non-GoGo-Time　／　真打OFF・非ゴーゴータイム
                     {
-                        if( pChip.nチャンネル番号 == 0x15 )
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, (long)( 100 * 1.2f ), nPlayer );
+                        // 旧配点・旧筐体配点
+                        if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
+                        {
+                            if (pChip.nチャンネル番号 == 0x15)
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(300L), nPlayer);
+                            else
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(360L), nPlayer);
+                        }
+                        // 新配点
                         else
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, (long)( 200 * 1.2f ), nPlayer );
+                        {
+                            if (pChip.nチャンネル番号 == 0x15)
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(100L), nPlayer);
+                            else
+                                this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, (long)(200L), nPlayer);
+                        }
                     }
                 }
-                else
+                else  //Shin'uchi　／　真打
                 {
                     // 旧配点・旧筐体配点
-                    if( TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1 )
+                    if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
                     {
-                        if( pChip.nチャンネル番号 == 0x15 )
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer );
+                        if (pChip.nチャンネル番号 == 0x15)
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
                         else
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer );
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
                     }
                     // 新配点
                     else
                     {
-                        if( pChip.nチャンネル番号 == 0x15 )
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer );
+                        if (pChip.nチャンネル番号 == 0x15)
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
                         else
-                            this.actScore.Add( E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer );
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
                     }
                 }
 
@@ -1282,11 +1304,24 @@ namespace TJAPlayer3
 
 
 
-                if (pChip.bGOGOTIME && !TJAPlayer3.ConfigIni.ShinuchiMode)
+                if (!TJAPlayer3.ConfigIni.ShinuchiMode)
                 {
-                    this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 360L, player);
+                    if (pChip.bGOGOTIME) //non-Shin'uchi / GoGo-Time　／　真打OFF・ゴーゴータイム
+                    {
+                        if (pChip.nBalloon == pChip.nRollCount)
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 6000L, player);
+                        else
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 360L, player);
+                    }
+                    else //non-Shin'uchi / non-GoGo-Time　／　真打OFF・非ゴーゴータイム
+                    {
+                        if (pChip.nBalloon == pChip.nRollCount)
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 5000L, player);
+                        else
+                            this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 300L, player);
+                    }
                 }
-                else
+                else //Shin'uchi　／　真打
                 {
                     this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 100L, player);
                 }
@@ -1305,10 +1340,6 @@ namespace TJAPlayer3
                     TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(3, player);
                     TJAPlayer3.stage演奏ドラム画面.Rainbow.Start( player );
                     //CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
-                    if(pChip.bGOGOTIME && !TJAPlayer3.ConfigIni.ShinuchiMode)
-                    {
-                        this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 6000L, player);
-                    }
                     pChip.bHit = true;
                     pChip.IsHitted = true;
                     chip現在処理中の連打チップ[ player ].bHit = true;
