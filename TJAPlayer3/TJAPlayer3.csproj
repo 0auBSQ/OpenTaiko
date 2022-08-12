@@ -454,6 +454,8 @@ move /y "$(TargetDir)KeraLua.dll" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)liblua54.dylib" "$(SolutionDir)Test\dll\"
 
+move /y "$(TargetDir)liblua54.so" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)System.*" "$(SolutionDir)Test\dll\"
