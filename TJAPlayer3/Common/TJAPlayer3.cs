@@ -2437,7 +2437,8 @@ for (int i = 0; i < 3; i++) {
 			try
 			{
 				ESoundDeviceType soundDeviceType;
-				switch ( TJAPlayer3.ConfigIni.nSoundDeviceType )
+				switch (Environment.Is64BitProcess ? TJAPlayer3.ConfigIni.nSoundDeviceType + 1 :
+					TJAPlayer3.ConfigIni.nSoundDeviceType)
 				{
 					case 0:
 						soundDeviceType = ESoundDeviceType.DirectSound;

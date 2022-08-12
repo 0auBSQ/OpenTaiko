@@ -206,7 +206,7 @@ namespace TJAPlayer3
 
 			if (Environment.Is64BitProcess)
 			{
-				this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType - 1,
+				this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
 				CLangManager.LangInstance.GetString(43),
 				new string[] { "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
             }
