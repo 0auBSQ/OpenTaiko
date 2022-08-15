@@ -2190,8 +2190,10 @@ namespace TJAPlayer3
 //			while ( nIndex_NearestChip_Future < count )	// 未来方向への検索
 			for ( ; nIndex_NearestChip_Future < count; nIndex_NearestChip_Future++ )
 			{
+                
                 if( nIndex_NearestChip_Future < 0 )
                     continue;
+                
 
 				CDTX.CChip chip = listChip[ nPlayer ][ nIndex_NearestChip_Future ];
 				if ( !chip.bHit && chip.b可視 )
@@ -2262,7 +2264,7 @@ namespace TJAPlayer3
 
                 if ( nTimeDiff_Future < nTimeDiff_Past )
 				{
-                    if( !listChip[ nPlayer ][ nIndex_NearestChip_Past ].bHit 
+                    if ( !listChip[ nPlayer ][ nIndex_NearestChip_Past ].bHit 
                         && listChip[ nPlayer ][ nIndex_NearestChip_Past ].n発声時刻ms + 108 >= nTime
                         && NotesManager.IsMissableNote(listChip[nPlayer][nIndex_NearestChip_Past])
                         )
@@ -2271,6 +2273,7 @@ namespace TJAPlayer3
                     }
                     else
 					    nearestChip = listChip[ nPlayer ][ nIndex_NearestChip_Future ];
+                    
 //					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
 				}
 				else

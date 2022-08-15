@@ -2356,7 +2356,7 @@ namespace TJAPlayer3
 
             #endregion
 
-            string strNull = "Found";
+            //string strNull = "Found";
 
             if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F1))
             {
