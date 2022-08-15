@@ -47,8 +47,14 @@ namespace TJAPlayer3
         [DllImport("discord-rpc", EntryPoint = "Discord_Initialize", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Initialize(string applicationId, ref EventHandlers handlers, bool autoRegister, string optionalSteamId);
 
+        [DllImport("discord-rpc-x64", EntryPoint = "Discord_Initialize", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Initialize_x64(string applicationId, ref EventHandlers handlers, bool autoRegister, string optionalSteamId);
+
         [DllImport("discord-rpc", EntryPoint = "Discord_Shutdown", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Shutdown();
+
+        [DllImport("discord-rpc-x64", EntryPoint = "Discord_Shutdown", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Shutdown_x64();
 
         /*
         [DllImport("discord-rpc", EntryPoint = "Discord_RunCallbacks", CallingConvention = CallingConvention.Cdecl)]
@@ -57,6 +63,9 @@ namespace TJAPlayer3
 
         [DllImport("discord-rpc", EntryPoint = "Discord_UpdatePresence", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdatePresence(ref RichPresence presence);
+
+        [DllImport("discord-rpc-x64", EntryPoint = "Discord_UpdatePresence", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void UpdatePresence_x64(ref RichPresence presence);
 
         /*
         [DllImport("discord-rpc", EntryPoint = "Discord_ClearPresence", CallingConvention = CallingConvention.Cdecl)]
@@ -101,7 +110,14 @@ namespace TJAPlayer3
             handlers.disconnectedCallback += DisconnectedCallback;
             handlers.errorCallback += ErrorCallback;
 
-            DiscordRpc.Initialize(clientId, ref handlers, true, null);
+            if (Environment.Is64BitProcess)
+            {
+                DiscordRpc.Initialize_x64(clientId, ref handlers, true, null);
+            }
+            else
+            {
+                DiscordRpc.Initialize(clientId, ref handlers, true, null);
+            }
 
         }
 
@@ -127,7 +143,14 @@ namespace TJAPlayer3
             if (!string.IsNullOrEmpty(smallImageKey)) presence.smallImageKey = StrToPtr(smallImageKey);
             if (!string.IsNullOrEmpty(smallImageText)) presence.smallImageText = StrToPtr(smallImageText);
 
-            DiscordRpc.UpdatePresence(ref presence);
+            if (Environment.Is64BitProcess)
+            {
+                DiscordRpc.UpdatePresence_x64(ref presence);
+            }
+            else
+            {
+                DiscordRpc.UpdatePresence(ref presence);
+            }
             FreeMem();
         }
 
@@ -137,7 +160,14 @@ namespace TJAPlayer3
         /// </summary>
         public static void Shutdown()
         {
-            DiscordRpc.Shutdown();
+            if (Environment.Is64BitProcess)
+            {
+                DiscordRpc.Shutdown_x64();
+            }
+            else
+            {
+                DiscordRpc.Shutdown();
+            }
             Trace.TraceInformation("[Discord] Shutdowned.");
         }
 

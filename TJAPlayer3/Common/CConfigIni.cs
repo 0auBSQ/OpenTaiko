@@ -2532,7 +2532,7 @@ namespace TJAPlayer3
                                             #region [ WASAPI/ASIO関係 ]
                                             else if ( str3.Equals( "SoundDeviceType" ) )
 											{
-												this.nSoundDeviceType = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 3, this.nSoundDeviceType );
+												this.nSoundDeviceType = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, Environment.Is64BitProcess ? 1 : 0, 3, this.nSoundDeviceType );
 											}
 											else if ( str3.Equals( "WASAPIBufferSizeMs" ) )
 											{

@@ -73,7 +73,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
+    <OutputPath>..\Test\</OutputPath>
     <DefineConstants>TRACE;DEBUG;_TEST_ENGLISH TEST_Direct3D9Ex_ _WindowedFullscreen MemoryRenderer</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>0219</NoWarn>
@@ -84,7 +84,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>..\Test\</OutputPath>
     <DefineConstants>TRACE;TEST_ENGLISH_ TEST_Direct3D9Ex_ _WindowedFullscreen</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>0219</NoWarn>
@@ -454,9 +454,20 @@ move /y "$(TargetDir)KeraLua.dll" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)liblua54.dylib" "$(SolutionDir)Test\dll\"
 
+move /y "$(TargetDir)liblua54.so" "$(SolutionDir)Test\dll\"
+
 move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
 
 move /y "$(TargetDir)System.*" "$(SolutionDir)Test\dll\"
+
+
+if "$(PlatformName)" == "x86" (
+
+copy /y "$(TargetDir)dll\x86\*.dll" "$(SolutionDir)Test\dll\"
+) else (
+
+copy /y "$(TargetDir)dll\x64\*.dll" "$(SolutionDir)Test\dll\"
+)
 
 
 copy /y "$(SolutionDir)Readme.txt" "$(SolutionDir)Test\"</PostBuildEvent>
