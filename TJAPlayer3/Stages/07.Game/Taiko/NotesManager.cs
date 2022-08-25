@@ -22,20 +22,20 @@ namespace TJAPlayer3
             ["2"] = 2, // Small Ka (Taiko) | Yellow (left) hit (Konga)
             ["3"] = 3, // Big Don (Taiko) | Pink note (Konga)
             ["4"] = 4, // Big Ka (Taiko) | Clap (Konga)
-            ["5"] = 5, // Small roll start
-            ["6"] = 6, // Big roll start
+            ["5"] = 5, // Small roll start | Konga red roll
+            ["6"] = 6, // Big roll start | Konga pink roll
             ["7"] = 7, // Balloon
             ["8"] = 8, // Roll/Balloon end
-            ["9"] = 7, // Kusudama (Currently treated as balloon)
+            ["9"] = 7, // Kusudama (Coming soon)
             ["A"] = 10, // Joint Big Don (2P)
             ["B"] = 11, // Joint Big Ka (2P)
-            ["C"] = 12, // Mine (Coming soon)
-            ["D"] = 0, // Unused
-            ["E"] = 5, // Unused
+            ["C"] = 12, // Mine
+            ["D"] = 7, // ProjectOutfox's Fuse roll (Coming soon)
+            ["E"] = 0, // Unused
             ["F"] = 15, // ADLib
-            ["G"] = 0xF1, // Green (Purple) double hit note (Coming soon)
-            ["H"] = 16, // Konga clap roll (Coming soon)
-            ["I"] = 17, // Konga yellow roll (Coming soon)
+            ["G"] = 0xF1, // Green (Purple) double hit note
+            ["H"] = 16, // Konga clap roll | Taiko big roll
+            ["I"] = 17, // Konga yellow roll | Taiko small roll 
         };
 
         public static bool FastFlankedParsing(string s)

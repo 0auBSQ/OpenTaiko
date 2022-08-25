@@ -166,10 +166,12 @@ namespace TJAPlayer3
                 int totalGoods = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect;
                 int totalOks = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great;
                 int totalBads = (int)TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss;
+                int totalCombo = (int)TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0];
 
                 int individualGoods = TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber];
                 int individualOks = TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber];
                 int individualBads = TJAPlayer3.stage演奏ドラム画面.n不可[NowShowingNumber];
+                int individualCombo = TJAPlayer3.stage演奏ドラム画面.nHighestCombo[NowShowingNumber];
 
                 int totalADLIBs = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nADLIB;
                 int totalMines = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine;
@@ -210,7 +212,7 @@ namespace TJAPlayer3
                         isChangedAmount = Challenge[i].Update(ExamChange[i] ? TJAPlayer3.stage演奏ドラム画面.n良[NowShowingNumber] + TJAPlayer3.stage演奏ドラム画面.n可[NowShowingNumber] + TJAPlayer3.stage演奏ドラム画面.n連打[NowShowingNumber] : (int)(TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great + TJAPlayer3.stage演奏ドラム画面.GetRoll(0)));
                         break;
                     case Exam.Type.Combo:
-                        isChangedAmount = Challenge[i].Update((int)TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0]);
+                        isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualCombo : totalCombo);
                         break;
                     case Exam.Type.Accuracy:
                         isChangedAmount = Challenge[i].Update(ExamChange[i] ? (int)individualAccuracy : (int)accuracy);

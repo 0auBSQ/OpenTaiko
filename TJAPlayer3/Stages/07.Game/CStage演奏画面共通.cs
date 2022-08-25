@@ -395,6 +395,8 @@ namespace TJAPlayer3
             if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
                 n良 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+                nCombo = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+                nHighestCombo = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
                 n可 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
                 n不可 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
                 n連打 = new int[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
@@ -642,6 +644,8 @@ namespace TJAPlayer3
 		public STDGBVALUE<CHITCOUNTOFRANK> nヒット数_Auto含まない;
 		public STDGBVALUE<CHITCOUNTOFRANK> nヒット数_Auto含む;
         public int[] n良;
+        public int[] nHighestCombo;
+        public int[] nCombo;
         public int[] n可;
         public int[] n不可;
         public int[] n連打;
@@ -787,6 +791,8 @@ namespace TJAPlayer3
 			}
 		}
 
+
+
 	    internal E判定 e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip, int player = 0)
 	    {
 	        var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player);
@@ -840,6 +846,13 @@ namespace TJAPlayer3
             }
 
             return _timingzonesAreEasy;
+        }
+
+        private void tIncreaseComboDan(int danSong)
+        {
+            this.nCombo[danSong]++;
+            if (this.nCombo[danSong] > this.nHighestCombo[danSong])
+                this.nHighestCombo[danSong] = this.nCombo[danSong];
         }
 
 		private E判定 e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip, int player = 0 )
@@ -1685,7 +1698,11 @@ namespace TJAPlayer3
                                     this.actCombo.n現在のコンボ数[nPlayer]++;
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                    {
                                         this.n良[actDan.NowShowingNumber]++;
+                                        this.tIncreaseComboDan(actDan.NowShowingNumber);
+                                    }
+                                        
 
                                     if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
                                     {
@@ -1715,8 +1732,13 @@ namespace TJAPlayer3
                                     this.actCombo.n現在のコンボ数[ nPlayer ]++;
 
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                    {
                                         this.n可[actDan.NowShowingNumber]++;
-                                    
+                                        this.tIncreaseComboDan(actDan.NowShowingNumber);
+                                    }
+                                        
+
+
                                     if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
                                     {
                                         this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 1;
@@ -1757,6 +1779,8 @@ namespace TJAPlayer3
                                     }
                                     
                                     this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
+                                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                        this.nCombo[actDan.NowShowingNumber] = 0;
                                     this.actComboVoice.tReset(nPlayer);
 
                                     this.bIsMiss[nPlayer] = true;
@@ -1779,7 +1803,10 @@ namespace TJAPlayer3
                                             break;
 
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                        {
                                             this.n良[actDan.NowShowingNumber]++;
+                                            this.tIncreaseComboDan(actDan.NowShowingNumber);
+                                        }
 
                                         this.CBranchScore[nPlayer].nGreat++;
                                         this.CChartScore[nPlayer].nGreat++;
@@ -1813,7 +1840,10 @@ namespace TJAPlayer3
                                     if (!NotesManager.IsGenericRoll(pChip))
                                     {
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                        { 
                                             this.n可[actDan.NowShowingNumber]++;
+                                            this.tIncreaseComboDan(actDan.NowShowingNumber);
+                                        }
 
                                         this.CBranchScore[nPlayer].nGood++;
                                         this.CChartScore[nPlayer].nGood++;
@@ -1855,6 +1885,7 @@ namespace TJAPlayer3
                                         {
                                             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                                 this.n不可[actDan.NowShowingNumber]++;
+                                                
 
                                             this.CBranchScore[nPlayer].nMiss++;
                                             this.CChartScore[nPlayer].nMiss++;
@@ -1862,6 +1893,8 @@ namespace TJAPlayer3
                                         }
 
                                         this.actCombo.n現在のコンボ数[ nPlayer ] = 0;
+                                        if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                            this.nCombo[actDan.NowShowingNumber] = 0;
                                         this.actComboVoice.tReset(nPlayer);
 
 
