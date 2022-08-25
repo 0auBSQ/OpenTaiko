@@ -69,6 +69,8 @@ BoxFontName=廻想体 ネクスト UP B
 023 - Stereotype : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) & 0AuBSQ (Easy, Normal, Hard))
 024 - Rainy Night ~夢幻想~ : Taichenko - https://space.bilibili.com/356518101 https://b23.tv/LBMw5Oz (Chart by Taichenko (Extreme) & 風に乗ってgo (Easy, Normal, Hard))
 025 - Fearless : Ash Electric - https://linktr.ee/ashelectric (Chart by 0AuBSQ)
+026 - Lost Emotion. : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+027 - Broken Metronome : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu (Extreme, Extra) & 0AuBSQ (Easy, Normal, Hard))
 ```
 
 ### About the OpenTaiko Original Soundtrack
