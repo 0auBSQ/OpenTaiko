@@ -1528,8 +1528,8 @@ namespace TJAPlayer3
 			#region [ AutoPlay ]
 			this.bAutoPlay = new STAUTOPLAY();
 
-            this.b太鼓パートAutoPlay = true;
-            this.b太鼓パートAutoPlay2P = true;
+            this.b太鼓パートAutoPlay = false;
+            this.b太鼓パートAutoPlay2P = false;
             this.bAuto先生の連打 = true;
 			#endregion
 			this.nヒット範囲ms = new STRANGE();
