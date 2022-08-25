@@ -1245,6 +1245,7 @@ namespace TJAPlayer3
 
         private int nNowRoll = 0;
         private int nNowRollCount = 0;
+        private int[] nNowRollCountBranch = new int[3];
 
         private int[] n連打チップ_temp = new int[3];
         public int nOFFSET = 0;
@@ -1340,7 +1341,7 @@ namespace TJAPlayer3
         public bool bGOGOTIME; //2018.03.11 kairera0467
 
         public bool[] IsBranchBarDraw = new bool[4]; // 仕様変更により、黄色lineの表示法を変更.2020.04.21.akasoko26
-        public bool IsEndedBranching; // BRANCHENDが呼び出されたかどうか
+        public bool IsEndedBranching = true; // BRANCHENDが呼び出されたかどうか
         public Dan_C[] Dan_C;
 
         public bool IsEnabledFixSENote;
@@ -2364,6 +2365,8 @@ namespace TJAPlayer3
                         int nBar = 0;
                         int nCount = 0;
                         this.nNowRollCount = 0;
+                        for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
+                            this.nNowRollCountBranch[i] = 0;
 
                         List<STLYRIC> tmplistlyric = new List<STLYRIC>();
                         int BGM番号 = 0;
@@ -2393,6 +2396,8 @@ namespace TJAPlayer3
 
                             nCount++;
                             this.nNowRollCount++;
+                            for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
+                                this.nNowRollCountBranch[i]++;
 
                             switch (ch)
                             {
@@ -4404,6 +4409,8 @@ namespace TJAPlayer3
                                 else
                                 {
                                     this.nNowRollCount = listChip.Count;
+                                    for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
+                                        this.nNowRollCountBranch[i] = listChip_Branch[i].Count;
                                     nNowRoll = nObjectNum;
                                 }
                             }
@@ -4451,6 +4458,8 @@ namespace TJAPlayer3
                                 {
                                     //this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 
+                                    #region [Balloons]
+
                                     switch (chip.nコース)
                                     {
                                         case ECourse.eNormal:
@@ -4466,12 +4475,6 @@ namespace TJAPlayer3
                                                 this.listBalloon_Normal_数値管理++;
                                                 break;
                                             }
-                                            //else if( this.listBalloon.Count != 0 )
-                                            //{
-                                            //    chip.nBalloon = this.listBalloon[ this.listBalloon_Normal_数値管理 ];
-                                            //    this.listBalloon_Normal_数値管理++;
-                                            //    break;
-                                            //}
                                             break;
                                         case ECourse.eExpert:
                                             if (this.listBalloon_Expert.Count == 0)
@@ -4486,12 +4489,6 @@ namespace TJAPlayer3
                                                 this.listBalloon_Expert_数値管理++;
                                                 break;
                                             }
-                                            //else if( this.listBalloon.Count != 0 )
-                                            //{
-                                            //    chip.nBalloon = this.listBalloon[ this.listBalloon_Normal_数値管理 ];
-                                            //    this.listBalloon_Normal_数値管理++;
-                                            //    break;
-                                            //}
                                             break;
                                         case ECourse.eMaster:
                                             if (this.listBalloon_Master.Count == 0)
@@ -4506,14 +4503,11 @@ namespace TJAPlayer3
                                                 this.listBalloon_Master_数値管理++;
                                                 break;
                                             }
-                                            //else if( this.listBalloon.Count != 0 )
-                                            //{
-                                            //    chip.nBalloon = this.listBalloon[ this.listBalloon_Normal_数値管理 ];
-                                            //    this.listBalloon_Normal_数値管理++;
-                                            //    break;
-                                            //}
                                             break;
                                     }
+
+                                    #endregion
+
                                 }
                                 if (NotesManager.IsRollEnd(chip))
                                 {
@@ -4525,12 +4519,30 @@ namespace TJAPlayer3
                                     chip.nノーツ移動開始時刻ms = listChip[nNowRollCount].nノーツ移動開始時刻ms;
 
                                     chip.n連打音符State = nNowRoll;
-                                    listChip[nNowRollCount].nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-                                    listChip[nNowRollCount].nノーツ終了時刻ms = (int)this.dbNowTime;
-                                    listChip[nNowRollCount].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+
+                                    if (!IsEndedBranching || i == 0)
+                                    {
+                                        listChip[nNowRollCount].nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
+                                        listChip[nNowRollCount].nノーツ終了時刻ms = (int)this.dbNowTime;
+                                        listChip[nNowRollCount].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+                                    }
+                                    else if (!IsEndedBranching)
+                                    {
+                                        listChip_Branch[(int)chip.nコース][nNowRollCountBranch[(int)chip.nコース]].nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
+                                        listChip_Branch[(int)chip.nコース][nNowRollCountBranch[(int)chip.nコース]].nノーツ終了時刻ms = (int)this.dbNowTime;
+                                        listChip_Branch[(int)chip.nコース][nNowRollCountBranch[(int)chip.nコース]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+                                    }
+                                    else
+                                    {
+                                        listChip_Branch[i][nNowRollCountBranch[i]].nノーツ終了位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
+                                        listChip_Branch[i][nNowRollCountBranch[i]].nノーツ終了時刻ms = (int)this.dbNowTime;
+                                        listChip_Branch[i][nNowRollCountBranch[i]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+                                    }
+                                    
                                     //listChip[ nNowRollCount ].dbBPM = this.dbNowBPM;
                                     //listChip[ nNowRollCount ].dbSCROLL = this.dbNowSCROLL;
-                                    nNowRoll = 0;
+                                    if (!IsEndedBranching || i == 2)
+                                        nNowRoll = 0;
                                     //continue;
                                 }
 
@@ -4583,24 +4595,32 @@ namespace TJAPlayer3
                                     //譜面分岐がない譜面でも値は加算されてしまうがしゃあない
                                     //分岐を開始しない間は共通譜面としてみなす。
                                     if (IsEndedBranching)
+                                    {
                                         this.nノーツ数_Branch[i]++;
-                                    else this.nノーツ数_Branch[(int)chip.nコース]++;
 
-                                    if (!IsEndedBranching && !this.b分岐を一回でも開始した)
-                                    {
-                                        //IsEndedBranching==false = forloopが行われていないときのみ
-                                        for (int l = 0; l < 3; l++)
-                                            this.nノーツ数_Branch[l]++;
+                                        if (i == 0)
+                                        {
+                                            if (this.n参照中の難易度 == (int)Difficulty.Dan)
+                                            {
+                                                this.nDan_NotesCount[DanSongs.Number - 1]++;
+                                            }
+                                            this.nノーツ数[3]++;
+                                        }
                                     }
-
-
-                                    if (this.n参照中の難易度 == (int)Difficulty.Dan)
+                                    else
                                     {
-                                        this.nDan_NotesCount[DanSongs.Number - 1]++;
-                                    }
-                                        
+                                        this.nノーツ数_Branch[(int)chip.nコース]++;
 
-                                    this.nノーツ数[3]++;
+                                        if (!this.b分岐を一回でも開始した)
+                                        {
+                                            //IsEndedBranching==false = forloopが行われていないときのみ
+                                            for (int l = 0; l < 3; l++)
+                                                this.nノーツ数_Branch[l]++;
+                                        }
+                                    }
+                                    
+
+                                    
                                     #endregion
                                 }
                                 else if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
@@ -4621,12 +4641,18 @@ namespace TJAPlayer3
                                 Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
                                 // Array.Resize(ref nDan_BallonCount, nDan_BallonCount.Length + 1);
 
-                                this.listChip.Add(chip);
-
-                                if(IsEndedBranching)
+                                if (IsEndedBranching)
+                                {
                                     this.listChip_Branch[i].Add(chip);
+                                    if (i == 0)
+                                        this.listChip.Add(chip);
+                                }
                                 else
+                                {
                                     this.listChip_Branch[(int)chip.nコース].Add(chip);
+                                    this.listChip.Add(chip);
+                                }
+                                    
                             }
                         }
 
@@ -5372,42 +5398,7 @@ namespace TJAPlayer3
         /// </summary>
         private int CharConvertNote(string str)
         {
-            return (NotesManager.GetNoteValueFromChar(str));
-            
-            /*
-            switch (str)
-            {
-                case "0":
-                    return 0;
-                case "1":
-                    return 1;
-                case "2":
-                    return 2;
-                case "3":
-                    return 3;
-                case "4":
-                    return 4;
-                case "5":
-                    return 5;
-                case "6":
-                    return 6;
-                case "7":
-                    return 7;
-                case "8":
-                    return 8;
-                case "9":
-                    return 7; //2017.01.30 DD 芋連打を風船連打扱いに
-                case "A": //2017.08.22 kairera0467 手つなぎ
-                    return 10;
-                case "B":
-                    return 11;
-                case "F":
-                    return 15;
-                default:
-                    return -1;
-            }
-            */
-            
+            return (NotesManager.GetNoteValueFromChar(str));            
         }
 
         private int strConvertCourse(string str)

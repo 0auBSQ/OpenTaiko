@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using FDK;
 using System.Diagnostics;
+using System.Linq;
 
 namespace TJAPlayer3
 {
@@ -13,6 +14,7 @@ namespace TJAPlayer3
         public double dbBPM;
         public readonly int[] NowMeasure = new int[2];
         public double dbSCROLL;
+		public int[] _chipCounts = new int[2];
 
 		// コンストラクタ
 
@@ -32,6 +34,10 @@ namespace TJAPlayer3
             }
 			this.dbBPM = TJAPlayer3.DTX.BASEBPM;
             this.dbSCROLL = 1.0;
+
+			_chipCounts[0] = TJAPlayer3.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
+			_chipCounts[1] = TJAPlayer3.DTX.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
+
 			base.On活性化();
 		}
 		public override int On進行描画()
@@ -55,11 +61,11 @@ namespace TJAPlayer3
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Frame:         {0:####0} fps", TJAPlayer3.FPS.n現在のFPS ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteN:         {0:####0}", TJAPlayer3.DTX.nノーツ数[0] ) );
+				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteN:         {0:####0}", TJAPlayer3.DTX.nノーツ数_Branch[0] ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteE:         {0:####0}", TJAPlayer3.DTX.nノーツ数[1] ) );
+				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteE:         {0:####0}", TJAPlayer3.DTX.nノーツ数_Branch[1] ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteM:         {0:####0}", TJAPlayer3.DTX.nノーツ数[2] ) );
+				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteM:         {0:####0}", TJAPlayer3.DTX.nノーツ数_Branch[2] ) );
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "NoteC:         {0:####0}", TJAPlayer3.DTX.nノーツ数[3] ) );
 				y -= 0x10;
@@ -68,7 +74,10 @@ namespace TJAPlayer3
                 TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "SCOREMODE:     {0:####0}", TJAPlayer3.DTX.nScoreModeTmp ) );
                 y -= 0x10;
                 TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "SCROLLMODE:    {0:####0}", Enum.GetName(typeof(EScrollMode), TJAPlayer3.ConfigIni.eScrollMode ) ) );
-
+				y -= 0x10;
+				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, string.Format(  "ListChip:      {0:####0}", _chipCounts[0]));
+				y -= 0x10;
+				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, string.Format(  "ListChipM:     {0:####0}", _chipCounts[1]));
 
 				//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound CPU :    {0:####0.00}%", CDTXMania.Sound管理.GetCPUusage() ) );
 				//y -= 0x10;

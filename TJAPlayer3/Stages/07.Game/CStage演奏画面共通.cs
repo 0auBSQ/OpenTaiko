@@ -136,72 +136,46 @@ namespace TJAPlayer3
                 }
             }
 
-            
-            
-
-            if (TJAPlayer3.DTX.bチップがある.Branch)
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                nNoteCount[0] = TJAPlayer3.DTX.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
-                for (int i = 0; i < TJAPlayer3.DTX.listChip_Branch[2].Count; i++)
-                {
-                    var chip = TJAPlayer3.DTX.listChip_Branch[2][i];
-                    //nBalloonCount[0] += TJAPlayer3.DTX.listChip_Branch[2][i].nRollCount;
-                    nBalloonCount[0] += TJAPlayer3.DTX.listChip_Branch[2][i].nBalloon;
-                    if (NotesManager.IsRoll(chip))
-                    {
-                        nRollTimeMs[0] += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
-                    }
-                    //pChip.n発声時刻ms
-                }
-            }
-            else
-            {
-                nNoteCount[0] = TJAPlayer3.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
-                for (int i = 0; i < TJAPlayer3.DTX.listChip.Count; i++)
-                {
-                    var chip = TJAPlayer3.DTX.listChip[i];
-                    //nBalloonCount[0] += TJAPlayer3.DTX.listChip[i].nRollCount;
-                    nBalloonCount[0] += TJAPlayer3.DTX.listChip[i].nBalloon;
-                    if (NotesManager.IsRoll(chip))
-                    {
-                        nRollTimeMs[0] += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
-                    }
-                }
-            }
+                var _dtx = (i == 0) ? TJAPlayer3.DTX : TJAPlayer3.DTX_2P;
 
 
-            if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
-            {
-                if (TJAPlayer3.DTX_2P.bチップがある.Branch)
-                {
-                    nNoteCount[1] = TJAPlayer3.DTX_2P.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
-                    for (int i = 0; i < TJAPlayer3.DTX_2P.listChip_Branch[2].Count; i++)
-                    {
-                        var chip = TJAPlayer3.DTX_2P.listChip_Branch[2][i];
-                        //nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip_Branch[2][i].nRollCount;
-                        nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip_Branch[2][i].nBalloon;
-                        if (NotesManager.IsRoll(chip))
-                        {
-                            nRollTimeMs[1] += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
-                        }
-                    }
-                }
-                else
-                {
-                    nNoteCount[1] = TJAPlayer3.DTX_2P.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
-                    for (int i = 0; i < TJAPlayer3.DTX_2P.listChip.Count; i++)
-                    {
-                        var chip = TJAPlayer3.DTX_2P.listChip[i];
-                        //nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip[i].nRollCount;
-                        nBalloonCount[1] += TJAPlayer3.DTX_2P.listChip[i].nBalloon;
-                        if (NotesManager.IsRoll(chip))
-                        {
-                            nRollTimeMs[1] += (chip.nノーツ終了時刻ms - chip.n発声時刻ms) / 1000.0;
-                        }
-                    }
-                }
-            }
+                int _totalNotes = 0;
+                int _totalBalloons = 0;
+                double _totalRolls = 0;
 
+                /*
+                for (int j = 0; j < (_dtx.bチップがある.Branch ? 2 : 1); j++)
+                {
+                    var _list = (j == 0) ? _dtx.listChip : _dtx.listChip_Branch[2];
+
+                    _totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
+                    for (int k = 0; k < _list.Count; k++)
+                    {
+                        var _chip = _list[k];
+                        _totalBalloons += _chip.nBalloon;
+                        if (NotesManager.IsRoll(_chip))
+                            _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
+                    }
+                }
+                */
+
+                var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
+
+                _totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
+                for (int k = 0; k < _list.Count; k++)
+                {
+                    var _chip = _list[k];
+                    _totalBalloons += _chip.nBalloon;
+                    if (NotesManager.IsRoll(_chip))
+                        _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
+                }
+
+                nNoteCount[i] = _totalNotes;
+                nBalloonCount[i] = _totalBalloons;
+                nRollTimeMs[i] = _totalRolls;
+            }
 
             for (int k = 0; k < TJAPlayer3.ConfigIni.nPlayerCount; k++)
             {
@@ -4184,7 +4158,8 @@ namespace TJAPlayer3
                         }
                         else
                         {
-                            dTX.listChip[A].b可視 = false;
+                            if (!dTX.listChip[A].IsEndedBranching)
+                                dTX.listChip[A].b可視 = false;
                         }
                         //共通なため分岐させない.
                         dTX.listChip[A].eNoteState = ENoteState.none;
