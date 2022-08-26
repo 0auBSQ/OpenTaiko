@@ -187,6 +187,12 @@ namespace TJAPlayer3
             return chip.nチャンネル番号 == 0x19;
         }
 
+        public static bool IsFuzeRoll(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x1D;
+        }
+
         public static bool IsRollEnd(CDTX.CChip chip)
         {
             if (chip == null) return false;
@@ -227,7 +233,8 @@ namespace TJAPlayer3
         {
             if (chip == null) return false;
             return (0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19) || 
-                (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21);
+                (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21)
+                || chip.nチャンネル番号 == 0x1D;
         }
 
         public static bool IsMissableNote(CDTX.CChip chip)

@@ -44,7 +44,10 @@ namespace TJAPlayer3
 				usedMenus = new int[] {
 					0,
 					1,
+					2,
+					10,
 					5,
+					3,
 					9,
 					8,
 					6,
@@ -52,7 +55,6 @@ namespace TJAPlayer3
 
 					// -- Debug
 					/*
-					10,
 					11,
 					12,
 					13,
