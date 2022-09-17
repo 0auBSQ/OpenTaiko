@@ -918,7 +918,7 @@ namespace TJAPlayer3
         public bool bNoInfo;
 
         public int nDefaultSongSort;
-
+		public int nRecentlyPlayedMax;
         public EGame eGameMode;
 		public int TokkunSkipMeasures;
 		public int TokkunMashInterval;
@@ -1613,6 +1613,7 @@ namespace TJAPlayer3
 			this.nMasterVolume = 100;                   // #33700 2014.4.26 yyagi マスターボリュームの設定(WASAPI/ASIO用)
 			this.bHispeedRandom = false;
             this.nDefaultSongSort = 2;
+			this.nRecentlyPlayedMax = 5;
             this.eGameMode = EGame.OFF;
 			this.TokkunMashInterval = 750;
 			this.bEndingAnime = false;
@@ -2163,6 +2164,7 @@ namespace TJAPlayer3
             sw.WriteLine( "; デフォルトの曲ソート(0:絶対パス順, 1:ジャンル名ソートOLD, 2:ジャンル名ソートNEW )" );
             sw.WriteLine( "0:Path, 1:GenreName(AC8～AC14), 2GenreName(AC15～)" );
             sw.WriteLine( "DefaultSongSort={0}", this.nDefaultSongSort );
+			sw.WriteLine("RecentlyPlayedMax={0}", this.nRecentlyPlayedMax);
             sw.WriteLine();
             sw.WriteLine( "; RANDOMモード(0:OFF, 1:Random (Kimagure), 2:Mirror (Abekobe) 3:SuperRandom (Detarame), 4:HyperRandom (Abekobe + Kimagure))" );
 			sw.WriteLine( "TaikoRandom1P={0}", (int) this.eRandom[0] );
@@ -3199,6 +3201,10 @@ namespace TJAPlayer3
                                             {
                                                 this.nDefaultSongSort = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, this.nDefaultSongSort );
                                             }
+											else if (str3.Equals("RecentlyPlayedMax"))
+											{
+												this.nRecentlyPlayedMax = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.nRecentlyPlayedMax);
+											}
 											else if( str3.Equals( "GameMode" ) )
 											{
 												this.eGameMode = (EGame) C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 2, (int) this.eGameMode );

@@ -24,7 +24,7 @@ namespace TJAPlayer3
             if (!data.recentlyplayedsongs[TJAPlayer3.SaveFile].Contains(chartID))
                 data.recentlyplayedsongs[TJAPlayer3.SaveFile].Enqueue(chartID);
 
-            while (data.recentlyplayedsongs[TJAPlayer3.SaveFile].Count > 6) // Replace the 6 by a value defined in the settings later
+            while (data.recentlyplayedsongs[TJAPlayer3.SaveFile].Count > TJAPlayer3.ConfigIni.nRecentlyPlayedMax)
                 data.recentlyplayedsongs[TJAPlayer3.SaveFile].Dequeue();
 
             tSaveFile();
