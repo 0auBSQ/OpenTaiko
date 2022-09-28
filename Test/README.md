@@ -71,6 +71,9 @@ BoxFontName=廻想体 ネクスト UP B
 025 - Fearless : Ash Electric - https://linktr.ee/ashelectric (Chart by 0AuBSQ)
 026 - Lost Emotion. : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 027 - Broken Metronome : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu (Extreme, Extra) & 0AuBSQ (Easy, Normal, Hard))
+028 - Katharsis : 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by 0AuBSQ)
+029 - 2​-​Steppin' Love : FUNKYZUKIN ft. Hatsune Miku - https://funkyzukin.bandcamp.com/album/2-steppin-love-single (Chart by colin, Extra by 0AuBSQ)
+030 - 闇 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
 ```
 
 ### About the OpenTaiko Original Soundtrack
