@@ -1,0 +1,9 @@
+Configurable from the F2 quick config menu on music select
+
+"完走!" Survival: 
+Play with a ticking countdown timer. Time 
+is extended based on your performance. When the timer hits zero, 
+the song is failed. 
+
+Time extension is judged by the following criteria: Precision,
+Overall accuracy,Combo,Misses.

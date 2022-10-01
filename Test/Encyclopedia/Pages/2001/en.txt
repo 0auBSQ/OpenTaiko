@@ -1,0 +1,21 @@
+
+
+quick config options:
+
+ばいそく: scroll speed
+演奏速度:  song playback speed. changes pitch
+
+ランダム: sets random mode 
+	* OFF
+	* random (kimagure)
+	* mirror (abekobe) 
+	* super  (detarame)
+	* hyper  (mirror + super)
+
+ドロン: sets note visibility
+   * ドロン invisible hitcircle, visible note label underneath
+   * ステルス stealth: both hitcircle and note label are invisible
+	
+ゲーム: sets game mode
+  * "完走!" 	 survival
+  * "完走!激辛" survival hard

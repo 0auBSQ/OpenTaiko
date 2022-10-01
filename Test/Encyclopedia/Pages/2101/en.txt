@@ -1,0 +1,11 @@
+"完走!激辛" Survival Hard: 
+Harsher, stricter judging for Survival mode. Extra time is also capped. 
+
+
+
+Super Hard Mode (Survival Super Hard): 
+Enabled with F5 at music select. Only active when Survival Hard is selected.
+
+The requirements for each criteria are raised significantly, amplifying
+the difficulty even further. Penalties are increased. 
+no bonus points are awarded. 
