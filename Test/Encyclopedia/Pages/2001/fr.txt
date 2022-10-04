@@ -1,0 +1,9 @@
+spacebar  trier (il faut le refaire chaque chanson)
+	絶対パス  le chemin d'accès au fichier
+	曲名  le nom
+	ジャンル  genre
+
+configuration simple:
+
+ばいそく: vitesse de défilement
+演奏速度:  vitesse de la chanson. attention: ça changer la hauteur des notes 

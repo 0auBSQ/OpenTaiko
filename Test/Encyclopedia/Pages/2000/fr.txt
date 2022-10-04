@@ -1,0 +1,9 @@
+Shift-F1  retourner chez le menu configuration
+F2  configuration simple
+F3  1P auto
+F4  2P auto
+F5  super hard mode
+F6  scroll mode (défilement de notes)
+F7  training mode (pour s'entraîner)
+ctrl + [  augmenter le SFX volume par 5
+ctrl + ]  baisser le SFX volume par 5

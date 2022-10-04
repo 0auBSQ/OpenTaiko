@@ -1,0 +1,8 @@
+les options trouvées dans le menu musique par appuyer F2
+
+"完走!" Survival: 
+Jouer avec un compte à rebours. Il faut jouer bien pour survivre. 
+Quand le minuteur atteint zéro, la chanson est terminée et echouée.
+
+le temps ajouté dépend de ces choses: la précision, l'exactitude,
+combo, combien des fautes ("miss")

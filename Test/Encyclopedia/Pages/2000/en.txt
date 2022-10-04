@@ -7,8 +7,3 @@ F6  scroll mode
 F7  training mode
 ctrl + [  increase SFX Volume by 5
 ctrl + ]  decrease SFX Volume by 5
-
-spacebar  sort (is reset after every song)
-	絶対パス  file disk path
-	曲名  name
-	ジャンル  genre

@@ -1,6 +1,7 @@
-F1 - pause menu: resume, restart, quit
+F1 - pause menu: continuer, recommencer, retourner chez musique menu
 
 F4 - show judgement screen
 
 F5 - cycle through video display modes
+
 Delete: show debug

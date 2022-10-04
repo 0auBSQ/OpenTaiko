@@ -1,0 +1,11 @@
+"完走!激辛" Survival Hard: 
+Plus difficile que "Survival". Exigences plus strictes pour réussir. Aussi,
+la quantité de temps ajouté est limitée.
+
+
+Super Hard Mode (Survival Super Hard): 
+Allumer par F5 dans le menu musqique. 
+Il faut que Survival Hard est aussi allumé.
+
+Le plus difficile mode de jeu. Tous les exigences sont encore augmentées. 
+Les fautes sont aussi plus punissaients. Il n'ya pas de points bonus.

@@ -1,0 +1,13 @@
+ランダム: changer "random" 
+	* OFF	
+	* random (kimagure)
+	* mirror (abekobe) 
+	* super  (detarame)
+	* hyper  (mirror + super)
+
+ドロン: visibilité des notes
+   * ドロン les notes sont invisibles, mais les titres des notes au dessous restents visible
+   * ステルス complètement invisible.
+ゲーム: changer le mode de jeu
+  * "完走!" 	 survival
+  * "完走!激辛" survival hard

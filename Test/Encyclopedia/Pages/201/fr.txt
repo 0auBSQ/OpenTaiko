@@ -1,0 +1,7 @@
+F1 - pause menu: continuer, recommencer, retourner chez le menu musique
+
+F4 - montre l'écran jugements
+
+F5 - changer la méthode pour montrer les vidéos
+
+Delete: montre les informations debug
