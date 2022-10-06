@@ -5005,6 +5005,15 @@ namespace TJAPlayer3
                 this.TITLE = subTitle.Substring(5);
                 //tbTitle.Text = strCommandParam;
             }
+            else if (strCommandName.Equals("TITLE" + CLangManager.fetchLang().ToUpper()))
+            {
+                var subTitle = "";
+                for (int i = 0; i < strArray.Length; i++)
+                {
+                    subTitle += strArray[i];
+                }
+                this.TITLE = subTitle.Substring(7);
+            }
             if (strCommandName.Equals("SUBTITLE"))
             {
                 if (strCommandParam.StartsWith("--"))
@@ -5028,6 +5037,15 @@ namespace TJAPlayer3
                     }
                     this.SUBTITLE = subTitle.Substring(10);
                 }
+            }
+            else if (strCommandName.Equals("SUBTITLE" + CLangManager.fetchLang().ToUpper()))
+            {
+                var subTitle = "";
+                for (int i = 0; i < strArray.Length; i++)
+                {
+                    subTitle += strArray[i];
+                }
+                this.SUBTITLE = subTitle.Substring(10);
             }
             else if (strCommandName.Equals("LEVEL"))
             {
