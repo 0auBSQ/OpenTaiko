@@ -1314,6 +1314,9 @@ namespace TJAPlayer3
         private string[] dlmtEnter = { "\n" };
         private string[] dlmtCOURSE = { "COURSE:" };
 
+        private readonly string langTITLE = "TITLE" + CLangManager.fetchLang().ToUpper();
+        private readonly string langSUBTITLE = "SUBTITLE" + CLangManager.fetchLang().ToUpper();
+
         private int nスクロール方向 = 0;
         //2015.09.18 kairera0467
         //バタフライスライドみたいなアレをやりたいがために実装。
@@ -5005,6 +5008,15 @@ namespace TJAPlayer3
                 this.TITLE = subTitle.Substring(5);
                 //tbTitle.Text = strCommandParam;
             }
+            else if (strCommandName.Equals(langTITLE))
+            {
+                var subTitle = "";
+                for (int i = 0; i < strArray.Length; i++)
+                {
+                    subTitle += strArray[i];
+                }
+                this.TITLE = subTitle.Substring(7);
+            }
             if (strCommandName.Equals("SUBTITLE"))
             {
                 if (strCommandParam.StartsWith("--"))
@@ -5028,6 +5040,15 @@ namespace TJAPlayer3
                     }
                     this.SUBTITLE = subTitle.Substring(10);
                 }
+            }
+            else if (strCommandName.Equals(langSUBTITLE))
+            {
+                var subTitle = "";
+                for (int i = 0; i < strArray.Length; i++)
+                {
+                    subTitle += strArray[i];
+                }
+                this.SUBTITLE = subTitle.Substring(10);
             }
             else if (strCommandName.Equals("LEVEL"))
             {
