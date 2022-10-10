@@ -337,6 +337,43 @@ namespace TJAPlayer3
 							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
 
+                            #region [ Update Dan Dojo exam results ]
+                            for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+                            {
+								if (ini[0].stセクション[0].nExamResult.Count < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count)
+								{
+									ini[0].stセクション[0].nExamResult.Add(new int[CExamInfo.cMaxExam]);
+									for (int h = 0; h < ini[0].stセクション[0].nExamResult.Last().Length; h++)
+                                    {
+										ini[0].stセクション[0].nExamResult.Last()[h] = -1;
+                                    }
+								}
+
+								for (int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Length; j++)
+                                {
+									if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetEnable())
+                                    {
+										int amount = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetAmount();
+										int current = ini[0].stセクション[0].nExamResult[i][j];
+
+										if (ini[0].stセクション[0].nExamResult[i][j] == -1)
+                                        {
+											ini[0].stセクション[0].nExamResult[i][j] = amount;
+                                        }
+										else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More)
+                                        {
+											ini[0].stセクション[0].nExamResult[i][j] = (amount > current) ? amount : current;
+										}
+										else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less)
+										{
+											ini[0].stセクション[0].nExamResult[i][j] = (amount < current) ? amount : current;
+										}
+
+									}
+								}
+                            }
+							#endregion
+
 							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
 								ini[0].t書き出し(str[0]);
 						}

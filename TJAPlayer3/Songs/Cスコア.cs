@@ -103,6 +103,8 @@ namespace TJAPlayer3
 			public int nDanTick;
 			public Color cDanTickColor;
 
+			public List<int[]> nExamResult;
+
 			[Serializable]
 			[StructLayout( LayoutKind.Sequential )]
 			public struct STHISTORY
@@ -339,7 +341,12 @@ namespace TJAPlayer3
 				this.GPInfo[i].nClear = new int[5];
 				this.GPInfo[i].nScoreRank = new int[5];
 			}
-			
+
+			this.譜面情報.nExamResult = new List<int[]> { };
+			//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+			//{
+			//	譜面情報.nExamResult.Add(new int[CExamInfo.cMaxExam]);
+			//}
 
 			this.譜面情報.nLife = 5;
 			this.譜面情報.nTotalFloor = 140;

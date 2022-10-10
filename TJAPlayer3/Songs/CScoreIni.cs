@@ -218,6 +218,7 @@ namespace TJAPlayer3
             public Dan_C[] Dan_C;
 			public int[] nクリア;		//0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 			public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+			public List<int[]> nExamResult; //
 
 			public C演奏記録()
 			{
@@ -294,6 +295,11 @@ namespace TJAPlayer3
 				this.nクリア = new int[5];
 				this.nスコアランク = new int[5];
                 Dan_C = new Dan_C[CExamInfo.cMaxExam];
+				this.nExamResult = new List<int[]> { };
+				//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+    //            {
+				//	nExamResult.Add(new int[CExamInfo.cMaxExam]);
+    //            }
 			}
 
 			public bool bフルコンボじゃない
@@ -1179,6 +1185,31 @@ namespace TJAPlayer3
 													{
 														c演奏記録.nスコアランク[i] = int.Parse(para);
 													}
+													else
+                                                    {
+														#region [Dan-i Dojo Exam Results]
+														if (item.StartsWith("ExamResult"))
+														{
+															int a = int.Parse(item.Substring(10, item.IndexOf('_') - 10));
+															int b = int.Parse(item.Substring(item.IndexOf('_') + 1));
+															try
+															{
+																c演奏記録.nExamResult[a][b] = int.Parse(para);
+															}
+															catch (ArgumentOutOfRangeException) // it's terrible but it works well lol
+                                                            {
+																c演奏記録.nExamResult.Insert(a, new int[CExamInfo.cMaxExam]);
+																for (int c = 0; c < c演奏記録.nExamResult[a].Length; c++)
+                                                                {
+																	c演奏記録.nExamResult[a][c] = -1;
+                                                                }
+																c演奏記録.nExamResult[a][b] = int.Parse(para);
+															}
+
+															
+														}
+														#endregion
+													}
 												}
 											}
                                             //else if ( item.Equals( "HiScore5" ) )
@@ -1321,6 +1352,22 @@ namespace TJAPlayer3
 				writer.WriteLine("ScoreRank2={0}", this.stセクション[i].nスコアランク[2]);
 				writer.WriteLine("ScoreRank3={0}", this.stセクション[i].nスコアランク[3]);
 				writer.WriteLine("ScoreRank4={0}", this.stセクション[i].nスコアランク[4]);
+				// Dan Dojo exam results
+				for (int section = 0; section < stセクション[i].nExamResult.Count; ++section)
+				{
+					for (int part = 0; part < stセクション[i].nExamResult[section].Length; ++part)
+                    {
+						try
+                        {
+							if (stセクション[i].nExamResult[section][part] > -1)
+								writer.WriteLine("ExamResult{0}_{1}={2}", section, part, this.stセクション[i].nExamResult[section][part]);
+                        }
+						catch (NullReferenceException)
+                        {
+
+                        }
+                    }
+				}
 			}
 			writer.Close();
 		}
