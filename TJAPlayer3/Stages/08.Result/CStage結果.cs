@@ -340,15 +340,6 @@ namespace TJAPlayer3
                             #region [ Update Dan Dojo exam results ]
                             for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                             {
-								if (ini[0].stセクション[0].nExamResult.Count < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count)
-								{
-									ini[0].stセクション[0].nExamResult.Add(new int[CExamInfo.cMaxExam]);
-									for (int h = 0; h < ini[0].stセクション[0].nExamResult.Last().Length; h++)
-                                    {
-										ini[0].stセクション[0].nExamResult.Last()[h] = -1;
-                                    }
-								}
-
 								for (int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Length; j++)
                                 {
 									if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetEnable())

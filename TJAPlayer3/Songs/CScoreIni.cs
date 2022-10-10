@@ -296,10 +296,6 @@ namespace TJAPlayer3
 				this.nスコアランク = new int[5];
                 Dan_C = new Dan_C[CExamInfo.cMaxExam];
 				this.nExamResult = new List<int[]> { };
-				//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
-    //            {
-				//	nExamResult.Add(new int[CExamInfo.cMaxExam]);
-    //            }
 			}
 
 			public bool bフルコンボじゃない

@@ -343,10 +343,6 @@ namespace TJAPlayer3
 			}
 
 			this.譜面情報.nExamResult = new List<int[]> { };
-			//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
-			//{
-			//	譜面情報.nExamResult.Add(new int[CExamInfo.cMaxExam]);
-			//}
 
 			this.譜面情報.nLife = 5;
 			this.譜面情報.nTotalFloor = 140;
