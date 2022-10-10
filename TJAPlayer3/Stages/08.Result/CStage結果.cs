@@ -337,7 +337,7 @@ namespace TJAPlayer3
 							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
 
-                            #region [ Update Dan Dojo individual conditions ]
+                            #region [ Update Dan Dojo exam results ]
                             for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                             {
 								if (ini[0].stセクション[0].nExamResult.Count < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count)

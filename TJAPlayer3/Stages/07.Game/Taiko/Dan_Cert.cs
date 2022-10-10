@@ -57,10 +57,11 @@ namespace TJAPlayer3
                 for (int i = 1; i < CExamInfo.cMaxExam; i++)
                     ExamChange[i] = false;
 
-                for (int j = 1; j < CExamInfo.cMaxExam; j++)  //段位条件のループ(魂ゲージを除く) 縦(y)
+                for (int j = 0; j < CExamInfo.cMaxExam; j++)
                 {
                     if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[0].Dan_C[j] != null)
                     {
+                        Challenge[j] = TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[j];
                         if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count - 1].Dan_C[j] != null
                             && TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
                         {
@@ -73,7 +74,6 @@ namespace TJAPlayer3
                                 TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[j].Amount = 0;
                             }
 
-                            Challenge[j] = TJAPlayer3.stage選曲.r確定された曲.DanSongs[NowShowingNumber].Dan_C[j];
                             ExamChange[j] = true;
                         }
                     }

@@ -1191,14 +1191,22 @@ namespace TJAPlayer3
 														if (item.StartsWith("ExamResult"))
 														{
 															int a = int.Parse(item.Substring(10, item.IndexOf('_') - 10));
-															int b = int.Parse(item.Substring(item.IndexOf('_')));
-
-															if (c演奏記録.nExamResult[a] == null)
+															int b = int.Parse(item.Substring(item.IndexOf('_') + 1));
+															try
+															{
+																c演奏記録.nExamResult[a][b] = int.Parse(para);
+															}
+															catch (ArgumentOutOfRangeException) // it's terrible but it works well lol
                                                             {
 																c演奏記録.nExamResult.Insert(a, new int[CExamInfo.cMaxExam]);
-                                                            }
+																for (int c = 0; c < c演奏記録.nExamResult[a].Length; c++)
+                                                                {
+																	c演奏記録.nExamResult[a][c] = -1;
+                                                                }
+																c演奏記録.nExamResult[a][b] = int.Parse(para);
+															}
 
-															c演奏記録.nExamResult[a][b] = int.Parse(para);
+															
 														}
 														#endregion
 													}
@@ -1344,6 +1352,7 @@ namespace TJAPlayer3
 				writer.WriteLine("ScoreRank2={0}", this.stセクション[i].nスコアランク[2]);
 				writer.WriteLine("ScoreRank3={0}", this.stセクション[i].nスコアランク[3]);
 				writer.WriteLine("ScoreRank4={0}", this.stセクション[i].nスコアランク[4]);
+				// Dan Dojo exam results
 				for (int section = 0; section < stセクション[i].nExamResult.Count; ++section)
 				{
 					for (int part = 0; part < stセクション[i].nExamResult[section].Length; ++part)
