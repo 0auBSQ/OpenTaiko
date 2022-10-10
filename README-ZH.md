@@ -4,7 +4,7 @@
 
 # OpenTaiko
 
-TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
+TJAPlayer3-Develop-ReWrite的分支项目，使用TJA文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
@@ -12,13 +12,13 @@ TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022/4/8）
+（译者注：由README-EN翻译。最近一次更新时间：2022年10月9日）
 
 ## 使用前注意事项（重要！！！）
 
 - 您**全权**对您对本软件的使用负责。开发者不为您使用本软件造成的任何问题承担任何责任。
 
-- 当前本软件无“官方”皮肤。若您使用的非官方皮肤有任何Bug，请先联系皮肤作者再联系本软件开发者。本软件不提供任何类AC皮肤或它们的分叉。
+- 当前本软件无“官方”皮肤。若您使用的非官方皮肤有任何Bug，请先联系皮肤作者再联系本软件开发者。本软件不提供任何类AC皮肤或它们的分支。
 
 - 在向他人寻求帮助前请先自行研究。
 
@@ -30,7 +30,7 @@ TJAPlayer3-Develop-ReWrite的分叉项目，使用.tja文件的太鼓模拟器
 
 若您在视频共享网站、直播服务、网站或博客上使用本软件，请确保您明确说明本软件不是万代南梦宫官方软件，并确保其不被与其它太鼓模拟器混淆。
 
-此外，若你使用的网站有标签功能，请打上“OpenTaiko”“TJAPlayer3-Develop-BSQ”或“TJAP3-BSQ”标签以防止与其它模拟器混淆。这也会使您的视频与其它类似视频被一同归类，因此我们强烈建议您打上这些标签。
+此外，若您使用的网站有标签功能，请打上“OpenTaiko”“TJAPlayer3-Develop-BSQ”或“TJAP3-BSQ”标签以防止与其它模拟器混淆。这也会使您的视频与其它类似视频被一同归类，因此我们强烈建议您打上这些标签。
 
 本软件作者并不支持违反版权法律的行为。请您遵守您所在国家的版权法律。
 
@@ -84,7 +84,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 现：#NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
-- 我被卡在了入口界面
+- 我卡在了入口界面
 
 ```
 按住P键
@@ -103,7 +103,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 请从演奏模式中选择塔曲目。
 ```
 
-- 游戏报“Tower_Floors”未找到错误。
+- 游戏报“Tower_Floors”错误但未找到错误。
 
 ```
 文件夹结构不应为“System/Graphics”，
@@ -123,7 +123,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 	- 修复了多个问题
 
-	- 全局角色和小角色
+	- 全局化角色和小角色
 
 	- 永久性的“最近演奏的曲目”文件夹
 
@@ -131,7 +131,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 	- 主菜单及结果画面上的角色
 
-	- 按难度搜索曲目
+	- 增加按难度搜索曲目
 
 </details>
 
@@ -185,165 +185,163 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 </details>
 
-（译者注：剩下的懒得翻了）
-
 <details>
 	<summary>v0.5.2</summary>
 	
-	- Taiko Heya features
+	- 太鼓部屋功能
 	
-	- Custom nameplates and character feature
+	- 自定义名片和角色功能
 	
-	- Make medals obtainable
+	- 使金币可获得
 	
-	- Make dan-i title unlockable
+	- 使段位称号可解锁
 	
-	- Add multiple step textures
+	- 增加多步贴图
 	
-	- Add Spanish translation (funnym0th)
+	- 增加西班牙语翻译 (由funnym0th制作)
 	
-	- Add "Random option"
+	- 增加“随机选项”
 	
-	- UX/UI improvements
+	- UX/UI改善
 	
-	- Fast song loading
+	- 加速歌曲加载
 	
-	- Fix branched charts
+	- 修复有谱面分歧的谱面
 	
 </details>
 
 <details>
 	<summary>v0.5.1</summary>
 	
-	- Add animations to dan-i dojo
+	- 在段位道场中增加动画
 	
-	- Add game end screen and icons
+	- 增加游戏退出界面和图标
 	
-	- Bug fix
+	- 修复问题
 	
-	- Multiple language support
+	- 多语言支持
 	
-	- UI improvements
+	- UI改善
 	
-	- Multiple layouts of song select screen
+	- 选曲界面增加其他多种样式
 	
 </details>
 
 <details>
 	<summary>v0.5.0</summary>
 	
-	- Taiko Tower features (Background+Result screen backbone)
+	- 太鼓Tower功能 (Background+Result screen backbone)
 	
-	- "TOWERTYPE" in Tower charts (USe multiple skins for playing Towercharts)
+	- Tower谱面增加“TOWERTYPE”（用以在Tower难度中使用多种皮肤）
 	
-	- Add accuracy exam in dan-i dojo
+	- 段位道场增加准确率考核目标
 	
-	- Add "#BOXCOLOR", "#BOXTYPE", "#BGCOLOR", "#BGTYPE", "#BOXCHARA in box.def
+	- box.def中增加“#BOXCOLOR”、“#BOXTYPE”、“#BGCOLOR”、“#BGTYPE”和“#BOXCHARA”
 	
 </details>
 
 <details>
 	<summary>v0.4.3</summary>
 	
-	- Add Taiko Tower (Gameplay)
+	- 增加太鼓Tower（游玩）
 	
 </details>
 
 <details>
 	<summary>v0.4.2</summary>
 	
-	- Fix multiple bug and crash on song select screen
+	- 修复选曲界面的多个问题及崩溃
 	
-	- Fix COURSE:Tower crashes, however Taiko Tower menu, LIFE management, and result screen is not implemented yet.
+	- 修复Tower难度崩溃，但未引入太鼓Tower菜单、LIFE管理和结算界面
 
 </details>
 
 <details>
 	<summary>v0.4.1</summary>
 	
-	- Fix multiple bug and crashes on song select screen
+	- 修复选曲界面的多个问题及崩溃
 	
 </details>
 
 <details>
 	<summary>v0.4.0</summary>
 	
-	- EXAM5, 6, 7 implementation
+	- 引入EXAM5、6、7
 	
-	- Fix crash with EXAM numbers having spaces between
+	- 修复EXAM和数字间有空格导致的崩溃问题
   
-	- Better code structuring on Dan-i dojo
+	- 段位道场模块使用更好的代码结构
   
 </details>
 
 <details>
 	<summary>v0.3.4.2</summary>
 	
-	- Add petit-chara on Dan-i select screen
+	- 段位道场选择界面中增加小角色
 	
 </details>
 
 <details>
 	<summary>v0.3.4.1</summary>
 	
-	- Fix bug with Mob animation speed
+	- 修复人群动作速度的问题
 	
 </details>
 
 <details>
 	<summary>v0.3.4</summary>
 	
-	- Save dan-i dojo results
+	- 保存段位道场结果
 	
-	- Add achievement plate on dan-i select screen
+	- 段位道场选择界面中增加成就展示板
 	
 </details>
 
 <details>
 	<summary>v0.3.3</summary>
 	
-	- Fix dan-i dojo gauge appearance
+	- 修复段位道场计量槽显示的问题
 	
-	- Add backbone for dan-i dojo result screen
+	- 为段位道场结算画面增加底板
 	
 </details>
 
 <details>
 	<summary>v0.3.2</summary>
 	
-	- Fix results saving multiple time
+	- 修复结果保存多次的问题
 	
 </details>
 
 <details>
 	<summary>v0.3.1</summary>
 	
-	- Fix P2 scorerank not showing
+	- 修复P2得分排名不显示的问题
 	
 </details>
 
 <details>
 	<summary>v0.3.0</summary>
 	
-	- Show petit-chara in menu
+	- 在菜单显示小角色
 	
-	- In Nameplate.json file players could select petit-chara separately
+	- 在Nameplate.json文件中，玩家可以分别选择各自的小角色
 	
 </details>
 
 <details>
 	<summary>v0.2.0</summary>
 	
-	- Fix song select screen bug
+	- 修复选曲界面问题
 	
-	- Fix main menu bugs
+	- 修复主菜单问题
 	
 </details>
 
 <details>
 	<summary>v0.1.0</summary>
 	
-	- Result screen animation
+	- 结算界面动画
 	
 </details>
 
