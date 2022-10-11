@@ -340,18 +340,26 @@ namespace TJAPlayer3
                             #region [ Update Dan Dojo exam results ]
                             for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                             {
-								ini[0].stセクション[0].nExamResult.Insert(i, new int[CExamInfo.cMaxExam]);
-								for (int part = 0; part < ini[0].stセクション[0].nExamResult[i].Length; part++)
-								{
-									// Default all values to -1, will not be saved to ScoreIni if value is not changed.
-									ini[0].stセクション[0].nExamResult[i][part] = -1;
-								}
 								for (int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Length; j++)
                                 {
-									if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetEnable())
+									if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetCleared()[0])
                                     {
 										int amount = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetAmount();
-										int current = ini[0].stセクション[0].nExamResult[i][j];
+										int current = -1;
+										try
+										{
+											current = ini[0].stセクション[0].nExamResult[i][j];
+										}
+										catch (ArgumentOutOfRangeException)
+										{
+											ini[0].stセクション[0].nExamResult.Insert(i, new int[CExamInfo.cMaxExam]);
+											for (int part = 0; part < ini[0].stセクション[0].nExamResult[i].Length; part++)
+											{
+												// Default all values to -1, will not be saved to ScoreIni if value is not changed.
+												ini[0].stセクション[0].nExamResult[i][part] = -1;
+											}
+											current = ini[0].stセクション[0].nExamResult[i][j];
+										}
 
 										if (ini[0].stセクション[0].nExamResult[i][j] == -1)
                                         {
@@ -723,7 +731,9 @@ namespace TJAPlayer3
 
 					for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
 					{
-						this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].bTitleShow && TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C) == Exam.Status.Failure
+						this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].bTitleShow
+							&&
+							(TJAPlayer3.stage選曲.r確定された曲.arスコア[6].GPInfo[TJAPlayer3.PlayerSide].nClear[0] == 0 || !TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Where(b => b != null).All(c => c.GetCleared()[0]))
 							? "???" 
 							: TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Title, 
 							pfDanTitles, 

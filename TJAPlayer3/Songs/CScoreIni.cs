@@ -1359,7 +1359,7 @@ namespace TJAPlayer3
                     {
 						try
                         {
-							if (stセクション[i].nExamResult[section][part] > -1)
+							if (stセクション[i].nExamResult[section][part] != -1)
 								writer.WriteLine("ExamResult{0}_{1}={2}", section, part, this.stセクション[i].nExamResult[section][part]);
                         }
 						catch (NullReferenceException)
