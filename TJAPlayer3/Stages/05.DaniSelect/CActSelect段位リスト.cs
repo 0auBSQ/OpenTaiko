@@ -535,7 +535,7 @@ namespace TJAPlayer3
                 stバー情報[i].n曲レベル = new int[TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count];
                 for (int j = 0; j < TJAPlayer3.Songs管理.list曲ルート_Dan[i].DanSongs.Count; j++)
                 {
-                    stバー情報[i].ttkタイトル[j] = new TitleTextureKey(song.DanSongs[j].bTitleShow ? "???" : song.DanSongs[j].Title, pfDanSong, Color.White, Color.Black, 700);
+                    stバー情報[i].ttkタイトル[j] = new TitleTextureKey(song.DanSongs[j].bTitleShow && song.arスコア[6].GPInfo[TJAPlayer3.PlayerSide].nClear[0] == 0 ? "???" : song.DanSongs[j].Title, pfDanSong, Color.White, Color.Black, 700);
                     stバー情報[i].n曲難易度[j] = song.DanSongs[j].Difficulty;
                     stバー情報[i].n曲レベル[j] = song.DanSongs[j].Level;
                     stバー情報[i].List_DanSongs = song.DanSongs;
