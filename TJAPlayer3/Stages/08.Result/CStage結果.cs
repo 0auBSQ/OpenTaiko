@@ -732,8 +732,6 @@ namespace TJAPlayer3
 					for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
 					{
 						this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].bTitleShow
-							&&
-							(TJAPlayer3.stage選曲.r確定された曲.arスコア[6].GPInfo[TJAPlayer3.PlayerSide].nClear[0] == 0 || !TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Where(b => b != null).All(c => c.GetCleared()[0]))
 							? "???" 
 							: TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Title, 
 							pfDanTitles, 
