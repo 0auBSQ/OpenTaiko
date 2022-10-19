@@ -74,6 +74,8 @@ BoxFontName=廻想体 ネクスト UP B
 028 - Katharsis : 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by 0AuBSQ)
 029 - 2​-​Steppin' Love : FUNKYZUKIN ft. Hatsune Miku - https://funkyzukin.bandcamp.com/album/2-steppin-love-single (Chart by colin, Extra by 0AuBSQ)
 030 - 闇 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
+031 - Mischief Madness : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
+032 - Re：Cøllapse : H888. (H5 + DashyDesu) - https://www.youtube.com/c/DashyDesu https://linktr.ee/H5Music (Chart by DashyDesu (Extreme) and bol (Easy, Normal, Hard))
 ```
 
 ### About the OpenTaiko Original Soundtrack
@@ -119,5 +121,5 @@ Main developer : 0AuBSQ - https://github.com/0auBSQ/OpenTaiko
 Several bug fixes and improvements : l1m0n3 - https://github.com/l1m0n3
 Complete removal of the SlimDX dependency : Mr-Oiji https://github.com/Mr-Ojii
 Several features and major improvements : Takkkom - https://github.com/Takkkom
-Mod icons : FAKEYJSNPI - https://github.com/FAKEYJSNPI 
+Mod icons : FAKEYJSNPI - https://github.com/FAKEYJSNPI
 ```
