@@ -234,7 +234,8 @@ namespace FDK
 			nMixing = 0;
 
 			SoundDelayExclusiveWASAPI = _nSoundDelayExclusiveWASAPI;
-			SoundDelayASIO = _nSoundDelayASIO;
+			SoundDelaySharedWASAPI = _nSoundDelayExclusiveWASAPI;
+            SoundDelayASIO = _nSoundDelayASIO;
 			ASIODevice = _nASIODevice;
 			bUseOSTimer = _bUseOSTimer;
 

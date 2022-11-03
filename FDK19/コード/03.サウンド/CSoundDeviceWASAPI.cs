@@ -263,14 +263,29 @@ namespace FDK
 					#region [ 共有モードで作成成功。]
 					//-----------------
 					this.e出力デバイス = ESoundDeviceType.SharedWASAPI;
+
+                    var devInfo = BassWasapi.BASS_WASAPI_GetDeviceInfo(BassWasapi.BASS_WASAPI_GetDevice());	// 共有モードの場合、更新間隔はデバイスのデフォルト値に固定される。
+                    var wasapiInfo = BassWasapi.BASS_WASAPI_GetInfo();
+                    int n1サンプルのバイト数 = 2 * wasapiInfo.chans; // default;
+                    switch (wasapiInfo.format)      // BASS WASAPI で扱うサンプルはすべて 32bit float で固定されているが、デバイスはそうとは限らない。
+                    {
+                        case BASSWASAPIFormat.BASS_WASAPI_FORMAT_8BIT: n1サンプルのバイト数 = 1 * wasapiInfo.chans; break;
+                        case BASSWASAPIFormat.BASS_WASAPI_FORMAT_16BIT: n1サンプルのバイト数 = 2 * wasapiInfo.chans; break;
+                        case BASSWASAPIFormat.BASS_WASAPI_FORMAT_24BIT: n1サンプルのバイト数 = 3 * wasapiInfo.chans; break;
+                        case BASSWASAPIFormat.BASS_WASAPI_FORMAT_32BIT: n1サンプルのバイト数 = 4 * wasapiInfo.chans; break;
+                        case BASSWASAPIFormat.BASS_WASAPI_FORMAT_FLOAT: n1サンプルのバイト数 = 4 * wasapiInfo.chans; break;
+                    }
+                    int n1秒のバイト数 = n1サンプルのバイト数 * wasapiInfo.freq;
+                    this.n実バッファサイズms = (long)(wasapiInfo.buflen * 1000.0f / n1秒のバイト数);
+
+                    this.n実出力遅延ms = 0;	// 初期値はゼロ
 					
-					this.n実出力遅延ms = 0;	// 初期値はゼロ
-					var devInfo = BassWasapi.BASS_WASAPI_GetDeviceInfo( BassWasapi.BASS_WASAPI_GetDevice() );	// 共有モードの場合、更新間隔はデバイスのデフォルト値に固定される。
 					Trace.TraceInformation( "BASS を初期化しました。(WASAPI共有モード, {0}ms, 更新間隔{1}ms)", n希望バッファサイズms, devInfo.defperiod * 1000.0f );
 					this.bIsBASSFree = false;
 					//-----------------
 					#endregion
 				}
+
 			}
 			#region [ #31737 WASAPI排他モードのみ利用可能とし、WASAPI共有モードは使用できないようにするために、WASAPI共有モードでの初期化フローを削除する。 ]
 			//else if ( mode == Eデバイスモード.排他 )
