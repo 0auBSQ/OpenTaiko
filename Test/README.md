@@ -78,6 +78,7 @@ BoxFontName=廻想体 ネクスト UP B
 032 - Re：Cøllapse : H888. (H5 + DashyDesu) - https://www.youtube.com/c/DashyDesu https://linktr.ee/H5Music (Chart by DashyDesu (Extreme) and bol (Easy, Normal, Hard))
 033 - Alonebirthday : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Extra) and bol (Easy, Normal, Hard))
 034 - The World of Our Past : DashyDesu & rainfall - https://www.youtube.com/c/DashyDesu https://soundcloud.com/user-698445934 (Chart by DashyDesu)
+035 - ENDOMANCER : Zovi - https://zovi.bandcamp.com/ https://soundcloud.com/zovi https://twitter.com/zovinoise (Chart by 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
