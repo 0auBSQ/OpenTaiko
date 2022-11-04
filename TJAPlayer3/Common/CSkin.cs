@@ -1087,14 +1087,14 @@ namespace TJAPlayer3
                             {
                                 this.Skin_Creator = strParam;
                             }
-                            /*else if (strCommand == "Resolution")
+                            else if (strCommand == "Resolution")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Resolution[i] = int.Parse(strSplit[i]);
                                 }
-                            }*/
+                            }
                             #endregion
 
                             #region [Background Scroll]
