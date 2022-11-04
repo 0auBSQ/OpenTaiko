@@ -2437,7 +2437,7 @@ for (int i = 0; i < 3; i++) {
 			try
 			{
 				ESoundDeviceType soundDeviceType;
-				switch (Environment.Is64BitProcess ? TJAPlayer3.ConfigIni.nSoundDeviceType + 1 :
+				switch (Environment.Is64BitProcess ? Math.Max(1, TJAPlayer3.ConfigIni.nSoundDeviceType) :
 					TJAPlayer3.ConfigIni.nSoundDeviceType)
 				{
 					case 0:

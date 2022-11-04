@@ -204,18 +204,10 @@ namespace TJAPlayer3
 
 			// #24820 2013.1.3 yyagi
 
-			if (Environment.Is64BitProcess)
-			{
-				this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
+
+			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
 				CLangManager.LangInstance.GetString(43),
-				new string[] { "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
-            }
-            else
-			{
-				this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
-				CLangManager.LangInstance.GetString(43),
-				new string[] { "DSound", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
-			}
+				new string[] { "DSound (x86 only)", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
 			this.list項目リスト.Add(this.iSystemSoundType);
 
 			// #24820 2013.1.15 yyagi
@@ -844,7 +836,7 @@ namespace TJAPlayer3
 				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex() )
 			{
 				ESoundDeviceType soundDeviceType;
-				switch (Environment.Is64BitProcess ? this.iSystemSoundType.n現在選択されている項目番号 + 1 :
+				switch (Environment.Is64BitProcess ? Math.Max(1, this.iSystemSoundType.n現在選択されている項目番号) :
 					this.iSystemSoundType.n現在選択されている項目番号)
 				{
 					case 0:
