@@ -52,6 +52,13 @@ namespace TJAPlayer3
                 Textures[fileName].vc拡大縮小倍率.Y = (float)yscale;
             }
         }
+        public void SetRotation(double angle, string fileName)
+        {
+            if (Textures[fileName] != null)
+            {
+                Textures[fileName].fZ軸中心回転 = (float)(angle * Math.PI / 180);
+            }
+        }
         public void SetColor(double r, double g, double b, string fileName)
         {
             if (Textures[fileName] != null)
