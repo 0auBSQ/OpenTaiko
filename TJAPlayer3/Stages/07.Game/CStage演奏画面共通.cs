@@ -167,7 +167,14 @@ namespace TJAPlayer3
                 for (int k = 0; k < _list.Count; k++)
                 {
                     var _chip = _list[k];
-                    _totalBalloons += _chip.nBalloon;
+
+                    if (NotesManager.IsGenericBalloon(_chip))
+                    {
+                        var _duration = (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
+                        var _expectedHits = (int)(_duration / 16.6f);
+                        _totalBalloons += Math.Min(_chip.nBalloon, _expectedHits);
+                    }
+                    
                     if (NotesManager.IsRoll(_chip))
                         _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
                 }

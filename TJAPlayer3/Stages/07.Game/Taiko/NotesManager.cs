@@ -229,6 +229,12 @@ namespace TJAPlayer3
             return IsBigRoll(chip) || IsSmallRoll(chip) || IsClapRoll(chip) || IsYellowRoll(chip);
         }
 
+        public static bool IsGenericBalloon(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return IsBalloon(chip) || IsKusudama(chip) || IsFuzeRoll(chip);
+        }
+
         public static bool IsGenericRoll(CDTX.CChip chip)
         {
             if (chip == null) return false;
