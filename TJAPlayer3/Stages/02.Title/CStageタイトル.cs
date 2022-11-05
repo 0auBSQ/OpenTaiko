@@ -639,7 +639,7 @@ namespace TJAPlayer3
 						int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
 						int puchi_y = player == 0 ? 330 + 230 : 330 + 230;
 
-						this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
+						this.PuchiChara.On進行描画(puchi_x, puchi_y, false, player: player);
 					}
 
 					#endregion
