@@ -4677,7 +4677,7 @@ namespace TJAPlayer3
         /// <param name="InputText"></param>
         private void t難易度別ヘッダ(string InputText)
         {
-            if (TJAPlayer3.actEnumSongs.b活性化してない)
+            if (TJAPlayer3.actEnumSongs != null && TJAPlayer3.actEnumSongs.b活性化してない)
             {
                 if (InputText.Equals("#HBSCROLL") && TJAPlayer3.ConfigIni.bスクロールモードを上書き == false)
                 {
