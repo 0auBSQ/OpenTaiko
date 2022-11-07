@@ -1457,7 +1457,7 @@ namespace TJAPlayer3
             this.BoxFontName = "MS UI Gothic";
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
-			this.sLang = "jp";
+			this.sLang = "ja";
 			this.nLayoutType = 1;
 
 			// 2018-08-28 twopointzero:
