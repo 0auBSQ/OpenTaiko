@@ -1316,6 +1316,7 @@ namespace TJAPlayer3
 
         private readonly string langTITLE = "TITLE" + CLangManager.fetchLang().ToUpper();
         private readonly string langSUBTITLE = "SUBTITLE" + CLangManager.fetchLang().ToUpper();
+        private bool titleIsLocalized = false;
 
         private int nスクロール方向 = 0;
         //2015.09.18 kairera0467
@@ -4997,16 +4998,14 @@ namespace TJAPlayer3
             }
 
             //パラメータを分別、そこから割り当てていきます。
-            if (strCommandName.Equals("TITLE"))
+            if (strCommandName.Equals("TITLE") && !titleIsLocalized) // Do not grab default TITLE if localized title is used first.
             {
-                //this.TITLE = strCommandParam;
                 var subTitle = "";
                 for (int i = 0; i < strArray.Length; i++)
                 {
                     subTitle += strArray[i];
                 }
                 this.TITLE = subTitle.Substring(5);
-                //tbTitle.Text = strCommandParam;
             }
             else if (strCommandName.Equals(langTITLE))
             {
@@ -5016,12 +5015,13 @@ namespace TJAPlayer3
                     subTitle += strArray[i];
                 }
                 this.TITLE = subTitle.Substring(7);
+                this.titleIsLocalized = true;
+                this.SUBTITLE = ""; // Wipe default SUBTITLE if picked up before localized subtitle.
             }
-            if (strCommandName.Equals("SUBTITLE"))
+            if (strCommandName.Equals("SUBTITLE") && !titleIsLocalized) // Do not grab default SUBTITLE if localized title is used first. Avoids localization conflicts. (i.e. English title w/ default Japanese subtitle)
             {
                 if (strCommandParam.StartsWith("--"))
                 {
-                    //this.SUBTITLE = strCommandParam.Remove( 0, 2 );
                     var subTitle = "";
                     for (int i = 0; i < strArray.Length; i++)
                     {
@@ -5031,14 +5031,21 @@ namespace TJAPlayer3
                 }
                 else if (strCommandParam.StartsWith("++"))
                 {
-                    //    //this.TITLE += strCommandParam.Remove( 0, 2 ); //このままだと選曲画面の表示がうまくいかない。
-                    //this.SUBTITLE = strCommandParam.Remove( 0, 2 );
                     var subTitle = "";
                     for (int i = 0; i < strArray.Length; i++)
                     {
                         subTitle += strArray[i];
                     }
                     this.SUBTITLE = subTitle.Substring(10);
+                }
+                else
+                {
+                    var subTitle = "";
+                    for (int i = 0; i < strArray.Length; i++)
+                    {
+                        subTitle += strArray[i];
+                    }
+                    this.SUBTITLE = subTitle.Substring(8);
                 }
             }
             else if (strCommandName.Equals(langSUBTITLE))
