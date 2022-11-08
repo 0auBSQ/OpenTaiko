@@ -111,14 +111,14 @@ namespace TJAPlayer3
 				return;
 
 			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-				this.pfMenuTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 36);
+				this.pfMenuTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[0]);
 			else
-				this.pfMenuTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 36);
+				this.pfMenuTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[0]);
 
 			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.BoxFontName))
-				this.pfBoxText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.BoxFontName), 15);
+				this.pfBoxText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.BoxFontName), TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[1]);
 			else
-				this.pfBoxText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 15);
+				this.pfBoxText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[1]);
 
 			// Init Menus
 			tReloadMenus();
@@ -419,8 +419,8 @@ namespace TJAPlayer3
 						else
 							TJAPlayer3.Tx.Entry_Bar_Text.Opacity = 255 - (this.ctコインイン待機.n現在の値 - (2000 - 355));
 
-						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 312, new RectangleF(0, 0, 395, 50));
-						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, 563, 430, new RectangleF(0, 50, 395, 50));
+						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Bar_Text_X[0], TJAPlayer3.Skin.Title_Entry_Bar_Text_Y[0], new RectangleF(0, 0, TJAPlayer3.Tx.Entry_Bar_Text.sz画像サイズ.Width, TJAPlayer3.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
+						TJAPlayer3.Tx.Entry_Bar_Text.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Bar_Text_X[1], TJAPlayer3.Skin.Title_Entry_Bar_Text_Y[1], new RectangleF(0, TJAPlayer3.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2, TJAPlayer3.Tx.Entry_Bar_Text.sz画像サイズ.Width, TJAPlayer3.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
 					}
 					else
 					{
@@ -543,7 +543,7 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.X = 1.0f + scalex;
 								TJAPlayer3.Tx.Banapas_Load_Clear[1].vc拡大縮小倍率.Y = 1.0f + scaley;
 								TJAPlayer3.Tx.Banapas_Load_Clear[1].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
-								TJAPlayer3.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, 198, 514 - anime);
+								TJAPlayer3.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Banapas_Load_Clear_Anime[0], TJAPlayer3.Skin.Title_Banapas_Load_Clear_Anime[1] - anime);
 
 								if (ctバナパス読み込み成功.n現在の値 >= 2000)
 								{
@@ -594,12 +594,20 @@ namespace TJAPlayer3
 					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
 
 					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
-					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
-						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 0, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
+					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], TJAPlayer3.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+						new RectangleF(TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][3]
+						));
 
 					TJAPlayer3.Tx.Entry_Player[2].Opacity = alpha;
-					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
-						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 92, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
+					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], TJAPlayer3.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+						new RectangleF(TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][3]
+						));
 
 					TJAPlayer3.Tx.Entry_Player[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
@@ -623,12 +631,16 @@ namespace TJAPlayer3
 					#endregion
 
 					TJAPlayer3.Tx.Entry_Player[2].Opacity = Opacity;
-					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].X, ptプレイヤーエントリーバー座標[n現在の選択行プレイヤーエントリー].Y,
-						new RectangleF(n現在の選択行プレイヤーエントリー == 1 ? 199 : 0, 92 * 2, n現在の選択行プレイヤーエントリー == 1 ? 224 : 199, 92));
+					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], TJAPlayer3.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+						new RectangleF(TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
+						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][3]
+						));
 
 					Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400);
 					if (Opacity > 0)
-						TJAPlayer3.NamePlate.tNamePlateDraw(530, 385, 0, true, Opacity);
+						TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.Title_Entry_NamePlate[0], TJAPlayer3.Skin.Title_Entry_NamePlate[1], 0, true, Opacity);
 				}
 
 				#endregion
@@ -704,17 +716,39 @@ namespace TJAPlayer3
 							// if (this.stModeBar[i].n現在存在している行 == 1 && ctBarMove.n現在の値 >= 150)
 							if (usedMenusPos[i] == 1 && ctBarMove.n現在の値 >= 150)
 							{
-								int BarAnime = ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) + 100 ? 0 : ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) && ctBarAnimeIn.n現在の値 <= (int)(26 * 16.6f) + 100 ? 40 + (int)((ctBarAnimeIn.n現在の値 - (26 * 16.6)) / 100f * 71f) : ctBarAnimeIn.n現在の値 < (int)(26 * 16.6f) ? 40 : 111;
-								int BarAnime1 = BarAnime == 0 ? ctBarMove.n現在の値 >= 150 ? 40 + (int)((ctBarMove.n現在の値 - 150) / 100f * 71f) : ctBarMove.n現在の値 < 150 ? 40 : 111 : 0;
+								float barAnimef = (ctBarMove.n現在の値 / 100.0f) - 1.5f;
+
+								float barAnime = TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[0] + 
+									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[1] - TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[0]));
+
+								float overlayAnime = TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[0] +
+									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[1] - TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[0]));
+
+
+
+								//int BarAnime = ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) + 100 ? 0 : ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) && ctBarAnimeIn.n現在の値 <= (int)(26 * 16.6f) + 100 ? 40 + (int)((ctBarAnimeIn.n現在の値 - (26 * 16.6)) / 100f * 71f) : ctBarAnimeIn.n現在の値 < (int)(26 * 16.6f) ? 40 : 111;
+								//int BarAnime1 = BarAnime == 0 ? ctBarMove.n現在の値 >= 150 ? 40 + (int)((ctBarMove.n現在の値 - 150) / 100f * 71f) : ctBarMove.n現在の値 < 150 ? 40 : 111 : 0;
 
 								if (_bar != null)
 								{
 									_bar.Opacity = 255;
 									_bar.vc拡大縮小倍率.Y = 1.0f;
-									_bar.t2D描画(TJAPlayer3.app.Device, 320, 347 - BarAnime - BarAnime1, new Rectangle(0, 0, 641, 27));
-									_bar.t2D描画(TJAPlayer3.app.Device, 320, 346 + BarAnime + BarAnime1, new Rectangle(0, 76, 641, 30));
-									_bar.vc拡大縮小倍率.Y = BarAnime / 25.7f + BarAnime1 / 25.7f;
-									_bar.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360, new Rectangle(0, 27, 641, 45));
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[0] - barAnime, 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][0], 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][1], 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][3]));
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[1], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[1] + barAnime, 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][0],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][1],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][3]));
+									_bar.vc拡大縮小倍率.Y = (barAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]) * 2.0f;
+									_bar.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[2], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[2], 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][0],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][1],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]));
 								}
 
 
@@ -723,38 +757,51 @@ namespace TJAPlayer3
 									CTexture _overlap = TJAPlayer3.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount];
 
 									_overlap.vc拡大縮小倍率.Y = 1.0f;
-									_overlap.t2D描画(TJAPlayer3.app.Device, 320, 306, new Rectangle(0, 0, 641, 27));
-									_overlap.t2D描画(TJAPlayer3.app.Device, 320, 334 + (BarAnime + BarAnime1) / 0.95238f, new Rectangle(0, 71, 641, 35));
-									_overlap.vc拡大縮小倍率.Y = (BarAnime + BarAnime1) / 0.95238f;
-									_overlap.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 640, 333, new Rectangle(0, 27, 641, 1));
+									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[0], 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][0],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][1],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][3]));
+									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[1], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + overlayAnime, 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][0],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][1],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][3]));
+									_overlap.vc拡大縮小倍率.Y = (overlayAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]);
+									_overlap.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[2], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[2], 
+										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][0],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][1],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][2],
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]));
 
 								}
 
 
 								float anime = 0;
-								float BarAnimeCount = this.ctBarMove.n現在の値 - 150;
+								float BarAnimeCount = (this.ctBarMove.n現在の値 - 150) / 100.0f;
 
-								if (BarAnimeCount <= 45)
+								if (BarAnimeCount <= 0.45)
 									anime = BarAnimeCount * 3.333333333f;
 								else
-									anime = 150 - (BarAnimeCount - 45) * 0.61764705f;
+									anime = 1.50f - (BarAnimeCount - 0.45f) * 0.61764705f;
+								anime *= TJAPlayer3.Skin.Title_ModeSelect_Bar_Chara_Move;
 
 								if (_chara != null)
 								{
-									_chara.Opacity = (int)(BarAnimeCount * 2.55f) + (int)(BarAnime * 2.5f);
-									_chara.t2D中心基準描画(TJAPlayer3.app.Device, 640 - _chara.szテクスチャサイズ.Width / 4 + 114 - anime, 360,
+									_chara.Opacity = (int)(BarAnimeCount * 255f) + (int)(barAnimef * 2.5f);
+									_chara.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Chara_X[0] - anime, TJAPlayer3.Skin.Title_ModeSelect_Bar_Chara_Y[0],
 										new Rectangle(0, 0, _chara.szテクスチャサイズ.Width / 2, _chara.szテクスチャサイズ.Height));
-									_chara.t2D中心基準描画(TJAPlayer3.app.Device, 640 + _chara.szテクスチャサイズ.Width / 4 - 114 + anime, 360,
+									_chara.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Chara_X[1] + anime, TJAPlayer3.Skin.Title_ModeSelect_Bar_Chara_Y[1],
 										new Rectangle(_chara.szテクスチャサイズ.Width / 2, 0, _chara.szテクスチャサイズ.Width / 2, _chara.szテクスチャサイズ.Height));
 								}
 
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, 631, 379 - BarAnimeCount / 1.5f);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[1] - (TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title_Move * BarAnimeCount));
 
 								CTexture currentText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText);
 								if (currentText != null)
 								{
-									currentText.Opacity = (int)(BarAnimeCount * 2.55f);
-									currentText?.t2D中心基準描画(TJAPlayer3.app.Device, 640, 331 + 132 / 2);
+									currentText.Opacity = (int)(BarAnimeCount * 255f);
+									currentText?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_BoxText[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_BoxText[1]);
 								}
 
 							}
@@ -802,7 +849,7 @@ namespace TJAPlayer3
 
 
 
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + 311, pos.Y + BarAnimeY - BarMoveY + 72);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[0], pos.Y + BarAnimeY - BarMoveY + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[1]);
 							}
 						}
 					}
@@ -826,7 +873,7 @@ namespace TJAPlayer3
 				TJAPlayer3.act文字コンソール.tPrint(4, 4, C文字コンソール.Eフォント種別.白, asmApp.Name + " Ver." + TJAPlayer3.VERSION + " (" + strCreator + ")");
 				TJAPlayer3.act文字コンソール.tPrint(4, 24, C文字コンソール.Eフォント種別.白, "Skin:" + TJAPlayer3.Skin.Skin_Name + " Ver." + TJAPlayer3.Skin.Skin_Version + " (" + TJAPlayer3.Skin.Skin_Creator + ")");
 				//CDTXMania.act文字コンソール.tPrint(4, 24, C文字コンソール.Eフォント種別.白, strSubTitle);
-				TJAPlayer3.act文字コンソール.tPrint(4, (720 - 24), C文字コンソール.Eフォント種別.白, "TJAPlayer3 forked TJAPlayer2 forPC(kairera0467)");
+				TJAPlayer3.act文字コンソール.tPrint(4, (TJAPlayer3.Skin.Resolution[1] - 24), C文字コンソール.Eフォント種別.白, "TJAPlayer3 forked TJAPlayer2 forPC(kairera0467)");
 
 #endif
 				#endregion
@@ -994,33 +1041,31 @@ namespace TJAPlayer3
 		private int n現在の選択行プレイヤーエントリー;
 		private int n現在の選択行モード選択;
 
-		private Point[] ptプレイヤーエントリーバー座標 =
+		/*private Point[] ptプレイヤーエントリーバー座標 =
 			{ new Point(337, 488), new Point( 529, 487), new Point(743, 486) };
 
 		private Point[] ptモード選択バー座標 =
-			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };
+			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };*/
 
 		private Point getFixedPositionForBar(int CurrentPos)
 		{
 			int posX;
 			int posY;
-			int XOffset = 20;
-			int YOffset = 112;
 
 			if (CurrentPos >= 0 && CurrentPos < 3)
 			{
-				posX = this.ptモード選択バー座標[CurrentPos].X;
-				posY = this.ptモード選択バー座標[CurrentPos].Y;
+				posX = TJAPlayer3.Skin.Title_ModeSelect_Bar_X[CurrentPos];
+				posY = TJAPlayer3.Skin.Title_ModeSelect_Bar_Y[CurrentPos];
 			}
 			else if (CurrentPos < 0)
 			{
-				posX = this.ptモード選択バー座標[0].X + CurrentPos * XOffset;
-				posY = this.ptモード選択バー座標[0].Y + CurrentPos * YOffset;
+				posX = TJAPlayer3.Skin.Title_ModeSelect_Bar_X[0] + CurrentPos * TJAPlayer3.Skin.Title_ModeSelect_Bar_Offset[0];
+				posY = TJAPlayer3.Skin.Title_ModeSelect_Bar_Y[0] + CurrentPos * TJAPlayer3.Skin.Title_ModeSelect_Bar_Offset[1];
 			}
 			else
 			{
-				posX = this.ptモード選択バー座標[2].X + (CurrentPos - 2) * XOffset;
-				posY = this.ptモード選択バー座標[2].Y + (CurrentPos - 2) * YOffset;
+				posX = TJAPlayer3.Skin.Title_ModeSelect_Bar_X[2] + (CurrentPos - 2) * TJAPlayer3.Skin.Title_ModeSelect_Bar_Offset[0];
+				posY = TJAPlayer3.Skin.Title_ModeSelect_Bar_Y[2] + (CurrentPos - 2) * TJAPlayer3.Skin.Title_ModeSelect_Bar_Offset[1];
 			}
 
 			return new Point(posX, posY);

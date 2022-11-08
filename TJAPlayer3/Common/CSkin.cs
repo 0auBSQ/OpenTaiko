@@ -1181,6 +1181,313 @@ namespace TJAPlayer3
 
                             #region 新・SkinConfig
 
+                            #region Title
+                            else if (strCommand == nameof(Title_LoadingPinInstances))
+                            {
+                                Title_LoadingPinInstances = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(Title_LoadingPinFrameCount))
+                            {
+                                Title_LoadingPinFrameCount = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(Title_LoadingPinCycle))
+                            {
+                                Title_LoadingPinCycle = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Title_LoadingPinBase")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_LoadingPinBase[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_LoadingPinDiff")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_LoadingPinDiff[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Bar_Text_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_Entry_Bar_Text_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Bar_Text_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_Entry_Bar_Text_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Banapas_Load_Clear_Anime")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_Banapas_Load_Clear_Anime[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_Entry_Player_Select_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_Entry_Player_Select_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_0_Side")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[0][0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_0_Center")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[0][1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_1_Side")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[1][0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_1_Center")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[1][1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_2_Side")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[2][0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_Player_Select_Rect_2_Center")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_Entry_Player_Select_Rect[2][1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_Entry_NamePlate")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_Entry_NamePlate[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Title_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Title_Scale")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Title_Scale[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Rect_Up")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_Rect[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Rect_Down")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_Rect[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Rect_Center")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_Rect[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
+
+
+
+                            else if (strCommand == "Title_ModeSelect_Bar_Overlay_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_Overlay_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Overlay_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Title_ModeSelect_Bar_Overlay_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Overlay_Rect_Up")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Overlay_Rect[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Overlay_Rect_Down")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Overlay_Rect[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Overlay_Rect_Center")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Title_ModeSelect_Bar_Overlay_Rect[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Overlay_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Overlay_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Chara_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Chara_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Chara_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Chara_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Chara_Move")
+                            {
+                                Title_ModeSelect_Bar_Chara_Move = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Title")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_Title[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Title_Move")
+                            {
+                                Title_ModeSelect_Bar_Center_Title_Move = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_BoxText")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Center_BoxText[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            #endregion
+
                             #region Config
                             else if (strCommand == nameof(Config_ItemText_Correction_X))
                             {
@@ -2752,11 +3059,64 @@ namespace TJAPlayer3
         #endregion
 
         #region [Title Screen]
+
         public int Title_LoadingPinInstances = 5;
         public int Title_LoadingPinFrameCount = 8;
         public int Title_LoadingPinCycle = 320;
         public int[] Title_LoadingPinBase = new int[] { 480, 410 };
         public int[] Title_LoadingPinDiff = new int[] { 90, 0 };
+
+        public int[] Title_Entry_Bar_Text_X = new int[] { 563, 563 };
+        public int[] Title_Entry_Bar_Text_Y = new int[] { 312, 430 };
+
+        public int[] Title_Banapas_Load_Clear_Anime = new int[] { 198, 514 };
+
+        public int[] Title_Entry_Player_Select_X = new int[] { 337, 529, 743 };
+        public int[] Title_Entry_Player_Select_Y = new int[] { 488, 487, 486 };
+
+        public int[][][] Title_Entry_Player_Select_Rect = new int[][][] {
+            new int[][] { new int[] { 0, 0, 199, 92 } ,new int[] { 199, 0, 224, 92 } },
+            new int[][] { new int[] { 0, 92, 199, 92 } ,new int[] { 199, 92, 224, 92 } },
+            new int[][] { new int[] { 0, 184, 199, 92 } ,new int[] { 199, 184, 224, 92 } }
+        };
+        public int[] Title_Entry_NamePlate = new int[] { 530, 385 };
+
+        public int[] Title_ModeSelect_Bar_X = new int[] { 290, 319, 356 };
+        public int[] Title_ModeSelect_Bar_Y = new int[] { 107, 306, 513 };
+
+        public int[] Title_ModeSelect_Bar_Offset = new int[] { 20, 112 };
+
+        public int[] Title_ModeSelect_Title_Offset = new int[] { 311, 72 };
+        public int[] Title_ModeSelect_Title_Scale = new int[] { 36, 15 };
+
+        public int[] Title_ModeSelect_Bar_Center_X = new int[] { 320, 320, 640 };
+        public int[] Title_ModeSelect_Bar_Center_Y = new int[] { 338, 360, 360 };
+        public int[][] Title_ModeSelect_Bar_Center_Rect = new int[][] {
+            new int[] { 0, 0, 641, 27 },
+            new int[] { 0, 76, 641, 30 },
+            new int[] { 0, 27, 641, 45 },
+        };
+
+        public int[] Title_ModeSelect_Bar_Overlay_X = new int[] { 320, 320, 640 };
+        public int[] Title_ModeSelect_Bar_Overlay_Y = new int[] { 306, 333, 333 };
+        public int[][] Title_ModeSelect_Bar_Overlay_Rect = new int[][] {
+            new int[] { 0, 0, 641, 27 },
+            new int[] { 0, 71, 641, 35 },
+            new int[] { 0, 27, 641, 1 },
+        };
+
+        public int[] Title_ModeSelect_Bar_Move = new int[] { 40, 100 };
+        public int[] Title_ModeSelect_Overlay_Move = new int[] { 40, 120 };
+
+        public int[] Title_ModeSelect_Bar_Chara_X = new int[] { 446, 835 };
+        public int[] Title_ModeSelect_Bar_Chara_Y = new int[] { 360, 360 };
+
+        public int Title_ModeSelect_Bar_Chara_Move = 45;
+
+        public int[] Title_ModeSelect_Bar_Center_Title = new int[] { 631, 379 };
+        public int Title_ModeSelect_Bar_Center_Title_Move = 60;
+
+        public int[] Title_ModeSelect_Bar_Center_BoxText = new int[] { 640, 397 };
 
         #endregion
 
