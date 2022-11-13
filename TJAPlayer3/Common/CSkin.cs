@@ -1489,13 +1489,117 @@ namespace TJAPlayer3
                             #endregion
 
                             #region Config
-                            else if (strCommand == nameof(Config_ItemText_Correction_X))
+                            else if (strCommand == "Config_Arrow_X")
                             {
-                                Config_ItemText_Correction_X = int.Parse(strParam);
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_Arrow_X[i] = int.Parse(strSplit[i]);
+                                }
                             }
-                            else if (strCommand == nameof(Config_ItemText_Correction_Y))
+                            else if (strCommand == "Config_Arrow_Y")
                             {
-                                Config_ItemText_Correction_Y = int.Parse(strParam);
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_Arrow_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Arrow_Focus_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_Arrow_Focus_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Arrow_Focus_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_Arrow_Focus_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Item_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Config_Item_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Item_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    Config_Item_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Item_Width")
+                            {
+                                Config_Item_Width = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Config_Item_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_Item_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_Font_Scale")
+                            {
+                                Config_Font_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Config_ItemBox_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    Config_ItemBox_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_ItemBox_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    Config_ItemBox_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_ItemBox_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_ItemBox_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_ItemBox_ItemValue_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_ItemBox_ItemValue_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_ExplanationPanel")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_ExplanationPanel[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_SkinSample1")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_SkinSample1[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             #endregion
 
@@ -2973,11 +3077,29 @@ namespace TJAPlayer3
 
         #region Config
 
-        public int Config_ItemText_Correction_X = 0;
-        public int Config_ItemText_Correction_Y = 0;
-
         public int Config_NamePlate_Ptn_Title;
         public int[] Config_NamePlate_Ptn_Title_Boxes;
+
+        public int[] Config_Arrow_X = new int[] { 552, 552 };
+        public int[] Config_Arrow_Y = new int[] { 297, 363 };
+
+        public int[] Config_Arrow_Focus_X = new int[] { 552, 552 };
+        public int[] Config_Arrow_Focus_Y = new int[] { 279, 381 };
+
+        public int[] Config_Item_X = new int[] { 282, 282, 282 };
+        public int[] Config_Item_Y = new int[] { 153, 192, 231 };
+        public int Config_Item_Width = 100;
+        public int[] Config_Item_Font_Offset = new int[] { 0, 8 };
+
+        public int Config_Font_Scale = 20;
+
+        public int[] Config_ItemBox_X = new int[] { 602, 602, 602, 602, 602, 602, 602, 602, 602, 602 };
+        public int[] Config_ItemBox_Y = new int[] { 4, 79, 154, 229, 304, 379, 454, 529, 604, 679 };
+        public int[] Config_ItemBox_Font_Offset = new int[] { 20, 12 };
+        public int[] Config_ItemBox_ItemValue_Font_Offset = new int[] { 400, 12 };
+
+        public int[] Config_ExplanationPanel = new int[] { 67, 382 };
+        public int[] Config_SkinSample1 = new int[] { 124, 449 };
 
         #endregion
 
@@ -3119,7 +3241,6 @@ namespace TJAPlayer3
         public int[] Title_ModeSelect_Bar_Center_BoxText = new int[] { 640, 397 };
 
         #endregion
-
 
         #region SongSelect
         public int SongSelect_Overall_Y = 123;

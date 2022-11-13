@@ -127,7 +127,7 @@ namespace TJAPlayer3
 
 			txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
 
-			using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" : TJAPlayer3.ConfigIni.FontName), 20))
+			using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" : TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Config_Font_Scale))
 			{
 				for (int i = 0; i < strMenuItem.Length; i++)
 				{
@@ -149,7 +149,7 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
-				ctBackgroundAnime = new CCounter(0, 1280, 20, TJAPlayer3.Timer);
+				ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
 				ReloadMenus();
 
@@ -230,7 +230,7 @@ namespace TJAPlayer3
 			//---------------------
 			for(int i = 0; i < 2; i++)
 				if (TJAPlayer3.Tx.Config_Background != null )
-					TJAPlayer3.Tx.Config_Background.t2D描画( TJAPlayer3.app.Device, 0 + -(1280 * i) + ctBackgroundAnime.n現在の値, 0 );
+					TJAPlayer3.Tx.Config_Background.t2D描画( TJAPlayer3.app.Device, 0 + -(TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width * i) + ctBackgroundAnime.n現在の値, 0 );
 			if(TJAPlayer3.Tx.Config_Header != null )
                 TJAPlayer3.Tx.Config_Header.t2D描画( TJAPlayer3.app.Device, 0, 0 );
 			//---------------------
@@ -241,6 +241,8 @@ namespace TJAPlayer3
 			//---------------------
 			if( TJAPlayer3.Tx.Config_Cursor != null )
 			{
+				#region Old
+				/*
 				Rectangle rectangle;
                 TJAPlayer3.Tx.Config_Cursor.Opacity = this.bメニューにフォーカス中 ? 255 : 128;
 				int x = 110;
@@ -259,25 +261,51 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Config_Cursor.t2D描画( TJAPlayer3.app.Device, x, y, rectangle );
 					x += rectangle.Width;
 				}
+				*/
+				#endregion
+
+
+				int x = TJAPlayer3.Skin.Config_Item_X[this.n現在のメニュー番号];
+				int y = TJAPlayer3.Skin.Config_Item_Y[this.n現在のメニュー番号];
+
+				int width = TJAPlayer3.Tx.Config_Cursor.sz画像サイズ.Width / 3;
+				int height = TJAPlayer3.Tx.Config_Cursor.sz画像サイズ.Height;
+
+				int move = TJAPlayer3.Skin.Config_Item_Width;
+
+				//Left
+				TJAPlayer3.Tx.Config_Cursor.t2D中心基準描画(TJAPlayer3.app.Device, x - (width / 2) - move, y, 
+					new Rectangle(0, 0, width, height));
+
+				//Right
+				TJAPlayer3.Tx.Config_Cursor.t2D中心基準描画(TJAPlayer3.app.Device, x + (width / 2) + move, y, 
+					new Rectangle(width * 2, 0, width, height));
+
+				//Center
+				TJAPlayer3.Tx.Config_Cursor.vc拡大縮小倍率.X = (move / (float)width) * 2.0f;
+				TJAPlayer3.Tx.Config_Cursor.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y, 
+					new Rectangle(width, 0, width, height));
+
+				TJAPlayer3.Tx.Config_Cursor.vc拡大縮小倍率.X = 1.0f;
 			}
-			//---------------------
-			#endregion
-			
-			#region [ Menu ]
-			//---------------------
-			int menuY = 162 - 22 + 13;
-			int stepY = 39;
-			for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
+            //---------------------
+            #endregion
+
+            #region [ Menu ]
+            //---------------------
+            //int menuY = 162 - 22 + 13;
+            //int stepY = 39;
+            for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 			{
 				//Bitmap bmpStr = (this.n現在のメニュー番号 == i) ?
 				//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black, Color.Yellow, Color.OrangeRed ) :
 				//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black );
 				//txMenuItemLeft = CDTXMania.tテクスチャの生成( bmpStr, false );
-				int flag = ( this.n現在のメニュー番号 == i ) ? 1 : 0;
-				int num4 = txMenuItemLeft[ i, flag ].sz画像サイズ.Width;
-                txMenuItemLeft[i, flag].t2D描画(TJAPlayer3.app.Device, 282 - (num4 / 2) + TJAPlayer3.Skin.Config_ItemText_Correction_X, menuY + TJAPlayer3.Skin.Config_ItemText_Correction_Y ); //55
+
+				int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
+				txMenuItemLeft[i, flag].t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Config_Item_X[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[0], TJAPlayer3.Skin.Config_Item_Y[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[1]); //55
 				//txMenuItem.Dispose();
-				menuY += stepY;
+				//menuY += stepY;
 			}
 			//---------------------
 			#endregion
@@ -285,7 +313,7 @@ namespace TJAPlayer3
 			#region [ Explanation Panel ]
 			//---------------------
 			if( this.tx説明文パネル != null )
-				this.tx説明文パネル.t2D描画( TJAPlayer3.app.Device, 67, 382 );
+				this.tx説明文パネル.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Config_ExplanationPanel[0], TJAPlayer3.Skin.Config_ExplanationPanel[1]);
 			//---------------------
 			#endregion
 			
