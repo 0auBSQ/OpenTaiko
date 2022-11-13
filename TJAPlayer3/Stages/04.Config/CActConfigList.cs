@@ -787,9 +787,9 @@ namespace TJAPlayer3
 			#endregion
 
             if ( !string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-			    this.prvFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 20 );	// t項目リストの設定 の前に必要
+			    this.prvFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Config_Font_Scale);	// t項目リストの設定 の前に必要
             else
-                this.prvFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 20);
+                this.prvFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Config_Font_Scale);
 
             //			this.listMenu = new List<stMenuItemRight>();
 
@@ -1037,7 +1037,7 @@ namespace TJAPlayer3
 
 			// 描画
 
-			this.ptパネルの基本座標[ 4 ].X = this.b項目リスト側にフォーカスがある ? 0x228 : 0x25a;		// メニューにフォーカスがあるなら、項目リストの中央は頭を出さない。
+			//this.ptパネルの基本座標[ 4 ].X = this.b項目リスト側にフォーカスがある ? 0x228 : 0x25a;		// メニューにフォーカスがあるなら、項目リストの中央は頭を出さない。
 
 			#region [ 計11個の項目パネルを描画する。]
 			//-----------------
@@ -1045,12 +1045,14 @@ namespace TJAPlayer3
 			for( int i = 0; i < 4; i++ )
 				nItem = this.t前の項目( nItem );
 
-			for( int n行番号 = -4; n行番号 < 6; n行番号++ )		// n行番号 == 0 がフォーカスされている項目パネル。
+			for( int i = 0; i < TJAPlayer3.Skin.Config_ItemBox_Count; i++ )		// n行番号 == 0 がフォーカスされている項目パネル。
 			{
+				bool centerFlag = i == (TJAPlayer3.Skin.Config_ItemBox_Count / 2) - 1;
+
 				#region [ 今まさに画面外に飛びだそうとしている項目パネルは描画しない。]
 				//-----------------
-				if( ( ( n行番号 == -4 ) && ( this.n現在のスクロールカウンタ > 0 ) ) ||		// 上に飛び出そうとしている
-					( ( n行番号 == +5 ) && ( this.n現在のスクロールカウンタ < 0 ) ) )		// 下に飛び出そうとしている
+				if ( ( ( i == 0 ) && ( this.n現在のスクロールカウンタ > 0 ) ) ||		// 上に飛び出そうとしている
+					( ( i == TJAPlayer3.Skin.Config_ItemBox_Count - 1) && ( this.n現在のスクロールカウンタ < 0 ) ) )		// 下に飛び出そうとしている
 				{
 					nItem = this.t次の項目( nItem );
 					continue;
@@ -1058,10 +1060,9 @@ namespace TJAPlayer3
 				//-----------------
 				#endregion
 
-				int n移動元の行の基本位置 = n行番号 + 4;
-				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( n移動元の行の基本位置 + 1 ) % 10 ) : ( ( ( n移動元の行の基本位置 - 1 ) + 10 ) % 10 );
-				int x = this.ptパネルの基本座標[ n移動元の行の基本位置 ].X + ( (int) ( ( this.ptパネルの基本座標[ n移動先の行の基本位置 ].X - this.ptパネルの基本座標[ n移動元の行の基本位置 ].X ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
-				int y = this.ptパネルの基本座標[ n移動元の行の基本位置 ].Y + ( (int) ( ( this.ptパネルの基本座標[ n移動先の行の基本位置 ].Y - this.ptパネルの基本座標[ n移動元の行の基本位置 ].Y ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
+				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( i + 1 ) % 10 ) : ( ( ( i - 1 ) + 10 ) % 10 );
+				int x = TJAPlayer3.Skin.Config_ItemBox_X[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_X[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_X[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
+				int y = TJAPlayer3.Skin.Config_ItemBox_Y[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_Y[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_Y[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 
 				#region [ 現在の行の項目パネル枠を描画。]
 				//-----------------
@@ -1079,7 +1080,7 @@ namespace TJAPlayer3
 				//-----------------
 				if ( listMenu[ nItem ].txMenuItemRight != null )	// 自前のキャッシュに含まれているようなら、再レンダリングせずキャッシュを使用
 				{
-                    listMenu[nItem].txMenuItemRight.t2D描画(TJAPlayer3.app.Device, x + 20 + TJAPlayer3.Skin.Config_ItemText_Correction_X, y + 12 + TJAPlayer3.Skin.Config_ItemText_Correction_Y);
+                    listMenu[nItem].txMenuItemRight.t2D描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.Config_ItemBox_Font_Offset[0], y + TJAPlayer3.Skin.Config_ItemBox_Font_Offset[1]);
 				}
 				else
 				{
@@ -1150,7 +1151,7 @@ namespace TJAPlayer3
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString(), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString();
 						}
-						b強調 = ( n行番号 == 0 ) && this.b要素値にフォーカス中;
+						b強調 = centerFlag && this.b要素値にフォーカス中;
 						break;
 					//-----------------
 						#endregion
@@ -1169,8 +1170,7 @@ namespace TJAPlayer3
 								tGenerateSkinSample();		// 最初にSkinの選択肢にきたとき(Enterを押す前)に限り、サンプル生成が発生する。
 								if ( txSkinSample1 != null )
 								{
-									txSkinSample1.t2D描画( TJAPlayer3.app.Device, 124, 449 );
-									txSkinSample1.t2D描画( TJAPlayer3.app.Device, 124, 449 );
+									txSkinSample1.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Config_SkinSample1[0], TJAPlayer3.Skin.Config_SkinSample1[1]);
 								}
 							}
 							#endregion
@@ -1185,7 +1185,7 @@ namespace TJAPlayer3
 				    {
 				        using (var txStr = TJAPlayer3.tテクスチャの生成( bmpStr, false ))
 				        {
-				            txStr.t2D描画( TJAPlayer3.app.Device, x + 400 + TJAPlayer3.Skin.Config_ItemText_Correction_X, y + 12 + TJAPlayer3.Skin.Config_ItemText_Correction_Y );
+				            txStr.t2D描画( TJAPlayer3.app.Device, x + TJAPlayer3.Skin.Config_ItemBox_ItemValue_Font_Offset[0], y + TJAPlayer3.Skin.Config_ItemBox_ItemValue_Font_Offset[1]);
 				        }
 				    }
 				}
@@ -1206,7 +1206,7 @@ namespace TJAPlayer3
 
 						listMenu[ nItem ] = stm;
 					}
-					listMenu[ nItem ].txParam.t2D描画( TJAPlayer3.app.Device,  x + 400 + TJAPlayer3.Skin.Config_ItemText_Correction_X, y + 12 + TJAPlayer3.Skin.Config_ItemText_Correction_Y );
+					listMenu[ nItem ].txParam.t2D描画( TJAPlayer3.app.Device, x + TJAPlayer3.Skin.Config_ItemBox_ItemValue_Font_Offset[0], y + TJAPlayer3.Skin.Config_ItemBox_ItemValue_Font_Offset[1]);
 				}
 				//-----------------
 				#endregion
@@ -1220,7 +1220,8 @@ namespace TJAPlayer3
 			//-----------------
 			if( this.b項目リスト側にフォーカスがある && ( this.n目標のスクロールカウンタ == 0 ) )
 			{
-				int x;
+				int x_upper;
+				int x_lower;
 				int y_upper;
 				int y_lower;
 			
@@ -1228,23 +1229,25 @@ namespace TJAPlayer3
 
 				if( this.b要素値にフォーカス中 )
 				{
-					x = 552;	// 要素値の上下あたり。
-					y_upper = 0x117 - this.ct三角矢印アニメ.n現在の値;
-					y_lower = 0x17d + this.ct三角矢印アニメ.n現在の値;
+					x_upper = TJAPlayer3.Skin.Config_Arrow_Focus_X[0];  // 要素値の上下あたり。
+					x_lower = TJAPlayer3.Skin.Config_Arrow_Focus_X[1];  // 要素値の上下あたり。
+					y_upper = TJAPlayer3.Skin.Config_Arrow_Focus_Y[0] - this.ct三角矢印アニメ.n現在の値;
+					y_lower = TJAPlayer3.Skin.Config_Arrow_Focus_Y[1] + this.ct三角矢印アニメ.n現在の値;
 				}
 				else
 				{
-					x = 552;	// 項目名の上下あたり。
-					y_upper = 0x129 - this.ct三角矢印アニメ.n現在の値;
-					y_lower = 0x16b + this.ct三角矢印アニメ.n現在の値;
+					x_upper = TJAPlayer3.Skin.Config_Arrow_X[0];  // 要素値の上下あたり。
+					x_lower = TJAPlayer3.Skin.Config_Arrow_X[1];  // 要素値の上下あたり。
+					y_upper = TJAPlayer3.Skin.Config_Arrow_Y[0] - this.ct三角矢印アニメ.n現在の値;
+					y_lower = TJAPlayer3.Skin.Config_Arrow_Y[1] + this.ct三角矢印アニメ.n現在の値;
 				}
 
 				// 描画。
 				
 				if( TJAPlayer3.Tx.Config_Arrow != null )
 				{
-                    TJAPlayer3.Tx.Config_Arrow.t2D描画( TJAPlayer3.app.Device, x, y_upper, new Rectangle( 0, 0, 0x40, 0x18 ) );
-                    TJAPlayer3.Tx.Config_Arrow.t2D描画( TJAPlayer3.app.Device, x, y_lower, new Rectangle( 0, 0x18, 0x40, 0x18 ) );
+                    TJAPlayer3.Tx.Config_Arrow.t2D描画( TJAPlayer3.app.Device, x_upper, y_upper, new Rectangle( 0, 0, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Width, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2) );
+                    TJAPlayer3.Tx.Config_Arrow.t2D描画( TJAPlayer3.app.Device, x_lower, y_lower, new Rectangle( 0, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Width, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2) );
 				}
 			}
 			//-----------------
@@ -1343,7 +1346,14 @@ namespace TJAPlayer3
 		private long nスクロール用タイマ値;
 		private int n現在のスクロールカウンタ;
 		private int n目標のスクロールカウンタ;
-        private Point[] ptパネルの基本座標 = new Point[] { new Point(0x25a, 4), new Point(0x25a, 0x4f), new Point(0x25a, 0x9a), new Point(0x25a, 0xe5), new Point(0x228, 0x130), new Point(0x25a, 0x17b), new Point(0x25a, 0x1c6), new Point(0x25a, 0x211), new Point(0x25a, 0x25c), new Point(0x25a, 0x2a7) };
+
+		/*
+        private Point[] ptパネルの基本座標 = new Point[] { 
+			new Point(0x25a, 4), new Point(0x25a, 0x4f), new Point(0x25a, 0x9a), new Point(0x25a, 0xe5), 
+			new Point(0x228, 0x130), 
+			new Point(0x25a, 0x17b), new Point(0x25a, 0x1c6), new Point(0x25a, 0x211), new Point(0x25a, 0x25c), new Point(0x25a, 0x2a7) };
+		*/
+
 		//private CTexture txその他項目行パネル;
 		//private CTexture tx三角矢印;
 		//private CTexture tx通常項目行パネル;
