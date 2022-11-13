@@ -1045,12 +1045,14 @@ namespace TJAPlayer3
 			for( int i = 0; i < 4; i++ )
 				nItem = this.t前の項目( nItem );
 
-			for( int n行番号 = -4; n行番号 < 6; n行番号++ )		// n行番号 == 0 がフォーカスされている項目パネル。
+			for( int i = 0; i < TJAPlayer3.Skin.Config_ItemBox_Count; i++ )		// n行番号 == 0 がフォーカスされている項目パネル。
 			{
+				bool centerFlag = i == (TJAPlayer3.Skin.Config_ItemBox_Count / 2) - 1;
+
 				#region [ 今まさに画面外に飛びだそうとしている項目パネルは描画しない。]
 				//-----------------
-				if( ( ( n行番号 == -4 ) && ( this.n現在のスクロールカウンタ > 0 ) ) ||		// 上に飛び出そうとしている
-					( ( n行番号 == +5 ) && ( this.n現在のスクロールカウンタ < 0 ) ) )		// 下に飛び出そうとしている
+				if ( ( ( i == 0 ) && ( this.n現在のスクロールカウンタ > 0 ) ) ||		// 上に飛び出そうとしている
+					( ( i == TJAPlayer3.Skin.Config_ItemBox_Count - 1) && ( this.n現在のスクロールカウンタ < 0 ) ) )		// 下に飛び出そうとしている
 				{
 					nItem = this.t次の項目( nItem );
 					continue;
@@ -1058,10 +1060,9 @@ namespace TJAPlayer3
 				//-----------------
 				#endregion
 
-				int n移動元の行の基本位置 = n行番号 + 4;
-				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( n移動元の行の基本位置 + 1 ) % 10 ) : ( ( ( n移動元の行の基本位置 - 1 ) + 10 ) % 10 );
-				int x = TJAPlayer3.Skin.Config_ItemBox_X[ n移動元の行の基本位置 ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_X[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_X[ n移動元の行の基本位置 ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
-				int y = TJAPlayer3.Skin.Config_ItemBox_Y[ n移動元の行の基本位置 ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_Y[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_Y[ n移動元の行の基本位置 ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
+				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( i + 1 ) % 10 ) : ( ( ( i - 1 ) + 10 ) % 10 );
+				int x = TJAPlayer3.Skin.Config_ItemBox_X[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_X[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_X[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
+				int y = TJAPlayer3.Skin.Config_ItemBox_Y[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_Y[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_Y[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 
 				#region [ 現在の行の項目パネル枠を描画。]
 				//-----------------
@@ -1150,7 +1151,7 @@ namespace TJAPlayer3
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString(), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString();
 						}
-						b強調 = ( n行番号 == 0 ) && this.b要素値にフォーカス中;
+						b強調 = centerFlag && this.b要素値にフォーカス中;
 						break;
 					//-----------------
 						#endregion

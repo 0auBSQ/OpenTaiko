@@ -1553,18 +1553,26 @@ namespace TJAPlayer3
                             {
                                 Config_Font_Scale = int.Parse(strParam);
                             }
+                            else if (strCommand == "Config_ItemBox_Count")
+                            {
+                                Config_ItemBox_Count = int.Parse(strParam);
+                            }
                             else if (strCommand == "Config_ItemBox_X")
                             {
+                                Config_ItemBox_X = new int[Config_ItemBox_Count];
+
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 10; i++)
+                                for (int i = 0; i < Config_ItemBox_Count; i++)
                                 {
                                     Config_ItemBox_X[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Config_ItemBox_Y")
                             {
+                                Config_ItemBox_Y = new int[Config_ItemBox_Count];
+
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 10; i++)
+                                for (int i = 0; i < Config_ItemBox_Count; i++)
                                 {
                                     Config_ItemBox_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -3093,6 +3101,7 @@ namespace TJAPlayer3
 
         public int Config_Font_Scale = 20;
 
+        public int Config_ItemBox_Count = 10;
         public int[] Config_ItemBox_X = new int[] { 602, 602, 602, 602, 602, 602, 602, 602, 602, 602 };
         public int[] Config_ItemBox_Y = new int[] { 4, 79, 154, 229, 304, 379, 454, 529, 604, 679 };
         public int[] Config_ItemBox_Font_Offset = new int[] { 20, 12 };
