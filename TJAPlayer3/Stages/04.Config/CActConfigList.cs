@@ -614,10 +614,14 @@ namespace TJAPlayer3
 				string path = skinSubFolders[ nSkinIndex ];
 				path = System.IO.Path.Combine( path, @"Graphics\1_Title\Background.png" );
 				Bitmap bmSrc = new Bitmap( path );
-				Bitmap bmDest = new Bitmap( bmSrc.Width / 4, bmSrc.Height / 4 );
+
+				int _w = TJAPlayer3.Skin.Resolution[0] / 4;// bmSrc.Width / 4;
+				int _h = TJAPlayer3.Skin.Resolution[1] / 4;// bmSrc.Height / 4;
+
+                Bitmap bmDest = new Bitmap( _w, _h );
 				Graphics g = Graphics.FromImage( bmDest );
 				g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-				g.DrawImage( bmSrc, new Rectangle( 0, 0, bmSrc.Width / 4, bmSrc.Height / 4 ),
+				g.DrawImage( bmSrc, new Rectangle( 0, 0, _w, _h ),
 					0, 0, bmSrc.Width, bmSrc.Height, GraphicsUnit.Pixel );
 				if ( txSkinSample1 != null )
 				{
