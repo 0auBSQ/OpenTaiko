@@ -607,6 +607,7 @@ namespace TJAPlayer3
 
 		private void tGenerateSkinSample()
 		{
+
 			nSkinIndex = ( ( CItemList ) this.list項目リスト[ this.n現在の選択項目 ] ).n現在選択されている項目番号;
 			if ( nSkinSampleIndex != nSkinIndex )
 			{
@@ -1042,7 +1043,7 @@ namespace TJAPlayer3
 			#region [ 計11個の項目パネルを描画する。]
 			//-----------------
 			int nItem = this.n現在の選択項目;
-			for( int i = 0; i < 4; i++ )
+			for( int i = 0; i < (TJAPlayer3.Skin.Config_ItemBox_Count / 2) - 1; i++ )
 				nItem = this.t前の項目( nItem );
 
 			for( int i = 0; i < TJAPlayer3.Skin.Config_ItemBox_Count; i++ )		// n行番号 == 0 がフォーカスされている項目パネル。
