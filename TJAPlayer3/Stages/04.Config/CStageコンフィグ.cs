@@ -61,11 +61,11 @@ namespace TJAPlayer3
 				this.n現在のメニュー番号 = 0;                                                    //
                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
                 {
-                    this.ftフォント = new Font(TJAPlayer3.ConfigIni.FontName, 18.0f, FontStyle.Bold, GraphicsUnit.Pixel);
+                    this.ftフォント = new Font(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Config_Font_Scale_Description, FontStyle.Bold, GraphicsUnit.Pixel);
                 }
                 else
                 {
-                    this.ftフォント = new Font("MS UI Gothic", 18.0f, FontStyle.Bold, GraphicsUnit.Pixel);
+                    this.ftフォント = new Font("MS UI Gothic", TJAPlayer3.Skin.Config_Font_Scale_Description, FontStyle.Bold, GraphicsUnit.Pixel);
                 }
 				for( int i = 0; i < 4; i++ )													//
 				{																				//

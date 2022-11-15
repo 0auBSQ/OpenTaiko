@@ -1553,6 +1553,10 @@ namespace TJAPlayer3
                             {
                                 Config_Font_Scale = int.Parse(strParam);
                             }
+                            else if (strCommand == "Config_Font_Scale_Description")
+                            {
+                                Config_Font_Scale_Description = float.Parse(strParam);
+                            }
                             else if (strCommand == "Config_ItemBox_Count")
                             {
                                 Config_ItemBox_Count = int.Parse(strParam);
@@ -3100,6 +3104,7 @@ namespace TJAPlayer3
         public int[] Config_Item_Font_Offset = new int[] { 0, 8 };
 
         public int Config_Font_Scale = 20;
+        public float Config_Font_Scale_Description = 14.0f;
 
         public int Config_ItemBox_Count = 10;
         public int[] Config_ItemBox_X = new int[] { 602, 602, 602, 602, 602, 602, 602, 602, 602, 602 };
