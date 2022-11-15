@@ -1553,6 +1553,14 @@ namespace TJAPlayer3
                             {
                                 Config_Font_Scale = int.Parse(strParam);
                             }
+                            else if (strCommand == "Config_Selected_Menu_Text_Grad_Color_1")
+                            {
+                                Config_Selected_Menu_Text_Grad_Color_1 = ColorTranslator.FromHtml(strParam);
+                            }
+                            else if (strCommand == "Config_Selected_Menu_Text_Grad_Color_2")
+                            {
+                                Config_Selected_Menu_Text_Grad_Color_2 = ColorTranslator.FromHtml(strParam);
+                            }
                             else if (strCommand == "Config_Font_Scale_Description")
                             {
                                 Config_Font_Scale_Description = float.Parse(strParam);
@@ -3105,6 +3113,9 @@ namespace TJAPlayer3
 
         public int Config_Font_Scale = 20;
         public float Config_Font_Scale_Description = 14.0f;
+
+        public Color Config_Selected_Menu_Text_Grad_Color_1 = Color.Yellow;
+        public Color Config_Selected_Menu_Text_Grad_Color_2 = Color.OrangeRed;
 
         public int Config_ItemBox_Count = 10;
         public int[] Config_ItemBox_X = new int[] { 602, 602, 602, 602, 602, 602, 602, 602, 602, 602 };

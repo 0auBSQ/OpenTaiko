@@ -1181,7 +1181,12 @@ namespace TJAPlayer3
 				}
 				if ( b強調 )
 				{
-				    using (var bmpStr = prvFont.DrawPrivateFont(strParam, Color.Black, Color.White, Color.Yellow, Color.OrangeRed))
+				    using (var bmpStr = prvFont.DrawPrivateFont(strParam, 
+						Color.Black, 
+						Color.White, 
+						TJAPlayer3.Skin.Config_Selected_Menu_Text_Grad_Color_1, 
+						TJAPlayer3.Skin.Config_Selected_Menu_Text_Grad_Color_2
+						))
 				    {
 				        using (var txStr = TJAPlayer3.tテクスチャの生成( bmpStr, false ))
 				        {

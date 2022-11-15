@@ -136,7 +136,12 @@ namespace TJAPlayer3
 						txMenuItemLeft[i, 0]?.Dispose();
 						txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
 					}
-					using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
+					using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], 
+						Color.White, 
+						Color.Black,
+                        TJAPlayer3.Skin.Config_Selected_Menu_Text_Grad_Color_1,
+                        TJAPlayer3.Skin.Config_Selected_Menu_Text_Grad_Color_2
+						))
 					{
 						txMenuItemLeft[i, 1]?.Dispose();
 						txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
