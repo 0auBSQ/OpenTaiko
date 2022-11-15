@@ -1061,7 +1061,7 @@ namespace TJAPlayer3
 				//-----------------
 				#endregion
 
-				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( i + 1 ) % 10 ) : ( ( ( i - 1 ) + 10 ) % 10 );
+				int n移動先の行の基本位置 = ( this.n現在のスクロールカウンタ <= 0 ) ? ( ( i + 1 ) % TJAPlayer3.Skin.Config_ItemBox_Count) : ( ( ( i - 1 ) + TJAPlayer3.Skin.Config_ItemBox_Count) % TJAPlayer3.Skin.Config_ItemBox_Count);
 				int x = TJAPlayer3.Skin.Config_ItemBox_X[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_X[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_X[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 				int y = TJAPlayer3.Skin.Config_ItemBox_Y[ i ] + ( (int) ( (TJAPlayer3.Skin.Config_ItemBox_Y[ n移動先の行の基本位置 ] - TJAPlayer3.Skin.Config_ItemBox_Y[ i ] ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 
