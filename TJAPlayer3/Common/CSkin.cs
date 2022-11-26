@@ -1624,13 +1624,6 @@ namespace TJAPlayer3
                             #endregion
 
                             #region SongSelect
-                            else if (strCommand == "SongSelect_Overall_Y")
-                            {
-                                if (int.Parse(strParam) != 0)
-                                {
-                                    SongSelect_Overall_Y = int.Parse(strParam);
-                                }
-                            }
                             else if (strCommand == "SongSelect_BoxExplanation_X")
                             {
                                 SongSelect_BoxExplanation_X = int.Parse(strParam);
@@ -1639,14 +1632,6 @@ namespace TJAPlayer3
                             {
                                 SongSelect_BoxExplanation_Y = int.Parse(strParam);
                             }
-                            else if (strCommand == "SongSelect_Title_X")
-                            {
-                                SongSelect_Title_X = int.Parse(strParam);
-                            }
-                            else if (strCommand == "SongSelect_Title_Y")
-                            {
-                                SongSelect_Title_Y = int.Parse(strParam);
-                            }
                             else if (strCommand == "SongSelect_BoxExplanation_Interval")
                             {
                                 SongSelect_BoxExplanation_Interval = int.Parse(strParam);
@@ -1654,6 +1639,154 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_GenreName")
                             {
                                 SongSelect_GenreName = this.strStringを配列に直す(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Bar_Count")
+                            {
+                                SongSelect_Bar_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Bar_X")
+                            {
+                                SongSelect_Bar_X = new int[SongSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < SongSelect_Bar_Count; i++)
+                                {
+                                    SongSelect_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Y")
+                            {
+                                SongSelect_Bar_Y = new int[SongSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < SongSelect_Bar_Count; i++)
+                                {
+                                    SongSelect_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Title_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_SubTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_SubTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
+
+                            else if (strCommand == "SongSelect_BoxName_Scale")
+                            {
+                                SongSelect_BoxName_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_MusicName_Scale")
+                            {
+                                SongSelect_MusicName_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Subtitle_Scale")
+                            {
+                                SongSelect_Subtitle_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_BoxText_Scale")
+                            {
+                                SongSelect_BoxText_Scale = int.Parse(strParam);
+                            }
+
+
+                            else if (strCommand == "SongSelect_Bar_Center_Move")
+                            {
+                                SongSelect_Bar_Center_Move = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Bar_Select")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Select[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Frame_Score_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Frame_Score_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Frame_Score_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Frame_Score_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Number_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_Number_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Number_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_Number_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Number_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Title")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Title[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_SubTitle")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Select_SubTitle[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Box_Chara_Move")
+                            {
+                                SongSelect_Box_Chara_Move = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Box_Chara_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Box_Chara_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Box_Chara_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Box_Chara_Y[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             else if (strCommand == "SongSelect_NamePlate_X")
                             {
@@ -1687,6 +1820,459 @@ namespace TJAPlayer3
                                     SongSelect_Auto_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_ModIcons_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_ModIcons_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_ModIcons_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_ModIcons_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Timer")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Timer[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Timer_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Timer_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Table_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Table_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Table_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Table_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_High_Score_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_High_Score_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_High_Score_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_High_Score_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_High_Score_Difficulty_Cymbol_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_High_Score_Difficulty_Cymbol_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_High_Score_Difficulty_Cymbol_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_High_Score_Difficulty_Cymbol_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_1P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_1P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_BoardNumber_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_SongNumber_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_SongNumber_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_SongNumber_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_SongNumber_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_SongNumber_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_SongNumber_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Search_Bar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Search_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Search_Bar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Search_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
+
+
+                            else if (strCommand == "SongSelect_Difficulty_Back")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Back[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Back_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Option_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Easy_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Normal_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[3][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Hard_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[4][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Oni_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[5][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_Edit_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_Rect[6][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Star_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Star_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Star_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Star_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Star_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Star_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Number_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Number_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Number_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Number_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Number_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Crown_1P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Crown_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Crown_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Crown_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Crown_1P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Crown_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Crown_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_Crown_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_ScoreRank_1P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_ScoreRank_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_ScoreRank_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_ScoreRank_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_ScoreRank_1P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_ScoreRank_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_ScoreRank_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_Difficulty_ScoreRank_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Back_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Back_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Back_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Back_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Cursor_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Rect[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Back1_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Rect[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Back2_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Rect[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Anime")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Anime[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_AnimeIn")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_AnimeIn[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Select_Bar_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Select_Bar_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Preimage")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Preimage[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Preimage_Size")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Preimage_Size[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
+
                             else if (strCommand == "SongSelect_ForeColor_JPOP")
                             {
                                 SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml(strParam);
@@ -3268,17 +3854,143 @@ namespace TJAPlayer3
         #endregion
 
         #region SongSelect
-        public int SongSelect_Overall_Y = 123;
-        public int SongSelect_BoxExplanation_X = 0;
-        public int SongSelect_BoxExplanation_Y = 0;
-        public int SongSelect_BoxExplanation_Interval = 30;
-        public int SongSelect_Title_X = 0;
-        public int SongSelect_Title_Y = 0;
+        //public int SongSelect_Overall_Y = 123;
         public string[] SongSelect_GenreName = { "ポップス", "アニメ", "ゲームバラエティ", "ナムコオリジナル", "クラシック", "バラエティ", "キッズ", "ボーカロイド", "最近遊んだ曲"};
+
+        public int SongSelect_Bar_Count = 9;
+
+        public int[] SongSelect_Bar_X = new int[] { 214, 239, 263, 291, 324, 358, 386, 411, 436 };
+        public int[] SongSelect_Bar_Y = new int[] { -127, -36, 55, 145, 314, 485, 574, 665, 756 };
+
+        public int[] SongSelect_Bar_Title_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_SubTitle_Offset = new int[] { 316, 90 };
+
+        public int SongSelect_BoxName_Scale = 28;
+        public int SongSelect_MusicName_Scale = 22;
+        public int SongSelect_Subtitle_Scale = 13;
+        public int SongSelect_BoxText_Scale = 14;
+
+        public int SongSelect_Bar_Center_Move = 62;
+
+        public int[] SongSelect_Bar_Select = new int[] { 309, 235 };
+
+        public int[] SongSelect_Frame_Score_X = new int[] { 400, 522, 644, 766 };
+        public int[] SongSelect_Frame_Score_Y = new int[] { 228, 228, 228, 228 };
+
+        public int[] SongSelect_Level_Number_X = new int[] { 485, 607, 729, 851 };
+        public int[] SongSelect_Level_Number_Y = new int[] { 400, 400, 400, 400 };
+
+        public int[] SongSelect_Level_Number_Interval = new int[] { 11, 0 };
+
+        public int[] SongSelect_Difficulty_Select_Title = new int[] { 640, 140 };
+        public int[] SongSelect_Difficulty_Select_SubTitle = new int[] { 640, 180 };
+
+        public int SongSelect_Box_Chara_Move = 114;
+
+        public int[] SongSelect_Box_Chara_X = new int[] { 434, 846 };
+        public int[] SongSelect_Box_Chara_Y = new int[] { 360, 360 };
+
+        public int SongSelect_BoxExplanation_X = 640;
+        public int SongSelect_BoxExplanation_Y = 360;
+
+        public int SongSelect_BoxExplanation_Interval = 30;
+
         public int[] SongSelect_NamePlate_X = new int[] { 36, 1020 };
         public int[] SongSelect_NamePlate_Y = new int[] { 615, 615 };
         public int[] SongSelect_Auto_X = new int[] { 60, 950 };
         public int[] SongSelect_Auto_Y = new int[] { 650, 650 };
+        public int[] SongSelect_ModIcons_X = new int[] { 40, 1020 };
+        public int[] SongSelect_ModIcons_Y = new int[] { 672, 672 };
+
+        public int[] SongSelect_Timer = new int[] { 1148, 57 };
+        public int[] SongSelect_Timer_Interval = new int[] { 46, 0 };
+
+        public int[] SongSelect_Table_X = new int[] { 0, 1034 };
+        public int[] SongSelect_Table_Y = new int[] { 0, 0 };
+
+        public int[] SongSelect_High_Score_X = new int[] { 124, 1158 };
+        public int[] SongSelect_High_Score_Y = new int[] { 416, 416 };
+
+        public int[] SongSelect_High_Score_Difficulty_Cymbol_X = new int[] { 46, 1080 };
+        public int[] SongSelect_High_Score_Difficulty_Cymbol_Y = new int[] { 418, 418 };
+
+        public int[][] SongSelect_BoardNumber_X = new int[][] {
+            new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, 190, 74, 114 },
+            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, 1224, 1214, 1148 }
+        };
+        public int[][] SongSelect_BoardNumber_Y = new int[][] {
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 }
+        };
+        public int[] SongSelect_BoardNumber_Interval = new int[] { 9, 0 };
+
+        public int[] SongSelect_SongNumber_X = new int[] { 1090, 1183 };
+        public int[] SongSelect_SongNumber_Y = new int[] { 167, 167 };
+        public int[] SongSelect_SongNumber_Interval = new int[] { 16, 0 };
+
+        public int[] SongSelect_Search_Bar_X = new int[] { 640, 640, 640, 640 };
+        public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620 };
+
+        public int[] SongSelect_Difficulty_Back = new int[] { 640, 290 };
+
+        public int[] SongSelect_Difficulty_Bar_X = new int[] { 255, 341, 426, 569, 712, 855, 855 };
+        public int[] SongSelect_Difficulty_Bar_Y = new int[] { 270, 270, 270, 270, 270, 270, 270 };
+
+        public int[][] SongSelect_Difficulty_Bar_Rect = new int[][] {
+            new int[] { 0, 0, 86, 236 },
+            new int[] { 86, 0, 86, 236 },
+            new int[] { 171, 0, 138, 236 },
+            new int[] { 314, 0, 138, 236 },
+            new int[] { 457, 0, 138, 236 },
+            new int[] { 600, 0, 138, 236 },
+            new int[] { 743, 0, 138, 236 },
+        };
+
+        public int[] SongSelect_Difficulty_Star_X = new int[] { 444, 587, 730, 873, 873 };
+        public int[] SongSelect_Difficulty_Star_Y = new int[] { 459, 459, 459, 459, 459 };
+        public int[] SongSelect_Difficulty_Star_Interval = new int[] { 10, 0 };
+
+        public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927 };
+        public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435 };
+        public int[] SongSelect_Difficulty_Number_Interval = new int[] { 11, 0 };
+
+        public int[][] SongSelect_Difficulty_Crown_X = new int[][] {
+            new int[] { 445, 589, 733, 877, 877 },
+            new int[] { 519, 663, 807, 951, 951 },
+        };
+        public int[][] SongSelect_Difficulty_Crown_Y = new int[][] {
+            new int[] { 284, 284, 284, 284, 284 },
+            new int[] { 284, 284, 284, 284, 284 },
+        };
+
+        public int[][] SongSelect_Difficulty_ScoreRank_X = new int[][] {
+            new int[] { 467, 611, 755, 899, 899 },
+            new int[] { 491, 635, 779, 923, 923 },
+        };
+        public int[][] SongSelect_Difficulty_ScoreRank_Y = new int[][] {
+            new int[] { 281, 281, 281, 281, 281 },
+            new int[] { 281, 281, 281, 281, 281 },
+        };
+
+        public int[] SongSelect_Difficulty_Select_Bar_X = new int[] { 163, 252, 367, 510, 653, 796, 796 };
+        public int[] SongSelect_Difficulty_Select_Bar_Y = new int[] { 176, 176, 176, 176, 176, 176, 176 };
+
+        public int[] SongSelect_Difficulty_Select_Bar_Back_X = new int[] { 163, 252, 367, 510, 653, 796, 796 };
+        public int[] SongSelect_Difficulty_Select_Bar_Back_Y = new int[] { 242, 242, 242, 242, 242, 242, 242 };
+
+        public int[][] SongSelect_Difficulty_Select_Bar_Rect = new int[][] {
+            new int[] { 0, 0, 259, 114 },
+            new int[] { 0, 114, 259, 275 },
+            new int[] { 0, 387, 259, 111 },
+        };
+
+        public int[] SongSelect_Difficulty_Select_Bar_Anime = new int[] { 0, 10 };
+        public int[] SongSelect_Difficulty_Select_Bar_AnimeIn = new int[] { 0, 50 };
+        public int[] SongSelect_Difficulty_Select_Bar_Move = new int[] { 25, 0 };
+
+        public int[] SongSelect_Preimage = new int[] { 120, 110 };
+        public int[] SongSelect_Preimage_Size = new int[] { 200, 200 };
+
         public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
         public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");
         public Color SongSelect_ForeColor_VOCALOID = ColorTranslator.FromHtml("#FFFFFF");
