@@ -2271,6 +2271,90 @@ namespace TJAPlayer3
                                     SongSelect_Preimage_Size[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Option_Select_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_Select_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_Font_Scale")
+                            {
+                                SongSelect_Option_Font_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Option_OptionType_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_OptionType_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_OptionType_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_OptionType_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_Value_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_Value_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_Value_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_Value_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_ModMults1_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_ModMults1_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_ModMults2_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_ModMults2_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_ModMults1_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_ModMults1_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Option_ModMults2_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Option_ModMults2_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
 
 
                             else if (strCommand == "SongSelect_ForeColor_JPOP")
@@ -3990,6 +4074,21 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Preimage = new int[] { 120, 110 };
         public int[] SongSelect_Preimage_Size = new int[] { 200, 200 };
+
+        public int[] SongSelect_Option_Select_Offset = new int[] { 0, -286 };
+
+        public int SongSelect_Option_Font_Scale = 13;
+        public int[] SongSelect_Option_OptionType_X = new int[] { 16, 1004 };
+        public int[] SongSelect_Option_OptionType_Y = new int[] { 93, 93 };
+        public int[] SongSelect_Option_Value_X = new int[] { 200, 1188 };
+        public int[] SongSelect_Option_Value_Y = new int[] { 93, 93 };
+        public int[] SongSelect_Option_Interval = new int[] { 0, 41 };
+
+        public int[] SongSelect_Option_ModMults1_X = new int[] { 108, 1096 };
+        public int[] SongSelect_Option_ModMults1_Y = new int[] { 11, 11 };
+
+        public int[] SongSelect_Option_ModMults2_X = new int[] { 108, 1096 };
+        public int[] SongSelect_Option_ModMults2_Y = new int[] { 52, 52 };
 
         public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
         public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");

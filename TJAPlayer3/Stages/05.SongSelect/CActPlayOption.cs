@@ -184,9 +184,6 @@ namespace TJAPlayer3
             
             
 
-            float baseX = (player == 0) ? 200 : 1188;
-            float baseY = 539.9f + y - nOptionCount * 40.7f;
-
             var _textures = new CTexture[]
             {
                 txSpeed[nSpeedCount],
@@ -203,23 +200,26 @@ namespace TJAPlayer3
                 txFunMods[nFunMods],
             };
 
-            var _shift = player == 1 ? 640 : 0;
-            var _rect = new Rectangle(_shift, 0, 640, 720);
+            var _shift = player == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2) : 0;
+            var _rect = new Rectangle(_shift, 0, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Height);
 
             TJAPlayer3.Tx.Difficulty_Option.t2D描画(TJAPlayer3.app.Device, _shift, y, _rect);
-            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, _shift, baseY - 375 + NowCount * 40.8f, _rect);
+            TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(TJAPlayer3.app.Device, _shift + TJAPlayer3.Skin.SongSelect_Option_Select_Offset[0] + NowCount * TJAPlayer3.Skin.SongSelect_Option_Interval[0], 
+                TJAPlayer3.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * TJAPlayer3.Skin.SongSelect_Option_Interval[1], _rect);
 
             for (int i = 0; i < OptionType.Length; i++)
             {
-                OptionType[i].t2D描画(TJAPlayer3.app.Device, baseX - 184, baseY + 4 + i * 40.8f);
+                OptionType[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Option_OptionType_X[player] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
+                    TJAPlayer3.Skin.SongSelect_Option_OptionType_Y[player] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
             }
 
-            txModMults[0]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX - 92, baseY + 4 - 2 * 40.8f);
-            txModMults[1]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX - 92, baseY + 4 - 1 * 40.8f);
+            txModMults[0]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults1_X[player], TJAPlayer3.Skin.SongSelect_Option_ModMults1_Y[player] + y);
+            txModMults[1]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults2_X[player], TJAPlayer3.Skin.SongSelect_Option_ModMults2_Y[player] + y);
 
             for (int i = 0; i < _textures.Length; i++)
             {
-                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, baseX, baseY + 4 + i * 40.8f);
+                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_Value_X[player] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
+                    TJAPlayer3.Skin.SongSelect_Option_Value_Y[player] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
             }
 
             if (ctClose.n現在の値 >= 50)
@@ -359,7 +359,7 @@ namespace TJAPlayer3
 
         public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor)
         {
-            using (var bmp = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 13).DrawPrivateFont(str文字, forecolor, backcolor))
+            using (var bmp = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_Option_Font_Scale).DrawPrivateFont(str文字, forecolor, backcolor))
             {
                 return TJAPlayer3.tテクスチャの生成(bmp);
             }
