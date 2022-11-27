@@ -176,7 +176,7 @@ namespace TJAPlayer3
 			TJAPlayer3.Tx.SongLoading_Plate.Opacity = (int)opacity;
 			TJAPlayer3.Tx.SongLoading_Plate.vc拡大縮小倍率.X = scaleX;
 			TJAPlayer3.Tx.SongLoading_Plate.vc拡大縮小倍率.Y = scaleY;
-			TJAPlayer3.Tx.SongLoading_Plate.t2D描画(TJAPlayer3.app.Device, SizeX_Harf - (SizeX_Harf * scaleX) + (1280.0f / 2.0f) - SizeX_Harf, TJAPlayer3.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
+			TJAPlayer3.Tx.SongLoading_Plate.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, TJAPlayer3.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
 		}
 
 		public void DrawChara(double time, float opacity, float X = -1, float Y = -1)
@@ -187,15 +187,15 @@ namespace TJAPlayer3
 
 			if (X == -1 && Y == -1)
 			{
-				Y = -(float)(Math.Sin((time - 680f) * (Math.PI / 320.0)) * 80f);
-				X = (float)((time - 680f) / 320.0) * 250f;
+				Y = (float)(Math.Sin((time - 680f) * (Math.PI / 320.0)) * TJAPlayer3.Skin.SongLoading_Chara_Move[1]);
+				X = (float)((time - 680f) / 320.0) * TJAPlayer3.Skin.SongLoading_Chara_Move[0];
 			}
 
 			TJAPlayer3.Tx.SongLoading_Chara.Opacity = (int)opacity;
 			//左どんちゃん
-			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, -250f + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
+			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, -TJAPlayer3.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
 			//左どんちゃん
-			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, SizeXHarf + 250f - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
+			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(TJAPlayer3.app.Device, SizeXHarf + TJAPlayer3.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 		}
 
 		// その他
