@@ -2486,7 +2486,8 @@ namespace TJAPlayer3
 
 		private void tバーの初期化()
 		{
-			for ( int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Count; i++ )
+            int barCenterNum = (TJAPlayer3.Skin.SongSelect_Bar_Count - 1) / 2;
+            for ( int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Count; i++ )
 			{
 				C曲リストノード song = this.rGetSideSong(i - 4);
 				if (song == null) continue;
