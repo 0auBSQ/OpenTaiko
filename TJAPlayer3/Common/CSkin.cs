@@ -2478,6 +2478,14 @@ namespace TJAPlayer3
                                 if (int.Parse(strParam) > 0)
                                     SongLoading_SubTitle_FontSize = int.Parse(strParam);
                             }
+                            else if (strCommand == "SongLoading_Chara_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Chara_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(SongLoading_Plate_ReferencePoint))
                             {
                                 SongLoading_Plate_ReferencePoint = (ReferencePoint)int.Parse(strParam);
@@ -3594,6 +3602,117 @@ namespace TJAPlayer3
 
                             #endregion
 
+                            #region Heya
+                            else if (strCommand == "Heya_Main_Menu_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Heya_Main_Menu_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Main_Menu_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Heya_Main_Menu_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Main_Menu_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Heya_Main_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Font_Scale")
+                            {
+                                Heya_Font_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_Count")
+                            {
+                                Heya_Center_Menu_Box_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Heya_Center_Menu_Box_Count; i++)
+                                {
+                                    Heya_Center_Menu_Box_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Heya_Center_Menu_Box_Count; i++)
+                                {
+                                    Heya_Center_Menu_Box_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_Item_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Heya_Center_Menu_Box_Item_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_Name_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Heya_Center_Menu_Box_Name_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Center_Menu_Box_Authors_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Heya_Center_Menu_Box_Authors_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Side_Menu_Count")
+                            {
+                                Heya_Side_Menu_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Heya_Side_Menu_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Heya_Side_Menu_Count; i++)
+                                {
+                                    Heya_Side_Menu_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Side_Menu_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Heya_Side_Menu_Count; i++)
+                                {
+                                    Heya_Side_Menu_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_Side_Menu_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Heya_Side_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Heya_InfoSection")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Heya_InfoSection[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            #endregion
+
                             #region Font
                             else if (strCommand == nameof(Font_Edge_Ratio)) //Config画面や簡易メニューのフォントについて(rhimm)
                             {
@@ -4126,6 +4245,7 @@ namespace TJAPlayer3
         public int SongLoading_SubTitle_Y = 325;
         public int SongLoading_Title_FontSize = 31;
         public int SongLoading_SubTitle_FontSize = 20;
+        public int[] SongLoading_Chara_Move = new int[] { 250, -80 };
         public ReferencePoint SongLoading_Plate_ReferencePoint = ReferencePoint.Center;
         public ReferencePoint SongLoading_Title_ReferencePoint = ReferencePoint.Center;
         public ReferencePoint SongLoading_SubTitle_ReferencePoint = ReferencePoint.Center;
@@ -4426,6 +4546,27 @@ namespace TJAPlayer3
         public int[] Result_Dan_XY = new int[] { 0, 420 };
         public int[] Result_Dan_Plate_XY = new int[] { 149, 149 };
         #endregion
+
+        #region Heya
+
+        public int[] Heya_Main_Menu_X = new int[] { 164, 164, 164, 164, 164 };
+        public int[] Heya_Main_Menu_Y = new int[] { 26, 106, 186, 266, 346 };
+        public int[] Heya_Main_Menu_Font_Offset = new int[] { 0, 14 };
+        public int Heya_Center_Menu_Box_Count = 11;
+        public int[] Heya_Center_Menu_Box_X = new int[] { -890, -588, -286, 16, 318, 620, 922, 1224, 1526, 1828, 2130 };
+        public int[] Heya_Center_Menu_Box_Y = new int[] { 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200 };
+        public int[] Heya_Center_Menu_Box_Item_Offset = new int[] { 0, 120 };
+        public int[] Heya_Center_Menu_Box_Name_Offset = new int[] { 0, 234 };
+        public int[] Heya_Center_Menu_Box_Authors_Offset = new int[] { 0, 260 };
+        public int Heya_Side_Menu_Count = 13;
+        public int[] Heya_Side_Menu_X = new int[] { 670, 680, 690, 700, 710, 720, 730, 720, 710, 700, 690, 680, 670 };
+        public int[] Heya_Side_Menu_Y = new int[] { -80, -10, 60, 130, 200, 270, 340, 410, 480, 550, 620, 690, 760 };
+        public int[] Heya_Side_Menu_Font_Offset = new int[] { 0, 14 };
+        public int[] Heya_InfoSection = new int[] { 620, 560 };
+        public int Heya_Font_Scale = 14;
+
+        #endregion
+
         #region Font
         public int Font_Edge_Ratio = 30;
         public int Font_Edge_Ratio_Vertical = 30;
