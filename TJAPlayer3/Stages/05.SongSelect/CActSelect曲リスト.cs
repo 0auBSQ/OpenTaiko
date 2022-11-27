@@ -2979,6 +2979,8 @@ namespace TJAPlayer3
 				float width = TJAPlayer3.Tx.SongSelect_Level_Number.sz画像サイズ.Width / 10.0f;
 				float height = TJAPlayer3.Tx.SongSelect_Level_Number.sz画像サイズ.Height;
 
+				TJAPlayer3.Tx.SongSelect_Level_Number.vc拡大縮小倍率.X = 1.0f / (1.0f + (0.25f * (nums.Length - 1)));
+
 				TJAPlayer3.Tx.SongSelect_Level_Number.t2D描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
