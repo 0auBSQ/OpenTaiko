@@ -2478,6 +2478,14 @@ namespace TJAPlayer3
                                 if (int.Parse(strParam) > 0)
                                     SongLoading_SubTitle_FontSize = int.Parse(strParam);
                             }
+                            else if (strCommand == "SongLoading_Chara_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Chara_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(SongLoading_Plate_ReferencePoint))
                             {
                                 SongLoading_Plate_ReferencePoint = (ReferencePoint)int.Parse(strParam);
@@ -4126,6 +4134,7 @@ namespace TJAPlayer3
         public int SongLoading_SubTitle_Y = 325;
         public int SongLoading_Title_FontSize = 31;
         public int SongLoading_SubTitle_FontSize = 20;
+        public int[] SongLoading_Chara_Move = new int[] { 250, -80 };
         public ReferencePoint SongLoading_Plate_ReferencePoint = ReferencePoint.Center;
         public ReferencePoint SongLoading_Title_ReferencePoint = ReferencePoint.Center;
         public ReferencePoint SongLoading_SubTitle_ReferencePoint = ReferencePoint.Center;
