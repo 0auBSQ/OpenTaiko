@@ -245,6 +245,17 @@ namespace FDK
 			return new Color4(col.R / 255f, col.G / 255f, col.B / 255f, col.A / 255f);
         }
 
+		public static int[] SeparateDigits(int num)
+		{
+			int[] digits = new int[num.ToString().Length];
+			for (int i = 0; i < digits.Length; i++)
+			{
+				digits[i] = num % 10;
+				num /= 10;
+			}
+			return digits;
+		}
+
 		#region [ private ]
 		//-----------------
 
