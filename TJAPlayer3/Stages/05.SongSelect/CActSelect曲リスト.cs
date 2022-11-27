@@ -2309,7 +2309,7 @@ namespace TJAPlayer3
 		new Point(358, 485), new Point(386, 574), new Point(411, 665), new Point(436, 756) };
 		*/
 
-        private STバー情報[] stバー情報 = new STバー情報[ 9 ];
+        private STバー情報[] stバー情報 = new STバー情報[TJAPlayer3.Skin.SongSelect_Bar_Count];
 		private CTexture txSongNotFound, txEnumeratingSongs;
 
         private TitleTextureKey ttk選択している曲の曲名;
