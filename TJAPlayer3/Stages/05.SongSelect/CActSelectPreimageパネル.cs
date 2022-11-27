@@ -580,8 +580,8 @@ namespace TJAPlayer3
 					*/
 
 					// Placeholder
-					int width = 200;
-					int height = 200;
+					int width = TJAPlayer3.Skin.SongSelect_Preimage_Size[0];
+					int height = TJAPlayer3.Skin.SongSelect_Preimage_Size[1];
 
 					float xRatio = width / (float)this.r表示するプレビュー画像.sz画像サイズ.Width;
 					float yRatio = height / (float)this.r表示するプレビュー画像.sz画像サイズ.Height;
@@ -596,7 +596,7 @@ namespace TJAPlayer3
 					// this.r表示するプレビュー画像.t2D描画( TJAPlayer3.app.Device, x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
 
 					// Temporary addition
-					this.r表示するプレビュー画像.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 120, 110);
+					this.r表示するプレビュー画像.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Preimage[0], TJAPlayer3.Skin.SongSelect_Preimage[1]);
 				}
 			}
 		}

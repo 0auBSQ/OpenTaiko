@@ -172,11 +172,6 @@ namespace TJAPlayer3
 
             base.list子Activities.Add(this.PuchiChara = new PuchiChara());
 
-            for (int i = 0; i < 10; i++)
-            {
-                stTimer[i].ch = i.ToString().ToCharArray()[0];
-                stTimer[i].pt = new Point(46 * i, 0);
-            }
 
             for(int i = 0; i < 10; i++)
             {
@@ -399,7 +394,7 @@ namespace TJAPlayer3
                     // }
                     if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                     {
-                        for (int i = 0; i < (1280 / TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width) + 2; i++)
+                        for (int i = 0; i < (TJAPlayer3.Skin.Resolution[0] / TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width) + 2; i++)
                         {
                             if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                             {
@@ -428,10 +423,10 @@ namespace TJAPlayer3
                 
                 TJAPlayer3.Tx.SongSelect_Header?.t2D描画(TJAPlayer3.app.Device, 0, 0);
                 
-                tTimerDraw((100 - ctTimer.n現在の値).ToString());
+                tTimerDraw(100 - ctTimer.n現在の値);
 
-                tSongNumberDraw(1097, 167, NowSong.ToString());
-                tSongNumberDraw(1190, 167, MaxSong.ToString());
+                tSongNumberDraw(TJAPlayer3.Skin.SongSelect_SongNumber_X[0], TJAPlayer3.Skin.SongSelect_SongNumber_Y[0], NowSong);
+                tSongNumberDraw(TJAPlayer3.Skin.SongSelect_SongNumber_X[1], TJAPlayer3.Skin.SongSelect_SongNumber_Y[1], MaxSong);
 
                 this.actInformation.On進行描画();
 
@@ -453,7 +448,7 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-                    ModIcons.tDisplayModsMenu(40 + i * 980, 672, i);
+                    ModIcons.tDisplayModsMenu(TJAPlayer3.Skin.SongSelect_ModIcons_X[i], TJAPlayer3.Skin.SongSelect_ModIcons_Y[i], i);
                 }
 
                 
@@ -554,8 +549,6 @@ namespace TJAPlayer3
                     defaultTable,
                     defaultTable };
 
-                int tablesGap = 1034;
-
                 //int currentPad = (int)Difficulty.Edit + 1;
                 if (TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
                 {
@@ -566,40 +559,34 @@ namespace TJAPlayer3
                 }
 
 
-                /*
-                TJAPlayer3.Tx.SongSelect_Table[currentPads[0]]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-                if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
-                    TJAPlayer3.Tx.SongSelect_Table[currentPads[1]]?.t2D描画(TJAPlayer3.app.Device, tablesGap, 0);
-                */
-
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     int p = TJAPlayer3.GetActualPlayer(i);
-
-                    TJAPlayer3.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(TJAPlayer3.app.Device, i * tablesGap, 0);
+                     
+                    TJAPlayer3.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Table_X[i], TJAPlayer3.Skin.SongSelect_Table_Y[i]);
 
                     CActSelect曲リスト.CScorePad[] SPArrRef = CSongDict.ScorePads[p];
 
                     // Current board
                     for (int j = 0; j < 10; j++)
                     {
-                        tBoardNumberDraw(this.ptBoardNumber[j].X - 10 + i * tablesGap, this.ptBoardNumber[j].Y, j < 7 ?
-                            SPArrRef[currentPads[i]].ScoreRankCount[j].ToString()
-                            : SPArrRef[currentPads[i]].CrownCount[j - 7].ToString());
+                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][j], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][j], j < 7 ?
+                            SPArrRef[currentPads[i]].ScoreRankCount[j]
+                            : SPArrRef[currentPads[i]].CrownCount[j - 7]);
                     }
 
                 }
 
                 TJAPlayer3.Tx.SongSelect_Coin_Slot?.t2D描画(TJAPlayer3.app.Device, 0, 0,
-                    new Rectangle(0, 0, 640 + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? 640 : 0), 720));
+                    new Rectangle(0, 0, (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) : 0), TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Height));
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     int p = TJAPlayer3.GetActualPlayer(i);
 
                     if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
-                        tBoardNumberDraw(this.ptBoardNumber[10].X - 10 + i * 1140, this.ptBoardNumber[10].Y, TJAPlayer3.NamePlateConfig.data.Medals[p].ToString());
+                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][10], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][10], TJAPlayer3.NamePlateConfig.data.Medals[p]);
 
                     #region [HiScore plate]
 
@@ -612,11 +599,10 @@ namespace TJAPlayer3
 
                         if (score != null)
                         {
-                            int posx = (i == 1) ? 1280 - this.ptBoardNumber[11].X : this.ptBoardNumber[11].X;
                             int displayedScore = 0;
                             int table = 0;
 
-                            TJAPlayer3.Tx.SongSelect_High_Score?.t2D中心基準描画(TJAPlayer3.app.Device, posx, this.ptBoardNumber[11].Y);
+                            TJAPlayer3.Tx.SongSelect_High_Score?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_High_Score_X[i], TJAPlayer3.Skin.SongSelect_High_Score_Y[i]);
 
                             if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
                                 table = 0;
@@ -628,12 +614,17 @@ namespace TJAPlayer3
                             displayedScore = score.GPInfo[p].nHighScore[table];
 
                             if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit)
-                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
-                                    posx - 78,
-                                    this.ptBoardNumber[11].Y + 2,
-                                    new Rectangle(table * 53, 0, 53, 53));
+                            {
+                                int width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.sz画像サイズ.Width / 5;
+                                int height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.sz画像サイズ.Height;
 
-                            tBoardNumberDraw(posx - 10, this.ptBoardNumber[11].Y + 6, displayedScore.ToString());
+                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
+                                    TJAPlayer3.Skin.SongSelect_High_Score_Difficulty_Cymbol_X[i],
+                                    TJAPlayer3.Skin.SongSelect_High_Score_Difficulty_Cymbol_Y[i],
+                                    new Rectangle(table * width, 0, width, height));
+                            }
+
+                            tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][11], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][11], displayedScore);
                         }
 
                     }
@@ -1246,7 +1237,6 @@ namespace TJAPlayer3
         //      private CTexture tx下部テキスト;
         private CCounter ctDiffSelect移動待ち;
 
-        private STNumber[] stTimer = new STNumber[10];
         private STNumber[] stSongNumber = new STNumber[10];
         private STNumber[] stBoardNumber = new STNumber[10];
 
@@ -1262,55 +1252,61 @@ namespace TJAPlayer3
             public long time;               // コマンド入力時刻
         }
 
+        /*
         private Point[] ptBoardNumber =
             { new Point(72, 283), new Point(135, 283), new Point(200, 283), new Point(72, 258), new Point(135, 258), new Point(200, 258), new Point(200, 233), new Point(72, 311), new Point(135, 311), new Point(200, 311), new Point(84, 360), new Point(124, 416) };
+        */
 
-        public void tBoardNumberDraw(int x, int y, string str)
+        public void tBoardNumberDraw(int x, int y, int num)
         {
-            for (int j = 0; j < str.Length; j++)
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    if (str[j] == stSongNumber[i].ch)
-                    {
-                        TJAPlayer3.Tx.SongSelect_BoardNumber.t2D描画(TJAPlayer3.app.Device, x - (str.Length * 15 + 9 * str.Length - str.Length * 15) / 2 + 15 / 2, (float)y - 17 / 2, new RectangleF(stBoardNumber[i].pt.X, stBoardNumber[i].pt.Y, 15, 17));
-                        x += 9;
-                    }
-                }
+                float offset = j - (nums.Length / 2.0f);
+                float _x = x - (TJAPlayer3.Skin.SongSelect_BoardNumber_Interval[0] * offset);
+                float _y = y - (TJAPlayer3.Skin.SongSelect_BoardNumber_Interval[1] * offset);
+
+                float width = TJAPlayer3.Tx.SongSelect_BoardNumber.sz画像サイズ.Width / 10.0f;
+                float height = TJAPlayer3.Tx.SongSelect_BoardNumber.sz画像サイズ.Height;
+
+                TJAPlayer3.Tx.SongSelect_BoardNumber.t2D描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
             }
         }
 
-        private void tSongNumberDraw(int x, int y, string str)
+        private void tSongNumberDraw(int x, int y, int num)
         {
-            for (int j = 0; j < str.Length; j++)
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    if (str[j] == stSongNumber[i].ch)
-                    {
-                        TJAPlayer3.Tx.SongSelect_Song_Number.t2D描画(TJAPlayer3.app.Device, x - (str.Length * 27 + 27 * str.Length - str.Length * 27) / 2 + 27 / 2, (float)y, new RectangleF(stSongNumber[i].pt.X, stSongNumber[i].pt.Y, 27, 29));
-                        x += str.Length >= 2 ? 16 : 27;
-                    }
-                }
+                float offset = j - (nums.Length / 2.0f);
+                float _x = x - (TJAPlayer3.Skin.SongSelect_SongNumber_Interval[0] * offset);
+                float _y = y - (TJAPlayer3.Skin.SongSelect_SongNumber_Interval[1] * offset);
+
+                float width = TJAPlayer3.Tx.SongSelect_Song_Number.sz画像サイズ.Width / 10.0f;
+                float height = TJAPlayer3.Tx.SongSelect_Song_Number.sz画像サイズ.Height;
+
+                TJAPlayer3.Tx.SongSelect_Song_Number.t2D描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
             }
         }
 
-        private void tTimerDraw(string str)
+        private void tTimerDraw(int num)
         {
-            int x = 1171, y = 57;
+            //int x = 1171, y = 57;
 
-            for (int j = 0; j < str.Length; j++)
+            int[] nums = C変換.SeparateDigits(num);
+
+            for (int j = 0; j < nums.Length; j++)
             {
-                for (int i = 0; i < 10; i++)
+                if (TJAPlayer3.ConfigIni.bEnableCountdownTimer)
                 {
-                    if (TJAPlayer3.ConfigIni.bEnableCountdownTimer)
-                    {
-                        if (str[j] == stTimer[i].ch)
-                        {
-                            TJAPlayer3.Tx.SongSelect_Timer.t2D描画(TJAPlayer3.app.Device, x - (str.Length * 46 + 46 * str.Length - str.Length * 46) / 2 + 46 / 2, (float)y, new RectangleF(stTimer[i].pt.X, stTimer[i].pt.Y, 46, 64));
-                            x += str.Length >= 3 ? 40 : 46;
-                        }
-                    }
+                    float offset = j - (nums.Length / 2.0f);
+                    float x = TJAPlayer3.Skin.SongSelect_Timer[0] - (int)(TJAPlayer3.Skin.SongSelect_Timer_Interval[0] * offset);
+                    float y = TJAPlayer3.Skin.SongSelect_Timer[1] - (int)(TJAPlayer3.Skin.SongSelect_Timer_Interval[1] * offset);
+
+                    float width = TJAPlayer3.Tx.SongSelect_Timer.sz画像サイズ.Width / 10.0f;
+                    float height = TJAPlayer3.Tx.SongSelect_Timer.sz画像サイズ.Height / 2.0f;
+
+                    TJAPlayer3.Tx.SongSelect_Timer.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(width * nums[j], 0, width, height));
                 }
             }
         }
