@@ -281,6 +281,11 @@ namespace TJAPlayer3
                 SongSelect_Table[i] = TxC(SONGSELECT + @"Table\" + i.ToString() + ".png");
             }
 
+            SongSelect_Song_Panel[0] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Box.png");
+            SongSelect_Song_Panel[1] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Song.png");
+            SongSelect_Song_Panel[2] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Dan.png");
+            SongSelect_Song_Panel[3] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Tower.png");
+
             #region [ 難易度選択画面 ]
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
             Difficulty_Number = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number.png");
@@ -1743,6 +1748,7 @@ namespace TJAPlayer3
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[2],
             SongSelect_NamePlate = new CTexture[1],
+            SongSelect_Song_Panel = new CTexture[4],
             SongSelect_Table = new CTexture[6];
 
         #region [ 難易度選択画面 ]

@@ -410,6 +410,19 @@ namespace TJAPlayer3
                             }
                         }
                     }
+
+                    if (this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX)
+                        TJAPlayer3.Tx.SongSelect_Song_Panel[0]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                    else if (this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+                    {
+                        if (TJAPlayer3.stage選曲.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+                            TJAPlayer3.Tx.SongSelect_Song_Panel[2]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                        else if (TJAPlayer3.stage選曲.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+                            TJAPlayer3.Tx.SongSelect_Song_Panel[3]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                        else
+                            TJAPlayer3.Tx.SongSelect_Song_Panel[1]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                    }
+                        
                 }
 
                 this.act曲リスト.On進行描画();
