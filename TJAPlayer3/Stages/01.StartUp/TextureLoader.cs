@@ -220,6 +220,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre_RecentryPlaySong = TxC(SONGSELECT + @"Bar_Genre_RecentryPlaySong.png");
             SongSelect_Bar_Select = TxC(SONGSELECT + @"Bar_Select.png");
             SongSelect_Level_Number = TxC(SONGSELECT + @"Level_Number.png");
+            SongSelect_Level_Number_Big = TxC(SONGSELECT + @"Level_Number_Big.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
             SongSelect_Song_Number = TxC(SONGSELECT + @"Song_Number.png");
@@ -1724,6 +1725,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
+            SongSelect_Level_Number_Big,
             SongSelect_Bar_Select,
             SongSelect_Bar_Genre_Overlay,
             SongSelect_Credit,

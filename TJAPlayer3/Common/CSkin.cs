@@ -1664,6 +1664,26 @@ namespace TJAPlayer3
                                     SongSelect_Bar_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Bar_Anim_X")
+                            {
+                                SongSelect_Bar_Anim_X = new int[SongSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < SongSelect_Bar_Count; i++)
+                                {
+                                    SongSelect_Bar_Anim_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Anim_Y")
+                            {
+                                SongSelect_Bar_Anim_Y = new int[SongSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < SongSelect_Bar_Count; i++)
+                                {
+                                    SongSelect_Bar_Anim_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Bar_Title_Offset")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1751,6 +1771,10 @@ namespace TJAPlayer3
                                 {
                                     SongSelect_Level_Number_Interval[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "SongSelect_Box_Opening_Interval")
+                            {
+                                SongSelect_Box_Opening_Interval = float.Parse(strParam);
                             }
                             else if (strCommand == "SongSelect_Difficulty_Select_Title")
                             {
@@ -1980,9 +2004,22 @@ namespace TJAPlayer3
                                     SongSelect_Search_Bar_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
-
-
-
+                            else if (strCommand == "SongSelect_Level_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Colors")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 7; i++)
+                                {
+                                    SongSelect_Difficulty_Colors[i] = ColorTranslator.FromHtml(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Difficulty_Back")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -4064,6 +4101,8 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Bar_X = new int[] { 214, 239, 263, 291, 324, 358, 386, 411, 436 };
         public int[] SongSelect_Bar_Y = new int[] { -127, -36, 55, 145, 314, 485, 574, 665, 756 };
+        public int[] SongSelect_Bar_Anim_X = new int[] { 0, 600, 500, 400, 0, -400, -500, -600, 0 };
+        public int[] SongSelect_Bar_Anim_Y = new int[] { 0, 1800, 1500, 1200, 0, -1200, -1500, -1800, 0 };
 
         public int[] SongSelect_Bar_Title_Offset = new int[] { 316, 62 };
         public int[] SongSelect_Bar_SubTitle_Offset = new int[] { 316, 90 };
@@ -4084,6 +4123,8 @@ namespace TJAPlayer3
         public int[] SongSelect_Level_Number_Y = new int[] { 400, 400, 400, 400 };
 
         public int[] SongSelect_Level_Number_Interval = new int[] { 11, 0 };
+
+        public float SongSelect_Box_Opening_Interval = 1f;
 
         public int[] SongSelect_Difficulty_Select_Title = new int[] { 640, 140 };
         public int[] SongSelect_Difficulty_Select_SubTitle = new int[] { 640, 180 };
@@ -4135,6 +4176,16 @@ namespace TJAPlayer3
         public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620 };
 
         public int[] SongSelect_Difficulty_Back = new int[] { 640, 290 };
+        public int[] SongSelect_Level_Offset = new int[] { 610, 40 };
+        public Color[] SongSelect_Difficulty_Colors = new Color[] { 
+            ColorTranslator.FromHtml("#88d2fd"),
+            ColorTranslator.FromHtml("#58de85"),
+            ColorTranslator.FromHtml("#ffc224"),
+            ColorTranslator.FromHtml("#d80b2c"),
+            ColorTranslator.FromHtml("#9065e2"),
+            ColorTranslator.FromHtml("#e9943b"),
+            ColorTranslator.FromHtml("#3b55a5")
+        };
 
         public int[] SongSelect_Difficulty_Bar_X = new int[] { 255, 341, 426, 569, 712, 855, 855 };
         public int[] SongSelect_Difficulty_Bar_Y = new int[] { 270, 270, 270, 270, 270, 270, 270 };

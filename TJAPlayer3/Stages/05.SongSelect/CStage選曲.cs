@@ -647,6 +647,7 @@ namespace TJAPlayer3
 
                 #endregion
 
+
                 #region [ Inputs ]
 
                 // キー入力
@@ -869,8 +870,8 @@ namespace TJAPlayer3
                                                             TJAPlayer3.Skin.sound決定音.t再生する();
                                                             this.act難易度選択画面.bIsDifficltSelect = true;
                                                             this.act難易度選択画面.t選択画面初期化();
-                                                            this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
-                                                            this.act曲リスト.ctDifficultyIn.t開始(0, 3200, 1, TJAPlayer3.Timer);
+                                                            this.act曲リスト.ctBarFlash.t開始(0, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
+                                                            this.act曲リスト.ctDifficultyIn.t開始(0, 3200, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
                                                             //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                                             CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
                                                         }
@@ -902,8 +903,8 @@ namespace TJAPlayer3
                                                         CSongSelectSongManager.disable();
 
                                                         TJAPlayer3.Skin.sound決定音.t再生する();
-                                                        this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
-                                                        this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
+                                                        this.act曲リスト.ctBarFlash.t開始(0, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
+                                                        this.act曲リスト.ctBoxOpen.t開始(200, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval * 1.3f, TJAPlayer3.Timer);
                                                         this.act曲リスト.bBoxOpen = true;
                                                         //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                                         CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -915,8 +916,8 @@ namespace TJAPlayer3
                                                         CSongSelectSongManager.enable();
 
                                                         TJAPlayer3.Skin.sound取消音.t再生する();
-                                                        this.act曲リスト.ctBarFlash.t開始(0, 2700, 1, TJAPlayer3.Timer);
-                                                        this.act曲リスト.ctBoxOpen.t開始(200, 2700, 1.3f, TJAPlayer3.Timer);
+                                                        this.act曲リスト.ctBarFlash.t開始(0, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
+                                                        this.act曲リスト.ctBoxOpen.t開始(200, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval * 1.3f, TJAPlayer3.Timer);
                                                         this.act曲リスト.bBoxClose = true;
                                                         //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                                         CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
