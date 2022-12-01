@@ -45,8 +45,8 @@ BoxFontName=廻想体 ネクスト UP B
 
 ```
 001 - CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
-002 - Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by Bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
-003 - Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by Bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
+002 - Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
+003 - Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 004 - Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ & bol)
 005 - WTF?! : MooX - https://soundcloud.com/themoox/wtf (Chart by MooX & bol)
 006 - Athazagoraphobia : Derpikarp - https://youtube.com/channel/UCrURywBu-fDA5KQaDPc3GOg (Chart by Colin & bol)
@@ -79,6 +79,9 @@ BoxFontName=廻想体 ネクスト UP B
 033 - Alonebirthday : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Extra) and bol (Easy, Normal, Hard))
 034 - The World of Our Past : DashyDesu & rainfall - https://www.youtube.com/c/DashyDesu https://soundcloud.com/user-698445934 (Chart by DashyDesu)
 035 - ENDOMANCER : Zovi - https://zovi.bandcamp.com/ https://soundcloud.com/zovi https://twitter.com/zovinoise (Chart by 0AuBSQ)
+036 - RUiNED GLORY : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
+037 - Yukianesa ~Azure Of Ice~ : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
+038 - Dear Stars : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 ```
 
 ### About the OpenTaiko Original Soundtrack
