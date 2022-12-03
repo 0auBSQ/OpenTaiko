@@ -46,7 +46,7 @@ namespace TJAPlayer3
                 if (Counter.b終了値に達した) Counter.t停止();
                 int opacity = (((150 - Counter.n現在の値) * 255) / 100);
                 Texture.Opacity = opacity;
-                Texture.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldBGX[Player], TJAPlayer3.Skin.nScrollFieldY[Player]);
+                Texture.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[Player], TJAPlayer3.Skin.Game_Lane_Y[Player]);
             }
             return base.On進行描画();
         }

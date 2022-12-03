@@ -51,9 +51,11 @@ namespace TJAPlayer3
 						JudgeAnimes[j, i].counter.t進行();
 
 						if (TJAPlayer3.Tx.Judge != null)
-                        {
-							float x = TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width / 2;
-							float y = (TJAPlayer3.Skin.nScrollFieldY[j] - 53 + CubicEaseOut((float)(JudgeAnimes[j, i].counter.n現在の値 >= 180 ? 180 : JudgeAnimes[j, i].counter.n現在の値) / 180f) * 20f) - 10;
+						{
+							float moveValue = CubicEaseOut(JudgeAnimes[j, i].counter.n現在の値 / 410.0f) - 1.0f;
+
+							float x = TJAPlayer3.Skin.Game_Judge_X[j] + (moveValue * TJAPlayer3.Skin.Game_Judge_Move[0]);
+							float y = TJAPlayer3.Skin.Game_Judge_Y[j] + (moveValue * TJAPlayer3.Skin.Game_Judge_Move[1]);
 							TJAPlayer3.Tx.Judge.Opacity = (int)(255f - (JudgeAnimes[j, i].counter.n現在の値 >= 360 ? ((JudgeAnimes[j, i].counter.n現在の値 - 360) / 50.0f) * 255f : 0f));
 							TJAPlayer3.Tx.Judge.t2D描画(TJAPlayer3.app.Device, x, y, JudgeAnimes[j, i].rc);
                         }
@@ -77,8 +79,8 @@ namespace TJAPlayer3
 				njudge = JudgesDict[judge];
             }
 
-			
-			JudgeAnimes[player, JudgeAnime.Index].rc = new Rectangle(0, (int)njudge * 60, 90, 60);
+			int height = TJAPlayer3.Tx.Judge.szテクスチャサイズ.Height / 5;
+			JudgeAnimes[player, JudgeAnime.Index].rc = new Rectangle(0, (int)njudge * height, TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width, height);
 			JudgeAnime.Index++;
 			if (JudgeAnime.Index >= 511) JudgeAnime.Index = 0;
 		}

@@ -67,7 +67,7 @@ namespace TJAPlayer3
 
                         
                         if (TJAPlayer3.Tx.Mob[RandomMob] != null)
-                            TJAPlayer3.Tx.Mob[RandomMob].t2D描画(TJAPlayer3.app.Device, 0, (720 - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)) * 70));
+                            TJAPlayer3.Tx.Mob[RandomMob].t2D描画(TJAPlayer3.app.Device, 0, (TJAPlayer3.Skin.Resolution[1] - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)) * 70));
                         
                     }
 
