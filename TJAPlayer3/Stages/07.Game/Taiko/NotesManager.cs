@@ -60,9 +60,9 @@ namespace TJAPlayer3
             return -1;
         }
 
-        public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode)
+        public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll)
         {
-            double hbtime = ((pChip.fBMSCROLLTime) - (play_bpm_time));
+            double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
             switch (eScrollMode)
             {
                 case EScrollMode.Normal:

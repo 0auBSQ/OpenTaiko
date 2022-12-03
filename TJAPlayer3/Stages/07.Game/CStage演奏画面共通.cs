@@ -3032,9 +3032,9 @@ namespace TJAPlayer3
 				pChip.nバーからの距離dot.Guitar = (int) ( time * ScrollSpeedGuitar );
 				pChip.nバーからの距離dot.Bass = (int) ( time * ScrollSpeedBass );
 
-                pChip.nバーからの距離dot.Taiko = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, pChip.dbSCROLL, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode);
+                pChip.nバーからの距離dot.Taiko = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, pChip.dbSCROLL, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
                 if ( pChip.nノーツ終了時刻ms != 0 )
-                    pChip.nバーからのノーツ末端距離dot = NotesManager.GetNoteX(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, pChip.dbSCROLL, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode);
+                    pChip.nバーからのノーツ末端距離dot = NotesManager.GetNoteX(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, pChip.dbSCROLL, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, true);
 
                 if ( configIni.eScrollMode == EScrollMode.BMSCROLL || configIni.eScrollMode == EScrollMode.HBSCROLL )
                 {

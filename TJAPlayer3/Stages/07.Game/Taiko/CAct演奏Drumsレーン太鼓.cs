@@ -737,6 +737,9 @@ namespace TJAPlayer3
                         //this.txアタックエフェクトLower.b加算合成 = true;
                         int n = this.st状態[i].nIsBig == 1 ? 520 : 0;
 
+                        float x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[i];
+                        float y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[i];
+
                         switch (st状態[i].judge)
                         {
                             case E判定.Perfect:
@@ -744,17 +747,17 @@ namespace TJAPlayer3
                             case E判定.Auto:
                                 //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
                                 if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.n現在の値] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Effects_Hit_Great_Big[0].szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.nJudgePointY[i] - TJAPlayer3.Tx.Effects_Hit_Great_Big[0].szテクスチャサイズ.Width / 2);
+                                    TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
                                 else if (TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.n現在の値] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Effects_Hit_Great[0].szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.nJudgePointY[i] - TJAPlayer3.Tx.Effects_Hit_Great[0].szテクスチャサイズ.Width / 2);
+                                    TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
                                 break;
 
                             case E判定.Good:
                                 //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
                                 if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.n現在の値] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Effects_Hit_Good_Big[0].szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.nJudgePointY[i] - TJAPlayer3.Tx.Effects_Hit_Good_Big[0].szテクスチャサイズ.Width / 2);
+                                    TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, x, y);
                                 else if (TJAPlayer3.Tx.Effects_Hit_Good[this.st状態[i].ct進行.n現在の値] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Good[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.Tx.Effects_Hit_Good[0].szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.nJudgePointY[i] - TJAPlayer3.Tx.Effects_Hit_Good[0].szテクスチャサイズ.Width / 2);
+                                    TJAPlayer3.Tx.Effects_Hit_Good[this.st状態[i].ct進行.n現在の値].t2D描画(TJAPlayer3.app.Device,x, y);
                                 break;
 
                             case E判定.Miss:
