@@ -153,8 +153,11 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 255;
                     }
 
-                    TJAPlayer3.Tx.Balloon_Roll?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Roll_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * 334, 0, 334, 204)); ;
-                    this.t文字表示(TJAPlayer3.Skin.Game_Balloon_Roll_Number_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Number_Y[player], n連打数.ToString(), n連打数, player);
+                    float width = TJAPlayer3.Tx.Balloon_Roll.szテクスチャサイズ.Width / 5.0f;
+                    float height = TJAPlayer3.Tx.Balloon_Roll.szテクスチャサイズ.Height;
+
+                    TJAPlayer3.Tx.Balloon_Roll?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Roll_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
+                    this.t文字表示(TJAPlayer3.Skin.Game_Balloon_Roll_Number_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Number_Y[player], n連打数, player);
                 }
             }
 
@@ -202,30 +205,23 @@ namespace TJAPlayer3
             public Point pt;
         }
 
-        private void t文字表示( int x, int y, string str, int n連打, int nPlayer)
-		{
-            int n桁数 = n連打.ToString().Length;
-            
-            //CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ct連打アニメ[nPlayer].n現在の値.ToString());
-            foreach ( char ch in str )
-			{
-				for( int i = 0; i < this.st文字位置.Length; i++ )
-				{
-					if( this.st文字位置[ i ].ch == ch )
-					{
-						Rectangle rectangle = new Rectangle(TJAPlayer3.Skin.Game_Balloon_Number_Size[0] * i, 0, TJAPlayer3.Skin.Game_Balloon_Number_Size[0], TJAPlayer3.Skin.Game_Balloon_Number_Size[1]);
+        private void t文字表示( int x, int y, int num, int nPlayer)
+        {
+            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale;
+            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ct連打アニメ[nPlayer].n現在の値];
 
-						if(TJAPlayer3.Tx.Balloon_Number_Roll != null )
-						{
-                            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale;
-                            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ct連打アニメ[nPlayer].n現在の値];
-                            TJAPlayer3.Tx.Balloon_Number_Roll.t2D拡大率考慮下基準描画( TJAPlayer3.app.Device, x - ( ( (TJAPlayer3.Skin.Game_Balloon_Number_Padding + 2) * n桁数 ) / 2 ), y, rectangle );
-						}
-						break;
-					}
-				}
-				x += ( TJAPlayer3.Skin.Game_Balloon_Number_Padding - ( n桁数 > 2 ? n桁数 * 2 : 0 ) );
-			}
-		}
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
+            {
+                float offset = j - (nums.Length / 2.0f);
+                float _x = x - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[0] * offset);
+                float _y = y - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[1] * offset);
+
+                float width = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Width / 10.0f;
+                float height = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Height;
+
+                TJAPlayer3.Tx.Balloon_Number_Roll.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
+            }
+        }
     }
 }

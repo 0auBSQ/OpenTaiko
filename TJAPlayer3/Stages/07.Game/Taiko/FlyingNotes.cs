@@ -44,7 +44,7 @@ namespace TJAPlayer3
                         Flying[i].Width = (Math.Abs((TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer])) / 2);
                         //Console.WriteLine("{0}, {1}", width2P, height2P);
                         Flying[i].Theta = ((Math.Atan2(Flying[i].Height, Flying[i].Width) * 180.0) / Math.PI);
-                        Flying[i].Counter = new CCounter(36, 140, TJAPlayer3.Skin.Game_Effect_FlyingNotes_Timer, TJAPlayer3.Timer);
+                        Flying[i].Counter = new CCounter(0, 140, TJAPlayer3.Skin.Game_Effect_FlyingNotes_Timer, TJAPlayer3.Timer);
                         //Flying[i].Counter = new CCounter(0, 200000, CDTXMania.Skin.Game_Effect_FlyingNotes_Timer, CDTXMania.Timer);
 
                         Flying[i].IncreaseX = (1.00 * Math.Abs((TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer]))) / (180);
@@ -112,14 +112,32 @@ namespace TJAPlayer3
                         }
                         for (int n = Flying[i].OldValue; n < Flying[i].Counter.n現在の値; n += 16)
                         {
+                            int movingDistanceX = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[Flying[i].Player] - StartPointX[Flying[i].Player];
+                            int movingDistanceY = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[Flying[i].Player] - TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player];
+
+                            /*
                             if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
                             {
-                                Flying[i].X = (Flying[i].StartPointX + 499 + ((-Math.Cos(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * 499))) - 85;
+                                Flying[i].X = (Flying[i].StartPointX + movingDistanceX + ((-Math.Cos(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * movingDistanceX))) - 85;
                                 //Flying[i].X += (Math.Cos(Flying[i].Counter.n現在の値 * (Math.PI / 180))) * Flying[i].Increase;
                             }
                             else
                             {
                                 Flying[i].X += Flying[i].IncreaseX;
+                            }
+                            */
+
+                            double value = (Flying[i].Counter.n現在の値 / 140.0);
+
+                            Flying[i].X = StartPointX[Flying[i].Player] + (movingDistanceX * value);
+                            Flying[i].Y = TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + (int)(movingDistanceY * value);
+                            Flying[i].Y += Math.Sin(value * Math.PI) * (Flying[i].Player == 0 ? -TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine : TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine);
+
+                            if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
+                            {
+                            }
+                            else
+                            {
                             }
 
                             if (n % TJAPlayer3.Skin.Game_Effect_FireWorks_Timing == 0 && !Flying[i].IsRoll && Flying[i].Counter.n現在の値 > 18)
@@ -130,6 +148,7 @@ namespace TJAPlayer3
                                 }
                             }
 
+                            /*
                             if (Flying[i].Player == 0)
                             {
                                 Flying[i].Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player]) + -Math.Sin(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * 559) + 329;
@@ -140,7 +159,7 @@ namespace TJAPlayer3
                                 Flying[i].Y = ((TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player]) + Math.Sin(Flying[i].Counter.n現在の値 * (Math.PI / 180)) * 559) - 329;
                                 Flying[i].Y += Flying[i].IncreaseY * Flying[i].Counter.n現在の値;
                             }
-
+                            */
                         }
                         //Flying[i].OldValue = Flying[i].Counter.n現在の値;
 

@@ -60,6 +60,26 @@ namespace TJAPlayer3
             return -1;
         }
 
+        public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll)
+        {
+            double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
+            switch (eScrollMode)
+            {
+                case EScrollMode.Normal:
+                    return (int)((timems / 240000.0) * interval * scroll);
+                case EScrollMode.BMSCROLL:
+                    {
+                        return (int)((hbtime / 16.0) * interval);
+                    }
+                case EScrollMode.HBSCROLL:
+                    {
+                        return (int)((hbtime / 16.0) * interval * scroll);
+                    }
+                default:
+                    return 0;
+            }
+        }
+
         #endregion
 
         #region [Gameplay]
@@ -276,19 +296,24 @@ namespace TJAPlayer3
                 case 2:
                 case 3:
                 case 4:
-                    TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(Lane * 130, 390, 130, 130));
+                    TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(Lane * TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1] * 3, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
                     break;
                 case 5:
-                    TJAPlayer3.Tx.Note_Swap?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 390, 130, 130));
+                    TJAPlayer3.Tx.Note_Swap?.t2D中心基準描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_Notes_Size[1] * 3, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
                     break;
             }
         }
 
         // Regular display
-        public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = 130)
+        public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = -1)
         {
             if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow)
                 return;
+
+            if (length == -1)
+            {
+                length = TJAPlayer3.Skin.Game_Notes_Size[0];
+            }
 
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
@@ -305,11 +330,11 @@ namespace TJAPlayer3
             }
             else if (IsPurpleNote(chip))
             {
-                TJAPlayer3.Tx.Note_Swap?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, 130, 130));
+                TJAPlayer3.Tx.Note_Swap?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
                 return;
             }
 
-            TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(noteType * 130, frame, length, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(noteType * TJAPlayer3.Skin.Game_Notes_Size[0], frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
         }
 
         // Roll display
@@ -329,34 +354,36 @@ namespace TJAPlayer3
             }
             if (IsBigRoll(chip) || (_gt == EGameType.TAIKO && IsClapRoll(chip)))
             {
-                _offset = 390;
+                _offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 3;
             }
             else if (IsClapRoll(chip) && _gt == EGameType.KONGA)
             {
-                _offset = 1430;
+                _offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 11;
             }
             else if (IsYellowRoll(chip) && _gt == EGameType.KONGA)
             {
-                _offset = 1040;
+                _offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 8;
             }
 
-            float _adjust = 65f;
+            float _adjust = TJAPlayer3.Skin.Game_Notes_Size[0] / 2.0f;
             int index = x末端 - x;
+
+            int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
 
             if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
             else
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
-            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - 65.0f + _adjust + 1) / 128.0f;
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 64, y, new Rectangle(781 + _offset, 0, 128, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + _adjust, y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + _adjust, y, 0, new Rectangle(910 + _offset, frame, 130, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + _adjust, y, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
             else
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
 
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(650 + _offset, frame, 130, 130));
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(rollOrigin + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
         }
 
@@ -367,15 +394,15 @@ namespace TJAPlayer3
 
             if (IsMine(chip))
             {
-                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 30, 136, 30));
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1], TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
             }
             else if (IsPurpleNote(chip) && _gt != EGameType.KONGA)
             {
-                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, 136, 30));
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
             }
             else
             {
-                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 30 * chip.nSenote, 136, 30));
+                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * chip.nSenote, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
             }
         }
 

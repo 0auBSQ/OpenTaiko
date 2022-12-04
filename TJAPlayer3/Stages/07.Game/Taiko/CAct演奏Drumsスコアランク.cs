@@ -42,7 +42,7 @@ namespace TJAPlayer3
             base.On非活性化();
         }
 
-        private void displayScoreRank(int i, int player, float x, int mode = 0)
+        private void displayScoreRank(int i, int player, float x, float y, int mode = 0)
         {
             CCounter cct = this.counter[i];
             if (player == 1)
@@ -62,7 +62,8 @@ namespace TJAPlayer3
             if (cct.n現在の値 <= 255)
             {
                 tex.Opacity = cct.n現在の値;
-                x = 51 - (cct.n現在の値 / 5.0f);
+                x = ((cct.n現在の値 / 255.0f) - 1.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
+                y = ((cct.n現在の値 / 255.0f) - 1.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
             }
             if (cct.n現在の値 > 255 && cct.n現在の値 <= 255 + 180)
             {
@@ -72,6 +73,7 @@ namespace TJAPlayer3
                 tex.vc拡大縮小倍率.X = newSize;
                 tex.vc拡大縮小倍率.Y = newSize;
                 x = 0;
+                y = 0;
             }
             if (cct.n現在の値 > 255 + 180 && cct.n現在の値 <= 2745)
             {
@@ -79,19 +81,37 @@ namespace TJAPlayer3
                 tex.vc拡大縮小倍率.X = 1.0f;
                 tex.vc拡大縮小倍率.Y = 1.0f;
                 x = 0;
+                y = 0;
             }
             if (cct.n現在の値 >= 2745 && cct.n現在の値 <= 3000)
             {
                 tex.Opacity = 255 - ((cct.n現在の値 - 2745));
-                x = -((cct.n現在の値 - 2745) / 5.0f);
+                x = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
+                y = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
             }
 
-            var ypos = (player == 0) ? 98 + (int)x : 720 - (98 + (int)x);
+            var xpos = TJAPlayer3.Skin.Game_ScoreRank_X[player] + (int)x;
+            var ypos = TJAPlayer3.Skin.Game_ScoreRank_Y[player] + (int)y;
+
+            int width;
+            int height;
+
+            switch (mode)
+            {
+                case 1:
+                    width = tex.szテクスチャサイズ.Width / 7;
+                    height = tex.szテクスチャサイズ.Height;
+                    break;
+                default:
+                    width = tex.szテクスチャサイズ.Width;
+                    height = tex.szテクスチャサイズ.Height / 7;
+                    break;
+            }
 
             if (mode == 0)
-                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, ypos, new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
+                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, xpos, ypos, new System.Drawing.Rectangle(0, height * i, width, height));
             else if (mode == 1 && player == 0)
-                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, ypos, new System.Drawing.Rectangle(i * 229, 0, 229, 194));
+                tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, xpos, ypos, new System.Drawing.Rectangle(width * i, 0, width, height));
         }
 
         public override int On進行描画()
@@ -99,6 +119,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
             {
                 float x = 0;
+                float y = 0;
 
                 for (int i = 0; i < 7; i++)
                 {
@@ -109,7 +130,7 @@ namespace TJAPlayer3
                         counter[i].t進行();
                         if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0) >= ScoreRank[i])
                         {
-                            displayScoreRank(i, 0, x);
+                            displayScoreRank(i, 0, x, y);
 
                             #region [Legacy]
 
@@ -153,7 +174,7 @@ namespace TJAPlayer3
                         counterJ2[i].t進行();
                         if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank2P[i])
                         {
-                            displayScoreRank(i, 1, x);
+                            displayScoreRank(i, 1, x, y);
 
                             #region [Legacy]
 
@@ -224,7 +245,7 @@ namespace TJAPlayer3
 
                         if (satisfied == true)
                         {
-                            displayScoreRank(i, 0, x, 1);
+                            displayScoreRank(i, 0, x, y, 1);
                         }
 
                         #endregion

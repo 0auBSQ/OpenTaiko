@@ -58,7 +58,7 @@ namespace TJAPlayer3
         {
             if (this.Mob_Footer != null)
             {
-                this.Mob_Footer.t2D描画(TJAPlayer3.app.Device, 0, 720 - this.Mob_Footer.szテクスチャサイズ.Height);
+                this.Mob_Footer.t2D描画(TJAPlayer3.app.Device, 0, TJAPlayer3.Skin.Resolution[1] - this.Mob_Footer.szテクスチャサイズ.Height);
             }
             return base.On進行描画();
         }

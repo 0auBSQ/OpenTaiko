@@ -1701,17 +1701,8 @@ namespace TJAPlayer3
                             break;
                     }
 
-                    int x = 0;
+                    int x = pChip.nバーからの距離dot.Taiko;
                     int y = TJAPlayer3.Skin.nScrollFieldY[nPlayer];// + ((int)(pChip.nコース) * 100)
-
-                    if (pChip.nノーツ移動開始時刻ms != 0 && (nPlayTime < pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms))
-                    {
-                        x = (int)( ( ( ( pChip.n発声時刻ms ) - ( pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms ) ) * pChip.dbBPM * pChip.dbSCROLL * ( this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5 ) ) / 628.7 );
-                    }
-                    else
-                    {
-                        x = pChip.nバーからの距離dot.Taiko;
-                    }
 
                     int xTemp = 0;
                     int yTemp = 0;
@@ -1796,7 +1787,7 @@ namespace TJAPlayer3
                         this.actGame.st叩ききりまショー.b最初のチップが叩かれた = true;
                     }
 
-                    if(( 1400 > x ))
+                    if((TJAPlayer3.Skin.Resolution[0] + TJAPlayer3.Skin.Game_Notes_Size[nPlayer] > x ))
                     {
                         if( TJAPlayer3.Tx.Notes[(int)_gt] != null )
                         {
@@ -1809,7 +1800,7 @@ namespace TJAPlayer3
                                     //num9 = ctChipAnime[nPlayer].n現在の値 != 0 ? 260 : 0;
                                     if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                     {
-                                        num9 = 260;
+                                        num9 = TJAPlayer3.Skin.Game_Notes_Size[1] * 2;
                                     }
                                     else
                                     {
@@ -1821,7 +1812,7 @@ namespace TJAPlayer3
                                     //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                     if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                     {
-                                        num9 = 130;
+                                        num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                     }
                                     else
                                     {
@@ -1833,7 +1824,7 @@ namespace TJAPlayer3
                                     //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                     if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                     {
-                                        num9 = 130;
+                                        num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                     }
                                     else
                                     {
@@ -1845,7 +1836,7 @@ namespace TJAPlayer3
                                     //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                     if ((int)ctChipAnime[nPlayer].n現在の値 <= 1)
                                     {
-                                        num9 = 130;
+                                        num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                     }
                                     else
                                     {
@@ -1865,12 +1856,13 @@ namespace TJAPlayer3
 
 
 
+                            int nSenotesX = TJAPlayer3.Skin.nSENotesX[nPlayer];
                             int nSenotesY = TJAPlayer3.Skin.nSENotesY[nPlayer];
                             this.ct手つなぎ.t進行Loop();
                             int nHand = this.ct手つなぎ.n現在の値 < 30 ? this.ct手つなぎ.n現在の値 : 60 - this.ct手つなぎ.n現在の値;
 
 
-                            x = ( x ) - ( ( int ) ( ( 130.0 * pChip.dbチップサイズ倍率 ) / 2.0 ) );
+                            //x = ( x ) - ( ( int ) ( (TJAPlayer3.Skin.Game_Note_Size[0] * pChip.dbチップサイズ倍率 ) / 2.0 ) );
 
                             //TJAPlayer3.Tx.Notes[(int)_gt].b加算合成 = false;
                             //TJAPlayer3.Tx.SENotes.b加算合成 = false;
@@ -1886,7 +1878,7 @@ namespace TJAPlayer3
                                 case 0x101:
                                     {
                                         NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-                                        NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
+                                        NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
                                         
                                         //TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
                                         break;
@@ -1908,7 +1900,7 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, x + 60, (y - 14) - nHand);
                                             }
                                             NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-                                            NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
+                                            NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
                                         }
                                         break;
                                     }
@@ -1935,9 +1927,10 @@ namespace TJAPlayer3
         }
 		protected override void t進行描画_チップ_Taiko連打( CConfigIni configIni, ref CDTX dTX, ref CDTX.CChip pChip, int nPlayer )
         {
+            int nSenotesX = TJAPlayer3.Skin.nSENotesX[nPlayer];
             int nSenotesY = TJAPlayer3.Skin.nSENotesY[ nPlayer ];
-            int nノート座標 = 0;
-            int nノート末端座標 = 0;
+            int nノート座標 = pChip.nバーからの距離dot.Taiko;
+            int nノート末端座標 = pChip.nバーからのノーツ末端距離dot;
             int n先頭発声位置 = 0;
 
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
@@ -1957,16 +1950,18 @@ namespace TJAPlayer3
                     else if (pChip.nノーツ出現時刻ms != 0 && pChip.nノーツ移動開始時刻ms != 0)
                         pChip.bShow = true;
 
+                    /*
                     if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms))
                     {
-                        nノート座標 = (int)((((pChip.n発声時刻ms) - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) / 502.8594 / 5.0);
-                        nノート末端座標 = (int)(((pChip.nノーツ終了時刻ms - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) / 502.8594 / 5.0);
+                        nノート座標 = NotesManager.GetNoteX(((pChip.n発声時刻ms) - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
+                        nノート末端座標 = NotesManager.GetNoteX((pChip.nノーツ終了時刻ms - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
                     }
                     else
                     {
                         nノート座標 = 0;
                         nノート末端座標 = 0;
                     }
+                    */
                 }
                 if (NotesManager.IsRollEnd(pChip))
                 {
@@ -1985,46 +1980,23 @@ namespace TJAPlayer3
                         }
                     }
 
+                    /*
                     //連打音符先頭の開始時刻を取得しなければならない。
                     //そうしなければ連打先頭と連打末端の移動開始時刻にズレが出てしまう。
                     if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < n先頭発声位置 - pChip.nノーツ移動開始時刻ms))
                     {
-                        nノート座標 = (int)(((pChip.n発声時刻ms - (n先頭発声位置 - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) / 502.8594 / 5.0);
+                        nノート座標 = NotesManager.GetNoteX((pChip.n発声時刻ms - (n先頭発声位置 - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
                     }
                     else
                     {
                         nノート座標 = 0;
                     }
+                    */
                 }
 
-                int x = 349 + pChip.nバーからの距離dot.Taiko + 10;
-                int x末端 = 349 + pChip.nバーからのノーツ末端距離dot + 10;
+                int x = TJAPlayer3.Skin.nScrollFieldX[nPlayer] + nノート座標;
+                int x末端 = TJAPlayer3.Skin.nScrollFieldX[nPlayer] + nノート末端座標;
                 int y = TJAPlayer3.Skin.nScrollFieldY[nPlayer];// + ((int)(pChip.nコース) * 100)
-
-                if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip))
-                {
-                    if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms))
-                    {
-                        x = 349 + nノート座標;
-                        x末端 = 349 + nノート末端座標;
-                    }
-                    else
-                    {
-                        x = 349 + pChip.nバーからの距離dot.Taiko + 10;
-                        x末端 = 349 + pChip.nバーからのノーツ末端距離dot + 10;
-                    }
-                }
-                else if (NotesManager.IsRollEnd(pChip))
-                {
-                    if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < n先頭発声位置 - pChip.nノーツ移動開始時刻ms))
-                    {
-                        x = 349 + nノート座標;
-                    }
-                    else
-                    {
-                        x = 349 + pChip.nバーからの距離dot.Taiko + 10;
-                    }
-                }
 
                 #region[ HIDSUD & STEALTH ]
 
@@ -2036,9 +2008,9 @@ namespace TJAPlayer3
                 #endregion
 
                 //if( CDTXMania.ConfigIni.eScrollMode != EScrollMode.Normal )
-                x -= 10;
+                //x -= 10;
 
-                if ((1400 > x))
+                if ((TJAPlayer3.Skin.Resolution[0] + TJAPlayer3.Skin.Game_Notes_Size[nPlayer] > x))
                 {
                     if (TJAPlayer3.Tx.Notes[(int)_gt] != null)
                     {
@@ -2060,7 +2032,7 @@ namespace TJAPlayer3
                                 //num9 = ctChipAnime[nPlayer].db現在の値 != 0 ? 260 : 0;
                                 if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                 {
-                                    num9 = 260;
+                                    num9 = TJAPlayer3.Skin.Game_Notes_Size[1] * 2;
                                 }
                                 else
                                 {
@@ -2072,7 +2044,7 @@ namespace TJAPlayer3
                                 //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                 if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                 {
-                                    num9 = 130;
+                                    num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                 }
                                 else
                                 {
@@ -2084,7 +2056,7 @@ namespace TJAPlayer3
                                 //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                 if ((int)ctChipAnime[nPlayer].n現在の値 == 1 || (int)ctChipAnime[nPlayer].n現在の値 == 3)
                                 {
-                                    num9 = 130;
+                                    num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                 }
                                 else
                                 {
@@ -2096,7 +2068,7 @@ namespace TJAPlayer3
                                 //num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                                 if ((int)ctChipAnime[nPlayer].n現在の値 <= 1)
                                 {
-                                    num9 = 130;
+                                    num9 = TJAPlayer3.Skin.Game_Notes_Size[1];
                                 }
                                 else
                                 {
@@ -2160,12 +2132,12 @@ namespace TJAPlayer3
                             if (pChip.bShow)
                             {
                                 if ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.n発声時刻ms && (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
-                                    x = 349;
+                                    x = TJAPlayer3.Skin.nScrollFieldX[nPlayer];
                                 else if ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.nノーツ終了時刻ms)
-                                    x = (349 + pChip.nバーからのノーツ末端距離dot);
+                                    x = (TJAPlayer3.Skin.nScrollFieldX[nPlayer] + pChip.nバーからのノーツ末端距離dot);
 
-                                NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, 260);
-                                NotesManager.DisplaySENotes(nPlayer, x - 2, y + nSenotesY, pChip);
+                                NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, TJAPlayer3.Skin.Game_Notes_Size[0] * 2);
+                                NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
 
                                 /*
                                 if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON)
@@ -2261,19 +2233,15 @@ namespace TJAPlayer3
 			{
                 if( x >= 0 )
                 {
-                    Matrix mat = Matrix.Identity;
-                    mat *= Matrix.RotationZ(C変換.DegreeToRadian(-(90.0f * (float)pChip.dbSCROLL_Y)));
-                    mat *= Matrix.Translation((float)(x - 640.0f) - 1.5f, -(y - 360.0f + 65.0f), 0f);
-
                     if( pChip.bBranch )
                     {
                         //this.tx小節線_branch.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar_Branch?.t3D描画( TJAPlayer3.app.Device, mat, new Rectangle( 0, 0, 3, 130 ) );
+                        TJAPlayer3.Tx.Bar_Branch?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                     else
                     {
                         //this.tx小節線.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar?.t3D描画( TJAPlayer3.app.Device, mat, new Rectangle( 0, 0, 3, 130 ) );
+                        TJAPlayer3.Tx.Bar?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                 }
 			}
@@ -2389,12 +2357,12 @@ namespace TJAPlayer3
                 //ボードの横幅は333px
                 //数字フォントの小さいほうはリザルトのものと同じ。
                 if( TJAPlayer3.Tx.Judge_Meter != null )
-                    TJAPlayer3.Tx.Judge_Meter.t2D描画( TJAPlayer3.app.Device, 0, 360 );
+                    TJAPlayer3.Tx.Judge_Meter.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Judge_Meter[0], TJAPlayer3.Skin.Game_Judge_Meter[1]);
 
-                this.t小文字表示( 102, 494, string.Format( "{0,4:###0}", this.nヒット数_Auto含まない.Drums.Perfect.ToString() ), false );
-                this.t小文字表示( 102, 532, string.Format( "{0,4:###0}", this.nヒット数_Auto含まない.Drums.Great.ToString() ), false );
-                this.t小文字表示( 102, 570, string.Format( "{0,4:###0}", this.nヒット数_Auto含まない.Drums.Miss.ToString() ), false );
-                this.t小文字表示(102, 634, string.Format("{0,4:###0}", GetRoll(0)), false);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Perfect[0], TJAPlayer3.Skin.Game_Judge_Meter_Perfect[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Perfect), false );
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Good[0], TJAPlayer3.Skin.Game_Judge_Meter_Good[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Great), false );
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Miss[0], TJAPlayer3.Skin.Game_Judge_Meter_Miss[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Miss), false );
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Roll[0], TJAPlayer3.Skin.Game_Judge_Meter_Roll[1], string.Format("{0,4:###0}", GetRoll(0)), false);
 
                 int nNowTotal = this.nヒット数_Auto含まない.Drums.Perfect + this.nヒット数_Auto含まない.Drums.Great + this.nヒット数_Auto含まない.Drums.Miss;
                 double dbたたけた率 = Math.Round((100.0 * ( TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great)) / (double)nNowTotal);
@@ -2411,10 +2379,10 @@ namespace TJAPlayer3
                 if (double.IsNaN(dbMISS率))
                     dbMISS率 = 0;
 
-                this.t大文字表示( 202, 436, string.Format( "{0,3:##0}%", dbたたけた率 ) );
-                this.t小文字表示( 206, 494, string.Format( "{0,3:##0}%", dbPERFECT率 ), false );
-                this.t小文字表示( 206, 532, string.Format( "{0,3:##0}%", dbGREAT率 ), false );
-                this.t小文字表示( 206, 570, string.Format( "{0,3:##0}%", dbMISS率 ), false );
+                this.t大文字表示(TJAPlayer3.Skin.Game_Judge_Meter_HitRate[0], TJAPlayer3.Skin.Game_Judge_Meter_HitRate[1], string.Format("{0,3:##0}%", dbたたけた率));
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[0], TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[1], string.Format("{0,3:##0}%", dbPERFECT率), false );
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[0], TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[1], string.Format("{0,3:##0}%", dbGREAT率), false );
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_MissRate[0], TJAPlayer3.Skin.Game_Judge_Meter_MissRate[1], string.Format("{0,3:##0}%", dbMISS率), false );
             }
         }
 
@@ -2441,7 +2409,7 @@ namespace TJAPlayer3
 				}
 				x += 22;
 			}
-		}
+        }
 
         private void t大文字表示( int x, int y, string str )
 		{

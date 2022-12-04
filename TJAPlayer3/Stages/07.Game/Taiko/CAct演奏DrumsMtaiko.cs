@@ -87,9 +87,9 @@ namespace TJAPlayer3
             //this.nHS = TJAPlayer3.ConfigIni.nScrollSpeed.Drums < 8 ? TJAPlayer3.ConfigIni.nScrollSpeed.Drums : 7;
 
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)  // Dan-i Dojo
-                TJAPlayer3.Tx.Taiko_Background[2]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                TJAPlayer3.Tx.Taiko_Background[2]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
             else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower) // Taiko Towers 
-                TJAPlayer3.Tx.Taiko_Background[3]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                TJAPlayer3.Tx.Taiko_Background[3]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
             else if (!TJAPlayer3.ConfigIni.bTokkunMode 
 	                || TJAPlayer3.Tx.Taiko_Background[5] == null 
 	                || TJAPlayer3.Tx.Taiko_Background[6] == null)
@@ -99,22 +99,22 @@ namespace TJAPlayer3
                 {
                     // 2P
                     if (TJAPlayer3.ConfigIni.nAILevel == 0 || TJAPlayer3.Tx.Taiko_Background[9] == null)
-                        TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
+                        TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[1], TJAPlayer3.Skin.Game_Taiko_Background_Y[1]);
                     else
-                        TJAPlayer3.Tx.Taiko_Background[9]?.t2D描画(TJAPlayer3.app.Device, 0, 360);
+                        TJAPlayer3.Tx.Taiko_Background[9]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[1], TJAPlayer3.Skin.Game_Taiko_Background_Y[1]);
                 }
                 if (TJAPlayer3.P1IsBlue())
-                     TJAPlayer3.Tx.Taiko_Background[4]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                     TJAPlayer3.Tx.Taiko_Background[4]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
                 else
-                    TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                    TJAPlayer3.Tx.Taiko_Background[0]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
             }
             else 
             {
                 // Training Mode
 	            if (TJAPlayer3.P1IsBlue())
-                    TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                    TJAPlayer3.Tx.Taiko_Background[6]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
                 else
-                    TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, 0, 184);
+                    TJAPlayer3.Tx.Taiko_Background[5]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[0], TJAPlayer3.Skin.Game_Taiko_Background_Y[0]);
             }
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
@@ -214,19 +214,22 @@ namespace TJAPlayer3
                         fScale = 1.0f;
                     }
 
-                    Matrix mat = Matrix.Identity;
-                    mat *= Matrix.Scaling( fScale, fScale, 1.0f );
-                    mat *= Matrix.Translation( -329, fY[ i ], 0 );
                     if( this.After[ i ] - this.Before[ i ] >= 0 )
                     {
                         //レベルアップ
+                        TJAPlayer3.Tx.Taiko_LevelUp.vc拡大縮小倍率.X = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelUp.vc拡大縮小倍率.Y = fScale;
                         TJAPlayer3.Tx.Taiko_LevelUp.Opacity = nAlpha;
-                        TJAPlayer3.Tx.Taiko_LevelUp.t3D描画( TJAPlayer3.app.Device, mat );
+                        TJAPlayer3.Tx.Taiko_LevelUp.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_LevelChange_X[i],
+                            TJAPlayer3.Skin.Game_Taiko_LevelChange_Y[i]);
                     }
                     else
                     {
+                        TJAPlayer3.Tx.Taiko_LevelDown.vc拡大縮小倍率.X = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelDown.vc拡大縮小倍率.Y = fScale;
                         TJAPlayer3.Tx.Taiko_LevelDown.Opacity = nAlpha;
-                        TJAPlayer3.Tx.Taiko_LevelDown.t3D描画( TJAPlayer3.app.Device, mat );
+                        TJAPlayer3.Tx.Taiko_LevelDown.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_LevelChange_X[i],
+                            TJAPlayer3.Skin.Game_Taiko_LevelChange_Y[i]);
                     }
                 }
             }
@@ -234,7 +237,7 @@ namespace TJAPlayer3
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
 
-                ModIcons.tDisplayMods(80, 236 + i * 190, i);
+                ModIcons.tDisplayMods(TJAPlayer3.Skin.Game_Taiko_ModIcons_X[i], TJAPlayer3.Skin.Game_Taiko_ModIcons_Y[i], i);
 
                 if (TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
                 {

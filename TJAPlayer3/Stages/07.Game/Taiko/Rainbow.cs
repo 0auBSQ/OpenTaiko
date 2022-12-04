@@ -96,13 +96,15 @@ namespace TJAPlayer3
 
                             if (this.Rainbow1P[f].Counter.n現在の値 < 82)
                             {
-                                int nRectX = ((this.Rainbow1P[f].Counter.n現在の値 * 920) / 85);
-                                TJAPlayer3.Tx.Effects_Rainbow.t2D描画(TJAPlayer3.app.Device, 360, -100, new Rectangle(0, 0, nRectX, 410));
+                                int nRectX = ((this.Rainbow1P[f].Counter.n現在の値 * TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width) / 85);
+                                TJAPlayer3.Tx.Effects_Rainbow.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_Rainbow_X[0], TJAPlayer3.Skin.Game_Effect_Rainbow_Y[0], 
+                                    new Rectangle(0, 0, nRectX, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Height));
                             }
                             else if (this.Rainbow1P[f].Counter.n現在の値 >= 82)
                             {
-                                int nRectX = (((this.Rainbow1P[f].Counter.n現在の値 - 82) * 920) / 85);
-                                TJAPlayer3.Tx.Effects_Rainbow.t2D描画(TJAPlayer3.app.Device, 360 + nRectX, -100, new Rectangle(nRectX, 0, 920 - nRectX, 410));
+                                int nRectX = (((this.Rainbow1P[f].Counter.n現在の値 - 82) * TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width) / 85);
+                                TJAPlayer3.Tx.Effects_Rainbow.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_Rainbow_X[0] + nRectX, TJAPlayer3.Skin.Game_Effect_Rainbow_Y[0],
+                                    new Rectangle(nRectX, 0, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width - nRectX, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Height));
                             }
 
                         }
@@ -126,13 +128,15 @@ namespace TJAPlayer3
 
                             if (this.Rainbow2P[f].Counter.n現在の値 < 82)
                             {
-                                int nRectX = ((this.Rainbow2P[f].Counter.n現在の値 * 920) / 85);
-                                TJAPlayer3.Tx.Effects_Rainbow.t2D上下反転描画(TJAPlayer3.app.Device, 360, 410, new Rectangle(0, 0, nRectX, 410));
+                                int nRectX = ((this.Rainbow2P[f].Counter.n現在の値 * TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width) / 85);
+                                TJAPlayer3.Tx.Effects_Rainbow.t2D上下反転描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_Rainbow_X[0], TJAPlayer3.Skin.Game_Effect_Rainbow_Y[1], 
+                                    new Rectangle(0, 0, nRectX, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Height));
                             }
                             else if (this.Rainbow2P[f].Counter.n現在の値 >= 82)
                             {
-                                int nRectX = (((this.Rainbow2P[f].Counter.n現在の値 - 82) * 920) / 85);
-                                TJAPlayer3.Tx.Effects_Rainbow.t2D上下反転描画(TJAPlayer3.app.Device, 360 + nRectX, 410, new Rectangle(nRectX, 0, 920 - nRectX, 410));
+                                int nRectX = (((this.Rainbow2P[f].Counter.n現在の値 - 82) * TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width) / 85);
+                                TJAPlayer3.Tx.Effects_Rainbow.t2D上下反転描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Effect_Rainbow_X[0] + nRectX, TJAPlayer3.Skin.Game_Effect_Rainbow_Y[1], 
+                                    new Rectangle(nRectX, 0, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Width - nRectX, TJAPlayer3.Tx.Effects_Rainbow.szテクスチャサイズ.Height));
                             }
 
                         }
