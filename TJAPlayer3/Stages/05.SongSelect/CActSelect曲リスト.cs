@@ -3092,7 +3092,7 @@ namespace TJAPlayer3
             }
         }
 
-		private int tFetchDifficulty(C曲リストノード song)
+		public int tFetchDifficulty(C曲リストノード song)
 		{
             var closest = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
             int defaultTable = Math.Max(0, Math.Min((int)Difficulty.Edit + 1, TJAPlayer3.ConfigIni.nDefaultCourse));

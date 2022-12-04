@@ -1389,7 +1389,8 @@ namespace TJAPlayer3
             var comparer = new ComparerChain<C曲リストノード>(
                 new C曲リストノードComparerノード種別(),
                 new C曲リストノードComparer絶対パス(order),
-                new C曲リストノードComparerタイトル(order));
+                new C曲リストノードComparerタイトル(order),
+                new C曲リストノードComparerSubtitle(order));
 
 	        ノードリスト.Sort( comparer );
 	    }
@@ -1399,18 +1400,42 @@ namespace TJAPlayer3
 	        var comparer = new ComparerChain<C曲リストノード>(
 	            new C曲リストノードComparerノード種別(),
 	            new C曲リストノードComparerタイトル(order),
-	            new C曲リストノードComparer絶対パス(order));
+                new C曲リストノードComparerSubtitle(order),
+                new C曲リストノードComparer絶対パス(order));
 
 	        ノードリスト.Sort( comparer );
 	    }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="ノードリスト"></param>
-		/// <param name="part"></param>
-		/// <param name="order">1=Ascend -1=Descend</param>
-		public static void t曲リストのソート3_演奏回数の多い順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
+        public static void tSongListSortBySubtitle(List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p)
+        {
+            var comparer = new ComparerChain<C曲リストノード>(
+                new C曲リストノードComparerノード種別(),
+                new C曲リストノードComparerSubtitle(order),
+                new C曲リストノードComparerタイトル(order),
+                new C曲リストノードComparer絶対パス(order));
+
+            ノードリスト.Sort(comparer);
+        }
+
+        public static void tSongListSortByLevel(List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p)
+        {
+            var comparer = new ComparerChain<C曲リストノード>(
+                new C曲リストノードComparerノード種別(),
+                new C曲リストノードComparerLevel(order),
+                new C曲リストノードComparerタイトル(order),
+                new C曲リストノードComparerSubtitle(order),
+                new C曲リストノードComparer絶対パス(order));
+
+            ノードリスト.Sort(comparer);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ノードリスト"></param>
+        /// <param name="part"></param>
+        /// <param name="order">1=Ascend -1=Descend</param>
+        public static void t曲リストのソート3_演奏回数の多い順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
 		{
 			order = -order;
 			int nL12345 = (int) p[ 0 ];

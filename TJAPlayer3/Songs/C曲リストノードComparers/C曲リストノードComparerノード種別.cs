@@ -22,9 +22,9 @@ namespace TJAPlayer3.C曲リストノードComparers
                 case C曲リストノード.Eノード種別.UNKNOWN:
                     return 2;
                 case C曲リストノード.Eノード種別.RANDOM:
-                    return 3;
-                case C曲リストノード.Eノード種別.BACKBOX:
                     return 4;
+                case C曲リストノード.Eノード種別.BACKBOX:
+                    return 3;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

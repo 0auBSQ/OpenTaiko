@@ -9,15 +9,15 @@
 0 : "System language" description
 1 : "System language" option title
 2 : "<< Back to left menu" option title
-3 : "<< Back to left menu" description 
-4 : "Reload songs" option title 
-5 : "Reload songs" description 
-6 : "Player count" option title 
+3 : "<< Back to left menu" description
+4 : "Reload songs" option title
+5 : "Reload songs" description
+6 : "Player count" option title
 7 : "Player count" description
-8 : "Risky" option title 
-9 : "Risky" description 
+8 : "Risky" option title
+9 : "Risky" description
 10 : "Song speed" option title
-11 : "Song speed" description 
+11 : "Song speed" description
 12 : "AI Level" option title
 13 : "AI Level" description
 14 : "Global offset" option title
@@ -185,13 +185,13 @@
 
 100 : Ensou main menu button
 101 : Dan main menu button
-102 : Tower main menu button 
-103 : Shop main menu button 
+102 : Tower main menu button
+103 : Shop main menu button
 104 : Bouken main menu button
-105 : Heya main menu button 
-106 : Settings main menu button 
+105 : Heya main menu button
+106 : Settings main menu button
 107 : Quit main menu button
-108 : Online lounge main menu button 
+108 : Online lounge main menu button
 109 : Open encyclopedia main menu button
 110 : AI Battle main menu button
 111 : Player stats main menu button
@@ -202,7 +202,7 @@
 151 : Dan main menu box text
 152 : Tower main menu box text
 153 : Shop main menu box text
-154 : Bouken main menu box text 
+154 : Bouken main menu box text
 155 : Heya main menu box text
 156 : Settings main menu box text
 157 : Quit main menu box text
@@ -216,7 +216,7 @@
 # Special items (002XX)
 
 200 : Ensou Back box (Tojiru)
-201 : Ensou recently played songs 
+201 : Ensou recently played songs
 202 : Ensou recently played songs description
 203 : Ensou randomly select song
 
@@ -281,12 +281,12 @@
 
 1010 : Soul gauge
 1011 : Perfect count
-1012 : Good count 
-1013 : Bad count 
+1012 : Good count
+1013 : Bad count
 1014 : Score
-1015 : Rolls count 
+1015 : Rolls count
 1016 : Notes hit count
-1017 : Combo 
+1017 : Combo
 1018 : Accuracy
 1019 : ADLIB count
 1020 : Bombs hit
@@ -334,6 +334,16 @@
 9100 : Search (Difficulty)
 9101 : Difficulty
 9102 : Level
+
+# Sort methods (092XX)
+
+9200 : Return
+9201 : Path
+9202 : Title
+9203 : Subtitle
+9204 : Displayed difficulty
+
+
 
 # Feature specific errors (9XXXX)
 

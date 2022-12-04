@@ -365,6 +365,12 @@ namespace TJAPlayer3
             [9100] = "Rechercher (Difficulté)",
             [9101] = "Difficulté",
             [9102] = "Niveau",
+
+            [9200] = "Retour",
+            [9201] = "Chemin",
+            [9202] = "Titre",
+            [9203] = "Sous-titre",
+            [9204] = "Niveau",
         };
     }
 }
