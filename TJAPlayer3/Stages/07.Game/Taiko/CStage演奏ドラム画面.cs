@@ -539,6 +539,13 @@ namespace TJAPlayer3
                     if (btmp == true)
                         ifp[i] = true;
 
+#if DEBUG
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.D0))
+                    {
+                        ifp[i] = true;
+                    }
+#endif
+
                     this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
                 }
 
