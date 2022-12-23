@@ -82,6 +82,12 @@ BoxFontName=廻想体 ネクスト UP B
 036 - RUiNED GLORY : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
 037 - Yukianesa ~Azure Of Ice~ : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
 038 - Dear Stars : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+039 - Forever Fading Away : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & colin)
+040 - Every Night : DJ NEXTON - https://nexton.bandcamp.com (Chart by colin)
+041 - Beyond the CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora/beyond-the-cityscape (Chart by bol)
+042 - Shockwave : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol)
+043 - TRIPLE HELIX : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by colin & 0AuBSQ)
+044 - Memory : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
