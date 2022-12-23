@@ -390,6 +390,9 @@ namespace TJAPlayer3
         // SENotes
         public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip)
         {
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] == Eステルスモード.STEALTH)
+                return;
+
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
             if (IsMine(chip))

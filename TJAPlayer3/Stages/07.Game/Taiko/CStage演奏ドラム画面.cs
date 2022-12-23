@@ -1768,7 +1768,17 @@ namespace TJAPlayer3
 
                         y = TJAPlayer3.Skin.nScrollFieldY[nPlayer];
                         if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.Normal)
-                            y += (int)(((pChip.n発声時刻ms - CSound管理.rc演奏用タイマ.n現在時刻) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) / 502.8594 / 5.0);
+                        {
+ 
+                            y += (int)((
+                                (pChip.n発声時刻ms - CSound管理.rc演奏用タイマ.n現在時刻) 
+                                * pChip.dbBPM 
+                                * pChip.dbSCROLL_Y 
+                                * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) 
+                                / 502.8594 
+                                / 5.0);
+                        }
+                            
                         else if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.BMSCROLL || TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.HBSCROLL)
                         {
                             float? play_bpm_time = null;
