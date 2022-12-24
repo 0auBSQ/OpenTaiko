@@ -13,12 +13,11 @@ using FDK;
 using Rectangle = System.Drawing.Rectangle;
 using Point = System.Drawing.Point;
 using Color = System.Drawing.Color;
-
 namespace TJAPlayer3
 {
-	internal class CStage演奏ドラム画面 : CStage演奏画面共通
-	{
-		// コンストラクタ
+    internal class CStage演奏ドラム画面 : CStage演奏画面共通
+    {
+        // コンストラクタ
 
 		public CStage演奏ドラム画面()
 		{
@@ -1767,6 +1766,16 @@ namespace TJAPlayer3
                         var dbSCROLL = configIni.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL;
 
                         y = TJAPlayer3.Skin.nScrollFieldY[nPlayer];
+
+
+                        double _scrollSpeed = pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
+                        long __dbt = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                        long time = pChip.n発声時刻ms - __dbt;
+                        float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+
+                        y += NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+
+                        /*
                         if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.Normal)
                         {
  
@@ -1790,6 +1799,8 @@ namespace TJAPlayer3
 
                             y += (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 2 / 5.0);
                         }
+                        */
+
                     }
 
                     if ( pChip.nバーからの距離dot.Drums < 0 )
