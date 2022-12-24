@@ -2545,6 +2545,8 @@ namespace TJAPlayer3
 
 		private void tバーの初期化()
 		{
+            stバー情報 = new STバー情報[TJAPlayer3.Skin.SongSelect_Bar_Count];
+
             int barCenterNum = (TJAPlayer3.Skin.SongSelect_Bar_Count - 1) / 2;
             for ( int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Count; i++ )
 			{

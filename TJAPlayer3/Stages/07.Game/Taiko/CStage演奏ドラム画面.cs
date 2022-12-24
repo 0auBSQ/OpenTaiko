@@ -1773,7 +1773,7 @@ namespace TJAPlayer3
                         long time = pChip.n発声時刻ms - __dbt;
                         float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
-                        y += NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                        y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
 
                         /*
                         if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.Normal)

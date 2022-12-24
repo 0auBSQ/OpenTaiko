@@ -63,17 +63,39 @@ namespace TJAPlayer3
         public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll)
         {
             double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
+            double screen_ratio = TJAPlayer3.Skin.Resolution[0] / 1280.0;
             switch (eScrollMode)
             {
                 case EScrollMode.Normal:
-                    return (int)((timems / 240000.0) * interval * scroll);
+                    return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
                 case EScrollMode.BMSCROLL:
                     {
-                        return (int)((hbtime / 16.0) * interval);
+                        return (int)((hbtime / 16.0) * interval * screen_ratio);
                     }
                 case EScrollMode.HBSCROLL:
                     {
-                        return (int)((hbtime / 16.0) * interval * scroll);
+                        return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
+                    }
+                default:
+                    return 0;
+            }
+        }
+
+        public static int GetNoteY(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll)
+        {
+            double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
+            double screen_ratio = TJAPlayer3.Skin.Resolution[1] / 720.0;
+            switch (eScrollMode)
+            {
+                case EScrollMode.Normal:
+                    return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
+                case EScrollMode.BMSCROLL:
+                    {
+                        return (int)((hbtime / 16.0) * interval * screen_ratio);
+                    }
+                case EScrollMode.HBSCROLL:
+                    {
+                        return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
                     }
                 default:
                     return 0;
