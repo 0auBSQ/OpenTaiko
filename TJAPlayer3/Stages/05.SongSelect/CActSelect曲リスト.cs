@@ -2653,6 +2653,12 @@ namespace TJAPlayer3
 			TJAPlayer3.Tx.SongSelect_Favorite.Opacity = opct; 
 			TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = opct;
 			TJAPlayer3.Tx.DanResult_Rank.Opacity = opct;
+			TJAPlayer3.Tx.SongSelect_Level_Number_Big?.tUpdateOpacity(opct);
+			for (int i = 0; i < TJAPlayer3.Tx.SongSelect_Song_Panel.Length; i++)
+			{
+				TJAPlayer3.Tx.SongSelect_Song_Panel[i]?.tUpdateOpacity(opct);
+            }
+
 
 			if (eバー種別 == Eバー種別.Random)
             {

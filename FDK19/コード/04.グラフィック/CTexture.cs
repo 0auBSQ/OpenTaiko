@@ -1278,6 +1278,11 @@ namespace FDK
         {
             this.color4 = c4;
         }
+
+        public void tUpdateOpacity(int o)
+        {
+            this.Opacity = o;
+        }
                                                             //-----------------
         #endregion
     }
