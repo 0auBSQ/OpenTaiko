@@ -5700,19 +5700,19 @@ namespace TJAPlayer3
         public int[] Result_Soul_Text_X = new int[] { 575, 1210 };
         public int[] Result_Soul_Text_Y = new int[] { 159, 159 };
 
-        public int[] Result_Perfect_X = new int[] { 556, 1191 };
+        public int[] Result_Perfect_X = new int[] { 490, 1125 };
         public int[] Result_Perfect_Y = new int[] { 188, 188 };
 
-        public int[] Result_Good_X = new int[] { 556, 1191 };
+        public int[] Result_Good_X = new int[] { 490, 1125 };
         public int[] Result_Good_Y = new int[] { 230, 230 };
 
-        public int[] Result_Miss_X = new int[] { 556, 1191 };
+        public int[] Result_Miss_X = new int[] { 490, 1125 };
         public int[] Result_Miss_Y = new int[] { 272, 272 };
 
-        public int[] Result_Roll_X = new int[] { 556, 1191 };
+        public int[] Result_Roll_X = new int[] { 490, 1125 };
         public int[] Result_Roll_Y = new int[] { 314, 314 };
 
-        public int[] Result_MaxCombo_X = new int[] { 556, 1191 };
+        public int[] Result_MaxCombo_X = new int[] { 490, 1125 };
         public int[] Result_MaxCombo_Y = new int[] { 356, 356 };
 
         public int[] Result_Score_X = new int[] { 295, 930 };

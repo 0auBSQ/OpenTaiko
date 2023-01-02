@@ -890,11 +890,12 @@ namespace TJAPlayer3
 			for (int j = 0; j < nums.Length; j++)
 			{
 				float offset = j;
-				float _x = x - (TJAPlayer3.Skin.Result_Number_Interval[0] * offset);
-				float _y = y - (TJAPlayer3.Skin.Result_Number_Interval[1] * offset);
 
 				float width = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Width / 11.0f;
 				float height = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Height / 2.0f;
+
+				float _x = x - (TJAPlayer3.Skin.Result_Number_Interval[0] * offset) + (width * 2);
+				float _y = y - (TJAPlayer3.Skin.Result_Number_Interval[1] * offset);
 
 				TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, _x + (width / 2), _y + (height / 2), 
 					new RectangleF(width * nums[j], 0, width, height));
