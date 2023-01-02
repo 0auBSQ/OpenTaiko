@@ -4034,6 +4034,426 @@ namespace TJAPlayer3
                             #endregion
 
                             #region Result
+                            else if (strCommand == nameof(Result_Cloud_Count))
+                            {
+                                Result_Cloud_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Result_Cloud_X")
+                            {
+                                Result_Cloud_X = new int[Result_Cloud_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Cloud_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Result_Cloud_Y")
+                            {
+                                Result_Cloud_Y = new int[Result_Cloud_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Cloud_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Result_Cloud_MaxMove")
+                            {
+                                Result_Cloud_MaxMove = new int[Result_Cloud_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Cloud_MaxMove[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == nameof(Result_Shine_Count))
+                            {
+                                Result_Shine_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Result_Shine_1P_X")
+                            {
+                                Result_Shine_X[0] = new int[Result_Shine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Shine_Count; i++)
+                                {
+                                    Result_Shine_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Shine_2P_X")
+                            {
+                                Result_Shine_X[1] = new int[Result_Shine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Shine_Count; i++)
+                                {
+                                    Result_Shine_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Shine_1P_Y")
+                            {
+                                Result_Shine_Y[0] = new int[Result_Shine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Shine_Count; i++)
+                                {
+                                    Result_Shine_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Shine_2P_Y")
+                            {
+                                Result_Shine_Y[1] = new int[Result_Shine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Shine_Count; i++)
+                                {
+                                    Result_Shine_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Shine_Size")
+                            {
+                                Result_Shine_Size = new float[Result_Shine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Shine_Size[i] = float.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Work_1P_X")
+                            {
+                                Result_Work_X[0] = new int[3];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Work_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Work_2P_X")
+                            {
+                                Result_Work_X[1] = new int[3];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Work_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Work_1P_Y")
+                            {
+                                Result_Work_Y[0] = new int[3];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Work_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Work_2P_Y")
+                            {
+                                Result_Work_Y[1] = new int[3];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_Cloud_Count; i++)
+                                {
+                                    Result_Work_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_DifficultyBar_Size")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_DifficultyBar_Size[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_DifficultyBar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_DifficultyBar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_DifficultyBar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_DifficultyBar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Base_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Base_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Base_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Base_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Result_Gauge_Rect[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Rainbow_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Rainbow_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Rainbow_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Rainbow_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_ClearText_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_ClearText_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Result_Gauge_ClearText_Rect[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_Clear_Rect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Result_Gauge_ClearText_Clear_Rect[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Number_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Fire_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Fire_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Fire_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Fire_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Text_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Text_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Text_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Text_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Perfect_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Perfect_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Perfect_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Perfect_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Good_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Good_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Good_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Good_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Miss_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Miss_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Miss_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Miss_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Roll_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Roll_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Roll_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Roll_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_MaxCombo_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_MaxCombo_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_MaxCombo_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_MaxCombo_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Score_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Score_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Score_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Score_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Score_Number_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Score_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ScoreRankEffect_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ScoreRankEffect_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ScoreRankEffect_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ScoreRankEffect_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_CrownEffect_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_CrownEffect_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_CrownEffect_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_CrownEffect_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(Result_MusicName_X))
                             {
                                 Result_MusicName_X = int.Parse(strParam);
@@ -4110,7 +4530,110 @@ namespace TJAPlayer3
                                     Result_NamePlate_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
-
+                            else if (strCommand == "Result_ModIcons_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ModIcons_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ModIcons_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ModIcons_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Flower_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Flower_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_Rotate_1P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_Flower_Rotate_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_Rotate_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_Flower_Rotate_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_Rotate_1P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_Flower_Rotate_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Flower_Rotate_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_Flower_Rotate_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == nameof(Result_PlateShine_Count))
+                            {
+                                Result_PlateShine_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Result_PlateShine_1P_X")
+                            {
+                                Result_PlateShine_X[0] = new int[Result_PlateShine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_PlateShine_Count; i++)
+                                {
+                                    Result_PlateShine_X[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_PlateShine_2P_X")
+                            {
+                                Result_PlateShine_X[1] = new int[Result_PlateShine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_PlateShine_Count; i++)
+                                {
+                                    Result_PlateShine_X[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_PlateShine_1P_Y")
+                            {
+                                Result_PlateShine_Y[0] = new int[Result_PlateShine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_PlateShine_Count; i++)
+                                {
+                                    Result_PlateShine_Y[0][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_PlateShine_2P_Y")
+                            {
+                                Result_PlateShine_Y[1] = new int[Result_PlateShine_Count];
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < Result_PlateShine_Count; i++)
+                                {
+                                    Result_PlateShine_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(Result_Dan))
                             {
                                 Result_Dan = strParam.Split(',').Select(int.Parse).ToArray();
@@ -5125,6 +5648,114 @@ namespace TJAPlayer3
 
         #endregion
         #region Result
+        public int Result_Cloud_Count = 11;
+        public int[] Result_Cloud_X = new int[] { 642, 612, 652, 1148, 1180, 112, 8, 1088, 1100, 32, 412 };
+        public int[] Result_Cloud_Y = new int[] { 202, 424, 636, 530, 636, 636, 102, 52, 108, 326, 644 };
+        public int[] Result_Cloud_MaxMove = new int[] { 150, 120, 180, 60, 90, 150, 120, 50, 45, 120, 180 };
+
+        public int Result_Shine_Count = 6;
+        public int[][] Result_Shine_X = new int[][] {
+            new int[] { 885, 1255, 725, 890, 1158, 1140 },
+            new int[] { 395, 25, 555, 390, 122, 140 },
+        };
+        public int[][] Result_Shine_Y = new int[][] {
+            new int[] { 650, 405, 645, 420, 202, 585 },
+            new int[] { 650, 405, 645, 420, 202, 585 }
+        };
+        public float[] Result_Shine_Size = { 0.44f, 0.6f, 0.4f, 0.15f, 0.35f, 0.6f };
+
+        public int[][] Result_Work_X = new int[][] {
+            new int[] { 800, 900, 1160 },
+            new int[] { 480, 380, 120 }
+        };
+        public int[][] Result_Work_Y = new int[][] {
+            new int[] { 435, 185, 260 },
+            new int[] { 435, 185, 260 }
+        };
+
+        public int[] Result_DifficultyBar_Size = new int[] { 185, 54 };
+        public int[] Result_DifficultyBar_X = new int[] { 18, 653 };
+        public int[] Result_DifficultyBar_Y = new int[] { 101, 101 };
+
+        public int[] Result_Gauge_Base_X = new int[] { 55, 690 };
+        public int[] Result_Gauge_Base_Y = new int[] { 140, 140 };
+
+        public int[] Result_Gauge_X = new int[] { 57, 692 };
+        public int[] Result_Gauge_Y = new int[] { 140, 140 };
+        public int[] Result_Gauge_Rect = new int[] { 0, 0, 487, 36 };
+
+        public int[] Result_Gauge_Rainbow_X = new int[] { 57, 692 };
+        public int[] Result_Gauge_Rainbow_Y = new int[] { 144, 144 };
+
+        public int[] Result_Gauge_ClearText_X = new int[] { 441, 1076 };
+        public int[] Result_Gauge_ClearText_Y = new int[] { 142, 142 };
+        public int[] Result_Gauge_ClearText_Rect = new int[] { 0, 35, 42, 20 };
+        public int[] Result_Gauge_ClearText_Clear_Rect = new int[] { 42, 35, 42, 20 };
+
+        public int[] Result_Number_Interval = new int[] { 22, 0 };
+
+        public int[] Result_Soul_Fire_X = new int[] { 576, 1211 };
+        public int[] Result_Soul_Fire_Y = new int[] { 160, 160 };
+
+        public int[] Result_Soul_Text_X = new int[] { 575, 1210 };
+        public int[] Result_Soul_Text_Y = new int[] { 159, 159 };
+
+        public int[] Result_Perfect_X = new int[] { 490, 1125 };
+        public int[] Result_Perfect_Y = new int[] { 188, 188 };
+
+        public int[] Result_Good_X = new int[] { 490, 1125 };
+        public int[] Result_Good_Y = new int[] { 230, 230 };
+
+        public int[] Result_Miss_X = new int[] { 490, 1125 };
+        public int[] Result_Miss_Y = new int[] { 272, 272 };
+
+        public int[] Result_Roll_X = new int[] { 490, 1125 };
+        public int[] Result_Roll_Y = new int[] { 314, 314 };
+
+        public int[] Result_MaxCombo_X = new int[] { 490, 1125 };
+        public int[] Result_MaxCombo_Y = new int[] { 356, 356 };
+
+        public int[] Result_Score_X = new int[] { 295, 930 };
+        public int[] Result_Score_Y = new int[] { 212, 212 };
+        public int[] Result_Score_Number_Interval = new int[] { 33, 0 };
+
+        public int[] Result_ScoreRankEffect_X = new int[] { 135, 770 };
+        public int[] Result_ScoreRankEffect_Y = new int[] { 339, 339 };
+
+        public int[] Result_CrownEffect_X = new int[] { 262, 897 };
+        public int[] Result_CrownEffect_Y = new int[] { 336, 336 };
+
+        public int[] Result_Speech_Bubble_X = new int[] { 430, 850 };
+        public int[] Result_Speech_Bubble_Y = new int[] { 526, 526 };
+
+        public int[] Result_NamePlate_X = new int[] { 28, 1032 };
+        public int[] Result_NamePlate_Y = new int[] { 621, 621 };
+
+        public int[] Result_ModIcons_X = new int[] { 32, 1028 };
+        public int[] Result_ModIcons_Y = new int[] { 678, 678 };
+
+        public int[] Result_Flower_X = new int[] { 182, 1098 };
+        public int[] Result_Flower_Y = new int[] { 602, 602 };
+
+        public int[][] Result_Flower_Rotate_X = new int[][] {
+            new int[] { 48, 125, 48, 240, 87 },
+            new int[] { 964, 1041, 964, 1156, 1003 },
+        };
+        public int[][] Result_Flower_Rotate_Y = new int[][] {
+            new int[] { 549, 585, 546, 501, 509 },
+            new int[] { 549, 585, 546, 501, 509 }
+        };
+
+        public int Result_PlateShine_Count = 6;
+        public int[][] Result_PlateShine_X = new int[][] {
+            new int[] { 333, 342, 184, 198, 189, 309 },
+            new int[] { 1249, 1258, 1100, 1114, 1105, 1225 }
+        };
+        public int[][] Result_PlateShine_Y = new int[][] {
+            new int[] { 670, 620, 650, 687, 558, 542 },
+            new int[] { 670, 620, 650, 687, 558, 542 }
+        };
+
         public int Result_MusicName_X = 640;
         public int Result_MusicName_Y = 30;
         public int Result_MusicName_FontSize = 25;
@@ -5140,9 +5771,6 @@ namespace TJAPlayer3
         public Color Result_MusicName_BackColor = ColorTranslator.FromHtml("#000000");
         public Color Result_StageText_BackColor = ColorTranslator.FromHtml("#000000");
         //public Color Result_StageText_BackColor_Red = ColorTranslator.FromHtml("#FF0000");
-
-        public int[] Result_NamePlate_X = new int[] { 6, 260 };
-        public int[] Result_NamePlate_Y = new int[] { 611, 611 };
 
         public int[] Result_Dan = new int[] { 500, 500 };
         public int[] Result_Dan_XY = new int[] { 0, 420 };
