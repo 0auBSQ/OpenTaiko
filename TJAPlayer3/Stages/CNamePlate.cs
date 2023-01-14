@@ -49,6 +49,15 @@ namespace TJAPlayer3
             ctAnimatedNamePlateTitle = new CCounter(0, 10000, 60.0f, TJAPlayer3.Timer);
         }
 
+        public void tNamePlateDisplayNamePlateBase(int x, int y, int item)
+        {
+            int namePlateBaseX = TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width;
+            int namePlateBaseY = TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Height / 12;
+
+            TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, item * namePlateBaseY, namePlateBaseX, namePlateBaseY));
+
+        }
+
         public void tNamePlateRefreshTitles(int player)
         {
             int actualPlayer = TJAPlayer3.GetActualPlayer(player);
@@ -88,162 +97,97 @@ namespace TJAPlayer3
 
             TJAPlayer3.Tx.NamePlateBase.Opacity = Opacity;
 
+
             for (int i = 0; i < 5; i++)
                 TJAPlayer3.Tx.NamePlate_Effect[i].Opacity = Opacity;
 
-            if (bTitle)
+            // White background
+            tNamePlateDisplayNamePlateBase(x, y, 3);
+
+            // Upper (title) plate
+            if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
             {
-                //220, 54
-                TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 3 * 54, 220, 54));
-
-                if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
+                int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
+                if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
                 {
-                    int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
-                    if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
-                    {
-                        var _tex = TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]];
+                    var _tex = TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]];
 
-                        if (_tex != null)
-                        {
-                            _tex.Opacity = Opacity;
-                            _tex.t2D描画(TJAPlayer3.app.Device, x - 2, y - 2);
-                        }
+                    if (_tex != null)
+                    {
+                        _tex.Opacity = Opacity;
+                        _tex.t2D描画(TJAPlayer3.app.Device, x - 2, y - 2);
                     }
                 }
+            }
 
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 7 * 54, 220, 54));
-                    TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (8 + TJAPlayer3.NamePlateConfig.data.DanType[player]) * 54, 220, 54));
-                }
+            // Dan plate
+            if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
+            {
+                tNamePlateDisplayNamePlateBase(x, y, 7);
+                tNamePlateDisplayNamePlateBase(x, y, (8 + TJAPlayer3.NamePlateConfig.data.DanType[player]));
+            }
 
-                tNamePlateDraw(player, x, y, Opacity);
+            // Glow
+            tNamePlateDraw(player, x, y, Opacity);
 
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    if (txName[player].szテクスチャサイズ.Width >= 120.0f)
-                        txName[player].vc拡大縮小倍率.X = 120.0f / txName[player].szテクスチャサイズ.Width;
-                }
-                else
-                {
-                    if (txName[player].szテクスチャサイズ.Width >= 220.0f)
-                        txName[player].vc拡大縮小倍率.X = 220.0f / txName[player].szテクスチャサイズ.Width;
-                }
+            // Player number
+            if (TJAPlayer3.PlayerSide == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 1)
+                tNamePlateDisplayNamePlateBase(x, y, basePlayer == 1 ? 2 : 0);
+            else
+                tNamePlateDisplayNamePlateBase(x, y, 1);
 
-                if (txdan[player].szテクスチャサイズ.Width >= 66.0f)
-                    txdan[player].vc拡大縮小倍率.X = 66.0f / txdan[player].szテクスチャサイズ.Width;
-
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 69, y + 45);
-                    if (TJAPlayer3.NamePlateConfig.data.DanGold[player])
-                    {
-                        TJAPlayer3.Tx.NamePlateBase.b乗算合成 = true;
-                        TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 11 * 54, 220, 54));
-                        TJAPlayer3.Tx.NamePlateBase.b乗算合成 = false;
-                    }
-                }
-
-                if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
-                {
-                    if (txTitle[player].szテクスチャサイズ.Width >= 160)
-                    {
-                        txTitle[player].vc拡大縮小倍率.X = 160.0f / txTitle[player].szテクスチャサイズ.Width;
-                        txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
-                    }
-
-                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 115, y + 21);
-                    if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
-                        this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 100, y + 45);
-                    else
-                        this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 149, y + 45);
-                }
-                else
-                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
+            // Name text squash (to add to skin config)
+            if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
+            {
+                if (txName[player].szテクスチャサイズ.Width >= 120.0f)
+                    txName[player].vc拡大縮小倍率.X = 120.0f / txName[player].szテクスチャサイズ.Width;
             }
             else
             {
-                //220, 54
-                TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 3 * 54, 220, 54));
-
-                if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
-                {
-                    int tt = TJAPlayer3.NamePlateConfig.data.TitleType[player];
-                    if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
-                    {
-                        var _tex = TJAPlayer3.Tx.NamePlate_Title[tt][ctAnimatedNamePlateTitle.n現在の値 % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[tt]];
-
-                        if (_tex != null)
-                        {
-                            _tex.Opacity = Opacity;
-                            _tex.t2D描画(TJAPlayer3.app.Device, x - 2, y - 2);
-                        }
-                    }
-                }
-
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 7 * 54, 220, 54));
-                    TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, (8 + TJAPlayer3.NamePlateConfig.data.DanType[player]) * 54, 220, 54));
-                }
-
-                tNamePlateDraw(player, x, y, Opacity);
-
-                if (TJAPlayer3.PlayerSide == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 1)
-                    TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, basePlayer == 1 ? 2 * 54 : 0, 220, 54));
-                else
-                    TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 1 * 54, 220, 54));
-
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    if (txName[player].szテクスチャサイズ.Width >= 120.0f)
-                        txName[player].vc拡大縮小倍率.X = 120.0f / txName[player].szテクスチャサイズ.Width;
-                }
-                else
-                {
-                    if (txName[player].szテクスチャサイズ.Width >= 220.0f)
-                        txName[player].vc拡大縮小倍率.X = 220.0f / txName[player].szテクスチャサイズ.Width;
-                }
-
-                if (txdan[player].szテクスチャサイズ.Width >= 66.0f)
-                    txdan[player].vc拡大縮小倍率.X = 66.0f / txdan[player].szテクスチャサイズ.Width;
-
-                if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
-                {
-                    this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 69, y + 44);
-
-                    if (TJAPlayer3.NamePlateConfig.data.DanGold[player])
-                    {
-                        TJAPlayer3.Tx.NamePlateBase.b乗算合成 = true;
-                        TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 11 * 54, 220, 54));
-                        TJAPlayer3.Tx.NamePlateBase.b乗算合成 = false;
-                    }
-                }
-
-                if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
-                {
-                    if (txTitle[player].szテクスチャサイズ.Width >= 160)
-                    {
-                        txTitle[player].vc拡大縮小倍率.X = 160.0f / txTitle[player].szテクスチャサイズ.Width;
-                        txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
-                    }
-
-                    txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 22);
-
-                    
-                    if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
-                        this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 44);
-                    else
-                        this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 144, y + 44);
-                }
-                else
-                {
-                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
-                }
-
+                if (txName[player].szテクスチャサイズ.Width >= 220.0f)
+                    txName[player].vc拡大縮小倍率.X = 220.0f / txName[player].szテクスチャサイズ.Width;
             }
 
-            TJAPlayer3.Tx.NamePlateBase.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, 4 * 54 + 3, 220, 54));
+            // Dan text squash (to add to skin config)
+            if (txdan[player].szテクスチャサイズ.Width >= 66.0f)
+                txdan[player].vc拡大縮小倍率.X = 66.0f / txdan[player].szテクスチャサイズ.Width;
+
+            // Dan text
+            if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
+            {
+                this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 69, y + 44);
+
+                if (TJAPlayer3.NamePlateConfig.data.DanGold[player])
+                {
+                    TJAPlayer3.Tx.NamePlateBase.b乗算合成 = true;
+                    tNamePlateDisplayNamePlateBase(x, y, 11);
+                    TJAPlayer3.Tx.NamePlateBase.b乗算合成 = false;
+                }
+            }
+
+            // Title text
+            if (TJAPlayer3.NamePlateConfig.data.Title[player] != "" && TJAPlayer3.NamePlateConfig.data.Title[player] != null)
+            {
+                if (txTitle[player].szテクスチャサイズ.Width >= 160)
+                {
+                    txTitle[player].vc拡大縮小倍率.X = 160.0f / txTitle[player].szテクスチャサイズ.Width;
+                    txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
+                }
+
+                txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 22);
+
+                // Name text
+                if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
+                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 44);
+                else
+                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 144, y + 44);
+            }
+            else
+                this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
+
+            
+            // Overlap frame
+            tNamePlateDisplayNamePlateBase(x, y, 4);
         }
 
         private void tNamePlateDraw(int player, int x, int y, int Opacity = 255)
