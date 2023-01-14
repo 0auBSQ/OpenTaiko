@@ -1261,7 +1261,9 @@ namespace TJAPlayer3
                                     // To be added later
                                     bool _isKongaPinkRoll = NotesManager.IsBigRoll(chipNoHit) && _gt == EGameType.KONGA;
 
-                                    bool _isBlueOnly = (NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO;
+                                    // To improve (array of functions ?)
+                                    bool _isBlueOnly = ((NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO)
+                                        && !_isBalloon && !_isKusudama;
 
                                     if ((_isRedOnly && !_isBlue) || (_isBlueOnly && _isBlue))
                                         this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
