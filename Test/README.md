@@ -44,7 +44,7 @@ BoxFontName=廻想体 ネクスト UP B
 ### Credits
 
 ```
-001 - CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
+001 - cityscape : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
 002 - Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
 003 - Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 004 - Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ & bol)
@@ -74,7 +74,7 @@ BoxFontName=廻想体 ネクスト UP B
 028 - Katharsis : 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by 0AuBSQ)
 029 - 2​-​Steppin' Love : FUNKYZUKIN ft. Hatsune Miku - https://funkyzukin.bandcamp.com/album/2-steppin-love-single (Chart by colin, Extra by 0AuBSQ)
 030 - 闇 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
-031 - Mischief Madness : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
+031 - mischief madness : Makotora - https://soundcloud.com/xoxomakotora | Makotora#0001 (Chart by Makotora)
 032 - Re：Cøllapse : H888. (H5 + DashyDesu) - https://www.youtube.com/c/DashyDesu https://linktr.ee/H5Music (Chart by DashyDesu (Extreme) and bol (Easy, Normal, Hard))
 033 - Alonebirthday : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Extra) and bol (Easy, Normal, Hard))
 034 - The World of Our Past : DashyDesu & rainfall - https://www.youtube.com/c/DashyDesu https://soundcloud.com/user-698445934 (Chart by DashyDesu)
@@ -84,10 +84,13 @@ BoxFontName=廻想体 ネクスト UP B
 038 - Dear Stars : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 039 - Forever Fading Away : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & colin)
 040 - Every Night : DJ NEXTON - https://nexton.bandcamp.com (Chart by colin)
-041 - Beyond the CITYSCAPE : Makotora - https://soundcloud.com/xoxomakotora/beyond-the-cityscape (Chart by bol)
+041 - beyond the cityscape : Makotora - https://soundcloud.com/xoxomakotora/beyond-the-cityscape (Chart by bol)
 042 - Shockwave : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol)
 043 - TRIPLE HELIX : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by colin & 0AuBSQ)
 044 - Memory : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
+045 - nanja korya ?! : Makotora - https://soundcloud.com/xoxomakotora/nanjakorya (Chart by 0AuBSQ)
+046 - ΣxilƎ : mrcool909090 - https://www.twitter.com/mrcool909090 (Chart by bol (Normal, Extreme) and 0AuBSQ)
+047 - Pixelated Angel : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol and TFD500)
 ```
 
 ### About the OpenTaiko Original Soundtrack
