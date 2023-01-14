@@ -1623,6 +1623,51 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            #region [Mod Icons]
+
+
+                            /*
+                             * public int[] ModIcons_OffsetX = { 0, 30, 60, 90, 0, 30, 60, 90 };
+                                public int[] ModIcons_OffsetY = { 0, 0, 0, 0, 30, 30, 30, 30 };
+                                public int[] ModIcons_OffsetX_Menu = { 0, 30, 60, 90, 120, 150, 180, 210 };
+                                public int[] ModIcons_OffsetY_Menu = { 0, 0, 0, 0, 0, 0, 0, 0 };
+                            */
+
+                            else if (strCommand == "ModIcons_OffsetX")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    ModIcons_OffsetX[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "ModIcons_OffsetY")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    ModIcons_OffsetY[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "ModIcons_OffsetX_Menu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    ModIcons_OffsetX_Menu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "ModIcons_OffsetY_Menu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    ModIcons_OffsetY_Menu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
+                            #endregion
+
                             #region SongSelect
                             else if (strCommand == "SongSelect_BoxExplanation_X")
                             {
@@ -5802,6 +5847,15 @@ namespace TJAPlayer3
         public int Font_Edge_Ratio_Vertical = 30;
         public int Text_Correction_X = 0;
         public int Text_Correction_Y = 0;
+        #endregion
+
+        #region [Mod icons]
+
+        public int[] ModIcons_OffsetX = { 0, 30, 60, 90, 0, 30, 60, 90 };
+        public int[] ModIcons_OffsetY = { 0, 0, 0, 0, 30, 30, 30, 30 };
+        public int[] ModIcons_OffsetX_Menu = { 0, 30, 60, 90, 120, 150, 180, 210 };
+        public int[] ModIcons_OffsetY_Menu = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
         #endregion
 
         #endregion
