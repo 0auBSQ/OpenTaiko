@@ -622,9 +622,9 @@ namespace TJAPlayer3
                     #region [Gauge base]
 
                     if (!isSmallGauge)
-                        TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 1006, 92));
+                        TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Height / 2 : 0, TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Width, TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Height / 2));
                     else
-                        TJAPlayer3.Tx.DanC_Base_Small?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 503, 92));
+                        TJAPlayer3.Tx.DanC_Base_Small?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Height / 2 : 0, TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Width, TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Height / 2));
 
                     #endregion
 
