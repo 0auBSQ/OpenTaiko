@@ -153,6 +153,7 @@
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerSubtitle.cs" />
     <Compile Include="Stages\01.StartUp\CCharacter.cs" />
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
+    <Compile Include="Stages\07.Game\Taiko\EndAnimeScript.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
     <Compile Include="Stages\15.OpenEncyclopedia\CEncyclopediaControler.cs" />
