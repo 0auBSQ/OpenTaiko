@@ -43,7 +43,7 @@ namespace TJAPlayer3
         const string TAIKO = @"6_Taiko\";
         const string GAUGE = @"7_Gauge\";
         public const string FOOTER = @"8_Footer\";
-        const string END = @"9_End\";
+        public const string END = @"9_End\";
         const string EFFECTS = @"10_Effects\";
         const string BALLOON = @"11_Balloon\";
         const string LANE = @"12_Lane\";
