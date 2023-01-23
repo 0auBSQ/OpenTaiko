@@ -788,8 +788,8 @@ namespace TJAPlayer3
 
             this.soundDanSongSelectIn = new Cシステムサウンド(@"Sounds\Dan\Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-            this.soundDanSelectBGM = new Cシステムサウンド(@"Sounds\Dan\DanSelectBGM.wav", true, false, false, ESoundGroup.SongPlayback);
-            this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.wav", false, false, false, ESoundGroup.SoundEffect);
+            this.soundDanSelectBGM = new Cシステムサウンド(@"Sounds\Dan\DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+            this.soundDanSongSelect = new Cシステムサウンド(@"Sounds\Dan\DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundHeyaBGM = new Cシステムサウンド(@"Sounds\Heya\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundOnlineLoungeBGM = new Cシステムサウンド(@"Sounds\OnlineLounge\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);

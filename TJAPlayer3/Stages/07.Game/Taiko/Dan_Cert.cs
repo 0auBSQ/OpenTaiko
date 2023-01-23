@@ -80,7 +80,7 @@ namespace TJAPlayer3
                 }
             }
 
-            ScreenPoint = new double[] { TJAPlayer3.Skin.Game_Lane_X[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, 1280 };
+            ScreenPoint = new double[] { TJAPlayer3.Skin.Game_Lane_X[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.Resolution[0] };
 
             TJAPlayer3.stage演奏ドラム画面.ReSetScore(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreInit, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
 
@@ -447,7 +447,7 @@ namespace TJAPlayer3
                     for (int i = Counter_In_Old; i < Counter_In.n現在の値; i++)
                     {
                         ScreenPoint[0] += (TJAPlayer3.Skin.Game_Lane_X[0] - ScreenPoint[0]) / 180.0;
-                        ScreenPoint[1] += ((1280 / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2) - ScreenPoint[1]) / 180.0;
+                        ScreenPoint[1] += ((TJAPlayer3.Skin.Resolution[0] / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2) - ScreenPoint[1]) / 180.0;
                     }
                     Counter_In_Old = Counter_In.n現在の値;
                     TJAPlayer3.Tx.DanC_Screen?.t2D描画(TJAPlayer3.app.Device, (int)ScreenPoint[0], TJAPlayer3.Skin.Game_Lane_Y[0], new Rectangle(0, 0, TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Height));
