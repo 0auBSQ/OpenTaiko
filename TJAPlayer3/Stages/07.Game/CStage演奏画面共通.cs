@@ -222,7 +222,15 @@ namespace TJAPlayer3
                 }
             }
 
-            int battleSectionCount = (endChip.n発声時刻ms * 5) / 180000;
+            int battleSectionCount = (endChip.n発声時刻ms * 5) / 120000;
+            // Avoid single section
+            if (battleSectionCount <= 1)
+                battleSectionCount = 3;
+            // Avoid ties
+            if (battleSectionCount % 2 == 0)
+                battleSectionCount -= 1;
+
+
             int battleSectionTime = 0;
 
             int nowBattleSectionCount = 1;
@@ -814,12 +822,17 @@ namespace TJAPlayer3
             if (AIBattleState >= 0)
             {
                 NowAIBattleSection.End = AIBattleSection.EndType.Clear;
+                if (TJAPlayer3.ConfigIni.nAILevel < 10)
+                    TJAPlayer3.ConfigIni.nAILevel++;
             }
             else
             {
                 NowAIBattleSection.End = AIBattleSection.EndType.Lose;
+                if (TJAPlayer3.ConfigIni.nAILevel > 1)
+                    TJAPlayer3.ConfigIni.nAILevel--;
             }
             actAIBattle.BatchAnimeCounter.n現在の値 = 0;
+            AIBattleState = 0;
         }
 
         public void AddMixer( CSound cs, bool _b演奏終了後も再生が続くチップである )

@@ -994,7 +994,6 @@ namespace TJAPlayer3
 
 								TJAPlayer3.latestSongSelect = stage選曲;
 								ConfigIni.nPlayerCount = 2;
-								ConfigIni.nAILevel = 2;
 								ConfigIni.bAIBattleMode = true;
 								//-----------------------------
 								#endregion
