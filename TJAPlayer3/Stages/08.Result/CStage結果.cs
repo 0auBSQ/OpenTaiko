@@ -62,7 +62,7 @@ namespace TJAPlayer3
 		public bool isAutoDisabled(int player)
         {
 			return ((player == 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && TJAPlayer3.ConfigIni.nAILevel == 0));
+					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && !TJAPlayer3.ConfigIni.bAIBattleMode));
 		}
 
 
@@ -626,7 +626,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
-				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)
 					this.nEarnedMedalsCount[1] = 0;
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
@@ -1651,7 +1651,7 @@ namespace TJAPlayer3
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
 							if ((i == 0 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
+								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)))
 								continue;
 
 							int actualPlayer = TJAPlayer3.GetActualPlayer(i);

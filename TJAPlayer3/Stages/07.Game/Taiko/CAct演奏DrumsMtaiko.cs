@@ -98,7 +98,7 @@ namespace TJAPlayer3
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
                 {
                     // 2P
-                    if (TJAPlayer3.ConfigIni.nAILevel == 0 || TJAPlayer3.Tx.Taiko_Background[9] == null)
+                    if (!TJAPlayer3.ConfigIni.bAIBattleMode || TJAPlayer3.Tx.Taiko_Background[9] == null)
                         TJAPlayer3.Tx.Taiko_Background[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[1], TJAPlayer3.Skin.Game_Taiko_Background_Y[1]);
                     else
                         TJAPlayer3.Tx.Taiko_Background[9]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Background_X[1], TJAPlayer3.Skin.Game_Taiko_Background_Y[1]);
@@ -292,7 +292,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                     break;
                 default:
                     break;

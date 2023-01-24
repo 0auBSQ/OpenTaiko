@@ -68,7 +68,7 @@ namespace TJAPlayer3
             string title = CLangManager.LangInstance.GetString(911);
             string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
 
-            if (TJAPlayer3.ConfigIni.nAILevel == 0 || actualPlayer == 0)
+            if (!TJAPlayer3.ConfigIni.bAIBattleMode || actualPlayer == 0)
             {
                 name = TJAPlayer3.NamePlateConfig.data.Name[player];
                 title = TJAPlayer3.NamePlateConfig.data.Title[player];

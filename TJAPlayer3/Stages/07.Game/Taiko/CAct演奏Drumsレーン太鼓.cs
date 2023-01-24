@@ -91,7 +91,7 @@ namespace TJAPlayer3
             
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (i == 1 && TJAPlayer3.ConfigIni.nAILevel > 0 && TJAPlayer3.Tx.Lane_Background_AI != null)
+                if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Lane_Background_AI != null)
                     TJAPlayer3.Tx.Lane_Background_AI?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[i], TJAPlayer3.Skin.Game_Lane_Y[i]);
                 else
                     TJAPlayer3.Tx.Lane_Background_Main?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[i], TJAPlayer3.Skin.Game_Lane_Y[i]);

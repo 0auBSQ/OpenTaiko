@@ -4076,6 +4076,73 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            #region AIBattle
+                            else if (strCommand == "Game_AIBattle_SectionTime_Panel")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_SectionTime_Panel[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_SectionTime_Bar")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_SectionTime_Bar[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch_Base")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch_Base[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch_Size")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch_Size[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch_Anime")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch_Anime[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch_Anime_Size")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch_Anime_Size[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Batch_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Batch_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            #endregion
+
                             #endregion
 
                             #region Result
@@ -5689,6 +5756,20 @@ namespace TJAPlayer3
         public int[] Game_Training_SpeedDisplay_XY = { 110, 370 };
         public int Game_Training_SmallNumber_Width = 17;
         public int Game_Training_BigNumber_Width = 20;
+        #endregion
+        #region AIBattle
+        public int[] Game_AIBattle_SectionTime_Panel = new int[] { 202, 178 };
+        public int[] Game_AIBattle_SectionTime_Bar = new int[] { 205, 193 };
+
+        public int[] Game_AIBattle_Batch_Base = new int[] { 150, 83 };
+
+        public int[] Game_AIBattle_Batch = new int[] { 150, 83 };
+        public int[] Game_AIBattle_Batch_Size = new int[] { 70, 70 };
+
+        public int[] Game_AIBattle_Batch_Anime = new int[] { 260, -35 };
+        public int[] Game_AIBattle_Batch_Anime_Size = new int[] { 274, 274 };
+
+        public int[] Game_AIBattle_Batch_Move = new int[] { 30, 15 };
         #endregion
 
         #endregion
