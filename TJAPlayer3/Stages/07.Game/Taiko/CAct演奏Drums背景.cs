@@ -113,6 +113,10 @@ namespace TJAPlayer3
             {
                 bgOrigindir += "Dan";
             }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+            {
+                bgOrigindir += "AI";
+            }
             else
             {
                 bgOrigindir += "Normal";

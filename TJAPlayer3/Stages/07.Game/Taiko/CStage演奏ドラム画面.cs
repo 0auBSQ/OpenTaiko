@@ -70,6 +70,7 @@ namespace TJAPlayer3
 
             base.list子Activities.Add(this.actDan = new Dan_Cert());
             base.list子Activities.Add(this.actTokkun = new CAct演奏Drums特訓モード());
+            base.list子Activities.Add(this.actAIBattle = new AIBattle());
             #region[ 文字初期化 ]
             ST文字位置[] st文字位置Array = new ST文字位置[ 12 ];
 			ST文字位置 st文字位置 = new ST文字位置();
@@ -553,6 +554,12 @@ namespace TJAPlayer3
                 this.actDan.On進行描画();
 
                 this.actMtaiko.On進行描画();
+
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    this.actAIBattle.On進行描画();
+                }
+
                 this.GoGoSplash.On進行描画();
                 this.t進行描画_リアルタイム判定数表示();
                 if (TJAPlayer3.ConfigIni.bTokkunMode)
@@ -611,6 +618,7 @@ namespace TJAPlayer3
                 {
                     actTokkun.On進行描画();
                 }
+
 
                 bIsFinishedEndAnime = this.actEnd.On進行描画() == 1 ? true : false;
 				bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();
@@ -978,7 +986,7 @@ namespace TJAPlayer3
 
                     if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
                         break;
-                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0) && isPad2P)
+                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode) && isPad2P)
                         break;
                     var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
                     var isDon = padTo < 2 ? true : false;
@@ -1657,7 +1665,7 @@ namespace TJAPlayer3
                                 bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
                                 break;
                             case 1:
-                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
+                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                                 break;
                             case 2:
                             case 3:
@@ -2187,7 +2195,7 @@ namespace TJAPlayer3
                 if (pChip.n発声時刻ms < (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && pChip.nノーツ終了時刻ms > (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                 {
                     //時間内でかつ0x9Aじゃないならならヒット処理
-                    if (!NotesManager.IsRollEnd(pChip) && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
+                    if (!NotesManager.IsRollEnd(pChip) && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)))
                         this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer);
                 }
             }

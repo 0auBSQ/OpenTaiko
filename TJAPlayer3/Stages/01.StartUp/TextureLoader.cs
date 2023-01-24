@@ -55,6 +55,7 @@ namespace TJAPlayer3
         const string DANC = @"17_DanC\";
         const string TOWER = @"20_Tower\";
         const string MODICONS = @"21_ModIcons\";
+        const string AIBATTLE = @"22_AIBattle\";
 
         // Tower infos
         const string TOWERDON = @"Tower_Don\";
@@ -858,6 +859,19 @@ namespace TJAPlayer3
             Mod_Just = TxC(GAME + MODICONS + @"Just.png");
             Mod_Safe = TxC(GAME + MODICONS + @"Safe.png");
             Mod_None = TxC(GAME + MODICONS + @"None.png");
+
+            #endregion
+
+            #region [22_AIBattle]
+
+            AIBattle_SectionTime_Panel = TxC(GAME + AIBATTLE + @"SectionTime_Panel.png");
+
+            AIBattle_SectionTime_Bar_Base = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Base.png");
+            AIBattle_SectionTime_Bar_Finish = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Finish.png");
+            AIBattle_SectionTime_Bar_Normal = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Normal.png");
+
+            AIBattle_Batch_Base = TxC(GAME + AIBATTLE + @"Batch_Base.png");
+            AIBattle_Batch = TxC(GAME + AIBATTLE + @"Batch.png");
 
             #endregion
 
@@ -1990,6 +2004,17 @@ namespace TJAPlayer3
             Mod_Just,
             Mod_Safe,
             Mod_Auto;
+
+        #endregion
+
+        #region [22_AIBattle]
+
+        public CTexture AIBattle_SectionTime_Panel,
+            AIBattle_SectionTime_Bar_Base,
+            AIBattle_SectionTime_Bar_Normal,
+            AIBattle_SectionTime_Bar_Finish,
+            AIBattle_Batch_Base,
+            AIBattle_Batch;
 
         #endregion
 

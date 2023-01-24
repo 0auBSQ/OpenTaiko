@@ -897,6 +897,7 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
+								ConfigIni.bAIBattleMode = false;
 								//-----------------------------
 								#endregion
 								break;
@@ -980,9 +981,28 @@ namespace TJAPlayer3
 								//-----------------------------
 								#endregion
 								break;
+
+							case (int)CStageタイトル.E戻り値.AIBATTLEMODE:
+								#region [ 選曲処理へ ]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ 選曲");
+								stage選曲.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stage選曲;
+
+								TJAPlayer3.latestSongSelect = stage選曲;
+								ConfigIni.nPlayerCount = 2;
+								ConfigIni.nAILevel = 2;
+								ConfigIni.bAIBattleMode = true;
+								//-----------------------------
+								#endregion
+								break;
+
 						}
 
-						foreach( STPlugin pg in this.listプラグイン )
+						foreach ( STPlugin pg in this.listプラグイン )
 						{
 							Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
 							pg.plugin.Onステージ変更();
