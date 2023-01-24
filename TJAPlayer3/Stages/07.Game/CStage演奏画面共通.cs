@@ -222,7 +222,7 @@ namespace TJAPlayer3
                 }
             }
 
-            int battleSectionCount = (endChip.n発声時刻ms * 5) / 120000;
+            int battleSectionCount = 3 + ((endChip.n発声時刻ms * 2) / 100000);
             // Avoid single section
             if (battleSectionCount <= 1)
                 battleSectionCount = 3;
