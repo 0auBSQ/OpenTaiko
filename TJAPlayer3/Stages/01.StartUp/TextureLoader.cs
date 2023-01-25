@@ -1035,6 +1035,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Start_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Menu_Select_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
 
+            TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Entry_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Entry_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Normal_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1043,6 +1044,8 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_X_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Y_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1382,6 +1385,8 @@ namespace TJAPlayer3
 
                 #region [Default values]
 
+                TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
+
                 TJAPlayer3.Skin.Characters_Title_Entry_X[i] = new int[] { 485, 485 };
                 TJAPlayer3.Skin.Characters_Title_Entry_Y[i] = new int[] { 140, 140 };
 
@@ -1393,6 +1398,8 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
+                TJAPlayer3.Skin.Characters_X_AI[i] = new int[] { 472, 602 };
+                TJAPlayer3.Skin.Characters_Y_AI[i] = new int[] { 42, 42 };
                 TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
@@ -1436,6 +1443,14 @@ namespace TJAPlayer3
                                 strCommand = strArray[0].Trim();
                                 strParam = strArray[1].Trim();
 
+                                if (strCommand == "Chara_Resolution")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
                                 if (strCommand == "Title_Chara_Entry_X")
                                 {
                                     string[] strSplit = strParam.Split(',');
@@ -1500,6 +1515,22 @@ namespace TJAPlayer3
                                     for (int k = 0; k < 2; k++)
                                     {
                                         TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_X_AI")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Y_AI")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
                                 else if (strCommand == "Game_Chara_Balloon_X")

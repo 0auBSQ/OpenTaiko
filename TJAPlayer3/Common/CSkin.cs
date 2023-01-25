@@ -4077,6 +4077,10 @@ namespace TJAPlayer3
                             #endregion
 
                             #region AIBattle
+                            else if (strCommand == "Game_AIBattle_CharaMove")
+                            {
+                                Game_AIBattle_CharaMove = int.Parse(strParam);
+                            }
                             else if (strCommand == "Game_AIBattle_SectionTime_Panel")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -5129,8 +5133,11 @@ namespace TJAPlayer3
         public int[][] Characters_Result_X;
         public int[][] Characters_Result_Y;
 
+        public int[][] Characters_Resolution;
         public int[][] Characters_X;
         public int[][] Characters_Y;
+        public int[][] Characters_X_AI;
+        public int[][] Characters_Y_AI;
         public int[][] Characters_Balloon_X;
         public int[][] Characters_Balloon_Y;
         public string[] Characters_Motion_Normal,
@@ -5758,6 +5765,8 @@ namespace TJAPlayer3
         public int Game_Training_BigNumber_Width = 20;
         #endregion
         #region AIBattle
+        public int Game_AIBattle_CharaMove = 71;
+
         public int[] Game_AIBattle_SectionTime_Panel = new int[] { 202, 178 };
         public int[] Game_AIBattle_SectionTime_Bar = new int[] { 205, 193 };
 
