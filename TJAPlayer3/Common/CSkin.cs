@@ -3296,6 +3296,14 @@ namespace TJAPlayer3
                                     Game_Gauge_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Game_Gauge_X_AI")
+                            {
+                                Game_Gauge_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Game_Gauge_Y_AI")
+                            {
+                                Game_Gauge_Y_AI = int.Parse(strParam);
+                            }
                             else if (strCommand == "Game_Gauge_Rect")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3319,6 +3327,14 @@ namespace TJAPlayer3
                                 {
                                     Game_Gauge_ClearText_Y[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "Game_Gauge_ClearText_X_AI")
+                            {
+                                Game_Gauge_ClearText_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Game_Gauge_ClearText_Y_AI")
+                            {
+                                Game_Gauge_ClearText_Y_AI = int.Parse(strParam);
                             }
                             else if (strCommand == "Game_Gauge_ClearText_Rect")
                             {
@@ -3352,6 +3368,14 @@ namespace TJAPlayer3
                                     Gauge_Soul_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Gauge_Soul_X_AI")
+                            {
+                                Gauge_Soul_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Gauge_Soul_Y_AI")
+                            {
+                                Gauge_Soul_Y_AI = int.Parse(strParam);
+                            }
                             else if (strCommand == "Gauge_Soul_Fire_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3367,6 +3391,14 @@ namespace TJAPlayer3
                                 {
                                     Gauge_Soul_Fire_Y[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "Gauge_Soul_Fire_X_AI")
+                            {
+                                Gauge_Soul_Fire_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Gauge_Soul_Fire_Y_AI")
+                            {
+                                Gauge_Soul_Fire_Y_AI = int.Parse(strParam);
                             }
                             else if (strCommand == "Game_Gauge_Rainbow_Timer")
                             {
@@ -4143,6 +4175,78 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Game_AIBattle_Batch_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Meter_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Meter_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Meter_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Meter_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Perfect_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Perfect_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Perfect_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Perfect_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Good_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Good_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Good_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Good_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Miss_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Miss_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Miss_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Miss_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Interval")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Interval[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             #endregion
@@ -5599,15 +5703,23 @@ namespace TJAPlayer3
         #region Gauge
         public int[] Game_Gauge_X = new int[] { 492, 492 };
         public int[] Game_Gauge_Y = new int[] { 144, 532 };
+        public int Game_Gauge_X_AI = 650;
+        public int Game_Gauge_Y_AI = 153;
         public int[] Game_Gauge_Rect = new int[] { 0, 0, 700, 44 };
         public int[] Game_Gauge_ClearText_X = new int[] { 1038, 1038 };
         public int[] Game_Gauge_ClearText_Y = new int[] { 144, 554 };
+        public int Game_Gauge_ClearText_X_AI = 1087;
+        public int Game_Gauge_ClearText_Y_AI = 153;
         public int[] Game_Gauge_ClearText_Rect = new int[] { 0, 44, 58, 24 };
         public int[] Game_Gauge_ClearText_Clear_Rect = new int[] { 58, 44, 58, 24 };
         public int[] Gauge_Soul_X = new int[] { 1184, 1184 };
         public int[] Gauge_Soul_Y = new int[] { 125, 516 };
+        public int Gauge_Soul_X_AI = 1200;
+        public int Gauge_Soul_Y_AI = 140;
         public int[] Gauge_Soul_Fire_X = new int[] { 1112, 1112 };
         public int[] Gauge_Soul_Fire_Y = new int[] { 52, 443 };
+        public int Gauge_Soul_Fire_X_AI = 1143;
+        public int Gauge_Soul_Fire_Y_AI = 83;
         public int Game_Gauge_Rainbow_Ptn;
         public int Game_Gauge_Dan_Rainbow_Ptn;
         public int Game_Gauge_Rainbow_Timer = 50;
@@ -5779,6 +5891,23 @@ namespace TJAPlayer3
         public int[] Game_AIBattle_Batch_Anime_Size = new int[] { 274, 274 };
 
         public int[] Game_AIBattle_Batch_Move = new int[] { 30, 15 };
+
+        public int[] Game_AIBattle_Judge_Meter_X = new int[] { 3, 3 };
+        public int[] Game_AIBattle_Judge_Meter_Y = new int[] { 55, 418 };
+
+        public int[] Game_AIBattle_Judge_Number_Perfect_X = new int[] { 107, 107 };
+        public int[] Game_AIBattle_Judge_Number_Perfect_Y = new int[] { 74, 437 };
+
+        public int[] Game_AIBattle_Judge_Number_Good_X = new int[] { 107, 107 };
+        public int[] Game_AIBattle_Judge_Number_Good_Y = new int[] { 91, 454 };
+
+        public int[] Game_AIBattle_Judge_Number_Miss_X = new int[] { 107, 107 };
+        public int[] Game_AIBattle_Judge_Number_Miss_Y = new int[] { 108, 471 };
+
+        public int[] Game_AIBattle_Judge_Number_Roll_X = new int[] { 107, 107 };
+        public int[] Game_AIBattle_Judge_Number_Roll_Y = new int[] { 125, 488 };
+
+        public int[] Game_AIBattle_Judge_Number_Interval = new int[] { 10, 0 };
         #endregion
 
         #endregion

@@ -218,8 +218,10 @@ namespace TJAPlayer3
 		/// <param name="bAutoPlay"></param>
 		/// <param name="delta"></param>
 		public void Add( E楽器パート part, STAUTOPLAY bAutoPlay, long delta, int player )
-		{
-			double rev = 1.0;
+        {
+            if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1) return;
+
+            double rev = 1.0;
 
             delta = (long)(delta * TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
 
@@ -257,7 +259,9 @@ namespace TJAPlayer3
 
         public void BonusAdd( int player )
         {
-            for( int sc = 0; sc < 1; sc++ )
+            if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1) return;
+
+            for ( int sc = 0; sc < 1; sc++ )
             {
                 for( int i = 0; i < 256; i++ )
                 {
