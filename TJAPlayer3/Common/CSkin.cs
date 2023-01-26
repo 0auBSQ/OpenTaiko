@@ -4241,6 +4241,22 @@ namespace TJAPlayer3
                                     Game_AIBattle_Judge_Number_Miss_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Roll_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Roll_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_AIBattle_Judge_Number_Roll_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_AIBattle_Judge_Number_Roll_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Game_AIBattle_Judge_Number_Interval")
                             {
                                 string[] strSplit = strParam.Split(',');
