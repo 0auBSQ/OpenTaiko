@@ -236,6 +236,7 @@ namespace TJAPlayer3
 
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
+                if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
 
                 ModIcons.tDisplayMods(TJAPlayer3.Skin.Game_Taiko_ModIcons_X[i], TJAPlayer3.Skin.Game_Taiko_ModIcons_Y[i], i);
 

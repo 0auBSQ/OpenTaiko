@@ -74,6 +74,8 @@ namespace TJAPlayer3
 			{
                 for( int i = 0; i < 2; i++ )
                 {
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode) break;
+
                     int j = i;
                     if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
                         j = 1;

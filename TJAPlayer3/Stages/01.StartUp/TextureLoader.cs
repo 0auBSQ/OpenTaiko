@@ -404,11 +404,13 @@ namespace TJAPlayer3
             Taiko_Background[9] = TxC(GAME + TAIKO + @"AI_Background.png");
             Taiko_Background[10] = TxC(GAME + TAIKO + @"Boss_Background.png");
 
-            Taiko_Frame = new CTexture[4];
+            Taiko_Frame = new CTexture[6];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
             Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
+            Taiko_Frame[4] = TxC(GAME + TAIKO + @"2P_None_Frame.png");
+            Taiko_Frame[5] = TxC(GAME + TAIKO + @"AI_Frame.png");
 
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
@@ -872,6 +874,11 @@ namespace TJAPlayer3
 
             AIBattle_Batch_Base = TxC(GAME + AIBATTLE + @"Batch_Base.png");
             AIBattle_Batch = TxC(GAME + AIBATTLE + @"Batch.png");
+
+            AIBattle_Judge_Meter[0] = TxC(GAME + AIBATTLE + @"Judge_Meter.png");
+            AIBattle_Judge_Meter[1] = TxC(GAME + AIBATTLE + @"Judge_Meter_AI.png");
+
+            AIBattle_Judge_Number = TxC(GAME + AIBATTLE + @"Judge_Number.png");
 
             #endregion
 
@@ -2045,7 +2052,10 @@ namespace TJAPlayer3
             AIBattle_SectionTime_Bar_Normal,
             AIBattle_SectionTime_Bar_Finish,
             AIBattle_Batch_Base,
-            AIBattle_Batch;
+            AIBattle_Batch,
+            AIBattle_Judge_Number;
+
+        public CTexture[] AIBattle_Judge_Meter = new CTexture[2];
 
         #endregion
 

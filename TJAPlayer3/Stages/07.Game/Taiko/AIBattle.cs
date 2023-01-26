@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -115,7 +116,7 @@ namespace TJAPlayer3
 
             for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.NowAIBattleSectionCount; i++)
             {
-                
+
                 var section = TJAPlayer3.stage演奏ドラム画面.AIBattleSections[i];
 
                 int upDown = (i % 2);
@@ -181,6 +182,41 @@ namespace TJAPlayer3
                 }
             }
 
+            for (int player = 0; player < 2; player++)
+            {
+                TJAPlayer3.Tx.AIBattle_Judge_Meter[player]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_AIBattle_Judge_Meter_X[player], TJAPlayer3.Skin.Game_AIBattle_Judge_Meter_Y[player]);
+
+
+                int[] numArr = new int[4]
+                {
+                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGreat,
+                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGood,
+                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nMiss,
+                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nRoll
+                };
+
+                int[] num_x = new int[4]
+                {
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Perfect_X[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Good_X[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Miss_X[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Roll_X[player]
+                };
+
+                int[] num_y = new int[4]
+                {
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Perfect_Y[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Good_Y[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Miss_Y[player],
+                    TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Roll_Y[player]
+                };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    DrawJudgeNumber(num_x[i], num_y[i], numArr[i]);
+                }
+            }
+
 
             return 0;
         }
@@ -189,6 +225,24 @@ namespace TJAPlayer3
 
         private CCounter BarFlashCounter;
         public CCounter BatchAnimeCounter;
+
+        private void DrawJudgeNumber(int x, int y, int num)
+        {
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
+            {
+                float offset = j - (nums.Length / 2.0f);
+
+                float width = TJAPlayer3.Tx.AIBattle_Judge_Number.sz画像サイズ.Width / 10.0f;
+                float height = TJAPlayer3.Tx.AIBattle_Judge_Number.sz画像サイズ.Height;
+
+                float _x = x - (TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Interval[0] * offset);
+                float _y = y - (TJAPlayer3.Skin.Game_AIBattle_Judge_Number_Interval[1] * offset);
+
+                TJAPlayer3.Tx.AIBattle_Judge_Number.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, _x + (width / 2), _y + (height / 2),
+                    new RectangleF(width * nums[j], 0, width, height));
+            }
+        }
 
         #endregion
     }
