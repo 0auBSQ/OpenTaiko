@@ -1794,7 +1794,7 @@ namespace TJAPlayer3
 				}
                 else
 				{
-					return new bool[] { actParameterPanel.gaugeValues[0] >= 80 && actParameterPanel.gaugeValues[1] >= 80 };
+					return new bool[] { actParameterPanel.gaugeValues[0] >= 80, actParameterPanel.gaugeValues[1] >= 80 };
 				}
 			}
         }
