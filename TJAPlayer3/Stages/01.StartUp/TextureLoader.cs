@@ -937,6 +937,16 @@ namespace TJAPlayer3
             Exit_Background = TxC(EXIT + @"Background.png");
             #endregion
 
+            #region 7_AIResults
+
+            Result_AIBattle_Panel_AI = TxC(RESULT + @"AIBattle\Panel_AI.png");
+            Result_AIBattle_Batch = TxC(RESULT + @"AIBattle\Batch.png");
+            Result_AIBattle_SectionPlate = TxC(RESULT + @"AIBattle\SectionPlate.png");
+            Result_AIBattle_WinFlag_Clear = TxC(RESULT + @"AIBattle\WinFlag_Win.png");
+            Result_AIBattle_WinFlag_Lose = TxC(RESULT + @"AIBattle\WinFlag_Lose.png");
+
+            #endregion
+
             #region [7_DanResults]
 
             DanResult_Background = TxC(DANRESULT + @"Background.png");
@@ -2064,7 +2074,6 @@ namespace TJAPlayer3
 
         #region 6_結果発表
         public CTexture Result_FadeIn,
-            
             Result_Header,
             Result_Number,
             Result_Panel,
@@ -2096,6 +2105,14 @@ namespace TJAPlayer3
             Result_Speech_Bubble = new CTexture[2],
 
             Result_Mountain = new CTexture[4];
+        #endregion
+
+        #region 7_AIResults
+        public CTexture Result_AIBattle_Panel_AI,
+            Result_AIBattle_Batch,
+            Result_AIBattle_SectionPlate,
+            Result_AIBattle_WinFlag_Clear,
+            Result_AIBattle_WinFlag_Lose;
         #endregion
 
         #region 7_終了画面
