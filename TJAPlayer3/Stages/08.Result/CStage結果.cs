@@ -834,7 +834,7 @@ namespace TJAPlayer3
 						{
 							#region [Mountain Bump (1P only)]
 
-							if (this.st演奏記録.Drums.fゲージ >= 80.0)
+							if (bClear[0])
 							{
 								//int gaugeAnimationFactor = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ[0].n終了値 * 66))) * 3;
 
@@ -920,7 +920,7 @@ namespace TJAPlayer3
 
 							#region [Background Clouds]
 
-							if (this.st演奏記録.Drums.fゲージ >= 80.0 && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+							if (bClear[0] && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
 							{
 								CloudType = Math.Min(255, Math.Max(0, (int)this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue));
 							}
@@ -950,7 +950,7 @@ namespace TJAPlayer3
 
 							#endregion
 
-							if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+							if (bClear[0] && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
 							{
 
 								#region [Background shines]
@@ -1775,6 +1775,30 @@ namespace TJAPlayer3
 		private int n最後に再生したHHのWAV番号;
 		private int n最後に再生したHHのチャンネル番号;
 		private CSound rResultSound;
+
+		public bool[] bClear
+        {
+            get
+            {
+				if (TJAPlayer3.ConfigIni.bAIBattleMode)
+				{
+					int clearCount = 0;
+                    for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count; i++)
+                    {
+						if (TJAPlayer3.stage演奏ドラム画面.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear)
+                        {
+							clearCount++;
+						}
+                    }
+					return new bool[] { clearCount >= TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count / 2.0, false };
+				}
+                else
+				{
+					return new bool[] { actParameterPanel.gaugeValues[0] >= 80 && actParameterPanel.gaugeValues[1] >= 80 };
+				}
+			}
+        }
+
 
 		// Cloud informations
 		/*

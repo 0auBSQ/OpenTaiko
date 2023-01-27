@@ -237,6 +237,18 @@ namespace TJAPlayer3
 				ctRotate_Flowers = new CCounter(0, 1500, 1, TJAPlayer3.Timer);
 				ctShine_Plate = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
 
+				ctAISectionChange = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
+				ctAISectionChange.n現在の値 = 255;
+
+				pfAISectionText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Result_AIBattle_SectionText_Scale);
+
+				ttkAISection = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count];
+                for (int i = 0; i < ttkAISection.Length; i++)
+                {
+					ttkAISection[i] = new CActSelect曲リスト.TitleTextureKey($"{i + 1}区", pfAISectionText, Color.White, Color.Black, 1280);
+
+				}
+
 				for (int i = 0; i < 2; i++)
                 {
 					CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
@@ -266,6 +278,8 @@ namespace TJAPlayer3
 		{
 			if (!base.b活性化してない)
 			{
+				TJAPlayer3.t安全にDisposeする(ref pfAISectionText);
+
 				base.OnManagedリソースの解放();
 			}
 		}
@@ -295,6 +309,8 @@ namespace TJAPlayer3
 			ctRotate_Flowers.t進行Loop();
 			ctShine_Plate.t進行Loop();
 
+			ctAISectionChange.t進行();
+
 			// this.PuchiChara.IdleAnimation();
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
@@ -310,7 +326,9 @@ namespace TJAPlayer3
 				int shift = 635;
 
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                {
+				{
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
+
 					// 1 if right, 0 if left
 					int shiftPos = (i == 1 || is2PSide) ? 1 : 0;
 					int pos = i;
@@ -609,18 +627,95 @@ namespace TJAPlayer3
 
 				}
 
+				if (ctAISectionChange.n現在の値 == ctAISectionChange.n終了値 && TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count > 5)
+                {
+					NextAISection();
+                }
+
+				if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+					TJAPlayer3.Tx.Result_AIBattle_Panel_AI.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+					int batch_width = TJAPlayer3.Tx.Result_AIBattle_Batch.szテクスチャサイズ.Width / 3;
+					int batch_height = TJAPlayer3.Tx.Result_AIBattle_Batch.szテクスチャサイズ.Height;
+
+
+					for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count; i++)
+					{
+						int nowIndex = (i / 5);
+						int drawCount = Math.Min(TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count - (nowIndex * 5), 5);
+
+						int drawPos = i % 5;
+						int batch_total_width = TJAPlayer3.Skin.Result_AIBattle_Batch_Move[0] * drawCount;
+
+						var section = TJAPlayer3.stage演奏ドラム画面.AIBattleSections[drawPos];
+						int upDown = (drawPos % 2);
+
+						int x = TJAPlayer3.Skin.Result_AIBattle_Batch[0] + (TJAPlayer3.Skin.Result_AIBattle_Batch_Move[0] * drawPos) - (batch_total_width / 2);
+						int y = TJAPlayer3.Skin.Result_AIBattle_Batch[1] + (TJAPlayer3.Skin.Result_AIBattle_Batch_Move[1] * upDown);
+
+						int opacityCounter = Math.Min(ctAISectionChange.n現在の値, 255);
+
+						if (nowIndex == nNowAISection)
+						{
+							TJAPlayer3.Tx.Result_AIBattle_Batch.Opacity = opacityCounter;
+							TJAPlayer3.Tx.Result_AIBattle_SectionPlate.Opacity = opacityCounter;
+							if (TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkAISection[i]) != null)
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkAISection[i]).Opacity = opacityCounter;
+						}
+						else
+						{
+							TJAPlayer3.Tx.Result_AIBattle_Batch.Opacity = 255 - opacityCounter;
+							TJAPlayer3.Tx.Result_AIBattle_SectionPlate.Opacity = 255 - opacityCounter;
+							if (TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkAISection[i]) != null)
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkAISection[i]).Opacity = 255 - opacityCounter;
+						}
+
+						TJAPlayer3.Tx.Result_AIBattle_Batch.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(batch_width * 0, 0, batch_width, batch_height));
+
+						switch (section.End)
+						{
+							case CStage演奏画面共通.AIBattleSection.EndType.Clear:
+								TJAPlayer3.Tx.Result_AIBattle_Batch.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(batch_width * 1, 0, batch_width, batch_height));
+								break;
+							case CStage演奏画面共通.AIBattleSection.EndType.Lose:
+								TJAPlayer3.Tx.Result_AIBattle_Batch.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(batch_width * 2, 0, batch_width, batch_height));
+								break;
+						}
+
+						TJAPlayer3.Tx.Result_AIBattle_Batch.Opacity = 255;
+
+						TJAPlayer3.Tx.Result_AIBattle_SectionPlate.t2D描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.Result_AIBattle_SectionPlate_Offset[0], y + TJAPlayer3.Skin.Result_AIBattle_SectionPlate_Offset[1]);
+
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkAISection[i])?.t2D中心基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[0], y + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[1]);
+					}
+
+					if (ct全体進行.n現在の値 >= MountainAppearValue)
+					{
+						float flagScale = 2.0f - (Math.Min(Math.Max(ct全体進行.n現在の値 - MountainAppearValue, 0), 200) / 200.0f);
+
+						CTexture tex = TJAPlayer3.stage結果.bClear[0] ? TJAPlayer3.Tx.Result_AIBattle_WinFlag_Clear : TJAPlayer3.Tx.Result_AIBattle_WinFlag_Lose;
+
+						tex.vc拡大縮小倍率.X = flagScale;
+						tex.vc拡大縮小倍率.Y = flagScale;
+
+						tex.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_AIBattle_WinFlag[0], TJAPlayer3.Skin.Result_AIBattle_WinFlag[1]);
+					}
+				}
 
 
 				// Should be Score + 4000, to synchronize with Stage Kekka
 
 				// MountainAppearValue = 2000 + (ctゲージアニメ.n終了値 * 66) + 8360 - 85;
 
-				
+
 
 				#region [Character related animations]
 
 				for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
 				{
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && p == 1) break;
+
 					int pos = p;
 					if (is2PSide)
 						pos = 1;
@@ -632,7 +727,7 @@ namespace TJAPlayer3
 						if (!this.ctMountain_ClearIn.b進行中)
 							this.ctMountain_ClearIn.t開始(0, 515, 3, TJAPlayer3.Timer);
 
-						if (gaugeValues[p] >= 80.0f)
+						if (TJAPlayer3.stage結果.bClear[p])
 						{
 							if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 								CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.CLEAR);
@@ -883,6 +978,27 @@ namespace TJAPlayer3
 		private readonly ST文字位置[] st小文字位置;
 		private readonly ST文字位置[] st大文字位置;
 		private ST文字位置[] stScoreFont;
+
+		private CActSelect曲リスト.TitleTextureKey[] ttkAISection;
+
+		private CPrivateFastFont pfAISectionText;
+
+		private CCounter ctAISectionChange;
+
+		private int nNowAISection;
+
+		private void NextAISection()
+		{
+			ctAISectionChange = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
+			ctAISectionChange.n現在の値 = 0;
+
+			nNowAISection++;
+			if (nNowAISection >= Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count / 5.0))
+            {
+				nNowAISection = 0;
+
+			}
+		}
 
 		public void t小文字表示(int x, int y, int num)
 		{
