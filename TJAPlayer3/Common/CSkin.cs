@@ -4870,6 +4870,7 @@ namespace TJAPlayer3
                                     Result_PlateShine_Y[1][i] = int.Parse(strSplit[i]);
                                 }
                             }
+
                             else if (strCommand == nameof(Result_Dan))
                             {
                                 Result_Dan = strParam.Split(',').Select(int.Parse).ToArray();
@@ -4883,6 +4884,52 @@ namespace TJAPlayer3
                                 Result_Dan_Plate_XY = strParam.Split(',').Select(int.Parse).ToArray();
                             }
 
+                            #endregion
+                            #region AIResult
+                            else if (strCommand == "Result_AIBattle_Batch")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_AIBattle_Batch[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_AIBattle_Batch_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_AIBattle_Batch_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_AIBattle_SectionPlate_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_AIBattle_SectionPlate_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_AIBattle_SectionText_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_AIBattle_SectionText_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_AIBattle_SectionText_Scale")
+                            {
+                                Result_AIBattle_SectionText_Scale = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Result_AIBattle_WinFlag")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_AIBattle_WinFlag[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #region Heya
@@ -6052,9 +6099,23 @@ namespace TJAPlayer3
         public Color Result_StageText_BackColor = ColorTranslator.FromHtml("#000000");
         //public Color Result_StageText_BackColor_Red = ColorTranslator.FromHtml("#FF0000");
 
+
         public int[] Result_Dan = new int[] { 500, 500 };
         public int[] Result_Dan_XY = new int[] { 0, 420 };
         public int[] Result_Dan_Plate_XY = new int[] { 149, 149 };
+        #endregion
+
+        #region AIResult
+
+        public int[] Result_AIBattle_Batch = new int[] { 884, 188 };
+        public int[] Result_AIBattle_Batch_Move = new int[] { 104, 43 };
+        public int[] Result_AIBattle_SectionPlate_Offset = new int[] { 55, 8 };
+
+        public int[] Result_AIBattle_SectionText_Offset = new int[] { 110, 27 };
+        public int Result_AIBattle_SectionText_Scale = 13;
+
+        public int[] Result_AIBattle_WinFlag = new int[] { 946, 526 };
+
         #endregion
 
         #region Heya
