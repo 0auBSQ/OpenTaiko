@@ -1406,7 +1406,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
                 TJAPlayer3.Skin.Characters_X_AI[i] = new int[] { 472, 602 };
-                TJAPlayer3.Skin.Characters_Y_AI[i] = new int[] { 42, 42 };
+                TJAPlayer3.Skin.Characters_Y_AI[i] = new int[] { 152, 152 };
                 TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";

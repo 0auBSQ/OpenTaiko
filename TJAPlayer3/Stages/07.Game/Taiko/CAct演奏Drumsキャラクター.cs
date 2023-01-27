@@ -370,6 +370,7 @@ namespace TJAPlayer3
                     if (TJAPlayer3.ConfigIni.bAIBattleMode)
                     {
                         chara_x += TJAPlayer3.Skin.Game_AIBattle_CharaMove * TJAPlayer3.stage演奏ドラム画面.AIBattleState;
+                        chara_y -= nowChara.szテクスチャサイズ.Height * charaScale; // Center down
                     }
 
                     nowChara.vc拡大縮小倍率.X = charaScale;
