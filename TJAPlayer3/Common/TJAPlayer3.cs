@@ -912,6 +912,8 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage段位選択;
 
+								ConfigIni.bAIBattleMode = false;
+
 								TJAPlayer3.latestSongSelect = stage段位選択;
 								//-----------------------------
 								#endregion
