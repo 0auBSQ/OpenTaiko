@@ -584,16 +584,40 @@ namespace TJAPlayer3
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 					//TJAPlayer3.Tx.Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(TJAPlayer3.app.Device, 485, 140);
-					int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(0)];
-					CMenuCharacter.tMenuDisplayCharacter(0, TJAPlayer3.Skin.Characters_Title_Entry_X[_charaId][TJAPlayer3.GetActualPlayer(0)], 
-						TJAPlayer3.Skin.Characters_Title_Entry_Y[_charaId][TJAPlayer3.GetActualPlayer(0)], CMenuCharacter.ECharacterAnimation.ENTRY, alpha);
 
-					//___ttx.Opacity = 255;
+					int _actual = TJAPlayer3.GetActualPlayer(0);
+
+                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[_actual];
+
+					int chara_x = TJAPlayer3.Skin.Title_Entry_NamePlate[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+					int chara_y = TJAPlayer3.Skin.Title_Entry_NamePlate[1];
+
+                    int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[0];
+
+                    CMenuCharacter.tMenuDisplayCharacter(
+						0, 
+						chara_x, 
+						chara_y, 
+						CMenuCharacter.ECharacterAnimation.ENTRY, alpha
+						);
+
+					/*
+                    CMenuCharacter.tMenuDisplayCharacter(
+                        0,
+                        TJAPlayer3.Skin.Characters_Title_Entry_X[_charaId][_actual],
+                        TJAPlayer3.Skin.Characters_Title_Entry_Y[_charaId][_actual],
+                        CMenuCharacter.ECharacterAnimation.ENTRY, alpha
+                        );
+					*/
+
+                    //___ttx.Opacity = 255;
 
 
-					this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
+                    //this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
+                    this.PuchiChara.On進行描画(puchi_x, puchi_y, false, alpha);
 
-					TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
+                    TJAPlayer3.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.n現在の値 >= 800 ? 255 - (ctエントリーバー決定点滅.n現在の値 - 800) : (this.ctバナパス読み込み成功.n現在の値 - 3400) - (this.ctエントリーバー点滅.n現在の値 <= 255 ? this.ctエントリーバー点滅.n現在の値 : 255 - (this.ctエントリーバー点滅.n現在の値 - 255));
 					TJAPlayer3.Tx.Entry_Player[2].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], TJAPlayer3.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
 						new RectangleF(TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
 						TJAPlayer3.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
@@ -663,14 +687,21 @@ namespace TJAPlayer3
 
 						int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
 
-						int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + DonchanX);
-						int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - DonchanY);
+						//int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + DonchanX);
+						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - DonchanY);
 
-						//TJAPlayer3.Tx.Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 341 - DonchanY);
-						CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 
-						int puchi_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
-						int puchi_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
+                        int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                        int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player] - (int)DonchanY;
+
+                        int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
+                        int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
+
+                        //TJAPlayer3.Tx.Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 341 - DonchanY);
+                        CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
+
+						//int puchi_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
+						//int puchi_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
 
                         this.PuchiChara.On進行描画(puchi_x, puchi_y, false, player: player);
 					}
