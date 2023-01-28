@@ -409,11 +409,23 @@ namespace TJAPlayer3
             int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
 
             for (int i = 0; i < stバー情報[currentSong].ttkタイトル.Length - 1; i++)
+            {
+                if (i > 2) break;
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Title_X[i], TJAPlayer3.Skin.DaniSelect_Title_Y[i]);
+            }
+                
             for (int i = 0; i < stバー情報[currentSong].n曲難易度.Length; i++)
+            {
+                if (i > 2) break;
                 TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Difficulty_Cymbol_X[i], TJAPlayer3.Skin.DaniSelect_Difficulty_Cymbol_Y[i], new Rectangle(stバー情報[currentSong].n曲難易度[i] * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+            }
+                
             for (int i = 0; i < stバー情報[currentSong].n曲レベル.Length; i++)
+            {
+                if (i > 2) break;
                 this.tLevelNumberDraw(scroll + Anime + TJAPlayer3.Skin.DaniSelect_Level_Number_X[i], TJAPlayer3.Skin.DaniSelect_Level_Number_Y[i], stバー情報[currentSong].n曲レベル[i]);
+            }
+                
 
             #endregion
 
