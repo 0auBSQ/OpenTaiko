@@ -512,11 +512,17 @@ namespace TJAPlayer3
 
                     int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
 
-                    int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
-                    int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
+                    //int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
+                    //int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
 
-                    int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
-                    int puchi_y = player == 0 ? 330 + 230 : 330 + 230;
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                    int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player];
+
+                    //int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
+                    //int puchi_y = player == 0 ? 330 + 230 : 330 + 230;
+
+                    int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
 
                     if (___cc != null && ___cc.b終了値に達してない)
                     {

@@ -208,7 +208,12 @@ namespace TJAPlayer3
                     // TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
                     // TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
 
-                    CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
+                    //CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
+                    CMenuCharacter.tMenuDisplayCharacter(
+                        0,
+                        TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2,
+                        TJAPlayer3.Skin.SongSelect_NamePlate_Y[0], 
+                        CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     #region [PuchiChara]
 

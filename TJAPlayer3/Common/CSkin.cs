@@ -5615,8 +5615,8 @@ namespace TJAPlayer3
         #endregion
 
         #region [Adjustments]
-        public int[] Adjustments_MenuPuchichara_X = new int[] { 100, 250, 100, 250 };
-        public int[] Adjustments_MenuPuchichara_Y = new int[] { 230, 230, 230, 230 };
+        public int[] Adjustments_MenuPuchichara_X = new int[] { -100, 100, -100, 100 };
+        public int[] Adjustments_MenuPuchichara_Y = new int[] { -100, -100, -100, -100 };
 
         #endregion
 
