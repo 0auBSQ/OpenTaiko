@@ -40,7 +40,11 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.Challenge_Select[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
-                TJAPlayer3.Tx.Challenge_Select[2].t2D描画(TJAPlayer3.app.Device, 228 + 228 * (2 - n現在の選択行), 0, new Rectangle(228 + 228 * (2 - n現在の選択行), 0, 228, 720));
+                int selectIndex = (2 - n現在の選択行);
+                int[] challenge_select_rect = TJAPlayer3.Skin.DaniSelect_Challenge_Select_Rect[selectIndex];
+
+                TJAPlayer3.Tx.Challenge_Select[2].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DaniSelect_Challenge_Select_X[selectIndex], TJAPlayer3.Skin.DaniSelect_Challenge_Select_Y[selectIndex], 
+                    new Rectangle(challenge_select_rect[0], challenge_select_rect[1], challenge_select_rect[2], challenge_select_rect[3]));
 
                 TJAPlayer3.Tx.Challenge_Select[1].t2D描画(TJAPlayer3.app.Device, 0, 0);
 
