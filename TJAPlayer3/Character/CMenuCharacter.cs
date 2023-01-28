@@ -200,7 +200,7 @@ namespace TJAPlayer3
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
 
-            if (_ref != null &&_ref.Length > 0 && _ctref != null)
+            if (_ref != null && _ref.Length > 0 && _ctref != null)
             {
                 _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / (float)_ref.Length, TJAPlayer3.Timer);
             }
@@ -272,6 +272,9 @@ namespace TJAPlayer3
                         _y // 312
                         );
                 }
+
+                _tex.vc拡大縮小倍率.X = 1f;
+                _tex.vc拡大縮小倍率.Y = 1f;
 
                 _tex.Opacity = 255;
 
