@@ -205,6 +205,7 @@ namespace TJAPlayer3
 
         public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterResult eca, int pos = 0, int opacity = 255)
         {
+            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
             bool _substitute = _usesSubstituteTexture(player, eca);
@@ -227,21 +228,38 @@ namespace TJAPlayer3
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 0.8f;
                     _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 0.8f;
                 }
+                else
+                {
+                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1.0f;
+                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1.0f;
+                }
 
                 _ref[_ctref[player].n現在の値].Opacity = opacity;
 
+                float resolutionRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][0];
+                float resolutionRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][1];
+
+                //202
+                float _x = (x - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
+
+                //532
+                float _y = (y - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f))) * resolutionRatioY;
+
+                _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X *= resolutionRatioY;
+                _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y *= resolutionRatioY;
+
                 if (pos % 2 == 0)
                 {
-                    _ref[_ctref[player].n現在の値].t2D中心基準描画(TJAPlayer3.app.Device,
-                        x - ((_substitute == true) ? 20 : 0),
-                        y - ((_substitute == true) ? 20 : 0)
+                    _ref[_ctref[player].n現在の値].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
+                        _x,
+                        _y
                         );
                 }
                 else
                 {
-                    _ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(TJAPlayer3.app.Device,
-                        x - ((_substitute == true) ? 20 : 0),
-                        y - ((_substitute == true) ? 20 : 0)
+                    _ref[_ctref[player].n現在の値].t2D拡大率考慮中央基準描画Mirrored(TJAPlayer3.app.Device,
+                        _x,
+                        _y
                         );
                 }
 
