@@ -5223,6 +5223,221 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            #region DanResult
+                            else if (strCommand == "DanResult_StatePanel")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_StatePanel[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_SongPanel_Main_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_SongPanel_Main_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_SongPanel_Main_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_SongPanel_Main_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Difficulty_Cymbol_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Difficulty_Cymbol_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Difficulty_Cymbol_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Difficulty_Cymbol_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Level_Number_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Level_Number_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Level_Number_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Level_Number_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Perfect_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Perfect_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Perfect_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Perfect_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Good_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Good_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Good_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Good_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Miss_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Miss_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Miss_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Miss_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Roll_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Roll_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Sections_Roll_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_Sections_Roll_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Perfect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Perfect[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Good")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Good[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Miss")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Miss[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Roll")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Roll[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_MaxCombo")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_MaxCombo[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_TotalHit")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_TotalHit[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Score")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Score[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Exam")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Exam[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanTitles_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanTitles_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanTitles_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanTitles_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Rank")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Rank[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_Font_DanTitles_Size")
+                            {
+                                DanResult_Font_DanTitles_Size = int.Parse(strParam);
+                            }
+                            #endregion
+
                             #region Heya
                             else if (strCommand == "Heya_Main_Menu_X")
                             {
@@ -5684,7 +5899,7 @@ namespace TJAPlayer3
 
         #region SongSelect
         //public int SongSelect_Overall_Y = 123;
-        public string[] SongSelect_GenreName = { "ポップス", "アニメ", "ゲームバラエティ", "ナムコオリジナル", "クラシック", "バラエティ", "キッズ", "ボーカロイド", "最近遊んだ曲"};
+        public string[] SongSelect_GenreName = { "ポップス", "アニメ", "ゲームバラエティ", "ナムコオリジナル", "クラシック", "バラエティ", "キッズ", "ボーカロイド", "最近遊んだ曲" };
 
         public int SongSelect_Bar_Count = 9;
 
@@ -5766,7 +5981,7 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Difficulty_Back = new int[] { 640, 290 };
         public int[] SongSelect_Level_Offset = new int[] { 610, 40 };
-        public Color[] SongSelect_Difficulty_Colors = new Color[] { 
+        public Color[] SongSelect_Difficulty_Colors = new Color[] {
             ColorTranslator.FromHtml("#88d2fd"),
             ColorTranslator.FromHtml("#58de85"),
             ColorTranslator.FromHtml("#ffc224"),
@@ -6008,7 +6223,7 @@ namespace TJAPlayer3
         public int Game_Chara_Balloon_Timer = 28;
         public int Game_Chara_Balloon_Delay = 500;
         public int Game_Chara_Balloon_FadeOut = 84;
-        
+
         #endregion
 
         #region Dancer
@@ -6463,6 +6678,51 @@ namespace TJAPlayer3
         public int Result_AIBattle_SectionText_Scale = 13;
 
         public int[] Result_AIBattle_WinFlag = new int[] { 946, 526 };
+
+        #endregion
+
+        #region DanResult
+
+        public int[] DanResult_StatePanel = new int[] { 0, -4 };
+
+        public int[] DanResult_SongPanel_Main_X = new int[] { 255, 255, 255 };
+        public int[] DanResult_SongPanel_Main_Y = new int[] { 100, 283, 466 };
+
+        public int[] DanResult_Difficulty_Cymbol_X = new int[] { 377, 377, 377 };
+        public int[] DanResult_Difficulty_Cymbol_Y = new int[] { 146, 329, 512 };
+
+        public int[] DanResult_Level_Number_X = new int[] { 383, 383, 383 };
+        public int[] DanResult_Level_Number_Y = new int[] { 173, 356, 539 };
+
+        public int[] DanResult_Sections_Perfect_X = new int[] { 455, 455, 455 };
+        public int[] DanResult_Sections_Perfect_Y = new int[] { 204, 387, 570 };
+
+        public int[] DanResult_Sections_Good_X = new int[] { 666, 666, 666 };
+        public int[] DanResult_Sections_Good_Y = new int[] { 204, 387, 570 };
+
+        public int[] DanResult_Sections_Miss_X = new int[] { 877, 877, 877 };
+        public int[] DanResult_Sections_Miss_Y = new int[] { 204, 387, 570 };
+
+        public int[] DanResult_Sections_Roll_X = new int[] { 1088, 1088, 1088 };
+        public int[] DanResult_Sections_Roll_Y = new int[] { 204, 387, 570 };
+
+
+        public int[] DanResult_Perfect = new int[] { 720, 95 };
+        public int[] DanResult_Good = new int[] { 720, 137 };
+        public int[] DanResult_Miss = new int[] { 720, 179 };
+        public int[] DanResult_Roll = new int[] { 1022, 95 };
+        public int[] DanResult_MaxCombo = new int[] { 1022, 137 };
+        public int[] DanResult_TotalHit = new int[] { 1022, 179 };
+        public int[] DanResult_Score = new int[] { 566, 119 };
+
+        public int[] DanResult_Exam = new int[] { 232, 254 };
+
+        public int[] DanResult_DanTitles_X = new int[] { 401, 401, 401 };
+        public int[] DanResult_DanTitles_Y = new int[] { 139, 322, 505 };
+
+        public int[] DanResult_Rank = new int[] { 130, 380 };
+
+        public int DanResult_Font_DanTitles_Size = 24;
 
         #endregion
 
