@@ -5424,6 +5424,14 @@ namespace TJAPlayer3
                                     DanResult_DanTitles_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DanResult_Rank")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DanResult_Rank[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "DanResult_Font_DanTitles_Size")
                             {
                                 DanResult_Font_DanTitles_Size = int.Parse(strParam);
@@ -6711,6 +6719,8 @@ namespace TJAPlayer3
 
         public int[] DanResult_DanTitles_X = new int[] { 401, 401, 401 };
         public int[] DanResult_DanTitles_Y = new int[] { 139, 322, 505 };
+
+        public int[] DanResult_Rank = new int[] { 130, 380 };
 
         public int DanResult_Font_DanTitles_Size = 24;
 
