@@ -631,6 +631,11 @@ namespace TJAPlayer3
                 {
 					NextAISection();
                 }
+				else if (nNowAISection > 0 && TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count <= 5)
+				{
+					// Fix locked sections
+					nNowAISection = 0;
+                }
 
 				if (TJAPlayer3.ConfigIni.bAIBattleMode)
                 {
@@ -648,7 +653,7 @@ namespace TJAPlayer3
 						int drawPos = i % 5;
 						int batch_total_width = TJAPlayer3.Skin.Result_AIBattle_Batch_Move[0] * drawCount;
 
-						var section = TJAPlayer3.stage演奏ドラム画面.AIBattleSections[drawPos];
+						var section = TJAPlayer3.stage演奏ドラム画面.AIBattleSections[i];
 						int upDown = (drawPos % 2);
 
 						int x = TJAPlayer3.Skin.Result_AIBattle_Batch[0] + (TJAPlayer3.Skin.Result_AIBattle_Batch_Move[0] * drawPos) - (batch_total_width / 2);
