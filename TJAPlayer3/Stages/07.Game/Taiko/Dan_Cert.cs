@@ -605,8 +605,8 @@ namespace TJAPlayer3
                         
 
                     // Panel origin
-                    int xOrigin = (isResult) ? 232 + offX : TJAPlayer3.Skin.Game_DanC_X[1];
-                    int yOrigin = (isResult) ? 254 : TJAPlayer3.Skin.Game_DanC_Y[1];
+                    int xOrigin = (isResult) ? TJAPlayer3.Skin.DanResult_Exam[0] + offX : TJAPlayer3.Skin.Game_DanC_X[1];
+                    int yOrigin = (isResult) ? TJAPlayer3.Skin.DanResult_Exam[1] : TJAPlayer3.Skin.Game_DanC_Y[1];
 
                     // Origin position which will be used as a reference for bar elements
                     int barXOffset = xOrigin + (currentPosition >= 3 ? 503 : 0);
