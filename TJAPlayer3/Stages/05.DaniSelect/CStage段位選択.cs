@@ -209,15 +209,23 @@ namespace TJAPlayer3
                     // TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
 
                     //CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
+
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                    int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0];
+
                     CMenuCharacter.tMenuDisplayCharacter(
                         0,
-                        TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2,
-                        TJAPlayer3.Skin.SongSelect_NamePlate_Y[0], 
+                        chara_x,
+                        chara_y, 
                         CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     #region [PuchiChara]
 
-                    this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                    int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[0];
+
+                    //this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                    this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
 
                     #endregion
                 }

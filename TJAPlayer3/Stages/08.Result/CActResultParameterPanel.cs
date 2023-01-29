@@ -753,10 +753,14 @@ namespace TJAPlayer3
 
 					int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(p)];
 
-					int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
-					int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
+					//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
+					//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
-					if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
+					int chara_x = TJAPlayer3.Skin.Result_NamePlate_X[pos] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+					int chara_y = TJAPlayer3.Skin.Result_NamePlate_Y[pos];
+
+
+                    if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.CLEAR, pos);
 					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.FAILED, pos);
@@ -770,14 +774,19 @@ namespace TJAPlayer3
 
 					#region [PuchiChara]
 
-					int ttdiff = 640 - 152;
-					int ttps = 640 + ((pos == 1) ? ttdiff + 60 : -ttdiff);
+					int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[pos];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[pos];
 
-					this.PuchiChara.On進行描画(ttps, 562, false, 255, false, p);
+                    //int ttdiff = 640 - 152;
+					//int ttps = 640 + ((pos == 1) ? ttdiff + 60 : -ttdiff);
 
-					#endregion
+					//this.PuchiChara.On進行描画(ttps, 562, false, 255, false, p);
 
-					if (ct全体進行.n現在の値 >= MountainAppearValue)
+                    this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, p);
+
+                    #endregion
+
+                    if (ct全体進行.n現在の値 >= MountainAppearValue)
 					{
 						float AddCount = 135;
 

@@ -222,55 +222,45 @@ namespace TJAPlayer3
                 // Quick fix
                 if (_ctref[player].n現在の値 >= _ref.Length) return;
 
-                // x0.8 if not substitute
-                if (!_substitute)
-                {
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 0.8f;
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 0.8f;
-                }
-                else
-                {
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1.0f;
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1.0f;
-                }
+                var _tex = _ref[_ctref[player].n現在の値];
 
-                _ref[_ctref[player].n現在の値].Opacity = opacity;
+                _tex.Opacity = opacity;
 
                 float resolutionRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][0];
                 float resolutionRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][1];
 
                 //202
-                float _x = (x - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
+                //float _x = (x - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
 
                 //532
-                float _y = (y - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f))) * resolutionRatioY;
+                //float _y = (y - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f))) * resolutionRatioY;
 
-                _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X *= resolutionRatioY;
-                _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y *= resolutionRatioY;
+                float _x = x;
+                float _y = y;
+
+                _tex.vc拡大縮小倍率.X *= resolutionRatioX;
+                _tex.vc拡大縮小倍率.Y *= resolutionRatioY;
 
                 if (pos % 2 == 0)
                 {
-                    _ref[_ctref[player].n現在の値].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
+                    _tex.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device,
                         _x,
                         _y
                         );
                 }
                 else
                 {
-                    _ref[_ctref[player].n現在の値].t2D拡大率考慮中央基準描画Mirrored(TJAPlayer3.app.Device,
+                    _tex.t2D拡大率考慮下中心基準描画Mirrored(TJAPlayer3.app.Device,
                         _x,
                         _y
                         );
                 }
 
-                // Restore if not substitute
-                if (!_substitute)
-                {
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.X = 1f;
-                    _ref[_ctref[player].n現在の値].vc拡大縮小倍率.Y = 1f;
-                }
+                _tex.vc拡大縮小倍率.X = 1f;
+                _tex.vc拡大縮小倍率.Y = 1f;
 
-                _ref[_ctref[player].n現在の値].Opacity = 255;
+
+                _tex.Opacity = 255;
 
             }
 
