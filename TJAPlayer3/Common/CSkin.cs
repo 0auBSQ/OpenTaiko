@@ -3667,6 +3667,14 @@ namespace TJAPlayer3
                             {
                                 Gauge_Soul_Y_AI = int.Parse(strParam);
                             }
+                            else if (strCommand == "Gauge_Soul_X_Tower")
+                            {
+                                Gauge_Soul_X_Tower = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Gauge_Soul_Y_Tower")
+                            {
+                                Gauge_Soul_Y_Tower = int.Parse(strParam);
+                            }
                             else if (strCommand == "Gauge_Soul_Fire_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3691,12 +3699,56 @@ namespace TJAPlayer3
                             {
                                 Gauge_Soul_Fire_Y_AI = int.Parse(strParam);
                             }
+                            else if (strCommand == "Gauge_Soul_Fire_X_Tower")
+                            {
+                                Gauge_Soul_Fire_X_Tower = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Gauge_Soul_Fire_Y_Tower")
+                            {
+                                Gauge_Soul_Fire_Y_Tower = int.Parse(strParam);
+                            }
                             else if (strCommand == "Game_Gauge_Rainbow_Timer")
                             {
                                 if (int.Parse(strParam) != 0)
                                 {
                                     Game_Gauge_Rainbow_Timer = int.Parse(strParam);
                                 }
+                            }
+                            else if (strCommand == "Game_Tower_Floor_Number")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Floor_Number[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Life_Number")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Life_Number[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Font_TouTatsuKaiSuu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Font_TouTatsuKaiSuu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Font_Kai")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Font_Kai[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Font_TowerText")
+                            {
+                                Game_Tower_Font_TowerText = int.Parse(strParam);
                             }
                             #endregion
 
@@ -4396,6 +4448,81 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_Training_BigNumber_Width))
                             {
                                 Game_Training_BigNumber_Width = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region Tower
+                            else if (strCommand == "Game_Tower_Sky_Gradient")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Sky_Gradient[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Sky_Gradient_Size")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Sky_Gradient_Size[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Floors_Body")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Floors_Body[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Floors_Deco")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Floors_Deco[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Floors_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Floors_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Don")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Don[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Don_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Don_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Miss")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Miss[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Tower_Miss")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Tower_Miss[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             #endregion
 
@@ -5176,6 +5303,7 @@ namespace TJAPlayer3
                             }
 
                             #endregion
+
                             #region AIResult
                             else if (strCommand == "Result_AIBattle_Batch")
                             {
@@ -5435,6 +5563,93 @@ namespace TJAPlayer3
                             else if (strCommand == "DanResult_Font_DanTitles_Size")
                             {
                                 DanResult_Font_DanTitles_Size = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region TowerResult
+                            else if (strCommand == "TowerResult_ScoreRankEffect")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_ScoreRankEffect[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_Toutatsu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_Toutatsu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_MaxFloors")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_MaxFloors[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_Ten")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_Ten[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_Score")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_Score[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_CurrentFloor")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_CurrentFloor[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_ScoreCount")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_ScoreCount[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_RemainingLifes")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_RemainingLifes[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_Gauge_Soul")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerResult_Gauge_Soul[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerResult_Font_TowerText")
+                            {
+                                TowerResult_Font_TowerText = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerResult_Font_TowerText48")
+                            {
+                                TowerResult_Font_TowerText48 = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerResult_Font_TowerText72")
+                            {
+                                TowerResult_Font_TowerText72 = int.Parse(strParam);
                             }
                             #endregion
 
@@ -6342,10 +6557,14 @@ namespace TJAPlayer3
         public int[] Gauge_Soul_Y = new int[] { 125, 516 };
         public int Gauge_Soul_X_AI = 1200;
         public int Gauge_Soul_Y_AI = 140;
+        public int Gauge_Soul_X_Tower = 958;
+        public int Gauge_Soul_Y_Tower = 95;
         public int[] Gauge_Soul_Fire_X = new int[] { 1112, 1112 };
         public int[] Gauge_Soul_Fire_Y = new int[] { 52, 443 };
         public int Gauge_Soul_Fire_X_AI = 1143;
         public int Gauge_Soul_Fire_Y_AI = 83;
+        public int Gauge_Soul_Fire_X_Tower = 886;
+        public int Gauge_Soul_Fire_Y_Tower = 22;
         public int Game_Gauge_Rainbow_Ptn;
         public int Game_Gauge_Dan_Rainbow_Ptn;
         public int Game_Gauge_Rainbow_Timer = 50;
@@ -6501,6 +6720,28 @@ namespace TJAPlayer3
         public int[] Game_Training_SpeedDisplay_XY = { 110, 370 };
         public int Game_Training_SmallNumber_Width = 17;
         public int Game_Training_BigNumber_Width = 20;
+        #endregion
+        #region Tower
+        public int[] Game_Tower_Sky_Gradient = new int[] { 0, 360 };
+        public int[] Game_Tower_Sky_Gradient_Size = new int[] { 1280, 316 };
+
+        public int[] Game_Tower_Floors_Body = new int[] { 640, 676 };
+        public int[] Game_Tower_Floors_Deco = new int[] { 460, 640 };
+        public int[] Game_Tower_Floors_Move = new int[] { 0, 288 };
+
+        public int[] Game_Tower_Don = new int[] { 590, 648 };
+        public int[] Game_Tower_Don_Move = new int[] { 300, 0 };
+
+        public int[] Game_Tower_Miss = new int[] { 640, 520 };
+
+        public int[] Game_Tower_Floor_Number = new int[] { 556, 84 };
+
+        public int[] Game_Tower_Life_Number = new int[] { 996, 106 };
+
+        public int[] Game_Tower_Font_TouTatsuKaiSuu = new int[] { 350, 32 };
+        public int[] Game_Tower_Font_Kai = new int[] { 550, 104 };
+
+        public int Game_Tower_Font_TowerText = 28;
         #endregion
         #region AIBattle
         public int Game_AIBattle_CharaMove = 71;
@@ -6723,6 +6964,27 @@ namespace TJAPlayer3
         public int[] DanResult_Rank = new int[] { 130, 380 };
 
         public int DanResult_Font_DanTitles_Size = 24;
+
+        #endregion
+
+        #region TowerResult
+
+        public int[] TowerResult_ScoreRankEffect = new int[] { 1000, 220 };
+
+        public int[] TowerResult_Toutatsu = new int[] { 196, 160 };
+        public int[] TowerResult_MaxFloors = new int[] { 616, 296 };
+        public int[] TowerResult_Ten = new int[] { 982, 394 };
+        public int[] TowerResult_Score = new int[] { 248, 394 };
+
+        public int[] TowerResult_CurrentFloor = new int[] { 688, 258 };
+        public int[] TowerResult_ScoreCount = new int[] { 1026, 394 };
+        public int[] TowerResult_RemainingLifes = new int[] { 1068, 490 };
+
+        public int[] TowerResult_Gauge_Soul = new int[] { 248, 474 };
+
+        public int TowerResult_Font_TowerText = 28;
+        public int TowerResult_Font_TowerText48 = 48;
+        public int TowerResult_Font_TowerText72 = 72;
 
         #endregion
 

@@ -687,7 +687,7 @@ namespace TJAPlayer3
 				ctWork_Plate = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
 
 				if (TJAPlayer3.Tx.TowerResult_Background != null)
-					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720, 25, TJAPlayer3.Timer);
+					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1], 25, TJAPlayer3.Timer);
 				else
 					ctTower_Animation = new CCounter();
 
@@ -700,15 +700,15 @@ namespace TJAPlayer3
                 {
 					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
 					{
-						this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
-						this.pfTowerText48 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 48);
-						this.pfTowerText72 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 72);
+						this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText72);
 					}
 					else
 					{
-						this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
-						this.pfTowerText48 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 48);
-						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 72);
+						this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText72);
 					}
 
 					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(1001), pfTowerText48, Color.Black, Color.Transparent, 700);
@@ -1307,14 +1307,17 @@ namespace TJAPlayer3
 						TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, sc.ToString());
 
 						if (sc >= 0 && TJAPlayer3.Tx.TowerResult_ScoreRankEffect != null)
-                        {
+						{
+							int scoreRankEffect_width = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Width / 7;
+							int scoreRankEffect_height = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Height;
+
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
-								1000,
-								220,
-								new Rectangle(sc * 229, 0, 229, 194));
+								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[0],
+								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[1],
+								new Rectangle(sc * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
 						}
 							
 
@@ -1323,23 +1326,23 @@ namespace TJAPlayer3
 
 						#region [Text elements]
 
-						int firstRowY = 394;
-						int secondRowY = firstRowY + 96;
-
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.app.Device, 196, 160);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.app.Device, 616, 296);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.app.Device, 982, firstRowY);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.app.Device, 248, firstRowY);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
 
 						CTexture tmpScoreCount = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScoreCount);
 						CTexture tmpCurrentFloor = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkReachedFloor);
 						CTexture tmpRemainingLifes = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkRemaningLifes);
 
-						tmpCurrentFloor?.t2D描画(TJAPlayer3.app.Device, 616 - tmpCurrentFloor.szテクスチャサイズ.Width + 72, 258);
-						tmpScoreCount?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpScoreCount.szテクスチャサイズ.Width + 12, firstRowY);
-						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpRemainingLifes.szテクスチャサイズ.Width + 54, secondRowY);
+						tmpCurrentFloor?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_CurrentFloor[1]);
+						tmpScoreCount?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_ScoreCount[1]);
+						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_RemainingLifes[1]);
 
-						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, 248, secondRowY - 16, new Rectangle(0, 0, 80, 80));
+						int soul_width = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width;
+						int soul_height = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Height / 2;
+
+						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Gauge_Soul[0], TJAPlayer3.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
 
 						#endregion
 
