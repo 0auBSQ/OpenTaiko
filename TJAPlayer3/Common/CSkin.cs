@@ -5764,6 +5764,176 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            #region OnlineLounge 
+                            else if (strCommand == "OnlineLounge_Side_Menu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Side_Menu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Side_Menu_Text_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Side_Menu_Text_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Side_Menu_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Side_Menu_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Song")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Song[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Song_Title_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Song_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Song_SubTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Song_SubTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Song_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Song_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Context_Charter")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Context_Charter[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Context_Genre")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Context_Genre[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Context_Couse_Symbol")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Context_Couse_Symbol[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Context_Level")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Context_Level[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Context_Couse_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Context_Couse_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Downloading")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OnlineLounge_Downloading[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OnlineLounge_Font_OLFont")
+                            {
+                                OnlineLounge_Font_OLFont = int.Parse(strParam);
+                            }
+                            else if (strCommand == "OnlineLounge_Font_OLFontLarge")
+                            {
+                                OnlineLounge_Font_OLFontLarge = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region OpenEncyclopedia 
+                            else if (strCommand == "OpenEncyclopedia_Context_Item2")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Context_Item2[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Context_Item3")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Context_Item3[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Context_PageText")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Context_PageText[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Side_Menu")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Side_Menu[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Side_Menu_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Side_Menu_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Side_Menu_Text_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    OpenEncyclopedia_Side_Menu_Text_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "OpenEncyclopedia_Font_EncyclopediaMenu_Size")
+                            {
+                                OpenEncyclopedia_Font_EncyclopediaMenu_Size = int.Parse(strParam);
+                            }
+                            #endregion
+
                             #region Font
                             else if (strCommand == nameof(Font_Edge_Ratio)) //Config画面や簡易メニューのフォントについて(rhimm)
                             {
@@ -5782,6 +5952,203 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Text_Correction_Y))
                             {
                                 Text_Correction_Y = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region PopupMenu
+                            else if (strCommand == "PopupMenu_Menu_Title")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_Menu_Title[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_Title")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_Title[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_Menu_Highlight")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_Menu_Highlight[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_MenuItem_Name")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_MenuItem_Name[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_MenuItem_Value")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_MenuItem_Value[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    PopupMenu_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "PopupMenu_Font_Size")
+                            {
+                                PopupMenu_Font_Size = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region NamePlate
+                            else if (strCommand == "NamePlate_Title_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    NamePlate_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "NamePlate_Dan_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    NamePlate_Dan_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "NamePlate_Name_Offset_Normal")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    NamePlate_Name_Offset_Normal[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "NamePlate_Name_Offset_WithTitle")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    NamePlate_Name_Offset_WithTitle[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "NamePlate_Name_Offset_Full")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    NamePlate_Name_Offset_Full[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "NamePlate_Font_Name_Size_Normal")
+                            {
+                                NamePlate_Font_Name_Size_Normal = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Font_Name_Size_WithTitle")
+                            {
+                                NamePlate_Font_Name_Size_WithTitle = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Font_Title_Size")
+                            {
+                                NamePlate_Font_Title_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Font_Dan_Size")
+                            {
+                                NamePlate_Font_Dan_Size = int.Parse(strParam);
+                            }
+                            #endregion
+
+                            #region Modal 
+                            else if (strCommand == "Modal_Title_Full")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Title_Full[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Title_Half_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Title_Half_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Title_Half_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Title_Half_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Full")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Full[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Full_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Full_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Half_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Half_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Half_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Font_ModalContentHalf_Size")
+                            {
+                                Modal_Font_ModalContentHalf_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Modal_Font_ModalTitleHalf_Size")
+                            {
+                                Modal_Font_ModalTitleHalf_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Modal_Font_ModalContentFull_Size")
+                            {
+                                Modal_Font_ModalContentFull_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Modal_Font_ModalTitleFull_Size")
+                            {
+                                Modal_Font_ModalTitleFull_Size = int.Parse(strParam);
                             }
                             #endregion
 
@@ -7008,11 +7375,62 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region OnlineLounge 
+
+        public int[] OnlineLounge_Side_Menu = new int[] { 640, 360 };
+        public int[] OnlineLounge_Side_Menu_Text_Offset = new int[] { 0, 18 };
+        public int[] OnlineLounge_Side_Menu_Move = new int[] { 0, 80 };
+
+        public int[] OnlineLounge_Song = new int[] { 350, 360 };
+        public int[] OnlineLounge_Song_Title_Offset = new int[] { 0, 18 };
+        public int[] OnlineLounge_Song_SubTitle_Offset = new int[] { 0, 46 };
+        public int[] OnlineLounge_Song_Move = new int[] { 0, 100 };
+
+        public int[] OnlineLounge_Context_Charter = new int[] { 980, 300 };
+        public int[] OnlineLounge_Context_Genre = new int[] { 980, 340 };
+        public int[] OnlineLounge_Context_Couse_Symbol = new int[] { 800, 480 };
+        public int[] OnlineLounge_Context_Level = new int[] { 900, 494 };
+        public int[] OnlineLounge_Context_Couse_Move = new int[] { 240, 60 };
+
+        public int[] OnlineLounge_Downloading = new int[] { 640, 605 };
+
+        public int OnlineLounge_Font_OLFont = 14;
+        public int OnlineLounge_Font_OLFontLarge = 28;
+
+        #endregion
+
+        #region OpenEncyclopedia 
+
+        public int[] OpenEncyclopedia_Context_Item2 = new int[] { 960, 180 };
+        public int[] OpenEncyclopedia_Context_Item3 = new int[] { 640, 360 };
+        public int[] OpenEncyclopedia_Context_PageText = new int[] { 960, 720 };
+        public int[] OpenEncyclopedia_Side_Menu = new int[] { 320, 360 };
+        public int[] OpenEncyclopedia_Side_Menu_Move = new int[] { 0, 90 };
+        public int[] OpenEncyclopedia_Side_Menu_Text_Offset = new int[] { 0, 0 };
+        public int OpenEncyclopedia_Font_EncyclopediaMenu_Size = 14;
+
+        #endregion
+
         #region Font
         public int Font_Edge_Ratio = 30;
         public int Font_Edge_Ratio_Vertical = 30;
         public int Text_Correction_X = 0;
         public int Text_Correction_Y = 0;
+        #endregion
+
+        #region NamePlate
+
+        public int[] NamePlate_Title_Offset = new int[] { 124, 22 };
+        public int[] NamePlate_Dan_Offset = new int[] { 69, 44 };
+        public int[] NamePlate_Name_Offset_Normal = new int[] { 121, 36 };
+        public int[] NamePlate_Name_Offset_WithTitle = new int[] { 121, 44 };
+        public int[] NamePlate_Name_Offset_Full = new int[] { 144, 44 };
+
+        public int NamePlate_Font_Name_Size_Normal = 15;
+        public int NamePlate_Font_Name_Size_WithTitle = 12;
+        public int NamePlate_Font_Title_Size = 11;
+        public int NamePlate_Font_Dan_Size = 12;
+
         #endregion
 
         #region [Mod icons]
@@ -7021,6 +7439,37 @@ namespace TJAPlayer3
         public int[] ModIcons_OffsetY = { 0, 0, 0, 0, 30, 30, 30, 30 };
         public int[] ModIcons_OffsetX_Menu = { 0, 30, 60, 90, 120, 150, 180, 210 };
         public int[] ModIcons_OffsetY_Menu = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        #endregion
+
+        #region Modal
+
+        public int[] Modal_Title_Full = new int[] { 640, 140 };
+        public int[] Modal_Title_Half_X = new int[] { 320, 960 };
+        public int[] Modal_Title_Half_Y = new int[] { 290, 290 };
+
+        public int[] Modal_Text_Full = new int[] { 640, 327 };//445
+        public int[] Modal_Text_Full_Move = new int[] { 0, 118 };
+        public int[] Modal_Text_Half_X = new int[] { 320, 960 };
+        public int[] Modal_Text_Half_Y = new int[] { 383, 383 };
+        public int[] Modal_Text_Half_Move = new int[] { 0, 59 };
+
+        public int Modal_Font_ModalContentHalf_Size = 28;
+        public int Modal_Font_ModalTitleHalf_Size = 28;
+        public int Modal_Font_ModalContentFull_Size = 56;
+        public int Modal_Font_ModalTitleFull_Size = 56;
+
+        #endregion
+
+        #region PopupMenu
+
+        public int[] PopupMenu_Menu_Title = new int[2] { 460, 40 };
+        public int[] PopupMenu_Title = new int[2] { 540, 44 };
+        public int[] PopupMenu_Menu_Highlight = new int[2] { 480, 46 };
+        public int[] PopupMenu_MenuItem_Name = new int[2] { 480, 77 };
+        public int[] PopupMenu_MenuItem_Value = new int[2] { 630, 77 };
+        public int[] PopupMenu_Move = new int[2] { 0, 32 };
+        public int PopupMenu_Font_Size = 18;
 
         #endregion
 

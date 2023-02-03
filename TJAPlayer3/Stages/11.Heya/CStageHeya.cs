@@ -230,7 +230,15 @@ namespace TJAPlayer3
 
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
-                    
+
+                    if (TJAPlayer3.Tx.Puchichara[pos].tx != null)
+                    {
+                        float puchiScale = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.X = puchiScale;
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.Y = puchiScale;
+                    }
+
                     TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0], 
                         scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[1] + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 

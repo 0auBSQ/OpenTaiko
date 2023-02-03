@@ -194,13 +194,13 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(TJAPlayer3.app.Device, RollCharas[i].X, RollCharas[i].Y);
                             
                             // 画面外にいたら描画をやめさせる
-                            if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Width || RollCharas[i].X > 1280)
+                            if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Width || RollCharas[i].X > TJAPlayer3.Skin.Resolution[0])
                             {
                                 RollCharas[i].Counter.t停止();
                                 RollCharas[i].IsUsing = false;
                             }
                             
-                            if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Height || RollCharas[i].Y > 720)
+                            if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Height || RollCharas[i].Y > TJAPlayer3.Skin.Resolution[1])
                             {
                                 RollCharas[i].Counter.t停止();
                                 RollCharas[i].IsUsing = false;

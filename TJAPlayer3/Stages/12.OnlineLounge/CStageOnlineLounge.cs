@@ -48,13 +48,13 @@ namespace TJAPlayer3
 
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
             {
-                this.pfOLFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
-                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
+                this.pfOLFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
+                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
             }
             else
             {
-                this.pfOLFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
-                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
+                this.pfOLFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
+                this.pfOLFontLarge = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
             }
                 
 
@@ -164,7 +164,8 @@ namespace TJAPlayer3
                 || currentMenu == ECurrentMenu.CDN_SELECT
                 || currentMenu == ECurrentMenu.CDN_OPTION)
             {
-                int baseY = 360 - _ref.Length * 40;
+                int baseX = TJAPlayer3.Skin.OnlineLounge_Side_Menu[0] - _ref.Length * (TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] / 2);
+                int baseY = TJAPlayer3.Skin.OnlineLounge_Side_Menu[1] - _ref.Length * (TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] / 2);
 
                 for (int i = 0; i < _ref.Length; i++)
                 {
@@ -181,8 +182,11 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                     }
 
-                    TJAPlayer3.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 640, baseY + 80 * i);
-                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 640, baseY + 18 + 80 * i);
+                    TJAPlayer3.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, baseX + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] * i, 
+                        baseY + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device,
+                        baseX + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Text_Offset[0] + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] * i,
+                        baseY + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Text_Offset[1] + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] * i);
                 }
             }
 
@@ -195,7 +199,8 @@ namespace TJAPlayer3
                 _ref = this.ttkCDNSongList;
                 _selector = cdnSongListIndex;
 
-                int baseY = 360;
+                int baseX = TJAPlayer3.Skin.OnlineLounge_Song[0];
+                int baseY = TJAPlayer3.Skin.OnlineLounge_Song[1];
 
                 for (int i = -4; i < 4; i++)
                 {
@@ -220,20 +225,23 @@ namespace TJAPlayer3
                     tmpTex.color4 = _color;
                     tmpSubtitle.color4 = _color;
 
+                    int x = baseX + TJAPlayer3.Skin.OnlineLounge_Song_Move[0] * i;
+                    int y = baseY + TJAPlayer3.Skin.OnlineLounge_Song_Move[1] * i;
+
                     if (pos == 0)
                     {
                         TJAPlayer3.Tx.OnlineLounge_Return_Box?.tUpdateColor4(_color);
-                        TJAPlayer3.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                        TJAPlayer3.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, x, y);
                     }
                     else
                     {
                         TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
-                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 100 * i);
+                        TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, x, y);
                     }
                     
 
-                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 18 + 100 * i);
-                    tmpSubtitle.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, 350, baseY + 46 + 100 * i);
+                    tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.OnlineLounge_Song_Title_Offset[0], y + TJAPlayer3.Skin.OnlineLounge_Song_Title_Offset[1]);
+                    tmpSubtitle.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + TJAPlayer3.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
 
                     if (pos != 0 && i == 0)
                     {
@@ -258,7 +266,7 @@ namespace TJAPlayer3
                         {
                             var charter_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
                                     new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-                            charter_?.t2D中心基準描画(TJAPlayer3.app.Device, 980, 300);
+                            charter_?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OnlineLounge_Context_Charter[0], TJAPlayer3.Skin.OnlineLounge_Context_Charter[1]);
                         }
 
                         #endregion
@@ -269,7 +277,7 @@ namespace TJAPlayer3
                         {
                             var genre_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
                                     new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-                            genre_?.t2D中心基準描画(TJAPlayer3.app.Device, 980, 340);
+                            genre_?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OnlineLounge_Context_Genre[0], TJAPlayer3.Skin.OnlineLounge_Context_Genre[1]);
                         }
 
                         #endregion
@@ -280,16 +288,18 @@ namespace TJAPlayer3
                         {
                             int diff = diffs[k];
 
-                            int column = (k >= 3) ? 240 : 0;
-                            int row = 60 * (k % 3);
+                            int column = (k >= 3) ? TJAPlayer3.Skin.OnlineLounge_Context_Couse_Move[0] : 0;
+                            int row = TJAPlayer3.Skin.OnlineLounge_Context_Couse_Move[1] * (k % 3);
 
                             if (diff > 0)
                             {
-                                TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(TJAPlayer3.app.Device, 800 + column, 480 + row);
+                                TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(TJAPlayer3.app.Device, 
+                                    TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
+                                    TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
 
                                 var difnb_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
                                     new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
-                                difnb_?.t2D中心基準描画(TJAPlayer3.app.Device, 900 + column, 480 + 14 + row);
+                                difnb_?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OnlineLounge_Context_Level[0] + column, TJAPlayer3.Skin.OnlineLounge_Context_Level[1] + row);
                             }
                             
                         }
@@ -310,7 +320,7 @@ namespace TJAPlayer3
 
                 var text = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
                                     new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
-                text.t2D中心基準描画(TJAPlayer3.app.Device, 640, 605);
+                text.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OnlineLounge_Downloading[0], TJAPlayer3.Skin.OnlineLounge_Downloading[1]);
             }
 
             #endregion
