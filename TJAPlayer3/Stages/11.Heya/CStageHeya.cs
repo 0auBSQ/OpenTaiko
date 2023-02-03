@@ -233,7 +233,7 @@ namespace TJAPlayer3
 
                     if (TJAPlayer3.Tx.Puchichara[pos].tx != null)
                     {
-                        float puchiScale = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+                        float puchiScale = TJAPlayer3.Skin.Resolution[1] / 1080.0f;
 
                         TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.X = puchiScale;
                         TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.Y = puchiScale;
