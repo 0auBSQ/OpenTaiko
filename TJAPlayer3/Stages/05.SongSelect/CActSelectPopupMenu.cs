@@ -93,9 +93,9 @@ namespace TJAPlayer3
 	        if (prvFont == null)
 			{
 				if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-					prvFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 18);
+					prvFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.PopupMenu_Font_Size);
 				else
-					prvFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 18);
+					prvFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.PopupMenu_Font_Size);
 	        }
 	    }
 
@@ -329,28 +329,30 @@ namespace TJAPlayer3
 				#region [ ポップアップメニュー 背景描画 ]
 				if ( TJAPlayer3.Tx.Menu_Title != null )
 				{
-                    TJAPlayer3.Tx.Menu_Title.t2D描画( TJAPlayer3.app.Device, 460, 40 );
+                    TJAPlayer3.Tx.Menu_Title.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.PopupMenu_Menu_Title[0], TJAPlayer3.Skin.PopupMenu_Menu_Title[1]);
 				}
 				#endregion
 				#region [ ソートメニュータイトル描画 ]
-				int x = 540, y = 44;
-				stqMenuTitle.txName.t2D描画( TJAPlayer3.app.Device, x, y );
+				stqMenuTitle.txName.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.PopupMenu_Title[0], TJAPlayer3.Skin.PopupMenu_Title[1]);
 				#endregion
 				#region [ カーソル描画 ]
 				if ( TJAPlayer3.Tx.Menu_Highlight != null )
 				{
-					int height = 32;
-					int curX = 480;
-					int curY = 46 + ( height * ( this.n現在の選択行 + 1 ) );
-                    TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, new Rectangle( 0, 0, 16, 32 ) );
-					curX += 0x10;
-					Rectangle rectangle = new Rectangle( 8, 0, 0x10, 0x20 );
+					int curX = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[0] + (TJAPlayer3.Skin.PopupMenu_Move[0] * (this.n現在の選択行 + 1));
+					int curY = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[1] + (TJAPlayer3.Skin.PopupMenu_Move[1] * (this.n現在の選択行 + 1));
+
+					int width = TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Width / 2;
+					int height = TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Height;
+
+					TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, new Rectangle( 0, 0, width, height) );
+					curX += width;
+					Rectangle rectangle = new Rectangle(width / 2, 0, width, height);
 					for ( int j = 0; j < 16; j++ )
 					{
                         TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, rectangle );
-						curX += 16;
+						curX += width;
 					}
-                    TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, new Rectangle( 0x10, 0, 16, 32 ) );
+                    TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, curX, curY, new Rectangle(width, 0, width, height) );
 				}
 				#endregion
 				#region [ ソート候補文字列描画 ]
@@ -361,7 +363,8 @@ namespace TJAPlayer3
 					if ( lciMenuItems[ i ].txName != null )
 					{
 						int height = lciMenuItems[ i ].rectName.Height;
-						lciMenuItems[ i ].txName.t2D描画( TJAPlayer3.app.Device, 480, 77 + i * 32 );
+						lciMenuItems[ i ].txName.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.PopupMenu_MenuItem_Name[0] + i * TJAPlayer3.Skin.PopupMenu_Move[0],
+							TJAPlayer3.Skin.PopupMenu_MenuItem_Name[1] + i * TJAPlayer3.Skin.PopupMenu_Move[1]);
 					}
 
                     bool bValueBold = (bItemBold || (i == nItemSelecting && bIsSelectingIntItem)) ? true : false;
@@ -394,7 +397,8 @@ namespace TJAPlayer3
                         {
                             using (var ctStr = TJAPlayer3.tテクスチャの生成(bmpStr, false))
                             {
-                                ctStr.t2D描画(TJAPlayer3.app.Device, 630, 77 + i * 32);
+                                ctStr.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.PopupMenu_MenuItem_Value[0] + i * TJAPlayer3.Skin.PopupMenu_Move[0],
+									TJAPlayer3.Skin.PopupMenu_MenuItem_Value[1] + i * TJAPlayer3.Skin.PopupMenu_Move[1]);
                             }
                         }
                     }

@@ -11,8 +11,47 @@ namespace TJAPlayer3
 {
     class CNamePlate
     {
+        public void RefleshSkin()
+        {
+            for (int player = 0; player < 2; player++)
+            {
+                this.pfName[player]?.Dispose();
+
+                if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+                {
+                    if (TJAPlayer3.NamePlateConfig.data.Title[player] == "" || TJAPlayer3.NamePlateConfig.data.Title[player] == null)
+                        this.pfName[player] = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.NamePlate_Font_Name_Size_Normal);
+                    else
+                        this.pfName[player] = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.NamePlate_Font_Name_Size_WithTitle);
+                }
+                else
+                {
+                    if (TJAPlayer3.NamePlateConfig.data.Title[player] == "" || TJAPlayer3.NamePlateConfig.data.Title[player] == null)
+                        this.pfName[player] = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.NamePlate_Font_Name_Size_Normal);
+                    else
+                        this.pfName[player] = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.NamePlate_Font_Name_Size_WithTitle);
+                }
+            }
+
+            this.pfTitle?.Dispose();
+            this.pfdan?.Dispose();
+
+            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+            {
+                this.pfTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.NamePlate_Font_Title_Size);
+                this.pfdan = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
+            }
+            else
+            {
+                this.pfTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.NamePlate_Font_Title_Size);
+                this.pfdan = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
+            }
+        }
+
         public CNamePlate()
         {
+            RefleshSkin();
+
             for (int player = 0; player < 2; player++)
             {
                 if (TJAPlayer3.NamePlateConfig.data.DanType[player] < 0) TJAPlayer3.NamePlateConfig.data.DanType[player] = 0;
@@ -20,29 +59,7 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.NamePlateConfig.data.TitleType[player] < 0) TJAPlayer3.NamePlateConfig.data.TitleType[player] = 0;
 
-                if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                {
-                    if (TJAPlayer3.NamePlateConfig.data.Title[player] == "" || TJAPlayer3.NamePlateConfig.data.Title[player] == null)
-                        this.pfName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 15);
-                    else
-                        this.pfName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 12);
-
-                    this.pfTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 11);
-                    this.pfdan = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 12);
-                }
-                else
-                {
-                    if (TJAPlayer3.NamePlateConfig.data.Title[player] == "" || TJAPlayer3.NamePlateConfig.data.Title[player] == null)
-                        this.pfName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 15);
-                    else
-                        this.pfName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 12);
-
-                    this.pfTitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 11);
-                    this.pfdan = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 12);
-                }
-
                 tNamePlateRefreshTitles(player);
-
             }
 
             ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
@@ -76,7 +93,7 @@ namespace TJAPlayer3
             }
 
             txTitle[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(title, pfTitle, Color.Black, Color.Empty, 1000));
-            txName[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(name, pfName, Color.White, Color.Black, 1000));
+            txName[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(name, pfName[player], Color.White, Color.Black, 1000));
             txdan[player] = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
         }
 
@@ -155,7 +172,7 @@ namespace TJAPlayer3
             // Dan text
             if (TJAPlayer3.NamePlateConfig.data.Dan[player] != "" && TJAPlayer3.NamePlateConfig.data.Dan[player] != null)
             {
-                this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 69, y + 44);
+                this.txdan[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.NamePlate_Dan_Offset[0], y + TJAPlayer3.Skin.NamePlate_Dan_Offset[1]);
 
                 if (TJAPlayer3.NamePlateConfig.data.DanGold[player])
                 {
@@ -174,16 +191,16 @@ namespace TJAPlayer3
                     txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
                 }
 
-                txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 124, y + 22);
+                txTitle[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.NamePlate_Title_Offset[0], y + TJAPlayer3.Skin.NamePlate_Title_Offset[1]);
 
                 // Name text
                 if (TJAPlayer3.NamePlateConfig.data.Dan[player] == "" || TJAPlayer3.NamePlateConfig.data.Dan[player] == null)
-                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 44);
+                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.NamePlate_Name_Offset_WithTitle[0], y + TJAPlayer3.Skin.NamePlate_Name_Offset_WithTitle[1]);
                 else
-                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 144, y + 44);
+                    this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.NamePlate_Name_Offset_Full[0], y + TJAPlayer3.Skin.NamePlate_Name_Offset_Full[1]);
             }
             else
-                this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + 121, y + 36);
+                this.txName[player].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.NamePlate_Name_Offset_Normal[0], y + TJAPlayer3.Skin.NamePlate_Name_Offset_Normal[1]);
 
             
             // Overlap frame
@@ -359,7 +376,7 @@ namespace TJAPlayer3
 
         }
 
-        private CPrivateFastFont pfName;
+        private CPrivateFastFont[] pfName = new CPrivateFastFont[2];
         private CPrivateFastFont pfTitle;
         private CPrivateFastFont pfdan;
         private CCounter ctNamePlateEffect;
