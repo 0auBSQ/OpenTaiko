@@ -861,6 +861,7 @@ namespace TJAPlayer3
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
 		public int nAILevel;
+		public bool bAIBattleMode;
 
 		public CAIPerformances[] apAIPerformances =
 		{
@@ -1452,8 +1453,10 @@ namespace TJAPlayer3
 			this.n表示可能な最小コンボ数.Bass = 10;
 			this.n表示可能な最小コンボ数.Taiko = 10;
 			this.nRollsPerSec = 15;
-			this.nAILevel = 0;
-            this.FontName = "MS UI Gothic";
+			this.nAILevel = 1;
+			this.bAIBattleMode = false;
+
+			this.FontName = "MS UI Gothic";
             this.BoxFontName = "MS UI Gothic";
 		    this.ApplyLoudnessMetadata = true;
 			this.bEnableCountdownTimer = true;
@@ -2010,7 +2013,8 @@ namespace TJAPlayer3
             sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 			sw.WriteLine("AILevel={0}", this.nAILevel);
-            sw.WriteLine();
+			sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
+			sw.WriteLine();
             sw.WriteLine(";-------------------");
             #endregion
 
@@ -2830,8 +2834,12 @@ namespace TJAPlayer3
 										else if (str3.Equals("AILevel"))
                                         {
 											this.nAILevel = int.Parse(str4);
-                                        }
-                                        continue;
+										}
+										if (str3.Equals("AIBattleMode"))
+										{
+											bAIBattleMode = C変換.bONorOFF(str4[0]);
+										}
+										continue;
                                     //-----------------------------
                                     #endregion
 

@@ -8,19 +8,27 @@ namespace TJAPlayer3
 {
     class ModIcons
     {
+        static Dictionary<int, Action<int, int, int, int>> __methods = new Dictionary<int, Action<int, int, int, int>>()
+        {
+            {0, (x, y, a, p) => tDisplayHSIcon(x, y, a) },
+            {1, (x, y, a, p) => tDisplayDoronIcon(x, y, a) },
+            {2, (x, y, a, p) => tDisplayRandomIcon(x, y, a) },
+            {3, (x, y, a, p) => tDisplayFunModIcon(x, y, a) },
+            {4, (x, y, a, p) => tDisplayJustIcon(x, y, a) },
+            {5, (x, y, a, p) => tDisplayTimingIcon(x, y, a) },
+            {6, (x, y, a, p) => tDisplaySongSpeedIcon(x, y, p) },
+            {7, (x, y, a, p) => tDisplayAutoIcon(x, y, p) },
+        };
+
         static public void tDisplayMods(int x, int y, int player)
         {
             // +30 x/y
             int actual = TJAPlayer3.GetActualPlayer(player);
 
-            tDisplayHSIcon(x, y, actual); // 1st icon
-            tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
-            tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
-            tDisplayFunModIcon(x + 90, y, actual); // 4th icon
-            tDisplayJustIcon(x, y + 30, actual); // 5th icon
-            tDisplayTimingIcon(x + 30, y + 30, actual); // 6th icon
-            tDisplaySongSpeedIcon(x + 60, y + 30, player); // 7th icon
-            tDisplayAutoIcon(x + 90, y + 30, player); // 8th icon
+            for (int i = 0; i < 8; i++)
+            {
+                __methods[i](x + TJAPlayer3.Skin.ModIcons_OffsetX[i], y + TJAPlayer3.Skin.ModIcons_OffsetY[i], actual, player);
+            }
         }
 
         static public void tDisplayModsMenu(int x, int y, int player)
@@ -30,14 +38,10 @@ namespace TJAPlayer3
 
             int actual = TJAPlayer3.GetActualPlayer(player);
 
-            tDisplayHSIcon(x, y, actual); // 1st icon
-            tDisplayDoronIcon(x + 30, y, actual); // 2nd icon
-            tDisplayRandomIcon(x + 60, y, actual); // 3rd icon
-            tDisplayFunModIcon(x + 90, y, actual); // 4th icon
-            tDisplayJustIcon(x + 120, y, actual); // 5th icon
-            tDisplayTimingIcon(x + 150, y, actual); // 6th icon
-            tDisplaySongSpeedIcon(x + 180, y, player); // 7th icon
-            tDisplayAutoIcon(x + 210, y, player); // 8th icon
+            for (int i = 0; i < 8; i++)
+            {
+                __methods[i](x + TJAPlayer3.Skin.ModIcons_OffsetX_Menu[i], y + TJAPlayer3.Skin.ModIcons_OffsetY_Menu[i], actual, player);
+            }
 
             if (TJAPlayer3.Tx.Mod_None != null)
                 TJAPlayer3.Tx.Mod_None.Opacity = 255;
@@ -45,6 +49,7 @@ namespace TJAPlayer3
 
         static private void tDisplayHSIcon(int x, int y, int player)
         {
+            // TO DO : Add HS x0.5 icon (_vals == 4)
             var _vals = new int[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 24, 29, 34, 39 };
             int _i = -1;
 

@@ -512,11 +512,17 @@ namespace TJAPlayer3
 
                     int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
 
-                    int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
-                    int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
+                    //int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
+                    //int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
 
-                    int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
-                    int puchi_y = player == 0 ? 330 + 230 : 330 + 230;
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                    int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player];
+
+                    //int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
+                    //int puchi_y = player == 0 ? 330 + 230 : 330 + 230;
+
+                    int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
 
                     if (___cc != null && ___cc.b終了値に達してない)
                     {
@@ -575,6 +581,8 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
+
                     int p = TJAPlayer3.GetActualPlayer(i);
                      
                     TJAPlayer3.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Table_X[i], TJAPlayer3.Skin.SongSelect_Table_Y[i]);
@@ -592,10 +600,12 @@ namespace TJAPlayer3
                 }
 
                 TJAPlayer3.Tx.SongSelect_Coin_Slot?.t2D描画(TJAPlayer3.app.Device, 0, 0,
-                    new Rectangle(0, 0, (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) + ((TJAPlayer3.ConfigIni.nPlayerCount > 1) ? (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) : 0), TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Height));
+                    new Rectangle(0, 0, (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) + ((TJAPlayer3.ConfigIni.nPlayerCount > 1 && !TJAPlayer3.ConfigIni.bAIBattleMode) ? (TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Width / 2) : 0), TJAPlayer3.Tx.SongSelect_Coin_Slot.sz画像サイズ.Height));
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
+
                     int p = TJAPlayer3.GetActualPlayer(i);
 
                     if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)

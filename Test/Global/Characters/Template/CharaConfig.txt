@@ -1,8 +1,17 @@
+
+Chara_Resolution=1280,720
+
 ;キャラのX座標。(1P,2P)
 Game_Chara_X=0,0
 
 ;キャラのY座標。(1P,2P)
 Game_Chara_Y=0,537
+
+;キャラのX座標。(1P,2P)
+Game_Chara_X_AI=472,602
+
+;キャラのY座標。(1P,2P)
+Game_Chara_Y_AI=152,152
 
 ;キャラの通常時モーション指定。(カンマ区切り)
 Game_Chara_Motion_Normal=0

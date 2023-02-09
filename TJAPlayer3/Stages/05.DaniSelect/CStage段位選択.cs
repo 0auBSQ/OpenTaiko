@@ -76,7 +76,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.X = zoom;
             TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.Y = zoom;
-            TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360);
+            TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Resolution[0] / 2, TJAPlayer3.Skin.Resolution[1] / 2);
 
             this.段位リスト.On進行描画();
 
@@ -91,16 +91,21 @@ namespace TJAPlayer3
                     bInSongPlayed = true;
                 }
 
+                int dani_dan_in_width = TJAPlayer3.Tx.Dani_Dan_In.szテクスチャサイズ.Width / 2;
+                int dani_dan_in_height = TJAPlayer3.Tx.Dani_Dan_In.szテクスチャサイズ.Height;
+
                 int doorLeft = 0;
-                int doorRight = 640;
+                int doorRight = dani_dan_in_width;
                 if (stamp >= 3834)
                 {
-                    doorLeft -= stamp - 3834;
-                    doorRight += stamp - 3834;
+                    double screen_ratio = TJAPlayer3.Skin.Resolution[0] / 1280.0;
+
+                    doorLeft -= (int)((stamp - 3834) * screen_ratio);
+                    doorRight += (int)((stamp - 3834) * screen_ratio);
                 }
-                    
-                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorLeft, 0, new Rectangle(0, 0, 640, 720));
-                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorRight, 0, new Rectangle(640, 0, 640, 720));
+
+                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorLeft, 0, new Rectangle(0, 0, dani_dan_in_width, dani_dan_in_height));
+                TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorRight, 0, new Rectangle(dani_dan_in_width, 0, dani_dan_in_width, dani_dan_in_height));
 
                 if (stamp <= 3834)
                 {
@@ -108,12 +113,17 @@ namespace TJAPlayer3
 
                     int quarter = TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Width / 4;
 
+                    /*
                     int[] xAxis = { 300, 980 };
                     int[] yAxis = { 198, 522 };
+                    */
                     int[] appearStamps = { 1645, 2188, 2646, 3152 };
 
                     for (int i = 0; i < 4; i++)
                     {
+                        int x = TJAPlayer3.Skin.DaniSelect_Dan_Text_X[i];
+                        int y = TJAPlayer3.Skin.DaniSelect_Dan_Text_Y[i];
+
                         if (stamp < appearStamps[i])
                             break;
 
@@ -124,7 +134,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Dani_Dan_Text.vc拡大縮小倍率.X = ratio;
                         TJAPlayer3.Tx.Dani_Dan_Text.vc拡大縮小倍率.Y = ratio;
 
-                        TJAPlayer3.Tx.Dani_Dan_Text.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, xAxis[i % 2], yAxis[i / 2],
+                        TJAPlayer3.Tx.Dani_Dan_Text.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y,
                             new Rectangle(quarter * i, 0, quarter, TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Height));
                     }
 
@@ -143,8 +153,8 @@ namespace TJAPlayer3
                     ctDonchan_In.t開始(0, 180, 1.25f, TJAPlayer3.Timer);
                 }
 
-                TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
-                ModIcons.tDisplayModsMenu(40, 672, 0);
+                TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0], 0);
+                ModIcons.tDisplayModsMenu(TJAPlayer3.Skin.SongSelect_ModIcons_X[0], TJAPlayer3.Skin.SongSelect_ModIcons_Y[0], 0);;
 
                 #region [ キー関連 ]
 
@@ -198,11 +208,24 @@ namespace TJAPlayer3
                     // TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
                     // TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
 
-                    CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
+                    //CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + DonchanX), (int)(336 - DonchanY), CMenuCharacter.ECharacterAnimation.NORMAL);
+
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                    int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0];
+
+                    CMenuCharacter.tMenuDisplayCharacter(
+                        0,
+                        chara_x,
+                        chara_y, 
+                        CMenuCharacter.ECharacterAnimation.NORMAL);
 
                     #region [PuchiChara]
 
-                    this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                    int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[0];
+
+                    //this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                    this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
 
                     #endregion
                 }

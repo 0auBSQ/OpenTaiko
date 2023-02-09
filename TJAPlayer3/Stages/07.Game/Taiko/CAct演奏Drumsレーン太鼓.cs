@@ -91,7 +91,7 @@ namespace TJAPlayer3
             
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (i == 1 && TJAPlayer3.ConfigIni.nAILevel > 0 && TJAPlayer3.Tx.Lane_Background_AI != null)
+                if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Lane_Background_AI != null)
                     TJAPlayer3.Tx.Lane_Background_AI?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[i], TJAPlayer3.Skin.Game_Lane_Y[i]);
                 else
                     TJAPlayer3.Tx.Lane_Background_Main?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[i], TJAPlayer3.Skin.Game_Lane_Y[i]);
@@ -600,11 +600,18 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Taiko_Frame[3]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
                 else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
                     TJAPlayer3.Tx.Taiko_Frame[2]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
+                else if (TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Taiko_Frame[5] != null)
+                    TJAPlayer3.Tx.Taiko_Frame[5]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
                 else
                     TJAPlayer3.Tx.Taiko_Frame[0]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
 
                 if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
-                    TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
+                {
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                        TJAPlayer3.Tx.Taiko_Frame[4]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
+                    else
+                        TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
+                }
             }
             var nTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 

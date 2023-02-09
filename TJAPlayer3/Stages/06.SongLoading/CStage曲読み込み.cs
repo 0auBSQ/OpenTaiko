@@ -286,8 +286,8 @@ namespace TJAPlayer3
 							yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
 						}
 
-						float pos = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720) -
-							((ct待機.n現在の値 <= 1200 ? ct待機.n現在の値 / 10f : 120) / 120f * (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720));
+						float pos = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1]) -
+							((ct待機.n現在の値 <= 1200 ? ct待機.n現在の値 / 10f : 120) / 120f * (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1]));
 
 						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(TJAPlayer3.app.Device, 0, -1 * pos);
 						TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(TJAPlayer3.app.Device, xFactor, -1 * yFactor * pos);

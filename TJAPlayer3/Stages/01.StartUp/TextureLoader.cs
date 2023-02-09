@@ -43,7 +43,7 @@ namespace TJAPlayer3
         const string TAIKO = @"6_Taiko\";
         const string GAUGE = @"7_Gauge\";
         public const string FOOTER = @"8_Footer\";
-        const string END = @"9_End\";
+        public const string END = @"9_End\";
         const string EFFECTS = @"10_Effects\";
         const string BALLOON = @"11_Balloon\";
         const string LANE = @"12_Lane\";
@@ -55,6 +55,7 @@ namespace TJAPlayer3
         const string DANC = @"17_DanC\";
         const string TOWER = @"20_Tower\";
         const string MODICONS = @"21_ModIcons\";
+        const string AIBATTLE = @"22_AIBattle\";
 
         // Tower infos
         const string TOWERDON = @"Tower_Don\";
@@ -403,11 +404,13 @@ namespace TJAPlayer3
             Taiko_Background[9] = TxC(GAME + TAIKO + @"AI_Background.png");
             Taiko_Background[10] = TxC(GAME + TAIKO + @"Boss_Background.png");
 
-            Taiko_Frame = new CTexture[4];
+            Taiko_Frame = new CTexture[6];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
             Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
+            Taiko_Frame[4] = TxC(GAME + TAIKO + @"2P_None_Frame.png");
+            Taiko_Frame[5] = TxC(GAME + TAIKO + @"AI_Frame.png");
 
             Taiko_PlayerNumber = new CTexture[2];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
@@ -861,6 +864,24 @@ namespace TJAPlayer3
 
             #endregion
 
+            #region [22_AIBattle]
+
+            AIBattle_SectionTime_Panel = TxC(GAME + AIBATTLE + @"SectionTime_Panel.png");
+
+            AIBattle_SectionTime_Bar_Base = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Base.png");
+            AIBattle_SectionTime_Bar_Finish = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Finish.png");
+            AIBattle_SectionTime_Bar_Normal = TxC(GAME + AIBATTLE + @"SectionTime_Bar_Normal.png");
+
+            AIBattle_Batch_Base = TxC(GAME + AIBATTLE + @"Batch_Base.png");
+            AIBattle_Batch = TxC(GAME + AIBATTLE + @"Batch.png");
+
+            AIBattle_Judge_Meter[0] = TxC(GAME + AIBATTLE + @"Judge_Meter.png");
+            AIBattle_Judge_Meter[1] = TxC(GAME + AIBATTLE + @"Judge_Meter_AI.png");
+
+            AIBattle_Judge_Number = TxC(GAME + AIBATTLE + @"Judge_Number.png");
+
+            #endregion
+
             #endregion
 
             #region 6_結果発表
@@ -914,6 +935,16 @@ namespace TJAPlayer3
 
             #region 7_終了画面
             Exit_Background = TxC(EXIT + @"Background.png");
+            #endregion
+
+            #region 7_AIResults
+
+            Result_AIBattle_Panel_AI = TxC(RESULT + @"AIBattle\Panel_AI.png");
+            Result_AIBattle_Batch = TxC(RESULT + @"AIBattle\Batch.png");
+            Result_AIBattle_SectionPlate = TxC(RESULT + @"AIBattle\SectionPlate.png");
+            Result_AIBattle_WinFlag_Clear = TxC(RESULT + @"AIBattle\WinFlag_Win.png");
+            Result_AIBattle_WinFlag_Lose = TxC(RESULT + @"AIBattle\WinFlag_Lose.png");
+
             #endregion
 
             #region [7_DanResults]
@@ -1021,6 +1052,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Start_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Menu_Select_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
 
+            TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Entry_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Entry_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Title_Normal_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1029,6 +1061,8 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_X_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Y_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1368,6 +1402,8 @@ namespace TJAPlayer3
 
                 #region [Default values]
 
+                TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
+
                 TJAPlayer3.Skin.Characters_Title_Entry_X[i] = new int[] { 485, 485 };
                 TJAPlayer3.Skin.Characters_Title_Entry_Y[i] = new int[] { 140, 140 };
 
@@ -1379,6 +1415,8 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
+                TJAPlayer3.Skin.Characters_X_AI[i] = new int[] { 472, 602 };
+                TJAPlayer3.Skin.Characters_Y_AI[i] = new int[] { 152, 152 };
                 TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
@@ -1422,6 +1460,14 @@ namespace TJAPlayer3
                                 strCommand = strArray[0].Trim();
                                 strParam = strArray[1].Trim();
 
+                                if (strCommand == "Chara_Resolution")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
                                 if (strCommand == "Title_Chara_Entry_X")
                                 {
                                     string[] strSplit = strParam.Split(',');
@@ -1486,6 +1532,22 @@ namespace TJAPlayer3
                                     for (int k = 0; k < 2; k++)
                                     {
                                         TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_X_AI")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Y_AI")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
                                 else if (strCommand == "Game_Chara_Balloon_X")
@@ -1993,12 +2055,25 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [22_AIBattle]
+
+        public CTexture AIBattle_SectionTime_Panel,
+            AIBattle_SectionTime_Bar_Base,
+            AIBattle_SectionTime_Bar_Normal,
+            AIBattle_SectionTime_Bar_Finish,
+            AIBattle_Batch_Base,
+            AIBattle_Batch,
+            AIBattle_Judge_Number;
+
+        public CTexture[] AIBattle_Judge_Meter = new CTexture[2];
+
+        #endregion
+
 
         #endregion
 
         #region 6_結果発表
         public CTexture Result_FadeIn,
-            
             Result_Header,
             Result_Number,
             Result_Panel,
@@ -2030,6 +2105,14 @@ namespace TJAPlayer3
             Result_Speech_Bubble = new CTexture[2],
 
             Result_Mountain = new CTexture[4];
+        #endregion
+
+        #region 7_AIResults
+        public CTexture Result_AIBattle_Panel_AI,
+            Result_AIBattle_Batch,
+            Result_AIBattle_SectionPlate,
+            Result_AIBattle_WinFlag_Clear,
+            Result_AIBattle_WinFlag_Lose;
         #endregion
 
         #region 7_終了画面

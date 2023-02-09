@@ -300,7 +300,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(61));
 			this.list項目リスト.Add(this.iRollsPerSec);
 
-			this.iAILevel = new CItemInteger(CLangManager.LangInstance.GetString(12), 0, 10, TJAPlayer3.ConfigIni.nAILevel,
+			this.iAILevel = new CItemInteger(CLangManager.LangInstance.GetString(12), 1, 10, TJAPlayer3.ConfigIni.nAILevel,
 				CLangManager.LangInstance.GetString(13));
 			this.list項目リスト.Add(this.iAILevel);
 

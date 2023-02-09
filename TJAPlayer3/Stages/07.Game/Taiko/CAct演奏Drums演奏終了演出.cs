@@ -31,11 +31,14 @@ namespace TJAPlayer3
             bSongsPlayed = false;
 
             this.ct進行メイン = new CCounter(0, 300, 22, TJAPlayer3.Timer);
+
+            /*
             this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
             this.ctEnd_FullCombo = new CCounter(0, 66, 33, TJAPlayer3.Timer);
             this.ctEnd_FullComboLoop = new CCounter(0, 2, 30, TJAPlayer3.Timer);
             this.ctEnd_DondaFullCombo = new CCounter(0, 61, 33, TJAPlayer3.Timer);
             this.ctEnd_DondaFullComboLoop = new CCounter(0, 2, 30, TJAPlayer3.Timer);
+            */
 
             // モードの決定。クリア失敗・フルコンボも事前に作っとく。
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
@@ -134,6 +137,20 @@ namespace TJAPlayer3
             this.b再生済み = false;
             if (!base.b活性化してない)
             {
+                var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
+
+                FailedScript = new EndAnimeScript($@"{origindir}ClearFailed\Script.lua");
+                FailedScript.Init();
+
+                ClearScript = new EndAnimeScript($@"{origindir}Clear\Script.lua");
+                ClearScript.Init();
+
+                FullComboScript = new EndAnimeScript($@"{origindir}FullCombo\Script.lua");
+                FullComboScript.Init();
+
+                DondaFullComboScript = new EndAnimeScript($@"{origindir}DondaFullCombo\Script.lua");
+                DondaFullComboScript.Init();
+
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     this.soundClear[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Clear.ogg"), ESoundGroup.SoundEffect);
@@ -150,6 +167,10 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
+                FailedScript.Dispose();
+                ClearScript.Dispose();
+                FullComboScript.Dispose();
+                DondaFullComboScript.Dispose();
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                         this.soundClear[i]?.t解放する();
@@ -166,7 +187,12 @@ namespace TJAPlayer3
         // ------------------------------------
         private void showEndEffect_Failed(int i)
         {
+            FailedScript.Update(i);
+            FailedScript.Draw(i);
+
             int[] y = new int[] { 0, 176 };
+
+            /*
 
             this.ctEnd_ClearFailed.t進行();
             if (this.ctEnd_ClearFailed.n現在の値 <= 20 || TJAPlayer3.Tx.ClearFailed == null)
@@ -185,9 +211,14 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.Tx.ClearFailed2?.t2D描画(TJAPlayer3.app.Device, 502, y[i] + 192);
             }
+            */
         }
         private void showEndEffect_Clear(int i)
         {
+            ClearScript.Update(i);
+            ClearScript.Draw(i);
+
+            /*
             int[] y = new int[] { 210, 386 };
             #region[ 文字 ]
             //登場アニメは20フレーム。うち最初の5フレームは半透過状態。
@@ -355,10 +386,16 @@ namespace TJAPlayer3
             }
 
             #endregion
+
+            */
         }
 
         private void showEndEffect_FullCombo(int i)
         {
+            FullComboScript.Update(i);
+            FullComboScript.Draw(i);
+
+            /*
             int[] y = new int[] { 0, 176 };
 
             this.ctEnd_FullCombo.t進行();
@@ -369,10 +406,15 @@ namespace TJAPlayer3
                 this.ctEnd_FullComboLoop.t進行Loop();
                 TJAPlayer3.Tx.End_FullComboLoop[this.ctEnd_FullComboLoop.n現在の値]?.t2D描画(TJAPlayer3.app.Device, 330, y[i] + 196);
             }
+            */
         }
 
         private void showEndEffect_DondaFullCombo(int i)
         {
+            DondaFullComboScript.Update(i);
+            DondaFullComboScript.Draw(i);
+
+            /*
             int[] y = new int[] { 0, 176 };
 
             this.ctEnd_DondaFullCombo.t進行();
@@ -410,18 +452,22 @@ namespace TJAPlayer3
                         switch (this.Mode[i])
                         {
                             case EndMode.StageFailed:
+                                FailedScript.PlayEndAnime(i);
                                 this.soundFailed[i]?.t再生を開始する();
                                 TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
                                 break;
                             case EndMode.StageCleared:
+                                ClearScript.PlayEndAnime(i);
                                 this.soundClear[i]?.t再生を開始する();
                                 TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
                                 break;
                             case EndMode.StageFullCombo:
+                                FullComboScript.PlayEndAnime(i);
                                 this.soundFullCombo[i]?.t再生を開始する();
                                 TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
                                 break;
                             case EndMode.StageDondaFullCombo:
+                                DondaFullComboScript.PlayEndAnime(i);
                                 this.soundDondaFullCombo[i]?.t再生を開始する();
                                 TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
                                 break;
@@ -469,16 +515,24 @@ namespace TJAPlayer3
 
         #region[ private ]
         //-----------------
+
+        private EndAnimeScript FailedScript;
+        private EndAnimeScript ClearScript;
+        private EndAnimeScript FullComboScript;
+        private EndAnimeScript DondaFullComboScript;
+
         bool b再生済み;
         bool bリザルトボイス再生済み;
         bool bSongsPlayed = false;
         CCounter ct進行メイン;
 
+        /*
         CCounter ctEnd_ClearFailed;
         CCounter ctEnd_FullCombo;
         CCounter ctEnd_FullComboLoop;
         CCounter ctEnd_DondaFullCombo;
         CCounter ctEnd_DondaFullComboLoop;
+        */
 
         CCounter ct進行Loop;
         CSound[] soundClear = new CSound[4];

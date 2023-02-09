@@ -82,9 +82,9 @@ namespace TJAPlayer3
                 {
                     var _page = _controler.Pages[_controler.PageIndex];
 
-                    _page.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, 960, 180);
-                    _page.Item3?.t2D描画(TJAPlayer3.app.Device, 640, 360);
-                    _controler.PageText?.t2D下中央基準描画(TJAPlayer3.app.Device, 960, 720);
+                    _page.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[1]);
+                    _page.Item3?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[1]);
+                    _controler.PageText?.t2D下中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[1]);
                 }
             }
 
@@ -106,11 +106,16 @@ namespace TJAPlayer3
                     _menu.Item2?.tUpdateColor4(C変換.ColorToColor4(Color.White));
                 }
 
+                int x = TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu[0] + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Move[0] * i;
+                int y = TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu[1] + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Move[1] * i;
+
                 if (_pos == 0)
-                    TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
+                    TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.t2D中心基準描画(TJAPlayer3.app.Device, x, y);
                 else
-                    TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
-                _menu.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, 320, 360 + i * 90);
+                    TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(TJAPlayer3.app.Device, x, y);
+                _menu.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, 
+                    x + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[0], 
+                    y + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[1]);
             }
 
             #endregion

@@ -70,6 +70,7 @@ namespace TJAPlayer3
 
             base.list子Activities.Add(this.actDan = new Dan_Cert());
             base.list子Activities.Add(this.actTokkun = new CAct演奏Drums特訓モード());
+            base.list子Activities.Add(this.actAIBattle = new AIBattle());
             #region[ 文字初期化 ]
             ST文字位置[] st文字位置Array = new ST文字位置[ 12 ];
 			ST文字位置 st文字位置 = new ST文字位置();
@@ -538,6 +539,13 @@ namespace TJAPlayer3
                     if (btmp == true)
                         ifp[i] = true;
 
+#if DEBUG
+                    if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.D0))
+                    {
+                        ifp[i] = true;
+                    }
+#endif
+
                     this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
                 }
 
@@ -546,6 +554,12 @@ namespace TJAPlayer3
                 this.actDan.On進行描画();
 
                 this.actMtaiko.On進行描画();
+
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    this.actAIBattle.On進行描画();
+                }
+
                 this.GoGoSplash.On進行描画();
                 this.t進行描画_リアルタイム判定数表示();
                 if (TJAPlayer3.ConfigIni.bTokkunMode)
@@ -604,6 +618,7 @@ namespace TJAPlayer3
                 {
                     actTokkun.On進行描画();
                 }
+
 
                 bIsFinishedEndAnime = this.actEnd.On進行描画() == 1 ? true : false;
 				bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();
@@ -971,7 +986,7 @@ namespace TJAPlayer3
 
                     if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
                         break;
-                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0) && isPad2P)
+                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode) && isPad2P)
                         break;
                     var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
                     var isDon = padTo < 2 ? true : false;
@@ -1254,7 +1269,9 @@ namespace TJAPlayer3
                                     // To be added later
                                     bool _isKongaPinkRoll = NotesManager.IsBigRoll(chipNoHit) && _gt == EGameType.KONGA;
 
-                                    bool _isBlueOnly = (NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO;
+                                    // To improve (array of functions ?)
+                                    bool _isBlueOnly = ((NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO)
+                                        && !_isBalloon && !_isKusudama;
 
                                     if ((_isRedOnly && !_isBlue) || (_isBlueOnly && _isBlue))
                                         this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
@@ -1648,7 +1665,7 @@ namespace TJAPlayer3
                                 bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
                                 break;
                             case 1:
-                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
+                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                                 break;
                             case 2:
                             case 3:
@@ -1774,33 +1791,6 @@ namespace TJAPlayer3
                         float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
                         y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
-
-                        /*
-                        if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.Normal)
-                        {
- 
-                            y += (int)((
-                                (pChip.n発声時刻ms - CSound管理.rc演奏用タイマ.n現在時刻) 
-                                * pChip.dbBPM 
-                                * pChip.dbSCROLL_Y 
-                                * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0)) 
-                                / 502.8594 
-                                / 5.0);
-                        }
-                            
-                        else if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.BMSCROLL || TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.HBSCROLL)
-                        {
-                            float? play_bpm_time = null;
-                            if (!play_bpm_time.HasValue)
-                            {
-                                play_bpm_time = this.GetNowPBMTime(dTX, 0);
-                            }
-                            var dbSCROLL_Y = configIni.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL_Y;
-
-                            y += (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 2 / 5.0);
-                        }
-                        */
-
                     }
 
                     if ( pChip.nバーからの距離dot.Drums < 0 )
@@ -2130,6 +2120,11 @@ namespace TJAPlayer3
                         var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
                         float f末端ノーツのテクスチャ位置調整 = 65f;
 
+                        //136, 30
+                        var _size = TJAPlayer3.Skin.Game_SENote_Size;
+                        int _60_cut = 60 * _size[0] / 136;
+                        int _58_cut = 58 * _size[0] / 136;
+                        int _78_cut = 78 * _size[0] / 136;
 
                         if (NotesManager.IsRoll(pChip))
                         {
@@ -2138,12 +2133,13 @@ namespace TJAPlayer3
                             if (TJAPlayer3.Tx.SENotes[(int)_gt] != null)
                             {
                                 int _shift = NotesManager.IsBigRoll(pChip) ? 26 : 0;
+                                
 
                                 TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(60, 240, 1, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
                                 TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 240, 60, 30));
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
+                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * pChip.nSenote, _size[0], _size[1]));
                             }
                             
                         }
@@ -2190,7 +2186,7 @@ namespace TJAPlayer3
                             {
                                 //if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                 //    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
-                                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x + 56, y + nSenotesY, new Rectangle(58, 270, 78, 30));
+                                TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
                             }
 
                         }
@@ -2199,7 +2195,7 @@ namespace TJAPlayer3
                 if (pChip.n発声時刻ms < (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && pChip.nノーツ終了時刻ms > (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                 {
                     //時間内でかつ0x9Aじゃないならならヒット処理
-                    if (!NotesManager.IsRollEnd(pChip) && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
+                    if (!NotesManager.IsRollEnd(pChip) && (nPlayer == 0 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)))
                         this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer);
                 }
             }
@@ -2228,8 +2224,13 @@ namespace TJAPlayer3
 
             if( pChip.dbSCROLL_Y != 0.0 )
             {
-                y = TJAPlayer3.Skin.nScrollFieldY[ nPlayer ];
-                y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
+                double _scrollSpeed = pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
+                long __dbt = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                long time = pChip.n発声時刻ms - __dbt;
+                float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+                y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+
+                //y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
             }
 
             if ( !pChip.bHit && pChip.n発声時刻ms > CSound管理.rc演奏用タイマ.n現在時刻 )
@@ -2300,12 +2301,6 @@ namespace TJAPlayer3
 
                         }
 
-                    }
-                    else
-                    {
-                        //if (actChara.CharaAction_Balloon_Breaking.b進行中 && chip現在処理中の連打チップ[i].nPlayerSide == 0)
-                        //{
-                        //}
                     }
                 }
             }
@@ -2380,10 +2375,10 @@ namespace TJAPlayer3
                 if( TJAPlayer3.Tx.Judge_Meter != null )
                     TJAPlayer3.Tx.Judge_Meter.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Judge_Meter[0], TJAPlayer3.Skin.Game_Judge_Meter[1]);
 
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Perfect[0], TJAPlayer3.Skin.Game_Judge_Meter_Perfect[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Perfect), false );
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Good[0], TJAPlayer3.Skin.Game_Judge_Meter_Good[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Great), false );
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Miss[0], TJAPlayer3.Skin.Game_Judge_Meter_Miss[1], string.Format("{0,4:###0}", this.nヒット数_Auto含まない.Drums.Miss), false );
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Roll[0], TJAPlayer3.Skin.Game_Judge_Meter_Roll[1], string.Format("{0,4:###0}", GetRoll(0)), false);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Perfect[0], TJAPlayer3.Skin.Game_Judge_Meter_Perfect[1], this.nヒット数_Auto含まない.Drums.Perfect, false, false);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Good[0], TJAPlayer3.Skin.Game_Judge_Meter_Good[1], this.nヒット数_Auto含まない.Drums.Great, false, false);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Miss[0], TJAPlayer3.Skin.Game_Judge_Meter_Miss[1], this.nヒット数_Auto含まない.Drums.Miss, false, false);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_Roll[0], TJAPlayer3.Skin.Game_Judge_Meter_Roll[1], GetRoll(0), false, false);
 
                 int nNowTotal = this.nヒット数_Auto含まない.Drums.Perfect + this.nヒット数_Auto含まない.Drums.Great + this.nヒット数_Auto含まない.Drums.Miss;
                 double dbたたけた率 = Math.Round((100.0 * ( TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great)) / (double)nNowTotal);
@@ -2400,62 +2395,54 @@ namespace TJAPlayer3
                 if (double.IsNaN(dbMISS率))
                     dbMISS率 = 0;
 
-                this.t大文字表示(TJAPlayer3.Skin.Game_Judge_Meter_HitRate[0], TJAPlayer3.Skin.Game_Judge_Meter_HitRate[1], string.Format("{0,3:##0}%", dbたたけた率));
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[0], TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[1], string.Format("{0,3:##0}%", dbPERFECT率), false );
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[0], TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[1], string.Format("{0,3:##0}%", dbGREAT率), false );
-                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_MissRate[0], TJAPlayer3.Skin.Game_Judge_Meter_MissRate[1], string.Format("{0,3:##0}%", dbMISS率), false );
+                this.t大文字表示(TJAPlayer3.Skin.Game_Judge_Meter_HitRate[0], TJAPlayer3.Skin.Game_Judge_Meter_HitRate[1], (int)dbたたけた率);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[0], TJAPlayer3.Skin.Game_Judge_Meter_PerfectRate[1], (int)dbPERFECT率, false, true);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[0], TJAPlayer3.Skin.Game_Judge_Meter_GoodRate[1], (int)dbGREAT率, false, true);
+                this.t小文字表示(TJAPlayer3.Skin.Game_Judge_Meter_MissRate[0], TJAPlayer3.Skin.Game_Judge_Meter_MissRate[1], (int)dbMISS率, false, true);
             }
         }
 
-        private void t小文字表示( int x, int y, string str, bool bOrange )
-		{
-			foreach( char ch in str )
-			{
-				for( int i = 0; i < this.st小文字位置.Length; i++ )
-				{
-                    if( ch == ' ' )
-                    {
-                        break;
-                    }
+        private void t小文字表示( int x, int y, int num, bool bOrange, bool drawPercent )
+        {
+            float width = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Width / 11.0f;
+            float height = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Height / 2.0f;
 
-					if( this.st小文字位置[ i ].ch == ch )
-					{
-						Rectangle rectangle = new Rectangle( this.st小文字位置[ i ].pt.X, this.st小文字位置[ i ].pt.Y, 32, 38 );
-						if( TJAPlayer3.Tx.Result_Number != null )
-						{
-                            TJAPlayer3.Tx.Result_Number.t2D描画( TJAPlayer3.app.Device, x, y, rectangle );
-						}
-						break;
-					}
-				}
-				x += 22;
-			}
+            int[] nums = C変換.SeparateDigits(num);
+
+            if (drawPercent)
+            {
+                TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + (TJAPlayer3.Skin.Result_Number_Interval[0] * 3.0f) + (width / 2),
+                    y + (TJAPlayer3.Skin.Result_Number_Interval[1] * 3.0f) + (height / 2),
+                    new System.Drawing.RectangleF(width * 10, 0, width, height));
+            }
+
+            for (int j = 0; j < nums.Length; j++)
+            {
+                float offset = j - 1.5f;
+                float _x = x - (TJAPlayer3.Skin.Result_Number_Interval[0] * offset);
+                float _y = y - (TJAPlayer3.Skin.Result_Number_Interval[1] * offset);
+
+                TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, _x + (width / 2), _y + (height / 2),
+                    new System.Drawing.RectangleF(width * nums[j], 0, width, height));
+            }
         }
 
-        private void t大文字表示( int x, int y, string str )
-		{
-			foreach( char ch in str )
-			{
-				for( int i = 0; i < this.st小文字位置.Length; i++ )
-				{
-                    if( ch == ' ' )
-                    {
-                        break;
-                    }
+        private void t大文字表示( int x, int y, int num)
+        {
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
+            {
+                float offset = j - 1.5f;
+                float _x = x - ((TJAPlayer3.Skin.Result_Number_Interval[0] * 1.27f) * offset);
+                float _y = y - ((TJAPlayer3.Skin.Result_Number_Interval[1] * 1.27f) * offset);
 
-					if( this.st小文字位置[ i ].ch == ch )
-					{
-						Rectangle rectangle = new Rectangle( this.st小文字位置[ i ].pt.X, 38, 32, 42 );
-						if(TJAPlayer3.Tx.Result_Number != null )
-						{
-                            TJAPlayer3.Tx.Result_Number.t2D描画( TJAPlayer3.app.Device, x, y, rectangle );
-						}
-						break;
-					}
-				}
-				x += 28;
-			}
-		}
+                float width = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Width / 11.0f;
+                float height = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Height / 2.0f;
+
+                TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, _x + (width / 2), _y + (height / 2),
+                    new System.Drawing.RectangleF(width * nums[j], height, width, height));
+            }
+        }
 		#endregion
 	}
 }

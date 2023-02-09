@@ -208,6 +208,67 @@ namespace TJAPlayer3
                 }
             }
 
+            AIBattleState = 0;
+
+            this.AIBattleSections = new List<AIBattleSection>();
+
+            CDTX.CChip endChip = null;
+            for (int i = 0; i < listChip[0].Count; i++)
+            {
+                CDTX.CChip chip = listChip[0][i];
+                if (endChip == null || (chip.n発声時刻ms > endChip.n発声時刻ms && chip.nチャンネル番号 == 0x50))
+                {
+                    endChip = chip;
+                }
+            }
+
+            int battleSectionCount = 3 + ((endChip.n発声時刻ms * 2) / 100000);
+            // Avoid single section
+            if (battleSectionCount <= 1)
+                battleSectionCount = 3;
+            // Avoid ties
+            if (battleSectionCount % 2 == 0)
+                battleSectionCount -= 1;
+
+
+            int battleSectionTime = 0;
+
+            int nowBattleSectionCount = 1;
+
+            for (int i = 0; i < listChip[0].Count; i++)
+            {
+                CDTX.CChip chip = listChip[0][i];
+
+                if (nowBattleSectionCount == battleSectionCount)
+                {
+                    chip = endChip;
+                    i = listChip[0].Count - 1;
+                }
+
+                int endtime = endChip.n発声時刻ms / battleSectionCount;
+
+                bool isAddSection = (nowBattleSectionCount != battleSectionCount) ? 
+                    chip.n発声時刻ms >= endtime * nowBattleSectionCount : 
+                    i == listChip[0].Count - 1;
+
+
+                if (isAddSection)
+                {
+                    AIBattleSection aIBattleSection = new AIBattleSection();
+
+                    aIBattleSection.StartTime = battleSectionTime;
+                    aIBattleSection.EndTime = chip.n発声時刻ms;
+                    aIBattleSection.Length = aIBattleSection.EndTime - aIBattleSection.StartTime;
+
+                    this.AIBattleSections.Add(aIBattleSection);
+
+                    battleSectionTime = aIBattleSection.EndTime;
+                    nowBattleSectionCount++;
+                }
+            }
+
+            NowAIBattleSectionCount = 0;
+
             ctChipAnime = new CCounter[2];
             ctChipAnimeLag = new CCounter[2];
             for (int i = 0; i < 2; i++)
@@ -307,6 +368,7 @@ namespace TJAPlayer3
             }
             this.nJPOSSCROLL = new int[ 4 ];
             this.bLEVELHOLD = new bool[]{ false, false, false, false };
+
 
             // Double play set here
             this.bDoublePlay = TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? true : false;
@@ -601,6 +663,7 @@ namespace TJAPlayer3
         public CAct演奏DrumsFooter actFooter;
         public CAct演奏DrumsMob actMob;
         public Dan_Cert actDan;
+        public AIBattle actAIBattle;
         public CAct演奏Drums特訓モード actTokkun;
         public bool bPAUSE;
         public bool[] bIsAlreadyCleared;
@@ -722,6 +785,55 @@ namespace TJAPlayer3
         public double nBranch条件数値A;
         public double nBranch条件数値B;
         private readonly int[] NowProcessingChip = new int[] { 0, 0 };
+
+        public int AIBattleState;
+
+        public class AIBattleSection
+        {
+            public enum EndType
+            {
+                None,
+                Clear,
+                Lose
+            }
+
+            public int Length;
+            public int StartTime;
+            public int EndTime;
+
+            public EndType End;
+            public bool IsAnimated;
+        }
+
+        public List<AIBattleSection> AIBattleSections;
+
+        public int NowAIBattleSectionCount;
+        public int NowAIBattleSectionTime;
+        public AIBattleSection NowAIBattleSection
+        {
+            get
+            {
+                return AIBattleSections[Math.Min(NowAIBattleSectionCount, AIBattleSections.Count - 1)];
+            }
+        }
+
+        private void PassAIBattleSection()
+        {
+            if (AIBattleState >= 0)
+            {
+                NowAIBattleSection.End = AIBattleSection.EndType.Clear;
+                if (TJAPlayer3.ConfigIni.nAILevel < 10)
+                    TJAPlayer3.ConfigIni.nAILevel++;
+            }
+            else
+            {
+                NowAIBattleSection.End = AIBattleSection.EndType.Lose;
+                if (TJAPlayer3.ConfigIni.nAILevel > 1)
+                    TJAPlayer3.ConfigIni.nAILevel--;
+            }
+            actAIBattle.BatchAnimeCounter.n現在の値 = 0;
+            AIBattleState = 0;
+        }
 
         public void AddMixer( CSound cs, bool _b演奏終了後も再生が続くチップである )
 		{
@@ -1391,7 +1503,7 @@ namespace TJAPlayer3
                     bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0;
+                    bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                     break;
             }
 
@@ -1435,7 +1547,7 @@ namespace TJAPlayer3
                             if (bAutoPlay)
                             {
                                 int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
-                                if (TJAPlayer3.ConfigIni.nAILevel > 0 && nPlayer == 1)
+                                if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
                                     rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
 
                                 if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
@@ -1565,7 +1677,7 @@ namespace TJAPlayer3
                         if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
                         {
 
-                            this.actJudgeString.Start(nPlayer, (bAutoPlay && TJAPlayer3.ConfigIni.nAILevel == 0) ? E判定.Auto : eJudgeResult);
+                            this.actJudgeString.Start(nPlayer, (bAutoPlay && !TJAPlayer3.ConfigIni.bAIBattleMode) ? E判定.Auto : eJudgeResult);
                             TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(pChip.nチャンネル番号, eJudgeResult, true, nPlayer);
                             TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(pChip.nチャンネル番号, eJudgeResult, nPlayer);
                         }
@@ -1694,6 +1806,19 @@ namespace TJAPlayer3
                                         this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
                                     }
 
+
+                                    if (nPlayer == 0)
+                                    {
+                                        AIBattleState += 2;
+                                        AIBattleState = Math.Min(AIBattleState, 9);
+                                    }
+                                    else if (nPlayer == 1)
+                                    {
+                                        AIBattleState -= 2;
+                                        AIBattleState = Math.Max(AIBattleState, -9);
+                                    }
+
+
                                     if (this.bIsMiss[nPlayer])
                                     {
                                         returnChara();
@@ -1728,6 +1853,19 @@ namespace TJAPlayer3
                                     {
                                         this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
                                     }
+
+
+                                    if (nPlayer == 0)
+                                    {
+                                        AIBattleState += 1;
+                                        AIBattleState = Math.Min(AIBattleState, 9);
+                                    }
+                                    else if (nPlayer == 1)
+                                    {
+                                        AIBattleState -= 1;
+                                        AIBattleState = Math.Max(AIBattleState, -9);
+                                    }
+
 
                                     if (this.bIsMiss[nPlayer])
                                     {
@@ -1805,6 +1943,20 @@ namespace TJAPlayer3
                                             this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
                                         }
 
+
+                                        if (nPlayer == 0)
+                                        {
+                                            AIBattleState += 2;
+                                            AIBattleState = Math.Min(AIBattleState, 9);
+                                        }
+                                        else if (nPlayer == 1)
+                                        {
+                                            AIBattleState -= 2;
+                                            AIBattleState = Math.Max(AIBattleState, -9);
+                                        }
+
+
+
                                         if (this.bIsMiss[nPlayer])
                                         {
                                             returnChara();
@@ -1841,6 +1993,20 @@ namespace TJAPlayer3
                                         {
                                             this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
                                         }
+
+
+                                        if (nPlayer == 0)
+                                        {
+                                            AIBattleState += 1;
+                                            AIBattleState = Math.Min(AIBattleState, 9);
+                                        }
+                                        else if (nPlayer == 1)
+                                        {
+                                            AIBattleState -= 1;
+                                            AIBattleState = Math.Max(AIBattleState, -9);
+                                        }
+
+
 
                                         if (this.bIsMiss[nPlayer])
                                         {
@@ -2979,6 +3145,8 @@ namespace TJAPlayer3
 
             var n現在時刻ms = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 
+            NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
+
             if ( this.r指定時刻に一番近い未ヒットChip( (long)n現在時刻ms, 0x50, 0, 1000000, nPlayer ) == null )
             {
                 this.actChara.b演奏中[nPlayer] = false;
@@ -3005,7 +3173,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
@@ -3286,7 +3454,21 @@ namespace TJAPlayer3
 					case 0x50:	// 小節線
 						{
                             if ( !pChip.bHit && ( pChip.nバーからの距離dot.Taiko < 0 ) )
-						    {
+                            {
+                                if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0)
+                                {
+                                    PassAIBattleSection();
+
+                                    NowAIBattleSectionCount++;
+
+                                    if (AIBattleSections.Count > NowAIBattleSectionCount)
+                                    {
+                                        NowAIBattleSectionTime = 0;
+                                    }
+                                    NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
+                                }
+
+
                                 this.actChara.b演奏中[nPlayer] = true;
                                 if( this.actPlayInfo.NowMeasure[nPlayer] == 0 )
                                 {
@@ -3915,7 +4097,7 @@ namespace TJAPlayer3
                     bAutoPlay = configIni.b太鼓パートAutoPlay;
                     break;
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || configIni.nAILevel > 0;
+                    bAutoPlay = configIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 default:
@@ -4253,7 +4435,18 @@ namespace TJAPlayer3
 
         public void t演奏やりなおし()
         {
-			TJAPlayer3.DTX.t全チップの再生停止とミキサーからの削除();
+            AIBattleState = 0;
+
+            NowAIBattleSectionCount = 0;
+            NowAIBattleSectionTime = 0;
+
+            for (int i = 0; i < AIBattleSections.Count; i++)
+            {
+                AIBattleSections[i].End = AIBattleSection.EndType.None;
+                AIBattleSections[i].IsAnimated = false;
+            }
+
+            TJAPlayer3.DTX.t全チップの再生停止とミキサーからの削除();
             this.t数値の初期化( true, true );
             this.actAVI.tReset();
             this.actPanel.t歌詞テクスチャを削除する();
@@ -4644,7 +4837,7 @@ namespace TJAPlayer3
         public E判定 AlterJudgement(int player, E判定 judgement, bool reroll)
         {
             int AILevel = TJAPlayer3.ConfigIni.nAILevel;
-            if (AILevel > 0 && player == 1)
+            if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1)
             {
                 if (reroll)
                     nDice = TJAPlayer3.Random.Next(1000);

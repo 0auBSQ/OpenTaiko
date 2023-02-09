@@ -34,11 +34,11 @@ namespace TJAPlayer3
             _pfEncyclopediaMenu?.Dispose();
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
             {
-                _pfEncyclopediaMenu = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+                _pfEncyclopediaMenu = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
             }
             else
             {
-                _pfEncyclopediaMenu = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+                _pfEncyclopediaMenu = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
             }
         }
 

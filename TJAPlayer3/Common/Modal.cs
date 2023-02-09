@@ -39,12 +39,12 @@ namespace TJAPlayer3
             _boxRect = new Rectangle(
                 (modalFormat == EModalFormat.Full || player == 0)
                     ? 0
-                    : 640,
+                    : _box.szテクスチャサイズ.Width / 2,
                 0,
                 (modalFormat == EModalFormat.Full)
-                    ? 1280
-                    : 640,
-                720);
+                    ? _box.szテクスチャサイズ.Width
+                    : _box.szテクスチャサイズ.Width / 2,
+                _box.szテクスチャサイズ.Height);
 
             tGenerateTextures();
 
@@ -55,12 +55,17 @@ namespace TJAPlayer3
         {
             if (_isSet == true)
             {
-                _box?.t2D描画(TJAPlayer3.app.Device, 640 * player, 0, _boxRect);
+                _box?.t2D描画(TJAPlayer3.app.Device, (_box.szテクスチャサイズ.Width / 2) * player, 0, _boxRect);
 
                 Point[] Pos = new Point[]
                 {
-                    (modalFormat == EModalFormat.Full) ? new Point(640, 140) : new Point(320 + 640 * player, 290), // title
-                    (modalFormat == EModalFormat.Full) ? new Point(640, tTextCentered() ? 445 : 327) : new Point(320 + 640 * player, tTextCentered() ? 442 : 383), // content
+                    (modalFormat == EModalFormat.Full) ? new Point(TJAPlayer3.Skin.Modal_Title_Full[0], TJAPlayer3.Skin.Modal_Title_Full[1]) : new Point(TJAPlayer3.Skin.Modal_Title_Half_X[player], TJAPlayer3.Skin.Modal_Title_Half_Y[player]), // title
+                    (modalFormat == EModalFormat.Full) ? 
+                    new Point(TJAPlayer3.Skin.Modal_Text_Full[0] +(tTextCentered () ?  TJAPlayer3.Skin.Modal_Text_Full_Move[0] : 0), 
+                    TJAPlayer3.Skin.Modal_Text_Full[1] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Full_Move[1] : 0)) : 
+
+                    new Point(TJAPlayer3.Skin.Modal_Text_Half_X[player] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Half_Move[0] : 0),
+                    TJAPlayer3.Skin.Modal_Text_Half_Y[player] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Half_Move[1] : 0)), // content
                 };
 
                 _ModalTitle?.t2D中心基準描画(TJAPlayer3.app.Device, Pos[0].X, Pos[0].Y);
@@ -88,17 +93,17 @@ namespace TJAPlayer3
 
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
             {
-                _pfModalContentHalf = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
-                _pfModalTitleHalf = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
-                _pfModalContentFull = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 56);
-                _pfModalTitleFull = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 56);
+                _pfModalContentHalf = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Modal_Font_ModalContentHalf_Size);
+                _pfModalTitleHalf = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Modal_Font_ModalTitleHalf_Size);
+                _pfModalContentFull = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Modal_Font_ModalContentFull_Size);
+                _pfModalTitleFull = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Modal_Font_ModalTitleFull_Size);
             }
             else
             {
-                _pfModalContentHalf = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
-                _pfModalTitleHalf = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
-                _pfModalContentFull = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 56);
-                _pfModalTitleFull = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 56);
+                _pfModalContentHalf = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Modal_Font_ModalContentHalf_Size);
+                _pfModalTitleHalf = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Modal_Font_ModalTitleHalf_Size);
+                _pfModalContentFull = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Modal_Font_ModalContentFull_Size);
+                _pfModalTitleFull = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Modal_Font_ModalTitleFull_Size);
             }
         }
 

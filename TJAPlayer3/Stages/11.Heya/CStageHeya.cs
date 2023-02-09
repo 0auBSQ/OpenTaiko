@@ -230,7 +230,15 @@ namespace TJAPlayer3
 
                     int puriColumn = pos % 5;
                     int puriRow = pos / 5;
-                    
+
+                    if (TJAPlayer3.Tx.Puchichara[pos].tx != null)
+                    {
+                        float puchiScale = TJAPlayer3.Skin.Resolution[1] / 1080.0f;
+
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.X = puchiScale;
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.Y = puchiScale;
+                    }
+
                     TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0], 
                         scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[1] + (int)(PuchiChara.sineY), 
                         new Rectangle((PuchiChara.Counter.n現在の値 + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
@@ -441,13 +449,19 @@ namespace TJAPlayer3
             {
                 float DonchanX = 0f, DonchanY = 0f;
 
-                DonchanX = (float)Math.Sin(ctDonchan_In.n現在の値 / 2 * (Math.PI / 180)) * 200f;
+                DonchanX = -200 + (float)Math.Sin(ctDonchan_In.n現在の値 / 2 * (Math.PI / 180)) * 200f;
                 DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
 
-                int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(0)];
+                //int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(0)];
 
-                int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + DonchanX));
-                int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - DonchanY);
+                //int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + DonchanX));
+                //int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - DonchanY);
+
+                int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] - (int)DonchanY;
+
+                int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
+                int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[0];
 
                 //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
                 //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(TJAPlayer3.app.Device, -200 + DonchanX, 336 - DonchanY);
@@ -456,9 +470,9 @@ namespace TJAPlayer3
 
                 #region [PuchiChara]
 
-                this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
+                this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
 
-                    #endregion
+                #endregion
             }
 
             #endregion

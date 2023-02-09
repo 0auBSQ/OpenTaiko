@@ -897,6 +897,7 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
+								ConfigIni.bAIBattleMode = false;
 								//-----------------------------
 								#endregion
 								break;
@@ -910,6 +911,8 @@ namespace TJAPlayer3
 								stage段位選択.On活性化();								
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage段位選択;
+
+								ConfigIni.bAIBattleMode = false;
 
 								TJAPlayer3.latestSongSelect = stage段位選択;
 								//-----------------------------
@@ -980,9 +983,27 @@ namespace TJAPlayer3
 								//-----------------------------
 								#endregion
 								break;
+
+							case (int)CStageタイトル.E戻り値.AIBATTLEMODE:
+								#region [ 選曲処理へ ]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ 選曲");
+								stage選曲.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stage選曲;
+
+								TJAPlayer3.latestSongSelect = stage選曲;
+								ConfigIni.nPlayerCount = 2;
+								ConfigIni.bAIBattleMode = true;
+								//-----------------------------
+								#endregion
+								break;
+
 						}
 
-						foreach( STPlugin pg in this.listプラグイン )
+						foreach ( STPlugin pg in this.listプラグイン )
 						{
 							Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
 							pg.plugin.Onステージ変更();
@@ -2147,9 +2168,6 @@ for (int i = 0; i < 3; i++) {
 			}
 			this.Window.EnableSystemMenu = TJAPlayer3.ConfigIni.bIsEnabledSystemMenu;	// #28200 2011.5.1 yyagi
 			// 2012.8.22 Config.iniが無いときに初期値が適用されるよう、この設定行をifブロック外に移動
-			
-			// Init Modal fonts once config.ini parsing is done
-			Modal.tInitModalFonts();
 
 			//---------------------
 			#endregion
@@ -2304,6 +2322,10 @@ for (int i = 0; i < 3; i++) {
 			{
 				Trace.Unindent();
 			}
+
+			// Init Modal fonts once config.ini parsing is done
+			// Moved here to reference Skin values.
+			Modal.tInitModalFonts();
 			//---------------------
 			#endregion
 			//-----------
@@ -3124,7 +3146,8 @@ for (int i = 0; i < 3; i++) {
 			TJAPlayer3.Tx.LoadTexture();
 
             TJAPlayer3.act文字コンソール.On活性化();
-        }
+			TJAPlayer3.NamePlate.RefleshSkin();
+		}
 		#region [ Windowイベント処理 ]
 		private void t指定フォルダ内でのプラグイン検索と生成( string strプラグインフォルダパス, string strプラグイン型名 )
 		{

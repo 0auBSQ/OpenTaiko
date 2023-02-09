@@ -35,6 +35,10 @@ namespace TJAPlayer3
         {
             Textures[fileName]?.t2D描画(TJAPlayer3.app.Device, (int)x, (int)y);
         }
+        public void DrawRectGraph(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName)
+        {
+            Textures[fileName]?.t2D描画(TJAPlayer3.app.Device, (int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+        }
         public void DrawGraphCenter(double x, double y, string fileName)
         {
             Textures[fileName]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)x, (int)y);
@@ -71,15 +75,15 @@ namespace TJAPlayer3
     {
         public Dictionary<string, CTexture> Textures;
 
-        private Lua LuaScript;
+        protected Lua LuaScript;
 
-        private LuaFunction LuaSetConstValues;
-        private LuaFunction LuaUpdateValues;
-        private LuaFunction LuaClearIn;
-        private LuaFunction LuaClearOut;
-        private LuaFunction LuaInit;
-        private LuaFunction LuaUpdate;
-        private LuaFunction LuaDraw;
+        protected LuaFunction LuaSetConstValues;
+        protected LuaFunction LuaUpdateValues;
+        protected LuaFunction LuaClearIn;
+        protected LuaFunction LuaClearOut;
+        protected LuaFunction LuaInit;
+        protected LuaFunction LuaUpdate;
+        protected LuaFunction LuaDraw;
 
         public ScriptBG(string filePath)
         {
@@ -93,23 +97,30 @@ namespace TJAPlayer3
             LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
 
 
-
-            using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8))
+            try
             {
-                using (var stream = new StreamReader(filePath, Encoding.UTF8))
+                using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8))
                 {
-                    var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
-                    LuaScript.DoString(text);
+                    using (var stream = new StreamReader(filePath, Encoding.UTF8))
+                    {
+                        var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
+                        LuaScript.DoString(text);
+                    }
                 }
-            }
 
-            LuaSetConstValues = LuaScript.GetFunction("setConstValues");
-            LuaUpdateValues = LuaScript.GetFunction("updateValues");
-            LuaClearIn = LuaScript.GetFunction("clearIn");
-            LuaClearOut = LuaScript.GetFunction("clearOut");
-            LuaInit = LuaScript.GetFunction("init");
-            LuaUpdate = LuaScript.GetFunction("update");
-            LuaDraw = LuaScript.GetFunction("draw");
+                LuaSetConstValues = LuaScript.GetFunction("setConstValues");
+                LuaUpdateValues = LuaScript.GetFunction("updateValues");
+                LuaClearIn = LuaScript.GetFunction("clearIn");
+                LuaClearOut = LuaScript.GetFunction("clearOut");
+                LuaInit = LuaScript.GetFunction("init");
+                LuaUpdate = LuaScript.GetFunction("update");
+                LuaDraw = LuaScript.GetFunction("draw");
+            }
+            catch (Exception ex)
+            {
+                LuaScript.Dispose();
+                LuaScript = null;
+            }
         }
         public void Dispose()
         {
@@ -194,7 +205,7 @@ namespace TJAPlayer3
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
                 }
 
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140);
+                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140, TJAPlayer3.stage演奏ドラム画面.AIBattleState);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);

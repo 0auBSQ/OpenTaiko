@@ -80,7 +80,7 @@ namespace TJAPlayer3
                 }
             }
 
-            ScreenPoint = new double[] { TJAPlayer3.Skin.Game_Lane_X[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, 1280 };
+            ScreenPoint = new double[] { TJAPlayer3.Skin.Game_Lane_X[0] - TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, TJAPlayer3.Skin.Resolution[0] };
 
             TJAPlayer3.stage演奏ドラム画面.ReSetScore(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreInit, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
 
@@ -447,7 +447,7 @@ namespace TJAPlayer3
                     for (int i = Counter_In_Old; i < Counter_In.n現在の値; i++)
                     {
                         ScreenPoint[0] += (TJAPlayer3.Skin.Game_Lane_X[0] - ScreenPoint[0]) / 180.0;
-                        ScreenPoint[1] += ((1280 / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2) - ScreenPoint[1]) / 180.0;
+                        ScreenPoint[1] += ((TJAPlayer3.Skin.Resolution[0] / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2) - ScreenPoint[1]) / 180.0;
                     }
                     Counter_In_Old = Counter_In.n現在の値;
                     TJAPlayer3.Tx.DanC_Screen?.t2D描画(TJAPlayer3.app.Device, (int)ScreenPoint[0], TJAPlayer3.Skin.Game_Lane_Y[0], new Rectangle(0, 0, TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.DanC_Screen.szテクスチャサイズ.Height));
@@ -605,8 +605,8 @@ namespace TJAPlayer3
                         
 
                     // Panel origin
-                    int xOrigin = (isResult) ? 232 + offX : TJAPlayer3.Skin.Game_DanC_X[1];
-                    int yOrigin = (isResult) ? 254 : TJAPlayer3.Skin.Game_DanC_Y[1];
+                    int xOrigin = (isResult) ? TJAPlayer3.Skin.DanResult_Exam[0] + offX : TJAPlayer3.Skin.Game_DanC_X[1];
+                    int yOrigin = (isResult) ? TJAPlayer3.Skin.DanResult_Exam[1] : TJAPlayer3.Skin.Game_DanC_Y[1];
 
                     // Origin position which will be used as a reference for bar elements
                     int barXOffset = xOrigin + (currentPosition >= 3 ? 503 : 0);
@@ -622,9 +622,9 @@ namespace TJAPlayer3
                     #region [Gauge base]
 
                     if (!isSmallGauge)
-                        TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 1006, 92));
+                        TJAPlayer3.Tx.DanC_Base?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Height / 2 : 0, TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Width, TJAPlayer3.Tx.DanC_Base.szテクスチャサイズ.Height / 2));
                     else
-                        TJAPlayer3.Tx.DanC_Base_Small?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? 92 : 0, 503, 92));
+                        TJAPlayer3.Tx.DanC_Base_Small?.t2D描画(TJAPlayer3.app.Device, barXOffset, barYOffset, new RectangleF(0, ExamChange[i] ? TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Height / 2 : 0, TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Width, TJAPlayer3.Tx.DanC_Base_Small.szテクスチャサイズ.Height / 2));
 
                     #endregion
 

@@ -187,6 +187,12 @@ namespace TJAPlayer3
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.ConfigIni.bTokkunMode)
                     return 0;
 
+                float scale = 1.0f;
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    scale = 0.8f;
+                }
+
                 #region [Gauge base]
 
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
@@ -219,7 +225,7 @@ namespace TJAPlayer3
                 }
                 else
                 {
-                    if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
+                    if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay && !TJAPlayer3.ConfigIni.bAIBattleMode)
                     {
                         TJAPlayer3.Tx.Gauge_Base[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[1], TJAPlayer3.Skin.Game_Gauge_Y[1],
                             new Rectangle(TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3]));
@@ -231,8 +237,27 @@ namespace TJAPlayer3
                     }
                     else
                     {
-                        TJAPlayer3.Tx.Gauge_Base[0]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0],
-                            new Rectangle(TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                        int x;
+                        int y;
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                        {
+                            x = TJAPlayer3.Skin.Game_Gauge_X_AI;
+                            y = TJAPlayer3.Skin.Game_Gauge_Y_AI;
+                        }
+                        else
+                        {
+                            x = TJAPlayer3.Skin.Game_Gauge_X[0];
+                            y = TJAPlayer3.Skin.Game_Gauge_Y[0];
+                        }
+
+                        if (TJAPlayer3.Tx.Gauge_Base[0] != null)
+                        {
+                            TJAPlayer3.Tx.Gauge_Base[0].vc拡大縮小倍率.X = scale;
+                            TJAPlayer3.Tx.Gauge_Base[0].vc拡大縮小倍率.Y = scale;
+
+                            TJAPlayer3.Tx.Gauge_Base[0].t2D描画(TJAPlayer3.app.Device, x, y,
+                                new Rectangle(TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                        }
                     }
                 }
 
@@ -242,27 +267,39 @@ namespace TJAPlayer3
 
                 if( TJAPlayer3.Tx.Gauge[0] != null )
                 {
+                    int x;
+                    int y;
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                    {
+                        x = TJAPlayer3.Skin.Game_Gauge_X_AI;
+                        y = TJAPlayer3.Skin.Game_Gauge_Y_AI;
+                    }
+                    else
+                    {
+                        x = TJAPlayer3.Skin.Game_Gauge_X[0];
+                        y = TJAPlayer3.Skin.Game_Gauge_Y[0];
+                    }
 
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     {
                         if (TJAPlayer3.P1IsBlue())
-                            TJAPlayer3.Tx.Gauge_Dan[5]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                            TJAPlayer3.Tx.Gauge_Dan[5]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
                         else
-                            TJAPlayer3.Tx.Gauge_Dan[1]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                            TJAPlayer3.Tx.Gauge_Dan[1]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
 
                         for (int i = 0; i < TJAPlayer3.DTX.Dan_C.Length; i++)
                         {
                             if (TJAPlayer3.DTX.Dan_C[i] != null && TJAPlayer3.DTX.Dan_C[i].GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= TJAPlayer3.DTX.Dan_C[i].GetValue(false))
                             {
                                 TJAPlayer3.Tx.Gauge_Dan[3].Opacity = 255;
-                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0] + (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, nRectX - (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, x + (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), y, new Rectangle(0, 0, nRectX - (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), TJAPlayer3.Skin.Game_Gauge_Rect[3]));
 
                                 int Opacity = 0;
                                 if (this.ctGaugeFlash.n現在の値 <= 365) Opacity = 0;
                                 else if (this.ctGaugeFlash.n現在の値 <= 448) Opacity = (int)((this.ctGaugeFlash.n現在の値 - 365) / 83f * 255f);
                                 else if (this.ctGaugeFlash.n現在の値 <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.n現在の値 - 448) / 83f * 255f);
                                 TJAPlayer3.Tx.Gauge_Dan[3].Opacity = Opacity;
-                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                                TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
 
                                 break;
                             }
@@ -272,9 +309,17 @@ namespace TJAPlayer3
                     else
                     {
                         if (TJAPlayer3.P1IsBlue())
-                            TJAPlayer3.Tx.Gauge[2]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                            TJAPlayer3.Tx.Gauge[2]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
                         else
-                            TJAPlayer3.Tx.Gauge[0]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0], new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                        {
+                            if (TJAPlayer3.Tx.Gauge[0] != null)
+                            {
+                                TJAPlayer3.Tx.Gauge[0].vc拡大縮小倍率.X = scale;
+                                TJAPlayer3.Tx.Gauge[0].vc拡大縮小倍率.Y = scale;
+
+                                TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, nRectX, TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                            }
+                        }
                     }
 
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && db現在のゲージ値[0] >= 80.0 && db現在のゲージ値[0] < 100.0)
@@ -286,8 +331,11 @@ namespace TJAPlayer3
 
                         if (TJAPlayer3.Tx.Gauge_Flash != null)
                         {
+                            TJAPlayer3.Tx.Gauge_Flash.vc拡大縮小倍率.X = scale;
+                            TJAPlayer3.Tx.Gauge_Flash.vc拡大縮小倍率.Y = scale;
+
                             TJAPlayer3.Tx.Gauge_Flash.Opacity = Opacity;
-                            TJAPlayer3.Tx.Gauge_Flash.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0],
+                            TJAPlayer3.Tx.Gauge_Flash.t2D描画(TJAPlayer3.app.Device, x, y,
                             new Rectangle(TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3]));
                         }
                         
@@ -304,14 +352,20 @@ namespace TJAPlayer3
 			                this.ct虹透明度.t進行Loop();
                             if(TJAPlayer3.Tx.Gauge_Rainbow[ this.ct虹アニメ.n現在の値 ] != null )
                             {
-				                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].Opacity = 255;
-                                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0] + (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0),
+                                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].vc拡大縮小倍率.X = scale;
+                                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].vc拡大縮小倍率.Y = scale;
+
+                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].vc拡大縮小倍率.X = scale;
+                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].vc拡大縮小倍率.Y = scale;
+
+                                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].Opacity = 255;
+                                TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, x, y + (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0),
                                     new RectangleF(0,
                                     TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? 22 : 0,
                                     TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Width,
                                     TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height - (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height));
                                 TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].Opacity = (ct虹透明度.n現在の値 * 255 / (int)ct虹透明度.n終了値)/1;
-                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_Y[0] + (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? 22 : 0), 
+                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, x, y + (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? 22 : 0), 
                                     new RectangleF(0, 
                                     TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan ? 22 : 0, 
                                     TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Width,
@@ -322,20 +376,36 @@ namespace TJAPlayer3
                         #endregion
 
 
-                        TJAPlayer3.Tx.Gauge_Line[0].t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[0], TJAPlayer3.Skin.Game_Gauge_X[1]);
+                        TJAPlayer3.Tx.Gauge_Line[0].vc拡大縮小倍率.X = scale;
+                        TJAPlayer3.Tx.Gauge_Line[0].vc拡大縮小倍率.Y = scale;
+
+                        TJAPlayer3.Tx.Gauge_Line[0].t2D描画( TJAPlayer3.app.Device, x, y);
                     }
 
                     #region[ 「Clear」icon ]
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
                     {
+                        int text_x;
+                        int text_y;
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                        {
+                            text_x = TJAPlayer3.Skin.Game_Gauge_ClearText_X_AI;
+                            text_y = TJAPlayer3.Skin.Game_Gauge_ClearText_Y_AI;
+                        }
+                        else
+                        {
+                            text_x = TJAPlayer3.Skin.Game_Gauge_ClearText_X[0];
+                            text_y = TJAPlayer3.Skin.Game_Gauge_ClearText_Y[0];
+                        }
+
                         if (this.db現在のゲージ値[0] >= 80.0)
                         {
-                            TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_ClearText_X[0], TJAPlayer3.Skin.Game_Gauge_ClearText_Y[0], 
+                            TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, text_x, text_y, 
                                 new Rectangle(TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[0], TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[1], TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[2], TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[3]));
                         }
                         else
                         {
-                            TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_ClearText_X[0], TJAPlayer3.Skin.Game_Gauge_ClearText_Y[0],
+                            TJAPlayer3.Tx.Gauge[0].t2D描画(TJAPlayer3.app.Device, text_x, text_y,
                                 new Rectangle(TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[0], TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[1], TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[2], TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[3]));
                         }
                     }
@@ -347,7 +417,7 @@ namespace TJAPlayer3
 
                 #region [ Gauge 2P ]
 
-                if( TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.Tx.Gauge[1] != null )
+                if( TJAPlayer3.stage演奏ドラム画面.bDoublePlay && !TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Gauge[1] != null )
                 {
                     TJAPlayer3.Tx.Gauge[1].t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Gauge_X[1], TJAPlayer3.Skin.Game_Gauge_Y[1], new Rectangle( 0, 0, nRectX2P, TJAPlayer3.Skin.Game_Gauge_Rect[3]) );
                     if (db現在のゲージ値[1] >= 80.0 && db現在のゲージ値[1] < 100.0)
@@ -399,10 +469,29 @@ namespace TJAPlayer3
                     int soulfire_height = TJAPlayer3.Tx.Gauge_Soul_Fire.szテクスチャサイズ.Height;
                     for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                     {
-                        if( this.db現在のゲージ値[ i ] >= 100.0)
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
+
+                        int x;
+                        int y;
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                        {
+                            x = TJAPlayer3.Skin.Gauge_Soul_Fire_X_AI;
+                            y = TJAPlayer3.Skin.Gauge_Soul_Fire_Y_AI;
+                        }
+                        else
+                        {
+                            x = TJAPlayer3.Skin.Gauge_Soul_Fire_X[i];
+                            y = TJAPlayer3.Skin.Gauge_Soul_Fire_Y[i];
+                        }
+
+                        if ( this.db現在のゲージ値[ i ] >= 100.0)
                         {
                             this.ct炎.t進行Loop();
-                            TJAPlayer3.Tx.Gauge_Soul_Fire.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Gauge_Soul_Fire_X[i], TJAPlayer3.Skin.Gauge_Soul_Fire_Y[i], new Rectangle(soulfire_width * ( this.ct炎.n現在の値 ), 0, soulfire_width, soulfire_height) );
+
+                            TJAPlayer3.Tx.Gauge_Soul_Fire.vc拡大縮小倍率.X = scale;
+                            TJAPlayer3.Tx.Gauge_Soul_Fire.vc拡大縮小倍率.Y = scale;
+
+                            TJAPlayer3.Tx.Gauge_Soul_Fire.t2D描画( TJAPlayer3.app.Device, x, y, new Rectangle(soulfire_width * ( this.ct炎.n現在の値 ), 0, soulfire_width, soulfire_height) );
                         }
                     }
                 }
@@ -412,13 +501,31 @@ namespace TJAPlayer3
                     int soul_height = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Height / 2;
                     for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                     {
-                        if( this.db現在のゲージ値[ i ] >= 80.0)
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
+
+                        int x;
+                        int y;
+                        if (TJAPlayer3.ConfigIni.bAIBattleMode)
                         {
-                            TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Gauge_Soul_X[i], TJAPlayer3.Skin.Gauge_Soul_Y[i], new Rectangle( 0, 0, TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width, soul_height) );
+                            x = TJAPlayer3.Skin.Gauge_Soul_X_AI;
+                            y = TJAPlayer3.Skin.Gauge_Soul_Y_AI;
                         }
                         else
                         {
-                            TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Gauge_Soul_X[i], TJAPlayer3.Skin.Gauge_Soul_Y[i], new Rectangle( 0, soul_height, TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width, soul_height) );
+                            x = TJAPlayer3.Skin.Gauge_Soul_X[i];
+                            y = TJAPlayer3.Skin.Gauge_Soul_Y[i];
+                        }
+
+                        TJAPlayer3.Tx.Gauge_Soul.vc拡大縮小倍率.X = scale;
+                        TJAPlayer3.Tx.Gauge_Soul.vc拡大縮小倍率.Y = scale;
+
+                        if ( this.db現在のゲージ値[ i ] >= 80.0)
+                        {
+                            TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, x, y, new Rectangle( 0, 0, TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width, soul_height) );
+                        }
+                        else
+                        {
+                            TJAPlayer3.Tx.Gauge_Soul.t2D描画( TJAPlayer3.app.Device, x, y, new Rectangle( 0, soul_height, TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width, soul_height) );
                         }
                     }
                 }

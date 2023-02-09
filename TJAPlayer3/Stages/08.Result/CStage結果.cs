@@ -62,7 +62,7 @@ namespace TJAPlayer3
 		public bool isAutoDisabled(int player)
         {
 			return ((player == 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && TJAPlayer3.ConfigIni.nAILevel == 0));
+					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P && !TJAPlayer3.ConfigIni.bAIBattleMode));
 		}
 
 
@@ -626,7 +626,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
 					this.nEarnedMedalsCount[0] = 0;
-				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)
+				if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)
 					this.nEarnedMedalsCount[1] = 0;
 
 				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
@@ -687,25 +687,28 @@ namespace TJAPlayer3
 				ctWork_Plate = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
 
 				if (TJAPlayer3.Tx.TowerResult_Background != null)
-					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - 720, 25, TJAPlayer3.Timer);
+					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1], 25, TJAPlayer3.Timer);
 				else
 					ctTower_Animation = new CCounter();
 
 				Dan_Plate = TJAPlayer3.tテクスチャの生成(Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス) + @"\Dan_Plate.png");
 
+				ctDanSongInfoChange = new CCounter(0, 3000, 1, TJAPlayer3.Timer);
+				ctDanSongInfoChange.n現在の値 = 255;
+
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
 					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
 					{
-						this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 28);
-						this.pfTowerText48 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 48);
-						this.pfTowerText72 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 72);
+						this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.TowerResult_Font_TowerText72);
 					}
 					else
 					{
-						this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 28);
-						this.pfTowerText48 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 48);
-						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 72);
+						this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText);
+						this.pfTowerText48 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText48);
+						this.pfTowerText72 = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.TowerResult_Font_TowerText72);
 					}
 
 					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(1001), pfTowerText48, Color.Black, Color.Transparent, 700);
@@ -720,11 +723,11 @@ namespace TJAPlayer3
 				{
 					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
 					{
-						this.pfDanTitles = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 24);
+						this.pfDanTitles = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.DanResult_Font_DanTitles_Size);
 					}
 					else
 					{
-						this.pfDanTitles = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 16);
+						this.pfDanTitles = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.DanResult_Font_DanTitles_Size);
 					}
 
 					this.ttkDanTitles = new TitleTextureKey[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
@@ -834,7 +837,7 @@ namespace TJAPlayer3
 						{
 							#region [Mountain Bump (1P only)]
 
-							if (this.st演奏記録.Drums.fゲージ >= 80.0)
+							if (bClear[0])
 							{
 								//int gaugeAnimationFactor = (this.actParameterPanel.ct全体進行.n現在の値 - (10275 + ((int)this.actParameterPanel.ctゲージアニメ[0].n終了値 * 66))) * 3;
 
@@ -891,13 +894,19 @@ namespace TJAPlayer3
                         {
 							gaugeAnimFactors = (this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue) * 3;
 
+							int width1 = TJAPlayer3.Tx.Result_Background[1].szテクスチャサイズ.Width / 2;
+							int height1 = TJAPlayer3.Tx.Result_Background[1].szテクスチャサイズ.Height;
+
 							for (int i = 0; i < 2; i++)
-                            {
-								TJAPlayer3.Tx.Result_Background[2 * i].t2D描画(TJAPlayer3.app.Device, 640 * i, 0, new Rectangle(640 * i, 0, 640, 720));
+							{
+								int width2 = TJAPlayer3.Tx.Result_Background[2 * i].szテクスチャサイズ.Width / 2;
+								int height2 = TJAPlayer3.Tx.Result_Background[2 * i].szテクスチャサイズ.Height;
+								TJAPlayer3.Tx.Result_Background[2 * i].t2D描画(TJAPlayer3.app.Device, width2 * i, 0, new Rectangle(width2 * i, 0, width2, height2));
+
 								if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80.0f)
                                 {
 									TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimFactors;
-									TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, 640 * i, 0, new Rectangle(640 * i, 0, 640, 720));
+									TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, width1 * i, 0, new Rectangle(width1 * i, 0, width1, height1));
 								}
 							}
 						}
@@ -907,39 +916,44 @@ namespace TJAPlayer3
 						if (is1P)
                         {
 							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 0].t2D描画(TJAPlayer3.app.Device, 0, 0);
-							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, 0, 720);
+							TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, 0, TJAPlayer3.Tx.Result_Mountain[mountainTexId + 1].szテクスチャサイズ.Height);
 
 							// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctShine_Plate.n現在の値.ToString());
 							// TJAPlayer3.act文字コンソール.tPrint(10, 10, C文字コンソール.Eフォント種別.白, this.actParameterPanel.ct全体進行.n現在の値.ToString());
 
 							#region [Background Clouds]
 
-							if (this.st演奏記録.Drums.fゲージ >= 80.0 && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+							if (bClear[0] && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
 							{
 								CloudType = Math.Min(255, Math.Max(0, (int)this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue));
 							}
 
-							for (int i = 10; i >= 0; i--)
-							{
-								int CurMoveRed = (int)((double)CloudMaxMove[i] * Math.Tanh((double)this.actParameterPanel.ct全体進行.n現在の値 / 10000));
-								int CurMoveGold = (int)((double)CloudMaxMove[i] * Math.Tanh(Math.Max(0, (double)this.actParameterPanel.ct全体進行.n現在の値 - (double)MountainAppearValue) / 10000));
+							int cloud_width = TJAPlayer3.Tx.Result_Cloud.szテクスチャサイズ.Width / TJAPlayer3.Skin.Result_Cloud_Count;
+							int cloud_height = TJAPlayer3.Tx.Result_Cloud.szテクスチャサイズ.Height / 3;
 
-								int cloudOffset = (is2PSide) ? 720 : 0;
+							for (int i = TJAPlayer3.Skin.Result_Cloud_Count - 1; i >= 0; i--)
+							{
+								int CurMoveRed = (int)((double)TJAPlayer3.Skin.Result_Cloud_MaxMove[i] * Math.Tanh((double)this.actParameterPanel.ct全体進行.n現在の値 / 10000));
+								int CurMoveGold = (int)((double)TJAPlayer3.Skin.Result_Cloud_MaxMove[i] * Math.Tanh(Math.Max(0, (double)this.actParameterPanel.ct全体進行.n現在の値 - (double)MountainAppearValue) / 10000));
+
+								int cloudOffset = (is2PSide) ? cloud_height * 2 : 0;
 
 								TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.X = 0.65f;
 								TJAPlayer3.Tx.Result_Cloud.vc拡大縮小倍率.Y = 0.65f;
 								TJAPlayer3.Tx.Result_Cloud.Opacity = CloudType;
 
-								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveGold, CloudYPos[i], new Rectangle(i * 1200, 360, 1200, 360));
+								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Cloud_X[i] - CurMoveGold, TJAPlayer3.Skin.Result_Cloud_Y[i], 
+									new Rectangle(i * cloud_width, cloud_height, cloud_width, cloud_height));
 
 								TJAPlayer3.Tx.Result_Cloud.Opacity = 255 - CloudType;
 
-								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, CloudXPos[i] - CurMoveRed, CloudYPos[i], new Rectangle(i * 1200, cloudOffset, 1200, 360));
+								TJAPlayer3.Tx.Result_Cloud.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Cloud_X[i] - CurMoveRed, TJAPlayer3.Skin.Result_Cloud_Y[i], 
+									new Rectangle(i * cloud_width, cloudOffset, cloud_width, cloud_height));
 							}
 
 							#endregion
 
-							if (TJAPlayer3.stage結果.st演奏記録[0].fゲージ >= 80.0f && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
+							if (bClear[0] && this.actParameterPanel.ct全体進行.n現在の値 >= MountainAppearValue)
 							{
 
 								#region [Background shines]
@@ -947,7 +961,7 @@ namespace TJAPlayer3
 								int ShineTime = (int)ctShine_Plate.n現在の値;
 								int Quadrant500 = ShineTime % 500;
 
-								for (int i = 0; i < 6; i++)
+								for (int i = 0; i < TJAPlayer3.Skin.Result_Shine_Count; i++)
 								{
 									if (i < 2 && ShineTime >= 500 || i >= 2 && ShineTime < 500)
 										TJAPlayer3.Tx.Result_Shine.Opacity = 0;
@@ -956,13 +970,10 @@ namespace TJAPlayer3
 									else
 										TJAPlayer3.Tx.Result_Shine.Opacity = (255 * Math.Min(Quadrant500, 500 - Quadrant500)) / ShinePFade;
 
-									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = ShinePSize[i];
-									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = ShinePSize[i];
+									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.X = TJAPlayer3.Skin.Result_Shine_Size[i];
+									TJAPlayer3.Tx.Result_Shine.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Result_Shine_Size[i];
 
-									if (!is2PSide)
-										TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, ShinePXPos[i] + 80, ShinePYPos[i]);
-									else
-										TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, 1280 - (ShinePXPos[i] + 80), ShinePYPos[i]);
+									TJAPlayer3.Tx.Result_Shine.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Shine_X[is2PSide ? 1 : 0][i], TJAPlayer3.Skin.Result_Shine_Y[is2PSide ? 1 : 0][i]);
 								}
 
 								#endregion
@@ -991,10 +1002,7 @@ namespace TJAPlayer3
 											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
 										}
 
-										if (!is2PSide)
-											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
-										else
-											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 - WorksPosX[i], WorksPosY[i]);
+										TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Work_X[is2PSide ? 1 : 0][i], TJAPlayer3.Skin.Result_Work_Y[is2PSide ? 1 : 0][i]);
 									}
 								}
 								else
@@ -1022,10 +1030,7 @@ namespace TJAPlayer3
 											TJAPlayer3.Tx.Result_Work[i].vc拡大縮小倍率.Y = 0.6f;
 										}
 
-										if (!is2PSide)
-											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, WorksPosX[i], WorksPosY[i]);
-										else
-											TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 - WorksPosX[i], WorksPosY[i]);
+										TJAPlayer3.Tx.Result_Work[i].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Work_X[is2PSide ? 1 : 0][i], TJAPlayer3.Skin.Result_Work_Y[is2PSide ? 1 : 0][i]);
 									}
 								}
 
@@ -1069,7 +1074,8 @@ namespace TJAPlayer3
 				else
                 {
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-                    {
+					{
+						double screen_ratio_x = TJAPlayer3.Skin.Resolution[0] / 1280.0;
 
 						#region [Counter processings]
 
@@ -1124,9 +1130,20 @@ namespace TJAPlayer3
 
 						#region [Charts Individual Results]
 
+						ctDanSongInfoChange.t進行();
+
+						if (ctDanSongInfoChange.n現在の値 == ctDanSongInfoChange.n終了値 && songCount > 3)
+						{
+							NextDanSongInfo();
+						}
+						else if(nNowDanSongInfo > 0 && songCount <= 3)
+						{
+							nNowDanSongInfo = 0;
+                        }
+
 						for (int i = 0; i < songCount; i++)
                         {
-							int songOffset = Math.Max(0, 3200 + 300 * i - ctPhase1.n現在の値);
+							int songOffset = (int)(Math.Max(0, 3200 + 300 * i - ctPhase1.n現在の値) * screen_ratio_x);
 
 							ftDanDisplaySongInfo(i, songOffset);
 						}
@@ -1142,6 +1159,8 @@ namespace TJAPlayer3
 						else if (ctPhase1.b終了値に達してない)
 							examsOffset = Math.Max(0, 5500 + 300 * songCount - ctPhase1.n現在の値) * 2;
 
+						examsOffset = (int)(examsOffset * screen_ratio_x);
+
 						ftDanDisplayExamInfo(examsOffset);
 
 						#endregion
@@ -1155,6 +1174,9 @@ namespace TJAPlayer3
 						if (unitsBeforeAppearance <= 270)
                         {
 							TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
+
+							int rank_width = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Width / 7;
+							int rank_height = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Height;
 
 							if (examStatus != Exam.Status.Failure)
 							{
@@ -1199,7 +1221,8 @@ namespace TJAPlayer3
 
 								#endregion
 
-								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380, new Rectangle(334 * (2 * comboType + successType + 1), 0, 334, 334));
+								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_Rank[0], TJAPlayer3.Skin.DanResult_Rank[1], 
+									new Rectangle(rank_width * (2 * comboType + successType + 1), 0, rank_width, rank_height));
 
 								#endregion
 							}
@@ -1219,7 +1242,8 @@ namespace TJAPlayer3
 
 								#endregion
 
-								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 130, 380 - (unitsBeforeAppearance / 10f), new Rectangle(0, 0, 334, 334));
+								TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_Rank[0], TJAPlayer3.Skin.DanResult_Rank[1] - (unitsBeforeAppearance / 10f), 
+									new Rectangle(0, 0, rank_width, rank_height));
 
 								#endregion
 							}
@@ -1283,14 +1307,17 @@ namespace TJAPlayer3
 						TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, sc.ToString());
 
 						if (sc >= 0 && TJAPlayer3.Tx.TowerResult_ScoreRankEffect != null)
-                        {
+						{
+							int scoreRankEffect_width = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Width / 7;
+							int scoreRankEffect_height = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Height;
+
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
-								1000,
-								220,
-								new Rectangle(sc * 229, 0, 229, 194));
+								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[0],
+								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[1],
+								new Rectangle(sc * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
 						}
 							
 
@@ -1299,23 +1326,23 @@ namespace TJAPlayer3
 
 						#region [Text elements]
 
-						int firstRowY = 394;
-						int secondRowY = firstRowY + 96;
-
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.app.Device, 196, 160);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.app.Device, 616, 296);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.app.Device, 982, firstRowY);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.app.Device, 248, firstRowY);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
+						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
 
 						CTexture tmpScoreCount = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScoreCount);
 						CTexture tmpCurrentFloor = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkReachedFloor);
 						CTexture tmpRemainingLifes = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkRemaningLifes);
 
-						tmpCurrentFloor?.t2D描画(TJAPlayer3.app.Device, 616 - tmpCurrentFloor.szテクスチャサイズ.Width + 72, 258);
-						tmpScoreCount?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpScoreCount.szテクスチャサイズ.Width + 12, firstRowY);
-						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, 1014 - tmpRemainingLifes.szテクスチャサイズ.Width + 54, secondRowY);
+						tmpCurrentFloor?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_CurrentFloor[1]);
+						tmpScoreCount?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_ScoreCount[1]);
+						tmpRemainingLifes?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_RemainingLifes[1]);
 
-						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, 248, secondRowY - 16, new Rectangle(0, 0, 80, 80));
+						int soul_width = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width;
+						int soul_height = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Height / 2;
+
+						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.TowerResult_Gauge_Soul[0], TJAPlayer3.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
 
 						#endregion
 
@@ -1357,11 +1384,11 @@ namespace TJAPlayer3
 					if (TJAPlayer3.P1IsBlue() && TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower)
 						pos = 1;
 
-					TJAPlayer3.NamePlate.tNamePlateDraw((pos == 1) ? 1280 - 28 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 28, 621, i);
+					TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.Result_NamePlate_X[pos], TJAPlayer3.Skin.Result_NamePlate_Y[pos], i);
 
 					#region Mods
 
-					ModIcons.tDisplayModsMenu((pos == 1) ? 1280 - 32 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width : 32, 678, i);
+					ModIcons.tDisplayModsMenu(TJAPlayer3.Skin.Result_ModIcons_X[pos], TJAPlayer3.Skin.Result_ModIcons_Y[pos], i);
 
 					#endregion
 				}
@@ -1538,51 +1565,39 @@ namespace TJAPlayer3
 
 		private void ftDanDisplayExamInfo(int offset = 0)
         {
-			int baseX = offset;
-			int baseY = -4;
+			int baseX = TJAPlayer3.Skin.DanResult_StatePanel[0] + offset;
+			int baseY = TJAPlayer3.Skin.DanResult_StatePanel[1];
 
 			TJAPlayer3.Tx.DanResult_StatePanel_Base.t2D描画(TJAPlayer3.app.Device, baseX, baseY);
 			TJAPlayer3.Tx.DanResult_StatePanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY);
 
 			#region [ Global scores ]
 
-			int smoothBaseX = baseX;
-			int smoothBaseY = 0;
-
 			int totalHit = TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat
 				+ TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood
 				+ TJAPlayer3.stage演奏ドラム画面.GetRoll(0);
 
-			string[] scoresArr = 
-			{
-				TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0).ToString(),
-				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat.ToString(),
-				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood.ToString(),
-				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss.ToString(),
-				TJAPlayer3.stage演奏ドラム画面.GetRoll(0).ToString(),
-				TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0].ToString(),
-				totalHit.ToString()
-			};
-
-			var totalZahyou = new Point[]
-			{
-				new Point(smoothBaseX + 584, smoothBaseY + 124),
-				new Point(smoothBaseX + 842, smoothBaseY + 106),
-				new Point(smoothBaseX + 842, smoothBaseY + 148),
-				new Point(smoothBaseX + 842, smoothBaseY + 190),
-				new Point(smoothBaseX + 1144, smoothBaseY + 106),
-				new Point(smoothBaseX + 1144, smoothBaseY + 148),
-				new Point(smoothBaseX + 1144, smoothBaseY + 190),
-			};
-
 			// Small digits
-			for (int i = 1; i < 7; i++)
-            {
-				this.actParameterPanel.t小文字表示(totalZahyou[i].X - 122, totalZahyou[i].Y - 11, string.Format("{0,5:####0}", scoresArr[i]));
-			}
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_Perfect[0] + offset, TJAPlayer3.Skin.DanResult_Perfect[1],
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGreat);
+
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_Good[0] + offset, TJAPlayer3.Skin.DanResult_Good[1],
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood);
+
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_Miss[0] + offset, TJAPlayer3.Skin.DanResult_Miss[1],
+				TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss);
+
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_Roll[0] + offset, TJAPlayer3.Skin.DanResult_Roll[1],
+				TJAPlayer3.stage演奏ドラム画面.GetRoll(0));
+
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_MaxCombo[0] + offset, TJAPlayer3.Skin.DanResult_MaxCombo[1],
+				TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0]);
+
+			this.actParameterPanel.t小文字表示(TJAPlayer3.Skin.DanResult_TotalHit[0] + offset, TJAPlayer3.Skin.DanResult_TotalHit[1],
+				totalHit);
 
 			// Large digits
-			this.actParameterPanel.tスコア文字表示(totalZahyou[0].X - 18, totalZahyou[0].Y - 5, string.Format("{0,7:######0}", scoresArr[0]));
+			this.actParameterPanel.tスコア文字表示(TJAPlayer3.Skin.DanResult_Score[0] + offset, TJAPlayer3.Skin.DanResult_Score[1], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0));
 
 			#endregion
 
@@ -1599,32 +1614,76 @@ namespace TJAPlayer3
         #region [Dan result individual song information]
 
         private void ftDanDisplaySongInfo(int i, int offset = 0)
-        {
+		{
+			int drawPos = i % 3;
+			int nowIndex = (i / 3);
+
+			int opacityCounter = Math.Min(ctDanSongInfoChange.n現在の値, 255);
+			int opacity;
+
+			if (nowIndex == nNowDanSongInfo)
+			{
+				opacity = opacityCounter;
+			}
+			else
+			{
+				opacity = 255 - opacityCounter;
+			}
+
+			/*
 			int baseX = 255 + offset;
 			int baseY = 100 + 183 * i;
+			*/
 
 			var song = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i];
 
 			// TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, scroll + 377, 180 + i * 73, new Rectangle(song.Difficulty * 53, 0, 53, 53));
 
-			TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, baseX, baseY, new Rectangle(0, 1 + 170 * Math.Min(i, 2), 960, 170));
+			int songPanel_main_width = TJAPlayer3.Tx.DanResult_SongPanel_Main.szテクスチャサイズ.Width;
+			int songPanel_main_height = TJAPlayer3.Tx.DanResult_SongPanel_Main.szテクスチャサイズ.Height / 3;
 
-			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, baseX + 122, baseY + 46, new Rectangle(song.Difficulty * 53, 0, 53, 53));
+			TJAPlayer3.Tx.DanResult_SongPanel_Main.Opacity = opacity;
+			TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_SongPanel_Main_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_SongPanel_Main_Y[drawPos], new Rectangle(0, songPanel_main_height * Math.Min(i, 2), songPanel_main_width, songPanel_main_height));
 
-			TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(baseX + 128, baseY + 73, song.Level.ToString());
+			int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Width / 5;
+			int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
 
-			string[] scoresArr =
+			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
+			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_Y[drawPos], new Rectangle(song.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+
+			TJAPlayer3.Tx.Dani_Level_Number.Opacity = opacity;
+			TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(TJAPlayer3.Skin.DanResult_Level_Number_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
+			TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
+
+			int[] scoresArr =
 			{
-				TJAPlayer3.stage演奏ドラム画面.n良[i].ToString(),
-				TJAPlayer3.stage演奏ドラム画面.n可[i].ToString(),
-				TJAPlayer3.stage演奏ドラム画面.n不可[i].ToString(),
-				TJAPlayer3.stage演奏ドラム画面.n連打[i].ToString()
+				TJAPlayer3.stage演奏ドラム画面.n良[i],
+				TJAPlayer3.stage演奏ドラム画面.n可[i],
+				TJAPlayer3.stage演奏ドラム画面.n不可[i],
+				TJAPlayer3.stage演奏ドラム画面.n連打[i]
 			};
 
-			for (int j = 0; j < 4; j++)
-				this.actParameterPanel.t小文字表示(baseX + 200 + 211 * j, baseY + 104, string.Format("{0,4:###0}", scoresArr[j]));
+			int[] num_x = {
+				TJAPlayer3.Skin.DanResult_Sections_Perfect_X[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Good_X[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Miss_X[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Roll_X[drawPos],
+			};
 
-			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.app.Device, baseX + 146, baseY + 39);
+			int[] num_y = {
+				TJAPlayer3.Skin.DanResult_Sections_Perfect_Y[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Good_Y[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Miss_Y[drawPos],
+				TJAPlayer3.Skin.DanResult_Sections_Roll_Y[drawPos],
+			};
+
+			TJAPlayer3.Tx.Result_Number.Opacity = opacity;
+			for (int j = 0; j < 4; j++)
+				this.actParameterPanel.t小文字表示(num_x[j] + offset, num_y[j], scoresArr[j]);
+			TJAPlayer3.Tx.Result_Number.Opacity = 255;
+
+			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
+			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
 
 		}
 
@@ -1649,7 +1708,7 @@ namespace TJAPlayer3
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
 							if ((i == 0 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.nAILevel > 0)))
+								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P || TJAPlayer3.ConfigIni.bAIBattleMode)))
 								continue;
 
 							int actualPlayer = TJAPlayer3.GetActualPlayer(i);
@@ -1774,22 +1833,72 @@ namespace TJAPlayer3
 		private int n最後に再生したHHのチャンネル番号;
 		private CSound rResultSound;
 
+		public bool[] bClear
+        {
+            get
+            {
+				if (TJAPlayer3.ConfigIni.bAIBattleMode)
+				{
+					int clearCount = 0;
+                    for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count; i++)
+                    {
+						if (TJAPlayer3.stage演奏ドラム画面.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear)
+                        {
+							clearCount++;
+						}
+                    }
+					return new bool[] { clearCount >= TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count / 2.0, false };
+				}
+                else
+				{
+					return new bool[] { actParameterPanel.gaugeValues[0] >= 80, actParameterPanel.gaugeValues[1] >= 80 };
+				}
+			}
+        }
+
+		private CCounter ctDanSongInfoChange;
+
+		private int nNowDanSongInfo;
+
+		private void NextDanSongInfo()
+		{
+			ctDanSongInfoChange = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
+			ctDanSongInfoChange.n現在の値 = 0;
+
+			nNowDanSongInfo++;
+			if (nNowDanSongInfo >= Math.Ceiling(TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count / 3.0))
+			{
+				nNowDanSongInfo = 0;
+			}
+		}
+
 		// Cloud informations
+		/*
 		private int[] CloudXPos = { 642, 612, 652, 1148, 1180, 112, 8, 1088, 1100, 32, 412 };
 		private int[] CloudYPos = { 202, 424, 636, 530, 636, 636, 102, 52, 108, 326, 644 };
 		private int[] CloudMaxMove = { 150, 120, 180, 60, 90, 150, 120, 50, 45, 120, 180 };
+		*/
 
 		// Shines informations
 		private CCounter ctShine_Plate;
+
+		/*
 		private int[] ShinePXPos = { 805, 1175, 645, 810, 1078, 1060 };
 		private int[] ShinePYPos = { 650, 405, 645, 420, 202, 585 };
+
 		private float[] ShinePSize = { 0.44f, 0.6f, 0.4f, 0.15f, 0.35f, 0.6f };
+		*/
+
 		private int ShinePFade = 100;
 
 		// Fireworks informations
 		private CCounter ctWork_Plate;
+
+		/*
 		private int[] WorksPosX = { 800, 900, 1160 };
 		private int[] WorksPosY = { 435, 185, 260 };
+		*/
+
 		private int[] WorksTimeStamp = { 1000, 2000, 3000 };
 
 		// Dan informations

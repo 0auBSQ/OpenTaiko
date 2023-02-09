@@ -67,18 +67,6 @@ namespace TJAPlayer3
 
 		public override void On活性化()
 		{
-			this.rc文字の矩形領域 = new Rectangle[3, str表記可能文字.Length ];
-			for( int i = 0; i < 3; i++ )
-			{
-				for (int j = 0; j < str表記可能文字.Length; j++)
-				{
-					const int regionX = 128, regionY = 16;
-					this.rc文字の矩形領域[ i, j ].X = ( ( i / 2 ) * regionX ) + ( ( j % regionY ) * nFontWidth );
-					this.rc文字の矩形領域[ i, j ].Y = ( ( i % 2 ) * regionX ) + ( ( j / regionY ) * nFontHeight );
-					this.rc文字の矩形領域[ i, j ].Width = nFontWidth;
-					this.rc文字の矩形領域[ i, j ].Height = nFontHeight;
-				}
-			}
 			base.On活性化();
 		}
 		public override void On非活性化()
@@ -94,7 +82,24 @@ namespace TJAPlayer3
 			{
 				this.txフォント8x16[ 0 ] = TJAPlayer3.Tx.TxC(@"Console_Font.png");
 				this.txフォント8x16[ 1 ] = TJAPlayer3.Tx.TxC(@"Console_Font_Small.png");
-                base.OnManagedリソースの作成();
+
+				nFontWidth = this.txフォント8x16[0].szテクスチャサイズ.Width / 32;
+				nFontHeight = this.txフォント8x16[0].szテクスチャサイズ.Height / 16;
+
+				this.rc文字の矩形領域 = new Rectangle[3, str表記可能文字.Length];
+				for (int i = 0; i < 3; i++)
+				{
+					for (int j = 0; j < str表記可能文字.Length; j++)
+					{
+						int regionX = nFontWidth * 16, regionY = nFontHeight * 8;
+						this.rc文字の矩形領域[i, j].X = ((i / 2) * regionX) + ((j % 16) * nFontWidth);
+						this.rc文字の矩形領域[i, j].Y = ((i % 2) * regionY) + ((j / 16) * nFontHeight);
+						this.rc文字の矩形領域[i, j].Width = nFontWidth;
+						this.rc文字の矩形領域[i, j].Height = nFontHeight;
+					}
+				}
+
+				base.OnManagedリソースの作成();
 			}
 		}
 		public override void OnManagedリソースの解放()
@@ -120,7 +125,7 @@ namespace TJAPlayer3
 		//-----------------
 		private Rectangle[,] rc文字の矩形領域;
 		private const string str表記可能文字 = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
-		private const int nFontWidth = 8, nFontHeight = 16;
+		private int nFontWidth = 8, nFontHeight = 16;
 		private CTexture[] txフォント8x16 = new CTexture[ 2 ];
 		//-----------------
 		#endregion
