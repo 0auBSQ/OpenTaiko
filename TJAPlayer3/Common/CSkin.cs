@@ -1621,6 +1621,34 @@ namespace TJAPlayer3
                                     Config_SkinSample1[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Config_KeyAssign")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_KeyAssign[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_KeyAssign_Menu_Highlight")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_KeyAssign_Menu_Highlight[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_KeyAssign_Font")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Config_KeyAssign_Font[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Config_KeyAssign_Move")
+                            {
+                                Config_KeyAssign_Move = int.Parse(strParam);
+                            }
                             #endregion
 
                             #region [Mod Icons]
@@ -1727,6 +1755,94 @@ namespace TJAPlayer3
                                 for (int i = 0; i < SongSelect_Bar_Count; i++)
                                 {
                                     SongSelect_Bar_Anim_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_DanStatus_Offset_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_DanStatus_Offset_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_DanStatus_Offset_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_DanStatus_Offset_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_TowerStatus_Offset_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_TowerStatus_Offset_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_TowerStatus_Offset_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_TowerStatus_Offset_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_Offset_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_Offset_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_Offset_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_Offset_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_ScoreRank_Offset_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_ScoreRank_Offset_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_ScoreRank_Offset_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_ScoreRank_Offset_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_FavoriteStatus_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_FavoriteStatus_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Bar_Title_Offset")
@@ -6335,6 +6451,11 @@ namespace TJAPlayer3
         public int[] Config_ExplanationPanel = new int[] { 67, 382 };
         public int[] Config_SkinSample1 = new int[] { 124, 449 };
 
+        public int[] Config_KeyAssign = new int[] { 389, 215 };
+        public int[] Config_KeyAssign_Menu_Highlight = new int[] { 324, 66 };
+        public int[] Config_KeyAssign_Font = new int[] { 308, 64 };
+        public int Config_KeyAssign_Move = 20;
+
         #endregion
 
         #region Puchichara
@@ -6492,6 +6613,23 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Bar_Title_Offset = new int[] { 316, 62 };
         public int[] SongSelect_Bar_SubTitle_Offset = new int[] { 316, 90 };
+
+        public int[] SongSelect_DanStatus_Offset_X = new int[] { 30, 602 };
+        public int[] SongSelect_DanStatus_Offset_Y = new int[] { 30, 30 };
+
+        public int[] SongSelect_TowerStatus_Offset_X = new int[] { 30, 602 };
+        public int[] SongSelect_TowerStatus_Offset_Y = new int[] { 30, 30 };
+
+        public int[] SongSelect_RegularCrowns_Offset_X = new int[] { 30, 602 };
+        public int[] SongSelect_RegularCrowns_Offset_Y = new int[] { 30, 30 };
+
+        public int[] SongSelect_RegularCrowns_ScoreRank_Offset_X = new int[] { 0, 0 };
+        public int[] SongSelect_RegularCrowns_ScoreRank_Offset_Y = new int[] { 0, 30 };
+
+        public int[] SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_X = new int[] { 22, 22 };
+        public int[] SongSelect_RegularCrowns_Difficulty_Cymbol_Offset_Y = new int[] { 22, 52 };
+
+        public int[] SongSelect_FavoriteStatus_Offset = new int[] { 90, 30 };
 
         public int SongSelect_BoxName_Scale = 28;
         public int SongSelect_MusicName_Scale = 22;

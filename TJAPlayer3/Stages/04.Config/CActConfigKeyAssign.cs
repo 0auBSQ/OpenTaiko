@@ -136,22 +136,27 @@ namespace TJAPlayer3
 				}
 				if(TJAPlayer3.Tx.Menu_Highlight != null )
 				{
-					int num = 20;
-					int num2 = 0x144;
-					int num3 = 0x3e + ( num * ( this.n現在の選択行 + 1 ) );
-                    TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3, new Rectangle( 0, 0, 0x10, 0x20 ) );
-					num2 += 0x10;
-					Rectangle rectangle = new Rectangle( 8, 0, 0x10, 0x20 );
+					int num = TJAPlayer3.Skin.Config_KeyAssign_Move;
+					int num2 = TJAPlayer3.Skin.Config_KeyAssign_Menu_Highlight[0];
+					int num3 = TJAPlayer3.Skin.Config_KeyAssign_Menu_Highlight[1] + ( num * ( this.n現在の選択行 + 1 ) );
+					//TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3, new Rectangle( 0, 0, 0x10, 0x20 ) );
+					float scale = 0.55f;
 					for( int j = 0; j < 14; j++ )
 					{
-                        TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3, rectangle );
-						num2 += 0x10;
+						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.X = scale;
+						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.Y = scale;
+
+						TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3 );
+						num2 += (int)(TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Width * scale);
+
+						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.X = 1;
+						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.Y = 1;
 					}
-                    TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3, new Rectangle( 0x10, 0, 0x10, 0x20 ) );
+					//TJAPlayer3.Tx.Menu_Highlight.t2D描画( TJAPlayer3.app.Device, num2, num3, new Rectangle( 0x10, 0, 0x10, 0x20 ) );
 				}
-				int num5 = 20;
-				int x = 0x134;
-				int y = 0x40;
+				int num5 = TJAPlayer3.Skin.Config_KeyAssign_Move;
+				int x = TJAPlayer3.Skin.Config_KeyAssign_Font[0];
+				int y = TJAPlayer3.Skin.Config_KeyAssign_Font[1];
 				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x, y, this.strパッド名, false, 0.75f );
 				y += num5;
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ];
@@ -160,34 +165,34 @@ namespace TJAPlayer3
 					switch( stkeyassignArray[ i ].入力デバイス )
 					{
 						case E入力デバイス.キーボード:
-							this.tアサインコードの描画_Keyboard( i + 1, x + 20, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
+							this.tアサインコードの描画_Keyboard( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
 							break;
 
 						case E入力デバイス.MIDI入力:
-							this.tアサインコードの描画_MidiIn( i + 1, x + 20, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
+							this.tアサインコードの描画_MidiIn( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
 							break;
 
 						case E入力デバイス.ジョイパッド:
-							this.tアサインコードの描画_Joypad( i + 1, x + 20, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
+							this.tアサインコードの描画_Joypad( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
 							break;
 
 						case E入力デバイス.マウス:
-							this.tアサインコードの描画_Mouse( i + 1, x + 20, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
+							this.tアサインコードの描画_Mouse( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
 							break;
 
 						default:
-							TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + 20, y, string.Format( "{0,2}.", i + 1 ), this.n現在の選択行 == i, 0.75f );
+							TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + num5, y, string.Format( "{0,2}.", i + 1 ), this.n現在の選択行 == i, 0.75f );
 							break;
 					}
 					y += num5;
 				}
-				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + 20, y, "Reset", this.n現在の選択行 == 0x10, 0.75f );
+				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + num5, y, "Reset", this.n現在の選択行 == 0x10, 0.75f );
 				y += num5;
-				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + 20, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f );
+				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + num5, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f );
 				y += num5;
 				if( this.bキー入力待ち && ( TJAPlayer3.Tx.Config_KeyAssign != null ) )
 				{
-                    TJAPlayer3.Tx.Config_KeyAssign.t2D描画( TJAPlayer3.app.Device, 0x185, 0xd7 );
+                    TJAPlayer3.Tx.Config_KeyAssign.t2D描画( TJAPlayer3.app.Device, TJAPlayer3.Skin.Config_KeyAssign[0], TJAPlayer3.Skin.Config_KeyAssign[1]);
 				}
 			}
 			return 0;
