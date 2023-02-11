@@ -18,7 +18,7 @@ namespace TJAPlayer3
         const string CHARACTERS = @"Characters\";
 
         // Stage
-        const string TITLE = @"1_Title\";
+        public const string TITLE = @"1_Title\";
         public const string CONFIG = @"2_Config\";
         const string SONGSELECT = @"3_SongSelect\";
         public const string DANISELECT = @"3_DaniSelect\";
@@ -152,7 +152,7 @@ namespace TJAPlayer3
             #endregion
 
             #region 1_タイトル画面
-            Title_Background = TxC(TITLE + @"Background.png");
+            //Title_Background = TxC(TITLE + @"Background.png");
             Entry_Bar = TxC(TITLE + @"Entry_Bar.png");
             Entry_Bar_Text = TxC(TITLE + @"Entry_Bar_Text.png");
 
@@ -1744,7 +1744,8 @@ namespace TJAPlayer3
 
         #region 1_タイトル画面
 
-        public CTexture Title_Background,
+        public CTexture 
+            //Title_Background,
             Entry_Bar,
             Entry_Bar_Text;
 
