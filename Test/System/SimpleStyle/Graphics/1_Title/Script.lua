@@ -17,10 +17,12 @@ function clearOut(player)
 end
 
 function init()
+    func:AddGraph("Background.png")
 end
 
 function update()
 end
 
 function draw()
+    func:DrawGraph(0, 0, "Background.png")
 end

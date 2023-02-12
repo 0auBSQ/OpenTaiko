@@ -43,6 +43,10 @@ namespace TJAPlayer3
         {
             Textures[fileName]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)x, (int)y);
         }
+        public void DrawGraphRectCenter(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName)
+        {
+            Textures[fileName]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, (int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+        }
         public void SetOpacity(double opacity, string fileName)
         {
             if (Textures[fileName] != null)
@@ -197,7 +201,7 @@ namespace TJAPlayer3
             {
                 float currentFloorPositionMax140 = 0;
 
-                if (TJAPlayer3.stage選曲.r確定された曲.arスコア[5] != null)
+                if (TJAPlayer3.stage選曲.r確定された曲 != null && TJAPlayer3.stage選曲.r確定された曲.arスコア[5] != null)
                 {
                     int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
                     int nightTime = Math.Max(140, maxFloor / 2);
@@ -210,7 +214,7 @@ namespace TJAPlayer3
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
                 LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) LuaUpdate.Call();
+                LuaUpdate.Call();
             }
             catch (Exception ex)
             {

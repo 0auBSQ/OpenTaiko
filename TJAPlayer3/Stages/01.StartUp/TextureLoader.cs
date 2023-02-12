@@ -18,22 +18,22 @@ namespace TJAPlayer3
         const string CHARACTERS = @"Characters\";
 
         // Stage
-        const string TITLE = @"1_Title\";
-        const string CONFIG = @"2_Config\";
+        public const string TITLE = @"1_Title\";
+        public const string CONFIG = @"2_Config\";
         const string SONGSELECT = @"3_SongSelect\";
-        const string DANISELECT = @"3_DaniSelect\";
+        public const string DANISELECT = @"3_DaniSelect\";
         const string SONGLOADING = @"4_SongLoading\";
         public const string GAME = @"5_Game\";
         const string RESULT = @"6_Result\";
-        const string EXIT = @"7_Exit\";
+        public const string EXIT = @"7_Exit\";
         const string DANRESULT = @"7_DanResult\";
         const string TOWERRESULT = @"8_TowerResult\";
-        const string HEYA = @"10_Heya\";
+        public const string HEYA = @"10_Heya\";
         
         const string MODALS = @"11_Modals\";
-        const string ONLINELOUNGE = @"12_OnlineLounge\";
+        public const string ONLINELOUNGE = @"12_OnlineLounge\";
         const string TOWERSELECT = @"13_TowerSelect\";
-        const string OPENENCYCLOPEDIA = @"15_OpenEncyclopedia\";
+        public const string OPENENCYCLOPEDIA = @"15_OpenEncyclopedia\";
 
         // InGame
         public const string DANCER = @"2_Dancer\";
@@ -152,7 +152,7 @@ namespace TJAPlayer3
             #endregion
 
             #region 1_タイトル画面
-            Title_Background = TxC(TITLE + @"Background.png");
+            //Title_Background = TxC(TITLE + @"Background.png");
             Entry_Bar = TxC(TITLE + @"Entry_Bar.png");
             Entry_Bar_Text = TxC(TITLE + @"Entry_Bar_Text.png");
 
@@ -188,8 +188,8 @@ namespace TJAPlayer3
             #endregion
 
             #region 2_コンフィグ画面
-            Config_Background = TxC(CONFIG + @"Background.png");
-            Config_Header = TxC(CONFIG + @"Header.png");
+            //Config_Background = TxC(CONFIG + @"Background.png");
+            //Config_Header = TxC(CONFIG + @"Header.png");
             Config_Cursor = TxC(CONFIG + @"Cursor.png");
             Config_ItemBox = TxC(CONFIG + @"ItemBox.png");
             Config_Arrow = TxC(CONFIG + @"Arrow.png");
@@ -315,7 +315,7 @@ namespace TJAPlayer3
 
             #region 3_段位選択画面
 
-            Dani_Background = TxC(DANISELECT + "Background.png");
+            //Dani_Background = TxC(DANISELECT + "Background.png");
             Dani_Difficulty_Cymbol = TxC(DANISELECT + "Difficulty_Cymbol.png");
             Dani_Level_Number = TxC(DANISELECT + "Level_Number.png");
             Dani_Soul_Number = TxC(DANISELECT + "SoulNumber.png");
@@ -326,8 +326,8 @@ namespace TJAPlayer3
             for (int i = 0; i < Challenge_Select.Length; i++)
                 Challenge_Select[i] = TxC(DANISELECT + "Challenge_Select_" + i.ToString() + ".png");
 
-            Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
-            Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
+            //Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
+            //Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
 
             Dani_DanPlates = TxC(DANISELECT + "DanPlates.png");
             Dani_DanSides = TxC(DANISELECT + "DanSides.png");
@@ -934,7 +934,7 @@ namespace TJAPlayer3
             #endregion
 
             #region 7_終了画面
-            Exit_Background = TxC(EXIT + @"Background.png");
+            //Exit_Background = TxC(EXIT + @"Background.png");
             #endregion
 
             #region 7_AIResults
@@ -977,7 +977,7 @@ namespace TJAPlayer3
 
             #region [10_Heya]
 
-            Heya_Background = TxC(HEYA + @"Background.png");
+            //Heya_Background = TxC(HEYA + @"Background.png");
             Heya_Center_Menu_Bar = TxC(HEYA + @"Center_Menu_Bar.png");
             Heya_Center_Menu_Box = TxC(HEYA + @"Center_Menu_Box.png");
             Heya_Center_Menu_Box_Slot = TxC(HEYA + @"Center_Menu_Box_Slot.png");
@@ -1120,7 +1120,7 @@ namespace TJAPlayer3
 
             #region [12_OnlineLounge]
 
-            OnlineLounge_Background = TxC(ONLINELOUNGE + @"Background.png");
+            //OnlineLounge_Background = TxC(ONLINELOUNGE + @"Background.png");
             OnlineLounge_Box = TxC(ONLINELOUNGE + @"Box.png");
             OnlineLounge_Center_Menu_Bar = TxC(ONLINELOUNGE + @"Center_Menu_Bar.png");
             OnlineLounge_Center_Menu_Box_Slot = TxC(ONLINELOUNGE + @"Center_Menu_Box_Slot.png");
@@ -1137,7 +1137,7 @@ namespace TJAPlayer3
 
             #region [15_OpenEncyclopedia]
 
-            OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
+            //OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
             OpenEncyclopedia_Context = TxC(OPENENCYCLOPEDIA + @"Context.png");
             OpenEncyclopedia_Side_Menu = TxC(OPENENCYCLOPEDIA + @"Side_Menu.png");
             OpenEncyclopedia_Return_Box = TxC(OPENENCYCLOPEDIA + @"Return_Box.png");
@@ -1744,7 +1744,8 @@ namespace TJAPlayer3
 
         #region 1_タイトル画面
 
-        public CTexture Title_Background,
+        public CTexture 
+            //Title_Background,
             Entry_Bar,
             Entry_Bar_Text;
 
@@ -1758,8 +1759,9 @@ namespace TJAPlayer3
         #endregion
 
         #region 2_コンフィグ画面
-        public CTexture Config_Background,
-            Config_Header,
+        public CTexture 
+            /*Config_Background,
+            Config_Header,*/
             Config_Cursor,
             Config_ItemBox,
             Config_Arrow,
@@ -1831,7 +1833,7 @@ namespace TJAPlayer3
 
         #region 3_段位選択画面
 
-        public CTexture Dani_Background;
+        //public CTexture Dani_Background;
         public CTexture Dani_Difficulty_Cymbol;
         public CTexture Dani_Level_Number;
         public CTexture Dani_Soul_Number;
@@ -1841,8 +1843,8 @@ namespace TJAPlayer3
 
         public CTexture[] Challenge_Select = new CTexture[3];
 
-        public CTexture Dani_Dan_In;
-        public CTexture Dani_Dan_Text;
+        //public CTexture Dani_Dan_In;
+        //public CTexture Dani_Dan_Text;
 
         public CTexture Dani_DanPlates;
         public CTexture Dani_DanSides;
@@ -2116,8 +2118,8 @@ namespace TJAPlayer3
         #endregion
 
         #region 7_終了画面
-        public CTexture Exit_Background/* , */
-                                       /*Exit_Text */;
+        //public CTexture Exit_Background/* , */
+        /*Exit_Text; */
         #endregion
 
         #region [7_DanResults]
@@ -2143,7 +2145,8 @@ namespace TJAPlayer3
 
         #region [10_Heya]
 
-        public CTexture Heya_Background,
+        public CTexture 
+            //Heya_Background,
             Heya_Center_Menu_Bar,
             Heya_Center_Menu_Box,
             Heya_Center_Menu_Box_Slot,
@@ -2196,7 +2199,8 @@ namespace TJAPlayer3
 
         #region [12_OnlineLounge]
 
-        public CTexture OnlineLounge_Background,
+        public CTexture 
+            //OnlineLounge_Background,
             OnlineLounge_Box,
             OnlineLounge_Center_Menu_Bar,
             OnlineLounge_Center_Menu_Box_Slot,
@@ -2213,7 +2217,8 @@ namespace TJAPlayer3
 
         #region [15_OpenEncyclopedia]
 
-        public CTexture OpenEncyclopedia_Background,
+        public CTexture 
+            //OpenEncyclopedia_Background,
             OpenEncyclopedia_Context,
             OpenEncyclopedia_Return_Box,
             OpenEncyclopedia_Side_Menu;
