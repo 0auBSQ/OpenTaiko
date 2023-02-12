@@ -388,7 +388,7 @@ namespace TJAPlayer3
             [9201] = "Ruta",
             [9202] = "Titulo",
             [9203] = "Subtitulo",
-            [9204] = "Displayed Level",
+            [9204] = "Dificultad mostrada",
         };
     }
 }
