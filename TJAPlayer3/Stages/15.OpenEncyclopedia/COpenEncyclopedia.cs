@@ -51,14 +51,25 @@ namespace TJAPlayer3
         {
             // Ressource allocation
 
-            base.OnManagedリソースの作成();
+            if (!base.b活性化してない)
+            {
+                Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.OPENENCYCLOPEDIA}Script.lua"));
+                Background.Init();
+
+                base.OnManagedリソースの作成();
+            }
         }
 
         public override void OnManagedリソースの解放()
         {
             // Ressource freeing
 
-            base.OnManagedリソースの解放();
+            if (!base.b活性化してない)
+            {
+                TJAPlayer3.t安全にDisposeする(ref Background);
+
+                base.OnManagedリソースの解放();
+            }
         }
 
         public override int On進行描画()
@@ -72,7 +83,10 @@ namespace TJAPlayer3
 
             #region [Displayables]
 
-            TJAPlayer3.Tx.OpenEncyclopedia_Background?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            Background.Update();
+            Background.Draw();
+
+            //TJAPlayer3.Tx.OpenEncyclopedia_Background?.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
             if (_arePagesOpened)
             {
@@ -190,6 +204,8 @@ namespace TJAPlayer3
         }
 
         #region [Private]
+
+        private ScriptBG Background;
 
         private CEncyclopediaControler _controler;
         private bool _arePagesOpened;

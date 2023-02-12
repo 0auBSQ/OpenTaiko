@@ -154,7 +154,10 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
-				ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
+				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Script.lua"));
+				Background.Init();
+
+				//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
 				ReloadMenus();
 
@@ -202,6 +205,9 @@ namespace TJAPlayer3
 				//CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
 				//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
 				//CDTXMania.tテクスチャの解放( ref this.txMenuカーソル );
+
+				TJAPlayer3.t安全にDisposeする(ref Background);
+
 				TJAPlayer3.tテクスチャの解放( ref this.tx説明文パネル );
 				for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 				{
@@ -226,25 +232,29 @@ namespace TJAPlayer3
 				base.b初めての進行描画 = false;
 			}
 
-			ctBackgroundAnime.t進行Loop();
+			//ctBackgroundAnime.t進行Loop();
 
 			// 描画
 
 			#region [ Background ]
-			
+
 			//---------------------
+			/*
 			for(int i = 0; i < 2; i++)
 				if (TJAPlayer3.Tx.Config_Background != null )
 					TJAPlayer3.Tx.Config_Background.t2D描画( TJAPlayer3.app.Device, 0 + -(TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width * i) + ctBackgroundAnime.n現在の値, 0 );
 			if(TJAPlayer3.Tx.Config_Header != null )
                 TJAPlayer3.Tx.Config_Header.t2D描画( TJAPlayer3.app.Device, 0, 0 );
+			*/
+			Background.Update();
+			Background.Draw();
 			//---------------------
 
 			#endregion
 
 			#region [ Menu Cursor ]
 			//---------------------
-			if( TJAPlayer3.Tx.Config_Cursor != null )
+			if ( TJAPlayer3.Tx.Config_Cursor != null )
 			{
 				#region Old
 				/*
@@ -535,7 +545,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		private CCounter ctBackgroundAnime;
+		//private CCounter ctBackgroundAnime;
 		private CActFIFOWhite actFIFO;
 		private CActConfigKeyAssign actKeyAssign;
 		private CActConfigList actList;
@@ -553,6 +563,8 @@ namespace TJAPlayer3
 		private CTexture tx説明文パネル;
 		//private CTexture tx背景;
 		private CTexture[ , ] txMenuItemLeft;
+
+		private ScriptBG Background;
 
 		private void tカーソルを下へ移動する()
 		{

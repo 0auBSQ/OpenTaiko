@@ -53,6 +53,9 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
+				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}Script.lua"));
+				Background.Init();
+
 				//            this.tx文字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\9_text.png" ) );
 				//            this.tx文字2 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\9_text.png" ) );
 				//            this.tx文字3 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\9_text.png" ) );
@@ -66,12 +69,14 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
+				TJAPlayer3.t安全にDisposeする(ref Background);
+
 				//CDTXMania.tテクスチャの解放( ref this.tx背景 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx文字 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx文字2 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx文字3 );
-    //            CDTXMania.tテクスチャの解放( ref this.tx白 );
-    //            CDTXMania.t安全にDisposeする( ref this.ds背景 );
+				//            CDTXMania.tテクスチャの解放( ref this.tx文字 );
+				//            CDTXMania.tテクスチャの解放( ref this.tx文字2 );
+				//            CDTXMania.tテクスチャの解放( ref this.tx文字3 );
+				//            CDTXMania.tテクスチャの解放( ref this.tx白 );
+				//            CDTXMania.t安全にDisposeする( ref this.ds背景 );
 				base.OnManagedリソースの解放();
 			}
 		}
@@ -96,7 +101,10 @@ namespace TJAPlayer3
 
 				this.ct時間稼ぎ.t進行();
 
-                TJAPlayer3.Tx.Exit_Background?.t2D描画( TJAPlayer3.app.Device, 0, 0 );
+				Background.Update();
+				Background.Draw();
+
+				//TJAPlayer3.Tx.Exit_Background?.t2D描画( TJAPlayer3.app.Device, 0, 0 );
 
                 if( this.ct時間稼ぎ.b終了値に達した && !TJAPlayer3.Skin.soundゲーム終了音.b再生中 )
 				{
@@ -111,6 +119,7 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
+		private ScriptBG Background;
 		private CCounter ct時間稼ぎ;
 		//private CTexture tx背景;
   //      private CTexture tx文字;
