@@ -120,6 +120,29 @@ From version 0.5.3.1, Characters and Puchicharas are loaded from the Global fold
 ## Update history
 
 <details>
+	<summary>v0.5.4</summary>
+
+	- Fix multiple bugs
+
+	- Online chart downloading via the Online Lounge
+
+  - Voice support for characters and puchicharas
+
+  - Multiple in-game hitsounds support
+
+  - Context box for Random song select
+
+  - Konga gamemode
+
+  - PREIMAGE metadata support
+
+  - Rework of in-game modifiers and modicons
+
+  - Purple notes (G), Bomb notes (C) and fix Joined notes (A and B) and ADLIBs (F)
+
+</details>
+
+<details>
 	<summary>v0.5.3.1</summary>
 
 	- Fix multiple bugs
