@@ -8,7 +8,7 @@ TJAPlayer3-Develop-ReWrite的分叉项目，读取TJA文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
-- 当前版本：v0.5.3.1
+- 当前版本：v0.5.4
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
@@ -349,6 +349,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 ## 致谢
 
+> * [Takkkom/Major OpenTaiko features (1080p support, AI Battle mode, 5P mode and so on)](https://github.com/Takkkom)
 > * [AkiraChnl/OpenTaiko图标](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko标志/多项默认皮肤资源](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko西班牙文翻译](https://github.com/funnym0th) (@funnym0th)

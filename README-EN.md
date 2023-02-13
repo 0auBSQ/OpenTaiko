@@ -7,7 +7,7 @@
 Fork of TJAPlayer3-Develop-ReWrite, a simulator for .tja files.
 Old TJAPlayer3-Develop-BSQ
 
-- Current version： v0.5.3.1
+- Current version： v0.5.4
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -121,233 +121,234 @@ From version 0.5.3.1, Characters and Puchicharas are loaded from the Global fold
 
 <details>
 	<summary>v0.5.3.1</summary>
-	
+
 	- Fix multiple bugs
-	
+
 	- Global characters and puchicharas
-	
-	- Permanent recently played songs folder 
-	
+
+	- Permanent recently played songs folder
+
 	- Easy/Normal timing zones
-	
+
 	- Characters on menus and result screens
-	
+
 	- Song search by difficulty feature
-	
+
 </details>
 
 <details>
 	<summary>v0.5.3</summary>
-	
+
 	- Fix multiple bugs
-	
+
 	- 1st version of the Dan result screen
-	
+
 	- Dan chart supporting any count of songs
-	
+
 	- Support of 2P Side
-	
+
 	- Major 2P update (Please check discord for more details about it)
-	
+
 	- Dan charts are now also selectable from the Taiko mode song select screen
-	
+
 	- Add Modals
-	
+
 	- 1st unlockables update
-	
+
 	- Add Favorite songs folder
-	
+
 	- Add Database files (Name and Author names for Characters and Puchichara)
-	
+
 	- Chinese language support (WHMHammer)
-	
+
 	- Remove SlimDX dependencies (Mr Ojii)
-	
+
 	- Add SimpleStyle skin (feat. cien)
-	
+
 	- Automatically generated unique ID addition for each song
-	
+
 	- Fix Discord RPC
-	
+
 	- Fix several config options issues (l1m0n3)
 
 </details>
 
 <details>
 	<summary>v0.5.2.1</summary>
-	
+
 	- Fix multiple bugs
-	
+
 	- Add multiple levels of AI in addition of Auto
-	
+
 	- Add Global offset
-	
+
 	- Replace AUTO ROLL by Rolls speed
-	
+
 </details>
 
 <details>
 	<summary>v0.5.2</summary>
-	
+
 	- Taiko Heya features
-	
+
 	- Custom nameplates and character feature
-	
+
 	- Make medals obtainable
-	
+
 	- Make dan-i title unlockable
-	
+
 	- Add multiple step textures
-	
+
 	- Add Spanish translation (funnym0th)
-	
+
 	- Add "Random option"
-	
+
 	- UX/UI improvements
-	
+
 	- Fast song loading
-	
+
 	- Fix branched charts
-	
+
 </details>
 
 <details>
 	<summary>v0.5.1</summary>
-	
+
 	- Add animations to dan-i dojo
-	
+
 	- Add game end screen and icons
-	
+
 	- Bug fix
-	
+
 	- Multiple language support
-	
+
 	- UI improvements
-	
+
 	- Multiple layouts of song select screen
-	
+
 </details>
 
 <details>
 	<summary>v0.5.0</summary>
-	
+
 	- Taiko Tower features (Background+Result screen backbone)
-	
+
 	- "TOWERTYPE" in Tower charts (USe multiple skins for playing Towercharts)
-	
+
 	- Add accuracy exam in dan-i dojo
-	
+
 	- Add "#BOXCOLOR", "#BOXTYPE", "#BGCOLOR", "#BGTYPE", "#BOXCHARA in box.def
-	
+
 </details>
 
 <details>
 	<summary>v0.4.3</summary>
-	
+
 	- Add Taiko Tower (Gameplay)
-	
+
 </details>
 
 <details>
 	<summary>v0.4.2</summary>
-	
+
 	- Fix multiple bug and crash on song select screen
-	
+
 	- Fix COURSE:Tower crashes, however Taiko Tower menu, LIFE management, and result screen is not implemented yet.
 
 </details>
 
 <details>
 	<summary>v0.4.1</summary>
-	
+
 	- Fix multiple bug and crashes on song select screen
-	
+
 </details>
 
 <details>
 	<summary>v0.4.0</summary>
-	
+
 	- EXAM5, 6, 7 implementation
-	
+
 	- Fix crash with EXAM numbers having spaces between
-  
+
 	- Better code structuring on Dan-i dojo
-  
+
 </details>
 
 <details>
 	<summary>v0.3.4.2</summary>
-	
+
 	- Add petit-chara on Dan-i select screen
-	
+
 </details>
 
 <details>
 	<summary>v0.3.4.1</summary>
-	
+
 	- Fix bug with Mob animation speed
-	
+
 </details>
 
 <details>
 	<summary>v0.3.4</summary>
-	
+
 	- Save dan-i dojo results
-	
+
 	- Add achievement plate on dan-i select screen
-	
+
 </details>
 
 <details>
 	<summary>v0.3.3</summary>
-	
+
 	- Fix dan-i dojo gauge appearance
-	
+
 	- Add backbone for dan-i dojo result screen
-	
+
 </details>
 
 <details>
 	<summary>v0.3.2</summary>
-	
+
 	- Fix results saving multiple time
-	
+
 </details>
 
 <details>
 	<summary>v0.3.1</summary>
-	
+
 	- Fix P2 scorerank not showing
-	
+
 </details>
 
 <details>
 	<summary>v0.3.0</summary>
-	
+
 	- Show petit-chara in menu
-	
+
 	- In Nameplate.json file players could select petit-chara separately
-	
+
 </details>
 
 <details>
 	<summary>v0.2.0</summary>
-	
+
 	- Fix song select screen bug
-	
+
 	- Fix main menu bugs
-	
+
 </details>
 
 <details>
 	<summary>v0.1.0</summary>
-	
+
 	- Result screen animation
-	
+
 </details>
 
 ## Credits
 
+> * [Takkkom/Major OpenTaiko features (1080p support, AI Battle mode, 5P mode and so on)](https://github.com/Takkkom)
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)

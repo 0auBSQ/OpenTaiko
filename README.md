@@ -11,7 +11,7 @@ English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
 TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
 旧名称 TJAPlayer3-Develop-BSQ
 
-- 現在のバージョン： v0.5.3.1
+- 現在のバージョン： v0.5.4
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
@@ -127,233 +127,234 @@ v0.5.3.1からキャラクターおよびプチキャラはGlobalフォルダに
 
 <details>
 	<summary>v0.5.3.1</summary>
-	
+
 	- バグ修正
-	
+
 	- グローバルキャラクター・プチキャラ
-	
-	- 「最近遊んだ曲」のフォルダデータを保存する機能を実装 
-	
+
+	- 「最近遊んだ曲」のフォルダデータを保存する機能を実装
+
 	- かんたん・ふつうの適当な判断範囲を実装
-	
+
 	- 選曲画面および結果画面にカスタムキャラクターの対応
-	
+
 	- 難易度に基づいての曲検索機能を実装
-	
+
 </details>
 
 <details>
 	<summary>v0.5.3</summary>
-	
+
 	- バグ修正
-	
+
 	- 段結果画面を実装（１／２）
-	
+
 	- 曲数の３つ以外の段譜面のクラッシュを修正
-	
+
 	- ２P側対応を追加
-	
+
 	- 主要な２P更新を追加
-	
+
 	- 演奏選曲画面に段及びタワーの譜面を選べるオプションを追加
-	
+
 	- Modal（注目ボックス）を追加
-	
+
 	- コインを使ってコンテンツを解除できる機能を追加（１／２）
-	
+
 	- 「お気に入りの曲」のフォルダーを追加（選曲画面にCTRLを押したら現在選択中の曲を「お気に入り」にする）
-	
+
 	- キャラクター及びプチキャラのメタデータファイル対応を追加
-	
+
 	- 中国語を追加 (WHMHammer)
-	
+
 	- SlimDXの依存を排除 (Mr Ojii)
-	
+
 	- SimpleStyleスキンを追加 (feat. cien)
-	
+
 	- 各曲に自動作成のユニークIDを追加
-	
+
 	- Discord RPCを修正
-	
+
 	- 様々な設定画面項目を修正 (l1m0n3)
 
 </details>
 
 <details>
 	<summary>v0.5.2.1</summary>
-	
+
 	- バグ修正
-	
+
 	- オート用のAIレベルを追加
-	
+
 	- グローバルオフセットを追加
-	
+
 	- AUTO ROLLをロールスピードに置き換え
 
 </details>
 
 <details>
 	<summary>v0.5.2</summary>
-	
+
 	- 太鼓部屋の機能を追加
-	
+
 	- カスタム名札やキャラクター可能にする機能を実装
-	
+
 	- メダルを取得可能にする手順を追加
-	
+
 	- 段位タイトルを解放可能にする機能を追加
-	
+
 	- 複数な手続き型テクスチャを追加
-	
+
 	- スペイン語の翻訳を追加
-	
+
 	- 「おまかせ」オプションを追加
-	
+
 	- 様々なUI/UX改善
-	
+
 	- 譜面読み込みの最適化
-	
+
 	- 分岐譜面を修正
-	
+
 </details>
 
 <details>
 	<summary>v0.5.1</summary>
-	
+
 	- 道場に複数なアニメーションを追加
-	
+
 	- ゲーム終了画面やメニュアイコンを追加
-	
+
 	- 様々なバグ修正
-	
+
 	- 複数な外国語サポートを追加
-	
+
 	- 様々なUI改善
-	
+
 	- 演奏選曲画面の複数なレイアウトを追加
-	
+
 </details>
 
 <details>
 	<summary>v0.5.0</summary>
-	
+
 	- タワーを実装 (背景+結果画面の基盤)
-	
+
 	- タワー譜面で「TOWERTYPE」の設定を追加 （タワー譜面に複数なスキンを用いてプレイを可能にする機能）
-	
+
 	- 道場にAccuracy（精度）のEXAMを追加
-	
+
 	- box.defで「#BOXCOLOR」, 「#BOXTYPE」, 「#BGCOLOR」, 「#BGTYPE」, 「#BOXCHARA」の設定を追加
-	
+
 </details>
 
 <details>
 	<summary>v0.4.3</summary>
-	
+
 	- タワーを実装 (Gameplay)
-	
+
 </details>
 
 <details>
 	<summary>v0.4.2</summary>
-	
+
 	- 演奏選曲画面に複数のバグとクラッシュを修正
-	
+
 	- COURSE:Towerの.tjaファイルのクラッシュを修正、太鼓タワーメニュ・LIFE管理・結果画面がまだ実装されていません。
 
 </details>
 
 <details>
 	<summary>v0.4.1</summary>
-	
+
 	- 演奏選曲画面に複数のバグとクラッシュ場面を修正
-	
+
 </details>
 
 <details>
 	<summary>v0.4.0</summary>
-	
+
 	- EXAM5,6,7の実装 (下記の映像をご覧ください)
-	
+
 	- EXAM数にギャップのあるクラッシュ場面を修正
-	
+
 	- Danに関してコードの構造を改善（コード蓄積の修正）
-  
+
 </details>
 
 <details>
 	<summary>v0.3.4.2</summary>
-	
+
 	- 道場選曲画面にプチキャラを追加
-	
+
 </details>
 
 <details>
 	<summary>v0.3.4.1</summary>
-	
+
 	- Mobアニメーション速度の変化バグを修正
-	
+
 </details>
 
 <details>
 	<summary>v0.3.4</summary>
-	
+
 	- 道場の結果を保存を可能にする機能を実装
-	
+
 	- 道場選曲画面に合格プレートを表示
-	
+
 </details>
 
 <details>
 	<summary>v0.3.3</summary>
-	
+
 	- 道場の魂ゲージの表示を修正
-	
+
 	- 道場の結果画面の基盤を実装（まだ実装中）
-	
+
 </details>
 
 <details>
 	<summary>v0.3.2</summary>
-	
+
 	- 演奏セーブの重ね書きバグを修正
-	
+
 </details>
 
 <details>
 	<summary>v0.3.1</summary>
-	
+
 	- P2がスコアランクを表示できないバグを修正
-	
+
 </details>
 
 <details>
 	<summary>v0.3.0</summary>
-	
+
 	- メニュにプチキャラを表示
-	
+
 	- Nameplate.jsonファイルにプレイヤー別々のプチキャラを選べる可能にする機能を実装
-	
+
 </details>
 
 <details>
 	<summary>v0.2.0</summary>
-	
+
 	- 様々な演奏選曲画面のバグを修正
-	
+
 	- メインメニュに様々なバグを修正、コード蓄積を修正
-	
+
 </details>
 
 <details>
 	<summary>v0.1.0</summary>
-	
+
 	- 演奏結果画面のアニメーションを実装
-	
+
 </details>
 
 ## スペシャルサンクス
 
+> * [Takkkom/Major OpenTaiko features (1080p support, AI Battle mode, 5P mode and so on)](https://github.com/Takkkom)
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
 > * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
