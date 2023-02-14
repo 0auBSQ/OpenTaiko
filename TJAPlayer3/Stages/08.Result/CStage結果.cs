@@ -945,14 +945,15 @@ namespace TJAPlayer3
 									TJAPlayer3.Tx.Result_Background[4],
 									TJAPlayer3.Tx.Result_Background[5]
 								};
-								for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+								int count = Math.Max(TJAPlayer3.ConfigIni.nPlayerCount, 4);
+								for (int i = 0; i < count; i++)
 								{
 									if (bClear[i])
 									{
 										gaugeAnimFactors = (this.actParameterPanel.ct全体進行.n現在の値 - (int)MountainAppearValue) * 3;
 										TJAPlayer3.Tx.Result_Background[1].Opacity = gaugeAnimFactors;
 									}
-									int width = texs[i].szテクスチャサイズ.Width / TJAPlayer3.ConfigIni.nPlayerCount;
+									int width = texs[i].szテクスチャサイズ.Width / count;
 									texs[i].t2D描画(TJAPlayer3.app.Device, width * i, 0, new RectangleF(width * i, 0, width, texs[i].szテクスチャサイズ.Height));
 									if (bClear[i])
 										TJAPlayer3.Tx.Result_Background[1].t2D描画(TJAPlayer3.app.Device, width * i, 0, new RectangleF(width * i, 0, width, texs[i].szテクスチャサイズ.Height));

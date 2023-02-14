@@ -545,7 +545,11 @@ namespace TJAPlayer3
                     this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
                 }
 
-                bIsFinishedPlaying = (TJAPlayer3.ConfigIni.nPlayerCount > 1 ) ? ifp[0] && ifp[1] : ifp[0];
+                bIsFinishedPlaying = true;
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    if (!ifp[i]) bIsFinishedPlaying = false;
+                }
 
                 this.actDan.On進行描画();
 
@@ -1975,7 +1979,7 @@ namespace TJAPlayer3
                     #region[ 両手待ち時 ]
                     if( pChip.eNoteState == ENoteState.wait )
                     {
-                        x = ( TJAPlayer3.Skin.nScrollFieldX[0] );
+                        x = (NoteOriginX[nPlayer]);
                     }
                     #endregion
 

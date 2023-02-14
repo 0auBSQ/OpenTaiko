@@ -175,7 +175,7 @@ namespace TJAPlayer3
 				b音声再生[i] = true;
 			}
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 5; i++)
             {
 				if (!ctゲージアニメ[i].b進行中)
 					ctゲージアニメ[i].t開始(0, gaugeValues[i] / 2, 59, TJAPlayer3.Timer);

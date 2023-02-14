@@ -79,6 +79,7 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return base.On進行描画();
                 for (int f = 0; f < 2; f++)
                 {
                     if (this.Rainbow1P[f].IsUsing)

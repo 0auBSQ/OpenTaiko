@@ -298,7 +298,7 @@ namespace TJAPlayer3
                                         for (int i2 = 0; i2 < TJAPlayer3.ConfigIni.nPlayerCount; i2++)
                                         {
                                             TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
-                                            if (i2 < 2) CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
+                                            CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
                                             if (TJAPlayer3.ConfigIni.bAIBattleMode)
                                             {
                                                 TJAPlayer3.stage選曲.t曲を選択する(n現在の選択行[0] - 2, i2);

@@ -610,7 +610,7 @@ namespace TJAPlayer3
 
                 }
 
-                if (TJAPlayer3.ConfigIni.nPlayerCount < 2)
+                if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
                 {
                     TJAPlayer3.Tx.SongSelect_Coin_Slot[0]?.t2D描画(TJAPlayer3.app.Device, 0, 0,
                         new Rectangle(0, 0, (TJAPlayer3.Tx.SongSelect_Coin_Slot[0].sz画像サイズ.Width / 2) + ((TJAPlayer3.ConfigIni.nPlayerCount > 1 && !TJAPlayer3.ConfigIni.bAIBattleMode) ? (TJAPlayer3.Tx.SongSelect_Coin_Slot[0].sz画像サイズ.Width / 2) : 0), TJAPlayer3.Tx.SongSelect_Coin_Slot[0].sz画像サイズ.Height));
