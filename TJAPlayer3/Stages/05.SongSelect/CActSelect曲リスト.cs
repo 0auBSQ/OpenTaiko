@@ -1569,6 +1569,8 @@ namespace TJAPlayer3
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 						{
+							if (i >= 2) continue;
+
 							int ap = TJAPlayer3.GetActualPlayer(i);
 
 							int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Dan].GPInfo[ap].nClear;
@@ -1588,6 +1590,8 @@ namespace TJAPlayer3
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 						{
+							if (i >= 2) continue;
+
 							int ap = TJAPlayer3.GetActualPlayer(i);
 
 							int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].GPInfo[ap].nClear;
@@ -1606,6 +1610,8 @@ namespace TJAPlayer3
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 						{
+							if (i >= 2) continue;
+
 							int ap = TJAPlayer3.GetActualPlayer(i);
 
 							int[] クリア = sr.GPInfo[ap].nClear;
@@ -2690,6 +2696,8 @@ namespace TJAPlayer3
 
 					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 					{
+						if (i >= 2) continue;
+
 						displayDanStatus(x + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i], Math.Min(クリア[i][0], 6) - 1, 0.2f);
 					}
 				}	
@@ -2699,6 +2707,8 @@ namespace TJAPlayer3
 
 					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 					{
+						if (i >= 2) continue;
+
 						displayTowerStatus(x + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i], Math.Min(クリア[i][0], 7) - 1, 0.3f);
 					}
 				}
@@ -2708,6 +2718,8 @@ namespace TJAPlayer3
 
 					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 					{
+						if (i >= 2) continue;
+
 						displayRegularCrowns(x + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i], クリア[i], スコアランク[i], 0.8f);
 					}
 				}

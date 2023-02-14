@@ -71,7 +71,7 @@ namespace TJAPlayer3
                 }
                 else if (nスイッチカウント == 0)
                 {
-                    for (int i = 0; i < 2; i++)
+                    for (int i = 0; i < 5; i++)
                     {
                         if(!bSelect[i])
                         {
@@ -121,9 +121,12 @@ namespace TJAPlayer3
             this.txTitle = TJAPlayer3.tテクスチャの生成(pfTitle.DrawPrivateFont(TJAPlayer3.stage選曲.r現在選択中の曲.strタイトル, Color.White, Color.Black ));
             this.txSubTitle = TJAPlayer3.tテクスチャの生成(pfSubTitle.DrawPrivateFont(TJAPlayer3.stage選曲.r現在選択中の曲.strサブタイトル, Color.White, Color.Black));
             
-            this.n現在の選択行 = new int[2];
+            this.n現在の選択行 = new int[5];
             this.bSelect[0] = false;
             this.bSelect[1] = false;
+            this.bSelect[2] = false;
+            this.bSelect[3] = false;
+            this.bSelect[4] = false;
 
             this.b裏譜面 = (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0 && TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] < 0);
 
@@ -136,9 +139,12 @@ namespace TJAPlayer3
 		{
 			if( this.b活性化してる )
 				return;
-            ctBarAnime = new CCounter[2];
+            ctBarAnime = new CCounter[5];
             ctBarAnime[0] = new CCounter();
             ctBarAnime[1] = new CCounter();
+            ctBarAnime[2] = new CCounter();
+            ctBarAnime[3] = new CCounter();
+            ctBarAnime[4] = new CCounter();
 
             base.On活性化();
 		}
@@ -188,8 +194,10 @@ namespace TJAPlayer3
             #endregion
 
             ctBarAnimeIn.t進行();
-            ctBarAnime[0].t進行();
-            ctBarAnime[1].t進行();
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+            {
+                ctBarAnime[i].t進行();
+            }
 
             bool uraExists = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
             bool omoteExists = TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
@@ -202,19 +210,42 @@ namespace TJAPlayer3
                 {
                     if (!bSelect[i] && !isOnOption())
                     {
-                        bool right = i == 0 ? 
-                            (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow)) :
-                            (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
+                        bool right = false;
+                        bool left = false;
+                        bool decide = false;
 
-                        bool left = i == 0 ? 
-                            (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow)) :
-                            (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
+                        bool cancel = false;
 
-                        bool decide = i == 0 ?
-                            (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) || (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return))) :
-                            (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
-
-                        bool cancel = i == 0 ? (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape)) : false;
+                        switch (i)
+                        {
+                            case 0:
+                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow));
+                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow));
+                                decide = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) || 
+                                    (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)));
+                                cancel = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape));
+                                break;
+                            case 1:
+                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
+                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
+                                decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                                break;
+                            case 2:
+                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue3P));
+                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue3P));
+                                decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed3P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed3P));
+                                break;
+                            case 3:
+                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue4P));
+                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue4P));
+                                decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed4P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed4P));
+                                break;
+                            case 4:
+                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue5P));
+                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue5P));
+                                decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed5P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed5P));
+                                break;
+                        }
 
                         if (right)
                         {
@@ -248,7 +279,6 @@ namespace TJAPlayer3
 
                                     this.bSelect[i] = true;
                                     TJAPlayer3.Skin.sound決定音.t再生する();
-                                    TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
 
                                     bool allPlayerSelected = true;
 
@@ -267,7 +297,8 @@ namespace TJAPlayer3
                                     {
                                         for (int i2 = 0; i2 < TJAPlayer3.ConfigIni.nPlayerCount; i2++)
                                         {
-                                            CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
+                                            TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
+                                            if (i2 < 2) CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
                                             if (TJAPlayer3.ConfigIni.bAIBattleMode)
                                             {
                                                 TJAPlayer3.stage選曲.t曲を選択する(n現在の選択行[0] - 2, i2);
@@ -380,6 +411,8 @@ namespace TJAPlayer3
 
                 for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
                 {
+                    if (j >= 2) continue;
+
                     if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
 
                     int p = TJAPlayer3.GetActualPlayer(j);
@@ -447,15 +480,44 @@ namespace TJAPlayer3
                     new RectangleF(0, 0, 259, 114));
                 */
 
-                bool overlap = n現在の選択行[0] == n現在の選択行[1] && consideMultiPlay;
+                //bool overlap = n現在の選択行[0] == n現在の選択行[1] && consideMultiPlay;
 
-                float moveX = overlap ? (i == 0 ? -TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[0] : TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[0]) : 0;
-                moveX += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[0]) - 
+                int overlapCount = 0;
+                int nowOverlapIndex = 0;
+
+                for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                {
+                    if (n現在の選択行[i] == n現在の選択行[j] && j != i) overlapCount++;
+                    if (j == i)
+                    {
+                        nowOverlapIndex = overlapCount;
+                    }
+                }
+
+                /*float moveX = overlap ? (i == 0 ? -TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[0] : TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[0]) : 0;
+                moveX += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[0]) -
                     (((float)Math.Cos((float)ctBarAnimeIn.n現在の値 * (Math.PI / 170)) + 1.0f) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_AnimeIn[0]));
 
                 float moveY = overlap ? (i == 0 ? -TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[1] : TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[1]) : 0;
-                moveY += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]) - 
+                moveY += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]) -
                     (((float)Math.Cos((float)ctBarAnimeIn.n現在の値 * (Math.PI / 170)) + 1.0f) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]));
+                */
+
+                float moveX = TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[0] * (nowOverlapIndex - (overlapCount / 2.0f)) * (2.0f / Math.Max(overlapCount, 1));
+                float moveY = TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Move[1] * (nowOverlapIndex - (overlapCount / 2.0f)) * (2.0f / Math.Max(overlapCount, 1));
+
+                if (!consideMultiPlay)
+                {
+                    moveX = 0;
+                    moveY = 0;
+                }
+
+                moveX += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[0]) -
+                    (((float)Math.Cos((float)ctBarAnimeIn.n現在の値 * (Math.PI / 170)) + 1.0f) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_AnimeIn[0]));
+                moveY += (((float)Math.Sin((float)ctBarAnime[i].n現在の値 * (Math.PI / 180)) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]) -
+                    (((float)Math.Cos((float)ctBarAnimeIn.n現在の値 * (Math.PI / 170)) + 1.0f) * TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]));
+
+
 
                 TJAPlayer3.Tx.Difficulty_Select_Bar[i].t2D描画(TJAPlayer3.app.Device,
                     TJAPlayer3.Skin.SongSelect_Difficulty_Select_Bar_X[n現在の選択行[i]] + moveX,
@@ -476,8 +538,8 @@ namespace TJAPlayer3
         #region [ private ]
         //-----------------
 
-        public bool[] bSelect = new bool[2];
-        public bool[] bOption = new bool[2];
+        public bool[] bSelect = new bool[5];
+        public bool[] bOption = new bool[5];
 
         private CPrivateFastFont pfTitle;
         private CPrivateFastFont pfSubTitle;
@@ -523,7 +585,7 @@ namespace TJAPlayer3
 
         private bool isOnOption()
         {
-            return bOption[1] || bOption[0];
+            return bOption[0] || bOption[1] || bOption[2] || bOption[3] || bOption[4];
         }
 
         public int nStrジャンルtoNum(string strジャンル)

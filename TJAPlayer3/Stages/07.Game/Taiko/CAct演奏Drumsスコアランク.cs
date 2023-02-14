@@ -23,16 +23,15 @@ namespace TJAPlayer3
             }
             */
 
-            this.ScoreRank = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[0] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[0]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[0] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[0] * 16.6 / 10) * 100 * 10)) };
-
-            this.ScoreRank2P = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, 
-                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[1] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[1]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[1] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[1] * 16.6 / 10) * 100 * 10)) };
-
-            for (int i = 0; i < 7; i++)
+            for (int player = 0; player < 5; player++)
             {
-                this.counter[i] = new CCounter();
-                this.counterJ2[i] = new CCounter();
+                this.ScoreRank[player] = new int[] { 500000, 600000, 700000, 800000, 900000, 950000,
+                Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[player] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[player]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[player] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
+
+                for (int i = 0; i < 7; i++)
+                {
+                    this.counter[player][i] = new CCounter();
+                }
             }
             base.On活性化();
         }
@@ -44,9 +43,7 @@ namespace TJAPlayer3
 
         private void displayScoreRank(int i, int player, float x, float y, int mode = 0)
         {
-            CCounter cct = this.counter[i];
-            if (player == 1)
-                cct = this.counterJ2[i];
+            CCounter cct = this.counter[player][i];
 
             CTexture tex = TJAPlayer3.Tx.ScoreRank;
             if (mode == 1) // tower
@@ -86,12 +83,29 @@ namespace TJAPlayer3
             if (cct.n現在の値 >= 2745 && cct.n現在の値 <= 3000)
             {
                 tex.Opacity = 255 - ((cct.n現在の値 - 2745));
-                x = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
-                y = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
+                x = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 || TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
+                y = ((cct.n現在の値 - 2745) / 255.0f) * (player == 0 || TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
             }
 
-            var xpos = TJAPlayer3.Skin.Game_ScoreRank_X[player] + (int)x;
-            var ypos = TJAPlayer3.Skin.Game_ScoreRank_Y[player] + (int)y;
+            var xpos = 0;
+            var ypos = 0;
+            if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+            {
+                xpos = TJAPlayer3.Skin.Game_ScoreRank_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
+                ypos = TJAPlayer3.Skin.Game_ScoreRank_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+            }
+            else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+            {
+                xpos = TJAPlayer3.Skin.Game_ScoreRank_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
+                ypos = TJAPlayer3.Skin.Game_ScoreRank_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+            }
+            else
+            {
+                xpos = TJAPlayer3.Skin.Game_ScoreRank_X[player];
+                ypos = TJAPlayer3.Skin.Game_ScoreRank_Y[player];
+            }
+            xpos += (int)x;
+            ypos += (int)y;
 
             int width;
             int height;
@@ -125,14 +139,17 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
                     {
-                        #region [Ensou score ranks]
 
-                        counter[i].t進行();
-                        if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0) >= ScoreRank[i])
+                        for (int player = 0; player < 5; player++)
                         {
-                            displayScoreRank(i, 0, x, y);
+                            #region [Ensou score ranks]
 
-                            #region [Legacy]
+                            counter[player][i].t進行();
+                            if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(player) >= ScoreRank[player][i])
+                            {
+                                displayScoreRank(i, player, x, y);
+
+                                #region [Legacy]
 
                                 /*
                                 if (!this.counter[i].b進行中)
@@ -168,50 +185,9 @@ namespace TJAPlayer3
                                 */
 
                                 #endregion
-                        }
+                            }
 
-                        x = 0;
-                        counterJ2[i].t進行();
-                        if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(1) >= ScoreRank2P[i])
-                        {
-                            displayScoreRank(i, 1, x, y);
-
-                            #region [Legacy]
-
-                                /*
-                                if (!this.counterJ2[i].b進行中)
-                                {
-                                    this.counterJ2[i].t開始(0, 3000, 1, TJAPlayer3.Timer);
-                                }
-                                if (counterJ2[i].n現在の値 <= 255)
-                                {
-                                    TJAPlayer3.Tx.ScoreRank.Opacity = counterJ2[i].n現在の値;
-                                    x = 51 - (counterJ2[i].n現在の値 / 5.0f);
-                                }
-                                if (counterJ2[i].n現在の値 > 255 && counterJ2[i].n現在の値 <= 255 + 180)
-                                {
-                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((counterJ2[i].n現在の値 - 255) * (Math.PI / 180)) * 0.2f;
-                                    x = 0;
-                                }
-                                if (counterJ2[i].n現在の値 > 255 + 180 && counterJ2[i].n現在の値 <= 2745)
-                                {
-                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255;
-                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.X = 1.0f;
-                                    TJAPlayer3.Tx.ScoreRank.vc拡大縮小倍率.Y = 1.0f;
-                                    x = 0;
-                                }
-                                if (counterJ2[i].n現在の値 >= 2745 && counterJ2[i].n現在の値 <= 3000)
-                                {
-                                    TJAPlayer3.Tx.ScoreRank.Opacity = 255 - ((counterJ2[i].n現在の値 - 2745));
-                                    x = -((counterJ2[i].n現在の値 - 2745) / 5.0f);
-                                }
-
-                                TJAPlayer3.Tx.ScoreRank.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 87, 720 - (98 + (int)x), new System.Drawing.Rectangle(0, i == 0 ? i * 114 : i * 120, 140, i == 0 ? 114 : 120));
-                                */
-
-                                #endregion
+                            x = 0;
                         }
                         #endregion
                     }
@@ -232,7 +208,7 @@ namespace TJAPlayer3
                             TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0
                         };
 
-                        counter[i].t進行();
+                        counter[0][i].t進行();
 
                         bool satisfied = true;
                         for (int j = 0; j <= i; j++)
@@ -261,9 +237,13 @@ namespace TJAPlayer3
             return base.On進行描画();
         }
 
-        public int[] ScoreRank;
-        public int[] ScoreRank2P;
-        private CCounter[] counter = new CCounter[7];
-        private CCounter[] counterJ2 = new CCounter[7];
+        public int[][] ScoreRank = new int[5][];
+        private CCounter[][] counter = new CCounter[5][] {
+            new CCounter[7],
+            new CCounter[7],
+            new CCounter[7],
+            new CCounter[7],
+            new CCounter[7]
+        };
     }
 }

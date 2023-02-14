@@ -12,7 +12,7 @@ namespace TJAPlayer3
         // プロパティ
 
         public double dbBPM;
-        public readonly int[] NowMeasure = new int[2];
+        public readonly int[] NowMeasure = new int[5];
         public double dbSCROLL;
 		public int[] _chipCounts = new int[2];
 
@@ -28,7 +28,7 @@ namespace TJAPlayer3
 
 		public override void On活性化()
 		{
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 NowMeasure[i] = 0;
             }

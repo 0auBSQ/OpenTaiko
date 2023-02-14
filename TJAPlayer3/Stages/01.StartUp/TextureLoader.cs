@@ -119,6 +119,7 @@ namespace TJAPlayer3
             Readme = TxC(@"Readme.png");
             NamePlate = new CTexture[2];
             NamePlateBase = TxC(@"NamePlate.png");
+            NamePlate_Extension = TxC(@"NamePlate_Extension.png");
             NamePlate[0] = TxC(@"1P_NamePlate.png");
             NamePlate[1] = TxC(@"2P_NamePlate.png");
             NamePlate_Effect[0] = TxC(@"9_NamePlateEffect\GoldMStar.png");
@@ -202,7 +203,10 @@ namespace TJAPlayer3
             #region 3_選曲画面
             SongSelect_Background = TxC(SONGSELECT + @"Background.png");
             SongSelect_Header = TxC(SONGSELECT + @"Header.png");
-            SongSelect_Coin_Slot = TxC(SONGSELECT + @"Coin_Slot.png");
+            SongSelect_Coin_Slot[0] = TxC(SONGSELECT + @"Coin_Slot.png");
+            SongSelect_Coin_Slot[1] = TxC(SONGSELECT + @"Coin_Slot_3P.png");
+            SongSelect_Coin_Slot[2] = TxC(SONGSELECT + @"Coin_Slot_4P.png");
+            SongSelect_Coin_Slot[3] = TxC(SONGSELECT + @"Coin_Slot_5P.png");
 
             SongSelect_Auto = TxC(SONGSELECT + @"Auto.png");
             SongSelect_Level = TxC(SONGSELECT + @"Level.png");
@@ -298,6 +302,9 @@ namespace TJAPlayer3
 
             Difficulty_Select_Bar[0] = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Select_Bar.png");
             Difficulty_Select_Bar[1] = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Select_Bar2.png");
+            Difficulty_Select_Bar[2] = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Select_Bar3.png");
+            Difficulty_Select_Bar[3] = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Select_Bar4.png");
+            Difficulty_Select_Bar[4] = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Select_Bar5.png");
 
             TJAPlayer3.Skin.SongSelect_Difficulty_Background_Count = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + SONGSELECT + @"Difficulty_Select\Difficulty_Back\"), "Difficulty_Back_");
 
@@ -391,7 +398,7 @@ namespace TJAPlayer3
 
             #region Taiko
 
-            Taiko_Background = new CTexture[11];
+            Taiko_Background = new CTexture[12];
             Taiko_Background[0] = TxC(GAME + TAIKO + @"1P_Background.png");
             Taiko_Background[1] = TxC(GAME + TAIKO + @"2P_Background.png");
             Taiko_Background[2] = TxC(GAME + TAIKO + @"Dan_Background.png");
@@ -403,18 +410,23 @@ namespace TJAPlayer3
             Taiko_Background[8] = TxC(GAME + TAIKO + @"4P_Background.png");
             Taiko_Background[9] = TxC(GAME + TAIKO + @"AI_Background.png");
             Taiko_Background[10] = TxC(GAME + TAIKO + @"Boss_Background.png");
+            Taiko_Background[11] = TxC(GAME + TAIKO + @"5P_Background.png");
 
-            Taiko_Frame = new CTexture[6];
+            Taiko_Frame = new CTexture[7];
             Taiko_Frame[0] = TxC(GAME + TAIKO + @"1P_Frame.png");
             Taiko_Frame[1] = TxC(GAME + TAIKO + @"2P_Frame.png");
             Taiko_Frame[2] = TxC(GAME + TAIKO + @"Tower_Frame.png");
             Taiko_Frame[3] = TxC(GAME + TAIKO + @"Tokkun_Frame.png");
             Taiko_Frame[4] = TxC(GAME + TAIKO + @"2P_None_Frame.png");
             Taiko_Frame[5] = TxC(GAME + TAIKO + @"AI_Frame.png");
+            Taiko_Frame[6] = TxC(GAME + TAIKO + @"4PPlay_Frame.png");
 
-            Taiko_PlayerNumber = new CTexture[2];
+            Taiko_PlayerNumber = new CTexture[5];
             Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @"1P_PlayerNumber.png");
             Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @"2P_PlayerNumber.png");
+            Taiko_PlayerNumber[2] = TxC(GAME + TAIKO + @"3P_PlayerNumber.png");
+            Taiko_PlayerNumber[3] = TxC(GAME + TAIKO + @"4P_PlayerNumber.png");
+            Taiko_PlayerNumber[4] = TxC(GAME + TAIKO + @"5P_PlayerNumber.png");
 
 
             Taiko_Base = new CTexture[2];
@@ -439,10 +451,13 @@ namespace TJAPlayer3
                 Couse_Symbol[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + ".png");
             }
 
-            Taiko_Score = new CTexture[3];
+            Taiko_Score = new CTexture[6];
             Taiko_Score[0] = TxC(GAME + TAIKO + @"Score.png");
             Taiko_Score[1] = TxC(GAME + TAIKO + @"Score_1P.png");
             Taiko_Score[2] = TxC(GAME + TAIKO + @"Score_2P.png");
+            Taiko_Score[3] = TxC(GAME + TAIKO + @"Score_3P.png");
+            Taiko_Score[4] = TxC(GAME + TAIKO + @"Score_4P.png");
+            Taiko_Score[5] = TxC(GAME + TAIKO + @"Score_5P.png");
             Taiko_Combo = new CTexture[4];
             Taiko_Combo[0] = TxC(GAME + TAIKO + @"Combo.png");
             Taiko_Combo[1] = TxC(GAME + TAIKO + @"Combo_Big.png");
@@ -461,15 +476,25 @@ namespace TJAPlayer3
 
             #region Gauge
 
-            Gauge = new CTexture[3];
+            Gauge = new CTexture[8];
             Gauge[0] = TxC(GAME + GAUGE + @"1P.png");
             Gauge[1] = TxC(GAME + GAUGE + @"2P.png");
             Gauge[2] = TxC(GAME + GAUGE + @"1P_Right.png");
+            Gauge[3] = TxC(GAME + GAUGE + @"1P_4PGauge.png");
+            Gauge[4] = TxC(GAME + GAUGE + @"2P_4PGauge.png");
+            Gauge[5] = TxC(GAME + GAUGE + @"3P_4PGauge.png");
+            Gauge[6] = TxC(GAME + GAUGE + @"4P_4PGauge.png");
+            Gauge[7] = TxC(GAME + GAUGE + @"5P_4PGauge.png");
 
-            Gauge_Base = new CTexture[3];
+            Gauge_Base = new CTexture[8];
             Gauge_Base[0] = TxC(GAME + GAUGE + @"1P_Base.png");
             Gauge_Base[1] = TxC(GAME + GAUGE + @"2P_Base.png");
             Gauge_Base[2] = TxC(GAME + GAUGE + @"1P_Base_Right.png");
+            Gauge_Base[3] = TxC(GAME + GAUGE + @"1P_Base_4PGauge.png");
+            Gauge_Base[4] = TxC(GAME + GAUGE + @"2P_Base_4PGauge.png");
+            Gauge_Base[5] = TxC(GAME + GAUGE + @"3P_Base_4PGauge.png");
+            Gauge_Base[6] = TxC(GAME + GAUGE + @"4P_Base_4PGauge.png");
+            Gauge_Base[7] = TxC(GAME + GAUGE + @"5P_Base_4PGauge.png");
 
             Gauge_Line = new CTexture[2];
             Gauge_Line[0] = TxC(GAME + GAUGE + @"1P_Line.png");
@@ -891,6 +916,12 @@ namespace TJAPlayer3
             Result_Gauge_Base[0] = TxC(RESULT + @"Gauge_Base.png");
             Result_Gauge[1] = TxC(RESULT + @"Gauge_2.png");
             Result_Gauge_Base[1] = TxC(RESULT + @"Gauge_Base_2.png");
+            Result_Gauge[2] = TxC(RESULT + @"Gauge_3.png");
+            Result_Gauge_Base[2] = TxC(RESULT + @"Gauge_Base_3.png");
+            Result_Gauge[3] = TxC(RESULT + @"Gauge_4.png");
+            Result_Gauge_Base[3] = TxC(RESULT + @"Gauge_Base_4.png");
+            Result_Gauge[4] = TxC(RESULT + @"Gauge_5.png");
+            Result_Gauge_Base[4] = TxC(RESULT + @"Gauge_Base_5.png");
 
             Result_Header = TxC(RESULT + @"Header.png");
             Result_Number = TxC(RESULT + @"Number.png");
@@ -912,6 +943,12 @@ namespace TJAPlayer3
 
             Result_Flower = TxC(RESULT + @"Flower\Flower.png");
 
+            for (int i = 0; i < 4; i++)
+                Result_Panel_4P[i] = TxC(RESULT + @"Panel_4P_" + (i + 1).ToString() + ".png");
+
+            for (int i = 0; i < 5; i++)
+                Result_Panel_5P[i] = TxC(RESULT + @"Panel_5P_" + (i + 1).ToString() + ".png");
+
             for (int i = 1; i <= 5; i++)
                 Result_Flower_Rotate[i - 1] = TxC(RESULT + @"Flower\Rotate_" + i.ToString() + ".png");
 
@@ -922,7 +959,7 @@ namespace TJAPlayer3
             for (int i = 0; i < 41; i++)
                 Result_Rainbow[i] = TxC(RESULT + @"Rainbow\" + i.ToString() + ".png");
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 6; i++)
                 Result_Background[i] = TxC(RESULT + @"Background_" + i.ToString() + ".png");
 
             for (int i = 0; i < 4; i++)
@@ -1061,12 +1098,16 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_5P = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_X_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y_AI = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Result_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Balloon_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Balloon_5P = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Motion_Normal = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Motion_Miss = new string[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Motion_MissDown = new string[TJAPlayer3.Skin.Characters_Ptn];
@@ -1088,10 +1129,10 @@ namespace TJAPlayer3
 
             #endregion
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 TJAPlayer3.NamePlateConfig.tReindexCharacter(i, TJAPlayer3.Skin.Characters_DirName);
-                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, i == 0);
+                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, true);
             }
                 
 
@@ -1108,13 +1149,19 @@ namespace TJAPlayer3
 
             Modal_Full = new CTexture[6];
             Modal_Half = new CTexture[6];
+            Modal_Half_4P = new CTexture[6];
+            Modal_Half_5P = new CTexture[6];
             for (int i = 0; i < 5; i++)
             {
                 Modal_Full[i] = TxC(MODALS + i.ToString() + @"_full.png");
                 Modal_Half[i] = TxC(MODALS + i.ToString() + @"_half.png");
+                Modal_Half_4P[i] = TxC(MODALS + i.ToString() + @"_half_4P.png");
+                Modal_Half_5P[i] = TxC(MODALS + i.ToString() + @"_half_5P.png");
             }
             Modal_Full[Modal_Full.Length - 1] = TxC(MODALS + @"Coin_full.png");
             Modal_Half[Modal_Full.Length - 1] = TxC(MODALS + @"Coin_half.png");
+            Modal_Half_4P[Modal_Full.Length - 1] = TxC(MODALS + @"Coin_half_4P.png");
+            Modal_Half_5P[Modal_Full.Length - 1] = TxC(MODALS + @"Coin_half_5P.png");
 
             #endregion
 
@@ -1163,7 +1210,12 @@ namespace TJAPlayer3
 
             int other = (player == 0) ? 1 : 0;
 
-            if (old >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != old)
+            if (old >= 0 && 
+                (TJAPlayer3.NamePlateConfig.data.Character[0] != old || player == 0) &&
+                (TJAPlayer3.NamePlateConfig.data.Character[1] != old || player == 1) &&
+                (TJAPlayer3.NamePlateConfig.data.Character[2] != old || player == 2) &&
+                (TJAPlayer3.NamePlateConfig.data.Character[3] != old || player == 3) &&
+                (TJAPlayer3.NamePlateConfig.data.Character[4] != old || player == 4))
             {
                 int i = old;
 
@@ -1252,7 +1304,12 @@ namespace TJAPlayer3
 
             string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + TJAPlayer3.Skin.Characters_DirName[newC];
 
-            if ((newC >= 0 && TJAPlayer3.NamePlateConfig.data.Character[other] != newC) || primary)
+            if ((newC >= 0 &&
+                TJAPlayer3.NamePlateConfig.data.Character[0] != newC &&
+                TJAPlayer3.NamePlateConfig.data.Character[1] != newC &&
+                TJAPlayer3.NamePlateConfig.data.Character[2] != newC &&
+                TJAPlayer3.NamePlateConfig.data.Character[3] != newC &&
+                TJAPlayer3.NamePlateConfig.data.Character[4] != newC) || primary)
             {
                 int i = newC;
 
@@ -1415,10 +1472,14 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
+                TJAPlayer3.Skin.Characters_4P[i] = new int[] { 165, 68 };
+                TJAPlayer3.Skin.Characters_5P[i] = new int[] { 165, 40 };
                 TJAPlayer3.Skin.Characters_X_AI[i] = new int[] { 472, 602 };
                 TJAPlayer3.Skin.Characters_Y_AI[i] = new int[] { 152, 152 };
                 TJAPlayer3.Skin.Characters_Balloon_X[i] = new int[] { 240, 240, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
+                TJAPlayer3.Skin.Characters_Balloon_4P[i] = new int[] { 0, -176 };
+                TJAPlayer3.Skin.Characters_Balloon_5P[i] = new int[] { 0, -168 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
                 TJAPlayer3.Skin.Characters_Motion_Miss[i] = "0";
                 TJAPlayer3.Skin.Characters_Motion_MissDown[i] = "0";
@@ -1534,6 +1595,22 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
+                                else if (strCommand == "Game_Chara_4P")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_4P[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_5P")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_5P[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
                                 else if (strCommand == "Game_Chara_X_AI")
                                 {
                                     string[] strSplit = strParam.Split(',');
@@ -1564,6 +1641,22 @@ namespace TJAPlayer3
                                     for (int k = 0; k < 2; k++)
                                     {
                                         TJAPlayer3.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_4P")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Balloon_4P[i][k] = int.Parse(strSplit[k]);
+                                    }
+                                }
+                                else if (strCommand == "Game_Chara_Balloon_5P")
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int k = 0; k < 2; k++)
+                                    {
+                                        TJAPlayer3.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
                                     }
                                 }
                                 else if (strCommand == "Game_Chara_Balloon_Timer")
@@ -1729,6 +1822,7 @@ namespace TJAPlayer3
             Loading,
             Scanning_Loudness,
             NamePlateBase,
+            NamePlate_Extension,
             Overlay,
             Readme,
             Network_Connection;
@@ -1773,7 +1867,6 @@ namespace TJAPlayer3
 
         public CTexture SongSelect_Background,
             SongSelect_Header,
-            SongSelect_Coin_Slot,
             SongSelect_Auto,
             SongSelect_Level,
             SongSelect_Branch,
@@ -1813,6 +1906,7 @@ namespace TJAPlayer3
             SongSelect_Frame_Score = new CTexture[2],
             SongSelect_NamePlate = new CTexture[1],
             SongSelect_Song_Panel = new CTexture[4],
+            SongSelect_Coin_Slot = new CTexture[4],
             SongSelect_Table = new CTexture[6];
 
         #region [ 難易度選択画面 ]
@@ -1823,7 +1917,7 @@ namespace TJAPlayer3
         public CTexture Difficulty_Option;
         public CTexture Difficulty_Option_Select;
 
-        public CTexture[] Difficulty_Select_Bar = new CTexture[2];
+        public CTexture[] Difficulty_Select_Bar = new CTexture[5];
         public CTexture[] Difficulty_Back;
         #endregion
 
@@ -2093,15 +2187,17 @@ namespace TJAPlayer3
             Result_Dan;
             
         public CTexture[]
+            Result_Panel_5P = new CTexture[5],
+            Result_Panel_4P = new CTexture[4],
             Result_Rainbow = new CTexture[41],
-            Result_Background = new CTexture[3],
+            Result_Background = new CTexture[6],
             Result_Crown = new CTexture[3],
 
             Result_Flower_Rotate = new CTexture[5],
             Result_Work = new CTexture[3],
 
-            Result_Gauge = new CTexture[2],
-            Result_Gauge_Base = new CTexture[2],
+            Result_Gauge = new CTexture[5],
+            Result_Gauge_Base = new CTexture[5],
             Result_Speech_Bubble = new CTexture[2],
 
             Result_Mountain = new CTexture[4];
@@ -2190,7 +2286,9 @@ namespace TJAPlayer3
         #region [11_Modals]
 
         public CTexture[] Modal_Full,
-            Modal_Half;
+            Modal_Half,
+            Modal_Half_4P,
+            Modal_Half_5P;
 
         #endregion
 

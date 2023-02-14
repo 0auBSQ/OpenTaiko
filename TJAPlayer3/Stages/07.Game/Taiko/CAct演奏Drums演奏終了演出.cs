@@ -122,7 +122,7 @@ namespace TJAPlayer3
         public override void On活性化()
         {
             this.bリザルトボイス再生済み = false;
-            this.Mode = new EndMode[2];
+            this.Mode = new EndMode[5];
             base.On活性化();
         }
 
@@ -139,7 +139,7 @@ namespace TJAPlayer3
             {
                 var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
 
-                FailedScript = new EndAnimeScript($@"{origindir}ClearFailed\Script.lua");
+                FailedScript = new EndAnimeScript($@"{origindir}ClearFailed\Script.lua");//ClearFailed
                 FailedScript.Init();
 
                 ClearScript = new EndAnimeScript($@"{origindir}Clear\Script.lua");
@@ -535,10 +535,10 @@ namespace TJAPlayer3
         */
 
         CCounter ct進行Loop;
-        CSound[] soundClear = new CSound[4];
-        CSound[] soundFailed = new CSound[4];
-        CSound[] soundFullCombo = new CSound[4];
-        CSound[] soundDondaFullCombo = new CSound[4];
+        CSound[] soundClear = new CSound[5];
+        CSound[] soundFailed = new CSound[5];
+        CSound[] soundFullCombo = new CSound[5];
+        CSound[] soundDondaFullCombo = new CSound[5];
         EndMode[] Mode;
         enum EndMode
         {

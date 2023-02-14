@@ -12,8 +12,11 @@ namespace TJAPlayer3
         private static Dictionary<string, C曲リストノード> nodes = new Dictionary<string, C曲リストノード>();
         private static HashSet<string> urls = new HashSet<string>();
 
-        public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[2][]
+        public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[5][]
         {
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
             new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
             new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() }
         };
@@ -274,7 +277,7 @@ namespace TJAPlayer3
         {
             #region [Reset nodes]
 
-            for (int pl = 0; pl < 2; pl++)
+            for (int pl = 0; pl < 5; pl++)
             {
                 CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
 
@@ -296,7 +299,7 @@ namespace TJAPlayer3
 
             foreach (C曲リストノード song in nodes.Values)
             {
-                for (int pl = 0; pl < 2; pl++)
+                for (int pl = 0; pl < 5; pl++)
                 {
                     CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
 

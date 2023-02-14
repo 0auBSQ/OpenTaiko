@@ -60,13 +60,13 @@ namespace TJAPlayer3
 
 		public override void On活性化()
 		{
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 ListCombo[i] = new List<CComboVoice>();
                 ListFloor[i] = new List<CComboVoice>();
             }
-            VoiceIndex = new int[] { 0, 0 };
-            FloorIndex = new int[] { 0, 0 };
+            VoiceIndex = new int[] { 0, 0, 0, 0, 0 };
+            FloorIndex = new int[] { 0, 0, 0, 0, 0 };
             base.On活性化();
 		}
 		public override void OnManagedリソースの作成()
@@ -142,7 +142,7 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     foreach (var item in ListCombo[i])
                     {
@@ -166,8 +166,8 @@ namespace TJAPlayer3
         int[] VoiceIndex;
         int[] FloorIndex;
 
-        readonly List<CComboVoice>[] ListCombo = new List<CComboVoice>[2];
-        readonly List<CComboVoice>[] ListFloor = new List<CComboVoice>[2];
+        readonly List<CComboVoice>[] ListCombo = new List<CComboVoice>[5];
+        readonly List<CComboVoice>[] ListFloor = new List<CComboVoice>[5];
         //-----------------
         #endregion
     }

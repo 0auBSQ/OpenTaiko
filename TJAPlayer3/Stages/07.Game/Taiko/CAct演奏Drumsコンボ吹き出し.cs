@@ -72,6 +72,7 @@ namespace TJAPlayer3
 		{
 			if( !base.b活性化してない )
 			{
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
                 for( int i = 0; i < 2; i++ )
                 {
                     if (TJAPlayer3.ConfigIni.bAIBattleMode) break;
@@ -159,10 +160,10 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
-        private CCounter[] ct進行 = new CCounter[ 2 ];
+        private CCounter[] ct進行 = new CCounter[ 5 ];
         //private CTexture[] tx吹き出し本体 = new CTexture[ 2 ];
         //private CTexture tx数字;
-        private int[] nCombo_渡 = new int[ 2 ];
+        private int[] nCombo_渡 = new int[ 5 ];
 
         private int NowDrawBalloon;
 

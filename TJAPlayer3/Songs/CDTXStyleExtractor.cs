@@ -391,7 +391,7 @@ namespace TJAPlayer3
         //    relevant section/subsection combination.
         private static void RankSheets(int seqNo, IList<Section> sections)
         {
-            var sheetRanksBySectionKindAndSubSectionKind = SeqNoSheetRanksBySectionKindAndSubSectionKind[seqNo];
+            var sheetRanksBySectionKindAndSubSectionKind = SeqNoSheetRanksBySectionKindAndSubSectionKind[((seqNo - 1) % 2) + 1];
 
             foreach (var section in sections)
             {

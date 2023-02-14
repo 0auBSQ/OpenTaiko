@@ -71,9 +71,7 @@ namespace TJAPlayer3
         {
             bool _displayed = false;
 
-            if (player == 0 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay)
-                _displayed = true;
-            else if (player == 1 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P)
+            if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player])
                 _displayed = true;
 
             if (_displayed == true)
