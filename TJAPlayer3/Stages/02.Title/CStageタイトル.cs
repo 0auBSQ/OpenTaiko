@@ -110,6 +110,9 @@ namespace TJAPlayer3
 			if (base.b活性化してない)
 				return;
 
+			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TITLE}Script.lua"));
+			Background.Init();
+
 			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
 				this.pfMenuTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[0]);
 			else
@@ -129,6 +132,8 @@ namespace TJAPlayer3
 		{
 			if (!base.b活性化してない)
 				return;
+
+			TJAPlayer3.t安全にDisposeする(ref Background);
 
 			TJAPlayer3.t安全にDisposeする(ref pfMenuTitle);
 			TJAPlayer3.t安全にDisposeする(ref pfBoxText);
@@ -399,8 +404,11 @@ namespace TJAPlayer3
 
 				#region [ 背景描画 ]
 
-				if (TJAPlayer3.Tx.Title_Background != null)
-					TJAPlayer3.Tx.Title_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+				Background.Update();
+				Background.Draw();
+
+				//if (TJAPlayer3.Tx.Title_Background != null)
+				//	TJAPlayer3.Tx.Title_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 				#endregion
 
@@ -971,6 +979,8 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
+
+		private ScriptBG Background;
 
 		// Directly propose the different game options if the save file is already loaded, go back to save file select by pressing "Escape"
 		private void SkipSaveFileStep()

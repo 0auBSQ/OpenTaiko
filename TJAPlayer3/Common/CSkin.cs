@@ -2690,6 +2690,7 @@ namespace TJAPlayer3
                             #endregion
 
                             #region DaniSelect
+                            /*
                             else if (strCommand == "DaniSelect_Dan_Text_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -2706,6 +2707,7 @@ namespace TJAPlayer3
                                     DaniSelect_Dan_Text_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            */
                             else if (strCommand == "DaniSelect_DanSides_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -7717,8 +7719,8 @@ namespace TJAPlayer3
 
         #endregion
         #region DaniSelect
-        public int[] DaniSelect_Dan_Text_X = new int[] { 300, 980, 300, 980 };
-        public int[] DaniSelect_Dan_Text_Y = new int[] { 198, 198, 522, 522 };
+        //public int[] DaniSelect_Dan_Text_X = new int[] { 300, 980, 300, 980 };
+        //public int[] DaniSelect_Dan_Text_Y = new int[] { 198, 198, 522, 522 };
 
         public int[] DaniSelect_DanSides_X = new int[] { 243, 1199 };
         public int[] DaniSelect_DanSides_Y = new int[] { 143, 143 };

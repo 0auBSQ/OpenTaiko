@@ -1,10 +1,10 @@
---func:DrawText(x, y, text);
---func:DrawNum(x, y, num);
---func:AddGraph("filename");
---func:DrawGraph(x, y, filename);
---func:SetOpacity(opacity, "filename");
---func:SetScale(xscale, yscale, "filename");
---func:SetColor(r, g, b, "filename");
+--func:DrawText(x, y, text)
+--func:DrawNum(x, y, num)
+--func:AddGraph("filename")
+--func:DrawGraph(x, y, filename)
+--func:SetOpacity(opacity, "filename")
+--func:SetScale(xscale, yscale, "filename")
+--func:SetColor(r, g, b, "filename")
 
 local inAnimeCounter = -20
 
@@ -44,8 +44,8 @@ function update()
     nowAnimeFrame = math.floor(animeCounter+0.5)
 
     if nowAnimeFrame > maxAnimeFrame then
-        animeCounter = 0;
-        nowAnimeFrame = 0;
+        animeCounter = 0
+        nowAnimeFrame = 0
     end
 end
 

@@ -364,7 +364,7 @@ namespace TJAPlayer3
 
             if (!IsUpNotFound)
             {
-                UpScript.Update();
+                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) UpScript.Update();
                 UpScript.Draw();
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
@@ -864,7 +864,7 @@ namespace TJAPlayer3
             {
                 if (!IsDownNotFound)
                 {
-                    DownScript.Update();
+                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
                     DownScript.Draw();
                     #region [Ensou lower background]
                     /*

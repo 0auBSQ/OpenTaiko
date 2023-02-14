@@ -163,12 +163,23 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            base.OnManagedリソースの作成();
+            if (!base.b活性化してない)
+            {
+                Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.HEYA}Script.lua"));
+                Background.Init();
+
+                base.OnManagedリソースの作成();
+            }
         }
 
         public override void OnManagedリソースの解放()
         {
-            base.OnManagedリソースの解放();
+            if (!base.b活性化してない)
+            {
+                TJAPlayer3.t安全にDisposeする(ref Background);
+
+                base.OnManagedリソースの解放();
+            }
         }
 
         public override int On進行描画()
@@ -178,7 +189,9 @@ namespace TJAPlayer3
 
             ScrollCounter.t進行();
 
-            TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            Background.Update();
+            Background.Draw();
+            //TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
             #region [Menus display]
 
@@ -854,11 +867,13 @@ namespace TJAPlayer3
             return ESelectStatus.SELECTED;
         }
 
-        
+
 
         #endregion
 
         #endregion
+
+        private ScriptBG Background;
 
         private TitleTextureKey[] ttkMainMenuOpt;
         private CPrivateFastFont pfHeyaFont;

@@ -56,12 +56,23 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            base.OnManagedリソースの作成();
+            if (!base.b活性化してない)
+            {
+                Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.DANISELECT}Script.lua"));
+                Background.Init();
+
+                base.OnManagedリソースの作成();
+            }
         }
 
         public override void OnManagedリソースの解放()
         {
-            base.OnManagedリソースの解放();
+            if (!base.b活性化してない)
+            {
+                TJAPlayer3.t安全にDisposeする(ref Background);
+
+                base.OnManagedリソースの解放();
+            }
         }
 
         public override int On進行描画()
@@ -74,9 +85,12 @@ namespace TJAPlayer3
 
             float zoom = Math.Min(1.14f, Math.Max(1f, (float)Math.Pow(stamp / 3834f, 0.5f)));
 
-            TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.X = zoom;
-            TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.Y = zoom;
-            TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Resolution[0] / 2, TJAPlayer3.Skin.Resolution[1] / 2);
+            Background.Update();
+            Background.Draw();
+
+            //TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.X = zoom;
+            //TJAPlayer3.Tx.Dani_Background.vc拡大縮小倍率.Y = zoom;
+            //TJAPlayer3.Tx.Dani_Background.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Resolution[0] / 2, TJAPlayer3.Skin.Resolution[1] / 2);
 
             this.段位リスト.On進行描画();
 
@@ -91,6 +105,7 @@ namespace TJAPlayer3
                     bInSongPlayed = true;
                 }
 
+                /*
                 int dani_dan_in_width = TJAPlayer3.Tx.Dani_Dan_In.szテクスチャサイズ.Width / 2;
                 int dani_dan_in_height = TJAPlayer3.Tx.Dani_Dan_In.szテクスチャサイズ.Height;
 
@@ -106,17 +121,19 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorLeft, 0, new Rectangle(0, 0, dani_dan_in_width, dani_dan_in_height));
                 TJAPlayer3.Tx.Dani_Dan_In.t2D描画(TJAPlayer3.app.Device, doorRight, 0, new Rectangle(dani_dan_in_width, 0, dani_dan_in_width, dani_dan_in_height));
-
+                */
                 if (stamp <= 3834)
                 {
                     #region [Dan intro letters]
 
-                    int quarter = TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Width / 4;
+                    //int quarter = TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Width / 4;
 
                     /*
                     int[] xAxis = { 300, 980 };
                     int[] yAxis = { 198, 522 };
                     */
+
+                    /*
                     int[] appearStamps = { 1645, 2188, 2646, 3152 };
 
                     for (int i = 0; i < 4; i++)
@@ -137,6 +154,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Dani_Dan_Text.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y,
                             new Rectangle(quarter * i, 0, quarter, TJAPlayer3.Tx.Dani_Dan_Text.szテクスチャサイズ.Height));
                     }
+                    */
 
                     #endregion
                 }
@@ -288,6 +306,8 @@ namespace TJAPlayer3
             // TJAPlayer3.Skin.bgm選曲画面.t停止する();
             CSongSelectSongManager.stopSong();
         }
+
+        private ScriptBG Background;
 
         public CCounter ct待機;
 
