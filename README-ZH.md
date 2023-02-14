@@ -12,7 +12,7 @@ TJAPlayer3-Develop-ReWrite的分叉项目，读取TJA文件的太鼓模拟器
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN.md翻译。最近一次更新时间：2023年2月9日）
+（译者注：由README-EN.md翻译。最近一次更新时间：2023年2月14日）
 
 （译者注：编译指南：[https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows)](https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows))）
 
@@ -115,10 +115,33 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 - 我找不到我自行添加的角色和迷你角色
 
 ```
-从0.5.3版本开始，角色和迷你角色将由skin文件夹外的Global文件夹读取。请把它们放在那里。
+从0.5.3.1版本开始，角色和迷你角色将由skin文件夹外的Global文件夹读取。请把它们放在那里。
 ```
 
 ## 更新历史
+
+<details>
+	<summary>v0.5.4</summary>
+
+	- 修复了多个问题
+
+	- 可以在线下载谱面
+
+	- 支持角色和迷你角色各自的声音
+
+	- 支持在游戏中更换音色
+
+	- 选曲界面新增随机选曲选项
+
+	- 新增康加鼓模式
+
+	- 支持PREIMAGE元数据
+
+	- 更改演奏模式及其图标
+
+	- 新增紫音符（G）、炸弹音符（C），修复牵手音符（A、B）和隐藏音符（F）
+
+</details>
 
 <details>
 	<summary>v0.5.3.1</summary>
