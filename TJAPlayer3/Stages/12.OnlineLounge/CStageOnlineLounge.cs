@@ -126,19 +126,33 @@ namespace TJAPlayer3
         {
             // Ressource allocation
 
-            base.OnManagedリソースの作成();
+            if (!base.b活性化してない)
+            {
+                Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.ONLINELOUNGE}Script.lua"));
+                Background.Init();
+
+                base.OnManagedリソースの作成();
+            }
         }
 
         public override void OnManagedリソースの解放()
         {
             // Ressource freeing
 
-            base.OnManagedリソースの解放();
+            if (!base.b活性化してない)
+            {
+                TJAPlayer3.t安全にDisposeする(ref Background);
+
+                base.OnManagedリソースの解放();
+            }
         }
 
         public override int On進行描画()
         {
-            TJAPlayer3.Tx.OnlineLounge_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            Background.Update();
+            Background.Draw();
+
+            //TJAPlayer3.Tx.OnlineLounge_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
             #region [Menus]
 
@@ -720,6 +734,8 @@ namespace TJAPlayer3
         #endregion
 
         #region [Private]
+
+        private ScriptBG Background;
 
         private ECurrentMenu currentMenu;
         private ECurrentMenu menuPointer;

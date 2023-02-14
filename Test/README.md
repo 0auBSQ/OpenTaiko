@@ -91,6 +91,13 @@ BoxFontName=廻想体 ネクスト UP B
 045 - nanja korya ?! : Makotora - https://soundcloud.com/xoxomakotora/nanjakorya (Chart by 0AuBSQ)
 046 - ΣxilƎ : mrcool909090 - https://www.twitter.com/mrcool909090 (Chart by bol (Normal, Extreme) and 0AuBSQ)
 047 - Pixelated Angel : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol and TFD500)
+048 - The Nostalgic Messenger : CuZi - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by 0AuBSQ)
+049 - Overclocked (Pocket Size) : DeBisco - https://soundcloud.com/debisco | https://twitter.com/debiscomusic (Chart by Colin & 0AuBSQ)
+050 - Annihilation : H5 - https://linktr.ee/H5Music (Chart by bol)
+051 - 650 HP : Akako Hinami - https://soundcloud.app.goo.gl/nnjSb (Chart by bol)
+052 - Scarlet Mirage : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & bol)
+053 - PYRΔMiD : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by colin, bol & 0AuBSQ)
+054 - Synthsea : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Hard), bol (Normal) and Megi (Easy))
 ```
 
 ### About the OpenTaiko Original Soundtrack

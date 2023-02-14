@@ -187,7 +187,7 @@ namespace TJAPlayer3
         // ------------------------------------
         private void showEndEffect_Failed(int i)
         {
-            FailedScript.Update(i);
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) FailedScript.Update(i);
             FailedScript.Draw(i);
 
             int[] y = new int[] { 0, 176 };
@@ -215,7 +215,7 @@ namespace TJAPlayer3
         }
         private void showEndEffect_Clear(int i)
         {
-            ClearScript.Update(i);
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) ClearScript.Update(i);
             ClearScript.Draw(i);
 
             /*
@@ -392,7 +392,7 @@ namespace TJAPlayer3
 
         private void showEndEffect_FullCombo(int i)
         {
-            FullComboScript.Update(i);
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) FullComboScript.Update(i);
             FullComboScript.Draw(i);
 
             /*
@@ -411,7 +411,7 @@ namespace TJAPlayer3
 
         private void showEndEffect_DondaFullCombo(int i)
         {
-            DondaFullComboScript.Update(i);
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DondaFullComboScript.Update(i);
             DondaFullComboScript.Draw(i);
 
             /*

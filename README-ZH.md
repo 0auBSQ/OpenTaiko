@@ -4,15 +4,17 @@
 
 # OpenTaiko
 
-TJAPlayer3-Develop-ReWrite的分支项目，使用TJA文件的太鼓模拟器
+TJAPlayer3-Develop-ReWrite的分叉项目，读取TJA文件的太鼓模拟器
 
 前身：TJAPlayer3-Develop-BSQ
 
-- 当前版本：v0.5.3.1
+- 当前版本：v0.5.4
 
 - Discord：https://discord.gg/aA8scTvZ6B
 
-（译者注：由README-EN翻译。最近一次更新时间：2022年10月9日）
+（译者注：由README-EN.md翻译。最近一次更新时间：2023年2月9日）
+
+（译者注：编译指南：[https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows)](https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows))）
 
 ## 使用前注意事项（重要！！！）
 
@@ -42,11 +44,11 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 **目标**
 
-- 各种愉快地游玩太鼓的方式。
+- 各种有趣的太鼓演奏的方式。
 
 - 加强定制更好的皮肤的可行性，使得每个人都能轻松地以他们自己的风格游玩太鼓成为现实。
 
-- 优化、修复和提升体验
+- 优化、修复及提升体验
 
 **非目标**
 
@@ -66,7 +68,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 如果您需要添加功能，请先在Discord上联系作者。
 
-需求的功能如果很好的话会被添加。
+需求的功能如果好的话可能会被添加。
 
 - **重要！！！**：类似于“请重建与AC虹色版完全一致的用户界面”的请求会被直接否决，不会得到回答。
 
@@ -90,7 +92,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 按住P键
 ```
 
-- 我发现了Bug。我该做什么？
+- 我发现了Bug。我该怎么办？
 
 ```
 当你发现Bug时请提交issue。
@@ -110,10 +112,10 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 而是“System/(Skin name)/Graphics”。
 ```
 
-- 我找不到我自行添加的角色和小角色
+- 我找不到我自行添加的角色和迷你角色
 
 ```
-从0.5.3版本开始，角色和小角色将由skin文件夹外的Global文件夹读取。请把它们放在那里。
+从0.5.3版本开始，角色和迷你角色将由skin文件夹外的Global文件夹读取。请把它们放在那里。
 ```
 
 ## 更新历史
@@ -123,7 +125,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 	- 修复了多个问题
 
-	- 全局化角色和小角色
+	- 全局化角色和迷你角色
 
 	- 永久性的“最近演奏的曲目”文件夹
 
@@ -156,7 +158,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 	- 添加了最爱曲目文件夹
 
-	- 添加了数据库文件（角色与小角色的名称及作者名称）
+	- 添加了数据库文件（角色与迷你角色的名称及作者名称）
 
 	- 中文支持（WHMHammer）
 
@@ -187,172 +189,173 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 <details>
 	<summary>v0.5.2</summary>
-	
+
 	- 太鼓部屋功能
-	
+
 	- 自定义名片和角色功能
-	
+
 	- 使金币可获得
-	
+
 	- 使段位称号可解锁
-	
+
 	- 增加多步贴图
-	
+
 	- 增加西班牙语翻译 (由funnym0th制作)
-	
+
 	- 增加“随机选项”
-	
+
 	- UX/UI改善
-	
+
 	- 加速歌曲加载
-	
+
 	- 修复有谱面分歧的谱面
-	
+
 </details>
 
 <details>
 	<summary>v0.5.1</summary>
-	
+
 	- 在段位道场中增加动画
-	
+
 	- 增加游戏退出界面和图标
-	
+
 	- 修复问题
-	
+
 	- 多语言支持
-	
+
 	- UI改善
-	
+
 	- 选曲界面增加其他多种样式
-	
+
 </details>
 
 <details>
 	<summary>v0.5.0</summary>
-	
+
 	- 太鼓Tower功能 (Background+Result screen backbone)
-	
+
 	- Tower谱面增加“TOWERTYPE”（用以在Tower难度中使用多种皮肤）
-	
+
 	- 段位道场增加准确率考核目标
-	
+
 	- box.def中增加“#BOXCOLOR”、“#BOXTYPE”、“#BGCOLOR”、“#BGTYPE”和“#BOXCHARA”
-	
+
 </details>
 
 <details>
 	<summary>v0.4.3</summary>
-	
+
 	- 增加太鼓Tower（游玩）
-	
+
 </details>
 
 <details>
 	<summary>v0.4.2</summary>
-	
+
 	- 修复选曲界面的多个问题及崩溃
-	
+
 	- 修复Tower难度崩溃，但未引入太鼓Tower菜单、LIFE管理和结算界面
 
 </details>
 
 <details>
 	<summary>v0.4.1</summary>
-	
+
 	- 修复选曲界面的多个问题及崩溃
-	
+
 </details>
 
 <details>
 	<summary>v0.4.0</summary>
-	
+
 	- 引入EXAM5、6、7
-	
+
 	- 修复EXAM和数字间有空格导致的崩溃问题
-  
+
 	- 段位道场模块使用更好的代码结构
-  
+
 </details>
 
 <details>
 	<summary>v0.3.4.2</summary>
-	
-	- 段位道场选择界面中增加小角色
-	
+
+	- 段位道场选择界面中增加迷你角色
+
 </details>
 
 <details>
 	<summary>v0.3.4.1</summary>
-	
+
 	- 修复人群动作速度的问题
-	
+
 </details>
 
 <details>
 	<summary>v0.3.4</summary>
-	
+
 	- 保存段位道场结果
-	
+
 	- 段位道场选择界面中增加成就展示板
-	
+
 </details>
 
 <details>
 	<summary>v0.3.3</summary>
-	
+
 	- 修复段位道场计量槽显示的问题
-	
+
 	- 为段位道场结算画面增加底板
-	
+
 </details>
 
 <details>
 	<summary>v0.3.2</summary>
-	
+
 	- 修复结果保存多次的问题
-	
+
 </details>
 
 <details>
 	<summary>v0.3.1</summary>
-	
+
 	- 修复P2得分排名不显示的问题
-	
+
 </details>
 
 <details>
 	<summary>v0.3.0</summary>
-	
-	- 在菜单显示小角色
-	
-	- 在Nameplate.json文件中，玩家可以分别选择各自的小角色
-	
+
+	- 在菜单显示迷你角色
+
+	- 在Nameplate.json文件中，玩家可以分别选择各自的迷你角色
+
 </details>
 
 <details>
 	<summary>v0.2.0</summary>
-	
+
 	- 修复选曲界面问题
-	
+
 	- 修复主菜单问题
-	
+
 </details>
 
 <details>
 	<summary>v0.1.0</summary>
-	
+
 	- 结算界面动画
-	
+
 </details>
 
 ## 致谢
 
-> * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
-> * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
-> * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
-> * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
-> * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
-> * [WHMHammer/OpenTaiko Chinese Translation](https://github.com/whmhammer)(@WHMHammer)
+> * [Takkkom/Major OpenTaiko features (1080p support, AI Battle mode, 5P mode and so on)](https://github.com/Takkkom)
+> * [AkiraChnl/OpenTaiko图标](https://github.com/AkiraChnl)(@akirach_jp)
+> * [cien/OpenTaiko标志/多项默认皮肤资源](https://twitter.com/CienpixeL)(@CienpixeL)
+> * [funnym0th/OpenTaiko西班牙文翻译](https://github.com/funnym0th) (@funnym0th)
+> * [basketballsmash/英文README翻译](https://twitter.com/basketballsmash)(@basketballsmash)
+> * [Meowgister/OpenTaiko英文翻译](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
+> * [WHMHammer/OpenTaiko中文翻译](https://github.com/whmhammer)(@WHMHammer)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)

@@ -457,7 +457,7 @@ namespace TJAPlayer3
                                 else if (this.stBranch[i].ct分岐アニメ進行.n現在の値 >= 60 && this.stBranch[i].ct分岐アニメ進行.n現在の値 < 150)
                                 {
                                     this.stBranch[i].nY = 21;
-                                    TJAPlayer3.Tx.Lane_Text[1].t2D描画(TJAPlayer3.app.Device, 333, TJAPlayer3.Skin.Game_Lane_Y[i]);
+                                    TJAPlayer3.Tx.Lane_Text[1].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[i], TJAPlayer3.Skin.Game_Lane_Y[i]);
                                     TJAPlayer3.Tx.Lane_Text[1].Opacity = 255;
                                     TJAPlayer3.Tx.Lane_Text[2].Opacity = 255;
                                 }
