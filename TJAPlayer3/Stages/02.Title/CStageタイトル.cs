@@ -352,7 +352,7 @@ namespace TJAPlayer3
 
 							if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.DANGAMESTART)
 							{
-								if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0 && TJAPlayer3.ConfigIni.nPlayerCount != 2)
+								if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
 									operationSucceded = true;
 							}
 							else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
@@ -687,6 +687,8 @@ namespace TJAPlayer3
 
 					for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
 					{
+						if (player >= 2) continue;
+
 						float DonchanX = 0f, DonchanY = 0f;
 
 						DonchanX = -200 + ((float)Math.Sin(ctどんちゃんイン.n現在の値 / 2 * (Math.PI / 180)) * 200f);
@@ -895,6 +897,8 @@ namespace TJAPlayer3
 
 					for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
 					{
+						if (player >= 2) continue;
+
 						TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[player], TJAPlayer3.Skin.SongSelect_NamePlate_Y[player], player, false, 255);
 					}
 				}

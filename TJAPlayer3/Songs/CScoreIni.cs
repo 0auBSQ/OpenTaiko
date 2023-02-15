@@ -1557,7 +1557,7 @@ namespace TJAPlayer3
 		}
 		internal static void t更新条件を取得する( out bool bDrumsを更新する, out bool bGuitarを更新する, out bool bBassを更新する )
 		{
-            bDrumsを更新する = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay;
+            bDrumsを更新する = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
 			bGuitarを更新する = false;
 			bBassを更新する =   false;
 		}

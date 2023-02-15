@@ -122,8 +122,68 @@ namespace TJAPlayer3
 				}
 			}
 		}
+		public static CDTX DTX_3P
+		{
+			get
+			{
+				return dtx[2];
+			}
+			set
+			{
+				if ((dtx[2] != null) && (app != null))
+				{
+					dtx[2].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[2]);
+				}
+				dtx[2] = value;
+				if ((dtx[2] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[2]);
+				}
+			}
+		}
+		public static CDTX DTX_4P
+		{
+			get
+			{
+				return dtx[3];
+			}
+			set
+			{
+				if ((dtx[3] != null) && (app != null))
+				{
+					dtx[3].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[3]);
+				}
+				dtx[3] = value;
+				if ((dtx[3] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[3]);
+				}
+			}
+		}
+		public static CDTX DTX_5P
+		{
+			get
+			{
+				return dtx[4];
+			}
+			set
+			{
+				if ((dtx[4] != null) && (app != null))
+				{
+					dtx[4].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[4]);
+				}
+				dtx[4] = value;
+				if ((dtx[4] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[4]);
+				}
+			}
+		}
 
-	    public static bool IsPerformingCalibration;
+		public static bool IsPerformingCalibration;
 
 		public static CFPS FPS
 		{ 
@@ -2094,7 +2154,7 @@ for (int i = 0; i < 3; i++) {
 		private bool b終了処理完了済み;
 		private bool bネットワークに接続中 = false;
 		private long 前回のシステム時刻ms = long.MinValue;
-		private static CDTX[] dtx = new CDTX[ 4 ];
+		private static CDTX[] dtx = new CDTX[ 5 ];
 
         public static TextureLoader Tx = new TextureLoader();
 
@@ -2304,7 +2364,9 @@ for (int i = 0; i < 3; i++) {
 			//---------------------
 			Trace.TraceInformation( "スキンの初期化を行います。" );
 			Trace.Indent();
+#if !DEBUG
 			try
+#endif
 			{
 				Skin = new CSkin( TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName, false);
 				TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName = TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName( true );  // 旧指定のSkinフォルダが消滅していた場合に備える
@@ -2313,6 +2375,7 @@ for (int i = 0; i < 3; i++) {
 
 				Trace.TraceInformation( "スキンの初期化を完了しました。" );
 			}
+#if !DEBUG
 			catch (Exception e)
 			{
 				Trace.TraceInformation( "スキンの初期化に失敗しました。" );
@@ -2322,6 +2385,7 @@ for (int i = 0; i < 3; i++) {
 			{
 				Trace.Unindent();
 			}
+#endif
 
 			// Init Modal fonts once config.ini parsing is done
 			// Moved here to reference Skin values.

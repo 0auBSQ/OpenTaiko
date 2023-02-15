@@ -9,11 +9,11 @@ namespace TJAPlayer3
 {
     class CMenuCharacter
     {
-        private static CCounter[] ctCharacterNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterSelect = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterStart = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterEntry = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterEntryNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterSelect = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterStart = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntry = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntryNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
         public enum ECharacterAnimation
         {
@@ -162,31 +162,31 @@ namespace TJAPlayer3
             {
                 case (ECharacterAnimation.NORMAL):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterNormal[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.START):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterStart[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.SELECT):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterSelect[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.ENTRY):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterEntry[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.ENTRY_NORMAL):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterEntryNormal[i] = new CCounter();
                         break;
                     }
@@ -208,7 +208,7 @@ namespace TJAPlayer3
 
         public static void tMenuResetTimer(ECharacterAnimation eca)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tMenuResetTimer(i, eca);
             }

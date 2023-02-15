@@ -64,7 +64,7 @@ namespace TJAPlayer3
         /// <param name="y">Y座標(中央)</param>
         /// <param name="alpha">不透明度</param>
         /// <returns></returns>
-        public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0)
+        public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f)
         {
             if (!TJAPlayer3.ConfigIni.ShowPuchiChara) return base.On進行描画();
             if (Counter == null || SineCounter == null || TJAPlayer3.Tx.Puchichara == null) return base.On進行描画();
@@ -103,6 +103,8 @@ namespace TJAPlayer3
                 float puchiScale = TJAPlayer3.Skin.Resolution[1] / 720.0f;
 
                 chara.vc拡大縮小倍率 = new Vector3((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] * puchiScale : TJAPlayer3.Skin.Game_PuchiChara_Scale[0] * puchiScale));
+                chara.vc拡大縮小倍率.X *= scale;
+                chara.vc拡大縮小倍率.Y *= scale;
                 chara.Opacity = alpha;
 
                 // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height

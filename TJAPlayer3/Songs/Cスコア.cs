@@ -50,7 +50,7 @@ namespace TJAPlayer3
 		public ST譜面情報 譜面情報;
 
 		// Smaller version of ST譜面情報 to keep the main info for each player (High scores, clear status, score ranks
-		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[2];
+		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[5];
 
 		[Serializable]
 		[StructLayout(LayoutKind.Sequential)]
@@ -335,7 +335,7 @@ namespace TJAPlayer3
 			this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
 		
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 5; i++)
             {
 				this.GPInfo[i].nHighScore = new int[(int)Difficulty.Total];
 				this.GPInfo[i].nClear = new int[5];

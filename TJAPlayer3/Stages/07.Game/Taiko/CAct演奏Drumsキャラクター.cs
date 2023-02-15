@@ -27,7 +27,7 @@ namespace TJAPlayer3
 
         public override void On活性化()
         {
-            for(int i = 0; i < 2; i++)
+            for(int i = 0; i < 5; i++)
             {
                 ctChara_Normal[i] = new CCounter();
                 ctChara_Miss[i] = new CCounter();
@@ -81,7 +81,7 @@ namespace TJAPlayer3
 
         public override void On非活性化()
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 ctChara_Normal[i] = null;
                 ctChara_Miss[i] = null;
@@ -109,7 +109,7 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Normal[this.iCurrentCharacter[i]]);
                 this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Miss[this.iCurrentCharacter[i]]);
@@ -335,27 +335,6 @@ namespace TJAPlayer3
 
                 float charaScale = 1.0f;
 
-                if (TJAPlayer3.ConfigIni.bAIBattleMode)
-                {
-                    chara_x = TJAPlayer3.Skin.Characters_X_AI[Character][i];
-                    chara_y = TJAPlayer3.Skin.Characters_Y_AI[Character][i];
-
-                    if (nowChara != null)
-                    {
-                        charaScale = 0.58f;
-                    }
-                }
-                else
-                {
-                    chara_x = TJAPlayer3.Skin.Characters_X[Character][i];
-                    chara_y = TJAPlayer3.Skin.Characters_Y[Character][i];
-
-                    if (nowChara != null)
-                    {
-                        charaScale = 1.0f;
-                    }
-                }
-
                 if (nowChara != null)
                 {
                     bool flipX = TJAPlayer3.ConfigIni.bAIBattleMode ? (i == 1) : false;
@@ -363,9 +342,50 @@ namespace TJAPlayer3
                     float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[Character][0];
                     float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[Character][1];
 
+                    if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                    {
+                        chara_x = (TJAPlayer3.Skin.Characters_X_AI[Character][i] * resolutionScaleX);
+                        chara_y = (TJAPlayer3.Skin.Characters_Y_AI[Character][i] * resolutionScaleY);
+
+                        if (nowChara != null)
+                        {
+                            charaScale = 0.58f;
+                        }
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                    {
+                        chara_x = (TJAPlayer3.Skin.Characters_X[Character][i] * resolutionScaleX);
+                        chara_y = (TJAPlayer3.Skin.Characters_Y[Character][i] * resolutionScaleY);
+
+                        if (nowChara != null)
+                        {
+                            charaScale = 1.0f;
+                        }
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                    {
+                        chara_x = (TJAPlayer3.Skin.Characters_5P[Character][0] * resolutionScaleX) + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                        chara_y = (TJAPlayer3.Skin.Characters_5P[Character][1] * resolutionScaleY) + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+
+                        if (nowChara != null)
+                        {
+                            charaScale = 0.58f;
+                        }
+                    }
+                    else
+                    {
+                        chara_x = (TJAPlayer3.Skin.Characters_4P[Character][0] * resolutionScaleX) + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                        chara_y = (TJAPlayer3.Skin.Characters_4P[Character][1] * resolutionScaleY) + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+
+                        if (nowChara != null)
+                        {
+                            charaScale = 0.58f;
+                        }
+                    }
+
                     charaScale *= resolutionScaleY;
-                    chara_x *= resolutionScaleX;
-                    chara_y *= resolutionScaleY;
+                    //chara_x *= resolutionScaleX;
+                    //chara_y *= resolutionScaleY;
 
                     if (TJAPlayer3.ConfigIni.bAIBattleMode)
                     {
@@ -389,9 +409,20 @@ namespace TJAPlayer3
                     nowChara.vc拡大縮小倍率.Y = 1.0f;
                 }
 
-                if (this.b風船連打中[i] != true && CharaAction_Balloon_Delay[i].b終了値に達した)
+                if ((this.b風船連打中[i] != true && CharaAction_Balloon_Delay[i].b終了値に達した) || TJAPlayer3.ConfigIni.nPlayerCount > 2)
                 {
-                    TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(TJAPlayer3.Skin.Game_PuchiChara_X[i], TJAPlayer3.Skin.Game_PuchiChara_Y[i], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyMaxed[i], player : i);
+                    if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(TJAPlayer3.Skin.Game_PuchiChara_X[i], TJAPlayer3.Skin.Game_PuchiChara_Y[i], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyMaxed[i], player: i);
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(TJAPlayer3.Skin.Game_PuchiChara_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i), TJAPlayer3.Skin.Game_PuchiChara_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i), TJAPlayer3.stage演奏ドラム画面.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+                    }
+                    else
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(TJAPlayer3.Skin.Game_PuchiChara_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i), TJAPlayer3.Skin.Game_PuchiChara_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i), TJAPlayer3.stage演奏ドラム画面.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+                    }
                 }
             }
             return base.On進行描画();
@@ -414,8 +445,28 @@ namespace TJAPlayer3
                     float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[this.iCurrentCharacter[i]][0];
                     float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[this.iCurrentCharacter[i]][1];
 
-                    float chara_x = TJAPlayer3.Skin.Characters_Balloon_X[this.iCurrentCharacter[i]][i];
-                    float chara_y = TJAPlayer3.Skin.Characters_Balloon_Y[this.iCurrentCharacter[i]][i];
+                    float chara_x = 0;
+                    float chara_y = 0;
+
+                    if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                    {
+                        chara_x = TJAPlayer3.Skin.Characters_Balloon_X[this.iCurrentCharacter[i]][i];
+                        chara_y = TJAPlayer3.Skin.Characters_Balloon_Y[this.iCurrentCharacter[i]][i];
+                    }
+                    else
+                    {
+                        if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                        {
+                            chara_x = TJAPlayer3.Skin.Characters_Balloon_5P[this.iCurrentCharacter[i]][0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                            chara_y = TJAPlayer3.Skin.Characters_Balloon_5P[this.iCurrentCharacter[i]][1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+                        }
+                        else
+                        {
+                            chara_x = TJAPlayer3.Skin.Characters_Balloon_4P[this.iCurrentCharacter[i]][0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                            chara_y = TJAPlayer3.Skin.Characters_Balloon_4P[this.iCurrentCharacter[i]][1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+                        }
+                    }
+
                     chara_x *= resolutionScaleX;
                     chara_y *= resolutionScaleY;
 
@@ -439,8 +490,9 @@ namespace TJAPlayer3
                                 + chara_x,
                                 chara_y);
                         }
-                        
-                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
+
+                        if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (CharaAction_Balloon_Broke[i].b終了値に達した)
                         {
@@ -467,7 +519,8 @@ namespace TJAPlayer3
                                 chara_y);
                         }
 
-                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
+                        if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (CharaAction_Balloon_Miss[i].b終了値に達した)
                         {
@@ -487,10 +540,10 @@ namespace TJAPlayer3
                                 chara_x,
                                 chara_y);
                         }
-                        
-                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player : i);
-                    }
 
+                        if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player : i);
+                    }
                 }
             }
         }
@@ -521,39 +574,39 @@ namespace TJAPlayer3
                 //CharaAction_Balloon_Delay.n現在の値 = 0;
         }
 
-        public int[][] arモーション番号 = new int[2][];
-        public int[][] arMissモーション番号 = new int[2][];
-        public int[][] arMissDownモーション番号 = new int[2][];
-        public int[][] arゴーゴーモーション番号 = new int[2][];
-        public int[][] arクリアモーション番号 = new int[2][];
+        public int[][] arモーション番号 = new int[5][];
+        public int[][] arMissモーション番号 = new int[5][];
+        public int[][] arMissDownモーション番号 = new int[5][];
+        public int[][] arゴーゴーモーション番号 = new int[5][];
+        public int[][] arクリアモーション番号 = new int[5][];
 
-        public CCounter[] ctキャラクターアクション_10コンボ = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_10コンボMAX = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_ゴーゴースタート = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_ゴーゴースタートMAX = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_ノルマ = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_魂MAX = new CCounter[2];
-        public CCounter[] ctキャラクターアクション_Return = new CCounter[2];
-        public CCounter[] CharaAction_Balloon_Breaking = new CCounter[2];
-        public CCounter[] CharaAction_Balloon_Broke = new CCounter[2];
-        public CCounter[] CharaAction_Balloon_Miss = new CCounter[2];
-        public CCounter[] CharaAction_Balloon_Delay = new CCounter[2];
+        public CCounter[] ctキャラクターアクション_10コンボ = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_10コンボMAX = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_ゴーゴースタート = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_ゴーゴースタートMAX = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_ノルマ = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_魂MAX = new CCounter[5];
+        public CCounter[] ctキャラクターアクション_Return = new CCounter[5];
+        public CCounter[] CharaAction_Balloon_Breaking = new CCounter[5];
+        public CCounter[] CharaAction_Balloon_Broke = new CCounter[5];
+        public CCounter[] CharaAction_Balloon_Miss = new CCounter[5];
+        public CCounter[] CharaAction_Balloon_Delay = new CCounter[5];
 
-        public CCounter[] ctChara_Normal = new CCounter[2];
-        public CCounter[] ctChara_Miss = new CCounter[2];
-        public CCounter[] ctChara_MissDown = new CCounter[2];
-        public CCounter[] ctChara_GoGo = new CCounter[2];
-        public CCounter[] ctChara_Clear = new CCounter[2];
+        public CCounter[] ctChara_Normal = new CCounter[5];
+        public CCounter[] ctChara_Miss = new CCounter[5];
+        public CCounter[] ctChara_MissDown = new CCounter[5];
+        public CCounter[] ctChara_GoGo = new CCounter[5];
+        public CCounter[] ctChara_Clear = new CCounter[5];
 
-        public Animations.FadeOut[] CharaAction_Balloon_FadeOut = new Animations.FadeOut[2];
-        //private readonly int[] CharaAction_Balloon_FadeOut_StartMs = new int[2];
-        private readonly int[][] CharaAction_Balloon_FadeOut_StartMs = new int[2][];
+        public Animations.FadeOut[] CharaAction_Balloon_FadeOut = new Animations.FadeOut[5];
+        //private readonly int[] CharaAction_Balloon_FadeOut_StartMs = new int[5];
+        private readonly int[][] CharaAction_Balloon_FadeOut_StartMs = new int[5][];
 
-        public bool[] bマイどんアクション中 = new bool[2];
+        public bool[] bマイどんアクション中 = new bool[5];
 
-        public bool[] b風船連打中 = new bool[2];
-        public bool[] b演奏中 = new bool[2];
+        public bool[] b風船連打中 = new bool[5];
+        public bool[] b演奏中 = new bool[5];
 
-        public int[] iCurrentCharacter = new int[2] { 0, 0 };
+        public int[] iCurrentCharacter = new int[5] { 0, 0, 0, 0, 0 };
     }
 }

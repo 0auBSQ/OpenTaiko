@@ -13,7 +13,7 @@ namespace TJAPlayer3
     {
         public void RefleshSkin()
         {
-            for (int player = 0; player < 2; player++)
+            for (int player = 0; player < 5; player++)
             {
                 this.pfName[player]?.Dispose();
 
@@ -52,7 +52,7 @@ namespace TJAPlayer3
         {
             RefleshSkin();
 
-            for (int player = 0; player < 2; player++)
+            for (int player = 0; player < 5; player++)
             {
                 if (TJAPlayer3.NamePlateConfig.data.DanType[player] < 0) TJAPlayer3.NamePlateConfig.data.DanType[player] = 0;
                 else if (TJAPlayer3.NamePlateConfig.data.DanType[player] > 2) TJAPlayer3.NamePlateConfig.data.DanType[player] = 2;
@@ -72,6 +72,15 @@ namespace TJAPlayer3
             int namePlateBaseY = TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Height / 12;
 
             TJAPlayer3.Tx.NamePlateBase?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, item * namePlateBaseY, namePlateBaseX, namePlateBaseY));
+
+        }
+
+        public void tNamePlateDisplayNamePlate_Extension(int x, int y, int item)
+        {
+            int namePlateBaseX = TJAPlayer3.Tx.NamePlate_Extension.szテクスチャサイズ.Width;
+            int namePlateBaseY = TJAPlayer3.Tx.NamePlate_Extension.szテクスチャサイズ.Height / 12;
+
+            TJAPlayer3.Tx.NamePlate_Extension?.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(0, item * namePlateBaseY, namePlateBaseX, namePlateBaseY));
 
         }
 
@@ -149,7 +158,16 @@ namespace TJAPlayer3
 
             // Player number
             if (TJAPlayer3.PlayerSide == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 1)
-                tNamePlateDisplayNamePlateBase(x, y, basePlayer == 1 ? 2 : 0);
+            {
+                if (basePlayer < 2)
+                {
+                    tNamePlateDisplayNamePlateBase(x, y, basePlayer == 1 ? 2 : 0);
+                }
+                else
+                {
+                    tNamePlateDisplayNamePlate_Extension(x, y, basePlayer - 2);
+                }
+            }
             else
                 tNamePlateDisplayNamePlateBase(x, y, 1);
 
@@ -376,15 +394,15 @@ namespace TJAPlayer3
 
         }
 
-        private CPrivateFastFont[] pfName = new CPrivateFastFont[2];
+        private CPrivateFastFont[] pfName = new CPrivateFastFont[5];
         private CPrivateFastFont pfTitle;
         private CPrivateFastFont pfdan;
         private CCounter ctNamePlateEffect;
 
         public CCounter ctAnimatedNamePlateTitle;
 
-        private CTexture[] txName = new CTexture[2];
-        private CTexture[] txTitle = new CTexture[2];
-        private CTexture[] txdan = new CTexture[2];
+        private CTexture[] txName = new CTexture[5];
+        private CTexture[] txTitle = new CTexture[5];
+        private CTexture[] txdan = new CTexture[5];
     }
 }

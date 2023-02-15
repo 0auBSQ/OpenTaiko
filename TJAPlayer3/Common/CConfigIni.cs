@@ -332,6 +332,141 @@ namespace TJAPlayer3
 					}
                 }
 
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed3P
+				{
+					get
+					{
+						return this.padLRed3P;
+					}
+					set
+					{
+						this.padLRed3P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed3P
+				{
+					get
+					{
+						return this.padRRed3P;
+					}
+					set
+					{
+						this.padRRed3P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue3P
+				{
+					get
+					{
+						return this.padLBlue3P;
+					}
+					set
+					{
+						this.padLBlue3P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue3P
+				{
+					get
+					{
+						return this.padRBlue3P;
+					}
+					set
+					{
+						this.padRBlue3P = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed4P
+				{
+					get
+					{
+						return this.padLRed4P;
+					}
+					set
+					{
+						this.padLRed4P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed4P
+				{
+					get
+					{
+						return this.padRRed4P;
+					}
+					set
+					{
+						this.padRRed4P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue4P
+				{
+					get
+					{
+						return this.padLBlue4P;
+					}
+					set
+					{
+						this.padLBlue4P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue4P
+				{
+					get
+					{
+						return this.padRBlue4P;
+					}
+					set
+					{
+						this.padRBlue4P = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed5P
+				{
+					get
+					{
+						return this.padLRed5P;
+					}
+					set
+					{
+						this.padLRed5P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed5P
+				{
+					get
+					{
+						return this.padRRed5P;
+					}
+					set
+					{
+						this.padRRed5P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue5P
+				{
+					get
+					{
+						return this.padLBlue5P;
+					}
+					set
+					{
+						this.padLBlue5P = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue5P
+				{
+					get
+					{
+						return this.padRBlue5P;
+					}
+					set
+					{
+						this.padRBlue5P = value;
+					}
+				}
+
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap
 				{
 					get
@@ -353,6 +488,42 @@ namespace TJAPlayer3
 					set
 					{
 						this.padClap2P = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap3P
+				{
+					get
+					{
+						return this.padClap3P;
+					}
+					set
+					{
+						this.padClap3P = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap4P
+				{
+					get
+					{
+						return this.padClap4P;
+					}
+					set
+					{
+						this.padClap4P = value;
+					}
+				}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap5P
+				{
+					get
+					{
+						return this.padClap5P;
+					}
+					set
+					{
+						this.padClap5P = value;
 					}
 				}
 
@@ -446,11 +617,56 @@ namespace TJAPlayer3
 							case (int) EKeyConfigPad.RBlue2P:
 								return this.padRBlue2P;
 
+							case (int)EKeyConfigPad.LRed3P:
+								return this.padLRed3P;
+
+							case (int)EKeyConfigPad.RRed3P:
+								return this.padRRed3P;
+
+							case (int)EKeyConfigPad.LBlue3P:
+								return this.padLBlue3P;
+
+							case (int)EKeyConfigPad.RBlue3P:
+								return this.padRBlue3P;
+
+							case (int)EKeyConfigPad.LRed4P:
+								return this.padLRed4P;
+
+							case (int)EKeyConfigPad.RRed4P:
+								return this.padRRed4P;
+
+							case (int)EKeyConfigPad.LBlue4P:
+								return this.padLBlue4P;
+
+							case (int)EKeyConfigPad.RBlue4P:
+								return this.padRBlue4P;
+
+							case (int)EKeyConfigPad.LRed5P:
+								return this.padLRed5P;
+
+							case (int)EKeyConfigPad.RRed5P:
+								return this.padRRed5P;
+
+							case (int)EKeyConfigPad.LBlue5P:
+								return this.padLBlue5P;
+
+							case (int)EKeyConfigPad.RBlue5P:
+								return this.padRBlue5P;
+
 							case (int)EKeyConfigPad.Clap:
 								return this.padClap;
 
 							case (int)EKeyConfigPad.Clap2P:
 								return this.padClap2P;
+
+							case (int)EKeyConfigPad.Clap3P:
+								return this.padClap3P;
+
+							case (int)EKeyConfigPad.Clap4P:
+								return this.padClap4P;
+
+							case (int)EKeyConfigPad.Clap5P:
+								return this.padClap5P;
 
 							case (int)EKeyConfigPad.LeftChange:
 								return this.padLeftChange;
@@ -547,12 +763,72 @@ namespace TJAPlayer3
                                 this.padRBlue2P = value;
                                 return;
 
+							case (int)EKeyConfigPad.LRed3P:
+								this.padLRed3P = value;
+								return;
+
+							case (int)EKeyConfigPad.RRed3P:
+								this.padRRed3P = value;
+								return;
+
+							case (int)EKeyConfigPad.LBlue3P:
+								this.padLBlue3P = value;
+								return;
+
+							case (int)EKeyConfigPad.RBlue3P:
+								this.padRBlue3P = value;
+								return;
+
+							case (int)EKeyConfigPad.LRed4P:
+								this.padLRed4P = value;
+								return;
+
+							case (int)EKeyConfigPad.RRed4P:
+								this.padRRed4P = value;
+								return;
+
+							case (int)EKeyConfigPad.LBlue4P:
+								this.padLBlue4P = value;
+								return;
+
+							case (int)EKeyConfigPad.RBlue4P:
+								this.padRBlue4P = value;
+								return;
+
+							case (int)EKeyConfigPad.LRed5P:
+								this.padLRed5P = value;
+								return;
+
+							case (int)EKeyConfigPad.RRed5P:
+								this.padRRed5P = value;
+								return;
+
+							case (int)EKeyConfigPad.LBlue5P:
+								this.padLBlue5P = value;
+								return;
+
+							case (int)EKeyConfigPad.RBlue5P:
+								this.padRBlue5P = value;
+								return;
+
 							case (int)EKeyConfigPad.Clap:
 								this.padClap = value;
 								return;
 
 							case (int)EKeyConfigPad.Clap2P:
 								this.padClap2P = value;
+								return;
+
+							case (int)EKeyConfigPad.Clap3P:
+								this.padClap3P = value;
+								return;
+
+							case (int)EKeyConfigPad.Clap4P:
+								this.padClap4P = value;
+								return;
+
+							case (int)EKeyConfigPad.Clap5P:
+								this.padClap5P = value;
 								return;
 
 							case (int)EKeyConfigPad.LeftChange:
@@ -585,16 +861,37 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSD_G;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLP;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBD;
+
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue;
+
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed2P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue2P;
+
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed3P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue3P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed3P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue3P;
+
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed4P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue4P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed4P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue4P;
+
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed5P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue5P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed5P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue5P;
+
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap2P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap3P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap4P;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap5P;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padLeftChange;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRightChange;
 
@@ -762,7 +1059,7 @@ namespace TJAPlayer3
 		public int nウインドウheight;				// #23510 2010.10.31 yyagi add
 		public Dictionary<int, string> dicJoystick;
 		public Eダークモード eDark;
-		public STDGBVALUE<Eランダムモード> eRandom;
+		public Eランダムモード[] eRandom;
 		public Eダメージレベル eダメージレベル;
         public CKeyAssign KeyAssign;
 		public int n非フォーカス時スリープms;       // #23568 2010.11.04 ikanick add
@@ -852,11 +1149,27 @@ namespace TJAPlayer3
         public int nScoreMode;
         public int nDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
 
-
-        public int nPlayerCount; //2017.08.18 kairera0467 マルチプレイ対応
+		private int _nPlayerCount;
+        public int nPlayerCount
+        {
+            get
+            {
+				if (bAIBattleMode)
+                {
+					return 2;
+                }
+                else
+                {
+					return _nPlayerCount;
+                }
+            }
+            set
+            {
+				_nPlayerCount = value;
+			}
+        }
         
-		public bool b太鼓パートAutoPlay;
-        public bool b太鼓パートAutoPlay2P; //2017.08.16 kairera0467 マルチプレイ対応
+		public bool[] b太鼓パートAutoPlay = new bool[5];
         
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
@@ -925,9 +1238,9 @@ namespace TJAPlayer3
 		public int TokkunMashInterval;
 		public bool bSuperHard = false;
         public bool bTokkunMode = false;
-        public int[] bJust = new int[4] { 0, 0, 0, 0 };
+        public int[] bJust = new int[5] { 0, 0, 0, 0, 0 };
 
-		public int[] nHitSounds = new int[4] { 0, 0, 0, 0 };
+		public int[] nHitSounds = new int[5] { 0, 0, 0, 0, 0 };
 
 		public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
@@ -1490,15 +1803,15 @@ namespace TJAPlayer3
 			this.bSudden = new STDGBVALUE<bool>();
 			this.bHidden = new STDGBVALUE<bool>();
 			this.bReverse = new STDGBVALUE<bool>();
-			this.eRandom = new STDGBVALUE<Eランダムモード>();
+			this.eRandom = new Eランダムモード[5];
 			this.bLight = new STDGBVALUE<bool>();
 			this.bLeft = new STDGBVALUE<bool>();
 			this.e判定位置 = new STDGBVALUE<E判定位置>();		// #33891 2014.6.26 yyagi
 			this.判定文字表示位置 = new STDGBVALUE<E判定文字表示位置>();
-			this.nScrollSpeed = new int[4] { 9, 9, 9, 9 };
-			this.nTimingZones = new int[4] { 2, 2, 2, 2 };
-			this.nGameType = new EGameType[4] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
-			this.nFunMods = new EFunMods[4] { EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE };
+			this.nScrollSpeed = new int[5] { 9, 9, 9, 9, 9 };
+			this.nTimingZones = new int[5] { 2, 2, 2, 2, 2 };
+			this.nGameType = new EGameType[5] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
+			this.nFunMods = new EFunMods[5] { EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			this.nJudgeLinePosOffset = new STDGBVALUE<int>();	// #31602 2013.6.23 yyagi
@@ -1519,7 +1832,7 @@ namespace TJAPlayer3
 			}
 
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 5; i++)
             {
 				this.eRandom[i] = Eランダムモード.OFF;
 				this.nScrollSpeed[i] = 9;
@@ -1531,8 +1844,10 @@ namespace TJAPlayer3
 			#region [ AutoPlay ]
 			this.bAutoPlay = new STAUTOPLAY();
 
-            this.b太鼓パートAutoPlay = false;
-            this.b太鼓パートAutoPlay2P = false;
+			for (int i = 0; i < 5; i++)
+			{
+				this.b太鼓パートAutoPlay[i] = false;
+			}
             this.bAuto先生の連打 = true;
 			#endregion
 			this.nヒット範囲ms = new STRANGE();
@@ -1605,9 +1920,9 @@ namespace TJAPlayer3
             ShowMob = true;
             ShowPuchiChara = true;
 
-			this.eSTEALTH = new Eステルスモード[4];
+			this.eSTEALTH = new Eステルスモード[5];
 
-			for (int i = 0; i < 4; i++) 
+			for (int i = 0; i < 5; i++) 
 				this.eSTEALTH[i] = Eステルスモード.OFF;
 
             this.bNoInfo = false;
@@ -2008,9 +2323,12 @@ namespace TJAPlayer3
             sw.WriteLine("[AutoPlay]");
             sw.WriteLine();
             sw.WriteLine("; 自動演奏(0:OFF, 1:ON)");
-            sw.WriteLine("Taiko={0}", this.b太鼓パートAutoPlay ? 1 : 0);
-            sw.WriteLine("Taiko2P={0}", this.b太鼓パートAutoPlay2P ? 1 : 0);
-            sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
+            sw.WriteLine("Taiko={0}", this.b太鼓パートAutoPlay[0] ? 1 : 0);
+			sw.WriteLine("Taiko2P={0}", this.b太鼓パートAutoPlay[1] ? 1 : 0);
+			sw.WriteLine("Taiko3P={0}", this.b太鼓パートAutoPlay[2] ? 1 : 0);
+			sw.WriteLine("Taiko4P={0}", this.b太鼓パートAutoPlay[3] ? 1 : 0);
+			sw.WriteLine("Taiko5P={0}", this.b太鼓パートAutoPlay[4] ? 1 : 0);
+			sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 			sw.WriteLine("AILevel={0}", this.nAILevel);
 			sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
@@ -2112,24 +2430,28 @@ namespace TJAPlayer3
 			sw.WriteLine("DrumsScrollSpeed2P={0}", this.nScrollSpeed[1]);
 			sw.WriteLine("DrumsScrollSpeed3P={0}", this.nScrollSpeed[2]);
 			sw.WriteLine("DrumsScrollSpeed4P={0}", this.nScrollSpeed[3]);
+			sw.WriteLine("DrumsScrollSpeed5P={0}", this.nScrollSpeed[4]);
 			sw.WriteLine();
 			sw.WriteLine("; Timing Zones (0-1 : Lenient, 2 : Regular, 3-4 : Strict)");
 			sw.WriteLine("TimingZones1P={0}", this.nTimingZones[0]);
 			sw.WriteLine("TimingZones2P={0}", this.nTimingZones[1]);
 			sw.WriteLine("TimingZones3P={0}", this.nTimingZones[2]);
 			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
+			sw.WriteLine("TimingZones5P={0}", this.nTimingZones[4]);
 			sw.WriteLine();
 			sw.WriteLine("; Gametype (0 : Taiko, 1 : Konga)");
 			sw.WriteLine("Gametype1P={0}", (int)this.nGameType[0]);
 			sw.WriteLine("Gametype2P={0}", (int)this.nGameType[1]);
 			sw.WriteLine("Gametype3P={0}", (int)this.nGameType[2]);
 			sw.WriteLine("Gametype4P={0}", (int)this.nGameType[3]);
+			sw.WriteLine("Gametype5P={0}", (int)this.nGameType[4]);
 			sw.WriteLine();
 			sw.WriteLine("; Fun Mods (0 : None, 1 : Avalanche (random scroll speed per note/chip), 2 : Minesweeper (replace randomly notes by bombs))");
 			sw.WriteLine("FunMods1P={0}", (int)this.nFunMods[0]);
 			sw.WriteLine("FunMods2P={0}", (int)this.nFunMods[1]);
 			sw.WriteLine("FunMods3P={0}", (int)this.nFunMods[2]);
 			sw.WriteLine("FunMods4P={0}", (int)this.nFunMods[3]);
+			sw.WriteLine("FunMods5P={0}", (int)this.nFunMods[4]);
 			sw.WriteLine();
 			sw.WriteLine( "; 演奏速度(5～40)(→x5/20～x40/20)" );
 			sw.WriteLine( "PlaySpeed={0}", this.n演奏速度 );
@@ -2175,12 +2497,14 @@ namespace TJAPlayer3
 			sw.WriteLine("TaikoRandom2P={0}", (int)this.eRandom[1]);
 			sw.WriteLine("TaikoRandom3P={0}", (int)this.eRandom[2]);
 			sw.WriteLine("TaikoRandom4P={0}", (int)this.eRandom[3]);
+			sw.WriteLine("TaikoRandom5P={0}", (int)this.eRandom[4]);
 			sw.WriteLine();
             sw.WriteLine( "; STEALTHモード(0:OFF, 1:ドロン, 2:ステルス)" );
 			sw.WriteLine( "TaikoStealth1P={0}", (int) this.eSTEALTH[0] );
 			sw.WriteLine("TaikoStealth2P={0}", (int)this.eSTEALTH[1]);
 			sw.WriteLine("TaikoStealth3P={0}", (int)this.eSTEALTH[2]);
 			sw.WriteLine("TaikoStealth4P={0}", (int)this.eSTEALTH[3]);
+			sw.WriteLine("TaikoStealth5P={0}", (int)this.eSTEALTH[4]);
 			sw.WriteLine();
             sw.WriteLine( "; ゲーム(0:OFF, 1:完走!叩ききりまショー!, 2:完走!叩ききりまショー!(激辛) )" );
 			sw.WriteLine( "GameMode={0}", (int) this.eGameMode );
@@ -2249,6 +2573,7 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.WriteLine( "[DrumsKeyAssign]" );
             sw.WriteLine();
+
 			sw.Write( "LeftRed=" );
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.LeftRed );
 			sw.WriteLine();
@@ -2261,6 +2586,7 @@ namespace TJAPlayer3
 			sw.Write( "RightBlue=" );										// #27029 2012.1.4 from
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue );	//
 			sw.WriteLine();
+
 			sw.Write( "LeftRed2P=" );
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.LeftRed2P );
 			sw.WriteLine();
@@ -2273,12 +2599,62 @@ namespace TJAPlayer3
 			sw.Write( "RightBlue2P=" );										// #27029 2012.1.4 from
 			this.tキーの書き出し( sw, this.KeyAssign.Drums.RightBlue2P );  //
 			sw.WriteLine();
+
+			sw.Write("LeftRed3P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed3P);
+			sw.WriteLine();
+			sw.Write("RightRed3P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed3P);
+			sw.WriteLine();
+			sw.Write("LeftBlue3P=");                                        // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue3P); //
+			sw.WriteLine();                                                 //
+			sw.Write("RightBlue3P=");                                       // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue3P);  //
+			sw.WriteLine();
+
+			sw.Write("LeftRed4P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed4P);
+			sw.WriteLine();
+			sw.Write("RightRed4P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed4P);
+			sw.WriteLine();
+			sw.Write("LeftBlue4P=");                                        // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue4P); //
+			sw.WriteLine();                                                 //
+			sw.Write("RightBlue4P=");                                       // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue4P);  //
+			sw.WriteLine();
+
+			sw.Write("LeftRed5P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed5P);
+			sw.WriteLine();
+			sw.Write("RightRed5P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed5P);
+			sw.WriteLine();
+			sw.Write("LeftBlue5P=");                                        // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue5P); //
+			sw.WriteLine();                                                 //
+			sw.Write("RightBlue5P=");                                       // #27029 2012.1.4 from
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue5P);  //
+			sw.WriteLine();
+
 			sw.Write("Clap=");
 			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap);
 			sw.WriteLine();
 			sw.Write("Clap2P=");
 			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap2P);
 			sw.WriteLine();
+			sw.Write("Clap3P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap3P);
+			sw.WriteLine();
+			sw.Write("Clap4P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap4P);
+			sw.WriteLine();
+			sw.Write("Clap5P=");
+			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap5P);
+			sw.WriteLine();
+
 			sw.Write("Decide=");
 			this.tキーの書き出し(sw, this.KeyAssign.Drums.Decide);
 			sw.WriteLine();
@@ -2291,6 +2667,7 @@ namespace TJAPlayer3
 			sw.Write("RightChange=");
 			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightChange);
 			sw.WriteLine();
+
 			sw.WriteLine();
 			#endregion
 			#region [ SystemkeyAssign ]
@@ -2817,13 +3194,25 @@ namespace TJAPlayer3
                                     case Eセクション種別.AutoPlay:
                                         if (str3.Equals("Taiko"))
                                         {
-                                            this.b太鼓パートAutoPlay = C変換.bONorOFF(str4[0]);
-                                        }
-                                        else if (str3.Equals("Taiko2P"))
-                                        {
-                                            this.b太鼓パートAutoPlay2P = C変換.bONorOFF(str4[0]);
-                                        }
-                                        else if (str3.Equals("TaikoAutoRoll"))
+                                            this.b太鼓パートAutoPlay[0] = C変換.bONorOFF(str4[0]);
+										}
+										else if (str3.Equals("Taiko2P"))
+										{
+											this.b太鼓パートAutoPlay[1] = C変換.bONorOFF(str4[0]);
+										}
+										else if (str3.Equals("Taiko3P"))
+										{
+											this.b太鼓パートAutoPlay[2] = C変換.bONorOFF(str4[0]);
+										}
+										else if (str3.Equals("Taiko4P"))
+										{
+											this.b太鼓パートAutoPlay[3] = C変換.bONorOFF(str4[0]);
+										}
+										else if (str3.Equals("Taiko5P"))
+										{
+											this.b太鼓パートAutoPlay[4] = C変換.bONorOFF(str4[0]);
+										}
+										else if (str3.Equals("TaikoAutoRoll"))
                                         {
                                             this.bAuto先生の連打 = C変換.bONorOFF(str4[0]);
                                         }
@@ -2989,6 +3378,10 @@ namespace TJAPlayer3
 											{
 												this.nScrollSpeed[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[3]);
 											}
+											else if (str3.Equals("DrumsScrollSpeed5P"))
+											{
+												this.nScrollSpeed[4] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[4]);
+											}
 
 											#endregion
 
@@ -3009,6 +3402,10 @@ namespace TJAPlayer3
 											else if (str3.Equals("TimingZones4P"))
 											{
 												this.nTimingZones[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[3]);
+											}
+											else if (str3.Equals("TimingZones5P"))
+											{
+												this.nTimingZones[4] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[4]);
 											}
 
 
@@ -3032,6 +3429,10 @@ namespace TJAPlayer3
 											{
 												this.bJust[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[3]);
 											}
+											else if (str3.Equals("Just5P"))
+											{
+												this.bJust[4] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[4]);
+											}
 
 											#endregion
 
@@ -3052,6 +3453,10 @@ namespace TJAPlayer3
 											else if (str3.Equals("HitSounds4P"))
 											{
 												this.nHitSounds[3] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[3]);
+											}
+											else if (str3.Equals("HitSounds5P"))
+											{
+												this.nHitSounds[4] = C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[4]);
 											}
 
 											#endregion
@@ -3074,6 +3479,10 @@ namespace TJAPlayer3
 											{
 												this.nGameType[3] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[3]);
 											}
+											else if (str3.Equals("Gametype5P"))
+											{
+												this.nGameType[4] = (EGameType)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[4]);
+											}
 
 											#endregion
 
@@ -3094,6 +3503,10 @@ namespace TJAPlayer3
 											else if (str3.Equals("FunMods4P"))
 											{
 												this.nFunMods[3] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[3]);
+											}
+											else if (str3.Equals("FunMods5P"))
+											{
+												this.nFunMods[4] = (EFunMods)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[4]);
 											}
 
 											#endregion
@@ -3116,6 +3529,10 @@ namespace TJAPlayer3
 											{
 												this.eSTEALTH[3] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[3]);
 											}
+											else if (str3.Equals("TaikoStealth5P"))
+											{
+												this.eSTEALTH[4] = (Eステルスモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[4]);
+											}
 
 											#endregion
 
@@ -3136,6 +3553,10 @@ namespace TJAPlayer3
 											else if (str3.Equals("TaikoRandom4P"))
 											{
 												this.eRandom[3] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[3]);
+											}
+											else if (str3.Equals("TaikoRandom5P"))
+											{
+												this.eRandom[4] = (Eランダムモード)C変換.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[4]);
 											}
 
 											#endregion
@@ -3234,7 +3655,7 @@ namespace TJAPlayer3
 
 											else if ( str3.Equals( "PlayerCount" ) )
                                             {
-                                                this.nPlayerCount = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 2, this.nPlayerCount );
+                                                this.nPlayerCount = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 5, this.nPlayerCount );
                                             }
                                             else if(str3.Equals(nameof(ShinuchiMode)))
                                             {
@@ -3337,6 +3758,57 @@ namespace TJAPlayer3
 												this.tキーの読み出しと設定( str4, this.KeyAssign.Drums.RightBlue2P ); //
 											}
 
+											else if (str3.Equals("LeftRed3P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed3P);
+											}
+											else if (str3.Equals("RightRed3P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed3P);
+											}
+											else if (str3.Equals("LeftBlue3P"))                                     // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue3P);    //
+											}                                                                   //
+											else if (str3.Equals("RightBlue3P"))                                        // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue3P); //
+											}
+
+											else if (str3.Equals("LeftRed4P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed4P);
+											}
+											else if (str3.Equals("RightRed4P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed4P);
+											}
+											else if (str3.Equals("LeftBlue4P"))                                     // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue4P);    //
+											}                                                                   //
+											else if (str3.Equals("RightBlue4P"))                                        // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue4P); //
+											}
+
+											else if (str3.Equals("LeftRed5P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed5P);
+											}
+											else if (str3.Equals("RightRed5P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed5P);
+											}
+											else if (str3.Equals("LeftBlue5P"))                                     // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue5P);    //
+											}                                                                   //
+											else if (str3.Equals("RightBlue5P"))                                        // #27029 2012.1.4 from
+											{                                                                   //
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue5P); //
+											}
+
 											else if (str3.Equals("Clap"))
 											{
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap);
@@ -3344,6 +3816,18 @@ namespace TJAPlayer3
 											else if (str3.Equals("Clap2P"))
 											{
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap2P);
+											}
+											else if (str3.Equals("Clap3P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap3P);
+											}
+											else if (str3.Equals("Clap4P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap4P);
+											}
+											else if (str3.Equals("Clap5P"))
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap5P);
 											}
 
 											else if (str3.Equals("Decide"))
@@ -3564,8 +4048,23 @@ LeftRed2P=K011
 RightRed2P=K023
 LeftBlue2P=K012
 RightBlue2P=K047
+LeftRed3P=
+RightRed3P=
+LeftBlue3P=
+RightBlue3P=
+LeftRed4P=
+RightRed4P=
+LeftBlue4P=
+RightBlue4P=
+LeftRed5P=
+RightRed5P=
+LeftBlue5P=
+RightBlue5P=
 Clap=K017
 Clap2P=
+Clap3P=
+Clap4P=
+Clap5P=
 Decide=K015,K019
 Cancel=
 LeftChange=K013

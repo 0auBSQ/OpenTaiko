@@ -90,18 +90,40 @@ namespace TJAPlayer3
 		LC		= 9,
 		LP		= 10,	// #27029 2012.1.4 from
         LBD     = 11,
+
         LRed    = 12,
         RRed    = 13,
         LBlue   = 14,
         RBlue   = 15,
+
         LRed2P  = 16,
         RRed2P  = 17,
         LBlue2P = 18,
         RBlue2P = 19,
-		CLAP	= 20,
-		CLAP2P	= 21,
-		LeftChange = 22,
-		RightChange = 23,
+
+		LRed3P = 20,
+		RRed3P = 21,
+		LBlue3P = 22,
+		RBlue3P = 23,
+
+		LRed4P = 24,
+		RRed4P = 25,
+		LBlue4P = 26,
+		RBlue4P = 27,
+
+		LRed5P = 28,
+		RRed5P = 29,
+		LBlue5P = 30,
+		RBlue5P = 31,
+
+		CLAP	= 32,
+		CLAP2P	= 33,
+		CLAP3P = 34,
+		CLAP4P = 35,
+		CLAP5P = 36,
+		LeftChange = 37,
+		RightChange = 38,
+
 		MAX,			// 門番用として定義
 		UNKNOWN = 99
 	}
@@ -126,18 +148,40 @@ namespace TJAPlayer3
 		LC		= Eパッド.LC,
 		LP		= Eパッド.LP,		// #27029 2012.1.4 from
         LBD     = Eパッド.LBD,
+
         LRed    = Eパッド.LRed,
         RRed    = Eパッド.RRed,
         LBlue   = Eパッド.LBlue,
         RBlue   = Eパッド.RBlue,
+
         LRed2P  = Eパッド.LRed2P,
         RRed2P  = Eパッド.RRed2P,
         LBlue2P = Eパッド.LBlue2P,
         RBlue2P = Eパッド.RBlue2P,
+
+		LRed3P = Eパッド.LRed3P,
+		RRed3P = Eパッド.RRed3P,
+		LBlue3P = Eパッド.LBlue3P,
+		RBlue3P = Eパッド.RBlue3P,
+
+		LRed4P = Eパッド.LRed4P,
+		RRed4P = Eパッド.RRed4P,
+		LBlue4P = Eパッド.LBlue4P,
+		RBlue4P = Eパッド.RBlue4P,
+
+		LRed5P = Eパッド.LRed5P,
+		RRed5P = Eパッド.RRed5P,
+		LBlue5P = Eパッド.LBlue5P,
+		RBlue5P = Eパッド.RBlue5P,
+
 		Clap	= Eパッド.CLAP,
-		Clap2P	= Eパッド.CLAP2P,
+		Clap2P = Eパッド.CLAP2P,
+		Clap3P = Eパッド.CLAP3P,
+		Clap4P = Eパッド.CLAP4P,
+		Clap5P = Eパッド.CLAP5P,
 		LeftChange = Eパッド.LeftChange,
 		RightChange = Eパッド.RightChange,
+
 		Capture,
 		UNKNOWN = Eパッド.UNKNOWN
 	}
