@@ -175,7 +175,7 @@ namespace TJAPlayer3
 				b音声再生[i] = true;
 			}
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 5; i++)
             {
 				if (!ctゲージアニメ[i].b進行中)
 					ctゲージアニメ[i].t開始(0, gaugeValues[i] / 2, 59, TJAPlayer3.Timer);
@@ -218,8 +218,8 @@ namespace TJAPlayer3
 			{
 				ct全体進行 = new CCounter(0, 50000, 1, TJAPlayer3.Timer);
 
-				ctゲージアニメ = new CCounter[2];
-				for (int i = 0; i < 2; i++)
+				ctゲージアニメ = new CCounter[5];
+				for (int i = 0; i < 5; i++)
 					ctゲージアニメ[i] = new CCounter();
 
 				ct虹ゲージアニメ = new CCounter();
@@ -249,7 +249,7 @@ namespace TJAPlayer3
 
 				}
 
-				for (int i = 0; i < 2; i++)
+				for (int i = 0; i < 5; i++)
                 {
 					CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
 					CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.CLEAR);
@@ -258,14 +258,14 @@ namespace TJAPlayer3
 				}
 				
 
-				gaugeValues = new int[2];
+				gaugeValues = new int[5];
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
 					gaugeValues[i] = (int)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i];
 				}
 
 				// Replace by max between 2 gauges if 2p
-				GaugeFactor = Math.Max(gaugeValues[0], gaugeValues[1]) / 2;
+				GaugeFactor = Math.Max(Math.Max(Math.Max(Math.Max(gaugeValues[0], gaugeValues[1]), gaugeValues[2]), gaugeValues[3]), gaugeValues[4]) / 2;
 				
 				MountainAppearValue = 10275 + (66 * GaugeFactor);
 
@@ -298,7 +298,7 @@ namespace TJAPlayer3
 
 			ct全体進行.t進行();
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 5; i++)
 				ctゲージアニメ[i].t進行();
 
 			ctEndAnime.t進行();
@@ -315,6 +315,28 @@ namespace TJAPlayer3
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
 			{
+				int[] namePlate_x = new int[5];
+				int[] namePlate_y = new int[5];
+
+				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+				{
+					if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+					{
+						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * i);
+						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * i);
+					}
+					else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+					{
+						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * i);
+						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * i);
+					}
+					else
+					{
+						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_X[i];
+						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_Y[i];
+					}
+				}
+
 				#region [ Ensou result contents ]
 
 				int AnimeCount = 3000 + GaugeFactor * 59;
@@ -330,7 +352,7 @@ namespace TJAPlayer3
 					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
 
 					// 1 if right, 0 if left
-					int shiftPos = (i == 1 || is2PSide) ? 1 : 0;
+					int shiftPos = (i == 1 || is2PSide) ? 1 : i;
 					int pos = i;
 					if (is2PSide)
 						pos = 1;
@@ -338,15 +360,62 @@ namespace TJAPlayer3
 
 					#region [General plate animations]
 
-					if (shiftPos == 0)
-						TJAPlayer3.Tx.Result_Panel.t2D描画(TJAPlayer3.app.Device, 0, 0);
-					else
-						TJAPlayer3.Tx.Result_Panel_2P.t2D描画(TJAPlayer3.app.Device, 0, 0);
+					if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+					{
+						if (shiftPos == 0)
+							TJAPlayer3.Tx.Result_Panel.t2D描画(TJAPlayer3.app.Device, 0, 0);
+						else
+							TJAPlayer3.Tx.Result_Panel_2P.t2D描画(TJAPlayer3.app.Device, 0, 0);
+					}
+                    else
+					{
+						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+						{
+							TJAPlayer3.Tx.Result_Panel_5P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_5P[0] * i, 0);
+						}
+						else
+						{
+							TJAPlayer3.Tx.Result_Panel_4P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_4P[0] * i, 0);
+						}
+					}
 
-					TJAPlayer3.Tx.Result_Diff_Bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_DifficultyBar_X[pos], TJAPlayer3.Skin.Result_DifficultyBar_Y[pos], 
+					//if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+					{
+						int bar_x;
+						int bar_y;
+						int gauge_base_x;
+						int gauge_base_y;
+						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+						{
+							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+						}
+						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+						{
+							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+						}
+						else
+						{
+							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 1.0f;
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_X[pos];
+							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_Y[pos];
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_X[pos];
+							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_Y[pos];
+						}
+
+						TJAPlayer3.Tx.Result_Diff_Bar.t2D描画(TJAPlayer3.app.Device, bar_x, bar_y,
 						new RectangleF(0, TJAPlayer3.stage選曲.n確定された曲の難易度[i] * TJAPlayer3.Skin.Result_DifficultyBar_Size[1], TJAPlayer3.Skin.Result_DifficultyBar_Size[0], TJAPlayer3.Skin.Result_DifficultyBar_Size[1]));
 
-					TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Gauge_Base_X[pos], TJAPlayer3.Skin.Result_Gauge_Base_Y[pos]);
+						TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].t2D描画(TJAPlayer3.app.Device, gauge_base_x, gauge_base_y);
+						TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 1.0f;
+					}
 
 					if (ct全体進行.n現在の値 >= 2000)
 					{
@@ -366,15 +435,66 @@ namespace TJAPlayer3
 								ctゲージアニメ[i].n現在の値 = (int)ctゲージアニメ[i].n終了値;
 						}
 
-						TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Gauge_X[pos], TJAPlayer3.Skin.Result_Gauge_Y[pos],
-							new RectangleF(TJAPlayer3.Skin.Result_Gauge_Rect[0], TJAPlayer3.Skin.Result_Gauge_Rect[1], (TJAPlayer3.Skin.Result_Gauge_Rect[2] / 50.0f) * ctゲージアニメ[i].n現在の値, TJAPlayer3.Skin.Result_Gauge_Rect[3]));
+						{
+							int gauge_x;
+							int gauge_y;
+							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+							{
+								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
+								gauge_x = TJAPlayer3.Skin.Result_Gauge_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								gauge_y = TJAPlayer3.Skin.Result_Gauge_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							}
+							else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+							{
+								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
+								gauge_x = TJAPlayer3.Skin.Result_Gauge_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								gauge_y = TJAPlayer3.Skin.Result_Gauge_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							}
+							else
+							{
+								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
+								gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos];
+								gauge_y = TJAPlayer3.Skin.Result_Gauge_Y[pos];
+							}
 
+							TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, gauge_x, gauge_y,
+							new RectangleF(TJAPlayer3.Skin.Result_Gauge_Rect[0], TJAPlayer3.Skin.Result_Gauge_Rect[1], (TJAPlayer3.Skin.Result_Gauge_Rect[2] / 50.0f) * ctゲージアニメ[i].n現在の値, TJAPlayer3.Skin.Result_Gauge_Rect[3]));
+							TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
+						}
 						// Modify to array for each players using i
 
 
 						int soultext_width = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Width / 3;
 						int soultext_height = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Height;
 
+						int soulText_x;
+						int soulText_y;
+						int soulFire_x;
+						int soulFire_y;
+						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+						{
+							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
+						}
+						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+						{
+							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
+						}
+						else
+						{
+							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_X[pos];
+							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_Y[pos];
+							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_X[pos];
+							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_Y[pos];
+							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 1.0f;
+						}
 
 						if (ctゲージアニメ[i].b終了値に達した)
 						{
@@ -402,34 +522,78 @@ namespace TJAPlayer3
 								ct虹ゲージアニメ.t進行Loop();
 								ctSoul.t進行Loop();
 
-								TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos], TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos]);
+								int rainbow_x;
+								int rainbow_y;
+								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+								{
+									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+								{
+									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
+								}
+								else
+								{
+									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos];
+									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos];
+									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 1.0f;
+								}
+								TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, rainbow_x, rainbow_y);
 
-								int soulfire_width = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Width / 8;
-								int soulfire_height = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Height;
+								{
+									int soulfire_width = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Width / 8;
+									int soulfire_height = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Height;
 
-								TJAPlayer3.Tx.Result_Soul_Fire.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Soul_Fire_X[pos], TJAPlayer3.Skin.Result_Soul_Fire_Y[pos], new Rectangle(soulfire_width * ctSoul.n現在の値, 0, soulfire_width, soulfire_height));
+									TJAPlayer3.Tx.Result_Soul_Fire.t2D中心基準描画(TJAPlayer3.app.Device, soulFire_x, soulFire_y, new Rectangle(soulfire_width * ctSoul.n現在の値, 0, soulfire_width, soulfire_height));
 
-								TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Soul_Text_X[pos], TJAPlayer3.Skin.Result_Soul_Text_Y[pos], new Rectangle(soultext_width * 1, 0, soultext_width, soultext_height));
+									TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y, new Rectangle(soultext_width * 1, 0, soultext_width, soultext_height));
 
-								if (ctSoul.n現在の値 % 2 == 0)
-									TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Soul_Text_X[pos], TJAPlayer3.Skin.Result_Soul_Text_Y[pos], new Rectangle(soultext_width * 2, 0, soultext_width, soultext_height));
+									if (ctSoul.n現在の値 % 2 == 0)
+										TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y, new Rectangle(soultext_width * 2, 0, soultext_width, soultext_height));
+								}
 							}
 						}
 						if (ctゲージアニメ[i].n現在の値 != 50)
 						{
-							if (ctゲージアニメ[i].n現在の値 < 40)
-                            {
-								TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos], TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos],
-									new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[3]));
-							}
-                            else
-                            {
-								TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos], TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos],
-									   new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[3]));
-							}
+							{
+								int clearText_x;
+								int clearText_y;
+								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+								{
+									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+								{
+									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
+								}
+								else
+								{
+									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos];
+									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos];
+									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
+								}
+								if (ctゲージアニメ[i].n現在の値 < 40)
+								{
+									TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, clearText_x, clearText_y,
+										new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[3]));
+								}
+								else
+								{
+									TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, clearText_x, clearText_y,
+										   new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[3]));
+								}
 
-							TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Soul_Text_X[pos], TJAPlayer3.Skin.Result_Soul_Text_Y[pos],
-								new Rectangle(soultext_width * (ctゲージアニメ[i].n現在の値 <= 30 ? 0 : 1), 0, soultext_width, soultext_height));
+								TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y,
+									new Rectangle(soultext_width * (ctゲージアニメ[i].n現在の値 <= 30 ? 0 : 1), 0, soultext_width, soultext_height));
+							}
 						}
 
 						#endregion
@@ -438,14 +602,15 @@ namespace TJAPlayer3
 					if (ct全体進行.n現在の値 >= 2000)
 					{
 						// Change score kiroku to total scores to have the contents for both players, unbloat it
-						#region [ Separate results display (excluding score) ]
-
-						int Interval = 420;
-
-						float AddCount = 135;
-
-						int[] scoresArr =
 						{
+							#region [ Separate results display (excluding score) ]
+
+							int Interval = 420;
+
+							float AddCount = 135;
+
+							int[] scoresArr =
+							{
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGreat,
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood,
 							TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss,
@@ -454,173 +619,132 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[i]
 						};
 
-						int[][] num_x = {
-							TJAPlayer3.Skin.Result_Perfect_X,
-							TJAPlayer3.Skin.Result_Good_X,
-							TJAPlayer3.Skin.Result_Miss_X,
-							TJAPlayer3.Skin.Result_Roll_X,
-							TJAPlayer3.Skin.Result_MaxCombo_X
-						};
+							int[][] num_x;
 
-						int[][] num_y = {
-							TJAPlayer3.Skin.Result_Perfect_Y,
-							TJAPlayer3.Skin.Result_Good_Y,
-							TJAPlayer3.Skin.Result_Miss_Y,
-							TJAPlayer3.Skin.Result_Roll_Y,
-							TJAPlayer3.Skin.Result_MaxCombo_Y
-						};
-
-						for (int k = 0; k < 5; k++)
-                        {
-							if (ct全体進行.n現在の値 >= AnimeCount + (Interval * k))
+							int[][] num_y;
+							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 							{
-								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = ct全体進行.n現在の値 <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
-								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
+								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
 
-								this.t小文字表示(num_x[k][pos], num_y[k][pos], scoresArr[k]);
+								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
 
-								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = 1f;
-								TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = 1f;
+								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
 
-								if (!this.b音声再生[1 + k])
+								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+
+								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+
+								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							}
+							else if (TJAPlayer3.ConfigIni.nPlayerCount > 2)
+							{
+								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
+
+								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+
+								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+
+								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+
+								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+
+								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							}
+                            else
+							{
+								num_x = new int[][] {
+									TJAPlayer3.Skin.Result_Perfect_X,
+									TJAPlayer3.Skin.Result_Good_X,
+									TJAPlayer3.Skin.Result_Miss_X,
+									TJAPlayer3.Skin.Result_Roll_X,
+									TJAPlayer3.Skin.Result_MaxCombo_X
+								};
+
+								num_y = new int[][] {
+									TJAPlayer3.Skin.Result_Perfect_Y,
+									TJAPlayer3.Skin.Result_Good_Y,
+									TJAPlayer3.Skin.Result_Miss_Y,
+									TJAPlayer3.Skin.Result_Roll_Y,
+									TJAPlayer3.Skin.Result_MaxCombo_Y
+								};
+							}
+
+							for (int k = 0; k < 5; k++)
+							{
+								if (ct全体進行.n現在の値 >= AnimeCount + (Interval * k))
 								{
-									TJAPlayer3.Skin.soundPon.t再生する();
-									this.b音声再生[1 + k] = true;
+									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = ct全体進行.n現在の値 <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
+									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
+
+									this.t小文字表示(num_x[k][pos], num_y[k][pos], scoresArr[k]);
+
+									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = 1f;
+									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = 1f;
+
+									if (!this.b音声再生[1 + k])
+									{
+										TJAPlayer3.Skin.soundPon.t再生する();
+										this.b音声再生[1 + k] = true;
+									}
+								}
+								else
+									break;
+							}
+
+							#endregion
+
+							#region [ Score display ]
+
+							if (ct全体進行.n現在の値 >= AnimeCount + Interval * 4 + 840)
+							{
+								int score_x;
+								int score_y;
+								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+								{
+									score_x = TJAPlayer3.Skin.Result_Score_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+									score_y = TJAPlayer3.Skin.Result_Score_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+								{
+									score_x = TJAPlayer3.Skin.Result_Score_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+									score_y = TJAPlayer3.Skin.Result_Score_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								}
+								else
+								{
+									score_x = TJAPlayer3.Skin.Result_Score_X[pos];
+									score_y = TJAPlayer3.Skin.Result_Score_Y[pos];
+								}
+
+								int AnimeCount1 = AnimeCount + Interval * 4 + 840;
+
+								TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.X = ct全体進行.n現在の値 <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
+																				  ct全体進行.n現在の値 <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
+								TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
+																				  ct全体進行.n現在の値 <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
+
+								this.tスコア文字表示(score_x, score_y, (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+
+								if (!b音声再生[6])
+								{
+									TJAPlayer3.Skin.soundScoreDon.t再生する();
+									b音声再生[6] = true;
 								}
 							}
-							else
-								break;
+
+							#endregion
 						}
-
-						#endregion
-
-						#region [ Score display ]
-
-						if (ct全体進行.n現在の値 >= AnimeCount + Interval * 4 + 840)
-						{
-							int AnimeCount1 = AnimeCount + Interval * 4 + 840;
-
-							TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.X = ct全体進行.n現在の値 <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
-																			  ct全体進行.n現在の値 <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
-							TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.Y = ct全体進行.n現在の値 <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
-																			  ct全体進行.n現在の値 <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.n現在の値 - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
-
-							this.tスコア文字表示(TJAPlayer3.Skin.Result_Score_X[pos], TJAPlayer3.Skin.Result_Score_Y[pos], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
-
-							if (!b音声再生[6])
-							{
-								TJAPlayer3.Skin.soundScoreDon.t再生する();
-								b音声再生[6] = true;
-							}
-						}
-
-						#endregion
-					}
-
-
-
-					if (ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 1000)
-					{
-						#region [Score rank apparition]
-
-						int scoreRank_width = TJAPlayer3.Tx.Result_ScoreRankEffect.szテクスチャサイズ.Width / 7;
-						int scoreRank_height = TJAPlayer3.Tx.Result_ScoreRankEffect.szテクスチャサイズ.Height / 4;
-
-						if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 1180)
-						{
-							TJAPlayer3.Tx.Result_ScoreRankEffect.Opacity = (int)((ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1000)) / 180.0f * 255.0f);
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 910)) / 1.5f * (Math.PI / 180)) * 1.4f;
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 910)) / 1.5f * (Math.PI / 180)) * 1.4f;
-						}
-						else if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 1270)
-						{
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1180)) * (Math.PI / 180)) * 0.5f;
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1180)) * (Math.PI / 180)) * 0.5f;
-						}
-						else
-						{
-							TJAPlayer3.Tx.Result_ScoreRankEffect.Opacity = 255;
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
-							TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
-						}
-
-						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage結果.nスコアランク[i] > 0)
-						{
-							int CurrentFlash = 0;
-							int[] FlashTimes = { 1500, 1540, 1580, 1620, 1660, 1700, 1740, 1780 };
-
-							if (ctFlash_Icon.n現在の値 >= FlashTimes[0] && ctFlash_Icon.n現在の値 <= FlashTimes[1] || ctFlash_Icon.n現在の値 >= FlashTimes[4] && ctFlash_Icon.n現在の値 <= FlashTimes[5])
-								CurrentFlash = 1;
-							else if (ctFlash_Icon.n現在の値 >= FlashTimes[1] && ctFlash_Icon.n現在の値 <= FlashTimes[2] || ctFlash_Icon.n現在の値 >= FlashTimes[5] && ctFlash_Icon.n現在の値 <= FlashTimes[6])
-								CurrentFlash = 2;
-							else if (ctFlash_Icon.n現在の値 >= FlashTimes[2] && ctFlash_Icon.n現在の値 <= FlashTimes[3] || ctFlash_Icon.n現在の値 >= FlashTimes[6] && ctFlash_Icon.n現在の値 <= FlashTimes[7])
-								CurrentFlash = 3;
-
-
-							TJAPlayer3.Tx.Result_ScoreRankEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_ScoreRankEffect_X[pos], TJAPlayer3.Skin.Result_ScoreRankEffect_Y[pos], 
-								new Rectangle((TJAPlayer3.stage結果.nスコアランク[i] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
-
-							if (!b音声再生[7] && ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 1180)
-							{
-								TJAPlayer3.Skin.soundRankIn.t再生する();
-								b音声再生[7] = true;
-							}
-						}
-
-						#endregion
-					}
-
-
-					if (ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 2500)
-					{
-						#region [Crown apparition]
-
-						int crownEffect_width = TJAPlayer3.Tx.Result_CrownEffect.szテクスチャサイズ.Width / 3;
-						int crownEffect_height = TJAPlayer3.Tx.Result_CrownEffect.szテクスチャサイズ.Height / 4;
-
-						if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 2680)
-						{
-							TJAPlayer3.Tx.Result_CrownEffect.Opacity = (int)((ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2500)) / 180.0f * 255.0f);
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2410)) / 1.5f * (Math.PI / 180)) * 1.4f;
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2410)) / 1.5f * (Math.PI / 180)) * 1.4f;
-						}
-						else if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 2770)
-						{
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2680)) * (Math.PI / 180)) * 0.5f;
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2680)) * (Math.PI / 180)) * 0.5f;
-						}
-						else
-						{
-							TJAPlayer3.Tx.Result_CrownEffect.Opacity = 255;
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 1f;
-							TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 1f;
-						}
-
-						int ClearType = TJAPlayer3.stage結果.nクリア[i] - 1;
-
-						if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)(Difficulty.Dan) && ClearType >= 0)
-						{
-							int CurrentFlash = 0;
-							int[] FlashTimes = { 2000, 2040, 2080, 2120, 2160, 2200, 2240, 2280 };
-
-							if (ctFlash_Icon.n現在の値 >= FlashTimes[0] && ctFlash_Icon.n現在の値 <= FlashTimes[1] || ctFlash_Icon.n現在の値 >= FlashTimes[4] && ctFlash_Icon.n現在の値 <= FlashTimes[5])
-								CurrentFlash = 1;
-							else if (ctFlash_Icon.n現在の値 >= FlashTimes[1] && ctFlash_Icon.n現在の値 <= FlashTimes[2] || ctFlash_Icon.n現在の値 >= FlashTimes[5] && ctFlash_Icon.n現在の値 <= FlashTimes[6])
-								CurrentFlash = 2;
-							else if (ctFlash_Icon.n現在の値 >= FlashTimes[2] && ctFlash_Icon.n現在の値 <= FlashTimes[3] || ctFlash_Icon.n現在の値 >= FlashTimes[6] && ctFlash_Icon.n現在の値 <= FlashTimes[7])
-								CurrentFlash = 3;
-
-							TJAPlayer3.Tx.Result_CrownEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_CrownEffect_X[pos], TJAPlayer3.Skin.Result_CrownEffect_Y[pos],
-								new Rectangle(ClearType * crownEffect_width, CurrentFlash * crownEffect_height, crownEffect_width, crownEffect_height));
-
-							if (!b音声再生[8] && ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 2680)
-							{
-								TJAPlayer3.Skin.soundCrownIn.t再生する();
-								b音声再生[8] = true;
-							}
-						}
-
-						#endregion
 					}
 
 					#endregion
@@ -761,8 +885,8 @@ namespace TJAPlayer3
 					//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 					//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
-					int chara_x = TJAPlayer3.Skin.Result_NamePlate_X[pos] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
-					int chara_y = TJAPlayer3.Skin.Result_NamePlate_Y[pos];
+					int chara_x = namePlate_x[pos] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+					int chara_y = namePlate_y[pos];
 
 
                     if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
@@ -779,8 +903,8 @@ namespace TJAPlayer3
 
 					#region [PuchiChara]
 
-					int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[pos];
-                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[pos];
+					int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? pos : 0];
+                    int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? pos : 0];
 
                     //int ttdiff = 640 - 152;
 					//int ttps = 640 + ((pos == 1) ? ttdiff + 60 : -ttdiff);
@@ -800,7 +924,7 @@ namespace TJAPlayer3
 
 						#region [Cherry blossom animation]
 
-						if (gaugeValues[p] >= 80.0f)
+						if (gaugeValues[p] >= 80.0f && TJAPlayer3.ConfigIni.nPlayerCount <= 2)
 						{
 							TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.X = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 							TJAPlayer3.Tx.Result_Flower.vc拡大縮小倍率.Y = 0.6f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
@@ -816,7 +940,7 @@ namespace TJAPlayer3
 
 						#region [Cherry blossom Rotating flowers]
 
-						if (gaugeValues[p] >= 80.0f)
+						if (gaugeValues[p] >= 80.0f && TJAPlayer3.ConfigIni.nPlayerCount <= 2)
 						{
 							float FlowerTime = ctRotate_Flowers.n現在の値;
 
@@ -852,7 +976,7 @@ namespace TJAPlayer3
 
 						#region [Panel shines]
 
-						if (gaugeValues[p] >= 80.0f)
+						if (gaugeValues[p] >= 80.0f && TJAPlayer3.ConfigIni.nPlayerCount <= 2)
 						{
 							int ShineTime = (int)ctShine_Plate.n現在の値;
 							int Quadrant500 = ShineTime % 500;
@@ -889,14 +1013,16 @@ namespace TJAPlayer3
 						else if (gaugeValues[p] >= 40.0f)
 							Mood = 1;
 
-						int speechBuddle_width = TJAPlayer3.Tx.Result_Speech_Bubble[pos].szテクスチャサイズ.Width / 4;
-						int speechBuddle_height = TJAPlayer3.Tx.Result_Speech_Bubble[pos].szテクスチャサイズ.Height / 3;
+						if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+						{
+							int speechBuddle_width = TJAPlayer3.Tx.Result_Speech_Bubble[pos].szテクスチャサイズ.Width / 4;
+							int speechBuddle_height = TJAPlayer3.Tx.Result_Speech_Bubble[pos].szテクスチャサイズ.Height / 3;
 
-						TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						TJAPlayer3.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Speech_Bubble_X[pos], TJAPlayer3.Skin.Result_Speech_Bubble_Y[pos],
-							new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
-
+							TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.X = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.Y = 0.9f * (ct全体進行.n現在の値 <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.n現在の値 - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_Speech_Bubble_X[pos], TJAPlayer3.Skin.Result_Speech_Bubble_Y[pos],
+								new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
+						}
 						if (!b音声再生[9])
 						{
 							if (gaugeValues[p] >= 80.0f)
@@ -917,6 +1043,157 @@ namespace TJAPlayer3
 						#endregion
 					}
 
+
+
+
+
+
+					if (ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 1000)
+					{
+						//if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+						{
+							#region [Score rank apparition]
+
+							int scoreRank_width = TJAPlayer3.Tx.Result_ScoreRankEffect.szテクスチャサイズ.Width / 7;
+							int scoreRank_height = TJAPlayer3.Tx.Result_ScoreRankEffect.szテクスチャサイズ.Height / 4;
+
+							if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 1180)
+							{
+								TJAPlayer3.Tx.Result_ScoreRankEffect.Opacity = (int)((ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1000)) / 180.0f * 255.0f);
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 910)) / 1.5f * (Math.PI / 180)) * 1.4f;
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 910)) / 1.5f * (Math.PI / 180)) * 1.4f;
+							}
+							else if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 1270)
+							{
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1180)) * (Math.PI / 180)) * 0.5f;
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 1180)) * (Math.PI / 180)) * 0.5f;
+							}
+							else
+							{
+								TJAPlayer3.Tx.Result_ScoreRankEffect.Opacity = 255;
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
+								TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
+							}
+
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage結果.nスコアランク[p] > 0)
+							{
+								int CurrentFlash = 0;
+								int[] FlashTimes = { 1500, 1540, 1580, 1620, 1660, 1700, 1740, 1780 };
+
+								if (ctFlash_Icon.n現在の値 >= FlashTimes[0] && ctFlash_Icon.n現在の値 <= FlashTimes[1] || ctFlash_Icon.n現在の値 >= FlashTimes[4] && ctFlash_Icon.n現在の値 <= FlashTimes[5])
+									CurrentFlash = 1;
+								else if (ctFlash_Icon.n現在の値 >= FlashTimes[1] && ctFlash_Icon.n現在の値 <= FlashTimes[2] || ctFlash_Icon.n現在の値 >= FlashTimes[5] && ctFlash_Icon.n現在の値 <= FlashTimes[6])
+									CurrentFlash = 2;
+								else if (ctFlash_Icon.n現在の値 >= FlashTimes[2] && ctFlash_Icon.n現在の値 <= FlashTimes[3] || ctFlash_Icon.n現在の値 >= FlashTimes[6] && ctFlash_Icon.n現在の値 <= FlashTimes[7])
+									CurrentFlash = 3;
+
+
+								int scoreRankEffect_x;
+								int scoreRankEffect_y;
+								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+								{
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+								{
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								}
+								else
+								{
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_X[pos];
+									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_Y[pos];
+								}
+
+								TJAPlayer3.Tx.Result_ScoreRankEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scoreRankEffect_x, scoreRankEffect_y,
+									new Rectangle((TJAPlayer3.stage結果.nスコアランク[p] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
+
+								if (!b音声再生[7] && ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 1180)
+								{
+									TJAPlayer3.Skin.soundRankIn.t再生する();
+									b音声再生[7] = true;
+								}
+							}
+
+							#endregion
+						}
+					}
+
+
+					if (ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 2500)
+					{
+						//if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+						{
+							#region [Crown apparition]
+
+							int crownEffect_width = TJAPlayer3.Tx.Result_CrownEffect.szテクスチャサイズ.Width / 3;
+							int crownEffect_height = TJAPlayer3.Tx.Result_CrownEffect.szテクスチャサイズ.Height / 4;
+
+							if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 2680)
+							{
+								TJAPlayer3.Tx.Result_CrownEffect.Opacity = (int)((ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2500)) / 180.0f * 255.0f);
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2410)) / 1.5f * (Math.PI / 180)) * 1.4f;
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2410)) / 1.5f * (Math.PI / 180)) * 1.4f;
+							}
+							else if (ct全体進行.n現在の値 <= ScoreApparitionTimeStamp + 2770)
+							{
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2680)) * (Math.PI / 180)) * 0.5f;
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 0.5f + (float)Math.Sin((float)(ct全体進行.n現在の値 - (ScoreApparitionTimeStamp + 2680)) * (Math.PI / 180)) * 0.5f;
+							}
+							else
+							{
+								TJAPlayer3.Tx.Result_CrownEffect.Opacity = 255;
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.X = 1f;
+								TJAPlayer3.Tx.Result_CrownEffect.vc拡大縮小倍率.Y = 1f;
+							}
+
+							int ClearType = TJAPlayer3.stage結果.nクリア[p] - 1;
+
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)(Difficulty.Dan) && ClearType >= 0)
+							{
+								int CurrentFlash = 0;
+								int[] FlashTimes = { 2000, 2040, 2080, 2120, 2160, 2200, 2240, 2280 };
+
+								if (ctFlash_Icon.n現在の値 >= FlashTimes[0] && ctFlash_Icon.n現在の値 <= FlashTimes[1] || ctFlash_Icon.n現在の値 >= FlashTimes[4] && ctFlash_Icon.n現在の値 <= FlashTimes[5])
+									CurrentFlash = 1;
+								else if (ctFlash_Icon.n現在の値 >= FlashTimes[1] && ctFlash_Icon.n現在の値 <= FlashTimes[2] || ctFlash_Icon.n現在の値 >= FlashTimes[5] && ctFlash_Icon.n現在の値 <= FlashTimes[6])
+									CurrentFlash = 2;
+								else if (ctFlash_Icon.n現在の値 >= FlashTimes[2] && ctFlash_Icon.n現在の値 <= FlashTimes[3] || ctFlash_Icon.n現在の値 >= FlashTimes[6] && ctFlash_Icon.n現在の値 <= FlashTimes[7])
+									CurrentFlash = 3;
+
+
+								int crownEffect_x;
+								int crownEffect_y;
+								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+								{
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
+									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								}
+								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+								{
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
+									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								}
+								else
+								{
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_X[pos];
+									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_Y[pos];
+								}
+
+								TJAPlayer3.Tx.Result_CrownEffect.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, crownEffect_x, crownEffect_y,
+									new Rectangle(ClearType * crownEffect_width, CurrentFlash * crownEffect_height, crownEffect_width, crownEffect_height));
+
+								if (!b音声再生[8] && ct全体進行.n現在の値 >= ScoreApparitionTimeStamp + 2680)
+								{
+									TJAPlayer3.Skin.soundCrownIn.t再生する();
+									b音声再生[8] = true;
+								}
+							}
+
+							#endregion
+						}
+					}
 				}
 
 				#endregion

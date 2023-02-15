@@ -42,11 +42,30 @@ namespace TJAPlayer3
             if (Texture == null || Counter == null) return base.On進行描画();
             if (!Counter.b停止中)
             {
+                int x;
+                int y;
+
+                if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                {
+                    x = TJAPlayer3.Skin.Game_Lane_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * Player);
+                    y = TJAPlayer3.Skin.Game_Lane_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * Player);
+                }
+                else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                {
+                    x = TJAPlayer3.Skin.Game_Lane_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * Player);
+                    y = TJAPlayer3.Skin.Game_Lane_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * Player);
+                }
+                else
+                {
+                    x = TJAPlayer3.Skin.Game_Lane_X[Player];
+                    y = TJAPlayer3.Skin.Game_Lane_Y[Player];
+                }
+
                 Counter.t進行();
                 if (Counter.b終了値に達した) Counter.t停止();
                 int opacity = (((150 - Counter.n現在の値) * 255) / 100);
                 Texture.Opacity = opacity;
-                Texture.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lane_X[Player], TJAPlayer3.Skin.Game_Lane_Y[Player]);
+                Texture.t2D描画(TJAPlayer3.app.Device, x, y);
             }
             return base.On進行描画();
         }

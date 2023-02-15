@@ -11,7 +11,7 @@ namespace TJAPlayer3
         public CHitSounds(string path)
         {
             tLoadFile(path);
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tReloadHitSounds(TJAPlayer3.ConfigIni.nHitSounds[i], i);
             }
@@ -39,10 +39,10 @@ namespace TJAPlayer3
 
         public string[] names;
 
-        public string[] don = new string[4];
-        public string[] ka = new string[4];
-        public string[] adlib = new string[4];
-        public string[] clap = new string[4];
+        public string[] don = new string[5];
+        public string[] ka = new string[5];
+        public string[] adlib = new string[5];
+        public string[] clap = new string[5];
 
         #region [private]
 

@@ -33,7 +33,7 @@ namespace TJAPlayer3
                     //base.t小文字表示( 20, 150, string.Format( "{0,7:######0}", this.nスコアの増分.Guitar ) );
                 }
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     if (!this.ct点数アニメタイマ[i].b停止中)
                     {
@@ -45,7 +45,7 @@ namespace TJAPlayer3
                     }
                 }
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     if (!this.ctボーナス加算タイマ[i].b停止中)
                     {
@@ -58,10 +58,50 @@ namespace TJAPlayer3
                     }
                 }
 
+                int[] x = new int[5];
+                int[] y = new int[5];
+                int[] add_x = new int[5];
+                int[] add_y = new int[5];
+                int[] addBonus_x = new int[5];
+                int[] addBonus_y = new int[5];
+
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                    {
+                        x[i] = TJAPlayer3.Skin.Game_Score_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                        y[i] = TJAPlayer3.Skin.Game_Score_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+                        add_x[i] = TJAPlayer3.Skin.Game_Score_Add_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                        add_y[i] = TJAPlayer3.Skin.Game_Score_Add_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+                        addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                        addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                    {
+                        x[i] = TJAPlayer3.Skin.Game_Score_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                        y[i] = TJAPlayer3.Skin.Game_Score_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+                        add_x[i] = TJAPlayer3.Skin.Game_Score_Add_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                        add_y[i] = TJAPlayer3.Skin.Game_Score_Add_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+                        addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                        addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+                    }
+                    else
+                    {
+                        x[i] = TJAPlayer3.Skin.Game_Score_X[i];
+                        y[i] = TJAPlayer3.Skin.Game_Score_Y[i];
+                        add_x[i] = TJAPlayer3.Skin.Game_Score_Add_X[i];
+                        add_y[i] = TJAPlayer3.Skin.Game_Score_Add_Y[i];
+                        addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_X[i];
+                        addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_Y[i];
+                    }
+                }
+
                 //CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.ctボーナス加算タイマ[0].n現在の値.ToString());
 
-                base.t小文字表示(TJAPlayer3.Skin.Game_Score_X[0], TJAPlayer3.Skin.Game_Score_Y[0], string.Format( "{0,7:######0}", this.n現在表示中のスコア[ 0 ].Taiko ), 0 , 256, 0);
-                if( TJAPlayer3.stage演奏ドラム画面.bDoublePlay && !TJAPlayer3.ConfigIni.bAIBattleMode) base.t小文字表示(TJAPlayer3.Skin.Game_Score_X[1], TJAPlayer3.Skin.Game_Score_Y[1], string.Format( "{0,7:######0}", this.n現在表示中のスコア[ 1 ].Taiko ), 0 , 256, 1);
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.n現在表示中のスコア[i].Taiko), 0, 256, i);
+                }
 
                 for( int i = 0; i < 256; i++ )
                 {
@@ -190,9 +230,9 @@ namespace TJAPlayer3
                                 pl = 1;
 
                             if ( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == false )
-                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_Add_X[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 ? TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] + yAdd : TJAPlayer3.Skin.Game_Score_Add_Y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
+                                base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 && TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? add_y[ this.stScore[ i ].nPlayer ] + yAdd : add_y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             if( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == true )
-                                base.t小文字表示(TJAPlayer3.Skin.Game_Score_AddBonus_X[this.stScore[i].nPlayer] + xAdd, TJAPlayer3.Skin.Game_Score_AddBonus_Y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
+                                base.t小文字表示(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             else
                             {
                                 this.n現在表示中のAddScore--;

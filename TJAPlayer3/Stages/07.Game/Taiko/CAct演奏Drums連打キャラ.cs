@@ -172,6 +172,9 @@ namespace TJAPlayer3
                 //    }
 
                 //}
+
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
+
                 for (int i = 0; i < 128; i++)
                 {
                     if(RollCharas[i].IsUsing)

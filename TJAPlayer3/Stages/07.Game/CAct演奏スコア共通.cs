@@ -287,14 +287,17 @@ namespace TJAPlayer3
 
 		public override void On活性化()
 		{
-            this.n現在表示中のスコア = new STDGBVALUE<long>[ 4 ];
-            this.n現在の本当のスコア = new STDGBVALUE<double>[ 4 ];
-            this.nスコアの増分 = new STDGBVALUE<long>[ 4 ];
-			for( int i = 0; i < 4; i++ )
-			{
-				this.n現在表示中のスコア[ i ][ i ] = 0L;
-				this.n現在の本当のスコア[ i ][ i ] = 0L;
-				this.nスコアの増分[ i ][ i ] = 0L;
+            this.n現在表示中のスコア = new STDGBVALUE<long>[ 5 ];
+            this.n現在の本当のスコア = new STDGBVALUE<double>[ 5 ];
+            this.nスコアの増分 = new STDGBVALUE<long>[ 5 ];
+			for( int i = 0; i < 5; i++ )
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    this.n現在表示中のスコア[i][j] = 0L;
+                    this.n現在の本当のスコア[i][j] = 0L;
+                    this.nスコアの増分[i][j] = 0L;
+                }
 			}
             for( int sc = 0; sc < 256; sc++ )
             {
@@ -309,13 +312,13 @@ namespace TJAPlayer3
 
             this.ctTimer = new CCounter();
 
-            this.ct点数アニメタイマ = new CCounter[4];
-            for (int i = 0; i < 4; i++)
+            this.ct点数アニメタイマ = new CCounter[5];
+            for (int i = 0; i < 5; i++)
             {
                 this.ct点数アニメタイマ[i] = new CCounter();
             }
-            this.ctボーナス加算タイマ = new CCounter[4];
-            for (int i = 0; i < 4; i++)
+            this.ctボーナス加算タイマ = new CCounter[5];
+            for (int i = 0; i < 5; i++)
             {
                 this.ctボーナス加算タイマ[i] = new CCounter();
             }
@@ -372,13 +375,43 @@ namespace TJAPlayer3
                                 }
                                 break;
                             case 2:
-                                if(TJAPlayer3.Tx.Taiko_Score[2] != null )
+                                if (TJAPlayer3.Tx.Taiko_Score[2] != null)
                                 {
                                     //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
                                     TJAPlayer3.Tx.Taiko_Score[2].Opacity = alpha;
                                     TJAPlayer3.Tx.Taiko_Score[2].vc拡大縮小倍率.Y = 1;
-                                    TJAPlayer3.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画( TJAPlayer3.app.Device, x, y, rectangle );
+                                    TJAPlayer3.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, x, y, rectangle);
+                                }
+                                break;
+                            case 3:
+                                if (TJAPlayer3.Tx.Taiko_Score[3] != null)
+                                {
+                                    //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
+                                    //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
+                                    TJAPlayer3.Tx.Taiko_Score[3].Opacity = alpha;
+                                    TJAPlayer3.Tx.Taiko_Score[3].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[3].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, x, y, rectangle);
+                                }
+                                break;
+                            case 4:
+                                if (TJAPlayer3.Tx.Taiko_Score[4] != null)
+                                {
+                                    //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
+                                    //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
+                                    TJAPlayer3.Tx.Taiko_Score[4].Opacity = alpha;
+                                    TJAPlayer3.Tx.Taiko_Score[4].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[4].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, x, y, rectangle);
+                                }
+                                break;
+                            case 5:
+                                if (TJAPlayer3.Tx.Taiko_Score[5] != null)
+                                {
+                                    //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
+                                    //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
+                                    TJAPlayer3.Tx.Taiko_Score[5].Opacity = alpha;
+                                    TJAPlayer3.Tx.Taiko_Score[5].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[5].t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, x, y, rectangle);
                                 }
                                 break;
                         }

@@ -67,8 +67,8 @@ namespace TJAPlayer3
         {
             this.ct風船終了 = new CCounter();
             this.ct風船ふきだしアニメ = new CCounter();
-            this.ct風船アニメ = new CCounter[4];
-            for (int i = 0; i < 4; i++)
+            this.ct風船アニメ = new CCounter[5];
+            for (int i = 0; i < 5; i++)
             {
                 this.ct風船アニメ[i] = new CCounter();
             }
@@ -146,22 +146,56 @@ namespace TJAPlayer3
 
             if (n連打数 != 0)
             {
+                int x;
+                int y;
+                int frame_x;
+                int frame_y;
+                int num_x;
+                int num_y;
+                if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                {
+                    x = TJAPlayer3.Skin.Game_Balloon_Balloon_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
+                    y = TJAPlayer3.Skin.Game_Balloon_Balloon_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+                    frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
+                    frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+                    num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
+                    num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+                }
+                else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                {
+                    x = TJAPlayer3.Skin.Game_Balloon_Balloon_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
+                    y = TJAPlayer3.Skin.Game_Balloon_Balloon_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+                    frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
+                    frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+                    num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
+                    num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+                }
+                else
+                {
+                    x = TJAPlayer3.Skin.Game_Balloon_Balloon_X[player];
+                    y = TJAPlayer3.Skin.Game_Balloon_Balloon_Y[player];
+                    frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_X[player];
+                    frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_Y[player];
+                    num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_X[player];
+                    num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Y[player];
+                }
                 //1P:0 2P:245
                 //if (CDTXMania.Tx.Chara_Balloon_Breaking != null && CDTXMania.ConfigIni.ShowChara)
                 //    CDTXMania.Tx.Chara_Balloon_Breaking.t2D描画(CDTXMania.app.Device, CDTXMania.Skin.Game_Chara_Balloon_X[player], CDTXMania.Skin.Game_Chara_Balloon_Y[player]);
                 for (int j = 0; j < 5; j++)
                 {
+
                     if (n残り打数[j] < n連打数)
                     {
                         if (TJAPlayer3.Tx.Balloon_Breaking[j] != null)
-                            TJAPlayer3.Tx.Balloon_Breaking[j].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Balloon_X[player] + (this.ct風船ふきだしアニメ.n現在の値 == 1 ? 3 : 0), TJAPlayer3.Skin.Game_Balloon_Balloon_Y[player]);
+                            TJAPlayer3.Tx.Balloon_Breaking[j].t2D描画(TJAPlayer3.app.Device, x + (this.ct風船ふきだしアニメ.n現在の値 == 1 ? 3 : 0), y);
                         break;
                     }
                 }
                 //1P:31 2P:329
                 if (TJAPlayer3.Tx.Balloon_Balloon != null)
-                    TJAPlayer3.Tx.Balloon_Balloon.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_Y[player]);
-                this.t文字表示(TJAPlayer3.Skin.Game_Balloon_Balloon_Number_X[player], TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Y[player], n連打数, player);
+                    TJAPlayer3.Tx.Balloon_Balloon.t2D描画(TJAPlayer3.app.Device, frame_x, frame_y);
+                this.t文字表示(num_x, num_y, n連打数, player);
                 //CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
             }
             if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player])

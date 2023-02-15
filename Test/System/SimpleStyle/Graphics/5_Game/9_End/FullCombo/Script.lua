@@ -10,11 +10,11 @@
 --func:SetScale(xscale, yscale, "filename")
 --func:SetColor(r, g, b, "filename")
 
-local x = { 330, 330 }
-local y = { 50, 226 }
+local x = { 330, 330, 330, 330, 330 }
+local y = { 50, 226, 0, 0, 0 }
 
-local animeCounter = { 0, 0 }
-local nowFrame = { 0, 0 }
+local animeCounter = { 0, 0, 0, 0, 0 }
+local nowFrame = { 0, 0, 0, 0, 0 }
 
 local textureCount = 66
 
@@ -25,11 +25,20 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    animeCounter = { 0, 0 }
-    nowFrame = { 0, 0 }
+    animeCounter = { 0, 0, 0, 0, 0 }
+    nowFrame = { 0, 0, 0, 0, 0 }
 end
 
 function init()
+
+    if playerCount <= 2 then
+        y = { 50, 226, 0, 0, 0 }
+    elseif playerCount == 5 then
+        y = { -118, 26, 170, 314, 458 }
+    else
+        y = { -96, 80, 256, 432, 0 }
+    end
+
     for i = 0 , textureCount do
         func:AddGraph(tostring(i)..".png")
     end

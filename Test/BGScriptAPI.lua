@@ -3,7 +3,7 @@ local p1IsBlue = false
 
 local fps = 0
 local deltaTime = 0
-local isClear = { false, false }
+local isClear = { false, false, false, false, false }
 local towerNightNum = 0
 local battleState = 0
 

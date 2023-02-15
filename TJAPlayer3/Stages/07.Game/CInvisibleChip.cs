@@ -52,7 +52,7 @@ namespace TJAPlayer3
 		/// </summary>
 		public void Reset()
 		{
-			for ( int i = 0; i < 4; i++ )
+			for ( int i = 0; i < 5; i++ )
 			{
 				ccounter[ i ] = new CCounter();
 				b演奏チップが１つでもバーを通過した[ i ] = false;
@@ -170,7 +170,7 @@ namespace TJAPlayer3
 			if( disposeManagedObjects )
 			{
 				// (A) Managed リソースの解放
-				for ( int i = 0; i < 4; i++ )
+				for ( int i = 0; i < 5; i++ )
 				{
 					// ctInvisibleTimer[ i ].Dispose();
 					ccounter[ i ].t停止();
@@ -189,8 +189,8 @@ namespace TJAPlayer3
 		//-----------------
 		#endregion
 
-		private STDGBVALUE<CCounter> ccounter;
+		private CCounter[] ccounter = new CCounter[5];
 		private bool bDispose完了済み = false;
-		private STDGBVALUE<bool> b演奏チップが１つでもバーを通過した;
+		private bool[] b演奏チップが１つでもバーを通過した = new bool[5];
 	}
 }

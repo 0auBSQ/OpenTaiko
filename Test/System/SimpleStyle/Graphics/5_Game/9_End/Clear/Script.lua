@@ -11,12 +11,12 @@
 --func:SetColor(r, g, b, "filename")
 
 
-local y = { 210, 386 }
+local y = { 210, 386, 0, 0, 0 }
 
 local sideTextureCount = 4
 
-local animeCounter = { 0, 0 }
-local nowFrame = { 0, 0 }
+local animeCounter = { 0, 0, 0, 0, 0 }
+local nowFrame = { 0, 0, 0, 0, 0 }
 
 
 
@@ -32,10 +32,18 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    animeCounter = { 0, 0 }
+    animeCounter = { 0, 0, 0, 0, 0 }
 end
 
 function init()
+
+    if playerCount <= 2 then
+        y = { 210, 386, 0, 0, 0 }
+    elseif playerCount == 5 then
+        y = { 36, 170, 314, 458, 602 }
+    else
+        y = { 64, 240, 416, 592, 0 }
+    end
     
     func:AddGraph("Clear_Text.png")
     func:AddGraph("Clear_Text_Effect.png")

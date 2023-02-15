@@ -26,7 +26,7 @@ namespace TJAPlayer3
             if (amounts.Length < 2)
                 return;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 int p = TJAPlayer3.GetActualPlayer(i);
 
@@ -154,44 +154,47 @@ namespace TJAPlayer3
         public class Data
         {
             [JsonProperty("name")]
-            public string[] Name = { "プレイヤー1", "プレイヤー2" };
+            public string[] Name = { "プレイヤー1", "プレイヤー2", "プレイヤー3", "プレイヤー4", "プレイヤー5" };
 
             [JsonProperty("title")]
-            public string[] Title = { "初心者", "初心者" };
+            public string[] Title = { "初心者", "初心者", "初心者", "初心者", "初心者" };
 
             [JsonProperty("dan")]
-            public string[] Dan = { "新人", "新人" };
+            public string[] Dan = { "新人", "新人", "新人", "新人", "新人" };
 
             [JsonProperty("danGold")]
-            public bool[] DanGold = { false, false };
+            public bool[] DanGold = { false, false, false, false, false };
 
             [JsonProperty("danType")]
-            public int[] DanType = { 0, 0 };
+            public int[] DanType = { 0, 0, 0, 0, 0 };
 
             [JsonProperty("titleType")]
-            public int[] TitleType = { 0, 0 };
+            public int[] TitleType = { 0, 0, 0, 0, 0 };
 
             [JsonProperty("puchiChara")]
-            public string[] PuchiChara = { "0", "0" };
+            public string[] PuchiChara = { "0", "0", "0", "0", "0" };
 
             [JsonProperty("medals")]
-            public int[] Medals = { 0, 0 };
+            public int[] Medals = { 0, 0, 0, 0, 0 };
 
             [JsonProperty("character")]
-            public int[] Character = { 0, 0 };
+            public int[] Character = { 0, 0, 0, 0, 0 };
 
             [JsonProperty("characterName")]
-            public string[] CharacterName = { "0", "0" };
+            public string[] CharacterName = { "0", "0", "0", "0", "0" };
 
             [JsonProperty("danTitles")]
-            public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[2];
+            public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[5];
 
             [JsonProperty("namePlateTitles")]
-            public Dictionary<string, CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, CNamePlateTitle>[2];
+            public Dictionary<string, CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, CNamePlateTitle>[5];
 
             [JsonProperty("unlockedPuchicharas")]
-            public List<string>[] UnlockedPuchicharas = new List<string>[2]
+            public List<string>[] UnlockedPuchicharas = new List<string>[5]
             {
+                new List<string>(),
+                new List<string>(),
+                new List<string>(),
                 new List<string>(),
                 new List<string>()
             };

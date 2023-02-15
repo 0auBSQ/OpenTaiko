@@ -20,7 +20,7 @@ namespace TJAPlayer3
         // メソッド
         public virtual void Start(int nLane, int nPlayer, bool isRoll = false)
         {
-
+            if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return;
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
             if (TJAPlayer3.Tx.Notes[(int)_gt] != null)

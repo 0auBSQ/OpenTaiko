@@ -9,10 +9,10 @@ namespace TJAPlayer3
 {
     class CResultCharacter
     {
-        private static CCounter[] ctCharacterNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterClear = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterFailed = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterFailedIn = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterClear = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterFailed = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterFailedIn = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
 
         public enum ECharacterResult
@@ -157,25 +157,25 @@ namespace TJAPlayer3
             {
                 case (ECharacterResult.NORMAL):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterNormal[i] = new CCounter();
                         break;
                     }
                 case (ECharacterResult.CLEAR):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterClear[i] = new CCounter();
                         break;
                     }
                 case (ECharacterResult.FAILED):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterFailed[i] = new CCounter();
                         break;
                     }
                 case (ECharacterResult.FAILED_IN):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterFailedIn[i] = new CCounter();
                         break;
                     }
@@ -241,7 +241,7 @@ namespace TJAPlayer3
                 _tex.vc拡大縮小倍率.X *= resolutionRatioX;
                 _tex.vc拡大縮小倍率.Y *= resolutionRatioY;
 
-                if (pos % 2 == 0)
+                if (pos % 2 == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 2)
                 {
                     _tex.t2D拡大率考慮下中心基準描画(TJAPlayer3.app.Device,
                         _x,

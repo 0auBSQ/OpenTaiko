@@ -97,7 +97,7 @@ namespace TJAPlayer3
 			    // player and the special song title and subtitle
 			    // of the .tja used to perform input calibration
 			    TJAPlayer3.IsPerformingCalibration =
-			        !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay &&
+			        !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] &&
 			        TJAPlayer3.ConfigIni.nPlayerCount == 1 &&
 			        str曲タイトル == "Input Calibration" &&
 			        strサブタイトル == "TJAPlayer3 Developers";
@@ -423,13 +423,19 @@ namespace TJAPlayer3
                         //if( CDTXMania.DTX == null )
                         {
 							TJAPlayer3.DTX = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 0, true, TJAPlayer3.stage選曲.n確定された曲の難易度[0]);
-							if ( TJAPlayer3.ConfigIni.nPlayerCount == 2 )
+							if ( TJAPlayer3.ConfigIni.nPlayerCount >= 2 )
 								TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[1]);
+							if (TJAPlayer3.ConfigIni.nPlayerCount >= 3)
+								TJAPlayer3.DTX_3P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 2, true, TJAPlayer3.stage選曲.n確定された曲の難易度[2]);
+							if (TJAPlayer3.ConfigIni.nPlayerCount >= 4)
+								TJAPlayer3.DTX_4P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 3, true, TJAPlayer3.stage選曲.n確定された曲の難易度[3]);
+							if (TJAPlayer3.ConfigIni.nPlayerCount >= 5)
+								TJAPlayer3.DTX_5P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 4, true, TJAPlayer3.stage選曲.n確定された曲の難易度[4]);
 							if ( File.Exists( TJAPlayer3.DTX.strフォルダ名 + @"\\set.def" ) )
                             {
-								TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[0]);
-								if ( TJAPlayer3.ConfigIni.nPlayerCount == 2 )
-									TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[1]);
+								//TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[0]);
+								//if ( TJAPlayer3.ConfigIni.nPlayerCount == 2 )
+									//TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[1]);
 							}
 
 							Trace.TraceInformation( "----曲情報-----------------" );
@@ -532,7 +538,7 @@ namespace TJAPlayer3
 								TJAPlayer3.DTX.PlanToAddMixerChannel();
 							}
 
-							var _dtx = new CDTX[4]{ TJAPlayer3.DTX, TJAPlayer3.DTX_2P, null, null };
+							var _dtx = new CDTX[5]{ TJAPlayer3.DTX, TJAPlayer3.DTX_2P, TJAPlayer3.DTX_3P, TJAPlayer3.DTX_4P, TJAPlayer3.DTX_5P };
 							
 							for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                             {
