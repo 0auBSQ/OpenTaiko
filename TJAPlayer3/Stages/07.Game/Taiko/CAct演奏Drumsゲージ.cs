@@ -373,16 +373,19 @@ namespace TJAPlayer3
 
                                 bool smart = TJAPlayer3.ConfigIni.nPlayerCount > 2 || TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan;
 
+
                                 TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].Opacity = 255;
                                 TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, x, y + (smart ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0),
                                     new RectangleF(0,
-                                    smart ? 22 : 0,
+                                    smart ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0,
                                     TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Width,
                                     smart ? TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height - (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : TJAPlayer3.Tx.Gauge_Rainbow[this.ct虹アニメ.n現在の値].szテクスチャサイズ.Height));
+                                
+
                                 TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].Opacity = (ct虹透明度.n現在の値 * 255 / (int)ct虹透明度.n終了値)/1;
-                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, x, y + (smart ? 22 : 0), 
+                                TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, x, y + (smart ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0), 
                                     new RectangleF(0,
-                                    smart ? 22 : 0, 
+                                    smart ? (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : 0, 
                                     TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Width,
                                     smart ? TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Height - (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2) : TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Height));
                             }
@@ -471,8 +474,8 @@ namespace TJAPlayer3
                                     }
                                     else
                                     {
-                                        TJAPlayer3.Tx.Gauge_Rainbow[ct虹アニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, gauge_x[i], gauge_y[i] + 22,
-                                       new RectangleF(0, 22,
+                                        TJAPlayer3.Tx.Gauge_Rainbow[ct虹アニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, gauge_x[i], gauge_y[i] + (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2),
+                                       new RectangleF(0, (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2),
                                        TJAPlayer3.Tx.Gauge_Rainbow[ct虹アニメ.n現在の値].szテクスチャサイズ.Width,
                                        TJAPlayer3.Tx.Gauge_Rainbow[ct虹アニメ.n現在の値].szテクスチャサイズ.Height - (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2)));
                                     }
@@ -484,8 +487,8 @@ namespace TJAPlayer3
                                     }
                                     else
                                     {
-                                        TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, gauge_x[i], gauge_y[i] + 22,
-                                       new RectangleF(0, 22,
+                                        TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].t2D描画(TJAPlayer3.app.Device, gauge_x[i], gauge_y[i] + (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2),
+                                       new RectangleF(0, (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2),
                                        TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Width,
                                        TJAPlayer3.Tx.Gauge_Rainbow[虹ベース].szテクスチャサイズ.Height - (TJAPlayer3.Skin.Game_Gauge_Rect[3] / 2)));
                                     }
