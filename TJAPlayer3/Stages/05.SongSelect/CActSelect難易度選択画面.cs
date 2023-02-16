@@ -226,9 +226,12 @@ namespace TJAPlayer3
                                 cancel = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape));
                                 break;
                             case 1:
-                                right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
-                                left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
-                                decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                                if (!TJAPlayer3.ConfigIni.bAIBattleMode)
+                                {
+                                    right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
+                                    left = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
+                                    decide = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                                }
                                 break;
                             case 2:
                                 right = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue3P));

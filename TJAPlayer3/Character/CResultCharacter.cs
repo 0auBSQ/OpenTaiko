@@ -197,7 +197,7 @@ namespace TJAPlayer3
 
         public static void tMenuResetTimer(ECharacterResult eca)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tMenuResetTimer(i, eca);
             }
