@@ -100,6 +100,8 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
+                    if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+
                     base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.n現在表示中のスコア[i].Taiko), 0, 256, i);
                 }
 

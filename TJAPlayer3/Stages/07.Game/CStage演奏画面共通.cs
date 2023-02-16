@@ -235,7 +235,7 @@ namespace TJAPlayer3
                 }
             }
 
-            AIBattleState = 0;
+            _AIBattleState = 0;
 
             this.AIBattleSections = new List<AIBattleSection>();
 
@@ -872,7 +872,14 @@ namespace TJAPlayer3
         public double nBranch条件数値B;
         private readonly int[] NowProcessingChip = new int[] { 0, 0, 0, 0, 0 };
 
-        public int AIBattleState;
+        private float _AIBattleState;
+        public int AIBattleState
+        {
+            get
+            {
+                return (int)_AIBattleState;
+            }
+        }
 
         public class AIBattleSection
         {
@@ -918,7 +925,7 @@ namespace TJAPlayer3
                     TJAPlayer3.ConfigIni.nAILevel--;
             }
             actAIBattle.BatchAnimeCounter.n現在の値 = 0;
-            AIBattleState = 0;
+            _AIBattleState = 0;
         }
 
         public void AddMixer( CSound cs, bool _b演奏終了後も再生が続くチップである )
@@ -1845,13 +1852,13 @@ namespace TJAPlayer3
 
                                     if (nPlayer == 0)
                                     {
-                                        AIBattleState += 2;
-                                        AIBattleState = Math.Min(AIBattleState, 9);
+                                        _AIBattleState += 1;
+                                        _AIBattleState = Math.Min(AIBattleState, 9);
                                     }
                                     else if (nPlayer == 1)
                                     {
-                                        AIBattleState -= 2;
-                                        AIBattleState = Math.Max(AIBattleState, -9);
+                                        _AIBattleState -= 1;
+                                        _AIBattleState = Math.Max(AIBattleState, -9);
                                     }
 
 
@@ -1893,13 +1900,13 @@ namespace TJAPlayer3
 
                                     if (nPlayer == 0)
                                     {
-                                        AIBattleState += 1;
-                                        AIBattleState = Math.Min(AIBattleState, 9);
+                                        _AIBattleState += 0.5f;
+                                        _AIBattleState = Math.Min(_AIBattleState, 9);
                                     }
                                     else if (nPlayer == 1)
                                     {
-                                        AIBattleState -= 1;
-                                        AIBattleState = Math.Max(AIBattleState, -9);
+                                        _AIBattleState -= 0.5f;
+                                        _AIBattleState = Math.Max(_AIBattleState, -9);
                                     }
 
 
@@ -1982,13 +1989,13 @@ namespace TJAPlayer3
 
                                         if (nPlayer == 0)
                                         {
-                                            AIBattleState += 2;
-                                            AIBattleState = Math.Min(AIBattleState, 9);
+                                            _AIBattleState += 1;
+                                            _AIBattleState = Math.Min(_AIBattleState, 9);
                                         }
                                         else if (nPlayer == 1)
                                         {
-                                            AIBattleState -= 2;
-                                            AIBattleState = Math.Max(AIBattleState, -9);
+                                            _AIBattleState -= 1;
+                                            _AIBattleState = Math.Max(_AIBattleState, -9);
                                         }
 
 
@@ -2033,13 +2040,13 @@ namespace TJAPlayer3
 
                                         if (nPlayer == 0)
                                         {
-                                            AIBattleState += 1;
-                                            AIBattleState = Math.Min(AIBattleState, 9);
+                                            _AIBattleState += 0.5f;
+                                            _AIBattleState = Math.Min(AIBattleState, 9);
                                         }
                                         else if (nPlayer == 1)
                                         {
-                                            AIBattleState -= 1;
-                                            AIBattleState = Math.Max(AIBattleState, -9);
+                                            _AIBattleState -= 0.5f;
+                                            _AIBattleState = Math.Max(AIBattleState, -9);
                                         }
 
 
@@ -4017,7 +4024,17 @@ namespace TJAPlayer3
                                 this.t強制用条件かを判断する(pChip.n条件数値A, pChip.n条件数値B, nPlayer);
 
                                 TJAPlayer3.stage演奏ドラム画面.bUseBranch[nPlayer] = true;
-                                this.tBranchJudge(pChip, this.CBranchScore[nPlayer].cBigNotes, this.CBranchScore[nPlayer].nScore, this.CBranchScore[nPlayer].nRoll, this.CBranchScore[nPlayer].nGreat, this.CBranchScore[nPlayer].nGood, this.CBranchScore[nPlayer].nMiss, nPlayer);
+
+                                CBRANCHSCORE branchScore;
+                                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                                {
+                                    branchScore = this.CBranchScore[0];
+                                }
+                                else
+                                {
+                                    branchScore = this.CBranchScore[nPlayer];
+                                }
+                                this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
 
                                 if (this.b強制分岐譜面[nPlayer])//強制分岐譜面だったら次回コースをそのコースにセット
                                     this.n次回のコース[nPlayer] = this.E強制コース[nPlayer];
@@ -4495,7 +4512,7 @@ namespace TJAPlayer3
 
         public void t演奏やりなおし()
         {
-            AIBattleState = 0;
+            _AIBattleState = 0;
 
             NowAIBattleSectionCount = 0;
             NowAIBattleSectionTime = 0;
