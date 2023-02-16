@@ -1533,7 +1533,7 @@ namespace TJAPlayer3
 
         private void tSelectSongRandomly()
         {
-            var usedDiffs = new int[] { -1, -1, -1, -1 };
+            var usedDiffs = new int[] { -1, -1, -1, -1, -1 };
             var mandatoryDiffs = new List<int>();
 
             #region [Fetch context informations]

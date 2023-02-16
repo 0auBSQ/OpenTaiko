@@ -2200,7 +2200,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_Search_Bar_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 4; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Search_Bar_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2208,7 +2208,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_Search_Bar_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 4; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Search_Bar_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -7603,8 +7603,8 @@ namespace TJAPlayer3
         public int[] SongSelect_SongNumber_Y = new int[] { 167, 167 };
         public int[] SongSelect_SongNumber_Interval = new int[] { 16, 0 };
 
-        public int[] SongSelect_Search_Bar_X = new int[] { 640, 640, 640, 640 };
-        public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620 };
+        public int[] SongSelect_Search_Bar_X = new int[] { 640, 640, 640, 640, 640 };
+        public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620, 720 };
 
         public int[] SongSelect_Difficulty_Back = new int[] { 640, 290 };
         public int[] SongSelect_Level_Offset = new int[] { 610, 40 };
