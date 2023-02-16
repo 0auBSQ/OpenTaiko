@@ -51,7 +51,7 @@ namespace TJAPlayer3
                 // Currently used character
                 int p = TJAPlayer3.GetActualPlayer(i);
 
-                this.iCurrentCharacter[i] = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
+                this.iCurrentCharacter[i] = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[p].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
 
 
                 this.b風船連打中[i] = false;

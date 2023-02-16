@@ -880,7 +880,7 @@ namespace TJAPlayer3
 
 					#region [Character Animations]
 
-					int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(p)];
+					int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(p)].data.Character;
 
 					//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 					//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];

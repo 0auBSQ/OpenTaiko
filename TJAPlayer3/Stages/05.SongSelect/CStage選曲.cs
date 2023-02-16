@@ -510,7 +510,7 @@ namespace TJAPlayer3
                 {
                     CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[player];
 
-                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+                    int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
                     //int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
                     //int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
@@ -624,8 +624,8 @@ namespace TJAPlayer3
 
                     int p = TJAPlayer3.GetActualPlayer(i);
 
-                    if (TJAPlayer3.NamePlateConfig.data.Medals[p] >= 0)
-                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][10], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][10], TJAPlayer3.NamePlateConfig.data.Medals[p]);
+                    if (TJAPlayer3.SaveFileInstances[p].data.Medals >= 0)
+                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][10], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][10], TJAPlayer3.SaveFileInstances[p].data.Medals);
 
                     #region [HiScore plate]
 

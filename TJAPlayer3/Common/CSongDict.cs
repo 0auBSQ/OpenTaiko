@@ -305,7 +305,8 @@ namespace TJAPlayer3
 
                     if (song.eノード種別 == C曲リストノード.Eノード種別.SCORE
                         && song.strジャンル != "最近遊んだ曲"
-                        && song.strジャンル != "Favorite")
+                        && song.strジャンル != "Favorite"
+                        && song.strジャンル != "SearchD")
                     {
                         var score = song.arスコア[TJAPlayer3.stage選曲.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 

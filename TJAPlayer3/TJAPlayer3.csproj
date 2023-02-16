@@ -137,6 +137,7 @@
     <Compile Include="Common\Discord.cs" />
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
+    <Compile Include="Common\SaveFile.cs" />
     <Compile Include="Databases\DBCDN.cs" />
     <Compile Include="Databases\DBEncyclopediaMenus.cs" />
     <Compile Include="Databases\DBPuchichara.cs" />

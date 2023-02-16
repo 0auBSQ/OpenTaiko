@@ -81,7 +81,7 @@ namespace TJAPlayer3
                 {
                     #region [Combo voices]
 
-                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(i)];
+                    int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character;
 
                     var currentDir = ($@"{TJAPlayer3.strEXEのあるフォルダ}Global\Characters\{TJAPlayer3.Skin.Characters_DirName[_charaId]}\Sounds\Combo\");
                     if (Directory.Exists(currentDir))
@@ -93,6 +93,7 @@ namespace TJAPlayer3
                             comboVoice.nPlayer = i;
                             comboVoice.strFilePath = item;
                             comboVoice.soundComboVoice = TJAPlayer3.Sound管理.tサウンドを生成する(item, ESoundGroup.Voice);
+                            /*
                             if (TJAPlayer3.ConfigIni.nPlayerCount >= 2) //2020.05.06 Mr-Ojii 左右に出したかったから追加。
                             {
                                 if (i == 0)
@@ -100,6 +101,8 @@ namespace TJAPlayer3
                                 else
                                     comboVoice.soundComboVoice.n位置 = 100;
                             }
+                            */
+                            comboVoice.soundComboVoice.n位置 = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
                             comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
                             ListCombo[i].Add(comboVoice);
                         }

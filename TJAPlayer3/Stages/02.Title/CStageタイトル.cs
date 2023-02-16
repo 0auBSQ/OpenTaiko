@@ -595,7 +595,7 @@ namespace TJAPlayer3
 
 					int _actual = TJAPlayer3.GetActualPlayer(0);
 
-                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[_actual];
+                    int _charaId = TJAPlayer3.SaveFileInstances[_actual].data.Character;
 
 					int chara_x = TJAPlayer3.Skin.Title_Entry_NamePlate[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
 					int chara_y = TJAPlayer3.Skin.Title_Entry_NamePlate[1];
@@ -695,7 +695,7 @@ namespace TJAPlayer3
 						DonchanY = ((float)Math.Sin((90 + (ctどんちゃんイン.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
 						if (player == 1) DonchanX *= -1;
 
-						int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+						int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
 						//int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + DonchanX);
 						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - DonchanY);

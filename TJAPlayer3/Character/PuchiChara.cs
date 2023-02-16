@@ -36,7 +36,7 @@ namespace TJAPlayer3
 
         public static int tGetPuchiCharaIndexByName(int p)
         {
-            var _pc = TJAPlayer3.NamePlateConfig.data.PuchiChara[p];
+            var _pc = TJAPlayer3.SaveFileInstances[p].data.PuchiChara;
             var _pcs = TJAPlayer3.Skin.Puchicharas_Name;
             int puriChar = 0;
             if (_pcs.Contains(_pc))

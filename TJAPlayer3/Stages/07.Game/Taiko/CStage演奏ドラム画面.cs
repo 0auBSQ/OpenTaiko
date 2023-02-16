@@ -238,7 +238,7 @@ namespace TJAPlayer3
             {
                 int p = TJAPlayer3.GetActualPlayer(nPlayer);
 
-                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
+                int chara = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[p].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
 
                 if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                 {
@@ -368,6 +368,12 @@ namespace TJAPlayer3
                         this.soundBlue[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual]), ESoundGroup.SoundEffect);
                         this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual]), ESoundGroup.SoundEffect);
                         this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual]), ESoundGroup.SoundEffect);
+
+                        int _panning = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
+                        this.soundRed[i].n位置 = _panning;
+                        this.soundBlue[i].n位置 = _panning;
+                        this.soundAdlib[i].n位置 = _panning;
+                        this.soundClap[i].n位置 = _panning;
                     }
                     /*
                     this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
@@ -379,7 +385,7 @@ namespace TJAPlayer3
                     this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect);
                     */
 
-
+                    /*
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 2)//2020.05.06 Mr-Ojii左右に出したかったから、追加。
                     {
                         this.soundRed[0].n位置 = -100;
@@ -389,6 +395,7 @@ namespace TJAPlayer3
                         this.soundBlue[1].n位置 = 100;
                         this.soundAdlib[1].n位置 = 100;
                     }
+                    */
                 }
 
 			    base.OnManagedリソースの作成();

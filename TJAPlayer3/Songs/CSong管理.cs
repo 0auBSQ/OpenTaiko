@@ -1766,9 +1766,14 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			// New format
 			string[] fp =
 			{
-				strScoreIniファイルパス + "1P.score.ini",
-				strScoreIniファイルパス + "2P.score.ini",
-			};
+				//strScoreIniファイルパス + "1P.score.ini",
+				//strScoreIniファイルパス + "2P.score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[0].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[1].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[2].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[3].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[4].name + @".score.ini"
+            };
 
 			// Load legacy format if new doesn't exist yet
 			if (!File.Exists(fp[0]))
@@ -1781,14 +1786,16 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			*/
 
 			// Select the main file for the common informations
+			/*
 			int mainFile = 0;
 			if (!File.Exists(fp[0]))
 				mainFile = 1;
 			if (!File.Exists(fp[1]) && mainFile == 1)
 				return;
+			*/
 
 			// Only the necessary scores are read from the auxilliary score file
-			int auxFile = mainFile ^ 1;
+			//int auxFile = mainFile ^ 1;
 
 			try
 			{
@@ -1796,9 +1803,14 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 				CScoreIni[] csi =
 				{
-					new CScoreIni(fp[mainFile]),
-					File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
-				};
+					//new CScoreIni(fp[mainFile]),
+					//File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
+                    new CScoreIni(fp[0]),
+                    new CScoreIni(fp[1]),
+                    new CScoreIni(fp[2]),
+                    new CScoreIni(fp[3]),
+                    new CScoreIni(fp[4])
+                };
 
 				var ini = csi[0];
 
@@ -1851,7 +1863,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 				}
 
 				// Load GPInfo for each save file
-				for (int i = 0; i < 2; i++)
+				for (int i = 0; i < 5; i++)
                 {
 					if (csi[i] == null)
 						continue;

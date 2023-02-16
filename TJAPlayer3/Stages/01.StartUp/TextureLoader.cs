@@ -1131,8 +1131,8 @@ namespace TJAPlayer3
 
             for (int i = 0; i < 5; i++)
             {
-                TJAPlayer3.NamePlateConfig.tReindexCharacter(i, TJAPlayer3.Skin.Characters_DirName);
-                this.ReloadCharacter(-1, TJAPlayer3.NamePlateConfig.data.Character[i], i, true);
+                TJAPlayer3.SaveFileInstances[i].tReindexCharacter(TJAPlayer3.Skin.Characters_DirName);
+                this.ReloadCharacter(-1, TJAPlayer3.SaveFileInstances[i].data.Character, i, true);
             }
                 
 
@@ -1208,14 +1208,12 @@ namespace TJAPlayer3
             if (old == newC)
                 return;
 
-            int other = (player == 0) ? 1 : 0;
-
             if (old >= 0 && 
-                (TJAPlayer3.NamePlateConfig.data.Character[0] != old || player == 0) &&
-                (TJAPlayer3.NamePlateConfig.data.Character[1] != old || player == 1) &&
-                (TJAPlayer3.NamePlateConfig.data.Character[2] != old || player == 2) &&
-                (TJAPlayer3.NamePlateConfig.data.Character[3] != old || player == 3) &&
-                (TJAPlayer3.NamePlateConfig.data.Character[4] != old || player == 4))
+                (TJAPlayer3.SaveFileInstances[0].data.Character != old || player == 0) &&
+                (TJAPlayer3.SaveFileInstances[1].data.Character != old || player == 1) &&
+                (TJAPlayer3.SaveFileInstances[2].data.Character != old || player == 2) &&
+                (TJAPlayer3.SaveFileInstances[3].data.Character != old || player == 3) &&
+                (TJAPlayer3.SaveFileInstances[4].data.Character != old || player == 4))
             {
                 int i = old;
 
@@ -1305,11 +1303,11 @@ namespace TJAPlayer3
             string charaPath = TJAPlayer3.strEXEのあるフォルダ + GLOBAL + CHARACTERS + TJAPlayer3.Skin.Characters_DirName[newC];
 
             if ((newC >= 0 &&
-                TJAPlayer3.NamePlateConfig.data.Character[0] != newC &&
-                TJAPlayer3.NamePlateConfig.data.Character[1] != newC &&
-                TJAPlayer3.NamePlateConfig.data.Character[2] != newC &&
-                TJAPlayer3.NamePlateConfig.data.Character[3] != newC &&
-                TJAPlayer3.NamePlateConfig.data.Character[4] != newC) || primary)
+                TJAPlayer3.SaveFileInstances[0].data.Character != newC &&
+                TJAPlayer3.SaveFileInstances[1].data.Character != newC &&
+                TJAPlayer3.SaveFileInstances[2].data.Character != newC &&
+                TJAPlayer3.SaveFileInstances[3].data.Character != newC &&
+                TJAPlayer3.SaveFileInstances[4].data.Character != newC) || primary)
             {
                 int i = newC;
 

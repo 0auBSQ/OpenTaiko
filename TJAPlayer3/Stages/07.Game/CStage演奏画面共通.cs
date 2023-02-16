@@ -3531,7 +3531,7 @@ namespace TJAPlayer3
 
                                     int p = TJAPlayer3.GetActualPlayer(nPlayer);
 
-                                    int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
+                                    int chara = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[p].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
 
                                     if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                                     {
@@ -3758,7 +3758,7 @@ namespace TJAPlayer3
 
                                 int p = TJAPlayer3.GetActualPlayer(nPlayer);
 
-                                int chara = Math.Max(0, Math.Min(TJAPlayer3.NamePlateConfig.data.Character[p], TJAPlayer3.Skin.Characters_Ptn - 1));
+                                int chara = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[p].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
 
                                 if (TJAPlayer3.Skin.Characters_Normal_Ptn[chara] != 0)
                                 {
@@ -4091,10 +4091,13 @@ namespace TJAPlayer3
                     case 0xF1:
                         if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
                         {
-                            if (dTX.listLyric.Count > ShownLyric[nPlayer] && dTX.nPlayerSide == nPlayer)
+                            if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
                             {
-                                this.actPanel.t歌詞テクスチャを生成する(dTX.listLyric[ShownLyric[nPlayer]]);
-                                ShownLyric[nPlayer]++;
+                                if (dTX.listLyric.Count > ShownLyric[nPlayer] && dTX.nPlayerSide == nPlayer)
+                                {
+                                    this.actPanel.t歌詞テクスチャを生成する(dTX.listLyric[ShownLyric[nPlayer]]);
+                                    ShownLyric[nPlayer]++;
+                                }
                             }
                             pChip.bHit = true;
                         }

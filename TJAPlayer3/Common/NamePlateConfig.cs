@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using radio42.Multimedia.Midi;
 
 namespace TJAPlayer3
 {
@@ -13,8 +14,11 @@ namespace TJAPlayer3
     {
         public void tNamePlateConfig()
         {
+            // Deprecated, only converts to new format
+            /*
             if (!File.Exists("NamePlate.json"))
                 tSaveFile();
+            */
 
             tLoadFile();
         }
@@ -63,7 +67,7 @@ namespace TJAPlayer3
             int cs = clearStatus;
 
             if (TJAPlayer3.NamePlateConfig.data.DanTitles[player] == null)
-                TJAPlayer3.NamePlateConfig.data.DanTitles[player] = new Dictionary<string, CDanTitle>();
+                TJAPlayer3.NamePlateConfig.data.DanTitles[player] = new Dictionary<string, SaveFile.CDanTitle>();
 
             if (TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title))
             {
@@ -87,7 +91,7 @@ namespace TJAPlayer3
             }
 
 
-            CDanTitle danTitle = new CDanTitle(iG, cs);
+            SaveFile.CDanTitle danTitle = new SaveFile.CDanTitle(iG, cs);
 
             TJAPlayer3.NamePlateConfig.data.DanTitles[player][title] = danTitle;
 
@@ -184,10 +188,10 @@ namespace TJAPlayer3
             public string[] CharacterName = { "0", "0", "0", "0", "0" };
 
             [JsonProperty("danTitles")]
-            public Dictionary<string, CDanTitle>[] DanTitles = new Dictionary<string, CDanTitle>[5];
+            public Dictionary<string, SaveFile.CDanTitle>[] DanTitles = new Dictionary<string, SaveFile.CDanTitle>[5];
 
             [JsonProperty("namePlateTitles")]
-            public Dictionary<string, CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, CNamePlateTitle>[5];
+            public Dictionary<string, SaveFile.CNamePlateTitle>[] NamePlateTitles = new Dictionary<string, SaveFile.CNamePlateTitle>[5];
 
             [JsonProperty("unlockedPuchicharas")]
             public List<string>[] UnlockedPuchicharas = new List<string>[5]
@@ -212,7 +216,34 @@ namespace TJAPlayer3
 
         private void tLoadFile()
         {
-            data = ConfigManager.GetConfig<Data>(@"NamePlate.json");
+            //data = ConfigManager.GetConfig<Data>(@"NamePlate.json");
+
+            if (!File.Exists("NamePlate.json"))
+                return;
+
+            var _data = ConfigManager.GetConfig<Data>(@"NamePlate.json");
+
+            for (int i = 0; i < _data.Name.Length; i++)
+            {
+                var _sf = new SaveFile();
+                _sf.tSaveFile((i + 1) + "P");
+                _sf.data.Name = _data.Name[i];
+                _sf.data.Title = _data.Title[i];
+                _sf.data.Dan = _data.Dan[i];
+                _sf.data.DanGold = _data.DanGold[i];
+                _sf.data.DanType = _data.DanType[i];
+                _sf.data.TitleType = _data.TitleType[i];
+                _sf.data.PuchiChara = _data.PuchiChara[i];
+                _sf.data.Medals = _data.Medals[i];
+                _sf.data.Character = _data.Character[i];
+                _sf.data.CharacterName = _data.CharacterName[i];
+                _sf.data.DanTitles = _data.DanTitles[i];
+                _sf.data.NamePlateTitles = _data.NamePlateTitles[i];
+                _sf.data.UnlockedPuchicharas = _data.UnlockedPuchicharas[i];
+                _sf.tApplyHeyaChanges();
+            }
+
+            System.IO.File.Move(@"NamePlate.json", @"NamePlate_old.json");
         }
 
         #endregion

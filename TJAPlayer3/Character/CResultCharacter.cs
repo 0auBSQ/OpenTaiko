@@ -44,7 +44,7 @@ namespace TJAPlayer3
 
         private static bool _usesSubstituteTexture(int player, ECharacterResult eca)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
             if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn)
             {
@@ -82,7 +82,7 @@ namespace TJAPlayer3
 
         public static CTexture[] _getReferenceArray(int player, ECharacterResult eca)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
             if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn)
             {
@@ -205,7 +205,7 @@ namespace TJAPlayer3
 
         public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterResult eca, int pos = 0, int opacity = 255)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
             bool _substitute = _usesSubstituteTexture(player, eca);

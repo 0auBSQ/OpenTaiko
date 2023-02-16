@@ -488,12 +488,14 @@ namespace TJAPlayer3
 		// 0 : 1P, 1 : 2P
 		public static int SaveFile = 0;
 
+		public static SaveFile[] SaveFileInstances = new SaveFile[5];
+
 		// 0 : Hidari, 1 : Migi (1P only)
 		public static int PlayerSide = 0;
 
 		public static int GetActualPlayer(int player)
         {
-			if (SaveFile == 0)
+			if (SaveFile == 0 || player > 1)
 				return player;
 			if (player == 0)
 				return 1;
@@ -2226,7 +2228,13 @@ for (int i = 0; i < 3; i++) {
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
 			}
-			this.Window.EnableSystemMenu = TJAPlayer3.ConfigIni.bIsEnabledSystemMenu;	// #28200 2011.5.1 yyagi
+
+            for (int i = 0; i < 5; i++)
+            {
+                SaveFileInstances[i] = new SaveFile();
+                SaveFileInstances[i].tSaveFile(TJAPlayer3.ConfigIni.sSaveFile[i]);
+            }
+            this.Window.EnableSystemMenu = TJAPlayer3.ConfigIni.bIsEnabledSystemMenu;	// #28200 2011.5.1 yyagi
 			// 2012.8.22 Config.iniが無いときに初期値が適用されるよう、この設定行をifブロック外に移動
 
 			//---------------------

@@ -7,14 +7,15 @@ using System.IO;
 using System.Diagnostics;
 using FDK;
 using FDK.ExtensionMethods;
+using System.Linq;
 
 namespace TJAPlayer3
 {
 	internal class CConfigIni : INotifyPropertyChanged
 	{
-	    private const int MinimumKeyboardSoundLevelIncrement = 1;
-	    private const int MaximumKeyboardSoundLevelIncrement = 20;
-	    private const int DefaultKeyboardSoundLevelIncrement = 5;
+		private const int MinimumKeyboardSoundLevelIncrement = 1;
+		private const int MaximumKeyboardSoundLevelIncrement = 20;
+		private const int DefaultKeyboardSoundLevelIncrement = 5;
 
 		// クラス
 
@@ -286,7 +287,7 @@ namespace TJAPlayer3
 					{
 						this.padRBlue = value;
 					}
-                }
+				}
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed2P
 				{
 					get
@@ -330,7 +331,7 @@ namespace TJAPlayer3
 					{
 						this.padRBlue2P = value;
 					}
-                }
+				}
 
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed3P
 				{
@@ -551,70 +552,70 @@ namespace TJAPlayer3
 					}
 				}
 
-				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[ int index ]
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[int index]
 				{
 					get
 					{
-						switch ( index )
+						switch (index)
 						{
-							case (int) EKeyConfigPad.HH:
+							case (int)EKeyConfigPad.HH:
 								return this.padHH_R;
 
-							case (int) EKeyConfigPad.SD:
+							case (int)EKeyConfigPad.SD:
 								return this.padSD_G;
 
-							case (int) EKeyConfigPad.BD:
+							case (int)EKeyConfigPad.BD:
 								return this.padBD_B;
 
-							case (int) EKeyConfigPad.HT:
+							case (int)EKeyConfigPad.HT:
 								return this.padHT_Pick;
 
-							case (int) EKeyConfigPad.LT:
+							case (int)EKeyConfigPad.LT:
 								return this.padLT_Wail;
 
-							case (int) EKeyConfigPad.FT:
+							case (int)EKeyConfigPad.FT:
 								return this.padFT_Cancel;
 
-							case (int) EKeyConfigPad.CY:
+							case (int)EKeyConfigPad.CY:
 								return this.padCY_Decide;
 
-							case (int) EKeyConfigPad.HHO:
+							case (int)EKeyConfigPad.HHO:
 								return this.padHHO;
 
-							case (int) EKeyConfigPad.RD:
+							case (int)EKeyConfigPad.RD:
 								return this.padRD;
 
-							case (int) EKeyConfigPad.LC:
+							case (int)EKeyConfigPad.LC:
 								return this.padLC;
 
-							case (int) EKeyConfigPad.LP:	// #27029 2012.1.4 from
-								return this.padLP;			//
+							case (int)EKeyConfigPad.LP: // #27029 2012.1.4 from
+								return this.padLP;          //
 
-							case (int) EKeyConfigPad.LBD:	// #27029 2012.1.4 from
-								return this.padLBD;			//
+							case (int)EKeyConfigPad.LBD:    // #27029 2012.1.4 from
+								return this.padLBD;         //
 
-							case (int) EKeyConfigPad.LRed:
+							case (int)EKeyConfigPad.LRed:
 								return this.padLRed;
 
-							case (int) EKeyConfigPad.RRed:
+							case (int)EKeyConfigPad.RRed:
 								return this.padRRed;
 
-							case (int) EKeyConfigPad.LBlue:
+							case (int)EKeyConfigPad.LBlue:
 								return this.padLBlue;
 
-							case (int) EKeyConfigPad.RBlue:
+							case (int)EKeyConfigPad.RBlue:
 								return this.padRBlue;
 
-							case (int) EKeyConfigPad.LRed2P:
+							case (int)EKeyConfigPad.LRed2P:
 								return this.padLRed2P;
 
-							case (int) EKeyConfigPad.RRed2P:
+							case (int)EKeyConfigPad.RRed2P:
 								return this.padRRed2P;
 
-							case (int) EKeyConfigPad.LBlue2P:
+							case (int)EKeyConfigPad.LBlue2P:
 								return this.padLBlue2P;
 
-							case (int) EKeyConfigPad.RBlue2P:
+							case (int)EKeyConfigPad.RBlue2P:
 								return this.padRBlue2P;
 
 							case (int)EKeyConfigPad.LRed3P:
@@ -674,94 +675,94 @@ namespace TJAPlayer3
 							case (int)EKeyConfigPad.RightChange:
 								return this.padRightChange;
 
-							case (int) EKeyConfigPad.Capture:
+							case (int)EKeyConfigPad.Capture:
 								return this.padCapture;
 						}
 						throw new IndexOutOfRangeException();
 					}
 					set
 					{
-						switch ( index )
+						switch (index)
 						{
-							case (int) EKeyConfigPad.HH:
+							case (int)EKeyConfigPad.HH:
 								this.padHH_R = value;
 								return;
 
-							case (int) EKeyConfigPad.SD:
+							case (int)EKeyConfigPad.SD:
 								this.padSD_G = value;
 								return;
 
-							case (int) EKeyConfigPad.BD:
+							case (int)EKeyConfigPad.BD:
 								this.padBD_B = value;
 								return;
 
-							case (int) EKeyConfigPad.Pick:
+							case (int)EKeyConfigPad.Pick:
 								this.padHT_Pick = value;
 								return;
 
-							case (int) EKeyConfigPad.LT:
+							case (int)EKeyConfigPad.LT:
 								this.padLT_Wail = value;
 								return;
 
-							case (int) EKeyConfigPad.FT:
+							case (int)EKeyConfigPad.FT:
 								this.padFT_Cancel = value;
 								return;
 
-							case (int) EKeyConfigPad.CY:
+							case (int)EKeyConfigPad.CY:
 								this.padCY_Decide = value;
 								return;
 
-							case (int) EKeyConfigPad.HHO:
+							case (int)EKeyConfigPad.HHO:
 								this.padHHO = value;
 								return;
 
-							case (int) EKeyConfigPad.RD:
+							case (int)EKeyConfigPad.RD:
 								this.padRD = value;
 								return;
 
-							case (int) EKeyConfigPad.LC:
+							case (int)EKeyConfigPad.LC:
 								this.padLC = value;
 								return;
 
-							case (int) EKeyConfigPad.LP:
+							case (int)EKeyConfigPad.LP:
 								this.padLP = value;
 								return;
 
-							case (int) EKeyConfigPad.LBD:
+							case (int)EKeyConfigPad.LBD:
 								this.padLBD = value;
 								return;
 
-                            case (int) EKeyConfigPad.LRed:
-                                this.padLRed = value;
-                                return;
+							case (int)EKeyConfigPad.LRed:
+								this.padLRed = value;
+								return;
 
-                            case (int) EKeyConfigPad.RRed:
-                                this.padRRed = value;
-                                return;
-                                
-                            case (int) EKeyConfigPad.LBlue:
-                                this.padLBlue = value;
-                                return;
+							case (int)EKeyConfigPad.RRed:
+								this.padRRed = value;
+								return;
 
-                            case (int) EKeyConfigPad.RBlue:
-                                this.padRBlue = value;
-                                return;
+							case (int)EKeyConfigPad.LBlue:
+								this.padLBlue = value;
+								return;
 
-                            case (int) EKeyConfigPad.LRed2P:
-                                this.padLRed2P = value;
-                                return;
+							case (int)EKeyConfigPad.RBlue:
+								this.padRBlue = value;
+								return;
 
-                            case (int) EKeyConfigPad.RRed2P:
-                                this.padRRed2P = value;
-                                return;
-                                
-                            case (int) EKeyConfigPad.LBlue2P:
-                                this.padLBlue2P = value;
-                                return;
+							case (int)EKeyConfigPad.LRed2P:
+								this.padLRed2P = value;
+								return;
 
-                            case (int) EKeyConfigPad.RBlue2P:
-                                this.padRBlue2P = value;
-                                return;
+							case (int)EKeyConfigPad.RRed2P:
+								this.padRRed2P = value;
+								return;
+
+							case (int)EKeyConfigPad.LBlue2P:
+								this.padLBlue2P = value;
+								return;
+
+							case (int)EKeyConfigPad.RBlue2P:
+								this.padRBlue2P = value;
+								return;
 
 							case (int)EKeyConfigPad.LRed3P:
 								this.padLRed3P = value;
@@ -839,7 +840,7 @@ namespace TJAPlayer3
 								this.padRightChange = value;
 								return;
 
-							case (int) EKeyConfigPad.Capture:
+							case (int)EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
 						}
@@ -900,13 +901,13 @@ namespace TJAPlayer3
 				#endregion
 			}
 
-			[StructLayout( LayoutKind.Sequential )]
+			[StructLayout(LayoutKind.Sequential)]
 			public struct STKEYASSIGN
 			{
 				public E入力デバイス 入力デバイス;
 				public int ID;
 				public int コード;
-				public STKEYASSIGN( E入力デバイス DeviceType, int nID, int nCode )
+				public STKEYASSIGN(E入力デバイス DeviceType, int nID, int nCode)
 				{
 					this.入力デバイス = DeviceType;
 					this.ID = nID;
@@ -919,50 +920,50 @@ namespace TJAPlayer3
 			public CKeyAssignPad Guitar = new CKeyAssignPad();
 			public CKeyAssignPad Taiko = new CKeyAssignPad();
 			public CKeyAssignPad System = new CKeyAssignPad();
-			public CKeyAssignPad this[ int index ]
+			public CKeyAssignPad this[int index]
 			{
 				get
 				{
-					switch( index )
+					switch (index)
 					{
-						case (int) EKeyConfigPart.DRUMS:
+						case (int)EKeyConfigPart.DRUMS:
 							return this.Drums;
 
-						case (int) EKeyConfigPart.GUITAR:
+						case (int)EKeyConfigPart.GUITAR:
 							return this.Guitar;
 
-						case (int) EKeyConfigPart.BASS:
+						case (int)EKeyConfigPart.BASS:
 							return this.Bass;
 
-                        case (int) EKeyConfigPart.TAIKO:
-                            return this.Taiko;
+						case (int)EKeyConfigPart.TAIKO:
+							return this.Taiko;
 
-						case (int) EKeyConfigPart.SYSTEM:
+						case (int)EKeyConfigPart.SYSTEM:
 							return this.System;
 					}
 					throw new IndexOutOfRangeException();
 				}
 				set
 				{
-					switch( index )
+					switch (index)
 					{
-						case (int) EKeyConfigPart.DRUMS:
+						case (int)EKeyConfigPart.DRUMS:
 							this.Drums = value;
 							return;
 
-						case (int) EKeyConfigPart.GUITAR:
+						case (int)EKeyConfigPart.GUITAR:
 							this.Guitar = value;
 							return;
 
-						case (int) EKeyConfigPart.BASS:
+						case (int)EKeyConfigPart.BASS:
 							this.Bass = value;
 							return;
 
-                        case (int) EKeyConfigPart.TAIKO:
-                            this.Taiko = value;
-                            return;
+						case (int)EKeyConfigPart.TAIKO:
+							this.Taiko = value;
+							return;
 
-						case (int) EKeyConfigPart.SYSTEM:
+						case (int)EKeyConfigPart.SYSTEM:
 							this.System = value;
 							return;
 					}
@@ -980,12 +981,12 @@ namespace TJAPlayer3
 			ASIO,
 			WASAPI_Exclusive,
 			WASAPI_Shared,
-			Unknown =99
+			Unknown = 99
 		}
 		// プロパティ
 
 		public class CAIPerformances
-        {
+		{
 			public int nGoodOdds;
 			public int nPerfectOdds;
 			public int nBadOdds;
@@ -993,32 +994,32 @@ namespace TJAPlayer3
 			public int nMineHitOdds;
 
 			public CAIPerformances(int po, int go, int bo, int rp, int mho = 0)
-            {
+			{
 				nGoodOdds = go;
 				nPerfectOdds = po;
 				nBadOdds = bo;
 				nRollSpeed = rp;
 				nMineHitOdds = mho;
-            }
-        }
+			}
+		}
 
 		public class CTimingZones
-        {
+		{
 			public int nGoodZone;
 			public int nOkZone;
 			public int nBadZone;
 
 			public CTimingZones(int gz, int oz, int bz)
-            {
+			{
 				nGoodZone = gz;
 				nOkZone = oz;
 				nBadZone = bz;
-            }
+			}
 
-        }
+		}
 
 
-#if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
+#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化                                                                                   
 		//----------------------------------------
 		public float[,] fGaugeFactor = new float[5,2];
 		public float[] fDamageLevelFactor = new float[3];
@@ -1037,7 +1038,7 @@ namespace TJAPlayer3
 		public STDGBVALUE<bool> bReverse;
 
 		public E判定表示優先度 e判定表示優先度;
-		public STDGBVALUE<E判定位置> e判定位置;			// #33891 2014.6.26 yyagi
+		public STDGBVALUE<E判定位置> e判定位置;         // #33891 2014.6.26 yyagi
 		public bool bScoreIniを出力する;
 
 		public bool bDanTowerHide;
@@ -1054,123 +1055,123 @@ namespace TJAPlayer3
 		public bool b垂直帰線待ちを行う;
 		public bool b全画面モード;
 		public int n初期ウィンドウ開始位置X; // #30675 2013.02.04 ikanick add
-		public int n初期ウィンドウ開始位置Y;  
-		public int nウインドウwidth;				// #23510 2010.10.31 yyagi add
-		public int nウインドウheight;				// #23510 2010.10.31 yyagi add
+		public int n初期ウィンドウ開始位置Y;
+		public int nウインドウwidth;             // #23510 2010.10.31 yyagi add
+		public int nウインドウheight;                // #23510 2010.10.31 yyagi add
 		public Dictionary<int, string> dicJoystick;
 		public Eダークモード eDark;
 		public Eランダムモード[] eRandom;
 		public Eダメージレベル eダメージレベル;
-        public CKeyAssign KeyAssign;
+		public CKeyAssign KeyAssign;
 		public int n非フォーカス時スリープms;       // #23568 2010.11.04 ikanick add
-		public int nフレーム毎スリープms;			// #xxxxx 2011.11.27 yyagi add
-		public int n演奏速度; 
+		public int nフレーム毎スリープms;            // #xxxxx 2011.11.27 yyagi add
+		public int n演奏速度;
 		public bool b演奏速度が一倍速であるとき以外音声を再生しない;
 		public int n曲が選択されてからプレビュー音が鳴るまでのウェイトms;
 		public int n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms;
 
-	    private bool _applyLoudnessMetadata;
+		private bool _applyLoudnessMetadata;
 
-	    public bool ApplyLoudnessMetadata
-	    {
-	        get => _applyLoudnessMetadata;
-	        set => SetProperty(ref _applyLoudnessMetadata, value, nameof(ApplyLoudnessMetadata));
-	    }
+		public bool ApplyLoudnessMetadata
+		{
+			get => _applyLoudnessMetadata;
+			set => SetProperty(ref _applyLoudnessMetadata, value, nameof(ApplyLoudnessMetadata));
+		}
 
-	    private double _targetLoudness;
+		private double _targetLoudness;
 
-	    public double TargetLoudness
-	    {
-	        get => _targetLoudness;
-	        set => SetProperty(ref _targetLoudness, value, nameof(TargetLoudness));
-	    }
+		public double TargetLoudness
+		{
+			get => _targetLoudness;
+			set => SetProperty(ref _targetLoudness, value, nameof(TargetLoudness));
+		}
 
-	    private bool _applySongVol;
+		private bool _applySongVol;
 
-	    public bool ApplySongVol
-	    {
-	        get => _applySongVol;
-	        set => SetProperty(ref _applySongVol, value, nameof(ApplySongVol));
-	    }
+		public bool ApplySongVol
+		{
+			get => _applySongVol;
+			set => SetProperty(ref _applySongVol, value, nameof(ApplySongVol));
+		}
 
-	    private int _soundEffectLevel;
+		private int _soundEffectLevel;
 
-	    public int SoundEffectLevel
-	    {
-	        get => _soundEffectLevel;
-	        set => SetProperty(ref _soundEffectLevel, value, nameof(SoundEffectLevel));
-	    }
+		public int SoundEffectLevel
+		{
+			get => _soundEffectLevel;
+			set => SetProperty(ref _soundEffectLevel, value, nameof(SoundEffectLevel));
+		}
 
-	    private int _voiceLevel;
+		private int _voiceLevel;
 
-	    public int VoiceLevel
-	    {
-	        get => _voiceLevel;
-	        set => SetProperty(ref _voiceLevel, value, nameof(VoiceLevel));
-	    }
+		public int VoiceLevel
+		{
+			get => _voiceLevel;
+			set => SetProperty(ref _voiceLevel, value, nameof(VoiceLevel));
+		}
 
-	    private int _songPreviewLevel;
+		private int _songPreviewLevel;
 
-	    public int SongPreviewLevel
-	    {
-	        get => _songPreviewLevel;
-	        set => SetProperty(ref _songPreviewLevel, value, nameof(SongPreviewLevel));
-	    }
+		public int SongPreviewLevel
+		{
+			get => _songPreviewLevel;
+			set => SetProperty(ref _songPreviewLevel, value, nameof(SongPreviewLevel));
+		}
 
-	    private int _songPlaybackLevel;
+		private int _songPlaybackLevel;
 
-	    public int SongPlaybackLevel
-	    {
-	        get => _songPlaybackLevel;
-	        set => SetProperty(ref _songPlaybackLevel, value, nameof(SongPlaybackLevel));
-	    }
+		public int SongPlaybackLevel
+		{
+			get => _songPlaybackLevel;
+			set => SetProperty(ref _songPlaybackLevel, value, nameof(SongPlaybackLevel));
+		}
 
-	    private int _keyboardSoundLevelIncrement;
+		private int _keyboardSoundLevelIncrement;
 
-	    public int KeyboardSoundLevelIncrement
-	    {
-	        get => _keyboardSoundLevelIncrement;
-	        set => SetProperty(
-	            ref _keyboardSoundLevelIncrement,
-	            value.Clamp(MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement),
-	            nameof(KeyboardSoundLevelIncrement));
-	    }
+		public int KeyboardSoundLevelIncrement
+		{
+			get => _keyboardSoundLevelIncrement;
+			set => SetProperty(
+				ref _keyboardSoundLevelIncrement,
+				value.Clamp(MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement),
+				nameof(KeyboardSoundLevelIncrement));
+		}
 
-	    public STDGBVALUE<int> n表示可能な最小コンボ数;
+		public STDGBVALUE<int> n表示可能な最小コンボ数;
 		public int[] nScrollSpeed;
 		public int[] nTimingZones;
 		public EGameType[] nGameType;
 		public EFunMods[] nFunMods;
 		public string strDTXManiaのバージョン;
 		public string str曲データ検索パス;
-        public string FontName;
+		public string FontName;
 		public string BoxFontName;
-        public bool bBranchGuide;
-        public int nScoreMode;
-        public int nDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
+		public bool bBranchGuide;
+		public int nScoreMode;
+		public int nDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
 
 		private int _nPlayerCount;
-        public int nPlayerCount
-        {
-            get
-            {
+		public int nPlayerCount
+		{
+			get
+			{
 				if (bAIBattleMode)
-                {
+				{
 					return 2;
-                }
-                else
-                {
+				}
+				else
+				{
 					return _nPlayerCount;
-                }
-            }
-            set
-            {
+				}
+			}
+			set
+			{
 				_nPlayerCount = value;
 			}
-        }
-        
+		}
+
 		public bool[] b太鼓パートAutoPlay = new bool[5];
-        
+
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
 		public int nAILevel;
@@ -1184,7 +1185,7 @@ namespace TJAPlayer3
 			new CAIPerformances(800, 180, 20, 10, 70),
 			new CAIPerformances(850, 135, 15, 12, 50),
 			new CAIPerformances(900, 90, 10, 14, 30),
-			new CAIPerformances(910, 85, 5, 16, 20),
+			new CAIPerformances(920, 75, 5, 16, 20),
 			new CAIPerformances(950, 49, 1, 22, 10),
 			new CAIPerformances(975, 25, 0, 26, 5),
 			new CAIPerformances(1000, 0, 0, 30, 0)
@@ -1201,9 +1202,9 @@ namespace TJAPlayer3
 			new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
 
-        public bool b大音符判定;
-        public int n両手判定の待ち時間;
-        public int nBranchAnime;
+		public bool b大音符判定;
+		public int n両手判定の待ち時間;
+		public int nBranchAnime;
 
 		// I18N choosen language
 		public string sLang;
@@ -1217,30 +1218,39 @@ namespace TJAPlayer3
 
 		// 各画像の表示・非表示設定
 		public bool ShowChara;
-        public bool ShowDancer;
-        public bool ShowRunner;
-        public bool ShowFooter;
-        public bool ShowMob;
-        public bool ShowPuchiChara; // リザーブ
-        //
+		public bool ShowDancer;
+		public bool ShowRunner;
+		public bool ShowFooter;
+		public bool ShowMob;
+		public bool ShowPuchiChara; // リザーブ
+									//
 
-        public EScrollMode eScrollMode = EScrollMode.Normal;
-        public bool bスクロールモードを上書き = false;
+		public EScrollMode eScrollMode = EScrollMode.Normal;
+		public bool bスクロールモードを上書き = false;
 
-        public bool bHispeedRandom;
-        public Eステルスモード[] eSTEALTH;
-        public bool bNoInfo;
+		public bool bHispeedRandom;
+		public Eステルスモード[] eSTEALTH;
+		public bool bNoInfo;
 
-        public int nDefaultSongSort;
+		public int nDefaultSongSort;
 		public int nRecentlyPlayedMax;
-        public EGame eGameMode;
+		public EGame eGameMode;
 		public int TokkunSkipMeasures;
 		public int TokkunMashInterval;
 		public bool bSuperHard = false;
-        public bool bTokkunMode = false;
-        public int[] bJust = new int[5] { 0, 0, 0, 0, 0 };
+		public bool bTokkunMode = false;
+		public int[] bJust = new int[5] { 0, 0, 0, 0, 0 };
 
 		public int[] nHitSounds = new int[5] { 0, 0, 0, 0, 0 };
+		public int[][] nPanning = new int[5][]
+		{
+			new int[1] { 0 },
+            new int[2] { -100, 100 },
+            new int[3] { -100, 0, 100 },
+            new int[4] { -75, -25, 25, 75 },
+            new int[5] { -100, -50, 0, 50, 100 },
+        };
+		public string[] sSaveFile = new string[5] { "1P", "2P", "3P", "4P", "5P" };
 
 		public bool bEndingAnime = false;   // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
@@ -2064,10 +2074,18 @@ namespace TJAPlayer3
 			sw.WriteLine("LayoutType={0}", this.nLayoutType);
 			sw.WriteLine();
 
-			#endregion
+            #endregion
 
-			#region [ Window関連 ]
-			sw.WriteLine( "; 画面モード(0:ウィンドウ, 1:全画面)" );
+            #region [Save Files]
+
+            sw.WriteLine("; File paths on the Saves folder.");
+            sw.WriteLine("SaveFileName={0}", String.Join(",", this.sSaveFile));
+            sw.WriteLine();
+
+            #endregion
+
+            #region [ Window関連 ]
+            sw.WriteLine( "; 画面モード(0:ウィンドウ, 1:全画面)" );
 			sw.WriteLine( "; Screen mode. (0:Window, 1:Fullscreen)" );
 			sw.WriteLine( "FullScreen={0}", this.b全画面モード ? 1 : 0 );
             sw.WriteLine();
@@ -2843,6 +2861,20 @@ namespace TJAPlayer3
 												this.nLayoutType = int.Parse(str4);
                                             }
 
+											else if (str3.Equals("SaveFileName"))
+											{
+												var _s = str4.Split(new char[] { ',' });
+
+												// Ignore custom save file names if duplicates
+												if (!_s.GroupBy(x => x).Any(g => g.Count() > 1))
+												{
+                                                    for (int i = 0; i < Math.Min(5, _s.Length); i++)
+                                                    {
+                                                        this.sSaveFile[i] = _s[i];
+                                                    }
+                                                }
+                                            }
+
 											#region [ skin関係 ]
 											else if ( str3.Equals( "SkinPath" ) )
 											{
@@ -3255,8 +3287,6 @@ namespace TJAPlayer3
 
                                     //-----------------------------
                                     #endregion
-
-
 
                                     #region [ [Log] ]
                                     //-----------------------------

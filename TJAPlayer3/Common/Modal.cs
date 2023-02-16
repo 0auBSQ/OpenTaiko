@@ -247,7 +247,7 @@ namespace TJAPlayer3
                     reference,
                     CLangManager.LangInstance.GetString(306),
                     CLangManager.LangInstance.GetString(307),
-                    TJAPlayer3.NamePlateConfig.data.Medals[player]
+                    TJAPlayer3.SaveFileInstances[player].data.Medals
                     );
             }
 

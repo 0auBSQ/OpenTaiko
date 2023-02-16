@@ -213,15 +213,15 @@ namespace TJAPlayer3
 					#region [ .score.ini file output ]
 					//---------------------
 
-					int currentSaveFile = TJAPlayer3.SaveFile + 1;
-					int secondSaveFile = (currentSaveFile == 1) ? 2 : 1;
+					//int currentSaveFile = TJAPlayer3.SaveFile + 1;
+					//int secondSaveFile = (currentSaveFile == 1) ? 2 : 1;
 
 					string[] str = {
-						TJAPlayer3.DTX.strファイル名の絶対パス + currentSaveFile.ToString() + "P.score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + secondSaveFile.ToString() + "P.score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + 3.ToString() + "P.score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + 4.ToString() + "P.score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + 5.ToString() + "P.score.ini"
+						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(0)].name + @".score.ini",
+						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(1)].name + @".score.ini",
+						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(2)].name + @".score.ini",
+						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(3)].name + @".score.ini",
+						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(4)].name + @".score.ini"
 					};
 
 					#region [Transfer legacy file format to new file format (P1)]
@@ -269,16 +269,8 @@ namespace TJAPlayer3
 
                         #region [Regular saves]
 
-                        CScoreIni.C演奏記録[] baseScores =
-						{
-							ini[0].stセクション[0],
-							ini[1].stセクション[0]
-						};
-
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
-							var ccf = TJAPlayer3.stage演奏ドラム画面.CChartScore[i];
-
 							int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[i];
 
 							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
@@ -394,11 +386,17 @@ namespace TJAPlayer3
 						// Unlock dan grade
 						if (clearValue > 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
 						{
+							/*
 							this.newGradeGranted = TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
 								clearValue % 2 == 0,
 								(clearValue - 1) / 2,
 								TJAPlayer3.SaveFile);
-						}
+							*/
+
+                            this.newGradeGranted = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
+                                clearValue % 2 == 0,
+                                (clearValue - 1) / 2);
+                        }
 
 						#endregion
 
@@ -635,10 +633,12 @@ namespace TJAPlayer3
 						this.nEarnedMedalsCount[i] = 0;
 					if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i] || TJAPlayer3.ConfigIni.bAIBattleMode) && i == 1)
 						this.nEarnedMedalsCount[i] = 0;
+
+					TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].tEarnCoins(this.nEarnedMedalsCount[i]);
 				}
 
 
-				TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
+				//TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
 
 				#endregion
 
