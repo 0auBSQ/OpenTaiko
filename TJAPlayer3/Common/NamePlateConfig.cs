@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using radio42.Multimedia.Midi;
 
 namespace TJAPlayer3
 {
