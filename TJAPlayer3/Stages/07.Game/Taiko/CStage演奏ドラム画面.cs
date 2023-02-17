@@ -314,10 +314,10 @@ namespace TJAPlayer3
                         this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する((@"Global\HitSounds\" + hs.clap[actual]), ESoundGroup.SoundEffect);
 
                         int _panning = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
-                        this.soundRed[i].n位置 = _panning;
-                        this.soundBlue[i].n位置 = _panning;
-                        this.soundAdlib[i].n位置 = _panning;
-                        this.soundClap[i].n位置 = _panning;
+                        if (this.soundRed[i] != null) this.soundRed[i].n位置 = _panning;
+                        if (this.soundBlue[i] != null) this.soundBlue[i].n位置 = _panning;
+                        if (this.soundAdlib[i] != null) this.soundAdlib[i].n位置 = _panning;
+                        if (this.soundClap[i] != null) this.soundClap[i].n位置 = _panning;
                     }
                     /*
                     this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
