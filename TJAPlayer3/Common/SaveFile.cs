@@ -185,6 +185,9 @@ namespace TJAPlayer3
             [JsonProperty("namePlateTitles")]
             public Dictionary<string, CNamePlateTitle> NamePlateTitles = new Dictionary<string, CNamePlateTitle>();
 
+            [JsonProperty("unlockedCharacters")]
+            public List<string> UnlockedCharacters = new List<string>();
+
             [JsonProperty("unlockedPuchicharas")]
             public List<string> UnlockedPuchicharas = new List<string>();
 
