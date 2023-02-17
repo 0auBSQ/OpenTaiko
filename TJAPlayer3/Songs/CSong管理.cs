@@ -1899,7 +1899,11 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		#region [ private ]
 		//-----------------
 		//private const string SONGSDB_VERSION = "SongsDB5";
-		private List<string> listStrBoxDefSkinSubfolderFullName;
+		public List<string> listStrBoxDefSkinSubfolderFullName
+        {
+			get;
+			private set;
+        }
 
 		/// <summary>
 		/// 検索を中断_スローダウンする

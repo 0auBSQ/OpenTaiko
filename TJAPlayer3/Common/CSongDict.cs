@@ -145,7 +145,7 @@ namespace TJAPlayer3
         public static List<C曲リストノード> tReinsertBackButtons(C曲リストノード parent, List<C曲リストノード> songList, string path = "/", List<string> listStrBoxDef = null)
         {
             // Remove all the existing back boxes currently existing
-            songList.RemoveAll(e => e.eノード種別 == C曲リストノード.Eノード種別.BACKBOX);
+            songList.RemoveAll(e => e.eノード種別 == C曲リストノード.Eノード種別.BACKBOX || e.eノード種別 == C曲リストノード.Eノード種別.RANDOM);
 
             int songCount = songList.Count;
 
