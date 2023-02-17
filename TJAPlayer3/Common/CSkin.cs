@@ -7867,8 +7867,8 @@ namespace TJAPlayer3
         public int[] Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
         public int[] Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
         public string Game_Dancer_Motion = "0";
-        public int Game_Dancer_Ptn = 0;
-        public int Game_Dancer_Beat = 8;
+        //public int Game_Dancer_Ptn = 0;
+        //public int Game_Dancer_Beat = 8;
         public int[] Game_Dancer_Gauge = new int[] { 0, 0, 0, 40, 80 };
 
         #endregion
