@@ -193,6 +193,14 @@ namespace TJAPlayer3
             Background.Draw();
             //TJAPlayer3.Tx.Heya_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
+            #region [Render field]
+
+            if (iCurrentMenu == 0 || iCurrentMenu == 1) TJAPlayer3.Tx.Heya_Render_Field?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            if (iCurrentMenu == 0) TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            if (iCurrentMenu == 1) TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
+            #endregion
+
             #region [Menus display]
 
             #region [Main menu (Side bar)]

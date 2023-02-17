@@ -1019,6 +1019,7 @@ namespace TJAPlayer3
             Heya_Center_Menu_Box = TxC(HEYA + @"Center_Menu_Box.png");
             Heya_Center_Menu_Box_Slot = TxC(HEYA + @"Center_Menu_Box_Slot.png");
             Heya_Side_Menu = TxC(HEYA + @"Side_Menu.png");
+            Heya_Render_Field = TxC(HEYA + @"Render_Field.png");
             Heya_Box = TxC(HEYA + @"Box.png");
             Heya_Lock = TxC(HEYA + @"Lock.png");
 
@@ -1032,6 +1033,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Ptn = charaDirs.Length;
 
             Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Heya_Render = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters = new CCharacter[TJAPlayer3.Skin.Characters_Ptn];
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1139,6 +1141,7 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
             {
                 Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Normal\0.png");
+                Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"Render.png");
                 Characters[i] = new CCharacter(charaDirs[i]);
             }
                 
@@ -2246,6 +2249,7 @@ namespace TJAPlayer3
             Heya_Center_Menu_Box_Slot,
             Heya_Side_Menu,
             Heya_Box,
+            Heya_Render_Field,
             Heya_Lock;
 
         #endregion
@@ -2279,7 +2283,8 @@ namespace TJAPlayer3
             Characters_Result_Failed_In,
             Characters_Result_Normal;
 
-        public CTexture[] Characters_Heya_Preview;
+        public CTexture[] Characters_Heya_Preview,
+            Characters_Heya_Render;
         public CCharacter[] Characters;
 
         #endregion
