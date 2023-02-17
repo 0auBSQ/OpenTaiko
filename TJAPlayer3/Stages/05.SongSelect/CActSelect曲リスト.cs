@@ -247,8 +247,24 @@ namespace TJAPlayer3
 			{
 //				CDTXMania.Songs管理.t曲リストのソート3_演奏回数の多い順( songList, eInst, order );
 				sf( songList, eInst, order, p );
-//				this.r現在選択中の曲 = CDTXMania
+				//				this.r現在選択中の曲 = CDTXMania
+				void addBackBox(List<C曲リストノード> list, string parentName = "/")
+				{
+					foreach (C曲リストノード node in list)
+					{
+						if (node.eノード種別 != C曲リストノード.Eノード種別.BOX) continue;
+						string newPath = parentName + node.strタイトル + "/";
+						CSongDict.tReinsertBackButtons(node, node.list子リスト, newPath, TJAPlayer3.Songs管理.listStrBoxDefSkinSubfolderFullName);
+
+						addBackBox(node.list子リスト, newPath);
+					}
+				}
+				addBackBox(TJAPlayer3.Songs管理.list曲ルート);
 				this.t現在選択中の曲を元に曲バーを再構成する();
+				tChangeSong(0);
+				this.t選択曲が変更された(false);
+				tUpdateCurSong();
+				TJAPlayer3.stage選曲.t選択曲変更通知();
 			}
 		}
 
@@ -401,6 +417,38 @@ namespace TJAPlayer3
 				ctBarOpen.t停止();
 				ctBarOpen.n現在の値 = 0;
 				this.n目標のスクロールカウンタ -= 100;
+			}
+			this.b選択曲が変更された = true;
+		}
+		public void tUpdateCurSong()
+		{
+			if ((this.rGetSideSong(0).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.rGetSideSong(0).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
+			{
+				TJAPlayer3.stage選曲.bBGMIn再生した = false;
+
+				CSongSelectSongManager.disable();
+			}
+			else
+			{
+				CSongSelectSongManager.enable();
+				CSongSelectSongManager.playSongIfPossible();
+			}
+
+			TJAPlayer3.stage選曲.ctBackgroundFade.t開始(0, 600, 1, TJAPlayer3.Timer);
+			if (this.ctBarOpen.n現在の値 >= 200 || TJAPlayer3.stage選曲.ctBackgroundFade.n現在の値 >= 600 - 255)
+			{
+				TJAPlayer3.stage選曲.OldGenre = this.r現在選択中の曲.strジャンル;
+				TJAPlayer3.stage選曲.OldUseGenre = !this.r現在選択中の曲.isChangedBgType;
+				TJAPlayer3.stage選曲.OldBg = this.r現在選択中の曲.BgType;
+				TJAPlayer3.stage選曲.OldBgColor = this.r現在選択中の曲.BgColor;
+			}
+
+			if (this.r現在選択中の曲 != null)
+			{
+				ctScoreFrameAnime.t停止();
+				ctScoreFrameAnime.n現在の値 = 0;
+				ctBarOpen.t停止();
+				ctBarOpen.n現在の値 = 0;
 			}
 			this.b選択曲が変更された = true;
 		}
