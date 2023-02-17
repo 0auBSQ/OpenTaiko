@@ -4167,7 +4167,7 @@ namespace TJAPlayer3
             }
         }
 
-        private CDTX.ECourse[] E強制コース = new CDTX.ECourse[4];
+        private CDTX.ECourse[] E強制コース = new CDTX.ECourse[5];
         private void t強制用条件かを判断する(double db条件A, double db条件B, int nPlayer)
         {
             //Wiki参考
