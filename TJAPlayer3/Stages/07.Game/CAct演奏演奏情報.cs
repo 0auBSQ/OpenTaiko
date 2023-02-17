@@ -11,8 +11,8 @@ namespace TJAPlayer3
     {
         // プロパティ
 
-        public double dbBPM;
-        public readonly int[] NowMeasure = new int[5];
+        public double[] dbBPM = new double[5];
+		public readonly int[] NowMeasure = new int[5];
         public double dbSCROLL;
 		public int[] _chipCounts = new int[2];
 
@@ -31,8 +31,8 @@ namespace TJAPlayer3
             for (int i = 0; i < 5; i++)
             {
                 NowMeasure[i] = 0;
-            }
-			this.dbBPM = TJAPlayer3.DTX.BASEBPM;
+				this.dbBPM[i] = TJAPlayer3.DTX.BASEBPM;
+			}
             this.dbSCROLL = 1.0;
 
 			_chipCounts[0] = TJAPlayer3.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();

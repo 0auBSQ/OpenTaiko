@@ -289,7 +289,7 @@ namespace TJAPlayer3
 
                 this.ctSlideAnimation = new CCounter();
                 this.ctClimbAnimation = new CCounter();
-                this.ctDonAnimation = new CCounter(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                this.ctDonAnimation = new CCounter(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
 
                 base.OnManagedリソースの作成();
             }
@@ -731,7 +731,7 @@ namespace TJAPlayer3
                 float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
                 if (bFloorChanged == true)
-                    ctSlideAnimation.t開始(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    ctSlideAnimation.t開始(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
 
                 float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.n現在の値 / 1000f);
 
@@ -816,8 +816,8 @@ namespace TJAPlayer3
 
                 if (bFloorChanged == true)
                 {
-                    ctClimbAnimation.t開始(0, 1500, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
-                    ctDonAnimation.t開始(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    ctClimbAnimation.t開始(0, 1500, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    ctDonAnimation.t開始(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
                 }
 
 
