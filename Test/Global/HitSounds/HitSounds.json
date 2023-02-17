@@ -1,0 +1,22 @@
+[
+	{
+		"name": "Taiko",
+		"path": "Taiko\\",
+		"format": "OGG",
+	},
+	{
+		"name": "Electro",
+		"path": "Electro\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Konga",
+		"path": "Konga\\",
+		"format": "WAV",
+	},
+	{
+		"name": "None",
+		"path": "None\\",
+		"format": "WAV",
+	},
+]

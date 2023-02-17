@@ -303,10 +303,15 @@ namespace TJAPlayer3
 
                         var hs = TJAPlayer3.Skin.hsHitSoundsInformations;
 
-                        this.soundRed[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual]), ESoundGroup.SoundEffect);
-                        this.soundBlue[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual]), ESoundGroup.SoundEffect);
-                        this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual]), ESoundGroup.SoundEffect);
-                        this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual]), ESoundGroup.SoundEffect);
+                        //this.soundRed[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual]), ESoundGroup.SoundEffect);
+                        //this.soundBlue[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual]), ESoundGroup.SoundEffect);
+                        //this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual]), ESoundGroup.SoundEffect);
+                        //this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual]), ESoundGroup.SoundEffect);
+
+                        this.soundRed[i] = TJAPlayer3.Sound管理.tサウンドを生成する((@"Global\HitSounds\" + hs.don[actual]), ESoundGroup.SoundEffect);
+                        this.soundBlue[i] = TJAPlayer3.Sound管理.tサウンドを生成する((@"Global\HitSounds\" + hs.ka[actual]), ESoundGroup.SoundEffect);
+                        this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する((@"Global\HitSounds\" + hs.adlib[actual]), ESoundGroup.SoundEffect);
+                        this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する((@"Global\HitSounds\" + hs.clap[actual]), ESoundGroup.SoundEffect);
 
                         int _panning = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
                         this.soundRed[i].n位置 = _panning;

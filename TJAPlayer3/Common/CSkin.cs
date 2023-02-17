@@ -806,7 +806,8 @@ namespace TJAPlayer3
             ReloadSkin();
             tReadSkinConfig();
 
-            hsHitSoundsInformations = new CHitSounds(Path(@"Sounds\HitSounds\HitSounds.json"));
+            //hsHitSoundsInformations = new CHitSounds(Path(@"Sounds\HitSounds\HitSounds.json"));
+            hsHitSoundsInformations = new CHitSounds(@"Global\HitSounds\HitSounds.json");
         }
 
         public void ReloadSkin()
