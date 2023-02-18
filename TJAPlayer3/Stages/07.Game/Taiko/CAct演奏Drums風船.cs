@@ -167,8 +167,8 @@ namespace TJAPlayer3
                     y = TJAPlayer3.Skin.Game_Balloon_Balloon_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
                     frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
                     frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
-                    num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-                    num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
+                    num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
+                    num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
                 }
                 else
                 {
