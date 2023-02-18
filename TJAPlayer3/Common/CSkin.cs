@@ -3318,12 +3318,28 @@ namespace TJAPlayer3
                                     Game_CourseSymbol_Back_4P[i] = int.Parse(strSplit[i]);
                                 }
                             }
-                            else if (strCommand == "Game_CourseSymbol_5P")
+                            else if (strCommand == "Game_CourseSymbol_Back_5P")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Game_CourseSymbol_Back_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Rect_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Game_CourseSymbol_Back_Rect_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Rect_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Game_CourseSymbol_Back_Rect_5P[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             #endregion
