@@ -3278,6 +3278,22 @@ namespace TJAPlayer3
                                     Game_CourseSymbol_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Game_CourseSymbol_Back_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Game_CourseSymbol_4P")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3292,6 +3308,22 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Game_CourseSymbol_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_5P[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             #endregion
@@ -7898,9 +7930,17 @@ namespace TJAPlayer3
         #region CourseSymbol
         public int[] Game_CourseSymbol_X = new int[] { -4, -4 };
         public int[] Game_CourseSymbol_Y = new int[] { 232, 582 };
+        public int[] Game_CourseSymbol_Back_X = new int[] { 280, 280 };
+        public int[] Game_CourseSymbol_Back_Y = new int[] { -110, 427 };
 
         public int[] Game_CourseSymbol_4P = new int[] { -4, 56 };
         public int[] Game_CourseSymbol_5P = new int[] { -4, 48 };
+
+        public int[] Game_CourseSymbol_Back_4P = new int[] { 896, 47 };
+        public int[] Game_CourseSymbol_Back_5P = new int[] { 896, 39 };
+
+        public int[] Game_CourseSymbol_Back_Rect_4P = new int[] { 0, 128, 384, 129 };
+        public int[] Game_CourseSymbol_Back_Rect_5P = new int[] { 0, 140, 384, 105 };
         #endregion
         #region PanelFont
         public int Game_MusicName_X = 1160;

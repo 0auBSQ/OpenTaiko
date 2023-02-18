@@ -40,11 +40,13 @@ namespace TJAPlayer3
         public override void OnManagedリソースの作成()
         {
              this.ctレベルアップダウン = new CCounter[ 5 ];
+            ctSymbolFlash = new CCounter[5];
             this.After = new CDTX.ECourse[ 5 ];
             this.Before = new CDTX.ECourse[ 5 ];
             for ( int i = 0; i < 5; i++ )
             {
                 this.ctレベルアップダウン[ i ] = new CCounter();
+                BackSymbolEvent(i);
             }
 
 
@@ -566,6 +568,96 @@ namespace TJAPlayer3
         }
 
 
+        public void BackSymbolEvent(int player)
+        {
+            ctSymbolFlash[player] = new CCounter(0, 1000, 0.2f, TJAPlayer3.Timer);
+        }
+
+        public void DrawBackSymbol()
+        {
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+            {
+                ctSymbolFlash[i].t進行();
+
+                int couse_symbol_x;
+                int couse_symbol_y;
+                if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                {
+                    couse_symbol_x = TJAPlayer3.Skin.Game_CourseSymbol_Back_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                    couse_symbol_y = TJAPlayer3.Skin.Game_CourseSymbol_Back_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
+                }
+                else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                {
+                    couse_symbol_x = TJAPlayer3.Skin.Game_CourseSymbol_Back_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                    couse_symbol_y = TJAPlayer3.Skin.Game_CourseSymbol_Back_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+                }
+                else
+                {
+                    couse_symbol_x = TJAPlayer3.Skin.Game_CourseSymbol_Back_X[i];
+                    couse_symbol_y = TJAPlayer3.Skin.Game_CourseSymbol_Back_Y[i];
+                }
+
+
+                if (TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
+                {
+                    int originX = 0;
+                    int originY = 0;
+                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Width;
+                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Height;
+
+                    if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                    {
+                        originX = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[0];
+                        originY = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[1];
+                        width = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[2];
+                        height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[3];
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount > 2)
+                    {
+                        originX = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[0];
+                        originY = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[1];
+                        width = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[2];
+                        height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[3];
+                    }
+
+                    TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].t2D描画(TJAPlayer3.app.Device,
+                        couse_symbol_x,
+                        couse_symbol_y,
+                        new System.Drawing.RectangleF(originX, originY, width, height));
+                }
+
+                if (TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
+                {
+                    int originX = 0;
+                    int originY = 0;
+                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Width;
+                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Height;
+
+                    if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                    {
+                        originX = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[0];
+                        originY = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[1];
+                        width = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[2];
+                        height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_5P[3];
+                    }
+                    else if (TJAPlayer3.ConfigIni.nPlayerCount > 2)
+                    {
+                        originX = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[0];
+                        originY = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[1];
+                        width = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[2];
+                        height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[3];
+                    }
+
+                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].Opacity = 255 - (int)((ctSymbolFlash[i].n現在の値 / 1000.0) * 255);
+                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].t2D描画(TJAPlayer3.app.Device,
+                        couse_symbol_x,
+                        couse_symbol_y, 
+                        new System.Drawing.RectangleF(originX, originY, width, height));
+                }
+            }
+        }
+
+
         #region[ private ]
         //-----------------
         //構造体
@@ -592,6 +684,7 @@ namespace TJAPlayer3
         private CCounter[] ctレベルアップダウン;
         public CDTX.ECourse[] After;
         public CDTX.ECourse[] Before;
+        private CCounter[] ctSymbolFlash = new CCounter[5];
         //-----------------
         #endregion
 

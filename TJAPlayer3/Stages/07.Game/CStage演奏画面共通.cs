@@ -1850,7 +1850,9 @@ namespace TJAPlayer3
                                         _AIBattleState = Math.Max(AIBattleState, -9);
                                     }
 
+                                    TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
+                                    
                                     if (this.bIsMiss[nPlayer])
                                     {
                                         returnChara();
@@ -1874,8 +1876,6 @@ namespace TJAPlayer3
                                         this.n可[actDan.NowShowingNumber]++;
                                         this.tIncreaseComboDan(actDan.NowShowingNumber);
                                     }
-                                        
-
 
                                     if (this.actCombo.ctコンボ加算[nPlayer].b終了値に達してない)
                                     {
@@ -1898,6 +1898,7 @@ namespace TJAPlayer3
                                         _AIBattleState = Math.Max(_AIBattleState, -9);
                                     }
 
+                                    TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
                                     if (this.bIsMiss[nPlayer])
                                     {
@@ -1987,7 +1988,7 @@ namespace TJAPlayer3
                                             _AIBattleState = Math.Max(_AIBattleState, -9);
                                         }
 
-
+                                        TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
                                         if (this.bIsMiss[nPlayer])
                                         {
@@ -2038,7 +2039,7 @@ namespace TJAPlayer3
                                             _AIBattleState = Math.Max(AIBattleState, -9);
                                         }
 
-
+                                        TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
                                         if (this.bIsMiss[nPlayer])
                                         {
