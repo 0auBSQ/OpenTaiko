@@ -61,6 +61,7 @@ namespace TJAPlayer3
             base.list子Activities.Add( this.actPauseMenu = new CAct演奏PauseMenu() );
             base.list子Activities.Add(this.actChipEffects = new CAct演奏Drumsチップエフェクト());
             base.list子Activities.Add(this.actFooter = new CAct演奏DrumsFooter());
+            base.list子Activities.Add(this.actRunner = new CAct演奏DrumsRunner());
             base.list子Activities.Add(this.actMob = new CAct演奏DrumsMob());
             base.list子Activities.Add(this.GoGoSplash = new GoGoSplash());
             base.list子Activities.Add(this.FlyingNotes = new FlyingNotes());
@@ -464,10 +465,14 @@ namespace TJAPlayer3
 				this.t進行描画_チップアニメ();
 
                 this.actLaneTaiko.On進行描画();
-                //this.t進行描画_レーン();
-				//this.t進行描画_レーンフラッシュD();
 
-                if( ( TJAPlayer3.ConfigIni.eClipDispType == EClipDispType.ウィンドウのみ || TJAPlayer3.ConfigIni.eClipDispType == EClipDispType.両方 ) && TJAPlayer3.ConfigIni.nPlayerCount == 1 )
+                if (TJAPlayer3.ConfigIni.ShowRunner && !TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.ConfigIni.nPlayerCount <= 2)
+                    this.actRunner.On進行描画();
+
+                //this.t進行描画_レーン();
+                //this.t進行描画_レーンフラッシュD();
+
+                if ( ( TJAPlayer3.ConfigIni.eClipDispType == EClipDispType.ウィンドウのみ || TJAPlayer3.ConfigIni.eClipDispType == EClipDispType.両方 ) && TJAPlayer3.ConfigIni.nPlayerCount == 1 )
                     this.actAVI.t窓表示();
 
 				if( !TJAPlayer3.ConfigIni.bNoInfo && !TJAPlayer3.ConfigIni.bTokkunMode)

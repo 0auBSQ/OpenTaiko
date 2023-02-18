@@ -751,6 +751,7 @@ namespace TJAPlayer3
         protected CAct演奏PauseMenu actPauseMenu;
         public CAct演奏Drumsチップエフェクト actChipEffects;
         public CAct演奏DrumsFooter actFooter;
+        public CAct演奏DrumsRunner actRunner;
         public CAct演奏DrumsMob actMob;
         public Dan_Cert actDan;
         public AIBattle actAIBattle;
@@ -1742,6 +1743,9 @@ namespace TJAPlayer3
             {
                 double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer]))));
 
+                // ランナー(たたけたやつ)
+                this.actRunner.Start(nPlayer, false, pChip);
+
                 int Character = this.actChara.iCurrentCharacter[nPlayer];
 
                 if ((int)actGauge.db現在のゲージ値[nPlayer] >= 100 && this.bIsAlreadyMaxed[nPlayer] == false)
@@ -1764,7 +1768,9 @@ namespace TJAPlayer3
             }
 
 			if ( eJudgeResult == E判定.Poor || eJudgeResult == E判定.Miss || eJudgeResult == E判定.Bad )
-			{
+            {
+                // ランナー(みすったやつ)
+                this.actRunner.Start(nPlayer, true, pChip);
                 if ((int)actGauge.db現在のゲージ値[nPlayer] < 100 && this.bIsAlreadyMaxed[nPlayer] == true)
                 {
                     this.bIsAlreadyMaxed[nPlayer] = false;

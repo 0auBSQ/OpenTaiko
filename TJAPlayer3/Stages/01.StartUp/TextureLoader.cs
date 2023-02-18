@@ -50,7 +50,7 @@ namespace TJAPlayer3
         const string GENRE = @"13_Genre\";
         const string GAMEMODE = @"14_GameMode\";
         const string FAILED = @"15_Failed\";
-        const string RUNNER = @"16_Runner\";
+        public const string RUNNER = @"16_Runner\";
         const string TRAINING = @"19_Training\";
         const string DANC = @"17_DanC\";
         const string TOWER = @"20_Tower\";
@@ -705,7 +705,7 @@ namespace TJAPlayer3
 
             #region Runner
 
-            Runner = TxC(GAME + RUNNER + @"0.png");
+            //Runner = TxC(GAME + RUNNER + @"0.png");
 
             #endregion
 
@@ -2082,7 +2082,7 @@ namespace TJAPlayer3
             Failed_Stage;
         #endregion
         #region ランナー
-        public CTexture Runner;
+        //public CTexture Runner;
         #endregion
         #region DanC
         public CTexture DanC_Background;

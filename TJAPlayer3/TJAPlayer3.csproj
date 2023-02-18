@@ -155,6 +155,7 @@
     <Compile Include="Stages\01.StartUp\CCharacter.cs" />
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
     <Compile Include="Stages\07.Game\Taiko\AIBattle.cs" />
+    <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsRunner.cs" />
     <Compile Include="Stages\07.Game\Taiko\EndAnimeScript.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
