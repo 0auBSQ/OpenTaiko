@@ -445,10 +445,14 @@ namespace TJAPlayer3
             Taiko_LevelUp = TxC(GAME + TAIKO + @"LevelUp.png");
             Taiko_LevelDown = TxC(GAME + TAIKO + @"LevelDown.png");
             Couse_Symbol = new CTexture[(int)Difficulty.Total + 1]; // +1は真打ちモードの分
+            Couse_Symbol_Back = new CTexture[(int)Difficulty.Total + 1]; // +1は真打ちモードの分
+            Couse_Symbol_Back_Flash = new CTexture[(int)Difficulty.Total + 1]; // +1は真打ちモードの分
             string[] Couse_Symbols = new string[(int)Difficulty.Total + 1] { "Easy", "Normal", "Hard", "Oni", "Edit", "Tower", "Dan", "Shin" };
             for (int i = 0; i < (int)Difficulty.Total + 1; i++)
             {
                 Couse_Symbol[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + ".png");
+                Couse_Symbol_Back[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + "_Back.png");
+                Couse_Symbol_Back_Flash[i] = TxC(GAME + COURSESYMBOL + Couse_Symbols[i] + "_Back_Flash.png");
             }
 
             Taiko_Score = new CTexture[6];
@@ -1993,6 +1997,8 @@ namespace TJAPlayer3
             Taiko_Combo_Effect,
             Taiko_Combo_Text;
         public CTexture[] Couse_Symbol, // コースシンボル
+            Couse_Symbol_Back,
+            Couse_Symbol_Back_Flash,
             Taiko_PlayerNumber,
             Taiko_NamePlate; // ネームプレート
         public CTexture[] Taiko_Score,

@@ -86,6 +86,7 @@ namespace TJAPlayer3
 
             //それぞれが独立したレイヤーでないといけないのでforループはパーツごとに分離すること。
 
+            if (TJAPlayer3.ConfigIni.nPlayerCount <= 2 && !TJAPlayer3.ConfigIni.bAIBattleMode) TJAPlayer3.stage演奏ドラム画面.actMtaiko.DrawBackSymbol();
 
             #region[ レーン本体 ]
 
@@ -121,6 +122,8 @@ namespace TJAPlayer3
             }
 
             #endregion
+
+            if (TJAPlayer3.ConfigIni.nPlayerCount > 2 && !TJAPlayer3.ConfigIni.bAIBattleMode) TJAPlayer3.stage演奏ドラム画面.actMtaiko.DrawBackSymbol();
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
