@@ -24,7 +24,6 @@ namespace TJAPlayer3
             }*/
 
             NullCheckAndRender(ref TJAPlayer3.Tx.Effects_GoGoSplash);
-            NullCheckAndRender(ref TJAPlayer3.Tx.Runner);
             for (int i = 0; i < TJAPlayer3.Skin.Game_Mob_Ptn; i++)
             {
                 NullCheckAndRender(ref TJAPlayer3.Tx.Mob[i]);

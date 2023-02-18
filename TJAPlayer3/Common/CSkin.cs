@@ -4873,45 +4873,6 @@ namespace TJAPlayer3
                             #endregion
 
                             #region Runner
-                            else if (strCommand == "Game_Runner_Size")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_Size[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_Ptn")
-                            {
-                                ParseInt32(value => Game_Runner_Ptn = value);
-                            }
-                            else if (strCommand == "Game_Runner_Type")
-                            {
-                                ParseInt32(value => Game_Runner_Type = value);
-                            }
-                            else if (strCommand == "Game_Runner_StartPoint_X")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_StartPoint_X[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_StartPoint_Y")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_StartPoint_Y[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_Timer")
-                            {
-                                if (int.Parse(strParam) != 0)
-                                {
-                                    Game_Runner_Timer = int.Parse(strParam);
-                                }
-                            }
                             #endregion
 
                             #region Dan_C
@@ -8207,12 +8168,6 @@ namespace TJAPlayer3
         public int[] Game_Lane_5P = new int[] { 333, 39 };
         #endregion
         #region Runner
-        public int[] Game_Runner_Size = new int[] { 60, 125 };
-        public int Game_Runner_Ptn = 48;
-        public int Game_Runner_Type = 4;
-        public int[] Game_Runner_StartPoint_X = new int[] { 175, 175 };
-        public int[] Game_Runner_StartPoint_Y = new int[] { 40, 560 };
-        public int Game_Runner_Timer = 16;
         #endregion
         #region PuchiChara
         public int[] Game_PuchiChara_X = new int[] { 100, 100 };
