@@ -1439,12 +1439,28 @@ namespace TJAPlayer3
                                     Title_ModeSelect_Bar_Move[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Title_ModeSelect_Bar_Move_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Move_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Title_ModeSelect_Overlay_Move")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Title_ModeSelect_Overlay_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Overlay_Move_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Overlay_Move_X[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Title_ModeSelect_Bar_Chara_X")
@@ -1479,6 +1495,10 @@ namespace TJAPlayer3
                             {
                                 Title_ModeSelect_Bar_Center_Title_Move = int.Parse(strParam);
                             }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Title_Move_X")
+                            {
+                                Title_ModeSelect_Bar_Center_Title_Move_X = int.Parse(strParam);
+                            }
                             else if (strCommand == "Title_ModeSelect_Bar_Center_BoxText")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1486,6 +1506,10 @@ namespace TJAPlayer3
                                 {
                                     Title_ModeSelect_Bar_Center_BoxText[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "Title_VerticalText")
+                            {
+                                Title_VerticalText = C変換.bONorOFF(strParam[0]);
                             }
                             #endregion
 
@@ -1881,6 +1905,24 @@ namespace TJAPlayer3
                                 SongSelect_BoxText_Scale = int.Parse(strParam);
                             }
 
+                            else if (strCommand == "SongSelect_VerticalText")
+                            {
+                                SongSelect_VerticalText = C変換.bONorOFF(strParam[0]);
+                            }
+
+                            else if (strCommand == "SongSelect_Bar_Center_Move_X")
+                            {
+                                SongSelect_Bar_Center_Move_X = int.Parse(strParam);
+                            }
+
+                            else if (strCommand == "SongSelect_Title_MaxSize")
+                            {
+                                SongSelect_Title_MaxSize = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_SubTitle_MaxSize")
+                            {
+                                SongSelect_SubTitle_MaxSize = int.Parse(strParam);
+                            }
 
                             else if (strCommand == "SongSelect_Bar_Center_Move")
                             {
@@ -1932,6 +1974,30 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     SongSelect_Level_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Move[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Box_Opening_Interval")
@@ -7496,7 +7562,9 @@ namespace TJAPlayer3
         };
 
         public int[] Title_ModeSelect_Bar_Move = new int[] { 40, 100 };
+        public int[] Title_ModeSelect_Bar_Move_X = new int[] { 0, 0 };
         public int[] Title_ModeSelect_Overlay_Move = new int[] { 40, 120 };
+        public int[] Title_ModeSelect_Overlay_Move_X = new int[] { 0, 0 };
 
         public int[] Title_ModeSelect_Bar_Chara_X = new int[] { 446, 835 };
         public int[] Title_ModeSelect_Bar_Chara_Y = new int[] { 360, 360 };
@@ -7505,8 +7573,11 @@ namespace TJAPlayer3
 
         public int[] Title_ModeSelect_Bar_Center_Title = new int[] { 631, 379 };
         public int Title_ModeSelect_Bar_Center_Title_Move = 60;
+        public int Title_ModeSelect_Bar_Center_Title_Move_X = 0;
 
         public int[] Title_ModeSelect_Bar_Center_BoxText = new int[] { 640, 397 };
+
+        public bool Title_VerticalText = false;
 
         #endregion
 
@@ -7545,8 +7616,13 @@ namespace TJAPlayer3
         public int SongSelect_MusicName_Scale = 22;
         public int SongSelect_Subtitle_Scale = 13;
         public int SongSelect_BoxText_Scale = 14;
+        public bool SongSelect_VerticalText = false;
+
+        public int SongSelect_Title_MaxSize = 550;
+        public int SongSelect_SubTitle_MaxSize = 510;
 
         public int SongSelect_Bar_Center_Move = 62;
+        public int SongSelect_Bar_Center_Move_X = 0;
 
         public int[] SongSelect_Bar_Select = new int[] { 309, 235 };
 
@@ -7555,6 +7631,10 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Level_Number_X = new int[] { 485, 607, 729, 851 };
         public int[] SongSelect_Level_Number_Y = new int[] { 400, 400, 400, 400 };
+
+        public int[] SongSelect_Level_X = new int[] { 485, 607, 729, 851 };
+        public int[] SongSelect_Level_Y = new int[] { 400, 400, 400, 400 };
+        public int[] SongSelect_Level_Move = new int[] { 0, -17 };
 
         public int[] SongSelect_Level_Number_Interval = new int[] { 11, 0 };
 
