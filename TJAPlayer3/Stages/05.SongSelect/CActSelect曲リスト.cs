@@ -1824,15 +1824,18 @@ namespace TJAPlayer3
 												t小文字表示(TJAPlayer3.Skin.SongSelect_Level_Number_X[displayingDiff], TJAPlayer3.Skin.SongSelect_Level_Number_Y[displayingDiff],
 													TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i]);
 
-												int level_width = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Width / 7;
-												int level_height = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Height;
+												if (TJAPlayer3.Tx.SongSelect_Level != null)
+												{
+													int level_width = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Width / 7;
+													int level_height = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Height;
 
-												for (int i2 = 0; i2 < TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i]; i2++)
-                                                {
-													TJAPlayer3.Tx.SongSelect_Level?.t2D描画(TJAPlayer3.app.Device,
-														TJAPlayer3.Skin.SongSelect_Level_X[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2), 
-														TJAPlayer3.Skin.SongSelect_Level_Y[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
-														new RectangleF(level_width * i, 0, level_width, level_height));
+													for (int i2 = 0; i2 < TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i]; i2++)
+													{
+														TJAPlayer3.Tx.SongSelect_Level.t2D描画(TJAPlayer3.app.Device,
+															TJAPlayer3.Skin.SongSelect_Level_X[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2),
+															TJAPlayer3.Skin.SongSelect_Level_Y[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
+															new RectangleF(level_width * i, 0, level_width, level_height));
+													}
 												}
 											}
 
@@ -1915,16 +1918,19 @@ namespace TJAPlayer3
 										t小文字表示(TJAPlayer3.Skin.SongSelect_Level_Number_X[(diff - 5)], TJAPlayer3.Skin.SongSelect_Level_Number_Y[(diff - 5)],
 											TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff]);
 
-										int level_width = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Width / 7;
-										int level_height = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Height;
-
-										for (int i2 = 0; i2 < TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++)
+										if (TJAPlayer3.Tx.SongSelect_Level != null)
 										{
-											TJAPlayer3.Tx.SongSelect_Level?.t2D描画(TJAPlayer3.app.Device,
-												TJAPlayer3.Skin.SongSelect_Level_X[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2),
-												TJAPlayer3.Skin.SongSelect_Level_Y[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
-												new RectangleF(level_width * diff, 0, level_width, level_height));
+											int level_width = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Width / 7;
+											int level_height = TJAPlayer3.Tx.SongSelect_Level.szテクスチャサイズ.Height;
 
+											for (int i2 = 0; i2 < TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++)
+											{
+												TJAPlayer3.Tx.SongSelect_Level?.t2D描画(TJAPlayer3.app.Device,
+													TJAPlayer3.Skin.SongSelect_Level_X[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2),
+													TJAPlayer3.Skin.SongSelect_Level_Y[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
+													new RectangleF(level_width * diff, 0, level_width, level_height));
+
+											}
 										}
 									}
 
