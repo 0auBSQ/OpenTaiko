@@ -435,7 +435,8 @@ namespace TJAPlayer3
                 }
                 
                 TJAPlayer3.Tx.SongSelect_Header?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-                
+                TJAPlayer3.Tx.SongSelect_Footer?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+
                 tTimerDraw(100 - ctTimer.n現在の値);
 
                 tSongNumberDraw(TJAPlayer3.Skin.SongSelect_SongNumber_X[0], TJAPlayer3.Skin.SongSelect_SongNumber_Y[0], NowSong);
