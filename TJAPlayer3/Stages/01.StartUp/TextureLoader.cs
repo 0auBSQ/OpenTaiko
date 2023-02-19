@@ -203,6 +203,7 @@ namespace TJAPlayer3
             #region 3_選曲画面
             SongSelect_Background = TxC(SONGSELECT + @"Background.png");
             SongSelect_Header = TxC(SONGSELECT + @"Header.png");
+            SongSelect_Footer = TxC(SONGSELECT + @"Footer.png");
             SongSelect_Coin_Slot[0] = TxC(SONGSELECT + @"Coin_Slot.png");
             SongSelect_Coin_Slot[1] = TxC(SONGSELECT + @"Coin_Slot_3P.png");
             SongSelect_Coin_Slot[2] = TxC(SONGSELECT + @"Coin_Slot_4P.png");
@@ -1874,6 +1875,7 @@ namespace TJAPlayer3
 
         public CTexture SongSelect_Background,
             SongSelect_Header,
+            SongSelect_Footer,
             SongSelect_Auto,
             SongSelect_Level,
             SongSelect_Branch,
