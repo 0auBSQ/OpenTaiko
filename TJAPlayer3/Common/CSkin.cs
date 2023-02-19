@@ -1511,6 +1511,10 @@ namespace TJAPlayer3
                             {
                                 Title_VerticalText = C変換.bONorOFF(strParam[0]);
                             }
+                            else if (strCommand == "Title_VerticalBar")
+                            {
+                                Title_VerticalBar = C変換.bONorOFF(strParam[0]);
+                            }
                             #endregion
 
                             #region Config
@@ -7578,6 +7582,7 @@ namespace TJAPlayer3
         public int[] Title_ModeSelect_Bar_Center_BoxText = new int[] { 640, 397 };
 
         public bool Title_VerticalText = false;
+        public bool Title_VerticalBar = false;
 
         #endregion
 

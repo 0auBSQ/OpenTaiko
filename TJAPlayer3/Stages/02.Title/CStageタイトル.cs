@@ -781,20 +781,20 @@ namespace TJAPlayer3
 									_bar.Opacity = 255;
 									_bar.vc拡大縮小倍率.X = 1.0f;
 									_bar.vc拡大縮小倍率.Y = 1.0f;
-									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[0] - (TJAPlayer3.Skin.Title_VerticalText ? barAnimeX : 0), 
-										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[0] - (TJAPlayer3.Skin.Title_VerticalText ? 0 : barAnime), 
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[0] - (TJAPlayer3.Skin.Title_VerticalBar ? barAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[0] - (TJAPlayer3.Skin.Title_VerticalBar ? 0 : barAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][0], 
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][1], 
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][3]));
-									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[1] + (TJAPlayer3.Skin.Title_VerticalText ? barAnimeX : 0), 
-										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[1] + (TJAPlayer3.Skin.Title_VerticalText ? 0 : barAnime), 
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[1] + (TJAPlayer3.Skin.Title_VerticalBar ? barAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[1] + (TJAPlayer3.Skin.Title_VerticalBar ? 0 : barAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][3]));
 
-									if (TJAPlayer3.Skin.Title_VerticalText)
+									if (TJAPlayer3.Skin.Title_VerticalBar)
 									{
 										_bar.vc拡大縮小倍率.X = (barAnimeX / TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][2]) * 2.0f;
 									}
@@ -822,14 +822,14 @@ namespace TJAPlayer3
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][3]));
-									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[1] + (TJAPlayer3.Skin.Title_VerticalText ? overlayAnimeX : 0), 
-										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + (TJAPlayer3.Skin.Title_VerticalText ? 0 : overlayAnime), 
+									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[1] + (TJAPlayer3.Skin.Title_VerticalBar ? overlayAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + (TJAPlayer3.Skin.Title_VerticalBar ? 0 : overlayAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][3]));
 
-									if (TJAPlayer3.Skin.Title_VerticalText)
+									if (TJAPlayer3.Skin.Title_VerticalBar)
 									{
 										_overlap.vc拡大縮小倍率.X = (overlayAnimeX / TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][2]);
 									}
