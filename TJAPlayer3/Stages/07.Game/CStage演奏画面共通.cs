@@ -1848,12 +1848,12 @@ namespace TJAPlayer3
                                     if (nPlayer == 0)
                                     {
                                         _AIBattleState += 1;
-                                        _AIBattleState = Math.Min(AIBattleState, 9);
+                                        _AIBattleState = Math.Min(_AIBattleState, 9);
                                     }
                                     else if (nPlayer == 1)
                                     {
                                         _AIBattleState -= 1;
-                                        _AIBattleState = Math.Max(AIBattleState, -9);
+                                        _AIBattleState = Math.Max(_AIBattleState, -9);
                                     }
 
                                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
@@ -2037,12 +2037,12 @@ namespace TJAPlayer3
                                         if (nPlayer == 0)
                                         {
                                             _AIBattleState += 0.5f;
-                                            _AIBattleState = Math.Min(AIBattleState, 9);
+                                            _AIBattleState = Math.Min(_AIBattleState, 9);
                                         }
                                         else if (nPlayer == 1)
                                         {
                                             _AIBattleState -= 0.5f;
-                                            _AIBattleState = Math.Max(AIBattleState, -9);
+                                            _AIBattleState = Math.Max(_AIBattleState, -9);
                                         }
 
                                         TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
