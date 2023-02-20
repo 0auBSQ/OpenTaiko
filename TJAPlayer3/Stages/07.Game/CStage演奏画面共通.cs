@@ -236,6 +236,7 @@ namespace TJAPlayer3
             }
 
             _AIBattleState = 0;
+            _AIBattleStateBatch = new Queue<float>[] { new Queue<float>(), new Queue<float>() };
 
             this.AIBattleSections = new List<AIBattleSection>();
 
@@ -874,6 +875,7 @@ namespace TJAPlayer3
         private readonly int[] NowProcessingChip = new int[] { 0, 0, 0, 0, 0 };
 
         private float _AIBattleState;
+        private Queue<float>[] _AIBattleStateBatch;
         public int AIBattleState
         {
             get
@@ -927,6 +929,19 @@ namespace TJAPlayer3
             }
             actAIBattle.BatchAnimeCounter.n現在の値 = 0;
             _AIBattleState = 0;
+        }
+
+        private void AIRegisterInput(int nPlayer, float move)
+        {
+            if (nPlayer < 2 && nPlayer >= 0)
+            {
+                _AIBattleStateBatch[nPlayer].Enqueue(move);
+                while (_AIBattleStateBatch[0].Count > 0 && _AIBattleStateBatch[1].Count > 0)
+                {
+                    _AIBattleState += _AIBattleStateBatch[0].Dequeue() - _AIBattleStateBatch[1].Dequeue();
+                    _AIBattleState = Math.Max(Math.Min(_AIBattleState, 9), -9);
+                }
+            }
         }
 
         private void UpdateCharaCounter(int nPlayer)
@@ -1845,16 +1860,7 @@ namespace TJAPlayer3
                                     }
 
 
-                                    if (nPlayer == 0)
-                                    {
-                                        _AIBattleState += 1;
-                                        _AIBattleState = Math.Min(_AIBattleState, 9);
-                                    }
-                                    else if (nPlayer == 1)
-                                    {
-                                        _AIBattleState -= 1;
-                                        _AIBattleState = Math.Max(_AIBattleState, -9);
-                                    }
+                                    AIRegisterInput(nPlayer, 1);
 
                                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -1893,16 +1899,7 @@ namespace TJAPlayer3
                                     }
 
 
-                                    if (nPlayer == 0)
-                                    {
-                                        _AIBattleState += 0.5f;
-                                        _AIBattleState = Math.Min(_AIBattleState, 9);
-                                    }
-                                    else if (nPlayer == 1)
-                                    {
-                                        _AIBattleState -= 0.5f;
-                                        _AIBattleState = Math.Max(_AIBattleState, -9);
-                                    }
+                                    AIRegisterInput(nPlayer, 0.5f);
 
                                     TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -1940,6 +1937,8 @@ namespace TJAPlayer3
                                     if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                         this.nCombo[actDan.NowShowingNumber] = 0;
                                     this.actComboVoice.tReset(nPlayer);
+
+                                    AIRegisterInput(nPlayer, 0f);
 
                                     this.bIsMiss[nPlayer] = true;
                                 }
@@ -1982,17 +1981,7 @@ namespace TJAPlayer3
                                             this.actCombo.ctコンボ加算[nPlayer].n現在の値 = 0;
                                         }
 
-
-                                        if (nPlayer == 0)
-                                        {
-                                            _AIBattleState += 1;
-                                            _AIBattleState = Math.Min(_AIBattleState, 9);
-                                        }
-                                        else if (nPlayer == 1)
-                                        {
-                                            _AIBattleState -= 1;
-                                            _AIBattleState = Math.Max(_AIBattleState, -9);
-                                        }
+                                        AIRegisterInput(nPlayer, 1);
 
                                         TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -2034,16 +2023,7 @@ namespace TJAPlayer3
                                         }
 
 
-                                        if (nPlayer == 0)
-                                        {
-                                            _AIBattleState += 0.5f;
-                                            _AIBattleState = Math.Min(_AIBattleState, 9);
-                                        }
-                                        else if (nPlayer == 1)
-                                        {
-                                            _AIBattleState -= 0.5f;
-                                            _AIBattleState = Math.Max(_AIBattleState, -9);
-                                        }
+                                        AIRegisterInput(nPlayer, 0.5f);
 
                                         TJAPlayer3.stage演奏ドラム画面.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -2082,6 +2062,8 @@ namespace TJAPlayer3
                                         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                             this.nCombo[actDan.NowShowingNumber] = 0;
                                         this.actComboVoice.tReset(nPlayer);
+
+                                        AIRegisterInput(nPlayer, 0f);
 
 
                                         this.bIsMiss[nPlayer] = true;
@@ -4341,6 +4323,7 @@ namespace TJAPlayer3
         public void t演奏やりなおし()
         {
             _AIBattleState = 0;
+            _AIBattleStateBatch = new Queue<float>[] { new Queue<float>(), new Queue<float>() };
 
             NowAIBattleSectionCount = 0;
             NowAIBattleSectionTime = 0;
