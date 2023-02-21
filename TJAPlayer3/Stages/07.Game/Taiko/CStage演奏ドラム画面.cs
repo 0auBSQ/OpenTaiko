@@ -2034,12 +2034,11 @@ namespace TJAPlayer3
 
                             switch (TJAPlayer3.ConfigIni.nPlayerCount)
                             {
-                                case 0:
                                 case 1:
+                                case 2:
                                     nSenotesX = TJAPlayer3.Skin.nSENotesX[nPlayer];
                                     nSenotesY = TJAPlayer3.Skin.nSENotesY[nPlayer];
                                     break;
-                                case 2:
                                 case 3:
                                 case 4:
                                     nSenotesX = TJAPlayer3.Skin.nSENotes_4P[0];
@@ -2052,7 +2051,7 @@ namespace TJAPlayer3
                             }
 
                             this.ct手つなぎ.t進行Loop();
-                            int nHand = this.ct手つなぎ.n現在の値 < 30 ? this.ct手つなぎ.n現在の値 : 60 - this.ct手つなぎ.n現在の値;
+                            float fHand = (this.ct手つなぎ.n現在の値 < 30 ? this.ct手つなぎ.n現在の値 : 60 - this.ct手つなぎ.n現在の値) / 30.0f;
 
 
                             //x = ( x ) - ( ( int ) ( (TJAPlayer3.Skin.Game_Note_Size[0] * pChip.dbチップサイズ倍率 ) / 2.0 ) );
@@ -2080,17 +2079,29 @@ namespace TJAPlayer3
                                 case 0x1A:
                                 case 0x1B:
                                     {
+                                        int moveX = (int)(fHand * TJAPlayer3.Skin.Game_Notes_Arm_Move[0]);
+                                        int moveY = (int)(fHand * TJAPlayer3.Skin.Game_Notes_Arm_Move[1]);
                                         if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.OFF && pChip.bShow)
                                         {
-                                            if (nPlayer == 0)
+                                            if (nPlayer != TJAPlayer3.ConfigIni.nPlayerCount - 1)
                                             {
-                                                TJAPlayer3.Tx.Notes_Arm?.t2D上下反転描画(device, x + 25, (y + 74) + nHand);
-                                                TJAPlayer3.Tx.Notes_Arm?.t2D上下反転描画(device, x + 60, (y + 104) - nHand);
+                                                //上から下
+                                                TJAPlayer3.Tx.Notes_Arm?.t2D上下反転描画(device, 
+                                                    x + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX, 
+                                                    y + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
+                                                TJAPlayer3.Tx.Notes_Arm?.t2D上下反転描画(device, 
+                                                    x + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX, 
+                                                    y + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
                                             }
-                                            else if (nPlayer == 1)
+                                            if (nPlayer != 0)
                                             {
-                                                TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, x + 25, (y - 44) + nHand);
-                                                TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, x + 60, (y - 14) - nHand);
+                                                //下から上
+                                                TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, 
+                                                    x + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX, 
+                                                    y + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
+                                                TJAPlayer3.Tx.Notes_Arm?.t2D描画(device, 
+                                                    x + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX, 
+                                                    y + TJAPlayer3.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
                                             }
                                             NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
                                             NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
@@ -2125,12 +2136,11 @@ namespace TJAPlayer3
 
             switch (TJAPlayer3.ConfigIni.nPlayerCount)
             {
-                case 0:
                 case 1:
+                case 2:
                     nSenotesX = TJAPlayer3.Skin.nSENotesX[nPlayer];
                     nSenotesY = TJAPlayer3.Skin.nSENotesY[nPlayer];
                     break;
-                case 2:
                 case 3:
                 case 4:
                     nSenotesX = TJAPlayer3.Skin.nSENotes_4P[0];

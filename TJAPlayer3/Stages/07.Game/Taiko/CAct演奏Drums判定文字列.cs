@@ -78,8 +78,8 @@ namespace TJAPlayer3
 								x = TJAPlayer3.Skin.Game_Judge_X[j];
 								y = TJAPlayer3.Skin.Game_Judge_Y[j];
 							}
-							x += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[0]);
-							y += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[1]);
+							x += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[0]) + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(j);
+							y += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[1]) + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(j);
 
 							TJAPlayer3.Tx.Judge.Opacity = (int)(255f - (JudgeAnimes[j, i].counter.n現在の値 >= 360 ? ((JudgeAnimes[j, i].counter.n現在の値 - 360) / 50.0f) * 255f : 0f));
 							TJAPlayer3.Tx.Judge.t2D描画(TJAPlayer3.app.Device, x, y, JudgeAnimes[j, i].rc);
