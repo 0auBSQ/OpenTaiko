@@ -396,6 +396,7 @@ namespace TJAPlayer3
             }
             this.nJPOSSCROLL = new int[ 5 ];
             this.bLEVELHOLD = new bool[]{ false, false, false, false, false };
+            this.JPOSCROLLX = new int[5];
 
 
             // Double play set here
@@ -661,6 +662,12 @@ namespace TJAPlayer3
             public int nMine;
         }
 
+        public int[] JPOSCROLLX = new int[5];
+        public int GetJPOSCROLLX(int player)
+        {
+            double screen_ratio = TJAPlayer3.Skin.Resolution[0] / 1280.0;
+            return (int)(JPOSCROLLX[player] * screen_ratio);
+        }
         public int[] NoteOriginX
         {
             get
@@ -668,29 +675,38 @@ namespace TJAPlayer3
                 if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
                 {
                     return new int[] {
-                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 0),
-                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 1),
-                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 2),
-                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 3),
-                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 4)
+                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 0) + GetJPOSCROLLX(0),
+                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 1) + GetJPOSCROLLX(1),
+                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 2) + GetJPOSCROLLX(2),
+                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 3) + GetJPOSCROLLX(3),
+                        TJAPlayer3.Skin.nScrollField_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * 4) + GetJPOSCROLLX(4)
                     };
                 }
                 else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
                 {
                     return new int[] {
-                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 0),
-                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 1),
-                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 2),
-                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 3)
+                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 0) + GetJPOSCROLLX(0),
+                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 1) + GetJPOSCROLLX(1),
+                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 2) + GetJPOSCROLLX(2),
+                        TJAPlayer3.Skin.nScrollField_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * 3) + GetJPOSCROLLX(3)
                     };
                 }
                 else
                 {
-                    return TJAPlayer3.Skin.nScrollFieldX;
+                    return new int[] {
+                        TJAPlayer3.Skin.nScrollFieldX[0] + GetJPOSCROLLX(0),
+                        TJAPlayer3.Skin.nScrollFieldX[1] + GetJPOSCROLLX(1)
+                    };
                 }
             }
         }
 
+        //Unused
+        public int[] JPOSCROLLY = new int[5];
+        public int GetJPOSCROLLY(int player)
+        {
+            return JPOSCROLLY[player];
+        }
         public int[] NoteOriginY
         {
             get
@@ -698,25 +714,28 @@ namespace TJAPlayer3
                 if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
                 {
                     return new int[] {
-                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 0),
-                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 1),
-                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 2),
-                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 3),
-                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 4)
+                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 0) + GetJPOSCROLLY(0),
+                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 1) + GetJPOSCROLLY(1),
+                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 2) + GetJPOSCROLLY(2),
+                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 3) + GetJPOSCROLLY(3),
+                        TJAPlayer3.Skin.nScrollField_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * 4) + GetJPOSCROLLY(4)
                     };
                 }
                 else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
                 {
                     return new int[] {
-                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 0),
-                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 1),
-                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 2),
-                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 3)
+                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 0) + GetJPOSCROLLY(0),
+                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 1) + GetJPOSCROLLY(1),
+                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 2) + GetJPOSCROLLY(2),
+                        TJAPlayer3.Skin.nScrollField_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * 3) + GetJPOSCROLLY(3)
                     };
                 }
                 else
                 {
-                    return TJAPlayer3.Skin.nScrollFieldY;
+                    return new int[] {
+                        TJAPlayer3.Skin.nScrollFieldY[0] + GetJPOSCROLLY(0),
+                        TJAPlayer3.Skin.nScrollFieldY[1] + GetJPOSCROLLY(1)
+                    };
                 }
             }
         }
@@ -3881,14 +3900,7 @@ namespace TJAPlayer3
                     case 0xE2:
                         if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
                         {
-                            if (nPlayer == 0)
-                            {
-                                TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向);
-                            }
-                            else
-                            {
-                                TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動2(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向);
-                            }
+                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向, nPlayer);
                             this.nJPOSSCROLL[ nPlayer ]++;
                             pChip.bHit = true;
                         }
@@ -4342,13 +4354,15 @@ namespace TJAPlayer3
             {
                 this.t演奏位置の変更(0, i);
                 this.actPlayInfo.NowMeasure[i] = 0;
+                JPOSCROLLX[i] = 0;
+                JPOSCROLLY[i] = 0;
             }
             TJAPlayer3.stage演奏ドラム画面.On活性化();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
                 this.chip現在処理中の連打チップ[ i ] = null;
                 this.actChara.b風船連打中[i] = false;
-                this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Normal, true);
+                this.actChara.ReturnDefaultAnime(i, true);
             }
             this.bPAUSE = false;
         }

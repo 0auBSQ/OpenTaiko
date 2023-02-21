@@ -1786,6 +1786,10 @@ namespace TJAPlayer3
                                     SongSelect_Bar_Anim_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Scroll_Interval")
+                            {
+                                SongSelect_Scroll_Interval = float.Parse(strParam);
+                            }
                             else if (strCommand == "SongSelect_DanStatus_Offset_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1880,6 +1884,30 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     SongSelect_Bar_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Box_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Box_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_BackBox_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_BackBox_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Random_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Random_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Bar_SubTitle_Offset")
@@ -3219,6 +3247,46 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_Notes_Interval))
                             {
                                 Game_Notes_Interval = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Left_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Left_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Right_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Right_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Left_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Left_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Right_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Right_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Move[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             else if (strCommand == "Game_Judge_X")
                             {
@@ -7597,7 +7665,12 @@ namespace TJAPlayer3
         public int[] SongSelect_Bar_Anim_X = new int[] { 0, 600, 500, 400, 0, -400, -500, -600, 0 };
         public int[] SongSelect_Bar_Anim_Y = new int[] { 0, 1800, 1500, 1200, 0, -1200, -1500, -1800, 0 };
 
+        public float SongSelect_Scroll_Interval = 0.12f;
+
         public int[] SongSelect_Bar_Title_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_Box_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_BackBox_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_Random_Offset = new int[] { 316, 62 };
         public int[] SongSelect_Bar_SubTitle_Offset = new int[] { 316, 90 };
 
         public int[] SongSelect_DanStatus_Offset_X = new int[] { 30, 602 };
@@ -7898,6 +7971,14 @@ namespace TJAPlayer3
         public int[] Game_Notes_Size = new int[] { 130, 130 };
         public int[] Game_SENote_Size = new int[] { 136, 30 };
         public int Game_Notes_Interval = 960;
+
+        public int[] Game_Notes_Arm_Offset_Left_X = new int[] { 25, 25 };
+        public int[] Game_Notes_Arm_Offset_Right_X = new int[] { 60, 60 };
+
+        public int[] Game_Notes_Arm_Offset_Left_Y = new int[] { 74, -44 };
+        public int[] Game_Notes_Arm_Offset_Right_Y = new int[] { 104, -14 };
+        public int[] Game_Notes_Arm_Move = new int[] { 0, 30 };
+
         public int[] Game_Judge_X = new int[] { 364, 364 };
         public int[] Game_Judge_Y = new int[] { 152, 328 };
         public int[] Game_Judge_Move = new int[] { 0, 20 };

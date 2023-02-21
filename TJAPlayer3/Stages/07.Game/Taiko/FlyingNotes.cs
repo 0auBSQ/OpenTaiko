@@ -129,8 +129,8 @@ namespace TJAPlayer3
 
                             double value = (Flying[i].Counter.n現在の値 / 140.0);
 
-                            Flying[i].X = StartPointX[Flying[i].Player] + (movingDistanceX * value);
-                            Flying[i].Y = TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + (int)(movingDistanceY * value);
+                            Flying[i].X = StartPointX[Flying[i].Player] + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(Flying[i].Player) + (movingDistanceX * value);
+                            Flying[i].Y = TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(Flying[i].Player) + (int)(movingDistanceY * value);
                             Flying[i].Y += Math.Sin(value * Math.PI) * (Flying[i].Player == 0 ? -TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine : TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine);
 
                             if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
