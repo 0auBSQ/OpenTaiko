@@ -35,16 +35,12 @@ namespace TJAPlayer3
                 this.stBranch[i].nBranchレイヤー透明度 = 0;
                 this.stBranch[i].nBranch文字透明度 = 0;
                 this.stBranch[i].nY座標 = 0;
+
+                this.n総移動時間[i] = -1;
             }
             this.ctゴーゴー = new CCounter();
 
 
-            this.n総移動時間 = -1;
-            this.n総移動時間2 = -1;
-            this.nDefaultJudgePos[0, 0] = TJAPlayer3.Skin.nScrollFieldX[0];
-            this.nDefaultJudgePos[0, 1] = TJAPlayer3.Skin.nScrollFieldY[0];
-            this.nDefaultJudgePos[1, 0] = TJAPlayer3.Skin.nScrollFieldX[1];
-            this.nDefaultJudgePos[1, 1] = TJAPlayer3.Skin.nScrollFieldY[1];
             this.ctゴーゴー炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
             base.On活性化();
         }
@@ -56,10 +52,6 @@ namespace TJAPlayer3
                 this.st状態[i].ct進行 = null;
                 this.stBranch[i].ct分岐アニメ進行 = null;
             }
-            TJAPlayer3.Skin.nScrollFieldX[0] = this.nDefaultJudgePos[0, 0];
-            TJAPlayer3.Skin.nScrollFieldY[0] = this.nDefaultJudgePos[0, 1];
-            TJAPlayer3.Skin.nScrollFieldX[1] = this.nDefaultJudgePos[1, 0];
-            TJAPlayer3.Skin.nScrollFieldY[1] = this.nDefaultJudgePos[1, 1];
             this.ctゴーゴー = null;
 
             base.On非活性化();
@@ -723,45 +715,27 @@ namespace TJAPlayer3
             }
             var nTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 
-            if (this.n総移動時間 != -1)
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (n移動方向 == 1)
+                if (this.n総移動時間[i] != -1)
                 {
-                    TJAPlayer3.Skin.nScrollFieldX[0] = this.n移動開始X + (int)((((int)nTime - this.n移動開始時刻) / (double)(this.n総移動時間)) * this.n移動距離px);
-                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[0] = this.n移動開始X + (int)((((int)nTime - this.n移動開始時刻) / (double)(this.n総移動時間)) * this.n移動距離px);
-                }
-                else
-                {
-                    TJAPlayer3.Skin.nScrollFieldX[0] = this.n移動開始X - (int)((((int)nTime - this.n移動開始時刻) / (double)(this.n総移動時間)) * this.n移動距離px);
-                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[0] = this.n移動開始X - (int)((((int)nTime - this.n移動開始時刻) / (double)(this.n総移動時間)) * this.n移動距離px);
-                }
+                    if (n移動方向[i] == 1)
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                        //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                    }
+                    else
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                        //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                    }
 
-                if (((int)nTime) > this.n移動開始時刻 + this.n総移動時間)
-                {
-                    this.n総移動時間 = -1;
-                    TJAPlayer3.Skin.nScrollFieldX[0] = this.n移動目的場所X;
-                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[0] = this.n移動目的場所X;
-                }
-            }
-            if (this.n総移動時間2 != -1)
-            {
-                if (n移動方向2 == 1)
-                {
-                    TJAPlayer3.Skin.nScrollFieldX[1] = this.n移動開始X2 + (int)((((int)nTime - this.n移動開始時刻2) / (double)(this.n総移動時間2)) * this.n移動距離px2);
-                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_X[1] = this.n移動開始X2 + (int)((((int)nTime - this.n移動開始時刻2) / (double)(this.n総移動時間2)) * this.n移動距離px2);
-                }
-                else
-                {
-                    TJAPlayer3.Skin.nScrollFieldX[1] = this.n移動開始X2 - (int)((((int)nTime - this.n移動開始時刻2) / (double)(this.n総移動時間2)) * this.n移動距離px2);
-                    TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_X[1] = this.n移動開始X2 - (int)((((int)nTime - this.n移動開始時刻2) / (double)(this.n総移動時間2)) * this.n移動距離px2);
-                }
-
-
-                if (((int)nTime) > this.n移動開始時刻2 + this.n総移動時間2)
-                {
-                    this.n総移動時間2 = -1;
-                    TJAPlayer3.Skin.nScrollFieldX[1] = this.n移動目的場所X2;
-                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[1] = this.n移動目的場所X2;
+                    if (((int)nTime) > this.n移動開始時刻[i] + this.n総移動時間[i])
+                    {
+                        this.n総移動時間[i] = -1;
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動目的場所X[i];
+                        //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動目的場所X[i];
+                    }
                 }
             }
 
@@ -794,7 +768,9 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Judge_Frame.b加算合成 = TJAPlayer3.Skin.Game_JudgeFrame_AddBlend;
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-                    TJAPlayer3.Tx.Judge_Frame.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.stage演奏ドラム画面.NoteOriginX[i], TJAPlayer3.stage演奏ドラム画面.NoteOriginY[i], new Rectangle(0, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+                    TJAPlayer3.Tx.Judge_Frame.t2D描画(TJAPlayer3.app.Device, 
+                        TJAPlayer3.stage演奏ドラム画面.NoteOriginX[i],
+                        TJAPlayer3.stage演奏ドラム画面.NoteOriginY[i], new Rectangle(0, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
                 }
             }
 
@@ -886,6 +862,8 @@ namespace TJAPlayer3
                             x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[i];
                             y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[i];
                         }
+                        x += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i);
+                        y += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i);
 
                         switch (st状態[i].judge)
                         {
@@ -974,31 +952,19 @@ namespace TJAPlayer3
             TJAPlayer3.stage演奏ドラム画面.actLane.t分岐レイヤー_コース変化(n現在, n次回, nPlayer);
         }
 
-        public void t判定枠移動(double db移動時間, int n移動px, int n移動方向)
+        public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer)
         {
-            this.n移動開始時刻 = (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-            this.n移動開始X = TJAPlayer3.Skin.nScrollFieldX[0];
-            this.n総移動時間 = (int)(db移動時間 * 1000);
-            this.n移動方向 = n移動方向;
-            this.n移動距離px = n移動px;
+            this.n移動開始時刻[nPlayer] = (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+            this.n移動開始X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer];
+            this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);
+            this.n移動方向[nPlayer] = n移動方向;
+            this.n移動距離px[nPlayer] = n移動px;
             if (n移動方向 == 0)
-                this.n移動目的場所X = TJAPlayer3.Skin.nScrollFieldX[0] - n移動px;
+                this.n移動目的場所X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer] - n移動px;
             else
-                this.n移動目的場所X = TJAPlayer3.Skin.nScrollFieldX[0] + n移動px;
+                this.n移動目的場所X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer] + n移動px;
         }
 
-        public void t判定枠移動2(double db移動時間, int n移動px, int n移動方向)
-        {
-            this.n移動開始時刻2 = (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-            this.n移動開始X2 = TJAPlayer3.Skin.nScrollFieldX[1];
-            this.n総移動時間2 = (int)(db移動時間 * 1000);
-            this.n移動方向2 = n移動方向;
-            this.n移動距離px2 = n移動px;
-            if (n移動方向 == 0)
-                this.n移動目的場所X2 = TJAPlayer3.Skin.nScrollFieldX[1] - n移動px;
-            else
-                this.n移動目的場所X2 = TJAPlayer3.Skin.nScrollFieldX[1] + n移動px;
-        }
         #region[ private ]
         //-----------------
         //private CTexture txLane;
@@ -1056,21 +1022,12 @@ namespace TJAPlayer3
         }
 
 
-        private int n総移動時間;
-        private int n移動開始X;
-        private int n移動開始時刻;
-        private int n移動距離px;
-        private int n移動目的場所X;
-        private int n移動方向;
-        private int n総移動時間2;
-        private int n移動開始X2;
-        private int n移動開始時刻2;
-        private int n移動距離px2;
-        private int n移動目的場所X2;
-        private int n移動方向2;
-
-        internal int[,] nDefaultJudgePos = new int[5, 2];
-
+        private int[] n総移動時間 = new int[5];
+        private int[] n移動開始X = new int[5];
+        private int[] n移動開始時刻 = new int[5];
+        private int[] n移動距離px = new int[5];
+        private int[] n移動目的場所X = new int[5];
+        private int[] n移動方向 = new int[5];
 
         //-----------------
         #endregion

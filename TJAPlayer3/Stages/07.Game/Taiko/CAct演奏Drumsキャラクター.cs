@@ -489,14 +489,15 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
                             TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
                             TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
-                            TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(TJAPlayer3.app.Device, 
-                                (TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) 
-                                + chara_x,
-                                chara_y);
+                            TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(TJAPlayer3.app.Device,
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + chara_x,
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + chara_y);
                         }
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
-                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (endAnime)
                         {
@@ -515,14 +516,15 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
                             TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
                             TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
-                            TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(TJAPlayer3.app.Device, 
-                                (TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) 
-                                + chara_x,
-                                chara_y);
+                            TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(TJAPlayer3.app.Device,
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + chara_x,
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + chara_y);
                         }
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
-                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (endAnime)
                         {
@@ -536,20 +538,21 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
                             TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
                             TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(TJAPlayer3.app.Device,
-                                (TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) +
-                                chara_x,
-                                chara_y);
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + chara_x,
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + chara_y);
                         }
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
-                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画((TJAPlayer3.Skin.nScrollFieldX[0] - TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.nDefaultJudgePos[0, 0]) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0], TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player : i);
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player : i);
                     }
                 }
             }
         }
 
 
-        private void ReturnDefaultAnime(int player, bool resetCounter)
+        public void ReturnDefaultAnime(int player, bool resetCounter)
         {
             if (TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[player] && TJAPlayer3.Skin.Characters_GoGoTime_Ptn[this.iCurrentCharacter[player]] != 0)
             {
