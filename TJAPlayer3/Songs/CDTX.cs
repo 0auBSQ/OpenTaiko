@@ -4057,7 +4057,7 @@ namespace TJAPlayer3
                 WarnSplitLength("#JPOSSCROLL", strArray, 3);
                 double db移動時刻 = Convert.ToDouble(strArray[0]);
                 int n移動px = Convert.ToInt32(strArray[1]);
-                int n移動方向 = Convert.ToInt32(strArray[2]);
+                int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
 
                 //チップ追加して割り込んでみる。
                 var chip = new CChip();
