@@ -296,7 +296,19 @@ namespace TJAPlayer3
 			//Trace.TraceInformation( "Skin変更Current : "+  CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) );
 			//Trace.TraceInformation( "Skin変更System  : "+  CSkin.strSystemSkinSubfolderFullName );
 			//Trace.TraceInformation( "Skin変更BoxDef  : "+  CSkin.strBoxDefSkinSubfolderFullName );
-			if(r現在選択中の曲.list子リスト.Count != 1)
+
+			if (this.ttk選択している曲の曲名 != null)
+			{
+				this.ttk選択している曲の曲名 = null;
+				this.b選択曲が変更された = false;
+			}
+			if (this.ttk選択している曲のサブタイトル != null)
+			{
+				this.ttk選択している曲のサブタイトル = null;
+				this.b選択曲が変更された = false;
+			}
+
+			if (r現在選択中の曲.list子リスト.Count != 1)
 			{
 				if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 				{
@@ -350,6 +362,17 @@ namespace TJAPlayer3
 			// tBoxに入る()とは処理が微妙に異なるので注意
 			TJAPlayer3.Skin.SetCurrentSkinSubfolderFullName(
 				( this.r現在選択中の曲.strSkinPath == "" ) ? "" : TJAPlayer3.Skin.GetSkinSubfolderFullNameFromSkinName( CSkin.GetSkinName( this.r現在選択中の曲.strSkinPath ) ), false );
+
+			if (this.ttk選択している曲の曲名 != null)
+			{
+				this.ttk選択している曲の曲名 = null;
+				this.b選択曲が変更された = false;
+			}
+			if (this.ttk選択している曲のサブタイトル != null)
+			{
+				this.ttk選択している曲のサブタイトル = null;
+				this.b選択曲が変更された = false;
+			}
 
 			if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 			{
