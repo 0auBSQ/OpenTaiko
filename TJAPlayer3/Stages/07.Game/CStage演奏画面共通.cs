@@ -397,6 +397,7 @@ namespace TJAPlayer3
             this.nJPOSSCROLL = new int[ 5 ];
             this.bLEVELHOLD = new bool[]{ false, false, false, false, false };
             this.JPOSCROLLX = new int[5];
+            this.JPOSCROLLY = new int[5];
 
 
             // Double play set here
@@ -701,11 +702,11 @@ namespace TJAPlayer3
             }
         }
 
-        //Unused
         public int[] JPOSCROLLY = new int[5];
         public int GetJPOSCROLLY(int player)
         {
-            return JPOSCROLLY[player];
+            double screen_ratio = TJAPlayer3.Skin.Resolution[1] / 720.0;
+            return (int)(JPOSCROLLY[player] * screen_ratio);
         }
         public int[] NoteOriginY
         {
@@ -842,6 +843,7 @@ namespace TJAPlayer3
 
         public CBRANCHSCORE[] CBranchScore = new CBRANCHSCORE[6];
         public CBRANCHSCORE[] CChartScore = new CBRANCHSCORE[5];
+        public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[2];
 
         public bool[] bIsGOGOTIME = new bool[5];
         public bool[] bIsMiss = new bool[5];
@@ -3900,7 +3902,7 @@ namespace TJAPlayer3
                     case 0xE2:
                         if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
                         {
-                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向, nPlayer);
+                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向, nPlayer, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].nVerticalMove);
                             this.nJPOSSCROLL[ nPlayer ]++;
                             pChip.bHit = true;
                         }

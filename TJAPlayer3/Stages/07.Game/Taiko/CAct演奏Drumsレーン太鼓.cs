@@ -722,18 +722,21 @@ namespace TJAPlayer3
                     if (n移動方向[i] == 1)
                     {
                         TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動開始Y[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
                         //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
                     }
                     else
                     {
                         TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動開始Y[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
                         //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
                     }
-
+                    
                     if (((int)nTime) > this.n移動開始時刻[i] + this.n総移動時間[i])
                     {
                         this.n総移動時間[i] = -1;
                         TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動目的場所X[i];
+                        TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動目的場所Y[i];
                         //TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動目的場所X[i];
                     }
                 }
@@ -952,17 +955,25 @@ namespace TJAPlayer3
             TJAPlayer3.stage演奏ドラム画面.actLane.t分岐レイヤー_コース変化(n現在, n次回, nPlayer);
         }
 
-        public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer)
+        public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs)
         {
             this.n移動開始時刻[nPlayer] = (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
             this.n移動開始X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer];
+            this.n移動開始Y[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[nPlayer];
             this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);
             this.n移動方向[nPlayer] = n移動方向;
             this.n移動距離px[nPlayer] = n移動px;
+            this.nVerticalJSPos[nPlayer] = vJs;
             if (n移動方向 == 0)
+            {
                 this.n移動目的場所X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer] - n移動px;
+                this.n移動目的場所Y[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[nPlayer] - vJs;
+            }
             else
+            {
                 this.n移動目的場所X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer] + n移動px;
+                this.n移動目的場所Y[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[nPlayer] + vJs;
+            }
         }
 
         #region[ private ]
@@ -1024,9 +1035,12 @@ namespace TJAPlayer3
 
         private int[] n総移動時間 = new int[5];
         private int[] n移動開始X = new int[5];
+        private int[] n移動開始Y = new int[5];
         private int[] n移動開始時刻 = new int[5];
         private int[] n移動距離px = new int[5];
+        private int[] nVerticalJSPos = new int[5];
         private int[] n移動目的場所X = new int[5];
+        private int[] n移動目的場所Y = new int[5];
         private int[] n移動方向 = new int[5];
 
         //-----------------

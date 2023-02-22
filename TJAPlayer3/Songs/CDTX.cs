@@ -257,6 +257,7 @@ namespace TJAPlayer3
             public int n移動方向; //移動方向は0(左)、1(右)の2つだけ。
             public int n内部番号;
             public int n表記上の番号;
+            public int nVerticalMove;
 
             public override string ToString()
             {
@@ -4056,7 +4057,19 @@ namespace TJAPlayer3
                 strArray = argument.Split(chDelimiter);
                 WarnSplitLength("#JPOSSCROLL", strArray, 3);
                 double db移動時刻 = Convert.ToDouble(strArray[0]);
-                int n移動px = Convert.ToInt32(strArray[1]);
+                int n移動px = 0;
+                int nComplexMove = 0;
+                if (strArray[1].IndexOf('i') != -1)
+                {
+                    double[] dbComplexNum = new double[2];
+                    this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
+                    n移動px = Convert.ToInt32(dbComplexNum[0]);
+                    nComplexMove = Convert.ToInt32(dbComplexNum[1]);
+                }
+                else
+                    n移動px = Convert.ToInt32(strArray[1]);
+
+
                 int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
 
                 //チップ追加して割り込んでみる。
@@ -4072,7 +4085,7 @@ namespace TJAPlayer3
 
                 // チップを配置。
 
-                this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向 });
+                this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向, nVerticalMove = nComplexMove });
                 this.listChip.Add(chip);
                 this.n内部番号JSCROLL1to++;
             }
