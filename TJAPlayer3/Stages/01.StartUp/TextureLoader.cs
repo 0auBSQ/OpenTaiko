@@ -20,13 +20,13 @@ namespace TJAPlayer3
         // Stage
         public const string TITLE = @"1_Title\";
         public const string CONFIG = @"2_Config\";
-        const string SONGSELECT = @"3_SongSelect\";
+        public const string SONGSELECT = @"3_SongSelect\";
         public const string DANISELECT = @"3_DaniSelect\";
         const string SONGLOADING = @"4_SongLoading\";
         public const string GAME = @"5_Game\";
-        const string RESULT = @"6_Result\";
+        public const string RESULT = @"6_Result\";
         public const string EXIT = @"7_Exit\";
-        const string DANRESULT = @"7_DanResult\";
+        public const string DANRESULT = @"7_DanResult\";
         const string TOWERRESULT = @"8_TowerResult\";
         public const string HEYA = @"10_Heya\";
         
@@ -353,6 +353,17 @@ namespace TJAPlayer3
             SongLoading_Chara = TxC(SONGLOADING + @"Chara.png");
             SongLoading_Fade = TxC(SONGLOADING + @"Fade.png");
             SongLoading_Bg_Dan = TxC(SONGLOADING + @"Bg_Dan.png");
+
+            SongLoading_Plate_AI = TxC(SONGLOADING + @"Plate_AI.png");
+            SongLoading_Bg_AI = TxC(SONGLOADING + @"Bg_AI.png");
+            SongLoading_Bg_AI_Wait = TxC(SONGLOADING + @"Bg_AI_Wait.png");
+            SongLoading_Fade_AI = TxC(SONGLOADING + @"Fade_AI.png");
+            SongLoading_Fade_AI_Anime_Base = TxC(SONGLOADING + @"Fade_AI_Anime_Base.png");
+            SongLoading_Fade_AI_Anime_Ring = TxC(SONGLOADING + @"Fade_AI_Anime_Ring.png");
+            SongLoading_Fade_AI_Anime_NowLoading = TxC(SONGLOADING + @"Fade_AI_Anime_NowLoading.png");
+            SongLoading_Fade_AI_Anime_Start = TxC(SONGLOADING + @"Fade_AI_Anime_Start.png");
+            SongLoading_Fade_AI_Anime_LoadBar_Base = TxC(SONGLOADING + @"Fade_AI_Anime_LoadBar_Base.png");
+            SongLoading_Fade_AI_Anime_LoadBar = TxC(SONGLOADING + @"Fade_AI_Anime_LoadBar.png");
 
             #endregion
 
@@ -1765,6 +1776,8 @@ namespace TJAPlayer3
             _skin.voiceClearClear[player]?.Dispose();
             _skin.voiceClearFullCombo[player]?.Dispose();
             _skin.voiceClearAllPerfect[player]?.Dispose();
+            _skin.voiceAIWin[player]?.Dispose();
+            _skin.voiceAILose[player]?.Dispose();
             _skin.voiceMenuSongSelect[player]?.Dispose();
             _skin.voiceMenuSongDecide[player]?.Dispose();
             _skin.voiceMenuDiffSelect[player]?.Dispose();
@@ -1788,6 +1801,8 @@ namespace TJAPlayer3
             _skin.voiceClearClear[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\Clear");
             _skin.voiceClearFullCombo[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\FullCombo");
             _skin.voiceClearAllPerfect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\AllPerfect");
+            _skin.voiceAIWin[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\AIBattle_Win");
+            _skin.voiceAILose[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\AIBattle_Lose");
             _skin.voiceMenuSongSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongSelect");
             _skin.voiceMenuSongDecide[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongDecide");
             _skin.voiceMenuDiffSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DiffSelect");
@@ -1959,7 +1974,18 @@ namespace TJAPlayer3
             SongLoading_BgWait,
             SongLoading_Chara,
             SongLoading_Bg_Dan,
-            SongLoading_Fade;
+            SongLoading_Fade,
+
+            SongLoading_Plate_AI,
+            SongLoading_Bg_AI,
+            SongLoading_Bg_AI_Wait,
+            SongLoading_Fade_AI,
+            SongLoading_Fade_AI_Anime_Base,
+            SongLoading_Fade_AI_Anime_Ring,
+            SongLoading_Fade_AI_Anime_NowLoading,
+            SongLoading_Fade_AI_Anime_Start,
+            SongLoading_Fade_AI_Anime_LoadBar_Base,
+            SongLoading_Fade_AI_Anime_LoadBar;
         #endregion
 
         #region 5_演奏画面

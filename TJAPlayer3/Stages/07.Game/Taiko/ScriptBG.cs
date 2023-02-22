@@ -209,7 +209,7 @@ namespace TJAPlayer3
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
                 }
 
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140, TJAPlayer3.stage演奏ドラム画面.AIBattleState);
+                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140, TJAPlayer3.stage演奏ドラム画面.AIBattleState, TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);

@@ -296,6 +296,7 @@ namespace TJAPlayer3
             }
 
             NowAIBattleSectionCount = 0;
+            bIsAIBattleWin = false;
 
             ctChipAnime = new CCounter[5];
             ctChipAnimeLag = new CCounter[5];
@@ -904,6 +905,11 @@ namespace TJAPlayer3
                 return (int)_AIBattleState;
             }
         }
+        public bool bIsAIBattleWin
+        {
+            get;
+            private set;
+        }
 
         public class AIBattleSection
         {
@@ -950,6 +956,16 @@ namespace TJAPlayer3
             }
             actAIBattle.BatchAnimeCounter.n現在の値 = 0;
             _AIBattleState = 0;
+
+            int clearCount = 0;
+            for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count; i++)
+            {
+                if (TJAPlayer3.stage演奏ドラム画面.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear)
+                {
+                    clearCount++;
+                }
+            }
+            bIsAIBattleWin = clearCount >= TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count / 2.0;
         }
 
         private void AIRegisterInput(int nPlayer, float move)

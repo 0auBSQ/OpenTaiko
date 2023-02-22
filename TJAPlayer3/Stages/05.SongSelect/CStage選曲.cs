@@ -20,21 +20,50 @@ namespace TJAPlayer3
 
     static internal class CSongSelectSongManager
     {
+        public static CSkin.Cシステムサウンド bgmIn
+        {
+            get
+            {
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    return TJAPlayer3.Skin.bgmSongSelect_Dan_In;
+                }
+                else
+                {
+                    return TJAPlayer3.Skin.bgm選曲画面イン;
+                }
+            }
+        }
+        public static CSkin.Cシステムサウンド bgmLoop
+        {
+            get
+            {
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    return TJAPlayer3.Skin.bgmSongSelect_Dan;
+                }
+                else
+                {
+                    return TJAPlayer3.Skin.bgm選曲画面;
+                }
+            }
+        }
+
         public static void playSongIfPossible()
         {
             if (CSongSelectSongManager.isSongDisabled)
                 return;
 
-            if (TJAPlayer3.ConfigIni.bBGM音を発声する && !TJAPlayer3.Skin.bgm選曲画面イン.b再生中 && !TJAPlayer3.Skin.bgm選曲画面.b再生中)
+            if (TJAPlayer3.ConfigIni.bBGM音を発声する && !bgmIn.b再生中 && !bgmLoop.b再生中)
             {
                 if (inSongPlayed == false)
                 {
-                    TJAPlayer3.Skin.bgm選曲画面イン.t再生する();
+                    bgmIn.t再生する();
                     CSongSelectSongManager.inSongPlayed = true;
                 }
                 else
                 {
-                    TJAPlayer3.Skin.bgm選曲画面.t再生する();
+                    bgmLoop.t再生する();
                 }
             }
                 
@@ -42,8 +71,8 @@ namespace TJAPlayer3
 
         public static void stopSong()
         {
-            TJAPlayer3.Skin.bgm選曲画面イン.t停止する();
-            TJAPlayer3.Skin.bgm選曲画面.t停止する();
+            bgmIn.t停止する();
+            bgmLoop.t停止する();
             CSongSelectSongManager.inSongPlayed = false;
         }
 
@@ -326,6 +355,9 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
+                AI_Background = new ScriptBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.SONGSELECT}\AIBattle\Script.lua"));
+                AI_Background.Init();
+
                 this.ct背景スクロール用タイマー = new CCounter(0, TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width, 30, TJAPlayer3.Timer);
                 base.OnManagedリソースの作成();
             }
@@ -334,6 +366,7 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
+                TJAPlayer3.t安全にDisposeする(ref AI_Background);
                 base.OnManagedリソースの解放();
             }
         }
@@ -375,8 +408,16 @@ namespace TJAPlayer3
 
                 this.ct登場時アニメ用共通.t進行();
 
-                if (TJAPlayer3.Tx.SongSelect_Background != null)
-                    TJAPlayer3.Tx.SongSelect_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    AI_Background?.Update();
+                    AI_Background?.Draw();
+                }
+                else
+                {
+                    if (TJAPlayer3.Tx.SongSelect_Background != null)
+                        TJAPlayer3.Tx.SongSelect_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                }
 
                 if (this.r現在選択中の曲 != null)
                 {
@@ -392,21 +433,24 @@ namespace TJAPlayer3
                         else
                             nOldGenreBack = this.OldBg;
                     // }
-                    if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
+                    if (!TJAPlayer3.ConfigIni.bAIBattleMode)
                     {
-                        for (int i = 0; i < (TJAPlayer3.Skin.Resolution[0] / TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width) + 2; i++)
+                        if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
                         {
-                            if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
+                            for (int i = 0; i < (TJAPlayer3.Skin.Resolution[0] / TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width) + 2; i++)
                             {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = C変換.ColorToColor4(this.NowBgColor);
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].Opacity = 255;
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
-                            }
-                            if (TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack] != null)
-                            {
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = C変換.ColorToColor4(this.OldBgColor);
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].Opacity = 600 - ctBackgroundFade.n現在の値;
-                                TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
+                                if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
+                                {
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].color4 = C変換.ColorToColor4(this.NowBgColor);
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].Opacity = 255;
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
+                                }
+                                if (TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack] != null)
+                                {
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].color4 = C変換.ColorToColor4(this.OldBgColor);
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].Opacity = 600 - ctBackgroundFade.n現在の値;
+                                    TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack].t2D描画(TJAPlayer3.app.Device, -(int)ct背景スクロール用タイマー.n現在の値 + TJAPlayer3.Tx.SongSelect_Background.szテクスチャサイズ.Width * i, 0);
+                                }
                             }
                         }
                     }
@@ -1254,6 +1298,7 @@ namespace TJAPlayer3
         public CActSortSongs actSortSongs;
         private CActSelectQuickConfig actQuickConfig;
 
+        private ScriptBG AI_Background;
         private const int MaxSong = 3;
         public int NowSong = 1;
 
@@ -1445,8 +1490,6 @@ namespace TJAPlayer3
             if ((this.act曲リスト.rGetSideSong(1).eノード種別 == C曲リストノード.Eノード種別.SCORE) || this.act曲リスト.rGetSideSong(1).eノード種別 == C曲リストノード.Eノード種別.BACKBOX)
             {
                 TJAPlayer3.stage選曲.bBGMIn再生した = false;
-                TJAPlayer3.Skin.bgm選曲画面イン.n位置_現在のサウンド = 0;
-                TJAPlayer3.Skin.bgm選曲画面.n位置_現在のサウンド = 0;
 
                 CSongSelectSongManager.disable();
             }
