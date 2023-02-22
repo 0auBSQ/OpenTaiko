@@ -323,6 +323,8 @@ namespace TJAPlayer3
         public Cシステムサウンド[] voiceClearClear = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceClearFullCombo = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceClearAllPerfect = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceAIWin = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceAILose = new Cシステムサウンド[5];
 
         // Sounds\Menu
 
@@ -383,6 +385,8 @@ namespace TJAPlayer3
         public Cシステムサウンド bgmタイトルイン = null;
         public Cシステムサウンド bgm選曲画面 = null;
         public Cシステムサウンド bgm選曲画面イン = null;
+        public Cシステムサウンド bgmSongSelect_Dan = null;
+        public Cシステムサウンド bgmSongSelect_Dan_In = null;
         public Cシステムサウンド bgmリザルト = null;
         public Cシステムサウンド bgmリザルトイン = null;
 
@@ -741,7 +745,7 @@ namespace TJAPlayer3
             this.bgm起動画面 = new Cシステムサウンド(@"Sounds\Setup BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\Option BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\Config BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
+            //this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             //this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
             this.soundSkip = new Cシステムサウンド(@"Sounds\Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.SoundBanapas = new Cシステムサウンド(@"Sounds\Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -759,6 +763,8 @@ namespace TJAPlayer3
             this.bgmタイトル = new Cシステムサウンド(@"Sounds\BGM\Title.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面イン = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\BGM\SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_Dan_In = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Dan_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_Dan = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Dan.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
 
@@ -3106,6 +3112,46 @@ namespace TJAPlayer3
                             {
                                 SongLoading_SubTitle_Y = int.Parse(strParam);
                             }
+                            else if (strCommand == nameof(SongLoading_Plate_X_AI))
+                            {
+                                SongLoading_Plate_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Plate_Y_AI))
+                            {
+                                SongLoading_Plate_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Title_X_AI))
+                            {
+                                SongLoading_Title_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Title_Y_AI))
+                            {
+                                SongLoading_Title_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_SubTitle_X_AI))
+                            {
+                                SongLoading_SubTitle_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_SubTitle_Y_AI))
+                            {
+                                SongLoading_SubTitle_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongLoading_Fade_AI_Anime_Ring")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Fade_AI_Anime_Ring[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongLoading_Fade_AI_Anime_LoadBar")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Fade_AI_Anime_LoadBar[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(SongLoading_Title_FontSize))
                             {
                                 if (int.Parse(strParam) > 0)
@@ -4823,6 +4869,14 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_Y))
                             {
                                 Game_Effect_FlyingNotes_EndPoint_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_X_AI))
+                            {
+                                Game_Effect_FlyingNotes_EndPoint_X_AI = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_Y_AI))
+                            {
+                                Game_Effect_FlyingNotes_EndPoint_Y_AI = strParam.Split(',').Select(int.Parse).ToArray();
                             }
                             else if (strCommand == nameof(Game_Effect_FlyingNotes_Sine))
                             {
@@ -7950,6 +8004,17 @@ namespace TJAPlayer3
         public int SongLoading_Title_Y = 280;
         public int SongLoading_SubTitle_X = 640;
         public int SongLoading_SubTitle_Y = 325;
+
+        public int SongLoading_Plate_X_AI = 640;
+        public int SongLoading_Plate_Y_AI = 360;
+        public int SongLoading_Title_X_AI = 640;
+        public int SongLoading_Title_Y_AI = 313;
+        public int SongLoading_SubTitle_X_AI = 640;
+        public int SongLoading_SubTitle_Y_AI = 365;
+
+        public int[] SongLoading_Fade_AI_Anime_Ring = new int[] { 466, 185 };
+        public int[] SongLoading_Fade_AI_Anime_LoadBar = new int[] { 490, 382 };
+
         public int SongLoading_Title_FontSize = 31;
         public int SongLoading_SubTitle_FontSize = 20;
         public int[] SongLoading_Chara_Move = new int[] { 250, -80 };
@@ -8294,6 +8359,8 @@ namespace TJAPlayer3
         public int[] Game_Effect_FlyingNotes_StartPoint_Y = new int[] { 260, 434 };
         public int[] Game_Effect_FlyingNotes_EndPoint_X = new int[] { 1222, 1222 }; // 1P, 2P
         public int[] Game_Effect_FlyingNotes_EndPoint_Y = new int[] { 164, 554 };
+        public int[] Game_Effect_FlyingNotes_EndPoint_X_AI = new int[] { 1222, 1222 }; // 1P, 2P
+        public int[] Game_Effect_FlyingNotes_EndPoint_Y_AI = new int[] { -230, 820 };
 
         public int Game_Effect_FlyingNotes_Sine = 220;
         public bool Game_Effect_FlyingNotes_IsUsingEasing = true;
