@@ -1230,7 +1230,10 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageコンフィグ;
 
-								foreach( STPlugin pg in this.listプラグイン )
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								foreach ( STPlugin pg in this.listプラグイン )
 								{
 									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
 									pg.plugin.Onステージ変更();

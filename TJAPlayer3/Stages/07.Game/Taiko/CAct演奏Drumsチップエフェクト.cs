@@ -23,7 +23,7 @@ namespace TJAPlayer3
         // メソッド
         public virtual void Start(int nPlayer, int Lane)
         {
-            if (TJAPlayer3.Tx.Gauge_Soul_Explosion != null)
+            if (TJAPlayer3.Tx.Gauge_Soul_Explosion != null && TJAPlayer3.ConfigIni.nPlayerCount <= 2 && !TJAPlayer3.ConfigIni.bAIBattleMode)
             {
                 for (int i = 0; i < 128; i++)
                 {

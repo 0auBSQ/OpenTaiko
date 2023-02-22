@@ -112,8 +112,22 @@ namespace TJAPlayer3
                         }
                         for (int n = Flying[i].OldValue; n < Flying[i].Counter.n現在の値; n += 16)
                         {
-                            int movingDistanceX = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[Flying[i].Player] - StartPointX[Flying[i].Player];
-                            int movingDistanceY = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[Flying[i].Player] - TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player];
+                            int endX;
+                            int endY;
+
+                            if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                            {
+                                endX = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X_AI[Flying[i].Player];
+                                endY = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y_AI[Flying[i].Player];
+                            }
+                            else
+                            {
+                                endX = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_X[Flying[i].Player];
+                                endY = TJAPlayer3.Skin.Game_Effect_FlyingNotes_EndPoint_Y[Flying[i].Player];
+                            }
+
+                            int movingDistanceX = endX - StartPointX[Flying[i].Player];
+                            int movingDistanceY = endY - TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player];
 
                             /*
                             if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
@@ -131,7 +145,15 @@ namespace TJAPlayer3
 
                             Flying[i].X = StartPointX[Flying[i].Player] + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(Flying[i].Player) + (movingDistanceX * value);
                             Flying[i].Y = TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(Flying[i].Player) + (int)(movingDistanceY * value);
-                            Flying[i].Y += Math.Sin(value * Math.PI) * (Flying[i].Player == 0 ? -TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine : TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine);
+                            
+                            if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                            {
+                                Flying[i].Y += Math.Sin(value * Math.PI) * ((Flying[i].Player == 0 ? -TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine : TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine) / 3.0);
+                            }
+                            else
+                            {
+                                Flying[i].Y += Math.Sin(value * Math.PI) * (Flying[i].Player == 0 ? -TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine : TJAPlayer3.Skin.Game_Effect_FlyingNotes_Sine);
+                            }
 
                             if (TJAPlayer3.Skin.Game_Effect_FlyingNotes_IsUsingEasing)
                             {
