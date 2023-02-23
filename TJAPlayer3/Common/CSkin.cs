@@ -385,8 +385,8 @@ namespace TJAPlayer3
         public Cシステムサウンド bgmタイトルイン = null;
         public Cシステムサウンド bgm選曲画面 = null;
         public Cシステムサウンド bgm選曲画面イン = null;
-        public Cシステムサウンド bgmSongSelect_Dan = null;
-        public Cシステムサウンド bgmSongSelect_Dan_In = null;
+        public Cシステムサウンド bgmSongSelect_AI = null;
+        public Cシステムサウンド bgmSongSelect_AI_In = null;
         public Cシステムサウンド bgmリザルト = null;
         public Cシステムサウンド bgmリザルトイン = null;
 
@@ -763,8 +763,8 @@ namespace TJAPlayer3
             this.bgmタイトル = new Cシステムサウンド(@"Sounds\BGM\Title.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面イン = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\BGM\SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
-            this.bgmSongSelect_Dan_In = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Dan_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-            this.bgmSongSelect_Dan = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Dan.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_AI_In = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_AI = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
 
