@@ -4055,7 +4055,7 @@ namespace TJAPlayer3
             else if (command == "#JPOSSCROLL")
             {
                 strArray = argument.Split(chDelimiter);
-                WarnSplitLength("#JPOSSCROLL", strArray, 3);
+                WarnSplitLength("#JPOSSCROLL", strArray, 2);
                 double db移動時刻 = Convert.ToDouble(strArray[0]);
                 int n移動px = 0;
                 int nComplexMove = 0;
