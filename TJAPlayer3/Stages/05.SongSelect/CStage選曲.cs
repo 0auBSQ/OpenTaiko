@@ -26,7 +26,7 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.ConfigIni.bAIBattleMode)
                 {
-                    return TJAPlayer3.Skin.bgmSongSelect_Dan_In;
+                    return TJAPlayer3.Skin.bgmSongSelect_AI_In;
                 }
                 else
                 {
@@ -40,7 +40,7 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.ConfigIni.bAIBattleMode)
                 {
-                    return TJAPlayer3.Skin.bgmSongSelect_Dan;
+                    return TJAPlayer3.Skin.bgmSongSelect_AI;
                 }
                 else
                 {
