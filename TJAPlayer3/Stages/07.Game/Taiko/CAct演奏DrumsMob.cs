@@ -58,7 +58,7 @@ namespace TJAPlayer3
                     if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
                     {
 
-                        if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowMobCounter += (((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * 180 / nMobBeat;
+                        if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowMobCounter += (Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * 180 / nMobBeat;
                         bool endAnime = nNowMobCounter >= 180;
 
                         if (endAnime)
