@@ -29,7 +29,7 @@ Old TJAPlayer3-Develop-BSQ, a spiritual successor to TJAPlayer3.
 If there is an tag feature on the website you are using, tagging it as "OpenTaiko", "TJAPlayer3", or "TJAP3" will avoid confusion, and might raise video as similar content, so it is highly recommended.
 
 The author of this software does not support breaking copyright laws, so please follow as per your country's copyright laws.
-Additionally, the OpenTaiko team is strongly against the creation and distribution of skins trying to reproduce specific commercial video games and might process to preventive take downs content depending of the infringement gravity.
+Additionally, the OpenTaiko team is strongly against the secondary distribution of skins trying to reproduce specific commercial video games.
 
 ### Editing source code/Secondary distribution
 
