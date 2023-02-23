@@ -51,7 +51,7 @@ OpenTaiko license does not apply in this case.
 
 **NON-GOALS**
 
-- Copying other games/commercial licenses (Such as AC Nijiiro Version) accurately.
+- Copying other games/commercial licenses accurately.
 
 ## Rules for posting Issues/Pull requests
 
