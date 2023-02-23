@@ -89,7 +89,7 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0)
                 {
-                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowDancerCounter += (((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * (this.ar踊り子モーション番号.Length - 1) / nDancerBeat;
+                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowDancerCounter += (Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * (this.ar踊り子モーション番号.Length - 1) / nDancerBeat;
                     nNowDancerFrame = (int)nNowDancerCounter;
                     nNowDancerFrame = Math.Min(nNowDancerFrame, (this.ar踊り子モーション番号.Length - 1));
                     bool endAnime = nNowDancerFrame >= (this.ar踊り子モーション番号.Length - 1) - 1;
