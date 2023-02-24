@@ -626,8 +626,8 @@ namespace TJAPlayer3
 							int[][] num_y;
 							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 							{
-								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
-								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 
 								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
 								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
@@ -652,8 +652,8 @@ namespace TJAPlayer3
 							}
 							else if (TJAPlayer3.ConfigIni.nPlayerCount > 2)
 							{
-								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
-								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
+								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 
 								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
 								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
