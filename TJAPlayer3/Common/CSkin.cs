@@ -330,6 +330,7 @@ namespace TJAPlayer3
 
         public Cシステムサウンド[] voiceMenuSongSelect = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceMenuSongDecide = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuSongDecide_AI = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceMenuDiffSelect = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceMenuDanSelectStart = new Cシステムサウンド[5];
         public Cシステムサウンド[] voiceMenuDanSelectPrompt = new Cシステムサウンド[5];
@@ -376,8 +377,11 @@ namespace TJAPlayer3
         public Cシステムサウンド soundBomb = null;
         //add
         public Cシステムサウンド sound曲決定音 = null;
+        public Cシステムサウンド soundSongDecide_AI = null;
         public Cシステムサウンド bgmリザルトイン音 = null;
         public Cシステムサウンド bgmリザルト音 = null;
+        public Cシステムサウンド bgmResultIn_AI = null;
+        public Cシステムサウンド bgmResult_AI = null;
 
         public Cシステムサウンド bgmDanResult = null;
 
@@ -758,6 +762,7 @@ namespace TJAPlayer3
             //this.soundBlue              = new Cシステムサウンド( @"Sounds\ka.ogg",              false, false, true, ESoundType.SoundEffect );
             this.soundBalloon = new Cシステムサウンド(@"Sounds\balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
             this.sound曲決定音 = new Cシステムサウンド(@"Sounds\SongDecide.ogg", false, false, true, ESoundGroup.Voice);
+            this.soundSongDecide_AI = new Cシステムサウンド(@"Sounds\SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
             this.bgmタイトルイン = new Cシステムサウンド(@"Sounds\BGM\Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmタイトル = new Cシステムサウンド(@"Sounds\BGM\Title.ogg", true, false, true, ESoundGroup.SongPlayback);
@@ -767,6 +772,8 @@ namespace TJAPlayer3
             this.bgmSongSelect_AI = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmResultIn_AI = new Cシステムサウンド(@"Sounds\BGM\Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmResult_AI = new Cシステムサウンド(@"Sounds\BGM\Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
 
             this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
@@ -5092,6 +5099,22 @@ namespace TJAPlayer3
                             {
                                 Game_DanC_Y = strParam.Split(',').Select(int.Parse).ToArray();
                             }
+                            else if (strCommand == nameof(Game_DanC_Base_Offset_X))
+                            {
+                                Game_DanC_Base_Offset_X = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_Base_Offset_Y))
+                            {
+                                Game_DanC_Base_Offset_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_SmallBase_Offset_X))
+                            {
+                                Game_DanC_SmallBase_Offset_X = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_SmallBase_Offset_Y))
+                            {
+                                Game_DanC_SmallBase_Offset_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
 
                             else if (strCommand == nameof(Game_DanC_Size))
                             {
@@ -5874,6 +5897,46 @@ namespace TJAPlayer3
                                     Result_MaxCombo_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Result_ADLib_Show")
+                            {
+                                Result_ADLib_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "Result_ADLib_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_Show")
+                            {
+                                Result_Bomb_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "Result_Bomb_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Result_Score_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -6347,6 +6410,38 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Result_MaxCombo_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_5P[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Result_Score_4P")
@@ -8067,8 +8162,8 @@ namespace TJAPlayer3
         public int[] Game_Judge_4P = new int[] { 364, 32 };
         public int[] Game_Judge_5P = new int[] { 364, 24 };
 
-        public int[] Game_UIMove_4P = new int[] { 165, 68 };
-        public int[] Game_UIMove_5P = new int[] { 165, 60 };
+        public int[] Game_UIMove_4P = new int[] { 0, 176 };
+        public int[] Game_UIMove_5P = new int[] { 0, 144 };
 
         public int[] Game_ScoreRank_4P = new int[] { 87, 88 };
         public int[] Game_ScoreRank_5P = new int[] { 87, 80 };
@@ -8435,6 +8530,10 @@ namespace TJAPlayer3
 
         public int[] Game_DanC_X = new int[] { 807, 70, 70, 70 }; // 329, 437
         public int[] Game_DanC_Y = new int[] { 116, 292, 292, 292 }; // { 116, 190, 236, 292 };
+        public int[] Game_DanC_Base_Offset_X = new int[] { 0, 503 };
+        public int[] Game_DanC_Base_Offset_Y = new int[] { 0, 0 };
+        public int[] Game_DanC_SmallBase_Offset_X = new int[] { 745, 410 };
+        public int[] Game_DanC_SmallBase_Offset_Y = new int[] { 119, 119 };
         public int[] Game_DanC_Number_XY = new int[] { 214, 67 };
         public int[] Game_DanC_Dan_Plate = new int[] { 149, 416 };
 
@@ -8591,6 +8690,14 @@ namespace TJAPlayer3
         public int[] Result_MaxCombo_X = new int[] { 490, 1125 };
         public int[] Result_MaxCombo_Y = new int[] { 356, 356 };
 
+        public bool Result_ADLib_Show = false;
+        public int[] Result_ADLib_X = new int[] { 0, 0 };
+        public int[] Result_ADLib_Y = new int[] { 0, 0 };
+
+        public bool Result_Bomb_Show = false;
+        public int[] Result_Bomb_X = new int[] { 0, 0 };
+        public int[] Result_Bomb_Y = new int[] { 0, 0 };
+
         public int[] Result_Score_X = new int[] { 295, 930 };
         public int[] Result_Score_Y = new int[] { 212, 212 };
         public int[] Result_Score_Number_Interval = new int[] { 33, 0 };
@@ -8688,6 +8795,12 @@ namespace TJAPlayer3
 
         public int[] Result_MaxCombo_4P = new int[] { 183, 419 };
         public int[] Result_MaxCombo_5P = new int[] { 151, 419 };
+
+        public int[] Result_ADLib_4P = new int[] { 0, 0 };
+        public int[] Result_ADLib_5P = new int[] { 0, 0 };
+
+        public int[] Result_Bomb_4P = new int[] { 0, 0 };
+        public int[] Result_Bomb_5P = new int[] { 0, 0 };
 
         public int[] Result_Score_4P = new int[] { 253, 180 };
         public int[] Result_Score_5P = new int[] { 221, 180 };

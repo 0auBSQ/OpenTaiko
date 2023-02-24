@@ -281,7 +281,6 @@ namespace TJAPlayer3
                                     
 
                                     this.bSelect[i] = true;
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
 
                                     bool allPlayerSelected = true;
 
@@ -298,9 +297,29 @@ namespace TJAPlayer3
 
                                     if (allPlayerSelected)
                                     {
+                                        if (TJAPlayer3.Skin.soundSongDecide_AI.b読み込み成功 && TJAPlayer3.ConfigIni.bAIBattleMode)
+                                        {
+                                            TJAPlayer3.Skin.soundSongDecide_AI.t再生する();
+                                        }
+                                        else if (TJAPlayer3.Skin.sound曲決定音.b読み込み成功)
+                                        {
+                                            TJAPlayer3.Skin.sound曲決定音.t再生する();
+                                        }
+                                        else
+                                        {
+                                            TJAPlayer3.Skin.sound決定音.t再生する();
+                                        }
+
                                         for (int i2 = 0; i2 < TJAPlayer3.ConfigIni.nPlayerCount; i2++)
                                         {
-                                            TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.SaveFile]?.t再生する();
+                                            if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                                            {
+                                                TJAPlayer3.Skin.voiceMenuSongDecide_AI[TJAPlayer3.GetActualPlayer(i2)]?.t再生する();
+                                            }
+                                            else
+                                            {
+                                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i2)]?.t再生する();
+                                            }
                                             CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
                                             if (TJAPlayer3.ConfigIni.bAIBattleMode)
                                             {
@@ -311,6 +330,10 @@ namespace TJAPlayer3
                                                 TJAPlayer3.stage選曲.t曲を選択する(n現在の選択行[i2] - 2, i2);
                                             }
                                         }
+                                    }
+                                    else
+                                    {
+                                        TJAPlayer3.Skin.sound決定音.t再生する();
                                     }
                                 }
                             }

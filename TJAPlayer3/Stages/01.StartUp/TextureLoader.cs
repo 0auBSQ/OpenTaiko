@@ -951,7 +951,7 @@ namespace TJAPlayer3
 
             Result_CrownEffect = TxC(RESULT + @"CrownEffect.png");
             Result_ScoreRankEffect = TxC(RESULT + @"ScoreRankEffect.png");
-            Result_Cloud = TxC(RESULT + @"Cloud.png");
+            //Result_Cloud = TxC(RESULT + @"Cloud.png");
             Result_Shine = TxC(RESULT + @"Shine.png");
 
             Result_Speech_Bubble[0] = TxC(RESULT + @"Speech_Bubble.png");
@@ -968,18 +968,18 @@ namespace TJAPlayer3
             for (int i = 1; i <= 5; i++)
                 Result_Flower_Rotate[i - 1] = TxC(RESULT + @"Flower\Rotate_" + i.ToString() + ".png");
 
-            for (int i = 0; i < 3; i++)
-                Result_Work[i] = TxC(RESULT + @"Work\" + i.ToString() + ".png");
+            //for (int i = 0; i < 3; i++)
+                //Result_Work[i] = TxC(RESULT + @"Work\" + i.ToString() + ".png");
 
 
             for (int i = 0; i < 41; i++)
                 Result_Rainbow[i] = TxC(RESULT + @"Rainbow\" + i.ToString() + ".png");
 
-            for (int i = 0; i < 6; i++)
-                Result_Background[i] = TxC(RESULT + @"Background_" + i.ToString() + ".png");
+            //for (int i = 0; i < 6; i++)
+                //Result_Background[i] = TxC(RESULT + @"Background_" + i.ToString() + ".png");
 
-            for (int i = 0; i < 4; i++)
-                Result_Mountain[i] = TxC(RESULT + @"Background_Mountain_" + i.ToString() + ".png");
+            //for (int i = 0; i < 4; i++)
+                //Result_Mountain[i] = TxC(RESULT + @"Background_Mountain_" + i.ToString() + ".png");
 
             for (int i = 0; i < 3; i++)
                 Result_Crown[i] = TxC(RESULT + @"Crown\Crown_" + i.ToString() + ".png");
@@ -1002,7 +1002,7 @@ namespace TJAPlayer3
 
             #region [7_DanResults]
 
-            DanResult_Background = TxC(DANRESULT + @"Background.png");
+            //DanResult_Background = TxC(DANRESULT + @"Background.png");
             DanResult_Rank = TxC(DANRESULT + @"Rank.png");
             DanResult_SongPanel_Base = TxC(DANRESULT + @"SongPanel_Base.png");
             DanResult_StatePanel_Base = TxC(DANRESULT + @"StatePanel_Base.png");
@@ -1780,6 +1780,7 @@ namespace TJAPlayer3
             _skin.voiceAILose[player]?.Dispose();
             _skin.voiceMenuSongSelect[player]?.Dispose();
             _skin.voiceMenuSongDecide[player]?.Dispose();
+            _skin.voiceMenuSongDecide_AI[player]?.Dispose();
             _skin.voiceMenuDiffSelect[player]?.Dispose();
             _skin.voiceMenuDanSelectStart[player]?.Dispose();
             _skin.voiceMenuDanSelectPrompt[player]?.Dispose();
@@ -1805,6 +1806,7 @@ namespace TJAPlayer3
             _skin.voiceAILose[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Clear\AIBattle_Lose");
             _skin.voiceMenuSongSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongSelect");
             _skin.voiceMenuSongDecide[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongDecide");
+            _skin.voiceMenuSongDecide_AI[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\SongDecide_AI");
             _skin.voiceMenuDiffSelect[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DiffSelect");
             _skin.voiceMenuDanSelectStart[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DanSelectStart");
             _skin.voiceMenuDanSelectPrompt[player] = VoiceSelectOggOrWav(charaPath + @"\Sounds\Menu\DanSelectPrompt");
@@ -2217,7 +2219,7 @@ namespace TJAPlayer3
             Result_CrownEffect,
             Result_ScoreRankEffect,
             
-            Result_Cloud,
+            //Result_Cloud,
             Result_Flower,
             Result_Shine,
 
@@ -2227,17 +2229,17 @@ namespace TJAPlayer3
             Result_Panel_5P = new CTexture[5],
             Result_Panel_4P = new CTexture[4],
             Result_Rainbow = new CTexture[41],
-            Result_Background = new CTexture[6],
+            //Result_Background = new CTexture[6],
             Result_Crown = new CTexture[3],
 
             Result_Flower_Rotate = new CTexture[5],
-            Result_Work = new CTexture[3],
+            //Result_Work = new CTexture[3],
 
             Result_Gauge = new CTexture[5],
             Result_Gauge_Base = new CTexture[5],
-            Result_Speech_Bubble = new CTexture[2],
-
-            Result_Mountain = new CTexture[4];
+            Result_Speech_Bubble = new CTexture[2]
+/*,
+Result_Mountain = new CTexture[4]*/;
         #endregion
 
         #region 7_AIResults
@@ -2255,7 +2257,8 @@ namespace TJAPlayer3
 
         #region [7_DanResults]
 
-        public CTexture DanResult_Background,
+        public CTexture 
+            //DanResult_Background,
             DanResult_Rank,
             DanResult_SongPanel_Base,
             DanResult_StatePanel_Base,
