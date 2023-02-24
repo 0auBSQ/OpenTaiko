@@ -609,8 +609,8 @@ namespace TJAPlayer3
                     int yOrigin = (isResult) ? TJAPlayer3.Skin.DanResult_Exam[1] : TJAPlayer3.Skin.Game_DanC_Y[1];
 
                     // Origin position which will be used as a reference for bar elements
-                    int barXOffset = xOrigin + (currentPosition >= 3 ? 503 : 0);
-                    int barYOffset = yOrigin + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
+                    int barXOffset = xOrigin + (currentPosition >= 3 ? TJAPlayer3.Skin.Game_DanC_Base_Offset_X[1] : TJAPlayer3.Skin.Game_DanC_Base_Offset_X[0]);
+                    int barYOffset = yOrigin + (currentPosition >= 3 ? TJAPlayer3.Skin.Game_DanC_Base_Offset_Y[1] : TJAPlayer3.Skin.Game_DanC_Base_Offset_Y[0]) + TJAPlayer3.Skin.Game_DanC_Size[1] * yIndex + (yIndex * TJAPlayer3.Skin.Game_DanC_Padding);
                     
                     // Small bar
                     int lowerBarYOffset = barYOffset + TJAPlayer3.Skin.Game_DanC_Size[1] + TJAPlayer3.Skin.Game_DanC_Padding;
@@ -719,10 +719,10 @@ namespace TJAPlayer3
                                 TJAPlayer3.Tx.DanC_SmallBase.vc拡大縮小倍率.X = isSmallGauge ? 0.34f : 1f;
 
                                 // 815 : Small base (70 + 745)
-                                int miniBarPositionX = barXOffset + (isSmallGauge ? 410 : 745);
+                                int miniBarPositionX = barXOffset + (isSmallGauge ? TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_X[1] : TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_X[0]);
 
                                 // 613 + (j - 1) * 33 : Small base (barYoffset for 3rd exam : 494 + 119 + Local song offset (j - 1) * 33)
-                                int miniBarPositionY = (barYOffset + 119) + (j - 1) * 33 - (TJAPlayer3.Skin.Game_DanC_Size[1] + (TJAPlayer3.Skin.Game_DanC_Padding));
+                                int miniBarPositionY = (barYOffset + (isSmallGauge ? TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[1] : TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[0])) + (j - 1) * 33 - (TJAPlayer3.Skin.Game_DanC_Size[1] + (TJAPlayer3.Skin.Game_DanC_Padding));
 
                                 // Display bars
                                 #region [Displayables]

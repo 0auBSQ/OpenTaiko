@@ -105,7 +105,7 @@ namespace TJAPlayer3
 		{
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-				TJAPlayer3.Skin.bgmリザルトイン音.t再生する();
+				bgmResultIn.t再生する();
 			
 			Trace.TraceInformation("結果ステージを活性化します。");
 			Trace.Indent();
@@ -745,9 +745,8 @@ namespace TJAPlayer3
 				}
 				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 				{
-					//Luaに移植する時にコメントアウトを解除
-					//Background = new ScriptBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}\Script.lua"));
-					//Background.Init();
+					Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
+					Background.Init();
 
 					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
 					{
@@ -773,14 +772,14 @@ namespace TJAPlayer3
 				}
                 else if (TJAPlayer3.ConfigIni.bAIBattleMode)
 				{
-					Background = new ScriptBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}\AIBattle\Script.lua"));
+					Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle\Script.lua"));
 					Background.Init();
 				}
 				else
 				{
 					//Luaに移植する時にコメントアウトを解除
-					//Background = new ScriptBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}\Script.lua"));
-					//Background.Init();
+					Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}\Script.lua"));
+					Background.Init();
 				}
 
 				base.OnManagedリソースの作成();
@@ -858,13 +857,14 @@ namespace TJAPlayer3
                 {
                     #region [Ensou game result screen]
 
-                    if (!b音声再生 && !TJAPlayer3.Skin.bgmリザルトイン音.b再生中)
+                    if (!b音声再生 && !bgmResultIn.b再生中)
 					{
-						TJAPlayer3.Skin.bgmリザルト音.t再生する();
+						bgmResultLoop.t再生する();
 						b音声再生 = true;
 					}
 					if (!TJAPlayer3.ConfigIni.bAIBattleMode)
 					{
+						/*
 						if (TJAPlayer3.Tx.Result_Background != null)
 						{
 							bool is1P = (TJAPlayer3.ConfigIni.nPlayerCount == 1);
@@ -1110,7 +1110,7 @@ namespace TJAPlayer3
 								}
 							}
 						}
-
+						*/
 						if (TJAPlayer3.Tx.Result_Header != null)
 						{
 							TJAPlayer3.Tx.Result_Header.t2D描画(TJAPlayer3.app.Device, 0, 0);
@@ -1131,9 +1131,9 @@ namespace TJAPlayer3
 					}
 					*/
 
-					if (!b音声再生 && !TJAPlayer3.Skin.bgmリザルトイン音.b再生中)
+					if (!b音声再生 && !bgmResultIn.b再生中)
 					{
-						TJAPlayer3.Skin.bgmリザルト音.t再生する();
+						bgmResultLoop.t再生する();
 						b音声再生 = true;
 					}
 
@@ -1180,7 +1180,7 @@ namespace TJAPlayer3
 							b音声再生 = true;
 						}
 
-						TJAPlayer3.Tx.DanResult_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
+						//TJAPlayer3.Tx.DanResult_Background.t2D描画(TJAPlayer3.app.Device, 0, 0);
 						TJAPlayer3.Tx.DanResult_SongPanel_Base.t2D描画(TJAPlayer3.app.Device, 0, 0);
 
 						#region [DanPlate]
@@ -1540,7 +1540,7 @@ namespace TJAPlayer3
 						{
 							#region [ Return to song select screen (Faster method) ]
 
-							TJAPlayer3.Skin.bgmリザルト音.t停止する();
+							bgmResultLoop.t停止する();
 							TJAPlayer3.Skin.bgmDanResult.t停止する();
 							TJAPlayer3.Skin.bgmTowerResult.t停止する();
 							TJAPlayer3.Skin.sound決定音.t再生する();
@@ -1606,7 +1606,7 @@ namespace TJAPlayer3
 									{
 										base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
 										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-										TJAPlayer3.Skin.bgmリザルト音.t停止する();
+										bgmResultLoop.t停止する();
 										TJAPlayer3.Skin.bgmDanResult.t停止する();
 										TJAPlayer3.Skin.bgmTowerResult.t停止する();
 									}
@@ -1970,7 +1970,7 @@ namespace TJAPlayer3
 		private int n最後に再生したHHのWAV番号;
 		private int n最後に再生したHHのチャンネル番号;
 		private CSound rResultSound;
-		private ScriptBG Background;
+		public ResultBG Background;
 
 		public bool[] bClear
         {
@@ -2062,6 +2062,36 @@ namespace TJAPlayer3
 		private CPrivateFastFont pfTowerText;
 		private CPrivateFastFont pfTowerText48;
 		private CPrivateFastFont pfTowerText72;
+
+		private CSkin.Cシステムサウンド bgmResultIn
+		{
+			get
+			{
+				if (TJAPlayer3.ConfigIni.bAIBattleMode)
+				{
+					return TJAPlayer3.Skin.bgmResultIn_AI;
+				}
+				else
+				{
+					return TJAPlayer3.Skin.bgmリザルトイン音;
+				}
+			}
+		}
+
+		private CSkin.Cシステムサウンド bgmResultLoop
+		{
+			get
+			{
+				if (TJAPlayer3.ConfigIni.bAIBattleMode)
+				{
+					return TJAPlayer3.Skin.bgmResult_AI;
+				}
+				else
+				{
+					return TJAPlayer3.Skin.bgmリザルト音;
+				}
+			}
+		}
 
 		// Modal queues
 		private ModalQueue mqModals;

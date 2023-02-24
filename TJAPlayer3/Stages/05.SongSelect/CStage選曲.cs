@@ -1053,7 +1053,7 @@ namespace TJAPlayer3
                                     {
                                         //this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
                                         //this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.START);
+                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
                                         for (int i = 0; i < 7; i++) tカーソルスキップ(true);
                                     }
@@ -1077,7 +1077,7 @@ namespace TJAPlayer3
                                     {
                                         //this.ctDonchan_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
                                         //this.ctDonchan_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.START);
+                                        CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
                                         for (int i = 0; i < 7; i++) tカーソルスキップ(false);
                                     }
@@ -1647,7 +1647,15 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 this.n確定された曲の難易度[i] = tGetRandomSongDifficulty(usedDiffs[i]);
-                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    TJAPlayer3.Skin.voiceMenuSongDecide_AI[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                }
+                else
+                {
+                    TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                }
             }
 
             /*

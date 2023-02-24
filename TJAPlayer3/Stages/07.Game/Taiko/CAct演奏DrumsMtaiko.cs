@@ -116,7 +116,11 @@ namespace TJAPlayer3
                 {
                     case 0:
                         {
-                            if (TJAPlayer3.ConfigIni.bTokkunMode)
+                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                            {
+                                tex = TJAPlayer3.Tx.Taiko_Background[2];
+                            }
+                            else if (TJAPlayer3.ConfigIni.bTokkunMode)
                             {
                                 if (TJAPlayer3.P1IsBlue())
                                     tex = TJAPlayer3.Tx.Taiko_Background[6];
