@@ -369,6 +369,7 @@ namespace TJAPlayer3
                 this.b強制的に分岐させた[i] = false;
 
                 this.CChartScore[i] = new CBRANCHSCORE();
+                this.CSectionScore[i] = new CBRANCHSCORE();
 
                 TJAPlayer3.stage演奏ドラム画面.actMtaiko.After[i] = CDTX.ECourse.eNormal;
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.stBranch[i].nAfter = CDTX.ECourse.eNormal;
@@ -844,7 +845,7 @@ namespace TJAPlayer3
 
         public CBRANCHSCORE[] CBranchScore = new CBRANCHSCORE[6];
         public CBRANCHSCORE[] CChartScore = new CBRANCHSCORE[5];
-        public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[2];
+        public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[5];
 
         public bool[] bIsGOGOTIME = new bool[5];
         public bool[] bIsMiss = new bool[5];
@@ -956,6 +957,11 @@ namespace TJAPlayer3
             }
             actAIBattle.BatchAnimeCounter.n現在の値 = 0;
             _AIBattleState = 0;
+
+            for (int i = 0; i < 5; i++)
+            {
+                this.CSectionScore[i] = new CBRANCHSCORE();
+            }
 
             int clearCount = 0;
             for (int i = 0; i < TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count; i++)
@@ -1355,6 +1361,7 @@ namespace TJAPlayer3
                 
                 this.CBranchScore[ nPlayer ].nRoll++;
                 this.CChartScore[nPlayer].nRoll++;
+                this.CSectionScore[nPlayer].nRoll++;
 
                 this.n合計連打数[ nPlayer ]++;
                 if(TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
@@ -1508,6 +1515,9 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     this.n連打[actDan.NowShowingNumber]++;
+                this.CBranchScore[player].nRoll++;
+                this.CChartScore[player].nRoll++;
+                this.CSectionScore[player].nRoll++;
 
                 this.n合計連打数[player]++; //  成績発表の連打数に風船を含めるように (AioiLight)
 
@@ -1739,6 +1749,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
                                 this.CChartScore[nPlayer].nADLIB++;
+                                this.CSectionScore[nPlayer].nADLIB++;
                                 this.CBranchScore[nPlayer].nADLIB++;
                                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                     this.nADLIB[actDan.NowShowingNumber]++;
@@ -1757,6 +1768,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Skin.soundBomb?.t再生する();
                                 actGauge.MineDamage(nPlayer);
                                 this.CChartScore[nPlayer].nMine++;
+                                this.CSectionScore[nPlayer].nMine++;
                                 this.CBranchScore[nPlayer].nMine++;
                                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                                     this.nMine[actDan.NowShowingNumber]++;
@@ -1875,6 +1887,7 @@ namespace TJAPlayer3
 
                                     this.CBranchScore[nPlayer].nGreat++;
                                     this.CChartScore[nPlayer].nGreat++;
+                                    this.CSectionScore[nPlayer].nGreat++;
                                     this.Chara_MissCount[nPlayer] = 0;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Perfect++;
@@ -1915,6 +1928,7 @@ namespace TJAPlayer3
                                 {
                                     this.CBranchScore[nPlayer].nGood++;
                                     this.CChartScore[nPlayer].nGood++;
+                                    this.CSectionScore[nPlayer].nGood++;
                                     this.Chara_MissCount[nPlayer] = 0;
 
                                     if ( nPlayer == 0 ) this.nヒット数_Auto含まない.Drums.Great++;
@@ -1965,6 +1979,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nMiss++;
                                         this.CChartScore[nPlayer].nMiss++;
+                                        this.CSectionScore[nPlayer].nMiss++;
                                         this.Chara_MissCount[nPlayer]++;
 
                                         if (nPlayer == 0) this.nヒット数_Auto含まない.Drums.Miss++;
@@ -2004,6 +2019,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nGreat++;
                                         this.CChartScore[nPlayer].nGreat++;
+                                        this.CSectionScore[nPlayer].nGreat++;
                                         this.Chara_MissCount[nPlayer] = 0;
 
                                         if ( nPlayer == 0 ) this.nヒット数_Auto含む.Drums.Perfect++;
@@ -2045,6 +2061,7 @@ namespace TJAPlayer3
 
                                         this.CBranchScore[nPlayer].nGood++;
                                         this.CChartScore[nPlayer].nGood++;
+                                        this.CSectionScore[nPlayer].nGood++;
                                         this.Chara_MissCount[nPlayer] = 0;
 
                                         if (nPlayer == 0) this.nヒット数_Auto含む.Drums.Great++;
@@ -2092,6 +2109,7 @@ namespace TJAPlayer3
 
                                             this.CBranchScore[nPlayer].nMiss++;
                                             this.CChartScore[nPlayer].nMiss++;
+                                            this.CSectionScore[nPlayer].nMiss++;
                                             this.Chara_MissCount[nPlayer]++;
                                         }
 
@@ -2360,8 +2378,10 @@ namespace TJAPlayer3
                 }
 
                 //キーを押したときにスコア情報 + nAddScoreを置き換える様に
-                this.CBranchScore[nPlayer].nScore = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
-                this.CChartScore[nPlayer].nScore = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+                int __score = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+                this.CBranchScore[nPlayer].nScore = __score;
+                this.CChartScore[nPlayer].nScore = __score;
+                this.CSectionScore[nPlayer].nScore = __score;
             }
 
 

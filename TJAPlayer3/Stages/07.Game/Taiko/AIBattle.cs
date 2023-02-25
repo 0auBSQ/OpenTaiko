@@ -189,10 +189,10 @@ namespace TJAPlayer3
 
                 int[] numArr = new int[4]
                 {
-                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGreat,
-                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGood,
-                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nMiss,
-                    TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nRoll
+                    TJAPlayer3.stage演奏ドラム画面.CSectionScore[player].nGreat,
+                    TJAPlayer3.stage演奏ドラム画面.CSectionScore[player].nGood,
+                    TJAPlayer3.stage演奏ドラム画面.CSectionScore[player].nMiss,
+                    TJAPlayer3.stage演奏ドラム画面.CSectionScore[player].nRoll
                 };
 
                 int[] num_x = new int[4]
