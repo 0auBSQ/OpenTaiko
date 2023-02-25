@@ -1966,7 +1966,7 @@ namespace TJAPlayer3
 
         public CTexture Dani_DanPlates;
         public CTexture Dani_DanSides;
-        public CTexture[] Dani_Bloc = new CTexture[3];
+        public CTexture[] Dani_Bloc = new CTexture[4];
 
         #endregion
 
