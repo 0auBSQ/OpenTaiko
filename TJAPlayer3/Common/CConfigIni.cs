@@ -1151,6 +1151,7 @@ namespace TJAPlayer3
 		public int nDefaultCourse; //2017.01.30 DD デフォルトでカーソルをあわせる難易度
 
 		private int _nPlayerCount;
+		public int nPreviousPlayerCount = 1; // Specific usages
 		public int nPlayerCount
 		{
 			get
@@ -1175,7 +1176,7 @@ namespace TJAPlayer3
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
 		public int nAILevel;
-		public bool bAIBattleMode;
+		public bool bAIBattleMode = false;
 
 		public CAIPerformances[] apAIPerformances =
 		{
@@ -2349,7 +2350,7 @@ namespace TJAPlayer3
 			sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 			sw.WriteLine("AILevel={0}", this.nAILevel);
-			sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
+			//sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
 			sw.WriteLine();
             sw.WriteLine(";-------------------");
             #endregion
@@ -3256,10 +3257,12 @@ namespace TJAPlayer3
                                         {
 											this.nAILevel = int.Parse(str4);
 										}
+										/*
 										if (str3.Equals("AIBattleMode"))
 										{
 											bAIBattleMode = C変換.bONorOFF(str4[0]);
 										}
+										*/
 										continue;
                                     //-----------------------------
                                     #endregion

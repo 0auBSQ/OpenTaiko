@@ -959,7 +959,6 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
-								ConfigIni.bAIBattleMode = false;
 								//-----------------------------
 								#endregion
 								break;
@@ -973,9 +972,6 @@ namespace TJAPlayer3
 								stage段位選択.On活性化();								
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage段位選択;
-
-								ConfigIni.bAIBattleMode = false;
-
 								TJAPlayer3.latestSongSelect = stage段位選択;
 								//-----------------------------
 								#endregion
@@ -1057,7 +1053,8 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
-								ConfigIni.nPlayerCount = 2;
+								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
+                                ConfigIni.nPlayerCount = 2;
 								ConfigIni.bAIBattleMode = true;
 								//-----------------------------
 								#endregion
@@ -1150,11 +1147,16 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
 
-								/*
+								if (ConfigIni.bAIBattleMode == true)
+								{
+									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
+                                    ConfigIni.bAIBattleMode = false;
+                                }
+                                /*
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
 								*/
-								CSongSelectSongManager.stopSong();
+                                CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
 								foreach ( STPlugin pg in this.listプラグイン )
