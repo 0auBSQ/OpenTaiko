@@ -1215,7 +1215,9 @@ namespace TJAPlayer3
                         {
 							int songOffset = (int)(Math.Max(0, 3200 + 300 * i - ctPhase1.n現在の値) * screen_ratio_x);
 
-							ftDanDisplaySongInfo(i, songOffset);
+							int quadrant = i / 3;
+							if (quadrant == nNowDanSongInfo)
+								ftDanDisplaySongInfo(i, songOffset);
 						}
 
 						#endregion
@@ -1788,8 +1790,9 @@ namespace TJAPlayer3
 
 			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
 			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_Y[drawPos], new Rectangle(song.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+            TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 
-			TJAPlayer3.Tx.Dani_Level_Number.Opacity = opacity;
+            TJAPlayer3.Tx.Dani_Level_Number.Opacity = opacity;
 			TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(TJAPlayer3.Skin.DanResult_Level_Number_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
 			TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
 
