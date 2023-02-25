@@ -3124,6 +3124,18 @@ namespace TJAPlayer3
                                     DaniSelect_Plate_Title_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Size")
+                            {
+                                DaniSelect_DanIconTitle_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DaniSelect_DanIconTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "DaniSelect_DanIcon_Color")
                             {
                                 string[] strSplit = strParam.Split(',');
