@@ -339,6 +339,7 @@ namespace TJAPlayer3
 
             Dani_DanPlates = TxC(DANISELECT + "DanPlates.png");
             Dani_DanIcon = TxC(DANISELECT + "DanIcon.png");
+            Dani_DanIcon_Fade = TxC(DANISELECT + "DanIcon_Fade.png");
             Dani_DanSides = TxC(DANISELECT + "DanSides.png");
 
             for (int i = 0; i < Dani_Bloc.Length; i++)
@@ -1967,6 +1968,7 @@ namespace TJAPlayer3
 
         public CTexture Dani_DanPlates;
         public CTexture Dani_DanIcon;
+        public CTexture Dani_DanIcon_Fade;
         public CTexture Dani_DanSides;
         public CTexture[] Dani_Bloc = new CTexture[4];
 

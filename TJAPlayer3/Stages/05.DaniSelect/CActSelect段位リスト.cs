@@ -338,7 +338,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static void tDisplayDanIcon(int count, float x, float y, int opacity)
+        public static void tDisplayDanIcon(int count, float x, float y, int opacity, float scale, bool showFade = false)
         {
             if (pfDanIconTitle == null)
                 pfDanIconTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.DaniSelect_DanIconTitle_Size);
@@ -359,13 +359,24 @@ namespace TJAPlayer3
 
             TitleTextureKey ttkTmp = new TitleTextureKey(count.ToString() + ex, pfDanIconTitle, Color.White, Color.Black, 1000);
 
+            if (showFade)
+            {
+                TJAPlayer3.Tx.Dani_DanIcon_Fade.vc拡大縮小倍率 = new SharpDX.Vector3(scale, scale, 1.0f);
+                TJAPlayer3.Tx.Dani_DanIcon_Fade.Opacity = opacity;
+                TJAPlayer3.Tx.Dani_DanIcon_Fade.color4 = C変換.ColorToColor4(TJAPlayer3.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, TJAPlayer3.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
+                TJAPlayer3.Tx.Dani_DanIcon_Fade.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Left, x - ((TJAPlayer3.Tx.Dani_DanIcon.szテクスチャサイズ.Width / 2) * scale), y);
+                TJAPlayer3.Tx.Dani_DanIcon_Fade.Opacity = 255;
+            }
+
+            TJAPlayer3.Tx.Dani_DanIcon.vc拡大縮小倍率 = new SharpDX.Vector3(scale, scale, 1.0f);
             TJAPlayer3.Tx.Dani_DanIcon.Opacity = opacity;
             TJAPlayer3.Tx.Dani_DanIcon.color4 = C変換.ColorToColor4(TJAPlayer3.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, TJAPlayer3.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
             TJAPlayer3.Tx.Dani_DanIcon.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
             TJAPlayer3.Tx.Dani_DanIcon.Opacity = 255;
 
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).vc拡大縮小倍率 = new SharpDX.Vector3(scale, scale, 1.0f);
             TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).Opacity = opacity;
-            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[0], y + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[1]);
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[0], y + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[1]);
             TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).Opacity = 255;
         }
 
@@ -485,7 +496,7 @@ namespace TJAPlayer3
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Title_X[pos], TJAPlayer3.Skin.DaniSelect_Title_Y[pos]);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = 255;
 
-                tDisplayDanIcon(i + 1, scroll + Anime + TJAPlayer3.Skin.DaniSelect_DanIcon_X[pos], TJAPlayer3.Skin.DaniSelect_DanIcon_Y[pos], opacity);
+                tDisplayDanIcon(i + 1, scroll + Anime + TJAPlayer3.Skin.DaniSelect_DanIcon_X[pos], TJAPlayer3.Skin.DaniSelect_DanIcon_Y[pos], opacity, 1.0f);
             }
                 
             for (int i = 0; i < stバー情報[currentSong].n曲難易度.Length; i++)

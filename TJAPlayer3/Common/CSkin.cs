@@ -5272,6 +5272,14 @@ namespace TJAPlayer3
                             {
                                 Game_DanC_Dan_Plate = strParam.Split(',').Select(int.Parse).ToArray();
                             }
+                            else if (strCommand == nameof(Game_DanC_DanIcon_Offset))
+                            {
+                                Game_DanC_DanIcon_Offset = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_DanIcon_Offset_Mini))
+                            {
+                                Game_DanC_DanIcon_Offset_Mini = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
                             else if (strCommand == nameof(Game_DanC_Title_X))
                             {
                                 Game_DanC_Title_X = strParam.Split(',').Select(int.Parse).ToArray();
@@ -6879,6 +6887,22 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 3; i++)
                                 {
                                     DanResult_DanTitles_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanIcon_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanIcon_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanIcon_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanIcon_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "DanResult_Rank")
@@ -8671,9 +8695,13 @@ namespace TJAPlayer3
         public int[] Game_DanC_Number_XY = new int[] { 214, 67 };
         public int[] Game_DanC_Dan_Plate = new int[] { 149, 416 };
 
+        public int[] Game_DanC_DanIcon_Offset = new int[] { 44, 57 };
+        public int[] Game_DanC_DanIcon_Offset_Mini = new int[] { -19, 11 };
+
         public int[] Game_DanC_Title_X = new int[] { 806, 806 };
         public int[] Game_DanC_Title_Y = new int[] { 257, 237 };
         public int[] Game_DanC_SubTitle = new int[] { 806, 277 };
+
 
         public int Game_DanC_Title_Size = 30;
         public int Game_DanC_SubTitle_Size = 22;
@@ -9014,6 +9042,9 @@ namespace TJAPlayer3
 
         public int[] DanResult_DanTitles_X = new int[] { 401, 401, 401 };
         public int[] DanResult_DanTitles_Y = new int[] { 139, 322, 505 };
+
+        public int[] DanResult_DanIcon_X = new int[] { 315, 315, 315 };
+        public int[] DanResult_DanIcon_Y = new int[] { 158, 342, 526 };
 
         public int[] DanResult_Rank = new int[] { 130, 380 };
 
