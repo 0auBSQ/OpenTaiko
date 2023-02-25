@@ -1823,6 +1823,8 @@ namespace TJAPlayer3
 			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
 			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
 
+			CActSelect段位リスト.tDisplayDanIcon(i + 1, TJAPlayer3.Skin.DanResult_DanIcon_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanIcon_Y[drawPos], opacity, 1.0f);
+
 		}
 
 		#endregion
