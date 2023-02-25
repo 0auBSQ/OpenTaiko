@@ -13,10 +13,16 @@ namespace TJAPlayer3
 {
 	internal class CActSelectPopupMenu : CActivity
 	{
+		private static List<CActSelectPopupMenu> Child = new List<CActSelectPopupMenu>();
+
+		public CActSelectPopupMenu()
+        {
+			Child.Add(this);
+		}
 
 		// プロパティ
 
-	
+
 		public int GetIndex(int pos)
 		{
 			return lciMenuItems[ pos ].cItem.GetIndex();
@@ -99,7 +105,37 @@ namespace TJAPlayer3
 	        }
 	    }
 
-	    public void tEnter押下()
+		public static void RefleshSkin()
+		{
+            for (int i = 0; i < Child.Count; i++)
+            {
+				Child[i]._RefleshSkin();
+			}
+		}
+
+		public void _RefleshSkin()
+		{
+			TJAPlayer3.t安全にDisposeする(ref prvFont);
+			ConditionallyInitializePrvFont();
+
+			using (var bitmap = prvFont.DrawPrivateFont(stqMenuTitle.cItem.str項目名, Color.White, Color.Black))
+			{
+				TJAPlayer3.t安全にDisposeする(ref stqMenuTitle.txName);
+				stqMenuTitle.txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+				stqMenuTitle.rectName = prvFont.RectStrings;
+			}
+			for (int i = 0; i < lciMenuItems.Length; i++)
+			{
+				using (var bitmap = prvFont.DrawPrivateFont(lciMenuItems[i].cItem.str項目名, Color.White, Color.Black))
+				{
+					TJAPlayer3.t安全にDisposeする(ref lciMenuItems[i].txName);
+					lciMenuItems[i].txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+					lciMenuItems[i].rectName = prvFont.RectStrings;
+				}
+			}
+		}
+
+		public void tEnter押下()
 		{
 			if ( this.bキー入力待ち )
 			{

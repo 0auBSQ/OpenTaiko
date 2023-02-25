@@ -269,6 +269,13 @@ namespace TJAPlayer3
         }
 
         static CPrivateFastFont pfDanPlateTitle = null;
+        static CPrivateFastFont pfDanIconTitle = null;
+
+        public static void RefleshSkin()
+        {
+            TJAPlayer3.t安全にDisposeする(ref pfDanPlateTitle);
+            TJAPlayer3.t安全にDisposeする(ref pfDanIconTitle);
+        }
 
         public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y)
         {
@@ -329,6 +336,37 @@ namespace TJAPlayer3
                 TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.Substring(0, 2), pfDanPlateTitle, Color.White, Color.Black, 1000);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_DanPlateTitle_Offset[0], y + TJAPlayer3.Skin.DaniSelect_DanPlateTitle_Offset[1]);
             }
+        }
+
+        public static void tDisplayDanIcon(int count, float x, float y, int opacity)
+        {
+            if (pfDanIconTitle == null)
+                pfDanIconTitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.DaniSelect_DanIconTitle_Size);
+
+            string ex = "th";
+            switch (count)
+            {
+                case 1:
+                    ex = "st";
+                    break;
+                case 2:
+                    ex = "nd";
+                    break;
+                case 3:
+                    ex = "rd";
+                    break;
+            }
+
+            TitleTextureKey ttkTmp = new TitleTextureKey(count.ToString() + ex, pfDanIconTitle, Color.White, Color.Black, 1000);
+
+            TJAPlayer3.Tx.Dani_DanIcon.Opacity = opacity;
+            TJAPlayer3.Tx.Dani_DanIcon.color4 = C変換.ColorToColor4(TJAPlayer3.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, TJAPlayer3.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
+            TJAPlayer3.Tx.Dani_DanIcon.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, x, y);
+            TJAPlayer3.Tx.Dani_DanIcon.Opacity = 255;
+
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).Opacity = opacity;
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).t2D中心基準描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[0], y + TJAPlayer3.Skin.DaniSelect_DanIconTitle_Offset[1]);
+            TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTmp).Opacity = 255;
         }
 
         private void tDrawDanSelectedLevel(float Anime, int modifier = 0)
@@ -438,12 +476,16 @@ namespace TJAPlayer3
             for (int i = 0; i < stバー情報[currentSong].ttkタイトル.Length - 1; i++)
             {
                 int pos = i % 3;
+                int opacity = 255;
                 if (stバー情報[currentSong].ttkタイトル.Length - 1 > 3)
                 {
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = getOpacity(i);
+                    opacity = getOpacity(i);
                 }
+                TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = opacity;
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Title_X[pos], TJAPlayer3.Skin.DaniSelect_Title_Y[pos]);
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = 255;
+
+                tDisplayDanIcon(i + 1, scroll + Anime + TJAPlayer3.Skin.DaniSelect_DanIcon_X[pos], TJAPlayer3.Skin.DaniSelect_DanIcon_Y[pos], opacity);
             }
                 
             for (int i = 0; i < stバー情報[currentSong].n曲難易度.Length; i++)
