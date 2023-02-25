@@ -454,12 +454,25 @@ namespace TJAPlayer3
 
             #region [Song information]
 
-            int getOpacity(int index)
+            int getOpacity(int index, int sections = 2)
             {
+                int current_section = index / 3;
+                int animJauge = ctExamConditionsAnim.n現在の値;
+                int split = 4000 / sections;
+                int begin = split * current_section;
+                int end = split * (current_section + 1);
+                if (animJauge < begin || animJauge > end) return 0;
+
+                double sinus = Math.Abs(Math.Sin(animJauge * Math.PI / split));
+
+                if (sinus == 0) return 0;
+                return (int)(Math.Abs(Math.Pow(sinus, 1.2) / sinus) * 255);
+
+                /*
                 int opacity = 255;
                 int half = index / 3;
 
-                int animJauge = ctExamConditionsAnim.n現在の値;
+                
 
                 if (half == 0)
                 {
@@ -479,10 +492,12 @@ namespace TJAPlayer3
                 }
 
                 return opacity;
+                */
             }
 
             int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Width / 5;
             int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
+            int sections_count = 1 + ((stバー情報[currentSong].n曲レベル.Length - 1) / 3);
 
             for (int i = 0; i < stバー情報[currentSong].ttkタイトル.Length - 1; i++)
             {
@@ -490,7 +505,7 @@ namespace TJAPlayer3
                 int opacity = 255;
                 if (stバー情報[currentSong].ttkタイトル.Length - 1 > 3)
                 {
-                    opacity = getOpacity(i);
+                    opacity = getOpacity(i, sections_count);
                 }
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = opacity;
                 TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Title_X[pos], TJAPlayer3.Skin.DaniSelect_Title_Y[pos]);
@@ -504,7 +519,7 @@ namespace TJAPlayer3
                 int pos = i % 3;
                 if (stバー情報[currentSong].n曲難易度.Length > 3)
                 {
-                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = getOpacity(i);
+                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = getOpacity(i, sections_count);
                 }
                 TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device, scroll + Anime + TJAPlayer3.Skin.DaniSelect_Difficulty_Cymbol_X[pos], TJAPlayer3.Skin.DaniSelect_Difficulty_Cymbol_Y[pos], new Rectangle(stバー情報[currentSong].n曲難易度[i] * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
                 TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
@@ -515,7 +530,7 @@ namespace TJAPlayer3
                 int pos = i % 3;
                 if (stバー情報[currentSong].n曲レベル.Length > 3)
                 {
-                    TJAPlayer3.Tx.Dani_Level_Number.Opacity = getOpacity(i);
+                    TJAPlayer3.Tx.Dani_Level_Number.Opacity = getOpacity(i, sections_count);
                 }
                 this.tLevelNumberDraw(scroll + Anime + TJAPlayer3.Skin.DaniSelect_Level_Number_X[pos], TJAPlayer3.Skin.DaniSelect_Level_Number_Y[pos], stバー情報[currentSong].n曲レベル[i]);
                 TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
@@ -596,6 +611,9 @@ namespace TJAPlayer3
                             CTexture tex = null;
                             switch (stバー情報[currentSong].List_DanSongs.Count)
                             {
+                                case 1:
+                                    tex = TJAPlayer3.Tx.Dani_Bloc[0];
+                                    break;
                                 case 2:
                                 case 3:
                                     tex = TJAPlayer3.Tx.Dani_Bloc[1];
@@ -603,15 +621,12 @@ namespace TJAPlayer3
                                 case 4:
                                 case 5:
                                 case 6:
+                                default:
                                     tex = TJAPlayer3.Tx.Dani_Bloc[3];
                                     moveX /= 2;
                                     moveY /= 2;
                                     exam_x = TJAPlayer3.Skin.DaniSelect_Exam_X_Ex[index];
                                     exam_y = TJAPlayer3.Skin.DaniSelect_Exam_Y_Ex[index];
-                                    break;
-                                case 1:
-                                default:
-                                    tex = TJAPlayer3.Tx.Dani_Bloc[0];
                                     break;
                             }
 
@@ -624,9 +639,10 @@ namespace TJAPlayer3
                                     y);
                             }
 
-                            tExamDraw(scroll + Anime + exam_x + (i * moveX),
-                                exam_y + (i * moveY),
-                                stバー情報[currentSong].List_DanSongs[i].Dan_C[j].Value[0], stバー情報[currentSong].List_DanSongs[i].Dan_C[j].GetExamRange());
+                            if (i < 6)
+                                tExamDraw(scroll + Anime + exam_x + (i * moveX),
+                                    exam_y + (i * moveY),
+                                    stバー情報[currentSong].List_DanSongs[i].Dan_C[j].Value[0], stバー情報[currentSong].List_DanSongs[i].Dan_C[j].GetExamRange());
                         } 
                         else    
                         {
@@ -636,7 +652,7 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.Tx.Dani_Bloc[0] != null)
                                     TJAPlayer3.Tx.Dani_Bloc[0].Opacity = opacity;
-                                TJAPlayer3.Tx.Dani_Bloc[0]?.t2D描画(TJAPlayer3.app.Device,
+                                    TJAPlayer3.Tx.Dani_Bloc[0]?.t2D描画(TJAPlayer3.app.Device,
                                     scroll + Anime + TJAPlayer3.Skin.DaniSelect_Exam_Bloc_X[index],
                                     TJAPlayer3.Skin.DaniSelect_Exam_Bloc_Y[index]);
                             }
@@ -778,8 +794,8 @@ namespace TJAPlayer3
 
             float text_width = TJAPlayer3.Skin.DaniSelect_Soul_Number_Text_Width;
 
-            TJAPlayer3.Tx.Dani_Soul_Number.t2D描画(TJAPlayer3.app.Device, x + (TJAPlayer3.Skin.DaniSelect_Soul_Number_Interval[0] * nums.Length),
-                y + (TJAPlayer3.Skin.DaniSelect_Soul_Number_Interval[1] * nums.Length) - (height / 2),
+            TJAPlayer3.Tx.Dani_Soul_Number.t2D描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_Soul_Number_Interval[0] + (width / 2),
+                y + TJAPlayer3.Skin.DaniSelect_Soul_Number_Interval[1] - (height / 2),
                 new RectangleF(0, height, text_width, height));
 
             for (int j = 0; j < nums.Length; j++)
@@ -820,8 +836,8 @@ namespace TJAPlayer3
 
             float text_width = TJAPlayer3.Skin.DaniSelect_Exam_Number_Text_Width;
 
-            TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, x + (TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] * nums.Length),
-                y + (TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] * nums.Length) - (height / 2),
+            TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] + (width / 2),
+                y + TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] - (height / 2),
                 new RectangleF(text_width * (int)Range, height, text_width, height));
 
             for (int j = 0; j < nums.Length; j++)
