@@ -3222,6 +3222,8 @@ for (int i = 0; i < 3; i++) {
 
             TJAPlayer3.act文字コンソール.On活性化();
 			TJAPlayer3.NamePlate.RefleshSkin();
+			CActSelectPopupMenu.RefleshSkin();
+			CActSelect段位リスト.RefleshSkin();
 		}
 		#region [ Windowイベント処理 ]
 		private void t指定フォルダ内でのプラグイン検索と生成( string strプラグインフォルダパス, string strプラグイン型名 )

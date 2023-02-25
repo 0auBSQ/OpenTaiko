@@ -2876,6 +2876,22 @@ namespace TJAPlayer3
                                     DaniSelect_Value_Gauge[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DaniSelect_DanIcon_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_DanIcon_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_DanIcon_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_DanIcon_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "DaniSelect_Title_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3106,6 +3122,27 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     DaniSelect_Plate_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Size")
+                            {
+                                DaniSelect_DanIconTitle_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DaniSelect_DanIconTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_DanIcon_Color")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                DaniSelect_DanIcon_Color = new Color[strSplit.Length];
+                                for (int i = 0; i < strSplit.Length; i++)
+                                {
+                                    DaniSelect_DanIcon_Color[i] = ColorTranslator.FromHtml(strSplit[i]);
                                 }
                             }
                             #endregion
@@ -8117,6 +8154,9 @@ namespace TJAPlayer3
         public int[] DaniSelect_Text_Gauge = new int[] { 396, 429 };
         public int[] DaniSelect_Value_Gauge = new int[] { 370, 462 };
 
+        public int[] DaniSelect_DanIcon_X = new int[] { 314, 314, 314 };
+        public int[] DaniSelect_DanIcon_Y = new int[] { 190, 263, 336 };
+
         public int[] DaniSelect_Title_X = new int[] { 401, 401, 401 };
         public int[] DaniSelect_Title_Y = new int[] { 173, 246, 319 };
 
@@ -8166,6 +8206,23 @@ namespace TJAPlayer3
 
         public int DaniSelect_DanPlateTitle_Size = 60;
         public int[] DaniSelect_DanPlateTitle_Offset = new int[] { 0, -50 };
+
+        public int DaniSelect_DanIconTitle_Size = 18;
+        public int[] DaniSelect_DanIconTitle_Offset = new int[] { 0, 6 };
+
+        public Color[] DaniSelect_DanIcon_Color = new Color[]
+            {
+                Color.Red,
+                Color.Green,
+                Color.Blue,
+                Color.Magenta,
+                Color.Yellow,
+                Color.Cyan,
+                Color.Brown,
+                Color.Gray,
+                Color.DarkGreen,
+                Color.Black
+            };
         #endregion
         #region SongLoading
         public int SongLoading_Plate_X = 640;
