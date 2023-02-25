@@ -1147,6 +1147,9 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
 
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
 								if (ConfigIni.bAIBattleMode == true)
 								{
 									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
@@ -1156,8 +1159,6 @@ namespace TJAPlayer3
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
 								*/
-                                CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								foreach ( STPlugin pg in this.listプラグイン )
 								{
