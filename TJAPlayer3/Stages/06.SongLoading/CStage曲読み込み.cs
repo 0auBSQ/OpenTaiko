@@ -448,17 +448,17 @@ namespace TJAPlayer3
 
 				CActSelect段位リスト.tDisplayDanPlate(dp,
 					null, 
-					1121, 
-					213);
+					TJAPlayer3.Skin.SongLoading_DanPlate[0],
+					TJAPlayer3.Skin.SongLoading_DanPlate[1]);
 
 				if (TJAPlayer3.Tx.Tile_Black != null)
 				{
 					TJAPlayer3.Tx.Tile_Black.Opacity = (int)(ct待機.n現在の値 <= 51 ? (255 - ct待機.n現在の値 / 0.2f) : (this.ct待機.n現在の値 - 949) / 0.2);
-					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / 64); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
+					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 					{
-						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / 64); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
+						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 						{
-							TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * 64, j * 64);
+							TJAPlayer3.Tx.Tile_Black.t2D描画(TJAPlayer3.app.Device, i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
 						}
 					}
 				}
@@ -524,13 +524,13 @@ namespace TJAPlayer3
                                 var pfSubTitle = new CPrivateFont();
                                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
                                 {
-                                    pfTitle = new CPrivateFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 30);
-                                    pfSubTitle = new CPrivateFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 22);
+                                    pfTitle = new CPrivateFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_DanC_Title_Size);
+                                    pfSubTitle = new CPrivateFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_DanC_SubTitle_Size);
                                 }
                                 else
                                 {
-                                    pfTitle = new CPrivateFont(new FontFamily("MS UI Gothic"), 30);
-                                    pfSubTitle = new CPrivateFont(new FontFamily("MS UI Gothic"), 22);
+                                    pfTitle = new CPrivateFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_DanC_Title_Size);
+                                    pfSubTitle = new CPrivateFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_DanC_SubTitle_Size);
                                 }
 
                                 var titleForeColor = TJAPlayer3.Skin.Game_DanC_Title_ForeColor;
@@ -545,7 +545,7 @@ namespace TJAPlayer3
                                         using (var bmpSongTitle = pfTitle.DrawPrivateFont(TJAPlayer3.DTX.List_DanSongs[i].Title, titleForeColor, titleBackColor))
                                         {
                                             TJAPlayer3.DTX.List_DanSongs[i].TitleTex = TJAPlayer3.tテクスチャの生成(bmpSongTitle, false);
-                                            TJAPlayer3.DTX.List_DanSongs[i].TitleTex.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref TJAPlayer3.DTX.List_DanSongs[i].TitleTex, 710);
+                                            TJAPlayer3.DTX.List_DanSongs[i].TitleTex.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref TJAPlayer3.DTX.List_DanSongs[i].TitleTex, TJAPlayer3.Skin.Game_DanC_Title_MaxWidth);
                                         }
                                     }
 
@@ -554,7 +554,7 @@ namespace TJAPlayer3
                                         using (var bmpSongSubTitle = pfSubTitle.DrawPrivateFont(TJAPlayer3.DTX.List_DanSongs[i].SubTitle, subtitleForeColor, subtitleBackColor))
                                         {
                                             TJAPlayer3.DTX.List_DanSongs[i].SubTitleTex = TJAPlayer3.tテクスチャの生成(bmpSongSubTitle, false);
-                                            TJAPlayer3.DTX.List_DanSongs[i].SubTitleTex.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref TJAPlayer3.DTX.List_DanSongs[i].SubTitleTex, 710);
+                                            TJAPlayer3.DTX.List_DanSongs[i].SubTitleTex.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref TJAPlayer3.DTX.List_DanSongs[i].SubTitleTex, TJAPlayer3.Skin.Game_DanC_SubTitle_MaxWidth);
                                         }
                                     }
 

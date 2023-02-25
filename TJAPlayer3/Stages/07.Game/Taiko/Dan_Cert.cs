@@ -126,9 +126,9 @@ namespace TJAPlayer3
             this.ct虹透明度 = new CCounter(0, TJAPlayer3.Skin.Game_Gauge_Rainbow_Timer - 1, 1, TJAPlayer3.Timer);
 
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                this.pfExamFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), 14);
+                this.pfExamFont = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_DanC_ExamFont_Size);
             else
-                this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), 14);
+                this.pfExamFont = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_DanC_ExamFont_Size);
 
             this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < this.ttkExams.Length; i++)
@@ -507,11 +507,11 @@ namespace TJAPlayer3
                     var title = TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].TitleTex;
                     var subTitle = TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].SubTitleTex;
                     if (subTitle == null)
-                        title?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2, TJAPlayer3.Skin.Game_Lane_Y[0] + 65);
+                        title?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_Title_X[0], TJAPlayer3.Skin.Game_DanC_Title_Y[0]);
                     else
                     {
-                        title?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2, TJAPlayer3.Skin.Game_Lane_Y[0] + 45);
-                        subTitle?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 1280 / 2 + TJAPlayer3.Skin.Game_Lane_X[0] / 2, TJAPlayer3.Skin.Game_Lane_Y[0] + 85);
+                        title?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_Title_X[1], TJAPlayer3.Skin.Game_DanC_Title_Y[1]);
+                        subTitle?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_DanC_SubTitle[0], TJAPlayer3.Skin.Game_DanC_SubTitle[1]);
                     }
                 }
                 if (Counter_Text.b終了値に達した)
