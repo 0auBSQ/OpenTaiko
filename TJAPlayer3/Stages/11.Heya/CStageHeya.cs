@@ -386,10 +386,10 @@ namespace TJAPlayer3
 
                     var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
-                    TJAPlayer3.Tx.NamePlateBase.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device,
-                        scroll.Item1,
-                        scroll.Item2,
-                        new RectangleF(0, (8 + danGrade) * 54, 220, 54));
+                    TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
+                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2, 
+                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Height / 24, 
+                        (8 + danGrade));
                     TJAPlayer3.Tx.NamePlateBase.color4 = C変換.ColorToColor4(Color.White);
 
                     tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
