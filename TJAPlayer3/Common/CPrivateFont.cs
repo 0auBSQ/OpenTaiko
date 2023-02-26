@@ -1008,6 +1008,12 @@ namespace TJAPlayer3
                     this._pfc = null;
                 }
 
+                if (_fontfamily != null)
+                {
+                    _fontfamily.Dispose();
+                    _fontfamily = null;
+                }
+
                 this.bDispose完了済み = true;
             }
         }

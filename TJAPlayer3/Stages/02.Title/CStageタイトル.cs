@@ -130,7 +130,7 @@ namespace TJAPlayer3
 		}
 		public override void OnManagedリソースの解放()
 		{
-			if (!base.b活性化してない)
+			if (base.b活性化してない)
 				return;
 
 			TJAPlayer3.t安全にDisposeする(ref Background);
