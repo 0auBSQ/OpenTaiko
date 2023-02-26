@@ -1,0 +1,38 @@
+Accepted formats are OGG or WAV
+
+- Combo Voices :
+Combo/[number]
+
+- Tower floor voices :
+Tower_Combo/[number]
+
+- Clear voices :
+Clear/Failed
+Clear/Clear
+Clear/FullCombo
+Clear/AllPerfect
+Clear/AIBattle_Win
+Clear/AIBattle_Lose
+
+- Menu voices
+Menu/SongSelect
+Menu/SongDecide
+Menu/SongDecide_AI
+Menu/DiffSelect
+Menu/DanSelectStart
+Menu/DanSelectPrompt
+Menu/DanSelectConfirm
+
+- Title
+Title/Sanka
+
+- Tower specific
+Tower/Miss
+
+- Result screen voices
+Result/BestScore
+Result/ClearFailed
+Result/ClearSuccess
+Result/DanFailed
+Result/DanRedPass
+Result/DanGoldPass
