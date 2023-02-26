@@ -757,8 +757,15 @@ namespace TJAPlayer3
                                         new Rectangle(0, 0, (int)(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Width / 100.0)), TJAPlayer3.Tx.DanC_Gauge[drawGaugeTypetwo].szテクスチャサイズ.Height));
                                 }
 
+                                int _tmpMiniPadding = (int)(14f * TJAPlayer3.Skin.Resolution[0] / 1280f);
+
                                 // Usually +23 for gold and +17 for white, to test
-                                DrawMiniNumber(TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmount(), miniBarPositionX + 11, miniBarPositionY + 20, 14, TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
+                                DrawMiniNumber(
+                                    TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i].GetAmount(), 
+                                    miniBarPositionX + 11, 
+                                    miniBarPositionY + 20,
+                                    _tmpMiniPadding, 
+                                    TJAPlayer3.stage選曲.r確定された曲.DanSongs[j - 1].Dan_C[i]);
 
                                 CActSelect段位リスト.tDisplayDanIcon(j, miniBarPositionX + TJAPlayer3.Skin.Game_DanC_DanIcon_Offset_Mini[0], miniBarPositionY + TJAPlayer3.Skin.Game_DanC_DanIcon_Offset_Mini[1], miniIconOpacity, 0.5f, false);
 
