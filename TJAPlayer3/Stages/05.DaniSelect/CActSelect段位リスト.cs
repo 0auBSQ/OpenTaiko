@@ -215,7 +215,9 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 0.20f;
                     TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 0.20f;
-                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(334 * (currentRank + 1), 0, 334, 334));
+                    int rank_width = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Width / 7;
+                    int rank_height = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Height;
+                    TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, xPos - 2, yPos - 14, new Rectangle(rank_width * (currentRank + 1), 0, rank_width, rank_height));
                 }
 
                 #endregion
