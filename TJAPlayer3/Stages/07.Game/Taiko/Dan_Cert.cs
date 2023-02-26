@@ -1033,19 +1033,23 @@ namespace TJAPlayer3
                 {
                     #region [Gauge dan condition]
 
+                    int _scale = (int)(14f * TJAPlayer3.Skin.Resolution[0] / 1280f);
+                    int _nbX = (int)(292f * TJAPlayer3.Skin.Resolution[0] / 1280f);
+                    int _nbY = (int)(64f * TJAPlayer3.Skin.Resolution[0] / 1280f);
+
                     TJAPlayer3.Tx.DanC_Gauge_Base?.t2D描画(TJAPlayer3.app.Device, 
-                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 4, 
+                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * _scale) + 4, 
                         TJAPlayer3.Skin.Game_DanC_Y[0]);
 
                     TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[(int)Exam.Type.Gauge]).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device,
-                            TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 104,
+                            TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * _scale) + 104,
                             TJAPlayer3.Skin.Game_DanC_Y[0] + 21);
 
                     // Display percentage here
                     DrawNumber(
                         dan_C[i].Value[0],
-                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * 14) + 292 - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
-                        TJAPlayer3.Skin.Game_DanC_Y[0] - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] + 64,
+                        TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * _scale) + _nbX - dan_C[i].Value[0].ToString().Length * (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
+                        TJAPlayer3.Skin.Game_DanC_Y[0] - TJAPlayer3.Skin.Game_DanC_Exam_Offset[1] + _nbY,
                         (int)(TJAPlayer3.Skin.Game_DanC_Number_Small_Padding * TJAPlayer3.Skin.Game_DanC_Exam_Number_Scale),
                         false,
                         dan_C[i]);
