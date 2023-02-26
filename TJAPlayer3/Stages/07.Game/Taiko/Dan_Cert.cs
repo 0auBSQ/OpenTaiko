@@ -724,11 +724,13 @@ namespace TJAPlayer3
                                 // Determine bars width
                                 TJAPlayer3.Tx.DanC_SmallBase.vc拡大縮小倍率.X = isSmallGauge ? 0.34f : 1f;
 
+                                int smallBarGap = (int)(33f * TJAPlayer3.Skin.Resolution[1] / 720f);
+
                                 // 815 : Small base (70 + 745)
                                 int miniBarPositionX = barXOffset + (isSmallGauge ? TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_X[1] : TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_X[0]);
 
                                 // 613 + (j - 1) * 33 : Small base (barYoffset for 3rd exam : 494 + 119 + Local song offset (j - 1) * 33)
-                                int miniBarPositionY = (barYOffset + (isSmallGauge ? TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[1] : TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[0])) + ((j - 1) % 2) * 33 - (TJAPlayer3.Skin.Game_DanC_Size[1] + (TJAPlayer3.Skin.Game_DanC_Padding));
+                                int miniBarPositionY = (barYOffset + (isSmallGauge ? TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[1] : TJAPlayer3.Skin.Game_DanC_SmallBase_Offset_Y[0])) + ((j - 1) % 2) * smallBarGap - (TJAPlayer3.Skin.Game_DanC_Size[1] + (TJAPlayer3.Skin.Game_DanC_Padding));
 
                                 // Display bars
                                 #region [Displayables]
