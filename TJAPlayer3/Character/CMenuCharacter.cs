@@ -156,6 +156,36 @@ namespace TJAPlayer3
             return null;
         }
 
+        public static int _getReferenceAnimationDuration(int player, ECharacterAnimation eca)
+        {
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+
+            switch (eca)
+            {
+                case (ECharacterAnimation.NORMAL):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Loop_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.START):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Start_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.SELECT):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Select_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.ENTRY):
+                    {
+                        return TJAPlayer3.Skin.Characters_Title_Entry_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.ENTRY_NORMAL):
+                    {
+                        return TJAPlayer3.Skin.Characters_Title_Normal_AnimationDuration[_charaId];
+                    }
+            }
+            return 1000;
+        }
+
         public static void tDisableCounter(ECharacterAnimation eca)
         {
             switch (eca)
@@ -199,10 +229,11 @@ namespace TJAPlayer3
         {
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
+            int _animeref = _getReferenceAnimationDuration(player, eca);
 
             if (_ref != null && _ref.Length > 0 && _ctref != null)
             {
-                _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / (float)_ref.Length, TJAPlayer3.Timer);
+                _ctref[player] = new CCounter(0, _ref.Length - 1, _animeref / (float)_ref.Length, TJAPlayer3.Timer);
             }
         }
 
