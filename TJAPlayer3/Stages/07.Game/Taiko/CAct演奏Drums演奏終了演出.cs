@@ -270,6 +270,14 @@ namespace TJAPlayer3
                     Tower_TopReached_PassScript.Dispose();
                     Tower_TopReached_FullComboScript.Dispose();
                     Tower_TopReached_PerfectScript.Dispose();
+
+                    for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        this.soundClear[i]?.t解放する();
+                        this.soundFailed[i]?.t解放する();
+                        this.soundFullCombo[i]?.t解放する();
+                        this.soundDondaFullCombo[i]?.t解放する();
+                    }
                 }
                 else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                 {
@@ -280,14 +288,26 @@ namespace TJAPlayer3
                     Dan_Gold_PassScript.Dispose();
                     Dan_Gold_FullComboScript.Dispose();
                     Dan_Gold_PerfectScript.Dispose();
+
+                    for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        this.soundClear[i]?.t解放する();
+                        this.soundFailed[i]?.t解放する();
+                        this.soundFullCombo[i]?.t解放する();
+                        this.soundDondaFullCombo[i]?.t解放する();
+                    }
                 }
                 else if (TJAPlayer3.ConfigIni.bAIBattleMode)
                 {
-                    AIWinScript.Dispose();
                     AILoseScript.Dispose();
+                    AIWinScript.Dispose();
+                    AIWin_FullComboScript.Dispose();
+                    AIWin_PerfectScript.Dispose();
 
-                    this.soundAIWin?.t解放する();
                     this.soundAILose?.t解放する();
+                    this.soundAIWin?.t解放する();
+                    this.soundAIWinFullCombo?.t解放する();
+                    this.soundAIWinDondaFullCombo?.t解放する();
                 }
                 else
                 {
