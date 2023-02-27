@@ -173,6 +173,10 @@ namespace TJAPlayer3
             {
                 return this.act曲リスト.r現在選択中の曲;
             }
+            set
+            {
+                this.act曲リスト.r現在選択中の曲 = value;
+            }
         }
 
         // コンストラクタ
@@ -769,7 +773,14 @@ namespace TJAPlayer3
                             {
                                 #region [Trigger context box]
 
-                                this.tSelectSongRandomly();
+                                this.tSetSongRandomly();
+
+                                // Called here
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                this.act難易度選択画面.bIsDifficltSelect = true;
+                                this.act難易度選択画面.t選択画面初期化();
+                                this.act曲リスト.ctBarFlash.t開始(0, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
+                                this.act曲リスト.ctDifficultyIn.t開始(0, 3200, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
 
                                 //this.ctDonchan_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Donchan_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                 CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -1705,7 +1716,83 @@ namespace TJAPlayer3
             #endregion
 
             CSongSelectSongManager.stopSong();
-            
+
+        }
+        private void tSetSongRandomly()
+        {
+            var usedDiffs = new int[] { -1, -1, -1, -1, -1 };
+            var mandatoryDiffs = new List<int>();
+
+            #region [Fetch context informations]
+
+            if (this.act曲リスト.latestContext == eMenuContext.Random)
+            {
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    var diff = this.act曲リスト.tMenuContextGetVar(i);
+                    usedDiffs[i] = diff;
+                    if (!mandatoryDiffs.Contains(diff))
+                        mandatoryDiffs.Add(diff);
+                }
+            }
+
+            #endregion
+
+            C曲リストノード song = this.act曲リスト.r現在選択中の曲;
+
+            song.stackランダム演奏番号.Clear();
+            song.listランダム用ノードリスト = null;
+
+            if ((song.stackランダム演奏番号.Count == 0) || (song.listランダム用ノードリスト == null))
+            {
+                if (song.listランダム用ノードリスト == null)
+                {
+                    song.listランダム用ノードリスト = this.t指定された曲が存在する場所の曲を列挙する_子リスト含む(song, ref mandatoryDiffs);
+                }
+                int count = song.listランダム用ノードリスト.Count;
+                if (count == 0)
+                {
+                    return;
+                }
+                int[] numArray = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    numArray[i] = i;
+                }
+                for (int j = 0; j < (count * 1.5); j++)
+                {
+                    int index = TJAPlayer3.Random.Next(count);
+                    int num5 = TJAPlayer3.Random.Next(count);
+                    int num6 = numArray[num5];
+                    numArray[num5] = numArray[index];
+                    numArray[index] = num6;
+                }
+                for (int k = 0; k < count; k++)
+                {
+                    song.stackランダム演奏番号.Push(numArray[k]);
+                }
+
+                if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
+                {
+                    StringBuilder builder = new StringBuilder(0x400);
+                    builder.Append(string.Format("ランダムインデックスリストを作成しました: {0}曲: ", song.stackランダム演奏番号.Count));
+                    for (int m = 0; m < count; m++)
+                    {
+                        builder.Append(string.Format("{0} ", numArray[m]));
+                    }
+                    Trace.TraceInformation(builder.ToString());
+                }
+            }
+
+            // Third assignment
+            this.r現在選択中の曲 = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
+
+            act曲リスト.t現在選択中の曲を元に曲バーを再構成する();
+            act曲リスト.t選択曲が変更された(false);
+            act曲リスト.tUpdateCurSong();
+            act曲リスト.tResetTitleKey();
+            act曲リスト.tバーの初期化();
+            t選択曲変更通知();
         }
         private void t曲を選択する()
         {

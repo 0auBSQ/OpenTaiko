@@ -482,7 +482,7 @@ namespace TJAPlayer3
 
                 // bIsFinishedPlaying was dependent on 2P in this case
 
-                
+                this.actDan.On進行描画();
 
                 for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                 {
@@ -506,8 +506,6 @@ namespace TJAPlayer3
                 {
                     if (!ifp[i]) bIsFinishedPlaying = false;
                 }
-
-                this.actDan.On進行描画();
 
                 this.actMtaiko.On進行描画();
 

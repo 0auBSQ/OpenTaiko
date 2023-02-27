@@ -73,7 +73,7 @@ namespace TJAPlayer3
 		public C曲リストノード r現在選択中の曲 
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public void ResetSongIndex()
@@ -270,6 +270,12 @@ namespace TJAPlayer3
 				tUpdateCurSong();
 				TJAPlayer3.stage選曲.t選択曲変更通知();
 			}
+		}
+
+		public void tResetTitleKey()
+		{
+			this.ttk選択している曲の曲名 = null;
+			this.ttk選択している曲のサブタイトル = null;
 		}
 
 		public bool tBOXに入る()
@@ -2036,10 +2042,10 @@ namespace TJAPlayer3
 					// Fonts here
 
 					//-----------------
-					if (this.stバー情報[nパネル番号].strタイトル文字列 != "" && this.ttk選択している曲の曲名 == null)
-						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(this.stバー情報[nパネル番号].strタイトル文字列, this.stバー情報[nパネル番号].ForeColor, this.stバー情報[nパネル番号].BackColor, stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
-					if (this.stバー情報[nパネル番号].strサブタイトル != "" && this.ttk選択している曲のサブタイトル == null)
-						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(this.stバー情報[nパネル番号].strサブタイトル, this.stバー情報[nパネル番号].ForeColor, this.stバー情報[nパネル番号].BackColor);
+					if (r現在選択中の曲.strタイトル != "" && this.ttk選択している曲の曲名 == null)
+						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(r現在選択中の曲.strタイトル, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor, r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? this.pfBoxName : this.pfMusicName);
+					if (r現在選択中の曲.strサブタイトル != "" && this.ttk選択している曲のサブタイトル == null)
+						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(r現在選択中の曲.strサブタイトル, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor);
 
 					if (this.ttk選択している曲のサブタイトル != null)
 						tx選択している曲のサブタイトル = ResolveTitleTexture(ttk選択している曲のサブタイトル, TJAPlayer3.Skin.SongSelect_VerticalText);
@@ -2074,17 +2080,17 @@ namespace TJAPlayer3
 						} 
 
 						tx選択している曲のサブタイトル.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
-							xAnime + TJAPlayer3.Skin.SongSelect_Bar_SubTitle_Offset[0] + (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMoveX : centerMoveX / 1.1f), 
-							y + TJAPlayer3.Skin.SongSelect_Bar_SubTitle_Offset[1] - (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMove : centerMove / 1.1f));
+							xAnime + TJAPlayer3.Skin.SongSelect_Bar_SubTitle_Offset[0] + (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMoveX : centerMoveX / 1.1f), 
+							y + TJAPlayer3.Skin.SongSelect_Bar_SubTitle_Offset[1] - (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMove : centerMove / 1.1f));
 						
 						if (this.ttk選択している曲の曲名 != null)
 						{
 							ResolveTitleTexture(this.ttk選択している曲の曲名, TJAPlayer3.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
-								xAnime + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別) +
-								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMoveX : centerMoveX / 1.1f) : 0),
+								xAnime + GetTitleOffsetX(r現在選択中の曲.eノード種別) +
+								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMoveX : centerMoveX / 1.1f) : 0),
 
-								y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別) - 
-								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMove : centerMove / 1.1f) : 0));
+								y + GetTitleOffsetY(r現在選択中の曲.eノード種別) - 
+								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMove : centerMove / 1.1f) : 0));
 						}
 					}
 					else
@@ -2093,10 +2099,10 @@ namespace TJAPlayer3
 						{
 							ResolveTitleTexture(this.ttk選択している曲の曲名, TJAPlayer3.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 
 								xAnime + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別) +
-								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMoveX : centerMoveX / 1.1f) : 0), 
+								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMoveX : centerMoveX / 1.1f) : 0), 
 
 								y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別) - 
-								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (this.stバー情報[nパネル番号].eバー種別 == Eバー種別.Box ? centerMove : centerMove / 1.1f) : 0));
+								(r現在選択中の曲.eノード種別 != C曲リストノード.Eノード種別.BACKBOX ? (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? centerMove : centerMove / 1.1f) : 0));
 						}
 					}
 					//-----------------
@@ -2487,6 +2493,23 @@ namespace TJAPlayer3
 			}
 		}
 
+		private int GetTitleOffsetX(C曲リストノード.Eノード種別 node)
+		{
+			switch (node)
+			{
+				case C曲リストノード.Eノード種別.SCORE:
+					return TJAPlayer3.Skin.SongSelect_Bar_Title_Offset[0];
+				case C曲リストノード.Eノード種別.BOX:
+					return TJAPlayer3.Skin.SongSelect_Bar_Box_Offset[0];
+				case C曲リストノード.Eノード種別.BACKBOX:
+					return TJAPlayer3.Skin.SongSelect_Bar_BackBox_Offset[0];
+				case C曲リストノード.Eノード種別.RANDOM:
+					return TJAPlayer3.Skin.SongSelect_Bar_Random_Offset[0];
+				default:
+					return TJAPlayer3.Skin.SongSelect_Bar_Title_Offset[0];
+			}
+		}
+
 		private int GetTitleOffsetY(Eバー種別 bar)
 		{
 			switch (bar)
@@ -2498,6 +2521,23 @@ namespace TJAPlayer3
 				case Eバー種別.BackBox:
 					return TJAPlayer3.Skin.SongSelect_Bar_BackBox_Offset[1];
 				case Eバー種別.Random:
+					return TJAPlayer3.Skin.SongSelect_Bar_Random_Offset[1];
+				default:
+					return TJAPlayer3.Skin.SongSelect_Bar_Title_Offset[1];
+			}
+		}
+
+		private int GetTitleOffsetY(C曲リストノード.Eノード種別 node)
+		{
+			switch (node)
+			{
+				case C曲リストノード.Eノード種別.SCORE:
+					return TJAPlayer3.Skin.SongSelect_Bar_Title_Offset[1];
+				case C曲リストノード.Eノード種別.BOX:
+					return TJAPlayer3.Skin.SongSelect_Bar_Box_Offset[1];
+				case C曲リストノード.Eノード種別.BACKBOX:
+					return TJAPlayer3.Skin.SongSelect_Bar_BackBox_Offset[1];
+				case C曲リストノード.Eノード種別.RANDOM:
 					return TJAPlayer3.Skin.SongSelect_Bar_Random_Offset[1];
 				default:
 					return TJAPlayer3.Skin.SongSelect_Bar_Title_Offset[1];
@@ -2772,7 +2812,7 @@ namespace TJAPlayer3
 			return list[index];
 		}
 
-		private void tバーの初期化()
+		public void tバーの初期化()
 		{
             stバー情報 = new STバー情報[TJAPlayer3.Skin.SongSelect_Bar_Count];
 
