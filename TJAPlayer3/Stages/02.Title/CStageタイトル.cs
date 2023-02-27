@@ -378,6 +378,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.soundEntry.t停止する();
 							ctバナパス読み込み成功.t開始(0, 3655, 1, TJAPlayer3.Timer);
 							bバナパス読み込み = true;
+							bどんちゃんカウンター初期化 = false;
 						}
 					}
 

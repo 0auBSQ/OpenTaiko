@@ -151,6 +151,32 @@ namespace TJAPlayer3
             return null;
         }
 
+        public static int _getReferenceAnimationDuration(int player, ECharacterResult eca)
+        {
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+
+            switch (eca)
+            {
+                case (ECharacterResult.NORMAL):
+                    {
+                        return TJAPlayer3.Skin.Characters_Result_Normal_AnimationDuration[_charaId];
+                    }
+                case (ECharacterResult.CLEAR):
+                    {
+                        return TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[_charaId];
+                    }
+                case (ECharacterResult.FAILED):
+                    {
+                        return TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[_charaId];
+                    }
+                case (ECharacterResult.FAILED_IN):
+                    {
+                        return TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[_charaId];
+                    }
+            }
+            return 1000;
+        }
+
         public static void tDisableCounter(ECharacterResult eca)
         {
             switch (eca)
@@ -188,10 +214,11 @@ namespace TJAPlayer3
         {
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
+            int _animeref = _getReferenceAnimationDuration(player, eca);
 
             if (_ref != null && _ref.Length > 0 && _ctref != null)
             {
-                _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / (float)_ref.Length, TJAPlayer3.Timer);
+                _ctref[player] = new CCounter(0, _ref.Length - 1, _animeref / (float)_ref.Length, TJAPlayer3.Timer);
             }
         }
 

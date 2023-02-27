@@ -7821,17 +7821,6 @@ namespace TJAPlayer3
 
         // Config
 
-        public int[][] Characters_Title_Entry_X;
-        public int[][] Characters_Title_Entry_Y;
-        public int[][] Characters_Title_Normal_X;
-        public int[][] Characters_Title_Normal_Y;
-
-        public int[][] Characters_Menu_X;
-        public int[][] Characters_Menu_Y;
-
-        public int[][] Characters_Result_X;
-        public int[][] Characters_Result_Y;
-
         public int[][] Characters_Resolution;
         public int[][] Characters_X;
         public int[][] Characters_Y;
@@ -7856,6 +7845,16 @@ namespace TJAPlayer3
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
         public int[] Characters_Balloon_FadeOut;
+
+        public int[] Characters_Title_Entry_AnimationDuration;
+        public int[] Characters_Title_Normal_AnimationDuration;
+        public int[] Characters_Menu_Loop_AnimationDuration;
+        public int[] Characters_Menu_Select_AnimationDuration;
+        public int[] Characters_Menu_Start_AnimationDuration;
+        public int[] Characters_Result_Normal_AnimationDuration;
+        public int[] Characters_Result_Clear_AnimationDuration;
+        public int[] Characters_Result_Failed_In_AnimationDuration;
+        public int[] Characters_Result_Failed_AnimationDuration;
 
         #endregion
 
