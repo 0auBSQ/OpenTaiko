@@ -58,6 +58,8 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
+				TJAPlayer3.Skin.bgmコンフィグ画面.t再生する();
+
 				this.n現在のメニュー番号 = 0;                                                    //
                 if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
                 {
@@ -87,6 +89,8 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
+				TJAPlayer3.Skin.bgmコンフィグ画面.t停止する();
+
 				TJAPlayer3.ConfigIni.t書き出し( TJAPlayer3.strEXEのあるフォルダ + "Config.ini" );	// CONFIGだけ
 				if( this.ftフォント != null )													// 以下OPTIONと共通
 				{
@@ -373,7 +377,6 @@ namespace TJAPlayer3
 				case CStage.Eフェーズ.共通_フェードイン:
 					if( this.actFIFO.On進行描画() != 0 )
 					{
-						TJAPlayer3.Skin.bgmコンフィグ画面.t再生する();
 						base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
 					}
 					break;

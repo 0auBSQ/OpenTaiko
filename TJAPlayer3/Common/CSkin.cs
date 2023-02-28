@@ -746,9 +746,6 @@ namespace TJAPlayer3
             this.soundステージクリア音 = new Cシステムサウンド(@"Sounds\Stage clear.ogg", false, true, true, ESoundGroup.Voice);
             this.soundフルコンボ音 = new Cシステムサウンド(@"Sounds\Full combo.ogg", false, false, true, ESoundGroup.Voice);
             this.sound曲読込開始音 = new Cシステムサウンド(@"Sounds\Now loading.ogg", false, true, true, ESoundGroup.Unknown);
-            this.bgm起動画面 = new Cシステムサウンド(@"Sounds\Setup BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\Option BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\Config BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             //this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             //this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
             this.soundSkip = new Cシステムサウンド(@"Sounds\Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -764,8 +761,11 @@ namespace TJAPlayer3
             this.sound曲決定音 = new Cシステムサウンド(@"Sounds\SongDecide.ogg", false, false, true, ESoundGroup.Voice);
             this.soundSongDecide_AI = new Cシステムサウンド(@"Sounds\SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
+            this.bgm起動画面 = new Cシステムサウンド(@"Sounds\BGM\Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmタイトルイン = new Cシステムサウンド(@"Sounds\BGM\Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmタイトル = new Cシステムサウンド(@"Sounds\BGM\Title.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\BGM\Option.ogg", true, true, false, ESoundGroup.SongPlayback);
+            this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\BGM\Config.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgm選曲画面イン = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\BGM\SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmSongSelect_AI_In = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
