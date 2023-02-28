@@ -71,6 +71,7 @@ namespace TJAPlayer3
 		public List<CDTX.DanSongs> DanSongs;
 		public Dan_C[] Dan_C;
 		public string strサブタイトル = "";
+		public string strMaker = "";
 		public string strBreadcrumbs = "";		// #27060 2011.2.27 yyagi; MUSIC BOXのパンくずリスト (曲リスト構造内の絶対位置捕捉のために使う)
 		public string strSkinPath = "";			// #28195 2012.5.4 yyagi; box.defでのスキン切り替え対応
         public bool bBranch = false;
@@ -90,6 +91,8 @@ namespace TJAPlayer3
 		public string[] strBoxText = new string[3];
         public Eジャンル eジャンル = Eジャンル.None;
 		
+		public string strSelectBGPath;
+
 		// コンストラクタ
 
 		public C曲リストノード()

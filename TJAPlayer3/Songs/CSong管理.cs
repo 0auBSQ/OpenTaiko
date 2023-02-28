@@ -51,7 +51,8 @@ namespace TJAPlayer3
 		/*[NonSerialized]
 		public List<Cスコア> listSongsDB;*/					// songs.dbから構築されるlist
 		public List<C曲リストノード> list曲ルート;			// 起動時にフォルダ検索して構築されるlist
-		public List<C曲リストノード> list曲ルート_Dan = new List<C曲リストノード>();			// 起動時にフォルダ検索して構築されるlist
+		public List<C曲リストノード> list曲ルート_Dan = new List<C曲リストノード>();          // 起動時にフォルダ検索して構築されるlist
+		public static List<FDK.CTexture> listCustomBGs = new List<FDK.CTexture>();
 		public bool bIsSuspending							// 外部スレッドから、内部スレッドのsuspendを指示する時にtrueにする
 		{													// 再開時は、これをfalseにしてから、次のautoReset.Set()を実行する
 			get;
@@ -221,11 +222,14 @@ namespace TJAPlayer3
                                     c曲リストノード.strタイトル = dtx.TITLE;
                                     c曲リストノード.strサブタイトル = dtx.SUBTITLE;
                                     c曲リストノード.strジャンル = dtx.GENRE;
-                                    if (c曲リストノード.r親ノード != null && c曲リストノード.r親ノード.strジャンル != "")
+									c曲リストノード.strMaker = dtx.MAKER;
+									if (c曲リストノード.r親ノード != null && c曲リストノード.r親ノード.strジャンル != "")
                                     {
                                         c曲リストノード.strジャンル = c曲リストノード.r親ノード.strジャンル;
-                                    }
-                                    c曲リストノード.nLevel = dtx.LEVELtaiko;
+									}
+									c曲リストノード.strSelectBGPath = $@"{fileinfo.FullName}\..\{dtx.SELECTBG}";
+									if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
+									c曲リストノード.nLevel = dtx.LEVELtaiko;
 
 									// LIFE here
 									c曲リストノード.nLife = dtx.LIFE;
@@ -341,6 +345,7 @@ namespace TJAPlayer3
 
                                 c曲リストノード.strタイトル = dtx.TITLE;
                                 c曲リストノード.strサブタイトル = dtx.SUBTITLE;
+								c曲リストノード.strMaker = dtx.MAKER;
 
 								if (dtx.List_DanSongs != null)
 									c曲リストノード.DanSongs = dtx.List_DanSongs;
@@ -366,6 +371,16 @@ namespace TJAPlayer3
 									c曲リストノード.strジャンル = c曲リストノード.r親ノード.strジャンル;
 									c曲リストノード.str本当のジャンル = c曲リストノード.r親ノード.strジャンル;
 								}
+
+								if (c曲リストノード.strSelectBGPath == null || !File.Exists(str基点フォルダ + dtx.SELECTBG))
+								{
+									c曲リストノード.strSelectBGPath = c曲リストノード.r親ノード.strSelectBGPath;
+								}
+								else
+								{
+									c曲リストノード.strSelectBGPath = str基点フォルダ + dtx.SELECTBG;
+								}
+								if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 
 								if (c曲リストノード.r親ノード != null)
                                 {
@@ -648,6 +663,8 @@ namespace TJAPlayer3
 					c曲リストノード.bDTXFilesで始まるフォルダ名のBOXである = false;
 					c曲リストノード.strタイトル = boxdef.Title;
 					c曲リストノード.strジャンル = boxdef.Genre;
+					c曲リストノード.strSelectBGPath = infoDir.FullName + @"\" + boxdef.SelectBG;
+					if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 
 					/*
 					switch (c曲リストノード.strジャンル)
@@ -886,7 +903,10 @@ namespace TJAPlayer3
 									c曲リストノード.arスコア[ i ].譜面情報.レベル.Guitar = cdtx.LEVEL.Guitar;
 									c曲リストノード.arスコア[ i ].譜面情報.レベル.Bass = cdtx.LEVEL.Bass;
 									c曲リストノード.arスコア[ i ].譜面情報.レベルを非表示にする = cdtx.HIDDENLEVEL;
-									c曲リストノード.arスコア[ i ].譜面情報.Bpm = cdtx.BPM;
+									c曲リストノード.arスコア[i].譜面情報.Bpm = cdtx.BPM;
+									c曲リストノード.arスコア[i].譜面情報.BaseBpm = cdtx.BASEBPM;
+									c曲リストノード.arスコア[i].譜面情報.MinBpm = cdtx.MinBPM;
+									c曲リストノード.arスコア[i].譜面情報.MaxBpm = cdtx.MaxBPM;
 									c曲リストノード.arスコア[ i ].譜面情報.Duration = 0;	//  (cdtx.listChip == null)? 0 : cdtx.listChip[ cdtx.listChip.Count - 1 ].n発声時刻ms;
                                     c曲リストノード.arスコア[ i ].譜面情報.strBGMファイル名 = cdtx.strBGM_PATH;
                                     c曲リストノード.arスコア[ i ].譜面情報.SongVol = cdtx.SongVol;
@@ -950,8 +970,11 @@ namespace TJAPlayer3
 										sb.Append( ", lvBs=" + c曲リストノード.arスコア[ i ].譜面情報.レベル.Bass );
 										sb.Append( ", lvHide=" + c曲リストノード.arスコア[ i ].譜面情報.レベルを非表示にする );
 										sb.Append( ", type=" + c曲リストノード.arスコア[ i ].譜面情報.曲種別 );
-										sb.Append( ", bpm=" + c曲リストノード.arスコア[ i ].譜面情報.Bpm );
-									//	sb.Append( ", duration=" + c曲リストノード.arスコア[ i ].譜面情報.Duration );
+										sb.Append(", bpm=" + c曲リストノード.arスコア[i].譜面情報.Bpm);
+										sb.Append(", basebpm=" + c曲リストノード.arスコア[i].譜面情報.BaseBpm);
+										sb.Append(", minbpm=" + c曲リストノード.arスコア[i].譜面情報.MinBpm);
+										sb.Append(", maxbpm=" + c曲リストノード.arスコア[i].譜面情報.MaxBpm);
+										//	sb.Append( ", duration=" + c曲リストノード.arスコア[ i ].譜面情報.Duration );
 										Trace.TraceInformation( sb.ToString() );
 									}
 									//-----------------

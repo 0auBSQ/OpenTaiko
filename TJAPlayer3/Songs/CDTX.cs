@@ -1184,10 +1184,14 @@ namespace TJAPlayer3
         public string BACKGROUND_GR;
         public double BASEBPM;
         public double BPM;
+        public double MinBPM;
+        public double MaxBPM;
         public STチップがある bチップがある;
         public string COMMENT;
         public double db再生速度;
         public string GENRE;
+        public string MAKER;
+        public string SELECTBG;
         public Eジャンル eジャンル;
         public bool HIDDENLEVEL;
         public STDGBVALUE<int> LEVEL;
@@ -1372,6 +1376,8 @@ namespace TJAPlayer3
             this.COMMENT = "";
             this.PANEL = "";
             this.GENRE = "";
+            this.MAKER = "";
+            this.SELECTBG = "";
             this.bLyrics = false;
             this.eジャンル = Eジャンル.None;
             this.PREVIEW = "";
@@ -3132,7 +3138,7 @@ namespace TJAPlayer3
         // Regexes
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
-             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
+             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MAKER|SELECTBG|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
 
         // private static readonly HashSet<string> valableTokens = new HashSet<string>(@"TIT|LEV|BPM|WAV|OFF|BAL|EXA|DAN|REN|BAL|SON|SEV|SCO|COU|STY|TOW|GAM|LIF|DEM|SID|SUB|GEN|MOV|BGI|BGM|HID|GAU|LYR|#HB|#BM".Split('|'));
@@ -3581,6 +3587,15 @@ namespace TJAPlayer3
             {
                 double dbBPM = Convert.ToDouble(argument);
                 this.dbNowBPM = dbBPM;
+
+                if (dbBPM > MaxBPM)
+                {
+                    MaxBPM = dbBPM;
+                }
+                else if (dbBPM < MinBPM)
+                {
+                    MinBPM = dbBPM;
+                }
 
                 this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
 
@@ -5110,6 +5125,8 @@ namespace TJAPlayer3
                 double dbBPM = Convert.ToDouble(strCommandParam);
                 this.BPM = dbBPM;
                 this.BASEBPM = dbBPM;
+                this.MinBPM = dbBPM;
+                this.MaxBPM = dbBPM;
                 this.dbNowBPM = dbBPM;
 
                 this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = dbBPM, });
@@ -5315,6 +5332,20 @@ namespace TJAPlayer3
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
                     this.GENRE = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("MAKER"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.MAKER = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("SELECTBG"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.SELECTBG = strCommandParam;
                 }
             }
             else if (strCommandName.Equals("DEMOSTART"))
@@ -6894,6 +6925,24 @@ namespace TJAPlayer3
                 {
                     this.t入力_パラメータ食い込みチェック("GENRE", ref strコマンド, ref strパラメータ);
                     this.GENRE = strパラメータ;
+                }
+                //-----------------
+                #endregion
+                #region [ MAKER ]
+                //-----------------
+                else if (strコマンド.StartsWith("MAKER", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.t入力_パラメータ食い込みチェック("MAKER", ref strコマンド, ref strパラメータ);
+                    this.MAKER = strパラメータ;
+                }
+                //-----------------
+                #endregion
+                #region [ SELECTBG ]
+                //-----------------
+                else if (strコマンド.StartsWith("SELECTBG", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.t入力_パラメータ食い込みチェック("SELECTBG", ref strコマンド, ref strパラメータ);
+                    this.SELECTBG = strパラメータ;
                 }
                 //-----------------
                 #endregion

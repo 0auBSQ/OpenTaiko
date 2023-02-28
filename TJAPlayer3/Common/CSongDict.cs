@@ -101,6 +101,7 @@ namespace TJAPlayer3
             itemBack.isChangedBgType = parent.isChangedBgType;
 
             itemBack.strジャンル = parent.strジャンル;
+            itemBack.strSelectBGPath = parent.strSelectBGPath;
             itemBack.nスコア数 = 1;
             itemBack.r親ノード = parent;
             itemBack.strSkinPath = (parent.r親ノード == null) ?
