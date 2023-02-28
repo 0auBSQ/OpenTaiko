@@ -69,11 +69,24 @@ namespace TJAPlayer3
         {
 			get;
 			private set;
-        }
-		public C曲リストノード r現在選択中の曲 
+		}
+		public C曲リストノード rPrevSelectedSong
 		{
 			get;
-			set;
+			private set;
+		}
+		private C曲リストノード _rNowSelectedSong;
+		public C曲リストノード r現在選択中の曲 
+		{
+            get
+            {
+				return _rNowSelectedSong;
+			}
+            set
+            {
+				rPrevSelectedSong = r現在選択中の曲;
+				_rNowSelectedSong = value;
+			}
 		}
 
 		public void ResetSongIndex()
@@ -276,6 +289,7 @@ namespace TJAPlayer3
 		{
 			this.ttk選択している曲の曲名 = null;
 			this.ttk選択している曲のサブタイトル = null;
+			this.ttkSelectedSongMaker = null;
 		}
 
 		public bool tBOXに入る()
@@ -311,6 +325,11 @@ namespace TJAPlayer3
 			if (this.ttk選択している曲のサブタイトル != null)
 			{
 				this.ttk選択している曲のサブタイトル = null;
+				this.b選択曲が変更された = false;
+			}
+			if (this.ttkSelectedSongMaker != null)
+			{
+				this.ttkSelectedSongMaker = null;
 				this.b選択曲が変更された = false;
 			}
 
@@ -377,6 +396,11 @@ namespace TJAPlayer3
 			if (this.ttk選択している曲のサブタイトル != null)
 			{
 				this.ttk選択している曲のサブタイトル = null;
+				this.b選択曲が変更された = false;
+			}
+			if (this.ttkSelectedSongMaker != null)
+			{
+				this.ttkSelectedSongMaker = null;
 				this.b選択曲が変更された = false;
 			}
 
@@ -558,6 +582,11 @@ namespace TJAPlayer3
 					this.ttk選択している曲のサブタイトル = null;
 					this.b選択曲が変更された = false;
 				}
+				if (this.ttkSelectedSongMaker != null)
+				{
+					this.ttkSelectedSongMaker = null;
+					this.b選択曲が変更された = false;
+				}
 			}
 			this.b選択曲が変更された = true;
 		}
@@ -695,6 +724,11 @@ namespace TJAPlayer3
 				if (this.ttk選択している曲のサブタイトル != null)
 				{
 					this.ttk選択している曲のサブタイトル = null;
+					this.b選択曲が変更された = false;
+				}
+				if (this.ttkSelectedSongMaker != null)
+				{
+					this.ttkSelectedSongMaker = null;
 					this.b選択曲が変更された = false;
 				}
 			}
@@ -951,12 +985,14 @@ namespace TJAPlayer3
                 this.pfBoxName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_BoxName_Scale);
                 this.pfMusicName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_MusicName_Scale);
                 this.pfSubtitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_Subtitle_Scale);
+				this.pfMaker = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_Maker_Size);
 			}
             else
             {
                 this.pfBoxName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_BoxName_Scale);
                 this.pfMusicName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_MusicName_Scale);
                 this.pfSubtitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_Subtitle_Scale);
+				this.pfMaker = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_Maker_Size);
 			}
 
 			if(!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.BoxFontName))
@@ -1020,11 +1056,13 @@ namespace TJAPlayer3
 		    TJAPlayer3.t安全にDisposeする(ref pfBoxName);
 		    TJAPlayer3.t安全にDisposeする(ref pfMusicName);
 		    TJAPlayer3.t安全にDisposeする(ref pfSubtitle);
+			TJAPlayer3.t安全にDisposeする(ref pfMaker);
 
 			TJAPlayer3.t安全にDisposeする( ref this.ft曲リスト用フォント );
 
 			this.ttk選択している曲の曲名 = null;
 			this.ttk選択している曲のサブタイトル = null;
+			this.ttkSelectedSongMaker = null;
 
 			this.ct三角矢印アニメ = null;
 
@@ -2046,6 +2084,8 @@ namespace TJAPlayer3
 						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(r現在選択中の曲.strタイトル, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor, r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX ? this.pfBoxName : this.pfMusicName);
 					if (r現在選択中の曲.strサブタイトル != "" && this.ttk選択している曲のサブタイトル == null)
 						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(r現在選択中の曲.strサブタイトル, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor);
+					if (r現在選択中の曲.strMaker != "" && this.ttkSelectedSongMaker == null)
+						this.ttkSelectedSongMaker = this.ttkGenerateMakerTexture(r現在選択中の曲.strMaker, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor);
 
 					if (this.ttk選択している曲のサブタイトル != null)
 						tx選択している曲のサブタイトル = ResolveTitleTexture(ttk選択している曲のサブタイトル, TJAPlayer3.Skin.SongSelect_VerticalText);
@@ -2441,7 +2481,8 @@ namespace TJAPlayer3
         private CCounter ct三角矢印アニメ;
         private CPrivateFastFont pfMusicName;
         private CPrivateFastFont pfSubtitle;
-        private CPrivateFastFont pfBoxName;
+		private CPrivateFastFont pfMaker;
+		private CPrivateFastFont pfBoxName;
 
 		private string strBoxText;
 		private CPrivateFastFont pfBoxText;
@@ -2468,8 +2509,9 @@ namespace TJAPlayer3
 
         private TitleTextureKey ttk選択している曲の曲名;
         private TitleTextureKey ttk選択している曲のサブタイトル;
+		public TitleTextureKey ttkSelectedSongMaker;
 
-        private CTexture[] tx曲バー_難易度 = new CTexture[ 5 ];
+		private CTexture[] tx曲バー_難易度 = new CTexture[ 5 ];
 
 		private int nCurrentPosition = 0;
 		private int nNumOfItems = 0;
@@ -2926,7 +2968,12 @@ namespace TJAPlayer3
 			for (int i = 0; i < TJAPlayer3.Tx.SongSelect_Song_Panel.Length; i++)
 			{
 				TJAPlayer3.Tx.SongSelect_Song_Panel[i]?.tUpdateOpacity(opct);
-            }
+			}
+			TJAPlayer3.Tx.SongSelect_Bpm_Number?.tUpdateOpacity(opct);
+			if (ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show)
+			{
+				ResolveTitleTexture(ttkSelectedSongMaker)?.tUpdateOpacity(opct);
+			}
 
 
 			if (eバー種別 == Eバー種別.Random)
@@ -3153,9 +3200,14 @@ namespace TJAPlayer3
 	    private TitleTextureKey ttkサブタイトルテクスチャを生成する( string str文字, Color forecolor, Color backcolor)
         {
             return new TitleTextureKey(str文字, pfSubtitle, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_SubTitle_MaxSize);
-        }
+		}
 
-	    public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey)
+		private TitleTextureKey ttkGenerateMakerTexture(string str文字, Color forecolor, Color backcolor)
+		{
+			return new TitleTextureKey(str文字, pfMaker, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_Maker_MaxSize);
+		}
+
+		public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey)
 	    {
 			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture))
 			{

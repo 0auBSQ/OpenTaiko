@@ -12,6 +12,7 @@ namespace TJAPlayer3
 		// プロパティ
 
 		public Color Color;
+		public string SelectBG;
 		public string Genre;
 		public string Title;
 		public string[] strBoxText = new string[3];
@@ -84,6 +85,10 @@ namespace TJAPlayer3
 							else if( str.StartsWith( "#GENRE", StringComparison.OrdinalIgnoreCase ) )
 							{
 								this.Genre = str.Substring( 6 ).Trim( ignoreChars );
+							}
+							else if (str.StartsWith("#SELECTBG", StringComparison.OrdinalIgnoreCase))
+							{
+								this.SelectBG = str.Substring(9).Trim(ignoreChars);
 							}
 							else if ( str.StartsWith( "#FONTCOLOR", StringComparison.OrdinalIgnoreCase ) )
 							{

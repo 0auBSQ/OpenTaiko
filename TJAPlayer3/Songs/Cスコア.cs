@@ -82,6 +82,9 @@ namespace TJAPlayer3
 			public bool レベルを非表示にする;
 			public CDTX.E種別 曲種別;
 			public double Bpm;
+			public double BaseBpm;
+			public double MinBpm;
+			public double MaxBpm;
 			public int Duration;
             public string strBGMファイル名;
             public int SongVol;
@@ -322,6 +325,8 @@ namespace TJAPlayer3
 			this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
 			this.譜面情報.曲種別 = CDTX.E種別.DTX;
 			this.譜面情報.Bpm = 120.0;
+			this.譜面情報.MinBpm = 120.0;
+			this.譜面情報.MaxBpm = 120.0;
 			this.譜面情報.Duration = 0;
             this.譜面情報.strBGMファイル名 = "";
             this.譜面情報.SongVol = CSound.DefaultSongVol;
