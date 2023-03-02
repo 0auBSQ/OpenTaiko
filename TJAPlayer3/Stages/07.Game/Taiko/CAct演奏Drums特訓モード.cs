@@ -268,6 +268,34 @@ namespace TJAPlayer3
 				if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.A))
 					this.t現在の位置にジャンプポイントを設定する();
 
+
+
+				if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F5) && (TJAPlayer3.ConfigIni.bTokkunMode == true) && (this.b特訓PAUSE))
+				{
+					string path_to_song = TJAPlayer3.DTX.strファイル名の絶対パス;
+					CScoreIni ini = new CScoreIni(path_to_song + ".score.ini" );
+					TJAPlayer3.DTX = new CDTX(path_to_song, false, 1.0, ini.stファイル.BGMAdjust, 0, 0, true, TJAPlayer3.stage選曲.n確定された曲の難易度[0]);
+					
+					int nWAVcount = 1;
+					int looptime = (TJAPlayer3.ConfigIni.b垂直帰線待ちを行う) ? 3 : 1;   // VSyncWait=ON時は1frame(1/60s)あたり3つ読むようにする
+					for (int i = 0; i < looptime && nWAVcount <= TJAPlayer3.DTX.listWAV.Count; i++)
+					{
+						if (TJAPlayer3.DTX.listWAV[nWAVcount].listこのWAVを使用するチャンネル番号の集合.Count > 0)   // #28674 2012.5.8 yyagi
+						{
+							TJAPlayer3.DTX.tWAVの読み込み(TJAPlayer3.DTX.listWAV[nWAVcount]);
+						}
+						nWAVcount++;
+					}
+
+					if (nWAVcount > TJAPlayer3.DTX.listWAV.Count)
+					{
+						if (TJAPlayer3.ConfigIni.bDynamicBassMixerManagement)
+						{
+							TJAPlayer3.DTX.PlanToAddMixerChannel();
+						}
+					}
+				}
+
 				if (this.bスクロール中)
 				{
 					CSound管理.rc演奏用タイマ.n現在時刻ms = easing.EaseOut(this.ctスクロールカウンター, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
