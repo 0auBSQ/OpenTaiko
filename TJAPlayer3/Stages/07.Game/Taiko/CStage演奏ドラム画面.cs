@@ -920,7 +920,7 @@ namespace TJAPlayer3
 					if( !inputEvent.b押された )
 						continue;
 
-                    long nTime = (long)(((inputEvent.nTimeStamp + nInputAdjustTimeMs - CSound管理.rc演奏用タイマ.n前回リセットした時のシステム時刻) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)));
+                    long nTime = (long)(((CSound管理.rc演奏用タイマ.n現在時刻ms + nInputAdjustTimeMs) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)));
                     //int nPad09 = ( nPad == (int) Eパッド.HP ) ? (int) Eパッド.BD : nPad;		// #27029 2012.1.5 yyagi
 
                     bool bHitted = false;
