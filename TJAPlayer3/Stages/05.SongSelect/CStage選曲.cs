@@ -1019,7 +1019,14 @@ namespace TJAPlayer3
                                                         }
                                                         else
                                                         {
-                                                            // Called here
+                                                            String tja_path = this.r現在選択中のスコア.ファイル情報.ファイルの絶対パス;
+                                                            if (!File.Exists(tja_path)) {
+                                                                this.act曲リスト.ctBarFlash.t開始(0, 2700, TJAPlayer3.Skin.SongSelect_Box_Opening_Interval, TJAPlayer3.Timer);
+                                                                CSound管理.rc演奏用タイマ.t再開();
+                                                                TJAPlayer3.Timer.t再開();
+                                                                TJAPlayer3.stage演奏ドラム画面.t演奏中止();
+                                                                break;
+                                                            }
                                                             TJAPlayer3.Skin.sound決定音.t再生する();
                                                             this.act難易度選択画面.bIsDifficltSelect = true;
                                                             this.act難易度選択画面.t選択画面初期化();
