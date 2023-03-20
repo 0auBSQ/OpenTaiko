@@ -16,7 +16,7 @@ namespace TJAPlayer3
         /*
         
         TO-DO :
-        - Tag support (lang, timestamp, color(?))
+        - Tag support (lang, timestamp, color(?), ruby/rt)
         - Adjust bitmap position/anchor when lyric contains newlines (currently snapped to top-center, gets trimmed going down) (also how on earth do i do this lmao)
         - NOTE support (for comments within file)
 
