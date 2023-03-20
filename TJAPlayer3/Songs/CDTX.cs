@@ -1309,6 +1309,8 @@ namespace TJAPlayer3
         public List<Bitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
         public List<STLYRIC> listLyric2;
 
+        public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
+
         private int listBalloon_Normal_数値管理;
         private int listBalloon_Expert_数値管理;
         private int listBalloon_Master_数値管理;
@@ -1379,6 +1381,7 @@ namespace TJAPlayer3
             this.MAKER = "";
             this.SELECTBG = "";
             this.bLyrics = false;
+            this.usingLyricsFile = false;
             this.eジャンル = Eジャンル.None;
             this.PREVIEW = "";
             this.PREIMAGE = "";
@@ -4001,7 +4004,7 @@ namespace TJAPlayer3
 
                 this.listChip.Add(chip);
             }
-            else if (command == "#LYRIC")
+            else if (command == "#LYRIC" && !usingLyricsFile) // Do not parse LYRIC tags if a lyric file is already loaded
             {
                 if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
                     this.listLyric.Add(this.pf歌詞フォント.DrawPrivateFont(argument, TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor));
@@ -5419,7 +5422,48 @@ namespace TJAPlayer3
                     this.bHIDDENBRANCH = true;
                 }
             }
-            else if (strCommandName.Equals("LYRICFILE"))
+            else if (strCommandName.Equals("LYRICS") && !usingLyricsFile)
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    string[] files = SplitComma(strCommandParam);
+                    string[] filePaths = new string[files.Length];
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        filePaths[i] = this.strフォルダ名 + files[i];
+
+                        if (File.Exists(filePaths[i]))
+                        {
+                            try
+                            {
+                                if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)
+                                {
+                                    if (filePaths[i].EndsWith(".vtt"))
+                                    {
+                                        using (VTTParser parser = new VTTParser())
+                                        {
+                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i, this.pf歌詞フォント));
+                                        }
+                                        this.bLyrics = true;
+                                        this.usingLyricsFile = true;
+                                    }
+                                    else if (filePaths[i].EndsWith(".lrc"))
+                                    {
+                                        this.LyricFileParser(filePaths[i], i);
+                                        this.bLyrics = true;
+                                        this.usingLyricsFile = true;
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("Something went wrong while parsing a lyric file. More details : {0}", e);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile)
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
@@ -5435,6 +5479,7 @@ namespace TJAPlayer3
                                 if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
                                     this.LyricFileParser(strFilePath[index], index);
                                 this.bLyrics = true;
+                                this.usingLyricsFile = true;
                             }
                             catch
                             {
