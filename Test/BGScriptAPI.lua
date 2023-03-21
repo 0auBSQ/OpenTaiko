@@ -20,7 +20,6 @@ function updateValues(_deltaTime, _fps, _isClear, _towerNightNum, _battleState, 
     fps = _fps
     isClear = _isClear
     towerNightNum = _towerNightNum
-    deltaTime = _deltaTime
     battleState = _battleState
     battleWin = _battleWin
     gauge = _gauge
