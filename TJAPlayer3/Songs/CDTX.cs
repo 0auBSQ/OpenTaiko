@@ -4004,7 +4004,7 @@ namespace TJAPlayer3
 
                 this.listChip.Add(chip);
             }
-            else if (command == "#LYRIC" && !usingLyricsFile) // Do not parse LYRIC tags if a lyric file is already loaded
+            else if (command == "#LYRIC" && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
             {
                 if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
                     this.listLyric.Add(this.pf歌詞フォント.DrawPrivateFont(argument, TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor));
@@ -5422,7 +5422,7 @@ namespace TJAPlayer3
                     this.bHIDDENBRANCH = true;
                 }
             }
-            else if (strCommandName.Equals("LYRICS") && !usingLyricsFile)
+            else if (strCommandName.Equals("LYRICS") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4)
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
@@ -5463,7 +5463,7 @@ namespace TJAPlayer3
                     }
                 }
             }
-            else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile)
+            else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4)
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
