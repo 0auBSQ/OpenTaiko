@@ -100,6 +100,7 @@ BoxFontName=廻想体 ネクスト UP B
 054 - Synthsea : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Hard), bol (Normal) and Megi (Easy))
 055 - NEKROS : GRYSCL - https://twitter.com/gr_ysc_l_?s=21&t=XsxV9B105MlJ0dHUUK8k4g (Chart by colin and 0AuBSQ (Extra))
 056 - I'll still be me : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+057 - Stories of your negative past : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
