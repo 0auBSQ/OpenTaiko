@@ -10,6 +10,7 @@ using FDK;
 
 using Rectangle = System.Drawing.Rectangle;
 using Point = System.Drawing.Point;
+using static TJAPlayer3.C曲リストノード;
 
 namespace TJAPlayer3
 {
@@ -65,7 +66,7 @@ namespace TJAPlayer3
 				this.txセンサ = TJAPlayer3.tテクスチャの生成( CSkin.Path( @"Graphics\5_sensor.png" ), false );
 				//this.txセンサ光 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\5_sensor light.png" ), false );
 				this.txプレビュー画像 = null;
-				this.txプレビュー画像がないときの画像 = TJAPlayer3.tテクスチャの生成( CSkin.Path( @"Graphics\5_preimage default.png" ), false );
+				this.txプレビュー画像がないときの画像 = TJAPlayer3.tテクスチャの生成( CSkin.Path(@"Graphics\3_SongSelect\PreImageDefault.png"), false );
 				this.sfAVI画像 = Surface.CreateOffscreenPlain( TJAPlayer3.app.Device, 0xcc, 0x10d, TJAPlayer3.app.GraphicsDeviceManager.CurrentSettings.BackBufferFormat, Pool.SystemMemory );
 				this.nAVI再生開始時刻 = -1;
 				this.n前回描画したフレーム番号 = -1;
@@ -248,7 +249,7 @@ namespace TJAPlayer3
 			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
 			if( ( cスコア == null ) || string.IsNullOrEmpty( cスコア.譜面情報.Preimage ) )
 			{
-				return false;
+                return false;
 			}
 			string str = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Preimage;
 			if( !str.Equals( this.str現在のファイル名 ) )

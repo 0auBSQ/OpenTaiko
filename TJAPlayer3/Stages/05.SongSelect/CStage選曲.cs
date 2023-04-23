@@ -603,7 +603,10 @@ namespace TJAPlayer3
 
                 #endregion
 
-                this.actPreimageパネル.On進行描画();
+                if (this.r現在選択中の曲 != null
+                    && this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE
+                    && (this.act難易度選択画面.bIsDifficltSelect == false || this.act曲リスト.ctDifficultyIn.n現在の値 < 1000))
+                    this.actPreimageパネル.On進行描画();
 
                 this.actPresound.On進行描画();
 
