@@ -777,10 +777,11 @@ namespace TJAPlayer3
 
                             if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit)
                             {
-                                int width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.sz画像サイズ.Width / 5;
-                                int height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.sz画像サイズ.Height;
+                                CTexture __tex = (TJAPlayer3.Tx.SongSelect_Difficulty_Cymbol == null) ? TJAPlayer3.Tx.Dani_Difficulty_Cymbol : TJAPlayer3.Tx.SongSelect_Difficulty_Cymbol;
+                                int width = __tex.sz画像サイズ.Width / 5;
+                                int height = __tex.sz画像サイズ.Height;
 
-                                TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.app.Device,
+                                __tex.t2D中心基準描画(TJAPlayer3.app.Device,
                                     TJAPlayer3.Skin.SongSelect_High_Score_Difficulty_Cymbol_X[i],
                                     TJAPlayer3.Skin.SongSelect_High_Score_Difficulty_Cymbol_Y[i],
                                     new Rectangle(table * width, 0, width, height));
