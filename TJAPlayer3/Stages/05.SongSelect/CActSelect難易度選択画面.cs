@@ -471,8 +471,13 @@ namespace TJAPlayer3
                     */
                 }
                 
-                if (level > 0)
-                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i], TJAPlayer3.Skin.SongSelect_Difficulty_Number_X[i], TJAPlayer3.Skin.SongSelect_Difficulty_Number_Y[i]);
+                if (level >= 0)
+                    t小文字表示(TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[i], 
+                        TJAPlayer3.Skin.SongSelect_Difficulty_Number_X[i], 
+                        TJAPlayer3.Skin.SongSelect_Difficulty_Number_Y[i],
+                        i,
+                        TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nLevelIcon[i]
+                        );
 
                 for (int g = 0; g < 10; g++)
                 {
@@ -488,6 +493,13 @@ namespace TJAPlayer3
                     }
                         
                 }
+
+                if (TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.b譜面分岐[i])
+                    TJAPlayer3.Tx.SongSelect_Branch_Text?.t2D描画(
+                        TJAPlayer3.app.Device, 
+                        TJAPlayer3.Skin.SongSelect_Difficulty_Bar_X[i + 2] + TJAPlayer3.Skin.SongSelect_Branch_Text_Offset[0], 
+                        TJAPlayer3.Skin.SongSelect_Difficulty_Bar_Y[i + 2] + TJAPlayer3.Skin.SongSelect_Branch_Text_Offset[1]
+                    );
             }
 
             this.txTitle.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Difficulty_Select_Title[0], TJAPlayer3.Skin.SongSelect_Difficulty_Select_Title[1]);
@@ -593,9 +605,10 @@ namespace TJAPlayer3
         }
         private STレベル数字[] st小文字位置 = new STレベル数字[10];
 
-        private void t小文字表示(int num, float x, float y)
+        private void t小文字表示(int num, float x, float y, int diff, CDTX.ELevelIcon icon)
         {
             int[] nums = C変換.SeparateDigits(num);
+            float[] icon_coords = new float[2] { -999, -999 };
             for (int j = 0; j < nums.Length; j++)
             {
                 float offset = j - (nums.Length / 2.0f);
@@ -605,8 +618,18 @@ namespace TJAPlayer3
                 int width = TJAPlayer3.Tx.Difficulty_Number.sz画像サイズ.Width / 10;
                 int height = TJAPlayer3.Tx.Difficulty_Number.sz画像サイズ.Height;
 
+                icon_coords[0] = Math.Max(icon_coords[0], _x + width);
+                icon_coords[1] = _y;
+
                 TJAPlayer3.Tx.Difficulty_Number.t2D描画(TJAPlayer3.app.Device, _x, _y, new Rectangle(width * nums[j], 0, width, height));
+
+                if (TJAPlayer3.Tx.Difficulty_Number_Colored != null)
+                {
+                    TJAPlayer3.Tx.Difficulty_Number_Colored.color4 = C変換.ColorToColor4(TJAPlayer3.Skin.SongSelect_Difficulty_Colors[diff]);
+                    TJAPlayer3.Tx.Difficulty_Number_Colored.t2D描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
+                }
             }
+            TJAPlayer3.stage選曲.act曲リスト.tDisplayLevelIcon((int)icon_coords[0], (int)icon_coords[1], icon, TJAPlayer3.Tx.Difficulty_Number_Icon);
         }
 
         private bool isOnOption()

@@ -1137,6 +1137,13 @@ namespace TJAPlayer3
             eExpert,
             eMaster
         }
+
+        public enum ELevelIcon
+        {
+            eMinus,
+            eNone,
+            ePlus
+        }
         public class CLine
         {
             public int n小節番号;
@@ -1197,6 +1204,7 @@ namespace TJAPlayer3
         public STDGBVALUE<int> LEVEL;
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+        public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
         public CSongUniqueID uniqueID;
         
         // Tower lifes
@@ -5090,10 +5098,16 @@ namespace TJAPlayer3
             }
             else if (strCommandName.Equals("LEVEL"))
             {
-                var level = (int)Convert.ToDouble(strCommandParam);
-                this.LEVEL.Drums = level;
-                this.LEVEL.Taiko = level;
-                this.LEVELtaiko[this.n参照中の難易度] = level;
+                var level_dec = Convert.ToDouble(strCommandParam);
+                var level = (int)level_dec;
+                if (strCommandParam != level.ToString())
+                {
+                    int frac_part = Int32.Parse(level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.')[1]);
+                    this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part > 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+                }
+                this.LEVEL.Drums = (int)level;
+                this.LEVEL.Taiko = (int)level;
+                this.LEVELtaiko[this.n参照中の難易度] = (int)level;
             }
             else if (strCommandName.Equals("LIFE"))
             {

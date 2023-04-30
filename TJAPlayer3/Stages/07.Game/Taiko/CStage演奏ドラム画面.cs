@@ -2166,7 +2166,7 @@ namespace TJAPlayer3
             {
                 if (NotesManager.IsGenericRoll(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else if (pChip.nノーツ出現時刻ms != 0 && pChip.nノーツ移動開始時刻ms != 0)
                         pChip.bShow = true;
@@ -2186,7 +2186,7 @@ namespace TJAPlayer3
                 }
                 if (NotesManager.IsRollEnd(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < n先頭発声位置 - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < n先頭発声位置 - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else
                         pChip.bShow = true;

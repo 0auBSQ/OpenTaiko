@@ -227,6 +227,10 @@ namespace TJAPlayer3
             SongSelect_Bar_Select = TxC(SONGSELECT + @"Bar_Select.png");
             SongSelect_Level_Number = TxC(SONGSELECT + @"Level_Number.png");
             SongSelect_Level_Number_Big = TxC(SONGSELECT + @"Level_Number_Big.png");
+            SongSelect_Level_Number_Big_Colored = TxC(SONGSELECT + @"Level_Number_Big_Colored.png");
+            SongSelect_Level_Number_Colored = TxC(SONGSELECT + @"Level_Number_Colored.png");
+            SongSelect_Level_Number_Big_Icon = TxC(SONGSELECT + @"Level_Number_Big_Icon.png");
+            SongSelect_Level_Number_Icon = TxC(SONGSELECT + @"Level_Number_Icon.png");
             SongSelect_Bpm_Number = TxC(SONGSELECT + @"Bpm_Number.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
@@ -298,6 +302,8 @@ namespace TJAPlayer3
             #region [ 難易度選択画面 ]
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
             Difficulty_Number = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number.png");
+            Difficulty_Number_Colored = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number_Colored.png");
+            Difficulty_Number_Icon = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number_Icon.png");
             Difficulty_Star = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Star.png");
             Difficulty_Crown = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Crown.png");
             Difficulty_Option = TxC($"{SONGSELECT}Difficulty_Select/Difficulty_Option.png");
@@ -1879,7 +1885,11 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
+            SongSelect_Level_Number_Colored,
+            SongSelect_Level_Number_Icon,
             SongSelect_Level_Number_Big,
+            SongSelect_Level_Number_Big_Colored,
+            SongSelect_Level_Number_Big_Icon,
             SongSelect_Bpm_Number,
             SongSelect_Bar_Select,
             SongSelect_Bar_Genre_Overlay,
@@ -1913,6 +1923,8 @@ namespace TJAPlayer3
         #region [ 難易度選択画面 ]
         public CTexture Difficulty_Bar;
         public CTexture Difficulty_Number;
+        public CTexture Difficulty_Number_Colored;
+        public CTexture Difficulty_Number_Icon;
         public CTexture Difficulty_Star;
         public CTexture Difficulty_Crown;
         public CTexture Difficulty_Option;

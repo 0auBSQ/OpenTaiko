@@ -150,6 +150,7 @@
     <Compile Include="I18N\CLang_jp.cs" />
     <Compile Include="I18N\CLang_zh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerLevelIcon.cs" />
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerLevel.cs" />
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerSubtitle.cs" />
     <Compile Include="Songs\VTTParser.cs" />

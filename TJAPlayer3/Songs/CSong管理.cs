@@ -230,9 +230,10 @@ namespace TJAPlayer3
 									c曲リストノード.strSelectBGPath = $@"{fileinfo.FullName}\..\{dtx.SELECTBG}";
 									if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 									c曲リストノード.nLevel = dtx.LEVELtaiko;
+									c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
 
-									// LIFE here
-									c曲リストノード.nLife = dtx.LIFE;
+                                    // LIFE here
+                                    c曲リストノード.nLife = dtx.LIFE;
 
 									c曲リストノード.nTowerType = dtx.TOWERTYPE;
 
@@ -462,7 +463,8 @@ namespace TJAPlayer3
 
 
                                 c曲リストノード.nLevel = dtx.LEVELtaiko;
-								c曲リストノード.uniqueId = dtx.uniqueID;
+                                c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
+                                c曲リストノード.uniqueId = dtx.uniqueID;
 
 								CSongDict.tAddSongNode(c曲リストノード.uniqueId, c曲リストノード);
 
@@ -912,24 +914,16 @@ namespace TJAPlayer3
                                     c曲リストノード.arスコア[ i ].譜面情報.SongVol = cdtx.SongVol;
                                     c曲リストノード.arスコア[ i ].譜面情報.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
 								    c曲リストノード.arスコア[ i ].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[0] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 0 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[1] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 1 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[2] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 2 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[3] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 3 ];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[4] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[4];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[5] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[5];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[6] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[6];
                                     c曲リストノード.arスコア[ i ].譜面情報.strサブタイトル = cdtx.SUBTITLE;
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[0] = cdtx.LEVELtaiko[0];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[1] = cdtx.LEVELtaiko[1];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[2] = cdtx.LEVELtaiko[2];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[3] = cdtx.LEVELtaiko[3];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[4] = cdtx.LEVELtaiko[4];
-                                    c曲リストノード.arスコア[i].譜面情報.nレベル[5] = cdtx.LEVELtaiko[5];
-                                    c曲リストノード.arスコア[i].譜面情報.nレベル[6] = cdtx.LEVELtaiko[6];
+									for (int k = 0; k < (int)Difficulty.Total; k++)
+									{
+                                        c曲リストノード.arスコア[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[k];
+                                        c曲リストノード.arスコア[i].譜面情報.nレベル[k] = cdtx.LEVELtaiko[k];
+                                        c曲リストノード.arスコア[i].譜面情報.nLevelIcon[k] = cdtx.LEVELtaikoIcon[k];
+                                    }
 
-									// Tower Lives
-									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
+                                    // Tower Lives
+                                    c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
 
 									c曲リストノード.arスコア[i].譜面情報.nTowerType = cdtx.TOWERTYPE;
 
@@ -1445,264 +1439,13 @@ namespace TJAPlayer3
             var comparer = new ComparerChain<C曲リストノード>(
                 new C曲リストノードComparerノード種別(),
                 new C曲リストノードComparerLevel(order),
+                new C曲リストノードComparerLevelIcon(order),
                 new C曲リストノードComparerタイトル(order),
                 new C曲リストノードComparerSubtitle(order),
                 new C曲リストノードComparer絶対パス(order));
 
             ノードリスト.Sort(comparer);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ノードリスト"></param>
-        /// <param name="part"></param>
-        /// <param name="order">1=Ascend -1=Descend</param>
-        public static void t曲リストのソート3_演奏回数の多い順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-//					for( int i = 0; i <(int)Difficulty.Total; i++ )
-//					{
-						if( n1.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN1 += n1.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-						if( n2.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN2 += n2.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-//					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-//					for ( int i = 0; i < 5; i++ )
-//					{
-						if ( c曲リストノード.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN1 += c曲リストノード.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-//					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート4_LEVEL順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int)p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.nLevel[ nL12345 ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.nLevel[ nL12345 ];
-					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.nLevel[ nL12345 ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート5_BestRank順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					bool isFullCombo1 = false, isFullCombo2 = false;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						isFullCombo1 = n1.arスコア[ nL12345 ].譜面情報.フルコンボ[ (int) part ];
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						isFullCombo2 = n2.arスコア[ nL12345 ].譜面情報.フルコンボ[ (int) part ];
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-					if ( isFullCombo1 ^ isFullCombo2 )
-					{
-						if ( isFullCombo1 ) return order; else return -order;
-					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート6_SkillPoint順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					double nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-					double d = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( d != 0 )
-					{
-						return order * System.Math.Sign(d);
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					double nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート7_更新日時順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					DateTime nSumPlayCountN1 = DateTime.Parse("0001/01/01 12:00:01.000");
-					DateTime nSumPlayCountN2 = DateTime.Parse("0001/01/01 12:00:01.000");
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-					int d = nSumPlayCountN1.CompareTo(nSumPlayCountN2);
-					if ( d != 0 )
-					{
-						return order * System.Math.Sign( d );
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					DateTime nSumPlayCountN1 = DateTime.Parse( "0001/01/01 12:00:01.000" );
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート8_アーティスト名順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			int nL12345 = (int) p[ 0 ]; 
-			ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-			{
-				string strAuthorN1 = "";
-				string strAuthorN2 = "";
-				if (n1.arスコア[ nL12345 ] != null ) {
-					strAuthorN1 = n1.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-				if ( n2.arスコア[ nL12345 ] != null )
-				{
-					strAuthorN2 = n2.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-
-				return order * strAuthorN1.CompareTo( strAuthorN2 );
-			} );
-			foreach ( C曲リストノード c曲リストノード in ノードリスト )
-			{
-				string s = "";
-				if ( c曲リストノード.arスコア[ nL12345 ] != null )
-				{
-					s = c曲リストノード.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-Debug.WriteLine( s + ":" + c曲リストノード.strタイトル );
-			}
-		}
 
 	    public static void t曲リストのソート9_ジャンル順(List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p)
 	    {
