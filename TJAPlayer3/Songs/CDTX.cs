@@ -370,6 +370,7 @@ namespace TJAPlayer3
             public int nチャンネル番号;
             public STDGBVALUE<int> nバーからの距離dot;
             public int nバーからのノーツ末端距離dot;
+            public int nバーからのノーツ末端距離dot_Y;
             public int n整数値;
             public int n文字数 = 16;
 
@@ -483,6 +484,7 @@ namespace TJAPlayer3
                 this.nバーからの距離dot.Bass = 0;
                 this.nバーからの距離dot.Taiko = 0;
                 this.nバーからのノーツ末端距離dot = 0;
+                this.nバーからのノーツ末端距離dot_Y = 0;
                 this.n総移動時間 = 0;
                 this.dbBPM = 120.0;
                 this.fNow_Measure_m = 4.0f;
