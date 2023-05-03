@@ -560,6 +560,8 @@ namespace TJAPlayer3
                     {
                         act曲リスト.ResolveTitleTexture(act曲リスト.ttkSelectedSongBPM).t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
                     }
+                    if (r現在選択中の曲.bExplicit == true)
+                        TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
                 }
 
                 tSongNumberDraw(TJAPlayer3.Skin.SongSelect_SongNumber_X[0], TJAPlayer3.Skin.SongSelect_SongNumber_Y[0], NowSong);

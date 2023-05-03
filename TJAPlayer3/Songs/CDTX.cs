@@ -1198,6 +1198,7 @@ namespace TJAPlayer3
         public double db再生速度;
         public string GENRE;
         public string MAKER;
+        public bool EXPLICIT;
         public string SELECTBG;
         public Eジャンル eジャンル;
         public bool HIDDENLEVEL;
@@ -1387,6 +1388,7 @@ namespace TJAPlayer3
             this.PANEL = "";
             this.GENRE = "";
             this.MAKER = "";
+            this.EXPLICIT = false;
             this.SELECTBG = "";
             this.bLyrics = false;
             this.usingLyricsFile = false;
@@ -5356,6 +5358,13 @@ namespace TJAPlayer3
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
                     this.MAKER = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("EXPLICIT"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.EXPLICIT = C変換.bONorOFF(strCommandParam[0]);
                 }
             }
             else if (strCommandName.Equals("SELECTBG"))

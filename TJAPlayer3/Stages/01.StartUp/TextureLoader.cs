@@ -234,6 +234,7 @@ namespace TJAPlayer3
             SongSelect_Bpm_Number = TxC(SONGSELECT + @"Bpm_Number.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
+            SongSelect_Explicit = TxC(SONGSELECT + @"Explicit.png");
             SongSelect_Song_Number = TxC(SONGSELECT + @"Song_Number.png");
             SongSelect_Bar_Genre_Overlay = TxC(SONGSELECT + @"Bar_Genre_Overlay.png");
             SongSelect_Crown = TxC(SONGSELECT + @"SongSelect_Crown.png");
@@ -1897,6 +1898,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre_Overlay,
             SongSelect_Credit,
             SongSelect_Timer,
+            SongSelect_Explicit,
             SongSelect_Crown,
             SongSelect_ScoreRank,
             SongSelect_Song_Number,

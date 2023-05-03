@@ -2217,6 +2217,14 @@ namespace TJAPlayer3
                             {
                                 SongSelect_BPM_Text_MaxSize = int.Parse(strParam);
                             }
+                            else if (strCommand == "SongSelect_Explicit")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Explicit[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Table_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -8070,6 +8078,8 @@ namespace TJAPlayer3
         public int[] SongSelect_BPM_Text = new int[] { 1240, 20 };
         public int SongSelect_BPM_Text_MaxSize = 180;
         public int SongSelect_BPM_Text_Size = 23;
+
+        public int[] SongSelect_Explicit = new int[] { 1240, 60 };
 
         public int SongSelect_Bar_Center_Move = 62;
         public int SongSelect_Bar_Center_Move_X = 0;
