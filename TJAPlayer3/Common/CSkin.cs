@@ -2197,6 +2197,26 @@ namespace TJAPlayer3
                                     SongSelect_Bpm_Interval[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_BPM_Text_Show")
+                            {
+                                SongSelect_BPM_Text_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_BPM_Text[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text_Size")
+                            {
+                                SongSelect_BPM_Text_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text_MaxSize")
+                            {
+                                SongSelect_BPM_Text_MaxSize = int.Parse(strParam);
+                            }
                             else if (strCommand == "SongSelect_Table_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -8045,6 +8065,11 @@ namespace TJAPlayer3
         public int[] SongSelect_Maker = new int[] { 1285, 190 };
         public int SongSelect_Maker_Size = 23;
         public int SongSelect_Maker_MaxSize = 180;
+
+        public bool SongSelect_BPM_Text_Show = false;
+        public int[] SongSelect_BPM_Text = new int[] { 1240, 20 };
+        public int SongSelect_BPM_Text_MaxSize = 180;
+        public int SongSelect_BPM_Text_Size = 23;
 
         public int SongSelect_Bar_Center_Move = 62;
         public int SongSelect_Bar_Center_Move_X = 0;

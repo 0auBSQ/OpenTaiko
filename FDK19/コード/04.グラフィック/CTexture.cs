@@ -467,6 +467,10 @@ namespace FDK
         {
             this.t2D描画(device, x - (rc.Width / 2 * this.vc拡大縮小倍率.X), y - (rc.Height / 2 * this.vc拡大縮小倍率.Y), 1f, rc);
         }
+        public void t2D_DisplayImage_AnchorCenterLeft(Device device, int x, int y, RectangleF rc)
+        {
+            this.t2D描画(device, x, y - (rc.Height / 2 * this.vc拡大縮小倍率.Y), 1f, rc);
+        }
         public void t2D拡大率考慮上中央基準描画(Device device, int x, int y, RectangleF rc)
         {
             this.t2D描画(device, x - (rc.Width / 2 * this.vc拡大縮小倍率.X), y, 1f, rc);

@@ -392,6 +392,8 @@ namespace TJAPlayer3
 
             int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
 
+            var theta = Math.Atan2(chip.dbSCROLL, chip.dbSCROLL_Y);
+
             if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
             else

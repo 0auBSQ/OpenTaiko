@@ -291,6 +291,7 @@ namespace TJAPlayer3
 			this.ttk選択している曲の曲名 = null;
 			this.ttk選択している曲のサブタイトル = null;
 			this.ttkSelectedSongMaker = null;
+			this.ttkSelectedSongBPM = null;
 		}
 
 		public bool tBOXに入る()
@@ -318,23 +319,10 @@ namespace TJAPlayer3
 			//Trace.TraceInformation( "Skin変更System  : "+  CSkin.strSystemSkinSubfolderFullName );
 			//Trace.TraceInformation( "Skin変更BoxDef  : "+  CSkin.strBoxDefSkinSubfolderFullName );
 
-			if (this.ttk選択している曲の曲名 != null)
-			{
-				this.ttk選択している曲の曲名 = null;
-				this.b選択曲が変更された = false;
-			}
-			if (this.ttk選択している曲のサブタイトル != null)
-			{
-				this.ttk選択している曲のサブタイトル = null;
-				this.b選択曲が変更された = false;
-			}
-			if (this.ttkSelectedSongMaker != null)
-			{
-				this.ttkSelectedSongMaker = null;
-				this.b選択曲が変更された = false;
-			}
+			tResetTitleTextureKey();
 
-			if (r現在選択中の曲.list子リスト.Count != 1)
+
+            if (r現在選択中の曲.list子リスト.Count != 1)
 			{
 				if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 				{
@@ -389,23 +377,9 @@ namespace TJAPlayer3
 			TJAPlayer3.Skin.SetCurrentSkinSubfolderFullName(
 				( this.r現在選択中の曲.strSkinPath == "" ) ? "" : TJAPlayer3.Skin.GetSkinSubfolderFullNameFromSkinName( CSkin.GetSkinName( this.r現在選択中の曲.strSkinPath ) ), false );
 
-			if (this.ttk選択している曲の曲名 != null)
-			{
-				this.ttk選択している曲の曲名 = null;
-				this.b選択曲が変更された = false;
-			}
-			if (this.ttk選択している曲のサブタイトル != null)
-			{
-				this.ttk選択している曲のサブタイトル = null;
-				this.b選択曲が変更された = false;
-			}
-			if (this.ttkSelectedSongMaker != null)
-			{
-				this.ttkSelectedSongMaker = null;
-				this.b選択曲が変更された = false;
-			}
+            tResetTitleTextureKey();
 
-			if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
+            if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 			{
 				if (this.r現在選択中の曲.r親ノード  != null)
 				{
@@ -571,26 +545,12 @@ namespace TJAPlayer3
 					ctScoreFrameAnime.t開始(0, 6000, 1, TJAPlayer3.Timer);
 				}
 
-				//-----------------
-				#endregion
+                //-----------------
+                #endregion
 
 
-				if (this.ttk選択している曲の曲名 != null)
-				{
-					this.ttk選択している曲の曲名 = null;
-					this.b選択曲が変更された = false;
-				}
-				if (this.ttk選択している曲のサブタイトル != null)
-				{
-					this.ttk選択している曲のサブタイトル = null;
-					this.b選択曲が変更された = false;
-				}
-				if (this.ttkSelectedSongMaker != null)
-				{
-					this.ttkSelectedSongMaker = null;
-					this.b選択曲が変更された = false;
-				}
-			}
+                tResetTitleTextureKey();
+            }
 			this.b選択曲が変更された = true;
 		}
 		public void t前に移動()
@@ -716,26 +676,12 @@ namespace TJAPlayer3
 				TJAPlayer3.stage選曲.NowBgColor = this.r現在選択中の曲.BgColor;
 				TJAPlayer3.stage選曲.NowUseGenre = !this.r現在選択中の曲.isChangedBgType;
 				ctScoreFrameAnime.t開始(0, 6000, 1, TJAPlayer3.Timer);
-				//-----------------
-				#endregion
+                //-----------------
+                #endregion
 
 
-				if (this.ttk選択している曲の曲名 != null)
-				{
-					this.ttk選択している曲の曲名 = null;
-					this.b選択曲が変更された = false;
-				}
-				if (this.ttk選択している曲のサブタイトル != null)
-				{
-					this.ttk選択している曲のサブタイトル = null;
-					this.b選択曲が変更された = false;
-				}
-				if (this.ttkSelectedSongMaker != null)
-				{
-					this.ttkSelectedSongMaker = null;
-					this.b選択曲が変更された = false;
-				}
-			}
+                tResetTitleTextureKey();
+            }
 			this.b選択曲が変更された = true;
 		}
 		public void tUpdateCurSong()
@@ -983,29 +929,16 @@ namespace TJAPlayer3
 			TJAPlayer3.IsPerformingCalibration = false;
 
 			TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect = false;
-			
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                this.pfBoxName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_BoxName_Scale);
-                this.pfMusicName = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_MusicName_Scale);
-                this.pfSubtitle = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_Subtitle_Scale);
-				this.pfMaker = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.SongSelect_Maker_Size);
-			}
-            else
-            {
-                this.pfBoxName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_BoxName_Scale);
-                this.pfMusicName = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_MusicName_Scale);
-                this.pfSubtitle = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_Subtitle_Scale);
-				this.pfMaker = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_Maker_Size);
-			}
 
-			if(!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.BoxFontName))
-				this.pfBoxText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.BoxFontName), TJAPlayer3.Skin.SongSelect_BoxText_Scale);
-			else
-				this.pfBoxText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.SongSelect_BoxText_Scale);
+            this.pfBoxName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_BoxName_Scale);
+            this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_MusicName_Scale);
+            this.pfSubtitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_Subtitle_Scale);
+            this.pfMaker = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.SongSelect_Maker_Size);
+            this.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.SongSelect_BoxText_Scale);
+            this.pfBPM = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.SongSelect_BPM_Text_Size);
 
 
-			this.b登場アニメ全部完了 = false;
+            this.b登場アニメ全部完了 = false;
 			this.ctScrollCounter = new CCounter(0, 1000, TJAPlayer3.Skin.SongSelect_Scroll_Interval, TJAPlayer3.Timer);
 
 			// フォント作成。
@@ -1061,12 +994,11 @@ namespace TJAPlayer3
 		    TJAPlayer3.t安全にDisposeする(ref pfMusicName);
 		    TJAPlayer3.t安全にDisposeする(ref pfSubtitle);
 			TJAPlayer3.t安全にDisposeする(ref pfMaker);
+            TJAPlayer3.t安全にDisposeする(ref pfBPM);
 
-			TJAPlayer3.t安全にDisposeする( ref this.ft曲リスト用フォント );
+            TJAPlayer3.t安全にDisposeする( ref this.ft曲リスト用フォント );
 
-			this.ttk選択している曲の曲名 = null;
-			this.ttk選択している曲のサブタイトル = null;
-			this.ttkSelectedSongMaker = null;
+			tResetTitleKey();
 
 			this.ct三角矢印アニメ = null;
 
@@ -2115,6 +2047,9 @@ namespace TJAPlayer3
 						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(r現在選択中の曲.strサブタイトル, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor);
 					if (r現在選択中の曲.strMaker != "" && this.ttkSelectedSongMaker == null)
 						this.ttkSelectedSongMaker = this.ttkGenerateMakerTexture(r現在選択中の曲.strMaker, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor);
+					if (this.ttkSelectedSongBPM == null)
+						this.ttkSelectedSongBPM = this.ttkGenerateBPMTexture(r現在選択中の曲, r現在選択中の曲.ForeColor, r現在選択中の曲.BackColor); ;
+
 
 					if (this.ttk選択している曲のサブタイトル != null)
 						tx選択している曲のサブタイトル = ResolveTitleTexture(ttk選択している曲のサブタイトル, TJAPlayer3.Skin.SongSelect_VerticalText);
@@ -2512,7 +2447,8 @@ namespace TJAPlayer3
         private CPrivateFastFont pfMusicName;
         private CPrivateFastFont pfSubtitle;
 		private CPrivateFastFont pfMaker;
-		private CPrivateFastFont pfBoxName;
+        private CPrivateFastFont pfBPM;
+        private CPrivateFastFont pfBoxName;
 
 		private string strBoxText;
 		private CPrivateFastFont pfBoxText;
@@ -2539,6 +2475,7 @@ namespace TJAPlayer3
 
         private TitleTextureKey ttk選択している曲の曲名;
         private TitleTextureKey ttk選択している曲のサブタイトル;
+		public TitleTextureKey ttkSelectedSongBPM;
 		public TitleTextureKey ttkSelectedSongMaker;
 
 		private CTexture[] tx曲バー_難易度 = new CTexture[ 5 ];
@@ -2941,9 +2878,13 @@ namespace TJAPlayer3
 			{
 				ResolveTitleTexture(ttkSelectedSongMaker)?.tUpdateOpacity(opct);
 			}
+            if (ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show)
+            {
+                ResolveTitleTexture(ttkSelectedSongBPM)?.tUpdateOpacity(opct);
+            }
 
 
-			if (eバー種別 == Eバー種別.Random)
+            if (eバー種別 == Eバー種別.Random)
             {
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Random?.t2D描画(TJAPlayer3.app.Device, x, y);
 			}
@@ -3171,10 +3112,27 @@ namespace TJAPlayer3
 
 		private TitleTextureKey ttkGenerateMakerTexture(string str文字, Color forecolor, Color backcolor)
 		{
-			return new TitleTextureKey(str文字, pfMaker, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_Maker_MaxSize);
+			return new TitleTextureKey("Maker: " + str文字, pfMaker, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_Maker_MaxSize);
 		}
 
-		public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey)
+        private TitleTextureKey ttkGenerateBPMTexture(C曲リストノード node, Color forecolor, Color backcolor)
+        {
+			var _score = node.arスコア[tFetchDifficulty(node)].譜面情報;
+
+            double[] bpms = new double[3] {
+				_score.BaseBpm,
+				_score.MinBpm,
+				_score.MaxBpm
+            };
+
+			string bpm_str = "BPM: " + bpms[0].ToString();
+			if (bpms[1] != bpms[0] || bpms[2] != bpms[0])
+				bpm_str += " (" + bpms[1].ToString() + "-" + bpms[2].ToString() + ")";
+			
+            return new TitleTextureKey(bpm_str, pfBPM, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_BPM_Text_MaxSize);
+        }
+
+        public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey)
 	    {
 			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture))
 			{
@@ -3184,8 +3142,6 @@ namespace TJAPlayer3
 
 			return texture;
 		}
-
-		#region [Yes I do code bloating, what will you do ? =)]
 
 		public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey, bool bVertical)
 		{
@@ -3229,7 +3185,6 @@ namespace TJAPlayer3
 			}
 		}
 
-		#endregion
 
 		private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey)
 	    {
@@ -3240,7 +3195,8 @@ namespace TJAPlayer3
 	            if (tx文字テクスチャ.szテクスチャサイズ.Width > titleTextureKey.maxWidth)
 	            {
 	                tx文字テクスチャ.vc拡大縮小倍率.X = (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
-	                tx文字テクスチャ.vc拡大縮小倍率.Y = (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
+					tx文字テクスチャ.vc拡大縮小倍率.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
+
 	            }
 
 	            return tx文字テクスチャ;
@@ -3361,6 +3317,30 @@ namespace TJAPlayer3
             public int ptX;
         }
         private STレベル数字[] st小文字位置 = new STレベル数字[ 10 ];
+
+		private void tResetTitleTextureKey()
+		{
+            if (this.ttk選択している曲の曲名 != null)
+            {
+                this.ttk選択している曲の曲名 = null;
+                this.b選択曲が変更された = false;
+            }
+            if (this.ttk選択している曲のサブタイトル != null)
+            {
+                this.ttk選択している曲のサブタイトル = null;
+                this.b選択曲が変更された = false;
+            }
+            if (this.ttkSelectedSongMaker != null)
+            {
+                this.ttkSelectedSongMaker = null;
+                this.b選択曲が変更された = false;
+            }
+            if (this.ttkSelectedSongBPM != null)
+            {
+                this.ttkSelectedSongBPM = null;
+                this.b選択曲が変更された = false;
+            }
+        }
 
 		public void tDisplayLevelIcon(int x, int y, CDTX.ELevelIcon icon, CTexture iconTex = null)
 		{

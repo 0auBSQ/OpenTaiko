@@ -144,6 +144,7 @@
     <Compile Include="Databases\DBUnlockables.cs" />
     <Compile Include="Databases\Databases.cs" />
     <Compile Include="Databases\DBCharacter.cs" />
+    <Compile Include="Helpers\HPrivateFastFont.cs" />
     <Compile Include="I18N\CLang_es.cs" />
     <Compile Include="I18N\CLang_fr.cs" />
     <Compile Include="I18N\CLang_en.cs" />
