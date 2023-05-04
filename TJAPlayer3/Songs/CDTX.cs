@@ -1146,6 +1146,12 @@ namespace TJAPlayer3
             eNone,
             ePlus
         }
+
+        public enum ESide
+        {
+            eNormal,
+            eEx
+        }
         public class CLine
         {
             public int n小節番号;
@@ -1208,6 +1214,7 @@ namespace TJAPlayer3
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
         public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
+        public ESide SIDE;
         public CSongUniqueID uniqueID;
         
         // Tower lifes
@@ -1387,6 +1394,7 @@ namespace TJAPlayer3
             this.SUBTITLE = "";
             this.ARTIST = "";
             this.COMMENT = "";
+            this.SIDE = ESide.eEx;
             this.PANEL = "";
             this.GENRE = "";
             this.MAKER = "";
@@ -5361,6 +5369,11 @@ namespace TJAPlayer3
                 {
                     this.MAKER = strCommandParam;
                 }
+            }
+            else if (strCommandName.Equals("SIDE"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam) && strCommandParam.Equals("Normal"))
+                    this.SIDE = ESide.eNormal;
             }
             else if (strCommandName.Equals("EXPLICIT"))
             {

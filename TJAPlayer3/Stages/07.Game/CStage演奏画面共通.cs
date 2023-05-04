@@ -1099,6 +1099,12 @@ namespace TJAPlayer3
 
                 }
             }
+            
+            // Diff = Tower and SIDE is Normal
+            if (diff == (int)Difficulty.Tower)
+            {
+                _timingzonesAreEasy = TJAPlayer3.stage選曲.r確定された曲.nSide == CDTX.ESide.eNormal;
+            }
 
             return _timingzonesAreEasy;
         }

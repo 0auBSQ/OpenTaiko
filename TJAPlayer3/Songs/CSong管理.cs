@@ -223,6 +223,7 @@ namespace TJAPlayer3
                                     c曲リストノード.strサブタイトル = dtx.SUBTITLE;
                                     c曲リストノード.strジャンル = dtx.GENRE;
 									c曲リストノード.strMaker = dtx.MAKER;
+                                    c曲リストノード.nSide = dtx.SIDE;
                                     c曲リストノード.bExplicit = dtx.EXPLICIT;
                                     if (c曲リストノード.r親ノード != null && c曲リストノード.r親ノード.strジャンル != "")
                                     {
@@ -348,6 +349,7 @@ namespace TJAPlayer3
                                 c曲リストノード.strタイトル = dtx.TITLE;
                                 c曲リストノード.strサブタイトル = dtx.SUBTITLE;
 								c曲リストノード.strMaker = dtx.MAKER;
+                                c曲リストノード.nSide = dtx.SIDE;
                                 c曲リストノード.bExplicit = dtx.EXPLICIT;
 
                                 if (dtx.List_DanSongs != null)

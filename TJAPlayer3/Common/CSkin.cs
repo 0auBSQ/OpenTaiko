@@ -2033,6 +2033,22 @@ namespace TJAPlayer3
                                     SongSelect_Level_Number_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Level_Number_Tower")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Number_Tower[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Tower_Side")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Tower_Side[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Level_Number_Interval")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -8091,6 +8107,8 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Level_Number_X = new int[] { 485, 607, 729, 851 };
         public int[] SongSelect_Level_Number_Y = new int[] { 400, 400, 400, 400 };
+        public int[] SongSelect_Level_Number_Tower = new int[] { 485, 400 };
+        public int[] SongSelect_Tower_Side = new int[] { 485, 400 };
 
         public int[] SongSelect_Level_X = new int[] { 485, 607, 729, 851 };
         public int[] SongSelect_Level_Y = new int[] { 400, 400, 400, 400 };
