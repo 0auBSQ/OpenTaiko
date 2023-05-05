@@ -5115,7 +5115,7 @@ namespace TJAPlayer3
                 if (strCommandParam != level.ToString())
                 {
                     int frac_part = Int32.Parse(level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.')[1]);
-                    this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part > 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+                    this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
                 }
                 this.LEVEL.Drums = (int)level;
                 this.LEVEL.Taiko = (int)level;
