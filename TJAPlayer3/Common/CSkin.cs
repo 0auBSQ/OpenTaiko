@@ -1972,6 +1972,14 @@ namespace TJAPlayer3
                             {
                                 SongSelect_Maker_Show = C変換.bONorOFF(strParam[0]);
                             }
+                            else if (strCommand == "SongSelect_Shorten_Frame_Fade")
+                            {
+                                SongSelect_Shorten_Frame_Fade = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_Bar_Select_Skip_Fade")
+                            {
+                                SongSelect_Bar_Select_Skip_Fade = C変換.bONorOFF(strParam[0]);
+                            }
                             else if (strCommand == "SongSelect_Maker")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -8094,6 +8102,9 @@ namespace TJAPlayer3
         public int[] SongSelect_BPM_Text = new int[] { 1240, 20 };
         public int SongSelect_BPM_Text_MaxSize = 180;
         public int SongSelect_BPM_Text_Size = 23;
+
+        public bool SongSelect_Shorten_Frame_Fade = false;
+        public bool SongSelect_Bar_Select_Skip_Fade = false;
 
         public int[] SongSelect_Explicit = new int[] { 1240, 60 };
 

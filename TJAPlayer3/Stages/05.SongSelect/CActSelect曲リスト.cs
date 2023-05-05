@@ -1479,71 +1479,63 @@ namespace TJAPlayer3
 			}
 			#endregion
 
-			if (this.ctScrollCounter.n現在の値 == this.ctScrollCounter.n終了値)
+			
+			if (TJAPlayer3.Skin.SongSelect_Bar_Select_Skip_Fade ||
+				this.ctScrollCounter.n現在の値 == this.ctScrollCounter.n終了値)
 			{
-				#region [ Draw BarCenter ]
+                #region [ Bar_Select ]
 
-				#region [ Bar_Select ]
+                int barSelect_width = TJAPlayer3.Tx.SongSelect_Bar_Select.sz画像サイズ.Width;
+                int barSelect_height = TJAPlayer3.Tx.SongSelect_Bar_Select.sz画像サイズ.Height / 2;
 
-				int barSelect_width = TJAPlayer3.Tx.SongSelect_Bar_Select.sz画像サイズ.Width;
-				int barSelect_height = TJAPlayer3.Tx.SongSelect_Bar_Select.sz画像サイズ.Height / 2;
+                if (ctBarFlash.b終了値に達した && !TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
+                {
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(BarAnimeCount * 255.0f);
+                    if (TJAPlayer3.Skin.SongSelect_Bar_Select_Skip_Fade)
+                        TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = 255;
 
-				/*
-				if (ctBoxOpen.n現在の値 >= 1300 && ctBoxOpen.n現在の値 <= 1940)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.vc拡大縮小倍率.X = 1.0f - (float)Math.Sin(((ctBoxOpen.n現在の値 - 1300) * 0.28125f) * (Math.PI / 180)) * 1.0f;
-				else
-					TJAPlayer3.Tx.SongSelect_Bar_Select.vc拡大縮小倍率.X = 1.0f;
+                }
+                else
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 700) * 2.55f);
+
+                TJAPlayer3.Tx.SongSelect_Bar_Select.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Bar_Select[0], TJAPlayer3.Skin.SongSelect_Bar_Select[1], new Rectangle(0, 0, barSelect_width, barSelect_height));
+
+                #region [ BarFlash ]
+
+                if (ctBarFlash.n現在の値 <= 100)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(ctBarFlash.n現在の値 * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 200)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 100) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 300)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 200) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 400)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 300) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 500)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 400) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 600)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 500) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 700)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 600) * 2.55f);
+                else if (ctBarFlash.n現在の値 <= 800)
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 700) * 2.55f);
+                else
+                    TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = 0;
+
+                TJAPlayer3.Tx.SongSelect_Bar_Select.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Bar_Select[0], TJAPlayer3.Skin.SongSelect_Bar_Select[1], new Rectangle(0, barSelect_height, barSelect_width, barSelect_height));
+
+                #endregion
+
+                #endregion
+            }
 
 
-				if (ctBarFlash.b終了値に達した && !TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(BarAnimeCount * 4.25f);
-				else
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 700) * 2.55f);
+            if (this.ctScrollCounter.n現在の値 == this.ctScrollCounter.n終了値)
+			{
+                #region [ Draw BarCenter ]
 
-				TJAPlayer3.Tx.SongSelect_Bar_Select.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 322 - BarAnimeCount, new Rectangle(0, 0, 662, 40));
+                
 
-				TJAPlayer3.Tx.SongSelect_Bar_Select.vc拡大縮小倍率.Y = BarAnimeCount == 0 ? 0.2f : 0.2f + (float)(BarAnimeCount * 0.012f);
-				TJAPlayer3.Tx.SongSelect_Bar_Select.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 360, new Rectangle(0, 40, 662, 172));
-				TJAPlayer3.Tx.SongSelect_Bar_Select.vc拡大縮小倍率.Y = 1.0f;
-
-				TJAPlayer3.Tx.SongSelect_Bar_Select.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, 640, 398 + BarAnimeCount, new Rectangle(0, 208, 662, 43));
-				*/
-
-				if (ctBarFlash.b終了値に達した && !TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(BarAnimeCount * 255.0f);
-				else
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 700) * 2.55f);
-
-				TJAPlayer3.Tx.SongSelect_Bar_Select.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Bar_Select[0], TJAPlayer3.Skin.SongSelect_Bar_Select[1], new Rectangle(0, 0, barSelect_width, barSelect_height));
-
-				#region [ BarFlash ]
-
-				if (ctBarFlash.n現在の値 <= 100)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(ctBarFlash.n現在の値 * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 200)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 100) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 300)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 200) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 400)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 300) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 500)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 400) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 600)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 500) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 700)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)((ctBarFlash.n現在の値 - 600) * 2.55f);
-				else if (ctBarFlash.n現在の値 <= 800)
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = (int)(255 - (ctBarFlash.n現在の値 - 700) * 2.55f);
-				else
-					TJAPlayer3.Tx.SongSelect_Bar_Select.Opacity = 0;
-
-				TJAPlayer3.Tx.SongSelect_Bar_Select.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Bar_Select[0], TJAPlayer3.Skin.SongSelect_Bar_Select[1], new Rectangle(0, barSelect_height, barSelect_width, barSelect_height));
-
-				#endregion
-
-				#endregion
-
-				if (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+                if (r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
                 {
 					#region [ Score ]
 
@@ -1698,7 +1690,7 @@ namespace TJAPlayer3
 
 									for (int i = 0; i < (int)Difficulty.Edit + 1; i++)
 									{
-										if (ctBarOpen.n現在の値 >= 100)
+										if (ctBarOpen.n現在の値 >= 100 || TJAPlayer3.Skin.SongSelect_Shorten_Frame_Fade)
 										{
                                             #region [Skip conditions]
 
@@ -1741,9 +1733,17 @@ namespace TJAPlayer3
 
 											#region [Display box parameters]
 
-											int difSelectOpacity = (i == (int)Difficulty.Edit && omoteExists) ? (BarAnimeCount < 1.0 ? 0 : opacity) : (int)(BarAnimeCount * 255.0f);
-						
-											if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect || ctDifficultyIn.n現在の値 < 1000)
+											bool _switchingUra = i == (int)Difficulty.Edit && omoteExists;
+
+                                            int difSelectOpacity = (_switchingUra) ? (BarAnimeCount < 1.0 ? 0 : opacity) : (int)(BarAnimeCount * 255.0f);
+
+                                            if (TJAPlayer3.Skin.SongSelect_Shorten_Frame_Fade && !_switchingUra)
+											{
+                                                difSelectOpacity = 255;
+                                            }
+
+
+                                            if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect || ctDifficultyIn.n現在の値 < 1000)
                                             {
 												TJAPlayer3.Tx.SongSelect_Frame_Score[0].Opacity = difSelectOpacity;
 												TJAPlayer3.Tx.SongSelect_Level_Number.Opacity = difSelectOpacity;
@@ -1839,24 +1839,12 @@ namespace TJAPlayer3
 
 									#endregion
 
-									// opacity : int (Box and scores opacity)
-									#region [Opacity management]
-
-									int opacity = 0;
-
-									if (avaliable && BarAnimeCount == 62)
-									{
-										if (ctScoreFrameAnime.n現在の値 <= 3000)
-											opacity = Math.Max(0, ctScoreFrameAnime.n現在の値 - 2745);
-										else
-											opacity = Math.Min(255, 255 - (ctScoreFrameAnime.n現在の値 - 5745));
-									}
-
-									#endregion
-
 									#region [Display box parameters]
 
 									int difSelectOpacity = (int)(BarAnimeCount * 255);
+
+									if (TJAPlayer3.Skin.SongSelect_Shorten_Frame_Fade)
+										difSelectOpacity = 255;
 
 									if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect || ctDifficultyIn.n現在の値 < 1000)
 									{
