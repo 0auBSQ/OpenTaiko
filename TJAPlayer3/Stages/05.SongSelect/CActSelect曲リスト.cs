@@ -3122,18 +3122,25 @@ namespace TJAPlayer3
         private TitleTextureKey ttkGenerateBPMTexture(C曲リストノード node, Color forecolor, Color backcolor)
         {
 			var _score = node.arスコア[tFetchDifficulty(node)].譜面情報;
+			var _speed = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
 
             double[] bpms = new double[3] {
-				_score.BaseBpm,
-				_score.MinBpm,
-				_score.MaxBpm
+				_score.BaseBpm * _speed,
+				_score.MinBpm * _speed,
+				_score.MaxBpm * _speed
             };
 
 			string bpm_str = "BPM: " + bpms[0].ToString();
 			if (bpms[1] != bpms[0] || bpms[2] != bpms[0])
 				bpm_str += " (" + bpms[1].ToString() + "-" + bpms[2].ToString() + ")";
-			
-            return new TitleTextureKey(bpm_str, pfBPM, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_BPM_Text_MaxSize);
+
+			var _color = forecolor;
+			if (_speed > 1)
+				_color = Color.Red;
+			else if (_speed < 1)
+				_color = Color.LightBlue;
+
+            return new TitleTextureKey(bpm_str, pfBPM, _color, backcolor, TJAPlayer3.Skin.SongSelect_BPM_Text_MaxSize);
         }
 
         public CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey)
