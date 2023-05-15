@@ -370,6 +370,7 @@ namespace TJAPlayer3
             public int nチャンネル番号;
             public STDGBVALUE<int> nバーからの距離dot;
             public int nバーからのノーツ末端距離dot;
+            public int nバーからのノーツ末端距離dot_Y;
             public int n整数値;
             public int n文字数 = 16;
 
@@ -483,6 +484,7 @@ namespace TJAPlayer3
                 this.nバーからの距離dot.Bass = 0;
                 this.nバーからの距離dot.Taiko = 0;
                 this.nバーからのノーツ末端距離dot = 0;
+                this.nバーからのノーツ末端距離dot_Y = 0;
                 this.n総移動時間 = 0;
                 this.dbBPM = 120.0;
                 this.fNow_Measure_m = 4.0f;
@@ -1137,6 +1139,19 @@ namespace TJAPlayer3
             eExpert,
             eMaster
         }
+
+        public enum ELevelIcon
+        {
+            eMinus,
+            eNone,
+            ePlus
+        }
+
+        public enum ESide
+        {
+            eNormal,
+            eEx
+        }
         public class CLine
         {
             public int n小節番号;
@@ -1191,12 +1206,15 @@ namespace TJAPlayer3
         public double db再生速度;
         public string GENRE;
         public string MAKER;
+        public bool EXPLICIT;
         public string SELECTBG;
         public Eジャンル eジャンル;
         public bool HIDDENLEVEL;
         public STDGBVALUE<int> LEVEL;
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+        public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
+        public ESide SIDE;
         public CSongUniqueID uniqueID;
         
         // Tower lifes
@@ -1376,9 +1394,11 @@ namespace TJAPlayer3
             this.SUBTITLE = "";
             this.ARTIST = "";
             this.COMMENT = "";
+            this.SIDE = ESide.eEx;
             this.PANEL = "";
             this.GENRE = "";
             this.MAKER = "";
+            this.EXPLICIT = false;
             this.SELECTBG = "";
             this.bLyrics = false;
             this.usingLyricsFile = false;
@@ -4489,7 +4509,7 @@ namespace TJAPlayer3
                                 chip.nPlayerSide = this.nPlayerSide;
                                 chip.bGOGOTIME = this.bGOGOTIME;
 
-                                if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
+                                if (NotesManager.IsGenericBalloon(chip))
                                 {
                                     //this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 
@@ -4658,7 +4678,7 @@ namespace TJAPlayer3
                                     
                                     #endregion
                                 }
-                                else if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
+                                else if (NotesManager.IsGenericBalloon(chip))
                                 {
                                     //風船はこのままでも機能しているので何もしない.
 
@@ -5090,10 +5110,16 @@ namespace TJAPlayer3
             }
             else if (strCommandName.Equals("LEVEL"))
             {
-                var level = (int)Convert.ToDouble(strCommandParam);
-                this.LEVEL.Drums = level;
-                this.LEVEL.Taiko = level;
-                this.LEVELtaiko[this.n参照中の難易度] = level;
+                var level_dec = Convert.ToDouble(strCommandParam);
+                var level = (int)level_dec;
+                if (strCommandParam != level.ToString())
+                {
+                    int frac_part = Int32.Parse(level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.')[1]);
+                    this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+                }
+                this.LEVEL.Drums = (int)level;
+                this.LEVEL.Taiko = (int)level;
+                this.LEVELtaiko[this.n参照中の難易度] = (int)level;
             }
             else if (strCommandName.Equals("LIFE"))
             {
@@ -5342,6 +5368,18 @@ namespace TJAPlayer3
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
                     this.MAKER = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("SIDE"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam) && strCommandParam.Equals("Normal"))
+                    this.SIDE = ESide.eNormal;
+            }
+            else if (strCommandName.Equals("EXPLICIT"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.EXPLICIT = C変換.bONorOFF(strCommandParam[0]);
                 }
             }
             else if (strCommandName.Equals("SELECTBG"))
@@ -5672,337 +5710,6 @@ namespace TJAPlayer3
                 Trace.TraceError(ex.ToString());
                 Trace.TraceError("例外が発生しましたが処理を継続します。 (b67473e4-1930-44f1-b320-4ead5786e74c)");
             }
-
-
-            #region[統合前]
-            //foreach( CChip pChip in list音符のみのリスト )
-            //{
-            //    int dbUnitTime = ( int )( ( ( 60.0 / this.dbNowBPM ) / 4.0 ) * 1000.0 );
-            //    int nUnit4 = dbUnitTime * 4;
-            //    int nUnit8 = dbUnitTime * 2;
-            //    int nUnit16 = dbUnitTime;
-
-            //    if( nCount == 0  )
-            //    {
-            //        nCount++;
-            //        continue;
-            //    }
-
-            //    double db1個前の発生時刻ms = list音符のみのリスト[nCount - 1].n発声時刻ms * 1;
-
-            //    if( nCount == 1 )
-            //    {
-            //        //nCount - 1は一番最初のノーツになる。
-
-            //        if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit4 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-
-            //            if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms < nUnit4 )
-            //            {
-            //                if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms < nUnit8 )
-            //                {
-            //                    //16分なら「ド」
-            //                    pChip.nSenote = 1;
-            //                }
-            //                else
-            //                {
-            //                    if( dkdkCount == 0 )
-            //                    {
-            //                        pChip.nSenote = 1;
-            //                        dkdkCount++;
-            //                    }
-            //                    else if( dkdkCount == 1 )
-            //                    {
-            //                        pChip.nSenote = 2;
-            //                        dkdkCount = 0;
-            //                    }
-
-            //                }
-            //            }
-            //            else
-            //            {
-            //                //次も4分なら「ドン」か「カッ」
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                {
-            //                    pChip.nSenote = 0;
-            //                }
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                {
-            //                    pChip.nSenote = 3;
-            //                }
-            //            }
-            //        }
-            //        else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms <= nUnit4 && pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit8 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 1;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //            {
-            //                pChip.nSenote = 1;
-            //            }
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //            {
-            //                pChip.nSenote = 4;
-            //            }
-            //        }
-            //        else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit8 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 1;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //            {
-            //                pChip.nSenote = 1;
-            //            }
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //            {
-            //                pChip.nSenote = 4;
-            //            }
-            //        }
-
-            //        nCount++;
-            //        continue;
-            //    }
-
-            //    double db2個前の発声時刻ms = list音符のみのリスト[ nCount - 2 ].n発声時刻ms * 1;
-
-            //    #region[新しいやつ]
-            //    if( nCount + 1 >= list音符のみのリスト.Count )
-            //        break;
-
-            //    if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit4 )
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 0;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 3;
-            //        }
-
-            //        if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms <= nUnit4 )
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 1;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 4;
-            //        }
-            //    }
-            //    else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit4 && pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit8 )
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 1;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 4;
-            //        }
-
-            //        if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms <= nUnit4 )
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 0;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 3;
-
-            //            if( list音符のみのリスト[ nCount + 2 ].n発声時刻ms - list音符のみのリスト[ nCount + 1 ].n発声時刻ms >= nUnit8 )
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                    pChip.nSenote = 1;
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                    pChip.nSenote = 4;
-            //            }
-            //            else if( list音符のみのリスト[ nCount + 2 ].n発声時刻ms - list音符のみのリスト[ nCount + 1 ].n発声時刻ms < nUnit8 )
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                    pChip.nSenote = 1;
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                    pChip.nSenote = 4;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 0;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 3;
-            //        }
-            //    }
-            //    else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit8 ) //8分以下
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 1;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 4;
-            //        }
-
-            //        //後ろが4分
-            //        try
-            //        {
-            //            if( nCount + 1 >= list音符のみのリスト.Count )
-            //                break;
-
-            //            if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms >= nUnit8 ) //分岐があるとここがバグるっぽい?(Indexエラー)
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                {
-            //                    pChip.nSenote = 0;
-            //                }
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                {
-            //                    pChip.nSenote = 3;
-            //                }
-            //            }
-            //        }
-            //        catch( Exception ex )
-            //        {
-
-            //        }
-
-
-            //    }
-            //    #endregion
-
-            //    #region[古いやつ]
-            //    ////2つ前と1つ前のチップのSenoteを決めていく。
-            //    ////連打、大音符などはチップ配置の際に決めます。
-            //    //if (( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit4)
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が4分以上でかつ、その音符がドンなら2つ前のSenoteは「ドン」で確定。
-            //    //    //同時にdkdkをリセット
-            //    //    dkdkCount = false;
-            //    //    if( list音符のみのリスト[nCount - 2].nチャンネル番号 == 0x93 )
-            //    //        list音符のみのリスト[nCount - 2].nSenote = 0;
-            //    //    else if( list音符のみのリスト[nCount - 2].nチャンネル番号 == 0x94 )
-            //    //        list音符のみのリスト[nCount - 2].nSenote = 3;
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit4 )
-            //    //    {
-            //    //        //1つ前の音符と現在の音符の間が4分以上かつ、その音符がドンなら1つ前の音符は「ドン」で確定。
-            //    //        if( list音符のみのリスト[nCount - 1].nチャンネル番号 == 0x93 )
-            //    //            list音符のみのリスト[nCount - 1].nSenote = 0;
-            //    //        else if( list音符のみのリスト[nCount - 1].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[nCount - 1].nSenote = 3;
-            //    //    }
-            //    //    else if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) <= nUnit4 )
-            //    //    {
-            //    //        //4分
-            //    //        if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //        {
-            //    //            dkdkCount = false;
-            //    //            //1つ前の音符と現在の音符の間が8分以内で16分以上でかつ、その音符が赤なら1つ前の音符は「ド」で確定。
-            //    //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 2;
-            //    //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-            //    //        }
-            //    //        else if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit8 )
-            //    //        {
-            //    //            dkdkCount = false;
-            //    //            if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //            {
-            //    //                list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-
-            //    //                //ドコドン
-            //    //                if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //    //                {
-            //    //                    if( pChip.nチャンネル番号 == 0x93 )
-            //    //                        pChip.nSenote = dkdkCount ? 2 : 1;
-            //    //                    if( dkdkCount == false )
-            //    //                        dkdkCount = true;
-            //    //                    else
-            //    //                        dkdkCount = false;
-            //    //                }
-            //    //            }
-            //    //            else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //        }
-
-            //    //    }
-            //    //}
-            //    //else if ( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit4 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit8)
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が8分以上でかつ、16分以内
-
-            //    //    if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit8 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) > nUnit16 )
-            //    //    {
-            //    //        //2つ前の音符と1つ前の音符の間が8分以上でかつ、16分以内なら「ド」
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //        }
-            //    //    }
-            //    //    else if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) < nUnit8 )
-            //    //    {
-            //    //        //2つ前の音符と1つ前の音符の間が16分以内なら「ド」で確定
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //    }
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit16 )
-            //    //    {
-            //    //        if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //        {
-            //    //            if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //            {
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //    //            }
-            //    //            else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-            //    //        }
-            //    //    }
-            //    //}
-            //    //else if ( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit16 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit8 )
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が16分以上
-            //    //    if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //    {
-            //    //        list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //    }
-            //    //    else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //        list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //    {
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-            //    //    }
-
-
-            //    //}
-            //    #endregion
-
-            //    nCount++;
-            //}
-            #endregion
-
 
         }
 

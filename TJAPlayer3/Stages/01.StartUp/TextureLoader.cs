@@ -217,6 +217,9 @@ namespace TJAPlayer3
 
             SongSelect_Frame_Score[0] = TxC(SONGSELECT + @"Frame_Score.png");
             SongSelect_Frame_Score[1] = TxC(SONGSELECT + @"Frame_Score_Tower.png");
+            SongSelect_Frame_Score[2] = TxC(SONGSELECT + @"Frame_Score_Dan.png");
+
+            SongSelect_Tower_Side = TxC(SONGSELECT + @"Tower_Side.png");
 
             SongSelect_Frame_Box = TxC(SONGSELECT + @"Frame_Box.png");
             SongSelect_Frame_BackBox = TxC(SONGSELECT + @"Frame_BackBox.png");
@@ -227,14 +230,20 @@ namespace TJAPlayer3
             SongSelect_Bar_Select = TxC(SONGSELECT + @"Bar_Select.png");
             SongSelect_Level_Number = TxC(SONGSELECT + @"Level_Number.png");
             SongSelect_Level_Number_Big = TxC(SONGSELECT + @"Level_Number_Big.png");
+            SongSelect_Level_Number_Big_Colored = TxC(SONGSELECT + @"Level_Number_Big_Colored.png");
+            SongSelect_Level_Number_Colored = TxC(SONGSELECT + @"Level_Number_Colored.png");
+            SongSelect_Level_Number_Big_Icon = TxC(SONGSELECT + @"Level_Number_Big_Icon.png");
+            SongSelect_Level_Number_Icon = TxC(SONGSELECT + @"Level_Number_Icon.png");
             SongSelect_Bpm_Number = TxC(SONGSELECT + @"Bpm_Number.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
+            SongSelect_Explicit = TxC(SONGSELECT + @"Explicit.png");
             SongSelect_Song_Number = TxC(SONGSELECT + @"Song_Number.png");
             SongSelect_Bar_Genre_Overlay = TxC(SONGSELECT + @"Bar_Genre_Overlay.png");
             SongSelect_Crown = TxC(SONGSELECT + @"SongSelect_Crown.png");
             SongSelect_ScoreRank = TxC(SONGSELECT + @"ScoreRank.png");
             SongSelect_BoardNumber = TxC(SONGSELECT + @"BoardNumber.png");
+            SongSelect_Difficulty_Cymbol = TxC(SONGSELECT + "Difficulty_Cymbol.png");
 
             SongSelect_Favorite = TxC(SONGSELECT + @"Favorite.png");
             SongSelect_High_Score = TxC(SONGSELECT + @"High_Score.png");
@@ -297,6 +306,8 @@ namespace TJAPlayer3
             #region [ 難易度選択画面 ]
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
             Difficulty_Number = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number.png");
+            Difficulty_Number_Colored = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number_Colored.png");
+            Difficulty_Number_Icon = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Number_Icon.png");
             Difficulty_Star = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Star.png");
             Difficulty_Crown = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Crown.png");
             Difficulty_Option = TxC($"{SONGSELECT}Difficulty_Select/Difficulty_Option.png");
@@ -380,6 +391,8 @@ namespace TJAPlayer3
 
             Note_Mine = TxC(GAME + @"Mine.png");
             Note_Swap = TxC(GAME + @"Swap.png");
+            Note_Kusu = TxC(GAME + @"Kusu.png");
+            Note_FuseRoll = TxC(GAME + @"FuseRoll.png");
 
             Judge_Frame = TxC(GAME + @"Notes.png");
 
@@ -1878,16 +1891,23 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
+            SongSelect_Level_Number_Colored,
+            SongSelect_Level_Number_Icon,
             SongSelect_Level_Number_Big,
+            SongSelect_Level_Number_Big_Colored,
+            SongSelect_Level_Number_Big_Icon,
             SongSelect_Bpm_Number,
             SongSelect_Bar_Select,
             SongSelect_Bar_Genre_Overlay,
             SongSelect_Credit,
             SongSelect_Timer,
+            SongSelect_Explicit,
             SongSelect_Crown,
             SongSelect_ScoreRank,
             SongSelect_Song_Number,
             SongSelect_BoardNumber,
+            SongSelect_Difficulty_Cymbol,
+            SongSelect_Tower_Side,
 
             SongSelect_Favorite,
             SongSelect_High_Score,
@@ -1902,7 +1922,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Genre,
             SongSelect_Box_Chara,
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
-            SongSelect_Frame_Score = new CTexture[2],
+            SongSelect_Frame_Score = new CTexture[3],
             SongSelect_NamePlate = new CTexture[1],
             SongSelect_Song_Panel = new CTexture[4],
             SongSelect_Coin_Slot = new CTexture[4],
@@ -1911,6 +1931,8 @@ namespace TJAPlayer3
         #region [ 難易度選択画面 ]
         public CTexture Difficulty_Bar;
         public CTexture Difficulty_Number;
+        public CTexture Difficulty_Number_Colored;
+        public CTexture Difficulty_Number_Icon;
         public CTexture Difficulty_Star;
         public CTexture Difficulty_Crown;
         public CTexture Difficulty_Option;
@@ -1970,6 +1992,8 @@ namespace TJAPlayer3
         public CTexture Judge_Frame,
             Note_Mine,
             Note_Swap,
+            Note_Kusu,
+            Note_FuseRoll,
             SENotesExtension,
             Notes_Arm,
             ChipEffect,

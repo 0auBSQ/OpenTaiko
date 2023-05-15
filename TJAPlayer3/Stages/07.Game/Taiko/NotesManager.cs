@@ -361,7 +361,7 @@ namespace TJAPlayer3
 
         // Roll display
         public static void DisplayRoll(int player, int x, int y, CDTX.CChip chip, int frame, 
-            SharpDX.Color4 normalColor, SharpDX.Color4 effectedColor, int x末端)
+            SharpDX.Color4 normalColor, SharpDX.Color4 effectedColor, int x末端, int y末端)
         {
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
@@ -388,23 +388,61 @@ namespace TJAPlayer3
             }
 
             float _adjust = TJAPlayer3.Skin.Game_Notes_Size[0] / 2.0f;
+            float image_size = TJAPlayer3.Skin.Game_Notes_Size[0];
             int index = x末端 - x;
 
             int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
+
+            var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
+            // Temporary patch for odd math bug, to fix later
+            if (theta == 0)
+                theta = 0.00000000001;
+
+            var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
+            var div = dist / image_size;
+            var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
 
             if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
             else
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
-            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + _adjust, y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+
+            // Body
+            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (float)div;
+            TJAPlayer3.Tx.Notes[(int)_gt].fZ軸中心回転 = (float)theta;
+            //var _x0 = x + _adjust;
+            //var _y0 = y + 0f;
+
+            var _center_x = (x + x末端 + image_size) / 2;
+            var _center_y = _adjust + (y + y末端) / 2;
+            //TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, _x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D中心基準描画(TJAPlayer3.app.Device, (int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            //t2D拡大率考慮中央基準描画 t2D中心基準描画
+
+            // Tail
             TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x末端 + _adjust, y, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            //var _x0 = x末端 + _adjust;
+            //var _y0 = y末端 + 0f;
+            var _d = _adjust;
+
+            var x1 = x + _adjust;
+            var y1 = y + _adjust;
+            var x2 = x末端 + _adjust;
+            var y2 = y末端 + _adjust;
+            var _xc = x2 + (x2 - x1) * _d / dist;
+            var _yc = y2 + (y2 - y1) * _d / dist;
+            //TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, (int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            TJAPlayer3.Tx.Notes[(int)_gt].t2D中心基準描画(TJAPlayer3.app.Device, (int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+
+
+            TJAPlayer3.Tx.Notes[(int)_gt].fZ軸中心回転 = 0;
+
             if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
             else
                 TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
 
+            // Head
             TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(rollOrigin + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
         }

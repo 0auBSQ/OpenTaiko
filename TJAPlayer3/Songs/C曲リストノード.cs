@@ -72,10 +72,13 @@ namespace TJAPlayer3
 		public Dan_C[] Dan_C;
 		public string strサブタイトル = "";
 		public string strMaker = "";
+		public CDTX.ESide nSide = CDTX.ESide.eEx;
+		public bool bExplicit = false;
 		public string strBreadcrumbs = "";		// #27060 2011.2.27 yyagi; MUSIC BOXのパンくずリスト (曲リスト構造内の絶対位置捕捉のために使う)
 		public string strSkinPath = "";			// #28195 2012.5.4 yyagi; box.defでのスキン切り替え対応
         public bool bBranch = false;
         public int[] nLevel = new int[(int)Difficulty.Total]{ 0, 0, 0, 0, 0, 0, 0 };
+		public CDTX.ELevelIcon[] nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] {CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
 		
 		// Tower Lives
 		public int nLife = 5;

@@ -2152,6 +2152,7 @@ namespace TJAPlayer3
 
             int nノート座標 = pChip.nバーからの距離dot.Taiko;
             int nノート末端座標 = pChip.nバーからのノーツ末端距離dot;
+            int nノート末端座標_Y = pChip.nバーからのノーツ末端距離dot_Y;
             int n先頭発声位置 = 0;
 
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
@@ -2166,27 +2167,14 @@ namespace TJAPlayer3
             {
                 if (NotesManager.IsGenericRoll(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else if (pChip.nノーツ出現時刻ms != 0 && pChip.nノーツ移動開始時刻ms != 0)
                         pChip.bShow = true;
-
-                    /*
-                    if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms))
-                    {
-                        nノート座標 = NotesManager.GetNoteX(((pChip.n発声時刻ms) - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
-                        nノート末端座標 = NotesManager.GetNoteX((pChip.nノーツ終了時刻ms - (pChip.n発声時刻ms - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
-                    }
-                    else
-                    {
-                        nノート座標 = 0;
-                        nノート末端座標 = 0;
-                    }
-                    */
                 }
                 if (NotesManager.IsRollEnd(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < n先頭発声位置 - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < n先頭発声位置 - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else
                         pChip.bShow = true;
@@ -2200,24 +2188,21 @@ namespace TJAPlayer3
                             n先頭発声位置 = cChip.n発声時刻ms;
                         }
                     }
-
-                    /*
-                    //連打音符先頭の開始時刻を取得しなければならない。
-                    //そうしなければ連打先頭と連打末端の移動開始時刻にズレが出てしまう。
-                    if (pChip.nノーツ移動開始時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < n先頭発声位置 - pChip.nノーツ移動開始時刻ms))
-                    {
-                        nノート座標 = NotesManager.GetNoteX((pChip.n発声時刻ms - (n先頭発声位置 - pChip.nノーツ移動開始時刻ms)) * pChip.dbBPM * pChip.dbSCROLL * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0), TJAPlayer3.Skin.Game_Note_Interval);
-                    }
-                    else
-                    {
-                        nノート座標 = 0;
-                    }
-                    */
                 }
 
                 int x = NoteOriginX[nPlayer] + nノート座標;
                 int x末端 = NoteOriginX[nPlayer] + nノート末端座標;
-                int y = NoteOriginY[nPlayer];// + ((int)(pChip.nコース) * 100)
+                int y末端 = NoteOriginY[nPlayer] + nノート末端座標_Y;
+                int y = NoteOriginY[nPlayer];
+
+                if (pChip.dbSCROLL_Y != 0.0)
+                {
+                    double _scrollSpeed = pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
+                    long __dbt = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                    long time = pChip.n発声時刻ms - __dbt;
+                    float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+                    y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                }
 
                 #region[ HIDSUD & STEALTH ]
 
@@ -2338,7 +2323,7 @@ namespace TJAPlayer3
 
                         if (NotesManager.IsRoll(pChip))
                         {
-                            NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端);
+                            NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端);
 
                             if (TJAPlayer3.Tx.SENotes[(int)_gt] != null)
                             {

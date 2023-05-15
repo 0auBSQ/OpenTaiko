@@ -1,7 +1,3 @@
-//Oni and Edit difficulties by Bol
-//Easy, Normal and Hard by MooX
-
-
 TITLE:WTF?!
 SUBTITLE:--MooX
 WAVE:MooX - WTF.ogg
@@ -9,11 +5,11 @@ BPM:100
 OFFSET:-0.04
 DEMOSTART:21
 BGMOVIE:MooX - WTF.mp4
-
-
+MAKER:bol & MooX
+EXPLICIT:1
 
 COURSE:Edit
-LEVEL:10
+LEVEL:10.4
 BALLOON:
 SCOREINIT:1190
 SCOREDIFF:0
