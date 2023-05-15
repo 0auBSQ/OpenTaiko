@@ -5442,7 +5442,7 @@ namespace TJAPlayer3
                                     {
                                         using (VTTParser parser = new VTTParser())
                                         {
-                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i, this.pf歌詞フォント));
+                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i));
                                         }
                                         this.bLyrics = true;
                                         this.usingLyricsFile = true;
@@ -5457,7 +5457,7 @@ namespace TJAPlayer3
                             }
                             catch (Exception e)
                             {
-                                Debug.WriteLine("Something went wrong while parsing a lyric file. More details : {0}", e);
+                                Trace.TraceError("Something went wrong while parsing a lyric file at {0}. More details : {1}", filePaths[i], e);
                             }
                         }
                     }
