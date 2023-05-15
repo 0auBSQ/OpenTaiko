@@ -26,8 +26,7 @@ namespace TJAPlayer3
             None = 0,
             Tag = 1,
             TagEnd = 2,
-            Rt = 4,
-            HtmlCode = 8
+            Rt = 4
         }
 
         internal struct LyricData
@@ -192,7 +191,6 @@ namespace TJAPlayer3
                     var parseMode = ParseMode.None;
 
                     string tagdata = String.Empty;
-                    string htmlcode = String.Empty;
                     data.Text = String.Empty;
                     isUsingLang = false;
                     
@@ -200,28 +198,6 @@ namespace TJAPlayer3
                     {
                         switch (lines[i].Substring(j, 1))
                         {
-                            #region HTML Character code
-                            case "&":
-                                if (j + 1 < lines[i].Length)
-                                {
-                                    if (lines[i].Substring(j + 1) == "#")
-                                    {
-                                        parseMode |= ParseMode.HtmlCode;
-                                    }
-                                }
-                                goto default;
-                            case ";":
-                                if (parseMode.HasFlag(ParseMode.HtmlCode))
-                                {
-                                    if (parseMode.HasFlag(ParseMode.Rt)) {  data.RubyText += WebUtility.HtmlDecode(tagdata + ";"); }
-                                    else { data.Text += WebUtility.HtmlDecode(tagdata + ";"); }
-
-                                    tagdata = String.Empty;
-                                    parseMode &= ParseMode.HtmlCode;
-                                }
-                                else { goto default; }
-                                break;
-                            #endregion
                             #region HTML Tags
                             case "<":
                                 parseMode |= ParseMode.Tag;
@@ -372,13 +348,14 @@ namespace TJAPlayer3
                                 if (parseMode.HasFlag(ParseMode.Tag)) { tagdata += lines[i].Substring(j, 1); }
                                 else if (!isUsingLang || (isUsingLang && data.Language == CLangManager.fetchLang()))
                                 {
-                                    if (parseMode.HasFlag(ParseMode.HtmlCode)) { htmlcode += lines[i].Substring(j, 1); }
-                                    else if (parseMode.HasFlag(ParseMode.Rt)) { data.RubyText += lines[i].Substring(j, 1); }
+                                    if (parseMode.HasFlag(ParseMode.Rt)) { data.RubyText += lines[i].Substring(j, 1); }
                                     else { data.Text += lines[i].Substring(j, 1); }
                                 }
                                 break;
                         }
                     }
+                    data.Text = WebUtility.HtmlDecode(data.Text);
+                    data.RubyText = WebUtility.HtmlDecode(data.RubyText);
                     lyricData.Add(data);
                     data.line++;
                 }
