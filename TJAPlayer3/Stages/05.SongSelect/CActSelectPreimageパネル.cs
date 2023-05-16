@@ -246,12 +246,10 @@ namespace TJAPlayer3
 		}
 		private bool tプレビュー画像の指定があれば構築する()
 		{
-			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
-			if( ( cスコア == null ) || string.IsNullOrEmpty( cスコア.譜面情報.Preimage ) )
-			{
-                return false;
-			}
-			string str = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Preimage;
+            Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
+            if ((cスコア == null) || string.IsNullOrEmpty(cスコア.譜面情報.Preimage)) return false;
+
+            string str = ((!Path.IsPathRooted(cスコア.譜面情報.Preimage)) ? cスコア.ファイル情報.フォルダの絶対パス : "") + cスコア.譜面情報.Preimage;
 			if( !str.Equals( this.str現在のファイル名 ) )
 			{
 				TJAPlayer3.tテクスチャの解放( ref this.txプレビュー画像 );

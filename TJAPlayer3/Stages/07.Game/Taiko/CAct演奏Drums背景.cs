@@ -6,6 +6,7 @@ using static TJAPlayer3.CActSelect曲リスト;
 
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
+using System.Collections.Generic;
 
 namespace TJAPlayer3
 {
@@ -105,6 +106,7 @@ namespace TJAPlayer3
                 return;
 
             var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
+            string presetSection = "";
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
             {
                 bgOrigindir += "Tower";
@@ -112,6 +114,7 @@ namespace TJAPlayer3
             else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
                 bgOrigindir += "Dan";
+                presetSection = "Dan";
             }
             else if (TJAPlayer3.ConfigIni.bAIBattleMode)
             {
@@ -120,37 +123,44 @@ namespace TJAPlayer3
             else
             {
                 bgOrigindir += "Normal";
+                presetSection = "Regular";
             }
+
+            object _ps = null;
+
+            switch (presetSection)
+            {
+                case "Regular":
+                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
+                    break;
+                case "Dan":
+                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Dan;
+                    break;
+                default:
+                    break;
+            };
+
+            var preset = (_ps != null 
+                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
+                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
+                : null;
+           
 
             Random random = new Random();
 
             if (System.IO.Directory.Exists($@"{bgOrigindir}\Up"))
             {
                 var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}\Up");
-                var upPath = upDirs[random.Next(0, upDirs.Length)];
+
+                // If there is a preset upper background and this preset exists on the skin use it, else random upper background
+                var _presetPath = (preset != null) ? $@"{bgOrigindir}\Up\" + preset.UpperBackground : "";
+                var upPath = (preset != null && System.IO.Directory.Exists(_presetPath)) 
+                    ?  _presetPath
+                    : upDirs[random.Next(0, upDirs.Length)];
 
                 UpScript = new ScriptBG($@"{upPath}\Script.lua");
                 UpScript.Init();
-
-                /*Background_Up_1st = new CTexture[3];
-                Background_Up_1st[0] = TJAPlayer3.tテクスチャの生成($@"{upPath}\1P_Up_1st.png");
-                Background_Up_1st[1] = TJAPlayer3.tテクスチャの生成($@"{upPath}\2P_Up_1st.png");
-                Background_Up_1st[2] = TJAPlayer3.tテクスチャの生成($@"{upPath}\Clear_Up_1st.png");
-
-                Background_Up_2nd = new CTexture[3];
-                Background_Up_2nd[0] = TJAPlayer3.tテクスチャの生成($@"{upPath}\1P_Up_2nd.png");
-                Background_Up_2nd[1] = TJAPlayer3.tテクスチャの生成($@"{upPath}\2P_Up_2nd.png");
-                Background_Up_2nd[2] = TJAPlayer3.tテクスチャの生成($@"{upPath}\Clear_Up_2nd.png");
-
-                Background_Up_3rd = new CTexture[3];
-                Background_Up_3rd[0] = TJAPlayer3.tテクスチャの生成($@"{upPath}\1P_Up_3rd.png");
-                Background_Up_3rd[1] = TJAPlayer3.tテクスチャの生成($@"{upPath}\2P_Up_3rd.png");
-                Background_Up_3rd[2] = TJAPlayer3.tテクスチャの生成($@"{upPath}\Clear_Up_3rd.png");
-
-                for (int i = 0; i < Background_Up_Dan.Length; i++)
-                    Background_Up_Dan[i] = TJAPlayer3.tテクスチャの生成($@"{upPath}\{i}.png");
-                for (int i = 0; i < Background_Up_Tower.Length; i++)
-                    Background_Up_Tower[i] = TJAPlayer3.tテクスチャの生成($@"{upPath}\{i}.png");*/
 
                 IsUpNotFound = false;
             }
@@ -162,16 +172,15 @@ namespace TJAPlayer3
             if (System.IO.Directory.Exists($@"{bgOrigindir}\Down"))
             {
                 var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}\Down");
-                var downPath = downDirs[random.Next(0, downDirs.Length)];
+
+                // If there is a preset lower background and this preset exists on the skin use it, else random upper background
+                var _presetPath = (preset != null) ? $@"{bgOrigindir}\Down\" + preset.LowerBackground : "";
+                var downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+                    ? _presetPath
+                    : downDirs[random.Next(0, downDirs.Length)];
 
                 DownScript = new ScriptBG($@"{downPath}\Script.lua");
                 DownScript.Init();
-
-                /*Background = TJAPlayer3.tテクスチャの生成($@"{bgOrigindir}Background.png");
-
-                Background_Down = TJAPlayer3.tテクスチャの生成($@"{downPath}\Down.png");
-                Background_Down_Clear = TJAPlayer3.tテクスチャの生成($@"{downPath}\Down_Clear.png");
-                Background_Down_Scroll = TJAPlayer3.tテクスチャの生成($@"{downPath}\Down_Scroll.png");*/
 
                 IsDownNotFound = false;
             }
@@ -180,15 +189,18 @@ namespace TJAPlayer3
                 IsDownNotFound = true;
             }
 
+            this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_Tower_Font_TowerText);
 
+            /*
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
             {
                 this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
             }
             else
-            {
+            { 
                 this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
             }
+            */
 
             this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString(1000), pfTowerText, Color.White, Color.Black, 700);
             this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString(1001), pfTowerText, Color.White, Color.Black, 700);
@@ -205,32 +217,9 @@ namespace TJAPlayer3
 
             TJAPlayer3.t安全にDisposeする(ref UpScript);
             TJAPlayer3.t安全にDisposeする(ref DownScript);
-            /*TJAPlayer3.t安全にDisposeする(ref Background);
-
-            TJAPlayer3.t安全にDisposeする(ref Background_Up_1st);
-            TJAPlayer3.t安全にDisposeする(ref Background_Up_2nd);
-            TJAPlayer3.t安全にDisposeする(ref Background_Up_3rd);
-
-            TJAPlayer3.t安全にDisposeする(ref Background_Down);
-            TJAPlayer3.t安全にDisposeする(ref Background_Down_Clear);
-            TJAPlayer3.t安全にDisposeする(ref Background_Down_Scroll);
-
-            for (int i = 0; i < Background_Up_Dan.Length; i++)
-                TJAPlayer3.t安全にDisposeする(ref Background_Up_Dan[i]);
-            for (int i = 0; i < Background_Up_Tower.Length; i++)
-                TJAPlayer3.t安全にDisposeする(ref Background_Up_Tower[i]);*/
-
 
             TJAPlayer3.t安全にDisposeする(ref pfTowerText);
 
-            /*TJAPlayer3.t安全にDisposeする(ref this.ct上背景FIFOタイマー);
-            for (int i = 0; i < 2; i++)
-            {
-                ct上背景スクロール用タイマー1st[i] = null;
-                ct上背景スクロール用タイマー2nd[i] = null;
-                ct上背景スクロール用タイマー3rd[i] = null;
-            }
-            TJAPlayer3.t安全にDisposeする(ref this.ct下背景スクロール用タイマー1);*/
             base.On非活性化();
         }
 
@@ -238,55 +227,6 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
-                /*this.ct上背景スクロール用タイマー1st = new CCounter[2];
-                this.ct上背景スクロール用タイマー2nd = new CCounter[2];
-                this.ct上背景スクロール用タイマー3rd = new CCounter[2];
-                this.ct上背景クリアインタイマー = new CCounter[2];
-                ct上背景スクロール用タイマー1stDan = new CCounter[4];
-                ct上背景スクロール用タイマー1stTower = new CCounter[4];*/
-
-                if (!IsUpNotFound)
-                {
-                    /*
-                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-                    {
-                        this.ct上背景スクロール用タイマー1stDan[0] = new CCounter(0, this.Background_Up_Dan[1].szテクスチャサイズ.Width, 8.453f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stDan[1] = new CCounter(0, this.Background_Up_Dan[2].szテクスチャサイズ.Width, 10.885f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stDan[2] = new CCounter(0, this.Background_Up_Dan[3].szテクスチャサイズ.Width, 11.4f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stDan[3] = new CCounter(0, this.Background_Up_Dan[5].szテクスチャサイズ.Width, 33.88f, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー2stDan = new CCounter(0, this.Background_Up_Dan[4].szテクスチャサイズ.Width + 200, 10, TJAPlayer3.Timer);
-                    }
-                    else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-                    {
-                        this.ct上背景スクロール用タイマー1stTower[0] = new CCounter(0, this.Background_Up_Tower[1].szテクスチャサイズ.Width, 8.453f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stTower[1] = new CCounter(0, this.Background_Up_Tower[2].szテクスチャサイズ.Width, 10.885f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stTower[2] = new CCounter(0, this.Background_Up_Tower[3].szテクスチャサイズ.Width, 11.4f * 2, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー1stTower[3] = new CCounter(0, this.Background_Up_Tower[5].szテクスチャサイズ.Width, 33.88f, TJAPlayer3.Timer);
-                        this.ct上背景スクロール用タイマー2stTower = new CCounter(0, this.Background_Up_Tower[4].szテクスチャサイズ.Width + 200, 10, TJAPlayer3.Timer);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            if (this.Background_Up_3rd[i] != null)
-                            {
-                                this.ct上背景スクロール用タイマー1st[i] = new CCounter(1, this.Background_Up_1st[i].szテクスチャサイズ.Width, 16, TJAPlayer3.Timer);
-                                this.ct上背景スクロール用タイマー2nd[i] = new CCounter(1, this.Background_Up_2nd[i].szテクスチャサイズ.Height, 70, TJAPlayer3.Timer);
-                                this.ct上背景スクロール用タイマー3rd[i] = new CCounter(1, 600, 3, TJAPlayer3.Timer);
-                                this.ct上背景クリアインタイマー[i] = new CCounter();
-                            }
-                        }
-                    }*/
-                }
-
-                if (!IsDownNotFound)
-                {
-                    /*if (this.Background_Down_Scroll != null)
-                        this.ct下背景スクロール用タイマー1 = new CCounter(1, this.Background_Down_Scroll.szテクスチャサイズ.Width, 4, TJAPlayer3.Timer);
-
-                    this.ct上背景FIFOタイマー = new CCounter();*/
-                }
-
                 this.ctSlideAnimation = new CCounter();
                 this.ctClimbAnimation = new CCounter();
                 this.ctDonAnimation = new CCounter(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
@@ -309,48 +249,6 @@ namespace TJAPlayer3
 
             //this.ct上背景FIFOタイマー?.t進行();
 
-            #region [Scroll counters]
-
-            /*for (int i = 0; i < 2; i++)
-            {
-                if (this.ct上背景クリアインタイマー[i] != null)
-                    this.ct上背景クリアインタイマー[i].t進行();
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                if (this.ct上背景スクロール用タイマー1st[i] != null)
-                    this.ct上背景スクロール用タイマー1st[i].t進行Loop();
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                if (this.ct上背景スクロール用タイマー2nd[i] != null)
-                    this.ct上背景スクロール用タイマー2nd[i].t進行Loop();
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                if (this.ct上背景スクロール用タイマー3rd[i] != null)
-                    this.ct上背景スクロール用タイマー3rd[i].t進行Loop();
-            }
-            for (int i = 0; i < 4; i++)
-            {
-                if (this.ct上背景スクロール用タイマー1stDan[i] != null)
-                    this.ct上背景スクロール用タイマー1stDan[i].t進行Loop();
-            }
-            if (this.ct下背景スクロール用タイマー1 != null)
-                this.ct下背景スクロール用タイマー1.t進行Loop();
-
-            if (this.ct上背景スクロール用タイマー2stDan != null)
-                this.ct上背景スクロール用タイマー2stDan.t進行Loop();
-            
-            for (int i = 0; i < 4; i++)
-            {
-                if (this.ct上背景スクロール用タイマー1stTower[i] != null)
-                    this.ct上背景スクロール用タイマー1stTower[i].t進行Loop();
-            }
-            if (this.ct上背景スクロール用タイマー2stTower != null)
-                this.ct上背景スクロール用タイマー2stTower.t進行Loop();
-            */
-            #endregion
 
             #region [Tower specific variables declaration]
 
@@ -376,56 +274,6 @@ namespace TJAPlayer3
                     int nightTime = Math.Max(140, maxFloor / 2);
 
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
-
-                    #endregion
-
-                    #region [Tower HAIKEI]
-
-                    /*
-                    this.Background_Up_Tower[0]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-
-                    if (this.Background_Up_Tower[7] != null)
-                        this.Background_Up_Tower[7].Opacity = (int)(255f * currentFloorPositionMax140);
-
-
-                    this.Background_Up_Tower[7]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-
-                    if (this.Background_Up_Tower[1] != null && this.Background_Up_Tower[2] != null && this.Background_Up_Tower[3] != null)
-                    {
-                        float colorTmp = 0.5f + (1f - currentFloorPositionMax140) * 0.5f;
-
-                        this.Background_Up_Tower[1].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
-                        this.Background_Up_Tower[2].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
-                        this.Background_Up_Tower[3].color4 = new Color4(colorTmp, colorTmp, colorTmp, 1f);
-
-                        this.Background_Up_Tower[1].Opacity = (int)(255f * colorTmp);
-                        this.Background_Up_Tower[2].Opacity = (int)(255f * colorTmp);
-                        this.Background_Up_Tower[3].Opacity = (int)(255f * colorTmp);
-                    }
-
-                    if (this.Background_Up_Tower[1] != null)
-                        for (int i = 0; i < 1280 / this.Background_Up_Tower[1].szテクスチャサイズ.Width + 2; i++)
-                            this.Background_Up_Tower[1].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Tower[1].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stTower[0].n現在の値, 0);
-
-                    if (this.Background_Up_Tower[2] != null)
-                        for (int i = 0; i < 1280 / this.Background_Up_Tower[2].szテクスチャサイズ.Width + 2; i++)
-                            this.Background_Up_Tower[2].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Tower[2].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stTower[1].n現在の値, 0);
-
-                    if (this.Background_Up_Tower[3] != null)
-                        for (int i = 0; i < 1280 / this.Background_Up_Tower[3].szテクスチャサイズ.Width + 2; i++)
-                            this.Background_Up_Tower[3].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Tower[3].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stTower[2].n現在の値, 0);
-
-                    this.Background_Up_Tower[6]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-
-                    if (this.Background_Up_Tower[4] != null)
-                        for (int i = 0; i < 1280 / this.Background_Up_Tower[4].szテクスチャサイズ.Width + 2; i++)
-                            this.Background_Up_Tower[4].t2D描画(TJAPlayer3.app.Device, +(i * this.Background_Up_Tower[4].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー2stTower.n現在の値, -200 + ct上背景スクロール用タイマー2stTower.n現在の値);
-
-                    if (this.Background_Up_Tower[5] != null)
-                        for (int i = 0; i < 1280 / this.Background_Up_Tower[5].szテクスチャサイズ.Width + 2; i++)
-                            this.Background_Up_Tower[5].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Tower[5].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stTower[3].n現在の値, 0);
-                    */
-
 
                     #endregion
 
@@ -517,193 +365,6 @@ namespace TJAPlayer3
 
                     }
 
-                    #endregion
-                }
-                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-                {
-                    // Multiple background handling will be here 
-                    #region [ Regular background ]
-
-                    /*for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
-                    {
-                        int i = j;
-                        if (TJAPlayer3.P1IsBlue())
-                            i = 1;
-
-                        if (this.ct上背景スクロール用タイマー1st[j] != null)
-                        {
-                            double TexSizeL = 1280 / this.Background_Up_1st[j].szテクスチャサイズ.Width;
-                            double TexSizeW = 308 / this.Background_Up_2nd[j].szテクスチャサイズ.Height;
-                            double TexSizeF = 1280 / this.Background_Up_3rd[j].szテクスチャサイズ.Width;
-                            // 1280をテクスチャサイズで割ったものを切り上げて、プラス+1足す。
-                            int ForLoopL = (int)Math.Ceiling(TexSizeL) + 1;
-                            int ForLoopW = (int)Math.Ceiling(TexSizeW) + 1;
-                            int ForLoopF = (int)Math.Ceiling(TexSizeF) + 1;
-                            //int nループ幅 = 328;
-
-                            #region [ 上背景-Back ]
-
-                            for (int W = 1; W < ForLoopW + 1; W++)
-                            {
-                                this.Background_Up_1st[i].t2D描画(TJAPlayer3.app.Device, 0 - this.ct上背景スクロール用タイマー1st[j].n現在の値, (185 + j * 600) - (W * this.Background_Up_1st[i].szテクスチャサイズ.Height) + ct上背景スクロール用タイマー2nd[j].n現在の値);
-                            }
-                            for (int l = 1; l < ForLoopL + 1; l++)
-                            {
-                                for (int W = 1; W < ForLoopW + 1; W++)
-                                {
-                                    this.Background_Up_1st[i].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_1st[i].szテクスチャサイズ.Width) - this.ct上背景スクロール用タイマー1st[j].n現在の値, (185 + j * 600) - (W * this.Background_Up_1st[i].szテクスチャサイズ.Height) + ct上背景スクロール用タイマー2nd[j].n現在の値);
-                                }
-                            }
-
-                            for (int W = 1; W < ForLoopW + 1; W++)
-                            {
-                                this.Background_Up_2nd[i].t2D描画(TJAPlayer3.app.Device, 0 - this.ct上背景スクロール用タイマー1st[j].n現在の値, (370 + j * 600) - (W * this.Background_Up_2nd[i].szテクスチャサイズ.Height) - ct上背景スクロール用タイマー2nd[j].n現在の値);
-                            }
-                            for (int l = 1; l < ForLoopL + 1; l++)
-                            {
-                                for (int W = 1; W < ForLoopW + 1; W++)
-                                {
-                                    this.Background_Up_2nd[i].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_2nd[i].szテクスチャサイズ.Width) - this.ct上背景スクロール用タイマー1st[j].n現在の値, (370 + j * 600) - (W * this.Background_Up_2nd[i].szテクスチャサイズ.Height) - ct上背景スクロール用タイマー2nd[j].n現在の値);
-                                }
-                            }
-
-                            #endregion
-
-                            #region [ 上背景-Front ]
-
-                            float thirdy = 0;
-                            float thirdx = 0;
-
-                            if (this.ct上背景スクロール用タイマー3rd[i].n現在の値 <= 270)
-                            {
-                                thirdx = this.ct上背景スクロール用タイマー3rd[i].n現在の値 * 0.9258f;
-                                thirdy = (float)Math.Sin((float)this.ct上背景スクロール用タイマー3rd[j].n現在の値 * (Math.PI / 270.0f)) * 40.0f;
-                            }
-                            else
-                            {
-                                thirdx = 250 + (ct上背景スクロール用タイマー3rd[j].n現在の値 - 270) * 0.24f;
-
-                                if (this.ct上背景スクロール用タイマー3rd[j].n現在の値 <= 490) thirdy = -(float)Math.Sin((float)(this.ct上背景スクロール用タイマー3rd[j].n現在の値 - 270) * (Math.PI / 170.0f)) * 15.0f;
-                                else thirdy = -((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f) + (float)(((this.ct上背景スクロール用タイマー3rd[j].n現在の値 - 490) / 110f) * ((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f));
-                            }
-
-                            this.Background_Up_3rd[i].t2D描画(TJAPlayer3.app.Device, 0 - thirdx, 0 + j * 540 - thirdy);
-
-                            for (int l = 1; l < ForLoopF + 1; l++)
-                            {
-                                this.Background_Up_3rd[i].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_3rd[i].szテクスチャサイズ.Width) - thirdx, 0 + j * 540 - thirdy);
-                            }
-
-                            #endregion
-                        }
-
-                        if (this.ct上背景スクロール用タイマー1st[j] != null)
-                        {
-                            if (TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[j])
-                            {
-                                this.Background_Up_1st[2].Opacity = ((this.ct上背景クリアインタイマー[j].n現在の値 * 0xff) / 100);
-                                this.Background_Up_2nd[2].Opacity = ((this.ct上背景クリアインタイマー[j].n現在の値 * 0xff) / 100);
-                                this.Background_Up_3rd[2].Opacity = ((this.ct上背景クリアインタイマー[j].n現在の値 * 0xff) / 100);
-                            }
-                            else
-                            {
-                                this.Background_Up_1st[2].Opacity = 0;
-                                this.Background_Up_2nd[2].Opacity = 0;
-                                this.Background_Up_3rd[2].Opacity = 0;
-                            }
-
-                            double TexSizeL = 1280 / this.Background_Up_1st[2].szテクスチャサイズ.Width;
-                            double TexSizeW = 308 / this.Background_Up_2nd[2].szテクスチャサイズ.Height;
-                            double TexSizeF = 1280 / this.Background_Up_3rd[2].szテクスチャサイズ.Width;
-                            // 1280をテクスチャサイズで割ったものを切り上げて、プラス+1足す。
-                            int ForLoopL = (int)Math.Ceiling(TexSizeL) + 1;
-                            int ForLoopW = (int)Math.Ceiling(TexSizeW) + 1;
-                            int ForLoopF = (int)Math.Ceiling(TexSizeF) + 1;
-
-                            #region [ 上背景-Back ]
-
-                            for (int W = 1; W < ForLoopW + 1; W++)
-                            {
-                                this.Background_Up_1st[2].t2D描画(TJAPlayer3.app.Device, 0 - this.ct上背景スクロール用タイマー1st[j].n現在の値, (185 + j * 600) - (W * this.Background_Up_1st[2].szテクスチャサイズ.Height) + ct上背景スクロール用タイマー2nd[j].n現在の値);
-                            }
-                            for (int l = 1; l < ForLoopL + 1; l++)
-                            {
-                                for (int W = 1; W < ForLoopW + 1; W++)
-                                {
-                                    this.Background_Up_1st[2].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_1st[2].szテクスチャサイズ.Width) - this.ct上背景スクロール用タイマー1st[j].n現在の値, (185 + j * 600) - (W * this.Background_Up_1st[2].szテクスチャサイズ.Height) + ct上背景スクロール用タイマー2nd[j].n現在の値);
-                                }
-                            }
-
-                            for (int W = 1; W < ForLoopW + 1; W++)
-                            {
-                                this.Background_Up_2nd[2].t2D描画(TJAPlayer3.app.Device, 0 - this.ct上背景スクロール用タイマー1st[j].n現在の値, (370 + j * 600) - (W * this.Background_Up_2nd[2].szテクスチャサイズ.Height) - ct上背景スクロール用タイマー2nd[j].n現在の値);
-                            }
-                            for (int l = 1; l < ForLoopL + 1; l++)
-                            {
-                                for (int W = 1; W < ForLoopW + 1; W++)
-                                {
-                                    this.Background_Up_2nd[2].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_2nd[2].szテクスチャサイズ.Width) - this.ct上背景スクロール用タイマー1st[j].n現在の値, (370 + j * 600) - (W * this.Background_Up_2nd[2].szテクスチャサイズ.Height) - ct上背景スクロール用タイマー2nd[j].n現在の値);
-                                }
-                            }
-
-                            #endregion
-
-                            #region [ 上背景-Front ]
-
-                            float thirdy = 0;
-                            float thirdx = 0;
-
-                            if (this.ct上背景スクロール用タイマー3rd[i].n現在の値 <= 270)
-                            {
-                                thirdx = this.ct上背景スクロール用タイマー3rd[i].n現在の値 * 0.9258f;
-                                thirdy = (float)Math.Sin((float)this.ct上背景スクロール用タイマー3rd[j].n現在の値 * (Math.PI / 270.0f)) * 40.0f;
-                            }
-                            else
-                            {
-                                thirdx = 250 + (ct上背景スクロール用タイマー3rd[j].n現在の値 - 270) * 0.24f;
-
-                                if (this.ct上背景スクロール用タイマー3rd[j].n現在の値 <= 490) thirdy = -(float)Math.Sin((float)(this.ct上背景スクロール用タイマー3rd[j].n現在の値 - 270) * (Math.PI / 170.0f)) * 15.0f;
-                                else thirdy = -((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f) + (float)(((this.ct上背景スクロール用タイマー3rd[j].n現在の値 - 490) / 110f) * ((float)Math.Sin((float)220f * (Math.PI / 170.0f)) * 15.0f));
-                            }
-
-                            this.Background_Up_3rd[2].t2D描画(TJAPlayer3.app.Device, 0 - thirdx, 0 + j * 540 - thirdy);
-
-                            for (int l = 1; l < ForLoopF + 1; l++)
-                            {
-                                this.Background_Up_3rd[2].t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Up_3rd[2].szテクスチャサイズ.Width) - thirdx, 0 + j * 540 - thirdy);
-                            }
-
-                            #endregion
-                        }
-                    }*/
-
-                    #endregion
-
-
-
-                }
-                else
-                {
-                    // Not 拝啓 but 背景 w, apparently Kanji typos are pretty common, "Dear DanI" lol
-                    #region [ 段位拝啓 ]
-
-                    /*this.Background_Up_Dan[0].t2D描画(TJAPlayer3.app.Device, 0, 0);
-
-                    for (int i = 0; i < 1280 / this.Background_Up_Dan[1].szテクスチャサイズ.Width + 2; i++)
-                        this.Background_Up_Dan[1].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Dan[1].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[0].n現在の値, 0);
-
-                    for (int i = 0; i < 1280 / this.Background_Up_Dan[2].szテクスチャサイズ.Width + 2; i++)
-                        this.Background_Up_Dan[2].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Dan[2].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[1].n現在の値, 0);
-
-                    for (int i = 0; i < 1280 / this.Background_Up_Dan[3].szテクスチャサイズ.Width + 2; i++)
-                        this.Background_Up_Dan[3].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Dan[3].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[2].n現在の値, 0);
-
-                    for (int i = 0; i < 1280 / this.Background_Up_Dan[4].szテクスチャサイズ.Width + 2; i++)
-                        this.Background_Up_Dan[4].t2D描画(TJAPlayer3.app.Device, +(i * this.Background_Up_Dan[4].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー2stDan.n現在の値, -200 + ct上背景スクロール用タイマー2stDan.n現在の値);
-
-                    for (int i = 0; i < 1280 / this.Background_Up_Dan[5].szテクスチャサイズ.Width + 2; i++)
-                        this.Background_Up_Dan[5].t2D描画(TJAPlayer3.app.Device, (i * this.Background_Up_Dan[5].szテクスチャサイズ.Width) - ct上背景スクロール用タイマー1stDan[3].n現在の値, 0);
-                    */
                     #endregion
                 }
             }
@@ -866,38 +527,6 @@ namespace TJAPlayer3
                 {
                     if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
                     DownScript.Draw();
-                    #region [Ensou lower background]
-                    /*
-                    if (this.Background_Down != null)
-                    {
-                        this.Background_Down.t2D描画(TJAPlayer3.app.Device, 0, 360);
-                    }
-                    if (TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[0])
-                    {
-                        if (this.Background_Down_Clear != null && this.Background_Down_Scroll != null && ct下背景スクロール用タイマー1 != null)
-                        {
-                            this.Background_Down_Clear.Opacity = ((this.ct上背景FIFOタイマー.n現在の値 * 0xff) / 100);
-                            this.Background_Down_Scroll.Opacity = ((this.ct上背景FIFOタイマー.n現在の値 * 0xff) / 100);
-                            this.Background_Down_Clear.t2D描画(TJAPlayer3.app.Device, 0, 360);
-
-                            //int nループ幅 = 1257;
-                            //CDTXMania.Tx.Background_Down_Scroll.t2D描画( CDTXMania.app.Device, 0 - this.ct下背景スクロール用タイマー1.n現在の値, 360 );
-                            //CDTXMania.Tx.Background_Down_Scroll.t2D描画(CDTXMania.app.Device, (1 * nループ幅) - this.ct下背景スクロール用タイマー1.n現在の値, 360);
-                            double TexSize = 1280 / this.Background_Down_Scroll.szテクスチャサイズ.Width;
-                            // 1280をテクスチャサイズで割ったものを切り上げて、プラス+1足す。
-                            int ForLoop = (int)Math.Ceiling(TexSize) + 1;
-
-                            //int nループ幅 = 328;
-                            this.Background_Down_Scroll.t2D描画(TJAPlayer3.app.Device, 0 - this.ct下背景スクロール用タイマー1.n現在の値, 360);
-                            for (int l = 1; l < ForLoop + 1; l++)
-                            {
-                                this.Background_Down_Scroll.t2D描画(TJAPlayer3.app.Device, +(l * this.Background_Down_Scroll.szテクスチャサイズ.Width) - this.ct下背景スクロール用タイマー1.n現在の値, 360);
-                            }
-
-                        }
-                    }
-                    */
-                    #endregion
                 }
             }
 

@@ -395,8 +395,9 @@ namespace TJAPlayer3
 
             var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
             // Temporary patch for odd math bug, to fix later
-            if (theta == 0)
-                theta = 0.00000000001;
+            if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI) 
+                theta += 0.00000000001;
+
 
             var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
             var div = dist / image_size;

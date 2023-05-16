@@ -8465,6 +8465,8 @@ namespace TJAPlayer3
         public int[] Game_ScoreRank_4P = new int[] { 87, 88 };
         public int[] Game_ScoreRank_5P = new int[] { 87, 80 };
 
+        public DBSkinPreset.SkinPreset Game_SkinScenes = null;
+
         #region Chara
 
         public int[] Game_Chara_X = new int[] { 0, 0 };

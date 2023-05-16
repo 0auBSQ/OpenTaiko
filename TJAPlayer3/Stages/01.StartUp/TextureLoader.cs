@@ -265,9 +265,11 @@ namespace TJAPlayer3
             if (TJAPlayer3.Skin.SongSelect_Bar_Genre_Count != 0)
             {
                 SongSelect_Bar_Genre = new CTexture[TJAPlayer3.Skin.SongSelect_Bar_Genre_Count];
+                SongSelect_Bar_Genre_Overlap = new CTexture[TJAPlayer3.Skin.SongSelect_Bar_Genre_Count];
                 for (int i = 0; i < SongSelect_Bar_Genre.Length; i++)
                 {
                     SongSelect_Bar_Genre[i] = TxC(SONGSELECT + @"Bar_Genre\Bar_Genre_" + i.ToString() + ".png");
+                    SongSelect_Bar_Genre_Overlap[i] = TxC(SONGSELECT + @"Bar_Genre\Bar_Genre_Overlap_" + i.ToString() + ".png");
                 }
             }
 
@@ -411,8 +413,14 @@ namespace TJAPlayer3
             Bar = TxC(GAME + @"Bar.png");
             Bar_Branch = TxC(GAME + @"Bar_Branch.png");
 
+            var _presetsDefs = CSkin.Path(BASE + GAME + BACKGROUND + @"Presets.json");
+            if (File.Exists(_presetsDefs))
+                TJAPlayer3.Skin.Game_SkinScenes = ConfigManager.GetConfig<DBSkinPreset.SkinPreset>(_presetsDefs);
+            else
+                TJAPlayer3.Skin.Game_SkinScenes = new DBSkinPreset.SkinPreset();
+
             #endregion
-            
+
             #region Mob
 
             TJAPlayer3.Skin.Game_Mob_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + MOB));
@@ -1920,6 +1928,7 @@ namespace TJAPlayer3
             SongSelect_ScoreWindow_Text;
         public CTexture[] SongSelect_GenreBack,
             SongSelect_Bar_Genre,
+            SongSelect_Bar_Genre_Overlap,
             SongSelect_Box_Chara,
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[3],

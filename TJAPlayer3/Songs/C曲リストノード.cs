@@ -96,6 +96,10 @@ namespace TJAPlayer3
 		
 		public string strSelectBGPath;
 
+		// In-game visuals
+
+		public string strScenePreset = null;
+
 		// コンストラクタ
 
 		public C曲リストノード()

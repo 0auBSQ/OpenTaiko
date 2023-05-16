@@ -30,6 +30,8 @@ namespace TJAPlayer3
 		public bool IsChangedBgType;
 		public int BoxChara;
 		public bool IsChangedBoxChara;
+		public string DefaultPreimage;
+		public string ScenePreset;
 
 		// コンストラクタ
 
@@ -46,13 +48,14 @@ namespace TJAPlayer3
 			BgType = 0;
 			BoxChara = 0;
 			BgColor = Color.White;
+			DefaultPreimage = null;
+			ScenePreset = null;
 		}
 		public CBoxDef( string boxdefファイル名 )
 			: this()
 		{
 			this.t読み込み( boxdefファイル名 );
 		}
-
 
 		// メソッド
 
@@ -129,7 +132,15 @@ namespace TJAPlayer3
 								this.BoxChara = int.Parse(str.Substring(9).Trim(ignoreChars));
 								IsChangedBoxChara = true;
 							}
-							else
+                            else if (str.StartsWith("#SCENEPRESET", StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.ScenePreset = str.Substring(12).Trim(ignoreChars);
+                            }
+                            else if (str.StartsWith("#DEFAULTPREIMAGE", StringComparison.OrdinalIgnoreCase))
+                            {
+                                this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, str.Substring(16).Trim(ignoreChars));
+                            }
+                            else
 							{
 								for(int i = 0; i < 3; i++)
                                 {

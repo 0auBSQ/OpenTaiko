@@ -138,9 +138,11 @@
     <Compile Include="Common\Easing.cs" />
     <Compile Include="Common\NamePlateConfig.cs" />
     <Compile Include="Common\SaveFile.cs" />
+    <Compile Include="Components\CGimmickValue.cs" />
     <Compile Include="Databases\DBCDN.cs" />
     <Compile Include="Databases\DBEncyclopediaMenus.cs" />
     <Compile Include="Databases\DBPuchichara.cs" />
+    <Compile Include="Databases\DBSkinPreset.cs" />
     <Compile Include="Databases\DBUnlockables.cs" />
     <Compile Include="Databases\Databases.cs" />
     <Compile Include="Databases\DBCharacter.cs" />
