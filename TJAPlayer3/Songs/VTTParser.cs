@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,19 +17,42 @@ namespace TJAPlayer3
         /*
         
         TO-DO :
-        - Tag support (lang, timestamp, color(?), ruby/rt)
-        - Adjust bitmap position/anchor when lyric contains newlines (currently snapped to top-center, gets trimmed going down) (also how on earth do i do this lmao)
-        - NOTE support (for comments within file)
+        - timestamp tag support
 
         */
+        [Flags]
+        private enum ParseMode
+        {
+            None = 0,
+            Tag = 1,
+            TagEnd = 2,
+            Rt = 4
+        }
+
+        internal struct LyricData
+        {
+            public long timestamp; // WIP, only first timestamp is accounted for
+            public string Text;
+
+            public FontStyle Style;
+            public Color ForeColor;
+            public Color BackColor;
+
+            public bool IsRuby;
+            public string RubyText;
+
+            public int line;
+            public string Language;
+        }
 
         private static string[] _vttdelimiter;
 
         private static Regex regexTimestamp;
-        private static Regex regexTag;
 
         private static Regex regexOffset;
         private static Regex regexLang;
+
+        private static bool isUsingLang;
 
         private bool _isDisposed;
 
@@ -37,10 +61,11 @@ namespace TJAPlayer3
             _vttdelimiter = new[] { "-->", "- >", "->" };
 
             regexTimestamp = new Regex(@"(-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+)");
-            regexTag = new Regex(@"<[^>]*>"); // For now, all tags will be ignored & removed.
 
-            regexOffset = new Regex(@"Offset:\s*((-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+));?"); // i.e. "WebVTT Offset: 00:01.001;"
-            regexLang = new Regex(@"Language:\s*([A-Za-z]+);?"); // i.e. "WebVTT Language: ja;"
+            regexOffset = new Regex(@"Offset:\s*(.*)\b;?"); // i.e. "WEBVTT Offset: 00:01.001;" , "WEBVTT Offset: 1.001;"
+            regexLang = new Regex(@"Language:\s*([A-Za-z]+);?"); // i.e. "WEBVTT Language: ja;"
+
+            isUsingLang = false;
         }
 
         #region Dispose stuff
@@ -56,10 +81,11 @@ namespace TJAPlayer3
             {
                 _vttdelimiter = null;
                 regexTimestamp = null;
-                regexTag = null;
 
                 regexOffset = null;
                 regexLang = null;
+
+                isUsingLang = false;
 
                 _isDisposed = true;
             }
@@ -67,13 +93,13 @@ namespace TJAPlayer3
         }
         #endregion
 
-        internal List<STLYRIC> ParseVTTFile(string filepath, int order, CPrivateFastFont drawer)
+        internal List<STLYRIC> ParseVTTFile(string filepath, int order)
         {
-            List<STLYRIC> lrclist = new List<STLYRIC>() { };
+            List<STLYRIC> lrclist = new List<STLYRIC>();
             List<string> lines = File.ReadAllLines(filepath).ToList();
             long offset = 0;
 
-            // Header stuff
+            #region Header data
             if (lines[0].StartsWith("WEBVTT"))
             {
                 Match languageMatch = regexLang.Match(lines[0]);
@@ -81,68 +107,261 @@ namespace TJAPlayer3
                 {
                     if (!(languageMatch.Groups[1].Value.ToLower() == CLangManager.fetchLang()))
                     {
-                        Debug.WriteLine("WebVTT header language does not match user's selected language. Aborting VTT parse.");
+                        Trace.TraceWarning("Aborting VTT parse at {0}. WebVTT header language does not match user's selected language.", filepath);
                         return lrclist;
                     }
                 }
                 Match offsetMatch = regexOffset.Match(lines[0]);
-                if (offsetMatch.Success)
+                if (offsetMatch.Success && regexTimestamp.Match(offsetMatch.Groups[1].Value).Success)
                 {
                     offset = ParseTimestamp(offsetMatch.Groups[1].Value);
+                }
+                else if (offsetMatch.Success && float.TryParse(offsetMatch.Groups[1].Value, out float result))
+                {
+                    offset = (long)(result * 1000);
                 }
             }
             else
             {
-                Debug.WriteLine("WebVTT lyric file at {0} does not start with \"WEBVTT\". Aborting VTT parse.");
+                Trace.TraceWarning("Aborting VTT parse at {0}. WebVTT header does not start with \"WEBVTT\".", filepath);
                 return lrclist;
             }
-
-            List<(string, long)> lyrics = new List<(string, long)>() { };
+            #endregion
 
             long startTime = -1;
             long endTime = -1;
-            string line = String.Empty;
+
+            bool ignoreLyrics = false;
+
+            List<LyricData> lyricData = new List<LyricData>();
+
+            LyricData data = new LyricData()
+            {
+                ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor,
+                BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor
+            };
 
             for (int i = 1; i < lines.Count; i++) // Skip header line (line 0)
             {
                 long start;
                 long end;
 
-                if (TryParseTimestamp(lines[i], out start, out end))
+                // Check for blank (process data if true), or else check for NOTE, or else check for Timestamps, or else parse text
+
+                if (String.IsNullOrEmpty(lines[i]))
+                {
+                    if (!ignoreLyrics && lyricData.Count != 0)
+                    {
+                        lyricData.RemoveAll(empty => String.IsNullOrEmpty(empty.Text));
+                        lrclist.Add(CreateLyric(lyricData, order));
+                    }
+
+                    lyricData = new List<LyricData>();
+                    data = new LyricData()
+                    {
+                        timestamp = startTime,
+                        ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor,
+                        BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor
+                    };
+                    ignoreLyrics = false;
+
+                    continue;
+                }
+
+                if (lines[i].StartsWith("NOTE ")) { ignoreLyrics = true; }
+
+                else if (!ignoreLyrics && TryParseTimestamp(lines[i], out start, out end))
                 {
                     if (start > endTime && endTime != -1)
                     {
-                        lyrics.Add((string.Empty, endTime + offset));
+                        lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
                         // If new start timestamp is greater than old end timestamp,
                         // it is assumed there is a gap in-between displaying lyrics.
-                    }
-
-                    if (startTime != -1)
-                    {
-                        lyrics.Add((line, startTime + offset));
-                        // When new timestamp is found,
-                        // create lyrics with existing timestamp.
                     }
 
                     startTime = start;
                     endTime = end;
 
-                    line = string.Empty;
+                    data.timestamp = start + offset;
                 }
-                else // If timestamp parse failed, let's assume it's a lyric. ¯\_(ツ)_/¯
+
+                else if (!ignoreLyrics) // If all else fails, let's assume it's a lyric. ¯\_(ツ)_/¯
                 {
-                    if (line != "") line += Environment.NewLine;
-                    line += String.Join(String.Empty, regexTag.Split(lines[i])); // Remove tags by splitting, then join back into single string
+                    int j = 0;
+                    var parseMode = ParseMode.None;
+
+                    string tagdata = String.Empty;
+                    data.Text = String.Empty;
+                    isUsingLang = false;
+                    
+                    for (j = 0; j < lines[i].Length; j++)
+                    {
+                        switch (lines[i].Substring(j, 1))
+                        {
+                            #region HTML Tags
+                            case "<":
+                                parseMode |= ParseMode.Tag;
+                                break;
+                            case "/":
+                                if (parseMode.HasFlag(ParseMode.Tag)) { parseMode |= ParseMode.TagEnd; }
+                                else { goto default; }
+                                break;
+                            case ">":
+                                if (parseMode.HasFlag(ParseMode.TagEnd))
+                                {
+                                    if (tagdata == ("c"))
+                                    {
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor;
+                                        data.BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor;
+                                    }
+                                    else if (tagdata.StartsWith("lang")) { data.Language = String.Empty; }
+                                    else if (tagdata == "ruby")
+                                    {
+                                        lyricData.Add(data);
+                                        data.IsRuby = false;
+                                        data.RubyText = String.Empty;
+                                        data.Text = String.Empty;
+                                    }
+                                    else if (tagdata == "rt") { parseMode &= ~ParseMode.Rt; }
+                                    else if (tagdata == "b") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style &= ~FontStyle.Bold; }
+                                    else if (tagdata == "i") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style &= ~FontStyle.Italic; }
+                                    else if (tagdata == "u") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style &= ~FontStyle.Underline; }
+                                    else if (tagdata == "s") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style &= ~FontStyle.Strikeout; }
+                                }
+                                else if (parseMode.HasFlag(ParseMode.Tag))
+                                {
+                                    if (tagdata.StartsWith("c."))
+                                    {
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        string[] colordata = tagdata.Split('.');
+                                        foreach (string clr in colordata)
+                                        {
+                                            switch (clr)
+                                            {
+                                                case "white":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[0];
+                                                    break;
+                                                case "lime":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[1];
+                                                    break;
+                                                case "cyan":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[2];
+                                                    break;
+                                                case "red":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[3];
+                                                    break;
+                                                case "yellow":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[4];
+                                                    break;
+                                                case "magenta":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[5];
+                                                    break;
+                                                case "blue":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[6];
+                                                    break;
+                                                case "black":
+                                                    data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[7];
+                                                    break;
+                                                case "bg_white":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[0];
+                                                    break;
+                                                case "bg_lime":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[1];
+                                                    break;
+                                                case "bg_cyan":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[2];
+                                                    break;
+                                                case "bg_red":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[3];
+                                                    break;
+                                                case "bg_yellow":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[4];
+                                                    break;
+                                                case "bg_magenta":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[5];
+                                                    break;
+                                                case "bg_blue":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[6];
+                                                    break;
+                                                case "bg_black":
+                                                    data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[7];
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                    else if (tagdata.StartsWith("lang"))
+                                    {
+                                        string[] langdata = tagdata.Split(' ');
+                                        foreach (string lng in langdata)
+                                        {
+                                            if (lng != "lang") { data.Language = lng; isUsingLang = true; }
+                                            if (data.Language == CLangManager.fetchLang()) { data.line = 0; lyricData.Clear(); } // Wipe current lyric data if matching lang is found
+                                        }
+                                    }
+                                    else if (tagdata == "ruby")
+                                    {
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.IsRuby = true;
+                                    }
+                                    else if (tagdata == "rt") { parseMode |= ParseMode.Rt; }
+                                    else if (tagdata == "b") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style |= FontStyle.Bold; }
+                                    else if (tagdata == "i") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style |= FontStyle.Italic; }
+                                    else if (tagdata == "u") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style |= FontStyle.Underline; }
+                                    else if (tagdata == "s") { 
+                                        lyricData.Add(data);
+                                        data.Text = String.Empty;
+                                        data.Style |= FontStyle.Strikeout; }
+                                }
+                                else { goto default; }
+                                parseMode &= ~ParseMode.Tag & ~ParseMode.TagEnd;
+                                tagdata = String.Empty;
+                                break;
+                            #endregion
+                            default:
+                                if (parseMode.HasFlag(ParseMode.Tag)) { tagdata += lines[i].Substring(j, 1); }
+                                else if (!isUsingLang || (isUsingLang && data.Language == CLangManager.fetchLang()))
+                                {
+                                    if (parseMode.HasFlag(ParseMode.Rt)) { data.RubyText += lines[i].Substring(j, 1); }
+                                    else { data.Text += lines[i].Substring(j, 1); }
+                                }
+                                break;
+                        }
+                    }
+                    data.Text = WebUtility.HtmlDecode(data.Text);
+                    data.RubyText = WebUtility.HtmlDecode(data.RubyText);
+                    lyricData.Add(data);
+                    data.line++;
                 }
             }
-            lyrics.Add((line, startTime + offset));
-            lyrics.Add((String.Empty, endTime + offset));
-
-            foreach ((string, long) lyric in lyrics)
-            {
-                lrclist.Add(CreateLyric(lyric, drawer, order));
-            }
-
+            if (lyricData.Count > 0) { lrclist.Add(CreateLyric(lyricData, order)); }
+            lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
             return lrclist;
 
         }
@@ -183,53 +402,119 @@ namespace TJAPlayer3
             
             return -1;
         }
-        internal STLYRIC CreateLyric(string lyric, long time, CPrivateFastFont draw, int order)
+        internal STLYRIC CreateLyric(List<LyricData> datalist, int order)
         {
-            return CreateLyric((lyric, time), draw, order);
-        }
-        internal STLYRIC CreateLyric((string, long) lyric, CPrivateFastFont draw, int order)
-        {
-            string[] split = lyric.Item1.Split(new string[]{"\\r\\n", "\\n", "\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
 
-            List<Bitmap> textures = new List<Bitmap>();
-            int width = 1;
-            int height = 1;
+            long timestamp = datalist[0].timestamp; // Function will change later w/ timestamp tag implementation
 
-            for (int i = 0; i < split.Length; i++)
+            List<List<Bitmap>> textures = new List<List<Bitmap>>();
+            List<List<int>> rubywidthoffset = new List<List<int>>(); // Save for when text is combined, in case ruby text is longer than original text
+            List<int> rubyheightoffset = new List<int>(); 
+            int linecount = datalist.Max((data => data.line)) + 1;
+
+            for (int i = 0; i < linecount; i++)
             {
-                textures.Add(draw.DrawPrivateFont(split[i], TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor));
-                width = width < textures[i].Width ? textures[i].Width : width;
-                height += textures[i].Height;
+                textures.Add(new List<Bitmap>());
+                rubywidthoffset.Add(new List<int>());
+                rubyheightoffset.Add(0);
             }
 
-            Bitmap texture = new Bitmap(width, height);
+            string text = String.Empty;
 
-            if (textures.Count != 0)
+            // HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU SINCE I BEGAN TO CODE.
+            // THERE ARE 387.44 MILLION LINES OF PRINTED CODE IN REGIONED THIN LAYERS THAT FILL THIS PROGRAM.
+            // IF THE WORD 'HATE' WAS COMMENTED ON EACH LINE OF THOSE HUNDREDS OF MILLIONS OF LINES OF CODE
+            // IT WOULD NOT EQUAL ONE ONE BILLIONITH OF THE HATE I FEEL FOR VTTParser.cs, CPrivateFont.cs, AND CPrivateFastFont.cs AT THIS MICRO-INSTANT.
+            // HATE. HATE.
+
+            foreach (LyricData data in datalist)
             {
-                using (Graphics canvas = Graphics.FromImage(texture))
+                FontFamily fontfamily = !string.IsNullOrEmpty(TJAPlayer3.Skin.Game_Lyric_FontName) ?
+                        new FontFamily(TJAPlayer3.Skin.Game_Lyric_FontName) : new FontFamily("MS UI Gothic"); // everytime CPrivateFont is disposed, it also disposes fontfamily, so I gotta reinitialize this everytime :(
+                using (CPrivateFastFont fastdraw = new CPrivateFastFont(fontfamily, TJAPlayer3.Skin.Game_Lyric_FontSize, data.Style))
+                {
+                    Bitmap textdrawing = fastdraw.DrawPrivateFont(data.Text, data.ForeColor, data.BackColor); // Draw main text
+                    
+                    if (data.IsRuby) // hell yeah ruby time
+                    {
+                        using (CPrivateFastFont rubydraw = new CPrivateFastFont(fontfamily, TJAPlayer3.Skin.Game_Lyric_FontSize / 2, data.Style))
+                        {
+                            Bitmap ruby = rubydraw.DrawPrivateFont(data.RubyText, data.ForeColor, data.BackColor);
+                            Size size = new Size(textdrawing.Width > ruby.Width ? textdrawing.Width : ruby.Width, textdrawing.Height + (TJAPlayer3.Skin.Game_Lyric_VTTRubyOffset + (ruby.Height / 2)));
+                            Bitmap fullruby = new Bitmap(size.Width, size.Height);
+
+                            using (Graphics canvas = Graphics.FromImage(fullruby))
+                            {
+                                canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                canvas.DrawImage(textdrawing, (fullruby.Width / 2) - (textdrawing.Width / 2), (fullruby.Height / 2) - (textdrawing.Height / 2));
+                                canvas.DrawImage(ruby, (fullruby.Width - ruby.Width) / 2, (fullruby.Height / 2) - (ruby.Height / 2) - TJAPlayer3.Skin.Game_Lyric_VTTRubyOffset);
+                            }
+                            textures[data.line].Add(fullruby);
+                            rubywidthoffset[data.line].Add((fullruby.Width - textdrawing.Width) / 2 > 0 ? (fullruby.Width - textdrawing.Width) / 2 : 0);
+                            rubyheightoffset[data.line] = (fullruby.Height - (fullruby.Height - ruby.Height)) / 2 > rubyheightoffset[data.line] ? (fullruby.Height - (fullruby.Height - ruby.Height)) / 2 : rubyheightoffset[data.line];
+                        }
+                    }
+                    else
+                    {
+                        textures[data.line].Add(textdrawing);
+                        rubywidthoffset[data.line].Add(0);
+                    }
+                }
+                text += data.IsRuby ? data.Text + "(" + data.RubyText + ")" : data.Text;
+            }
+
+            int[] width = new int[textures.Count];
+            int[] height = new int[textures.Count];
+            int max_width = 0;
+            int max_height = 0;
+
+            for (int i = 0; i < textures.Count; i++)
+            {
+                for (int j = 0; j < textures[i].Count; j++)
+                {
+                    width[i] += textures[i][j].Width;
+                    height[i] = textures[i][j].Height > height[i] ? textures[i][j].Height : height[i];
+                }
+                max_width = width[i] > max_width ? width[i] : max_width;
+                max_height += height[i];
+            }
+
+            Bitmap lyrictex = new Bitmap(max_width > 0 ? max_width : 1, max_height - rubyheightoffset.Sum() > 0 ? max_height - rubyheightoffset.Sum() : 1); // Prevent exception with 0x0y Bitmap
+
+            if (textures.Count > 0)
+            {
+                using (Graphics canvas = Graphics.FromImage(lyrictex))
                 {
                     canvas.Clear(Color.Transparent);
+                    canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-                    Point pos = new Point(0, 0);
-                    foreach (Bitmap bitmap in textures)
+                    int x = 0;
+                    int y = 0;
+                    for (int i = 0; i < textures.Count; i++)
                     {
-                        pos.X = (width - bitmap.Width) / 2;
-                        canvas.DrawImage(bitmap, pos);
-                        pos.Y += bitmap.Height;
+                        int tempwidth = (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 2) * (textures[i].Count - 1);
+                        x = (max_width - width[i]) / 2;
+                        for (int j = 0; j < textures[i].Count; j++)
+                        {
+                            canvas.DrawImage(textures[i][j], x + tempwidth, y + ((height[i] - textures[i][j].Height) / 2) + (rubyheightoffset[i] / 2));
+                            tempwidth += textures[i][j].Width - (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 4) + 2 - j; // i don't know why this works, please don't ask me why this works
+
+                            // disabled ruby width adjustment by コミ's request, original code below
+                            // textures[i][j].Width - (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 4) + 2 - j - rubywidthoffset[i][j];
+                        }
+                        y += height[i] - rubyheightoffset[i];
                     }
                 }
             }
 
-            STLYRIC stlrc = new STLYRIC()
+            STLYRIC st = new STLYRIC()
             {
-
-                Text = lyric.Item1,
-                TextTex = texture,
-                Time = lyric.Item2,
-                index = order
+                index = order,
+                Text = text,
+                TextTex = lyrictex,
+                Time = timestamp
             };
-
-            return stlrc;
+            return st;
         }
     }
 }
