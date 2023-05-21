@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
 namespace TJAPlayer3
@@ -87,33 +88,99 @@ namespace TJAPlayer3
              * == Condition avaliable ==
              * ch : "Coins here", coin requirement, payable within the heya menu, 1 value : [Coin price]
              * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
-             *
-             *
-             *
+             * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
+             * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
+             * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
+             * 
              * 
             */
-            public (bool, string) tConditionMet(int[] inputValues)
+            public (bool, string) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
             {
-                if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
-                    RequiredArgCount = RequiredArgs[Condition];
-
-                if (this.Values.Length < this.RequiredArgCount)
-                    return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
 
                 switch (this.Condition)
                 {
                     case "ch":
-                        // Coins are strictly more or equal
-                        this.Type = "me";
-                        bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
-                        return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
                     case "cs":
-                        return (false, CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                    case "cm":
+                        if (this.Values.Length == 1)
+                            return tConditionMet(new int[] { TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    case "dp":
+                    case "lp":
+                        if (this.Values.Length == 3)
+                            return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+
+
                 }
 
                 return (false, CLangManager.LangInstance.GetString(90000));
             }
 
+
+            public (bool, string) tConditionMet(int[] inputValues, EScreen screen)
+            {
+                // Trying to unlock an item from the My Room menu (If my room buy => check if enough coints, else => Display a hint to how to get the item)
+                if (screen == EScreen.MyRoom)
+                {
+                    switch (this.Condition)
+                    {
+                        case "ch":
+                            // Coins are strictly more or equal
+                            this.Type = "me";
+                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                        case "cs":
+                            return (false, CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                    }
+                }
+                // Unlockables from result screen or specific events (If any buy event => Invalid command, else check)
+                else if (screen == EScreen.Internal)
+                {
+                    switch (this.Condition)
+                    {
+
+                        case "ch":
+                        case "cs":
+                        case "cm":
+                            return (false, CLangManager.LangInstance.GetString(90000));
+                        case "dp":
+                        case "lp":
+                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
+                            return (fulfiled, "");
+                    }
+                }
+                // Trying to unlock an item from the Shop menu (If shop => check if enough coins, else => Invalid command)
+                else if (screen == EScreen.Shop)
+                {
+                    switch (this.Condition)
+                    {
+                        case "cs":
+                            // Coins are strictly more or equal
+                            this.Type = "me";
+                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                    }
+                }
+                // Trying to unlock an item from the Song Select screen (If song select => check if enough coins, else => Invalid command)
+                else if (screen == EScreen.SongSelect)
+                {
+                    switch (this.Condition)
+                    {
+                        case "cm":
+                            // Coins are strictly more or equal
+                            this.Type = "me";
+                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                    }
+                }
+
+                return (false, CLangManager.LangInstance.GetString(90000));
+            }
+
+            // My Room menu usage, to improve later
             public string tConditionMessage()
             {
                 if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
@@ -131,6 +198,67 @@ namespace TJAPlayer3
                 }
                 return (CLangManager.LangInstance.GetString(90000));
             }
+
+            public enum EScreen
+            {
+                MyRoom,
+                Shop,
+                SongSelect,
+                Internal
+            }
+
+            #region [private calls]
+
+            private int tGetCountChartsPassingCondition(int player)
+            {
+                int _aimedDifficulty = this.Values[0]; // Difficulty if dp, Level if lp
+                int _aimedStatus = this.Values[1];
+
+                var _sf = TJAPlayer3.SaveFileInstances[player].data.standardPasses;
+                if (_sf == null 
+                    || _aimedDifficulty < 0 
+                    || _aimedStatus < 0 
+                    || (this.Condition == "dp" && _aimedDifficulty > 4) 
+                    || _aimedStatus > 2)
+                    return -1;
+
+                switch (this.Condition)
+                {
+                    case "dp":
+                        int _count = 0;
+                        foreach (KeyValuePair<string, SaveFile.CPassStatus> cps in _sf)
+                        {
+                            var _values = cps.Value.d;
+                            if (_values[_aimedDifficulty] >= _aimedStatus)
+                                _count++;
+                            // Extreme includes Extra
+                            if (_aimedDifficulty == 3 && _values[4] >= _aimedStatus)
+                                _count++;
+                        }
+                        return _count;
+                    case "lp":
+                        _count = 0;
+                        foreach (KeyValuePair<string, SaveFile.CPassStatus> cps in _sf)
+                        {
+                            var _node = CSongDict.tGetNodeFromID(cps.Key);
+                            if (_node != null)
+                            {
+                                var _values = cps.Value.d;
+                                var _levels = _node.nLevel;
+                                for (int i = 0; i <= (int)Difficulty.Edit; i++)
+                                {
+                                    if (_levels[i] == _aimedDifficulty && _values[i] >= _aimedStatus)
+                                        _count++;
+                                }
+                            }
+                        }
+                        return _count;
+                        
+                }
+                return -1;
+            }
+
+            #endregion
 
         }
 

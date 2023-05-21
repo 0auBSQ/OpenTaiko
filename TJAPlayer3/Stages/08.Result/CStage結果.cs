@@ -631,10 +631,31 @@ namespace TJAPlayer3
 
 					if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i])
 						this.nEarnedMedalsCount[i] = 0;
-					if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i] || TJAPlayer3.ConfigIni.bAIBattleMode) && i == 1)
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1)
 						this.nEarnedMedalsCount[i] = 0;
 
-					TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].tEarnCoins(this.nEarnedMedalsCount[i]);
+					var _sf = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)];
+
+                    _sf.tEarnCoins(this.nEarnedMedalsCount[i]);
+
+					if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i]
+						&& !(TJAPlayer3.ConfigIni.bAIBattleMode && i == 1))
+					{
+						int _cs = -1;
+                        if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
+						{
+                            _cs = 0;
+                            if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0)
+							{
+                                _cs = 1;
+                                if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
+                                    _cs = 2;
+                            }
+                        }
+							
+						if (TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
+							_sf.tUpdateSongClearStatus(TJAPlayer3.stage選曲.r確定された曲, _cs, TJAPlayer3.stage選曲.n確定された曲の難易度[i]);
+					}
 				}
 
 
@@ -670,6 +691,8 @@ namespace TJAPlayer3
 								0,
 								this.nEarnedMedalsCount[i]), 
 							i);
+
+					TJAPlayer3.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, mqModals);
                 }
 
 				displayedModals = new Modal[] { null, null, null, null, null };

@@ -11,7 +11,7 @@ namespace TJAPlayer3
 {
     internal class Modal
     {
-        public Modal(EModalType mt, int ra, int re)
+        public Modal(EModalType mt, int ra, object re)
         {
             modalType = mt;
             rarity = ra;
@@ -206,7 +206,7 @@ namespace TJAPlayer3
         #region [Public variables]
 
         // Coin number for coin; database/unlockable asset for puchichara, character and title; no effect on text, confirm
-        public int reference;
+        public object reference;
 
         public int rarity;
         public EModalType modalType;
@@ -244,11 +244,15 @@ namespace TJAPlayer3
             if (modalType == EModalType.Coin)
             {
                 content = String.Format("+{0} {1} ({2}: {3})",
-                    reference,
+                    (int)reference,
                     CLangManager.LangInstance.GetString(306),
                     CLangManager.LangInstance.GetString(307),
                     TJAPlayer3.SaveFileInstances[player].data.Medals
                     );
+            }
+            else if (modalType == EModalType.Title)
+            {
+                content = (string)reference;
             }
 
             TitleTextureKey _content = new TitleTextureKey(

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using radio42.Multimedia.Midi;
 
 namespace TJAPlayer3
 {
@@ -116,10 +118,24 @@ namespace TJAPlayer3
             public CNamePlateTitle(int type)
             {
                 iType = type;
+                cld = new CLocalizationData();
             }
 
             [JsonProperty("iType")]
             public int iType;
+
+            [JsonProperty("Localization")]
+            public CLocalizationData cld;
+        }
+
+        public class CPassStatus
+        {
+            public CPassStatus()
+            {
+                d = new int[5] { -1, -1, -1, -1, -1 };
+            }
+
+            public int[] d;
         }
 
         #endregion
@@ -143,6 +159,30 @@ namespace TJAPlayer3
         public void tApplyHeyaChanges()
         {
             this.tSaveFile();
+        }
+
+        #endregion
+
+        #region [Player stats]
+
+        public void tUpdateSongClearStatus(C曲リストノード node, int clearStatus, int difficulty)
+        {
+            if (difficulty > (int)Difficulty.Edit) return;
+
+            string _id = node.uniqueId.data.id;
+            var _sdp = data.standardPasses;
+
+            if (!_sdp.ContainsKey(_id))
+                _sdp[_id] = new CPassStatus();
+
+            var cps = _sdp[_id];
+
+            var _values = cps.d;
+            if (clearStatus > _values[difficulty])
+            {
+                cps.d[difficulty] = clearStatus;
+                tSaveFile();
+            }
         }
 
         #endregion
@@ -190,6 +230,12 @@ namespace TJAPlayer3
 
             [JsonProperty("unlockedPuchicharas")]
             public List<string> UnlockedPuchicharas = new List<string>();
+
+            [JsonProperty("activeTriggers")]
+            public HashSet<string> ActiveTriggers = new HashSet<string>();
+
+            [JsonProperty("standardPasses")]
+            public Dictionary<string, CPassStatus> standardPasses = new Dictionary<string, CPassStatus>();
 
         }
 

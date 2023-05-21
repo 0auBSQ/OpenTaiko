@@ -53,7 +53,7 @@ namespace TJAPlayer3
             (new FileInfo(filePath)).Directory.Create();
             using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8))
             {
-                stream.Write(JsonConvert.SerializeObject(obj, Formatting.Indented, Settings));
+                stream.Write(JsonConvert.SerializeObject(obj, Formatting.None, Settings));
             }
         }
     }

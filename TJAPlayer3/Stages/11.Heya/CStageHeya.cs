@@ -97,16 +97,19 @@ namespace TJAPlayer3
                 amount += TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.Count;
 
             this.ttkTitles = new TitleTextureKey[amount];
+            this.titlesKeys = new string[amount];
 
             // Wood shojinsha (default title) always avaliable by default
             this.ttkTitles[0] = new TitleTextureKey("初心者", this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+            this.titlesKeys[0] = "初心者";
 
             idx = 1;
             if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null)
             {
                 foreach (var item in TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles)
                 {
-                    this.ttkTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+                    this.ttkTitles[idx] = new TitleTextureKey(item.Value.cld.GetString(item.Key), this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+                    this.titlesKeys[idx] = item.Key;
                     idx++;
                 }
             }
@@ -126,7 +129,7 @@ namespace TJAPlayer3
 
             for (int i = 0; i < iPuchiCharaCount; i++)
             {
-                var textColor = tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
+                var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
                 ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
                 ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
@@ -142,7 +145,7 @@ namespace TJAPlayer3
 
             for (int i = 0; i < iCharacterCount; i++)
             {
-                var textColor = tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
+                var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
                 ttkCharacterNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
                 ttkCharacterAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
@@ -426,8 +429,8 @@ namespace TJAPlayer3
                     int iType = -1;
 
                     if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null &&
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.ttkTitles[pos].str文字))
-                        iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.ttkTitles[pos].str文字].iType;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[pos]))
+                        iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
                     else if (pos == 0)
                         iType = 0;
 
@@ -643,8 +646,8 @@ namespace TJAPlayer3
                     TJAPlayer3.SaveFileInstances[iPlayer].data.Title = this.ttkTitles[iTitleCurrent].str文字;
 
                     if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null
-                        && TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.ttkTitles[iTitleCurrent].str文字))
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.ttkTitles[iTitleCurrent].str文字].iType;
+                        && TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[iTitleCurrent]))
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[iTitleCurrent]].iType;
                     else if (iTitleCurrent == 0)
                         TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = 0;
                     else
@@ -763,27 +766,7 @@ namespace TJAPlayer3
             iPuchiCharaCurrent = PuchiChara.tGetPuchiCharaIndexByName(this.iPlayer);
         }
 
-        private Dictionary<string, Color> RarityToColor = new Dictionary<string, Color>
-        {
-            ["Poor"] = Color.Gray,
-            ["Common"] = Color.White,
-            ["Uncommon"] = Color.Lime,
-            ["Rare"] = Color.Blue,
-            ["Epic"] = Color.Purple,
-            ["Legendary"] = Color.Orange,
-        };
-
-        private Color tRarityToColor(string rarity)
-        {
-
-            Color textColor = Color.White;
-
-            if (RarityToColor.ContainsKey(rarity))
-                textColor = RarityToColor[rarity];
-
-            return textColor;
-
-        }
+        
 
         private bool tMove(int off)
         {
@@ -886,8 +869,10 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
-                    new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
+                (bool, string) response = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                    //TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
+                    //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
+
                 Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
@@ -927,8 +912,10 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMet(
-                    new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
+                (bool, string) response = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                //tConditionMet(
+                //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
+
                 Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
@@ -954,6 +941,7 @@ namespace TJAPlayer3
         private TitleTextureKey[] ttkDanTitles;
 
         private TitleTextureKey[] ttkTitles;
+        private string[] titlesKeys;
 
         private int iPuchiCharaCount;
         private int iCharacterCount;
