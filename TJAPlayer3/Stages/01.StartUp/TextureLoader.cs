@@ -1132,6 +1132,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Menu_Select_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
 
             TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Heya_Render_Offset = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1142,16 +1143,34 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Balloon_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_5P = new int[TJAPlayer3.Skin.Characters_Ptn][];
-            TJAPlayer3.Skin.Characters_Motion_Normal = new string[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Motion_Miss = new string[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Motion_MissDown = new string[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Motion_Clear = new string[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Motion_GoGo = new string[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Normal = new int[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Miss = new int[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_MissDown = new int[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Clear = new int[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_GoGo = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Motion_Normal = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_10Combo = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_10ComboMax = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_Miss = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_MissDown = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_ClearIn = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_Clear = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_ClearMax = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_GoGoStart = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_GoGoStartMax = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_GoGo = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_GoGoMax = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_SoulIn = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Motion_Return = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Beat_Normal = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_Miss = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_MissDown = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_Clear = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_GoGo = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_10Combo = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_10ComboMax = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_ClearIn = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_ClearMax = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_GoGoStart = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_GoGoStartMax = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_GoGoMax = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_SoulIn = new float[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Beat_Return = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Timer = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Delay = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_FadeOut = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1182,7 +1201,7 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
             {
                 Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Normal\0.png");
-                Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"Render.png");
+                Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @"\Render.png");
                 Characters[i] = new CCharacter(charaDirs[i]);
             }
                 
@@ -1502,6 +1521,7 @@ namespace TJAPlayer3
                 #region [Default values]
 
                 TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
+                TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
 
 
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
@@ -1514,16 +1534,34 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_4P[i] = new int[] { 0, -176 };
                 TJAPlayer3.Skin.Characters_Balloon_5P[i] = new int[] { 0, -168 };
-                TJAPlayer3.Skin.Characters_Motion_Normal[i] = "0";
-                TJAPlayer3.Skin.Characters_Motion_Miss[i] = "0";
-                TJAPlayer3.Skin.Characters_Motion_MissDown[i] = "0";
-                TJAPlayer3.Skin.Characters_Motion_Clear[i] = "0";
-                TJAPlayer3.Skin.Characters_Motion_GoGo[i] = "0";
+                TJAPlayer3.Skin.Characters_Motion_Normal[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_10Combo[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_10ComboMax[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_Miss[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_MissDown[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_ClearIn[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_Clear[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_ClearMax[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_GoGoStart[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_GoGo[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_GoGoMax[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_SoulIn[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_Return[i] = new int[] { 0 };
                 TJAPlayer3.Skin.Characters_Beat_Normal[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Miss[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_MissDown[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Clear[i] = 2;
                 TJAPlayer3.Skin.Characters_Beat_GoGo[i] = 2;
+                TJAPlayer3.Skin.Characters_Beat_10Combo[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_10ComboMax[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_ClearIn[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_ClearMax[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_GoGoStart[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_GoGoStartMax[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_GoGoMax[i] = 2;
+                TJAPlayer3.Skin.Characters_Beat_SoulIn[i] = 1.5f;
+                TJAPlayer3.Skin.Characters_Beat_Return[i] = 1.5f;
                 TJAPlayer3.Skin.Characters_Balloon_Timer[i] = 28;
                 TJAPlayer3.Skin.Characters_Balloon_Delay[i] = 500;
                 TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = 84;
@@ -1561,187 +1599,321 @@ namespace TJAPlayer3
                                 strCommand = strArray[0].Trim();
                                 strParam = strArray[1].Trim();
 
-                                if (strCommand == "Chara_Resolution")
+                                switch (strCommand)
                                 {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Chara_Resolution":
                                     {
-                                        TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_X")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Heya_Chara_Render_Offset":
                                     {
-                                        TJAPlayer3.Skin.Characters_X[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Y")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_X":
                                     {
-                                        TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_X[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_4P")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_Y":
                                     {
-                                        TJAPlayer3.Skin.Characters_4P[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_5P")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_4P":
                                     {
-                                        TJAPlayer3.Skin.Characters_5P[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_4P[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_X_AI")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_5P":
                                     {
-                                        TJAPlayer3.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_5P[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Y_AI")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_X_AI":
                                     {
-                                        TJAPlayer3.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_X")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_Y_AI":
                                     {
-                                        TJAPlayer3.Skin.Characters_Balloon_X[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_Y")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_Balloon_X":
                                     {
-                                        TJAPlayer3.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Balloon_X[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_4P")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_Balloon_Y":
                                     {
-                                        TJAPlayer3.Skin.Characters_Balloon_4P[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_5P")
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int k = 0; k < 2; k++)
+                                    case "Game_Chara_Balloon_4P":
                                     {
-                                        TJAPlayer3.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Balloon_4P[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
                                     }
+                                    case "Game_Chara_Balloon_5P":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 2; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
+                                    }
+                                    case "Game_Chara_Balloon_Timer":
+                                    {
+                                        if (int.Parse(strParam) > 0)
+                                            TJAPlayer3.Skin.Characters_Balloon_Timer[i] = int.Parse(strParam);
+                                        break;
+                                    }
+                                    case "Game_Chara_Balloon_Delay":
+                                    {
+                                        if (int.Parse(strParam) > 0)
+                                            TJAPlayer3.Skin.Characters_Balloon_Delay[i] = int.Parse(strParam);
+                                        break;
+                                    }
+                                    case "Game_Chara_Balloon_FadeOut":
+                                    {
+                                        if (int.Parse(strParam) > 0)
+                                            TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = int.Parse(strParam);
+                                        break;
+                                    }
+                                    // パターン数の設定はTextureLoader.csで反映されます。
+                                    case "Game_Chara_Motion_Normal":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_Normal[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_10Combo":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_10Combo[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_10Combo_Max":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_10ComboMax[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_Miss":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_Miss[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_MissDown":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_MissDown[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_ClearIn":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_ClearIn[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_Clear":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_Clear[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_GoGoStart":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_GoGoStart[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                        TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[i] = TJAPlayer3.Skin.Characters_Motion_GoGoStart[i];
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_GoGoStart_Max":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_GoGo":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_GoGo[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                        TJAPlayer3.Skin.Characters_Motion_GoGoMax[i] = TJAPlayer3.Skin.Characters_Motion_GoGo[i];
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_GoGo_Max":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_GoGoMax[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_SoulIn":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_SoulIn[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Motion_Return":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Motion_Return[i] = C変換.ar配列形式のstringをint配列に変換して返す(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_Normal":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_Normal[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_10Combo":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_10Combo[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_10ComboMax":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_10ComboMax[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_Miss":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_Miss[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_MissDown":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_MissDown[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_ClearIn":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_ClearIn[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_Clear":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_Clear[i] = float.Parse(strParam);
+                                        TJAPlayer3.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
+                                            break;
+                                    }
+                                    case "Game_Chara_Beat_ClearMax":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_GoGoStart":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_GoGoStart[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_GoGoStartMax":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_GoGoStartMax[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_GoGo":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_GoGo[i] = float.Parse(strParam);
+                                        TJAPlayer3.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
+                                            break;
+                                    }
+                                    case "Game_Chara_Beat_GoGoMax":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Game_Chara_Beat_SoulIn":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Beat_SoulIn[i] = float.Parse(strParam);
+                                                break;
+                                        }
+                                    case "Game_Chara_Beat_Return":
+                                        {
+                                            TJAPlayer3.Skin.Characters_Beat_Return[i] = float.Parse(strParam);
+                                            break;
+                                        }
+                                    case "Chara_Entry_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Title_Entry_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Normal_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Title_Normal_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Menu_Loop_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Menu_Loop_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Menu_Select_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Menu_Select_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Menu_Start_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Menu_Start_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Result_Normal_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_Normal_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Result_Clear_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Result_Failed_In_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    case "Chara_Result_Failed_AnimationDuration":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
+                                                break;
+                                    }
+                                    default: { break; }
                                 }
-                                else if (strCommand == "Game_Chara_Balloon_Timer")
-                                {
-                                    if (int.Parse(strParam) > 0)
-                                        TJAPlayer3.Skin.Characters_Balloon_Timer[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_Delay")
-                                {
-                                    if (int.Parse(strParam) > 0)
-                                        TJAPlayer3.Skin.Characters_Balloon_Delay[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Balloon_FadeOut")
-                                {
-                                    if (int.Parse(strParam) > 0)
-                                        TJAPlayer3.Skin.Characters_Balloon_FadeOut[i] = int.Parse(strParam);
-                                }
-                                // パターン数の設定はTextureLoader.csで反映されます。
-                                else if (strCommand == "Game_Chara_Motion_Normal")
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Normal[i] = strParam;
-                                }
-                                else if (strCommand == "Game_Chara_Motion_Miss")
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Miss[i] = strParam;
-                                }
-                                else if (strCommand == "Game_Chara_Motion_MissDown")
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_MissDown[i] = strParam;
-                                }
-                                else if (strCommand == "Game_Chara_Motion_Clear")
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Clear[i] = strParam;
-                                }
-                                else if (strCommand == "Game_Chara_Motion_GoGo")
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_GoGo[i] = strParam;
-                                }
-                                else if (strCommand == "Game_Chara_Beat_Normal")
-                                {
-                                    TJAPlayer3.Skin.Characters_Beat_Normal[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Beat_Miss")
-                                {
-                                    TJAPlayer3.Skin.Characters_Beat_Miss[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Beat_MissDown")
-                                {
-                                    TJAPlayer3.Skin.Characters_Beat_MissDown[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Beat_Clear")
-                                {
-                                    TJAPlayer3.Skin.Characters_Beat_Clear[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Game_Chara_Beat_GoGo")
-                                {
-                                    TJAPlayer3.Skin.Characters_Beat_GoGo[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Entry_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Title_Entry_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Normal_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Title_Normal_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Menu_Loop_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Menu_Loop_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Menu_Select_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Menu_Select_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Menu_Start_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Menu_Start_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Result_Normal_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Result_Normal_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Result_Clear_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Result_Failed_In_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[i] = int.Parse(strParam);
-                                }
-                                else if (strCommand == "Chara_Result_Failed_AnimationDuration")
-                                {
-                                    TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
-                                }
-
                             }
                             continue;
                         }

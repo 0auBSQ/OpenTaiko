@@ -200,7 +200,7 @@ namespace TJAPlayer3
 
             if (iCurrentMenu == 0 || iCurrentMenu == 1) TJAPlayer3.Tx.Heya_Render_Field?.t2D描画(TJAPlayer3.app.Device, 0, 0);
             if (iCurrentMenu == 0) TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-            if (iCurrentMenu == 1) TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+            if (iCurrentMenu == 1) TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0], TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1]);
 
             #endregion
 

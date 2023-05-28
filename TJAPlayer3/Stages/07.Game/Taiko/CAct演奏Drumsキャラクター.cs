@@ -116,17 +116,17 @@ namespace TJAPlayer3
         {
             for (int i = 0; i < 5; i++)
             {
-                this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Normal[this.iCurrentCharacter[i]]);
-                this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Miss[this.iCurrentCharacter[i]]);
-                this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_MissDown[this.iCurrentCharacter[i]]);
-                this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_GoGo[this.iCurrentCharacter[i]]);
-                this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Clear[this.iCurrentCharacter[i]]);
+                //this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Normal[this.iCurrentCharacter[i]]);
+                //this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Miss[this.iCurrentCharacter[i]]);
+                //this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_MissDown[this.iCurrentCharacter[i]]);
+                //this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_GoGo[this.iCurrentCharacter[i]]);
+                //this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す(TJAPlayer3.Skin.Characters_Motion_Clear[this.iCurrentCharacter[i]]);
 
-                if (arモーション番号[i] == null) this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
-                if (arMissモーション番号[i] == null) this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
-                if (arMissDownモーション番号[i] == null) this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
-                if (arゴーゴーモーション番号[i] == null) this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
-                if (arクリアモーション番号[i] == null) this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                //if (arモーション番号[i] == null) this.arモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                //if (arMissモーション番号[i] == null) this.arMissモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                //if (arMissDownモーション番号[i] == null) this.arMissDownモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                //if (arゴーゴーモーション番号[i] == null) this.arゴーゴーモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
+                //if (arクリアモーション番号[i] == null) this.arクリアモーション番号[i] = C変換.ar配列形式のstringをint配列に変換して返す("0,0");
 
                 if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].n現在の値 = (int)CharaAction_Balloon_Delay[i].n終了値;
             }
@@ -187,7 +187,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal[Character][this.arモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -199,7 +199,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Missed[Character][this.arMissモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Missed[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -211,7 +211,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][this.arMissDownモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -223,7 +223,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Cleared[Character][this.arクリアモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Cleared[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -235,7 +235,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Maxed[Character][this.arクリアモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Maxed[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -247,7 +247,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime[Character][this.arゴーゴーモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -259,7 +259,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime_Maxed[Character][this.arゴーゴーモーション番号[i][nNowCharaFrame[i]]];
+                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime_Maxed[Character][nNowCharaFrame[i]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -684,54 +684,60 @@ namespace TJAPlayer3
                 case Anime.None:
                     break;
                 case Anime.Normal:
-                    nCharaFrameCount[player] = this.arモーション番号[player].Length - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Ptn[iCurrentCharacter[player]] - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Normal[iCurrentCharacter[player]];
                     break;
                 case Anime.Miss:
-                    nCharaFrameCount[player] = this.arMissモーション番号[player].Length - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[iCurrentCharacter[player]] - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Miss[iCurrentCharacter[player]];
                     break;
                 case Anime.MissDown:
-                    nCharaFrameCount[player] = this.arMissDownモーション番号[player].Length - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[iCurrentCharacter[player]] - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissDown[iCurrentCharacter[player]];
                     break;
                 case Anime.Cleared:
-                case Anime.Maxed:
-                    nCharaFrameCount[player] = this.arクリアモーション番号[player].Length - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[iCurrentCharacter[player]] - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Clear[iCurrentCharacter[player]];
                     break;
+                case Anime.Maxed:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearMax[iCurrentCharacter[player]];
+                    break;
                 case Anime.GoGoTime:
-                case Anime.GoGoTime_Maxed:
-                    nCharaFrameCount[player] = this.arゴーゴーモーション番号[player].Length - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoTime_Ptn[iCurrentCharacter[player]] - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGo[iCurrentCharacter[player]];
+                    break;
+                case Anime.GoGoTime_Maxed:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoMax[iCurrentCharacter[player]];
                     break;
                 case Anime.Combo10:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_10Combo_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_10Combo[iCurrentCharacter[player]];
                     break;
                 case Anime.Combo10_Max:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_10ComboMax[iCurrentCharacter[player]];
                     break;
                 case Anime.GoGoStart:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoStart_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoStart[iCurrentCharacter[player]];
                     break;
                 case Anime.GoGoStart_Max:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoStartMax[iCurrentCharacter[player]];
                     break;
                 case Anime.Become_Cleared:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearIn[iCurrentCharacter[player]];
                     break;
                 case Anime.Become_Maxed:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_SoulIn[iCurrentCharacter[player]];
                     break;
                 case Anime.Return:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Return_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 1.5f;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Return[iCurrentCharacter[player]];
                     break;
                 case Anime.Balloon_Breaking:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[iCurrentCharacter[player]] - 1;
