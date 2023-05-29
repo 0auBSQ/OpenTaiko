@@ -1221,7 +1221,7 @@ namespace TJAPlayer3
                     }
                     else if (line.StartsWith("Heya_Chara_Render_Offset="))
                     {
-                        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 1280, 720 };
+                        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
 
                         string[] values = line.Substring(25).Trim().Split(',');
                         TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][0] = int.Parse(values[0]);
