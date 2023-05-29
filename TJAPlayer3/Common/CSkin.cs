@@ -7958,6 +7958,7 @@ namespace TJAPlayer3
         // Config
 
         public int[][] Characters_Resolution;
+        public int[][] Characters_Heya_Render_Offset;
         public int[][] Characters_X;
         public int[][] Characters_Y;
         public int[][] Characters_4P;
@@ -7968,16 +7969,34 @@ namespace TJAPlayer3
         public int[][] Characters_Balloon_Y;
         public int[][] Characters_Balloon_4P;
         public int[][] Characters_Balloon_5P;
-        public string[] Characters_Motion_Normal,
+        public int[][] Characters_Motion_Normal,
+            Characters_Motion_10Combo,
+            Characters_Motion_10ComboMax,
             Characters_Motion_Miss,
             Characters_Motion_MissDown,
+            Characters_Motion_ClearIn,
             Characters_Motion_Clear,
-            Characters_Motion_GoGo;
-        public int[] Characters_Beat_Normal;
-        public int[] Characters_Beat_Miss;
-        public int[] Characters_Beat_MissDown;
-        public int[] Characters_Beat_Clear;
-        public int[] Characters_Beat_GoGo;
+            Characters_Motion_ClearMax,
+            Characters_Motion_GoGoStart,
+            Characters_Motion_GoGoStartMax,
+            Characters_Motion_GoGo,
+            Characters_Motion_GoGoMax,
+            Characters_Motion_SoulIn,
+            Characters_Motion_Return;
+        public float[] Characters_Beat_Normal,
+            Characters_Beat_10Combo,
+            Characters_Beat_10ComboMax,
+            Characters_Beat_Miss,
+            Characters_Beat_MissDown,
+            Characters_Beat_ClearIn,
+            Characters_Beat_Clear,
+            Characters_Beat_ClearMax,
+            Characters_Beat_GoGoStart,
+            Characters_Beat_GoGoStartMax,
+            Characters_Beat_GoGo,
+            Characters_Beat_GoGoMax,
+            Characters_Beat_SoulIn,
+            Characters_Beat_Return;
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
         public int[] Characters_Balloon_FadeOut;
