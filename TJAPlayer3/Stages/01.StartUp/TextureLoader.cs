@@ -1547,10 +1547,6 @@ namespace TJAPlayer3
 
                 #region [Default values]
 
-                TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
-                TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
-
-
                 TJAPlayer3.Skin.Characters_X[i] = new int[] { 0, 0 };
                 TJAPlayer3.Skin.Characters_Y[i] = new int[] { 0, 537 };
                 TJAPlayer3.Skin.Characters_4P[i] = new int[] { 165, 68 };
