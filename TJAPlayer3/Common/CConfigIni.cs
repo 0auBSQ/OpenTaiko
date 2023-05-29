@@ -1338,6 +1338,7 @@ namespace TJAPlayer3
 			}
 		}
 		public int nRisky;						// #23559 2011.6.20 yyagi Riskyでの残ミス数。0で閉店
+		public bool bIsAllowedDoubleClickFullscreen;	// #26752 2011.11.27 yyagi ダブルクリックしてもフルスクリーンに移行しない
 		public STAUTOPLAY bAutoPlay;
 		public int nSoundDeviceType;				// #24820 2012.12.23 yyagi 出力サウンドデバイス(0=ACM(にしたいが設計がきつそうならDirectShow), 1=ASIO, 2=WASAPI)
 		public int nWASAPIBufferSizeMs;				// #24820 2013.1.15 yyagi WASAPIのバッファサイズ
@@ -1885,6 +1886,7 @@ namespace TJAPlayer3
 			this.bIsAutoResultCapture = false;			// #25399 2011.6.9 yyagi リザルト画像自動保存機能ON/OFF
 
 			this.bバッファ入力を行う = true;
+			this.bIsAllowedDoubleClickFullscreen = true;	// #26752 2011.11.26 ダブルクリックでのフルスクリーンモード移行を許可
 			this.nPoliphonicSounds = 4;					// #28228 2012.5.1 yyagi レーン毎の最大同時発音数
 														// #24820 2013.1.15 yyagi 初期値を4から2に変更。BASS.net使用時の負荷軽減のため。
 														// #24820 2013.1.17 yyagi 初期値を4に戻した。動的なミキサー制御がうまく動作しているため。
@@ -2103,6 +2105,11 @@ namespace TJAPlayer3
 			sw.WriteLine( "; ウィンドウモード時の位置Y" );			            	//
 			sw.WriteLine( "; Y position in the window mode." );	            	    //
 			sw.WriteLine( "WindowY={0}", this.n初期ウィンドウ開始位置Y );   		//
+			sw.WriteLine();												            //
+
+			sw.WriteLine( "; ウインドウをダブルクリックした時にフルスクリーンに移行するか(0:移行しない,1:移行する)" );	// #26752 2011.11.27 yyagi
+			sw.WriteLine( "; Whether double click to go full screen mode or not.(0:No, 1:Yes)" );		//
+			sw.WriteLine( "DoubleClickFullScreen={0}", this.bIsAllowedDoubleClickFullscreen? 1 : 0);	//
 			sw.WriteLine();																				//
 			sw.WriteLine( "; ALT+SPACEのメニュー表示を抑制するかどうか(0:抑制する 1:抑制しない)" );		// #28200 2012.5.1 yyagi
 			sw.WriteLine( "; Whether ALT+SPACE menu would be masked or not.(0=masked 1=not masked)" );	//
@@ -2923,6 +2930,10 @@ namespace TJAPlayer3
 												{
 													this.nウインドウheight = SampleFramework.GameWindowSize.Height;
 												}
+											}
+											else if ( str3.Equals( "DoubleClickFullScreen" ) )	// #26752 2011.11.27 yyagi
+											{
+												this.bIsAllowedDoubleClickFullscreen = C変換.bONorOFF( str4[ 0 ] );
 											}
 											else if ( str3.Equals( "EnableSystemMenu" ) )		// #28200 2012.5.1 yyagi
 											{

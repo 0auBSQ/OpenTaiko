@@ -2323,6 +2323,7 @@ for (int i = 0; i < 3; i++) {
 			base.Window.Icon = global::TJAPlayer3.Properties.Resources.tjap3;
 			base.Window.KeyDown += new KeyEventHandler( this.Window_KeyDown );
 			base.Window.MouseUp +=new MouseEventHandler( this.Window_MouseUp);
+			base.Window.MouseDoubleClick += new MouseEventHandler(this.Window_MouseDoubleClick);	// #23510 2010.11.13 yyagi: to go fullscreen mode
 			base.Window.ResizeEnd += new EventHandler(this.Window_ResizeEnd);						// #23510 2010.11.20 yyagi: to set resized window size in Config.ini
 			base.Window.ApplicationActivated += new EventHandler(this.Window_ApplicationActivated);
 			base.Window.ApplicationDeactivated += new EventHandler( this.Window_ApplicationDeactivated );
@@ -3323,6 +3324,15 @@ for (int i = 0; i < 3; i++) {
 		private void Window_MouseUp( object sender, MouseEventArgs e )
 		{
 			mb = e.Button;
+		}
+
+		private void Window_MouseDoubleClick( object sender, MouseEventArgs e)	// #23510 2010.11.13 yyagi: to go full screen mode
+		{
+			if ( mb.Equals(MouseButtons.Left) && ConfigIni.bIsAllowedDoubleClickFullscreen )	// #26752 2011.11.27 yyagi
+			{
+				ConfigIni.bウィンドウモード = false;
+				this.t全画面_ウィンドウモード切り替え();
+			}
 		}
 		private void Window_ResizeEnd(object sender, EventArgs e)				// #23510 2010.11.20 yyagi: to get resized window size
 		{
