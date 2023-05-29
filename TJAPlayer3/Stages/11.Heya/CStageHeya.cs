@@ -198,9 +198,23 @@ namespace TJAPlayer3
 
             #region [Render field]
 
+            float renderRatioX = 1.0f;
+            float renderRatioY = 1.0f;
+
+            if (TJAPlayer3.Skin.Characters_Resolution[iCharacterCurrent] != null)
+            {
+                renderRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[iCharacterCurrent][0];
+                renderRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[iCharacterCurrent][1];
+            }
+
+            if (TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent] != null)
+            {
+                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vc拡大縮小倍率.X = renderRatioX;
+                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vc拡大縮小倍率.Y = renderRatioY;
+            }
             if (iCurrentMenu == 0 || iCurrentMenu == 1) TJAPlayer3.Tx.Heya_Render_Field?.t2D描画(TJAPlayer3.app.Device, 0, 0);
             if (iCurrentMenu == 0) TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(TJAPlayer3.app.Device, 0, 0);
-            if (iCurrentMenu == 1) TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0], TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1]);
+            if (iCurrentMenu == 1) TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, TJAPlayer3.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
 
             #endregion
 
@@ -310,6 +324,9 @@ namespace TJAPlayer3
                 {
                     int pos = (iCharacterCount * 5 + iCharacterCurrent + i) % iCharacterCount;
 
+                    float charaRatioX = 1.0f;
+                    float charaRatioY = 1.0f;
+
                     if (i != 0)
                     {
                         TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(C変換.ColorToColor4(Color.DarkGray));
@@ -324,6 +341,18 @@ namespace TJAPlayer3
                     }
 
                     var scroll = DrawBox_Slot(i + (TJAPlayer3.Skin.Heya_Center_Menu_Box_Count / 2));
+
+                    if (TJAPlayer3.Skin.Characters_Resolution[pos] != null)
+                    {
+                        charaRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[pos][0];
+                        charaRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[pos][1];
+                    }
+
+                    if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
+                    {
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vc拡大縮小倍率.X = charaRatioX;
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vc拡大縮小倍率.Y = charaRatioY;
+                    }
 
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0],
                         scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[1]);
