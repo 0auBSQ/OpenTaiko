@@ -1211,13 +1211,21 @@ namespace TJAPlayer3
 
                 foreach (string line in strSingleLine)
                 {
-                    if (line.StartsWith("Chara_Resolution=")) // fix for Heya resolution compatibility
+                    if (line.StartsWith("Chara_Resolution=")) // required for Heya resolution compatibility
                     {
                         TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
 
                         string[] values = line.Substring(17).Trim().Split(',');
                         TJAPlayer3.Skin.Characters_Resolution[i][0] = int.Parse(values[0]);
                         TJAPlayer3.Skin.Characters_Resolution[i][1] = int.Parse(values[1]);
+                    }
+                    else if (line.StartsWith("Heya_Chara_Render_Offset="))
+                    {
+                        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 1280, 720 };
+
+                        string[] values = line.Substring(25).Trim().Split(',');
+                        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][0] = int.Parse(values[0]);
+                        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][1] = int.Parse(values[1]);
                     }
                 }
 
@@ -1620,24 +1628,24 @@ namespace TJAPlayer3
 
                                 switch (strCommand)
                                 {
-                                    case "Chara_Resolution":
-                                    {
-                                        string[] strSplit = strParam.Split(',');
-                                        for (int k = 0; k < 2; k++)
-                                        {
-                                            TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
-                                        }
-                                        break;
-                                    }
-                                    case "Heya_Chara_Render_Offset":
-                                    {
-                                        string[] strSplit = strParam.Split(',');
-                                        for (int k = 0; k < 2; k++)
-                                        {
-                                            TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][k] = int.Parse(strSplit[k]);
-                                        }
-                                        break;
-                                    }
+                                    //case "Chara_Resolution":
+                                    //{
+                                    //    string[] strSplit = strParam.Split(',');
+                                    //    for (int k = 0; k < 2; k++)
+                                    //    {
+                                    //        TJAPlayer3.Skin.Characters_Resolution[i][k] = int.Parse(strSplit[k]);
+                                    //    }
+                                    //    break;
+                                    //}
+                                    //case "Heya_Chara_Render_Offset":
+                                    //{
+                                    //    string[] strSplit = strParam.Split(',');
+                                    //    for (int k = 0; k < 2; k++)
+                                    //    {
+                                    //        TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][k] = int.Parse(strSplit[k]);
+                                    //    }
+                                    //    break;
+                                    //}
                                     case "Game_Chara_X":
                                     {
                                         string[] strSplit = strParam.Split(',');
