@@ -26,6 +26,11 @@ namespace TJAPlayer3
             return nodes.Count();
         }
 
+        public static string[] tGetNodesByGenreName(string genreName)
+        {
+            return nodes.Where(_nd => _nd.Value.strジャンル == genreName).Select(_nd => _nd.Key).ToArray();
+        }
+
         #region [General song dict methods]
 
         public static C曲リストノード tGetNodeFromID(string id)

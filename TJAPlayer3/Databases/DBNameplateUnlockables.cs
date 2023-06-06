@@ -23,8 +23,9 @@ namespace TJAPlayer3
             public DBUnlockables.CUnlockConditions unlockConditions;
         }
 
-        public void tGetUnlockedItems(int player, ModalQueue mq)
+        public void tGetUnlockedItems(int _player, ModalQueue mq)
         {
+            int player = TJAPlayer3.GetActualPlayer(_player);
             var _sf = TJAPlayer3.SaveFileInstances[player].data.NamePlateTitles;
             bool _edited = false;
 
@@ -45,7 +46,7 @@ namespace TJAPlayer3
                                 HRarity.tRarityToModalInt(item.Value.rarity), 
                                 item.Value.nameplateInfo.cld.GetString(item.Key)
                                 ), 
-                            player);
+                            _player);
                     } 
                 }
             }

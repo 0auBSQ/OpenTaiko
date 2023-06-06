@@ -463,7 +463,7 @@
 	},
 	"Challenger from another world": {
 		"NameplateInfo": {
-			"iType": 6,
+			"iType": 11,
 			"Localization": {
 				"strings": {
 					"default": "Challenger from another world",
@@ -485,7 +485,7 @@
 	},
 	"Unbeatable warrior": {
 		"NameplateInfo": {
-			"iType": 6,
+			"iType": 13,
 			"Localization": {
 				"strings": {
 					"default": "Unbeatable warrior",
@@ -494,7 +494,7 @@
 				}
 			}
 		},
-		"Rarity": "Rare",
+		"Rarity": "Epic",
 		"UnlockCondition": {
 			"condition": "lp",
 			"type": "me",
@@ -551,7 +551,7 @@
 	},
 	"Talented drummer": {
 		"NameplateInfo": {
-			"iType": 2,
+			"iType": 12,
 			"Localization": {
 				"strings": {
 					"default": "Talented drummer",
@@ -560,7 +560,7 @@
 				}
 			}
 		},
-		"Rarity": "Uncommon",
+		"Rarity": "Rare",
 		"UnlockCondition": {
 			"condition": "lp",
 			"type": "me",
@@ -661,7 +661,7 @@
 	},
 	"Nine sparkling stars": {
 		"NameplateInfo": {
-			"iType": 3,
+			"iType": 7,
 			"Localization": {
 				"strings": {
 					"default": "Nine sparkling stars",
@@ -670,7 +670,7 @@
 				}
 			}
 		},
-		"Rarity": "Rare",
+		"Rarity": "Epic",
 		"UnlockCondition": {
 			"condition": "lp",
 			"type": "me",
@@ -705,7 +705,7 @@
 	},
 	"Eternal legend": {
 		"NameplateInfo": {
-			"iType": 7,
+			"iType": 8,
 			"Localization": {
 				"strings": {
 					"default": "Eternal legend",
@@ -714,7 +714,7 @@
 				}
 			}
 		},
-		"Rarity": "Epic",
+		"Rarity": "Legendary",
 		"UnlockCondition": {
 			"condition": "lp",
 			"type": "me",
@@ -768,5 +768,30 @@
 				1
 			],
 		}	
-	}
+	},
+	"First Secret": {
+		"NameplateInfo": {
+			"iType": 15,
+			"Localization": {
+				"strings": {
+					"default": "First Secret",
+					"fr": "Mon premier secret",
+					"ja": "初めての秘密"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "sg",
+			"type": "me",
+			"values": [
+				1,
+				-1,
+				0
+			],
+			"references": [
+				"Dashy's Secrets"
+			]
+		}	
+	},
 }

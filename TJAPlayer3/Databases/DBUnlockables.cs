@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
@@ -11,6 +12,10 @@ namespace TJAPlayer3
         {
             ["ch"] = 1,
             ["cs"] = 1,
+            ["dp"] = 3,
+            ["lp"] = 3,
+            ["sp"] = 2,
+            ["sg"] = 3,
         };
 
         public class CUnlockConditions
@@ -20,9 +25,9 @@ namespace TJAPlayer3
                 Condition = "";
                 Values = new int[]{ 0 };
                 Type = "me";
-                Reference = "";
+                Reference = new string[] { "" };
             }
-            public CUnlockConditions(string cd, int[] vl, string tp, string rf)
+            public CUnlockConditions(string cd, int[] vl, string tp, string[] rf)
             {
                 Condition = cd;
                 Values = vl;
@@ -42,9 +47,9 @@ namespace TJAPlayer3
             [JsonProperty("type")]
             public string Type;
 
-            // Referenced chart
-            [JsonProperty("reference")]
-            public string Reference;
+            // Referenced charts
+            [JsonProperty("references")]
+            public string[] Reference;
 
             [JsonIgnore]
             private int RequiredArgCount = -1;
@@ -91,11 +96,15 @@ namespace TJAPlayer3
              * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
              * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
              * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
+             * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
+             * sg : "Song genre (performance)", count of any song pass within a specific genre folder, unlock check during the results screen, condition 3 x n values for n songs : [Song count, Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
              * 
              * 
             */
             public (bool, string) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
             {
+                if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
+                    RequiredArgCount = RequiredArgs[Condition];
 
                 switch (this.Condition)
                 {
@@ -112,7 +121,13 @@ namespace TJAPlayer3
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
                         else
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
-
+                    case "sp":
+                    case "sg":
+                        if (this.Values.Length % this.RequiredArgCount == 0
+                            && this.Reference.Length == this.Values.Length / this.RequiredArgCount)
+                            return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires (" + this.RequiredArgCount.ToString() + " * n) values and n references.");
 
                 }
 
@@ -149,6 +164,10 @@ namespace TJAPlayer3
                         case "dp":
                         case "lp":
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
+                            return (fulfiled, "");
+                        case "sp":
+                        case "sg":
+                            fulfiled = this.tValueRequirementMet(inputValues[0], this.Reference.Length);
                             return (fulfiled, "");
                     }
                 }
@@ -211,8 +230,14 @@ namespace TJAPlayer3
 
             private int tGetCountChartsPassingCondition(int player)
             {
-                int _aimedDifficulty = this.Values[0]; // Difficulty if dp, Level if lp
-                int _aimedStatus = this.Values[1];
+                int _aimedDifficulty = 0;
+                int _aimedStatus = 0;
+
+                if (this.Condition == "dp" || this.Condition == "lp")
+                {
+                    _aimedDifficulty = this.Values[0]; // Difficulty if dp, Level if lp
+                    _aimedStatus = this.Values[1];
+                }
 
                 var _sf = TJAPlayer3.SaveFileInstances[player].data.standardPasses;
                 if (_sf == null 
@@ -253,7 +278,67 @@ namespace TJAPlayer3
                             }
                         }
                         return _count;
-                        
+                    case "sp":
+                        _count = 0;
+                        for (int i = 0; i < this.Values.Length / this.RequiredArgCount; i++)
+                        {
+                            int _base = i * this.RequiredArgCount;
+                            string _songId = this.Reference[i];
+                            _aimedDifficulty = this.Values[_base];
+                            _aimedStatus = this.Values[_base + 1];
+
+                            if (_sf.ContainsKey(_songId))
+                            {
+                                var _values = _sf[_songId].d;
+                                if (_aimedDifficulty >= 0 && _aimedDifficulty < 4)
+                                {
+                                    if (_values[_aimedDifficulty] >= _aimedStatus)
+                                        _count++;
+                                }
+                                else
+                                {
+                                    if (Array.Exists(_values, _v => _v >= _aimedStatus))
+                                        _count++;
+                                }
+                            }
+                        }
+                        return _count;
+                    case "sg":
+                        _count = 0;
+                        for (int i = 0; i < this.Values.Length / this.RequiredArgCount; i++)
+                        {
+                            int _base = i * this.RequiredArgCount;
+                            string _genreName = this.Reference[i];
+                            int _songCount = this.Values[_base];
+                            _aimedDifficulty = this.Values[_base + 1];
+                            _aimedStatus = this.Values[_base + 2];
+                            int _innerCount = 0;
+
+                            var _songList = CSongDict.tGetNodesByGenreName(_genreName);
+                            foreach (string songId in _songList)
+                            {
+                                _innerCount = 0;
+                                if (_sf.ContainsKey(songId))
+                                {
+                                    var _values = _sf[songId].d;
+                                    if (_aimedDifficulty >= 0 && _aimedDifficulty < 4)
+                                    {
+                                        if (_values[_aimedDifficulty] >= _aimedStatus)
+                                            _innerCount++;
+                                    }
+                                    else
+                                    {
+                                        if (Array.Exists(_values, _v => _v >= _aimedStatus))
+                                            _innerCount++;
+                                    }
+                                }
+                            }
+
+                            if (_innerCount >= _songCount)
+                                _count++;
+
+                        }
+                        return _count;
                 }
                 return -1;
             }
