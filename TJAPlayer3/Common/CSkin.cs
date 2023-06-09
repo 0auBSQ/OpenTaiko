@@ -779,14 +779,9 @@ namespace TJAPlayer3
 
             this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-            //this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
-
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundRankIn = new Cシステムサウンド(@"Sounds\ResultScreen\RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.soundDonClear = new Cシステムサウンド(@"Sounds\ResultScreen\Donchan_Clear.ogg", false, false, true, ESoundGroup.Voice);
-            this.soundDonFailed = new Cシステムサウンド(@"Sounds\ResultScreen\Donchan_Miss.ogg", false, false, true, ESoundGroup.Voice);
 
-            this.soundSelectAnnounce = new Cシステムサウンド(@"Sounds\DiffSelect.ogg", false, false, true, ESoundGroup.Voice);
             this.sound特訓再生音 = new Cシステムサウンド(@"Sounds\Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓停止音 = new Cシステムサウンド(@"Sounds\Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓スクロール音 = new Cシステムサウンド(@"Sounds\Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -795,9 +790,6 @@ namespace TJAPlayer3
             this.soundPon = new Cシステムサウンド(@"Sounds\Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundGauge = new Cシステムサウンド(@"Sounds\Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundScoreDon = new Cシステムサウンド(@"Sounds\ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundChallengeVoice = new Cシステムサウンド(@"Sounds\Dan\ChallengeVoice.wav", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundDanSelectStart = new Cシステムサウンド(@"Sounds\Dan\DanSelectStart.wav", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundDanSongSelectCheck = new Cシステムサウンド(@"Sounds\Dan\DanSongSelectCheck.wav", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundDanSongSelectIn = new Cシステムサウンド(@"Sounds\Dan\Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
 
