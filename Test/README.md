@@ -115,6 +115,7 @@ BoxFontName=廻想体 ネクスト UP B
 068 - Unlucky Rain : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, Shoxk and 0AuBSQ)
 069 - Vanaheimr : SiLiS - https://soundcloud.com/silis (Chart by bol and 0AuBSQ)
 070 - Kernschmelze 256 : funkyzukin-Q - https://funkyzukin.bandcamp.com/ (Chart by DashyDesu and DragonRatTiger)
+071 - When will the end arrive, I wonder? : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
