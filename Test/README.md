@@ -113,6 +113,8 @@ BoxFontName=廻想体 ネクスト UP B
 066 - Heating Up : FCN - https://fcngroove.carrd.co/ (Chart by Shoxk)
 067 - Liar Prison : SiLiS ft. Karin Natsuki - https://soundcloud.com/silis/liarprison/s-RY4KsJUxuzL?si=e1738364de3a45328b27d1f10c90fea5&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by 0AuBSQ)
 068 - Unlucky Rain : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, Shoxk and 0AuBSQ)
+069 - Vanaheimr : SiLiS - https://soundcloud.com/silis (Chart by bol and 0AuBSQ)
+070 - Kernschmelze 256 : funkyzukin-Q - https://funkyzukin.bandcamp.com/ (Chart by DashyDesu and DragonRatTiger)
 ```
 
 ### About the OpenTaiko Original Soundtrack
