@@ -375,7 +375,11 @@ namespace TJAPlayer3
             this.iTaikoJudgeCountDisp = new CItemToggle(CLangManager.LangInstance.GetString(93), TJAPlayer3.ConfigIni.bJudgeCountDisplay,
 				CLangManager.LangInstance.GetString(94));
             this.list項目リスト.Add( this.iTaikoJudgeCountDisp );
-            
+
+			this.iShowExExtraAnime = new CItemToggle(CLangManager.LangInstance.GetString(10124), TJAPlayer3.ConfigIni.ShowExExtraAnime,
+				CLangManager.LangInstance.GetString(10125));
+			this.list項目リスト.Add(this.iShowExExtraAnime);
+
 			this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(95), CItemBase.Eパネル種別.通常,
 				CLangManager.LangInstance.GetString(96));
 			this.list項目リスト.Add( this.iDrumsGoToKeyAssign );
@@ -1557,6 +1561,7 @@ namespace TJAPlayer3
         CItemToggle ShowMob;
         CItemToggle ShowFooter;
         CItemToggle ShowPuchiChara;
+		CItemToggle iShowExExtraAnime;
         CItemToggle ShinuchiMode;
         CItemToggle FastRender;
         CItemInteger MusicPreTimeMs;
@@ -1713,7 +1718,8 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.eGameMode = (EGame)this.iTaikoGameMode.n現在選択されている項目番号;
             //TJAPlayer3.ConfigIni.bJust = this.iTaikoJust.bON;
             TJAPlayer3.ConfigIni.bJudgeCountDisplay = this.iTaikoJudgeCountDisp.bON;
-            TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
+			TJAPlayer3.ConfigIni.ShowExExtraAnime = this.iShowExExtraAnime.bON;
+			TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
 		}
 		//-----------------
 		#endregion

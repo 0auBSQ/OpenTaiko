@@ -209,7 +209,7 @@ namespace TJAPlayer3
             base.list子Activities.Add(this.actQuickConfig = new CActSelectQuickConfig());
             base.list子Activities.Add(this.act難易度選択画面 = new CActSelect難易度選択画面());
             base.list子Activities.Add(this.actPlayOption = new CActPlayOption());
-
+            base.list子Activities.Add(this.actExExtraTransAnime = new CActSelectExExtraTransAnime());
             base.list子Activities.Add(this.PuchiChara = new PuchiChara());
 
 
@@ -1387,6 +1387,7 @@ namespace TJAPlayer3
         private CActSelectShowCurrentPosition actShowCurrentPosition;
         public CActSelect難易度選択画面 act難易度選択画面;
         public CActPlayOption actPlayOption;
+        public CActSelectExExtraTransAnime actExExtraTransAnime;
 
         public CActSortSongs actSortSongs;
         private CActSelectQuickConfig actQuickConfig;

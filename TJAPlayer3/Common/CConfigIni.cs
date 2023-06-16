@@ -1215,6 +1215,8 @@ namespace TJAPlayer3
 
 		public bool bJudgeCountDisplay;
 
+		public bool ShowExExtraAnime;
+
 		public bool bEnableCountdownTimer;
 
 		// 各画像の表示・非表示設定
@@ -1224,7 +1226,6 @@ namespace TJAPlayer3
 		public bool ShowFooter;
 		public bool ShowMob;
 		public bool ShowPuchiChara; // リザーブ
-									//
 
 		public EScrollMode eScrollMode = EScrollMode.Normal;
 		public bool bスクロールモードを上書き = false;
@@ -1924,7 +1925,9 @@ namespace TJAPlayer3
 
             this.bJudgeCountDisplay = false;
 
-            ShowChara = true;
+			ShowExExtraAnime = true;
+
+			ShowChara = true;
             ShowDancer = true;
             ShowRunner = true;
             ShowFooter = true;
@@ -2402,7 +2405,7 @@ namespace TJAPlayer3
             sw.WriteLine("ShowFooter={0}", ShowFooter ? 1 : 0);
             sw.WriteLine("; ぷちキャラ画像 (0:OFF, 1:ON)");
             sw.WriteLine("ShowPuchiChara={0}", ShowPuchiChara ? 1 : 0);
-            sw.WriteLine();
+			sw.WriteLine();
 			sw.WriteLine( "; DARKモード(0:OFF, 1:HALF, 2:FULL)" );
 			sw.WriteLine( "Dark={0}", (int) this.eDark );
 			sw.WriteLine();
@@ -2550,6 +2553,9 @@ namespace TJAPlayer3
 			sw.WriteLine();
             sw.WriteLine( "; 判定数の表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "JudgeCountDisplay={0}", this.bJudgeCountDisplay ? 1 : 0 );
+			sw.WriteLine();
+			sw.WriteLine("; 裏表移行アニメーションを有効する (0:OFF, 1:ON)");
+			sw.WriteLine("ShowExExtraAnime={0}", this.ShowExExtraAnime ? 1 : 0);
 			sw.WriteLine();
             sw.WriteLine( "; プレイ人数" );
             sw.WriteLine( "PlayerCount={0}", this.nPlayerCount );
@@ -3683,8 +3689,12 @@ namespace TJAPlayer3
 											{
 												this.bJudgeCountDisplay = C変換.bONorOFF( str4[ 0 ] );
 											}
+											else if (str3.Equals("ShowExExtraAnime"))
+											{
+												this.ShowExExtraAnime = C変換.bONorOFF(str4[0]);
+											}
 
-                                            
+
 
 											else if ( str3.Equals( "PlayerCount" ) )
                                             {
