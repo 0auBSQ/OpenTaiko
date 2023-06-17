@@ -418,12 +418,13 @@ namespace TJAPlayer3
         public Cシステムサウンド soundEncyclopediaBGM = null;
         public Cシステムサウンド soundTowerSelectBGM = null;
 
+        public Cシステムサウンド[] soundExToExtra = null;
+        public Cシステムサウンド[] soundExtraToEx = null;
+
         public Cシステムサウンド[] soundModal = null;
 
         public Cシステムサウンド soundCrownIn = null;
         public Cシステムサウンド soundRankIn = null;
-        public Cシステムサウンド soundDonClear = null;
-        public Cシステムサウンド soundDonFailed = null;
 
         public Cシステムサウンド soundSelectAnnounce = null;
 
@@ -800,6 +801,9 @@ namespace TJAPlayer3
             this.soundOnlineLoungeBGM = new Cシステムサウンド(@"Sounds\OnlineLounge\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundEncyclopediaBGM = new Cシステムサウンド(@"Sounds\Encyclopedia\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundTowerSelectBGM = new Cシステムサウンド(@"Sounds\Tower\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+
+            soundExToExtra = new Cシステムサウンド[1] { new Cシステムサウンド(@"Sounds\SongSelect\0\ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
+            soundExtraToEx = new Cシステムサウンド[1] { new Cシステムサウンド(@"Sounds\SongSelect\0\ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
 
             soundModal = new Cシステムサウンド[6];
             for (int i = 0; i < soundModal.Length - 1; i++)
@@ -2719,6 +2723,14 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     SongSelect_Difficulty_Select_Bar_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_ExExtra_AnimeDuration")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Preimage")
@@ -8289,6 +8301,8 @@ namespace TJAPlayer3
         public int[] SongSelect_Difficulty_Select_Bar_Anime = new int[] { 0, 10 };
         public int[] SongSelect_Difficulty_Select_Bar_AnimeIn = new int[] { 0, 50 };
         public int[] SongSelect_Difficulty_Select_Bar_Move = new int[] { 25, 0 };
+
+        public int[] SongSelect_Difficulty_Bar_ExExtra_AnimeDuration = new int[] { -1, -1 };
 
         public int[] SongSelect_Preimage = new int[] { 120, 110 };
         public int[] SongSelect_Preimage_Size = new int[] { 200, 200 };

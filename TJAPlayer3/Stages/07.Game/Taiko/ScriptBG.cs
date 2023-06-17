@@ -126,6 +126,10 @@ namespace TJAPlayer3
                 LuaScript = null;
             }
         }
+        public bool Exists()
+        {
+            return LuaScript != null;
+        }
         public void Dispose()
         {
             List<CTexture> texs = new List<CTexture>();
