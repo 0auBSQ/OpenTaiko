@@ -116,6 +116,8 @@ BoxFontName=廻想体 ネクスト UP B
 069 - Vanaheimr : SiLiS - https://soundcloud.com/silis (Chart by bol and 0AuBSQ)
 070 - Kernschmelze 256 : funkyzukin-Q - https://funkyzukin.bandcamp.com/ (Chart by DashyDesu and DragonRatTiger)
 071 - When will the end arrive, I wonder? : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
+072 - Scarlet Soul : Cusi vs 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol and 0AuBSQ)
+073 - Emily : H5 - https://linktr.ee/H5Music (Chart by bol and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
