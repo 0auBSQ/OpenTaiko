@@ -187,7 +187,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal[Character][TJAPlayer3.Skin.Characters_Motion_Normal[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -199,7 +199,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Missed[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Missed[Character][TJAPlayer3.Skin.Characters_Motion_Miss[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -211,7 +211,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_MissedDown[Character][TJAPlayer3.Skin.Characters_Motion_MissDown[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -223,7 +223,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Cleared[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Cleared[Character][TJAPlayer3.Skin.Characters_Motion_Clear[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -235,7 +235,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_Normal_Maxed[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_Normal_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_ClearMax[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -247,7 +247,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime[Character][TJAPlayer3.Skin.Characters_Motion_GoGo[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -259,7 +259,7 @@ namespace TJAPlayer3
                             {
                                 updateNormal();
                                 ReturnDefaultAnime(i, false);
-                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime_Maxed[Character][nNowCharaFrame[i]];
+                                nowChara = TJAPlayer3.Tx.Characters_GoGoTime_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_GoGoMax[Character][nNowCharaFrame[i]]];
                                 if (endAnime)
                                 {
                                     nNowCharaCounter[i] = 0;
@@ -272,7 +272,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_10Combo[Character] != null && TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_10Combo[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_10Combo[Character][TJAPlayer3.Skin.Characters_Motion_10Combo[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -285,7 +285,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_10Combo_Maxed[Character] != null && TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_10Combo_Maxed[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_10Combo_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_10ComboMax[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -298,7 +298,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_GoGoStart[Character] != null && TJAPlayer3.Skin.Characters_GoGoStart_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_GoGoStart[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_GoGoStart[Character][TJAPlayer3.Skin.Characters_Motion_GoGoStart[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -311,7 +311,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_GoGoStart_Maxed[Character] != null && TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_GoGoStart_Maxed[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_GoGoStart_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -324,7 +324,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_Become_Cleared[Character] != null && TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_Become_Cleared[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_Become_Cleared[Character][TJAPlayer3.Skin.Characters_Motion_ClearIn[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -337,7 +337,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_Become_Maxed[Character] != null && TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_Become_Maxed[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_Become_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_SoulIn[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -350,7 +350,7 @@ namespace TJAPlayer3
                                 updateNormal();
                                 if (TJAPlayer3.Tx.Characters_Return[Character] != null && TJAPlayer3.Skin.Characters_Return_Ptn[Character] != 0)
                                 {
-                                    nowChara = TJAPlayer3.Tx.Characters_Return[Character][nNowCharaFrame[i]];
+                                    nowChara = TJAPlayer3.Tx.Characters_Return[Character][TJAPlayer3.Skin.Characters_Motion_Return[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {

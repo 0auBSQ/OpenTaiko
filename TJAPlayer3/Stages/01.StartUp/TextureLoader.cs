@@ -1282,7 +1282,15 @@ namespace TJAPlayer3
 
         }
 
-
+        public int[] CreateNumberedArrayFromInt(int total)
+        {
+            int[] array = new int[total];
+            for (int i = 0; i < total; i++)
+            {
+                array[i] = i;
+            }
+            return array;
+        }
 
         public CSkin.Cシステムサウンド VoiceSelectOggOrWav(string basePath)
         {
@@ -1556,20 +1564,20 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_4P[i] = new int[] { 0, -176 };
                 TJAPlayer3.Skin.Characters_Balloon_5P[i] = new int[] { 0, -168 };
-                TJAPlayer3.Skin.Characters_Motion_Normal[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_10Combo[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_10ComboMax[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_Miss[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_MissDown[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_ClearIn[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_Clear[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_ClearMax[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_GoGoStart[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_GoGo[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_GoGoMax[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_SoulIn[i] = new int[] { 0 };
-                TJAPlayer3.Skin.Characters_Motion_Return[i] = new int[] { 0 };
+                TJAPlayer3.Skin.Characters_Motion_Normal[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_10Combo[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_10Combo_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_10ComboMax[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_Miss[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_MissDown[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_ClearIn[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_Clear[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_ClearMax[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_GoGoStart[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_GoGoStart_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_GoGo[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_GoGoTime_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_GoGoMax[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_SoulIn[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[i]);
+                TJAPlayer3.Skin.Characters_Motion_Return[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Return_Ptn[i]);
                 TJAPlayer3.Skin.Characters_Beat_Normal[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Miss[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_MissDown[i] = 1;
