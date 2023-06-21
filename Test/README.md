@@ -118,6 +118,7 @@ BoxFontName=廻想体 ネクスト UP B
 071 - When will the end arrive, I wonder? : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
 072 - Scarlet Soul : Cusi vs 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol and 0AuBSQ)
 073 - Emily : H5 - https://linktr.ee/H5Music (Chart by bol and 0AuBSQ)
+074 - Spatium Cursu : X3ll3n - https://linktr.ee/x3ll3n https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg https://x3ll3n.newgrounds.com/ https://soundcloud.com/x3ll3n https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX https://www.instagram.com/x3ll3n_music/ (Chart by 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
