@@ -93,11 +93,10 @@ namespace TJAPlayer3
         }
         #endregion
 
-        internal List<STLYRIC> ParseVTTFile(string filepath, int order)
+        internal List<STLYRIC> ParseVTTFile(string filepath, int order, long offset)
         {
             List<STLYRIC> lrclist = new List<STLYRIC>();
             List<string> lines = File.ReadAllLines(filepath).ToList();
-            long offset = 0;
 
             #region Header data
             if (lines[0].StartsWith("WEBVTT"))
@@ -114,11 +113,11 @@ namespace TJAPlayer3
                 Match offsetMatch = regexOffset.Match(lines[0]);
                 if (offsetMatch.Success && regexTimestamp.Match(offsetMatch.Groups[1].Value).Success)
                 {
-                    offset = ParseTimestamp(offsetMatch.Groups[1].Value);
+                    offset += ParseTimestamp(offsetMatch.Groups[1].Value);
                 }
                 else if (offsetMatch.Success && float.TryParse(offsetMatch.Groups[1].Value, out float result))
                 {
-                    offset = (long)(result * 1000);
+                    offset += (long)(result * 1000);
                 }
             }
             else
@@ -132,6 +131,7 @@ namespace TJAPlayer3
             long endTime = -1;
 
             bool ignoreLyrics = false;
+            bool langIsMatch = false;
 
             List<LyricData> lyricData = new List<LyricData>();
 
@@ -164,6 +164,8 @@ namespace TJAPlayer3
                         BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor
                     };
                     ignoreLyrics = false;
+                    isUsingLang = false;
+                    langIsMatch = false;
 
                     continue;
                 }
@@ -192,7 +194,6 @@ namespace TJAPlayer3
 
                     string tagdata = String.Empty;
                     data.Text = String.Empty;
-                    isUsingLang = false;
                     
                     for (j = 0; j < lines[i].Length; j++)
                     {
@@ -311,8 +312,14 @@ namespace TJAPlayer3
                                         string[] langdata = tagdata.Split(' ');
                                         foreach (string lng in langdata)
                                         {
-                                            if (lng != "lang") { data.Language = lng; isUsingLang = true; }
-                                            if (data.Language == CLangManager.fetchLang()) { data.line = 0; lyricData.Clear(); } // Wipe current lyric data if matching lang is found
+                                            if (lng != "lang")
+                                            {
+                                                data.Language = lng;
+                                                isUsingLang = true;
+
+                                                if (data.Language == CLangManager.fetchLang()) { data.line = 0; lyricData.Clear(); langIsMatch = true; } // Wipe current lyric data if matching lang is found
+                                                else { langIsMatch = false; }
+                                            }
                                         }
                                     }
                                     else if (tagdata == "ruby")
@@ -346,7 +353,7 @@ namespace TJAPlayer3
                             #endregion
                             default:
                                 if (parseMode.HasFlag(ParseMode.Tag)) { tagdata += lines[i].Substring(j, 1); }
-                                else if (!isUsingLang || (isUsingLang && data.Language == CLangManager.fetchLang()))
+                                else if (!isUsingLang || (isUsingLang && langIsMatch))
                                 {
                                     if (parseMode.HasFlag(ParseMode.Rt)) { data.RubyText += lines[i].Substring(j, 1); }
                                     else { data.Text += lines[i].Substring(j, 1); }
@@ -356,7 +363,9 @@ namespace TJAPlayer3
                     }
                     data.Text = WebUtility.HtmlDecode(data.Text);
                     data.RubyText = WebUtility.HtmlDecode(data.RubyText);
+
                     lyricData.Add(data);
+
                     data.line++;
                 }
             }
@@ -404,7 +413,6 @@ namespace TJAPlayer3
         }
         internal STLYRIC CreateLyric(List<LyricData> datalist, int order)
         {
-
             long timestamp = datalist[0].timestamp; // Function will change later w/ timestamp tag implementation
 
             List<List<Bitmap>> textures = new List<List<Bitmap>>();
