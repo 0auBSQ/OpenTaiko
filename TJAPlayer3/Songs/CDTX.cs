@@ -5480,7 +5480,7 @@ namespace TJAPlayer3
                                     {
                                         using (VTTParser parser = new VTTParser())
                                         {
-                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i));
+                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
                                         }
                                         this.bLyrics = true;
                                         this.usingLyricsFile = true;
