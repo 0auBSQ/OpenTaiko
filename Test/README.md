@@ -120,6 +120,7 @@ BoxFontName=廻想体 ネクスト UP B
 073 - Emily : H5 - https://linktr.ee/H5Music (Chart by bol and 0AuBSQ)
 074 - Spatium Cursu : X3ll3n - https://linktr.ee/x3ll3n https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg https://x3ll3n.newgrounds.com/ https://soundcloud.com/x3ll3n https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX https://www.instagram.com/x3ll3n_music/ (Chart by 0AuBSQ)
 075 - 640x480 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by Colin and Komi)
+076 - Rainy Night II ~無信の森~ : Taichenko - https://space.bilibili.com/356518101 https://b23.tv/LBMw5Oz (Chart by Taichenko (Extreme) & 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
