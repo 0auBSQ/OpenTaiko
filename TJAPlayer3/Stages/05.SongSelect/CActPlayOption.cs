@@ -461,7 +461,7 @@ namespace TJAPlayer3
 
             int speed = TJAPlayer3.ConfigIni.nScrollSpeed[actual];
 
-            if (speed <= 4)
+            if (speed <= 8)
                 nSpeedCount = 0;
             else if (speed <= 19)
                 nSpeedCount = speed - 8;
