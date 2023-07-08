@@ -1424,7 +1424,7 @@ namespace TJAPlayer3
                                     && NotesManager.IsGenericRoll(chipNoHit) 
                                     && !NotesManager.IsRollEnd(chipNoHit))
                                 {
-                                    bool _isBalloon = NotesManager.IsBalloon(chipNoHit);
+                                    bool _isBalloon = NotesManager.IsGenericBalloon(chipNoHit);
                                     bool _isKusudama = NotesManager.IsKusudama(chipNoHit);
                                     bool _isKongaRedRoll = (NotesManager.IsSmallRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.TAIKO;
 
@@ -2131,6 +2131,7 @@ namespace TJAPlayer3
         {
             int nSenotesX = 0;
             int nSenotesY = 0;
+            long nowTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0));
 
             switch (TJAPlayer3.ConfigIni.nPlayerCount)
             {
@@ -2167,14 +2168,14 @@ namespace TJAPlayer3
             {
                 if (NotesManager.IsGenericRoll(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && (nowTime < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else if (pChip.nノーツ出現時刻ms != 0 && pChip.nノーツ移動開始時刻ms != 0)
                         pChip.bShow = true;
                 }
                 if (NotesManager.IsRollEnd(pChip))
                 {
-                    if (pChip.nノーツ出現時刻ms != 0 && ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (double)(TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) < n先頭発声位置 - pChip.nノーツ出現時刻ms))
+                    if (pChip.nノーツ出現時刻ms != 0 && (nowTime < n先頭発声位置 - pChip.nノーツ出現時刻ms))
                         pChip.bShow = false;
                     else
                         pChip.bShow = true;
@@ -2198,7 +2199,7 @@ namespace TJAPlayer3
                 if (pChip.dbSCROLL_Y != 0.0)
                 {
                     double _scrollSpeed = pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
-                    long __dbt = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                    long __dbt = nowTime;
                     long time = pChip.n発声時刻ms - __dbt;
                     float play_bpm_time = this.GetNowPBMTime(dTX, 0);
                     y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
@@ -2321,20 +2322,35 @@ namespace TJAPlayer3
                         int _58_cut = 58 * _size[0] / 136;
                         int _78_cut = 78 * _size[0] / 136;
 
-                        if (NotesManager.IsRoll(pChip))
+                        if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip))
                         {
+                            if (NotesManager.IsFuzeRoll(pChip)
+                                && nowTime >= pChip.n発声時刻ms && nowTime < pChip.nノーツ終了時刻ms)
+                            {
+                                x = NoteOriginX[nPlayer];
+                                y = NoteOriginY[nPlayer];
+                            }
+                            
+
                             NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端);
 
                             if (TJAPlayer3.Tx.SENotes[(int)_gt] != null)
                             {
                                 int _shift = NotesManager.IsBigRoll(pChip) ? 26 : 0;
-                                
 
-                                TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
-                                TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
-                                TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * pChip.nSenote, _size[0], _size[1]));
+                                if (!NotesManager.IsFuzeRoll(pChip))
+                                {
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * pChip.nSenote, _size[0], _size[1]));
+                                }
+                                else
+                                {
+                                    NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
+                                }
+                                
                             }
                             
                         }
@@ -2343,9 +2359,9 @@ namespace TJAPlayer3
                         {
                             if (pChip.bShow)
                             {
-                                if ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.n発声時刻ms && (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
+                                if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.nノーツ終了時刻ms)
                                     x = NoteOriginX[nPlayer];
-                                else if ((long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.nノーツ終了時刻ms)
+                                else if (nowTime >= pChip.nノーツ終了時刻ms)
                                     x = (NoteOriginX[nPlayer] + pChip.nバーからのノーツ末端距離dot);
 
                                 NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, TJAPlayer3.Skin.Game_Notes_Size[0] * 2);
@@ -2377,7 +2393,7 @@ namespace TJAPlayer3
                                     n = 910;
                                     break;
                             }
-                            if (pChip.n連打音符State != 7)
+                            if (pChip.n連打音符State != 7 && pChip.n連打音符State != 13)
                             {
                                 //if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                 //    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
@@ -2387,7 +2403,7 @@ namespace TJAPlayer3
                         }
                     }
                 }
-                if (pChip.n発声時刻ms < (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && pChip.nノーツ終了時刻ms > (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
+                if (pChip.n発声時刻ms < nowTime && pChip.nノーツ終了時刻ms > nowTime)
                 {
                     //時間内でかつ0x9Aじゃないならならヒット処理
                     if (!NotesManager.IsRollEnd(pChip) && (nPlayer != 1 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)))
@@ -2482,18 +2498,26 @@ namespace TJAPlayer3
                 if (this.chip現在処理中の連打チップ[i] != null)
                 {
                     //int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
-                    if (NotesManager.IsBalloon(this.chip現在処理中の連打チップ[i]) && this.b連打中[i] == true)
+                    if (NotesManager.IsGenericBalloon(this.chip現在処理中の連打チップ[i]) && this.b連打中[i] == true)
                     {
                         //if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
                         if (this.chip現在処理中の連打チップ[i].n発声時刻ms <= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && this.chip現在処理中の連打チップ[i].nノーツ終了時刻ms + 500 >= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                         {
                             this.chip現在処理中の連打チップ[i].bShow = false;
-                            this.actBalloon.On進行描画(this.chip現在処理中の連打チップ[i].nBalloon, this.n風船残り[i], i);
+                            this.actBalloon.On進行描画(
+                                this.chip現在処理中の連打チップ[i].nBalloon, 
+                                this.n風船残り[i], 
+                                i,
+                                NotesManager.IsFuzeRoll(this.chip現在処理中の連打チップ[i])
+                                 ? CAct演奏Drums風船.EBalloonType.FUSEROLL
+                                 : NotesManager.IsKusudama(this.chip現在処理中の連打チップ[i])
+                                    ? CAct演奏Drums風船.EBalloonType.KUSUDAMA
+                                    : CAct演奏Drums風船.EBalloonType.BALLOON
+                                );
                         }
                         else
                         {
                             this.n現在の連打数[i] = 0;
-
                         }
 
                     }

@@ -4283,7 +4283,7 @@ namespace TJAPlayer3
                 if (b分岐前の連打開始)
                 {
                     //if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
-                    if (NotesManager.IsRoll(listChips[i]))
+                    if (NotesManager.IsRoll(listChips[i]) || NotesManager.IsFuzeRoll(listChips[i]))
                     {
                         if (nReturnChip == null)
                             nReturnChip = i;
@@ -4453,7 +4453,7 @@ namespace TJAPlayer3
 
                         if (nObjectNum != 0)
                         {
-                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 16 || nObjectNum == 17)
+                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17)
                             {
                                 if (nNowRoll != 0)
                                 {
@@ -4636,6 +4636,9 @@ namespace TJAPlayer3
                                         break;
                                     case 0xB:
                                         chip.nSenote = 6;
+                                        break;
+                                    case 0xD:
+                                        chip.nSenote = 0xB;
                                         break;
                                     case 0xF1:
                                         chip.nSenote = 5;

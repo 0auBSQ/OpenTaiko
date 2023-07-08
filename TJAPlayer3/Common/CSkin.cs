@@ -8774,6 +8774,9 @@ namespace TJAPlayer3
 
         public int[] Game_Balloon_Balloon_Number_4P = new int[] { 423, 95 };
         public int[] Game_Balloon_Balloon_Number_5P = new int[] { 423, 87 };
+
+        public int Game_Kusudama_Number_X = 960;
+        public int Game_Kusudama_Number_Y = 450;
         #endregion
         #region Effects
         public int[] Game_Effect_Roll_StartPoint_X = new int[] { 56, -10, 200, 345, 100, 451, 600, 260, -30, 534, 156, 363 };

@@ -120,7 +120,14 @@ namespace TJAPlayer3
             return base.On進行描画();
         }
 
-        public int On進行描画(int n連打ノルマ, int n連打数, int player)
+        public enum EBalloonType
+        {
+            BALLOON,
+            KUSUDAMA,
+            FUSEROLL
+        }
+
+        public int On進行描画(int n連打ノルマ, int n連打数, int player, EBalloonType btype)
         {
             this.ct風船ふきだしアニメ.t進行Loop();
             this.ct風船アニメ[player].t進行();
@@ -185,7 +192,7 @@ namespace TJAPlayer3
                 for (int j = 0; j < 5; j++)
                 {
 
-                    if (n残り打数[j] < n連打数)
+                    if (n残り打数[j] < n連打数 && btype == EBalloonType.BALLOON)
                     {
                         if (TJAPlayer3.Tx.Balloon_Breaking[j] != null)
                             TJAPlayer3.Tx.Balloon_Breaking[j].t2D描画(TJAPlayer3.app.Device, x + (this.ct風船ふきだしアニメ.n現在の値 == 1 ? 3 : 0), y);
@@ -193,9 +200,28 @@ namespace TJAPlayer3
                     }
                 }
                 //1P:31 2P:329
-                if (TJAPlayer3.Tx.Balloon_Balloon != null)
-                    TJAPlayer3.Tx.Balloon_Balloon.t2D描画(TJAPlayer3.app.Device, frame_x, frame_y);
-                this.t文字表示(num_x, num_y, n連打数, player);
+
+                if (btype == EBalloonType.BALLOON)
+                {
+                    if (TJAPlayer3.Tx.Balloon_Balloon != null)
+                        TJAPlayer3.Tx.Balloon_Balloon.t2D描画(TJAPlayer3.app.Device, frame_x, frame_y);
+                    this.t文字表示(num_x, num_y, n連打数, player);
+                }
+                else if (btype == EBalloonType.FUSEROLL)
+                {
+                    if (TJAPlayer3.Tx.Fuse_Balloon != null)
+                        TJAPlayer3.Tx.Fuse_Balloon.t2D描画(TJAPlayer3.app.Device, frame_x, frame_y);
+                    this.tFuseNumber(num_x, num_y, n連打数, player);
+                }
+                else if (btype == EBalloonType.KUSUDAMA && player == 0)
+                {
+                    if (TJAPlayer3.Tx.Kusudama_Back != null)
+                        TJAPlayer3.Tx.Kusudama_Back.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                    if (TJAPlayer3.Tx.Kusudama != null)
+                        TJAPlayer3.Tx.Kusudama.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                    this.tKusudamaNumber(n連打数);
+                }
+                
                 //CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
             }
             if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player])
@@ -247,11 +273,8 @@ namespace TJAPlayer3
             public Point pt;
         }
 
-        private void t文字表示(int x, int y, int num, int nPlayer)
+        private void _nbDisplay(CTexture tx, int num, int x, int y)
         {
-            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].n現在の値];
-
             int[] nums = C変換.SeparateDigits(num);
             for (int j = 0; j < nums.Length; j++)
             {
@@ -259,11 +282,40 @@ namespace TJAPlayer3
                 float _x = x - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[0] * offset);
                 float _y = y - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[1] * offset);
 
-                float width = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Width / 10.0f;
-                float height = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Height;
+                float width = tx.sz画像サイズ.Width / 10.0f;
+                float height = tx.sz画像サイズ.Height;
 
-                TJAPlayer3.Tx.Balloon_Number_Roll.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
+                tx.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
             }
+        }
+
+        private void tKusudamaNumber(int num)
+        {
+            if (TJAPlayer3.Tx.Kusudama_Number == null) return;
+            TJAPlayer3.Tx.Kusudama_Number.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Kusudama_Number.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            int x = TJAPlayer3.Skin.Game_Kusudama_Number_X;
+            int y = TJAPlayer3.Skin.Game_Kusudama_Number_Y;
+
+            _nbDisplay(TJAPlayer3.Tx.Kusudama_Number, num, x, y);
+        }
+
+        private void tFuseNumber(int x, int y, int num, int nPlayer)
+        {
+            if (TJAPlayer3.Tx.Fuse_Number == null) return;
+            TJAPlayer3.Tx.Fuse_Number.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Fuse_Number.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].n現在の値];
+
+            _nbDisplay(TJAPlayer3.Tx.Fuse_Number, num, x, y);
+        }
+
+        private void t文字表示(int x, int y, int num, int nPlayer)
+        {
+            if (TJAPlayer3.Tx.Balloon_Number_Roll == null) return;
+            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].n現在の値];
+
+            _nbDisplay(TJAPlayer3.Tx.Balloon_Number_Roll, num, x, y);
         }
 
         public void tEnd()

@@ -30,7 +30,7 @@ namespace TJAPlayer3
             ["A"] = 10, // Joint Big Don (2P)
             ["B"] = 11, // Joint Big Ka (2P)
             ["C"] = 12, // Mine
-            ["D"] = 7, // ProjectOutfox's Fuse roll (Coming soon)
+            ["D"] = 13, // ProjectOutfox's Fuse roll
             ["E"] = 0, // Unused
             ["F"] = 15, // ADLib
             ["G"] = 0xF1, // Green (Purple) double hit note
@@ -365,10 +365,14 @@ namespace TJAPlayer3
         {
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
-            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow || TJAPlayer3.Tx.Notes[(int)_gt] == null)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow)
                 return;
 
             int _offset = 0;
+            var _texarr = TJAPlayer3.Tx.Notes[(int)_gt];
+            int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
+            float _adjust = TJAPlayer3.Skin.Game_Notes_Size[0] / 2.0f;
+            float image_size = TJAPlayer3.Skin.Game_Notes_Size[0];
 
             if (IsSmallRoll(chip) || (_gt == EGameType.TAIKO && IsYellowRoll(chip)))
             {
@@ -386,15 +390,18 @@ namespace TJAPlayer3
             {
                 _offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 8;
             }
+            else if (IsFuzeRoll(chip))
+            {
+                _texarr = TJAPlayer3.Tx.Note_FuseRoll;
+                _offset = -rollOrigin;
+            }
 
-            float _adjust = TJAPlayer3.Skin.Game_Notes_Size[0] / 2.0f;
-            float image_size = TJAPlayer3.Skin.Game_Notes_Size[0];
+            if (_texarr == null) return;
+
             int index = x末端 - x;
 
-            int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
-
             var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
-            // Temporary patch for odd math bug, to fix later
+            // Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
             if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI) 
                 theta += 0.00000000001;
 
@@ -404,24 +411,24 @@ namespace TJAPlayer3
             var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
 
             if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
-                TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
+                _texarr.color4 = effectedColor;
             else
-                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+                _texarr.color4 = normalColor;
 
             // Body
-            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = (float)div;
-            TJAPlayer3.Tx.Notes[(int)_gt].fZ軸中心回転 = (float)theta;
+            _texarr.vc拡大縮小倍率.X = (float)div;
+            _texarr.fZ軸中心回転 = (float)theta;
             //var _x0 = x + _adjust;
             //var _y0 = y + 0f;
 
             var _center_x = (x + x末端 + image_size) / 2;
             var _center_y = _adjust + (y + y末端) / 2;
             //TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, _x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D中心基準描画(TJAPlayer3.app.Device, (int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            _texarr.t2D中心基準描画(TJAPlayer3.app.Device, (int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             //t2D拡大率考慮中央基準描画 t2D中心基準描画
 
             // Tail
-            TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+            _texarr.vc拡大縮小倍率.X = 1.0f;
             //var _x0 = x末端 + _adjust;
             //var _y0 = y末端 + 0f;
             var _d = _adjust;
@@ -433,19 +440,19 @@ namespace TJAPlayer3
             var _xc = x2 + (x2 - x1) * _d / dist;
             var _yc = y2 + (y2 - y1) * _d / dist;
             //TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, (int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D中心基準描画(TJAPlayer3.app.Device, (int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            _texarr.t2D中心基準描画(TJAPlayer3.app.Device, (int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
 
 
-            TJAPlayer3.Tx.Notes[(int)_gt].fZ軸中心回転 = 0;
+            _texarr.fZ軸中心回転 = 0;
 
             if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
-                TJAPlayer3.Tx.Notes[(int)_gt].color4 = effectedColor;
+                _texarr.color4 = effectedColor;
             else
-                TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+                _texarr.color4 = normalColor;
 
             // Head
-            TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(rollOrigin + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-            TJAPlayer3.Tx.Notes[(int)_gt].color4 = normalColor;
+            _texarr.t2D描画(TJAPlayer3.app.Device, x, y, 0, new Rectangle(rollOrigin + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            _texarr.color4 = normalColor;
         }
 
         // SENotes
@@ -463,6 +470,10 @@ namespace TJAPlayer3
             else if (IsPurpleNote(chip) && _gt != EGameType.KONGA)
             {
                 TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, 0, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+            }
+            else if (IsFuzeRoll(chip))
+            {
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * 2, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
             }
             else
             {

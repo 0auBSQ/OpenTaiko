@@ -133,7 +133,7 @@ namespace TJAPlayer3
                     {
                         chip.nList上の位置 = n整数値管理;
                         //if ((chip.nチャンネル番号 == 0x15 || chip.nチャンネル番号 == 0x16) && (n整数値管理 < this.listChip[i].Count - 1))
-                        if (NotesManager.IsRoll(chip) && (n整数値管理 < this.listChip[i].Count - 1))
+                        if ((NotesManager.IsRoll(chip) || NotesManager.IsFuzeRoll(chip)) && (n整数値管理 < this.listChip[i].Count - 1))
                         {
                             if (chip.db発声時刻ms < r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(0, i).db発声時刻ms)
                             {
@@ -1131,7 +1131,7 @@ namespace TJAPlayer3
                         return E判定.Perfect;
 				    }
                 }
-                else if(NotesManager.IsBalloon(pChip))
+                else if(NotesManager.IsGenericBalloon(pChip))
                 {
                     if ((CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.n発声時刻ms - 17 && (CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
                     {
@@ -1701,7 +1701,7 @@ namespace TJAPlayer3
                             //---------------------------
                             #endregion
                         }
-                        else if (NotesManager.IsBalloon(pChip))
+                        else if (NotesManager.IsGenericBalloon(pChip))
                         {
                             #region [ Balloon ]
 
@@ -3415,6 +3415,7 @@ namespace TJAPlayer3
 					case 0x16:
 					case 0x17:
                     case 0x19:
+                    case 0x1D:
                         {
                             //2015.03.28 kairera0467
                             //描画順序を変えるため、メイン処理だけをこちらに残して描画処理は分離。
@@ -3460,6 +3461,29 @@ namespace TJAPlayer3
                                                 TJAPlayer3.Timer);
                                         }
                                     }
+                                    if (chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount)
+                                    {
+                                        if (pChip.n連打音符State == 13)
+                                        {
+                                            this.actJudgeString.Start(nPlayer, E判定.Mine);
+                                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, E判定.Bad, true, nPlayer);
+                                            TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, E判定.Mine, nPlayer);
+                                            actGauge.MineDamage(nPlayer);
+                                            TJAPlayer3.Skin.soundBomb?.t再生する();
+                                            this.CChartScore[nPlayer].nMine++;
+                                            this.CSectionScore[nPlayer].nMine++;
+                                            this.CBranchScore[nPlayer].nMine++;
+                                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                                CFloorManagement.damage();
+                                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                                this.nMine[actDan.NowShowingNumber]++;
+                                            this.actCombo.n現在のコンボ数[nPlayer] = 0;
+                                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                                                this.nCombo[actDan.NowShowingNumber] = 0;
+                                            this.actComboVoice.tReset(nPlayer);
+                                            this.bIsMiss[nPlayer] = true;
+                                        }
+                                    }
                                     chip現在処理中の連打チップ[nPlayer] = null;
 
                                 }
@@ -3471,7 +3495,6 @@ namespace TJAPlayer3
 
                         break;
 
-                    case 0x1d:
                     case 0x1e:
                         break;
 
@@ -4074,6 +4097,7 @@ namespace TJAPlayer3
                     case 0x17: //風船
                     case 0x18: //連打終了
                     case 0x19:
+                    case 0x1D:
                     case 0x20:
                     case 0x21:
                         {
@@ -4270,7 +4294,7 @@ namespace TJAPlayer3
 
                 var bDontDeleteFlag = NotesManager.IsHittableNote(_chip);// Chip >= 0x11 && Chip <= 0x19;
                 var bRollAllFlag = NotesManager.IsGenericRoll(_chip);//Chip >= 0x15 && Chip <= 0x19;
-                var bBalloonOnlyFlag = NotesManager.IsBalloon(_chip) || NotesManager.IsKusudama(_chip);//Chip == 0x17;
+                var bBalloonOnlyFlag = NotesManager.IsGenericBalloon(_chip);//Chip == 0x17;
                 var bRollOnlyFlag = NotesManager.IsRoll(_chip);//Chip >= 0x15 && Chip <= 0x16;
 
                 if (bDontDeleteFlag)

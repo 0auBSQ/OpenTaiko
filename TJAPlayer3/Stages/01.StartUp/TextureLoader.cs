@@ -57,6 +57,10 @@ namespace TJAPlayer3
         const string MODICONS = @"21_ModIcons\";
         const string AIBATTLE = @"22_AIBattle\";
 
+        // Special balloons
+        const string KUSUDAMA = @"Kusudama\";
+        const string FUSE = @"Fuseroll\";
+
         // Tower infos
         const string TOWERDON = @"Tower_Don\";
         const string TOWERFLOOR = @"Tower_Floors\";
@@ -594,8 +598,17 @@ namespace TJAPlayer3
                 Balloon_Breaking[i] = TxC(GAME + BALLOON + @"Breaking_" + i.ToString() + ".png");
             }
 
+            Kusudama = TxC(GAME + BALLOON + KUSUDAMA + @"Kusudama.png");
+            Kusudama_Clear = TxC(GAME + BALLOON + KUSUDAMA + @"Kusudama_Clear.png");
+            Kusudama_Fail = TxC(GAME + BALLOON + KUSUDAMA + @"Kusudama_Fail.png");
+            Kusudama_Number = TxC(GAME + BALLOON + KUSUDAMA + @"Kusudama_Number.png");
+            Kusudama_Back = TxC(GAME + BALLOON + KUSUDAMA + @"Kusudama_Back.png");
+
+            Fuse_Number = TxC(GAME + BALLOON + FUSE + @"Number_Fuse.png");
+            Fuse_Balloon = TxC(GAME + BALLOON + FUSE + @"Fuse.png");
+
             #endregion
-            
+
             #region Effects
 
             Effects_Hit_Explosion = TxCAf(GAME + EFFECTS + @"Hit\Explosion.png");
@@ -2246,6 +2259,15 @@ namespace TJAPlayer3
             Balloon_Number_Roll,
             Balloon_Number_Combo/*,*/
                                 /*Balloon_Broken*/;
+        public CTexture Kusudama,
+            Kusudama_Clear,
+            Kusudama_Fail,
+            Kusudama_Number,
+            Kusudama_Back;
+
+        public CTexture Fuse_Number,
+            Fuse_Balloon;
+
         public CTexture[] Balloon_Breaking;
         #endregion
         #region エフェクト
