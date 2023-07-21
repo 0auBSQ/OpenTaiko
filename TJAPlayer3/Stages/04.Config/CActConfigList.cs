@@ -86,7 +86,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(17));
 			this.list項目リスト.Add(this.iLayoutType);
 
-			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 2, TJAPlayer3.ConfigIni.nPlayerCount,
+			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount,
 				CLangManager.LangInstance.GetString(7));
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
@@ -375,7 +375,11 @@ namespace TJAPlayer3
             this.iTaikoJudgeCountDisp = new CItemToggle(CLangManager.LangInstance.GetString(93), TJAPlayer3.ConfigIni.bJudgeCountDisplay,
 				CLangManager.LangInstance.GetString(94));
             this.list項目リスト.Add( this.iTaikoJudgeCountDisp );
-            
+
+			this.iShowExExtraAnime = new CItemToggle(CLangManager.LangInstance.GetString(10124), TJAPlayer3.ConfigIni.ShowExExtraAnime,
+				CLangManager.LangInstance.GetString(10125));
+			this.list項目リスト.Add(this.iShowExExtraAnime);
+
 			this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(95), CItemBase.Eパネル種別.通常,
 				CLangManager.LangInstance.GetString(96));
 			this.list項目リスト.Add( this.iDrumsGoToKeyAssign );
@@ -493,6 +497,60 @@ namespace TJAPlayer3
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue2P );
 			}
 
+			//太鼓のキー設定。3P
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed3P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed3P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed3P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed3P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue3P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue3P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue3P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue3P);
+			}
+
+			//太鼓のキー設定。4P
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed4P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed4P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed4P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed4P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue4P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue4P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue4P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue4P);
+			}
+
+			//太鼓のキー設定。5P
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed5P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed5P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed5P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed5P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue5P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue5P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue5P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue5P);
+			}
+
 			// Konga claps
 			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap)
 			{
@@ -501,6 +559,18 @@ namespace TJAPlayer3
 			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap2P)
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap2P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap3P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap3P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap4P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap4P);
+			}
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap5P)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap5P);
 			}
 
 			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide)
@@ -696,6 +766,45 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(10014));
 			this.list項目リスト.Add( this.iKeyAssignTaikoRBlue2P );
 
+			this.iKeyAssignTaikoLRed3P = new CItemBase(CLangManager.LangInstance.GetString(10094),
+				CLangManager.LangInstance.GetString(10095));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLRed3P);
+			this.iKeyAssignTaikoRRed3P = new CItemBase(CLangManager.LangInstance.GetString(10096),
+				CLangManager.LangInstance.GetString(10097));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRRed3P);
+			this.iKeyAssignTaikoLBlue3P = new CItemBase(CLangManager.LangInstance.GetString(10098),
+				CLangManager.LangInstance.GetString(10099));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue3P);
+			this.iKeyAssignTaikoRBlue3P = new CItemBase(CLangManager.LangInstance.GetString(10100),
+				CLangManager.LangInstance.GetString(10101));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue3P);
+
+			this.iKeyAssignTaikoLRed4P = new CItemBase(CLangManager.LangInstance.GetString(10102),
+				CLangManager.LangInstance.GetString(10103));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLRed4P);
+			this.iKeyAssignTaikoRRed4P = new CItemBase(CLangManager.LangInstance.GetString(10104),
+				CLangManager.LangInstance.GetString(10105));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRRed4P);
+			this.iKeyAssignTaikoLBlue4P = new CItemBase(CLangManager.LangInstance.GetString(10106),
+				CLangManager.LangInstance.GetString(10107));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue4P);
+			this.iKeyAssignTaikoRBlue4P = new CItemBase(CLangManager.LangInstance.GetString(10108),
+				CLangManager.LangInstance.GetString(10109));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue4P);
+
+			this.iKeyAssignTaikoLRed5P = new CItemBase(CLangManager.LangInstance.GetString(10110),
+				CLangManager.LangInstance.GetString(10111));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLRed5P);
+			this.iKeyAssignTaikoRRed5P = new CItemBase(CLangManager.LangInstance.GetString(10112),
+				CLangManager.LangInstance.GetString(10113));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRRed5P);
+			this.iKeyAssignTaikoLBlue5P = new CItemBase(CLangManager.LangInstance.GetString(10114),
+				CLangManager.LangInstance.GetString(10115));
+			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue5P);
+			this.iKeyAssignTaikoRBlue5P = new CItemBase(CLangManager.LangInstance.GetString(10116),
+				CLangManager.LangInstance.GetString(10117));
+			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue5P);
+
 			this.iKeyAssignKongaClap = new CItemBase(CLangManager.LangInstance.GetString(10060),
 				CLangManager.LangInstance.GetString(10061));
 			this.list項目リスト.Add(this.iKeyAssignKongaClap);
@@ -703,6 +812,18 @@ namespace TJAPlayer3
 			this.iKeyAssignKongaClap2P = new CItemBase(CLangManager.LangInstance.GetString(10062),
 				CLangManager.LangInstance.GetString(10063));
 			this.list項目リスト.Add(this.iKeyAssignKongaClap2P);
+
+			this.iKeyAssignKongaClap3P = new CItemBase(CLangManager.LangInstance.GetString(10118),
+				CLangManager.LangInstance.GetString(10119));
+			this.list項目リスト.Add(this.iKeyAssignKongaClap3P);
+
+			this.iKeyAssignKongaClap4P = new CItemBase(CLangManager.LangInstance.GetString(10120),
+				CLangManager.LangInstance.GetString(10121));
+			this.list項目リスト.Add(this.iKeyAssignKongaClap4P);
+
+			this.iKeyAssignKongaClap5P = new CItemBase(CLangManager.LangInstance.GetString(10122),
+				CLangManager.LangInstance.GetString(10123));
+			this.list項目リスト.Add(this.iKeyAssignKongaClap5P);
 
 			this.iKeyAssignDecide = new CItemBase(CLangManager.LangInstance.GetString(10064),
 				CLangManager.LangInstance.GetString(10065));
@@ -1293,13 +1414,32 @@ namespace TJAPlayer3
 		private CItemBase iKeyAssignTaikoRRed;
 		private CItemBase iKeyAssignTaikoLBlue;
 		private CItemBase iKeyAssignTaikoRBlue;
+
 		private CItemBase iKeyAssignTaikoLRed2P;
 		private CItemBase iKeyAssignTaikoRRed2P;
 		private CItemBase iKeyAssignTaikoLBlue2P;
 		private CItemBase iKeyAssignTaikoRBlue2P;
 
+		private CItemBase iKeyAssignTaikoLRed3P;
+		private CItemBase iKeyAssignTaikoRRed3P;
+		private CItemBase iKeyAssignTaikoLBlue3P;
+		private CItemBase iKeyAssignTaikoRBlue3P;
+
+		private CItemBase iKeyAssignTaikoLRed4P;
+		private CItemBase iKeyAssignTaikoRRed4P;
+		private CItemBase iKeyAssignTaikoLBlue4P;
+		private CItemBase iKeyAssignTaikoRBlue4P;
+
+		private CItemBase iKeyAssignTaikoLRed5P;
+		private CItemBase iKeyAssignTaikoRRed5P;
+		private CItemBase iKeyAssignTaikoLBlue5P;
+		private CItemBase iKeyAssignTaikoRBlue5P;
+
 		private CItemBase iKeyAssignKongaClap;
 		private CItemBase iKeyAssignKongaClap2P;
+		private CItemBase iKeyAssignKongaClap3P;
+		private CItemBase iKeyAssignKongaClap4P;
+		private CItemBase iKeyAssignKongaClap5P;
 
 		private CItemBase iKeyAssignDecide;
 		private CItemBase iKeyAssignCancel;
@@ -1421,6 +1561,7 @@ namespace TJAPlayer3
         CItemToggle ShowMob;
         CItemToggle ShowFooter;
         CItemToggle ShowPuchiChara;
+		CItemToggle iShowExExtraAnime;
         CItemToggle ShinuchiMode;
         CItemToggle FastRender;
         CItemInteger MusicPreTimeMs;
@@ -1577,7 +1718,8 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.eGameMode = (EGame)this.iTaikoGameMode.n現在選択されている項目番号;
             //TJAPlayer3.ConfigIni.bJust = this.iTaikoJust.bON;
             TJAPlayer3.ConfigIni.bJudgeCountDisplay = this.iTaikoJudgeCountDisp.bON;
-            TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
+			TJAPlayer3.ConfigIni.ShowExExtraAnime = this.iShowExExtraAnime.bON;
+			TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
 		}
 		//-----------------
 		#endregion

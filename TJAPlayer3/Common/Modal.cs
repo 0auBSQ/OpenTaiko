@@ -11,7 +11,7 @@ namespace TJAPlayer3
 {
     internal class Modal
     {
-        public Modal(EModalType mt, int ra, int re)
+        public Modal(EModalType mt, int ra, object re)
         {
             modalType = mt;
             rarity = ra;
@@ -25,6 +25,10 @@ namespace TJAPlayer3
 
             if (modalFormat == EModalFormat.Half)
                 arrRef = TJAPlayer3.Tx.Modal_Half;
+            else if (modalFormat == EModalFormat.Half_4P)
+                arrRef = TJAPlayer3.Tx.Modal_Half_4P;
+            else if (modalFormat == EModalFormat.Half_5P)
+                arrRef = TJAPlayer3.Tx.Modal_Half_5P;
             else
                 arrRef = TJAPlayer3.Tx.Modal_Full;
 
@@ -36,6 +40,7 @@ namespace TJAPlayer3
                 _box = arrRef[usedTex];
             }
 
+            /*
             _boxRect = new Rectangle(
                 (modalFormat == EModalFormat.Full || player == 0)
                     ? 0
@@ -45,6 +50,13 @@ namespace TJAPlayer3
                     ? _box.szテクスチャサイズ.Width
                     : _box.szテクスチャサイズ.Width / 2,
                 _box.szテクスチャサイズ.Height);
+            */
+
+            _boxRect = new Rectangle(
+                (modalFormat == EModalFormat.Full || player == 0) ? 0 : _box.szテクスチャサイズ.Width / 2,
+                0,
+                (modalFormat == EModalFormat.Full) ? _box.szテクスチャサイズ.Width : _box.szテクスチャサイズ.Width / 2,
+                _box.szテクスチャサイズ.Height / (((TJAPlayer3.ConfigIni.nPlayerCount - 1) / 2) + 1));
 
             tGenerateTextures();
 
@@ -55,17 +67,78 @@ namespace TJAPlayer3
         {
             if (_isSet == true)
             {
-                _box?.t2D描画(TJAPlayer3.app.Device, (_box.szテクスチャサイズ.Width / 2) * player, 0, _boxRect);
+                _box?.t2D描画(TJAPlayer3.app.Device, _boxRect.Width * (player % 2), _boxRect.Height * (player / 2), _boxRect);
 
+                int[] title_x;
+                int[] title_y;
+                int[] text_x;
+                int[] text_y;
+                int moveX;
+                int moveY;
+
+                if (modalFormat == EModalFormat.Full)
+                {
+                    title_x = new int[] { TJAPlayer3.Skin.Modal_Title_Full[0] };
+                    title_y = new int[] { TJAPlayer3.Skin.Modal_Title_Full[1] };
+
+                    text_x = new int[] { TJAPlayer3.Skin.Modal_Text_Full[0] };
+                    text_y = new int[] { TJAPlayer3.Skin.Modal_Text_Full[1] };
+
+                    moveX = TJAPlayer3.Skin.Modal_Text_Full_Move[0];
+                    moveY = TJAPlayer3.Skin.Modal_Text_Full_Move[1];
+                }
+                else if (modalFormat == EModalFormat.Half)
+                {
+                    title_x = TJAPlayer3.Skin.Modal_Title_Half_X;
+                    title_y = TJAPlayer3.Skin.Modal_Title_Half_Y;
+
+                    text_x = TJAPlayer3.Skin.Modal_Text_Half_X;
+                    text_y = TJAPlayer3.Skin.Modal_Text_Half_Y;
+
+                    moveX = TJAPlayer3.Skin.Modal_Text_Half_Move[0];
+                    moveY = TJAPlayer3.Skin.Modal_Text_Half_Move[1];
+                }
+                else if (modalFormat == EModalFormat.Half_4P)
+                {
+                    title_x = TJAPlayer3.Skin.Modal_Title_Half_X_4P;
+                    title_y = TJAPlayer3.Skin.Modal_Title_Half_Y_4P;
+
+                    text_x = TJAPlayer3.Skin.Modal_Text_Half_X_4P;
+                    text_y = TJAPlayer3.Skin.Modal_Text_Half_Y_4P;
+
+                    moveX = TJAPlayer3.Skin.Modal_Text_Half_Move_4P[0];
+                    moveY = TJAPlayer3.Skin.Modal_Text_Half_Move_4P[1];
+                }
+                else// 5P
+                {
+                    title_x = TJAPlayer3.Skin.Modal_Title_Half_X_5P;
+                    title_y = TJAPlayer3.Skin.Modal_Title_Half_Y_5P;
+
+                    text_x = TJAPlayer3.Skin.Modal_Text_Half_X_5P;
+                    text_y = TJAPlayer3.Skin.Modal_Text_Half_Y_5P;
+
+                    moveX = TJAPlayer3.Skin.Modal_Text_Half_Move_5P[0];
+                    moveY = TJAPlayer3.Skin.Modal_Text_Half_Move_5P[1];
+                }
+
+                /*
                 Point[] Pos = new Point[]
                 {
                     (modalFormat == EModalFormat.Full) ? new Point(TJAPlayer3.Skin.Modal_Title_Full[0], TJAPlayer3.Skin.Modal_Title_Full[1]) : new Point(TJAPlayer3.Skin.Modal_Title_Half_X[player], TJAPlayer3.Skin.Modal_Title_Half_Y[player]), // title
-                    (modalFormat == EModalFormat.Full) ? 
-                    new Point(TJAPlayer3.Skin.Modal_Text_Full[0] +(tTextCentered () ?  TJAPlayer3.Skin.Modal_Text_Full_Move[0] : 0), 
-                    TJAPlayer3.Skin.Modal_Text_Full[1] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Full_Move[1] : 0)) : 
+                    (modalFormat == EModalFormat.Full) ?
+                    new Point(TJAPlayer3.Skin.Modal_Text_Full[0] +(tTextCentered () ?  TJAPlayer3.Skin.Modal_Text_Full_Move[0] : 0),
+                    TJAPlayer3.Skin.Modal_Text_Full[1] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Full_Move[1] : 0)) :
 
                     new Point(TJAPlayer3.Skin.Modal_Text_Half_X[player] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Half_Move[0] : 0),
                     TJAPlayer3.Skin.Modal_Text_Half_Y[player] + (tTextCentered () ? TJAPlayer3.Skin.Modal_Text_Half_Move[1] : 0)), // content
+                };
+                */
+
+                Point[] Pos = new Point[]
+                {
+                    new Point(title_x[player], title_y[player]),
+                    new Point(text_x[player] + (tTextCentered () ? moveX : 0),
+                    text_y[player] + (tTextCentered () ? moveY : 0)), // content
                 };
 
                 _ModalTitle?.t2D中心基準描画(TJAPlayer3.app.Device, Pos[0].X, Pos[0].Y);
@@ -124,6 +197,8 @@ namespace TJAPlayer3
         {
             Full,
             Half,
+            Half_4P,
+            Half_5P,
         }
 
         #endregion
@@ -131,7 +206,7 @@ namespace TJAPlayer3
         #region [Public variables]
 
         // Coin number for coin; database/unlockable asset for puchichara, character and title; no effect on text, confirm
-        public int reference;
+        public object reference;
 
         public int rarity;
         public EModalType modalType;
@@ -169,11 +244,15 @@ namespace TJAPlayer3
             if (modalType == EModalType.Coin)
             {
                 content = String.Format("+{0} {1} ({2}: {3})",
-                    reference,
+                    (int)reference,
                     CLangManager.LangInstance.GetString(306),
                     CLangManager.LangInstance.GetString(307),
-                    TJAPlayer3.NamePlateConfig.data.Medals[player]
+                    TJAPlayer3.SaveFileInstances[player].data.Medals
                     );
+            }
+            else if (modalType == EModalType.Title)
+            {
+                content = (string)reference;
             }
 
             TitleTextureKey _content = new TitleTextureKey(

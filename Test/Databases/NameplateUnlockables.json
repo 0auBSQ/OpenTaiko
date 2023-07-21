@@ -1,0 +1,797 @@
+﻿{
+	"First Steps": {
+		"NameplateInfo": {
+			"iType": 0,
+			"Localization": {
+				"strings": {
+					"default": "First Steps",
+					"fr": "Premiers Pas",
+					"ja": "第一歩"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				0,
+				0,
+				1
+			],
+		}	
+	},
+	"A Normal Player": {
+		"NameplateInfo": {
+			"iType": 0,
+			"Localization": {
+				"strings": {
+					"default": "A Normal Player",
+					"fr": "Un joueur Normal",
+					"ja": "ふつうなプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				1,
+				0,
+				1
+			],
+		}	
+	},
+	"A very Normal Player": {
+		"NameplateInfo": {
+			"iType": 0,
+			"Localization": {
+				"strings": {
+					"default": "A very Normal Player",
+					"fr": "Un joueur très Normal",
+					"ja": "とてもふつうなプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				1,
+				0,
+				10
+			],
+		}	
+	},
+	"An extremely Normal player": {
+		"NameplateInfo": {
+			"iType": 1,
+			"Localization": {
+				"strings": {
+					"default": "An extremely Normal player",
+					"fr": "Un joueur extrèmement Normal",
+					"ja": "ずいぶんふつうなプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				1,
+				0,
+				100
+			],
+		}	
+	},
+	"Hard-boiled": {
+		"NameplateInfo": {
+			"iType": 0,
+			"Localization": {
+				"strings": {
+					"default": "Hard-boiled",
+					"fr": "Dur à cuire",
+					"ja": "ハードボイルド"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				2,
+				0,
+				1
+			],
+		}	
+	},
+	"Hard as rock": {
+		"NameplateInfo": {
+			"iType": 1,
+			"Localization": {
+				"strings": {
+					"default": "Hard as rock",
+					"fr": "Dur comme la pierre",
+					"ja": "ロックハード"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				2,
+				0,
+				10
+			],
+		}	
+	},
+	"Hard as diamonds": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Hard as diamonds",
+					"fr": "Dur comme du diamant",
+					"ja": "ダイヤモンドハード"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				2,
+				0,
+				100
+			],
+		}	
+	},
+	"My first Extreme": {
+		"NameplateInfo": {
+			"iType": 1,
+			"Localization": {
+				"strings": {
+					"default": "My first Extreme",
+					"fr": "Mon premier Extrème",
+					"ja": "初めてのおに"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				0,
+				1
+			],
+		}	
+	},
+	"An Extreme player": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "An Extreme player",
+					"fr": "Un joueur Extrème",
+					"ja": "おにのプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				0,
+				10
+			],
+		}	
+	},
+	"A very Extreme player": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "A very Extreme player",
+					"fr": "Un joueur très Extrème",
+					"ja": "とてもおにのプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				0,
+				100
+			],
+		}	
+	},
+	"An extremely Extreme player": {
+		"NameplateInfo": {
+			"iType": 4,
+			"Localization": {
+				"strings": {
+					"default": "An extremely Extreme player",
+					"fr": "Un joueur extrèmement Extrème",
+					"ja": "ずいぶんおにのプレイヤー"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				0,
+				1000
+			],
+		}	
+	},
+	"Free from errors": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Free from errors",
+					"fr": "Exempt d'erreurs",
+					"ja": "エラーに当たらない"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				1,
+				1
+			],
+		}	
+	},
+	"Unbreakable combo": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Unbreakable combo",
+					"fr": "Combo indestructible",
+					"ja": "アンブレイカブルコンボ"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				1,
+				10
+			],
+		}	
+	},
+	"Everlasting combo": {
+		"NameplateInfo": {
+			"iType": 4,
+			"Localization": {
+				"strings": {
+					"default": "Everlasting combo",
+					"fr": "Combo éternel",
+					"ja": "永遠のコンボ"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				1,
+				100
+			],
+		}	
+	},
+	"100%": {
+		"NameplateInfo": {
+			"iType": 3,
+			"Localization": {
+				"strings": {
+					"default": "100%",
+					"fr": "100%",
+					"ja": "100点"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				2,
+				1
+			],
+		}	
+	},
+	"Aims for perfection": {
+		"NameplateInfo": {
+			"iType": 3,
+			"Localization": {
+				"strings": {
+					"default": "Aims for perfection",
+					"fr": "Vise la perfection",
+					"ja": "完璧主義"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				2,
+				10
+			],
+		}	
+	},
+	"Flawless": {
+		"NameplateInfo": {
+			"iType": 7,
+			"Localization": {
+				"strings": {
+					"default": "Flawless",
+					"fr": "Sans défaut",
+					"ja": "寸分の狂いもない"
+				}
+			}
+		},
+		"Rarity": "Epic",
+		"UnlockCondition": {
+			"condition": "dp",
+			"type": "me",
+			"values": [
+				3,
+				2,
+				100
+			],
+		}	
+	},
+	"Eight stars": {
+		"NameplateInfo": {
+			"iType": 1,
+			"Localization": {
+				"strings": {
+					"default": "Eight stars",
+					"fr": "Huit étoiles",
+					"ja": "八つ星"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				8,
+				0,
+				1
+			],
+		}	
+	},
+	"Nine stars": {
+		"NameplateInfo": {
+			"iType": 1,
+			"Localization": {
+				"strings": {
+					"default": "Nine stars",
+					"fr": "Neuf étoiles",
+					"ja": "九つ星"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				9,
+				0,
+				1
+			],
+		}	
+	},
+	"Challenger": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Challenger",
+					"fr": "Challenger",
+					"ja": "チャレンジャー"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				10,
+				0,
+				1
+			],
+		}	
+	},
+	"Sweaty challenger": {
+		"NameplateInfo": {
+			"iType": 6,
+			"Localization": {
+				"strings": {
+					"default": "Sweaty challenger",
+					"fr": "Challenger en sueur",
+					"ja": "汗だくのチャレンジャー"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				11,
+				0,
+				1
+			],
+		}	
+	},
+	"Challenger from another world": {
+		"NameplateInfo": {
+			"iType": 11,
+			"Localization": {
+				"strings": {
+					"default": "Challenger from another world",
+					"fr": "Challenger d'un autre monde",
+					"ja": "異世界から来たチャレンジャー"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				12,
+				0,
+				1
+			],
+		}	
+	},
+	"Unbeatable warrior": {
+		"NameplateInfo": {
+			"iType": 13,
+			"Localization": {
+				"strings": {
+					"default": "Unbeatable warrior",
+					"fr": "Guerrier imbattable",
+					"ja": "無敵の勇者"
+				}
+			}
+		},
+		"Rarity": "Epic",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				13,
+				0,
+				1
+			],
+		}	
+	},
+	"Eight shining stars": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Eight shining stars",
+					"fr": "Huit étoiles brillantes",
+					"ja": "光る八つ星"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				8,
+				1,
+				1
+			],
+		}	
+	},
+	"Nine shining stars": {
+		"NameplateInfo": {
+			"iType": 2,
+			"Localization": {
+				"strings": {
+					"default": "Nine shining stars",
+					"fr": "Neuf étoiles brillantes",
+					"ja": "光る九つ星"
+				}
+			}
+		},
+		"Rarity": "Uncommon",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				9,
+				1,
+				1
+			],
+		}	
+	},
+	"Talented drummer": {
+		"NameplateInfo": {
+			"iType": 12,
+			"Localization": {
+				"strings": {
+					"default": "Talented drummer",
+					"fr": "Batteur talentueux",
+					"ja": "有能なドラマー"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				10,
+				1,
+				1
+			],
+		}	
+	},
+	"Tenacious warrior": {
+		"NameplateInfo": {
+			"iType": 7,
+			"Localization": {
+				"strings": {
+					"default": "Tenacious warrior",
+					"fr": "Guerrier tenace",
+					"ja": "粘り強い勇者"
+				}
+			}
+		},
+		"Rarity": "Epic",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				11,
+				1,
+				1
+			],
+		}	
+	},
+	"Drummer from another world": {
+		"NameplateInfo": {
+			"iType": 8,
+			"Localization": {
+				"strings": {
+					"default": "Drummer from another world",
+					"fr": "Batteur d'un autre monde",
+					"ja": "異世界から来たドラマー"
+				}
+			}
+		},
+		"Rarity": "Legendary",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				12,
+				1,
+				1
+			],
+		}	
+	},
+	"Celestial divinity": {
+		"NameplateInfo": {
+			"iType": 9,
+			"Localization": {
+				"strings": {
+					"default": "Celestial divinity",
+					"fr": "Divinité celeste",
+					"ja": "天の神性"
+				}
+			}
+		},
+		"Rarity": "Legendary",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				13,
+				1,
+				1
+			],
+		}	
+	},
+	"Eight sparkling stars": {
+		"NameplateInfo": {
+			"iType": 3,
+			"Localization": {
+				"strings": {
+					"default": "Eight sparkling stars",
+					"fr": "Huit étoiles étincelantes",
+					"ja": "輝く八つ星"
+				}
+			}
+		},
+		"Rarity": "Rare",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				8,
+				2,
+				1
+			],
+		}	
+	},
+	"Nine sparkling stars": {
+		"NameplateInfo": {
+			"iType": 7,
+			"Localization": {
+				"strings": {
+					"default": "Nine sparkling stars",
+					"fr": "Neuf étoiles étincelantes",
+					"ja": "輝く九つ星"
+				}
+			}
+		},
+		"Rarity": "Epic",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				9,
+				2,
+				1
+			],
+		}	
+	},
+	"Outstanding drummer": {
+		"NameplateInfo": {
+			"iType": 7,
+			"Localization": {
+				"strings": {
+					"default": "Outstanding drummer",
+					"fr": "Batteur d'exception",
+					"ja": "優秀なドラマー"
+				}
+			}
+		},
+		"Rarity": "Epic",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				10,
+				2,
+				1
+			],
+		}	
+	},
+	"Eternal legend": {
+		"NameplateInfo": {
+			"iType": 8,
+			"Localization": {
+				"strings": {
+					"default": "Eternal legend",
+					"fr": "Légende éternelle",
+					"ja": "永遠の伝説"
+				}
+			}
+		},
+		"Rarity": "Legendary",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				11,
+				2,
+				1
+			],
+		}	
+	},
+	"Drummer from another dimension": {
+		"NameplateInfo": {
+			"iType": 8,
+			"Localization": {
+				"strings": {
+					"default": "Drummer from another dimension",
+					"fr": "Batteur d'une autre dimention",
+					"ja": "異次元から来たドラマー"
+				}
+			}
+		},
+		"Rarity": "Legendary",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				12,
+				2,
+				1
+			],
+		}	
+	},
+	"I sold my real life": {
+		"NameplateInfo": {
+			"iType": 10,
+			"Localization": {
+				"strings": {
+					"default": "I sold my real life",
+					"fr": "J'ai vendu ma vie réele",
+					"ja": "現実に手を離れてしまいました"
+				}
+			}
+		},
+		"Rarity": "Poor",
+		"UnlockCondition": {
+			"condition": "lp",
+			"type": "me",
+			"values": [
+				13,
+				2,
+				1
+			],
+		}	
+	},
+	"First Secret": {
+		"NameplateInfo": {
+			"iType": 15,
+			"Localization": {
+				"strings": {
+					"default": "First Secret",
+					"fr": "Mon premier secret",
+					"ja": "初めての秘密"
+				}
+			}
+		},
+		"Rarity": "Common",
+		"UnlockCondition": {
+			"condition": "sg",
+			"type": "me",
+			"values": [
+				1,
+				-1,
+				0
+			],
+			"references": [
+				"Dashy's Secrets"
+			]
+		}	
+	},
+}

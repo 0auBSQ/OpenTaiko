@@ -110,7 +110,9 @@ namespace TJAPlayer3
                     {
                         this.long再生開始時のシステム時刻 = CSound管理.rc演奏用タイマ.nシステム時刻ms;
                         this.long再生位置 = cスコア.譜面情報.nデモBGMオフセット;
+                        
                         this.sound.t再生位置を変更する(cスコア.譜面情報.nデモBGMオフセット);
+
                     }
                     else
                     {
@@ -170,6 +172,8 @@ namespace TJAPlayer3
                     strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名;
 					if(TJAPlayer3.ConfigIni.bBGM音を発声する)
                     this.sound = TJAPlayer3.Sound管理.tサウンドを生成する( strPreviewFilename, ESoundGroup.SongPreview );
+					if (this.sound == null) return;
+                    //this.sound.db再生速度 = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
 
                     // 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
                     //                           Initialization, song enumeration, and/or interactions may have
@@ -188,7 +192,7 @@ namespace TJAPlayer3
                     {
                         this.long再生開始時のシステム時刻 = CSound管理.rc演奏用タイマ.nシステム時刻ms;
                         this.long再生位置 = cスコア.譜面情報.nデモBGMオフセット;
-                        this.sound.t再生位置を変更する( cスコア.譜面情報.nデモBGMオフセット );
+                        this.sound.t再生位置を変更する(cスコア.譜面情報.nデモBGMオフセット);
                         this.long再生位置 = CSound管理.rc演奏用タイマ.nシステム時刻ms - this.long再生開始時のシステム時刻;
                     }
                     //if( long再生位置 == this.sound.n総演奏時間ms - 10 )
@@ -197,13 +201,7 @@ namespace TJAPlayer3
                     this.str現在のファイル名 = strPreviewFilename;
                     this.tBGMフェードアウト開始();
                     Trace.TraceInformation( "プレビューサウンドを生成しました。({0})", strPreviewFilename );
-                    #region[ DTXMania(コメントアウト) ]
-                    //this.sound = CDTXMania.Sound管理.tサウンドを生成する( strPreviewFilename );
-                    //this.sound.t再生を開始する( true );
-                    //this.str現在のファイル名 = strPreviewFilename;
-                    //this.tBGMフェードアウト開始();
-                    //Trace.TraceInformation( "プレビューサウンドを生成しました。({0})", strPreviewFilename );
-                    #endregion
+ 
                 }
 				catch (Exception e)
 				{

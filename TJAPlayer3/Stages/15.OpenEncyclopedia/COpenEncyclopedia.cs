@@ -97,7 +97,12 @@ namespace TJAPlayer3
                     var _page = _controler.Pages[_controler.PageIndex];
 
                     _page.Item2?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[1]);
-                    _page.Item3?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[1]);
+                    if (_page.Item3 != null)
+                    {
+                        _page.Item3.vc拡大縮小倍率.X = TJAPlayer3.Skin.Resolution[0] / (2f * _page.Item3.szテクスチャサイズ.Width);
+                        _page.Item3.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Resolution[1] / (2f * _page.Item3.szテクスチャサイズ.Height);
+                        _page.Item3.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[1]);
+                    }
                     _controler.PageText?.t2D下中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[1]);
                 }
             }

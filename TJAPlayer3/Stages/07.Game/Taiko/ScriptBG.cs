@@ -126,6 +126,10 @@ namespace TJAPlayer3
                 LuaScript = null;
             }
         }
+        public bool Exists()
+        {
+            return LuaScript != null;
+        }
         public void Dispose()
         {
             List<CTexture> texs = new List<CTexture>();
@@ -184,7 +188,14 @@ namespace TJAPlayer3
             try
             {
                 LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, TJAPlayer3.P1IsBlue());
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, 0);
+                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime,
+                    TJAPlayer3.FPS.n現在のFPS,
+                    TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared,
+                    0,
+                    TJAPlayer3.stage演奏ドラム画面.AIBattleState,
+                    TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
+                    TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
+                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM);
 
                 LuaInit.Call();
             }
@@ -209,7 +220,14 @@ namespace TJAPlayer3
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
                 }
 
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.n現在のFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140, TJAPlayer3.stage演奏ドラム画面.AIBattleState);
+                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, 
+                    TJAPlayer3.FPS.n現在のFPS, 
+                    TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, 
+                    (double)currentFloorPositionMax140, 
+                    TJAPlayer3.stage演奏ドラム画面.AIBattleState,
+                    TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
+                    TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
+                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);

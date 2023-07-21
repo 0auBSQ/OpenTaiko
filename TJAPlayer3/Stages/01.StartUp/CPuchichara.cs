@@ -12,6 +12,7 @@ namespace TJAPlayer3
     class CPuchichara
     {
         public CTexture tx;
+        public CTexture render;
         public CSkin.Cシステムサウンド welcome;
         public DBPuchichara.PuchicharaData metadata;
         public DBUnlockables.CUnlockConditions unlock;
@@ -27,6 +28,9 @@ namespace TJAPlayer3
             {
                 tx.vc拡大縮小倍率 = new SharpDX.Vector3(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
             }
+
+            // Heya render
+            render = TJAPlayer3.Tx.TxCAbsolute($@"{path}\Render.png");
 
             // Puchichara welcome sfx
             welcome = new CSkin.Cシステムサウンド($@"{path}\Welcome.ogg", false, false, true, ESoundGroup.Voice);

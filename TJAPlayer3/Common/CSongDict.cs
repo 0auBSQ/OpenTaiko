@@ -12,8 +12,11 @@ namespace TJAPlayer3
         private static Dictionary<string, C曲リストノード> nodes = new Dictionary<string, C曲リストノード>();
         private static HashSet<string> urls = new HashSet<string>();
 
-        public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[2][]
+        public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[5][]
         {
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
+            new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
             new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
             new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() }
         };
@@ -21,6 +24,11 @@ namespace TJAPlayer3
         public static int tGetNodesCount()
         {
             return nodes.Count();
+        }
+
+        public static string[] tGetNodesByGenreName(string genreName)
+        {
+            return nodes.Where(_nd => _nd.Value.strジャンル == genreName).Select(_nd => _nd.Key).ToArray();
         }
 
         #region [General song dict methods]
@@ -98,6 +106,7 @@ namespace TJAPlayer3
             itemBack.isChangedBgType = parent.isChangedBgType;
 
             itemBack.strジャンル = parent.strジャンル;
+            itemBack.strSelectBGPath = parent.strSelectBGPath;
             itemBack.nスコア数 = 1;
             itemBack.r親ノード = parent;
             itemBack.strSkinPath = (parent.r親ノード == null) ?
@@ -142,7 +151,7 @@ namespace TJAPlayer3
         public static List<C曲リストノード> tReinsertBackButtons(C曲リストノード parent, List<C曲リストノード> songList, string path = "/", List<string> listStrBoxDef = null)
         {
             // Remove all the existing back boxes currently existing
-            songList.RemoveAll(e => e.eノード種別 == C曲リストノード.Eノード種別.BACKBOX);
+            songList.RemoveAll(e => e.eノード種別 == C曲リストノード.Eノード種別.BACKBOX || e.eノード種別 == C曲リストノード.Eノード種別.RANDOM);
 
             int songCount = songList.Count;
 
@@ -274,7 +283,7 @@ namespace TJAPlayer3
         {
             #region [Reset nodes]
 
-            for (int pl = 0; pl < 2; pl++)
+            for (int pl = 0; pl < 5; pl++)
             {
                 CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
 
@@ -296,13 +305,14 @@ namespace TJAPlayer3
 
             foreach (C曲リストノード song in nodes.Values)
             {
-                for (int pl = 0; pl < 2; pl++)
+                for (int pl = 0; pl < 5; pl++)
                 {
                     CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
 
                     if (song.eノード種別 == C曲リストノード.Eノード種別.SCORE
                         && song.strジャンル != "最近遊んだ曲"
-                        && song.strジャンル != "Favorite")
+                        && song.strジャンル != "Favorite"
+                        && song.strジャンル != "SearchD")
                     {
                         var score = song.arスコア[TJAPlayer3.stage選曲.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 

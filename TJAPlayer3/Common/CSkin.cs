@@ -319,36 +319,39 @@ namespace TJAPlayer3
 
         // Sounds\Clear
 
-        public Cシステムサウンド[] voiceClearFailed = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceClearClear = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceClearFullCombo = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceClearAllPerfect = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceClearFailed = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceClearClear = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceClearFullCombo = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceClearAllPerfect = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceAIWin = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceAILose = new Cシステムサウンド[5];
 
         // Sounds\Menu
 
-        public Cシステムサウンド[] voiceMenuSongSelect = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceMenuSongDecide = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceMenuDiffSelect = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceMenuDanSelectStart = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceMenuDanSelectPrompt = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceMenuDanSelectConfirm = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceMenuSongSelect = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuSongDecide = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuSongDecide_AI = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuDiffSelect = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuDanSelectStart = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuDanSelectPrompt = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceMenuDanSelectConfirm = new Cシステムサウンド[5];
 
         // Sounds\Title
 
-        public Cシステムサウンド[] voiceTitleSanka = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceTitleSanka = new Cシステムサウンド[5];
 
         // Sounds\Tower
 
-        public Cシステムサウンド[] voiceTowerMiss = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceTowerMiss = new Cシステムサウンド[5];
 
         // Sounds\Result
 
-        public Cシステムサウンド[] voiceResultBestScore = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceResultClearFailed = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceResultClearSuccess = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceResultDanFailed = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceResultDanRedPass = new Cシステムサウンド[4];
-        public Cシステムサウンド[] voiceResultDanGoldPass = new Cシステムサウンド[4];
+        public Cシステムサウンド[] voiceResultBestScore = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceResultClearFailed = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceResultClearSuccess = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceResultDanFailed = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceResultDanRedPass = new Cシステムサウンド[5];
+        public Cシステムサウンド[] voiceResultDanGoldPass = new Cシステムサウンド[5];
 
         // General sound effects (Skin specific)
 
@@ -374,8 +377,11 @@ namespace TJAPlayer3
         public Cシステムサウンド soundBomb = null;
         //add
         public Cシステムサウンド sound曲決定音 = null;
+        public Cシステムサウンド soundSongDecide_AI = null;
         public Cシステムサウンド bgmリザルトイン音 = null;
         public Cシステムサウンド bgmリザルト音 = null;
+        public Cシステムサウンド bgmResultIn_AI = null;
+        public Cシステムサウンド bgmResult_AI = null;
 
         public Cシステムサウンド bgmDanResult = null;
 
@@ -383,6 +389,8 @@ namespace TJAPlayer3
         public Cシステムサウンド bgmタイトルイン = null;
         public Cシステムサウンド bgm選曲画面 = null;
         public Cシステムサウンド bgm選曲画面イン = null;
+        public Cシステムサウンド bgmSongSelect_AI = null;
+        public Cシステムサウンド bgmSongSelect_AI_In = null;
         public Cシステムサウンド bgmリザルト = null;
         public Cシステムサウンド bgmリザルトイン = null;
 
@@ -410,12 +418,13 @@ namespace TJAPlayer3
         public Cシステムサウンド soundEncyclopediaBGM = null;
         public Cシステムサウンド soundTowerSelectBGM = null;
 
+        public Cシステムサウンド[] soundExToExtra = null;
+        public Cシステムサウンド[] soundExtraToEx = null;
+
         public Cシステムサウンド[] soundModal = null;
 
         public Cシステムサウンド soundCrownIn = null;
         public Cシステムサウンド soundRankIn = null;
-        public Cシステムサウンド soundDonClear = null;
-        public Cシステムサウンド soundDonFailed = null;
 
         public Cシステムサウンド soundSelectAnnounce = null;
 
@@ -738,10 +747,7 @@ namespace TJAPlayer3
             this.soundステージクリア音 = new Cシステムサウンド(@"Sounds\Stage clear.ogg", false, true, true, ESoundGroup.Voice);
             this.soundフルコンボ音 = new Cシステムサウンド(@"Sounds\Full combo.ogg", false, false, true, ESoundGroup.Voice);
             this.sound曲読込開始音 = new Cシステムサウンド(@"Sounds\Now loading.ogg", false, true, true, ESoundGroup.Unknown);
-            this.bgm起動画面 = new Cシステムサウンド(@"Sounds\Setup BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\Option BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\Config BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
-            this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
+            //this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
             //this.soundSongSelectChara = new Cシステムサウンド(@"Sounds\SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
             this.soundSkip = new Cシステムサウンド(@"Sounds\Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.SoundBanapas = new Cシステムサウンド(@"Sounds\Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -754,26 +760,29 @@ namespace TJAPlayer3
             //this.soundBlue              = new Cシステムサウンド( @"Sounds\ka.ogg",              false, false, true, ESoundType.SoundEffect );
             this.soundBalloon = new Cシステムサウンド(@"Sounds\balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
             this.sound曲決定音 = new Cシステムサウンド(@"Sounds\SongDecide.ogg", false, false, true, ESoundGroup.Voice);
+            this.soundSongDecide_AI = new Cシステムサウンド(@"Sounds\SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
+            this.bgm起動画面 = new Cシステムサウンド(@"Sounds\BGM\Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgmタイトルイン = new Cシステムサウンド(@"Sounds\BGM\Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmタイトル = new Cシステムサウンド(@"Sounds\BGM\Title.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmオプション画面 = new Cシステムサウンド(@"Sounds\BGM\Option.ogg", true, true, false, ESoundGroup.SongPlayback);
+            this.bgmコンフィグ画面 = new Cシステムサウンド(@"Sounds\BGM\Config.ogg", true, true, false, ESoundGroup.SongPlayback);
             this.bgm選曲画面イン = new Cシステムサウンド(@"Sounds\BGM\SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgm選曲画面 = new Cシステムサウンド(@"Sounds\BGM\SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_AI_In = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmSongSelect_AI = new Cシステムサウンド(@"Sounds\BGM\SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルトイン音 = new Cシステムサウンド(@"Sounds\BGM\Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
             this.bgmリザルト音 = new Cシステムサウンド(@"Sounds\BGM\Result.ogg", true, false, true, ESoundGroup.SongPlayback);
+            this.bgmResultIn_AI = new Cシステムサウンド(@"Sounds\BGM\Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
+            this.bgmResult_AI = new Cシステムサウンド(@"Sounds\BGM\Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
 
             this.bgmDanResult = new Cシステムサウンド(@"Sounds\Dan\Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
             this.bgmTowerResult = new Cシステムサウンド(@"Sounds\Tower\Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-            //this.soundTowerMiss = new Cシステムサウンド(@"Sounds\Tower\Miss.wav", false, false, true, ESoundGroup.SoundEffect);
-
             this.soundCrownIn = new Cシステムサウンド(@"Sounds\ResultScreen\CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundRankIn = new Cシステムサウンド(@"Sounds\ResultScreen\RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.soundDonClear = new Cシステムサウンド(@"Sounds\ResultScreen\Donchan_Clear.ogg", false, false, true, ESoundGroup.Voice);
-            this.soundDonFailed = new Cシステムサウンド(@"Sounds\ResultScreen\Donchan_Miss.ogg", false, false, true, ESoundGroup.Voice);
 
-            this.soundSelectAnnounce = new Cシステムサウンド(@"Sounds\DiffSelect.ogg", false, false, true, ESoundGroup.Voice);
             this.sound特訓再生音 = new Cシステムサウンド(@"Sounds\Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓停止音 = new Cシステムサウンド(@"Sounds\Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓スクロール音 = new Cシステムサウンド(@"Sounds\Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -782,9 +791,6 @@ namespace TJAPlayer3
             this.soundPon = new Cシステムサウンド(@"Sounds\Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundGauge = new Cシステムサウンド(@"Sounds\Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundScoreDon = new Cシステムサウンド(@"Sounds\ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundChallengeVoice = new Cシステムサウンド(@"Sounds\Dan\ChallengeVoice.wav", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundDanSelectStart = new Cシステムサウンド(@"Sounds\Dan\DanSelectStart.wav", false, false, false, ESoundGroup.SoundEffect);
-            //this.soundDanSongSelectCheck = new Cシステムサウンド(@"Sounds\Dan\DanSongSelectCheck.wav", false, false, false, ESoundGroup.SoundEffect);
 
             this.soundDanSongSelectIn = new Cシステムサウンド(@"Sounds\Dan\Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
 
@@ -796,6 +802,9 @@ namespace TJAPlayer3
             this.soundEncyclopediaBGM = new Cシステムサウンド(@"Sounds\Encyclopedia\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
             this.soundTowerSelectBGM = new Cシステムサウンド(@"Sounds\Tower\BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
+            soundExToExtra = new Cシステムサウンド[1] { new Cシステムサウンド(@"Sounds\SongSelect\0\ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
+            soundExtraToEx = new Cシステムサウンド[1] { new Cシステムサウンド(@"Sounds\SongSelect\0\ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
+
             soundModal = new Cシステムサウンド[6];
             for (int i = 0; i < soundModal.Length - 1; i++)
             {
@@ -806,7 +815,8 @@ namespace TJAPlayer3
             ReloadSkin();
             tReadSkinConfig();
 
-            hsHitSoundsInformations = new CHitSounds(Path(@"Sounds\HitSounds\HitSounds.json"));
+            //hsHitSoundsInformations = new CHitSounds(Path(@"Sounds\HitSounds\HitSounds.json"));
+            hsHitSoundsInformations = new CHitSounds(@"Global\HitSounds\HitSounds.json");
         }
 
         public void ReloadSkin()
@@ -1438,12 +1448,28 @@ namespace TJAPlayer3
                                     Title_ModeSelect_Bar_Move[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Title_ModeSelect_Bar_Move_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Bar_Move_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Title_ModeSelect_Overlay_Move")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Title_ModeSelect_Overlay_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Title_ModeSelect_Overlay_Move_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Title_ModeSelect_Overlay_Move_X[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Title_ModeSelect_Bar_Chara_X")
@@ -1478,6 +1504,10 @@ namespace TJAPlayer3
                             {
                                 Title_ModeSelect_Bar_Center_Title_Move = int.Parse(strParam);
                             }
+                            else if (strCommand == "Title_ModeSelect_Bar_Center_Title_Move_X")
+                            {
+                                Title_ModeSelect_Bar_Center_Title_Move_X = int.Parse(strParam);
+                            }
                             else if (strCommand == "Title_ModeSelect_Bar_Center_BoxText")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1485,6 +1515,14 @@ namespace TJAPlayer3
                                 {
                                     Title_ModeSelect_Bar_Center_BoxText[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "Title_VerticalText")
+                            {
+                                Title_VerticalText = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "Title_VerticalBar")
+                            {
+                                Title_VerticalBar = C変換.bONorOFF(strParam[0]);
                             }
                             #endregion
 
@@ -1757,6 +1795,10 @@ namespace TJAPlayer3
                                     SongSelect_Bar_Anim_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Scroll_Interval")
+                            {
+                                SongSelect_Scroll_Interval = float.Parse(strParam);
+                            }
                             else if (strCommand == "SongSelect_DanStatus_Offset_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1853,6 +1895,30 @@ namespace TJAPlayer3
                                     SongSelect_Bar_Title_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Bar_Box_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Box_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_BackBox_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_BackBox_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bar_Random_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bar_Random_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Bar_SubTitle_Offset")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -1880,6 +1946,52 @@ namespace TJAPlayer3
                                 SongSelect_BoxText_Scale = int.Parse(strParam);
                             }
 
+                            else if (strCommand == "SongSelect_VerticalText")
+                            {
+                                SongSelect_VerticalText = C変換.bONorOFF(strParam[0]);
+                            }
+
+                            else if (strCommand == "SongSelect_Bar_Center_Move_X")
+                            {
+                                SongSelect_Bar_Center_Move_X = int.Parse(strParam);
+                            }
+
+                            else if (strCommand == "SongSelect_Title_MaxSize")
+                            {
+                                SongSelect_Title_MaxSize = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_SubTitle_MaxSize")
+                            {
+                                SongSelect_SubTitle_MaxSize = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Maker_Show")
+                            {
+                                SongSelect_Maker_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_Shorten_Frame_Fade")
+                            {
+                                SongSelect_Shorten_Frame_Fade = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_Bar_Select_Skip_Fade")
+                            {
+                                SongSelect_Bar_Select_Skip_Fade = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_Maker")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Maker[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Maker_Size")
+                            {
+                                SongSelect_Maker_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Maker_MaxSize")
+                            {
+                                SongSelect_Maker_MaxSize = int.Parse(strParam);
+                            }
 
                             else if (strCommand == "SongSelect_Bar_Center_Move")
                             {
@@ -1925,12 +2037,52 @@ namespace TJAPlayer3
                                     SongSelect_Level_Number_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_Level_Number_Tower")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Number_Tower[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Tower_Side")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Tower_Side[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "SongSelect_Level_Number_Interval")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
                                     SongSelect_Level_Number_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    SongSelect_Level_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Level_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Level_Move[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Box_Opening_Interval")
@@ -1976,7 +2128,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_NamePlate_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_NamePlate_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -1984,7 +2136,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_NamePlate_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_NamePlate_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2008,7 +2160,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_ModIcons_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_ModIcons_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2016,7 +2168,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_ModIcons_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_ModIcons_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2037,10 +2189,66 @@ namespace TJAPlayer3
                                     SongSelect_Timer_Interval[i] = int.Parse(strSplit[i]);
                                 }
                             }
-                            else if (strCommand == "SongSelect_Table_X")
+                            else if (strCommand == "SongSelect_Bpm_Show")
+                            {
+                                SongSelect_Bpm_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_Bpm_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    SongSelect_Bpm_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bpm_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    SongSelect_Bpm_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Bpm_Interval")
                             {
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Bpm_Interval[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text_Show")
+                            {
+                                SongSelect_BPM_Text_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_BPM_Text[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text_Size")
+                            {
+                                SongSelect_BPM_Text_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_BPM_Text_MaxSize")
+                            {
+                                SongSelect_BPM_Text_MaxSize = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_Explicit")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Explicit[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Table_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Table_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2048,7 +2256,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_Table_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Table_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2056,7 +2264,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_High_Score_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_High_Score_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2064,7 +2272,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_High_Score_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_High_Score_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2072,7 +2280,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_High_Score_Difficulty_Cymbol_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_High_Score_Difficulty_Cymbol_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2080,7 +2288,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_High_Score_Difficulty_Cymbol_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_High_Score_Difficulty_Cymbol_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2115,6 +2323,54 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 12; i++)
                                 {
                                     SongSelect_BoardNumber_Y[1][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_3P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_X[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_3P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_Y[2][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_4P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_X[3][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_4P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_Y[3][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_5P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_X[4][i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_BoardNumber_5P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    SongSelect_BoardNumber_Y[4][i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_BoardNumber_Interval")
@@ -2152,7 +2408,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_Search_Bar_X")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 4; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Search_Bar_X[i] = int.Parse(strSplit[i]);
                                 }
@@ -2160,7 +2416,7 @@ namespace TJAPlayer3
                             else if (strCommand == "SongSelect_Search_Bar_Y")
                             {
                                 string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 4; i++)
+                                for (int i = 0; i < 5; i++)
                                 {
                                     SongSelect_Search_Bar_Y[i] = int.Parse(strSplit[i]);
                                 }
@@ -2195,6 +2451,22 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 7; i++)
                                 {
                                     SongSelect_Difficulty_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Branch_Text_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Branch_Text_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Branch_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Branch_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Difficulty_Bar_Y")
@@ -2451,6 +2723,14 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     SongSelect_Difficulty_Select_Bar_Move[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_Difficulty_Bar_ExExtra_AnimeDuration")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "SongSelect_Preimage")
@@ -2716,6 +2996,22 @@ namespace TJAPlayer3
                                     DaniSelect_Value_Gauge[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DaniSelect_DanIcon_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_DanIcon_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_DanIcon_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_DanIcon_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "DaniSelect_Title_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -2836,6 +3132,22 @@ namespace TJAPlayer3
                                     DaniSelect_Exam_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DaniSelect_Exam_X_Ex")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_Exam_X_Ex[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_Exam_Y_Ex")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DaniSelect_Exam_Y_Ex[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "DaniSelect_Exam_Interval")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -2932,6 +3244,27 @@ namespace TJAPlayer3
                                     DaniSelect_Plate_Title_Offset[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Size")
+                            {
+                                DaniSelect_DanIconTitle_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "DaniSelect_DanIconTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DaniSelect_DanIconTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DaniSelect_DanIcon_Color")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                DaniSelect_DanIcon_Color = new Color[strSplit.Length];
+                                for (int i = 0; i < strSplit.Length; i++)
+                                {
+                                    DaniSelect_DanIcon_Color[i] = ColorTranslator.FromHtml(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #region SongLoading
@@ -2958,6 +3291,54 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(SongLoading_SubTitle_Y))
                             {
                                 SongLoading_SubTitle_Y = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Plate_X_AI))
+                            {
+                                SongLoading_Plate_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Plate_Y_AI))
+                            {
+                                SongLoading_Plate_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Title_X_AI))
+                            {
+                                SongLoading_Title_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_Title_Y_AI))
+                            {
+                                SongLoading_Title_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_SubTitle_X_AI))
+                            {
+                                SongLoading_SubTitle_X_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_SubTitle_Y_AI))
+                            {
+                                SongLoading_SubTitle_Y_AI = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongLoading_Fade_AI_Anime_Ring")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Fade_AI_Anime_Ring[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongLoading_Fade_AI_Anime_LoadBar")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_Fade_AI_Anime_LoadBar[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongLoading_DanPlate")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongLoading_DanPlate[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             else if (strCommand == nameof(SongLoading_Title_FontSize))
                             {
@@ -3010,6 +3391,18 @@ namespace TJAPlayer3
                             {
                                 SongLoading_Plate_ScreenBlend = C変換.bONorOFF(strParam[0]);
                             }
+                            else if (strCommand == nameof(DaniSelect_DanPlateTitle_Size))
+                            {
+                                DaniSelect_DanPlateTitle_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "DaniSelect_DanPlateTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    DaniSelect_DanPlateTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #region Game
@@ -3033,6 +3426,22 @@ namespace TJAPlayer3
                                     nScrollFieldY[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Game_ScrollField_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    nScrollField_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_ScrollField_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    nScrollField_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Game_SENotes_Offset_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -3047,6 +3456,22 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     nSENotesY[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_SENotes_Offset_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    nSENotes_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_SENotes_Offset_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    nSENotes_5P[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Game_Notes_Size")
@@ -3068,6 +3493,46 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_Notes_Interval))
                             {
                                 Game_Notes_Interval = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Left_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Left_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Right_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Right_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Left_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Left_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Offset_Right_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Offset_Right_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Notes_Arm_Move")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Notes_Arm_Move[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             else if (strCommand == "Game_Judge_X")
                             {
@@ -3130,6 +3595,56 @@ namespace TJAPlayer3
                                 Game_JudgeFrame_AddBlend = C変換.bONorOFF(strParam[0]);
                             }
 
+
+                            else if (strCommand == "Game_Judge_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Judge_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Judge_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Judge_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_UIMove_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_UIMove_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_UIMove_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_UIMove_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_ScoreRank_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_ScoreRank_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_ScoreRank_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_ScoreRank_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
                             #region CourseSymbol
                             else if (strCommand == "Game_CourseSymbol_X")
                             {
@@ -3145,6 +3660,70 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 2; i++)
                                 {
                                     Game_CourseSymbol_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_CourseSymbol_Back_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Rect_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Game_CourseSymbol_Back_Rect_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_CourseSymbol_Back_Rect_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Game_CourseSymbol_Back_Rect_5P[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             #endregion
@@ -3207,6 +3786,26 @@ namespace TJAPlayer3
                             {
                                 if (int.Parse(strParam) > 0)
                                     Game_Lyric_FontSize = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(Game_Lyric_VTTRubyOffset))
+                            {
+                                Game_Lyric_VTTRubyOffset = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(Game_Lyric_VTTForeColor))
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    Game_Lyric_VTTForeColor[i] = ColorTranslator.FromHtml(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == nameof(Game_Lyric_VTTBackColor))
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    Game_Lyric_VTTBackColor[i] = ColorTranslator.FromHtml(strSplit[i]);
+                                }
                             }
                             else if (strCommand == nameof(Game_Lyric_ReferencePoint))
                             {
@@ -3460,6 +4059,57 @@ namespace TJAPlayer3
                                     Game_Score_Size[i] = int.Parse(strSplit[i]);
                                 }
                             }
+
+
+                            else if (strCommand == "Game_Score_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Score_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Score_Add_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_Add_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Score_Add_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_Add_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Score_AddBonus_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_AddBonus_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Score_AddBonus_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Score_AddBonus_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
                             #endregion
 
                             #region Taiko
@@ -3686,6 +4336,168 @@ namespace TJAPlayer3
                                     Game_Taiko_Frame_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+
+
+                            else if (strCommand == "Game_Taiko_Background_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Background_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Background_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Background_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_ModIcons_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_ModIcons_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_ModIcons_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_ModIcons_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_NamePlate_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_NamePlate_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_NamePlate_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_NamePlate_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_PlayerNumber_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_PlayerNumber_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_PlayerNumber_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_PlayerNumber_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Ex_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Ex_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Ex_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Ex_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Ex4_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Ex4_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Ex4_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Ex4_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Text_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Text_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Combo_Text_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Combo_Text_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Frame_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Frame_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Taiko_Frame_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Taiko_Frame_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #region Gauge
@@ -3867,6 +4679,56 @@ namespace TJAPlayer3
                             else if (strCommand == "Game_Tower_Font_TowerText")
                             {
                                 Game_Tower_Font_TowerText = int.Parse(strParam);
+                            }
+
+
+                            else if (strCommand == "Game_Gauge_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Gauge_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Gauge_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Gauge_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Gauge_Soul_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Gauge_Soul_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Gauge_Soul_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Gauge_Soul_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Gauge_Soul_Fire_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Gauge_Soul_Fire_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Gauge_Soul_Fire_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Gauge_Soul_Fire_5P[i] = int.Parse(strSplit[i]);
+                                }
                             }
                             #endregion
 
@@ -4083,6 +4945,56 @@ namespace TJAPlayer3
                                 ParseInt32(value => Game_Balloon_Balloon_Number_Scale = value);
                             }
 
+
+                            else if (strCommand == "Game_Balloon_Balloon_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Balloon_Balloon_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Balloon_Balloon_Frame_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_Frame_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Balloon_Balloon_Frame_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_Frame_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Balloon_Balloon_Number_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_Number_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Balloon_Balloon_Number_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Balloon_Balloon_Number_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
                             #endregion
 
                             #region Effects
@@ -4177,6 +5089,14 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_Y))
                             {
                                 Game_Effect_FlyingNotes_EndPoint_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_X_AI))
+                            {
+                                Game_Effect_FlyingNotes_EndPoint_X_AI = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_Effect_FlyingNotes_EndPoint_Y_AI))
+                            {
+                                Game_Effect_FlyingNotes_EndPoint_Y_AI = strParam.Split(',').Select(int.Parse).ToArray();
                             }
                             else if (strCommand == nameof(Game_Effect_FlyingNotes_Sine))
                             {
@@ -4274,6 +5194,41 @@ namespace TJAPlayer3
                             {
                                 Game_Effect_FireWorks_Timing = int.Parse(strParam);
                             }
+
+
+                            else if (strCommand == "Game_Effects_Hit_Explosion_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Effects_Hit_Explosion_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Effects_Hit_Explosion_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Effects_Hit_Explosion_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Effect_Fire_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Effect_Fire_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Effect_Fire_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Effect_Fire_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
                             #endregion
 
                             #region Lane
@@ -4311,48 +5266,25 @@ namespace TJAPlayer3
                                 }
                             }
 
+                            else if (strCommand == "Game_Lane_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Lane_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Game_Lane_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Game_Lane_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #region Runner
-                            else if (strCommand == "Game_Runner_Size")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_Size[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_Ptn")
-                            {
-                                ParseInt32(value => Game_Runner_Ptn = value);
-                            }
-                            else if (strCommand == "Game_Runner_Type")
-                            {
-                                ParseInt32(value => Game_Runner_Type = value);
-                            }
-                            else if (strCommand == "Game_Runner_StartPoint_X")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_StartPoint_X[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_StartPoint_Y")
-                            {
-                                string[] strSplit = strParam.Split(',');
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Game_Runner_StartPoint_Y[i] = int.Parse(strSplit[i]);
-                                }
-                            }
-                            else if (strCommand == "Game_Runner_Timer")
-                            {
-                                if (int.Parse(strParam) != 0)
-                                {
-                                    Game_Runner_Timer = int.Parse(strParam);
-                                }
-                            }
                             #endregion
 
                             #region Dan_C
@@ -4379,6 +5311,22 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_DanC_Y))
                             {
                                 Game_DanC_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_Base_Offset_X))
+                            {
+                                Game_DanC_Base_Offset_X = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_Base_Offset_Y))
+                            {
+                                Game_DanC_Base_Offset_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_SmallBase_Offset_X))
+                            {
+                                Game_DanC_SmallBase_Offset_X = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_SmallBase_Offset_Y))
+                            {
+                                Game_DanC_SmallBase_Offset_Y = strParam.Split(',').Select(int.Parse).ToArray();
                             }
 
                             else if (strCommand == nameof(Game_DanC_Size))
@@ -4464,6 +5412,47 @@ namespace TJAPlayer3
                             {
                                 Game_DanC_Dan_Plate = strParam.Split(',').Select(int.Parse).ToArray();
                             }
+                            else if (strCommand == nameof(Game_DanC_DanIcon_Offset))
+                            {
+                                Game_DanC_DanIcon_Offset = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_DanIcon_Offset_Mini))
+                            {
+                                Game_DanC_DanIcon_Offset_Mini = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_Title_X))
+                            {
+                                Game_DanC_Title_X = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_Title_Y))
+                            {
+                                Game_DanC_Title_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_DanC_SubTitle))
+                            {
+                                Game_DanC_SubTitle = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+
+                            else if (strCommand == nameof(Game_DanC_Title_Size))
+                            {
+                                ParseInt32(value => Game_DanC_Title_Size = value);
+                            }
+                            else if (strCommand == nameof(Game_DanC_SubTitle_Size))
+                            {
+                                ParseInt32(value => Game_DanC_SubTitle_Size = value);
+                            }
+                            else if (strCommand == nameof(Game_DanC_ExamFont_Size))
+                            {
+                                ParseInt32(value => Game_DanC_ExamFont_Size = value);
+                            }
+                            else if (strCommand == nameof(Game_DanC_Title_MaxWidth))
+                            {
+                                ParseInt32(value => Game_DanC_Title_MaxWidth = value);
+                            }
+                            else if (strCommand == nameof(Game_DanC_SubTitle_MaxWidth))
+                            {
+                                ParseInt32(value => Game_DanC_SubTitle_MaxWidth = value);
+                            }
 
                             #endregion
 
@@ -4475,6 +5464,14 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(Game_PuchiChara_Y))
                             {
                                 Game_PuchiChara_Y = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_PuchiChara_4P))
+                            {
+                                Game_PuchiChara_4P = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_PuchiChara_5P))
+                            {
+                                Game_PuchiChara_5P = strParam.Split(',').Select(int.Parse).ToArray();
                             }
                             else if (strCommand == nameof(Game_PuchiChara_BalloonX))
                             {
@@ -5154,6 +6151,46 @@ namespace TJAPlayer3
                                     Result_MaxCombo_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Result_ADLib_Show")
+                            {
+                                Result_ADLib_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "Result_ADLib_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_Show")
+                            {
+                                Result_Bomb_Show = C変換.bONorOFF(strParam[0]);
+                            }
+                            else if (strCommand == "Result_Bomb_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == "Result_Score_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -5420,6 +6457,328 @@ namespace TJAPlayer3
                                 Result_Dan_Plate_XY = strParam.Split(',').Select(int.Parse).ToArray();
                             }
 
+
+                            else if (strCommand == "Result_UIMove_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_UIMove_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_UIMove_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_UIMove_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_DifficultyBar_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_DifficultyBar_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_DifficultyBar_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_DifficultyBar_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Base_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Base_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Base_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Base_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_ClearText_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_ClearText_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_ClearText_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Rainbow_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Rainbow_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Gauge_Rainbow_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Gauge_Rainbow_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Fire_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Fire_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Fire_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Fire_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Text_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Text_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Soul_Text_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Soul_Text_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Perfect_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Perfect_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Perfect_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Perfect_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Good_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Good_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Good_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Good_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Miss_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Miss_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Miss_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Miss_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Roll_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Roll_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Roll_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Roll_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_MaxCombo_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_MaxCombo_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_MaxCombo_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_MaxCombo_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ADLib_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ADLib_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Bomb_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Bomb_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Score_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Score_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Score_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Score_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ScoreRankEffect_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ScoreRankEffect_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ScoreRankEffect_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ScoreRankEffect_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_CrownEffect_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_CrownEffect_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_CrownEffect_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_CrownEffect_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_NamePlate_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_NamePlate_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_NamePlate_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_NamePlate_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ModIcons_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ModIcons_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_ModIcons_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_ModIcons_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+
                             #endregion
 
                             #region AIResult
@@ -5668,6 +7027,22 @@ namespace TJAPlayer3
                                 for (int i = 0; i < 3; i++)
                                 {
                                     DanResult_DanTitles_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanIcon_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanIcon_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "DanResult_DanIcon_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    DanResult_DanIcon_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "DanResult_Rank")
@@ -6268,6 +7643,86 @@ namespace TJAPlayer3
                             {
                                 Modal_Font_ModalTitleFull_Size = int.Parse(strParam);
                             }
+                            else if (strCommand == "Modal_Title_Half_X_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Modal_Title_Half_X_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Title_Half_X_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Modal_Title_Half_X_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Title_Half_Y_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Modal_Title_Half_Y_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Title_Half_Y_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Modal_Title_Half_Y_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_X_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Modal_Text_Half_X_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_X_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Modal_Text_Half_X_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Y_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Modal_Text_Half_Y_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Y_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Modal_Text_Half_Y_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Move_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Half_Move_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Modal_Text_Half_Move_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Modal_Text_Half_Move_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             #endregion
 
                             #endregion
@@ -6331,6 +7786,9 @@ namespace TJAPlayer3
         public int[] nScrollFieldX = new int[] { 349, 349 };
         public int[] nScrollFieldY = new int[] { 192, 368 };
 
+        public int[] nScrollField_4P = new int[] { 349, 46 };
+        public int[] nScrollField_5P = new int[] { 349, 27 };
+
         //中心座標指定
         public int[] nJudgePointX = new int[] { 413, 413, 413, 413 };
         public int[] nJudgePointY = new int[] { 256, 433, 0, 0 };
@@ -6348,6 +7806,9 @@ namespace TJAPlayer3
         //音符座標に加算
         public int[] nSENotesX = new int[] { -2, -2 };
         public int[] nSENotesY = new int[] { 131, 131 };
+
+        public int[] nSENotes_4P = new int[] { -2, 100 };
+        public int[] nSENotes_5P = new int[] { -2, 94 };
 
         //光る太鼓部分
         public int nMtaikoBackgroundX = 0;
@@ -6500,43 +7961,65 @@ namespace TJAPlayer3
 
         // Config
 
-        public int[][] Characters_Title_Entry_X;
-        public int[][] Characters_Title_Entry_Y;
-        public int[][] Characters_Title_Normal_X;
-        public int[][] Characters_Title_Normal_Y;
-
-        public int[][] Characters_Menu_X;
-        public int[][] Characters_Menu_Y;
-
-        public int[][] Characters_Result_X;
-        public int[][] Characters_Result_Y;
-
         public int[][] Characters_Resolution;
+        public int[][] Characters_Heya_Render_Offset;
         public int[][] Characters_X;
         public int[][] Characters_Y;
+        public int[][] Characters_4P;
+        public int[][] Characters_5P;
         public int[][] Characters_X_AI;
         public int[][] Characters_Y_AI;
         public int[][] Characters_Balloon_X;
         public int[][] Characters_Balloon_Y;
-        public string[] Characters_Motion_Normal,
+        public int[][] Characters_Balloon_4P;
+        public int[][] Characters_Balloon_5P;
+        public int[][] Characters_Motion_Normal,
+            Characters_Motion_10Combo,
+            Characters_Motion_10ComboMax,
             Characters_Motion_Miss,
             Characters_Motion_MissDown,
+            Characters_Motion_ClearIn,
             Characters_Motion_Clear,
-            Characters_Motion_GoGo;
-        public int[] Characters_Beat_Normal;
-        public int[] Characters_Beat_Miss;
-        public int[] Characters_Beat_MissDown;
-        public int[] Characters_Beat_Clear;
-        public int[] Characters_Beat_GoGo;
+            Characters_Motion_ClearMax,
+            Characters_Motion_GoGoStart,
+            Characters_Motion_GoGoStartMax,
+            Characters_Motion_GoGo,
+            Characters_Motion_GoGoMax,
+            Characters_Motion_SoulIn,
+            Characters_Motion_Return;
+        public float[] Characters_Beat_Normal,
+            Characters_Beat_10Combo,
+            Characters_Beat_10ComboMax,
+            Characters_Beat_Miss,
+            Characters_Beat_MissDown,
+            Characters_Beat_ClearIn,
+            Characters_Beat_Clear,
+            Characters_Beat_ClearMax,
+            Characters_Beat_GoGoStart,
+            Characters_Beat_GoGoStartMax,
+            Characters_Beat_GoGo,
+            Characters_Beat_GoGoMax,
+            Characters_Beat_SoulIn,
+            Characters_Beat_Return;
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
         public int[] Characters_Balloon_FadeOut;
 
+        public int[] Characters_Title_Entry_AnimationDuration;
+        public int[] Characters_Title_Normal_AnimationDuration;
+        public int[] Characters_Menu_Loop_AnimationDuration;
+        public int[] Characters_Menu_Select_AnimationDuration;
+        public int[] Characters_Menu_Start_AnimationDuration;
+        public int[] Characters_Result_Normal_AnimationDuration;
+        public int[] Characters_Result_Clear_AnimationDuration;
+        public int[] Characters_Result_Failed_In_AnimationDuration;
+        public int[] Characters_Result_Failed_AnimationDuration;
+
         #endregion
 
         #region [Adjustments]
-        public int[] Adjustments_MenuPuchichara_X = new int[] { -100, 100, -100, 100 };
-        public int[] Adjustments_MenuPuchichara_Y = new int[] { -100, -100, -100, -100 };
+        public int[] Adjustments_MenuPuchichara_X = new int[] { -100, 100 };
+        public int[] Adjustments_MenuPuchichara_Y = new int[] { -100, -100 };
 
         #endregion
 
@@ -6588,7 +8071,9 @@ namespace TJAPlayer3
         };
 
         public int[] Title_ModeSelect_Bar_Move = new int[] { 40, 100 };
+        public int[] Title_ModeSelect_Bar_Move_X = new int[] { 0, 0 };
         public int[] Title_ModeSelect_Overlay_Move = new int[] { 40, 120 };
+        public int[] Title_ModeSelect_Overlay_Move_X = new int[] { 0, 0 };
 
         public int[] Title_ModeSelect_Bar_Chara_X = new int[] { 446, 835 };
         public int[] Title_ModeSelect_Bar_Chara_Y = new int[] { 360, 360 };
@@ -6597,8 +8082,12 @@ namespace TJAPlayer3
 
         public int[] Title_ModeSelect_Bar_Center_Title = new int[] { 631, 379 };
         public int Title_ModeSelect_Bar_Center_Title_Move = 60;
+        public int Title_ModeSelect_Bar_Center_Title_Move_X = 0;
 
         public int[] Title_ModeSelect_Bar_Center_BoxText = new int[] { 640, 397 };
+
+        public bool Title_VerticalText = false;
+        public bool Title_VerticalBar = false;
 
         #endregion
 
@@ -6613,7 +8102,12 @@ namespace TJAPlayer3
         public int[] SongSelect_Bar_Anim_X = new int[] { 0, 600, 500, 400, 0, -400, -500, -600, 0 };
         public int[] SongSelect_Bar_Anim_Y = new int[] { 0, 1800, 1500, 1200, 0, -1200, -1500, -1800, 0 };
 
+        public float SongSelect_Scroll_Interval = 0.12f;
+
         public int[] SongSelect_Bar_Title_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_Box_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_BackBox_Offset = new int[] { 316, 62 };
+        public int[] SongSelect_Bar_Random_Offset = new int[] { 316, 62 };
         public int[] SongSelect_Bar_SubTitle_Offset = new int[] { 316, 90 };
 
         public int[] SongSelect_DanStatus_Offset_X = new int[] { 30, 602 };
@@ -6637,8 +8131,28 @@ namespace TJAPlayer3
         public int SongSelect_MusicName_Scale = 22;
         public int SongSelect_Subtitle_Scale = 13;
         public int SongSelect_BoxText_Scale = 14;
+        public bool SongSelect_VerticalText = false;
+
+        public int SongSelect_Title_MaxSize = 550;
+        public int SongSelect_SubTitle_MaxSize = 510;
+
+        public bool SongSelect_Maker_Show = false;
+        public int[] SongSelect_Maker = new int[] { 1285, 190 };
+        public int SongSelect_Maker_Size = 23;
+        public int SongSelect_Maker_MaxSize = 180;
+
+        public bool SongSelect_BPM_Text_Show = false;
+        public int[] SongSelect_BPM_Text = new int[] { 1240, 20 };
+        public int SongSelect_BPM_Text_MaxSize = 180;
+        public int SongSelect_BPM_Text_Size = 23;
+
+        public bool SongSelect_Shorten_Frame_Fade = false;
+        public bool SongSelect_Bar_Select_Skip_Fade = false;
+
+        public int[] SongSelect_Explicit = new int[] { 1240, 60 };
 
         public int SongSelect_Bar_Center_Move = 62;
+        public int SongSelect_Bar_Center_Move_X = 0;
 
         public int[] SongSelect_Bar_Select = new int[] { 309, 235 };
 
@@ -6647,6 +8161,12 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Level_Number_X = new int[] { 485, 607, 729, 851 };
         public int[] SongSelect_Level_Number_Y = new int[] { 400, 400, 400, 400 };
+        public int[] SongSelect_Level_Number_Tower = new int[] { 485, 400 };
+        public int[] SongSelect_Tower_Side = new int[] { 485, 400 };
+
+        public int[] SongSelect_Level_X = new int[] { 485, 607, 729, 851 };
+        public int[] SongSelect_Level_Y = new int[] { 400, 400, 400, 400 };
+        public int[] SongSelect_Level_Move = new int[] { 0, -17 };
 
         public int[] SongSelect_Level_Number_Interval = new int[] { 11, 0 };
 
@@ -6665,31 +8185,43 @@ namespace TJAPlayer3
 
         public int SongSelect_BoxExplanation_Interval = 30;
 
-        public int[] SongSelect_NamePlate_X = new int[] { 36, 1020 };
-        public int[] SongSelect_NamePlate_Y = new int[] { 615, 615 };
+        public int[] SongSelect_NamePlate_X = new int[] { 36, 1020, 216, 840, 396 };
+        public int[] SongSelect_NamePlate_Y = new int[] { 615, 615, 561, 561, 615 };
         public int[] SongSelect_Auto_X = new int[] { 60, 950 };
         public int[] SongSelect_Auto_Y = new int[] { 650, 650 };
-        public int[] SongSelect_ModIcons_X = new int[] { 40, 1020 };
-        public int[] SongSelect_ModIcons_Y = new int[] { 672, 672 };
+        public int[] SongSelect_ModIcons_X = new int[] { 40, 1020, 220, 840, 400 };
+        public int[] SongSelect_ModIcons_Y = new int[] { 672, 672, 618, 618, 672 };
 
         public int[] SongSelect_Timer = new int[] { 1148, 57 };
         public int[] SongSelect_Timer_Interval = new int[] { 46, 0 };
 
-        public int[] SongSelect_Table_X = new int[] { 0, 1034 };
-        public int[] SongSelect_Table_Y = new int[] { 0, 0 };
+        public bool SongSelect_Bpm_Show = false;
+        public int[] SongSelect_Bpm_X = new int[] { 1240, 1240, 1240 };
+        public int[] SongSelect_Bpm_Y = new int[] { 20, 66, 112 };
+        public int[] SongSelect_Bpm_Interval = new int[] { 22, 0 };
 
-        public int[] SongSelect_High_Score_X = new int[] { 124, 1158 };
-        public int[] SongSelect_High_Score_Y = new int[] { 416, 416 };
+        public int[] SongSelect_Table_X = new int[] { 0, 1034, 180, 854, 360 };
+        public int[] SongSelect_Table_Y = new int[] { 0, 0, -204, -204, 0 };
 
-        public int[] SongSelect_High_Score_Difficulty_Cymbol_X = new int[] { 46, 1080 };
-        public int[] SongSelect_High_Score_Difficulty_Cymbol_Y = new int[] { 418, 418 };
+        public int[] SongSelect_High_Score_X = new int[] { 124, 1158, 304, 978, 484 };
+        public int[] SongSelect_High_Score_Y = new int[] { 416, 416, 212, 212, 416 };
+
+        public int[] SongSelect_High_Score_Difficulty_Cymbol_X = new int[] { 46, 1080, 226, 900, 406 };
+        public int[] SongSelect_High_Score_Difficulty_Cymbol_Y = new int[] { 418, 418, 214, 214, 418 };
 
         public int[][] SongSelect_BoardNumber_X = new int[][] {
             new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, 190, 74, 114 },
-            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, 1224, 1214, 1148 }
+            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, 1224, 1214, 1148 },
+
+            new int[] { 242, 305, 370, 242, 305, 370, 370, 242, 305, 370, 254, 294 },
+            new int[] { 916, 979, 1044, 916, 979, 1044, 1044, 916, 979, 1044, 1034, 968 },
+            new int[] { 422, 485, 550, 422, 485, 550, 550, 422, 485, 550, 434, 474 }
         };
         public int[][] SongSelect_BoardNumber_Y = new int[][] {
             new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
+            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
+            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
             new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 }
         };
         public int[] SongSelect_BoardNumber_Interval = new int[] { 9, 0 };
@@ -6698,8 +8230,8 @@ namespace TJAPlayer3
         public int[] SongSelect_SongNumber_Y = new int[] { 167, 167 };
         public int[] SongSelect_SongNumber_Interval = new int[] { 16, 0 };
 
-        public int[] SongSelect_Search_Bar_X = new int[] { 640, 640, 640, 640 };
-        public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620 };
+        public int[] SongSelect_Search_Bar_X = new int[] { 640, 640, 640, 640, 640 };
+        public int[] SongSelect_Search_Bar_Y = new int[] { 320, 420, 520, 620, 720 };
 
         public int[] SongSelect_Difficulty_Back = new int[] { 640, 290 };
         public int[] SongSelect_Level_Offset = new int[] { 610, 40 };
@@ -6715,6 +8247,8 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Difficulty_Bar_X = new int[] { 255, 341, 426, 569, 712, 855, 855 };
         public int[] SongSelect_Difficulty_Bar_Y = new int[] { 270, 270, 270, 270, 270, 270, 270 };
+        public int[] SongSelect_Branch_Text_Offset = new int[] { 276, 6 };
+        public int[] SongSelect_Branch_Offset = new int[] { 6, 6 };
 
         public int[][] SongSelect_Difficulty_Bar_Rect = new int[][] {
             new int[] { 0, 0, 86, 236 },
@@ -6767,6 +8301,8 @@ namespace TJAPlayer3
         public int[] SongSelect_Difficulty_Select_Bar_Anime = new int[] { 0, 10 };
         public int[] SongSelect_Difficulty_Select_Bar_AnimeIn = new int[] { 0, 50 };
         public int[] SongSelect_Difficulty_Select_Bar_Move = new int[] { 25, 0 };
+
+        public int[] SongSelect_Difficulty_Bar_ExExtra_AnimeDuration = new int[] { -1, -1 };
 
         public int[] SongSelect_Preimage = new int[] { 120, 110 };
         public int[] SongSelect_Preimage_Size = new int[] { 200, 200 };
@@ -6826,6 +8362,9 @@ namespace TJAPlayer3
         public int[] DaniSelect_Text_Gauge = new int[] { 396, 429 };
         public int[] DaniSelect_Value_Gauge = new int[] { 370, 462 };
 
+        public int[] DaniSelect_DanIcon_X = new int[] { 314, 314, 314 };
+        public int[] DaniSelect_DanIcon_Y = new int[] { 190, 263, 336 };
+
         public int[] DaniSelect_Title_X = new int[] { 401, 401, 401 };
         public int[] DaniSelect_Title_Y = new int[] { 173, 246, 319 };
 
@@ -6852,6 +8391,9 @@ namespace TJAPlayer3
         public int[] DaniSelect_Exam_X = new int[] { 590, 590, 590 };
         public int[] DaniSelect_Exam_Y = new int[] { 455, 543, 631 };
 
+        public int[] DaniSelect_Exam_X_Ex = new int[] { 536, 536, 536 };
+        public int[] DaniSelect_Exam_Y_Ex = new int[] { 455, 543, 631 };
+
         public int[] DaniSelect_Exam_Interval = new int[] { 220, 0 };
 
         public int[] DaniSelect_Exam_Title_X = new int[] { 614, 614, 614 };
@@ -6869,6 +8411,26 @@ namespace TJAPlayer3
         public int[] DaniSelect_Plate_Move = new int[] { 52, 0 };
         public int[] DaniSelect_Plate_Center_Move = new int[] { 0, 15 };
         public int[] DaniSelect_Plate_Title_Offset = new int[] { 2, 36 };
+
+        public int DaniSelect_DanPlateTitle_Size = 60;
+        public int[] DaniSelect_DanPlateTitle_Offset = new int[] { 0, -50 };
+
+        public int DaniSelect_DanIconTitle_Size = 18;
+        public int[] DaniSelect_DanIconTitle_Offset = new int[] { 0, 6 };
+
+        public Color[] DaniSelect_DanIcon_Color = new Color[]
+            {
+                Color.Red,
+                Color.Green,
+                Color.Blue,
+                Color.Magenta,
+                Color.Yellow,
+                Color.Cyan,
+                Color.Brown,
+                Color.Gray,
+                Color.DarkGreen,
+                Color.Black
+            };
         #endregion
         #region SongLoading
         public int SongLoading_Plate_X = 640;
@@ -6877,6 +8439,19 @@ namespace TJAPlayer3
         public int SongLoading_Title_Y = 280;
         public int SongLoading_SubTitle_X = 640;
         public int SongLoading_SubTitle_Y = 325;
+
+        public int SongLoading_Plate_X_AI = 640;
+        public int SongLoading_Plate_Y_AI = 360;
+        public int SongLoading_Title_X_AI = 640;
+        public int SongLoading_Title_Y_AI = 313;
+        public int SongLoading_SubTitle_X_AI = 640;
+        public int SongLoading_SubTitle_Y_AI = 365;
+
+        public int[] SongLoading_Fade_AI_Anime_Ring = new int[] { 466, 185 };
+        public int[] SongLoading_Fade_AI_Anime_LoadBar = new int[] { 490, 382 };
+
+        public int[] SongLoading_DanPlate = new int[] { 1121, 213 };
+
         public int SongLoading_Title_FontSize = 31;
         public int SongLoading_SubTitle_FontSize = 20;
         public int[] SongLoading_Chara_Move = new int[] { 250, -80 };
@@ -6898,6 +8473,14 @@ namespace TJAPlayer3
         public int[] Game_Notes_Size = new int[] { 130, 130 };
         public int[] Game_SENote_Size = new int[] { 136, 30 };
         public int Game_Notes_Interval = 960;
+
+        public int[] Game_Notes_Arm_Offset_Left_X = new int[] { 25, 25 };
+        public int[] Game_Notes_Arm_Offset_Right_X = new int[] { 60, 60 };
+
+        public int[] Game_Notes_Arm_Offset_Left_Y = new int[] { 74, -44 };
+        public int[] Game_Notes_Arm_Offset_Right_Y = new int[] { 104, -14 };
+        public int[] Game_Notes_Arm_Move = new int[] { 0, 30 };
+
         public int[] Game_Judge_X = new int[] { 364, 364 };
         public int[] Game_Judge_Y = new int[] { 152, 328 };
         public int[] Game_Judge_Move = new int[] { 0, 20 };
@@ -6917,6 +8500,17 @@ namespace TJAPlayer3
         public int[] Game_Judge_Meter_PerfectRate = new int[] { 206, 494 };
         public int[] Game_Judge_Meter_GoodRate = new int[] { 206, 532 };
         public int[] Game_Judge_Meter_MissRate = new int[] { 206, 570 };
+
+        public int[] Game_Judge_4P = new int[] { 364, 32 };
+        public int[] Game_Judge_5P = new int[] { 364, 24 };
+
+        public int[] Game_UIMove_4P = new int[] { 0, 176 };
+        public int[] Game_UIMove_5P = new int[] { 0, 144 };
+
+        public int[] Game_ScoreRank_4P = new int[] { 87, 88 };
+        public int[] Game_ScoreRank_5P = new int[] { 87, 80 };
+
+        public DBSkinPreset.SkinPreset Game_SkinScenes = null;
 
         #region Chara
 
@@ -6953,8 +8547,8 @@ namespace TJAPlayer3
         public int[] Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
         public int[] Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
         public string Game_Dancer_Motion = "0";
-        public int Game_Dancer_Ptn = 0;
-        public int Game_Dancer_Beat = 8;
+        //public int Game_Dancer_Ptn = 0;
+        //public int Game_Dancer_Beat = 8;
         public int[] Game_Dancer_Gauge = new int[] { 0, 0, 0, 40, 80 };
 
         #endregion
@@ -6981,8 +8575,19 @@ namespace TJAPlayer3
             Game_Mob_Ptn_Beat = 1;
         #endregion
         #region CourseSymbol
-        public int[] Game_CourseSymbol_X = new int[] { 64, 64 };
+        public int[] Game_CourseSymbol_X = new int[] { -4, -4 };
         public int[] Game_CourseSymbol_Y = new int[] { 232, 582 };
+        public int[] Game_CourseSymbol_Back_X = new int[] { 280, 280 };
+        public int[] Game_CourseSymbol_Back_Y = new int[] { -110, 427 };
+
+        public int[] Game_CourseSymbol_4P = new int[] { -4, 56 };
+        public int[] Game_CourseSymbol_5P = new int[] { -4, 48 };
+
+        public int[] Game_CourseSymbol_Back_4P = new int[] { 896, 47 };
+        public int[] Game_CourseSymbol_Back_5P = new int[] { 896, 39 };
+
+        public int[] Game_CourseSymbol_Back_Rect_4P = new int[] { 0, 128, 384, 129 };
+        public int[] Game_CourseSymbol_Back_Rect_5P = new int[] { 0, 140, 384, 105 };
         #endregion
         #region PanelFont
         public int Game_MusicName_X = 1160;
@@ -6998,6 +8603,7 @@ namespace TJAPlayer3
         public int Game_Lyric_Y = 630;
         public string Game_Lyric_FontName = "MS UI Gothic";
         public int Game_Lyric_FontSize = 38;
+        public int Game_Lyric_VTTRubyOffset = 65;
         public ReferencePoint Game_Lyric_ReferencePoint = ReferencePoint.Center;
 
         public Color Game_MusicName_ForeColor = ColorTranslator.FromHtml("#FFFFFF");
@@ -7006,6 +8612,8 @@ namespace TJAPlayer3
         public Color Game_MusicName_BackColor = ColorTranslator.FromHtml("#000000");
         public Color Game_StageText_BackColor = ColorTranslator.FromHtml("#000000");
         public Color Game_Lyric_BackColor = ColorTranslator.FromHtml("#0000FF");
+        public Color[] Game_Lyric_VTTForeColor = new Color[] { Color.White, Color.Lime, Color.Cyan, Color.Red, Color.Yellow, Color.Magenta, Color.Blue, Color.Black };
+        public Color[] Game_Lyric_VTTBackColor = new Color[] { Color.White, Color.Lime, Color.Cyan, Color.Red, Color.Yellow, Color.Magenta, Color.Blue, Color.Black };
 
         #endregion
         #region Score
@@ -7017,18 +8625,28 @@ namespace TJAPlayer3
         public int[] Game_Score_AddBonus_Y = new int[] { 136, 626, 0, 0 };
         public int Game_Score_Padding = 20;
         public int[] Game_Score_Size = new int[] { 24, 40 };
+
+        public int[] Game_Score_4P = new int[] { 20, 54 };
+        public int[] Game_Score_5P = new int[] { 20, 46 };
+
+        public int[] Game_Score_Add_4P = new int[] { 20, 94 };
+        public int[] Game_Score_Add_5P = new int[] { 20, 86 };
+
+        public int[] Game_Score_AddBonus_4P = new int[] { 20, 134 };
+        public int[] Game_Score_AddBonus_5P = new int[] { 20, 126 };
         #endregion
         #region Taiko
         public int[] Game_Taiko_Background_X = new int[] { 0, 0 };
         public int[] Game_Taiko_Background_Y = new int[] { 184, 360 };
+
         public int[] Game_Taiko_ModIcons_X = new int[] { 80, 80 };
         public int[] Game_Taiko_ModIcons_Y = new int[] { 236, 426 };
-        public int[] Game_Taiko_NamePlate_X = new int[] { 0, 0 };
-        public int[] Game_Taiko_NamePlate_Y = new int[] { 300, 380 };
+        public int[] Game_Taiko_NamePlate_X = new int[] { -5, -5 };
+        public int[] Game_Taiko_NamePlate_Y = new int[] { 297, 371 };
         public int[] Game_Taiko_PlayerNumber_X = new int[] { 4, 4 };
         public int[] Game_Taiko_PlayerNumber_Y = new int[] { 233, 435 };
-        public int[] Game_Taiko_X = new int[] { 190, 190 };
-        public int[] Game_Taiko_Y = new int[] { 190, 368 };
+        public int[] Game_Taiko_X = new int[] { 205, 205 };
+        public int[] Game_Taiko_Y = new int[] { 206, 384 };
         public int[] Game_Taiko_Combo_X = new int[] { 267, 267 };
         public int[] Game_Taiko_Combo_Y = new int[] { 272, 447 };
         public int[] Game_Taiko_Combo_Ex_X = new int[] { 267, 267 };
@@ -7047,6 +8665,38 @@ namespace TJAPlayer3
         public int[] Game_Taiko_LevelChange_Y = new int[] { 154, 566 };
         public int[] Game_Taiko_Frame_X = new int[] { 329, 329 };
         public int[] Game_Taiko_Frame_Y = new int[] { 136, 360 };
+
+        
+        public int[] Game_Taiko_Background_4P = new int[] { 0, 8 };
+        public int[] Game_Taiko_Background_5P = new int[] { 0, 0 };
+
+        public int[] Game_Taiko_ModIcons_4P = new int[] { 80, 60 };
+        public int[] Game_Taiko_ModIcons_5P = new int[] { 80, 50 };
+
+        public int[] Game_Taiko_NamePlate_4P = new int[] { -55, 121 };
+        public int[] Game_Taiko_NamePlate_5P = new int[] { -55, 97 };
+
+        public int[] Game_Taiko_PlayerNumber_4P = new int[] { 4, 57 };
+        public int[] Game_Taiko_PlayerNumber_5P = new int[] { 4, 49 };
+
+        public int[] Game_Taiko_4P = new int[] { 205, 30 };
+        public int[] Game_Taiko_5P = new int[] { 205, 22 };
+
+        public int[] Game_Taiko_Combo_4P = new int[] { 267, 73 };
+        public int[] Game_Taiko_Combo_5P = new int[] { 267, 65 };
+
+        public int[] Game_Taiko_Combo_Ex_4P = new int[] { 267, 75 };
+        public int[] Game_Taiko_Combo_Ex_5P = new int[] { 267, 67 };
+
+        public int[] Game_Taiko_Combo_Ex4_4P = new int[] { 267, 70 };
+        public int[] Game_Taiko_Combo_Ex4_5P = new int[] { 267, 62 };
+
+        public int[] Game_Taiko_Combo_Text_4P = new int[] { 268, 99 };
+        public int[] Game_Taiko_Combo_Text_5P = new int[] { 268, 91 };
+
+        public int[] Game_Taiko_Frame_4P = new int[] { 333, 8 };
+        public int[] Game_Taiko_Frame_5P = new int[] { 333, 0 };
+
         #endregion
         #region Gauge
         public int[] Game_Gauge_X = new int[] { 492, 492 };
@@ -7075,6 +8725,16 @@ namespace TJAPlayer3
         public int Game_Gauge_Rainbow_Ptn;
         public int Game_Gauge_Dan_Rainbow_Ptn;
         public int Game_Gauge_Rainbow_Timer = 50;
+
+        public int[] Game_Gauge_4P = new int[] { 492, -4 };
+        public int[] Game_Gauge_5P = new int[] { 492, -12 };
+
+        public int[] Gauge_Soul_4P = new int[] { 1184, -12 };
+        public int[] Gauge_Soul_5P = new int[] { 1184, -20 };
+
+        public int[] Gauge_Soul_Fire_4P = new int[] { 1112, -85 };
+        public int[] Gauge_Soul_Fire_5P = new int[] { 1112, -93 };
+
         #endregion
         #region Balloon
         public int[] Game_Balloon_Combo_X = new int[] { 253, 253 };
@@ -7105,6 +8765,18 @@ namespace TJAPlayer3
         public int[] Game_Balloon_Number_Interval = new int[] { 55, 0 };
         public float Game_Balloon_Roll_Number_Scale = 1.000f;
         public float Game_Balloon_Balloon_Number_Scale = 0.879f;
+
+        public int[] Game_Balloon_Balloon_4P = new int[] { 382, -61 };
+        public int[] Game_Balloon_Balloon_5P = new int[] { 382, -53 };
+
+        public int[] Game_Balloon_Balloon_Frame_4P = new int[] { 382, -12 };
+        public int[] Game_Balloon_Balloon_Frame_5P = new int[] { 382, -4 };
+
+        public int[] Game_Balloon_Balloon_Number_4P = new int[] { 423, 95 };
+        public int[] Game_Balloon_Balloon_Number_5P = new int[] { 423, 87 };
+
+        public int Game_Kusudama_Number_X = 960;
+        public int Game_Kusudama_Number_Y = 450;
         #endregion
         #region Effects
         public int[] Game_Effect_Roll_StartPoint_X = new int[] { 56, -10, 200, 345, 100, 451, 600, 260, -30, 534, 156, 363 };
@@ -7132,6 +8804,8 @@ namespace TJAPlayer3
         public int[] Game_Effect_FlyingNotes_StartPoint_Y = new int[] { 260, 434 };
         public int[] Game_Effect_FlyingNotes_EndPoint_X = new int[] { 1222, 1222 }; // 1P, 2P
         public int[] Game_Effect_FlyingNotes_EndPoint_Y = new int[] { 164, 554 };
+        public int[] Game_Effect_FlyingNotes_EndPoint_X_AI = new int[] { 1222, 1222 }; // 1P, 2P
+        public int[] Game_Effect_FlyingNotes_EndPoint_Y_AI = new int[] { -230, 820 };
 
         public int Game_Effect_FlyingNotes_Sine = 220;
         public bool Game_Effect_FlyingNotes_IsUsingEasing = true;
@@ -7155,24 +8829,29 @@ namespace TJAPlayer3
         public bool Game_Effect_Fire_AddBlend = true;
         public bool Game_Effect_GoGoSplash_AddBlend = true;
         public int Game_Effect_FireWorks_Timing = 8;
+
+        public int[] Game_Effects_Hit_Explosion_4P = new int[] { 284, -20 };
+        public int[] Game_Effects_Hit_Explosion_5P = new int[] { 284, -39 };
+
+        public int[] Game_Effect_Fire_4P = new int[] { 240, -75 };
+        public int[] Game_Effect_Fire_5P = new int[] { 240, -94 };
         #endregion
         #region Lane
         public int[] Game_Lane_X = new int[] { 333, 333 };
         public int[] Game_Lane_Y = new int[] { 192, 368 };
         public int[] Game_Lane_Sub_X = new int[] { 333, 333 };
         public int[] Game_Lane_Sub_Y = new int[] { 326, 502 };
+
+        public int[] Game_Lane_4P = new int[] { 333, 46 };
+        public int[] Game_Lane_5P = new int[] { 333, 39 };
         #endregion
         #region Runner
-        public int[] Game_Runner_Size = new int[] { 60, 125 };
-        public int Game_Runner_Ptn = 48;
-        public int Game_Runner_Type = 4;
-        public int[] Game_Runner_StartPoint_X = new int[] { 175, 175 };
-        public int[] Game_Runner_StartPoint_Y = new int[] { 40, 560 };
-        public int Game_Runner_Timer = 16;
         #endregion
         #region PuchiChara
         public int[] Game_PuchiChara_X = new int[] { 100, 100 };
         public int[] Game_PuchiChara_Y = new int[] { 140, 675 };
+        public int[] Game_PuchiChara_4P = new int[] { 230, 162 };
+        public int[] Game_PuchiChara_5P = new int[] { 230, 150 };
         public int[] Game_PuchiChara_BalloonX = new int[] { 300, 300 };
         public int[] Game_PuchiChara_BalloonY = new int[] { 240, 500 };
         public float[] Game_PuchiChara_Scale = new float[] { 0.6f, 0.8f }; // 通常時、 ふうせん連打時
@@ -7201,8 +8880,27 @@ namespace TJAPlayer3
 
         public int[] Game_DanC_X = new int[] { 807, 70, 70, 70 }; // 329, 437
         public int[] Game_DanC_Y = new int[] { 116, 292, 292, 292 }; // { 116, 190, 236, 292 };
+        public int[] Game_DanC_Base_Offset_X = new int[] { 0, 503 };
+        public int[] Game_DanC_Base_Offset_Y = new int[] { 0, 0 };
+        public int[] Game_DanC_SmallBase_Offset_X = new int[] { 745, 410 };
+        public int[] Game_DanC_SmallBase_Offset_Y = new int[] { 119, 119 };
         public int[] Game_DanC_Number_XY = new int[] { 214, 67 };
         public int[] Game_DanC_Dan_Plate = new int[] { 149, 416 };
+
+        public int[] Game_DanC_DanIcon_Offset = new int[] { 44, 57 };
+        public int[] Game_DanC_DanIcon_Offset_Mini = new int[] { -19, 11 };
+
+        public int[] Game_DanC_Title_X = new int[] { 806, 806 };
+        public int[] Game_DanC_Title_Y = new int[] { 257, 237 };
+        public int[] Game_DanC_SubTitle = new int[] { 806, 277 };
+
+
+        public int Game_DanC_Title_Size = 30;
+        public int Game_DanC_SubTitle_Size = 22;
+        public int Game_DanC_ExamFont_Size = 14;
+
+        public int Game_DanC_Title_MaxWidth = 710;
+        public int Game_DanC_SubTitle_MaxWidth = 710;
 
         public int Game_DanC_Padding = 9;
         public int Game_DanC_Number_Padding = 35;
@@ -7286,6 +8984,10 @@ namespace TJAPlayer3
 
         #endregion
         #region Result
+
+        public int[] Result_UIMove_4P = new int[] { 320, 0 };
+        public int[] Result_UIMove_5P = new int[] { 256, 0 };
+
         public int Result_Cloud_Count = 11;
         public int[] Result_Cloud_X = new int[] { 642, 612, 652, 1148, 1180, 112, 8, 1088, 1100, 32, 412 };
         public int[] Result_Cloud_Y = new int[] { 202, 424, 636, 530, 636, 636, 102, 52, 108, 326, 644 };
@@ -7353,6 +9055,14 @@ namespace TJAPlayer3
         public int[] Result_MaxCombo_X = new int[] { 490, 1125 };
         public int[] Result_MaxCombo_Y = new int[] { 356, 356 };
 
+        public bool Result_ADLib_Show = false;
+        public int[] Result_ADLib_X = new int[] { 0, 0 };
+        public int[] Result_ADLib_Y = new int[] { 0, 0 };
+
+        public bool Result_Bomb_Show = false;
+        public int[] Result_Bomb_X = new int[] { 0, 0 };
+        public int[] Result_Bomb_Y = new int[] { 0, 0 };
+
         public int[] Result_Score_X = new int[] { 295, 930 };
         public int[] Result_Score_Y = new int[] { 212, 212 };
         public int[] Result_Score_Number_Interval = new int[] { 33, 0 };
@@ -7414,6 +9124,63 @@ namespace TJAPlayer3
         public int[] Result_Dan = new int[] { 500, 500 };
         public int[] Result_Dan_XY = new int[] { 0, 420 };
         public int[] Result_Dan_Plate_XY = new int[] { 149, 149 };
+
+        public int[] Result_DifficultyBar_4P = new int[] { 6, 101 };
+        public int[] Result_DifficultyBar_5P = new int[] { -9, 101 };
+
+        public int[] Result_Gauge_Base_4P = new int[] { 25, 140 };
+        public int[] Result_Gauge_Base_5P = new int[] { 4, 140 };
+
+        public int[] Result_Gauge_4P = new int[] { 27, 140 };
+        public int[] Result_Gauge_5P = new int[] { 6, 140 };
+
+        public int[] Result_Gauge_ClearText_4P = new int[] { 218, 142 };
+        public int[] Result_Gauge_ClearText_5P = new int[] { 197, 142 };
+
+        public int[] Result_Gauge_Rainbow_4P = new int[] { 26, 144 };
+        public int[] Result_Gauge_Rainbow_5P = new int[] { 5, 144 };
+
+        public int[] Result_Soul_Fire_4P = new int[] { 284, 160 };
+        public int[] Result_Soul_Fire_5P = new int[] { 232, 120 };
+
+        public int[] Result_Soul_Text_4P = new int[] { 283, 159 };
+        public int[] Result_Soul_Text_5P = new int[] { 231, 119 };
+
+        public int[] Result_Perfect_4P = new int[] { 183, 251 };
+        public int[] Result_Perfect_5P = new int[] { 151, 251 };
+
+        public int[] Result_Good_4P = new int[] { 183, 293 };
+        public int[] Result_Good_5P = new int[] { 151, 293 };
+
+        public int[] Result_Miss_4P = new int[] { 183, 335 };
+        public int[] Result_Miss_5P = new int[] { 151, 335 };
+
+        public int[] Result_Roll_4P = new int[] { 183, 377 };
+        public int[] Result_Roll_5P = new int[] { 151, 377 };
+
+        public int[] Result_MaxCombo_4P = new int[] { 183, 419 };
+        public int[] Result_MaxCombo_5P = new int[] { 151, 419 };
+
+        public int[] Result_ADLib_4P = new int[] { 0, 0 };
+        public int[] Result_ADLib_5P = new int[] { 0, 0 };
+
+        public int[] Result_Bomb_4P = new int[] { 0, 0 };
+        public int[] Result_Bomb_5P = new int[] { 0, 0 };
+
+        public int[] Result_Score_4P = new int[] { 253, 180 };
+        public int[] Result_Score_5P = new int[] { 221, 180 };
+
+        public int[] Result_ScoreRankEffect_4P = new int[] { 100, 545 };
+        public int[] Result_ScoreRankEffect_5P = new int[] { 68, 545 };
+
+        public int[] Result_CrownEffect_4P = new int[] { 220, 545 };
+        public int[] Result_CrownEffect_5P = new int[] { 188, 545 };
+
+        public int[] Result_NamePlate_4P = new int[] { 80, 621 };
+        public int[] Result_NamePlate_5P = new int[] { 31, 621 };
+
+        public int[] Result_ModIcons_4P = new int[] { 15, 678 };
+        public int[] Result_ModIcons_5P = new int[] { -17, 678 };
         #endregion
 
         #region AIResult
@@ -7467,6 +9234,9 @@ namespace TJAPlayer3
 
         public int[] DanResult_DanTitles_X = new int[] { 401, 401, 401 };
         public int[] DanResult_DanTitles_Y = new int[] { 139, 322, 505 };
+
+        public int[] DanResult_DanIcon_X = new int[] { 315, 315, 315 };
+        public int[] DanResult_DanIcon_Y = new int[] { 158, 342, 526 };
 
         public int[] DanResult_Rank = new int[] { 130, 380 };
 
@@ -7598,6 +9368,21 @@ namespace TJAPlayer3
         public int Modal_Font_ModalTitleHalf_Size = 28;
         public int Modal_Font_ModalContentFull_Size = 56;
         public int Modal_Font_ModalTitleFull_Size = 56;
+
+        public int[] Modal_Title_Half_X_4P = new int[] { 320, 960, 320, 960 };
+        public int[] Modal_Title_Half_X_5P = new int[] { 320, 960, 320, 960, 320 };
+
+        public int[] Modal_Title_Half_Y_4P = new int[] { 66, 66, 426, 426 };
+        public int[] Modal_Title_Half_Y_5P = new int[] { 50, 50, 290, 290, 530 };
+
+        public int[] Modal_Text_Half_X_4P = new int[] { 320, 960, 320, 960 };
+        public int[] Modal_Text_Half_X_5P = new int[] { 320, 960, 320, 960, 320 };
+
+        public int[] Modal_Text_Half_Y_4P = new int[] { 159, 159, 519, 519 };
+        public int[] Modal_Text_Half_Y_5P = new int[] { 107, 107, 347, 347, 587 };
+
+        public int[] Modal_Text_Half_Move_4P = new int[] { 0, 59 };
+        public int[] Modal_Text_Half_Move_5P = new int[] { 0, 40 };
 
         #endregion
 

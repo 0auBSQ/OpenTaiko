@@ -48,15 +48,15 @@ namespace TJAPlayer3
                     if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0)
                     {
                         if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
-                            this.Mode[0] = EndMode.StageDondaFullCombo;
+                            this.Mode[0] = EndMode.Tower_TopReached_Perfect;
                         else
-                            this.Mode[0] = EndMode.StageFullCombo;
+                            this.Mode[0] = EndMode.Tower_TopReached_FullCombo;
                     }
                     else
-                        this.Mode[0] = EndMode.StageCleared;
+                        this.Mode[0] = EndMode.Tower_TopReached_Pass;
                 }
                 else
-                    this.Mode[0] = EndMode.StageFailed;
+                    this.Mode[0] = EndMode.Tower_Dropout;
             }
             else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
@@ -66,22 +66,43 @@ namespace TJAPlayer3
                     // 段位認定モード、クリア成功
                     // this.Mode[0] = EndMode.StageCleared;
 
+                    bool bgold = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
+
                     if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0)
                     {
                         if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
-                            this.Mode[0] = EndMode.StageDondaFullCombo;
+                            this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
                         else
-                            this.Mode[0] = EndMode.StageFullCombo;
+                            this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
                     }
                     else
-                        this.Mode[0] = EndMode.StageCleared;
+                        this.Mode[0] = bgold ? EndMode.Dan_Gold_Pass : EndMode.Dan_Red_Pass;
 
 
                 }
                 else
                 {
                     // 段位認定モード、クリア失敗
-                    this.Mode[0] = EndMode.StageFailed;
+                    this.Mode[0] = EndMode.Dan_Fail;
+                }
+            }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+            {
+                if (TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin)
+                {
+                    if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0)
+                    {
+                        if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+                            this.Mode[0] = EndMode.AI_Win_Perfect;
+                        else
+                            this.Mode[0] = EndMode.AI_Win_FullCombo;
+                    }
+                    else
+                        this.Mode[0] = EndMode.AI_Win;
+                }
+                else
+                {
+                    this.Mode[0] = EndMode.AI_Lose;
                 }
             }
             else
@@ -97,7 +118,7 @@ namespace TJAPlayer3
                         //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
                         {
                             if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
-                                //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
+                            //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
                             {
                                 this.Mode[i] = EndMode.StageDondaFullCombo;
                             }
@@ -122,7 +143,7 @@ namespace TJAPlayer3
         public override void On活性化()
         {
             this.bリザルトボイス再生済み = false;
-            this.Mode = new EndMode[2];
+            this.Mode = new EndMode[5];
             base.On活性化();
         }
 
@@ -139,26 +160,100 @@ namespace TJAPlayer3
             {
                 var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
 
-                FailedScript = new EndAnimeScript($@"{origindir}ClearFailed\Script.lua");
-                FailedScript.Init();
 
-                ClearScript = new EndAnimeScript($@"{origindir}Clear\Script.lua");
-                ClearScript.Init();
-
-                FullComboScript = new EndAnimeScript($@"{origindir}FullCombo\Script.lua");
-                FullComboScript.Init();
-
-                DondaFullComboScript = new EndAnimeScript($@"{origindir}DondaFullCombo\Script.lua");
-                DondaFullComboScript.Init();
-
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
-                    this.soundClear[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Clear.ogg"), ESoundGroup.SoundEffect);
-                    this.soundFailed[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Failed.ogg"), ESoundGroup.SoundEffect);
-                    this.soundFullCombo[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\FullCombo.ogg"), ESoundGroup.SoundEffect);
-                    this.soundDondaFullCombo[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                    Tower_DropoutScript = new EndAnimeScript($@"{origindir}Tower_Dropout\Script.lua");
+                    Tower_DropoutScript.Init();
+
+                    Tower_TopReached_PassScript = new EndAnimeScript($@"{origindir}Tower_TopReached_Pass\Script.lua");
+                    Tower_TopReached_PassScript.Init();
+
+                    Tower_TopReached_FullComboScript = new EndAnimeScript($@"{origindir}Tower_TopReached_FullCombo\Script.lua");
+                    Tower_TopReached_FullComboScript.Init();
+
+                    Tower_TopReached_PerfectScript = new EndAnimeScript($@"{origindir}Tower_TopReached_Perfect\Script.lua");
+                    Tower_TopReached_PerfectScript.Init();
+
+                    this.soundTowerDropout = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Tower\Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
+                    this.soundTowerTopPass = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Tower\Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
+                    this.soundTowerTopFC = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Tower\Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
+                    this.soundTowerTopPerfect = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Tower\Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
                 }
-                
+                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                {
+                    Dan_FailScript = new EndAnimeScript($@"{origindir}Dan_Fail\Script.lua");
+                    Dan_FailScript.Init();
+
+                    Dan_Red_PassScript = new EndAnimeScript($@"{origindir}Dan_Red_Pass\Script.lua");
+                    Dan_Red_PassScript.Init();
+
+                    Dan_Red_FullComboScript = new EndAnimeScript($@"{origindir}Dan_Red_FullCombo\Script.lua");
+                    Dan_Red_FullComboScript.Init();
+
+                    Dan_Red_PerfectScript = new EndAnimeScript($@"{origindir}Dan_Red_Perfect\Script.lua");
+                    Dan_Red_PerfectScript.Init();
+
+                    Dan_Gold_PassScript = new EndAnimeScript($@"{origindir}Dan_Gold_Pass\Script.lua");
+                    Dan_Gold_PassScript.Init();
+
+                    Dan_Gold_FullComboScript = new EndAnimeScript($@"{origindir}Dan_Gold_FullCombo\Script.lua");
+                    Dan_Gold_FullComboScript.Init();
+
+                    Dan_Gold_PerfectScript = new EndAnimeScript($@"{origindir}Dan_Gold_Perfect\Script.lua");
+                    Dan_Gold_PerfectScript.Init();
+
+                    this.soundDanFailed = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Fail.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanRedClear = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanRedFC = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanRedPerfect = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanGoldClear = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanGoldFC = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
+                    this.soundDanGoldPerfect = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Dan\Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
+                    
+                }
+                else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    AILoseScript = new EndAnimeScript($@"{origindir}AI_Lose\Script.lua");
+                    AILoseScript.Init();
+
+                    AIWinScript = new EndAnimeScript($@"{origindir}AI_Win\Script.lua");
+                    AIWinScript.Init();
+
+                    AIWin_FullComboScript = new EndAnimeScript($@"{origindir}AI_Win_FullCombo\Script.lua");
+                    AIWin_FullComboScript.Init();
+
+                    AIWin_PerfectScript = new EndAnimeScript($@"{origindir}AI_Win_Perfect\Script.lua");
+                    AIWin_PerfectScript.Init();
+
+                    this.soundAILose = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
+                    this.soundAIWin = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
+                    this.soundAIWinFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
+                    this.soundAIWinDondaFullCombo = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                }
+                else
+                {
+                    FailedScript = new EndAnimeScript($@"{origindir}ClearFailed\Script.lua");//ClearFailed
+                    FailedScript.Init();
+
+                    ClearScript = new EndAnimeScript($@"{origindir}Clear\Script.lua");
+                    ClearScript.Init();
+
+                    FullComboScript = new EndAnimeScript($@"{origindir}FullCombo\Script.lua");
+                    FullComboScript.Init();
+
+                    DondaFullComboScript = new EndAnimeScript($@"{origindir}DondaFullCombo\Script.lua");
+                    DondaFullComboScript.Init();
+
+                    for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        this.soundClear[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Clear.ogg"), ESoundGroup.SoundEffect);
+                        this.soundFailed[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Failed.ogg"), ESoundGroup.SoundEffect);
+                        this.soundFullCombo[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\FullCombo.ogg"), ESoundGroup.SoundEffect);
+                        this.soundDondaFullCombo[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                    }
+                }
+
                 base.OnManagedリソースの作成();
             }
         }
@@ -167,18 +262,64 @@ namespace TJAPlayer3
         {
             if (!base.b活性化してない)
             {
-                FailedScript.Dispose();
-                ClearScript.Dispose();
-                FullComboScript.Dispose();
-                DondaFullComboScript.Dispose();
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
+                    Tower_DropoutScript.Dispose();
+                    Tower_TopReached_PassScript.Dispose();
+                    Tower_TopReached_FullComboScript.Dispose();
+                    Tower_TopReached_PerfectScript.Dispose();
+
+                    this.soundTowerDropout?.t解放する();
+                    this.soundTowerTopPass?.t解放する();
+                    this.soundTowerTopFC?.t解放する();
+                    this.soundTowerTopPerfect?.t解放する();
+                }
+                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                {
+                    Dan_FailScript.Dispose();
+                    Dan_Red_PassScript.Dispose();
+                    Dan_Red_FullComboScript.Dispose();
+                    Dan_Red_PerfectScript.Dispose();
+                    Dan_Gold_PassScript.Dispose();
+                    Dan_Gold_FullComboScript.Dispose();
+                    Dan_Gold_PerfectScript.Dispose();
+
+                    this.soundDanFailed?.t解放する();
+                    this.soundDanRedClear?.t解放する();
+                    this.soundDanRedFC?.t解放する();
+                    this.soundDanRedPerfect?.t解放する();
+                    this.soundDanGoldClear?.t解放する();
+                    this.soundDanGoldFC?.t解放する();
+                    this.soundDanGoldPerfect?.t解放する();
+                }
+                else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                {
+                    AILoseScript.Dispose();
+                    AIWinScript.Dispose();
+                    AIWin_FullComboScript.Dispose();
+                    AIWin_PerfectScript.Dispose();
+
+                    this.soundAILose?.t解放する();
+                    this.soundAIWin?.t解放する();
+                    this.soundAIWinFullCombo?.t解放する();
+                    this.soundAIWinDondaFullCombo?.t解放する();
+                }
+                else
+                {
+                    FailedScript.Dispose();
+                    ClearScript.Dispose();
+                    FullComboScript.Dispose();
+                    DondaFullComboScript.Dispose();
+
+                    for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
                         this.soundClear[i]?.t解放する();
                         this.soundFailed[i]?.t解放する();
                         this.soundFullCombo[i]?.t解放する();
                         this.soundDondaFullCombo[i]?.t解放する();
+                    }
                 }
-                
+
                 base.OnManagedリソースの解放();
             }
         }
@@ -449,6 +590,8 @@ namespace TJAPlayer3
                 {
                     for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                     {
+                        if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+
                         switch (this.Mode[i])
                         {
                             case EndMode.StageFailed:
@@ -471,6 +614,85 @@ namespace TJAPlayer3
                                 this.soundDondaFullCombo[i]?.t再生を開始する();
                                 TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
                                 break;
+
+                            case EndMode.AI_Lose:
+                                AILoseScript.PlayEndAnime(i);
+                                this.soundAILose?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceAILose[TJAPlayer3.GetActualPlayer(1)]?.t再生する();
+                                break;
+                            case EndMode.AI_Win:
+                                AIWinScript.PlayEndAnime(i);
+                                this.soundAIWin?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.AI_Win_FullCombo:
+                                AIWin_FullComboScript.PlayEndAnime(i);
+                                this.soundAIWinFullCombo?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.AI_Win_Perfect:
+                                AIWin_PerfectScript.PlayEndAnime(i);
+                                this.soundAIWinDondaFullCombo?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+
+                            case EndMode.Tower_Dropout:
+                                Tower_DropoutScript.PlayEndAnime(i);
+                                this.soundTowerDropout?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Tower_TopReached_Pass:
+                                Tower_TopReached_PassScript.PlayEndAnime(i);
+                                this.soundTowerTopPass?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Tower_TopReached_FullCombo:
+                                Tower_TopReached_FullComboScript.PlayEndAnime(i);
+                                this.soundTowerTopFC?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Tower_TopReached_Perfect:
+                                Tower_TopReached_PerfectScript.PlayEndAnime(i);
+                                this.soundTowerTopPerfect?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+
+                            case EndMode.Dan_Fail:
+                                Dan_FailScript.PlayEndAnime(i);
+                                this.soundDanFailed?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Red_Pass:
+                                Dan_Red_PassScript.PlayEndAnime(i);
+                                this.soundDanRedClear?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Red_FullCombo:
+                                Dan_Red_FullComboScript.PlayEndAnime(i);
+                                this.soundDanRedFC?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Red_Perfect:
+                                Dan_Red_PerfectScript.PlayEndAnime(i);
+                                this.soundDanRedPerfect?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Gold_Pass:
+                                Dan_Gold_PassScript.PlayEndAnime(i);
+                                this.soundDanGoldClear?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Gold_FullCombo:
+                                Dan_Gold_FullComboScript.PlayEndAnime(i);
+                                this.soundDanGoldFC?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+                            case EndMode.Dan_Gold_Perfect:
+                                Dan_Gold_PerfectScript.PlayEndAnime(i);
+                                this.soundDanGoldPerfect?.t再生を開始する();
+                                TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.t再生する();
+                                break;
+
                             default:
                                 break;
                         }
@@ -482,6 +704,8 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
+                    if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+
                     switch (this.Mode[i])
                     {
                         case EndMode.StageFailed:
@@ -495,6 +719,61 @@ namespace TJAPlayer3
                             break;
                         case EndMode.StageDondaFullCombo:
                             this.showEndEffect_DondaFullCombo(i);
+                            break;
+
+                        case EndMode.AI_Win:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWinScript.Update(i);
+                            AIWinScript.Draw(i);
+                            break;
+                        case EndMode.AI_Lose:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AILoseScript.Update(i);
+                            AILoseScript.Draw(i);
+                            break;
+
+                        case EndMode.Tower_Dropout:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_DropoutScript.Update(i);
+                            Tower_DropoutScript.Draw(i);
+                            break;
+                        case EndMode.Tower_TopReached_Pass:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PassScript.Update(i);
+                            Tower_TopReached_PassScript.Draw(i);
+                            break;
+                        case EndMode.Tower_TopReached_FullCombo:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
+                            Tower_TopReached_FullComboScript.Draw(i);
+                            break;
+                        case EndMode.Tower_TopReached_Perfect:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
+                            Tower_TopReached_PerfectScript.Draw(i);
+                            break;
+
+                        case EndMode.Dan_Fail:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_FailScript.Update(i);
+                            Dan_FailScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Red_Pass:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_PassScript.Update(i);
+                            Dan_Red_PassScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Red_FullCombo:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_FullComboScript.Update(i);
+                            Dan_Red_FullComboScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Red_Perfect:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_PerfectScript.Update(i);
+                            Dan_Red_PerfectScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Gold_Pass:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_PassScript.Update(i);
+                            Dan_Gold_PassScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Gold_FullCombo:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_FullComboScript.Update(i);
+                            Dan_Gold_FullComboScript.Draw(i);
+                            break;
+                        case EndMode.Dan_Gold_Perfect:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_PerfectScript.Update(i);
+                            Dan_Gold_PerfectScript.Draw(i);
                             break;
                         default:
                             break;
@@ -521,6 +800,25 @@ namespace TJAPlayer3
         private EndAnimeScript FullComboScript;
         private EndAnimeScript DondaFullComboScript;
 
+        private EndAnimeScript AILoseScript;
+        private EndAnimeScript AIWinScript;
+        private EndAnimeScript AIWin_FullComboScript;
+        private EndAnimeScript AIWin_PerfectScript;
+
+        private EndAnimeScript Tower_DropoutScript;
+        private EndAnimeScript Tower_TopReached_PassScript;
+        private EndAnimeScript Tower_TopReached_FullComboScript;
+        private EndAnimeScript Tower_TopReached_PerfectScript;
+
+        private EndAnimeScript Dan_FailScript;
+        private EndAnimeScript Dan_Red_PassScript;
+        private EndAnimeScript Dan_Red_FullComboScript;
+        private EndAnimeScript Dan_Red_PerfectScript;
+
+        private EndAnimeScript Dan_Gold_PassScript;
+        private EndAnimeScript Dan_Gold_FullComboScript;
+        private EndAnimeScript Dan_Gold_PerfectScript;
+
         bool b再生済み;
         bool bリザルトボイス再生済み;
         bool bSongsPlayed = false;
@@ -535,17 +833,52 @@ namespace TJAPlayer3
         */
 
         CCounter ct進行Loop;
-        CSound[] soundClear = new CSound[4];
-        CSound[] soundFailed = new CSound[4];
-        CSound[] soundFullCombo = new CSound[4];
-        CSound[] soundDondaFullCombo = new CSound[4];
+        CSound[] soundClear = new CSound[5];
+        CSound[] soundFailed = new CSound[5];
+        CSound[] soundFullCombo = new CSound[5];
+        CSound[] soundDondaFullCombo = new CSound[5];
+        CSound soundDanFailed;
+        CSound soundDanRedClear;
+        CSound soundDanRedFC;
+        CSound soundDanRedPerfect;
+        CSound soundDanGoldClear;
+        CSound soundDanGoldFC;
+        CSound soundDanGoldPerfect;
+        CSound soundTowerDropout;
+        CSound soundTowerTopPass;
+        CSound soundTowerTopFC;
+        CSound soundTowerTopPerfect; 
+
+        CSound soundAILose;
+        CSound soundAIWin;
+        CSound soundAIWinFullCombo;
+        CSound soundAIWinDondaFullCombo;
+
         EndMode[] Mode;
         enum EndMode
         {
             StageFailed,
             StageCleared,
             StageFullCombo,
-            StageDondaFullCombo
+            StageDondaFullCombo,
+
+            AI_Lose,
+            AI_Win,
+            AI_Win_FullCombo,
+            AI_Win_Perfect,
+
+            Tower_Dropout,
+            Tower_TopReached_Pass,
+            Tower_TopReached_FullCombo,
+            Tower_TopReached_Perfect,
+
+            Dan_Fail,
+            Dan_Red_Pass,
+            Dan_Red_FullCombo,
+            Dan_Red_Perfect,
+            Dan_Gold_Pass,
+            Dan_Gold_FullCombo,
+            Dan_Gold_Perfect
         }
 
         void StarDraw(int x, int y, int count, int starttime = 0, int Endtime = 20)

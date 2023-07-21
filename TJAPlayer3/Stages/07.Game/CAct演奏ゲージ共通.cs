@@ -33,14 +33,17 @@ namespace TJAPlayer3
         {
             for (int i = 0; i < 3; i++)
             {
-                dbゲージ増加量[i] = new float[2];
+                dbゲージ増加量[i] = new float[5];
                 for (int n = 0; n < 3; n++)
                 {
-                    dbゲージ増加量_Branch[i, n] = new float[2];
+                    dbゲージ増加量_Branch[i, n] = new float[5];
                 }
             }
             this.DTX[0] = TJAPlayer3.DTX;
             this.DTX[1] = TJAPlayer3.DTX_2P;
+            this.DTX[2] = TJAPlayer3.DTX_3P;
+            this.DTX[3] = TJAPlayer3.DTX_4P;
+            this.DTX[4] = TJAPlayer3.DTX_5P;
             actLVLNFont = new CActLVLNFont();
             actLVLNFont.On活性化();
             base.On活性化();
@@ -107,7 +110,7 @@ namespace TJAPlayer3
         {
             //ダメージ値の計算は太鼓の達人譜面Wikiのものを参考にしました。
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 this.db現在のゲージ値[i] = 0;
             }
@@ -519,8 +522,8 @@ namespace TJAPlayer3
         //-----------------
         #endregion
 
-        private CDTX[] DTX = new CDTX[2];
-        public double[] db現在のゲージ値 = new double[4];
+        private CDTX[] DTX = new CDTX[5];
+        public double[] db現在のゲージ値 = new double[5];
         protected CCounter ct炎;
         protected CCounter ct虹アニメ;
         protected CCounter ct虹透明度;

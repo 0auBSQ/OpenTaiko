@@ -130,7 +130,7 @@ namespace TJAPlayer3
 		}
 		public override void OnManagedリソースの解放()
 		{
-			if (!base.b活性化してない)
+			if (base.b活性化してない)
 				return;
 
 			TJAPlayer3.t安全にDisposeする(ref Background);
@@ -352,7 +352,7 @@ namespace TJAPlayer3
 
 							if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.DANGAMESTART)
 							{
-								if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0 && TJAPlayer3.ConfigIni.nPlayerCount != 2)
+								if (TJAPlayer3.Songs管理.list曲ルート_Dan.Count > 0 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
 									operationSucceded = true;
 							}
 							else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
@@ -378,6 +378,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.soundEntry.t停止する();
 							ctバナパス読み込み成功.t開始(0, 3655, 1, TJAPlayer3.Timer);
 							bバナパス読み込み = true;
+							bどんちゃんカウンター初期化 = false;
 						}
 					}
 
@@ -595,7 +596,7 @@ namespace TJAPlayer3
 
 					int _actual = TJAPlayer3.GetActualPlayer(0);
 
-                    int _charaId = TJAPlayer3.NamePlateConfig.data.Character[_actual];
+                    int _charaId = TJAPlayer3.SaveFileInstances[_actual].data.Character;
 
 					int chara_x = TJAPlayer3.Skin.Title_Entry_NamePlate[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
 					int chara_y = TJAPlayer3.Skin.Title_Entry_NamePlate[1];
@@ -687,13 +688,15 @@ namespace TJAPlayer3
 
 					for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
 					{
+						if (player >= 2) continue;
+
 						float DonchanX = 0f, DonchanY = 0f;
 
 						DonchanX = -200 + ((float)Math.Sin(ctどんちゃんイン.n現在の値 / 2 * (Math.PI / 180)) * 200f);
 						DonchanY = ((float)Math.Sin((90 + (ctどんちゃんイン.n現在の値 / 2)) * (Math.PI / 180)) * 150f);
 						if (player == 1) DonchanX *= -1;
 
-						int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+						int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
 						//int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + DonchanX);
 						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - DonchanY);
@@ -737,8 +740,8 @@ namespace TJAPlayer3
 									_bar.color4 = C変換.ColorToColor4(Color.DarkGray);
 								if (_chara != null)
 									_chara.color4 = C変換.ColorToColor4(Color.DarkGray);
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText).color4 = C変換.ColorToColor4(Color.DarkGray);
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle).color4 = C変換.ColorToColor4(Color.DarkGray);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText, TJAPlayer3.Skin.Title_VerticalText).color4 = C変換.ColorToColor4(Color.DarkGray);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle, TJAPlayer3.Skin.Title_VerticalText).color4 = C変換.ColorToColor4(Color.DarkGray);
 							}
 							else
 							{
@@ -746,8 +749,8 @@ namespace TJAPlayer3
 									_bar.color4 = C変換.ColorToColor4(Color.White);
 								if (_chara != null)
 									_chara.color4 = C変換.ColorToColor4(Color.White);
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText).color4 = C変換.ColorToColor4(Color.White);
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle).color4 = C変換.ColorToColor4(Color.White);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText, TJAPlayer3.Skin.Title_VerticalText).color4 = C変換.ColorToColor4(Color.White);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle, TJAPlayer3.Skin.Title_VerticalText).color4 = C変換.ColorToColor4(Color.White);
 							}
 
 							#endregion
@@ -757,11 +760,17 @@ namespace TJAPlayer3
 							{
 								float barAnimef = (ctBarMove.n現在の値 / 100.0f) - 1.5f;
 
-								float barAnime = TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[0] + 
+								float barAnime = TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[0] +
 									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[1] - TJAPlayer3.Skin.Title_ModeSelect_Bar_Move[0]));
+
+								float barAnimeX = TJAPlayer3.Skin.Title_ModeSelect_Bar_Move_X[0] +
+									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Bar_Move_X[1] - TJAPlayer3.Skin.Title_ModeSelect_Bar_Move_X[0]));
 
 								float overlayAnime = TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[0] +
 									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[1] - TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move[0]));
+
+								float overlayAnimeX = TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move_X[0] +
+									(barAnimef * (TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move_X[1] - TJAPlayer3.Skin.Title_ModeSelect_Overlay_Move_X[0]));
 
 
 
@@ -771,18 +780,30 @@ namespace TJAPlayer3
 								if (_bar != null)
 								{
 									_bar.Opacity = 255;
+									_bar.vc拡大縮小倍率.X = 1.0f;
 									_bar.vc拡大縮小倍率.Y = 1.0f;
-									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[0] - barAnime, 
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[0] - (TJAPlayer3.Skin.Title_VerticalBar ? barAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[0] - (TJAPlayer3.Skin.Title_VerticalBar ? 0 : barAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][0], 
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][1], 
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[0][3]));
-									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[1], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[1] + barAnime, 
+									_bar.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[1] + (TJAPlayer3.Skin.Title_VerticalBar ? barAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[1] + (TJAPlayer3.Skin.Title_VerticalBar ? 0 : barAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[1][3]));
-									_bar.vc拡大縮小倍率.Y = (barAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]) * 2.0f;
+
+									if (TJAPlayer3.Skin.Title_VerticalBar)
+									{
+										_bar.vc拡大縮小倍率.X = (barAnimeX / TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][2]) * 2.0f;
+									}
+                                    else
+									{
+										_bar.vc拡大縮小倍率.Y = (barAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]) * 2.0f;
+									}
+
 									_bar.t2D拡大率考慮中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_X[2], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Y[2], 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Rect[2][1],
@@ -795,18 +816,29 @@ namespace TJAPlayer3
 								{
 									CTexture _overlap = TJAPlayer3.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount];
 
+									_overlap.vc拡大縮小倍率.X = 1.0f;
 									_overlap.vc拡大縮小倍率.Y = 1.0f;
 									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[0], 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][3]));
-									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[1], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + overlayAnime, 
+									_overlap.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[1] + (TJAPlayer3.Skin.Title_VerticalBar ? overlayAnimeX : 0), 
+										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + (TJAPlayer3.Skin.Title_VerticalBar ? 0 : overlayAnime), 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][1],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][2],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][3]));
-									_overlap.vc拡大縮小倍率.Y = (overlayAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]);
+
+									if (TJAPlayer3.Skin.Title_VerticalBar)
+									{
+										_overlap.vc拡大縮小倍率.X = (overlayAnimeX / TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][2]);
+									}
+                                    else
+									{
+										_overlap.vc拡大縮小倍率.Y = (overlayAnime / TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]);
+									}
+
 									_overlap.t2D拡大率考慮上中央基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_X[2], TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Y[2], 
 										new Rectangle(TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][0],
 										TJAPlayer3.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][1],
@@ -834,9 +866,11 @@ namespace TJAPlayer3
 										new Rectangle(_chara.szテクスチャサイズ.Width / 2, 0, _chara.szテクスチャサイズ.Width / 2, _chara.szテクスチャサイズ.Height));
 								}
 
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[0], TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[1] - (TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title_Move * BarAnimeCount));
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle, TJAPlayer3.Skin.Title_VerticalText)?.t2D中心基準描画(TJAPlayer3.app.Device, 
+									TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[0] + (TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title_Move_X * BarAnimeCount),
+									TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title[1] - (TJAPlayer3.Skin.Title_ModeSelect_Bar_Center_Title_Move * BarAnimeCount));
 
-								CTexture currentText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText);
+								CTexture currentText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkBoxText, TJAPlayer3.Skin.Title_VerticalText);
 								if (currentText != null)
 								{
 									currentText.Opacity = (int)(BarAnimeCount * 255f);
@@ -874,6 +908,7 @@ namespace TJAPlayer3
 
 								if (_bar != null)
 								{
+									_bar.vc拡大縮小倍率.X = 1.0f;
 									_bar.vc拡大縮小倍率.Y = 1.0f;
 									_bar.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 								}
@@ -882,19 +917,22 @@ namespace TJAPlayer3
 								{
 									CTexture _overlap = TJAPlayer3.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount];
 
+									_overlap.vc拡大縮小倍率.X = 1.0f;
 									_overlap.vc拡大縮小倍率.Y = 1.0f;
 									_overlap.t2D描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 								}
 
 
 
-								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle)?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[0], pos.Y + BarAnimeY - BarMoveY + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[1]);
+								TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_menu.ttkTitle, TJAPlayer3.Skin.Title_VerticalText)?.t2D中心基準描画(TJAPlayer3.app.Device, pos.X + BarAnimeX - BarMoveX + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[0], pos.Y + BarAnimeY - BarMoveY + TJAPlayer3.Skin.Title_ModeSelect_Title_Offset[1]);
 							}
 						}
 					}
 
 					for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
 					{
+						if (player >= 2) continue;
+
 						TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[player], TJAPlayer3.Skin.SongSelect_NamePlate_Y[player], player, false, 255);
 					}
 				}

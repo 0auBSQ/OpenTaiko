@@ -37,6 +37,7 @@ BoxFontName=廻想体 ネクスト UP B
 - cien (@CienpixeL) (Nameplates, Rainbox result screen gauge, Drum textures, End game animations, Gogo splash animations)
 - Waldo - https://pressstart.vip/assets (Tower and Dan result screen background and skyboxes)
 - PNG Egg (Fireworks) (Non-commercial)
+- Takkkom - https://github.com/Takkkom (AI Battle mode and 5P assets)
 ```
 
 ## OpenTaiko Original Soundtrack
@@ -82,7 +83,7 @@ BoxFontName=廻想体 ネクスト UP B
 036 - RUiNED GLORY : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
 037 - Yukianesa ~Azure Of Ice~ : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
 038 - Dear Stars : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
-039 - Forever Fading Away : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & colin)
+039 - Forever Fading Away : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, colin, bol, 0AuBSQ & Ryuto Setsujin)
 040 - Every Night : DJ NEXTON - https://nexton.bandcamp.com (Chart by colin)
 041 - beyond the cityscape : Makotora - https://soundcloud.com/xoxomakotora/beyond-the-cityscape (Chart by bol)
 042 - Shockwave : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol)
@@ -98,11 +99,33 @@ BoxFontName=廻想体 ネクスト UP B
 052 - Scarlet Mirage : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu & bol)
 053 - PYRΔMiD : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by colin, bol & 0AuBSQ)
 054 - Synthsea : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme), 0AuBSQ (Hard), bol (Normal) and Megi (Easy))
+055 - NEKROS : GRYSCL - https://twitter.com/gr_ysc_l_?s=21&t=XsxV9B105MlJ0dHUUK8k4g (Chart by colin and 0AuBSQ (Extra))
+056 - I'll still be me : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+057 - Stories of your negative past : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
+058 - pipie : goldenyoshi22 - https://www.youtube.com/@goldenyoshi22 (Chart by goldenyoshi22 and 0AuBSQ)
+059 - Hero's March : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
+060 - lost in the cityscape : Makotora - https://soundcloud.com/xoxomakotora (Chart by Makotora)
+061 - The Abyss : ok cheez - https://rchase.bandcamp.com/ | https://soundcloud.com/ok-cheez-96 (Chart by colin)
+062 - next-level cityscape : Makotora - https://soundcloud.com/xoxomakotora (Chart by 0AuBSQ and Makotora)
+063 - away : rainfall - https://on.soundcloud.com/dHt1P (Chart by Megi and 0AuBSQ)
+064 - PLANETES : SiLiS - https://soundcloud.com/silis/planetes?si=2da8518a62bd4022a176a62fd2abe458&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by 0AuBSQ)
+065 - Bounded Quietude : SiLiS vs Finite Limit - https://soundcloud.com/silis/silis-vs-finite-limit-bounded?si=f7b16b47ef5e4feb992df028778af30a&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by bol and 0AuBSQ)
+066 - Heating Up : FCN - https://fcngroove.carrd.co/ (Chart by Shoxk)
+067 - Liar Prison : SiLiS ft. Karin Natsuki - https://soundcloud.com/silis/liarprison/s-RY4KsJUxuzL?si=e1738364de3a45328b27d1f10c90fea5&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by 0AuBSQ)
+068 - Unlucky Rain : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, Shoxk and 0AuBSQ)
+069 - Vanaheimr : SiLiS - https://soundcloud.com/silis (Chart by bol and 0AuBSQ)
+070 - Kernschmelze 256 : funkyzukin-Q - https://funkyzukin.bandcamp.com/ (Chart by DashyDesu and DragonRatTiger)
+071 - When will the end arrive, I wonder? : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu and 0AuBSQ)
+072 - Scarlet Soul : Cusi vs 9C - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA (Chart by bol and 0AuBSQ)
+073 - Emily : H5 - https://linktr.ee/H5Music (Chart by bol and 0AuBSQ)
+074 - Spatium Cursu : X3ll3n - https://linktr.ee/x3ll3n https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg https://x3ll3n.newgrounds.com/ https://soundcloud.com/x3ll3n https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX https://www.instagram.com/x3ll3n_music/ (Chart by 0AuBSQ)
+075 - 640x480 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by Colin and Komi)
+076 - Rainy Night II ~無信の森~ : Taichenko - https://space.bilibili.com/356518101 https://b23.tv/LBMw5Oz (Chart by Taichenko (Extreme) & 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
 
-Songs within the `OpenTaiko Original` folder have non-exclusive licences (which means that you might see some of them in other games or projects).
+Songs within the `OpenTaiko Chapter` and the distinctive characters folders have non-exclusive licences (which means that you might see some of them in other games or projects).
 It is permitted to use them in the following cases :
 ```
 - OpenTaiko streamings on services such as Twitch, Youtube streaming or similar
@@ -113,16 +136,6 @@ It is permitted to use them in the following cases :
 Each composer keep the rights on their songs, therefore you **must** ensure to have their authorization to use their songs for any different purpose than those listed above and/or to get an appropriate licence if necessary.
 
 If you liked a specific song and want to support the composer's work, please check their links on the credits.
-
-### About the OpenTaiko Sound Team songs
-
-Songs having on their `.tja` one of the following artist names as `SUBTITLE` metadata :
-```
-0AuBSQ
-申しコミ
-OpenTaiko Sound Team
-```
-are songs made and owned by the OpenTaiko Team and are under the Creative Commons BY-NC licence.
 
 ## Translations
 
@@ -144,4 +157,5 @@ Several bug fixes and improvements : l1m0n3 - https://github.com/l1m0n3
 Complete removal of the SlimDX dependency : Mr-Oiji https://github.com/Mr-Ojii
 Several features and major improvements : Takkkom - https://github.com/Takkkom
 Mod icons : FAKEYJSNPI - https://github.com/FAKEYJSNPI
+VTT lyrics support : DragonRatTiger - https://github.com/DragonRatTiger
 ```

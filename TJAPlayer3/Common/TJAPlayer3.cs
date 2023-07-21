@@ -122,8 +122,68 @@ namespace TJAPlayer3
 				}
 			}
 		}
+		public static CDTX DTX_3P
+		{
+			get
+			{
+				return dtx[2];
+			}
+			set
+			{
+				if ((dtx[2] != null) && (app != null))
+				{
+					dtx[2].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[2]);
+				}
+				dtx[2] = value;
+				if ((dtx[2] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[2]);
+				}
+			}
+		}
+		public static CDTX DTX_4P
+		{
+			get
+			{
+				return dtx[3];
+			}
+			set
+			{
+				if ((dtx[3] != null) && (app != null))
+				{
+					dtx[3].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[3]);
+				}
+				dtx[3] = value;
+				if ((dtx[3] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[3]);
+				}
+			}
+		}
+		public static CDTX DTX_5P
+		{
+			get
+			{
+				return dtx[4];
+			}
+			set
+			{
+				if ((dtx[4] != null) && (app != null))
+				{
+					dtx[4].On非活性化();
+					app.listトップレベルActivities.Remove(dtx[4]);
+				}
+				dtx[4] = value;
+				if ((dtx[4] != null) && (app != null))
+				{
+					app.listトップレベルActivities.Add(dtx[4]);
+				}
+			}
+		}
 
-	    public static bool IsPerformingCalibration;
+		public static bool IsPerformingCalibration;
 
 		public static CFPS FPS
 		{ 
@@ -428,12 +488,14 @@ namespace TJAPlayer3
 		// 0 : 1P, 1 : 2P
 		public static int SaveFile = 0;
 
+		public static SaveFile[] SaveFileInstances = new SaveFile[5];
+
 		// 0 : Hidari, 1 : Migi (1P only)
 		public static int PlayerSide = 0;
 
 		public static int GetActualPlayer(int player)
         {
-			if (SaveFile == 0)
+			if (SaveFile == 0 || player > 1)
 				return player;
 			if (player == 0)
 				return 1;
@@ -897,7 +959,6 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
-								ConfigIni.bAIBattleMode = false;
 								//-----------------------------
 								#endregion
 								break;
@@ -911,9 +972,6 @@ namespace TJAPlayer3
 								stage段位選択.On活性化();								
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage段位選択;
-
-								ConfigIni.bAIBattleMode = false;
-
 								TJAPlayer3.latestSongSelect = stage段位選択;
 								//-----------------------------
 								#endregion
@@ -995,7 +1053,8 @@ namespace TJAPlayer3
 								r現在のステージ = stage選曲;
 
 								TJAPlayer3.latestSongSelect = stage選曲;
-								ConfigIni.nPlayerCount = 2;
+								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
+                                ConfigIni.nPlayerCount = 2;
 								ConfigIni.bAIBattleMode = true;
 								//-----------------------------
 								#endregion
@@ -1088,12 +1147,18 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
 
-								/*
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								if (ConfigIni.bAIBattleMode == true)
+								{
+									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
+                                    ConfigIni.bAIBattleMode = false;
+                                }
+                                /*
 								Skin.bgm選曲画面イン.t停止する();
 								Skin.bgm選曲画面.t停止する();
 								*/
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								foreach ( STPlugin pg in this.listプラグイン )
 								{
@@ -1168,7 +1233,10 @@ namespace TJAPlayer3
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageコンフィグ;
 
-								foreach( STPlugin pg in this.listプラグイン )
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								foreach ( STPlugin pg in this.listプラグイン )
 								{
 									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
 									pg.plugin.Onステージ変更();
@@ -2094,7 +2162,7 @@ for (int i = 0; i < 3; i++) {
 		private bool b終了処理完了済み;
 		private bool bネットワークに接続中 = false;
 		private long 前回のシステム時刻ms = long.MinValue;
-		private static CDTX[] dtx = new CDTX[ 4 ];
+		private static CDTX[] dtx = new CDTX[ 5 ];
 
         public static TextureLoader Tx = new TextureLoader();
 
@@ -2166,7 +2234,13 @@ for (int i = 0; i < 3; i++) {
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
 			}
-			this.Window.EnableSystemMenu = TJAPlayer3.ConfigIni.bIsEnabledSystemMenu;	// #28200 2011.5.1 yyagi
+
+            for (int i = 0; i < 5; i++)
+            {
+                SaveFileInstances[i] = new SaveFile();
+                SaveFileInstances[i].tSaveFile(TJAPlayer3.ConfigIni.sSaveFile[i]);
+            }
+            this.Window.EnableSystemMenu = TJAPlayer3.ConfigIni.bIsEnabledSystemMenu;	// #28200 2011.5.1 yyagi
 			// 2012.8.22 Config.iniが無いときに初期値が適用されるよう、この設定行をifブロック外に移動
 
 			//---------------------
@@ -2304,7 +2378,9 @@ for (int i = 0; i < 3; i++) {
 			//---------------------
 			Trace.TraceInformation( "スキンの初期化を行います。" );
 			Trace.Indent();
+#if !DEBUG
 			try
+#endif
 			{
 				Skin = new CSkin( TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName, false);
 				TJAPlayer3.ConfigIni.strSystemSkinSubfolderFullName = TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName( true );  // 旧指定のSkinフォルダが消滅していた場合に備える
@@ -2313,6 +2389,7 @@ for (int i = 0; i < 3; i++) {
 
 				Trace.TraceInformation( "スキンの初期化を完了しました。" );
 			}
+#if !DEBUG
 			catch (Exception e)
 			{
 				Trace.TraceInformation( "スキンの初期化に失敗しました。" );
@@ -2322,6 +2399,7 @@ for (int i = 0; i < 3; i++) {
 			{
 				Trace.Unindent();
 			}
+#endif
 
 			// Init Modal fonts once config.ini parsing is done
 			// Moved here to reference Skin values.
@@ -3147,6 +3225,8 @@ for (int i = 0; i < 3; i++) {
 
             TJAPlayer3.act文字コンソール.On活性化();
 			TJAPlayer3.NamePlate.RefleshSkin();
+			CActSelectPopupMenu.RefleshSkin();
+			CActSelect段位リスト.RefleshSkin();
 		}
 		#region [ Windowイベント処理 ]
 		private void t指定フォルダ内でのプラグイン検索と生成( string strプラグインフォルダパス, string strプラグイン型名 )
@@ -3250,7 +3330,7 @@ for (int i = 0; i < 3; i++) {
 		{
 			if ( mb.Equals(MouseButtons.Left) && ConfigIni.bIsAllowedDoubleClickFullscreen )	// #26752 2011.11.27 yyagi
 			{
-				ConfigIni.bウィンドウモード = false;
+				ConfigIni.bウィンドウモード = !ConfigIni.bウィンドウモード;
 				this.t全画面_ウィンドウモード切り替え();
 			}
 		}

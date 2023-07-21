@@ -19,17 +19,14 @@ namespace TJAPlayer3
 
         public override void On活性化()
         {
-            ctMob = new CCounter();
-            //ctMob = new CCounter(1, 180, 60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM * TJAPlayer3.Skin.Game_Mob_Beat / 180 / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0), CSound管理.rc演奏用タイマ);
-            ctMobPtn = new CCounter();
             RandomMob = TJAPlayer3.Random.Next(TJAPlayer3.Skin.Game_Mob_Ptn);
+            nMobBeat = TJAPlayer3.Skin.Game_Mob_Beat;
+
             base.On活性化();
         }
 
         public override void On非活性化()
         {
-            ctMob = null;
-            ctMobPtn = null;
             base.On非活性化();
         }
 
@@ -47,9 +44,6 @@ namespace TJAPlayer3
         {
             if(!TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
             {
-                if (ctMob != null) ctMob.t進行LoopDb();
-                if (ctMobPtn != null || TJAPlayer3.Skin.Game_Mob_Ptn != 0) ctMobPtn.t進行LoopDb();
-
                 if (TJAPlayer3.Skin.Game_Mob_Ptn != 0 && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
                 {
 
@@ -63,11 +57,18 @@ namespace TJAPlayer3
 
                     if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= 100)
                     {
-                        
 
-                        
+                        if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowMobCounter += (Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * 180 / nMobBeat;
+                        bool endAnime = nNowMobCounter >= 180;
+
+                        if (endAnime)
+                        {
+                            nNowMobCounter = 0;
+                        }
+
+
                         if (TJAPlayer3.Tx.Mob[RandomMob] != null)
-                            TJAPlayer3.Tx.Mob[RandomMob].t2D描画(TJAPlayer3.app.Device, 0, (TJAPlayer3.Skin.Resolution[1] - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)) * 70));
+                            TJAPlayer3.Tx.Mob[RandomMob].t2D描画(TJAPlayer3.app.Device, 0, (TJAPlayer3.Skin.Resolution[1] - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin(nNowMobCounter * (Math.PI / 180)) * 70));
                         
                     }
 
@@ -77,8 +78,8 @@ namespace TJAPlayer3
         }
         #region[ private ]
         //-----------------
-        public CCounter ctMob;
-        public CCounter ctMobPtn;
+        private float nNowMobCounter;
+        private float nMobBeat;
         private int RandomMob;
         //-----------------
         #endregion

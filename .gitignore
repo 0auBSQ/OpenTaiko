@@ -21,7 +21,9 @@
 /Test/Favorite.json
 /Test/RecentlyPlayedSongs.json
 /Test/SongsIgnored/*
+/Test/SongsTest/*
 /Test/SongsIgnored2/*
+/Test/Saves
 /Test/xadec.dll
 /Test/SoundDecoder.dll
 /Test/msvcr90.dll
@@ -50,5 +52,9 @@
 /Test/Global/Characters/D
 /Test/Global/Characters/Ume
 /Test/Global/Characters/Kuro
+/Test/Global/Characters/Aitritus
+/Test/Global/Characters/Kohaku
+/Test/Global/Characters/Student (A)
+/Test/Global/Characters/Student (B)
 *.score.ini
 Test/System/Open-World Memories.zip

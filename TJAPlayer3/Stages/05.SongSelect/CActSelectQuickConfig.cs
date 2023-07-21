@@ -95,7 +95,7 @@ namespace TJAPlayer3
 
 			#endregion
 			#region [ 共通 SET切り替え/More/Return ]
-			l.Add(new CItemInteger("PlayerCount", 1, 2, TJAPlayer3.ConfigIni.nPlayerCount, "プレイヤーの人数を指定します。" ,"Set a player count."));
+			l.Add(new CItemInteger("PlayerCount", 1, 5, TJAPlayer3.ConfigIni.nPlayerCount, "プレイヤーの人数を指定します。" ,"Set a player count."));
 			l.Add( new CSwitchItemList( "More...", CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" } ) );
 			l.Add( new CSwitchItemList( "戻る", CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "", "" } ) );
 			#endregion

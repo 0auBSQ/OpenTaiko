@@ -267,10 +267,29 @@ namespace TJAPlayer3
 					        if( TJAPlayer3.Tx.Effects_Hit_Explosion != null && !TJAPlayer3.IsPerformingCalibration )
 					        {
                                 int n = this.st状態[ i ].nIsBig == 1 ? (nHeight * 2) : 0;
-                                int nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
-                                int nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
 
-                                switch( st状態[ i ].judge )
+                                int nX = 0;
+                                int nY = 0;
+
+                                if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                                {
+                                    nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
+                                    nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+                                }
+                                else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                                {
+                                    nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
+                                    nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+                                }
+                                else
+                                {
+                                    nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
+                                    nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+                                }
+                                nX += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
+                                nY += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+
+                                switch ( st状態[ i ].judge )
                                 {
                                     case E判定.Perfect:
                                     case E判定.Great:
@@ -340,8 +359,29 @@ namespace TJAPlayer3
                                         TJAPlayer3.Tx.Effects_Hit_Explosion_Big.t3D描画( TJAPlayer3.app.Device, mat );
                                         */
 
-                                        float x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態_大[i].nPlayer] - (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Width * (f倍率 - 1.0f) / 2.0f);
-                                        float y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態_大[i].nPlayer] - (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Height * (f倍率 - 1.0f) / 2.0f);
+                                        float x = 0;
+                                        float y = 0;
+
+                                        if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+                                        {
+                                            x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
+                                            y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+                                        }
+                                        else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+                                        {
+                                            x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
+                                            y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+                                        }
+                                        else
+                                        {
+                                            x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
+                                            y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+                                        }
+                                        x += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
+                                        y += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+
+                                        x -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Width * (f倍率 - 1.0f) / 2.0f);
+                                        y -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Height * (f倍率 - 1.0f) / 2.0f);
 
                                         TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X = f倍率;
                                         TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y = f倍率;

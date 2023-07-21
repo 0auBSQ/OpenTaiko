@@ -180,15 +180,15 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Left)
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X , TJAPlayer3.Skin.Game_Lyric_Y);
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X , TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
                 }
                 else if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Right)
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Lyric_Y);
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
                 }
                 else
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szテクスチャサイズ.Width / 2), TJAPlayer3.Skin.Game_Lyric_Y);
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szテクスチャサイズ.Width / 2), TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
                 }
             }
         }
@@ -252,7 +252,7 @@ namespace TJAPlayer3
 		}
 		public int t進行描画( int x, int y )
 		{
-            if (TJAPlayer3.stage演奏ドラム画面.actDan.IsAnimating) return 0;
+            if (TJAPlayer3.stage演奏ドラム画面.actDan.IsAnimating || TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
 			if( !base.b活性化してない && !this.bMute )
 			{
 				this.ct進行用.t進行Loop();

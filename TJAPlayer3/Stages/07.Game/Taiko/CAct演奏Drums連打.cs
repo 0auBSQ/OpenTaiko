@@ -65,25 +65,25 @@ namespace TJAPlayer3
 
         public override void On活性化()
         {
-            this.ct連打枠カウンター = new CCounter[ 4 ];
-            this.ct連打アニメ = new CCounter[4];
-            FadeOut = new Animations.FadeOut[4];
-            for ( int i = 0; i < 4; i++ )
+            this.ct連打枠カウンター = new CCounter[ 5 ];
+            this.ct連打アニメ = new CCounter[5];
+            FadeOut = new Animations.FadeOut[5];
+            for ( int i = 0; i < 5; i++ )
             {
                 this.ct連打枠カウンター[ i ] = new CCounter();
                 this.ct連打アニメ[i] = new CCounter();
                 // 後から変えれるようにする。大体10フレーム分。
                 FadeOut[i] = new Animations.FadeOut(167);
             }
-            this.b表示 = new bool[]{ false, false, false, false };
-            this.n連打数 = new int[ 4 ];
+            this.b表示 = new bool[]{ false, false, false, false, false };
+            this.n連打数 = new int[ 5 ];
 
             base.On活性化();
         }
 
         public override void On非活性化()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 ct連打枠カウンター[i] = null;
                 ct連打アニメ[i] = null;
@@ -109,6 +109,8 @@ namespace TJAPlayer3
 
         public int On進行描画( int n連打数, int player )
         {
+            if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return base.On進行描画();
+
             this.ct連打枠カウンター[ player ].t進行();
             this.ct連打アニメ[player].t進行();
             FadeOut[player].Tick();

@@ -257,6 +257,7 @@ namespace TJAPlayer3
             public int n移動方向; //移動方向は0(左)、1(右)の2つだけ。
             public int n内部番号;
             public int n表記上の番号;
+            public int nVerticalMove;
 
             public override string ToString()
             {
@@ -369,6 +370,7 @@ namespace TJAPlayer3
             public int nチャンネル番号;
             public STDGBVALUE<int> nバーからの距離dot;
             public int nバーからのノーツ末端距離dot;
+            public int nバーからのノーツ末端距離dot_Y;
             public int n整数値;
             public int n文字数 = 16;
 
@@ -482,6 +484,7 @@ namespace TJAPlayer3
                 this.nバーからの距離dot.Bass = 0;
                 this.nバーからの距離dot.Taiko = 0;
                 this.nバーからのノーツ末端距離dot = 0;
+                this.nバーからのノーツ末端距離dot_Y = 0;
                 this.n総移動時間 = 0;
                 this.dbBPM = 120.0;
                 this.fNow_Measure_m = 4.0f;
@@ -1136,6 +1139,19 @@ namespace TJAPlayer3
             eExpert,
             eMaster
         }
+
+        public enum ELevelIcon
+        {
+            eMinus,
+            eNone,
+            ePlus
+        }
+
+        public enum ESide
+        {
+            eNormal,
+            eEx
+        }
         public class CLine
         {
             public int n小節番号;
@@ -1183,15 +1199,22 @@ namespace TJAPlayer3
         public string BACKGROUND_GR;
         public double BASEBPM;
         public double BPM;
+        public double MinBPM;
+        public double MaxBPM;
         public STチップがある bチップがある;
         public string COMMENT;
         public double db再生速度;
         public string GENRE;
+        public string MAKER;
+        public bool EXPLICIT;
+        public string SELECTBG;
         public Eジャンル eジャンル;
         public bool HIDDENLEVEL;
         public STDGBVALUE<int> LEVEL;
         public bool bLyrics;
         public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+        public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
+        public ESide SIDE;
         public CSongUniqueID uniqueID;
         
         // Tower lifes
@@ -1304,6 +1327,8 @@ namespace TJAPlayer3
         public List<Bitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
         public List<STLYRIC> listLyric2;
 
+        public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
+
         private int listBalloon_Normal_数値管理;
         private int listBalloon_Expert_数値管理;
         private int listBalloon_Master_数値管理;
@@ -1369,9 +1394,14 @@ namespace TJAPlayer3
             this.SUBTITLE = "";
             this.ARTIST = "";
             this.COMMENT = "";
+            this.SIDE = ESide.eEx;
             this.PANEL = "";
             this.GENRE = "";
+            this.MAKER = "";
+            this.EXPLICIT = false;
+            this.SELECTBG = "";
             this.bLyrics = false;
+            this.usingLyricsFile = false;
             this.eジャンル = Eジャンル.None;
             this.PREVIEW = "";
             this.PREIMAGE = "";
@@ -3131,7 +3161,7 @@ namespace TJAPlayer3
         // Regexes
         private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
         private static readonly Regex regexForStrippingHeadingLines = new Regex(
-             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
+             @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MAKER|SELECTBG|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
             RegexOptions.Multiline | RegexOptions.Compiled);
 
         // private static readonly HashSet<string> valableTokens = new HashSet<string>(@"TIT|LEV|BPM|WAV|OFF|BAL|EXA|DAN|REN|BAL|SON|SEV|SCO|COU|STY|TOW|GAM|LIF|DEM|SID|SUB|GEN|MOV|BGI|BGM|HID|GAU|LYR|#HB|#BM".Split('|'));
@@ -3581,6 +3611,15 @@ namespace TJAPlayer3
                 double dbBPM = Convert.ToDouble(argument);
                 this.dbNowBPM = dbBPM;
 
+                if (dbBPM > MaxBPM)
+                {
+                    MaxBPM = dbBPM;
+                }
+                else if (dbBPM < MinBPM)
+                {
+                    MinBPM = dbBPM;
+                }
+
                 this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
 
 
@@ -3985,7 +4024,7 @@ namespace TJAPlayer3
 
                 this.listChip.Add(chip);
             }
-            else if (command == "#LYRIC")
+            else if (command == "#LYRIC" && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
             {
                 if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
                     this.listLyric.Add(this.pf歌詞フォント.DrawPrivateFont(argument, TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor));
@@ -4054,10 +4093,22 @@ namespace TJAPlayer3
             else if (command == "#JPOSSCROLL")
             {
                 strArray = argument.Split(chDelimiter);
-                WarnSplitLength("#JPOSSCROLL", strArray, 3);
+                WarnSplitLength("#JPOSSCROLL", strArray, 2);
                 double db移動時刻 = Convert.ToDouble(strArray[0]);
-                int n移動px = Convert.ToInt32(strArray[1]);
-                int n移動方向 = Convert.ToInt32(strArray[2]);
+                int n移動px = 0;
+                int nComplexMove = 0;
+                if (strArray[1].IndexOf('i') != -1)
+                {
+                    double[] dbComplexNum = new double[2];
+                    this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
+                    n移動px = Convert.ToInt32(dbComplexNum[0]);
+                    nComplexMove = Convert.ToInt32(dbComplexNum[1]);
+                }
+                else
+                    n移動px = Convert.ToInt32(strArray[1]);
+
+
+                int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
 
                 //チップ追加して割り込んでみる。
                 var chip = new CChip();
@@ -4072,7 +4123,7 @@ namespace TJAPlayer3
 
                 // チップを配置。
 
-                this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向 });
+                this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向, nVerticalMove = nComplexMove });
                 this.listChip.Add(chip);
                 this.n内部番号JSCROLL1to++;
             }
@@ -4232,7 +4283,7 @@ namespace TJAPlayer3
                 if (b分岐前の連打開始)
                 {
                     //if (listChips[i].nチャンネル番号 == 0x15 || listChips[i].nチャンネル番号 == 0x16)
-                    if (NotesManager.IsRoll(listChips[i]))
+                    if (NotesManager.IsRoll(listChips[i]) || NotesManager.IsFuzeRoll(listChips[i]))
                     {
                         if (nReturnChip == null)
                             nReturnChip = i;
@@ -4402,7 +4453,7 @@ namespace TJAPlayer3
 
                         if (nObjectNum != 0)
                         {
-                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 16 || nObjectNum == 17)
+                            if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17)
                             {
                                 if (nNowRoll != 0)
                                 {
@@ -4458,7 +4509,7 @@ namespace TJAPlayer3
                                 chip.nPlayerSide = this.nPlayerSide;
                                 chip.bGOGOTIME = this.bGOGOTIME;
 
-                                if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
+                                if (NotesManager.IsGenericBalloon(chip))
                                 {
                                     //this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 
@@ -4586,6 +4637,9 @@ namespace TJAPlayer3
                                     case 0xB:
                                         chip.nSenote = 6;
                                         break;
+                                    case 0xD:
+                                        chip.nSenote = 0xB;
+                                        break;
                                     case 0xF1:
                                         chip.nSenote = 5;
                                         break;
@@ -4627,7 +4681,7 @@ namespace TJAPlayer3
                                     
                                     #endregion
                                 }
-                                else if (NotesManager.IsBalloon(chip) || NotesManager.IsKusudama(chip))
+                                else if (NotesManager.IsGenericBalloon(chip))
                                 {
                                     //風船はこのままでも機能しているので何もしない.
 
@@ -5059,10 +5113,16 @@ namespace TJAPlayer3
             }
             else if (strCommandName.Equals("LEVEL"))
             {
-                var level = (int)Convert.ToDouble(strCommandParam);
-                this.LEVEL.Drums = level;
-                this.LEVEL.Taiko = level;
-                this.LEVELtaiko[this.n参照中の難易度] = level;
+                var level_dec = Convert.ToDouble(strCommandParam);
+                var level = (int)level_dec;
+                if (strCommandParam != level.ToString())
+                {
+                    int frac_part = Int32.Parse(level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.')[1]);
+                    this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+                }
+                this.LEVEL.Drums = (int)level;
+                this.LEVEL.Taiko = (int)level;
+                this.LEVELtaiko[this.n参照中の難易度] = (int)level;
             }
             else if (strCommandName.Equals("LIFE"))
             {
@@ -5097,6 +5157,8 @@ namespace TJAPlayer3
                 double dbBPM = Convert.ToDouble(strCommandParam);
                 this.BPM = dbBPM;
                 this.BASEBPM = dbBPM;
+                this.MinBPM = dbBPM;
+                this.MaxBPM = dbBPM;
                 this.dbNowBPM = dbBPM;
 
                 this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = dbBPM, });
@@ -5304,6 +5366,32 @@ namespace TJAPlayer3
                     this.GENRE = strCommandParam;
                 }
             }
+            else if (strCommandName.Equals("MAKER"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.MAKER = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("SIDE"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam) && strCommandParam.Equals("Normal"))
+                    this.SIDE = ESide.eNormal;
+            }
+            else if (strCommandName.Equals("EXPLICIT"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.EXPLICIT = C変換.bONorOFF(strCommandParam[0]);
+                }
+            }
+            else if (strCommandName.Equals("SELECTBG"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.SELECTBG = strCommandParam;
+                }
+            }
             else if (strCommandName.Equals("DEMOSTART"))
             {
                 //2015.04.10 kairera0467
@@ -5375,7 +5463,48 @@ namespace TJAPlayer3
                     this.bHIDDENBRANCH = true;
                 }
             }
-            else if (strCommandName.Equals("LYRICFILE"))
+            else if (strCommandName.Equals("LYRICS") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4)
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    string[] files = SplitComma(strCommandParam);
+                    string[] filePaths = new string[files.Length];
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        filePaths[i] = this.strフォルダ名 + files[i];
+
+                        if (File.Exists(filePaths[i]))
+                        {
+                            try
+                            {
+                                if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)
+                                {
+                                    if (filePaths[i].EndsWith(".vtt"))
+                                    {
+                                        using (VTTParser parser = new VTTParser())
+                                        {
+                                            this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
+                                        }
+                                        this.bLyrics = true;
+                                        this.usingLyricsFile = true;
+                                    }
+                                    else if (filePaths[i].EndsWith(".lrc"))
+                                    {
+                                        this.LyricFileParser(filePaths[i], i);
+                                        this.bLyrics = true;
+                                        this.usingLyricsFile = true;
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Trace.TraceError("Something went wrong while parsing a lyric file at {0}. More details : {1}", filePaths[i], e);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4)
             {
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
@@ -5391,6 +5520,7 @@ namespace TJAPlayer3
                                 if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
                                     this.LyricFileParser(strFilePath[index], index);
                                 this.bLyrics = true;
+                                this.usingLyricsFile = true;
                             }
                             catch
                             {
@@ -5583,337 +5713,6 @@ namespace TJAPlayer3
                 Trace.TraceError(ex.ToString());
                 Trace.TraceError("例外が発生しましたが処理を継続します。 (b67473e4-1930-44f1-b320-4ead5786e74c)");
             }
-
-
-            #region[統合前]
-            //foreach( CChip pChip in list音符のみのリスト )
-            //{
-            //    int dbUnitTime = ( int )( ( ( 60.0 / this.dbNowBPM ) / 4.0 ) * 1000.0 );
-            //    int nUnit4 = dbUnitTime * 4;
-            //    int nUnit8 = dbUnitTime * 2;
-            //    int nUnit16 = dbUnitTime;
-
-            //    if( nCount == 0  )
-            //    {
-            //        nCount++;
-            //        continue;
-            //    }
-
-            //    double db1個前の発生時刻ms = list音符のみのリスト[nCount - 1].n発声時刻ms * 1;
-
-            //    if( nCount == 1 )
-            //    {
-            //        //nCount - 1は一番最初のノーツになる。
-
-            //        if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit4 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-
-            //            if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms < nUnit4 )
-            //            {
-            //                if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms < nUnit8 )
-            //                {
-            //                    //16分なら「ド」
-            //                    pChip.nSenote = 1;
-            //                }
-            //                else
-            //                {
-            //                    if( dkdkCount == 0 )
-            //                    {
-            //                        pChip.nSenote = 1;
-            //                        dkdkCount++;
-            //                    }
-            //                    else if( dkdkCount == 1 )
-            //                    {
-            //                        pChip.nSenote = 2;
-            //                        dkdkCount = 0;
-            //                    }
-
-            //                }
-            //            }
-            //            else
-            //            {
-            //                //次も4分なら「ドン」か「カッ」
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                {
-            //                    pChip.nSenote = 0;
-            //                }
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                {
-            //                    pChip.nSenote = 3;
-            //                }
-            //            }
-            //        }
-            //        else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms <= nUnit4 && pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit8 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 1;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //            {
-            //                pChip.nSenote = 1;
-            //            }
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //            {
-            //                pChip.nSenote = 4;
-            //            }
-            //        }
-            //        else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit8 )
-            //        {
-            //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 1;
-            //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //            {
-            //                pChip.nSenote = 1;
-            //            }
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //            {
-            //                pChip.nSenote = 4;
-            //            }
-            //        }
-
-            //        nCount++;
-            //        continue;
-            //    }
-
-            //    double db2個前の発声時刻ms = list音符のみのリスト[ nCount - 2 ].n発声時刻ms * 1;
-
-            //    #region[新しいやつ]
-            //    if( nCount + 1 >= list音符のみのリスト.Count )
-            //        break;
-
-            //    if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit4 )
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 0;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 3;
-            //        }
-
-            //        if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms <= nUnit4 )
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 1;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 4;
-            //        }
-            //    }
-            //    else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit4 && pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms >= nUnit8 )
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 1;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 4;
-            //        }
-
-            //        if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms <= nUnit4 )
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 0;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 3;
-
-            //            if( list音符のみのリスト[ nCount + 2 ].n発声時刻ms - list音符のみのリスト[ nCount + 1 ].n発声時刻ms >= nUnit8 )
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                    pChip.nSenote = 1;
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                    pChip.nSenote = 4;
-            //            }
-            //            else if( list音符のみのリスト[ nCount + 2 ].n発声時刻ms - list音符のみのリスト[ nCount + 1 ].n発声時刻ms < nUnit8 )
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                    pChip.nSenote = 1;
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                    pChip.nSenote = 4;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            if( pChip.nチャンネル番号 == 0x93 )
-            //                pChip.nSenote = 0;
-            //            else if( pChip.nチャンネル番号 == 0x94 )
-            //                pChip.nSenote = 3;
-            //        }
-            //    }
-            //    else if( pChip.n発声時刻ms - list音符のみのリスト[ nCount - 1 ].n発声時刻ms < nUnit8 ) //8分以下
-            //    {
-            //        if( pChip.nチャンネル番号 == 0x93 )
-            //        {
-            //            pChip.nSenote = 1;
-            //        }
-            //        else if( pChip.nチャンネル番号 == 0x94 )
-            //        {
-            //            pChip.nSenote = 4;
-            //        }
-
-            //        //後ろが4分
-            //        try
-            //        {
-            //            if( nCount + 1 >= list音符のみのリスト.Count )
-            //                break;
-
-            //            if( list音符のみのリスト[ nCount + 1 ].n発声時刻ms - pChip.n発声時刻ms >= nUnit8 ) //分岐があるとここがバグるっぽい?(Indexエラー)
-            //            {
-            //                if( pChip.nチャンネル番号 == 0x93 )
-            //                {
-            //                    pChip.nSenote = 0;
-            //                }
-            //                else if( pChip.nチャンネル番号 == 0x94 )
-            //                {
-            //                    pChip.nSenote = 3;
-            //                }
-            //            }
-            //        }
-            //        catch( Exception ex )
-            //        {
-
-            //        }
-
-
-            //    }
-            //    #endregion
-
-            //    #region[古いやつ]
-            //    ////2つ前と1つ前のチップのSenoteを決めていく。
-            //    ////連打、大音符などはチップ配置の際に決めます。
-            //    //if (( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit4)
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が4分以上でかつ、その音符がドンなら2つ前のSenoteは「ドン」で確定。
-            //    //    //同時にdkdkをリセット
-            //    //    dkdkCount = false;
-            //    //    if( list音符のみのリスト[nCount - 2].nチャンネル番号 == 0x93 )
-            //    //        list音符のみのリスト[nCount - 2].nSenote = 0;
-            //    //    else if( list音符のみのリスト[nCount - 2].nチャンネル番号 == 0x94 )
-            //    //        list音符のみのリスト[nCount - 2].nSenote = 3;
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit4 )
-            //    //    {
-            //    //        //1つ前の音符と現在の音符の間が4分以上かつ、その音符がドンなら1つ前の音符は「ドン」で確定。
-            //    //        if( list音符のみのリスト[nCount - 1].nチャンネル番号 == 0x93 )
-            //    //            list音符のみのリスト[nCount - 1].nSenote = 0;
-            //    //        else if( list音符のみのリスト[nCount - 1].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[nCount - 1].nSenote = 3;
-            //    //    }
-            //    //    else if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) <= nUnit4 )
-            //    //    {
-            //    //        //4分
-            //    //        if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //        {
-            //    //            dkdkCount = false;
-            //    //            //1つ前の音符と現在の音符の間が8分以内で16分以上でかつ、その音符が赤なら1つ前の音符は「ド」で確定。
-            //    //            if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 2;
-            //    //            else if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 4;
-            //    //        }
-            //    //        else if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit8 )
-            //    //        {
-            //    //            dkdkCount = false;
-            //    //            if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //            {
-            //    //                list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-
-            //    //                //ドコドン
-            //    //                if( list音符のみのリスト[ nCount - 1 ].nチャンネル番号 == 0x93 )
-            //    //                {
-            //    //                    if( pChip.nチャンネル番号 == 0x93 )
-            //    //                        pChip.nSenote = dkdkCount ? 2 : 1;
-            //    //                    if( dkdkCount == false )
-            //    //                        dkdkCount = true;
-            //    //                    else
-            //    //                        dkdkCount = false;
-            //    //                }
-            //    //            }
-            //    //            else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //        }
-
-            //    //    }
-            //    //}
-            //    //else if ( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit4 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit8)
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が8分以上でかつ、16分以内
-
-            //    //    if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit8 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) > nUnit16 )
-            //    //    {
-            //    //        //2つ前の音符と1つ前の音符の間が8分以上でかつ、16分以内なら「ド」
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //        }
-            //    //    }
-            //    //    else if( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) < nUnit8 )
-            //    //    {
-            //    //        //2つ前の音符と1つ前の音符の間が16分以内なら「ド」で確定
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-            //    //    }
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit16 )
-            //    //    {
-            //    //        if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //        {
-            //    //            if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //            {
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //    //            }
-            //    //            else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //                list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-            //    //        }
-            //    //    }
-            //    //}
-            //    //else if ( ( db1個前の発生時刻ms - db2個前の発声時刻ms ) >= nUnit16 && ( db1個前の発生時刻ms - db2個前の発声時刻ms ) <= nUnit8 )
-            //    //{
-            //    //    //2つ前の音符と1つ前の音符の間が16分以上
-            //    //    if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //    {
-            //    //        list音符のみのリスト[ nCount - 2 ].nSenote = 1;
-            //    //    }
-            //    //    else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //        list音符のみのリスト[ nCount - 2 ].nSenote = 4;
-
-            //    //    if( ( pChip.n発声時刻ms - db1個前の発生時刻ms ) >= nUnit8 )
-            //    //    {
-            //    //        if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x93 )
-            //    //        {
-            //    //            list音符のみのリスト[ nCount - 1 ].nSenote = 0;
-            //    //        }
-            //    //        else if( list音符のみのリスト[ nCount - 2 ].nチャンネル番号 == 0x94 )
-            //    //            list音符のみのリスト[ nCount - 1 ].nSenote = 3;
-            //    //    }
-
-
-            //    //}
-            //    #endregion
-
-            //    nCount++;
-            //}
-            #endregion
-
 
         }
 
@@ -6427,13 +6226,24 @@ namespace TJAPlayer3
         private CPrivateFastFont pf歌詞フォント;
         public override void On活性化()
         {
-            if (!string.IsNullOrEmpty(TJAPlayer3.Skin.Game_Lyric_FontName))
+            if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)
             {
-                this.pf歌詞フォント = new CPrivateFastFont(new FontFamily(TJAPlayer3.Skin.Game_Lyric_FontName), TJAPlayer3.Skin.Game_Lyric_FontSize);
-            }
-            else
-            {
-                this.pf歌詞フォント = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_Lyric_FontSize);
+                //まさかこれが原因で曲の読み込みが停止するとは思わなかった...
+                //どういうことかというとスキンを読み込むときに...いや厳密には
+                //RefleshSkinを呼び出した後一回Disposeしてnullにして解放(その後にまたインスタンスを作成する)するんだけど
+                //その時にここでTJAPlayer3.Skinを参照して例外が出ていたんだ....
+                //いやいや! なんでTJAPlayer3.Skinをnullにした瞬間に参照されるんだ!と思った方もいるかもしれないですが
+                //実は曲の読み込みはマルチスレッドで実行されているのでnullにした瞬間に参照される可能性も十分にある
+                //それならアプリが終了するんじゃないかと思ったのだけどtryを使ってい曲の読み込みを続行していた...
+                //いやーマルチスレッドって難しいね!
+                if (!string.IsNullOrEmpty(TJAPlayer3.Skin.Game_Lyric_FontName))
+                {
+                    this.pf歌詞フォント = new CPrivateFastFont(new FontFamily(TJAPlayer3.Skin.Game_Lyric_FontName), TJAPlayer3.Skin.Game_Lyric_FontSize);
+                }
+                else
+                {
+                    this.pf歌詞フォント = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_Lyric_FontSize);
+                }
             }
             this.listWAV = new Dictionary<int, CWAV>();
             this.listBPM = new Dictionary<int, CBPM>();
@@ -6870,6 +6680,24 @@ namespace TJAPlayer3
                 {
                     this.t入力_パラメータ食い込みチェック("GENRE", ref strコマンド, ref strパラメータ);
                     this.GENRE = strパラメータ;
+                }
+                //-----------------
+                #endregion
+                #region [ MAKER ]
+                //-----------------
+                else if (strコマンド.StartsWith("MAKER", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.t入力_パラメータ食い込みチェック("MAKER", ref strコマンド, ref strパラメータ);
+                    this.MAKER = strパラメータ;
+                }
+                //-----------------
+                #endregion
+                #region [ SELECTBG ]
+                //-----------------
+                else if (strコマンド.StartsWith("SELECTBG", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.t入力_パラメータ食い込みチェック("SELECTBG", ref strコマンド, ref strパラメータ);
+                    this.SELECTBG = strパラメータ;
                 }
                 //-----------------
                 #endregion

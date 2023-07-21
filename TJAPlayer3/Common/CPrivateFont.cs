@@ -547,8 +547,10 @@ namespace TJAPlayer3
             #region[ キャンバスの大きさ予測 ]
 
             //大きさを計算していく。
+            int nWidth = 160;
             int nHeight = 0;
-            for( int i = 0; i < strName.Length; i++ )
+            int nNowHeight = 0;
+            for ( int i = 0; i < strName.Length; i++ )
             {
                 Size strSize = System.Windows.Forms.TextRenderer.MeasureText( strName[ i ], this._font, new Size( int.MaxValue, int.MaxValue ),
 				System.Windows.Forms.TextFormatFlags.NoPrefix |
@@ -575,12 +577,30 @@ namespace TJAPlayer3
 
                 if( strName[ i ] == "ー" || strName[ i ] == "-" || strName[ i ] == "～" || strName[ i ] == "<" || strName[ i ] == ">" || strName[ i ] == "(" || strName[ i ] == ")" || strName[ i ] == "「" || strName[ i ] == "」" || strName[ i ] == "[" || strName[ i ] == "]" )
                 {
-                    nHeight += ( rect正確なサイズ.Width ) + 4;
+                    nNowHeight += ( rect正確なサイズ.Width ) + 4;
                 }
-                else if( strName[ i ] == "_" ){ nHeight += ( rect正確なサイズ.Height ) + 6;  }
+                else if( strName[ i ] == "_" )
+                {
+                    nNowHeight += ( rect正確なサイズ.Height ) + 6;  
+                }
                 else if( strName[ i ] == " " )
-                { nHeight += ( 12 ); }
-                else { nHeight += ( rect正確なサイズ.Height ) + 10; }
+                {
+                    nNowHeight += ( 12 );
+                }
+                else if (strName[i] == "\n")
+                {
+                    nWidth += 12;
+                    nNowHeight = 0;
+                }
+                else 
+                {
+                    nNowHeight += ( rect正確なサイズ.Height ) + 10; 
+                }
+
+                if (nNowHeight > nHeight)
+                {
+                    nHeight = nNowHeight;
+                }
 
                 //念のため解放
                 bmpDummy.Dispose();
@@ -592,10 +612,11 @@ namespace TJAPlayer3
 
             #endregion
 
-            Bitmap bmpCambus = new Bitmap( 160, nHeight );
+            Bitmap bmpCambus = new Bitmap(nWidth, nHeight );
             Graphics Gcambus = Graphics.FromImage( bmpCambus );
 
             //キャンバス作成→1文字ずつ作成してキャンバスに描画という形がよさそうかな?
+            int nNowPosX = 0;
             int nNowPos = 0;
             int nAdded = 0;
             int nEdge補正X = 0;
@@ -759,9 +780,18 @@ namespace TJAPlayer3
                 if( i == 0 )
                 {
                     nNowPos = 4;
+                    nNowPosX = nWidth - bmpCambus.Width;
                 }
-                Gcambus.DrawImage( bmpV, (bmpCambus.Width / 2) - (bmpV.Width / 2) + n補正, nNowPos + nY補正 );
-                nNowPos += bmpV.Size.Height - 6;
+                Gcambus.DrawImage( bmpV, nNowPosX + (bmpCambus.Width / 2) - (bmpV.Width / 2) + n補正, nNowPos + nY補正 );
+                if (strName[i] == "\n")
+                {
+                    nNowPosX -= bmpV.Size.Width * 2;
+                    nNowPos = 0;
+                }
+                else
+                {
+                    nNowPos += bmpV.Size.Height - 6;
+                }
 
                 if( bmpV != null ) bmpV.Dispose(); bmpV = null;
                 if( gCal != null ) gCal.Dispose(); gCal = null;
@@ -976,6 +1006,12 @@ namespace TJAPlayer3
                 {
                     this._pfc.Dispose();
                     this._pfc = null;
+                }
+
+                if (_fontfamily != null)
+                {
+                    _fontfamily.Dispose();
+                    _fontfamily = null;
                 }
 
                 this.bDispose完了済み = true;

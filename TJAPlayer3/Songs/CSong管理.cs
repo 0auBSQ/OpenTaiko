@@ -51,7 +51,8 @@ namespace TJAPlayer3
 		/*[NonSerialized]
 		public List<Cスコア> listSongsDB;*/					// songs.dbから構築されるlist
 		public List<C曲リストノード> list曲ルート;			// 起動時にフォルダ検索して構築されるlist
-		public List<C曲リストノード> list曲ルート_Dan = new List<C曲リストノード>();			// 起動時にフォルダ検索して構築されるlist
+		public List<C曲リストノード> list曲ルート_Dan = new List<C曲リストノード>();          // 起動時にフォルダ検索して構築されるlist
+		public static List<FDK.CTexture> listCustomBGs = new List<FDK.CTexture>();
 		public bool bIsSuspending							// 外部スレッドから、内部スレッドのsuspendを指示する時にtrueにする
 		{													// 再開時は、これをfalseにしてから、次のautoReset.Set()を実行する
 			get;
@@ -221,14 +222,20 @@ namespace TJAPlayer3
                                     c曲リストノード.strタイトル = dtx.TITLE;
                                     c曲リストノード.strサブタイトル = dtx.SUBTITLE;
                                     c曲リストノード.strジャンル = dtx.GENRE;
+									c曲リストノード.strMaker = dtx.MAKER;
+                                    c曲リストノード.nSide = dtx.SIDE;
+                                    c曲リストノード.bExplicit = dtx.EXPLICIT;
                                     if (c曲リストノード.r親ノード != null && c曲リストノード.r親ノード.strジャンル != "")
                                     {
                                         c曲リストノード.strジャンル = c曲リストノード.r親ノード.strジャンル;
-                                    }
-                                    c曲リストノード.nLevel = dtx.LEVELtaiko;
+									}
+									c曲リストノード.strSelectBGPath = $@"{fileinfo.FullName}\..\{dtx.SELECTBG}";
+									if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
+									c曲リストノード.nLevel = dtx.LEVELtaiko;
+									c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
 
-									// LIFE here
-									c曲リストノード.nLife = dtx.LIFE;
+                                    // LIFE here
+                                    c曲リストノード.nLife = dtx.LIFE;
 
 									c曲リストノード.nTowerType = dtx.TOWERTYPE;
 
@@ -341,8 +348,11 @@ namespace TJAPlayer3
 
                                 c曲リストノード.strタイトル = dtx.TITLE;
                                 c曲リストノード.strサブタイトル = dtx.SUBTITLE;
+								c曲リストノード.strMaker = dtx.MAKER;
+                                c曲リストノード.nSide = dtx.SIDE;
+                                c曲リストノード.bExplicit = dtx.EXPLICIT;
 
-								if (dtx.List_DanSongs != null)
+                                if (dtx.List_DanSongs != null)
 									c曲リストノード.DanSongs = dtx.List_DanSongs;
 
 								if (dtx.Dan_C != null)
@@ -367,8 +377,19 @@ namespace TJAPlayer3
 									c曲リストノード.str本当のジャンル = c曲リストノード.r親ノード.strジャンル;
 								}
 
+								if (c曲リストノード.strSelectBGPath == null || !File.Exists(str基点フォルダ + dtx.SELECTBG))
+								{
+									c曲リストノード.strSelectBGPath = c曲リストノード.r親ノード.strSelectBGPath;
+								}
+								else
+								{
+									c曲リストノード.strSelectBGPath = str基点フォルダ + dtx.SELECTBG;
+								}
+								if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
+
 								if (c曲リストノード.r親ノード != null)
                                 {
+									c曲リストノード.strScenePreset = c曲リストノード.r親ノード.strScenePreset;
                                     if (c曲リストノード.r親ノード.IsChangedForeColor)
                                     {
                                         c曲リストノード.ForeColor = c曲リストノード.r親ノード.ForeColor;
@@ -404,7 +425,9 @@ namespace TJAPlayer3
 										c曲リストノード.BoxChara = c曲リストノード.r親ノード.BoxChara;
 										c曲リストノード.isChangedBoxChara = true;
 									}
-								}
+									
+										
+                                }
 
 
                                 switch (CStrジャンルtoNum.ForAC15(c曲リストノード.strジャンル))
@@ -447,7 +470,8 @@ namespace TJAPlayer3
 
 
                                 c曲リストノード.nLevel = dtx.LEVELtaiko;
-								c曲リストノード.uniqueId = dtx.uniqueID;
+                                c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
+                                c曲リストノード.uniqueId = dtx.uniqueID;
 
 								CSongDict.tAddSongNode(c曲リストノード.uniqueId, c曲リストノード);
 
@@ -456,6 +480,12 @@ namespace TJAPlayer3
                                 c曲リストノード.arスコア[ n ].ファイル情報.フォルダの絶対パス = str基点フォルダ;
                                 c曲リストノード.arスコア[ n ].ファイル情報.ファイルサイズ = fileinfo.Length;
                                 c曲リストノード.arスコア[ n ].ファイル情報.最終更新日時 = fileinfo.LastWriteTime;
+
+                                if (c曲リストノード.r親ノード != null && String.IsNullOrEmpty(c曲リストノード.arスコア[n].譜面情報.Preimage))
+                                {
+                                    c曲リストノード.arスコア[n].譜面情報.Preimage = c曲リストノード.r親ノード.arスコア[0].譜面情報.Preimage;
+                                }
+
                                 string strFileNameScoreIni = c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス + ".score.ini";
                                 if( File.Exists( strFileNameScoreIni ) )
                                 {
@@ -509,138 +539,10 @@ namespace TJAPlayer3
 			{
 				SlowOrSuspendSearchTask();		// #27060 中断要求があったら、解除要求が来るまで待機, #PREMOVIE再生中は検索負荷を落とす
 
-				#region [ a. "dtxfiles." で始まるフォルダの場合 ]
-				//-----------------------------
-				if( infoDir.Name.ToLower().StartsWith( "dtxfiles." ) )
-				{
-					C曲リストノード c曲リストノード = new C曲リストノード();
-					c曲リストノード.eノード種別 = C曲リストノード.Eノード種別.BOX;
-					c曲リストノード.bDTXFilesで始まるフォルダ名のBOXである = true;
-					c曲リストノード.strタイトル = infoDir.Name.Substring( 9 );
-					c曲リストノード.nスコア数 = 1;
-					c曲リストノード.r親ノード = node親;
-
-
-					// 一旦、上位BOXのスキン情報をコピー (後でbox.defの記載にて上書きされる場合がある)
-					c曲リストノード.strSkinPath = ( c曲リストノード.r親ノード == null ) ?
-						"" : c曲リストノード.r親ノード.strSkinPath;
-
-					c曲リストノード.strBreadcrumbs = ( c曲リストノード.r親ノード == null ) ?
-						c曲リストノード.strタイトル : c曲リストノード.r親ノード.strBreadcrumbs + " > " + c曲リストノード.strタイトル;
-
-
 		
-					c曲リストノード.list子リスト = new List<C曲リストノード>();
-					c曲リストノード.arスコア[ 0 ] = new Cスコア();
-					c曲リストノード.arスコア[ 0 ].ファイル情報.フォルダの絶対パス = infoDir.FullName + @"\";
-					c曲リストノード.arスコア[ 0 ].譜面情報.タイトル = c曲リストノード.strタイトル;
-					c曲リストノード.arスコア[ 0 ].譜面情報.コメント =
-						(CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ja") ?
-						"BOX に移動します。" :
-						"Enter into the BOX.";
-					listノードリスト.Add(c曲リストノード);
-					if( File.Exists( infoDir.FullName + @"\box.def" ) )
-					{
-						CBoxDef boxdef = new CBoxDef( infoDir.FullName + @"\box.def" );
-						if( ( boxdef.Title != null ) && ( boxdef.Title.Length > 0 ) )
-						{
-							c曲リストノード.strタイトル = boxdef.Title;
-						}
-						for(int i = 0; i < 3; i++)
-						{
-							if ((boxdef.strBoxText[i] != null) && (boxdef.strBoxText[i].Length > 0))
-							{
-								c曲リストノード.strBoxText[i] = boxdef.strBoxText[i];
-							}
-						}
-						if( ( boxdef.Genre != null ) && ( boxdef.Genre.Length > 0 ) )
-						{
-							c曲リストノード.strジャンル = boxdef.Genre;
-						}
-						if(boxdef.IsChangedForeColor)
-						{
-							c曲リストノード.ForeColor = boxdef.ForeColor;
-						}
-                        if (boxdef.IsChangedBackColor)
-                        {
-                            c曲リストノード.BackColor = boxdef.BackColor;
-                        }
-						if (boxdef.IsChangedBoxColor)
-                        {
-							c曲リストノード.BoxColor = boxdef.BoxColor;
-                        }
-						if (boxdef.IsChangedBgColor)
-                        {
-							c曲リストノード.BgColor = boxdef.BgColor;
-                        }
-						if (boxdef.IsChangedBgType)
-                        {
-							c曲リストノード.BgType = boxdef.BgType;
-                        }
-						if (boxdef.IsChangedBoxType)
-                        {
-							c曲リストノード.BoxType = boxdef.BoxType;
-                        }
-						if (boxdef.IsChangedBoxChara)
-                        {
-							c曲リストノード.BoxChara = boxdef.BoxChara;
-                        }
-					}
-
-					/*
-					switch (c曲リストノード.strジャンル)
-					{
-						case "J-POP":
-							c曲リストノード.strジャンル = "ポップス";
-							break;
-						case "ゲームミュージック":
-						case "バラエティー":
-						case "バラエティ":
-							c曲リストノード.strジャンル = "ゲームバラエティ";
-							break;
-						case "どうよう":
-							c曲リストノード.strジャンル = "キッズ";
-							break;
-					}
-					*/
-
-					if ( TJAPlayer3.ConfigIni.bLog曲検索ログ出力 )
-					{
-						Trace.Indent();
-						try
-						{
-							StringBuilder sb = new StringBuilder( 0x100 );
-							sb.Append( string.Format( "nID#{0:D3}", c曲リストノード.nID ) );
-							if( c曲リストノード.r親ノード != null )
-							{
-								sb.Append( string.Format( "(in#{0:D3}):", c曲リストノード.r親ノード.nID ) );
-							}
-							else
-							{
-								sb.Append( "(onRoot):" );
-							}
-							sb.Append( " BOX, Title=" + c曲リストノード.strタイトル );
-							sb.Append( ", Folder=" + c曲リストノード.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-							sb.Append( ", Comment=" + c曲リストノード.arスコア[ 0 ].譜面情報.コメント );
-							sb.Append( ", SkinPath=" + c曲リストノード.strSkinPath );
-							Trace.TraceInformation( sb.ToString() );
-						}
-						finally
-						{
-							Trace.Unindent();
-						}
-					}
-					if( b子BOXへ再帰する )
-					{
-						this.t曲を検索してリストを作成する( infoDir.FullName + @"\", b子BOXへ再帰する, c曲リストノード.list子リスト, c曲リストノード );
-					}
-				}
+				#region [ a.box.def を含むフォルダの場合  ]
 				//-----------------------------
-				#endregion
-
-				#region [ b.box.def を含むフォルダの場合  ]
-				//-----------------------------
-				else if( File.Exists( infoDir.FullName + @"\box.def" ) )
+				if( File.Exists( infoDir.FullName + @"\box.def" ) )
 				{
 					CBoxDef boxdef = new CBoxDef( infoDir.FullName + @"\box.def" );
 					C曲リストノード c曲リストノード = new C曲リストノード();
@@ -648,21 +550,9 @@ namespace TJAPlayer3
 					c曲リストノード.bDTXFilesで始まるフォルダ名のBOXである = false;
 					c曲リストノード.strタイトル = boxdef.Title;
 					c曲リストノード.strジャンル = boxdef.Genre;
-
-					/*
-					switch (c曲リストノード.strジャンル)
-					{
-						case "J-POP":
-							c曲リストノード.strジャンル = "ポップス";
-							break;
-						case "ゲームミュージック":
-							c曲リストノード.strジャンル = "ゲームバラエティ";
-							break;
-						case "どうよう":
-							c曲リストノード.strジャンル = "キッズ";
-							break;
-					}
-					*/
+                    c曲リストノード.strScenePreset = boxdef.ScenePreset;
+                    c曲リストノード.strSelectBGPath = infoDir.FullName + @"\" + boxdef.SelectBG;
+					if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 
 					if (boxdef.IsChangedForeColor)
                     {
@@ -699,9 +589,10 @@ namespace TJAPlayer3
 						c曲リストノード.BoxChara = boxdef.BoxChara;
 						c曲リストノード.isChangedBoxChara = true;
 					}
+                    
 
 
-					for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < 3; i++)
 					{
 						if ((boxdef.strBoxText[i] != null) && (boxdef.strBoxText[i].Length > 0))
 						{
@@ -753,9 +644,12 @@ namespace TJAPlayer3
 					c曲リストノード.arスコア[ 0 ].ファイル情報.フォルダの絶対パス = infoDir.FullName + @"\";
 					c曲リストノード.arスコア[ 0 ].譜面情報.タイトル = boxdef.Title;
 					c曲リストノード.arスコア[ 0 ].譜面情報.ジャンル = boxdef.Genre;
-					c曲リストノード.r親ノード = node親;
+                    if (!String.IsNullOrEmpty(boxdef.DefaultPreimage))
+                        c曲リストノード.arスコア[0].譜面情報.Preimage = boxdef.DefaultPreimage;
+                    c曲リストノード.r親ノード = node親;
+                    
 
-					c曲リストノード.strBreadcrumbs = ( c曲リストノード.r親ノード == null ) ?
+                    c曲リストノード.strBreadcrumbs = ( c曲リストノード.r親ノード == null ) ?
 						c曲リストノード.strタイトル : c曲リストノード.r親ノード.strBreadcrumbs + " > " + c曲リストノード.strタイトル;
 	
 					
@@ -879,37 +773,33 @@ namespace TJAPlayer3
                                     c曲リストノード.arスコア[ i ].譜面情報.アーティスト名 = cdtx.ARTIST;
 									c曲リストノード.arスコア[ i ].譜面情報.コメント = cdtx.COMMENT;
 									c曲リストノード.arスコア[ i ].譜面情報.ジャンル = cdtx.GENRE;
-                                    c曲リストノード.arスコア[ i ].譜面情報.Preimage = cdtx.PREIMAGE;
+									if (!String.IsNullOrEmpty(cdtx.PREIMAGE))
+										c曲リストノード.arスコア[ i ].譜面情報.Preimage = cdtx.PREIMAGE;
 									c曲リストノード.arスコア[ i ].譜面情報.Presound = cdtx.PREVIEW;
 									c曲リストノード.arスコア[ i ].譜面情報.Backgound = ( ( cdtx.BACKGROUND != null ) && ( cdtx.BACKGROUND.Length > 0 ) ) ? cdtx.BACKGROUND : cdtx.BACKGROUND_GR;
 									c曲リストノード.arスコア[ i ].譜面情報.レベル.Drums = cdtx.LEVEL.Drums;
 									c曲リストノード.arスコア[ i ].譜面情報.レベル.Guitar = cdtx.LEVEL.Guitar;
 									c曲リストノード.arスコア[ i ].譜面情報.レベル.Bass = cdtx.LEVEL.Bass;
 									c曲リストノード.arスコア[ i ].譜面情報.レベルを非表示にする = cdtx.HIDDENLEVEL;
-									c曲リストノード.arスコア[ i ].譜面情報.Bpm = cdtx.BPM;
+									c曲リストノード.arスコア[i].譜面情報.Bpm = cdtx.BPM;
+									c曲リストノード.arスコア[i].譜面情報.BaseBpm = cdtx.BASEBPM;
+									c曲リストノード.arスコア[i].譜面情報.MinBpm = cdtx.MinBPM;
+									c曲リストノード.arスコア[i].譜面情報.MaxBpm = cdtx.MaxBPM;
 									c曲リストノード.arスコア[ i ].譜面情報.Duration = 0;	//  (cdtx.listChip == null)? 0 : cdtx.listChip[ cdtx.listChip.Count - 1 ].n発声時刻ms;
                                     c曲リストノード.arスコア[ i ].譜面情報.strBGMファイル名 = cdtx.strBGM_PATH;
                                     c曲リストノード.arスコア[ i ].譜面情報.SongVol = cdtx.SongVol;
                                     c曲リストノード.arスコア[ i ].譜面情報.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
 								    c曲リストノード.arスコア[ i ].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[0] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 0 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[1] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 1 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[2] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 2 ];
-                                    c曲リストノード.arスコア[ i ].譜面情報.b譜面分岐[3] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[ 3 ];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[4] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[4];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[5] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[5];
-                                    c曲リストノード.arスコア[i].譜面情報.b譜面分岐[6] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[6];
                                     c曲リストノード.arスコア[ i ].譜面情報.strサブタイトル = cdtx.SUBTITLE;
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[0] = cdtx.LEVELtaiko[0];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[1] = cdtx.LEVELtaiko[1];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[2] = cdtx.LEVELtaiko[2];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[3] = cdtx.LEVELtaiko[3];
-                                    c曲リストノード.arスコア[ i ].譜面情報.nレベル[4] = cdtx.LEVELtaiko[4];
-                                    c曲リストノード.arスコア[i].譜面情報.nレベル[5] = cdtx.LEVELtaiko[5];
-                                    c曲リストノード.arスコア[i].譜面情報.nレベル[6] = cdtx.LEVELtaiko[6];
+									for (int k = 0; k < (int)Difficulty.Total; k++)
+									{
+                                        c曲リストノード.arスコア[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[k];
+                                        c曲リストノード.arスコア[i].譜面情報.nレベル[k] = cdtx.LEVELtaiko[k];
+                                        c曲リストノード.arスコア[i].譜面情報.nLevelIcon[k] = cdtx.LEVELtaikoIcon[k];
+                                    }
 
-									// Tower Lives
-									c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
+                                    // Tower Lives
+                                    c曲リストノード.arスコア[i].譜面情報.nLife = cdtx.LIFE;
 
 									c曲リストノード.arスコア[i].譜面情報.nTowerType = cdtx.TOWERTYPE;
 
@@ -950,8 +840,11 @@ namespace TJAPlayer3
 										sb.Append( ", lvBs=" + c曲リストノード.arスコア[ i ].譜面情報.レベル.Bass );
 										sb.Append( ", lvHide=" + c曲リストノード.arスコア[ i ].譜面情報.レベルを非表示にする );
 										sb.Append( ", type=" + c曲リストノード.arスコア[ i ].譜面情報.曲種別 );
-										sb.Append( ", bpm=" + c曲リストノード.arスコア[ i ].譜面情報.Bpm );
-									//	sb.Append( ", duration=" + c曲リストノード.arスコア[ i ].譜面情報.Duration );
+										sb.Append(", bpm=" + c曲リストノード.arスコア[i].譜面情報.Bpm);
+										sb.Append(", basebpm=" + c曲リストノード.arスコア[i].譜面情報.BaseBpm);
+										sb.Append(", minbpm=" + c曲リストノード.arスコア[i].譜面情報.MinBpm);
+										sb.Append(", maxbpm=" + c曲リストノード.arスコア[i].譜面情報.MaxBpm);
+										//	sb.Append( ", duration=" + c曲リストノード.arスコア[ i ].譜面情報.Duration );
 										Trace.TraceInformation( sb.ToString() );
 									}
 									//-----------------
@@ -1422,264 +1315,13 @@ namespace TJAPlayer3
             var comparer = new ComparerChain<C曲リストノード>(
                 new C曲リストノードComparerノード種別(),
                 new C曲リストノードComparerLevel(order),
+                new C曲リストノードComparerLevelIcon(order),
                 new C曲リストノードComparerタイトル(order),
                 new C曲リストノードComparerSubtitle(order),
                 new C曲リストノードComparer絶対パス(order));
 
             ノードリスト.Sort(comparer);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ノードリスト"></param>
-        /// <param name="part"></param>
-        /// <param name="order">1=Ascend -1=Descend</param>
-        public static void t曲リストのソート3_演奏回数の多い順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-//					for( int i = 0; i <(int)Difficulty.Total; i++ )
-//					{
-						if( n1.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN1 += n1.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-						if( n2.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN2 += n2.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-//					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-//					for ( int i = 0; i < 5; i++ )
-//					{
-						if ( c曲リストノード.arスコア[ nL12345 ] != null )
-						{
-							nSumPlayCountN1 += c曲リストノード.arスコア[ nL12345 ].譜面情報.演奏回数[ (int) part ];
-						}
-//					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート4_LEVEL順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int)p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.nLevel[ nL12345 ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.nLevel[ nL12345 ];
-					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.nLevel[ nL12345 ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート5_BestRank順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					int nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					bool isFullCombo1 = false, isFullCombo2 = false;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						isFullCombo1 = n1.arスコア[ nL12345 ].譜面情報.フルコンボ[ (int) part ];
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						isFullCombo2 = n2.arスコア[ nL12345 ].譜面情報.フルコンボ[ (int) part ];
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-					if ( isFullCombo1 ^ isFullCombo2 )
-					{
-						if ( isFullCombo1 ) return order; else return -order;
-					}
-					var num = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( num != 0 )
-					{
-						return order * num;
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					int nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].譜面情報.最大ランク[ (int) part ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート6_SkillPoint順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			order = -order;
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					double nSumPlayCountN1 = 0, nSumPlayCountN2 = 0;
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-					double d = nSumPlayCountN2 - nSumPlayCountN1;
-					if ( d != 0 )
-					{
-						return order * System.Math.Sign(d);
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					double nSumPlayCountN1 = 0;
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].譜面情報.最大スキル[ (int) part ];
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート7_更新日時順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			int nL12345 = (int) p[ 0 ];
-			if ( part != E楽器パート.UNKNOWN )
-			{
-				ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-				{
-					#region [ 共通処理 ]
-					if ( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
-					{
-						return order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
-					}
-					#endregion
-					DateTime nSumPlayCountN1 = DateTime.Parse("0001/01/01 12:00:01.000");
-					DateTime nSumPlayCountN2 = DateTime.Parse("0001/01/01 12:00:01.000");
-					if ( n1.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = n1.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-					if ( n2.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN2 = n2.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-					int d = nSumPlayCountN1.CompareTo(nSumPlayCountN2);
-					if ( d != 0 )
-					{
-						return order * System.Math.Sign( d );
-					}
-					return order * n1.strタイトル.CompareTo( n2.strタイトル );
-				} );
-				foreach ( C曲リストノード c曲リストノード in ノードリスト )
-				{
-					DateTime nSumPlayCountN1 = DateTime.Parse( "0001/01/01 12:00:01.000" );
-					if ( c曲リストノード.arスコア[ nL12345 ] != null )
-					{
-						nSumPlayCountN1 = c曲リストノード.arスコア[ nL12345 ].ファイル情報.最終更新日時;
-					}
-// Debug.WriteLine( nSumPlayCountN1 + ":" + c曲リストノード.strタイトル );
-				}
-			}
-		}
-		public static void t曲リストのソート8_アーティスト名順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )
-		{
-			int nL12345 = (int) p[ 0 ]; 
-			ノードリスト.Sort( delegate( C曲リストノード n1, C曲リストノード n2 )
-			{
-				string strAuthorN1 = "";
-				string strAuthorN2 = "";
-				if (n1.arスコア[ nL12345 ] != null ) {
-					strAuthorN1 = n1.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-				if ( n2.arスコア[ nL12345 ] != null )
-				{
-					strAuthorN2 = n2.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-
-				return order * strAuthorN1.CompareTo( strAuthorN2 );
-			} );
-			foreach ( C曲リストノード c曲リストノード in ノードリスト )
-			{
-				string s = "";
-				if ( c曲リストノード.arスコア[ nL12345 ] != null )
-				{
-					s = c曲リストノード.arスコア[ nL12345 ].譜面情報.アーティスト名;
-				}
-Debug.WriteLine( s + ":" + c曲リストノード.strタイトル );
-			}
-		}
 
 	    public static void t曲リストのソート9_ジャンル順(List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p)
 	    {
@@ -1766,9 +1408,14 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			// New format
 			string[] fp =
 			{
-				strScoreIniファイルパス + "1P.score.ini",
-				strScoreIniファイルパス + "2P.score.ini",
-			};
+				//strScoreIniファイルパス + "1P.score.ini",
+				//strScoreIniファイルパス + "2P.score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[0].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[1].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[2].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[3].name + @".score.ini",
+                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[4].name + @".score.ini"
+            };
 
 			// Load legacy format if new doesn't exist yet
 			if (!File.Exists(fp[0]))
@@ -1781,14 +1428,16 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			*/
 
 			// Select the main file for the common informations
+			/*
 			int mainFile = 0;
 			if (!File.Exists(fp[0]))
 				mainFile = 1;
 			if (!File.Exists(fp[1]) && mainFile == 1)
 				return;
+			*/
 
 			// Only the necessary scores are read from the auxilliary score file
-			int auxFile = mainFile ^ 1;
+			//int auxFile = mainFile ^ 1;
 
 			try
 			{
@@ -1796,9 +1445,14 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 				CScoreIni[] csi =
 				{
-					new CScoreIni(fp[mainFile]),
-					File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
-				};
+					//new CScoreIni(fp[mainFile]),
+					//File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
+                    new CScoreIni(fp[0]),
+                    new CScoreIni(fp[1]),
+                    new CScoreIni(fp[2]),
+                    new CScoreIni(fp[3]),
+                    new CScoreIni(fp[4])
+                };
 
 				var ini = csi[0];
 
@@ -1851,7 +1505,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 				}
 
 				// Load GPInfo for each save file
-				for (int i = 0; i < 2; i++)
+				for (int i = 0; i < 5; i++)
                 {
 					if (csi[i] == null)
 						continue;
@@ -1887,7 +1541,11 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		#region [ private ]
 		//-----------------
 		//private const string SONGSDB_VERSION = "SongsDB5";
-		private List<string> listStrBoxDefSkinSubfolderFullName;
+		public List<string> listStrBoxDefSkinSubfolderFullName
+        {
+			get;
+			private set;
+        }
 
 		/// <summary>
 		/// 検索を中断_スローダウンする

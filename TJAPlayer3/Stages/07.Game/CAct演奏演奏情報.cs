@@ -11,8 +11,8 @@ namespace TJAPlayer3
     {
         // プロパティ
 
-        public double dbBPM;
-        public readonly int[] NowMeasure = new int[2];
+        public double[] dbBPM = new double[5];
+		public readonly int[] NowMeasure = new int[5];
         public double dbSCROLL;
 		public int[] _chipCounts = new int[2];
 
@@ -28,11 +28,11 @@ namespace TJAPlayer3
 
 		public override void On活性化()
 		{
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 NowMeasure[i] = 0;
-            }
-			this.dbBPM = TJAPlayer3.DTX.BASEBPM;
+				this.dbBPM[i] = TJAPlayer3.DTX.BASEBPM;
+			}
             this.dbSCROLL = 1.0;
 
 			_chipCounts[0] = TJAPlayer3.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
@@ -57,7 +57,7 @@ namespace TJAPlayer3
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1] ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "BPM:           {0:####0.0000}", this.dbBPM ) );
+				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "BPM:           {0:####0.0000}", this.dbBPM[0] ) );
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Frame:         {0:####0} fps", TJAPlayer3.FPS.n現在のFPS ) );
 				y -= 0x10;

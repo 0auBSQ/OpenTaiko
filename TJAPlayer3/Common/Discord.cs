@@ -90,10 +90,17 @@ namespace TJAPlayer3
                 " Tower ",
                 " Dan "
             };
+            string[] diffArrIcon =
+            {
+                "-",
+                "",
+                "+"
+            };
 
             int level = TJAPlayer3.stage選曲.r確定された曲.nLevel[diff];
+            CDTX.ELevelIcon levelIcon = TJAPlayer3.stage選曲.r確定された曲.nLevelIcon[diff];
 
-            return (diffArr[Math.Min(diff, 6)] + "Lv." + level);
+            return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
         }
 
 

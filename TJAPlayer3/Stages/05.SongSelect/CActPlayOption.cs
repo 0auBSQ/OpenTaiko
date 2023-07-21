@@ -200,7 +200,8 @@ namespace TJAPlayer3
                 txFunMods[nFunMods],
             };
 
-            var _shift = player == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2) : 0;
+            var pos = player % 2;
+            var _shift = pos == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2) : 0;
             var _rect = new Rectangle(_shift, 0, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Height);
 
             TJAPlayer3.Tx.Difficulty_Option.t2D描画(TJAPlayer3.app.Device, _shift, y, _rect);
@@ -209,17 +210,17 @@ namespace TJAPlayer3
 
             for (int i = 0; i < OptionType.Length; i++)
             {
-                OptionType[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Option_OptionType_X[player] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
-                    TJAPlayer3.Skin.SongSelect_Option_OptionType_Y[player] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
+                OptionType[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Option_OptionType_X[pos] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
+                    TJAPlayer3.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
             }
 
-            txModMults[0]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults1_X[player], TJAPlayer3.Skin.SongSelect_Option_ModMults1_Y[player] + y);
-            txModMults[1]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults2_X[player], TJAPlayer3.Skin.SongSelect_Option_ModMults2_Y[player] + y);
+            txModMults[0]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults1_X[pos], TJAPlayer3.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
+            txModMults[1]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults2_X[pos], TJAPlayer3.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
 
             for (int i = 0; i < _textures.Length; i++)
             {
-                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_Value_X[player] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
-                    TJAPlayer3.Skin.SongSelect_Option_Value_Y[player] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
+                _textures[i]?.t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_Value_X[pos] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
+                    TJAPlayer3.Skin.SongSelect_Option_Value_Y[pos] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
             }
 
             if (ctClose.n現在の値 >= 50)
@@ -239,17 +240,44 @@ namespace TJAPlayer3
 
             if (!ctClose.b進行中)
             {
-                bool _leftDrum = (player == 0)
-                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange)
-                    : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P);
+                bool _leftDrum = false;
 
-                bool _rightDrum = (player == 0)
-                    ? TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange)
-                    : TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P);
+                bool _rightDrum = false;
 
-                bool _centerDrum = (player == 0)
-                    ? (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
-                    : (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                bool _centerDrum = false;
+
+                bool _cancel = false;
+
+                switch (player)
+                {
+                    case 0:
+                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow));
+                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow));
+                        _centerDrum = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) ||
+                            (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Return)));
+                        _cancel = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.Escape));
+                        break;
+                    case 1:
+                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
+                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
+                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                        break;
+                    case 2:
+                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue3P));
+                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue3P));
+                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed3P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed3P));
+                        break;
+                    case 3:
+                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue4P));
+                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue4P));
+                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed4P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed4P));
+                        break;
+                    case 4:
+                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue5P));
+                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue5P));
+                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed5P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed5P));
+                        break;
+                }
 
 
                 if (_leftDrum || TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.LeftArrow))
@@ -433,7 +461,7 @@ namespace TJAPlayer3
 
             int speed = TJAPlayer3.ConfigIni.nScrollSpeed[actual];
 
-            if (speed <= 4)
+            if (speed <= 8)
                 nSpeedCount = 0;
             else if (speed <= 19)
                 nSpeedCount = speed - 8;
@@ -521,9 +549,7 @@ namespace TJAPlayer3
 
             #region [ AutoMode ]
 
-            bool _auto = (player == 0)
-                ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay
-                : TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P;
+            bool _auto = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player];
 
             if (_auto == true)
                 nAutoMode = 1;
@@ -657,17 +683,11 @@ namespace TJAPlayer3
 
             if (nAutoMode == 1)
             {
-                if (player == 0)
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = true;
-                else
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = true;
+                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player] = true;
             }
             else
             {
-                if (player == 0)
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = false;
-                else
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = false;
+                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player] = false;
             }
 
             #endregion

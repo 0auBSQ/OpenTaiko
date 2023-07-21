@@ -50,7 +50,7 @@ namespace TJAPlayer3
 		public ST譜面情報 譜面情報;
 
 		// Smaller version of ST譜面情報 to keep the main info for each player (High scores, clear status, score ranks
-		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[2];
+		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[5];
 
 		[Serializable]
 		[StructLayout(LayoutKind.Sequential)]
@@ -82,6 +82,9 @@ namespace TJAPlayer3
 			public bool レベルを非表示にする;
 			public CDTX.E種別 曲種別;
 			public double Bpm;
+			public double BaseBpm;
+			public double MinBpm;
+			public double MaxBpm;
 			public int Duration;
             public string strBGMファイル名;
             public int SongVol;
@@ -94,6 +97,7 @@ namespace TJAPlayer3
             public int[] nレベル;
 			public int[] nクリア;		//0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 			public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+			public CDTX.ELevelIcon[] nLevelIcon;
 
 			// Tower lifes
 			public int nLife;
@@ -322,6 +326,8 @@ namespace TJAPlayer3
 			this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
 			this.譜面情報.曲種別 = CDTX.E種別.DTX;
 			this.譜面情報.Bpm = 120.0;
+			this.譜面情報.MinBpm = 120.0;
+			this.譜面情報.MaxBpm = 120.0;
 			this.譜面情報.Duration = 0;
             this.譜面情報.strBGMファイル名 = "";
             this.譜面情報.SongVol = CSound.DefaultSongVol;
@@ -332,10 +338,11 @@ namespace TJAPlayer3
             this.譜面情報.nハイスコア = new int[(int)Difficulty.Total];
             this.譜面情報.strサブタイトル = "";
             this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1};
-			this.譜面情報.nクリア = new int[5];
+            this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
+            this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
 		
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 5; i++)
             {
 				this.GPInfo[i].nHighScore = new int[(int)Difficulty.Total];
 				this.GPInfo[i].nClear = new int[5];

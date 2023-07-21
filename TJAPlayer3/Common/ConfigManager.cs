@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -49,9 +50,10 @@ namespace TJAPlayer3
         /// <param name="filePath">ファイル名。</param>
         public static void SaveConfig(object obj, string filePath)
         {
+            (new FileInfo(filePath)).Directory.Create();
             using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8))
             {
-                stream.Write(JsonConvert.SerializeObject(obj, Formatting.Indented, Settings));
+                stream.Write(JsonConvert.SerializeObject(obj, Formatting.None, Settings));
             }
         }
     }

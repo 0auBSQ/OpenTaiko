@@ -9,11 +9,11 @@ namespace TJAPlayer3
 {
     class CMenuCharacter
     {
-        private static CCounter[] ctCharacterNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterSelect = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterStart = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterEntry = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
-        private static CCounter[] ctCharacterEntryNormal = new CCounter[4] { new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterSelect = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterStart = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntry = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterEntryNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
         public enum ECharacterAnimation
         {
@@ -29,7 +29,7 @@ namespace TJAPlayer3
 
         private static bool _usesSubstituteTexture(int player, ECharacterAnimation eca)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
             if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn)
             {
@@ -73,7 +73,7 @@ namespace TJAPlayer3
 
         public static CTexture[] _getReferenceArray(int player, ECharacterAnimation eca)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
             if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn)
             {
@@ -156,37 +156,67 @@ namespace TJAPlayer3
             return null;
         }
 
+        public static int _getReferenceAnimationDuration(int player, ECharacterAnimation eca)
+        {
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+
+            switch (eca)
+            {
+                case (ECharacterAnimation.NORMAL):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Loop_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.START):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Start_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.SELECT):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Select_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.ENTRY):
+                    {
+                        return TJAPlayer3.Skin.Characters_Title_Entry_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.ENTRY_NORMAL):
+                    {
+                        return TJAPlayer3.Skin.Characters_Title_Normal_AnimationDuration[_charaId];
+                    }
+            }
+            return 1000;
+        }
+
         public static void tDisableCounter(ECharacterAnimation eca)
         {
             switch (eca)
             {
                 case (ECharacterAnimation.NORMAL):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterNormal[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.START):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterStart[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.SELECT):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterSelect[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.ENTRY):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterEntry[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.ENTRY_NORMAL):
                     {
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < 5; i++)
                             ctCharacterEntryNormal[i] = new CCounter();
                         break;
                     }
@@ -199,16 +229,17 @@ namespace TJAPlayer3
         {
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
+            int _animeref = _getReferenceAnimationDuration(player, eca);
 
             if (_ref != null && _ref.Length > 0 && _ctref != null)
             {
-                _ctref[player] = new CCounter(0, _ref.Length - 1, 1000 / (float)_ref.Length, TJAPlayer3.Timer);
+                _ctref[player] = new CCounter(0, _ref.Length - 1, _animeref / (float)_ref.Length, TJAPlayer3.Timer);
             }
         }
 
         public static void tMenuResetTimer(ECharacterAnimation eca)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tMenuResetTimer(i, eca);
             }
@@ -216,7 +247,7 @@ namespace TJAPlayer3
 
         public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterAnimation eca, int opacity = 255)
         {
-            int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(player)];
+            int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
             CTexture[] _ref = _getReferenceArray(player, eca);
             CCounter[] _ctref = _getReferenceCounter(eca);
             bool _substitute = _usesSubstituteTexture(player, eca);

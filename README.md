@@ -2,383 +2,364 @@
   <img src="https://user-images.githubusercontent.com/58159635/140600257-f712fc48-d09a-4a5e-a78d-e7c65ca19b80.png">
 </p>
 
-English : https://github.com/0auBSQ/OpenTaiko/blob/main/README-EN.md
+日本語 : https://github.com/0auBSQ/OpenTaiko/blob/main/README-JA.md
 
 中文：https://github.com/0auBSQ/OpenTaiko/blob/main/README-ZH.md
 
 # OpenTaiko
 
-TJAPlayer3-Develop-ReWriteの改造版, 太鼓シミュレーターです。
-旧名称 TJAPlayer3-Develop-BSQ
+Old TJAPlayer3-Develop-BSQ, a spiritual successor to TJAPlayer3.
 
-- 現在のバージョン： v0.5.4
+- Current version： v0.5.4
 
 - Discord : https://discord.gg/aA8scTvZ6B
 
-## 使用上の注意 （重要）
+## Cautions before using （IMPORTANT）
 
-- このシミュレータを使用する場合は、**全て自己責任**でお願いします。
+- It is **YOUR RESPONSIBILITY** to use this software. The creator will not take responsibilities for any problems you got from using this software.
 
-- 本家風スキンや派生ビルドのサポートは原則行いませんのでご了承ください。
+- Please research before asking people.
 
-- 質問する前に、まずは自分で調べたりしてください。
-また、[取扱説明書](https://drive.google.com/file/d/1VJoia2M_EWrf58xsATL7udIJ0ozR2YFf/view?usp=sharing)や[Wiki](https://seesaawiki.jp/opentaiko-unofficial/)もご確認ください。
+- If your PC can not maintain 60fps stably, it will not work well with the software.
 
-- 常時60fpsを保てないPCでの動作は快適なプレイは期待できません。
+- There will be no support other than the version listed above. If you are using the pre-release on the releases page, do note it is a testing release, and will not take responsibility for any problem caused using this release.
 
-- 上記のリリースのバージョン以外でサポートは行いませんので自己責任でお願いします。
+### Using this software on streams and videos
 
-### 動画、配信等でのご利用について
+If there is an tag feature on the website you are using, tagging it as "OpenTaiko", "TJAPlayer3", or "TJAP3" will avoid confusion, and might raise video as similar content, so it is highly recommended.
 
-OpenTaikoを動画共有サイトやライブ配信サービス、ウェブサイトやブログ等でご利用になられる場合、バンダイナムコエンターテインメント公式のものでないこと、他の太鼓の達人シミュレーターと混同しないよう配慮をお願いいたします。
+The author of this software does not support breaking copyright laws, so please follow as per your country's copyright laws.
+Additionally, the OpenTaiko team is strongly against the secondary distribution of skins trying to reproduce specific commercial video games.
 
-また、タグ機能のあるサイトの場合、「OpenTaiko」「TJAPlayer3-Develop-BSQ」「TJAP3-BSQ」といったタグを付けることで、他シミュレータとの誤解を防ぐとともに、関連動画として出やすくなるメリットがあるため、推奨します。
+### Editing source code/Secondary distribution
 
-知的所有権侵害は支援しておりませんので、自国の著作権規則に基づいて行動してください。
+OpenTaiko is open source code with MIT license.
+Under the MIT license, you are allowed to make edits, or secondary distribute, however this is all **YOUR RESPONSIBILITY**.
+Also, under the used library's licenses, **PLEASE** include the "License" folder when editing or redistributing it.
+Please follow the creators' licenses and rules for other skins or song packages.
+OpenTaiko license does not apply in this case.
 
-### 改造・再配布(二次配布)を行う場合について
+### Goals/Non-goals
 
-OpenTaikoはオープンソースソフトウェア(MIT)です。
-MITライセンスのルールのもと、改造・再配布を行うことは自由ですが、**全て自己責任**でお願いします。
-また、使用しているライブラリのライセンス上、**必ず**「Licenses」フォルダを同梱の上、改造・再配布をお願いします。
-外部スキンや、譜面パッケージを同梱する場合は、それぞれの制作者のルールや規約を守ってください。
-これらにOpenTaikoのライセンスは適用されません。
+**GOALS**
 
-### 目標・目標ではない物事
+- Multiple fun ways to play Taiko.
 
-**目標**
+- More customization for better skinning potential, and make "Everyone could play Taiko easily at their own style" true.
 
-- 様々な楽しい太鼓のプレイ手段を設けること。
+- Optimizations, bug fixes, and QOL features.
 
-- より多くのスキンのカスタマイズを可能にすること、「色々な見た目のスキンを簡単に作れる」ということを可能にすること。
+**NON-GOALS**
 
-- 最適化、バグ修正、ＱＯＬ機能を改善すること。
+- Copying other games/commercial licenses accurately.
 
-**目標ではない**
+## Rules for posting Issues/Pull requests
 
-- 本家(ニジイロver など)を再現すること。
+Thank you for posting to Issue/Pull Request. It is very much appreciated.
 
-## IssueとPull Request投稿上の注意 （重要）
+- **PLEASE** follow Japan and France copyright laws in the post.
 
-Issue/Pull Requestへ投稿を送ってくれてありがとうございます、大変助かります。
+- **IMPORTANT**: Once you post an issue, please write the release version and recreation steps. If it is a crash, please attach the TJAPlayer3.log file.
 
-- 投稿内容は**必ず**フランス及び日本の著作権規則に従ってください。
+- If you want CLang translations, please contact the software author on Discord beforehand.
 
-- **重要** ：Issueを提供したら、リリースバージョンと再現方法を述べてください。クラッシュの場合、TJAPlayer3.logの内容をご添付ください。
+### Feature requests
 
-- CLang言語翻訳を追加して欲しい場合は予めDiscordでご連絡ください.
+If you want a feature to be added please contact me on Discord beforehand.
 
-### 提案について
+If the feature request is good it might be added.
 
-特別な機能の実装が希望ならDiscordでご連絡ください.
-
-提案を気に入れば実装する事は可能です。
-
-- **重要** ： 「こういうUI・UXのパートを本家っぽく実装してください」のような提案は基本的に拒否しております。
+- **IMPORTANT**: Feature requests such as "Please recreate UI/UX as per following AC Nijiiro Version" will be denied and left without answer.
 
 ## Q＆A
 
-- 選曲画面の段位道場の曲の難易度が全部鬼の☆１０になってます
+- The song difficulty on the dan-i select screen is all Oni 10 stars!
 
 ```
-.tjaファイルの#NEXTSONG行に「,[LEVEL],[COURSE]」を追加してください。
+In the .tja file, please add ",(Difficulty),(Course)" in the #NEXTSONG line.
 
-例：
+Example：
 
-旧： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF]
+Old： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF]
 
-新： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
+New： #NEXTSONG [TITLE],[SUBTITLE],[GENRE],[WAVE],[SCOREINIT],[SCOREDIFF],[LEVEL],[COURSE]
 ```
 
-- エントリー画面から進めません。
+- I can not go past the entry screen.
 
 ```
-Pキーを長押し、または面のキー（デフォルトではF、J／B、N）を押してください。
+Hold the P key.
 ```
 
-- バグを発見しました、どうすればいいですか？
+- I found a bug, what should I do?
 
 ```
-バグを発見したらGithubのIssue、またはDiscordサーバーの#bugsチャンネルまでご報告ください。
+Please make a new Issue if you find a bug.
 ```
 
-- 「太鼓タワー」のメニューに入れません。
+- I cannot find the characters/puchicharas I added
 
 ```
-「太鼓タワー」のメニューはまだ実装されていません。
-タワーの譜面をプレイする場合は演奏ゲームの選曲画面から選択してください。
-（設定で『段・タワー譜面省略』をONにしていると表示されないのでご注意ください）
+From version 0.5.3.1, Characters and Puchicharas are loaded from the Global folder (outside of skins), please add them there.
 ```
 
-- 「Tower_Floors」が見つからないというエラーが出ます！
-
-```
-System/Graphicsではなく
-System/（スキン名）/Graphicsにフォルダを配置してください。
-```
-
-- 追加したキャラクター・プチキャラが表示されていません。
-
-```
-v0.5.3.1からキャラクターおよびプチキャラはGlobalフォルダに読み込まれます（スキンフォルダ以外）、そこに入れてください。
-```
-
-## 更新記録
+## Update history
 
 <details>
 	<summary>v0.5.4</summary>
 
-	- バグ修正
+	- Fix multiple bugs
 
-	- オンライン譜面ダウンロード機能の追加
+	- Online chart downloading via the Online Lounge
 
-	- キャラクター及びプチキャラの個人音声SFXの対応
+	- Voice support for characters and puchicharas
 
-	- 音色の対応
+	- Multiple in-game hitsounds support
 
-	- お任せ曲選択のコンテキストボックスの追加
+	- Context box for Random song select
 
-	- コンガゲームモード
+	- Konga gamemode
 
-	- PREIMAGEメタデータ対応
+	- PREIMAGE metadata support
 
-	- モードアイコンもモードの使い方の更新
+	- Rework of in-game modifiers and modicons
 
-	- 紫音符(G), 爆弾音符(C) の追加及び相手音符(A、B)、ADLIB音符(F)の修正
+	- Purple notes (G), Bomb notes (C) and fix Joined notes (A and B) and ADLIBs (F)
 
 </details>
 
 <details>
 	<summary>v0.5.3.1</summary>
 
-	- バグ修正
+	- Fix multiple bugs
 
-	- グローバルキャラクター・プチキャラ
+	- Global characters and puchicharas
 
-	- 「最近遊んだ曲」のフォルダデータを保存する機能を実装
+	- Permanent recently played songs folder
 
-	- かんたん・ふつうの適当な判断範囲を実装
+	- Easy/Normal timing zones
 
-	- 選曲画面および結果画面にカスタムキャラクターの対応
+	- Characters on menus and result screens
 
-	- 難易度に基づいての曲検索機能を実装
+	- Song search by difficulty feature
 
 </details>
 
 <details>
 	<summary>v0.5.3</summary>
 
-	- バグ修正
+	- Fix multiple bugs
 
-	- 段結果画面を実装（１／２）
+	- 1st version of the Dan result screen
 
-	- 曲数の３つ以外の段譜面のクラッシュを修正
+	- Dan chart supporting any count of songs
 
-	- ２P側対応を追加
+	- Support of 2P Side
 
-	- 主要な２P更新を追加
+	- Major 2P update (Please check discord for more details about it)
 
-	- 演奏選曲画面に段及びタワーの譜面を選べるオプションを追加
+	- Dan charts are now also selectable from the Taiko mode song select screen
 
-	- Modal（注目ボックス）を追加
+	- Add Modals
 
-	- コインを使ってコンテンツを解除できる機能を追加（１／２）
+	- 1st unlockables update
 
-	- 「お気に入りの曲」のフォルダーを追加（選曲画面にCTRLを押したら現在選択中の曲を「お気に入り」にする）
+	- Add Favorite songs folder
 
-	- キャラクター及びプチキャラのメタデータファイル対応を追加
+	- Add Database files (Name and Author names for Characters and Puchichara)
 
-	- 中国語を追加 (WHMHammer)
+	- Chinese language support (WHMHammer)
 
-	- SlimDXの依存を排除 (Mr Ojii)
+	- Remove SlimDX dependencies (Mr Ojii)
 
-	- SimpleStyleスキンを追加 (feat. cien)
+	- Add SimpleStyle skin (feat. cien)
 
-	- 各曲に自動作成のユニークIDを追加
+	- Automatically generated unique ID addition for each song
 
-	- Discord RPCを修正
+	- Fix Discord RPC
 
-	- 様々な設定画面項目を修正 (l1m0n3)
+	- Fix several config options issues (l1m0n3)
 
 </details>
 
 <details>
 	<summary>v0.5.2.1</summary>
 
-	- バグ修正
+	- Fix multiple bugs
 
-	- オート用のAIレベルを追加
+	- Add multiple levels of AI in addition of Auto
 
-	- グローバルオフセットを追加
+	- Add Global offset
 
-	- AUTO ROLLをロールスピードに置き換え
+	- Replace AUTO ROLL by Rolls speed
 
 </details>
 
 <details>
 	<summary>v0.5.2</summary>
 
-	- 太鼓部屋の機能を追加
+	- Taiko Heya features
 
-	- カスタム名札やキャラクター可能にする機能を実装
+	- Custom nameplates and character feature
 
-	- メダルを取得可能にする手順を追加
+	- Make medals obtainable
 
-	- 段位タイトルを解放可能にする機能を追加
+	- Make dan-i title unlockable
 
-	- 複数な手続き型テクスチャを追加
+	- Add multiple step textures
 
-	- スペイン語の翻訳を追加
+	- Add Spanish translation (funnym0th)
 
-	- 「おまかせ」オプションを追加
+	- Add "Random option"
 
-	- 様々なUI/UX改善
+	- UX/UI improvements
 
-	- 譜面読み込みの最適化
+	- Fast song loading
 
-	- 分岐譜面を修正
+	- Fix branched charts
 
 </details>
 
 <details>
 	<summary>v0.5.1</summary>
 
-	- 道場に複数なアニメーションを追加
+	- Add animations to dan-i dojo
 
-	- ゲーム終了画面やメニュアイコンを追加
+	- Add game end screen and icons
 
-	- 様々なバグ修正
+	- Bug fix
 
-	- 複数な外国語サポートを追加
+	- Multiple language support
 
-	- 様々なUI改善
+	- UI improvements
 
-	- 演奏選曲画面の複数なレイアウトを追加
+	- Multiple layouts of song select screen
 
 </details>
 
 <details>
 	<summary>v0.5.0</summary>
 
-	- タワーを実装 (背景+結果画面の基盤)
+	- Taiko Tower features (Background+Result screen backbone)
 
-	- タワー譜面で「TOWERTYPE」の設定を追加 （タワー譜面に複数なスキンを用いてプレイを可能にする機能）
+	- "TOWERTYPE" in Tower charts (USe multiple skins for playing Towercharts)
 
-	- 道場にAccuracy（精度）のEXAMを追加
+	- Add accuracy exam in dan-i dojo
 
-	- box.defで「#BOXCOLOR」, 「#BOXTYPE」, 「#BGCOLOR」, 「#BGTYPE」, 「#BOXCHARA」の設定を追加
+	- Add "#BOXCOLOR", "#BOXTYPE", "#BGCOLOR", "#BGTYPE", "#BOXCHARA in box.def
 
 </details>
 
 <details>
 	<summary>v0.4.3</summary>
 
-	- タワーを実装 (Gameplay)
+	- Add Taiko Tower (Gameplay)
 
 </details>
 
 <details>
 	<summary>v0.4.2</summary>
 
-	- 演奏選曲画面に複数のバグとクラッシュを修正
+	- Fix multiple bug and crash on song select screen
 
-	- COURSE:Towerの.tjaファイルのクラッシュを修正、太鼓タワーメニュ・LIFE管理・結果画面がまだ実装されていません。
+	- Fix COURSE:Tower crashes, however Taiko Tower menu, LIFE management, and result screen is not implemented yet.
 
 </details>
 
 <details>
 	<summary>v0.4.1</summary>
 
-	- 演奏選曲画面に複数のバグとクラッシュ場面を修正
+	- Fix multiple bug and crashes on song select screen
 
 </details>
 
 <details>
 	<summary>v0.4.0</summary>
 
-	- EXAM5,6,7の実装 (下記の映像をご覧ください)
+	- EXAM5, 6, 7 implementation
 
-	- EXAM数にギャップのあるクラッシュ場面を修正
+	- Fix crash with EXAM numbers having spaces between
 
-	- Danに関してコードの構造を改善（コード蓄積の修正）
+	- Better code structuring on Dan-i dojo
 
 </details>
 
 <details>
 	<summary>v0.3.4.2</summary>
 
-	- 道場選曲画面にプチキャラを追加
+	- Add petit-chara on Dan-i select screen
 
 </details>
 
 <details>
 	<summary>v0.3.4.1</summary>
 
-	- Mobアニメーション速度の変化バグを修正
+	- Fix bug with Mob animation speed
 
 </details>
 
 <details>
 	<summary>v0.3.4</summary>
 
-	- 道場の結果を保存を可能にする機能を実装
+	- Save dan-i dojo results
 
-	- 道場選曲画面に合格プレートを表示
+	- Add achievement plate on dan-i select screen
 
 </details>
 
 <details>
 	<summary>v0.3.3</summary>
 
-	- 道場の魂ゲージの表示を修正
+	- Fix dan-i dojo gauge appearance
 
-	- 道場の結果画面の基盤を実装（まだ実装中）
+	- Add backbone for dan-i dojo result screen
 
 </details>
 
 <details>
 	<summary>v0.3.2</summary>
 
-	- 演奏セーブの重ね書きバグを修正
+	- Fix results saving multiple time
 
 </details>
 
 <details>
 	<summary>v0.3.1</summary>
 
-	- P2がスコアランクを表示できないバグを修正
+	- Fix P2 scorerank not showing
 
 </details>
 
 <details>
 	<summary>v0.3.0</summary>
 
-	- メニュにプチキャラを表示
+	- Show petit-chara in menu
 
-	- Nameplate.jsonファイルにプレイヤー別々のプチキャラを選べる可能にする機能を実装
+	- In Nameplate.json file players could select petit-chara separately
 
 </details>
 
 <details>
 	<summary>v0.2.0</summary>
 
-	- 様々な演奏選曲画面のバグを修正
+	- Fix song select screen bug
 
-	- メインメニュに様々なバグを修正、コード蓄積を修正
+	- Fix main menu bugs
 
 </details>
 
 <details>
 	<summary>v0.1.0</summary>
 
-	- 演奏結果画面のアニメーションを実装
+	- Result screen animation
 
 </details>
 
-## スペシャルサンクス
+## Credits
 
 > * [Takkkom/Major OpenTaiko features (1080p support, AI Battle mode, 5P mode and so on)](https://github.com/Takkkom)
 > * [AkiraChnl/OpenTaiko Icon](https://github.com/AkiraChnl)(@akirach_jp)
+> * [Reichisama/OpenTaiko 0.6.0 Icon](https://twitter.com/himikoreichi135)(@himikoreichi135)
 > * [cien/OpenTaiko Logo/Various Default Skin Assets](https://twitter.com/CienpixeL)(@CienpixeL)
 > * [funnym0th/OpenTaiko Spanish Translation](https://github.com/funnym0th) (@funnym0th)
 > * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
