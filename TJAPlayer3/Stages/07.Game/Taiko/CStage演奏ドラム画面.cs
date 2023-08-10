@@ -2511,7 +2511,7 @@ namespace TJAPlayer3
                             {
                                 this.n風船残り[0] = chkChip.nBalloon;
                             }
-                            chkChip.bShow = false;
+                            if (!NotesManager.IsFuzeRoll(chkChip)) chkChip.bShow = false;
                             this.actBalloon.On進行描画(
                                 chkChip.nBalloon, 
                                 this.n風船残り[i], 

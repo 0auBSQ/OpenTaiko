@@ -1493,6 +1493,7 @@ namespace TJAPlayer3
             //if( dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.nノーツ終了時刻ms )
             long nowTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
             bool IsKusudama = NotesManager.IsKusudama(pChip);
+            bool IsFuze = NotesManager.IsFuzeRoll(pChip);
 
             ref int rollCount = ref pChip.nRollCount;
             int balloon = pChip.nBalloon;
