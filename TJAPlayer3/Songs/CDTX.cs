@@ -1335,6 +1335,8 @@ namespace TJAPlayer3
         private int listBalloon_Expert_数値管理;
         private int listBalloon_Master_数値管理;
 
+        public string scenePreset;
+
         public bool[] b譜面が存在する = new bool[(int)Difficulty.Total];
 
         private string[] dlmtSpace = { " " };
@@ -5448,6 +5450,13 @@ namespace TJAPlayer3
                 if (!string.IsNullOrEmpty(strCommandParam))
                 {
                     this.SELECTBG = strCommandParam;
+                }
+            }
+            else if (strCommandName.Equals("SCENEPRESET"))
+            {
+                if (!string.IsNullOrEmpty(strCommandParam))
+                {
+                    this.scenePreset = strCommandParam;
                 }
             }
             else if (strCommandName.Equals("DEMOSTART"))
