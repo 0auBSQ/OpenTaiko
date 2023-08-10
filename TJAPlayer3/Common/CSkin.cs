@@ -4944,6 +4944,14 @@ namespace TJAPlayer3
                             {
                                 ParseInt32(value => Game_Balloon_Balloon_Number_Scale = value);
                             }
+                            else if (strCommand == "Game_Kusudama_Number_X")
+                            {
+                                ParseInt32(value => Game_Kusudama_Number_X = value);
+                            }
+                            else if (strCommand == "Game_Kusudama_Number_Y")
+                            {
+                                ParseInt32(value => Game_Kusudama_Number_Y = value);
+                            }
 
 
                             else if (strCommand == "Game_Balloon_Balloon_4P")
@@ -8776,7 +8784,7 @@ namespace TJAPlayer3
         public int[] Game_Balloon_Balloon_Number_5P = new int[] { 423, 87 };
 
         public int Game_Kusudama_Number_X = 960;
-        public int Game_Kusudama_Number_Y = 450;
+        public int Game_Kusudama_Number_Y = 540;
         #endregion
         #region Effects
         public int[] Game_Effect_Roll_StartPoint_X = new int[] { 56, -10, 200, 345, 100, 451, 600, 260, -30, 534, 156, 363 };

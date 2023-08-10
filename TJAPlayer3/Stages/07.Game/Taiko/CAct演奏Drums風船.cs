@@ -84,34 +84,12 @@ namespace TJAPlayer3
 
         public override void OnManagedリソースの作成()
         {
-            //this.tx連打枠 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_balloon.png"));
-            //this.tx連打数字 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_RollNumber.png"));
-
-            //this.txキャラクター = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Chara\balloon.png"));
-            //this.txキャラクター_風船終了 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Chara\balloon_break_0.png"));
-
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    this.tx風船枠[i] = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\Chara\balloon_" + i.ToString() + ".png"));
-            //}
-
             this.ct風船ふきだしアニメ = new CCounter(0, 1, 100, TJAPlayer3.Timer);
             base.OnManagedリソースの作成();
         }
 
         public override void OnManagedリソースの解放()
         {
-            //CDTXMania.tテクスチャの解放(ref this.tx連打枠);
-            //CDTXMania.tテクスチャの解放(ref this.tx連打数字);
-
-            //CDTXMania.tテクスチャの解放(ref this.txキャラクター);
-            //CDTXMania.tテクスチャの解放(ref this.txキャラクター_風船終了);
-
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    CDTXMania.tテクスチャの解放(ref this.tx風船枠[i]);
-            //}
-
             base.OnManagedリソースの解放();
         }
 
@@ -297,7 +275,17 @@ namespace TJAPlayer3
             int x = TJAPlayer3.Skin.Game_Kusudama_Number_X;
             int y = TJAPlayer3.Skin.Game_Kusudama_Number_Y;
 
-            _nbDisplay(TJAPlayer3.Tx.Kusudama_Number, num, x, y);
+            int[] nums = C変換.SeparateDigits(num);
+            for (int j = 0; j < nums.Length; j++)
+            {
+                float offset = j - ((nums.Length - 2) / 2.0f);
+                float width = TJAPlayer3.Tx.Kusudama_Number.sz画像サイズ.Width / 10.0f;
+                float height = TJAPlayer3.Tx.Kusudama_Number.sz画像サイズ.Height;
+                float _x = x - (width * offset);
+                float _y = y;
+
+                TJAPlayer3.Tx.Kusudama_Number.t2D拡大率考慮下基準描画(TJAPlayer3.app.Device, _x, _y, new RectangleF(width * nums[j], 0, width, height));
+            }
         }
 
         private void tFuseNumber(int x, int y, int num, int nPlayer)

@@ -26,7 +26,7 @@ namespace TJAPlayer3
             ["6"] = 6, // Big roll start | Konga pink roll
             ["7"] = 7, // Balloon
             ["8"] = 8, // Roll/Balloon end
-            ["9"] = 7, // Kusudama (Coming soon)
+            ["9"] = 7, // Kusudama
             ["A"] = 10, // Joint Big Don (2P)
             ["B"] = 11, // Joint Big Ka (2P)
             ["C"] = 12, // Mine
@@ -355,6 +355,11 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Note_Swap?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
                 return;
             }
+            else if (IsKusudama(chip))
+            {
+                TJAPlayer3.Tx.Note_Kusu?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+                return;
+            }
 
             TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(noteType * TJAPlayer3.Skin.Game_Notes_Size[0], frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
         }
@@ -474,6 +479,10 @@ namespace TJAPlayer3
             else if (IsFuzeRoll(chip))
             {
                 TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * 2, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+            }
+            else if (IsKusudama(chip))
+            {
+                TJAPlayer3.Tx.SENotesExtension?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * 3, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
             }
             else
             {

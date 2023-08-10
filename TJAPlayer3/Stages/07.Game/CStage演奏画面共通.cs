@@ -1491,18 +1491,41 @@ namespace TJAPlayer3
         protected bool tBalloonProcess( CDTX.CChip pChip, double dbProcess_time, int player )
         {
             //if( dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.nノーツ終了時刻ms )
-            if ((int)(long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) >= pChip.n発声時刻ms && (int)(long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) <= pChip.nノーツ終了時刻ms)
+            long nowTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+            bool IsKusudama = NotesManager.IsKusudama(pChip);
+
+            ref int rollCount = ref pChip.nRollCount;
+            int balloon = pChip.nBalloon;
+            if (IsKusudama)
             {
-                if ( pChip.nRollCount == 0 && this.bPAUSE == false)
+                var ts = pChip.db発声時刻ms;
+                var km = TJAPlayer3.DTX.kusudaMAP;
+
+                if (km.ContainsKey(ts))
                 {
-                    this.n風船残り[ player ] = pChip.nBalloon;
+                    rollCount = ref km[ts].nRollCount;
+                    balloon = km[ts].nBalloon;
+                }
+            }
+
+            if ((int)nowTime >= pChip.n発声時刻ms 
+                && (int)nowTime <= pChip.nノーツ終了時刻ms)
+            {
+                if (rollCount == 0 && this.bPAUSE == false)
+                {
+                    if (IsKusudama)
+                    {
+                        this.n風船残り[0] = balloon;
+                    }
+                    else
+                    {
+                        this.n風船残り[player] = balloon;
+                    }
                 }
 
-                this.b連打中[ player ] = true;
-                {
-                    actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
-                   
-                }
+                this.b連打中[player] = true;
+                actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
+                
 
                 if (this.actBalloon.ct風船アニメ[player].b終了値に達してない)
                 {
@@ -1516,8 +1539,16 @@ namespace TJAPlayer3
                 
                 this.eRollState = E連打State.balloon;
 
-                pChip.nRollCount++;
-                this.n風船残り[ player ]--;
+
+                rollCount++;
+                if (IsKusudama)
+                {
+                    this.n風船残り[0]--;
+                }
+                else
+                {
+                    this.n風船残り[player]--;
+                }
 
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
                     this.n連打[actDan.NowShowingNumber]++;
@@ -1531,20 +1562,18 @@ namespace TJAPlayer3
 
                 //赤か青かの分岐
 
-
-
                 if (!TJAPlayer3.ConfigIni.ShinuchiMode)
                 {
                     if (pChip.bGOGOTIME) //non-Shin'uchi / GoGo-Time　／　真打OFF・ゴーゴータイム
                     {
-                        if (pChip.nBalloon == pChip.nRollCount)
+                        if (balloon == rollCount)
                             this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 6000L, player);
                         else
                             this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 360L, player);
                     }
                     else //non-Shin'uchi / non-GoGo-Time　／　真打OFF・非ゴーゴータイム
                     {
-                        if (pChip.nBalloon == pChip.nRollCount)
+                        if (balloon == rollCount)
                             this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 5000L, player);
                         else
                             this.actScore.Add(E楽器パート.TAIKO, this.bIsAutoPlay, 300L, player);
@@ -1558,45 +1587,61 @@ namespace TJAPlayer3
                 this.soundRed[pChip.nPlayerSide]?.t再生を開始する();
 
 
-                if ( pChip.nBalloon == pChip.nRollCount )
+                if (balloon == rollCount)
                 {
-                    //ﾊﾟｧｰﾝ
-                    TJAPlayer3.Skin.soundBalloon.t再生する();
-                    //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 3, player ); //ここで飛ばす。飛ばされるのは大音符のみ。
-                    TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(3, player);
-                    TJAPlayer3.stage演奏ドラム画面.Rainbow.Start( player );
-                    //CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
-                    pChip.bHit = true;
-                    pChip.IsHitted = true;
-                    chip現在処理中の連打チップ[ player ].bHit = true;
-                    //this.b連打中 = false;
-                    //this.actChara.b風船連打中 = false;
-                    pChip.b可視 = false;
+                    if (IsKusudama)
                     {
-                        actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
-                        if(actChara.CharaAction_Balloon_Delay[player] != null )actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
+                        TJAPlayer3.Skin.soundBalloon.t再生する();
+                        var ts = pChip.db発声時刻ms;
+                        for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                        {
+                            var _dtx = new CDTX[5] { TJAPlayer3.DTX, TJAPlayer3.DTX_2P, TJAPlayer3.DTX_3P, TJAPlayer3.DTX_4P, TJAPlayer3.DTX_5P };
+                            var km = _dtx[j].kusudaMAP;
+                            if (km.ContainsKey(ts))
+                            {
+                                var tChip = km[ts];
+                                tChip.bHit = true;
+                                tChip.IsHitted = true;
+                                chip現在処理中の連打チップ[j].bHit = true;
+                                tChip.b可視 = false;
+                                {
+                                    actChara.ChangeAnime(j, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
+                                    if (actChara.CharaAction_Balloon_Delay[j] != null) actChara.CharaAction_Balloon_Delay[j] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[j]] - 1, 1, TJAPlayer3.Timer);
+                                }
+                            }
+                            
+                        }
                     }
-                    this.eRollState = E連打State.none;
+                    else
+                    {
+                        //ﾊﾟｧｰﾝ
+                        TJAPlayer3.Skin.soundBalloon.t再生する();
+                        //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 3, player ); //ここで飛ばす。飛ばされるのは大音符のみ。
+                        TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(3, player);
+                        TJAPlayer3.stage演奏ドラム画面.Rainbow.Start(player);
+                        //CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
+                        pChip.bHit = true;
+                        pChip.IsHitted = true;
+                        chip現在処理中の連打チップ[player].bHit = true;
+                        //this.b連打中 = false;
+                        //this.actChara.b風船連打中 = false;
+                        pChip.b可視 = false;
+                        {
+                            actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
+                            if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
+                        }
+                    }
+                    this.eRollState = E連打State.none; // Unused variable ?
                 }
-                /*
-                else
-                {
-                    
-                }
-                */
-                //TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[player].Start(PlayerLane.FlashType.Hit);
             }
             else
             {
-                if ( chip現在処理中の連打チップ[ player ] != null )
-                    chip現在処理中の連打チップ[ player ].bHit = true;
-                this.b連打中[ player ] = false;
+                if (chip現在処理中の連打チップ[player] != null)
+                    chip現在処理中の連打チップ[player].bHit = true;
+                this.b連打中[player] = false;
                 this.actChara.b風船連打中[player] = false;
                 return false;
             }
-
-            
-
             return true;
         }
 
@@ -1665,7 +1710,9 @@ namespace TJAPlayer3
 
                                 if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
                                 {
-                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + (1000.0 / (double)rollSpeed) * pChip.nRollCount))
+                                    if (((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) 
+                                        * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) 
+                                            > (pChip.n発声時刻ms + (1000.0 / (double)rollSpeed) * pChip.nRollCount))
                                     {
                                         EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
                                         int nLane = 0;
@@ -1710,9 +1757,32 @@ namespace TJAPlayer3
 
                             if (bAutoPlay)
                             {
-                                if (pChip.nBalloon != 0 && this.bPAUSE == false)
+                                bool IsKusudama = NotesManager.IsKusudama(pChip);
+
+                                int rollCount = pChip.nRollCount;
+                                int balloon = pChip.nBalloon;
+                                if (IsKusudama)
                                 {
-                                    if ((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > (pChip.n発声時刻ms + ((pChip.nノーツ終了時刻ms - pChip.n発声時刻ms) / pChip.nBalloon) * pChip.nRollCount))
+                                    var ts = pChip.db発声時刻ms;
+                                    var km = TJAPlayer3.DTX.kusudaMAP;
+
+                                    if (km.ContainsKey(ts))
+                                    {
+                                        rollCount = km[ts].nRollCount;
+                                        balloon = km[ts].nBalloon;
+                                    }
+                                }
+
+                                if (balloon != 0 && this.bPAUSE == false)
+                                {
+                                    int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
+                                    if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
+                                        rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
+
+                                    int balloonDuration = (pChip.nノーツ終了時刻ms - pChip.n発声時刻ms);
+
+                                    if ((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > 
+                                        (pChip.n発声時刻ms + (balloonDuration / balloon) * rollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;

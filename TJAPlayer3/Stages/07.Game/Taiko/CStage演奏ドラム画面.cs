@@ -2355,7 +2355,7 @@ namespace TJAPlayer3
                             
                         }
 
-                        if (NotesManager.IsBalloon(pChip))
+                        if (NotesManager.IsBalloon(pChip) || NotesManager.IsKusudama(pChip))
                         {
                             if (pChip.bShow)
                             {
@@ -2393,7 +2393,7 @@ namespace TJAPlayer3
                                     n = 910;
                                     break;
                             }
-                            if (pChip.n連打音符State != 7 && pChip.n連打音符State != 13)
+                            if (pChip.n連打音符State != 7 && pChip.n連打音符State != 9 && pChip.n連打音符State != 13)
                             {
                                 //if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
                                 //    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
@@ -2495,22 +2495,30 @@ namespace TJAPlayer3
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (this.chip現在処理中の連打チップ[i] != null)
+                var chkChip = this.chip現在処理中の連打チップ[i];
+                if (chkChip != null)
                 {
+                    long nowTime = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
                     //int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
-                    if (NotesManager.IsGenericBalloon(this.chip現在処理中の連打チップ[i]) && this.b連打中[i] == true)
+                    if (NotesManager.IsGenericBalloon(chkChip) && (this.b連打中[i] == true)
+                        || NotesManager.IsKusudama(chkChip))
                     {
                         //if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
-                        if (this.chip現在処理中の連打チップ[i].n発声時刻ms <= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) && this.chip現在処理中の連打チップ[i].nノーツ終了時刻ms + 500 >= (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
+                        if (chkChip.n発声時刻ms <= (int)nowTime
+                            && chkChip.nノーツ終了時刻ms + 500 >= (int)nowTime)
                         {
-                            this.chip現在処理中の連打チップ[i].bShow = false;
+                            if (i == 0 && chkChip.nRollCount == 0 && NotesManager.IsKusudama(chkChip))
+                            {
+                                this.n風船残り[0] = chkChip.nBalloon;
+                            }
+                            chkChip.bShow = false;
                             this.actBalloon.On進行描画(
-                                this.chip現在処理中の連打チップ[i].nBalloon, 
+                                chkChip.nBalloon, 
                                 this.n風船残り[i], 
                                 i,
-                                NotesManager.IsFuzeRoll(this.chip現在処理中の連打チップ[i])
+                                NotesManager.IsFuzeRoll(chkChip)
                                  ? CAct演奏Drums風船.EBalloonType.FUSEROLL
-                                 : NotesManager.IsKusudama(this.chip現在処理中の連打チップ[i])
+                                 : NotesManager.IsKusudama(chkChip)
                                     ? CAct演奏Drums風船.EBalloonType.KUSUDAMA
                                     : CAct演奏Drums風船.EBalloonType.BALLOON
                                 );

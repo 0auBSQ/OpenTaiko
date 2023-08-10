@@ -502,23 +502,18 @@ namespace TJAPlayer3
 								TJAPlayer3.DTX_4P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 3, true, TJAPlayer3.stage選曲.n確定された曲の難易度[3]);
 							if (TJAPlayer3.ConfigIni.nPlayerCount >= 5)
 								TJAPlayer3.DTX_5P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 4, true, TJAPlayer3.stage選曲.n確定された曲の難易度[4]);
-							if ( File.Exists( TJAPlayer3.DTX.strフォルダ名 + @"\\set.def" ) )
-                            {
-								//TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[0]);
-								//if ( TJAPlayer3.ConfigIni.nPlayerCount == 2 )
-									//TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stage選曲.n確定された曲の難易度[1]);
-							}
 
-							Trace.TraceInformation( "----曲情報-----------------" );
+							Trace.TraceInformation( "---- Song information -----------------" );
 				    		Trace.TraceInformation( "TITLE: {0}", TJAPlayer3.DTX.TITLE );
 			    			Trace.TraceInformation( "FILE: {0}",  TJAPlayer3.DTX.strファイル名の絶対パス );
 		    				Trace.TraceInformation( "---------------------------" );
 
 	    					span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-    						Trace.TraceInformation( "DTX読込所要時間:           {0}", span.ToString() );
+    						Trace.TraceInformation( "Chart loading time:           {0}", span.ToString() );
 
-                            // 段位認定モード用。
-                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan && TJAPlayer3.DTX.List_DanSongs != null)
+							// 段位認定モード用。
+							#region [dan setup]
+							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan && TJAPlayer3.DTX.List_DanSongs != null)
                             {
                                 var pfTitle = new CPrivateFont();
                                 var pfSubTitle = new CPrivateFont();
@@ -563,7 +558,8 @@ namespace TJAPlayer3
                                 pfTitle?.Dispose();
                                 pfSubTitle?.Dispose();
                             }
-                        }
+							#endregion
+						}
 
                         base.eフェーズID = CStage.Eフェーズ.NOWLOADING_WAV読み込み待機;
 						timeBeginLoadWAV = DateTime.Now;
@@ -601,7 +597,7 @@ namespace TJAPlayer3
 						if ( nWAVcount > TJAPlayer3.DTX.listWAV.Count )
 						{
 							TimeSpan span = ( TimeSpan ) ( DateTime.Now - timeBeginLoadWAV );
-							Trace.TraceInformation( "WAV読込所要時間({0,4}):     {1}", TJAPlayer3.DTX.listWAV.Count, span.ToString() );
+							Trace.TraceInformation("Song loading time({0,4}):     {1}", TJAPlayer3.DTX.listWAV.Count, span.ToString() );
 							timeBeginLoadWAV = DateTime.Now;
 
 							if ( TJAPlayer3.ConfigIni.bDynamicBassMixerManagement )
@@ -616,6 +612,7 @@ namespace TJAPlayer3
 								_dtx[i]?.tRandomizeTaikoChips(i);
 								_dtx[i]?.tApplyFunMods(i);
 							}
+							CDTX.tManageKusudama(_dtx);
 								
 
 							TJAPlayer3.stage演奏ドラム画面.On活性化();

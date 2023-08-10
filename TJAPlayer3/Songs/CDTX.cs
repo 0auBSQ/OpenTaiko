@@ -1327,6 +1327,8 @@ namespace TJAPlayer3
         public List<Bitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
         public List<STLYRIC> listLyric2;
 
+        public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
+
         public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
 
         private int listBalloon_Normal_数値管理;
@@ -1734,7 +1736,69 @@ namespace TJAPlayer3
             return new string(new char[] { str[n / 36], str[n % 36] });
         }
 
-        public void tApplyFunMods(int player = 0)
+        public static void tManageKusudama(CDTX[] dtxarr)
+        {
+            if (TJAPlayer3.ConfigIni.nPlayerCount == 1) return; 
+
+			// Replace non-shared kusudamas by balloons
+			#region [Sync check]
+			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+            {
+                CDTX dtx = dtxarr[i];
+                if (dtx == null) continue;
+                foreach (KeyValuePair<double, CChip> kvp in dtx.kusudaMAP)
+                {
+                    for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                    {
+                        if (j == i) continue;
+
+                        CDTX dtxp = dtxarr[j];
+                        if (dtxp == null) continue;
+                        if (!dtxp.kusudaMAP.ContainsKey(kvp.Key))
+                        {
+                            kvp.Value.nチャンネル番号 = 0x17;
+                            break;
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            // Stack balloon values to all remining (= existing) kusudamas to player 1
+            #region [Accumulation]
+            CDTX dtx1 = dtxarr[0];
+            if (dtx1 == null) return;
+            foreach (KeyValuePair<double, CChip> kvp in dtx1.kusudaMAP)
+            {
+                if (!NotesManager.IsKusudama(kvp.Value)) continue;
+                for (int j = 1; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                {
+                    CDTX dtxp = dtxarr[j];
+                    if (dtxp == null) continue;
+                    if (dtxp.kusudaMAP.ContainsKey(kvp.Key)
+                        && NotesManager.IsKusudama(dtxp.kusudaMAP[kvp.Key]))
+                    {
+                        kvp.Value.nBalloon += dtxp.kusudaMAP[kvp.Key].nBalloon;
+                    }
+                }
+                // For score normalization
+                
+                for (int j = 1; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                {
+                    CDTX dtxp = dtxarr[j];
+                    if (dtxp == null) continue;
+                    if (dtxp.kusudaMAP.ContainsKey(kvp.Key)
+                        && NotesManager.IsKusudama(dtxp.kusudaMAP[kvp.Key]))
+                    {
+                        dtxp.kusudaMAP[kvp.Key].nBalloon = kvp.Value.nBalloon;
+                    }
+                }
+                
+            }
+            #endregion
+        }
+
+		public void tApplyFunMods(int player = 0)
         {
             Random rnd = new System.Random();
 
@@ -1754,14 +1818,6 @@ namespace TJAPlayer3
                                 chip.nチャンネル番号 = 0x1C;
                             }
 
-                            /*
-                            switch (chip.nチャンネル番号)
-                            {
-                                case 0x10:
-                                    chip.nチャンネル番号 = 0x1C;
-                                    break;
-                            }
-                            */
                         }
                     }
                     break;
@@ -4508,6 +4564,20 @@ namespace TJAPlayer3
                                 chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
                                 chip.nPlayerSide = this.nPlayerSide;
                                 chip.bGOGOTIME = this.bGOGOTIME;
+
+                                if (NotesManager.IsKusudama(chip))
+                                {
+                                    if (IsEndedBranching)
+                                    {
+                                        if (!this.kusudaMAP.ContainsKey(chip.n発声時刻ms))
+                                            kusudaMAP[chip.n発声時刻ms] = chip;
+                                    }
+                                    else
+                                    {
+                                        // Balloon in branches
+                                        chip.nチャンネル番号 = 0x17;
+                                    }
+                                }
 
                                 if (NotesManager.IsGenericBalloon(chip))
                                 {

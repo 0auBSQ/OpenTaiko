@@ -39,10 +39,8 @@ namespace TJAPlayer3
                 "Disabled if AUTO 2P is on.",
             [14] = "Global Offset",
             [15] = "Change the interpreted OFFSET\nvalue for all charts.\n" +
-                "Can be set between -99 and 99ms.\n" +
-                "To decrease input lag, set minus value.\n\n" +
-                "Note: Reload songs to make\n" +
-                "     the setting take effect.",
+                "Can be set between -999 and 999ms.\n" +
+                "To decrease input lag, set minus value.",
             [16] = "Layout type",
             [17] = "You can change the layout of the songs \ndisplayed on the song select screen.\n" +
                 "0 : Regular (Up to down diagonal)\n" +
