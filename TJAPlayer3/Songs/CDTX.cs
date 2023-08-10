@@ -1343,7 +1343,6 @@ namespace TJAPlayer3
 
         private readonly string langTITLE = "TITLE" + CLangManager.fetchLang().ToUpper();
         private readonly string langSUBTITLE = "SUBTITLE" + CLangManager.fetchLang().ToUpper();
-        private bool titleIsLocalized = false;
 
         private int nスクロール方向 = 0;
         //2015.09.18 kairera0467
@@ -5122,7 +5121,7 @@ namespace TJAPlayer3
             }
 
             //パラメータを分別、そこから割り当てていきます。
-            if (strCommandName.Equals("TITLE") && !titleIsLocalized) // Do not grab default TITLE if localized title is used first.
+            if (strCommandName.Equals("TITLE"))
             {
                 var subTitle = "";
                 for (int i = 0; i < strArray.Length; i++)
@@ -5139,21 +5138,10 @@ namespace TJAPlayer3
                     subTitle += strArray[i];
                 }
                 this.TITLE = subTitle.Substring(7);
-                this.titleIsLocalized = true;
-                this.SUBTITLE = ""; // Wipe default SUBTITLE if picked up before localized subtitle.
             }
-            if (strCommandName.Equals("SUBTITLE") && !titleIsLocalized) // Do not grab default SUBTITLE if localized title is used first. Avoids localization conflicts. (i.e. English title w/ default Japanese subtitle)
+            else if (strCommandName.Equals("SUBTITLE"))
             {
-                if (strCommandParam.StartsWith("--"))
-                {
-                    var subTitle = "";
-                    for (int i = 0; i < strArray.Length; i++)
-                    {
-                        subTitle += strArray[i];
-                    }
-                    this.SUBTITLE = subTitle.Substring(10);
-                }
-                else if (strCommandParam.StartsWith("++"))
+                if (strCommandParam.StartsWith("--") || strCommandParam.StartsWith("++"))
                 {
                     var subTitle = "";
                     for (int i = 0; i < strArray.Length; i++)
