@@ -1346,6 +1346,9 @@ namespace TJAPlayer3
         private readonly string langTITLE = "TITLE" + CLangManager.fetchLang().ToUpper();
         private readonly string langSUBTITLE = "SUBTITLE" + CLangManager.fetchLang().ToUpper();
 
+        private bool titleIsLocalized = false;
+        private bool subtitleIsLocalized = false;
+
         private int nスクロール方向 = 0;
         //2015.09.18 kairera0467
         //バタフライスライドみたいなアレをやりたいがために実装。
@@ -5123,7 +5126,7 @@ namespace TJAPlayer3
             }
 
             //パラメータを分別、そこから割り当てていきます。
-            if (strCommandName.Equals("TITLE"))
+            if (strCommandName.Equals("TITLE") && !titleIsLocalized)
             {
                 var subTitle = "";
                 for (int i = 0; i < strArray.Length; i++)
@@ -5140,8 +5143,9 @@ namespace TJAPlayer3
                     subTitle += strArray[i];
                 }
                 this.TITLE = subTitle.Substring(7);
+                titleIsLocalized = true;
             }
-            else if (strCommandName.Equals("SUBTITLE"))
+            else if (strCommandName.Equals("SUBTITLE") && !subtitleIsLocalized)
             {
                 if (strCommandParam.StartsWith("--") || strCommandParam.StartsWith("++"))
                 {
@@ -5170,6 +5174,7 @@ namespace TJAPlayer3
                     subTitle += strArray[i];
                 }
                 this.SUBTITLE = subTitle.Substring(10);
+                subtitleIsLocalized = true;
             }
             else if (strCommandName.Equals("LEVEL"))
             {
