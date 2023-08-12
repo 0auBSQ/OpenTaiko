@@ -6471,7 +6471,16 @@ namespace TJAPlayer3
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
-                                    Result_UIMove_4P[i] = int.Parse(strSplit[i]);
+                                    //Result_UIMove_4P[i] = int.Parse(strSplit[i]);
+                                }
+
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    int moveX = int.Parse(strSplit[0]);
+                                    Result_UIMove_4P_X[i] = moveX * i;
+
+                                    int moveY = int.Parse(strSplit[1]);
+                                    Result_UIMove_4P_Y[i] = moveY * i;
                                 }
                             }
                             else if (strCommand == "Result_UIMove_5P")
@@ -6479,7 +6488,48 @@ namespace TJAPlayer3
                                 string[] strSplit = strParam.Split(',');
                                 for (int i = 0; i < 2; i++)
                                 {
-                                    Result_UIMove_5P[i] = int.Parse(strSplit[i]);
+                                    //Result_UIMove_5P[i] = int.Parse(strSplit[i]);
+                                }
+
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    int moveX = int.Parse(strSplit[0]);
+                                    Result_UIMove_5P_X[i] = moveX * i;
+
+                                    int moveY = int.Parse(strSplit[1]);
+                                    Result_UIMove_5P_Y[i] = moveY * i;
+                                }
+                            }
+                            else if (strCommand == "Result_UIMove_4P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Result_UIMove_4P_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_UIMove_4P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    Result_UIMove_4P_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_UIMove_5P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_UIMove_5P_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_UIMove_5P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    Result_UIMove_5P_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
                             else if (strCommand == "Result_DifficultyBar_4P")
@@ -8992,9 +9042,14 @@ namespace TJAPlayer3
 
         #endregion
         #region Result
-
+        /*
         public int[] Result_UIMove_4P = new int[] { 320, 0 };
         public int[] Result_UIMove_5P = new int[] { 256, 0 };
+        */
+        public int[] Result_UIMove_4P_X = new int[] { 0, 320, 640, 960 };
+        public int[] Result_UIMove_4P_Y = new int[] { 0, 0, 0, 0 };
+        public int[] Result_UIMove_5P_X = new int[] { 0, 256, 512, 768, 1024 };
+        public int[] Result_UIMove_5P_Y = new int[] { 0, 0, 0, 0, 0 };
 
         public int Result_Cloud_Count = 11;
         public int[] Result_Cloud_X = new int[] { 642, 612, 652, 1148, 1180, 112, 8, 1088, 1100, 32, 412 };

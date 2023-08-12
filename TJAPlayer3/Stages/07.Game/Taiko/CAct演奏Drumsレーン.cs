@@ -72,13 +72,13 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
                 {
-                    x[i] = TJAPlayer3.Skin.Game_Lane_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * i);
-                    y[i] = TJAPlayer3.Skin.Game_Lane_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * i);
+                    x[i] = TJAPlayer3.Skin.Game_Lane_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
+                    y[i] = TJAPlayer3.Skin.Game_Lane_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
                 }
                 else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
                 {
-                    x[i] = TJAPlayer3.Skin.Game_Lane_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * i);
-                    y[i] = TJAPlayer3.Skin.Game_Lane_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * i);
+                    x[i] = TJAPlayer3.Skin.Game_Lane_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
+                    y[i] = TJAPlayer3.Skin.Game_Lane_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
                 }
                 else
                 {
