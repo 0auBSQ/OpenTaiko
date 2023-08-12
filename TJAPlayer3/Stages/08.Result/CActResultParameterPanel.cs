@@ -323,13 +323,13 @@ namespace TJAPlayer3
 				{
 					if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 					{
-						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * i);
-						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * i);
+						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[i];
+						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[i];
 					}
 					else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 					{
-						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * i);
-						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * i);
+						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[i];
+						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[i];
 					}
 					else
 					{
@@ -372,11 +372,11 @@ namespace TJAPlayer3
 					{
 						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 						{
-							TJAPlayer3.Tx.Result_Panel_5P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_5P[0] * i, 0);
+							TJAPlayer3.Tx.Result_Panel_5P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_5P_X[i], TJAPlayer3.Skin.Result_UIMove_5P_Y[i]);
 						}
 						else
 						{
-							TJAPlayer3.Tx.Result_Panel_4P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_4P[0] * i, 0);
+							TJAPlayer3.Tx.Result_Panel_4P[i].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.Result_UIMove_4P_X[i], TJAPlayer3.Skin.Result_UIMove_4P_Y[i]);
 						}
 					}
 
@@ -389,18 +389,18 @@ namespace TJAPlayer3
 						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 						{
 							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
-							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
-							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 						}
 						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 						{
 							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
-							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
-							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 						}
 						else
 						{
@@ -442,14 +442,14 @@ namespace TJAPlayer3
 							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 							{
 								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								gauge_x = TJAPlayer3.Skin.Result_Gauge_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								gauge_y = TJAPlayer3.Skin.Result_Gauge_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								gauge_x = TJAPlayer3.Skin.Result_Gauge_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								gauge_y = TJAPlayer3.Skin.Result_Gauge_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 							}
 							else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 							{
 								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								gauge_x = TJAPlayer3.Skin.Result_Gauge_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								gauge_y = TJAPlayer3.Skin.Result_Gauge_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								gauge_x = TJAPlayer3.Skin.Result_Gauge_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								gauge_y = TJAPlayer3.Skin.Result_Gauge_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 							}
 							else
 							{
@@ -474,18 +474,18 @@ namespace TJAPlayer3
 						int soulFire_y;
 						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 						{
-							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
-							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
+							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
 						}
 						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 						{
-							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
-							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
+							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
+							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
+							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
 							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
 						}
 						else
@@ -527,14 +527,14 @@ namespace TJAPlayer3
 								int rainbow_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
-									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
-									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
 								}
 								else
@@ -565,14 +565,14 @@ namespace TJAPlayer3
 								int clearText_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
-									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[0];
+									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[1];
 									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
-									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
+									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
 									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
 								}
 								else
@@ -629,52 +629,52 @@ namespace TJAPlayer3
 								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 
-								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[5][pos] = TJAPlayer3.Skin.Result_ADLib_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[5][pos] = TJAPlayer3.Skin.Result_ADLib_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[5][pos] = TJAPlayer3.Skin.Result_ADLib_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[5][pos] = TJAPlayer3.Skin.Result_ADLib_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 
-								num_x[6][pos] = TJAPlayer3.Skin.Result_Bomb_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-								num_y[6][pos] = TJAPlayer3.Skin.Result_Bomb_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+								num_x[6][pos] = TJAPlayer3.Skin.Result_Bomb_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								num_y[6][pos] = TJAPlayer3.Skin.Result_Bomb_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 							}
 							else if (TJAPlayer3.ConfigIni.nPlayerCount > 2)
 							{
 								num_x = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 								num_y = new int[][] { new int[5], new int[5], new int[5], new int[5], new int[5], new int[5], new int[5] };
 
-								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[0][pos] = TJAPlayer3.Skin.Result_Perfect_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[1][pos] = TJAPlayer3.Skin.Result_Good_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[1][pos] = TJAPlayer3.Skin.Result_Good_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[2][pos] = TJAPlayer3.Skin.Result_Miss_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[3][pos] = TJAPlayer3.Skin.Result_Roll_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[4][pos] = TJAPlayer3.Skin.Result_MaxCombo_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[5][pos] = TJAPlayer3.Skin.Result_ADLib_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[5][pos] = TJAPlayer3.Skin.Result_ADLib_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[5][pos] = TJAPlayer3.Skin.Result_ADLib_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[5][pos] = TJAPlayer3.Skin.Result_ADLib_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 
-								num_x[6][pos] = TJAPlayer3.Skin.Result_Bomb_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-								num_y[6][pos] = TJAPlayer3.Skin.Result_Bomb_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+								num_x[6][pos] = TJAPlayer3.Skin.Result_Bomb_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								num_y[6][pos] = TJAPlayer3.Skin.Result_Bomb_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 							}
                             else
 							{
@@ -737,13 +737,13 @@ namespace TJAPlayer3
 								int score_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
-									score_x = TJAPlayer3.Skin.Result_Score_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-									score_y = TJAPlayer3.Skin.Result_Score_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									score_x = TJAPlayer3.Skin.Result_Score_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+									score_y = TJAPlayer3.Skin.Result_Score_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
-									score_x = TJAPlayer3.Skin.Result_Score_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-									score_y = TJAPlayer3.Skin.Result_Score_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									score_x = TJAPlayer3.Skin.Result_Score_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+									score_y = TJAPlayer3.Skin.Result_Score_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 								}
 								else
 								{
@@ -1116,13 +1116,13 @@ namespace TJAPlayer3
 								int scoreRankEffect_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
-									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
-									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 								}
 								else
 								{
@@ -1191,13 +1191,13 @@ namespace TJAPlayer3
 								int crownEffect_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
-									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_5P[0] + (TJAPlayer3.Skin.Result_UIMove_5P[0] * pos);
-									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_5P[1] + (TJAPlayer3.Skin.Result_UIMove_5P[1] * pos);
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
-									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_4P[0] + (TJAPlayer3.Skin.Result_UIMove_4P[0] * pos);
-									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_4P[1] + (TJAPlayer3.Skin.Result_UIMove_4P[1] * pos);
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 								}
 								else
 								{
