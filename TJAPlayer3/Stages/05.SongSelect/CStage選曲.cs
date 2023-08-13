@@ -2002,7 +2002,7 @@ namespace TJAPlayer3
             return list;
         }
 
-        public void t指定された曲の子リストの曲を列挙する_孫リスト含む(C曲リストノード r親, ref List<C曲リストノード> list, ref List<int> mandatory, bool dan = false)
+        public void t指定された曲の子リストの曲を列挙する_孫リスト含む(C曲リストノード r親, ref List<C曲リストノード> list, ref List<int> mandatory, bool dan = false, Difficulty difficulty = Difficulty.Dan)
         {
             if ((r親 != null) && (r親.list子リスト != null))
             {
@@ -2013,7 +2013,7 @@ namespace TJAPlayer3
                         // Don't add Dan/Tower charts for Random
                         int diff = this.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
 
-                        if (dan ? diff == (int)Difficulty.Dan : diff < (int)Difficulty.Tower)
+                        if (dan ? diff == (int)difficulty : diff < (int)Difficulty.Tower)
                         {
                             // Check if mandatory diffs are present
                             var score = c曲リストノード.arスコア[diff];
@@ -2036,7 +2036,7 @@ namespace TJAPlayer3
                     }
                     if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
                     {
-                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory);
+                        this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory, dan, difficulty);
                     }
                 }
             }

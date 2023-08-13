@@ -32,7 +32,7 @@ namespace TJAPlayer3
         
         const string MODALS = @"11_Modals\";
         public const string ONLINELOUNGE = @"12_OnlineLounge\";
-        const string TOWERSELECT = @"13_TowerSelect\";
+        public const string TOWERSELECT = @"13_TowerSelect\";
         public const string OPENENCYCLOPEDIA = @"15_OpenEncyclopedia\";
 
         // InGame
@@ -1282,6 +1282,8 @@ namespace TJAPlayer3
             #endregion
 
             #region [13_TowerSelect]
+
+            TowerSelect_Tower = TxC(TOWERSELECT + @"Tower.png");
 
             #endregion
 
@@ -2566,6 +2568,9 @@ Result_Mountain = new CTexture[4]*/;
         #endregion
 
         #region [13_TowerSelect]
+
+        public CTexture
+            TowerSelect_Tower;
 
         #endregion
 

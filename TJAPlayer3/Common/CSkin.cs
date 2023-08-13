@@ -7574,6 +7574,65 @@ namespace TJAPlayer3
                             }
                             #endregion
 
+                            #region TowerSelect
+                            else if (strCommand == "TowerSelect_Title_Size")
+                            {
+                                TowerSelect_Title_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerSelect_Title_MaxWidth")
+                            {
+                                TowerSelect_Title_MaxWidth = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerSelect_Title_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerSelect_Title_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerSelect_SubTitle_Size")
+                            {
+                                TowerSelect_SubTitle_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerSelect_SubTitle_MaxWidth")
+                            {
+                                TowerSelect_SubTitle_MaxWidth = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerSelect_SubTitle_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    TowerSelect_SubTitle_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerSelect_Bar_Count")
+                            {
+                                TowerSelect_Bar_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "TowerSelect_Bar_X")
+                            {
+                                TowerSelect_Bar_X = new int[TowerSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < TowerSelect_Bar_Count; i++)
+                                {
+                                    TowerSelect_Bar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "TowerSelect_Bar_Y")
+                            {
+                                TowerSelect_Bar_Y = new int[TowerSelect_Bar_Count];
+
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < TowerSelect_Bar_Count; i++)
+                                {
+                                    TowerSelect_Bar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            #endregion
+
                             #region OpenEncyclopedia 
                             else if (strCommand == "OpenEncyclopedia_Context_Item2")
                             {
@@ -9538,6 +9597,20 @@ namespace TJAPlayer3
 
         public int OnlineLounge_Font_OLFont = 14;
         public int OnlineLounge_Font_OLFontLarge = 28;
+
+        #endregion
+
+        #region TowerSelect 
+
+        public int TowerSelect_Title_Size = 30;
+        public int TowerSelect_Title_MaxWidth = 230;
+        public int[] TowerSelect_Title_Offset = new int[] { 0, -30 };
+        public int TowerSelect_SubTitle_Size = 30;
+        public int TowerSelect_SubTitle_MaxWidth = 230;
+        public int[] TowerSelect_SubTitle_Offset = new int[] { 0, 10 };
+        public int TowerSelect_Bar_Count = 7;
+        public int[] TowerSelect_Bar_X = new int[] { -260, 40, 340, 640, 940, 1240, 1540 };
+        public int[] TowerSelect_Bar_Y = new int[] { 420, 400, 380, 360, 380, 400, 420 };
 
         #endregion
 

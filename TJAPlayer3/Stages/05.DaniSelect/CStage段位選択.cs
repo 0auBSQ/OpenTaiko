@@ -224,7 +224,7 @@ namespace TJAPlayer3
                                 break;
                             case C曲リストノード.Eノード種別.BACKBOX:
                                 {
-                                    if (段位リスト.currentBar.r親ノード.eノード種別 == C曲リストノード.Eノード種別.BOX && 段位リスト.currentBar.r親ノード.strジャンル == "段位道場")
+                                    if (TJAPlayer3.Songs管理.list曲ルート.Contains(段位リスト.currentBar.r親ノード) && 段位リスト.currentBar.r親ノード.strジャンル == "段位道場")
                                     {
                                         return returnTitle();
                                     }
@@ -338,10 +338,10 @@ namespace TJAPlayer3
         public void t段位を選択する()
         {
             this.b選択した = true;
-            TJAPlayer3.stage選曲.r確定された曲 = TJAPlayer3.Songs管理.list曲ルート_Dan[段位リスト.n現在の選択行];
-            TJAPlayer3.stage選曲.r確定されたスコア = TJAPlayer3.Songs管理.list曲ルート_Dan[段位リスト.n現在の選択行].arスコア[(int)Difficulty.Dan];
+            TJAPlayer3.stage選曲.r確定された曲 = 段位リスト.listSongs[段位リスト.n現在の選択行];
+            TJAPlayer3.stage選曲.r確定されたスコア = 段位リスト.listSongs[段位リスト.n現在の選択行].arスコア[(int)Difficulty.Dan];
             TJAPlayer3.stage選曲.n確定された曲の難易度[0] = (int)Difficulty.Dan;
-            TJAPlayer3.stage選曲.str確定された曲のジャンル = TJAPlayer3.Songs管理.list曲ルート_Dan[段位リスト.n現在の選択行].strジャンル;
+            TJAPlayer3.stage選曲.str確定された曲のジャンル = 段位リスト.listSongs[段位リスト.n現在の選択行].strジャンル;
             if ((TJAPlayer3.stage選曲.r確定された曲 != null) && (TJAPlayer3.stage選曲.r確定されたスコア != null))
             {
                 this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
