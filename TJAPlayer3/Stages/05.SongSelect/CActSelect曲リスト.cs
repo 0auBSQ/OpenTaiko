@@ -1877,14 +1877,18 @@ namespace TJAPlayer3
 
 									#region [Displayables]
 
-									TJAPlayer3.Tx.SongSelect_Frame_Score[1]?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+									int displayingDiff = diff == 5 ? 0 : 2;
+									int width = TJAPlayer3.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Width / 5;
+									int height = TJAPlayer3.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Height;
+
+									TJAPlayer3.Tx.SongSelect_Frame_Score[1].t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Frame_Score_X[displayingDiff], TJAPlayer3.Skin.SongSelect_Frame_Score_Y[displayingDiff], new Rectangle(width * displayingDiff, 0, width, height));
 
 									var _level_number = (diff == 5) ? TJAPlayer3.Skin.SongSelect_Level_Number_Tower : TJAPlayer3.Skin.SongSelect_Level_Number_Tower;
 
 
                                     if (avaliable)
 									{
-										t小文字表示(_level_number[0], _level_number[1],
+										t小文字表示(TJAPlayer3.Skin.SongSelect_Level_Number_X[displayingDiff], TJAPlayer3.Skin.SongSelect_Level_Number_Y[displayingDiff],
 											TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff],
 											diff,
                                             TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nLevelIcon[diff]
@@ -1913,8 +1917,8 @@ namespace TJAPlayer3
 											for (int i2 = 0; i2 < TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++)
 											{
 												TJAPlayer3.Tx.SongSelect_Level?.t2D描画(TJAPlayer3.app.Device,
-													TJAPlayer3.Skin.SongSelect_Level_X[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2),
-													TJAPlayer3.Skin.SongSelect_Level_Y[(diff - 5)] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
+													TJAPlayer3.Skin.SongSelect_Level_X[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[0] * i2),
+													TJAPlayer3.Skin.SongSelect_Level_Y[displayingDiff] + (TJAPlayer3.Skin.SongSelect_Level_Move[1] * i2),
 													new RectangleF(level_width * diff, 0, level_width, level_height));
 
 											}

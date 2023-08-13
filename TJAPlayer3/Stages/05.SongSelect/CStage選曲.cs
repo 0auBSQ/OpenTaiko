@@ -198,6 +198,9 @@ namespace TJAPlayer3
             //base.list子Activities.Add( this.actFOtoNowLoading = new CActFIFOBlack() );
             base.list子Activities.Add(this.actFOtoNowLoading = new CActFIFOStart());
             base.list子Activities.Add(this.act曲リスト = new CActSelect曲リスト());
+            base.list子Activities.Add(this.actSongInfo = new CActSelectSongInfo());
+            base.list子Activities.Add(this.actDanInfo = new CActSelectDanInfo());
+            base.list子Activities.Add(this.actTowerInfo = new CActSelectTowerInfo());
             base.list子Activities.Add(this.actステータスパネル = new CActSelectステータスパネル());
             base.list子Activities.Add(this.act演奏履歴パネル = new CActSelect演奏履歴パネル());
             base.list子Activities.Add(this.actPreimageパネル = new CActSelectPreimageパネル());
@@ -270,6 +273,7 @@ namespace TJAPlayer3
             this.act演奏履歴パネル.t選択曲が変更された();
             this.actステータスパネル.t選択曲が変更された();
             this.actArtistComment.t選択曲が変更された();
+            actDanInfo.UpdateSong();
 
             #region [ プラグインにも通知する（BOX, RANDOM, BACK なら通知しない）]
             //---------------------
@@ -540,28 +544,28 @@ namespace TJAPlayer3
 
                 tTimerDraw(100 - ctTimer.n現在の値);
 
-                if (this.r現在選択中の曲 != null && this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
-                {
-                    int[] bpms = new int[3] {
-                        (int)r現在選択中の曲.arスコア[act曲リスト.tFetchDifficulty(r現在選択中の曲)].譜面情報.BaseBpm,
-                        (int)r現在選択中の曲.arスコア[act曲リスト.tFetchDifficulty(r現在選択中の曲)].譜面情報.MinBpm,
-                        (int)r現在選択中の曲.arスコア[act曲リスト.tFetchDifficulty(r現在選択中の曲)].譜面情報.MaxBpm
-                    };
-                    for (int i = 0; i < 3; i++)
-                    {
-                        tBPMNumberDraw(TJAPlayer3.Skin.SongSelect_Bpm_X[i], TJAPlayer3.Skin.SongSelect_Bpm_Y[i], bpms[i]);
-                    }
 
-                    if (act曲リスト.ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show)
+                if (this.r現在選択中の曲 != null)
+                {
+                    if (this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX)
                     {
-                        act曲リスト.ResolveTitleTexture(act曲リスト.ttkSelectedSongMaker).t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
                     }
-                    if (act曲リスト.ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show)
+                    else if (this.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
                     {
-                        act曲リスト.ResolveTitleTexture(act曲リスト.ttkSelectedSongBPM).t2D拡大率考慮描画(TJAPlayer3.app.Device, CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
+                        actSongInfo.On進行描画();
+
+                        if (TJAPlayer3.stage選曲.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+                        {
+                            actDanInfo.On進行描画();
+                        }
+                        else if (TJAPlayer3.stage選曲.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+                        {
+                            actTowerInfo.On進行描画();
+                        }
+                        else
+                        {
+                        }
                     }
-                    if (r現在選択中の曲.bExplicit == true)
-                        TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.app.Device, TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
                 }
 
                 tSongNumberDraw(TJAPlayer3.Skin.SongSelect_SongNumber_X[0], TJAPlayer3.Skin.SongSelect_SongNumber_Y[0], NowSong);
@@ -1384,6 +1388,9 @@ namespace TJAPlayer3
         private CActSelectステータスパネル actステータスパネル;
         public CActSelect演奏履歴パネル act演奏履歴パネル;
         public CActSelect曲リスト act曲リスト;
+        public CActSelectSongInfo actSongInfo;
+        public CActSelectDanInfo actDanInfo;
+        public CActSelectTowerInfo actTowerInfo;
         private CActSelectShowCurrentPosition actShowCurrentPosition;
         public CActSelect難易度選択画面 act難易度選択画面;
         public CActPlayOption actPlayOption;
@@ -1522,28 +1529,6 @@ namespace TJAPlayer3
                     float height = TJAPlayer3.Tx.SongSelect_Timer.sz画像サイズ.Height / 2.0f;
 
                     TJAPlayer3.Tx.SongSelect_Timer.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(width * nums[j], 0, width, height));
-                }
-            }
-        }
-
-        private void tBPMNumberDraw(float originx, float originy, int num)
-        {
-            //int x = 1171, y = 57;
-
-            int[] nums = C変換.SeparateDigits(num);
-
-            for (int j = 0; j < nums.Length; j++)
-            {
-                if (TJAPlayer3.Skin.SongSelect_Bpm_Show && TJAPlayer3.Tx.SongSelect_Bpm_Number != null)
-                {
-                    float offset = j;
-                    float x = originx - (TJAPlayer3.Skin.SongSelect_Bpm_Interval[0] * offset);
-                    float y = originy - (TJAPlayer3.Skin.SongSelect_Bpm_Interval[1] * offset);
-
-                    float width = TJAPlayer3.Tx.SongSelect_Bpm_Number.sz画像サイズ.Width / 10.0f;
-                    float height = TJAPlayer3.Tx.SongSelect_Bpm_Number.sz画像サイズ.Height;
-
-                    TJAPlayer3.Tx.SongSelect_Bpm_Number.t2D描画(TJAPlayer3.app.Device, x, y, new RectangleF(width * nums[j], 0, width, height));
                 }
             }
         }

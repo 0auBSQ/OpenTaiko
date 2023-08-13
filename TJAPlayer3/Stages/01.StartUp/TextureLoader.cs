@@ -239,6 +239,7 @@ namespace TJAPlayer3
             SongSelect_Level_Number_Big_Icon = TxC(SONGSELECT + @"Level_Number_Big_Icon.png");
             SongSelect_Level_Number_Icon = TxC(SONGSELECT + @"Level_Number_Icon.png");
             SongSelect_Bpm_Number = TxC(SONGSELECT + @"Bpm_Number.png");
+            SongSelect_Floor_Number = TxC(SONGSELECT + @"Floor_Number.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
             SongSelect_Explicit = TxC(SONGSELECT + @"Explicit.png");
@@ -2102,6 +2103,7 @@ namespace TJAPlayer3
             SongSelect_Level_Number_Big_Colored,
             SongSelect_Level_Number_Big_Icon,
             SongSelect_Bpm_Number,
+            SongSelect_Floor_Number,
             SongSelect_Bar_Select,
             SongSelect_Bar_Genre_Overlay,
             SongSelect_Credit,

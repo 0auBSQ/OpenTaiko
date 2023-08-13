@@ -741,7 +741,7 @@ namespace TJAPlayer3
             }
         }
 
-        public void tLevelNumberDraw(float x, float y, int num)
+        public void tLevelNumberDraw(float x, float y, int num, float scale = 1.0f)
         {
             /*
             for (int j = 0; j < str.Length; j++)
@@ -764,11 +764,15 @@ namespace TJAPlayer3
             {
                 float offset = j;
 
-                float _x = x - (TJAPlayer3.Skin.DaniSelect_Level_Number_Interval[0] * offset) + (width / 2);
-                float _y = y - (TJAPlayer3.Skin.DaniSelect_Level_Number_Interval[1] * offset) - (width / 2);
+                float _x = x - (((TJAPlayer3.Skin.DaniSelect_Level_Number_Interval[0] * offset) + (width / 2)) * scale);
+                float _y = y - (((TJAPlayer3.Skin.DaniSelect_Level_Number_Interval[1] * offset) - (width / 2)) * scale);
 
+                TJAPlayer3.Tx.Dani_Level_Number.vc拡大縮小倍率.X = scale;
+                TJAPlayer3.Tx.Dani_Level_Number.vc拡大縮小倍率.Y = scale;
                 TJAPlayer3.Tx.Dani_Level_Number.t2D描画(TJAPlayer3.app.Device, _x, _y,
                     new RectangleF(width * nums[j], 0, width, height));
+                TJAPlayer3.Tx.Dani_Level_Number.vc拡大縮小倍率.X = 1;
+                TJAPlayer3.Tx.Dani_Level_Number.vc拡大縮小倍率.Y = 1;
             }
         }
 
@@ -812,7 +816,7 @@ namespace TJAPlayer3
             }
         }
 
-        public void tExamDraw(float x, float y, int num, Exam.Range Range)
+        public void tExamDraw(float x, float y, int num, Exam.Range Range, float scale = 1.0f)
         {
             /*
             TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, x + 19 * str.Length, y - 24 / 2, new RectangleF(45 * (int)Range, 24, 45, 24));
@@ -838,16 +842,20 @@ namespace TJAPlayer3
 
             float text_width = TJAPlayer3.Skin.DaniSelect_Exam_Number_Text_Width;
 
-            TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, x + TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] + (width / 2),
-                y + TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] - (height / 2),
+            TJAPlayer3.Tx.Dani_Exam_Number.vc拡大縮小倍率.X = scale;
+            TJAPlayer3.Tx.Dani_Exam_Number.vc拡大縮小倍率.Y = scale;
+
+            TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, 
+                x + ((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] + (width / 2)) * scale),
+                y + ((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] - (height / 2)) * scale),
                 new RectangleF(text_width * (int)Range, height, text_width, height));
 
             for (int j = 0; j < nums.Length; j++)
             {
                 float offset = j;
 
-                float _x = x - (TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] * offset) + (width / 2);
-                float _y = y - (TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] * offset) - (height / 2);
+                float _x = x - (((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] * offset) + (width / 2)) * scale);
+                float _y = y - (((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] * offset) - (height / 2)) * scale);
 
                 TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(TJAPlayer3.app.Device, _x, _y,
                     new RectangleF(width * nums[j], 0, width, height));
