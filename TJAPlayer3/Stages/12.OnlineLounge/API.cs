@@ -39,6 +39,9 @@ namespace TJAPlayer3
             // Additional
             public APICharterInfo charter;
             public APIGenreInfo Genre;
+
+            [JsonIgnore]
+            public bool DownloadNow;
         }
 
         #region [ContractResolver override for properties]

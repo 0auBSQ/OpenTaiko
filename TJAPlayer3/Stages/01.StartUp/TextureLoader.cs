@@ -32,7 +32,7 @@ namespace TJAPlayer3
         
         const string MODALS = @"11_Modals\";
         public const string ONLINELOUNGE = @"12_OnlineLounge\";
-        const string TOWERSELECT = @"13_TowerSelect\";
+        public const string TOWERSELECT = @"13_TowerSelect\";
         public const string OPENENCYCLOPEDIA = @"15_OpenEncyclopedia\";
 
         // InGame
@@ -239,6 +239,7 @@ namespace TJAPlayer3
             SongSelect_Level_Number_Big_Icon = TxC(SONGSELECT + @"Level_Number_Big_Icon.png");
             SongSelect_Level_Number_Icon = TxC(SONGSELECT + @"Level_Number_Icon.png");
             SongSelect_Bpm_Number = TxC(SONGSELECT + @"Bpm_Number.png");
+            SongSelect_Floor_Number = TxC(SONGSELECT + @"Floor_Number.png");
             SongSelect_Credit = TxC(SONGSELECT + @"Credit.png");
             SongSelect_Timer = TxC(SONGSELECT + @"Timer.png");
             SongSelect_Explicit = TxC(SONGSELECT + @"Explicit.png");
@@ -1282,6 +1283,8 @@ namespace TJAPlayer3
 
             #region [13_TowerSelect]
 
+            TowerSelect_Tower = TxC(TOWERSELECT + @"Tower.png");
+
             #endregion
 
             #region [15_OpenEncyclopedia]
@@ -2102,6 +2105,7 @@ namespace TJAPlayer3
             SongSelect_Level_Number_Big_Colored,
             SongSelect_Level_Number_Big_Icon,
             SongSelect_Bpm_Number,
+            SongSelect_Floor_Number,
             SongSelect_Bar_Select,
             SongSelect_Bar_Genre_Overlay,
             SongSelect_Credit,
@@ -2564,6 +2568,9 @@ Result_Mountain = new CTexture[4]*/;
         #endregion
 
         #region [13_TowerSelect]
+
+        public CTexture
+            TowerSelect_Tower;
 
         #endregion
 

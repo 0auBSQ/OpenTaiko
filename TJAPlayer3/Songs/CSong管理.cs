@@ -50,8 +50,9 @@ namespace TJAPlayer3
 		}
 		/*[NonSerialized]
 		public List<Cスコア> listSongsDB;*/					// songs.dbから構築されるlist
-		public List<C曲リストノード> list曲ルート;			// 起動時にフォルダ検索して構築されるlist
+		public List<C曲リストノード> list曲ルート;         // 起動時にフォルダ検索して構築されるlist
 		public List<C曲リストノード> list曲ルート_Dan = new List<C曲リストノード>();          // 起動時にフォルダ検索して構築されるlist
+		public List<C曲リストノード> list曲ルート_Tower = new List<C曲リストノード>();          // 起動時にフォルダ検索して構築されるlist
 		public static List<FDK.CTexture> listCustomBGs = new List<FDK.CTexture>();
 		public bool bIsSuspending							// 外部スレッドから、内部スレッドのsuspendを指示する時にtrueにする
 		{													// 再開時は、これをfalseにしてから、次のautoReset.Set()を実行する
@@ -957,13 +958,14 @@ namespace TJAPlayer3
 			{
 				if (c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX)
 				{
-
 					if (c曲リストノード.strジャンル == "段位道場")
 					{
 						if (TJAPlayer3.ConfigIni.bDanTowerHide)
 							list曲ルート.Remove(c曲リストノード);
 
 						// Add to dojo
+						list曲ルート_Dan = c曲リストノード.list子リスト;
+						/*
 						for (int i = 0; i < c曲リストノード.list子リスト.Count; i++)
 						{
 							if(c曲リストノード.list子リスト[i].eノード種別 == C曲リストノード.Eノード種別.SCORE)
@@ -972,8 +974,16 @@ namespace TJAPlayer3
 								continue;
 							}
 						}
+						*/
 					}
-                    else
+					else if (c曲リストノード.strジャンル == "太鼓タワー")
+					{
+						if (TJAPlayer3.ConfigIni.bDanTowerHide)
+							list曲ルート.Remove(c曲リストノード);
+
+						list曲ルート_Tower = c曲リストノード.list子リスト;
+					}
+					else
 					{
 						for (int i = 0; i < c曲リストノード.list子リスト.Count; i++)
                         {
@@ -986,7 +996,16 @@ namespace TJAPlayer3
 								
 								continue;
 							}
-                        }
+							if (c曲リストノード.list子リスト[i].arスコア[5] != null)
+							{
+								list曲ルート_Tower.Add(c曲リストノード.list子リスト[i]);
+
+								if (TJAPlayer3.ConfigIni.bDanTowerHide)
+									c曲リストノード.list子リスト.Remove(c曲リストノード.list子リスト[i]);
+
+								continue;
+							}
+						}
 					}
 				}
                 else

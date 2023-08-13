@@ -343,7 +343,7 @@ namespace TJAPlayer3
 
             #region [Input]
 
-            if (!IsDownloading)
+            //if (!IsDownloading)
             {
                 if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.RightArrow) ||
                     TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
@@ -408,20 +408,27 @@ namespace TJAPlayer3
 
                     if (currentMenu == ECurrentMenu.MAIN)
                     {
-                        // Base menu
-                        currentMenu = mainMenu[mainMenuIndex];
-                        if (currentMenu == ECurrentMenu.RETURN)
+                        if (mainMenu[mainMenuIndex] == ECurrentMenu.CDN_SELECT || !IsDownloading)
                         {
-                            // Quit
-                            TJAPlayer3.Skin.sound取消音.t再生する();
-                            TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
-                            this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
-                            this.actFOtoTitle.tフェードアウト開始();
-                            base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                            // Base menu
+                            currentMenu = mainMenu[mainMenuIndex];
+                            if (currentMenu == ECurrentMenu.RETURN)
+                            {
+                                // Quit
+                                TJAPlayer3.Skin.sound取消音.t再生する();
+                                TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                                this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+                                this.actFOtoTitle.tフェードアウト開始();
+                                base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                            }
+                            else
+                            {
+                                TJAPlayer3.Skin.sound決定音.t再生する();
+                            }
                         }
                         else
                         {
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.soundError.t再生する();
                         }
                     }
                     else if (currentMenu == ECurrentMenu.CDN_SELECT)
@@ -495,7 +502,7 @@ namespace TJAPlayer3
                                 //var zipPath = $@"Cache\{song.Md5}.zip";
                                 var downloadLink = GetDownloadLink(song);
 
-                                if (CSongDict.tContainsSongUrl(downloadLink))
+                                if (CSongDict.tContainsSongUrl(downloadLink) || song.DownloadNow)
                                 {
                                     TJAPlayer3.Skin.soundError.t再生する();
                                 }
@@ -599,6 +606,7 @@ namespace TJAPlayer3
 
             
             var song = apiMethods.FetchedSongsList[this.cdnSongListIndex - 1];
+            song.DownloadNow = true;
             var zipName = ReplaceInvalidChars($@"{TruncateString(song.SongTitle, 16)}-{TruncateString(song.Md5, 10)}");
             var zipPath = $@"Cache\{zipName}.zip";
             var downloadLink = GetDownloadLink(song);
@@ -711,6 +719,7 @@ namespace TJAPlayer3
             }
 
 
+            song.DownloadNow = false;
             IsDownloading = false;
         }
 

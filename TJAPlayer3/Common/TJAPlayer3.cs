@@ -383,10 +383,16 @@ namespace TJAPlayer3
 		}
 
 		public static CStageOnlineLounge stageOnlineLounge
-        {
+		{
 			get;
 			private set;
-        }
+		}
+
+		public static CStageTowerSelect stageTowerSelect
+		{
+			get;
+			private set;
+		}
 
 		public static COpenEncyclopedia stageOpenEncyclopedia
 		{
@@ -977,6 +983,19 @@ namespace TJAPlayer3
 								#endregion
 								break;
 
+							case (int)CStageタイトル.E戻り値.TAIKOTOWERSSTART:
+								#region [Online Lounge]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Online Lounge");
+								stageTowerSelect.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageTowerSelect;
+								//-----------------------------
+								#endregion
+								break;
+
 							case (int)CStageタイトル.E戻り値.HEYA:
 								#region [Heya menu]
 								//-----------------------------
@@ -1302,6 +1321,7 @@ namespace TJAPlayer3
 							case (int)CStage選曲.E戻り値.選曲した:
 								#region [ *** ]
 								//-----------------------------
+
 								r現在のステージ.On非活性化();
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ 曲読み込み");
@@ -1800,6 +1820,66 @@ for (int i = 0; i < 3; i++) {
 							}
 						}
 						//-----------------------------
+						#endregion
+						break;
+
+
+					case CStage.Eステージ.TaikoTowers:
+						#region [ *** ]
+						switch (this.n進行描画の戻り値)
+						{
+							case (int)EReturnValue.ReturnToTitle:
+								#region [ *** ]
+								//-----------------------------
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ タイトル");
+								stageタイトル.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageタイトル;
+
+								/*
+								Skin.bgm選曲画面イン.t停止する();
+								Skin.bgm選曲画面.t停止する();
+								*/
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								foreach (STPlugin pg in this.listプラグイン)
+								{
+									Directory.SetCurrentDirectory(pg.strプラグインフォルダ);
+									pg.plugin.Onステージ変更();
+									Directory.SetCurrentDirectory(TJAPlayer3.strEXEのあるフォルダ);
+								}
+
+								this.tガベージコレクションを実行する();
+								break;
+							//-----------------------------
+							#endregion
+
+							case (int)EReturnValue.SongChoosen:
+								#region [ *** ]
+								//-----------------------------
+								latestSongSelect = stageTowerSelect;
+								r現在のステージ.On非活性化();
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ 曲読み込み");
+								stage曲読み込み.On活性化();
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stage曲読み込み;
+
+								foreach (STPlugin pg in this.listプラグイン)
+								{
+									Directory.SetCurrentDirectory(pg.strプラグインフォルダ);
+									pg.plugin.Onステージ変更();
+									Directory.SetCurrentDirectory(TJAPlayer3.strEXEのあるフォルダ);
+								}
+
+								this.tガベージコレクションを実行する();
+								break;
+								//-----------------------------
+								#endregion
+						}
 						#endregion
 						break;
 
@@ -2651,6 +2731,7 @@ for (int i = 0; i < 3; i++) {
 			stage段位選択 = new CStage段位選択();
 			stageHeya = new CStageHeya();
 			stageOnlineLounge = new CStageOnlineLounge();
+			stageTowerSelect = new CStageTowerSelect();
 			stageOpenEncyclopedia = new COpenEncyclopedia();
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
@@ -2669,7 +2750,8 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add( stage選曲 );
 			this.listトップレベルActivities.Add( stage段位選択 );
 			this.listトップレベルActivities.Add( stageHeya );
-			this.listトップレベルActivities.Add( stageOnlineLounge );
+			this.listトップレベルActivities.Add(stageOnlineLounge);
+			this.listトップレベルActivities.Add(stageTowerSelect);
 			this.listトップレベルActivities.Add( stageOpenEncyclopedia );
 			this.listトップレベルActivities.Add( stage曲読み込み );
 			this.listトップレベルActivities.Add( stage演奏ドラム画面 );

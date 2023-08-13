@@ -164,13 +164,17 @@
     <Compile Include="Stages\01.StartUp\CCharacter.cs" />
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />
     <Compile Include="Stages\05.SongSelect\AnimeBG.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectDanInfo.cs" />
     <Compile Include="Stages\05.SongSelect\CActSelectExExtraTransAnime.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectSongInfo.cs" />
+    <Compile Include="Stages\05.SongSelect\CActSelectTowerInfo.cs" />
     <Compile Include="Stages\07.Game\Taiko\AIBattle.cs" />
     <Compile Include="Stages\07.Game\Taiko\CAct演奏DrumsRunner.cs" />
     <Compile Include="Stages\07.Game\Taiko\EndAnimeScript.cs" />
     <Compile Include="Stages\07.Game\Taiko\NotesManager.cs" />
     <Compile Include="Stages\07.Game\Taiko\ScriptBG.cs" />
     <Compile Include="Stages\08.Result\ResultBG.cs" />
+    <Compile Include="Stages\13.TowerSelect\CStageTowerSelect.cs" />
     <Compile Include="Stages\15.OpenEncyclopedia\CEncyclopediaControler.cs" />
     <Compile Include="Stages\15.OpenEncyclopedia\COpenEncyclopedia.cs" />
     <Compile Include="Stages\XX.Templates\CStageTemplate.cs" />

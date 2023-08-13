@@ -121,7 +121,7 @@ namespace TJAPlayer3
                 {
                     true,
                     true,
-                    false,
+                    true,
                     false,
                     false,
                     true,
