@@ -964,6 +964,8 @@ namespace TJAPlayer3
 							list曲ルート.Remove(c曲リストノード);
 
 						// Add to dojo
+						list曲ルート_Dan = c曲リストノード.list子リスト;
+						/*
 						for (int i = 0; i < c曲リストノード.list子リスト.Count; i++)
 						{
 							if(c曲リストノード.list子リスト[i].eノード種別 == C曲リストノード.Eノード種別.SCORE)
@@ -972,6 +974,7 @@ namespace TJAPlayer3
 								continue;
 							}
 						}
+						*/
 					}
                     else
 					{
