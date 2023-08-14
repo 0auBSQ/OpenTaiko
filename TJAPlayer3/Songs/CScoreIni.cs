@@ -513,7 +513,7 @@ namespace TJAPlayer3
 			stファイル.Title = "";
 			stファイル.Name = "";
 			stファイル.Hash = "";
-			stファイル.History = new string[] { "", "", "", "", "" };
+			stファイル.History = new string[] { "", "", "", "", "", "", "" };
 			stファイル.BestRank.Drums =  (int)ERANK.UNKNOWN;		// #24459 2011.2.24 yyagi
 			stファイル.BestRank.Guitar = (int)ERANK.UNKNOWN;		//
 			stファイル.BestRank.Bass =   (int)ERANK.UNKNOWN;		//

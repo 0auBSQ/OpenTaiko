@@ -501,12 +501,6 @@ namespace TJAPlayer3
                     this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
                 }
 
-                bIsFinishedPlaying = true;
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                {
-                    if (!ifp[i]) bIsFinishedPlaying = false;
-                }
-
                 this.actMtaiko.On進行描画();
 
                 if (TJAPlayer3.ConfigIni.bAIBattleMode)
@@ -581,8 +575,14 @@ namespace TJAPlayer3
                 bIsFinishedEndAnime = this.actEnd.On進行描画() == 1 ? true : false;
 				bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();
 
+                bIsFinishedPlaying = true;
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    if (!ifp[i]) bIsFinishedPlaying = false;
+                }
+
                 //演奏終了→演出表示→フェードアウト
-                if( bIsFinishedPlaying && base.eフェーズID == CStage.Eフェーズ.共通_通常状態 )
+                if ( bIsFinishedPlaying && base.eフェーズID == CStage.Eフェーズ.共通_通常状態 )
                 {
                     if (TJAPlayer3.ConfigIni.bTokkunMode)
                     {
@@ -649,8 +649,6 @@ namespace TJAPlayer3
 			public Point pt;
 		}
 		public CAct演奏DrumsチップファイアD actChipFireD;
-
-        private bool[] ifp = { false, false, false, false, false };
 
         private CAct演奏Drumsグラフ actGraph;   // #24074 2011.01.23 add ikanick
 		private CAct演奏Drumsパッド actPad;
@@ -2462,7 +2460,7 @@ namespace TJAPlayer3
 				    TJAPlayer3.act文字コンソール.tPrint(x + 8, y - 26, C文字コンソール.Eフォント種別.白, nowMeasure.ToString());
                 }
 			}
-			if ( ( pChip.b可視 ) && (TJAPlayer3.Tx.Bar != null ) )
+			if ( (pChip.b可視 && !pChip.bHideBarLine) && (TJAPlayer3.Tx.Bar != null ) )
 			{
                 if( x >= 0 )
                 {

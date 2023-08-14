@@ -345,6 +345,7 @@ namespace TJAPlayer3
         {
             public bool bHit;
             public bool b可視 = true;
+            public bool bHideBarLine = true;
             public bool bShow;
             public bool bShowRoll;
             public bool bBranch = false;
@@ -4433,10 +4434,8 @@ namespace TJAPlayer3
                             else
                                 chip.nコース = n現在のコース;
 
-                            if (this.bBARLINECUE[0] == 1)
-                            {
-                                chip.b可視 = false;
-                            }
+                            chip.b可視 = true;
+                            chip.bHideBarLine = this.bBARLINECUE[0] == 1;
                             #region [ 作り直し ]  
                             if (IsEndedBranching)
                             {
