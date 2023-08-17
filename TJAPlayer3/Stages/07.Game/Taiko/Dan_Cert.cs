@@ -84,7 +84,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.stage演奏ドラム画面.ReSetScore(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreInit, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
 
-            TJAPlayer3.stage演奏ドラム画面.ftDanReSetScoreNiji(TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber], 0);
+            TJAPlayer3.stage演奏ドラム画面.ftDanReSetScoreNiji(TJAPlayer3.DTX.nDan_NotesCount[NowShowingNumber], TJAPlayer3.DTX.nDan_BalloonCount[NowShowingNumber]);
             TJAPlayer3.stage演奏ドラム画面.ftDanReSetBranches(TJAPlayer3.DTX.bHasBranchDan[NowShowingNumber]);
 
             IsAnimating = true;

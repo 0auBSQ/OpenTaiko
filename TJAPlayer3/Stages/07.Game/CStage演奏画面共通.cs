@@ -868,6 +868,7 @@ namespace TJAPlayer3
         protected int[] n現在の連打数 = new int[ 5 ];
         public int[] Chara_MissCount;
         protected E連打State eRollState;
+        protected bool[] ifp = { false, false, false, false, false };
 
         protected int nタイマ番号;
         protected int n現在の音符の顔番号;
@@ -4500,6 +4501,7 @@ namespace TJAPlayer3
                 this.actPlayInfo.NowMeasure[i] = 0;
                 JPOSCROLLX[i] = 0;
                 JPOSCROLLY[i] = 0;
+                ifp[i] = false;
             }
             TJAPlayer3.stage演奏ドラム画面.On活性化();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )

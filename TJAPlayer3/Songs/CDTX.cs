@@ -345,6 +345,7 @@ namespace TJAPlayer3
         {
             public bool bHit;
             public bool b可視 = true;
+            public bool bHideBarLine = true;
             public bool bShow;
             public bool bShowRoll;
             public bool bBranch = false;
@@ -1289,6 +1290,7 @@ namespace TJAPlayer3
         public int[] nノーツ数 = new int[4]; //3:共通
         
         public int[] nDan_NotesCount = new int[1];
+        public int[] nDan_BalloonCount = new int[1];
         // public int[] nDan_BallonCount = new int[1];
 
         public int[] nノーツ数_Branch = new int[4]; //
@@ -4433,10 +4435,8 @@ namespace TJAPlayer3
                             else
                                 chip.nコース = n現在のコース;
 
-                            if (this.bBARLINECUE[0] == 1)
-                            {
-                                chip.b可視 = false;
-                            }
+                            chip.b可視 = true;
+                            chip.bHideBarLine = this.bBARLINECUE[0] == 1;
                             #region [ 作り直し ]  
                             if (IsEndedBranching)
                             {
@@ -4742,6 +4742,10 @@ namespace TJAPlayer3
                                     else
                                     {
                                         this.nノーツ数_Branch[(int)chip.nコース]++;
+                                        if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nコース == ECourse.eMaster)
+                                        {
+                                            this.nDan_NotesCount[DanSongs.Number - 1]++;
+                                        }
 
                                         if (!this.b分岐を一回でも開始した)
                                         {
@@ -4751,13 +4755,25 @@ namespace TJAPlayer3
                                         }
                                     }
                                     
-
-                                    
                                     #endregion
                                 }
                                 else if (NotesManager.IsGenericBalloon(chip))
                                 {
                                     //風船はこのままでも機能しているので何もしない.
+                                    if (IsEndedBranching)
+                                    {
+                                        if (this.n参照中の難易度 == (int)Difficulty.Dan)
+                                        {
+                                            this.nDan_BalloonCount[DanSongs.Number - 1]++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nコース == ECourse.eMaster)
+                                        {
+                                            this.nDan_BalloonCount[DanSongs.Number - 1]++;
+                                        }
+                                    }
 
                                     if (this.b最初の分岐である == false)
                                     {
@@ -4771,6 +4787,7 @@ namespace TJAPlayer3
                                 }
                                 
                                 Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
+                                Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
                                 // Array.Resize(ref nDan_BallonCount, nDan_BallonCount.Length + 1);
 
                                 if (IsEndedBranching)
