@@ -1988,8 +1988,32 @@ for (int i = 0; i < 3; i++) {
 			this.Device.EndScene();			// Present()は game.csのOnFrameEnd()に登録された、GraphicsDeviceManager.game_FrameEnd() 内で実行されるので不要
 											// (つまり、Present()は、Draw()完了後に実行される)
 #if !GPUFlushAfterPresent
-			actFlushGPU?.On進行描画();		// Flush GPU	// EndScene()～Present()間 (つまりVSync前) でFlush実行
+			actFlushGPU?.On進行描画();      // Flush GPU	// EndScene()～Present()間 (つまりVSync前) でFlush実行
 #endif
+
+			foreach(var capture in ConfigIni.KeyAssign.System.Capture)
+			{
+				if (TJAPlayer3.Input管理.Keyboard.bキーが押された(capture.コード))
+				{
+					if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftControl))
+					{
+						if (r現在のステージ.eステージID != CStage.Eステージ.演奏)
+						{
+							RefleshSkin();
+							r現在のステージ.On非活性化();
+							r現在のステージ.On活性化();
+						}
+					}
+					else
+                    {
+						// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
+						string strFullPath =
+						   Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+						strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+						SaveResultScreen(strFullPath);
+					}
+				}
+			}
 
 			/*
 			if ( Sound管理?.GetCurrentSoundDeviceType() != "DirectSound" )
@@ -3408,18 +3432,6 @@ for (int i = 0; i < 3; i++) {
 			}
 			else
 			{
-				for ( int i = 0; i < 0x10; i++ )
-				{
-					if ( ConfigIni.KeyAssign.System.Capture[ i ].コード > 0 &&
-						 e.KeyCode == DeviceConstantConverter.KeyToKeyCode( (SlimDXKeys.Key) ConfigIni.KeyAssign.System.Capture[ i ].コード ) )
-					{
-						// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
-						string strFullPath =
-						   Path.Combine( TJAPlayer3.strEXEのあるフォルダ, "Capture_img" );
-						strFullPath = Path.Combine( strFullPath, DateTime.Now.ToString( "yyyyMMddHHmmss" ) + ".png" );
-						SaveResultScreen( strFullPath );
-					}
-				}
 			}
 		}
 		private void Window_MouseUp( object sender, MouseEventArgs e )
