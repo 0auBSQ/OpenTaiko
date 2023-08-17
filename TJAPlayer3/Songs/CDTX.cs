@@ -12,6 +12,10 @@ using FDK;
 using FDK.ExtensionMethods;
 using System.Linq;
 using TJAPlayer3;
+using SharpDX;
+
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
 
 namespace TJAPlayer3
 {
@@ -412,6 +416,55 @@ namespace TJAPlayer3
             public bool IsHitted = false;
             public bool IsMissed = false;
 
+
+
+            //EXTENDED COMMANDS
+            public int fCamTimeMs;
+            public string strCamEaseType;
+            public Easing.CalcType fCamMoveType;
+
+            public float fCamScrollStartX;
+            public float fCamScrollStartY;
+            public float fCamScrollEndX;
+            public float fCamScrollEndY;
+
+            public float fCamRotationStart;
+            public float fCamRotationEnd;
+
+            public float fCamZoomStart;
+            public float fCamZoomEnd;
+
+            public float fCamScaleStartX;
+            public float fCamScaleStartY;
+            public float fCamScaleEndX;
+            public float fCamScaleEndY;
+
+            public Color4 borderColor;
+
+            public int fObjTimeMs;
+            public string strObjName;
+            public string strObjEaseType;
+            public Easing.CalcType objCalcType;
+
+            public float fObjX;
+            public float fObjY;
+
+            public float fObjStart;
+            public float fObjEnd;
+
+            public CSongObject obj;
+
+            public string strTargetTxName;
+            public string strNewPath;
+
+            public string strConfigValue;
+
+            public double dbAnimInterval;
+
+            public int intFrame;
+            //
+
+
             public bool bBPMチップである
             {
                 get
@@ -525,10 +578,10 @@ namespace TJAPlayer3
                     "??", "??", "??", "??", "??", "??", "??", "??", 
 
                     //システム(移動予定)
-					"SCROLL", "DELAY", "ゴーゴータイム開始", "ゴーゴータイム終了", "??", "??", "??", "??",
-                    "??", "??", "??", "??", "??", "??", "??", "??",
+					"SCROLL", "DELAY", "ゴーゴータイム開始", "ゴーゴータイム終了", "カメラ移動開始(縦)", "カメラ移動終了(縦)", "カメラ移動開始(横)", "カメラ移動終了(横)",
+                    "カメラズーム開始", "カメラズーム終了", "カメラ回転開始", "カメラ回転終了", "カメラスケーリング開始(横)", "カメラスケーリング終了(横)", "カメラスケーリング開始(縦)", "カメラスケーリング終了(縦)",
 
-                    "??", "??", "??", "??", "??", "??", "??", "??",
+                    "ボーダーカラー変更", "??", "??", "??", "??", "??", "??", "??",
                     "??", "??", "??", "??", "??", "??", "??", "??",
 
                     "??", "??", "??", "??", "??", "??", "??", "??",
@@ -1384,6 +1437,12 @@ namespace TJAPlayer3
         public bool IsEnabledFixSENote;
         public int FixSENote;
         public GaugeIncreaseMode GaugeIncreaseMode;
+
+        #region [ EXTENDED VARiABLES ]
+        public Dictionary<string, CSongObject> listObj;
+        public Dictionary<string, CTexture> listTextures;
+        public Dictionary<string, CTexture> listOriginalTextures;
+        #endregion
 
 
 
@@ -3904,6 +3963,1801 @@ namespace TJAPlayer3
                 // チップを配置。
                 this.listChip.Add(chip);
             }
+
+
+            else if (command == "#CAMVMOVESTART")
+            {
+                if (currentCamVMoveChip == null)
+                {
+                    //starts vertical camera moving
+                    //arguments: <start y>,<end y>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA0;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamScrollStartY = float.Parse(args[0]);
+                    chip.fCamScrollEndY = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamVMoveChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVMOVEEND");
+                }
+            }
+            else if (command == "#CAMVMOVEEND")
+            {
+                if (currentCamVMoveChip != null)
+                {
+                    //ends vertical camera moving
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA1;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamVMoveChip);
+                    var msDiff = chip.n発声時刻ms - currentCamVMoveChip.n発声時刻ms;
+
+                    currentCamVMoveChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamVMoveChip;
+
+                    currentCamVMoveChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVMOVESTART");
+                }
+            }
+            else if (command == "#CAMHMOVESTART")
+            {
+                if (currentCamHMoveChip == null)
+                {
+                    //starts horizontal camera moving
+                    //arguments: <start x>,<end x>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA2;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamScrollStartX = float.Parse(args[0]);
+                    chip.fCamScrollEndX = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamHMoveChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHMOVEEND");
+                }
+            }
+            else if (command == "#CAMHMOVEEND")
+            {
+                if (currentCamHMoveChip != null)
+                {
+                    //ends horizontal camera moving
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA3;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamHMoveChip);
+                    var msDiff = chip.n発声時刻ms - currentCamHMoveChip.n発声時刻ms;
+
+                    currentCamHMoveChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamHMoveChip;
+
+                    currentCamHMoveChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHMOVESTART");
+                }
+            }
+            else if (command == "#CAMZOOMSTART")
+            {
+                if (currentCamZoomChip == null)
+                {
+                    //starts zooming in/out the screen
+                    //arguments: <start value>,<end value>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA4;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamZoomStart = float.Parse(args[0]);
+                    chip.fCamZoomEnd = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamZoomChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMZOOMEND");
+                }
+            }
+            else if (command == "#CAMZOOMEND")
+            {
+                if (currentCamZoomChip != null)
+                {
+                    //stops zooming
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA5;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamZoomChip);
+                    var msDiff = chip.n発声時刻ms - currentCamZoomChip.n発声時刻ms;
+
+                    currentCamZoomChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamZoomChip;
+
+                    currentCamZoomChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMZOOMSTART");
+                }
+            }
+            else if (command == "#CAMROTATIONSTART")
+            {
+                if (currentCamRotateChip == null)
+                {
+                    //starts rotating the screen
+                    //arguments: <start degrees>,<end degrees>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA6;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamRotationStart = float.Parse(args[0]);
+                    chip.fCamRotationEnd = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamRotateChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMROTATIONEND");
+                }
+            }
+            else if (command == "#CAMROTATIONEND")
+            {
+                if (currentCamRotateChip != null)
+                {
+                    //stops screen rotation
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA7;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamRotateChip);
+                    var msDiff = chip.n発声時刻ms - currentCamRotateChip.n発声時刻ms;
+
+                    currentCamRotateChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamRotateChip;
+
+                    currentCamRotateChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMROTATIONSTART");
+                }
+            }
+            else if (command == "#CAMVSCALESTART")
+            {
+                if (currentCamVScaleChip == null)
+                {
+                    //starts vertical camera scale changing
+                    //arguments: <start scale>,<end scale>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA8;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamScaleStartY = float.Parse(args[0]);
+                    chip.fCamScaleEndY = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamVScaleChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVSCALEEND");
+                }
+            }
+            else if (command == "#CAMVSCALEEND")
+            {
+                if (currentCamVScaleChip != null)
+                {
+                    //ends vertical camera scaling
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xA9;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamVScaleChip);
+                    var msDiff = chip.n発声時刻ms - currentCamVScaleChip.n発声時刻ms;
+
+                    currentCamVScaleChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamVScaleChip;
+
+                    currentCamVScaleChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVSCALESTART");
+                }
+            }
+            else if (command == "#CAMHSCALESTART")
+            {
+                if (currentCamHScaleChip == null)
+                {
+                    //starts horizontal camera scale changing
+                    //arguments: <start scale>,<end scale>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB0;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    string[] args = argument.Split(',');
+                    chip.fCamScaleStartX = float.Parse(args[0]);
+                    chip.fCamScaleEndX = float.Parse(args[1]);
+                    chip.strCamEaseType = args[2];
+
+                    var type = args[3];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.fCamMoveType = eType;
+
+                    currentCamHScaleChip = chip;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHSCALEEND");
+                }
+            }
+            else if (command == "#CAMHSCALEEND")
+            {
+                if (currentCamHScaleChip != null)
+                {
+                    //ends horizontal camera scaling
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB1;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    var index = this.listChip.IndexOf(currentCamHScaleChip);
+                    var msDiff = chip.n発声時刻ms - currentCamHScaleChip.n発声時刻ms;
+
+                    currentCamHScaleChip.fCamTimeMs = msDiff;
+                    this.listChip[index] = currentCamHScaleChip;
+
+                    currentCamHScaleChip = null;
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHSCALESTART");
+                }
+            }
+            else if (command == "#BORDERCOLOR")
+            {
+                //sets border color
+                //arguments: <r>,<g>,<b>
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xB2;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.borderColor = new Color4(1f, float.Parse(args[0]) / 255, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#CAMHOFFSET")
+            {
+                if (currentCamHMoveChip == null)
+                {
+                    //sets camera x offset
+                    //argument: <offset>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB3;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamScrollStartX = float.Parse(argument);
+                    chip.fCamScrollEndX = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHMOVEEND");
+                }
+            }
+            else if (command == "#CAMVOFFSET")
+            {
+                if (currentCamVMoveChip == null)
+                {
+                    //sets camera y offset
+                    //argument: <offset>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB4;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamScrollStartY = float.Parse(argument);
+                    chip.fCamScrollEndY = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVMOVEEND");
+                }
+            }
+            else if (command == "#CAMZOOM")
+            {
+                if (currentCamZoomChip == null)
+                {
+                    //sets camera zoom factor
+                    //argument: <zoom factor>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB5;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamZoomStart = float.Parse(argument);
+                    chip.fCamZoomEnd = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMZOOMEND");
+                }
+            }
+            else if (command == "#CAMROTATION")
+            {
+                if (currentCamRotateChip == null)
+                {
+                    //sets camera rotation
+                    //argument: <degrees>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB6;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamRotationStart = float.Parse(argument);
+                    chip.fCamRotationEnd = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMROTATIONEND");
+                }
+            }
+            else if (command == "#CAMHSCALE")
+            {
+                if (currentCamHScaleChip == null)
+                {
+                    //sets camera x scale
+                    //argument: <scale>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB7;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamScaleStartX = float.Parse(argument);
+                    chip.fCamScaleEndX = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMHSCALEEND");
+                }
+            }
+            else if (command == "#CAMVSCALE")
+            {
+                if (currentCamVScaleChip == null)
+                {
+                    //sets camera y scale
+                    //argument: <scale>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xB8;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+
+                    chip.fCamScaleStartY = float.Parse(argument);
+                    chip.fCamScaleEndY = float.Parse(argument);
+                    chip.strCamEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #CAMVSCALEEND");
+                }
+            }
+            else if (command == "#CAMRESET")
+            {
+                //resets camera properties
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xB9;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                chip.fCamScrollStartX = 0.0f;
+                chip.fCamScrollEndX = 0.0f;
+                chip.fCamScrollStartY = 0.0f;
+                chip.fCamScrollEndY = 0.0f;
+
+                chip.fCamZoomStart = 1.0f;
+                chip.fCamZoomEnd = 1.0f;
+                chip.fCamRotationStart = 0.0f;
+                chip.fCamRotationEnd = 0.0f;
+
+                chip.fCamScaleStartX = 1.0f;
+                chip.fCamScaleEndX = 1.0f;
+                chip.fCamScaleStartY = 1.0f;
+                chip.fCamScaleEndY = 1.0f;
+
+                chip.strCamEaseType = "IN_OUT";
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#ENABLEDORON")
+            {
+                //resets camera properties
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xBA;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#DISABLEDORON")
+            {
+                //resets camera properties
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xBB;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#ADDOBJECT")
+            {
+                //adds object
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xBC;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+
+                chip.strObjName = args[0];
+                chip.fObjX = float.Parse(args[1]);
+                chip.fObjY = float.Parse(args[2]);
+                var txPath = this.strフォルダ名 + args[3];
+                Trace.TraceInformation("" + this.bSession譜面を読み込む);
+                if (this.bSession譜面を読み込む)
+                {
+                    var obj = new CSongObject(chip.strObjName, chip.fObjX, chip.fObjY, txPath);
+                    this.listObj.Add(args[0], obj);
+                }
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#REMOVEOBJECT")
+            {
+                //removes object
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xBD;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                chip.strObjName = argument;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJVMOVESTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("vmove_" + name))
+                {
+                    //starts vertical object movement
+                    //arguments: <start y>,<end y>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xBE;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("vmove_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVMOVEEND");
+                }
+            }
+            else if (command == "#OBJVMOVEEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("vmove_" + name))
+                {
+                    //ends vertical camera moving
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xBF;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("vmove_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("vmove_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVMOVESTART");
+                }
+            }
+            else if (command == "#OBJHMOVESTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("hmove_" + name))
+                {
+                    //starts horizontal object movement
+                    //arguments: <start x>,<end x>,<easing type>,<calc type>
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC0;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("hmove_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHMOVEEND");
+                }
+            }
+            else if (command == "#OBJHMOVEEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("hmove_" + name))
+                {
+                    //ends horizontal camera moving
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC1;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("hmove_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("hmove_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHMOVESTART");
+                }
+            }
+            else if (command == "#OBJVSCALESTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("vscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC2;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("vscale_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVSCALEEND");
+                }
+            }
+            else if (command == "#OBJVSCALEEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("vscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC3;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("vscale_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("vscale_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVSCALESTART");
+                }
+            }
+            else if (command == "#OBJHSCALESTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("hscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC4;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("hscale_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHSCALEEND");
+                }
+            }
+            else if (command == "#OBJHSCALEEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("hscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC5;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("hscale_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("hscale_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHSCALESTART");
+                }
+            }
+            else if (command == "#OBJROTATIONSTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("rotation_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC6;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("rotation_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJROTATIONEND");
+                }
+            }
+            else if (command == "#OBJROTATIONEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("rotation_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC7;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("rotation_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("rotation_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJROTATIONSTART");
+                }
+            }
+            else if (command == "#OBJOPACITYSTART")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("opacity_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC8;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[2]);
+                    chip.strObjEaseType = args[3];
+
+                    var type = args[4];
+                    var eType = Easing.CalcType.Quadratic;
+                    switch (type)
+                    {
+                        case "CUBIC":
+                            eType = Easing.CalcType.Cubic;
+                            break;
+                        case "QUARTIC":
+                            eType = Easing.CalcType.Quartic;
+                            break;
+                        case "QUINTIC":
+                            eType = Easing.CalcType.Quintic;
+                            break;
+                        case "SINUSOIDAL":
+                            eType = Easing.CalcType.Sinusoidal;
+                            break;
+                        case "EXPONENTIAL":
+                            eType = Easing.CalcType.Exponential;
+                            break;
+                        case "CIRCULAR":
+                            eType = Easing.CalcType.Circular;
+                            break;
+                        case "LINEAR":
+                            eType = Easing.CalcType.Linear;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    chip.objCalcType = eType;
+
+                    currentObjAnimations.Add("opacity_" + name, chip);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJOPACITYEND");
+                }
+            }
+            else if (command == "#OBJOPACITYEND")
+            {
+                string name = argument;
+
+                if (currentObjAnimations.ContainsKey("opacity_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xC9;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 1;
+                    chip.strObjName = argument;
+
+                    currentObjAnimations.TryGetValue("opacity_" + name, out CChip startChip);
+
+                    var index = this.listChip.IndexOf(startChip);
+                    var msDiff = chip.n発声時刻ms - startChip.n発声時刻ms;
+
+                    startChip.fObjTimeMs = msDiff;
+                    this.listChip[index] = startChip;
+
+                    currentObjAnimations.Remove("opacity_" + name);
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJOPACITYSTART");
+                }
+            }
+            else if (command == "#OBJCOLOR")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xCA;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.strObjName = args[0];
+                chip.borderColor = new Color4(1f, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJY")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("vmove_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xCB;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVMOVEEND");
+                }
+            }
+            else if (command == "#OBJX")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("hmove_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xCC;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHMOVEEND");
+                }
+            }
+            else if (command == "#OBJVSCALE")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("vscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xCD;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJVSCALEEND");
+                }
+            }
+            else if (command == "#OBJHSCALE")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("hscale_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xCE;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJHSCALEEND");
+                }
+            }
+            else if (command == "#OBJROTATION")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("rotation_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xCF;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJROTATIONEND");
+                }
+            }
+            else if (command == "#OBJOPACITY")
+            {
+                string[] args = argument.Split(',');
+                string name = args[0];
+
+                if (!currentObjAnimations.ContainsKey("opacity_" + name))
+                {
+                    var chip = new CChip();
+
+                    chip.nチャンネル番号 = 0xD0;
+                    chip.n発声位置 = ((this.n現在の小節数) * 384);
+                    chip.dbBPM = this.dbNowBPM;
+                    chip.n発声時刻ms = (int)this.dbNowTime;
+                    chip.fNow_Measure_m = this.fNow_Measure_m;
+                    chip.fNow_Measure_s = this.fNow_Measure_s;
+                    chip.n整数値_内部番号 = 0;
+
+                    chip.strObjName = args[0];
+                    chip.fObjStart = float.Parse(args[1]);
+                    chip.fObjEnd = float.Parse(args[1]);
+                    chip.strObjEaseType = "IN_OUT";
+
+                    // チップを配置。
+                    this.listChip.Add(chip);
+                }
+                else
+                {
+                    Trace.TraceInformation("TJA ERROR: Missing #OBJOPACITYEND");
+                }
+            }
+            else if (command == "#CHANGETEXTURE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD1;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.strTargetTxName = args[0].Replace("/", "\\");
+                chip.strNewPath = this.strフォルダ名 + args[1];
+
+                if (this.bSession譜面を読み込む)
+                {
+                    if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName))
+                    {
+                        TJAPlayer3.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
+                        this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
+                    }
+                    if (!this.listTextures.ContainsKey(chip.strNewPath))
+                    {
+                        CTexture tx = TJAPlayer3.Tx.TxCSong(chip.strNewPath);
+                        this.listTextures.Add(chip.strNewPath, tx);
+                    }
+                }
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#RESETTEXTURE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD2;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                chip.strTargetTxName = argument.Replace("/", "\\");
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#SETCONFIG")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD3;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                chip.strConfigValue = argument;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJANIMSTART")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD4;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.strObjName = args[0];
+                chip.dbAnimInterval = double.Parse(args[1]);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJANIMSTARTLOOP")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD5;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.strObjName = args[0];
+                chip.dbAnimInterval = double.Parse(args[1]);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJANIMEND")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD6;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                chip.strObjName = argument;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#OBJFRAME")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD7;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                string[] args = argument.Split(',');
+                chip.strObjName = args[0];
+                chip.intFrame = int.Parse(args[1]);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+
             else if (command == "#SECTION")
             {
                 //分岐:条件リセット
@@ -6359,6 +8213,10 @@ namespace TJAPlayer3
             this.listLyric = new List<Bitmap>();
             this.listLyric2 = new List<STLYRIC>();
             this.List_DanSongs = new List<DanSongs>();
+            this.listObj = new Dictionary<string, CSongObject>();
+            this.listTextures = new Dictionary<string, CTexture>();
+            this.listOriginalTextures = new Dictionary<string, CTexture>();
+            this.currentObjAnimations = new Dictionary<string, CChip>();
             base.On活性化();
         }
         public override void On非活性化()
@@ -6468,6 +8326,43 @@ namespace TJAPlayer3
             {
                 this.listLyric2.Clear();
             }
+
+
+
+            if (this.listObj != null)
+            {
+                foreach (KeyValuePair<string, CSongObject> pair in this.listObj)
+                {
+                    pair.Value.tDispose();
+                }
+                this.listObj.Clear();
+            }
+
+            if (this.listOriginalTextures != null)
+            {
+                foreach (KeyValuePair<string, CTexture> pair in this.listOriginalTextures)
+                {
+                    string txPath = pair.Key;
+                    CTexture originalTx = pair.Value;
+                    TJAPlayer3.Tx.trackedTextures.TryGetValue(txPath, out CTexture oldTx);
+
+                    if (oldTx != originalTx)
+                    {
+                        oldTx.UpdateTexture(TJAPlayer3.app.Device, originalTx.texture, originalTx.sz画像サイズ.Width, originalTx.sz画像サイズ.Height);
+                    }
+                }
+                this.listOriginalTextures.Clear();
+            }
+
+            if (this.listTextures != null)
+            {
+                foreach (KeyValuePair<string, CTexture> pair in this.listTextures)
+                {
+                    pair.Value.Dispose();
+                }
+                this.listTextures.Clear();
+            }
+
             base.On非活性化();
         }
         public override void OnManagedリソースの作成()
@@ -6543,6 +8438,15 @@ namespace TJAPlayer3
         private int[] nRESULTIMAGE用優先順位;
         private int[] nRESULTMOVIE用優先順位;
         private int[] nRESULTSOUND用優先順位;
+
+        private CChip currentCamVMoveChip;
+        private CChip currentCamHMoveChip;
+        private CChip currentCamRotateChip;
+        private CChip currentCamZoomChip;
+        private CChip currentCamVScaleChip;
+        private CChip currentCamHScaleChip;
+
+        private Dictionary<string, CChip> currentObjAnimations;
 
         private void t行のコメント処理(ref string strText)
         {

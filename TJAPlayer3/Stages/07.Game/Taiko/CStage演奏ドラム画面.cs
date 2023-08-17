@@ -1930,7 +1930,7 @@ namespace TJAPlayer3
                     #endregion
 
                     #region[ HIDSUD & STEALTH ]
-                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH )
+                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                     {
                         pChip.bShow = false;
                     }
@@ -2205,7 +2205,7 @@ namespace TJAPlayer3
 
                 #region[ HIDSUD & STEALTH ]
 
-                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH)
+                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                 {
                     pChip.bShow = false;
                 }

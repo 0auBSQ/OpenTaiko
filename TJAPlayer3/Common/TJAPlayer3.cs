@@ -1946,6 +1946,25 @@ for (int i = 0; i < 3; i++) {
 
 			    actScanningLoudness.On進行描画();
 
+				if (!ConfigIni.bTokkunMode)
+				{
+					float screen_ratiox = TJAPlayer3.Skin.Resolution[0] / 1280.0f;
+					float screen_ratioy = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+					var mat = Matrix.LookAtLH(new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, (float)(-SampleFramework.GameWindowSize.Height / (fCamZoomFactor * 2) * Math.Sqrt(3.0))), new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, 0f), new Vector3(0f, 1f, 0f));
+					mat *= Matrix.RotationYawPitchRoll(0, 0, C変換.DegreeToRadian(fCamRotation));
+					mat *= Matrix.Scaling(fCamXScale, fCamYScale, 1f);
+					this.Device.SetTransform(TransformState.View, mat);
+
+					if (TJAPlayer3.DTX != null)
+					{
+						//object rendering
+						foreach (KeyValuePair<string, CSongObject> pair in TJAPlayer3.DTX.listObj)
+						{
+							pair.Value.tDraw();
+						}
+					}
+				}
+
 				if (r現在のステージ != null && r現在のステージ.eステージID != CStage.Eステージ.起動 && TJAPlayer3.Tx.Network_Connection != null)
 				{
 					if (Math.Abs(CSound管理.rc演奏用タイマ.nシステム時刻ms - this.前回のシステム時刻ms) > 10000)
@@ -3428,6 +3447,19 @@ for (int i = 0; i < 3; i++) {
 			ConfigIni.nウインドウheight = (ConfigIni.bウィンドウモード) ? base.Window.ClientSize.Height : currentClientSize.Height;
 		}
 		#endregion
+		#endregion
+
+		#region [ EXTENDED VARIABLES ]
+		public static float fCamXOffset;
+		public static float fCamYOffset;
+
+		public static float fCamZoomFactor = 1.0f;
+		public static float fCamRotation;
+
+		public static float fCamXScale = 1.0f;
+		public static float fCamYScale = 1.0f;
+
+		public static Color4 borderColor = new Color4(1f, 0f, 0f, 0f);
 		#endregion
 	}
 }

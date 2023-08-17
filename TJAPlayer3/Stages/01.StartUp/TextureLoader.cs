@@ -71,6 +71,8 @@ namespace TJAPlayer3
         const string ROLL = @"Roll\";
         const string SPLASH = @"Splash\";
 
+        public Dictionary<string, CTexture> trackedTextures = new Dictionary<string, CTexture>();
+
 
         public TextureLoader()
         {
@@ -107,6 +109,33 @@ namespace TJAPlayer3
         internal CTexture TxCGen(string FileName)
         {
             return TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + GAME + GENRE + FileName + ".png"));
+        }
+
+        internal CTexture TxCSong(string path)
+        {
+            return TxCUntrackedSong(path);
+        }
+
+        private CTexture[] TxCSong(int count, string format, int start = 0)
+        {
+            return TxCSong(format, Enumerable.Range(start, count).Select(o => o.ToString()).ToArray());
+        }
+
+        private CTexture[] TxCSong(string format, params string[] parts)
+        {
+            return parts.Select(o => TxCSong(string.Format(format, o))).ToArray();
+        }
+
+        public CTexture[] TxCSongFolder(string folder)
+        {
+            var count = TJAPlayer3.t連番画像の枚数を数える(folder);
+            var texture = count == 0 ? null : TxCSong(count, folder + "{0}.png");
+            return texture;
+        }
+
+        internal CTexture TxCUntrackedSong(string path)
+        {
+            return TJAPlayer3.tテクスチャの生成(path);
         }
 
         public void LoadTexture()
