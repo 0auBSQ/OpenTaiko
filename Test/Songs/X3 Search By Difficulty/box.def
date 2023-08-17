@@ -1,9 +1,12 @@
 ﻿#TITLE:Search by difficulty
+#TITLEJA:むずかしさから探す
 #GENRE:SearchD
 #FORECOLOR:#FFFFFF
 #BACKCOLOR:#213d18
 #BOXEXPLANATION1:Search and play songs that
 #BOXEXPLANATION2:fit your level !
+#BOXEXPLANATIONJA1:難易度やレベルで検索するよ
+#BOXEXPLANATIONJA2:とても便利!
 #BGTYPE:1
 #BOXTYPE:0
 #BOXCOLOR:#5ac736
