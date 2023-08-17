@@ -154,6 +154,18 @@ namespace TJAPlayer3
             return chip.nチャンネル番号 == 0x1C;
         }
 
+        public static bool IsDonNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x11 || chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A;
+        }
+
+        public static bool IsKaNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x12 || chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B;
+        }
+
         public static bool IsSmallNote(CDTX.CChip chip, bool blue)
         {
             if (chip == null) return false;

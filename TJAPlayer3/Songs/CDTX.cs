@@ -462,6 +462,8 @@ namespace TJAPlayer3
             public double dbAnimInterval;
 
             public int intFrame;
+
+            public EGameType eGameType;
             //
 
 
@@ -5753,6 +5755,77 @@ namespace TJAPlayer3
                 string[] args = argument.Split(',');
                 chip.strObjName = args[0];
                 chip.intFrame = int.Parse(args[1]);
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#GAMETYPE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD8;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+                switch(argument)
+                {
+                    case "Taiko":
+                        chip.eGameType = EGameType.TAIKO;
+                        break;
+                    case "Konga":
+                        chip.eGameType = EGameType.KONGA;
+                        break;
+                }
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#SPLITLANE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xD9;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#MERGELANE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xE3;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
+
+                // チップを配置。
+                this.listChip.Add(chip);
+            }
+            else if (command == "#BARLINE")
+            {
+                var chip = new CChip();
+
+                chip.nチャンネル番号 = 0xE4;
+                chip.n発声位置 = ((this.n現在の小節数) * 384);
+                chip.dbBPM = this.dbNowBPM;
+                chip.dbSCROLL = this.dbNowScroll;
+                chip.dbSCROLL_Y = this.dbNowScrollY;
+                chip.n発声時刻ms = (int)this.dbNowTime;
+                chip.fNow_Measure_m = this.fNow_Measure_m;
+                chip.fNow_Measure_s = this.fNow_Measure_s;
+                chip.n整数値_内部番号 = 1;
 
                 // チップを配置。
                 this.listChip.Add(chip);

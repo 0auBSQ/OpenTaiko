@@ -400,6 +400,8 @@ namespace TJAPlayer3
             this.bLEVELHOLD = new bool[]{ false, false, false, false, false };
             this.JPOSCROLLX = new int[5];
             this.JPOSCROLLY = new int[5];
+            eFirstGameType = new EGameType[5];
+            bSplitLane = new bool[5];
 
 
             // Double play set here
@@ -418,6 +420,7 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 actGauge.Init(TJAPlayer3.ConfigIni.nRisky, i);                                  // #23559 2011.7.28 yyagi
+                eFirstGameType[i] = TJAPlayer3.ConfigIni.nGameType[i];
             }
 			this.nPolyphonicSounds = TJAPlayer3.ConfigIni.nPoliphonicSounds;
 			e判定表示優先度 = TJAPlayer3.ConfigIni.e判定表示優先度;
@@ -549,6 +552,8 @@ namespace TJAPlayer3
             {
                 ctChipAnime[i] = null;
                 ctChipAnimeLag[i] = null;
+                TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
+                bSplitLane[i] = false;
             }
 
 			listWAV.Clear();
@@ -893,6 +898,8 @@ namespace TJAPlayer3
         protected int nWaitButton;
 
         protected int[] nStoredHit;
+        private EGameType[] eFirstGameType;
+        protected bool[] bSplitLane;
 
 
         public CDTX.CChip[] chip現在処理中の連打チップ = new CDTX.CChip[ 5 ];
@@ -4228,15 +4235,21 @@ namespace TJAPlayer3
                         break;
                     #endregion
 
-#region [ d8-d9: EmptySlot ]
+#region [ d8-d9: EXTENDED2 ]
 					case 0xd8:
-					case 0xd9:
-                    //case 0xe0:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
-						{
-							pChip.bHit = true;
-						}
-						break;
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            TJAPlayer3.ConfigIni.nGameType[nPlayer] = pChip.eGameType;
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xd9:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            bSplitLane[nPlayer] = true;
+                            pChip.bHit = true;
+                        }
+                        break;
 #endregion
 
 #region [ da: ミキサーへチップ音追加 ]
@@ -4411,10 +4424,27 @@ namespace TJAPlayer3
                             return true;
                         }
                         break;
-#endregion
+                    #endregion
 
-#region [ その他(未定義) ]
-					default:
+                    #region [ d8-d9: EXTENDED2 ]
+                    case 0xe3:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            bSplitLane[nPlayer] = false;
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xe4:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+                        break;
+                    #endregion
+
+                    #region [ その他(未定義) ]
+                    default:
 						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
 						{
 							pChip.bHit = true;
@@ -4987,6 +5017,9 @@ namespace TJAPlayer3
                 JPOSCROLLX[i] = 0;
                 JPOSCROLLY[i] = 0;
                 ifp[i] = false;
+
+                TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
+                bSplitLane[i] = false;
             }
             TJAPlayer3.stage演奏ドラム画面.On活性化();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )

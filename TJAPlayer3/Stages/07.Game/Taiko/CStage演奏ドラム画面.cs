@@ -1951,6 +1951,18 @@ namespace TJAPlayer3
                         y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
                     }
 
+                    if (bSplitLane[nPlayer])
+                    {
+                        if (NotesManager.IsDonNote(pChip))
+                        {
+                            y -= TJAPlayer3.Skin.Game_Notes_Size[1] / 3;
+                        }
+                        else if (NotesManager.IsKaNote(pChip))
+                        {
+                            y += TJAPlayer3.Skin.Game_Notes_Size[1] / 3;
+                        }
+                    }
+
                     if ( pChip.nバーからの距離dot.Drums < 0 )
                     {
                         this.actGame.st叩ききりまショー.b最初のチップが叩かれた = true;
@@ -2201,6 +2213,21 @@ namespace TJAPlayer3
                     long time = pChip.n発声時刻ms - __dbt;
                     float play_bpm_time = this.GetNowPBMTime(dTX, 0);
                     y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                }
+
+                if (bSplitLane[nPlayer])
+                {
+                    if (NotesManager.IsClapRoll(pChip))
+                    {
+                    }
+                    else if (NotesManager.IsYellowRoll(pChip))
+                    {
+                        y += TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                    }
+                    else if (NotesManager.IsRoll(pChip))
+                    {
+                        y -= TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                    }
                 }
 
                 #region[ HIDSUD & STEALTH ]
@@ -2472,7 +2499,7 @@ namespace TJAPlayer3
                     else
                     {
                         //this.tx小節線.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
+                        TJAPlayer3.Tx.Bar?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                 }
 			}
