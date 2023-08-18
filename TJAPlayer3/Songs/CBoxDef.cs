@@ -83,80 +83,88 @@ namespace TJAPlayer3
 							}
                         
 							char[] ignoreChars = new char[] { ':', ' ', '\t' };
-							if (str.StartsWith(langTITLE, StringComparison.OrdinalIgnoreCase))
+
+							var split = str.Split(':');
+							if (split.Length == 2)
 							{
-								this.Title = str.Substring(8).Trim(ignoreChars);
-							}
-							else if(str.StartsWith("#TITLE", StringComparison.OrdinalIgnoreCase))
-							{
-								if (this.Title == "") this.Title = str.Substring(6).Trim(ignoreChars);
-							}
-							else if( str.StartsWith( "#GENRE", StringComparison.OrdinalIgnoreCase ) )
-							{
-								this.Genre = str.Substring( 6 ).Trim( ignoreChars );
-							}
-							else if (str.StartsWith("#SELECTBG", StringComparison.OrdinalIgnoreCase))
-							{
-								this.SelectBG = str.Substring(9).Trim(ignoreChars);
-							}
-							else if ( str.StartsWith( "#FONTCOLOR", StringComparison.OrdinalIgnoreCase ) )
-							{
-								this.Color = ColorTranslator.FromHtml( str.Substring( 10 ).Trim( ignoreChars ) );
-							}
-                            else if (str.StartsWith("#FORECOLOR", StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.ForeColor = ColorTranslator.FromHtml(str.Substring(10).Trim(ignoreChars));
-                                IsChangedForeColor = true;
-                            }
-                            else if (str.StartsWith("#BACKCOLOR", StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.BackColor = ColorTranslator.FromHtml(str.Substring(10).Trim(ignoreChars));
-                                IsChangedBackColor = true;
-							}
-							else if (str.StartsWith("#BOXCOLOR", StringComparison.OrdinalIgnoreCase))
-							{
-								this.BoxColor = ColorTranslator.FromHtml(str.Substring(9).Trim(ignoreChars));
-								IsChangedBoxColor = true;
-							}
-							else if (str.StartsWith("#BGCOLOR", StringComparison.OrdinalIgnoreCase))
-							{
-								this.BgColor = ColorTranslator.FromHtml(str.Substring(8).Trim(ignoreChars));
-								IsChangedBgColor = true;
-							}
-							else if (str.StartsWith("#BGTYPE", StringComparison.OrdinalIgnoreCase))
-							{
-								this.BgType = int.Parse(str.Substring(7).Trim(ignoreChars));
-								IsChangedBgType = true;
-							}
-							else if (str.StartsWith("#BOXTYPE", StringComparison.OrdinalIgnoreCase))
-							{
-								this.BoxType = int.Parse(str.Substring(8).Trim(ignoreChars));
-								IsChangedBoxType = true;
-							}
-							else if (str.StartsWith("#BOXCHARA", StringComparison.OrdinalIgnoreCase))
-							{
-								this.BoxChara = int.Parse(str.Substring(9).Trim(ignoreChars));
-								IsChangedBoxChara = true;
-							}
-                            else if (str.StartsWith("#SCENEPRESET", StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.ScenePreset = str.Substring(12).Trim(ignoreChars);
-                            }
-                            else if (str.StartsWith("#DEFAULTPREIMAGE", StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, str.Substring(16).Trim(ignoreChars));
-                            }
-                            else
-							{
-								for(int i = 0; i < 3; i++)
+								string key = split[0];
+								string value = split[1];
+
+								if (key == langTITLE)
 								{
-									if (str.StartsWith(langBOXEXPLANATION + (i + 1).ToString(), StringComparison.OrdinalIgnoreCase))
+									this.Title = value.Trim(ignoreChars);
+								}
+								else if (key == "#TITLE")
+								{
+									if (this.Title == "") this.Title = value.Trim(ignoreChars);
+								}
+								else if (key == "#GENRE")
+								{
+									this.Genre = value.Trim(ignoreChars);
+								}
+								else if (key == "#SELECTBG")
+								{
+									this.SelectBG = value.Trim(ignoreChars);
+								}
+								else if (key == "#FONTCOLOR")
+								{
+									this.Color = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								}
+								else if (key == "#FORECOLOR")
+								{
+									this.ForeColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+									IsChangedForeColor = true;
+								}
+								else if (key == "#BACKCOLOR")
+								{
+									this.BackColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+									IsChangedBackColor = true;
+								}
+								else if (key == "#BOXCOLOR")
+								{
+									this.BoxColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+									IsChangedBoxColor = true;
+								}
+								else if (key == "#BGCOLOR")
+								{
+									this.BgColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+									IsChangedBgColor = true;
+								}
+								else if (key == "#BGTYPE")
+								{
+									this.BgType = int.Parse(value.Trim(ignoreChars));
+									IsChangedBgType = true;
+								}
+								else if (key == "#BOXTYPE")
+								{
+									this.BoxType = int.Parse(value.Trim(ignoreChars));
+									IsChangedBoxType = true;
+								}
+								else if (key == "#BOXCHARA")
+								{
+									this.BoxChara = int.Parse(value.Trim(ignoreChars));
+									IsChangedBoxChara = true;
+								}
+								else if (key == "#SCENEPRESET")
+								{
+									this.ScenePreset = value.Trim(ignoreChars);
+								}
+								else if (key == "#DEFAULTPREIMAGE")
+								{
+									this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, value.Trim(ignoreChars));
+								}
+								else
+								{
+									for (int i = 0; i < 3; i++)
 									{
-										this.strBoxText[i] = str.Substring(18).Trim(ignoreChars);
-									}
-									else if (str.StartsWith("#BOXEXPLANATION" + (i + 1).ToString(), StringComparison.OrdinalIgnoreCase))
-									{
-										if (this.strBoxText[i] == "") this.strBoxText[i] = str.Substring(16).Trim(ignoreChars);
+										if (key == langBOXEXPLANATION + (i + 1).ToString())
+										{
+											this.strBoxText[i] = value.Trim(ignoreChars);
+										}
+										else if (key == "#BOXEXPLANATION" + (i + 1).ToString())
+										{
+											if (this.strBoxText[i] == "") this.strBoxText[i] = value.Trim(ignoreChars);
+										}
 									}
 								}
 							}
