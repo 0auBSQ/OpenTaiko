@@ -6148,6 +6148,7 @@ namespace TJAPlayer3
                 chip.fNow_Measure_m = this.fNow_Measure_m;
                 chip.fNow_Measure_s = this.fNow_Measure_s;
                 chip.n整数値_内部番号 = 1;
+                chip.bHideBarLine = false;
 
                 // チップを配置。
                 this.listChip.Add(chip);
