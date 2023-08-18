@@ -19,6 +19,16 @@ namespace TJAPlayer3
         public DBUnlockables.CUnlockConditions unlock;
         public string _path;
 
+        public float GetEffectCoinMultiplier()
+        {
+            float mult = 1f;
+
+            mult *= HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity);
+            mult *= effect.GetCoinMultiplier();
+
+            return mult;
+        }
+
         public CPuchichara(string path)
         {
             _path = path;

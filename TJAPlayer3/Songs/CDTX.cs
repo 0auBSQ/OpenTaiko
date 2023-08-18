@@ -1872,22 +1872,30 @@ namespace TJAPlayer3
             Random rnd = new System.Random();
 
             var eFun = TJAPlayer3.ConfigIni.nFunMods[TJAPlayer3.GetActualPlayer(player)];
+            var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+
+            var bombFactor = Math.Max(1, Math.Min(100, chara.effect.BombFactor));
+            var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
 
             switch (eFun)
             {
                 case EFunMods.MINESWEEPER:
                     foreach (var chip in this.listChip)
                     {
-                        int n = rnd.Next(100);
-
-                        if (n >= 0 && n <= 20)
+                        if (NotesManager.IsMissableNote(chip))
                         {
-                            if (NotesManager.IsMissableNote(chip))
-                            {
-                                chip.nチャンネル番号 = 0x1C;
-                            }
+                            int n = rnd.Next(100);
 
+                            if (n < bombFactor) chip.nチャンネル番号 = 0x1C;
                         }
+
+                        if (NotesManager.IsBalloon(chip))
+                        {
+                            int n = rnd.Next(100);
+
+                            if (n < fuseRollFactor) chip.nチャンネル番号 = 0x1D;
+                        }
+
                     }
                     break;
                 case EFunMods.AVALANCHE:
@@ -2029,19 +2037,13 @@ namespace TJAPlayer3
                 {
                     switch (chip.nチャンネル番号)
                     {
-                        case 0x11:
-                            chip.nチャンネル番号 = 0x101;
-                            break;
-                        case 0x12:
-                            chip.nチャンネル番号 = 0x101;
-                            break;
                         case 0x13:
+                        case 0x1A:
                             chip.nチャンネル番号 = 0x101;
-                            chip.nSenote = 6;
                             break;
                         case 0x14:
+                        case 0x1B:
                             chip.nチャンネル番号 = 0x101;
-                            chip.nSenote = 5;
                             break;
                     }
                 }

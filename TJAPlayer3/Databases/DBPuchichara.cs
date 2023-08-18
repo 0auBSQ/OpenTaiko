@@ -16,6 +16,16 @@ namespace TJAPlayer3
                 SplitLane = false;
             }
 
+            public float GetCoinMultiplier()
+            {
+                float mult = 1f;
+
+                if (Autoroll > 0) mult *= 0f;
+                if (ShowAdlib == true) mult *= 0.9f;
+                if (AllPurple == true) mult *= 1.1f;
+
+                return mult;
+            }
 
             [JsonProperty("allpurple")]
             public bool AllPurple;

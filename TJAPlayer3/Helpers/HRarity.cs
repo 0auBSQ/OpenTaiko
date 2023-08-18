@@ -29,6 +29,16 @@ namespace TJAPlayer3
             ["Legendary"] = 4,
         };
 
+        private static Dictionary<string, float> RarityToCoinMultiplier = new Dictionary<string, float>
+        {
+            ["Poor"] = 0.8f,
+            ["Common"] = 1f,
+            ["Uncommon"] = 1.1f,
+            ["Rare"] = 1.2f,
+            ["Epic"] = 1.3f,
+            ["Legendary"] = 1.5f,
+        };
+
         public static Color tRarityToColor(string rarity)
         {
 
@@ -49,6 +59,16 @@ namespace TJAPlayer3
                 modalInt = RarityToModalInt[rarity];
 
             return modalInt;
+        }
+
+        public static float tRarityToRarityToCoinMultiplier(string rarity)
+        {
+            float coinMult = 1f;
+
+            if (RarityToCoinMultiplier.ContainsKey(rarity))
+                coinMult = RarityToCoinMultiplier[rarity];
+
+            return coinMult;
         }
 
 

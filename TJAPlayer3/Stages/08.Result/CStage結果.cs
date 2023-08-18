@@ -482,52 +482,8 @@ namespace TJAPlayer3
 					var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
 					var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(player))];
 
-					float charamul = 1.0f;
-					switch(chara.metadata.Rarity)
-					{
-						case "Poor":
-							charamul = 0.8f;
-							break;
-						case "Common":
-							charamul = 1.0f;
-							break;
-						case "Uncommon":
-							charamul = 1.1f;
-							break;
-						case "Rare":
-							charamul = 1.2f;
-							break;
-						case "Epic":
-							charamul = 1.3f;
-							break;
-						case "Legendary":
-							charamul = 1.5f;
-							break;
-					}
 
-					float puchimul = 1.0f;
-					switch (puchichara.metadata.Rarity)
-					{
-						case "Poor":
-							puchimul = 0.8f;
-							break;
-						case "Common":
-							puchimul = 1.0f;
-							break;
-						case "Uncommon":
-							puchimul = 1.1f;
-							break;
-						case "Rare":
-							puchimul = 1.2f;
-							break;
-						case "Epic":
-							puchimul = 1.3f;
-							break;
-						case "Legendary":
-							puchimul = 1.5f;
-							break;
-					}
-					return charamul * puchimul;
+					return chara.GetEffectCoinMultiplier() * puchichara.GetEffectCoinMultiplier();
 				}
 
 				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
