@@ -503,6 +503,15 @@ namespace TJAPlayer3
 							if (TJAPlayer3.ConfigIni.nPlayerCount >= 5)
 								TJAPlayer3.DTX_5P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 4, true, TJAPlayer3.stage選曲.n確定された曲の難易度[4]);
 
+							if (TJAPlayer3.DTX.listErrors.Count != 0)
+                            {
+								string message = "";
+								foreach (var text in TJAPlayer3.DTX.listErrors)
+								{
+									System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
+								}
+							}
+
 							Trace.TraceInformation( "---- Song information -----------------" );
 				    		Trace.TraceInformation( "TITLE: {0}", TJAPlayer3.DTX.TITLE );
 			    			Trace.TraceInformation( "FILE: {0}",  TJAPlayer3.DTX.strファイル名の絶対パス );

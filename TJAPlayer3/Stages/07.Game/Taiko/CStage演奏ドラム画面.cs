@@ -1951,7 +1951,7 @@ namespace TJAPlayer3
                         y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
                     }
 
-                    if (bSplitLane[nPlayer])
+                    if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
                     {
                         if (NotesManager.IsDonNote(pChip))
                         {
@@ -2221,7 +2221,7 @@ namespace TJAPlayer3
                     y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
                 }
 
-                if (bSplitLane[nPlayer])
+                if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
                 {
                     if (TJAPlayer3.ConfigIni.nGameType[nPlayer] == EGameType.KONGA)
                     {
