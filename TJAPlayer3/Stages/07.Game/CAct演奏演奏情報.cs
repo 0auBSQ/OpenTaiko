@@ -73,8 +73,6 @@ namespace TJAPlayer3
                 y -= 0x10;
                 TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "SCOREMODE:     {0:####0}", TJAPlayer3.DTX.nScoreModeTmp ) );
                 y -= 0x10;
-                TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "SCROLLMODE:    {0:####0}", Enum.GetName(typeof(EScrollMode), TJAPlayer3.ConfigIni.eScrollMode ) ) );
-				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, string.Format(  "ListChip:      {0:####0}", _chipCounts[0]));
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, string.Format(  "ListChipM:     {0:####0}", _chipCounts[1]));
