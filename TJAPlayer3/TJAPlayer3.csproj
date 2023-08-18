@@ -145,6 +145,7 @@
     <Compile Include="Databases\DBNameplateUnlockables.cs" />
     <Compile Include="Databases\DBPuchichara.cs" />
     <Compile Include="Databases\DBSkinPreset.cs" />
+    <Compile Include="Databases\DBSongUnlockables.cs" />
     <Compile Include="Databases\DBUnlockables.cs" />
     <Compile Include="Databases\Databases.cs" />
     <Compile Include="Databases\DBCharacter.cs" />
