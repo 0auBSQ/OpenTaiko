@@ -160,6 +160,7 @@
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerLevelIcon.cs" />
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerLevel.cs" />
     <Compile Include="Songs\C曲リストノードComparers\C曲リストノードComparerSubtitle.cs" />
+    <Compile Include="Songs\Extended\CSongObject.cs" />
     <Compile Include="Songs\VTTParser.cs" />
     <Compile Include="Stages\01.StartUp\CCharacter.cs" />
     <Compile Include="Stages\01.StartUp\CPuchichara.cs" />

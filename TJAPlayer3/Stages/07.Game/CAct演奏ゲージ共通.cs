@@ -112,7 +112,19 @@ namespace TJAPlayer3
 
             for (int i = 0; i < 5; i++)
             {
-                this.db現在のゲージ値[i] = 0;
+                var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+                switch(chara.effect.Gauge)
+                {
+                    case "Normal":
+                        this.db現在のゲージ値[i] = 0;
+                        break;
+                    case "Hard":
+                        this.db現在のゲージ値[i] = 100;
+                        break;
+                    case "Extreme":
+                        this.db現在のゲージ値[i] = 100;
+                        break;
+                }
             }
 
             //ゲージのMAXまでの最低コンボ数を計算
@@ -331,13 +343,41 @@ namespace TJAPlayer3
 
             for (int i = 0; i < 3; i++)
             {
-                dbゲージ増加量[i][nPlayer] = increase[i];
+                var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+                switch (chara.effect.Gauge)
+                {
+                    case "Normal":
+                        dbゲージ増加量[i][nPlayer] = increase[i];
+                        break;
+                    case "Hard":
+                        dbゲージ増加量[i][nPlayer] = increase[i] / 2.0f;
+                        break;
+                    case "Extreme":
+                        dbゲージ増加量[i][nPlayer] = increase[i] / 4.0f;
+                        break;
+                }
             }
             for (int i = 0; i < 3; i++)
             {
-                dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0];
-                dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1];
-                dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2];
+                var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+                switch (chara.effect.Gauge)
+                {
+                    case "Normal":
+                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0];
+                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1];
+                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2];
+                        break;
+                    case "Hard":
+                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] / 2.0f;
+                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] / 2.0f;
+                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] / 2.0f;
+                        break;
+                    case "Extreme":
+                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] / 4.0f;
+                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] / 4.0f;
+                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] / 4.0f;
+                        break;
+                }
             }
             #endregion
         }
@@ -425,10 +465,20 @@ namespace TJAPlayer3
                         else
                             fDamage = this.dbゲージ増加量[2][nPlayer];
 
-
                         if (fDamage >= 0)
                         {
                             fDamage = -fDamage;
+                        }
+
+                        var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+                        switch (chara.effect.Gauge)
+                        {
+                            case "Hard":
+                                fDamage = -25;
+                                break;
+                            case "Extreme":
+                                fDamage = -50;
+                                break;
                         }
 
                         if (this.bRisky)

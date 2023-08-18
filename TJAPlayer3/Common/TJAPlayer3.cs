@@ -1946,6 +1946,25 @@ for (int i = 0; i < 3; i++) {
 
 			    actScanningLoudness.On進行描画();
 
+				if (!ConfigIni.bTokkunMode)
+				{
+					float screen_ratiox = TJAPlayer3.Skin.Resolution[0] / 1280.0f;
+					float screen_ratioy = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+					var mat = Matrix.LookAtLH(new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, (float)(-SampleFramework.GameWindowSize.Height / (fCamZoomFactor * 2) * Math.Sqrt(3.0))), new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, 0f), new Vector3(0f, 1f, 0f));
+					mat *= Matrix.RotationYawPitchRoll(0, 0, C変換.DegreeToRadian(fCamRotation));
+					mat *= Matrix.Scaling(fCamXScale, fCamYScale, 1f);
+					this.Device.SetTransform(TransformState.View, mat);
+
+					if (TJAPlayer3.DTX != null)
+					{
+						//object rendering
+						foreach (KeyValuePair<string, CSongObject> pair in TJAPlayer3.DTX.listObj)
+						{
+							pair.Value.tDraw();
+						}
+					}
+				}
+
 				if (r現在のステージ != null && r現在のステージ.eステージID != CStage.Eステージ.起動 && TJAPlayer3.Tx.Network_Connection != null)
 				{
 					if (Math.Abs(CSound管理.rc演奏用タイマ.nシステム時刻ms - this.前回のシステム時刻ms) > 10000)
@@ -1969,8 +1988,32 @@ for (int i = 0; i < 3; i++) {
 			this.Device.EndScene();			// Present()は game.csのOnFrameEnd()に登録された、GraphicsDeviceManager.game_FrameEnd() 内で実行されるので不要
 											// (つまり、Present()は、Draw()完了後に実行される)
 #if !GPUFlushAfterPresent
-			actFlushGPU?.On進行描画();		// Flush GPU	// EndScene()～Present()間 (つまりVSync前) でFlush実行
+			actFlushGPU?.On進行描画();      // Flush GPU	// EndScene()～Present()間 (つまりVSync前) でFlush実行
 #endif
+
+			foreach(var capture in ConfigIni.KeyAssign.System.Capture)
+			{
+				if (TJAPlayer3.Input管理.Keyboard.bキーが押された(capture.コード))
+				{
+					if (TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftControl))
+					{
+						if (r現在のステージ.eステージID != CStage.Eステージ.演奏)
+						{
+							RefleshSkin();
+							r現在のステージ.On非活性化();
+							r現在のステージ.On活性化();
+						}
+					}
+					else
+                    {
+						// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
+						string strFullPath =
+						   Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+						strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+						SaveResultScreen(strFullPath);
+					}
+				}
+			}
 
 			/*
 			if ( Sound管理?.GetCurrentSoundDeviceType() != "DirectSound" )
@@ -3389,18 +3432,6 @@ for (int i = 0; i < 3; i++) {
 			}
 			else
 			{
-				for ( int i = 0; i < 0x10; i++ )
-				{
-					if ( ConfigIni.KeyAssign.System.Capture[ i ].コード > 0 &&
-						 e.KeyCode == DeviceConstantConverter.KeyToKeyCode( (SlimDXKeys.Key) ConfigIni.KeyAssign.System.Capture[ i ].コード ) )
-					{
-						// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
-						string strFullPath =
-						   Path.Combine( TJAPlayer3.strEXEのあるフォルダ, "Capture_img" );
-						strFullPath = Path.Combine( strFullPath, DateTime.Now.ToString( "yyyyMMddHHmmss" ) + ".png" );
-						SaveResultScreen( strFullPath );
-					}
-				}
 			}
 		}
 		private void Window_MouseUp( object sender, MouseEventArgs e )
@@ -3428,6 +3459,19 @@ for (int i = 0; i < 3; i++) {
 			ConfigIni.nウインドウheight = (ConfigIni.bウィンドウモード) ? base.Window.ClientSize.Height : currentClientSize.Height;
 		}
 		#endregion
+		#endregion
+
+		#region [ EXTENDED VARIABLES ]
+		public static float fCamXOffset;
+		public static float fCamYOffset;
+
+		public static float fCamZoomFactor = 1.0f;
+		public static float fCamRotation;
+
+		public static float fCamXScale = 1.0f;
+		public static float fCamYScale = 1.0f;
+
+		public static Color4 borderColor = new Color4(1f, 0f, 0f, 0f);
 		#endregion
 	}
 }

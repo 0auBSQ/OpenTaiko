@@ -6,6 +6,18 @@ namespace TJAPlayer3
 {
     class DBCharacter
     {
+        public class CharacterEffect
+        {
+            public CharacterEffect()
+            {
+                Gauge = "Normal";
+            }
+
+
+            [JsonProperty("gauge")]
+            public string Gauge;
+        }
+
         public class CharacterData
         {
             public CharacterData()

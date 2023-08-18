@@ -154,6 +154,18 @@ namespace TJAPlayer3
             return chip.nチャンネル番号 == 0x1C;
         }
 
+        public static bool IsDonNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x11 || chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A;
+        }
+
+        public static bool IsKaNote(CDTX.CChip chip)
+        {
+            if (chip == null) return false;
+            return chip.nチャンネル番号 == 0x12 || chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B;
+        }
+
         public static bool IsSmallNote(CDTX.CChip chip, bool blue)
         {
             if (chip == null) return false;
@@ -358,6 +370,16 @@ namespace TJAPlayer3
             else if (IsKusudama(chip))
             {
                 TJAPlayer3.Tx.Note_Kusu?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+                return;
+            }
+            else if (IsADLIB(chip))
+            {
+                var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(player))];
+                if (puchichara.effect.ShowAdlib)
+                {
+                    TJAPlayer3.Tx.Note_Adlib?.tUpdateOpacity(50);
+                    TJAPlayer3.Tx.Note_Adlib?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+                }
                 return;
             }
 

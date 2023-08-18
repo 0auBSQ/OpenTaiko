@@ -33,6 +33,9 @@ namespace TJAPlayer3
 		public string DefaultPreimage;
 		public string ScenePreset;
 
+		private readonly string langTITLE = "#TITLE" + CLangManager.fetchLang().ToUpper();
+		private readonly string langBOXEXPLANATION = "#BOXEXPLANATION" + CLangManager.fetchLang().ToUpper();
+
 		// コンストラクタ
 
 		public CBoxDef()
@@ -80,10 +83,13 @@ namespace TJAPlayer3
 							}
                         
 							char[] ignoreChars = new char[] { ':', ' ', '\t' };
-		
-							if ( str.StartsWith( "#TITLE", StringComparison.OrdinalIgnoreCase ) )
+							if (str.StartsWith(langTITLE, StringComparison.OrdinalIgnoreCase))
 							{
-								this.Title = str.Substring( 6 ).Trim( ignoreChars );
+								this.Title = str.Substring(8).Trim(ignoreChars);
+							}
+							else if(str.StartsWith("#TITLE", StringComparison.OrdinalIgnoreCase))
+							{
+								if (this.Title == "") this.Title = str.Substring(6).Trim(ignoreChars);
 							}
 							else if( str.StartsWith( "#GENRE", StringComparison.OrdinalIgnoreCase ) )
 							{
@@ -143,11 +149,15 @@ namespace TJAPlayer3
                             else
 							{
 								for(int i = 0; i < 3; i++)
-                                {
-									if (str.StartsWith("#BOXEXPLANATION" + (i + 1).ToString(), StringComparison.OrdinalIgnoreCase))
-                                    {
-										this.strBoxText[i] = str.Substring(16).Trim(ignoreChars);
-                                    }
+								{
+									if (str.StartsWith(langBOXEXPLANATION + (i + 1).ToString(), StringComparison.OrdinalIgnoreCase))
+									{
+										this.strBoxText[i] = str.Substring(18).Trim(ignoreChars);
+									}
+									else if (str.StartsWith("#BOXEXPLANATION" + (i + 1).ToString(), StringComparison.OrdinalIgnoreCase))
+									{
+										if (this.strBoxText[i] == "") this.strBoxText[i] = str.Substring(16).Trim(ignoreChars);
+									}
 								}
 							}
 						}

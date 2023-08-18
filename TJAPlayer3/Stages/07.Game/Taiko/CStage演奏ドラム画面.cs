@@ -1849,7 +1849,7 @@ namespace TJAPlayer3
 
                             int n大音符 = (pChip.nチャンネル番号 == 0x11 || pChip.nチャンネル番号 == 0x12 ? 2 : 0);
 
-                            this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, true, nLane + n大音符, nPlayer);
+                            this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, true, nLane + n大音符, nPlayer, false);
                             this.tサウンド再生(pChip, nPlayer);
                             return;
                         }
@@ -1930,7 +1930,7 @@ namespace TJAPlayer3
                     #endregion
 
                     #region[ HIDSUD & STEALTH ]
-                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH )
+                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                     {
                         pChip.bShow = false;
                     }
@@ -1949,6 +1949,18 @@ namespace TJAPlayer3
                         float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
                         y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                    }
+
+                    if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
+                    {
+                        if (NotesManager.IsDonNote(pChip))
+                        {
+                            y -= TJAPlayer3.Skin.Game_Notes_Size[1] / 3;
+                        }
+                        else if (NotesManager.IsKaNote(pChip))
+                        {
+                            y += TJAPlayer3.Skin.Game_Notes_Size[1] / 3;
+                        }
                     }
 
                     if ( pChip.nバーからの距離dot.Drums < 0 )
@@ -2106,7 +2118,13 @@ namespace TJAPlayer3
                                     }
 
                                 case 0x1F:
+                                    {
+                                        NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
+                                    }
+                                    break;
                                 default:
+                                    { 
+                                    }
                                     break;
 
                             }
@@ -2203,9 +2221,29 @@ namespace TJAPlayer3
                     y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
                 }
 
+                if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
+                {
+                    if (TJAPlayer3.ConfigIni.nGameType[nPlayer] == EGameType.KONGA)
+                    {
+                        if (NotesManager.IsClapRoll(pChip))
+                        {
+                        }
+                        else if (NotesManager.IsYellowRoll(pChip))
+                        {
+                            y += TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                            y末端 += TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                        }
+                        else if (NotesManager.IsRoll(pChip))
+                        {
+                            y -= TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                            y末端 -= TJAPlayer3.Skin.Game_Notes_Size[1] / 2;
+                        }
+                    }
+                }
+
                 #region[ HIDSUD & STEALTH ]
 
-                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH)
+                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                 {
                     pChip.bShow = false;
                 }
@@ -2401,11 +2439,17 @@ namespace TJAPlayer3
                         }
                     }
                 }
+
                 if (pChip.n発声時刻ms < nowTime && pChip.nノーツ終了時刻ms > nowTime)
                 {
+                    var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))];
+
                     //時間内でかつ0x9Aじゃないならならヒット処理
-                    if (!NotesManager.IsRollEnd(pChip) && (nPlayer != 1 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] : (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)))
-                        this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer);
+                    if (!NotesManager.IsRollEnd(pChip) &&
+                        ((nPlayer != 1 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] : 
+                        (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)) || 
+                        puchichara.effect.Autoroll > 0))
+                        this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer, puchichara.effect.Autoroll > 0);
                 }
             }
             #endregion
@@ -2472,7 +2516,7 @@ namespace TJAPlayer3
                     else
                     {
                         //this.tx小節線.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
+                        TJAPlayer3.Tx.Bar?.t2D描画( TJAPlayer3.app.Device, x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                 }
 			}

@@ -400,6 +400,8 @@ namespace TJAPlayer3
             this.bLEVELHOLD = new bool[]{ false, false, false, false, false };
             this.JPOSCROLLX = new int[5];
             this.JPOSCROLLY = new int[5];
+            eFirstGameType = new EGameType[5];
+            bSplitLane = new bool[5];
 
 
             // Double play set here
@@ -418,6 +420,7 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 actGauge.Init(TJAPlayer3.ConfigIni.nRisky, i);                                  // #23559 2011.7.28 yyagi
+                eFirstGameType[i] = TJAPlayer3.ConfigIni.nGameType[i];
             }
 			this.nPolyphonicSounds = TJAPlayer3.ConfigIni.nPoliphonicSounds;
 			e判定表示優先度 = TJAPlayer3.ConfigIni.e判定表示優先度;
@@ -488,11 +491,27 @@ namespace TJAPlayer3
             //			this.gclatencymode = GCSettings.LatencyMode;
             //			GCSettings.LatencyMode = GCLatencyMode.Batch;	// 演奏画面中はGCを抑止する
             this.bIsAlreadyCleared = new bool[5];
+            for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
+            {
+                var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+                switch (chara.effect.Gauge)
+                {
+                    case "Normal":
+                        bIsAlreadyCleared[player] = false;
+                        break;
+                    case "Hard":
+                    case "Extreme":
+                        bIsAlreadyCleared[player] = true;
+                        break;
+                }
+            }
             this.bIsAlreadyMaxed = new bool[5];
 
             this.ListDan_Number = 0;
             this.IsDanFailed = false;
-		}
+
+            this.objHandlers = new Dictionary<CDTX.CChip, CCounter>();
+        }
 
 
         public void ftDanReSetScoreNiji(int songNotes, int ballons)
@@ -528,10 +547,27 @@ namespace TJAPlayer3
 			this.ctチップ模様アニメ.Bass = null;
 			this.ctチップ模様アニメ.Taiko = null;
 
+            this.ctCamHMove = null;
+            this.ctCamVMove = null;
+            this.ctCamHScale = null;
+            this.ctCamVScale = null;
+            this.ctCamRotation = null;
+            this.ctCamZoom = null;
+
+            TJAPlayer3.borderColor = new SharpDX.Color4(0f, 0f, 0f, 0f);
+            TJAPlayer3.fCamXOffset = 0.0f;
+            TJAPlayer3.fCamYOffset = 0.0f;
+            TJAPlayer3.fCamXScale = 1.0f;
+            TJAPlayer3.fCamYScale = 1.0f;
+            TJAPlayer3.fCamRotation = 0.0f;
+            TJAPlayer3.fCamZoomFactor = 1.0f;
+
             for (int i = 0; i < 5; i++)
             {
                 ctChipAnime[i] = null;
                 ctChipAnimeLag[i] = null;
+                TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
+                bSplitLane[i] = false;
             }
 
 			listWAV.Clear();
@@ -876,6 +912,8 @@ namespace TJAPlayer3
         protected int nWaitButton;
 
         protected int[] nStoredHit;
+        private EGameType[] eFirstGameType;
+        protected bool[] bSplitLane;
 
 
         public CDTX.CChip[] chip現在処理中の連打チップ = new CDTX.CChip[ 5 ];
@@ -1653,7 +1691,7 @@ namespace TJAPlayer3
 		{
 			return tチップのヒット処理( nHitTime, pChip, screenmode, bCorrectLane, nNowInput, 0 );
 		}
-        protected unsafe E判定 tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer)
+        protected unsafe E判定 tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer, bool rollEffectHit = false)
         {
             //unsafeコードにつき、デバッグ中の変更厳禁!
 
@@ -1697,16 +1735,18 @@ namespace TJAPlayer3
                         if (!bAutoPlay && eJudgeResult != E判定.Miss)
 					    {
 					        CLagLogger.Add(nPlayer, pChip);
-					    }
+                        }
+
+                        var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))];
 
                         if (NotesManager.IsRoll(pChip))
                         {
                             #region[ Drumroll ]
                             //---------------------------
                             this.b連打中[nPlayer] = true;
-                            if (bAutoPlay)
+                            if (bAutoPlay || rollEffectHit)
                             {
-                                int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
+                                int rollSpeed = bAutoPlay ? TJAPlayer3.ConfigIni.nRollsPerSec : puchichara.effect.Autoroll;
                                 if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
                                     rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
 
@@ -1740,7 +1780,7 @@ namespace TJAPlayer3
                                     }
                                 }
                             }
-                            else
+                            if (!bAutoPlay && !rollEffectHit)
                             {
                                 this.eRollState = E連打State.roll;
                                 this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, nNowInput, 0, nPlayer);
@@ -1757,7 +1797,7 @@ namespace TJAPlayer3
                             this.b連打中[nPlayer] = true;
                             this.actChara.b風船連打中[nPlayer] = true;
 
-                            if (bAutoPlay)
+                            if (bAutoPlay || rollEffectHit)
                             {
                                 bool IsKusudama = NotesManager.IsKusudama(pChip);
 
@@ -1777,14 +1817,12 @@ namespace TJAPlayer3
 
                                 if (balloon != 0 && this.bPAUSE == false)
                                 {
-                                    int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
-                                    if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
-                                        rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
+                                    int rollSpeed = bAutoPlay ? balloon : puchichara.effect.Autoroll;
 
-                                    int balloonDuration = (pChip.nノーツ終了時刻ms - pChip.n発声時刻ms);
+                                    int balloonDuration = bAutoPlay ? (pChip.nノーツ終了時刻ms - pChip.n発声時刻ms) : 1000;
 
                                     if ((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > 
-                                        (pChip.n発声時刻ms + (balloonDuration / balloon) * rollCount))
+                                        (pChip.n発声時刻ms + (balloonDuration / (double)rollSpeed) * rollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
@@ -1798,7 +1836,7 @@ namespace TJAPlayer3
                                     }
                                 }
                             }
-                            else
+                            if (!bAutoPlay && !rollEffectHit)
                             {
                                 this.tBalloonProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), nPlayer);
                             }
@@ -1881,6 +1919,19 @@ namespace TJAPlayer3
                 }
             }
 
+            var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+            bool cleared = false;
+            switch (chara.effect.Gauge)
+            {
+                case "Normal":
+                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] >= 80;
+                    break;
+                case "Hard":
+                case "Extreme":
+                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] > 0;
+                    break;
+            }
+
             if (eJudgeResult != E判定.Poor && eJudgeResult != E判定.Miss)
             {
                 double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer]))));
@@ -1898,7 +1949,7 @@ namespace TJAPlayer3
                     }
                     this.bIsAlreadyMaxed[nPlayer] = true;
                 }
-                if ((int)actGauge.db現在のゲージ値[nPlayer] >= 80 && this.bIsAlreadyCleared[nPlayer] == false)
+                if (cleared && this.bIsAlreadyCleared[nPlayer] == false)
                 {
                     if(TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                     {
@@ -1917,11 +1968,22 @@ namespace TJAPlayer3
                 {
                     this.bIsAlreadyMaxed[nPlayer] = false;
                 }
-                if ((int)actGauge.db現在のゲージ値[nPlayer] < 80 && this.bIsAlreadyCleared[nPlayer] == true)
+                if (!cleared && this.bIsAlreadyCleared[nPlayer] == true)
                 {
                     this.bIsAlreadyCleared[nPlayer] = false;
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
-                    //CDTXMania.stage演奏ドラム画面.actBackground.ClearIn(nPlayer);
+
+                    switch (chara.effect.Gauge)
+                    {
+                        case "Hard":
+                        case "Extreme":
+                            {
+                                CSound管理.rc演奏用タイマ.t一時停止();
+                                TJAPlayer3.DTX.t全チップの再生停止();
+                                ifp[nPlayer] = true;
+                            }
+                            break;
+                    }
                 }
                 cInvisibleChip.ShowChipTemporally( pChip.e楽器パート );
 			}
@@ -3871,49 +3933,361 @@ namespace TJAPlayer3
                             this.bIsGOGOTIME[ nPlayer ] = false;
                         }
                         break;
-#endregion
+                    #endregion
 
-#region [ a0-a8: EmptySlot ]
-					case 0xa0:
-					case 0xa1:
-					case 0xa2:
-					case 0xa3:
-					case 0xa4:
-					case 0xa5:
-					case 0xa6:
-					case 0xa7:
-					case 0xa8:
+                    #region [ EXTENDED COMMANDS ]
+                    case 0xa0: //camera vertical move start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamVMoveChip = pChip;
+                            this.ctCamVMove = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
                         break;
-#endregion
-#region [ B1～BC EmptySlot ]
-					case 0xb1:
-					case 0xb2:
-					case 0xb3:
-					case 0xb4:
-					case 0xb5:
-					case 0xb6:
-					case 0xb7:
-					case 0xb8:
-					case 0xb9:
-                    case 0xba:
-                    case 0xbb:
-					case 0xbc:
-						break;
-#endregion
-#region [ c4, c7, d5-d9: EmptySlot ]
-					case 0xc4:
-					case 0xc7:
-					case 0xd5:
-					case 0xd6:	// BGA画像入れ替え
-					case 0xd7:
+                    case 0xa1: //camera vertical move end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xa2: //camera horizontal move start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamHMoveChip = pChip;
+                            this.ctCamHMove = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xa3: //camera horizontal move end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xa4: //camera zoom start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamZoomChip = pChip;
+                            this.ctCamZoom = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xa5: //camera zoom end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xa6: //camera rotation start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamRotateChip = pChip;
+                            this.ctCamRotation = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xa7: //camera rotation end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xa8: //camera vertical scaling start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamVScaleChip = pChip;
+                            this.ctCamVScale = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xa9: //camera vertical scaling end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xb0: //camera horizontal scaling start
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            this.currentCamHScaleChip = pChip;
+                            this.ctCamHScale = new CCounter(0, pChip.fCamTimeMs, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb1: //camera horizontal scaling end
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xb2: //change border color
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            TJAPlayer3.borderColor = pChip.borderColor;
+                        }
+                        break;
+                    case 0xb3: //set camera x offset
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamHMoveChip = pChip;
+                            this.ctCamHMove = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb4: //set camera y offset
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamVMoveChip = pChip;
+                            this.ctCamVMove = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb5: //set camera zoom factor
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamZoomChip = pChip;
+                            this.ctCamZoom = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb6: //set camera rotation
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamRotateChip = pChip;
+                            this.ctCamRotation = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb7: //set camera x scale
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamHScaleChip = pChip;
+                            this.ctCamHScale = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb8: //set camera y scale
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            this.currentCamVScaleChip = pChip;
+                            this.ctCamVScale = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xb9: //reset camera
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            TJAPlayer3.borderColor = new SharpDX.Color4(0f, 0f, 0f, 0f);
+
+                            this.currentCamVMoveChip = pChip;
+                            this.currentCamHMoveChip = pChip;
+
+                            this.currentCamZoomChip = pChip;
+                            this.currentCamRotateChip = pChip;
+
+                            this.currentCamVScaleChip = pChip;
+                            this.currentCamHScaleChip = pChip;
+
+                            this.ctCamVMove = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                            this.ctCamHMove = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+
+                            this.ctCamZoom = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                            this.ctCamRotation = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+
+                            this.ctCamVScale = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                            this.ctCamHScale = new CCounter(0, 0, 1, TJAPlayer3.Timer);
+                        }
+                        break;
+                    case 0xba: //enable doron
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            bCustomDoron = true;
+                        }
+                        break;
+                    case 0xbb: //disable doron
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            bCustomDoron = false;
+                        }
+                        break;
+                    case 0xbc: //add object
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+                            obj.x = pChip.fObjX;
+                            obj.y = pChip.fObjY;
+                            obj.isVisible = true;
+                        }
+                        break;
+                    case 0xbd: //remove object
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+                            obj.isVisible = false;
+                        }
+                        break;
+                    case 0xbe: //object animation start
+                    case 0xc0:
+                    case 0xc2:
+                    case 0xc4:
+                    case 0xc6:
+                    case 0xc8:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj);
+                            objHandlers.Add(pChip, new CCounter(0, pChip.fObjTimeMs, 1, TJAPlayer3.Timer));
+                        }
+                        break;
+                    case 0xbf: //object animation end
+                    case 0xc1:
+                    case 0xc3:
+                    case 0xc5:
+                    case 0xc7:
+                    case 0xc9:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xca: //set object color
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+                            obj.color = pChip.borderColor;
+                        }
+                        break;
+                    case 0xcb: //set object y
+                    case 0xcc: //set object x
+                    case 0xcd: //set object vertical scale
+                    case 0xce: //set object horizontal scale
+                    case 0xcf: //set object rotation
+                    case 0xd0: //set object opacity
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj);
+                            objHandlers.Add(pChip, new CCounter(0, 0, 1, TJAPlayer3.Timer));
+                        }
+                        break;
+                    case 0xd1: //change texture
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            if (TJAPlayer3.Tx.trackedTextures.ContainsKey(pChip.strTargetTxName))
+                            {
+                                TJAPlayer3.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture oldTx);
+                                dTX.listTextures.TryGetValue(pChip.strNewPath, out CTexture newTx);
+
+                                newTx.Opacity = oldTx.Opacity;
+                                newTx.fZ軸中心回転 = oldTx.fZ軸中心回転;
+                                newTx.vc拡大縮小倍率 = oldTx.vc拡大縮小倍率;
+
+                                oldTx.UpdateTexture(TJAPlayer3.app.Device, newTx.texture, newTx.sz画像サイズ.Width, newTx.sz画像サイズ.Height);
+                            }
+                        }
+                        break;
+                    case 0xd2: //reset texture
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+
+                            if (TJAPlayer3.Tx.trackedTextures.ContainsKey(pChip.strTargetTxName))
+                            {
+                                TJAPlayer3.Tx.trackedTextures.TryGetValue(pChip.strTargetTxName, out CTexture oldTx);
+                                dTX.listOriginalTextures.TryGetValue(pChip.strTargetTxName, out CTexture originalTx);
+
+                                originalTx.Opacity = oldTx.Opacity;
+                                originalTx.fZ軸中心回転 = oldTx.fZ軸中心回転;
+                                originalTx.vc拡大縮小倍率 = oldTx.vc拡大縮小倍率;
+
+                                oldTx.UpdateTexture(TJAPlayer3.app.Device, originalTx.texture, originalTx.sz画像サイズ.Width, originalTx.sz画像サイズ.Height);
+                            }
+                        }
+                        break;
+                    case 0xd3: //set config
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            string[] split = pChip.strConfigValue.Split('=');
+
+                            //TJAPlayer3.Skin.t文字列から読み込み(pChip.strConfigValue, split[0]);
+                            bConfigUpdated = true;
+                        }
+                        break;
+                    case 0xd4: //start object animation
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+
+                            obj.tStartAnimation(pChip.dbAnimInterval, false);
+                        }
+                        break;
+                    case 0xd5: //start object animation (looping)
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+
+                            obj.tStartAnimation(pChip.dbAnimInterval, true);
+                        }
+                        break;
+                    case 0xd6: //end object animation
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+
+                            obj.tStopAnimation();
+                        }
+                        break;
+                    case 0xd7: //set object frame
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            pChip.bHit = true;
+                            dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
+
+                            obj.frame = pChip.intFrame;
+                        }
+                        break;
+                    #endregion
+
+#region [ d8-d9: EXTENDED2 ]
 					case 0xd8:
-					case 0xd9:
-                    //case 0xe0:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
-						{
-							pChip.bHit = true;
-						}
-						break;
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            TJAPlayer3.ConfigIni.nGameType[nPlayer] = pChip.eGameType;
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xd9:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            bSplitLane[nPlayer] = true;
+                            pChip.bHit = true;
+                        }
+                        break;
 #endregion
 
 #region [ da: ミキサーへチップ音追加 ]
@@ -4088,10 +4462,27 @@ namespace TJAPlayer3
                             return true;
                         }
                         break;
-#endregion
+                    #endregion
 
-#region [ その他(未定義) ]
-					default:
+                    #region [ d8-d9: EXTENDED2 ]
+                    case 0xe3:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        {
+                            bSplitLane[nPlayer] = false;
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0xe4:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        {
+                            pChip.bHit = true;
+                        }
+                        this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+                        break;
+                    #endregion
+
+                    #region [ その他(未定義) ]
+                    default:
 						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
 						{
 							pChip.bHit = true;
@@ -4101,7 +4492,146 @@ namespace TJAPlayer3
                 }
 
             }
-			return false;
+
+
+            #region [ EXTENDED CONTROLS ]
+            if (ctCamVMove != null) //vertical camera move
+            {
+                ctCamVMove.t進行();
+                float value = 0.0f;
+                if (currentCamVMoveChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+                if (currentCamVMoveChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+                if (currentCamVMoveChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+                TJAPlayer3.fCamYOffset = float.IsNaN(value) ? currentCamVMoveChip.fCamScrollStartY : value;
+
+                if (ctCamVMove.b終了値に達した)
+                {
+                    ctCamVMove = null;
+                    TJAPlayer3.fCamYOffset = currentCamVMoveChip.fCamScrollEndY;
+                }
+            }
+
+            if (ctCamHMove != null) //horizontal camera move
+            {
+                ctCamHMove.t進行();
+                float value = 0.0f;
+                if (currentCamHMoveChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+                if (currentCamHMoveChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+                if (currentCamHMoveChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+                TJAPlayer3.fCamXOffset = float.IsNaN(value) ? currentCamHMoveChip.fCamScrollStartX : value;
+
+                if (ctCamHMove.b終了値に達した)
+                {
+                    ctCamHMove = null;
+                    TJAPlayer3.fCamXOffset = currentCamHMoveChip.fCamScrollEndX;
+                }
+            }
+
+            if (ctCamZoom != null) //camera zoom
+            {
+                ctCamZoom.t進行();
+                float value = 0.0f;
+                if (currentCamZoomChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+                if (currentCamZoomChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+                if (currentCamZoomChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+                TJAPlayer3.fCamZoomFactor = float.IsNaN(value) ? currentCamZoomChip.fCamZoomStart : value;
+
+                if (ctCamZoom.b終了値に達した)
+                {
+                    ctCamZoom = null;
+                    TJAPlayer3.fCamZoomFactor = currentCamZoomChip.fCamZoomEnd;
+                }
+            }
+
+            if (ctCamRotation != null) //camera rotation
+            {
+                ctCamRotation.t進行();
+                float value = 0.0f;
+                if (currentCamRotateChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+                if (currentCamRotateChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+                if (currentCamRotateChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+                TJAPlayer3.fCamRotation = float.IsNaN(value) ? currentCamRotateChip.fCamRotationStart : value;
+
+                if (ctCamRotation.b終了値に達した)
+                {
+                    ctCamRotation = null;
+                    TJAPlayer3.fCamRotation = currentCamRotateChip.fCamRotationEnd;
+                }
+            }
+
+            if (ctCamVScale != null) //vertical camera scaling
+            {
+                ctCamVScale.t進行();
+                float value = 0.0f;
+                if (currentCamVScaleChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+                if (currentCamVScaleChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+                if (currentCamVScaleChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+                TJAPlayer3.fCamYScale = float.IsNaN(value) ? currentCamVScaleChip.fCamScaleStartY : value;
+
+                if (ctCamVScale.b終了値に達した)
+                {
+                    ctCamVScale = null;
+                    TJAPlayer3.fCamYScale = currentCamVScaleChip.fCamScaleEndY;
+                }
+            }
+
+            if (ctCamHScale != null) //horizontal camera scaling
+            {
+                ctCamHScale.t進行();
+                float value = 0.0f;
+                if (currentCamHScaleChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+                if (currentCamHScaleChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+                if (currentCamHScaleChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+                TJAPlayer3.fCamXScale = float.IsNaN(value) ? currentCamHScaleChip.fCamScaleStartX : value;
+
+                if (ctCamHScale.b終了値に達した)
+                {
+                    ctCamHScale = null;
+                    TJAPlayer3.fCamXScale = currentCamHScaleChip.fCamScaleEndX;
+                }
+            }
+
+            foreach (KeyValuePair<CDTX.CChip, CCounter> pair in objHandlers)
+            {
+                CDTX.CChip chip = pair.Key;
+                CCounter counter = pair.Value;
+
+                if (counter != null)
+                {
+                    counter.t進行();
+
+                    float value = 0.0f;
+                    if (counter.b終了値に達した)
+                    {
+                        value = chip.fObjEnd;
+                        counter = null;
+                    }
+                    else
+                    {
+                        if (chip.strObjEaseType.Equals("IN")) value = easing.EaseIn(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+                        if (chip.strObjEaseType.Equals("OUT")) value = easing.EaseOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+                        if (chip.strObjEaseType.Equals("IN_OUT")) value = easing.EaseInOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+                        value = float.IsNaN(value) ? chip.fObjStart : value;
+                    }
+
+                    if (chip.nチャンネル番号 == 0xBE) chip.obj.y = value;
+                    if (chip.nチャンネル番号 == 0xC0) chip.obj.x = value;
+                    if (chip.nチャンネル番号 == 0xC2) chip.obj.yScale = value;
+                    if (chip.nチャンネル番号 == 0xC4) chip.obj.xScale = value;
+                    if (chip.nチャンネル番号 == 0xC6) chip.obj.rotation = value;
+                    if (chip.nチャンネル番号 == 0xC8) chip.obj.opacity = (int)value;
+
+                    if (chip.nチャンネル番号 == 0xCB) chip.obj.y = value;
+                    if (chip.nチャンネル番号 == 0xCC) chip.obj.x = value;
+                    if (chip.nチャンネル番号 == 0xCD) chip.obj.yScale = value;
+                    if (chip.nチャンネル番号 == 0xCE) chip.obj.xScale = value;
+                    if (chip.nチャンネル番号 == 0xCF) chip.obj.rotation = value;
+                    if (chip.nチャンネル番号 == 0xD0) chip.obj.opacity = (int)value;
+                }
+            }
+            #endregion
+
+            return false;
 		}
 
         protected bool t進行描画_チップ_連打( E楽器パート ePlayMode, int nPlayer )
@@ -4491,6 +5021,29 @@ namespace TJAPlayer3
                 AIBattleSections[i].IsAnimated = false;
             }
 
+            TJAPlayer3.fCamXOffset = 0;
+
+            TJAPlayer3.fCamYOffset = 0;
+
+            TJAPlayer3.fCamZoomFactor = 1.0f;
+            TJAPlayer3.fCamRotation = 0;
+
+            TJAPlayer3.fCamXScale = 1.0f;
+            TJAPlayer3.fCamYScale = 1.0f;
+
+            TJAPlayer3.borderColor = new SharpDX.Color4(1f, 0f, 0f, 0f);
+
+            foreach (var chip in TJAPlayer3.DTX.listChip)
+            {
+                if (chip.obj == null) continue;
+                chip.obj.isVisible = false;
+                chip.obj.yScale = 1.0f;
+                chip.obj.xScale = 1.0f;
+                chip.obj.rotation = 0.0f;
+                chip.obj.opacity = 255;
+                chip.obj.frame = 0;
+            }
+
             TJAPlayer3.DTX.t全チップの再生停止とミキサーからの削除();
             this.t数値の初期化( true, true );
             this.actAVI.tReset();
@@ -4502,6 +5055,9 @@ namespace TJAPlayer3
                 JPOSCROLLX[i] = 0;
                 JPOSCROLLY[i] = 0;
                 ifp[i] = false;
+
+                TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
+                bSplitLane[i] = false;
             }
             TJAPlayer3.stage演奏ドラム画面.On活性化();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
@@ -4937,5 +5493,30 @@ namespace TJAPlayer3
                 }
             }
         }
-	}
+
+
+        #region [EXTENDED COMMANDS]
+        private CCounter ctCamVMove;
+        private CCounter ctCamHMove;
+        private CCounter ctCamZoom;
+        private CCounter ctCamRotation;
+        private CCounter ctCamVScale;
+        private CCounter ctCamHScale;
+
+        private CDTX.CChip currentCamVMoveChip;
+        private CDTX.CChip currentCamHMoveChip;
+        private CDTX.CChip currentCamZoomChip;
+        private CDTX.CChip currentCamRotateChip;
+        private CDTX.CChip currentCamVScaleChip;
+        private CDTX.CChip currentCamHScaleChip;
+
+        private Dictionary<CDTX.CChip, CCounter> camHandlers;
+        private Dictionary<CDTX.CChip, CCounter> objHandlers;
+
+        private Easing easing = new Easing();
+
+        public bool bCustomDoron = false;
+        private bool bConfigUpdated = false;
+        #endregion
+    }
 }
