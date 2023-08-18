@@ -15,6 +15,7 @@ namespace TJAPlayer3
         public CTexture render;
         public CSkin.Cシステムサウンド welcome;
         public DBPuchichara.PuchicharaData metadata;
+        public DBPuchichara.PuchicharaEffect effect;
         public DBUnlockables.CUnlockConditions unlock;
         public string _path;
 
@@ -40,6 +41,12 @@ namespace TJAPlayer3
                 metadata = ConfigManager.GetConfig<DBPuchichara.PuchicharaData>($@"{path}\Metadata.json");
             else
                 metadata = new DBPuchichara.PuchicharaData();
+
+            // Puchichara metadata
+            if (File.Exists($@"{path}\Effects.json"))
+                effect = ConfigManager.GetConfig<DBPuchichara.PuchicharaEffect>($@"{path}\Effects.json");
+            else
+                effect = new DBPuchichara.PuchicharaEffect();
 
             // Puchichara unlockables
             if (File.Exists($@"{path}\Unlock.json"))

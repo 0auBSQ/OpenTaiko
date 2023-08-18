@@ -491,6 +491,20 @@ namespace TJAPlayer3
             //			this.gclatencymode = GCSettings.LatencyMode;
             //			GCSettings.LatencyMode = GCLatencyMode.Batch;	// 演奏画面中はGCを抑止する
             this.bIsAlreadyCleared = new bool[5];
+            for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
+            {
+                var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+                switch (chara.effect.Gauge)
+                {
+                    case "Normal":
+                        bIsAlreadyCleared[player] = false;
+                        break;
+                    case "Hard":
+                    case "Extreme":
+                        bIsAlreadyCleared[player] = true;
+                        break;
+                }
+            }
             this.bIsAlreadyMaxed = new bool[5];
 
             this.ListDan_Number = 0;
@@ -1677,7 +1691,7 @@ namespace TJAPlayer3
 		{
 			return tチップのヒット処理( nHitTime, pChip, screenmode, bCorrectLane, nNowInput, 0 );
 		}
-        protected unsafe E判定 tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer)
+        protected unsafe E判定 tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer, bool rollEffectHit = false)
         {
             //unsafeコードにつき、デバッグ中の変更厳禁!
 
@@ -1721,16 +1735,18 @@ namespace TJAPlayer3
                         if (!bAutoPlay && eJudgeResult != E判定.Miss)
 					    {
 					        CLagLogger.Add(nPlayer, pChip);
-					    }
+                        }
+
+                        var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))];
 
                         if (NotesManager.IsRoll(pChip))
                         {
                             #region[ Drumroll ]
                             //---------------------------
                             this.b連打中[nPlayer] = true;
-                            if (bAutoPlay)
+                            if (bAutoPlay || rollEffectHit)
                             {
-                                int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
+                                int rollSpeed = bAutoPlay ? TJAPlayer3.ConfigIni.nRollsPerSec : puchichara.effect.Autoroll;
                                 if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
                                     rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
 
@@ -1764,7 +1780,7 @@ namespace TJAPlayer3
                                     }
                                 }
                             }
-                            else
+                            if (!bAutoPlay && !rollEffectHit)
                             {
                                 this.eRollState = E連打State.roll;
                                 this.tRollProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), 1, nNowInput, 0, nPlayer);
@@ -1781,7 +1797,7 @@ namespace TJAPlayer3
                             this.b連打中[nPlayer] = true;
                             this.actChara.b風船連打中[nPlayer] = true;
 
-                            if (bAutoPlay)
+                            if (bAutoPlay || rollEffectHit)
                             {
                                 bool IsKusudama = NotesManager.IsKusudama(pChip);
 
@@ -1801,14 +1817,12 @@ namespace TJAPlayer3
 
                                 if (balloon != 0 && this.bPAUSE == false)
                                 {
-                                    int rollSpeed = TJAPlayer3.ConfigIni.nRollsPerSec;
-                                    if (TJAPlayer3.ConfigIni.bAIBattleMode && nPlayer == 1)
-                                        rollSpeed = TJAPlayer3.ConfigIni.apAIPerformances[TJAPlayer3.ConfigIni.nAILevel - 1].nRollSpeed;
+                                    int rollSpeed = bAutoPlay ? balloon : puchichara.effect.Autoroll;
 
-                                    int balloonDuration = (pChip.nノーツ終了時刻ms - pChip.n発声時刻ms);
+                                    int balloonDuration = bAutoPlay ? (pChip.nノーツ終了時刻ms - pChip.n発声時刻ms) : 1000;
 
                                     if ((CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > 
-                                        (pChip.n発声時刻ms + (balloonDuration / balloon) * rollCount))
+                                        (pChip.n発声時刻ms + (balloonDuration / (double)rollSpeed) * rollCount))
                                     {
                                         if (this.nHand[nPlayer] == 0)
                                             this.nHand[nPlayer]++;
@@ -1822,7 +1836,7 @@ namespace TJAPlayer3
                                     }
                                 }
                             }
-                            else
+                            if (!bAutoPlay && !rollEffectHit)
                             {
                                 this.tBalloonProcess(pChip, (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), nPlayer);
                             }
@@ -1905,6 +1919,19 @@ namespace TJAPlayer3
                 }
             }
 
+            var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+            bool cleared = false;
+            switch (chara.effect.Gauge)
+            {
+                case "Normal":
+                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] >= 80;
+                    break;
+                case "Hard":
+                case "Extreme":
+                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] > 0;
+                    break;
+            }
+
             if (eJudgeResult != E判定.Poor && eJudgeResult != E判定.Miss)
             {
                 double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer]))));
@@ -1922,7 +1949,7 @@ namespace TJAPlayer3
                     }
                     this.bIsAlreadyMaxed[nPlayer] = true;
                 }
-                if ((int)actGauge.db現在のゲージ値[nPlayer] >= 80 && this.bIsAlreadyCleared[nPlayer] == false)
+                if (cleared && this.bIsAlreadyCleared[nPlayer] == false)
                 {
                     if(TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                     {
@@ -1941,11 +1968,22 @@ namespace TJAPlayer3
                 {
                     this.bIsAlreadyMaxed[nPlayer] = false;
                 }
-                if ((int)actGauge.db現在のゲージ値[nPlayer] < 80 && this.bIsAlreadyCleared[nPlayer] == true)
+                if (!cleared && this.bIsAlreadyCleared[nPlayer] == true)
                 {
                     this.bIsAlreadyCleared[nPlayer] = false;
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
-                    //CDTXMania.stage演奏ドラム画面.actBackground.ClearIn(nPlayer);
+
+                    switch (chara.effect.Gauge)
+                    {
+                        case "Hard":
+                        case "Extreme":
+                            {
+                                CSound管理.rc演奏用タイマ.t一時停止();
+                                TJAPlayer3.DTX.t全チップの再生停止();
+                                ifp[nPlayer] = true;
+                            }
+                            break;
+                    }
                 }
                 cInvisibleChip.ShowChipTemporally( pChip.e楽器パート );
 			}

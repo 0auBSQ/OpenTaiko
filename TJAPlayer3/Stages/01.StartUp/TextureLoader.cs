@@ -429,6 +429,7 @@ namespace TJAPlayer3
             Note_Swap = TxC(GAME + @"Swap.png");
             Note_Kusu = TxC(GAME + @"Kusu.png");
             Note_FuseRoll = TxC(GAME + @"FuseRoll.png");
+            Note_Adlib = TxC(GAME + @"Adlib.png");
 
             Judge_Frame = TxC(GAME + @"Notes.png");
 
@@ -2233,6 +2234,7 @@ namespace TJAPlayer3
             Note_Swap,
             Note_Kusu,
             Note_FuseRoll,
+            Note_Adlib,
             SENotesExtension,
             Notes_Arm,
             ChipEffect,

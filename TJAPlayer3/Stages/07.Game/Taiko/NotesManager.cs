@@ -372,6 +372,16 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Note_Kusu?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
                 return;
             }
+            else if (IsADLIB(chip))
+            {
+                var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(player))];
+                if (puchichara.effect.ShowAdlib)
+                {
+                    TJAPlayer3.Tx.Note_Adlib?.tUpdateOpacity(50);
+                    TJAPlayer3.Tx.Note_Adlib?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+                }
+                return;
+            }
 
             TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(TJAPlayer3.app.Device, x, y, new Rectangle(noteType * TJAPlayer3.Skin.Game_Notes_Size[0], frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
         }

@@ -6,6 +6,30 @@ namespace TJAPlayer3
 {
     class DBPuchichara
     {
+        public class PuchicharaEffect
+        {
+            public PuchicharaEffect()
+            {
+                AllPurple = false;
+                Autoroll = 0;
+                ShowAdlib = false;
+                SplitLane = false;
+            }
+
+
+            [JsonProperty("allpurple")]
+            public bool AllPurple;
+
+            [JsonProperty("AutoRoll")]
+            public int Autoroll;
+
+            [JsonProperty("showadlib")]
+            public bool ShowAdlib;
+
+            [JsonProperty("splitlane")]
+            public bool SplitLane;
+        }
+
         public class PuchicharaData
         {
             public PuchicharaData()

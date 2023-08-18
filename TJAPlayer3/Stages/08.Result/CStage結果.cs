@@ -2018,7 +2018,7 @@ namespace TJAPlayer3
 				}
                 else
 				{
-					return new bool[] { actParameterPanel.gaugeValues[0] >= 80, actParameterPanel.gaugeValues[1] >= 80, actParameterPanel.gaugeValues[2] >= 80, actParameterPanel.gaugeValues[3] >= 80, actParameterPanel.gaugeValues[4] >= 80 };
+					return new bool[] { TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[0], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[1], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[2], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[3], TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared[4] };
 				}
 			}
         }

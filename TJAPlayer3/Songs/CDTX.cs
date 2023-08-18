@@ -2021,6 +2021,30 @@ namespace TJAPlayer3
                     break;
             }
 
+            if (TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayerSide))].effect.AllPurple)
+            {
+                foreach (var chip in this.listChip)
+                {
+                    switch (chip.nチャンネル番号)
+                    {
+                        case 0x11:
+                            chip.nチャンネル番号 = 0x101;
+                            break;
+                        case 0x12:
+                            chip.nチャンネル番号 = 0x101;
+                            break;
+                        case 0x13:
+                            chip.nチャンネル番号 = 0x101;
+                            chip.nSenote = 6;
+                            break;
+                        case 0x14:
+                            chip.nチャンネル番号 = 0x101;
+                            chip.nSenote = 5;
+                            break;
+                    }
+                }
+            }
+
             if (eRandom != Eランダムモード.OFF)
             {
                 #region[ list作成 ]
