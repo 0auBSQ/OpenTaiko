@@ -3499,8 +3499,8 @@ namespace TJAPlayer3
                 {
                     #region[ 最初の処理 ]
                     //1小節の時間を挿入して開始時間を調節。
-                    this.dbNowTime += ((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0);
-                    //this.dbNowBMScollTime += (( this.dbBarLength ) * 16.0 );
+                    this.dbNowTime += ((15000.0 / dbNowBPM * (4.0 / 4.0)) * 16.0);
+                    this.dbNowBMScollTime += (( this.dbBarLength ) * 16.0 );
                     #endregion
                     //string strWrite = "";
                     for (int i = 0; strSplitした後の譜面.Length > i; i++)
@@ -7606,7 +7606,7 @@ namespace TJAPlayer3
 
                 this.bOFFSETの値がマイナスである = this.nOFFSET < 0 ? true : false;
 
-                this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
+                //this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
                 if (this.bOFFSETの値がマイナスである == true)
                     this.nOFFSET = this.nOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
                 //tbOFFSET.Text = strCommandParam;
