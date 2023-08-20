@@ -1,5 +1,6 @@
 ﻿#TITLE:Taiko Towers
 #TITLEJA:太鼓タワー
+#TITLEZH:太鼓塔
 #GENRE:太鼓タワー
 #BOXEXPLANATION1:Play long charts within a limited
 #BOXEXPLANATION2:count of lives and reach
@@ -7,6 +8,9 @@
 #BOXEXPLANATIONJA1:曲を演奏して頂上まで
 #BOXEXPLANATIONJA2:たどり着いたらクリアだよ!
 #BOXEXPLANATIONJA3:ミスをするとHPが減るから気を付けて!
+#BOXEXPLANATIONZH1:演奏长歌曲
+#BOXEXPLANATIONZH2:直冲塔顶过关！
+#BOXEXPLANATIONZH3:注意在此处失误将失去机会！
 #BACKCOLOR:#222222
 #BOXCOLOR:#ffb300
 #BOXTYPE:0
