@@ -381,14 +381,17 @@ namespace TJAPlayer3
 					}
 
 					//if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
-					{
+					var _frame = TJAPlayer3.Tx.Result_Gauge_Frame;
+					if (_frame != null) {
 						int bar_x;
 						int bar_y;
 						int gauge_base_x;
 						int gauge_base_y;
+
+						
 						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 						{
-							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
+							_frame.vc拡大縮小倍率.X = 0.5f;
 							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
 							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
@@ -396,7 +399,7 @@ namespace TJAPlayer3
 						}
 						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 						{
-							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 0.5f;
+							_frame.vc拡大縮小倍率.X = 0.5f;
 							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
 							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
@@ -404,7 +407,7 @@ namespace TJAPlayer3
 						}
 						else
 						{
-							TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 1.0f;
+							_frame.vc拡大縮小倍率.X = 1.0f;
 							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_X[pos];
 							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_Y[pos];
 							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_X[pos];
@@ -414,8 +417,8 @@ namespace TJAPlayer3
 						TJAPlayer3.Tx.Result_Diff_Bar.t2D描画(TJAPlayer3.app.Device, bar_x, bar_y,
 						new RectangleF(0, TJAPlayer3.stage選曲.n確定された曲の難易度[i] * TJAPlayer3.Skin.Result_DifficultyBar_Size[1], TJAPlayer3.Skin.Result_DifficultyBar_Size[0], TJAPlayer3.Skin.Result_DifficultyBar_Size[1]));
 
-						TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].t2D描画(TJAPlayer3.app.Device, gauge_base_x, gauge_base_y);
-						TJAPlayer3.Tx.Result_Gauge_Base[shiftPos].vc拡大縮小倍率.X = 1.0f;
+						_frame.t2D描画(TJAPlayer3.app.Device, gauge_base_x, gauge_base_y);
+						_frame.vc拡大縮小倍率.X = 1.0f;
 					}
 
 					if (ct全体進行.n現在の値 >= 2000)
@@ -436,6 +439,9 @@ namespace TJAPlayer3
 								ctゲージアニメ[i].n現在の値 = (int)ctゲージアニメ[i].n終了値;
 						}
 
+
+
+						/*
 						{
 							int gauge_x;
 							int gauge_y;
@@ -462,9 +468,10 @@ namespace TJAPlayer3
 							new RectangleF(TJAPlayer3.Skin.Result_Gauge_Rect[0], TJAPlayer3.Skin.Result_Gauge_Rect[1], (TJAPlayer3.Skin.Result_Gauge_Rect[2] / 50.0f) * ctゲージアニメ[i].n現在の値, TJAPlayer3.Skin.Result_Gauge_Rect[3]));
 							TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
 						}
+						*/
 						// Modify to array for each players using i
 
-
+						/*
 						int soultext_width = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Width / 3;
 						int soultext_height = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Height;
 
@@ -496,6 +503,7 @@ namespace TJAPlayer3
 							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_Y[pos];
 							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 1.0f;
 						}
+						*/
 
 						if (ctゲージアニメ[i].b終了値に達した)
 						{
@@ -523,6 +531,7 @@ namespace TJAPlayer3
 								ct虹ゲージアニメ.t進行Loop();
 								ctSoul.t進行Loop();
 
+								/*
 								int rainbow_x;
 								int rainbow_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
@@ -556,8 +565,13 @@ namespace TJAPlayer3
 									if (ctSoul.n現在の値 % 2 == 0)
 										TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y, new Rectangle(soultext_width * 2, 0, soultext_width, soultext_height));
 								}
+								*/
 							}
 						}
+
+						HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctゲージアニメ[i].n現在の値, ct虹ゲージアニメ.n現在の値, ctSoul.n現在の値);
+
+						/*
 						if (ctゲージアニメ[i].n現在の値 != 50)
 						{
 							{
@@ -596,6 +610,7 @@ namespace TJAPlayer3
 									new Rectangle(soultext_width * (ctゲージアニメ[i].n現在の値 <= 30 ? 0 : 1), 0, soultext_width, soultext_height));
 							}
 						}
+						*/
 
 						#endregion
 					}

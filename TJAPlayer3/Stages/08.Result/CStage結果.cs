@@ -177,12 +177,16 @@ namespace TJAPlayer3
                         {
 							var ccf = TJAPlayer3.stage演奏ドラム画面.CChartScore[p];
 
-							this.nクリア[p] = (ccf.nMiss == 0 && ccf.nMine == 0 && TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[p] == 100) 
-								? ccf.nGood == 0 
-								? 3 : 2 
-								: TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[p] >= 80 
-								? 1 
-								: 0;
+							this.nクリア[p] = 0;
+							if (HGaugeMethods.UNSAFE_FastNormaCheck(p))
+                            {
+								this.nクリア[p] = 1;
+								if (ccf.nMiss == 0 && ccf.nMine == 0)
+                                {
+									this.nクリア[p] = 2;
+									if (ccf.nGood == 0) this.nクリア[p] = 3;
+								}
+							}
 
 							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, p) < 500000)
 							{
@@ -591,7 +595,7 @@ namespace TJAPlayer3
 
 						int clearModifier = modifiers[0];
 
-						if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
+						if (HGaugeMethods.UNSAFE_FastNormaCheck(i))
                         {
 							clearModifier = modifiers[1] * diffModifier;
 							if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0)
@@ -652,7 +656,7 @@ namespace TJAPlayer3
 						&& !(TJAPlayer3.ConfigIni.bAIBattleMode && i == 1))
 					{
 						int _cs = -1;
-                        if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
+                        if (HGaugeMethods.UNSAFE_FastNormaCheck(i))
 						{
                             _cs = 0;
                             if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0)

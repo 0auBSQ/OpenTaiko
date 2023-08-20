@@ -112,7 +112,7 @@ namespace TJAPlayer3
                 // 今の段階では魂ゲージ80%以上でチェック。
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-                    if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 80)
+                    if (HGaugeMethods.UNSAFE_FastNormaCheck(i))
                     {
                         if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMine == 0)
                         //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
@@ -819,6 +819,8 @@ namespace TJAPlayer3
         private EndAnimeScript Dan_Gold_FullComboScript;
         private EndAnimeScript Dan_Gold_PerfectScript;
 
+        
+
         bool b再生済み;
         bool bリザルトボイス再生済み;
         bool bSongsPlayed = false;
@@ -837,6 +839,7 @@ namespace TJAPlayer3
         CSound[] soundFailed = new CSound[5];
         CSound[] soundFullCombo = new CSound[5];
         CSound[] soundDondaFullCombo = new CSound[5];
+        
         CSound soundDanFailed;
         CSound soundDanRedClear;
         CSound soundDanRedFC;

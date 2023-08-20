@@ -9009,6 +9009,8 @@ namespace TJAPlayer3
         public int Gauge_Soul_Fire_X_Tower = 886;
         public int Gauge_Soul_Fire_Y_Tower = 22;
         public int Game_Gauge_Rainbow_Ptn;
+        public int Game_Gauge_Rainbow_2PGauge_Ptn;
+        public int Game_Gauge_Rainbow_Flat_Ptn;
         public int Game_Gauge_Dan_Rainbow_Ptn;
         public int Game_Gauge_Rainbow_Timer = 50;
 

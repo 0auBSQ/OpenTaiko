@@ -210,12 +210,11 @@ namespace TJAPlayer3
             base.On活性化();
             base.eフェーズID = CStage.Eフェーズ.共通_通常状態;//初期化すれば、リザルト変遷は止まる。
 
-            ifp[0] = false;
-            ifp[1] = false;
-            ifp[2] = false;
-            ifp[3] = false;
-            ifp[4] = false;
-
+            for (int i = 0; i < 5; i++) {
+                ifp[i] = false;
+                isDeniedPlaying[i] = false;
+            }
+            
             this.nStoredHit = new int[TJAPlayer3.ConfigIni.nPlayerCount];
 
             // MODIFY_BEGIN #25398 2011.06.07 FROM
@@ -603,7 +602,7 @@ namespace TJAPlayer3
                             int Character = this.actChara.iCurrentCharacter[i];
                             if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                             {
-                                if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[i] >= 100)
+                                if (HGaugeMethods.UNSAFE_IsRainbow(i))
                                 {
                                     double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]))));
                                     this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Combo10_Max, true);
@@ -969,6 +968,8 @@ namespace TJAPlayer3
                         if (TJAPlayer3.ConfigIni.nPlayerCount < 5) //プレイ人数が5人以上でなければ入力をキャンセル
                             break;
                     }
+
+                    if (TJAPlayer3.stage演奏ドラム画面.isDeniedPlaying[nUsePlayer]) break;
 
                     if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
                         break;

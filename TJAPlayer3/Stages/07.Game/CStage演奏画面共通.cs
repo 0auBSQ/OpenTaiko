@@ -496,6 +496,7 @@ namespace TJAPlayer3
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
                 switch (chara.effect.Gauge)
                 {
+                    default:
                     case "Normal":
                         bIsAlreadyCleared[player] = false;
                         break;
@@ -905,6 +906,7 @@ namespace TJAPlayer3
         public int[] Chara_MissCount;
         protected E連打State eRollState;
         protected bool[] ifp = { false, false, false, false, false };
+        protected bool[] isDeniedPlaying = { false, false, false, false, false };
 
         protected int nタイマ番号;
         protected int n現在の音符の顔番号;
@@ -1920,17 +1922,7 @@ namespace TJAPlayer3
             }
 
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
-            bool cleared = false;
-            switch (chara.effect.Gauge)
-            {
-                case "Normal":
-                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] >= 80;
-                    break;
-                case "Hard":
-                case "Extreme":
-                    cleared = (int)actGauge.db現在のゲージ値[nPlayer] > 0;
-                    break;
-            }
+            bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
 
             if (eJudgeResult != E判定.Poor && eJudgeResult != E判定.Miss)
             {
@@ -1941,7 +1933,7 @@ namespace TJAPlayer3
 
                 int Character = this.actChara.iCurrentCharacter[nPlayer];
 
-                if ((int)actGauge.db現在のゲージ値[nPlayer] >= 100 && this.bIsAlreadyMaxed[nPlayer] == false)
+                if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == false)
                 {
                     if(TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                     {
@@ -1964,7 +1956,7 @@ namespace TJAPlayer3
             {
                 // ランナー(みすったやつ)
                 this.actRunner.Start(nPlayer, true, pChip);
-                if ((int)actGauge.db現在のゲージ値[nPlayer] < 100 && this.bIsAlreadyMaxed[nPlayer] == true)
+                if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true)
                 {
                     this.bIsAlreadyMaxed[nPlayer] = false;
                 }
@@ -1978,9 +1970,22 @@ namespace TJAPlayer3
                         case "Hard":
                         case "Extreme":
                             {
-                                CSound管理.rc演奏用タイマ.t一時停止();
-                                TJAPlayer3.DTX.t全チップの再生停止();
                                 ifp[nPlayer] = true;
+                                isDeniedPlaying[nPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
+
+                                bool allDeniedPlaying = true;
+                                for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
+                                {
+                                    if (!isDeniedPlaying[p])
+                                    {
+                                        allDeniedPlaying = false;
+                                        break;
+                                    }
+                                }
+                                if (allDeniedPlaying) TJAPlayer3.DTX.t全チップの再生停止(); // Stop playing song
+
+                                // Stop timer : Pauses the whole game (to remove once is denied playing will work)
+                                //CSound管理.rc演奏用タイマ.t一時停止();
                             }
                             break;
                     }
@@ -2304,7 +2309,7 @@ namespace TJAPlayer3
                                 {
                                     if (TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CAct演奏Drumsキャラクター.Anime.Combo10 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                                     {
-                                        if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[nPlayer] < 100)
+                                        if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                         {
                                             // 魂ゲージMAXではない
                                             // ジャンプ_ノーマル
@@ -2313,7 +2318,7 @@ namespace TJAPlayer3
                                     }
                                     if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CAct演奏Drumsキャラクター.Anime.Combo10_Max && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                                     {
-                                        if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[nPlayer] >= 100)
+                                        if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                         {
                                             // 魂ゲージMAX
                                             // ジャンプ_MAX
@@ -3904,7 +3909,7 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                                 {
-                                    if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[nPlayer] < 100)
+                                    if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                     {
                                         // 魂ゲージMAXではない
                                         // ゴーゴースタート_ノーマル
@@ -3914,7 +3919,7 @@ namespace TJAPlayer3
                                 }
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].b終了値に達した)
                                 {
-                                    if (TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[nPlayer] >= 100)
+                                    if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                     {
                                         // 魂ゲージMAX
                                         // ゴーゴースタート_MAX
@@ -5055,6 +5060,7 @@ namespace TJAPlayer3
                 JPOSCROLLX[i] = 0;
                 JPOSCROLLY[i] = 0;
                 ifp[i] = false;
+                isDeniedPlaying[i] = false;
 
                 TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
                 bSplitLane[i] = false;

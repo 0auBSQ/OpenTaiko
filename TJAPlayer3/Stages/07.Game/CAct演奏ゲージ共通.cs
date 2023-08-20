@@ -110,23 +110,21 @@ namespace TJAPlayer3
         {
             //ダメージ値の計算は太鼓の達人譜面Wikiのものを参考にしました。
 
-            for (int i = 0; i < 5; i++)
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
-                switch(chara.effect.Gauge)
+                switch (chara.effect.Gauge)
                 {
+                    default:
                     case "Normal":
-                        this.db現在のゲージ値[i] = 0;
+                        this.db現在のゲージ値[nPlayer] = 0;
                         break;
                     case "Hard":
-                        this.db現在のゲージ値[i] = 100;
-                        break;
                     case "Extreme":
-                        this.db現在のゲージ値[i] = 100;
+                        this.db現在のゲージ値[nPlayer] = 100;
                         break;
                 }
             }
-
+            
             //ゲージのMAXまでの最低コンボ数を計算
             float dbGaugeMaxComboValue = 0;
             float[] dbGaugeMaxComboValue_branch = new float[3];
@@ -166,25 +164,10 @@ namespace TJAPlayer3
 
                 case 9:
                 case 10:
+                default:
                     gaugeRate = this.fGaugeMaxRate[2];
                     dbDamageRate = 2.0f;
                     break;
-
-                case 11:
-                    gaugeRate = this.fGaugeMaxRate[3];
-                    dbDamageRate = 2.2f;
-                    break;
-
-                case 12:
-                    gaugeRate = this.fGaugeMaxRate[4];
-                    dbDamageRate = 2.4f;
-                    break;
-
-                default:
-                    gaugeRate = this.fGaugeMaxRate[5];
-                    dbDamageRate = 2.6f;
-                    break;
-
             }
 
             #region [(Unbloated) Gauge max combo values]
@@ -204,27 +187,9 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region [Change the weights depending on the choosen difficulty (More lenient for easier diffs, set to 0 for Tower charts)]
-
             float multiplicationFactor = 1f;
-
-            if (nanidou <= (int)Difficulty.Edit)
-            {
-                float[] factors =
-                {
-                    1.6f,
-                    1.33f,
-                    1.14f,
-                    1f,
-                    1f,
-                };
-
-                multiplicationFactor = factors[nanidou];
-            }
-            else if (nanidou == (int)Difficulty.Tower)
+            if (nanidou == (int)Difficulty.Tower)
                 multiplicationFactor = 0f;
-
-            #endregion
 
             double nGaugeRankValue = 0D;
             double[] nGaugeRankValue_branch = new double[] { 0D, 0D, 0D };
@@ -346,14 +311,15 @@ namespace TJAPlayer3
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
                 switch (chara.effect.Gauge)
                 {
+                    default:
                     case "Normal":
                         dbゲージ増加量[i][nPlayer] = increase[i];
                         break;
                     case "Hard":
-                        dbゲージ増加量[i][nPlayer] = increase[i] / 2.0f;
+                        dbゲージ増加量[i][nPlayer] = increase[i] * HGaugeMethods.HardGaugeFillRatio;
                         break;
                     case "Extreme":
-                        dbゲージ増加量[i][nPlayer] = increase[i] / 4.0f;
+                        dbゲージ増加量[i][nPlayer] = increase[i] * HGaugeMethods.ExtremeGaugeFillRatio;
                         break;
                 }
             }
@@ -362,20 +328,21 @@ namespace TJAPlayer3
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
                 switch (chara.effect.Gauge)
                 {
+                    default:
                     case "Normal":
                         dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0];
                         dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1];
                         dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2];
                         break;
                     case "Hard":
-                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] / 2.0f;
-                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] / 2.0f;
-                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] / 2.0f;
+                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] * HGaugeMethods.HardGaugeFillRatio;
+                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] * HGaugeMethods.HardGaugeFillRatio;
+                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] * HGaugeMethods.HardGaugeFillRatio;
                         break;
                     case "Extreme":
-                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] / 4.0f;
-                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] / 4.0f;
-                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] / 4.0f;
+                        dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] * HGaugeMethods.ExtremeGaugeFillRatio;
+                        dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] * HGaugeMethods.ExtremeGaugeFillRatio;
+                        dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] * HGaugeMethods.ExtremeGaugeFillRatio;
                         break;
                 }
             }
@@ -422,7 +389,12 @@ namespace TJAPlayer3
 
         public void MineDamage(int nPlayer)
         {
-            this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - 4);
+            this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.BombDamage);
+        }
+
+        public void FuseDamage(int nPlayer)
+        {
+            this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
         }
 
         public void Damage(E楽器パート screenmode, E楽器パート part, E判定 e今回の判定, int nPlayer)
@@ -471,13 +443,17 @@ namespace TJAPlayer3
                         }
 
                         var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+
+                        int nanidou = TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer];
+                        int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
+
                         switch (chara.effect.Gauge)
                         {
                             case "Hard":
-                                fDamage = -25;
+                                fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);
                                 break;
                             case "Extreme":
-                                fDamage = -50;
+                                fDamage = -HGaugeMethods.tExtremeGaugeGetDamage((Difficulty)nanidou, level);
                                 break;
                         }
 

@@ -150,6 +150,7 @@
     <Compile Include="Databases\Databases.cs" />
     <Compile Include="Databases\DBCharacter.cs" />
     <Compile Include="Helpers\HEasingMethods.cs" />
+    <Compile Include="Helpers\HGaugeMethods.cs" />
     <Compile Include="Helpers\HPrivateFastFont.cs" />
     <Compile Include="Helpers\HRarity.cs" />
     <Compile Include="I18N\CLang_es.cs" />

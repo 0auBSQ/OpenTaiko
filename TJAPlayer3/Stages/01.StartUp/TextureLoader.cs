@@ -575,6 +575,21 @@ namespace TJAPlayer3
             Gauge_Line[0] = TxC(GAME + GAUGE + @"1P_Line.png");
             Gauge_Line[1] = TxC(GAME + GAUGE + @"2P_Line.png");
 
+            Gauge_Clear = new CTexture[3];
+            Gauge_Clear[0] = TxC(GAME + GAUGE + @"Clear.png");
+            Gauge_Clear[1] = TxC(GAME + GAUGE + @"Clear_2PGauge.png");
+            Gauge_Clear[2] = TxC(GAME + GAUGE + @"Clear_4PGauge.png");
+
+            Gauge_Base_Norma = new CTexture[3];
+            Gauge_Base_Norma[0] = TxC(GAME + GAUGE + @"Norma_Base.png");
+            Gauge_Base_Norma[1] = TxC(GAME + GAUGE + @"Norma_Base_2PGauge.png");
+            Gauge_Base_Norma[2] = TxC(GAME + GAUGE + @"Norma_Base_4PGauge.png");
+
+            Gauge_Killzone = new CTexture[3];
+            Gauge_Killzone[0] = TxC(GAME + GAUGE + @"Killzone.png");
+            Gauge_Killzone[1] = TxC(GAME + GAUGE + @"Killzone_2PGauge.png");
+            Gauge_Killzone[2] = TxC(GAME + GAUGE + @"Killzone_4PGauge.png");
+
             TJAPlayer3.Skin.Game_Gauge_Rainbow_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + GAUGE + @"Rainbow\"));
             if (TJAPlayer3.Skin.Game_Gauge_Rainbow_Ptn != 0)
             {
@@ -584,6 +599,28 @@ namespace TJAPlayer3
                     Gauge_Rainbow[i] = TxC(GAME + GAUGE + @"Rainbow\" + i.ToString() + ".png");
                 }
             }
+
+            TJAPlayer3.Skin.Game_Gauge_Rainbow_Flat_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + GAUGE + @"Rainbow_Flat\"));
+            if (TJAPlayer3.Skin.Game_Gauge_Rainbow_Flat_Ptn != 0)
+            {
+                Gauge_Rainbow_Flat = new CTexture[TJAPlayer3.Skin.Game_Gauge_Rainbow_Flat_Ptn];
+                for (int i = 0; i < TJAPlayer3.Skin.Game_Gauge_Rainbow_Flat_Ptn; i++)
+                {
+                    Gauge_Rainbow_Flat[i] = TxC(GAME + GAUGE + @"Rainbow_Flat\" + i.ToString() + ".png");
+                }
+            }
+
+            TJAPlayer3.Skin.Game_Gauge_Rainbow_2PGauge_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + GAUGE + @"Rainbow_2PGauge\"));
+            if (TJAPlayer3.Skin.Game_Gauge_Rainbow_2PGauge_Ptn != 0)
+            {
+                Gauge_Rainbow_2PGauge = new CTexture[TJAPlayer3.Skin.Game_Gauge_Rainbow_2PGauge_Ptn];
+                for (int i = 0; i < TJAPlayer3.Skin.Game_Gauge_Rainbow_2PGauge_Ptn; i++)
+                {
+                    Gauge_Rainbow_2PGauge[i] = TxC(GAME + GAUGE + @"Rainbow_2PGauge\" + i.ToString() + ".png");
+                }
+            }
+
+            // Dan
 
             TJAPlayer3.Skin.Game_Gauge_Dan_Rainbow_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + DANC + @"Rainbow\"));
             if (TJAPlayer3.Skin.Game_Gauge_Dan_Rainbow_Ptn != 0)
@@ -1006,6 +1043,11 @@ namespace TJAPlayer3
             Result_Gauge_Base[3] = TxC(RESULT + @"Gauge_Base_4.png");
             Result_Gauge[4] = TxC(RESULT + @"Gauge_5.png");
             Result_Gauge_Base[4] = TxC(RESULT + @"Gauge_Base_5.png");
+
+            Result_Gauge_Frame = TxC(RESULT + @"Gauge_Frame.png");
+            Result_Gauge_Clear = TxC(RESULT + @"Gauge_Clear.png");
+            Result_Gauge_Clear_Base = TxC(RESULT + @"Gauge_Clear_Base.png");
+            Result_Gauge_Killzone = TxC(RESULT + @"Gauge_Killzone.png");
 
             Result_Header = TxC(RESULT + @"Header.png");
             Result_Number = TxC(RESULT + @"Number.png");
@@ -2278,8 +2320,13 @@ namespace TJAPlayer3
         #region ゲージ
         public CTexture[] Gauge,
             Gauge_Base,
+            Gauge_Base_Norma,
             Gauge_Line,
             Gauge_Rainbow,
+            Gauge_Rainbow_2PGauge,
+            Gauge_Rainbow_Flat,
+            Gauge_Clear,
+            Gauge_Killzone,
             Gauge_Soul_Explosion;
         public CTexture Gauge_Soul,
             Gauge_Flash,
@@ -2467,10 +2514,14 @@ namespace TJAPlayer3
 
             Result_CrownEffect,
             Result_ScoreRankEffect,
-            
+
             //Result_Cloud,
             Result_Flower,
             Result_Shine,
+            Result_Gauge_Frame,
+            Result_Gauge_Clear,
+            Result_Gauge_Clear_Base,
+            Result_Gauge_Killzone,
 
             Result_Dan;
             
