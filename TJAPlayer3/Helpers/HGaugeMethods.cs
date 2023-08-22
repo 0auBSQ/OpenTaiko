@@ -337,7 +337,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static void tDrawClearIcon(CTexture clearIcon, Difficulty diff, int level, float currentPercent, int text_x, int text_y, EGaugeType gaugeType, int perfectHits, int totalNotes)
+        public static void tDrawClearIcon(CTexture clearIcon, Difficulty diff, int level, float currentPercent, int text_x, int text_y, EGaugeType gaugeType, int perfectHits, int totalNotes, Rectangle clearRect, Rectangle clearRectHighlight)
         {
             if (clearIcon == null) return;
             if (diff > Difficulty.Edit) return;
@@ -350,23 +350,11 @@ namespace TJAPlayer3
             clearIcon.Opacity = 255;
             if (highlight)
             {
-                clearIcon.t2D描画(TJAPlayer3.app.Device, text_x, text_y,
-                    new Rectangle(
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[0], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[1], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[2], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[3]
-                        ));
+                clearIcon.t2D描画(TJAPlayer3.app.Device, text_x, text_y, clearRectHighlight);
             }
             else
             {
-                clearIcon.t2D描画(TJAPlayer3.app.Device, text_x, text_y,
-                    new Rectangle(
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[0], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[1], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[2], 
-                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[3]
-                        ));
+                clearIcon.t2D描画(TJAPlayer3.app.Device, text_x, text_y, clearRect);
             }
         }
 
@@ -438,7 +426,9 @@ namespace TJAPlayer3
             int soul_x,
             int soul_y,
             int fire_x,
-            int fire_y
+            int fire_y, 
+            Rectangle clearRect, 
+            Rectangle clearRectHighlight
             )
         {
             // Layers : Base - Base clear - Fill - Flash - Killzone - Clear logo - Soul fire - Soul text
@@ -447,7 +437,7 @@ namespace TJAPlayer3
             tDrawGaugeFill(fillTexture, yellowTexture, (rainbowTextureArr != null && RainbowTextureIndex < rainbowTextureArr.Length) ? rainbowTextureArr[RainbowTextureIndex] : null, x, y, diff, level, currentPercent, gaugeType, scale_x, scale_y, Opacity, perfectHits, totalNotes);
             tDrawGaugeFlash(flashTexture, x, y, Opacity, diff, level, currentPercent, gaugeType, scale_x, scale_y);
             tDrawKillZone(killzoneTexture, x, y, diff, level, gaugeType, scale_x, scale_y, perfectHits, totalNotes);
-            tDrawClearIcon(clearIcon, diff, level, currentPercent, text_x, text_y, gaugeType, perfectHits, totalNotes);
+            tDrawClearIcon(clearIcon, diff, level, currentPercent, text_x, text_y, gaugeType, perfectHits, totalNotes, clearRect, clearRectHighlight);
             tDrawSoulFire(soulFire, diff, level, currentPercent, gaugeType, scale_x, scale_y, fire_x, fire_y, SoulFireIndex);
             tDrawSoulLetter(soulLetter, diff, level, currentPercent, gaugeType, scale_x, scale_y, soul_x, soul_y);
         }
@@ -659,7 +649,22 @@ namespace TJAPlayer3
             CTexture soulLetter = TJAPlayer3.Tx.Gauge_Soul;
             CTexture soulFlame = TJAPlayer3.Tx.Gauge_Soul_Fire;
 
-            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y);
+            // Rectangles
+            Rectangle clearRectHighlight = new Rectangle(
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[0],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[1],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[2],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[3]
+                        );
+
+            Rectangle clearRect = new Rectangle(
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[0],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[1],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[2],
+                        TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[3]
+                        );
+
+            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
         }
 
         public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex)
@@ -749,13 +754,13 @@ namespace TJAPlayer3
             int clearText_y;
             if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
             {
-                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[0];
-                clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[1];
+                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+                clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
             }
             else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
             {
-                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-                clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
+                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+                clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
             }
             else
             {
@@ -774,12 +779,43 @@ namespace TJAPlayer3
             CTexture killzoneTexture = TJAPlayer3.Tx.Result_Gauge_Killzone;
 
             CTexture flashTexture = null;
-            CTexture clearIcon = TJAPlayer3.Tx.Result_Gauge[0];
+            CTexture clearIcon = (gaugeType != EGaugeType.NORMAL)
+                    ? TJAPlayer3.Tx.Result_Gauge_Killzone
+                    : TJAPlayer3.Tx.Result_Gauge[0];
+
             CTexture soulLetter = TJAPlayer3.Tx.Result_Soul_Text;
             CTexture soulFlame = TJAPlayer3.Tx.Result_Soul_Fire;
 
+            // Rectangles
+            Rectangle clearRectHighlight = new Rectangle(
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[0], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[1], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[2], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[3]
+                        );
 
-            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y);
+            Rectangle clearRect = new Rectangle(
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[0], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[1], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[2], 
+                        TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[3]
+                        );
+
+            // Positionnings 
+            if (soulLetter != null)
+            {
+                soulText_x -= (int)((soulLetter.szテクスチャサイズ.Width / 2));
+                soulText_y -= (soulLetter.szテクスチャサイズ.Height / 4);
+            }
+            if (soulFlame != null)
+            {
+                soulFire_y -= (soulFlame.szテクスチャサイズ.Height / 2);
+                soulFire_x -= (int)((soulFlame.szテクスチャサイズ.Width / 16));
+            }
+            
+            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, null, null, gauge_x, gauge_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y, clearRect, clearRectHighlight);
+            tDrawSoulFire(soulFlame, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulFire_x, soulFire_y, soulFlameIndex);
+            tDrawSoulLetter(soulLetter, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulText_x, soulText_y);
         }
 
         #endregion
