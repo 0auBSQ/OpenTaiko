@@ -212,7 +212,9 @@ namespace TJAPlayer3
             CTexture yellowTexture, 
             CTexture rainbowTexture, 
             int x, 
-            int y, 
+            int y,
+            int rainbow_x,
+            int rainbow_y,
             Difficulty diff, 
             int level, 
             float currentPercent, 
@@ -282,13 +284,7 @@ namespace TJAPlayer3
                 rainbowTexture.vc拡大縮小倍率.X = scale_x;
                 rainbowTexture.vc拡大縮小倍率.Y = scale_y;
 
-                rainbowTexture.t2D描画(TJAPlayer3.app.Device, x, y,
-                new Rectangle(
-                    GaugeBox[0],
-                    GaugeBox[1],
-                    GaugeBox[2],
-                    GaugeBox[3])
-                );
+                rainbowTexture.t2D描画(TJAPlayer3.app.Device, rainbow_x, rainbow_y);
             }
 
         }
@@ -408,8 +404,10 @@ namespace TJAPlayer3
             CTexture clearIcon,
             CTexture soulLetter,
             CTexture soulFire,
-            int x, 
-            int y, 
+            int x,
+            int y,
+            int rainbow_x,
+            int rainbow_y,
             int Opacity,
             int RainbowTextureIndex,
             int SoulFireIndex,
@@ -434,7 +432,7 @@ namespace TJAPlayer3
             // Layers : Base - Base clear - Fill - Flash - Killzone - Clear logo - Soul fire - Soul text
             tDrawGaugeBase(baseTexture, x, y, scale_x, scale_y);
             tDrawGaugeBaseClear(baseNormaTexture, x, y, diff, level, gaugeType, scale_x, scale_y);
-            tDrawGaugeFill(fillTexture, yellowTexture, (rainbowTextureArr != null && RainbowTextureIndex < rainbowTextureArr.Length) ? rainbowTextureArr[RainbowTextureIndex] : null, x, y, diff, level, currentPercent, gaugeType, scale_x, scale_y, Opacity, perfectHits, totalNotes);
+            tDrawGaugeFill(fillTexture, yellowTexture, (rainbowTextureArr != null && RainbowTextureIndex < rainbowTextureArr.Length) ? rainbowTextureArr[RainbowTextureIndex] : null, x, y, rainbow_x, rainbow_y, diff, level, currentPercent, gaugeType, scale_x, scale_y, Opacity, perfectHits, totalNotes);
             tDrawGaugeFlash(flashTexture, x, y, Opacity, diff, level, currentPercent, gaugeType, scale_x, scale_y);
             tDrawKillZone(killzoneTexture, x, y, diff, level, gaugeType, scale_x, scale_y, perfectHits, totalNotes);
             tDrawClearIcon(clearIcon, diff, level, currentPercent, text_x, text_y, gaugeType, perfectHits, totalNotes, clearRect, clearRectHighlight);
@@ -664,7 +662,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[3]
                         );
 
-            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
+            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
         }
 
         public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex)
@@ -720,6 +718,24 @@ namespace TJAPlayer3
             {
                 gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos];
                 gauge_y = TJAPlayer3.Skin.Result_Gauge_Y[pos];
+            }
+
+            int gauge_rainbow_x;
+            int gauge_rainbow_y;
+            if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+            {
+                gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+                gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
+            }
+            else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+            {
+                gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+                gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+            }
+            else
+            {
+                gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos];
+                gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos];
             }
 
             // Flame and soul
@@ -813,7 +829,7 @@ namespace TJAPlayer3
                 soulFire_x -= (int)((soulFlame.szテクスチャサイズ.Width / 16));
             }
             
-            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, null, null, gauge_x, gauge_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y, clearRect, clearRectHighlight);
+            tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, null, null, gauge_x, gauge_y, gauge_rainbow_x, gauge_rainbow_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y, clearRect, clearRectHighlight);
             tDrawSoulFire(soulFlame, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulFire_x, soulFire_y, soulFlameIndex);
             tDrawSoulLetter(soulLetter, difficulty, level, currentPercent, gaugeType, 1f, 1f, soulText_x, soulText_y);
         }
