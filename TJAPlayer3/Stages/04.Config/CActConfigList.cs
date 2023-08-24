@@ -124,6 +124,12 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(23));
 			this.list項目リスト.Add( this.iSystemAVI );
 
+			// TEMPORARY v
+			this.iSystemVideoType = new CItemInteger(CLangManager.LangInstance.GetString(99000), 0, 1, TJAPlayer3.ConfigIni.nVideoType,
+				CLangManager.LangInstance.GetString(99001));
+			this.list項目リスト.Add( this.iSystemVideoType );
+			// TEMPORARY ^
+
 			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bBGA有効,
 				CLangManager.LangInstance.GetString(24));
 			this.list項目リスト.Add( this.iSystemBGA );
@@ -1457,6 +1463,9 @@ namespace TJAPlayer3
 	    private CItemInteger iSystemSongPlaybackLevel;
 		private CItemInteger iSystemKeyboardSoundLevelIncrement;
 		private CItemToggle iSystemAVI;
+		// TEMPORARY v
+		private CItemInteger iSystemVideoType;
+		// TEMPORARY ^
 		private CItemToggle iSystemBGA;
 		private CItemInteger iSystemBGAlpha;
 		private CItemToggle iSystemBGMSound;
@@ -1615,6 +1624,9 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = this.iSystemVSyncWait.bON;
 			TJAPlayer3.ConfigIni.bバッファ入力を行う = this.iSystemBufferedInput.bON;
 			TJAPlayer3.ConfigIni.bAVI有効 = this.iSystemAVI.bON;
+			// TEMPORARY v
+			TJAPlayer3.ConfigIni.nVideoType = this.iSystemVideoType.n現在の値;
+			// TEMPORARY ^
 			TJAPlayer3.ConfigIni.bBGA有効 = this.iSystemBGA.bON;
 //			CDTXMania.ConfigIni.bGraph有効 = this.iSystemGraph.bON;#24074 2011.01.23 comment-out ikanick オプション(Drums)へ移行
 			TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = this.iSystemPreviewSoundWait.n現在の値;

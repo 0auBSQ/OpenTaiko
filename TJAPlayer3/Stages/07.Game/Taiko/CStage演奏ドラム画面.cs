@@ -412,17 +412,21 @@ namespace TJAPlayer3
 					base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_FAILED;
 				}
 
-                bool BGA_Hidden = TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listAVI.Count > 0;
+                bool BGA_Hidden = (TJAPlayer3.ConfigIni.bAVI有効 && (TJAPlayer3.DTX.listAVI.Count > 0 || TJAPlayer3.DTX.video.Loaded));
 
                 // (????)
-                if ( !String.IsNullOrEmpty( TJAPlayer3.DTX.strBGIMAGE_PATH ) || ( TJAPlayer3.DTX.listAVI.Count == 0 )|| !TJAPlayer3.ConfigIni.bAVI有効 ) //背景動画があったら背景画像を描画しない。
+                if ( !String.IsNullOrEmpty( TJAPlayer3.DTX.strBGIMAGE_PATH ) || ( TJAPlayer3.DTX.listAVI.Count == 0 )|| !TJAPlayer3.ConfigIni.bAVI有効 || !TJAPlayer3.DTX.video.Loaded ) //背景動画があったら背景画像を描画しない。
                 {
 				    this.t進行描画_背景();
                 }
 
-                if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listAVI.Count > 0 && !TJAPlayer3.ConfigIni.bTokkunMode)
+                if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.ConfigIni.nVideoType == 1 && TJAPlayer3.DTX.listAVI.Count > 0 && !TJAPlayer3.ConfigIni.bTokkunMode)
                 {
-                    this.t進行描画_AVI();
+                    this.t進行描画_AVI(); // Draw BGMOVIE frames via. AVIFIL32
+                }
+                else if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.ConfigIni.nVideoType == 0 && TJAPlayer3.DTX.video.Loaded && !TJAPlayer3.ConfigIni.bTokkunMode)
+                {
+                    this.tDrawVideo(); // Draw BGMOVIE frames via. OpenCVSharp
                 }
                 else if (TJAPlayer3.ConfigIni.bBGA有効)
                 {
@@ -853,7 +857,11 @@ namespace TJAPlayer3
 		{
 			base.t進行描画_AVI( 0, 0 );
 		}
-		protected override void t進行描画_DANGER()
+        protected override void tDrawVideo()
+        {
+            base.tDrawVideo(0, 0);
+        }
+        protected override void t進行描画_DANGER()
 		{
 			this.actDANGER.t進行描画( this.actGauge.IsDanger(E楽器パート.DRUMS), false, false );
 		}

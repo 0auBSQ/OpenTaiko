@@ -636,12 +636,16 @@ namespace TJAPlayer3
 				case CStage.Eフェーズ.NOWLOADING_BMPファイルを読み込む:
 					{
 						TimeSpan span;
-						DateTime timeBeginLoadBMPAVI = DateTime.Now;
+						//DateTime timeBeginLoadBMPAVI = DateTime.Now;
 
-						if ( TJAPlayer3.ConfigIni.bAVI有効 )
+						if ( TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.ConfigIni.nVideoType == 1 )
 							TJAPlayer3.DTX.tAVIの読み込み();
-						span = ( TimeSpan ) ( DateTime.Now - timeBeginLoadBMPAVI );
-
+						if ( TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.ConfigIni.nVideoType == 0 )
+                        {
+							TJAPlayer3.DTX.video = new CVideo(TJAPlayer3.DTX.strフォルダ名 + TJAPlayer3.DTX.strBGVIDEO_PATH);
+							//TJAPlayer3.DTX.video.SetResolution(new Size(TJAPlayer3.Skin.Resolution[0], TJAPlayer3.Skin.Resolution[1]));
+						}						
+						//span = ( TimeSpan ) ( DateTime.Now - timeBeginLoadBMPAVI );
 						span = ( TimeSpan ) ( DateTime.Now - timeBeginLoad );
 						Trace.TraceInformation( "総読込時間:                {0}", span.ToString() );
 

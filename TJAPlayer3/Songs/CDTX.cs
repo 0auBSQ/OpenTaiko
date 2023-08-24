@@ -1282,7 +1282,9 @@ namespace TJAPlayer3
 
         public int DANTICK = 0;
         public Color DANTICKCOLOR = Color.White;
-        
+
+        public CVideo video;
+
         public Dictionary<int, CAVI> listAVI;
         public Dictionary<int, CAVIPAN> listAVIPAN;
         public Dictionary<int, CDirectShow> listDS;
@@ -8626,6 +8628,11 @@ namespace TJAPlayer3
                     cwav.Dispose();
                 }
                 this.listWAV = null;
+            }
+            if (this.video != null)
+            {
+                this.video.Dispose();
+                this.video = null;
             }
             if (this.listAVI != null)
             {

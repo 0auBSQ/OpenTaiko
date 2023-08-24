@@ -871,6 +871,8 @@ namespace TJAPlayer3
 
 		protected CTexture tx背景;
 
+        protected CTexture txVideoFrame;
+
 		protected STAUTOPLAY bIsAutoPlay;		// #24239 2011.1.23 yyagi
 //		protected int nRisky_InitialVar, nRiskyTime;		// #23559 2011.7.28 yyagi → CAct演奏ゲージ共通クラスに隠蔽
 		protected int nPolyphonicSounds;
@@ -3273,6 +3275,7 @@ namespace TJAPlayer3
 
 
 		protected abstract void t進行描画_AVI();
+        protected abstract void tDrawVideo();
 		protected void t進行描画_AVI(int x, int y)
 		{
 			if ( ( ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) && ( !TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bAVI有効 ) )
@@ -3280,6 +3283,18 @@ namespace TJAPlayer3
 				this.actAVI.t進行描画( x, y );
 			}
 		}
+        protected void tDrawVideo(int x, int y)
+        {
+            if ((base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED) && (base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト))
+            {
+                TJAPlayer3.DTX.video.UpdateFrame((float)((CSound管理.rc演奏用タイマ.n現在時刻 * (TJAPlayer3.ConfigIni.n演奏速度 / 20.0)) / 1000));
+                txVideoFrame = new CTexture(TJAPlayer3.app.Device, TJAPlayer3.DTX.video.Frame, TJAPlayer3.TextureFormat);
+                txVideoFrame.vc拡大縮小倍率.X = TJAPlayer3.Skin.Resolution[0] / (float)txVideoFrame.szテクスチャサイズ.Width;
+                txVideoFrame.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Resolution[1] / (float)txVideoFrame.szテクスチャサイズ.Height;
+                txVideoFrame?.t2D描画(TJAPlayer3.app.Device, 0, 0);
+                txVideoFrame?.Dispose();
+            }
+        }
 		protected abstract void t進行描画_DANGER();
 
 		protected void t進行描画_STAGEFAILED()
@@ -3741,7 +3756,7 @@ namespace TJAPlayer3
 						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
 						{
 							pChip.bHit = true;
-							if ( configIni.bAVI有効 )
+							if ( configIni.bAVI有効 && configIni.nVideoType == 1 )
 							{
 								switch ( pChip.eAVI種別 )
 								{

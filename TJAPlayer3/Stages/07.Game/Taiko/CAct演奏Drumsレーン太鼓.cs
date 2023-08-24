@@ -745,7 +745,7 @@ namespace TJAPlayer3
 
 
 
-            if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listAVI.Count > 0)
+            if (TJAPlayer3.ConfigIni.bAVI有効 && (TJAPlayer3.DTX.listAVI.Count > 0 || TJAPlayer3.DTX.video.Loaded))
             {
                 if (TJAPlayer3.Tx.Lane_Background_Main != null) TJAPlayer3.Tx.Lane_Background_Main.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;
                 if (TJAPlayer3.Tx.Lane_Background_AI != null) TJAPlayer3.Tx.Lane_Background_AI.Opacity = TJAPlayer3.ConfigIni.nBGAlpha;

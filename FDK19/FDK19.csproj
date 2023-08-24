@@ -159,6 +159,8 @@
     <Compile Include="コード\04.グラフィック\CAvi.cs" />
     <Compile Include="コード\04.グラフィック\CTaskBar.cs" />
     <Compile Include="コード\04.グラフィック\CTextureAutofold.cs" />
+    <Compile Include="コード\04.グラフィック\CVideo.cs" />
+    <Compile Include="コード\04.グラフィック\CVideoBitmap.cs" />
     <Compile Include="コード\04.グラフィック\頂点フォーマット%28Vertex%29\ColoredVertex.cs" />
     <Compile Include="コード\04.グラフィック\CTexture.cs" />
     <Compile Include="コード\04.グラフィック\CTextureCreateFailedException.cs" />
@@ -193,6 +195,9 @@
     <Content Include="コード\01.フレームワーク\Resources\sdx_icon_black.ico" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="OpenCvSharp4">
+      <Version>4.8.0.20230708</Version>
+    </PackageReference>
     <PackageReference Include="ReadJEnc">
       <Version>1.3.1.2</Version>
     </PackageReference>

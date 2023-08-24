@@ -275,6 +275,13 @@ namespace TJAPlayer3
             [10124] = "Use Extreme/Extra Transitions",
             [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
+            // TEMPORARY v
+            [99000] = "Video Playback Type",
+            [99001] = "Temporary configuration for testing Video Playback. Will be removed in future commits.\n" +
+                        "0 : OpenCVSharp\n" +
+                        "1 : AVIFIL32",
+            // TEMPORARY ^
+
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",
             [102] = "Taiko Towers",

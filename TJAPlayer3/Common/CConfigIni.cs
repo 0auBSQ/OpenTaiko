@@ -1027,6 +1027,7 @@ namespace TJAPlayer3
 #endif
 		public int nBGAlpha;
 		public bool bAVI有効;
+		public int nVideoType;
 		public bool bBGA有効;
 		public bool bBGM音を発声する;
 		public STDGBVALUE<bool> bHidden;
@@ -1761,6 +1762,7 @@ namespace TJAPlayer3
 			this.eダメージレベル = Eダメージレベル.普通;
 			this.bSTAGEFAILED有効 = true;
 			this.bAVI有効 = false;
+			this.nVideoType = 0;
 			this.bBGA有効 = true;
 			this.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = 1000;
 			this.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms = 100;
@@ -2210,6 +2212,11 @@ namespace TJAPlayer3
 			sw.WriteLine( "; AVIの表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "AVI={0}", this.bAVI有効 ? 1 : 0 );
 			sw.WriteLine();
+			// TEMPORARY v
+			sw.WriteLine( "; Video playback type to be used -- TEMPORARY CONFIGURATION, SUBJECT TO REMOVAL (0:OpenCV, 1:AVIFIL32)" );
+			sw.WriteLine( "VideoType={0}", this.nVideoType );
+			sw.WriteLine();
+			// TEMPORARY ^
 			sw.WriteLine( "; BGAの表示(0:OFF, 1:ON)" );
 			sw.WriteLine( "BGA={0}", this.bBGA有効 ? 1 : 0 );
 			sw.WriteLine();
@@ -3018,6 +3025,10 @@ namespace TJAPlayer3
 											else if( str3.Equals( "AVI" ) )
 											{
 												this.bAVI有効 = C変換.bONorOFF( str4[ 0 ] );
+											}
+											else if (str3.Equals("VideoType"))
+                                            {
+												this.nVideoType = int.Parse(str4).Clamp(0, 1);
 											}
 											else if( str3.Equals( "BGA" ) )
 											{
