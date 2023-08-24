@@ -34,7 +34,7 @@ namespace FDK
                 Trace.TraceWarning("(CVideo) Something went wrong while trying to open a video file located at {0}. More info : {1}", fileInput, e);
                 return;
             }
-            if (vidCapture.IsOpened()) { Trace.TraceWarning("The video file located at {0} was not opened. Did you use the correct directory?"); }
+            if (!vidCapture.IsOpened()) { Trace.TraceWarning("The video file located at {0} was not opened. Did you use the correct directory?", fileInput); }
 
             Input = fileInput;
             Frame = new Bitmap(1, 1);

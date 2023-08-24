@@ -486,10 +486,6 @@ move /y "$(TargetDir)CSharpTest.Net.Collections.*" "$(SolutionDir)Test\dll\"
 move /y "$(TargetDir)System.*" "$(SolutionDir)Test\dll\"
 
 
-move /y "$(TargetDir)Microsoft.Win32.Primitives.dll" "$(SolutionDir)Test\dll\"
-move /y "$(TargetDir)netstandard.dll" "$(SolutionDir)Test\dll\"
-move /y "$(TargetDir)OpenCvSharp.dll" "$(SolutionDir)Test\dll\"
-
 if "$(PlatformName)" == "x86" (
 
 copy /y "$(TargetDir)dll\x86\*.dll" "$(SolutionDir)Test\dll\"
