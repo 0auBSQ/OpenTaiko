@@ -82,7 +82,15 @@ namespace TJAPlayer3
 			get; 
 			private set;
 		}
-		public static CDTX DTX
+
+		public static CVisualLogManager VisualLogManager
+        {
+			get;
+			private set;
+        }
+
+        #region [DTX instances]
+        public static CDTX DTX
 		{
 			get
 			{
@@ -182,6 +190,28 @@ namespace TJAPlayer3
 				}
 			}
 		}
+
+		public static CDTX GetDTX(int player)
+        {
+			switch (player)
+            {
+				case 0:
+					return TJAPlayer3.DTX;
+				case 1:
+					return TJAPlayer3.DTX_2P;
+				case 2:
+					return TJAPlayer3.DTX_3P;
+				case 3:
+					return TJAPlayer3.DTX_4P;
+				case 4:
+					return TJAPlayer3.DTX_5P;
+			}
+			return null;
+        }
+
+		#endregion
+
+		public static CSongReplay[] ReplayInstances = new CSongReplay[5];
 
 		public static bool IsPerformingCalibration;
 
@@ -1980,6 +2010,10 @@ for (int i = 0; i < 3; i++) {
 					TJAPlayer3.Tx.Network_Connection.t2D描画(app.Device, GameWindowSize.Width - (TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2), GameWindowSize.Height - TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Height, new Rectangle((TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2) * (this.bネットワークに接続中 ? 0 : 1), 0, TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Height));
 				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
+
+				// Display log cards
+				VisualLogManager.Display();
+
 				if (r現在のステージ != null && r現在のステージ.eステージID != CStage.Eステージ.起動 && TJAPlayer3.Tx.Overlay != null)
 				{
 					TJAPlayer3.Tx.Overlay.t2D描画(app.Device, 0, 0);
@@ -2342,6 +2376,8 @@ for (int i = 0; i < 3; i++) {
 			Databases.tDatabases();
 
 			ConfigIni = new CConfigIni();
+			VisualLogManager = new CVisualLogManager();
+
 			string path = strEXEのあるフォルダ + "Config.ini";
 			if( File.Exists( path ) )
 			{

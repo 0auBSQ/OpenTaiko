@@ -440,71 +440,6 @@ namespace TJAPlayer3
 						}
 
 
-
-						/*
-						{
-							int gauge_x;
-							int gauge_y;
-							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
-							{
-								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								gauge_x = TJAPlayer3.Skin.Result_Gauge_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-								gauge_y = TJAPlayer3.Skin.Result_Gauge_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-							}
-							else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
-							{
-								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								gauge_x = TJAPlayer3.Skin.Result_Gauge_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
-								gauge_y = TJAPlayer3.Skin.Result_Gauge_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
-							}
-							else
-							{
-								TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
-								gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos];
-								gauge_y = TJAPlayer3.Skin.Result_Gauge_Y[pos];
-							}
-
-							TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, gauge_x, gauge_y,
-							new RectangleF(TJAPlayer3.Skin.Result_Gauge_Rect[0], TJAPlayer3.Skin.Result_Gauge_Rect[1], (TJAPlayer3.Skin.Result_Gauge_Rect[2] / 50.0f) * ctゲージアニメ[i].n現在の値, TJAPlayer3.Skin.Result_Gauge_Rect[3]));
-							TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
-						}
-						*/
-						// Modify to array for each players using i
-
-						/*
-						int soultext_width = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Width / 3;
-						int soultext_height = TJAPlayer3.Tx.Result_Soul_Text.szテクスチャサイズ.Height;
-
-						int soulText_x;
-						int soulText_y;
-						int soulFire_x;
-						int soulFire_y;
-						if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
-						{
-							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
-						}
-						else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
-						{
-							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
-							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
-							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
-						}
-						else
-						{
-							soulText_x = TJAPlayer3.Skin.Result_Soul_Text_X[pos];
-							soulText_y = TJAPlayer3.Skin.Result_Soul_Text_Y[pos];
-							soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_X[pos];
-							soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_Y[pos];
-							TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 1.0f;
-						}
-						*/
-
 						if (ctゲージアニメ[i].b終了値に達した)
 						{
 							if (ctゲージアニメ[i].n現在の値 != 50)
@@ -530,87 +465,10 @@ namespace TJAPlayer3
 
 								ct虹ゲージアニメ.t進行Loop();
 								ctSoul.t進行Loop();
-
-								/*
-								int rainbow_x;
-								int rainbow_y;
-								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
-								{
-									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
-								}
-								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
-								{
-									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
-									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
-									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 0.5f;
-								}
-								else
-								{
-									rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos];
-									rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos];
-									TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].vc拡大縮小倍率.X = 1.0f;
-								}
-								TJAPlayer3.Tx.Result_Rainbow[ct虹ゲージアニメ.n現在の値].t2D描画(TJAPlayer3.app.Device, rainbow_x, rainbow_y);
-
-								{
-									int soulfire_width = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Width / 8;
-									int soulfire_height = TJAPlayer3.Tx.Result_Soul_Fire.szテクスチャサイズ.Height;
-
-									TJAPlayer3.Tx.Result_Soul_Fire.t2D中心基準描画(TJAPlayer3.app.Device, soulFire_x, soulFire_y, new Rectangle(soulfire_width * ctSoul.n現在の値, 0, soulfire_width, soulfire_height));
-
-									TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y, new Rectangle(soultext_width * 1, 0, soultext_width, soultext_height));
-
-									if (ctSoul.n現在の値 % 2 == 0)
-										TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y, new Rectangle(soultext_width * 2, 0, soultext_width, soultext_height));
-								}
-								*/
 							}
 						}
 
 						HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctゲージアニメ[i].n現在の値, ct虹ゲージアニメ.n現在の値, ctSoul.n現在の値);
-
-						/*
-						if (ctゲージアニメ[i].n現在の値 != 50)
-						{
-							{
-								int clearText_x;
-								int clearText_y;
-								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
-								{
-									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[0];
-									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[1];
-									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								}
-								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
-								{
-									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
-									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 0.5f;
-								}
-								else
-								{
-									clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos];
-									clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos];
-									TJAPlayer3.Tx.Result_Gauge[shiftPos].vc拡大縮小倍率.X = 1.0f;
-								}
-								if (ctゲージアニメ[i].n現在の値 < 40)
-								{
-									TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, clearText_x, clearText_y,
-										new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[3]));
-								}
-								else
-								{
-									TJAPlayer3.Tx.Result_Gauge[shiftPos].t2D描画(TJAPlayer3.app.Device, clearText_x, clearText_y,
-										   new RectangleF(TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[0], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[1], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[2], TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[3]));
-								}
-
-								TJAPlayer3.Tx.Result_Soul_Text.t2D中心基準描画(TJAPlayer3.app.Device, soulText_x, soulText_y,
-									new Rectangle(soultext_width * (ctゲージアニメ[i].n現在の値 <= 30 ? 0 : 1), 0, soultext_width, soultext_height));
-							}
-						}
-						*/
 
 						#endregion
 					}

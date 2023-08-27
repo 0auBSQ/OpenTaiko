@@ -112,6 +112,9 @@ namespace TJAPlayer3
 			b最近遊んだ曲追加済み = false;
 			try
 			{
+				int[] ClearStatus_Replay = new int[5] { 0, 0, 0, 0, 0 };
+				int[] ScoreRank_Replay = new int[5] { 0, 0, 0, 0, 0 };
+
 				{
 					#region [ 初期化 ]
 					//---------------------
@@ -267,6 +270,8 @@ namespace TJAPlayer3
 
 					// Clear and score ranks
 
+					
+
 					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
                     {
                         // Regular (Ensou game) Score and Score Rank saves
@@ -280,6 +285,9 @@ namespace TJAPlayer3
 							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
 							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
 							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));
+
+							ClearStatus_Replay[i] = this.nクリア[i];
+							ScoreRank_Replay[i] = this.nスコアランク[i];
 
 							if (isAutoDisabled(i))
 							{
@@ -339,8 +347,10 @@ namespace TJAPlayer3
 							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
 
-                            #region [ Update Dan Dojo exam results ]
-                            for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+							ClearStatus_Replay[0] = clearValue;
+
+							#region [ Update Dan Dojo exam results ]
+							for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
                             {
 								for (int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Length; j++)
                                 {
@@ -420,6 +430,8 @@ namespace TJAPlayer3
 							ini[0].stセクション[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
 							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
 
+							ClearStatus_Replay[0] = tmpClear;
+
 							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
 								ini[0].t書き出し(str[0]);
 						}
@@ -460,6 +472,8 @@ namespace TJAPlayer3
 				this.nEarnedMedalsCount[2] = 0;
 				this.nEarnedMedalsCount[3] = 0;
 				this.nEarnedMedalsCount[4] = 0;
+
+				
 
 				// Medals
 
@@ -674,6 +688,20 @@ namespace TJAPlayer3
 
 
 				//TJAPlayer3.NamePlateConfig.tEarnCoins(this.nEarnedMedalsCount);
+
+				#endregion
+
+				#region [Replay files generation]
+
+				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+					if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i])
+						continue;
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1)
+						continue;
+					TJAPlayer3.ReplayInstances[i].tResultsRegisterReplayInformations(this.nEarnedMedalsCount[i], ClearStatus_Replay[i], ScoreRank_Replay[i]);
+					TJAPlayer3.ReplayInstances[i].tSaveReplayFile();
+				}
 
 				#endregion
 

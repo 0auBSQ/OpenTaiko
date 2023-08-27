@@ -620,9 +620,9 @@ namespace TJAPlayer3
                             {
 								_dtx[i]?.tRandomizeTaikoChips(i);
 								_dtx[i]?.tApplyFunMods(i);
+								TJAPlayer3.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
 							}
 							CDTX.tManageKusudama(_dtx);
-								
 
 							TJAPlayer3.stage演奏ドラム画面.On活性化();
 

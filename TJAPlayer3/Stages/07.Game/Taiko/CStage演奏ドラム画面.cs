@@ -1346,6 +1346,9 @@ namespace TJAPlayer3
 
                                 #endregion
 
+                                // Register to replay file
+                                TJAPlayer3.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)_pad);
+
                                 // Process small note
                                 if (e判定 != E判定.Miss && _isSmallNote)
                                 {

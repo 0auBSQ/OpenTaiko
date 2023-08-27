@@ -247,6 +247,7 @@ namespace TJAPlayer3
             SongSelect_Branch = TxC(SONGSELECT + @"Branch.png");
             SongSelect_Branch_Text = TxC(SONGSELECT + @"Branch_Text.png");
             SongSelect_Bar_Center = TxC(SONGSELECT + @"Bar_Center.png");
+            SongSelect_Lock = TxC(SONGSELECT + @"Lock.png");
 
             SongSelect_Frame_Score[0] = TxC(SONGSELECT + @"Frame_Score.png");
             SongSelect_Frame_Score[1] = TxC(SONGSELECT + @"Frame_Score_Tower.png");
@@ -258,6 +259,7 @@ namespace TJAPlayer3
             SongSelect_Frame_BackBox = TxC(SONGSELECT + @"Frame_BackBox.png");
             SongSelect_Frame_Random = TxC(SONGSELECT + @"Frame_Random.png");
             SongSelect_Bar_Genre_Back = TxC(SONGSELECT + @"Bar_Genre_Back.png");
+            SongSelect_Bar_Genre_Locked = TxC(SONGSELECT + @"Bar_Genre_Locked.png");
             SongSelect_Bar_Genre_Random = TxC(SONGSELECT + @"Bar_Genre_Random.png");
             SongSelect_Bar_Genre_RecentryPlaySong = TxC(SONGSELECT + @"Bar_Genre_RecentryPlaySong.png");
             SongSelect_Bar_Select = TxC(SONGSELECT + @"Bar_Select.png");
@@ -338,6 +340,8 @@ namespace TJAPlayer3
             SongSelect_Song_Panel[1] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Song.png");
             SongSelect_Song_Panel[2] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Dan.png");
             SongSelect_Song_Panel[3] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Tower.png");
+            SongSelect_Song_Panel[4] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Locked_Song.png");
+            SongSelect_Song_Panel[5] = TxC(SONGSELECT + @"Song_Panel\Song_Panel_Locked_Asset.png");
 
             #region [ 難易度選択画面 ]
             Difficulty_Bar = TxC(SONGSELECT + @"Difficulty_Select\Difficulty_Bar.png");
@@ -2162,12 +2166,13 @@ namespace TJAPlayer3
             SongSelect_Level,
             SongSelect_Branch,
             SongSelect_Branch_Text,
-            
+            SongSelect_Lock,
             SongSelect_Frame_Box,
             SongSelect_Frame_BackBox,
             SongSelect_Frame_Random,
             SongSelect_Bar_Center,
-            SongSelect_Bar_Genre_Back,
+            SongSelect_Bar_Genre_Back, 
+            SongSelect_Bar_Genre_Locked,
             SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
@@ -2206,7 +2211,7 @@ namespace TJAPlayer3
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[3],
             SongSelect_NamePlate = new CTexture[1],
-            SongSelect_Song_Panel = new CTexture[4],
+            SongSelect_Song_Panel = new CTexture[6],
             SongSelect_Coin_Slot = new CTexture[4],
             SongSelect_Table = new CTexture[6];
 
