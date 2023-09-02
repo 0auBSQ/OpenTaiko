@@ -79,6 +79,11 @@ namespace TJAPlayer3
             allInputs.Add(Tuple.Create(timestamp, keypress));
         }
 
+        public void tResetInputs()
+        {
+            allInputs = new List<Tuple<double, byte>>();
+        }
+
         #region [Dan methods]
         
         public void tDanRegisterSongCount(int songCount)
@@ -112,6 +117,85 @@ namespace TJAPlayer3
 
         #endregion
 
+        #region [Debug methods]
+
+        public string DEBUG_ToString()
+        {
+            string ret = "";
+
+            ret += @"Game Mode: " + GameMode.ToString() + Environment.NewLine;
+            ret += @"Game Version: " + GameVersion.ToString() + Environment.NewLine;
+            ret += @"Chart Checksum: " + ChartChecksum + Environment.NewLine;
+            ret += @"Player Name: " + PlayerName + Environment.NewLine;
+            ret += @"Good Count: " + GoodCount.ToString() + Environment.NewLine;
+            ret += @"Ok Count: " + OkCount.ToString() + Environment.NewLine;
+            ret += @"Bad Count: " + BadCount.ToString() + Environment.NewLine;
+            ret += @"Roll Count: " + RollCount.ToString() + Environment.NewLine;
+            ret += @"Max Combo: " + MaxCombo.ToString() + Environment.NewLine;
+            ret += @"Boom Count: " + BoomCount.ToString() + Environment.NewLine;
+            ret += @"ADLib Count: " + ADLibCount.ToString() + Environment.NewLine;
+            ret += @"Score: " + Score.ToString() + Environment.NewLine;
+            ret += @"Coin Value: " + CoinValue.ToString() + Environment.NewLine;
+            ret += @"Reached Floor: " + ReachedFloor.ToString() + Environment.NewLine;
+            ret += @"Remaining Lives: " + RemainingLives.ToString() + Environment.NewLine;
+            ret += @"Dan Song Count: " + DanSongCount.ToString() + Environment.NewLine;
+            for (int i = 0; i < DanSongCount; i++)
+            {
+                ret += @"Individual Good Count[" + i.ToString() + @"]: " + IndividualGoodCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual Ok Count[" + i.ToString() + @"]: " + IndividualOkCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual Bad Count[" + i.ToString() + @"]: " + IndividualBadCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual Roll Count[" + i.ToString() + @"]: " + IndividualRollCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual Max Combo[" + i.ToString() + @"]: " + IndividualMaxCombo[i].ToString() + Environment.NewLine;
+                ret += @"Individual Boom Count[" + i.ToString() + @"]: " + IndividualBoomCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual ADLib Count[" + i.ToString() + @"]: " + IndividualADLibCount[i].ToString() + Environment.NewLine;
+                ret += @"Individual Score[" + i.ToString() + @"]: " + IndividualScore[i].ToString() + Environment.NewLine;
+            }
+            ret += @"Clear Status: " + ClearStatus.ToString() + Environment.NewLine;
+            ret += @"Score Rank: " + ScoreRank.ToString() + Environment.NewLine;
+            ret += @"Scroll Speed Value: " + ScrollSpeedValue.ToString() + Environment.NewLine;
+            ret += @"Song Speed Value: " + SongSpeedValue.ToString() + Environment.NewLine;
+            ret += @"Judge Strictness Adjust: " + JudgeStrictnessAdjust.ToString() + Environment.NewLine;
+            ret += @"Mod Flags: " + Convert.ToString(ModFlags, 2) + Environment.NewLine;
+            ret += @"Gauge Type: " + ((HGaugeMethods.EGaugeType)GaugeType).ToString() + Environment.NewLine;
+            ret += @"Gauge Fill: " + GaugeFill.ToString() + Environment.NewLine;
+            ret += @"Timestamp: " + (new DateTime(Timestamp)).ToString() + Environment.NewLine;
+            ret += @"Input count: " + allInputs.Count + Environment.NewLine;
+            for (int i = 0; i < allInputs.Count; i++)
+            {
+                var input = allInputs[i];
+                ret += @"[" + input.Item1.ToString() + @"ms]: " + input.Item2.ToString() + Environment.NewLine;
+            }
+            ret += @"Chart UniqueID: " + ChartUniqueID + Environment.NewLine;
+            ret += @"Chart Difficulty: " + ((Difficulty)ChartDifficulty).ToString() + Environment.NewLine;
+            ret += @"Chart Level: " + ChartLevel.ToString() + Environment.NewLine;
+            ret += @"Online Score ID: " + OnlineScoreID.ToString() + Environment.NewLine;
+            ret += @"Replay Checksum: " + ReplayChecksum.ToString() + Environment.NewLine;
+            return ret;
+        }
+
+        public void DEBUG_DecryptAndExtractReplayFile(string optkrFilePath)
+        {
+            tLoadReplayFile(optkrFilePath);
+            string debugString = DEBUG_ToString();
+            string _path = optkrFilePath + @"_DEBUG.txt";
+            try
+            {
+                using (FileStream fileStream = new FileStream(_path, FileMode.Create))
+                {
+                    using (BinaryWriter writer = new BinaryWriter(fileStream))
+                    {
+                        writer.Write(debugString);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        #endregion
+
         #region [Load methods]
 
         private List<Tuple<double, byte>> ConvertByteArrayToTupleList(byte[] byteArray)
@@ -127,6 +211,8 @@ namespace TJAPlayer3
 
             return tupleList;
         }
+
+        
 
         public void tLoadReplayFile(string optkrFilePath)
         {
@@ -180,6 +266,7 @@ namespace TJAPlayer3
                         ChartDifficulty = reader.ReadByte();
                         ChartLevel = reader.ReadByte();
                         OnlineScoreID = reader.ReadInt64();
+                        ReplayChecksum = reader.ReadString();
                     }
                 }
             }
@@ -207,7 +294,7 @@ namespace TJAPlayer3
             return byteArray.ToArray();
         }
 
-        public void tSaveReplayFile()
+        public string tSaveReplayFile()
         {
             string _path = replayFolder + @"/Replay_" + ChartUniqueID + @"_" + PlayerName + @"_" + Timestamp.ToString() + @".optkr";
 
@@ -259,6 +346,7 @@ namespace TJAPlayer3
                         writer.Write(ChartDifficulty);
                         writer.Write(ChartLevel);
                         writer.Write(OnlineScoreID);
+                        writer.Write(ReplayChecksum);
                     }
                 }
             }
@@ -266,6 +354,7 @@ namespace TJAPlayer3
             {
 
             }
+            return _path;
         }
 
         public void tResultsRegisterReplayInformations(int Coins, int Clear, int SRank)

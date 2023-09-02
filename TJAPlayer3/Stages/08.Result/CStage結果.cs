@@ -700,7 +700,12 @@ namespace TJAPlayer3
 					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1)
 						continue;
 					TJAPlayer3.ReplayInstances[i].tResultsRegisterReplayInformations(this.nEarnedMedalsCount[i], ClearStatus_Replay[i], ScoreRank_Replay[i]);
-					TJAPlayer3.ReplayInstances[i].tSaveReplayFile();
+					string _replayFilePath = TJAPlayer3.ReplayInstances[i].tSaveReplayFile();
+
+#if DEBUG
+					CSongReplay _debug = new CSongReplay();
+					_debug.DEBUG_DecryptAndExtractReplayFile(_replayFilePath);
+#endif
 				}
 
 				#endregion
