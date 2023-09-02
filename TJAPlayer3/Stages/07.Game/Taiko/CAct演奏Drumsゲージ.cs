@@ -290,7 +290,7 @@ namespace TJAPlayer3
                                 if (TJAPlayer3.DTX.Dan_C[i] != null && TJAPlayer3.DTX.Dan_C[i].GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= TJAPlayer3.DTX.Dan_C[i].GetValue(false))
                                 {
                                     TJAPlayer3.Tx.Gauge_Dan[3].Opacity = 255;
-                                    TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, x + (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), y, new Rectangle(0, 0, nRectX[0] - (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), TJAPlayer3.Skin.Game_Gauge_Rect[3]));
+                                    TJAPlayer3.Tx.Gauge_Dan[3]?.t2D描画(TJAPlayer3.app.Device, x + (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), y, new Rectangle(TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth, 0, nRectX[0] - (TJAPlayer3.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), TJAPlayer3.Skin.Game_Gauge_Rect[3]));
 
                                     int Opacity = 0;
                                     if (this.ctGaugeFlash.n現在の値 <= 365) Opacity = 0;

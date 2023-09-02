@@ -523,6 +523,11 @@ namespace TJAPlayer3
                 gauge_x = TJAPlayer3.Skin.Game_Gauge_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
                 gauge_y = TJAPlayer3.Skin.Game_Gauge_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
             }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+            {
+                gauge_x = TJAPlayer3.Skin.Game_Gauge_X_AI;
+                gauge_y = TJAPlayer3.Skin.Game_Gauge_Y_AI;
+            }
             else
             {
                 gauge_x = TJAPlayer3.Skin.Game_Gauge_X[player];
