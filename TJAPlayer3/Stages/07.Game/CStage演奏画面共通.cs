@@ -5064,7 +5064,7 @@ namespace TJAPlayer3
 
                 TJAPlayer3.ConfigIni.nGameType[i] = eFirstGameType[i];
                 bSplitLane[i] = false;
-                TJAPlayer3.ReplayInstances[i].tResetInputs();
+                TJAPlayer3.ReplayInstances[i]?.tResetInputs();
             }
             TJAPlayer3.stage演奏ドラム画面.On活性化();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
