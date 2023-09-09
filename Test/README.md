@@ -121,6 +121,10 @@ BoxFontName=廻想体 ネクスト UP B
 074 - Spatium Cursu : X3ll3n - https://linktr.ee/x3ll3n https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg https://x3ll3n.newgrounds.com/ https://soundcloud.com/x3ll3n https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX https://www.instagram.com/x3ll3n_music/ (Chart by 0AuBSQ)
 075 - 640x480 : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by Colin and Komi)
 076 - Rainy Night II ~無信の森~ : Taichenko - https://space.bilibili.com/356518101 https://b23.tv/LBMw5Oz (Chart by Taichenko (Extreme) & 0AuBSQ)
+077 - Meowmetic : HHS - https://www.youtube.com/channel/UCC244lvpAR4n4brBbHtvjAQ (Chart by colin)
+078 - the garden : AZALI - https://www.youtube.com/@AZALI00013 (Chart by 0AuBSQ)
+079 - MECHANICAL GOD : AZALI × Crow - https://www.youtube.com/@AZALI00013 (AZALI) https://www.youtube.com/@crow4277 (Crow) (Chart by 0AuBSQ)
+080 - I WANT TO BL00000000M : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 ```
 
 ### About the OpenTaiko Original Soundtrack
