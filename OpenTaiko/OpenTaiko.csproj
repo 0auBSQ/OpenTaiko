@@ -21,6 +21,8 @@
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="README.md" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Readme.txt" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
   <PropertyGroup>
     <Version>0.6.0</Version>
