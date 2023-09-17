@@ -1,0 +1,469 @@
+TITLE:I'll Still Be Me
+SUBTITLE:--DashyDesu
+BPM:76
+WAVE:I'll Still Be Me.ogg
+OFFSET:-0.025
+DEMOSTART:60.60
+SCOREMODE:2
+PREIMAGE:I'll Still Be Me.png
+MAKER:Dashy
+
+COURSE:Oni
+LEVEL:6
+BALLOON:
+SCOREINIT:1620
+SCOREDIFF:0
+
+#START
+#SCROLL 0.88
+1001100101004000,
+1001100101104000,
+1001100101102210,
+
+#LYRIC The [days and nights] fly over me
+1010201110102011,
+1001201010102010,
+#LYRIC in a time so fast, it feels like only seconds.
+1010201000102011,
+1011020110104020,
+#LYRIC And soon they go, and disappear...
+300000000000200000100100100000000000200020002000,
+1000201010102011,
+#LYRIC like I once wished to be able to do.
+1010201000102011,
+1011201010102220,
+
+#LYRIC But I wonder, does time truly pass?
+3000201100104010,
+1011202200112010,
+#LYRIC Does it fade away?
+10112000100
+#LYRIC [Fade away forever?]
+12011,
+1011201101102220,
+#LYRIC Because it just feels like
+3000201100104010,
+1011
+#LYRIC change doesn't exist for me, at least.
+202200112010,
+1012020010012011,
+#LYRIC These [lost emotions] can't be helped,
+1011201030203020,
+
+#GOGOSTART
+1011201110102101,
+1011201101102100,
+#LYRIC but I'll still keep going on each day
+3011201030112010,
+3011201030203020,
+#LYRIC Even if I'm not here...
+1011201010201100,
+1011202210
+#LYRIC I'll still be "me".
+#GOGOEND
+300000,
+
+1001100101004000,
+#LYRIC
+1001100101104000,
+1001100101102210,
+
+1011201110102000,
+1011201110102020,
+1011201120112010,
+1011221020112000,
+1001201110212000,
+1010201120112220,
+1011201110102022,
+1001201111115080,
+
+#LYRIC Sometimes I fear "What if I said the wrong thing?"
+3000201100104010,
+1011202200112010,
+#LYRIC My mind paces through thoughts like a [broken metronome]
+1011200010012011,
+1011201101102220,
+#LYRIC but in the end, I don't have time to worry 
+3000201100104010,
+1011202200112010,
+#LYRIC because it won't matter.
+1012022010012011,
+#LYRIC No, I can't [chase] after my past
+1011201030203020,
+
+#GOGOSTART
+1011201110102101,
+1011201101102100,
+#LYRIC like [the wind] that blows each fall evening
+3011201030112010,
+3011201030203020,
+#LYRIC It'll always be stuck with me... 
+1011201010201100,
+1011202210300
+#GOGOEND
+300,
+
+#GOGOSTART
+#LYRIC It'll always be stuck with me,
+3011201102102011,
+1011201202100100,
+#LYRIC only inside of my empty heart.
+3022101100221011,
+002210221
+#LYRIC No more will I wear a mask of lies,
+0201200,
+1122102011201200,
+101120
+#LYRIC So I will be me.
+2202102110,
+#GOGOEND
+
+3,
+,
+,
+#END
+
+COURSE:Hard
+LEVEL:5
+BALLOON:30
+SCOREINIT:2500
+SCOREDIFF:0
+
+#START
+#SCROLL 0.88
+1001100010002000,
+1001101010002000,
+1001100010002000,
+
+#LYRIC The [days and nights] fly over me
+0010102200020020,
+1002000000002010,
+#LYRIC in a time so fast, it feels like only seconds.
+10210221,
+1001020100002040,
+#LYRIC And soon they go, and disappear...
+300000200000200000100100000000000200000020002000,
+20000022,
+#LYRIC like I once wished to be able to do.
+10210221,
+1001000010002220,
+
+#LYRIC But I wonder, does time truly pass?
+3000201100000020,
+1000202200020020,
+#LYRIC Does it fade away?
+10220000000
+#LYRIC [Fade away forever?]
+20020,
+1022010010002220,
+#LYRIC Because it just feels like
+3000201100000020,
+1000
+#LYRIC change doesn't exist for me, at least.
+202200020020,
+1022010000002100,
+#LYRIC These [lost emotions] can't be helped,
+5008,
+
+#GOGOSTART
+1000201110102000,
+1000201110102000,
+#LYRIC but I'll still keep going on each day
+10211021,
+1000201010200200,
+#LYRIC Even if I'm not here...
+1000201110102000,
+1000201110
+#LYRIC I'll still be "me".
+#GOGOEND
+400000,
+
+7,
+#LYRIC
+8,
+1001100010002000,
+
+1000201110102000,
+1000201110102000,
+1000201110102000,
+1000201110102000,
+1000201110102000,
+1000201110102000,
+1000201110102000,
+1000201110102000,
+
+#LYRIC Sometimes I fear "What if I said the wrong thing?"
+3000201100000020,
+1010202200020020,
+#LYRIC My mind paces through thoughts like a [broken metronome]
+1011011000020020,
+1011011000002220,
+#LYRIC but in the end, I don't have time to worry 
+3000201100000020,
+1010202200020020,
+#LYRIC because it won't matter.
+1011011000002100,
+#LYRIC No, I can't [chase] after my past
+5008,
+
+#GOGOSTART
+1000201110102000,
+1000201110102000,
+#LYRIC like [the wind] that blows each fall evening
+1000201110002011,
+1000201110200100,
+#LYRIC It'll always be stuck with me... 
+1000201110102000,
+1000201110300
+#GOGOEND
+300,
+
+#GOGOSTART
+#LYRIC It'll always be stuck with me,
+1010201110102010,
+1010201110202000,
+#LYRIC only inside of my empty heart.
+1000201110002011,
+100020111
+#LYRIC No more will I wear a mask of lies,
+0200200,
+1010201110102010,
+101020
+#LYRIC So I will be me.
+1110202220,
+#GOGOEND
+
+3,
+,
+,
+#END
+
+COURSE:Normal
+LEVEL:3
+BALLOON:25
+SCOREINIT:3280
+SCOREDIFF:0
+
+#START
+#SCROLL 0.88
+3012,
+10011020,
+10001021,
+
+#LYRIC The [days and nights] fly over me
+3212,
+10211020,
+#LYRIC in a time so fast, it feels like only seconds.
+1212,
+10211020,
+#LYRIC And soon they go, and disappear...
+3212,
+10211020,
+#LYRIC like I once wished to be able to do.
+1212,
+10211020,
+
+#LYRIC But I wonder, does time truly pass?
+3212,
+10211020,
+#LYRIC Does it fade away?
+10002010100
+#LYRIC [Fade away forever?]
+02000,
+10211020,
+#LYRIC Because it just feels like
+3212,
+10
+#LYRIC change doesn't exist for me, at least.
+211020,
+10211020,
+#LYRIC These [lost emotions] can't be helped,
+10212222,
+
+#GOGOSTART
+30211020,
+10211020,
+#LYRIC but I'll still keep going on each day
+10211020,
+10211020,
+#LYRIC Even if I'm not here...
+30211020,
+10211
+#LYRIC I'll still be "me".
+#GOGOEND
+300,
+
+7,
+#LYRIC
+8,
+10001022,
+
+3212,
+10211020,
+1212,
+10211022,
+3212,
+10211020,
+1212,
+10211020,
+
+#LYRIC Sometimes I fear "What if I said the wrong thing?"
+30211020,
+10211020,
+#LYRIC My mind paces through thoughts like a [broken metronome]
+10211020,
+10211020,
+#LYRIC but in the end, I don't have time to worry 
+30211020,
+10211020,
+#LYRIC because it won't matter.
+10211020,
+#LYRIC No, I can't [chase] after my past
+10211020,
+
+#GOGOSTART
+30211020,
+10211020,
+#LYRIC like [the wind] that blows each fall evening
+10211020,
+10211020,
+#LYRIC It'll always be stuck with me... 
+10211020,
+1000201010004
+#GOGOEND
+000,
+
+#GOGOSTART
+#LYRIC It'll always be stuck with me,
+30211020,
+10211220,
+#LYRIC only inside of my empty heart.
+11201020,
+100020101
+#LYRIC No more will I wear a mask of lies,
+0202000,
+1212,
+102
+#LYRIC So I will be me.
+11220,
+#GOGOEND
+
+3,
+,
+,
+#END
+
+COURSE:Easy
+LEVEL:1
+BALLOON:20
+SCOREINIT:5260
+SCOREDIFF:0
+
+#START
+#SCROLL 0.88
+3012,
+1012,
+1012,
+
+#LYRIC The [days and nights] fly over me
+3012,
+1012,
+#LYRIC in a time so fast, it feels like only seconds.
+1012,
+1012,
+#LYRIC And soon they go, and disappear...
+3012,
+1012,
+#LYRIC like I once wished to be able to do.
+1012,
+1012,
+
+#LYRIC But I wonder, does time truly pass?
+3210,
+1210,
+#LYRIC Does it fade away?
+50000000800
+#LYRIC [Fade away forever?]
+00000,
+58,
+#LYRIC Because it just feels like
+3210,
+1
+#LYRIC change doesn't exist for me, at least.
+210,
+58,
+#LYRIC These [lost emotions] can't be helped,
+58,
+
+#GOGOSTART
+3212,
+1212,
+#LYRIC but I'll still keep going on each day
+1212,
+1258,
+#LYRIC Even if I'm not here...
+3212,
+10200
+#LYRIC I'll still be "me".
+#GOGOEND
+300,
+
+7,
+#LYRIC
+8,
+,
+
+3212,
+1212,
+1212,
+1212,
+3212,
+1212,
+1212,
+58,
+
+#LYRIC Sometimes I fear "What if I said the wrong thing?"
+3202,
+1202,
+#LYRIC My mind paces through thoughts like a [broken metronome]
+1202,
+1202,
+#LYRIC but in the end, I don't have time to worry 
+3202,
+1202,
+#LYRIC because it won't matter.
+1202,
+#LYRIC No, I can't [chase] after my past
+5008,
+
+#GOGOSTART
+1212,
+1212,
+#LYRIC like [the wind] that blows each fall evening
+1212,
+1212,
+#LYRIC It'll always be stuck with me... 
+1212,
+5000000080000
+#GOGOEND
+000,
+
+#GOGOSTART
+#LYRIC It'll always be stuck with me,
+3212,
+1212,
+#LYRIC only inside of my empty heart.
+1212,
+100020005
+#LYRIC No more will I wear a mask of lies,
+0008000,
+1212,
+102
+#LYRIC So I will be me.
+00020,
+#GOGOEND
+
+3,
+,
+,
+#END

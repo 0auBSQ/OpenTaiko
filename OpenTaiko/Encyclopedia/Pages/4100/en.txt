@@ -1,0 +1,13 @@
+Each Puchichara is defined by 4 files :
+
+- Chara.png : The 2 frames for the Puchichara.
+The texture size is 512x256px.
+Both frames should be 256x256px each before merging.
+
+- Metadata.json : The Puchichara's related informations.
+A .json file with 3 attributes :
+- "name" : The Puchichara's name.
+- "rarity" : The Puchichara's rarity. 
+=> (Poor), Common, Uncommon, Rare, Epic, Legendary
+=> Has effects on the unlocking modal style and on the name text color.
+- "author" : The Puchichara's maker/artist name.

@@ -1,0 +1,46 @@
+{
+	"Pidgey's TJADB CDN" : {
+		"baseUrl": "https://tjadataba.se/",
+		"download": {
+			"en": "download/eng/",
+			"default": "download/orig/",
+		},
+		"songList": "api/browse",
+		"hooks": {
+			"id": "_id",
+			"title": {
+				"en": "title_en",
+				"default": "title_orig",
+			},
+			"subtitle": {
+				"en": "subtitle_en",
+				"default": "subtitle_orig",
+			},
+			"difficulties": [
+				"d_kantan",
+				"d_futsuu",
+				"d_muzukashii",
+				"d_oni",
+				"d_ura",
+				"d_tower",
+				"d_dan",
+			],
+			"life": "d_tower_lives",
+			"updateDate": "last_updated",
+			"creationDate": "created",
+			"uploadDate": "uploaded",
+			"md5": {
+				"en": "tja_en_md5",
+				"default": "tja_orig_md5",
+			},
+			"charter": "charter",
+			"genre": "genre",
+			"genreSub": {
+				"en": "name_en",
+				"default": "name_jp",
+			}
+		}
+		
+		
+	}
+}
