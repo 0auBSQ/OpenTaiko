@@ -1,0 +1,38 @@
+[
+	{
+		"name": "Taiko",
+		"path": "Taiko\\",
+		"format": "OGG",
+	},
+	{
+		"name": "Electro",
+		"path": "Electro\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Konga",
+		"path": "Konga\\",
+		"format": "WAV",
+	},
+	{
+	      "name": "'08 Dual",
+		"path": "'08 Dual\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Break",
+		"path": "Break\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Gorgeous Taiko",
+		"path": "Gorgeous Taiko\\",
+		"format": "WAV",
+	},
+	{
+	      "name": "None",
+		"path": "None",
+		"format": "WAV",
+	},    
+	
+]

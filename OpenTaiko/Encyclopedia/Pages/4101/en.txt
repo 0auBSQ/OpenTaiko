@@ -1,0 +1,12 @@
+- Unlock.json : The Puchichara's unlock informations.
+A .json file with 3 attributes :
+- "condition" : The unlock condition type.
+- "type" : The value comparer used with the condition. 
+- "values" : An array of values related to the condition.
+=> Unfinished feature, more informations coming soon.
+
+- Welcome.ogg : A voice sample played when the Puchichara is selected.
+Also plays when the Puchichara is unlocked.
+
+Puchicharas can have the folder name of your choice.
+They have to be put within the "Global/PuchiChara" folder.

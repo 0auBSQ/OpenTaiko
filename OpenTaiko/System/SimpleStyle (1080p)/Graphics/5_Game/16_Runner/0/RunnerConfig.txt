@@ -1,0 +1,14 @@
+
+Game_Runner_Size=90,187
+
+Game_Runner_Ptn=48
+
+Game_Runner_Type=4
+
+
+Game_Runner_StartPoint_X=262,262
+
+Game_Runner_StartPoint_Y=60,840
+
+
+Game_Runner_Timer=10

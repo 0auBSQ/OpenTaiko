@@ -1,0 +1,13 @@
+每个迷你角色由以下４个文件定义：
+
+- Chara.png：存储迷你角色的２帧。
+图片尺寸为512×256像素。
+其中每帧为256×256像素。
+
+- Metadata.json：存储迷你角色相关信息。
+该JSON文件含有以下３个参数：
+- "name"：迷你角色名称。
+- "rarity"：迷你角色稀有度。
+=> (Poor)、Common、Uncommon、Rare、Epic、Legendary
+=> 决定解锁画面和名称的文字颜色。
+- "author"：迷你角色作者姓名。

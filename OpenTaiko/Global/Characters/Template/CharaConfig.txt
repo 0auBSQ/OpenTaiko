@@ -1,0 +1,95 @@
+
+Chara_Resolution=1280,720
+
+;キャラのX座標。(1P,2P)
+Game_Chara_X=0,0
+
+;キャラのY座標。(1P,2P)
+Game_Chara_Y=0,537
+
+;3人プレイ以上のキャラの座標。(X, Y)
+Game_Chara_4P=165,68
+
+;5人プレイのキャラの座標。(X, Y)
+Game_Chara_5P=165,40
+                
+;キャラのX座標。(1P,2P)
+Game_Chara_X_AI=472,602
+
+;キャラのY座標。(1P,2P)
+Game_Chara_Y_AI=152,152
+
+;キャラの通常時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Normal=0
+
+;キャラのミス時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Miss=0
+
+;キャラの連続でミス時モーション指定。(カンマ区切り)
+Game_Chara_Motion_MissDown=0
+
+;キャラのクリア時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Clear=0
+
+;キャラのゴーゴータイム時モーション指定。(４分の4拍子換算)
+Game_Chara_Motion_GoGo=0
+
+;キャラの通常時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Normal=4
+
+;キャラのミス時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Miss=1
+
+;キャラの連続でミス時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_MissDown=1
+
+;キャラのクリア時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Clear=2
+
+;キャラのゴーゴータイム時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_GoGo=4
+
+;ふうせん連打時のキャラ画像X座標。(X,Y)
+Game_Chara_Balloon_X=0,0
+
+;ふうせん連打時のキャラ画像Y座標。(X,Y)
+Game_Chara_Balloon_Y=0,297
+
+;3人プレイ以上のふうせん連打時のキャラ画像X座標。
+Game_Chara_Balloon_4P=0,-176
+
+;3人プレイ以上のふうせん連打時のキャラ画像Y座標。
+Game_Chara_Balloon_5P=0,-168
+
+;ふうせん連打アクション時に使用するタイマーの更新間隔。(ms)
+Game_Chara_Balloon_Timer=16
+
+;ふうせん連打成功 / 失敗 のフェードアウトにかける時間 (ms)
+Game_Chara_Balloon_FadeOut=500
+
+;エントリーアニメーションにかける時間 (ms)
+Chara_Entry_AnimationDuration=1000
+
+;演奏画面以外の通常アニメーションにかける時間 (ms)
+Chara_Normal_AnimationDuration=1000
+
+;メニューのループアニメーションにかける時間 (ms)
+Chara_Menu_Loop_AnimationDuration=1000
+
+;メニューの選択アニメーションにかける時間 (ms)
+Chara_Menu_Select_AnimationDuration=1000
+
+;メニューの開始アニメーションにかける時間 (ms)
+Chara_Menu_Start_AnimationDuration=1000
+
+;結果画面の通常アニメーションにかける時間 (ms)
+Chara_Result_Normal_AnimationDuration=1000
+
+;結果画面のクリアアニメーションにかける時間 (ms)
+Chara_Result_Clear_AnimationDuration=1000
+
+;結果画面のクリア失敗の最初のアニメーションにかける時間 (ms)
+Chara_Result_Failed_In_AnimationDuration=1000
+
+;結果画面のクリア失敗のアニメーションにかける時間 (ms)
+Chara_Result_Failed_AnimationDuration=1000
