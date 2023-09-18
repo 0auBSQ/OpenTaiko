@@ -243,6 +243,32 @@ namespace TJAPlayer3
                                 }
                             }
                             break;
+                        case Anime.MissIn:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_MissIn[Character] != null && TJAPlayer3.Skin.Characters_MissIn_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_MissIn[Character][TJAPlayer3.Skin.Characters_Motion_MissIn[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
+                        case Anime.MissDownIn:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_MissDownIn[Character] != null && TJAPlayer3.Skin.Characters_MissDownIn_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_MissDownIn[Character][TJAPlayer3.Skin.Characters_Motion_MissDownIn[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
                         case Anime.GoGoTime:
                             {
                                 updateNormal();
@@ -692,6 +718,8 @@ namespace TJAPlayer3
             MissDown,
             Cleared,
             Maxed,
+            MissIn,
+            MissDownIn,
             GoGoTime,
             GoGoTime_Maxed,
             Combo10,
@@ -744,6 +772,14 @@ namespace TJAPlayer3
                 case Anime.Maxed:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_ClearMax[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearMax[iCurrentCharacter[player]];
+                    break;
+                case Anime.MissIn:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_MissIn[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissIn[iCurrentCharacter[player]];
+                    break;
+                case Anime.MissDownIn:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_MissDownIn[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissDownIn[iCurrentCharacter[player]];
                     break;
                 case Anime.GoGoTime:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGo[iCurrentCharacter[player]].Length - 1;

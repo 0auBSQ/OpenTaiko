@@ -1967,6 +1967,23 @@ namespace TJAPlayer3
                         this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.SoulOut, true);
                     }
                 }
+                else 
+                {
+                    if (Chara_MissCount[nPlayer] == 1 - 1)
+                    {
+                        if(TJAPlayer3.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                        {
+                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissIn, true);
+                        }
+                    }
+                    else if (Chara_MissCount[nPlayer] == 6 - 1)
+                    {
+                        if(TJAPlayer3.Skin.Characters_MissDownIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                        {
+                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissDownIn, true);
+                        }
+                    }
+                }
                 if (!cleared && this.bIsAlreadyCleared[nPlayer] == true)
                 {
                     this.bIsAlreadyCleared[nPlayer] = false;
