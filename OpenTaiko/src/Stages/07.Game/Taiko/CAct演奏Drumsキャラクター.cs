@@ -171,8 +171,8 @@ namespace TJAPlayer3
                     }
                 }
                 nNowCharaFrame[i] = (int)nNowCharaCounter[i];
+                bool endAnime = nNowCharaFrame[i] > nCharaFrameCount[i];
                 nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
-                bool endAnime = nNowCharaFrame[i] >= nCharaFrameCount[i];
 
                 if (eNowAnime[i] != Anime.None)
                 {
@@ -243,6 +243,32 @@ namespace TJAPlayer3
                                 }
                             }
                             break;
+                        case Anime.MissIn:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_MissIn[Character] != null && TJAPlayer3.Skin.Characters_MissIn_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_MissIn[Character][TJAPlayer3.Skin.Characters_Motion_MissIn[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
+                        case Anime.MissDownIn:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_MissDownIn[Character] != null && TJAPlayer3.Skin.Characters_MissDownIn_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_MissDownIn[Character][TJAPlayer3.Skin.Characters_Motion_MissDownIn[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
                         case Anime.GoGoTime:
                             {
                                 updateNormal();
@@ -280,6 +306,19 @@ namespace TJAPlayer3
                                 }
                             }
                             break;
+                        case Anime.Combo10_Clear:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_10Combo_Clear[Character] != null && TJAPlayer3.Skin.Characters_10Combo_Clear_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_10Combo_Clear[Character][TJAPlayer3.Skin.Characters_Motion_10Combo_Clear[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
                         case Anime.Combo10_Max:
                             {
                                 updateNormal();
@@ -299,6 +338,19 @@ namespace TJAPlayer3
                                 if (TJAPlayer3.Tx.Characters_GoGoStart[Character] != null && TJAPlayer3.Skin.Characters_GoGoStart_Ptn[Character] != 0)
                                 {
                                     nowChara = TJAPlayer3.Tx.Characters_GoGoStart[Character][TJAPlayer3.Skin.Characters_Motion_GoGoStart[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
+                        case Anime.GoGoStart_Clear:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_GoGoStart_Clear[Character] != null && TJAPlayer3.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_GoGoStart_Clear[Character][TJAPlayer3.Skin.Characters_Motion_GoGoStart_Clear[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -338,6 +390,19 @@ namespace TJAPlayer3
                                 if (TJAPlayer3.Tx.Characters_Become_Maxed[Character] != null && TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[Character] != 0)
                                 {
                                     nowChara = TJAPlayer3.Tx.Characters_Become_Maxed[Character][TJAPlayer3.Skin.Characters_Motion_SoulIn[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
+                        case Anime.SoulOut:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_SoulOut[Character] != null && TJAPlayer3.Skin.Characters_SoulOut_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_SoulOut[Character][TJAPlayer3.Skin.Characters_Motion_SoulOut[Character][nNowCharaFrame[i]]];
                                 }
                                 if (endAnime)
                                 {
@@ -653,14 +718,19 @@ namespace TJAPlayer3
             MissDown,
             Cleared,
             Maxed,
+            MissIn,
+            MissDownIn,
             GoGoTime,
             GoGoTime_Maxed,
             Combo10,
+            Combo10_Clear,
             Combo10_Max,
             GoGoStart,
+            GoGoStart_Clear,
             GoGoStart_Max,
             Become_Cleared,
             Become_Maxed,
+            SoulOut,
             Return,
             Balloon_Breaking,
             Balloon_Broke,
@@ -684,59 +754,79 @@ namespace TJAPlayer3
                 case Anime.None:
                     break;
                 case Anime.Normal:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_Normal[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Normal[iCurrentCharacter[player]];
                     break;
                 case Anime.Miss:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Missed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_Miss[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Miss[iCurrentCharacter[player]];
                     break;
                 case Anime.MissDown:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_MissedDown_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_MissDown[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissDown[iCurrentCharacter[player]];
                     break;
                 case Anime.Cleared:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Cleared_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_Clear[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Clear[iCurrentCharacter[player]];
                     break;
                 case Anime.Maxed:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Normal_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_ClearMax[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearMax[iCurrentCharacter[player]];
                     break;
+                case Anime.MissIn:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_MissIn[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissIn[iCurrentCharacter[player]];
+                    break;
+                case Anime.MissDownIn:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_MissDownIn[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_MissDownIn[iCurrentCharacter[player]];
+                    break;
                 case Anime.GoGoTime:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoTime_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGo[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGo[iCurrentCharacter[player]];
                     break;
                 case Anime.GoGoTime_Maxed:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoTime_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGoMax[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoMax[iCurrentCharacter[player]];
                     break;
                 case Anime.Combo10:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_10Combo_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_10Combo[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_10Combo[iCurrentCharacter[player]];
                     break;
+                case Anime.Combo10_Clear:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_10Combo_Clear[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_10Combo_Clear[iCurrentCharacter[player]];
+                    break;
                 case Anime.Combo10_Max:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_10ComboMax[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_10ComboMax[iCurrentCharacter[player]];
                     break;
                 case Anime.GoGoStart:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoStart_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGoStart[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoStart[iCurrentCharacter[player]];
                     break;
+                case Anime.GoGoStart_Clear:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGoStart_Clear[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoStart_Clear[iCurrentCharacter[player]];
+                    break;
                 case Anime.GoGoStart_Max:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_GoGoStartMax[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_GoGoStartMax[iCurrentCharacter[player]];
                     break;
                 case Anime.Become_Cleared:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_ClearIn[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearIn[iCurrentCharacter[player]];
                     break;
                 case Anime.Become_Maxed:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_SoulIn[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_SoulIn[iCurrentCharacter[player]];
                     break;
+                case Anime.SoulOut:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_SoulOut[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_SoulOut[iCurrentCharacter[player]];
+                    break;
                 case Anime.Return:
-                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Return_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_Return[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_Return[iCurrentCharacter[player]];
                     break;
                 case Anime.Balloon_Breaking:
