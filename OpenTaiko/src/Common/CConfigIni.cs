@@ -4083,6 +4083,10 @@ namespace TJAPlayer3
 						sw.Write( 'J' );
 						break;
 
+					case E入力デバイス.Gamepad:
+						sw.Write( 'G' );
+						break;
+
 					case E入力デバイス.マウス:
 						sw.Write( 'N' );
 						break;
@@ -4106,6 +4110,10 @@ namespace TJAPlayer3
 					{
 						case 'J':
 							e入力デバイス = E入力デバイス.ジョイパッド;
+							break;
+							
+						case 'G':
+							e入力デバイス = E入力デバイス.Gamepad;
 							break;
 
 						case 'K':
