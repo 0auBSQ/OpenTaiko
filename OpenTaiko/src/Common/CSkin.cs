@@ -8248,7 +8248,6 @@ namespace TJAPlayer3
             Characters_Motion_MissDown,
             Characters_Motion_ClearIn,
             Characters_Motion_Clear,
-            Characters_Motion_Clear_Max,
             Characters_Motion_ClearMax,
             Characters_Motion_GoGoStart,
             Characters_Motion_GoGoStartMax,
