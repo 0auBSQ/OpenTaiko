@@ -122,7 +122,7 @@ namespace TJAPlayer3
 						this.bキー入力待ち = false;
 						TJAPlayer3.Input管理.Polling( false );
 					}
-					else if( ( this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn() ) || ( this.tキーチェックとアサイン_Joypad() || this.tキーチェックとアサイン_Mouse() ) )
+					else if( ( this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn() ) || ( this.tキーチェックとアサイン_Joypad() || tキーチェックとアサイン_Gamepad() || this.tキーチェックとアサイン_Mouse() ) )
 					{
 						this.bキー入力待ち = false;
 						TJAPlayer3.Input管理.Polling( false );
@@ -175,6 +175,10 @@ namespace TJAPlayer3
 
 						case E入力デバイス.ジョイパッド:
 							this.tアサインコードの描画_Joypad( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
+							break;
+
+						case E入力デバイス.Gamepad:
+							this.tアサインコードの描画_Gamepad( i + 1, x + num5, y, stkeyassignArray[ i ].ID, stkeyassignArray[ i ].コード, this.n現在の選択行 == i );
 							break;
 
 						case E入力デバイス.マウス:
@@ -290,6 +294,23 @@ namespace TJAPlayer3
 			}
 			TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x, y, string.Format( "{0,2}. Joypad #{1} ", line, nID ) + str, b強調, 0.75f );
 		}
+		private void tアサインコードの描画_Gamepad( int line, int x, int y, int nID, int nCode, bool b強調 )
+		{
+			string str = "";
+					if ((8 <= nCode) && (nCode < 8 + 128))              // other buttons (128 types)
+					{
+						str = string.Format("Button{0}", nCode - 7);
+					}
+					else if ((8 + 128 <= nCode) && (nCode < 8 + 128 + 8))       // POV HAT ( 8 types; 45 degrees per HATs)
+					{
+						str = string.Format("POV {0}", (nCode - 8 - 128) * 45);
+					}
+					else
+					{
+						str = string.Format( "Code{0}", nCode );
+					}
+			TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x, y, string.Format( "{0,2}. Gamepad #{1} ", line, nID ) + str, b強調, 0.75f );
+		}
 		private void tアサインコードの描画_Keyboard( int line, int x, int y, int nID, int nCode, bool b強調 )
 		{
 			string str = null;
@@ -314,6 +335,29 @@ namespace TJAPlayer3
 		private void tアサインコードの描画_Mouse( int line, int x, int y, int nID, int nCode, bool b強調 )
 		{
 			TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x, y, string.Format( "{0,2}. Mouse Button{1}", line, nCode ), b強調, 0.75f );
+		}
+		
+		private bool tキーチェックとアサイン_Gamepad()
+		{
+			foreach( IInputDevice device in TJAPlayer3.Input管理.InputDevices )
+			{
+				if( device.CurrentType == InputDeviceType.Gamepad )
+				{
+					for (int i = 0; i < 15; i++)      // +8 for Axis, +8 for HAT
+					{
+						if (device.KeyPressed(i))
+						{
+							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス.Gamepad, device.ID, i, this.pad);
+							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = E入力デバイス.Gamepad;
+							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
+							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].コード = i;
+							return true;
+						}
+					}
+				}
+			}
+			return false;
 		}
 		private bool tキーチェックとアサイン_Joypad()
 		{

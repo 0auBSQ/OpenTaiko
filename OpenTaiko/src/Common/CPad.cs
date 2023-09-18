@@ -17,6 +17,7 @@ namespace TJAPlayer3
 			public bool Keyboard;
 			public bool MIDIIN;
 			public bool Joypad;
+			public bool Gamepad;
 			public bool Mouse;
 			public void Clear()
 			{
@@ -133,6 +134,18 @@ namespace TJAPlayer3
 								this.st検知したデバイス.Joypad = true;
 								return true;
 							}
+						case E入力デバイス.Gamepad:
+							{
+								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
+									break;
+
+								IInputDevice device = this.rInput管理.Gamepad( stkeyassignArray[ i ].ID );
+								if( ( device == null ) || !device.KeyPressed( stkeyassignArray[ i ].コード ) )
+									break;
+
+								this.st検知したデバイス.Gamepad = true;
+								return true;
+							}
 						case E入力デバイス.マウス:
 							if( !this.rInput管理.Mouse.KeyPressed( stkeyassignArray[ i ].コード ) )
 								break;
@@ -189,6 +202,21 @@ namespace TJAPlayer3
 									break;
 								}
 								this.st検知したデバイス.Joypad = true;
+								return true;
+							}
+
+						case E入力デバイス.Gamepad:
+							{
+								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
+								{
+									break;
+								}
+								IInputDevice device = this.rInput管理.Gamepad( stkeyassignArray[ i ].ID );
+								if( ( device == null ) || !device.KeyPressing( stkeyassignArray[ i ].コード ) )
+								{
+									break;
+								}
+								this.st検知したデバイス.Gamepad = true;
 								return true;
 							}
 						case E入力デバイス.マウス:
