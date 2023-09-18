@@ -1967,7 +1967,7 @@ namespace TJAPlayer3
                         this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.SoulOut, true);
                     }
                 }
-                else 
+                else if (!bIsGOGOTIME[nPlayer])
                 {
                     if (Chara_MissCount[nPlayer] == 1 - 1)
                     {
