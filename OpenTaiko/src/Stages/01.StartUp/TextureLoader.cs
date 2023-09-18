@@ -1873,12 +1873,12 @@ namespace TJAPlayer3
                                     case "Game_Chara_Motion_Clear":
                                     {
                                         TJAPlayer3.Skin.Characters_Motion_Clear[i] = CConversion.StringToIntArray(strParam);
-                                        TJAPlayer3.Skin.Characters_Motion_Clear_Max[i] = CConversion.StringToIntArray(strParam);
+                                        TJAPlayer3.Skin.Characters_Motion_ClearMax[i] = TJAPlayer3.Skin.Characters_Motion_Clear[i];
                                         break;
                                     }
                                     case "Game_Chara_Motion_ClearMax":
                                     {
-                                        TJAPlayer3.Skin.Characters_Motion_Clear_Max[i] = CConversion.StringToIntArray(strParam);
+                                        TJAPlayer3.Skin.Characters_Motion_ClearMax[i] = CConversion.StringToIntArray(strParam);
                                         break;
                                     }
                                     case "Game_Chara_Motion_GoGoStart":
