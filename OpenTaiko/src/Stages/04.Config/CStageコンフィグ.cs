@@ -223,8 +223,6 @@ namespace TJAPlayer3
 				//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
 				//CDTXMania.tテクスチャの解放( ref this.txMenuカーソル );
 
-			TJAPlayer3.t安全にDisposeする(ref TJAPlayer3.Tx.Config_Cursor);
-
 			TJAPlayer3.tテクスチャの解放( ref this.tx説明文パネル );
 			base.ReleaseManagedResource();
 		}

@@ -1059,6 +1059,7 @@ namespace TJAPlayer3
 		public int nウインドウwidth;             // #23510 2010.10.31 yyagi add
 		public int nウインドウheight;                // #23510 2010.10.31 yyagi add
 		public Dictionary<int, string> dicJoystick;
+		public Dictionary<int, string> dicGamepad;
 		public Eダークモード eDark;
 		public Eランダムモード[] eRandom;
 		public Eダメージレベル eダメージレベル;
@@ -1872,6 +1873,7 @@ namespace TJAPlayer3
 			this.nヒット範囲ms.Poor = 108;
 			this.ConfigIniファイル名 = "";
 			this.dicJoystick = new Dictionary<int, string>( 10 );
+			this.dicGamepad = new Dictionary<int, string>( 10 );
 			this.tデフォルトのキーアサインに設定する();
 			#region [ velocityMin ]
 			this.nVelocityMin.LC = 0;					// #23857 2011.1.31 yyagi VelocityMin
@@ -2595,6 +2597,10 @@ namespace TJAPlayer3
 			foreach( KeyValuePair<int, string> pair in this.dicJoystick )
 			{
 				sw.WriteLine( "JoystickID={0},{1}", pair.Key, pair.Value );
+			}
+			foreach( KeyValuePair<int, string> pair in this.dicGamepad )
+			{
+				sw.WriteLine( "GamepadID={0},{1}", pair.Key, pair.Value );
 			}
 			#endregion
 			#region [ DrumsKeyAssign ]
@@ -3794,6 +3800,10 @@ namespace TJAPlayer3
 										{
 											this.tJoystickIDの取得( str4 );
 										}
+										else if( str3.Equals( "GamepadID" ) )
+										{
+											this.tGamepadIDの取得( str4 );
+										}
 										continue;
 									//-----------------------------
 									#endregion
@@ -4014,6 +4024,22 @@ namespace TJAPlayer3
 				}
 			}
 		}
+		private void tGamepadIDの取得( string strキー記述 )
+		{
+			string[] strArray = strキー記述.Split( new char[] { ',' } );
+			if( strArray.Length >= 2 )
+			{
+				int result = 0;
+				if( ( int.TryParse( strArray[ 0 ], out result ) && ( result >= 0 ) ) && ( result <= 9 ) )
+				{
+					if( this.dicGamepad.ContainsKey( result ) )
+					{
+						this.dicGamepad.Remove( result );
+					}
+					this.dicGamepad.Add( result, strArray[ 1 ] );
+				}
+			}
+		}
 		private void tキーアサインを全部クリアする()
 		{
 			this.KeyAssign = new CKeyAssign();
@@ -4057,6 +4083,10 @@ namespace TJAPlayer3
 						sw.Write( 'J' );
 						break;
 
+					case E入力デバイス.Gamepad:
+						sw.Write( 'G' );
+						break;
+
 					case E入力デバイス.マウス:
 						sw.Write( 'N' );
 						break;
@@ -4080,6 +4110,10 @@ namespace TJAPlayer3
 					{
 						case 'J':
 							e入力デバイス = E入力デバイス.ジョイパッド;
+							break;
+							
+						case 'G':
+							e入力デバイス = E入力デバイス.Gamepad;
 							break;
 
 						case 'K':
