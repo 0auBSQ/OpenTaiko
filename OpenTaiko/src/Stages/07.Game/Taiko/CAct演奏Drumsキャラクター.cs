@@ -171,8 +171,8 @@ namespace TJAPlayer3
                     }
                 }
                 nNowCharaFrame[i] = (int)nNowCharaCounter[i];
+                bool endAnime = nNowCharaFrame[i] > nCharaFrameCount[i];
                 nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
-                bool endAnime = nNowCharaFrame[i] >= nCharaFrameCount[i];
 
                 if (eNowAnime[i] != Anime.None)
                 {
