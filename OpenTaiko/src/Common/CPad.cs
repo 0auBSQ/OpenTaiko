@@ -81,6 +81,14 @@ namespace TJAPlayer3
 									}
 									break;
 
+								case E入力デバイス.Gamepad:
+									if( ( ( device.CurrentType == InputDeviceType.Gamepad ) && ( device.ID == stkeyassignArray[ i ].ID ) ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
+									{
+										list.Add( event2 );
+										this.st検知したデバイス.Gamepad = true;
+									}
+									break;
+
 								case E入力デバイス.マウス:
 									if( ( device.CurrentType == InputDeviceType.Mouse ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
