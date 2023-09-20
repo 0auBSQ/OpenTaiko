@@ -270,6 +270,7 @@ namespace TJAPlayer3
 		MIDI入力		= 1,
 		ジョイパッド	= 2,
 		マウス			= 3,
+		Gamepad = 4,
 		不明			= -1
 	}
 	public enum E判定

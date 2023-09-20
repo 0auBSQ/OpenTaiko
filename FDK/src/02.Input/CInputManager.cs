@@ -99,6 +99,10 @@ namespace FDK
 			{
 				this.InputDevices.Add(new CInputJoystick(joysticks));
 			}
+			foreach (var gamepad in Context.Gamepads)
+			{
+				this.InputDevices.Add(new CInputGamepad(gamepad));
+			}
 			#endregion
 		}
 
@@ -121,6 +125,28 @@ namespace FDK
 			foreach (IInputDevice device in this.InputDevices)
 			{
 				if ((device.CurrentType == InputDeviceType.Joystick) && device.GUID.Equals(GUID))
+				{
+					return device;
+				}
+			}
+			return null;
+		}
+		public IInputDevice Gamepad(int ID)
+		{
+			foreach (IInputDevice device in this.InputDevices)
+			{
+				if ((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == ID))
+				{
+					return device;
+				}
+			}
+			return null;
+		}
+		public IInputDevice Gamepad(string GUID)
+		{
+			foreach (IInputDevice device in this.InputDevices)
+			{
+				if ((device.CurrentType == InputDeviceType.Gamepad) && device.GUID.Equals(GUID))
 				{
 					return device;
 				}

@@ -2977,6 +2977,116 @@ namespace TJAPlayer3
                                     SongSelect_Option_ModMults2_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "SongSelect_NewHeya_Close_Select")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_Close_Select[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_PlayerPlate_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_NewHeya_PlayerPlate_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_PlayerPlate_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_NewHeya_PlayerPlate_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_ModeBar_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_NewHeya_ModeBar_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_ModeBar_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    SongSelect_NewHeya_ModeBar_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_ModeBar_Font_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_ModeBar_Font_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_Count")
+                            {
+                                SongSelect_NewHeya_Box_Count = int.Parse(strParam);
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                SongSelect_NewHeya_Box_X = new int[SongSelect_NewHeya_Box_Count]; 
+                                for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++)
+                                {
+                                    SongSelect_NewHeya_Box_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                SongSelect_NewHeya_Box_Y = new int[SongSelect_NewHeya_Box_Count]; 
+                                for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++)
+                                {
+                                    SongSelect_NewHeya_Box_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_Chara_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_Box_Chara_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_Name_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_Box_Name_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Box_Author_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_Box_Author_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_Lock_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_Lock_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "SongSelect_NewHeya_InfoSection_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    SongSelect_NewHeya_InfoSection_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
 
 
                             else if (strCommand == "SongSelect_ForeColor_JPOP")
@@ -8205,14 +8315,19 @@ namespace TJAPlayer3
             Characters_Normal_MissedDown_Ptn,
             Characters_Normal_Cleared_Ptn,
             Characters_Normal_Maxed_Ptn,
+            Characters_MissIn_Ptn,
+            Characters_MissDownIn_Ptn,
             Characters_GoGoTime_Ptn,
             Characters_GoGoTime_Maxed_Ptn,
             Characters_10Combo_Ptn,
+            Characters_10Combo_Clear_Ptn,
             Characters_10Combo_Maxed_Ptn,
             Characters_GoGoStart_Ptn,
+            Characters_GoGoStart_Clear_Ptn,
             Characters_GoGoStart_Maxed_Ptn,
             Characters_Become_Cleared_Ptn,
             Characters_Become_Maxed_Ptn,
+            Characters_SoulOut_Ptn,
             Characters_Return_Ptn,
             Characters_Balloon_Breaking_Ptn,
             Characters_Balloon_Broke_Ptn,
@@ -8243,31 +8358,41 @@ namespace TJAPlayer3
         public int[][] Characters_Balloon_5P;
         public int[][] Characters_Motion_Normal,
             Characters_Motion_10Combo,
+            Characters_Motion_10Combo_Clear,
             Characters_Motion_10ComboMax,
             Characters_Motion_Miss,
             Characters_Motion_MissDown,
             Characters_Motion_ClearIn,
             Characters_Motion_Clear,
             Characters_Motion_ClearMax,
+            Characters_Motion_MissIn,
+            Characters_Motion_MissDownIn,
             Characters_Motion_GoGoStart,
+            Characters_Motion_GoGoStart_Clear,
             Characters_Motion_GoGoStartMax,
             Characters_Motion_GoGo,
             Characters_Motion_GoGoMax,
             Characters_Motion_SoulIn,
+            Characters_Motion_SoulOut,
             Characters_Motion_Return;
         public float[] Characters_Beat_Normal,
             Characters_Beat_10Combo,
+            Characters_Beat_10Combo_Clear,
             Characters_Beat_10ComboMax,
             Characters_Beat_Miss,
             Characters_Beat_MissDown,
             Characters_Beat_ClearIn,
             Characters_Beat_Clear,
             Characters_Beat_ClearMax,
+            Characters_Beat_MissIn,
+            Characters_Beat_MissDownIn,
             Characters_Beat_GoGoStart,
+            Characters_Beat_GoGoStart_Clear,
             Characters_Beat_GoGoStartMax,
             Characters_Beat_GoGo,
             Characters_Beat_GoGoMax,
             Characters_Beat_SoulIn,
+            Characters_Beat_SoulOut,
             Characters_Beat_Return;
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
@@ -8614,6 +8739,26 @@ namespace TJAPlayer3
 
         public int[] SongSelect_Option_ModMults2_X = new int[] { 108, 1096 };
         public int[] SongSelect_Option_ModMults2_Y = new int[] { 52, 52 };
+
+
+        public int[] SongSelect_NewHeya_Close_Select = new int[] { 0, 0 };
+
+        public int[] SongSelect_NewHeya_PlayerPlate_X = new int[] { 0, 256, 513, 770, 1026 };
+        public int[] SongSelect_NewHeya_PlayerPlate_Y = new int[] { 66, 66, 66, 66, 66 };
+
+        public int[] SongSelect_NewHeya_ModeBar_X = new int[] { 0, 256, 513, 770, 1026 };
+        public int[] SongSelect_NewHeya_ModeBar_Y = new int[] { 200, 200, 200, 200, 200 };
+        public int[] SongSelect_NewHeya_ModeBar_Font_Offset = new int[] { 128, 33 };
+
+
+        public int SongSelect_NewHeya_Box_Count = 7;
+        public int[] SongSelect_NewHeya_Box_X = new int[] { -424, -120, 184, 488, 792, 1096, 1400 };
+        public int[] SongSelect_NewHeya_Box_Y = new int[] { 273, 273, 273, 273, 273, 273, 273 };
+        public int[] SongSelect_NewHeya_Box_Chara_Offset = new int[] { 152, 200 };
+        public int[] SongSelect_NewHeya_Box_Name_Offset = new int[] { 152, 386 };
+        public int[] SongSelect_NewHeya_Box_Author_Offset = new int[] { 152, 413 };
+        public int[] SongSelect_NewHeya_Lock_Offset = new int[]{ 0, 73 };
+        public int[] SongSelect_NewHeya_InfoSection_Offset = new int[] { 152, 206 };
 
         public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
         public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");

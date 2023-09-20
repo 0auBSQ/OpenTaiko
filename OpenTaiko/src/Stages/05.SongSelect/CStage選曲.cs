@@ -207,6 +207,7 @@ namespace TJAPlayer3
             base.ChildActivities.Add(this.act難易度選択画面 = new CActSelect難易度選択画面());
             base.ChildActivities.Add(this.actPlayOption = new CActPlayOption());
             base.ChildActivities.Add(this.actExExtraTransAnime = new CActSelectExExtraTransAnime());
+            base.ChildActivities.Add(this.actNewHeya = new CActNewHeya());
             base.ChildActivities.Add(this.PuchiChara = new PuchiChara());
 
 
@@ -866,7 +867,7 @@ namespace TJAPlayer3
                             this.act曲リスト.tMenuContextDisable();
                         }
                     }
-                    else if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.act難易度選択画面.bIsDifficltSelect)
+                    else if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.act難易度選択画面.bIsDifficltSelect && !actNewHeya.IsOpend)
                     {
                         #region [ ESC ]
                         if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) && (this.act曲リスト.r現在選択中の曲 != null))// && (  ) ) )
@@ -970,18 +971,24 @@ namespace TJAPlayer3
                             }
                         }
                         #endregion
-                        /*
                         #region [ F8 ランダム選曲 ]
-                        if (TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F8))
+                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F8))
                         {
+                            /*
                             if (TJAPlayer3.Skin.sound曲決定音.b読み込み成功)
                                 TJAPlayer3.Skin.sound曲決定音.t再生する();
                             else
                                 TJAPlayer3.Skin.sound決定音.t再生する();
                             this.t曲をランダム選択する();
+                            */
                         }
                         #endregion
-                        */
+                        #region [ F9  ]
+                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F9))
+                        {
+                            actNewHeya.Open();
+                        }
+                        #endregion
 
                         if (this.act曲リスト.r現在選択中の曲 != null)
                         {
@@ -1284,6 +1291,8 @@ namespace TJAPlayer3
                 if (act難易度選択画面.bOption[3]) actPlayOption.On進行描画(3);
                 if (act難易度選択画面.bOption[4]) actPlayOption.On進行描画(4);
 
+                if (actNewHeya.IsOpend) actNewHeya.Draw();
+
                 switch (base.eフェーズID)
                 {
                     case CStage.Eフェーズ.共通_フェードイン:
@@ -1398,6 +1407,7 @@ namespace TJAPlayer3
         public CActSelect難易度選択画面 act難易度選択画面;
         public CActPlayOption actPlayOption;
         public CActSelectExExtraTransAnime actExExtraTransAnime;
+        public CActNewHeya actNewHeya;
 
         public CActSortSongs actSortSongs;
         private CActSelectQuickConfig actQuickConfig;
@@ -1411,7 +1421,7 @@ namespace TJAPlayer3
         //private CCounter ctDonchan_Select;
         //public CCounter[] ctDonchan_Jump = new CCounter[2];
 
-        private PuchiChara PuchiChara;
+        public PuchiChara PuchiChara;
 
         private int nGenreBack;
         private int nOldGenreBack;

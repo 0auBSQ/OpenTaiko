@@ -1955,11 +1955,34 @@ namespace TJAPlayer3
 
 			if ( eJudgeResult == E判定.Poor || eJudgeResult == E判定.Miss || eJudgeResult == E判定.Bad )
             {
+                int Character = this.actChara.iCurrentCharacter[nPlayer];
+
                 // ランナー(みすったやつ)
                 this.actRunner.Start(nPlayer, true, pChip);
                 if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true)
                 {
                     this.bIsAlreadyMaxed[nPlayer] = false;
+                    if(TJAPlayer3.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                    {
+                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.SoulOut, true);
+                    }
+                }
+                else if (!bIsGOGOTIME[nPlayer])
+                {
+                    if (Chara_MissCount[nPlayer] == 1 - 1)
+                    {
+                        if(TJAPlayer3.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                        {
+                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissIn, true);
+                        }
+                    }
+                    else if (Chara_MissCount[nPlayer] == 6 - 1)
+                    {
+                        if(TJAPlayer3.Skin.Characters_MissDownIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                        {
+                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissDownIn, true);
+                        }
+                    }
                 }
                 if (!cleared && this.bIsAlreadyCleared[nPlayer] == true)
                 {
@@ -3931,12 +3954,19 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                                 {
-                                    if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
+                                    if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer) || TJAPlayer3.Skin.Characters_GoGoStart_Clear_Ptn[Character] == 0))
                                     {
                                         // 魂ゲージMAXではない
                                         // ゴーゴースタート_ノーマル
                                         this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart, true);
                                         //this.actChara.マイどん_アクション_10コンボ();
+                                    }
+                                }
+                                if (TJAPlayer3.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                                {
+                                    if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer))
+                                    {
+                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart_Clear, true);
                                     }
                                 }
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)

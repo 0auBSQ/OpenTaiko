@@ -2757,6 +2757,15 @@ for (int i = 0; i < 3; i++) {
 						}
 						ConfigIni.dicJoystick.Add( key, device.GUID );
 					}
+					else if( ( device.CurrentType == InputDeviceType.Gamepad ) && !ConfigIni.dicGamepad.ContainsValue( device.GUID ) )
+					{
+						int key = 0;
+						while( ConfigIni.dicGamepad.ContainsKey( key ) )
+						{
+							key++;
+						}
+						ConfigIni.dicGamepad.Add( key, device.GUID );
+					}
 				}
 				foreach( IInputDevice device2 in Input管理.InputDevices )
 				{
@@ -2767,6 +2776,18 @@ for (int i = 0; i < 3; i++) {
 							if( device2.GUID.Equals( pair.Value ) )
 							{
 								( (CInputJoystick) device2 ).SetID( pair.Key );
+								break;
+							}
+						}
+						continue;
+					}
+					else if( device2.CurrentType == InputDeviceType.Gamepad )
+					{
+						foreach( KeyValuePair<int, string> pair in ConfigIni.dicGamepad )
+						{
+							if( device2.GUID.Equals( pair.Value ) )
+							{
+								( (CInputGamepad) device2 ).SetID( pair.Key );
 								break;
 							}
 						}

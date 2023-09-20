@@ -455,10 +455,12 @@ namespace FDK
 
             Matrix4X4<float> mvp = Matrix4X4<float>.Identity;
 
+            float trueWidth = Math.Abs((float)rc画像内の描画領域.Width);
+            float trueHeight = Math.Abs((float)rc画像内の描画領域.Height);
 
             Matrix4X4<float> scaling()
             {
-                Matrix4X4<float> resizeMatrix = Matrix4X4.CreateScale((float)rc画像内の描画領域.Width / GameWindowSize.Width, (float)rc画像内の描画領域.Height / GameWindowSize.Height, 0.0f);
+                Matrix4X4<float> resizeMatrix = Matrix4X4.CreateScale(trueWidth / GameWindowSize.Width, trueHeight / GameWindowSize.Height, 0.0f);
                 Matrix4X4<float> scaleMatrix = Matrix4X4.CreateScale(vc拡大縮小倍率.X, vc拡大縮小倍率.Y, vc拡大縮小倍率.Z);
                 return resizeMatrix * scaleMatrix;
             }
@@ -482,8 +484,8 @@ namespace FDK
 
                 Matrix4X4<float> translation = Matrix4X4.CreateTranslation(api_x, api_y, 0.0f);
                 Matrix4X4<float> translation2 = Matrix4X4.CreateTranslation(
-                    (rc画像内の描画領域.Width * vc拡大縮小倍率.X / GameWindowSize.Width), 
-                    (rc画像内の描画領域.Height * vc拡大縮小倍率.Y / GameWindowSize.Height) * -1, 
+                    (trueWidth * vc拡大縮小倍率.X / GameWindowSize.Width), 
+                    (trueHeight * vc拡大縮小倍率.Y / GameWindowSize.Height) * -1, 
                     0.0f);
                 return translation * translation2;
             }
