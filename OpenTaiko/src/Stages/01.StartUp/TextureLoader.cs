@@ -371,6 +371,19 @@ namespace TJAPlayer3
             }
             #endregion
 
+            NewHeya_Close = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}Close.png");
+            NewHeya_Close_Select = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}Close_Select.png");
+            NewHeya_PlayerPlate[0] = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_1P.png");
+            NewHeya_PlayerPlate[1] = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_2P.png");
+            NewHeya_PlayerPlate[2] = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_3P.png");
+            NewHeya_PlayerPlate[3] = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_4P.png");
+            NewHeya_PlayerPlate[4] = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_5P.png");
+            NewHeya_PlayerPlate_Select = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}PlayerPlate_Select.png");
+            NewHeya_ModeBar = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}ModeBar.png");
+            NewHeya_ModeBar_Select = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}ModeBar_Select.png");
+            NewHeya_Box = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}Box.png");
+            NewHeya_Lock = TxC(SONGSELECT + @$"NewHeya{Path.DirectorySeparatorChar}Lock.png");
+
             #endregion
 
             #region 3_段位選択画面
@@ -2361,6 +2374,15 @@ namespace TJAPlayer3
         public CTexture[] Difficulty_Select_Bar = new CTexture[5];
         public CTexture[] Difficulty_Back;
         #endregion
+
+        public CTexture NewHeya_Close;
+        public CTexture NewHeya_Close_Select;
+        public CTexture[] NewHeya_PlayerPlate = new CTexture[5];
+        public CTexture NewHeya_PlayerPlate_Select;
+        public CTexture NewHeya_ModeBar;
+        public CTexture NewHeya_ModeBar_Select;
+        public CTexture NewHeya_Box;
+        public CTexture NewHeya_Lock;
 
         #endregion
 
