@@ -1098,9 +1098,15 @@ namespace TJAPlayer3
             //for (int i = 0; i < 3; i++)
                 //Result_Work[i] = TxC(RESULT + @$"Work{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
 
-
-            for (int i = 0; i < 41; i++)
-                Result_Rainbow[i] = TxC(RESULT + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+            TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + RESULT + @$"Rainbow{Path.DirectorySeparatorChar}"));
+            if (TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn != 0)
+            {
+                Result_Rainbow = new CTexture[TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn];
+                for (int i = 0; i < TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn; i++)
+                {
+                    Result_Rainbow[i] = TxC(RESULT + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+                }
+            }
 
             //for (int i = 0; i < 6; i++)
                 //Result_Background[i] = TxC(RESULT + @$"Background_" + i.ToString() + ".png");

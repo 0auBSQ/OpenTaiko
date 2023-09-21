@@ -207,13 +207,8 @@ namespace TJAPlayer3
 
 		public override void Activate()
 		{
-            if( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.FontName ) )
-            {
-                this.pfMusicName = new CCachedFontRenderer( TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Game_MusicName_FontSize);
-                //this.pf縦書きテスト = new CPrivateFastFont( new FontFamily( CDTXMania.ConfigIni.strPrivateFontで使うフォント名 ), 22 );
-            }
-
-			this.txPanel = null;
+            this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_MusicName_FontSize);
+            this.txPanel = null;
 			this.ct進行用 = new CCounter();
 			this.Start();
             this.bFirst = true;
