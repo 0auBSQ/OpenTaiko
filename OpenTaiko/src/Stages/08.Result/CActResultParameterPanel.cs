@@ -451,7 +451,7 @@ namespace TJAPlayer3
 								}
 									
 								if (!ct虹ゲージアニメ.IsTicked)
-									ct虹ゲージアニメ.Start(0, 40, 1000 / 60, TJAPlayer3.Timer);
+									ct虹ゲージアニメ.Start(0, TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn - 1, TJAPlayer3.Skin.Result_Gauge_Rainbow_Interval, TJAPlayer3.Timer);
 
 								if (!ctSoul.IsTicked)
 									ctSoul.Start(0, 8, 33, TJAPlayer3.Timer);

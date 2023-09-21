@@ -6261,6 +6261,10 @@ namespace TJAPlayer3
                                     Result_Gauge_Rainbow_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Result_Gauge_Rainbow_Interval")
+                            {
+                                Result_Gauge_Rainbow_Interval = int.Parse(strParam);
+                            }
                             else if (strCommand == "Result_Gauge_ClearText_X")
                             {
                                 string[] strSplit = strParam.Split(',');
@@ -9471,6 +9475,8 @@ namespace TJAPlayer3
 
         public int[] Result_Gauge_Rainbow_X = new int[] { 57, 692 };
         public int[] Result_Gauge_Rainbow_Y = new int[] { 144, 144 };
+        public int Result_Gauge_Rainbow_Ptn;
+        public int Result_Gauge_Rainbow_Interval = 1000 / 60;
 
         public int[] Result_Gauge_ClearText_X = new int[] { 441, 1076 };
         public int[] Result_Gauge_ClearText_Y = new int[] { 142, 142 };
