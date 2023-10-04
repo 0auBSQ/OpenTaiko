@@ -43,7 +43,7 @@ namespace TJAPlayer3
 
 		    {
 		        this.txMusicName = TJAPlayer3.tテクスチャの生成(bmpSongTitle, false);
-		        txMusicName.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName);
+		        txMusicName.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName, TJAPlayer3.Skin.Result_MusicName_MaxSize);
 		    }
 
 			base.Activate();

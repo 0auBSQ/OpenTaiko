@@ -3538,6 +3538,10 @@ namespace TJAPlayer3
                             {
                                 SongLoading_Title_Y = int.Parse(strParam);
                             }
+                            else if (strCommand == nameof(SongLoading_Title_MaxSize))
+                            {
+                                SongLoading_Title_MaxSize = int.Parse(strParam);
+                            }
                             else if (strCommand == nameof(SongLoading_SubTitle_X))
                             {
                                 SongLoading_SubTitle_X = int.Parse(strParam);
@@ -3545,6 +3549,10 @@ namespace TJAPlayer3
                             else if (strCommand == nameof(SongLoading_SubTitle_Y))
                             {
                                 SongLoading_SubTitle_Y = int.Parse(strParam);
+                            }
+                            else if (strCommand == nameof(SongLoading_SubTitle_MaxSize))
+                            {
+                                SongLoading_SubTitle_MaxSize = int.Parse(strParam);
                             }
                             else if (strCommand == nameof(SongLoading_Plate_X_AI))
                             {
@@ -6542,6 +6550,10 @@ namespace TJAPlayer3
                                 if (int.Parse(strParam) > 0)
                                     Result_MusicName_FontSize = int.Parse(strParam);
                             }
+                            else if (strCommand == nameof(Result_MusicName_MaxSize))
+                            {
+                                Result_MusicName_MaxSize = int.Parse(strParam);
+                            }
                             else if (strCommand == nameof(Result_MusicName_ReferencePoint))
                             {
                                 Result_MusicName_ReferencePoint = (ReferencePoint)int.Parse(strParam);
@@ -8879,8 +8891,10 @@ namespace TJAPlayer3
         public int SongLoading_Plate_Y = 360;
         public int SongLoading_Title_X = 640;
         public int SongLoading_Title_Y = 280;
+        public int SongLoading_Title_MaxSize = 710;
         public int SongLoading_SubTitle_X = 640;
         public int SongLoading_SubTitle_Y = 325;
+        public int SongLoading_SubTitle_MaxSize = 710;
 
         public int SongLoading_Plate_X_AI = 640;
         public int SongLoading_Plate_Y_AI = 360;
@@ -9032,10 +9046,10 @@ namespace TJAPlayer3
         public int[] Game_CourseSymbol_Back_Rect_5P = new int[] { 0, 140, 384, 105 };
         #endregion
         #region PanelFont
-        public int Game_MusicName_X = 1160;
+        public int Game_MusicName_X = 1260;
         public int Game_MusicName_Y = 24;
         public int Game_MusicName_FontSize = 27;
-        public int Game_MusicName_MaxWidth = 195;
+        public int Game_MusicName_MaxWidth = 660;
         public ReferencePoint Game_MusicName_ReferencePoint = ReferencePoint.Center;
         public int Game_Genre_X = 1015;
         public int Game_Genre_Y = 70;
@@ -9185,7 +9199,7 @@ namespace TJAPlayer3
         public int[] Game_Balloon_Combo_Y = new int[] { -11, 538 };
         public int[] Game_Balloon_Combo_Number_X = new int[] { 257, 257 };
         public int[] Game_Balloon_Combo_Number_Y = new int[] { 54, 603 };
-        public int[] Game_Balloon_Combo_Number_Ex_X = new int[] { 297, 297 };
+        public int[] Game_Balloon_Combo_Number_Ex_X = new int[] { 257, 257 };
         public int[] Game_Balloon_Combo_Number_Ex_Y = new int[] { 54, 603 };
         public int[] Game_Balloon_Combo_Number_Size = new int[] { 53, 62 };
         public int[] Game_Balloon_Combo_Number_Interval = new int[] { 45, 0 };
@@ -9558,6 +9572,7 @@ namespace TJAPlayer3
         public int Result_MusicName_X = 640;
         public int Result_MusicName_Y = 30;
         public int Result_MusicName_FontSize = 25;
+        public int Result_MusicName_MaxSize = 660;
         public ReferencePoint Result_MusicName_ReferencePoint = ReferencePoint.Center;
         public int Result_StageText_X = 230;
         public int Result_StageText_Y = 6;

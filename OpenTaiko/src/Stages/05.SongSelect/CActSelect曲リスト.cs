@@ -1016,7 +1016,7 @@ namespace TJAPlayer3
 			#region [ Songs not found画像 ]
 			try
 			{
-				this.txSongNotFound = new CTexture(ft曲リスト用フォント.DrawText_V("Songs not found.\nYou need to install songs.", Color.White));
+				this.txSongNotFound = new CTexture(ft曲リスト用フォント.DrawText("Songs not found.\nYou need to install songs.", Color.White));
 				this.txSongNotFound.vc拡大縮小倍率 = new Vector3D<float>( 0.5f, 0.5f, 1f );	// 半分のサイズで表示する。
 
 				/*
@@ -1048,7 +1048,7 @@ namespace TJAPlayer3
 			#region [ "曲データを検索しています"画像 ]
 			try
 			{
-				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText_V("Now enumerating songs.\nPlease wait...", Color.White));
+				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText("Now enumerating songs.\nPlease wait...", Color.White));
 				this.txEnumeratingSongs.vc拡大縮小倍率 = new Vector3D<float>( 0.5f, 0.5f, 1f );	// 半分のサイズで表示する。
 
 				/*

@@ -560,7 +560,13 @@ namespace TJAPlayer3
 
                             if (TJAPlayer3.Tx.Puchichara[index].unlock != null
                                 && !TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[index]))
-                                TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
+                            {
+                                TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[1]);
+                                
+                                if (this.ttkInfoSection != null)
+                                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkInfoSection)
+                                        .t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
+                            }
                         }
                         break;
                         case ModeType.SubTitle:
