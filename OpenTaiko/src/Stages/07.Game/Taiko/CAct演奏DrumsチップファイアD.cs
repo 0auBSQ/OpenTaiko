@@ -287,16 +287,10 @@ namespace TJAPlayer3
                                     case E判定.Perfect:
                                     case E判定.Great:
                                     case E判定.Auto:
-                                        if (!this.st状態_大[i].ct進行.IsStoped && TJAPlayer3.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1)  
-                                                TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
-                                        else
-                                            TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
+                                        TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
                                         break;                                    
                                     case E判定.Good:
-                                        if (!this.st状態_大[i].ct進行.IsStoped && TJAPlayer3.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1)
-                                            TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画( nX, nY, new Rectangle( this.st状態[ i ].ct進行.CurrentValue * nWidth, n + (n * nHeight), nWidth, nHeight) );
-                                        else
-                                            TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
+                                         TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
                                         break;
                                     case E判定.Mine:
                                         TJAPlayer3.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));

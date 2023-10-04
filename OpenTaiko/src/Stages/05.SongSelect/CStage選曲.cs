@@ -379,8 +379,6 @@ namespace TJAPlayer3
             }
             finally
             {
-                TJAPlayer3.ConfigIni.eScrollMode = EScrollMode.Normal;
-                TJAPlayer3.ConfigIni.bスクロールモードを上書き = false;
                 Trace.TraceInformation("選曲ステージの活性化を完了しました。");
                 Trace.Unindent();
             }
@@ -597,10 +595,6 @@ namespace TJAPlayer3
                     TJAPlayer3.act文字コンソール.tPrint(0, 16, C文字コンソール.Eフォント種別.白, "GAME: SURVIVAL HARD");
                 if (TJAPlayer3.ConfigIni.bSuperHard)
                     TJAPlayer3.act文字コンソール.tPrint(0, 32, C文字コンソール.Eフォント種別.赤, "SUPER HARD MODE : ON");
-                if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.BMSCROLL)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 48, C文字コンソール.Eフォント種別.赤, "BMSCROLL : ON");
-                else if (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.HBSCROLL)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 48, C文字コンソール.Eフォント種別.赤, "HBSCROLL : ON");
 
                 #endregion
 
@@ -944,6 +938,7 @@ namespace TJAPlayer3
                         #region [ F6 SCROLL ]
                         if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F6))
                         {
+                            /*
                             TJAPlayer3.Skin.sound変更音.t再生する();
                             TJAPlayer3.ConfigIni.bスクロールモードを上書き = true;
                             switch ((int)TJAPlayer3.ConfigIni.eScrollMode)
@@ -959,6 +954,7 @@ namespace TJAPlayer3
                                     TJAPlayer3.ConfigIni.bスクロールモードを上書き = false;
                                     break;
                             }
+                            */
                         }
                         #endregion
                         #region [ F7 TokkunMode ]

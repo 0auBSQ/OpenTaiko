@@ -160,7 +160,7 @@ namespace TJAPlayer3
                 {
                     if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE)
                     {
-                        nNowCharaCounter[i] += ((Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]) / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * nCharaFrameCount[i] / nCharaBeat[i];
+                        nNowCharaCounter[i] += ((Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]) / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * (nCharaFrameCount[i] + 1) / nCharaBeat[i];
                     }
                 }
                 void updateBalloon()

@@ -1228,9 +1228,6 @@ namespace TJAPlayer3
 		public bool ShowMob;
 		public bool ShowPuchiChara; // リザーブ
 
-		public EScrollMode eScrollMode = EScrollMode.Normal;
-		public bool bスクロールモードを上書き = false;
-
 		public bool bHispeedRandom;
 		public Eステルスモード[] eSTEALTH;
 		public bool bNoInfo;
@@ -3395,10 +3392,12 @@ namespace TJAPlayer3
 											{
 												this.eDark = (Eダークモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.eDark);
 											}
+											/*
 											else if (str3.Equals("ScrollMode"))
 											{
 												this.eScrollMode = (EScrollMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, 0);
 											}
+											*/
 											else if (str3.Equals("EnableCountDownTimer"))
 											{
 												this.bEnableCountdownTimer = CConversion.bONorOFF(str4[0]);

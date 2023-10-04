@@ -1975,7 +1975,7 @@ namespace TJAPlayer3
 
                     if( pChip.dbSCROLL_Y != 0.0 )
                     {
-                        var dbSCROLL = configIni.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL;
+                        var dbSCROLL = pChip.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL;
 
                         y = NoteOriginY[nPlayer];
 
@@ -1985,7 +1985,7 @@ namespace TJAPlayer3
                         long time = pChip.n発声時刻ms - __dbt;
                         float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
-                        y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                        y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
                     }
 
                     if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
@@ -2250,7 +2250,7 @@ namespace TJAPlayer3
                     long __dbt = nowTime;
                     long time = pChip.n発声時刻ms - __dbt;
                     float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-                    y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                    y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
                 }
 
                 if (bSplitLane[nPlayer] || TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayer))].effect.SplitLane)
@@ -2513,7 +2513,7 @@ namespace TJAPlayer3
                 long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
                 long time = pChip.n発声時刻ms - __dbt;
                 float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-                y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
 
                 //y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
             }
