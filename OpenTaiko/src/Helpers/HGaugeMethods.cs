@@ -670,7 +670,7 @@ namespace TJAPlayer3
             tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
         }
 
-        public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex)
+        public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x)
         {
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
             CDTX[] dtxs =
@@ -721,7 +721,7 @@ namespace TJAPlayer3
             }
             else
             {
-                gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos];
+                gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos] + uioffset_x;
                 gauge_y = TJAPlayer3.Skin.Result_Gauge_Y[pos];
             }
 
@@ -739,7 +739,7 @@ namespace TJAPlayer3
             }
             else
             {
-                gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos];
+                gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos] + uioffset_x;
                 gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos];
             }
 
@@ -764,9 +764,9 @@ namespace TJAPlayer3
             }
             else
             {
-                soulText_x = TJAPlayer3.Skin.Result_Soul_Text_X[pos];
+                soulText_x = TJAPlayer3.Skin.Result_Soul_Text_X[pos] + uioffset_x;
                 soulText_y = TJAPlayer3.Skin.Result_Soul_Text_Y[pos];
-                soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_X[pos];
+                soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_X[pos] + uioffset_x;
                 soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_Y[pos];
             }
 
@@ -785,7 +785,7 @@ namespace TJAPlayer3
             }
             else
             {
-                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos];
+                clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos] + uioffset_x;
                 clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos];
             }
 

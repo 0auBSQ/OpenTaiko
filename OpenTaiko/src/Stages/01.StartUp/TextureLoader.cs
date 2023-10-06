@@ -1183,6 +1183,8 @@ namespace TJAPlayer3
 
             Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters_Heya_Render = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Clear_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Failed_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters = new CCharacter[TJAPlayer3.Skin.Characters_Ptn];
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1252,6 +1254,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Heya_Render_Offset = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_UseResult1P = new bool[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1331,9 +1334,13 @@ namespace TJAPlayer3
             {
                 Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}0.png");
                 Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Render.png");
+                Characters_Result_Clear_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Clear_1P.png");
+                Characters_Result_Failed_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Failed_1P.png");
 
                 TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
                 TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
+                TJAPlayer3.Skin.Characters_UseResult1P[i] = false;
+
 
                 var _str = "";
                 TJAPlayer3.Skin.LoadSkinConfigFromFile(charaDirs[i] + @$"{Path.DirectorySeparatorChar}CharaConfig.txt", ref _str);
@@ -1354,6 +1361,10 @@ namespace TJAPlayer3
                         string[] values = line.Substring(25).Trim().Split(',');
                         TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][0] = int.Parse(values[0]);
                         TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][1] = int.Parse(values[1]);
+                    }
+                    else if (line.StartsWith("Result_UseResult1P="))
+                    {
+                        TJAPlayer3.Skin.Characters_UseResult1P[i] = FDK.CConversion.bONorOFF(line.Substring(19).Trim()[0]);
                     }
                 }
 
@@ -2792,7 +2803,9 @@ Result_Mountain = new CTexture[4]*/;
             Characters_Result_Normal;
 
         public CTexture[] Characters_Heya_Preview,
-            Characters_Heya_Render;
+            Characters_Heya_Render,
+            Characters_Result_Clear_1P,
+            Characters_Result_Failed_1P;
         public CCharacter[] Characters;
 
         #endregion
