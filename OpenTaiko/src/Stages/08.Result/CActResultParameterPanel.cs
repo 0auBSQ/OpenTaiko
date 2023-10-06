@@ -223,6 +223,8 @@ namespace TJAPlayer3
 			ctAISectionChange = new CCounter(0, 2000, 1, TJAPlayer3.Timer);
 			ctAISectionChange.CurrentValue = 255;
 
+			ctUIMove = new CCounter();
+
 			for (int i = 0; i < 5; i++)
             {
 				CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
@@ -326,10 +328,15 @@ namespace TJAPlayer3
 					}
 					else
 					{
-						namePlate_x[i] = TJAPlayer3.Skin.Result_NamePlate_X[i];
-						namePlate_y[i] = TJAPlayer3.Skin.Result_NamePlate_Y[i];
+						int pos = i;
+						if (TJAPlayer3.P1IsBlue())
+							pos = 1;
+						namePlate_x[pos] = TJAPlayer3.Skin.Result_NamePlate_X[pos];
+						namePlate_y[pos] = TJAPlayer3.Skin.Result_NamePlate_Y[pos];
 					}
 				}
+
+				ctUIMove.Tick();
 
 				#region [ Ensou result contents ]
 
@@ -340,6 +347,14 @@ namespace TJAPlayer3
 				bool is2PSide = TJAPlayer3.P1IsBlue();
 
 				int shift = 635;
+
+				int uioffset_x = 0;
+				double uioffset_value = Math.Sin((ctUIMove.CurrentValue / 1000.0) * Math.PI / 2.0);
+				if (is1P)
+				{
+					uioffset_x = (int)(uioffset_value * TJAPlayer3.Skin.Resolution[0] / 2.0);
+					if (is2PSide) uioffset_x *= -1;
+				}
 
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 				{
@@ -357,9 +372,9 @@ namespace TJAPlayer3
 					if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
 					{
 						if (shiftPos == 0)
-							TJAPlayer3.Tx.Result_Panel.t2D描画(0, 0);
+							TJAPlayer3.Tx.Result_Panel.t2D描画(0 + uioffset_x, 0);
 						else
-							TJAPlayer3.Tx.Result_Panel_2P.t2D描画(0, 0);
+							TJAPlayer3.Tx.Result_Panel_2P.t2D描画(0 + uioffset_x, 0);
 					}
                     else
 					{
@@ -401,9 +416,9 @@ namespace TJAPlayer3
 						else
 						{
 							_frame.vc拡大縮小倍率.X = 1.0f;
-							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_X[pos];
+							bar_x = TJAPlayer3.Skin.Result_DifficultyBar_X[pos] + uioffset_x;
 							bar_y = TJAPlayer3.Skin.Result_DifficultyBar_Y[pos];
-							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_X[pos];
+							gauge_base_x = TJAPlayer3.Skin.Result_Gauge_Base_X[pos] + uioffset_x;
 							gauge_base_y = TJAPlayer3.Skin.Result_Gauge_Base_Y[pos];
 						}
 
@@ -461,7 +476,7 @@ namespace TJAPlayer3
 							}
 						}
 
-						HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctゲージアニメ[i].CurrentValue, ct虹ゲージアニメ.CurrentValue, ctSoul.CurrentValue);
+						HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctゲージアニメ[i].CurrentValue, ct虹ゲージアニメ.CurrentValue, ctSoul.CurrentValue, uioffset_x);
 
 						#endregion
 					}
@@ -574,7 +589,7 @@ namespace TJAPlayer3
 
 									if ((k != 5 || TJAPlayer3.Skin.Result_ADLib_Show) && (k != 6 || TJAPlayer3.Skin.Result_Bomb_Show))
 									{
-										this.t小文字表示(num_x[k][pos], num_y[k][pos], scoresArr[k]);
+										this.t小文字表示(num_x[k][pos] + uioffset_x, num_y[k][pos], scoresArr[k]);
 									}
 
 									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = 1f;
@@ -613,7 +628,7 @@ namespace TJAPlayer3
 								}
 								else
 								{
-									score_x = TJAPlayer3.Skin.Result_Score_X[pos];
+									score_x = TJAPlayer3.Skin.Result_Score_X[pos] + uioffset_x;
 									score_y = TJAPlayer3.Skin.Result_Score_Y[pos];
 								}
 
@@ -745,6 +760,8 @@ namespace TJAPlayer3
 
 						if (!this.ctMountain_ClearIn.IsTicked)
 							this.ctMountain_ClearIn.Start(0, 515, 3, TJAPlayer3.Timer);
+							
+						if (ctUIMove.EndValue != 1000 && TJAPlayer3.Skin.Result_Use1PUI && is1P) ctUIMove = new CCounter(0, 1000, 0.5, TJAPlayer3.Timer);
 
 						if (TJAPlayer3.stage結果.bClear[p])
 						{
@@ -775,16 +792,66 @@ namespace TJAPlayer3
 					//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 					//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
-					int chara_x = namePlate_x[pos] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+					int chara_x = namePlate_x[pos] - (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
 					int chara_y = namePlate_y[pos];
 
+					int p1chara_x = is2PSide ? TJAPlayer3.Skin.Resolution[0] / 2 : 0;
+					int p1chara_y = TJAPlayer3.Skin.Resolution[1] - (int)(uioffset_value * TJAPlayer3.Skin.Resolution[1]);
+					float renderRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][0];
+					float renderRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][1];
 
                     if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
+					{
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.CLEAR, pos);
+
+						if (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] && TJAPlayer3.Skin.Result_Use1PUI && TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId] != null)
+						{
+							TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].vc拡大縮小倍率.X = renderRatioX;
+							TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].vc拡大縮小倍率.Y = renderRatioY;
+							if (is2PSide)
+							{
+								TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].t2D左右反転描画(p1chara_x, p1chara_y);
+							}
+							else 
+							{
+								TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].t2D描画(p1chara_x, p1chara_y);
+							}
+						}
+					}
 					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
+					{
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.FAILED, pos);
-					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED_IN))
+						if (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] && TJAPlayer3.Skin.Result_Use1PUI && TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId] != null)
+						{
+							TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].vc拡大縮小倍率.X = renderRatioX;
+							TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].vc拡大縮小倍率.Y = renderRatioY;
+							if (is2PSide)
+							{
+								TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].t2D左右反転描画(p1chara_x, p1chara_y);
+							}
+							else 
+							{
+								TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].t2D描画(p1chara_x, p1chara_y);
+							}
+						}
+					}
+					else if (CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED_IN) && TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId] != null)
+					{
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.FAILED_IN, pos);
+						if (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] && TJAPlayer3.Skin.Result_Use1PUI)
+						{
+							TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].vc拡大縮小倍率.X = renderRatioX;
+							TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].vc拡大縮小倍率.Y = renderRatioY;
+							if (is2PSide)
+							{
+								TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].t2D左右反転描画(p1chara_x, p1chara_y);
+							}
+							else 
+							{
+								TJAPlayer3.Tx.Characters_Result_Failed_1P[_charaId].t2D描画(p1chara_x, p1chara_y);
+							}
+						}
+					}
 					else
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.NORMAL, pos);
 
@@ -992,7 +1059,7 @@ namespace TJAPlayer3
 								}
 								else
 								{
-									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_X[pos];
+									scoreRankEffect_x = TJAPlayer3.Skin.Result_ScoreRankEffect_X[pos] + uioffset_x;
 									scoreRankEffect_y = TJAPlayer3.Skin.Result_ScoreRankEffect_Y[pos];
 								}
 
@@ -1067,7 +1134,7 @@ namespace TJAPlayer3
 								}
 								else
 								{
-									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_X[pos];
+									crownEffect_x = TJAPlayer3.Skin.Result_CrownEffect_X[pos] + uioffset_x;
 									crownEffect_y = TJAPlayer3.Skin.Result_CrownEffect_Y[pos];
 								}
 
@@ -1165,6 +1232,8 @@ namespace TJAPlayer3
 		private CCachedFontRenderer pfAISectionText;
 
 		private CCounter ctAISectionChange;
+
+		private CCounter ctUIMove;
 
 		private int nNowAISection;
 

@@ -6073,6 +6073,10 @@ namespace TJAPlayer3
                             #endregion
 
                             #region Result
+                            else if (strCommand == "Result_Use1PUI")
+                            {
+                                Result_Use1PUI = CConversion.bONorOFF(strParam[0]);
+                            }
                             else if (strCommand == nameof(Result_Cloud_Count))
                             {
                                 Result_Cloud_Count = int.Parse(strParam);
@@ -8362,6 +8366,7 @@ namespace TJAPlayer3
 
         public int[][] Characters_Resolution;
         public int[][] Characters_Heya_Render_Offset;
+        public bool[] Characters_UseResult1P;
         public int[][] Characters_X;
         public int[][] Characters_Y;
         public int[][] Characters_4P;
@@ -9446,6 +9451,8 @@ namespace TJAPlayer3
         public int[] Result_UIMove_4P = new int[] { 320, 0 };
         public int[] Result_UIMove_5P = new int[] { 256, 0 };
         */
+
+        public bool Result_Use1PUI = false;
         public int[] Result_UIMove_4P_X = new int[] { 0, 320, 640, 960 };
         public int[] Result_UIMove_4P_Y = new int[] { 0, 0, 0, 0 };
         public int[] Result_UIMove_5P_X = new int[] { 0, 256, 512, 768, 1024 };

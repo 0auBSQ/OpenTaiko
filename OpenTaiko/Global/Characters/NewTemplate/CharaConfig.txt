@@ -93,3 +93,5 @@ Chara_Result_Failed_In_AnimationDuration=1000
 
 ;結果画面のクリア失敗のアニメーションにかける時間 (ms)
 Chara_Result_Failed_AnimationDuration=1000
+
+Result_UseResult1P=1
