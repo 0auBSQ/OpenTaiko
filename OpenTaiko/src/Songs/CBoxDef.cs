@@ -52,7 +52,7 @@ namespace TJAPlayer3
 			BoxChara = 0;
 			BgColor = Color.White;
 			DefaultPreimage = null;
-			ScenePreset = null;
+			ScenePreset = "";
 		}
 		public CBoxDef( string boxdefファイル名 )
 			: this()
