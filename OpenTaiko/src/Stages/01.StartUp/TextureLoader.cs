@@ -1084,6 +1084,9 @@ namespace TJAPlayer3
             Result_Speech_Bubble[0] = TxC(RESULT + @$"Speech_Bubble.png");
             Result_Speech_Bubble[1] = TxC(RESULT + @$"Speech_Bubble_2.png");
 
+            Result_Speech_Bubble_V2[0] = TxC(RESULT + @$"Speech_Bubble_V2_Left.png");
+            Result_Speech_Bubble_V2[1] = TxC(RESULT + @$"Speech_Bubble_V2_Right.png");
+
             Result_Flower = TxC(RESULT + @$"Flower{Path.DirectorySeparatorChar}Flower.png");
 
             for (int i = 0; i < 4; i++)
@@ -1315,6 +1318,7 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Result_SpeechText = new string[TJAPlayer3.Skin.Characters_Ptn][];
 
             for (int i = 0; i < charaDirs.Length; i++)
             {
@@ -1804,6 +1808,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[i] = 1000;
                 TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[i] = 1000;
                 TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = 1000;
+                TJAPlayer3.Skin.Characters_Result_SpeechText[i] = new string[] { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" };
 
                 #endregion
 
@@ -2168,6 +2173,15 @@ namespace TJAPlayer3
                                     case "Chara_Result_Failed_AnimationDuration":
                                     {
                                         TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
+                                        break;
+                                    }
+                                    case "Chara_Result_SpeechText":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int j = 0; j < 6; j++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Result_SpeechText[i][j] = strSplit[j];
+                                        }
                                         break;
                                     }
                                     default: { break; }
@@ -2714,7 +2728,8 @@ namespace TJAPlayer3
 
             Result_Gauge = new CTexture[5],
             Result_Gauge_Base = new CTexture[5],
-            Result_Speech_Bubble = new CTexture[2]
+            Result_Speech_Bubble = new CTexture[2],
+            Result_Speech_Bubble_V2 = new CTexture[2]
 /*,
 Result_Mountain = new CTexture[4]*/;
         #endregion
