@@ -1086,6 +1086,7 @@ namespace TJAPlayer3
 
             Result_Speech_Bubble_V2[0] = TxC(RESULT + @$"Speech_Bubble_V2_Left.png");
             Result_Speech_Bubble_V2[1] = TxC(RESULT + @$"Speech_Bubble_V2_Right.png");
+            Result_Speech_Bubble_V2[2] = TxC(RESULT + @$"Speech_Bubble_V2_4P_5P.png");
 
             Result_Flower = TxC(RESULT + @$"Flower{Path.DirectorySeparatorChar}Flower.png");
 
@@ -2729,7 +2730,7 @@ namespace TJAPlayer3
             Result_Gauge = new CTexture[5],
             Result_Gauge_Base = new CTexture[5],
             Result_Speech_Bubble = new CTexture[2],
-            Result_Speech_Bubble_V2 = new CTexture[2]
+            Result_Speech_Bubble_V2 = new CTexture[3]
 /*,
 Result_Mountain = new CTexture[4]*/;
         #endregion

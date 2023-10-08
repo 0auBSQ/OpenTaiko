@@ -1026,39 +1026,50 @@ namespace TJAPlayer3
 							TJAPlayer3.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Result_Speech_Bubble_X[pos], TJAPlayer3.Skin.Result_Speech_Bubble_Y[pos],
 								new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 						}
-						if (TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos] != null)
+						int speech_vubble_index = TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? pos : 2;
+						if (TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index] != null)
 						{
-							int speechBuddle_width = TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos].szテクスチャサイズ.Width;
-							int speechBuddle_height = TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos].szテクスチャサイズ.Height / 6;
+							int speechBuddle_width = TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szテクスチャサイズ.Width;
+							int speechBuddle_height = TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szテクスチャサイズ.Height / 6;
 
 							int speech_bubble_x;
 							int speech_bubble_y;
+							float scale;
 							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 							{
 								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
 								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
+								scale = 0.5f;
 							}
 							else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 							{
 								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
 								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+								scale = 0.5f;
+							}
+							else if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
+							{
+								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_2P_X[pos];
+								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_2P_Y[pos];
+								scale = 0.5f;
 							}
 							else
 							{
 								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_X[pos];
 								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_Y[pos];
+								scale = 1.0f;
 							}
 
-							int spindex = TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? pos : 0;
-
-							TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos].vc拡大縮小倍率.X = 0.9f * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-							TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos].vc拡大縮小倍率.Y = 0.9f * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-							TJAPlayer3.Tx.Result_Speech_Bubble_V2[pos].t2D拡大率考慮中央基準描画(speech_bubble_x, speech_bubble_y,
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vc拡大縮小倍率.X = 0.9f * scale * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vc拡大縮小倍率.Y = 0.9f * scale * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2D拡大率考慮中央基準描画(speech_bubble_x, speech_bubble_y,
 								new Rectangle(0, MoodV2 * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 
-							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[spindex][MoodV2]).t2D拡大率考慮中央基準描画(
-								speech_bubble_x + TJAPlayer3.Skin.Result_Speech_Text_Offset[0], 
-								speech_bubble_y + TJAPlayer3.Skin.Result_Speech_Text_Offset[1]);
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vc拡大縮小倍率.X = scale;
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vc拡大縮小倍率.Y = scale;
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2D拡大率考慮中央基準描画(
+								speech_bubble_x + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[0] * scale), 
+								speech_bubble_y + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[1] * scale));
 						}
 						if (!b音声再生[11])
 						{

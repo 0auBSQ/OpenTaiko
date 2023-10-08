@@ -6557,6 +6557,22 @@ namespace TJAPlayer3
                                     Result_Speech_Bubble_V2_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Result_Speech_Bubble_V2_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_2P_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_2P_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(Result_MusicName_X))
                             {
                                 Result_MusicName_X = int.Parse(strParam);
@@ -9599,6 +9615,9 @@ namespace TJAPlayer3
 
         public int[] Result_Speech_Bubble_V2_X = new int[] { 0, 0 };
         public int[] Result_Speech_Bubble_V2_Y = new int[] { 0, 0 };
+
+        public int[] Result_Speech_Bubble_V2_2P_X = new int[] { 0, 0 };
+        public int[] Result_Speech_Bubble_V2_2P_Y = new int[] { 0, 0 };
 
         public int[] Result_NamePlate_X = new int[] { 28, 1032 };
         public int[] Result_NamePlate_Y = new int[] { 621, 621 };
