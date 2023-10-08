@@ -30,20 +30,20 @@ namespace TJAPlayer3
             _path = path;
 
             // Character metadata
-            if (File.Exists($@"{path}\Metadata.json"))
-                metadata = ConfigManager.GetConfig<DBCharacter.CharacterData>($@"{path}\Metadata.json");
+            if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))
+                metadata = ConfigManager.GetConfig<DBCharacter.CharacterData>($@"{path}{Path.DirectorySeparatorChar}Metadata.json");
             else
                 metadata = new DBCharacter.CharacterData();
 
             // Character metadata
-            if (File.Exists($@"{path}\Effects.json"))
-                effect = ConfigManager.GetConfig<DBCharacter.CharacterEffect>($@"{path}\Effects.json");
+            if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Effects.json"))
+                effect = ConfigManager.GetConfig<DBCharacter.CharacterEffect>($@"{path}{Path.DirectorySeparatorChar}Effects.json");
             else
                 effect = new DBCharacter.CharacterEffect();
 
             // Character unlockables
-            if (File.Exists($@"{path}\Unlock.json"))
-                unlock = ConfigManager.GetConfig<DBUnlockables.CUnlockConditions>($@"{path}\Unlock.json");
+            if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
+                unlock = ConfigManager.GetConfig<DBUnlockables.CUnlockConditions>($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
             else
                 unlock = null;
         }

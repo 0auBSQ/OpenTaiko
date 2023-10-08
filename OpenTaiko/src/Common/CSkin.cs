@@ -8492,7 +8492,6 @@ namespace TJAPlayer3
         public int[] Characters_Result_Clear_AnimationDuration;
         public int[] Characters_Result_Failed_In_AnimationDuration;
         public int[] Characters_Result_Failed_AnimationDuration;
-        public string[][] Characters_Result_SpeechText;
 
         #endregion
 

@@ -1319,7 +1319,6 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration = new int[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Result_SpeechText = new string[TJAPlayer3.Skin.Characters_Ptn][];
 
             for (int i = 0; i < charaDirs.Length; i++)
             {
@@ -1809,7 +1808,6 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[i] = 1000;
                 TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[i] = 1000;
                 TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = 1000;
-                TJAPlayer3.Skin.Characters_Result_SpeechText[i] = new string[] { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" };
 
                 #endregion
 
@@ -2176,6 +2174,7 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
                                         break;
                                     }
+                                    /*
                                     case "Chara_Result_SpeechText":
                                     {
                                         string[] strSplit = strParam.Split(',');
@@ -2185,6 +2184,7 @@ namespace TJAPlayer3
                                         }
                                         break;
                                     }
+                                    */
                                     default: { break; }
                                 }
                             }

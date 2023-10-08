@@ -207,7 +207,10 @@ namespace TJAPlayer3
 				
 				for (int j = 0; j < 6; j++)
 				{
-					ttkSpeechText[i][j] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Skin.Characters_Result_SpeechText[_charaId][j], pfSpeechText, Color.White, Color.Black, TJAPlayer3.Skin.Result_Speech_Text_MaxWidth);
+					// { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" }
+					ttkSpeechText[i][j] = new CActSelect曲リスト.TitleTextureKey(
+						TJAPlayer3.Tx.Characters[_charaId].metadata.SpeechText[j].GetString(""), 
+						pfSpeechText, Color.White, Color.Black, TJAPlayer3.Skin.Result_Speech_Text_MaxWidth);
 				}
 			}
 			
