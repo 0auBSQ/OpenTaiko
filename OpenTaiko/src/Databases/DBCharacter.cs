@@ -43,13 +43,15 @@ namespace TJAPlayer3
                 Name = "(None)";
                 Rarity = "Common";
                 Author = "(None)";
+                SpeechText = new CLocalizationData[6] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData(), new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
             }
 
-            public CharacterData(string pcn, string pcr, string pca)
+            public CharacterData(string pcn, string pcr, string pca, CLocalizationData[] pcst)
             {
                 Name = pcn;
                 Rarity = pcr;
                 Author = pca;
+                SpeechText = pcst;
             }
 
 
@@ -61,6 +63,9 @@ namespace TJAPlayer3
 
             [JsonProperty("author")]
             public string Author;
+
+            [JsonProperty("speechtext")]
+            public CLocalizationData[] SpeechText;
         }
 
     }

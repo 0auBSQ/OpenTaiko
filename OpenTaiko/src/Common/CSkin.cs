@@ -6541,6 +6541,38 @@ namespace TJAPlayer3
                                     Result_Speech_Bubble_Y[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "Result_Speech_Bubble_V2_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_2P_X")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_2P_X[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_2P_Y")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_2P_Y[i] = int.Parse(strSplit[i]);
+                                }
+                            }
                             else if (strCommand == nameof(Result_MusicName_X))
                             {
                                 Result_MusicName_X = int.Parse(strParam);
@@ -7077,6 +7109,38 @@ namespace TJAPlayer3
                                 {
                                     Result_CrownEffect_5P[i] = int.Parse(strSplit[i]);
                                 }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_4P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_4P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Bubble_V2_5P")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Bubble_V2_5P[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Text_Offset")
+                            {
+                                string[] strSplit = strParam.Split(',');
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    Result_Speech_Text_Offset[i] = int.Parse(strSplit[i]);
+                                }
+                            }
+                            else if (strCommand == "Result_Speech_Text_Size")
+                            {
+                                Result_Speech_Text_Size = int.Parse(strParam);
+                            }
+                            else if (strCommand == "Result_Speech_Text_MaxWidth")
+                            {
+                                Result_Speech_Text_MaxWidth = int.Parse(strParam);
                             }
                             else if (strCommand == "Result_NamePlate_4P")
                             {
@@ -9548,6 +9612,12 @@ namespace TJAPlayer3
         public int[] Result_Speech_Bubble_X = new int[] { 430, 850 };
         public int[] Result_Speech_Bubble_Y = new int[] { 526, 526 };
 
+        public int[] Result_Speech_Bubble_V2_X = new int[] { 0, 0 };
+        public int[] Result_Speech_Bubble_V2_Y = new int[] { 0, 0 };
+
+        public int[] Result_Speech_Bubble_V2_2P_X = new int[] { 0, 0 };
+        public int[] Result_Speech_Bubble_V2_2P_Y = new int[] { 0, 0 };
+
         public int[] Result_NamePlate_X = new int[] { 28, 1032 };
         public int[] Result_NamePlate_Y = new int[] { 621, 621 };
 
@@ -9648,6 +9718,16 @@ namespace TJAPlayer3
 
         public int[] Result_CrownEffect_4P = new int[] { 220, 545 };
         public int[] Result_CrownEffect_5P = new int[] { 188, 545 };
+
+
+        public int[] Result_Speech_Bubble_V2_4P = new int[] { 0, 0 };
+
+        public int[] Result_Speech_Bubble_V2_5P = new int[] { 0, 0 };
+
+
+        public int[] Result_Speech_Text_Offset = new int[] { 0, 0 };
+        public int Result_Speech_Text_Size = 60;
+        public int Result_Speech_Text_MaxWidth = 560;
 
         public int[] Result_NamePlate_4P = new int[] { 80, 621 };
         public int[] Result_NamePlate_5P = new int[] { 31, 621 };

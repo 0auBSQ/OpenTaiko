@@ -198,6 +198,21 @@ namespace TJAPlayer3
 				ttkAISection[i] = new CActSelect曲リスト.TitleTextureKey($"{i + 1}区", pfAISectionText, Color.White, Color.Black, 1280);
 
 			}
+
+            for (int i = 0; i < 5; i++)
+            {
+				ttkSpeechText[i] = new CActSelect曲リスト.TitleTextureKey[6];
+
+				int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character;
+				
+				for (int j = 0; j < 6; j++)
+				{
+					// { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" }
+					ttkSpeechText[i][j] = new CActSelect曲リスト.TitleTextureKey(
+						TJAPlayer3.Tx.Characters[_charaId].metadata.SpeechText[j].GetString(""), 
+						pfSpeechText, Color.White, Color.Black, TJAPlayer3.Skin.Result_Speech_Text_MaxWidth);
+				}
+			}
 			
 			ct全体進行 = new CCounter(0, 50000, 1, TJAPlayer3.Timer);
 
@@ -269,12 +284,14 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
+			pfSpeechText = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Result_Speech_Text_Size);
 			pfAISectionText = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Result_AIBattle_SectionText_Scale);
 				
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()
 		{
+			TJAPlayer3.t安全にDisposeする(ref pfSpeechText);
 			TJAPlayer3.t安全にDisposeする(ref pfAISectionText);
 
 			base.ReleaseManagedResource();
@@ -962,6 +979,7 @@ namespace TJAPlayer3
 						// Speech Bubble
 
 						int Mood = 0;
+						int MoodV2 = 0;
 
 						if (gaugeValues[p] >= 100.0f)
 							Mood = 3;
@@ -969,6 +987,37 @@ namespace TJAPlayer3
 							Mood = 2;
 						else if (gaugeValues[p] >= 40.0f)
 							Mood = 1;
+
+						if (TJAPlayer3.stage結果.nクリア[p] == 3)
+						{
+							MoodV2 = 5;
+						}
+						else if (TJAPlayer3.stage結果.nクリア[p] == 2)
+						{
+							MoodV2 = 4;
+						}
+						else if (TJAPlayer3.stage結果.nクリア[p] == 1)
+						{
+							if (gaugeValues[p] >= 100.0f)
+							{
+								MoodV2 = 3;
+							}
+							else 
+							{
+								MoodV2 = 2;
+							}
+						}
+						else if (TJAPlayer3.stage結果.nクリア[p] == 0)
+						{
+							if (gaugeValues[p] >= 40.0f)
+							{
+								MoodV2 = 1;
+							}
+							else 
+							{
+								MoodV2 = 0;
+							}
+						}
 
 						if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
 						{
@@ -979,6 +1028,51 @@ namespace TJAPlayer3
 							TJAPlayer3.Tx.Result_Speech_Bubble[pos].vc拡大縮小倍率.Y = 0.9f * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 							TJAPlayer3.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Result_Speech_Bubble_X[pos], TJAPlayer3.Skin.Result_Speech_Bubble_Y[pos],
 								new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
+						}
+						int speech_vubble_index = TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? pos : 2;
+						if (TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index] != null)
+						{
+							int speechBuddle_width = TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szテクスチャサイズ.Width;
+							int speechBuddle_height = TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].szテクスチャサイズ.Height / 6;
+
+							int speech_bubble_x;
+							int speech_bubble_y;
+							float scale;
+							if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+							{
+								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
+								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
+								scale = 0.5f;
+							}
+							else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
+							{
+								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
+								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+								scale = 0.5f;
+							}
+							else if (TJAPlayer3.ConfigIni.nPlayerCount == 2)
+							{
+								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_2P_X[pos];
+								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_2P_Y[pos];
+								scale = 0.5f;
+							}
+							else
+							{
+								speech_bubble_x = TJAPlayer3.Skin.Result_Speech_Bubble_V2_X[pos];
+								speech_bubble_y = TJAPlayer3.Skin.Result_Speech_Bubble_V2_Y[pos];
+								scale = 1.0f;
+							}
+
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vc拡大縮小倍率.X = 0.9f * scale * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vc拡大縮小倍率.Y = 0.9f * scale * (ct全体進行.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
+							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2D拡大率考慮中央基準描画(speech_bubble_x, speech_bubble_y,
+								new Rectangle(0, MoodV2 * speechBuddle_height, speechBuddle_width, speechBuddle_height));
+
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vc拡大縮小倍率.X = scale;
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vc拡大縮小倍率.Y = scale;
+							TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2D拡大率考慮中央基準描画(
+								speech_bubble_x + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[0] * scale), 
+								speech_bubble_y + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[1] * scale));
 						}
 						if (!b音声再生[11])
 						{
@@ -1229,6 +1323,9 @@ namespace TJAPlayer3
 
 		private CActSelect曲リスト.TitleTextureKey[] ttkAISection;
 
+		private CActSelect曲リスト.TitleTextureKey[][] ttkSpeechText = new CActSelect曲リスト.TitleTextureKey[5][];
+
+		private CCachedFontRenderer pfSpeechText;
 		private CCachedFontRenderer pfAISectionText;
 
 		private CCounter ctAISectionChange;
