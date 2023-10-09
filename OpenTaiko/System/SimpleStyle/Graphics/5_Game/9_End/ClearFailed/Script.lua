@@ -18,7 +18,7 @@ local nowFrame = { 0, 0, 0, 0, 0 }
 
 local textureCount = 25
 
-local useExtraAnime = true
+local useExtraAnime = false
 
 function clearIn(player)
 end

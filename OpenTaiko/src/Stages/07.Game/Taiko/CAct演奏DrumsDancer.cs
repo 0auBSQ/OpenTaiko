@@ -21,7 +21,50 @@ namespace TJAPlayer3
         public override void Activate()
         {
             //this.ct踊り子モーション = new CCounter();
+
+            string presetSection = "";
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            {
+            }
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            {
+                presetSection = "Dan";
+            }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+            {
+            }
+            else
+            {
+                presetSection = "Regular";
+            }
+
+            object _ps = null;
+
+            switch (presetSection)
+            {
+                case "Regular":
+                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
+                    break;
+                case "Dan":
+                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Dan;
+                    break;
+                default:
+                    break;
+            };
             
+            var preset = (_ps != null 
+                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
+                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
+                : null;
+
+            if (_ps != null
+                    && TJAPlayer3.DTX.scenePreset != null
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
+            {
+                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
+            }
+
             Random random = new Random();
             Dancer = new CTexture[5][];
 
@@ -31,7 +74,11 @@ namespace TJAPlayer3
                 var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
                 if (dirs.Length > 0)
                 {
-                    var path = dirs[random.Next(0, dirs.Length)];
+                    var _presetPath = (preset != null) ? $@"{dancerOrigindir}" + preset.DancerSet : "";
+                    var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
+                        ?  _presetPath
+                        : dirs[random.Next(0, dirs.Length)];
+
                     LoadDancerConifg(path);
 
                     nDancerPtn = TJAPlayer3.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1{Path.DirectorySeparatorChar}");

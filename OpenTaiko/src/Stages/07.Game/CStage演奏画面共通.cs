@@ -1762,7 +1762,7 @@ namespace TJAPlayer3
                                         else
                                             this.nHand[nPlayer] = 0;
 
-                                        if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (TJAPlayer3.ConfigIni.eScrollMode == EScrollMode.HBSCROLL))
+                                        if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HBSCROLL))
                                             pChip.fBMSCROLLTime -= TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] * -0.05;
 
                                         TJAPlayer3.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Red);
@@ -3450,15 +3450,15 @@ namespace TJAPlayer3
 
                 double _scrollSpeed = pChip.dbSCROLL * (db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
                 double _scrollSpeed_Y = pChip.dbSCROLL_Y * (db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
-                pChip.nバーからの距離dot.Taiko = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, false);
+                pChip.nバーからの距離dot.Taiko = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
                 if ( pChip.nノーツ終了時刻ms != 0 )
                 {
-                    pChip.nバーからのノーツ末端距離dot = NotesManager.GetNoteX(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, true);
-                    pChip.nバーからのノーツ末端距離dot_Y = NotesManager.GetNoteY(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, _scrollSpeed_Y, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, configIni.eScrollMode, true);
+                    pChip.nバーからのノーツ末端距離dot = NotesManager.GetNoteX(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
+                    pChip.nバーからのノーツ末端距離dot_Y = NotesManager.GetNoteY(pChip, (pChip.nノーツ終了時刻ms - n現在時刻ms) * pChip.dbBPM, _scrollSpeed_Y, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
                 }
                     
 
-                if ( configIni.eScrollMode == EScrollMode.BMSCROLL || configIni.eScrollMode == EScrollMode.HBSCROLL )
+                if ( pChip.eScrollMode == EScrollMode.BMSCROLL || pChip.eScrollMode == EScrollMode.HBSCROLL )
                 {
 
                     /*
@@ -4535,6 +4535,27 @@ namespace TJAPlayer3
                             pChip.bHit = true;
                         }
                         this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+                        break;
+                    case 0x09:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        {
+
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0x0A:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        {
+
+                            pChip.bHit = true;
+                        }
+                        break;
+                    case 0x0B:
+                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        {
+
+                            pChip.bHit = true;
+                        }
                         break;
                     #endregion
 

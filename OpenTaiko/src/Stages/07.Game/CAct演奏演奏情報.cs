@@ -43,7 +43,6 @@ namespace TJAPlayer3
 			NotesTextM = string.Format( "NoteM:         {0:####0}", TJAPlayer3.DTX.nノーツ数_Branch[2]);
 			NotesTextC = string.Format( "NoteC:         {0:####0}", TJAPlayer3.DTX.nノーツ数[3] );
 			ScoreModeText = string.Format( "SCOREMODE:     {0:####0}", TJAPlayer3.DTX.nScoreModeTmp );
-			ScrollModeText = string.Format( "SCROLLMODE:    {0:####0}", Enum.GetName(typeof(EScrollMode), TJAPlayer3.ConfigIni.eScrollMode ) );
 			ListChipText = string.Format(  "ListChip:      {0:####0}", _chipCounts[0]);
 			ListChipMText = string.Format(  "ListChipM:     {0:####0}", _chipCounts[1]);
 
@@ -82,8 +81,6 @@ namespace TJAPlayer3
                 y -= 0x10;
                 TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, ScoreModeText );
                 y -= 0x10;
-                TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, ScrollModeText );
-				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, ListChipText);
 				y -= 0x10;
 				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, ListChipMText);
@@ -102,7 +99,6 @@ namespace TJAPlayer3
 		private string NotesTextM;
 		private string NotesTextC;
 		private string ScoreModeText;
-		private string ScrollModeText;
 		private string ListChipText;
 		private string ListChipMText;
 	}

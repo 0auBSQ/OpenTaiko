@@ -1084,6 +1084,10 @@ namespace TJAPlayer3
             Result_Speech_Bubble[0] = TxC(RESULT + @$"Speech_Bubble.png");
             Result_Speech_Bubble[1] = TxC(RESULT + @$"Speech_Bubble_2.png");
 
+            Result_Speech_Bubble_V2[0] = TxC(RESULT + @$"Speech_Bubble_V2_Left.png");
+            Result_Speech_Bubble_V2[1] = TxC(RESULT + @$"Speech_Bubble_V2_Right.png");
+            Result_Speech_Bubble_V2[2] = TxC(RESULT + @$"Speech_Bubble_V2_4P_5P.png");
+
             Result_Flower = TxC(RESULT + @$"Flower{Path.DirectorySeparatorChar}Flower.png");
 
             for (int i = 0; i < 4; i++)
@@ -1098,9 +1102,15 @@ namespace TJAPlayer3
             //for (int i = 0; i < 3; i++)
                 //Result_Work[i] = TxC(RESULT + @$"Work{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
 
-
-            for (int i = 0; i < 41; i++)
-                Result_Rainbow[i] = TxC(RESULT + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+            TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + RESULT + @$"Rainbow{Path.DirectorySeparatorChar}"));
+            if (TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn != 0)
+            {
+                Result_Rainbow = new CTexture[TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn];
+                for (int i = 0; i < TJAPlayer3.Skin.Result_Gauge_Rainbow_Ptn; i++)
+                {
+                    Result_Rainbow[i] = TxC(RESULT + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+                }
+            }
 
             //for (int i = 0; i < 6; i++)
                 //Result_Background[i] = TxC(RESULT + @$"Background_" + i.ToString() + ".png");
@@ -1177,6 +1187,8 @@ namespace TJAPlayer3
 
             Characters_Heya_Preview = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters_Heya_Render = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Clear_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Failed_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters = new CCharacter[TJAPlayer3.Skin.Characters_Ptn];
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1246,6 +1258,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Heya_Render_Offset = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_UseResult1P = new bool[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1325,9 +1338,13 @@ namespace TJAPlayer3
             {
                 Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}0.png");
                 Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Render.png");
+                Characters_Result_Clear_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Clear_1P.png");
+                Characters_Result_Failed_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Failed_1P.png");
 
                 TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
                 TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
+                TJAPlayer3.Skin.Characters_UseResult1P[i] = false;
+
 
                 var _str = "";
                 TJAPlayer3.Skin.LoadSkinConfigFromFile(charaDirs[i] + @$"{Path.DirectorySeparatorChar}CharaConfig.txt", ref _str);
@@ -1348,6 +1365,10 @@ namespace TJAPlayer3
                         string[] values = line.Substring(25).Trim().Split(',');
                         TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][0] = int.Parse(values[0]);
                         TJAPlayer3.Skin.Characters_Heya_Render_Offset[i][1] = int.Parse(values[1]);
+                    }
+                    else if (line.StartsWith("Result_UseResult1P="))
+                    {
+                        TJAPlayer3.Skin.Characters_UseResult1P[i] = FDK.CConversion.bONorOFF(line.Substring(19).Trim()[0]);
                     }
                 }
 
@@ -2153,6 +2174,17 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
                                         break;
                                     }
+                                    /*
+                                    case "Chara_Result_SpeechText":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int j = 0; j < 6; j++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Result_SpeechText[i][j] = strSplit[j];
+                                        }
+                                        break;
+                                    }
+                                    */
                                     default: { break; }
                                 }
                             }
@@ -2697,7 +2729,8 @@ namespace TJAPlayer3
 
             Result_Gauge = new CTexture[5],
             Result_Gauge_Base = new CTexture[5],
-            Result_Speech_Bubble = new CTexture[2]
+            Result_Speech_Bubble = new CTexture[2],
+            Result_Speech_Bubble_V2 = new CTexture[3]
 /*,
 Result_Mountain = new CTexture[4]*/;
         #endregion
@@ -2786,7 +2819,9 @@ Result_Mountain = new CTexture[4]*/;
             Characters_Result_Normal;
 
         public CTexture[] Characters_Heya_Preview,
-            Characters_Heya_Render;
+            Characters_Heya_Render,
+            Characters_Result_Clear_1P,
+            Characters_Result_Failed_1P;
         public CCharacter[] Characters;
 
         #endregion
