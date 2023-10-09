@@ -49,7 +49,7 @@ BoxFontName=廻想体 ネクスト UP B
 002 - Zerstören : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Hard) : https://drive.google.com/drive/folders/1xESVf820-iIxnyEtRq7liqmC_0zCZGJA)
 003 - Breaking Point : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol : https://drive.google.com/drive/folders/1kocNOQrdsgKHjHTjMTAKPnHh7-WpNzDJ)
 004 - Deceiving the Deceiver : H5 - https://linktr.ee/H5Music (Chart by 0AuBSQ & bol)
-005 - WTF?! : MooX - https://soundcloud.com/themoox/wtf (Chart by MooX & bol)
+005 - WTF?! : Moox - https://soundcloud.com/themoox/wtf (Chart by Moox & bol)
 006 - Athazagoraphobia : Derpikarp - https://youtube.com/channel/UCrURywBu-fDA5KQaDPc3GOg (Chart by Colin & bol)
 007 - Gewissenbisse : Sukima Altera vs ALTERNATiVE THEORY - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by 0AuBSQ)
 008 - DON'T LOOK BACK : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol)
@@ -125,6 +125,9 @@ BoxFontName=廻想体 ネクスト UP B
 078 - the garden : AZALI - https://www.youtube.com/@AZALI00013 (Chart by 0AuBSQ)
 079 - MECHANICAL GOD : AZALI × Crow - https://www.youtube.com/@AZALI00013 (AZALI) https://www.youtube.com/@crow4277 (Crow) (Chart by 0AuBSQ)
 080 - I WANT TO BL00000000M : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+081 - Taikonitos : Moox - https://soundcloud.com/themoox/moox-taikonitos (Chart by Colin (Extreme, Hard) and DragonRatTiger)
+082 - Comma, ～ 意味ト構造ノ分離 : Sparxe - https://soundcloud.com/sparxenic https://sparxe.bandcamp.com https://twitter.com/Sparxenic https://www.youtube.com/@SparxeMusic (Chart by 0AuBSQ)
+083 - <Bracket> ～破壊ト混沌ノ複製～ : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol (Extreme) and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
@@ -156,10 +159,9 @@ Chinese : WHMHammer - https://github.com/WHMHammer
 ### Credits
 
 ```
-Main developer : 0AuBSQ - https://github.com/0auBSQ/OpenTaiko
+Main developers : 0AuBSQ - https://github.com/0auBSQ/OpenTaiko and Takkkom - https://github.com/Takkkom
+Multiple additionnal features, mainly VTT lyrics support : DragonRatTiger - https://github.com/DragonRatTiger
 Several bug fixes and improvements : l1m0n3 - https://github.com/l1m0n3
 Complete removal of the SlimDX dependency : Mr-Oiji https://github.com/Mr-Ojii
-Several features and major improvements : Takkkom - https://github.com/Takkkom
 Mod icons : FAKEYJSNPI - https://github.com/FAKEYJSNPI
-VTT lyrics support : DragonRatTiger - https://github.com/DragonRatTiger
 ```
