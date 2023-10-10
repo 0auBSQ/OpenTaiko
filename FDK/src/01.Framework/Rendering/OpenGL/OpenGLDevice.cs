@@ -117,21 +117,23 @@ namespace SampleFramework
         {  
             fixed(uint* pixels = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
             {
+                Gl.ReadBuffer(GLEnum.Front);
                 Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, GLEnum.Bgra, GLEnum.UnsignedByte, pixels);
 
                 fixed(uint* pixels2 = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
                 {
                     for(int x = 0; x < ViewportWidth; x++)
                     {
-                        for(int y = 0; y < ViewportHeight; y++)
+                        for(int y = 1; y < ViewportHeight; y++)
                         {
-                            int pos = x + (y * ViewportWidth);
+                            int pos = x + ((y - 1) * ViewportWidth);
                             int pos2 = x + ((ViewportHeight - y) * ViewportWidth);
-                            pixels2[pos] = pixels[pos2];
+                            var p = pixels[pos2];
+                            pixels2[pos] = p;
                         }
                     }
-
-                    using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight);
+                    
+                    using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight - 1);
                     sKBitmap.SetPixels((IntPtr)pixels2);
                     return sKBitmap.Copy();
                 }
