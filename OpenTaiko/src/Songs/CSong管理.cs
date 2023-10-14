@@ -346,6 +346,7 @@ namespace TJAPlayer3
 							this.n検索されたスコア数++;
 							listノードリスト.Add( value );
 							CSongDict.tAddSongNode(value.uniqueId, value);
+                            value.r親ノード = node親;
 							this.n検索された曲ノード数++;
 						}
 						else
