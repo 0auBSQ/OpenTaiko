@@ -336,13 +336,10 @@ namespace TJAPlayer3
 
 						string filePath = str基点フォルダ + fileinfo.Name;
 
-						/*
-						using HashAlgorithm hashProvider = new SHA1CryptoServiceProvider();
-						var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+						using SHA256 hashProvider = SHA256.Create();
+						var fs = File.OpenRead(filePath);
     					var hash = hashProvider.ComputeHash(fs);
 						fs.Dispose();
-						*/
-						string hash = "1234";
 
 						if (listSongsDB.TryGetValue(filePath + hash, out C曲リストノード value))
 						{
