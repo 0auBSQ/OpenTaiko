@@ -1747,7 +1747,7 @@ namespace TJAPlayer3
 			//----------------------------------------
 #endif
 			this.strDTXManiaのバージョン = "Unknown";
-			this.str曲データ検索パス = @"." + Path.DirectorySeparatorChar;
+			this.str曲データ検索パス = @"." + Path.DirectorySeparatorChar + "Songs" + Path.DirectorySeparatorChar;
 			this.b全画面モード = false;
 			this.b垂直帰線待ちを行う = true;
 			this.n初期ウィンドウ開始位置X = 100; // #30675 2013.02.04 ikanick add

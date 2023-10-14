@@ -656,9 +656,12 @@ namespace TJAPlayer3
             #endregion
         }
 
+	    [Serializable]
         public class DanSongs
         {
+            [NonSerialized]
             public CTexture TitleTex;
+            [NonSerialized]
             public CTexture SubTitleTex;
             public string Title;
             public string SubTitle;
@@ -671,6 +674,8 @@ namespace TJAPlayer3
             public static int Number = 0;
             public bool bTitleShow;
             public Dan_C[] Dan_C = new Dan_C[CExamInfo.cMaxExam];
+
+            [NonSerialized]
             public CWAV Wave;
 
             public DanSongs()
