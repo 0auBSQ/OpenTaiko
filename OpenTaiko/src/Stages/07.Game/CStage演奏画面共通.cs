@@ -1672,6 +1672,7 @@ namespace TJAPlayer3
                 else
                 {
                     pChip.nRollCount++;
+                    rollCount = pChip.nRollCount;
                     this.n風船残り[player] = balloon - rollCount;
                 }
 
