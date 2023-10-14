@@ -1712,7 +1712,7 @@ namespace TJAPlayer3
                 this.soundRed[pChip.nPlayerSide]?.PlayStart();
 
 
-                if (balloon <= rollCount)
+                if (this.n風船残り[player] <= 0)
                 {
                     if (IsKusudama)
                     {
