@@ -496,6 +496,10 @@ namespace TJAPlayer3
 						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)formatter.Deserialize(stream);
 					}
 				}
+				catch(Exception exception)
+				{
+					this.Songs管理.listSongsDB = new();
+				}
 				finally
 				{
 				}
