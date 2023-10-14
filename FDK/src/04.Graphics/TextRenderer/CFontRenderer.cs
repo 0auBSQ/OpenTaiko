@@ -79,6 +79,11 @@ namespace FDK
 			}
 		}
 
+		public static bool FontExists(string fontpath)
+		{
+			return SKFontManager.Default.FontFamilies.Contains(fontpath) || File.Exists(fontpath);
+        }
+
 		#region [ コンストラクタ ]
 		public CFontRenderer(string fontpath, int pt, FontStyle style)
 		{

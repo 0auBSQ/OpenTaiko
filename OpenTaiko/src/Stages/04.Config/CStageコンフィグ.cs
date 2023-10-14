@@ -146,7 +146,7 @@ namespace TJAPlayer3
 
 			txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
 
-			using (var prvFont = new CCachedFontRenderer(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? CFontRenderer.DefaultFontName : TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Config_Font_Scale))
+			using (var prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Config_Font_Scale))
 			{
 				for (int i = 0; i < strMenuItem.Length; i++)
 				{
@@ -172,9 +172,9 @@ namespace TJAPlayer3
 
 		public override void CreateManagedResource()											// OPTIONと画像以外共通
 		{
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
+            if (HPrivateFastFont.FontExists(TJAPlayer3.Skin.FontName))
             {
-                this.ftフォント = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+                this.ftフォント = new CCachedFontRenderer(TJAPlayer3.Skin.FontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
             }
             else
             {

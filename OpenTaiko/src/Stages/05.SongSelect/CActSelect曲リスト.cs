@@ -1008,8 +1008,7 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-			CFontRenderer.FontStyle regular = CFontRenderer.FontStyle.Regular;
-			this.ft曲リスト用フォント = new CCachedFontRenderer( TJAPlayer3.ConfigIni.FontName, 40, regular );
+			this.ft曲リスト用フォント = HPrivateFastFont.tInstantiateMainFont(40);
 
 			int c = ( CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ja" ) ? 0 : 1;
 

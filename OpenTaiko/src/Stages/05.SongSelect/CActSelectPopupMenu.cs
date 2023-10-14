@@ -96,10 +96,7 @@ namespace TJAPlayer3
 	    {
 	        if (prvFont == null)
 			{
-				if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-					prvFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.PopupMenu_Font_Size);
-				else
-					prvFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.PopupMenu_Font_Size);
+				prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.PopupMenu_Font_Size);
 	        }
 	    }
 
