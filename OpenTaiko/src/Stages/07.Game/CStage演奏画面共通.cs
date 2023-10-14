@@ -100,6 +100,7 @@ namespace TJAPlayer3
         public override void Activate()
 		{
             listChip = new List<CDTX.CChip>[ 5 ];
+            List<CDTX.CChip>[] balloonChips = new List<CDTX.CChip>[5];
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
                 nNoteCount[i] = 0;
@@ -124,6 +125,20 @@ namespace TJAPlayer3
                     case 4:
                         listChip[i] = TJAPlayer3.DTX_5P.listChip;
                         break;
+                }
+
+                if (TJAPlayer3.ConfigIni.nPlayerCount >= 2)
+                {
+                    balloonChips[i] = new();
+                    for(int j = 0; j < listChip[i].Count; j++)
+                    {
+                        var chip = listChip[i][j];
+
+                        if (NotesManager.IsGenericBalloon(chip))
+                        {
+                            balloonChips[i].Add(chip);
+                        }
+                    }
                 }
 
                 int n整数値管理 = 0;
@@ -168,6 +183,58 @@ namespace TJAPlayer3
                         break;
                 }
 
+                if (TJAPlayer3.ConfigIni.nPlayerCount >= 2)
+                {
+                    for(int j = 0; j < balloonChips[i].Count; j++)
+                    {
+                        var chip = balloonChips[i][j];
+                        if (NotesManager.IsKusudama(chip))
+                        {
+                            for(int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
+                            {
+                                if (p == i) continue;
+                                var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+
+                                if (chip2 == null)
+                                {
+                                    var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+                                    if (!NotesManager.IsKusudama(chip3))
+                                    {
+                                        chip.nチャンネル番号 = 0x17;
+                                    }
+                                }
+                                else if (!NotesManager.IsKusudama(chip2)) 
+                                {
+                                    chip.nチャンネル番号 = 0x17;
+                                }
+                            }
+                        }
+                    }
+                    /*
+                    for(int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
+                    {
+                        for(int j = 0; j < balloonChips[p].Count; j++)
+                        {
+                            var chip = balloonChips[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
+                            if (chip == null)
+                            {
+                                var chip2 = listChip[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
+                                if (NotesManager.IsKusudama(chip2))
+                                {
+                                    chip.nチャンネル番号 = NotesManager.GetNoteValueFromChar("7");
+                                }
+                            }
+                            else if (NotesManager.IsKusudama(chip) && !NotesManager.IsKusudama(balloonChips[p][j]))
+                            {
+                                chip.nチャンネル番号 = balloonChips[p][j].nチャンネル番号;
+                            }
+                        }
+                    }
+                    */
+                }
+
+
+
                 int _totalNotes = 0;
                 int _totalBalloons = 0;
                 double _totalRolls = 0;
@@ -202,7 +269,7 @@ namespace TJAPlayer3
                         _totalBalloons += Math.Min(_chip.nBalloon, _expectedHits);
                     }
                     
-                    if (NotesManager.IsRoll(_chip))
+                    if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
                         _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
                 }
 
@@ -363,6 +430,8 @@ namespace TJAPlayer3
             this.bUseBranch = new bool[]{ false, false, false, false, false };
             this.n現在のコース = new CDTX.ECourse[5];
             this.n次回のコース = new CDTX.ECourse[5];
+            nCurrentKusudamaRollCount = 0;
+            nCurrentKusudamaCount = 0;
 
             for (int i = 0; i < 5; i++)
             {
@@ -933,6 +1002,8 @@ namespace TJAPlayer3
         public double nBranch条件数値A;
         public double nBranch条件数値B;
         private readonly int[] NowProcessingChip = new int[] { 0, 0, 0, 0, 0 };
+        protected int nCurrentKusudamaRollCount;
+        protected int nCurrentKusudamaCount;
 
         private float _AIBattleState;
         private Queue<float>[] _AIBattleStateBatch;
@@ -1161,7 +1232,7 @@ namespace TJAPlayer3
 				pChip.nLag = (int) ( nTime - pChip.n発声時刻ms );		// #23580 2011.1.3 yyagi: add "nInputAdjustTime" to add input timing adjust feature
 				int nDeltaTime = Math.Abs( pChip.nLag );
                 //Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime + nInputAdjustTime - pChip.n発声時刻ms));
-                if(NotesManager.IsRoll(pChip))
+                if(NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip))
                 {
                     if ((SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) > pChip.n発声時刻ms && (SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)) < pChip.nノーツ終了時刻ms)
                     {
@@ -1236,7 +1307,7 @@ namespace TJAPlayer3
 			//while ( nIndex_NearestChip_Future < count )		// 未来方向への検索
 			for ( ; nIndex_NearestChip_Future < count; nIndex_NearestChip_Future++)
 			{
-				if ( ( ( 0x11 <= nChannel ) && ( nChannel <= 0x17 ) ) )
+				if ( ( ( 0x11 <= nChannel ) && ( nChannel <= 0x17 ) ) || nChannel == 0x19 )
 				{
                     CDTX.CChip chip = playerListChip[ nIndex_NearestChip_Future ];
 
@@ -1261,7 +1332,7 @@ namespace TJAPlayer3
 			//while ( nIndex_NearestChip_Past >= 0 )			// 過去方向への検索
 			for ( ; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past-- )
 			{
-				if ( (( 0x15 <= nChannel ) && ( nChannel <= 0x17 ) || (nChannel == 0x20 || nChannel == 0x21)) )
+				if ( ((( 0x15 <= nChannel ) && ( nChannel <= 0x17 ) || nChannel == 0x19) || (nChannel == 0x20 || nChannel == 0x21)) )
 				{
                     CDTX.CChip chip = playerListChip[ nIndex_NearestChip_Past ];
 
@@ -1532,60 +1603,76 @@ namespace TJAPlayer3
             bool IsKusudama = NotesManager.IsKusudama(pChip);
             bool IsFuze = NotesManager.IsFuzeRoll(pChip);
 
-            ref int rollCount = ref pChip.nRollCount;
+            int rollCount = pChip.nRollCount;
             int balloon = pChip.nBalloon;
+            
             if (IsKusudama)
             {
-                var ts = pChip.db発声時刻ms;
-                var km = TJAPlayer3.DTX.kusudaMAP;
-
-                if (km.ContainsKey(ts))
-                {
-                    rollCount = ref km[ts].nRollCount;
-                    balloon = km[ts].nBalloon;
-                }
+                nCurrentKusudamaRollCount++;
+                rollCount = nCurrentKusudamaRollCount;
+                balloon = nCurrentKusudamaCount;
             }
 
             if ((int)nowTime >= pChip.n発声時刻ms 
                 && (int)nowTime <= pChip.nノーツ終了時刻ms)
             {
-                if (rollCount == 0 && this.bPAUSE == false)
+
+                if (IsKusudama)
                 {
-                    if (IsKusudama)
+                    if (nCurrentKusudamaCount > 0)
                     {
-                        this.n風船残り[0] = balloon;
+                        for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                        {
+                            this.b連打中[i] = true;
+                            actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
+                            
+
+                            if (this.actBalloon.ct風船アニメ[i].IsUnEnded)
+                            {
+                                this.actBalloon.ct風船アニメ[i] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
+                                this.actBalloon.ct風船アニメ[i].CurrentValue = 1;
+                            }
+                            else
+                            {
+                                this.actBalloon.ct風船アニメ[i] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
+                            }
+                        }
+                    }
+                }
+                else 
+                {
+                    this.b連打中[player] = true;
+                    actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
+                    
+
+                    if (this.actBalloon.ct風船アニメ[player].IsUnEnded)
+                    {
+                        this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
+                        this.actBalloon.ct風船アニメ[player].CurrentValue = 1;
                     }
                     else
                     {
-                        this.n風船残り[player] = balloon;
+                        this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
                     }
-                }
-
-                this.b連打中[player] = true;
-                actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
-                
-
-                if (this.actBalloon.ct風船アニメ[player].IsUnEnded)
-                {
-                    this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
-                    this.actBalloon.ct風船アニメ[player].CurrentValue = 1;
-                }
-                else
-                {
-                    this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, TJAPlayer3.Timer);
                 }
                 
                 this.eRollState = E連打State.balloon;
 
 
-                rollCount++;
+                
                 if (IsKusudama)
                 {
-                    this.n風船残り[0]--;
+                    //pChip.nRollCount = nCurrentKusudamaRollCount;
+                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        pChip.nRollCount = nCurrentKusudamaRollCount;
+                        this.n風船残り[i] = balloon - rollCount;
+                    }
                 }
                 else
                 {
-                    this.n風船残り[player]--;
+                    pChip.nRollCount++;
+                    this.n風船残り[player] = balloon - rollCount;
                 }
 
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
@@ -1625,29 +1712,35 @@ namespace TJAPlayer3
                 this.soundRed[pChip.nPlayerSide]?.PlayStart();
 
 
-                if (balloon == rollCount)
+                if (balloon <= rollCount)
                 {
                     if (IsKusudama)
                     {
-                        TJAPlayer3.Skin.soundBalloon.t再生する();
-                        var ts = pChip.db発声時刻ms;
-                        for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
+                        //ﾊﾟｧｰﾝ
+                        /*
+                        for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
-                            var _dtx = new CDTX[5] { TJAPlayer3.DTX, TJAPlayer3.DTX_2P, TJAPlayer3.DTX_3P, TJAPlayer3.DTX_4P, TJAPlayer3.DTX_5P };
-                            var km = _dtx[j].kusudaMAP;
-                            if (km.ContainsKey(ts))
+                            TJAPlayer3.Skin.soundBalloon.t再生する();
+                            pChip.bHit = true;
+                            pChip.IsHitted = true;
+                            chip現在処理中の連打チップ[i].bHit = true;
+                            pChip.b可視 = false;
+                            nCurrentKusudamaCount = 0;
                             {
-                                var tChip = km[ts];
-                                tChip.bHit = true;
-                                tChip.IsHitted = true;
-                                chip現在処理中の連打チップ[j].bHit = true;
-                                tChip.b可視 = false;
-                                {
-                                    actChara.ChangeAnime(j, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
-                                    if (actChara.CharaAction_Balloon_Delay[j] != null) actChara.CharaAction_Balloon_Delay[j] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[j]] - 1, 1, TJAPlayer3.Timer);
-                                }
+                                actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
+                                if (actChara.CharaAction_Balloon_Delay[i] != null) actChara.CharaAction_Balloon_Delay[i] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[i]] - 1, 1, TJAPlayer3.Timer);
                             }
-                            
+                        }*/
+                        
+                        TJAPlayer3.Skin.soundBalloon.t再生する();
+                        pChip.bHit = true;
+                        pChip.IsHitted = true;
+                        chip現在処理中の連打チップ[player].bHit = true;
+                        pChip.b可視 = false;
+                        nCurrentKusudamaCount = 0;
+                        {
+                            actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
+                            if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
                         }
                     }
                     else
@@ -1674,10 +1767,24 @@ namespace TJAPlayer3
             }
             else
             {
-                if (chip現在処理中の連打チップ[player] != null)
-                    chip現在処理中の連打チップ[player].bHit = true;
-                this.b連打中[player] = false;
-                this.actChara.b風船連打中[player] = false;
+                if (IsKusudama)
+                {
+                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        if (chip現在処理中の連打チップ[i] != null)
+                            chip現在処理中の連打チップ[i].bHit = true;
+                        this.b連打中[i] = false;
+                        this.actChara.b風船連打中[i] = false;
+                        nCurrentKusudamaCount = 0;
+                    }
+                }
+                else
+                {
+                    if (chip現在処理中の連打チップ[player] != null)
+                        chip現在処理中の連打チップ[player].bHit = true;
+                    this.b連打中[player] = false;
+                    this.actChara.b風船連打中[player] = false;
+                }
                 return false;
             }
             return true;
@@ -1792,17 +1899,33 @@ namespace TJAPlayer3
                         {
                             #region [ Balloon ]
 
-                            this.b連打中[nPlayer] = true;
-                            this.actChara.b風船連打中[nPlayer] = true;
+                            bool IsKusudama = NotesManager.IsKusudama(pChip);
+
+                            if (IsKusudama)
+                            {
+                                if (nCurrentKusudamaCount > 0)
+                                {
+                                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                                    {
+                                        this.b連打中[i] = true;
+                                        this.actChara.b風船連打中[i] = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                this.b連打中[nPlayer] = true;
+                                this.actChara.b風船連打中[nPlayer] = true;
+                            }
 
                             if (bAutoPlay || rollEffectHit)
                             {
-                                bool IsKusudama = NotesManager.IsKusudama(pChip);
 
                                 int rollCount = pChip.nRollCount;
                                 int balloon = pChip.nBalloon;
                                 if (IsKusudama)
                                 {
+                                    /*
                                     var ts = pChip.db発声時刻ms;
                                     var km = TJAPlayer3.DTX.kusudaMAP;
 
@@ -1811,6 +1934,10 @@ namespace TJAPlayer3
                                         rollCount = km[ts].nRollCount;
                                         balloon = km[ts].nBalloon;
                                     }
+                                    */
+                                    rollCount = nCurrentKusudamaRollCount;
+                                    balloon = nCurrentKusudamaCount;
+                                    
                                 }
 
                                 if (balloon != 0 && this.bPAUSE == false)
@@ -1836,7 +1963,10 @@ namespace TJAPlayer3
                             }
                             if (!bAutoPlay && !rollEffectHit)
                             {
-                                this.tBalloonProcess(pChip, (SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), nPlayer);
+                                if (!IsKusudama || nCurrentKusudamaCount > 0)
+                                {
+                                    this.tBalloonProcess(pChip, (SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), nPlayer);
+                                }
                             }
                             break;
                             #endregion
@@ -1845,7 +1975,19 @@ namespace TJAPlayer3
                         {
                             if (pChip.nノーツ終了時刻ms <= (SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
                             {
-                                this.b連打中[nPlayer] = false;
+                                if (NotesManager.IsKusudama(pChip))
+                                {
+                                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                                    {
+                                        chip現在処理中の連打チップ[i].bHit = true;
+                                        this.b連打中[i] = false;
+                                    }
+                                }
+                                else 
+                                {
+                                    this.b連打中[nPlayer] = false;
+                                }
+                              
                                 
                                 // this.actChara.b風船連打中[nPlayer] = false;
 
@@ -3596,6 +3738,15 @@ namespace TJAPlayer3
                                         this.chip現在処理中の連打チップ[ nPlayer ] = pChip;
                                 }
                             }
+                            if ( !pChip.bProcessed && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						    {
+                                if (NotesManager.IsKusudama(pChip))
+                                {
+                                    nCurrentKusudamaRollCount = 0;
+                                    nCurrentKusudamaCount += pChip.nBalloon;
+                                    pChip.bProcessed = true;
+                                }
+                            }
                             if (pChip.n描画優先度 <= 0)
                                 this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
                         }
@@ -3611,6 +3762,8 @@ namespace TJAPlayer3
                                 pChip.bHit = true;
                                 if( chip現在処理中の連打チップ[ nPlayer ] != null )
                                 {
+                                    nCurrentKusudamaRollCount = 0;
+                                    nCurrentKusudamaCount = 0;
                                     chip現在処理中の連打チップ[ nPlayer ].bHit = true;
                                     if (chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount 
                                         && chip現在処理中の連打チップ[nPlayer].nRollCount > 0)
@@ -5214,6 +5367,8 @@ namespace TJAPlayer3
                     NowProcessingChip[i] = 0;
                 }
             }
+            nCurrentKusudamaCount = 0;
+            nCurrentKusudamaRollCount = 0;
 
             this.ReSetScore(TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stage選曲.n確定された曲の難易度[0]], TJAPlayer3.DTX.nScoreDiff[TJAPlayer3.stage選曲.n確定された曲の難易度[0]]);
             this.nHand = new int[]{ 0, 0, 0, 0, 0 };
@@ -5256,6 +5411,7 @@ namespace TJAPlayer3
 
                 dTX.listChip[i].bHit = false;
                 dTX.listChip[i].bShow = true;
+                dTX.listChip[i].bProcessed = false;
                 dTX.listChip[i].b可視 = true;
                 dTX.listChip[i].IsHitted = false;
                 dTX.listChip[i].IsMissed = false;

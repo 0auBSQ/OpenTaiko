@@ -205,8 +205,19 @@ namespace TJAPlayer3
             }
             if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player])
             {
-                TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
-                TJAPlayer3.stage演奏ドラム画面.b連打中[player] = false;
+                if (btype == EBalloonType.KUSUDAMA)
+                {
+                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[i] = false;
+                        TJAPlayer3.stage演奏ドラム画面.b連打中[i] = false;
+                    }
+                }
+                else
+                {
+                    TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
+                    TJAPlayer3.stage演奏ドラム画面.b連打中[player] = false;
+                }
 
             }
 

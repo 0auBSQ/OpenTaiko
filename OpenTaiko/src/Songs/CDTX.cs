@@ -175,6 +175,7 @@ namespace TJAPlayer3
             public bool bHit;
             public bool b可視 = true;
             public bool bHideBarLine = true;
+            public bool bProcessed = false;
             public bool bShow;
             public bool bShowRoll;
             public bool bBranch = false;
@@ -1212,7 +1213,7 @@ namespace TJAPlayer3
         public List<SKBitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
         public List<STLYRIC> listLyric2;
 
-        public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
+        //public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
         public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
 
@@ -1600,6 +1601,7 @@ namespace TJAPlayer3
 
 			// Replace non-shared kusudamas by balloons
 			#region [Sync check]
+            /*
 			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 CDTX dtx = dtxarr[i];
@@ -1620,10 +1622,12 @@ namespace TJAPlayer3
                     }
                 }
             }
+            */
             #endregion
 
             // Stack balloon values to all remining (= existing) kusudamas to player 1
             #region [Accumulation]
+            /*
             CDTX dtx1 = dtxarr[0];
             if (dtx1 == null) return;
             foreach (KeyValuePair<double, CChip> kvp in dtx1.kusudaMAP)
@@ -1653,6 +1657,7 @@ namespace TJAPlayer3
                 }
                 
             }
+            */
             #endregion
         }
 
@@ -2427,6 +2432,8 @@ namespace TJAPlayer3
                                 case 0x15:
                                 case 0x16:
                                 case 0x17:
+                                case 0x19:
+                                case 0x1D:
                                 case 0x20:
                                 case 0x21:
                                     {
@@ -6469,6 +6476,7 @@ namespace TJAPlayer3
             int? nReturnChip = null;
 
             //--して取得しないとだめよ～ダメダメ💛
+            //:damedane:
             for (int i = listChips.Count - 1; i >= 0; i--)
             {
                 if (b分岐前の連打開始)
@@ -6705,13 +6713,11 @@ namespace TJAPlayer3
                                 {
                                     if (IsEndedBranching)
                                     {
-                                        if (!this.kusudaMAP.ContainsKey(chip.n発声時刻ms))
-                                            kusudaMAP[chip.n発声時刻ms] = chip;
                                     }
                                     else
                                     {
                                         // Balloon in branches
-                                        chip.nチャンネル番号 = 0x17;
+                                        chip.nチャンネル番号 = 0x19;
                                     }
                                 }
 
