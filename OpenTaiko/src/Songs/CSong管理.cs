@@ -338,7 +338,12 @@ namespace TJAPlayer3
 
 						using SHA256 hashProvider = SHA256.Create();
 						var fs = File.OpenRead(filePath);
-    					var hash = hashProvider.ComputeHash(fs);
+    					byte[] rawhash = hashProvider.ComputeHash(fs);
+						string hash = "";
+						for (int i = 0; i < rawhash.Length; i++) {
+							hash += string.Format("{0:X2}", rawhash[i]);
+						}
+
 						fs.Dispose();
 
 						if (listSongsDB.TryGetValue(filePath + hash, out C曲リストノード value))
@@ -530,7 +535,7 @@ namespace TJAPlayer3
 									{
 										this.n検索されたスコア数++;
 										listノードリスト.Add( c曲リストノード );
-										if (!listSongsDB.ContainsKey(filePath + hash)) listSongsDB.Add(filePath + hash, c曲リストノード );
+										listSongsDB.Add(filePath + hash, c曲リストノード );
 										this.n検索された曲ノード数++;
 										b = true;
 									}
