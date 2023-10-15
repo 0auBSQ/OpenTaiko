@@ -2933,7 +2933,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Random の初期化 ]
 			//---------------------
-			Random = new Random( (int) Timer.SystemTime );
+			Random = new Random();
 			//---------------------
 			#endregion
 			#region [ Stages initialisation ]
