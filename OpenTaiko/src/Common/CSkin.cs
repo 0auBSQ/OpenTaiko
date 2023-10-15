@@ -1105,6 +1105,22 @@ namespace TJAPlayer3
                                     Resolution[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "FontName")
+                            {
+                                strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
+                                strParam = Path(strParam);
+                                if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
+                            }
+                            else if (strCommand == "BoxFontName")
+                            {
+                                strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                if (HPrivateFastFont.FontExists(strParam)) BoxFontName = strParam;
+                                strParam = Path(strParam);
+                                if (HPrivateFastFont.FontExists(Path(strParam))) BoxFontName = strParam;
+                            }
                             #endregion
 
                             #region [Background Scroll]
@@ -8343,6 +8359,8 @@ namespace TJAPlayer3
         public string Skin_Version = "Unknown";
         public string Skin_Creator = "Unknown";
         public int[] Resolution = new int[] { 1280, 720 };
+        public string FontName = TJAPlayer3.ConfigIni.FontName;
+        public string BoxFontName = TJAPlayer3.ConfigIni.BoxFontName;
         #endregion
 
         #region Config

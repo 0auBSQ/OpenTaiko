@@ -17,35 +17,17 @@ namespace TJAPlayer3
             {
                 this.pfName[player]?.Dispose();
 
-                if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                {
-                    if (TJAPlayer3.SaveFileInstances[player].data.Title == "" || TJAPlayer3.SaveFileInstances[player].data.Title == null)
-                        this.pfName[player] = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.NamePlate_Font_Name_Size_Normal);
-                    else
-                        this.pfName[player] = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.NamePlate_Font_Name_Size_WithTitle);
-                }
+                if (TJAPlayer3.SaveFileInstances[player].data.Title == "" || TJAPlayer3.SaveFileInstances[player].data.Title == null)
+                    this.pfName[player] = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Name_Size_Normal);
                 else
-                {
-                    if (TJAPlayer3.SaveFileInstances[player].data.Title == "" || TJAPlayer3.SaveFileInstances[player].data.Title == null)
-                        this.pfName[player] = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.NamePlate_Font_Name_Size_Normal);
-                    else
-                        this.pfName[player] = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.NamePlate_Font_Name_Size_WithTitle);
-                }
+                    this.pfName[player] = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Name_Size_WithTitle);
             }
 
             this.pfTitle?.Dispose();
             this.pfdan?.Dispose();
 
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                this.pfTitle = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.NamePlate_Font_Title_Size);
-                this.pfdan = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
-            }
-            else
-            {
-                this.pfTitle = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.NamePlate_Font_Title_Size);
-                this.pfdan = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
-            }
+            this.pfTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Title_Size);
+            this.pfdan = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
         }
 
         public CNamePlate()

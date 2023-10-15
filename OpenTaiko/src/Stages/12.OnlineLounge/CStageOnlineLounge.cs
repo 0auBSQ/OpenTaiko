@@ -119,17 +119,8 @@ namespace TJAPlayer3
         {
             // Ressource allocation
 
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                this.pfOLFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
-                this.pfOLFontLarge = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
-            }
-            else
-            {
-                this.pfOLFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
-                this.pfOLFontLarge = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
-            }
+            this.pfOLFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
+            this.pfOLFontLarge = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
 
             base.CreateManagedResource();
         }

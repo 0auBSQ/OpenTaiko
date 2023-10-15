@@ -284,8 +284,8 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-			pfSpeechText = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Result_Speech_Text_Size);
-			pfAISectionText = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Result_AIBattle_SectionText_Scale);
+			pfSpeechText = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Result_Speech_Text_Size);
+			pfAISectionText = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Result_AIBattle_SectionText_Scale);
 				
 			base.CreateManagedResource();
 		}

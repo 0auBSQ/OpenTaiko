@@ -140,7 +140,7 @@ namespace TJAPlayer3
         }
         public override void CreateManagedResource()
         {
-            OptionFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.SongSelect_Option_Font_Scale);
+            OptionFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_Option_Font_Scale);
 
             base.CreateManagedResource();
         }

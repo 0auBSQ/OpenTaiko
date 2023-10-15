@@ -1008,8 +1008,7 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-			CFontRenderer.FontStyle regular = CFontRenderer.FontStyle.Regular;
-			this.ft曲リスト用フォント = new CCachedFontRenderer( TJAPlayer3.ConfigIni.FontName, 40, regular );
+			this.ft曲リスト用フォント = HPrivateFastFont.tInstantiateMainFont(40);
 
 			int c = ( CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ja" ) ? 0 : 1;
 
@@ -2957,7 +2956,7 @@ namespace TJAPlayer3
 					{
 						if (i >= 2) continue;
 
-						displayTowerStatus(x + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i], Math.Min(クリア[i][0], 7) - 1, 0.3f);
+						displayTowerStatus(x + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_Y[i], Math.Min(クリア[i][0], 7) - 1, 0.3f);
 					}
 				}
 				else
@@ -2968,7 +2967,7 @@ namespace TJAPlayer3
 					{
 						if (i >= 2) continue;
 
-						displayRegularCrowns(x + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i], クリア[i], スコアランク[i], 0.8f);
+						displayRegularCrowns(x + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_X[i], y + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_Y[i], クリア[i], スコアランク[i], 0.8f);
 					}
 				}
 

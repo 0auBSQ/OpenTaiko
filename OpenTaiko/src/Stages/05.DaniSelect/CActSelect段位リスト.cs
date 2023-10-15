@@ -73,15 +73,8 @@ namespace TJAPlayer3
 
         public override void CreateManagedResource()
         {
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                pfDanSong = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.DaniSelect_Font_DanSong_Size);
-            else
-                pfDanSong = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.DaniSelect_Font_DanSong_Size);
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                this.pfExamFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.DaniSelect_Font_Exam_Size);
-            else
-                this.pfExamFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.DaniSelect_Font_Exam_Size);
+            this.pfDanSong = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_DanSong_Size);
+            this.pfExamFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_Exam_Size);
 
             base.CreateManagedResource();
         }
@@ -337,7 +330,7 @@ namespace TJAPlayer3
                 ));
 
                 if (pfDanPlateTitle == null)
-                    pfDanPlateTitle = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.DaniSelect_DanPlateTitle_Size);
+                    pfDanPlateTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_DanPlateTitle_Size);
 
                 string titleTmp = "";
 
@@ -358,7 +351,7 @@ namespace TJAPlayer3
         public static void tDisplayDanIcon(int count, float x, float y, int opacity, float scale, bool showFade = false)
         {
             if (pfDanIconTitle == null)
-                pfDanIconTitle = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.DaniSelect_DanIconTitle_Size);
+                pfDanIconTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_DanIconTitle_Size);
 
             string ex = "th";
             switch (count)

@@ -45,16 +45,8 @@ namespace TJAPlayer3
         public override void CreateManagedResource()
         {
             // Ressource allocation
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                pfTitleFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.SongSelect_DanInfo_Title_Size);
-            else
-                pfTitleFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.SongSelect_DanInfo_Title_Size);
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                pfExamFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Size);
-            else
-                pfExamFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Size);
+            pfTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_DanInfo_Title_Size);
+            pfExamFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Size);
 
             base.CreateManagedResource();
         }

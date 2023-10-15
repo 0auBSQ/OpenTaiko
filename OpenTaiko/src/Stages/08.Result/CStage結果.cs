@@ -869,27 +869,11 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-			{
-				this.pfTowerText = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.TowerResult_Font_TowerText);
-				this.pfTowerText48 = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.TowerResult_Font_TowerText48);
-				this.pfTowerText72 = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.TowerResult_Font_TowerText72);
-			}
-			else
-			{
-				this.pfTowerText = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.TowerResult_Font_TowerText);
-				this.pfTowerText48 = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.TowerResult_Font_TowerText48);
-				this.pfTowerText72 = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.TowerResult_Font_TowerText72);
-			}
-
-			if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-			{
-				this.pfDanTitles = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.DanResult_Font_DanTitles_Size);
-			}
-			else
-			{
-				this.pfDanTitles = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.DanResult_Font_DanTitles_Size);
-			}
+			this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerResult_Font_TowerText);
+			this.pfTowerText48 = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerResult_Font_TowerText48);
+			this.pfTowerText72 = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerResult_Font_TowerText72);
+			
+			this.pfDanTitles = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DanResult_Font_DanTitles_Size);
 
 			base.CreateManagedResource();
 		}
