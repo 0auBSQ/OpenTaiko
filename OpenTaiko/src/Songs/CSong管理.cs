@@ -336,7 +336,7 @@ namespace TJAPlayer3
 
 						string filePath = str基点フォルダ + fileinfo.Name;
 
-						using SHA256 hashProvider = SHA256.Create();
+						using SHA1 hashProvider = SHA1.Create();
 						var fs = File.OpenRead(filePath);
     					byte[] rawhash = hashProvider.ComputeHash(fs);
 						string hash = "";
@@ -535,7 +535,7 @@ namespace TJAPlayer3
 									{
 										this.n検索されたスコア数++;
 										listノードリスト.Add( c曲リストノード );
-										listSongsDB.Add(filePath + hash, c曲リストノード );
+										if (!listSongsDB.ContainsKey(filePath + hash)) listSongsDB.Add(filePath + hash, c曲リストノード );
 										this.n検索された曲ノード数++;
 										b = true;
 									}
@@ -882,12 +882,7 @@ namespace TJAPlayer3
 							//-----------------
                             try
                             {
-								var scoreIniPath = c曲リストノード.arスコア[i].ファイル情報.ファイルの絶対パス;// + ".score.ini";
-
-                                if( File.Exists( scoreIniPath ) )
-                                {
-									this.tScoreIniを読み込んで譜面情報を設定する(scoreIniPath, c曲リストノード.arスコア[i]);
-								}
+								this.tScoreIniを読み込んで譜面情報を設定する(c曲リストノード.arスコア[i].ファイル情報.ファイルの絶対パス, c曲リストノード.arスコア[i]);
 								// Legacy save files from DTX mania
 								/*
                                 else
@@ -1478,6 +1473,38 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			try
 			{
 				//var ini = new CScoreIni( strScoreIniファイルパス );
+
+				/*
+				CScoreIni getScoreIni(string filePath)
+				{
+					if (!File.Exists(filePath))
+					{
+						var result = new CScoreIni(filePath);
+						return result;
+					}
+
+					using SHA1 hashProvider = SHA1.Create();
+					var fs = File.OpenRead(filePath);
+    				byte[] rawhash = hashProvider.ComputeHash(fs);
+					string hash = "";
+					for (int i = 0; i < rawhash.Length; i++) {
+						hash += string.Format("{0:X2}", rawhash[i]);
+					}
+
+					fs.Dispose();
+
+					if (listScoreDB.TryGetValue(hash, out CScoreIni value))
+					{
+						return value;
+					}
+					else 
+					{
+						var result = new CScoreIni(filePath);
+						listScoreDB.Add(hash, result);
+						return result;
+					}
+				}
+				*/
 
 				CScoreIni[] csi =
 				{

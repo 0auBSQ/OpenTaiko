@@ -3090,6 +3090,7 @@ for (int i = 0; i < 3; i++) {
 				Trace.TraceInformation( "■ アプリケーションの終了" );
 				#region [ 曲検索の終了処理 ]
 				//---------------------
+				
 				if ( actEnumSongs != null )
 				{
 					Trace.TraceInformation( "曲検索actの終了処理を行います。" );
@@ -3172,6 +3173,15 @@ for (int i = 0; i < 3; i++) {
 					Trace.Indent();
 					try
 					{
+#pragma warning disable SYSLIB0011
+						if (EnumSongs.IsSongListEnumCompletelyDone)
+						{
+							BinaryFormatter songlistdb_ = new BinaryFormatter();
+							using Stream songlistdb = File.OpenWrite($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+							songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
+						}
+#pragma warning restore SYSLIB0011
+
 						Songs管理 = null;
 						Trace.TraceInformation( "曲リストの終了処理を完了しました。" );
 					}

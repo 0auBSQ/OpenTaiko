@@ -59,6 +59,7 @@ namespace TJAPlayer3
 		{
 			if ( this.IsDeActivated )
 				return;
+				
 			base.DeActivate();
 			this.ctNowEnumeratingSongs = null;
 		}

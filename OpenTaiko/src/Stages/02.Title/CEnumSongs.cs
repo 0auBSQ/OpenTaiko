@@ -475,9 +475,9 @@ namespace TJAPlayer3
 		/// </summary>
 		private void SerializeSongList()
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
-			using Stream stream = File.OpenWrite($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
-			formatter.Serialize(stream, Songs管理.listSongsDB);
+			BinaryFormatter songlistdb_ = new BinaryFormatter();
+			using Stream songlistdb = File.OpenWrite($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+			songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
 		}
 
 		/// <summary>
@@ -485,15 +485,15 @@ namespace TJAPlayer3
 		/// </summary>
 		/// <param name="songs管理"></param>
 		/// <param name="strPathSongList"></param>
-		private void Deserialize()
+		public void Deserialize()
 		{
 				try
 				{
 					if (File.Exists($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db"))
 					{
-						BinaryFormatter formatter = new BinaryFormatter();
-						using Stream stream = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
-						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)formatter.Deserialize(stream);
+						BinaryFormatter songlistdb_ = new BinaryFormatter();
+						using Stream songlistdb = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)songlistdb_.Deserialize(songlistdb);
 					}
 				}
 				catch(Exception exception)
