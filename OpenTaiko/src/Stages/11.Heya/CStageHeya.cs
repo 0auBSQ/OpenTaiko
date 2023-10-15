@@ -41,11 +41,7 @@ namespace TJAPlayer3
 
             bInSongPlayed = false;
 
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                this.pfHeyaFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Heya_Font_Scale);
-            else
-                this.pfHeyaFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Heya_Font_Scale);
+            this.pfHeyaFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Heya_Font_Scale);
 
             ScrollCounter = new CCounter(0, 1000, 0.15f, TJAPlayer3.Timer);
 

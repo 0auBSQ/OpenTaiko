@@ -181,27 +181,10 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-            if( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.FontName ) )
-            {
-                this.pfTITLE = new CCachedFontRenderer( TJAPlayer3.ConfigIni.FontName , TJAPlayer3.Skin.SongLoading_Title_FontSize );
-                this.pfSUBTITLE = new CCachedFontRenderer( TJAPlayer3.ConfigIni.FontName , TJAPlayer3.Skin.SongLoading_SubTitle_FontSize);
-            }
-            else
-            {
-                this.pfTITLE = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.SongLoading_Title_FontSize);
-                this.pfSUBTITLE = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.SongLoading_SubTitle_FontSize);
-            }
-			
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                pfDanTitle = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Game_DanC_Title_Size);
-                pfDanSubTitle = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Game_DanC_SubTitle_Size);
-            }
-            else
-            {
-                pfDanTitle = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Game_DanC_Title_Size);
-                pfDanSubTitle = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Game_DanC_SubTitle_Size);
-            }
+			this.pfTITLE = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongLoading_Title_FontSize );
+			this.pfSUBTITLE = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongLoading_SubTitle_FontSize);
+			pfDanTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_DanC_Title_Size);
+			pfDanSubTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_DanC_SubTitle_Size);
 
 			this.tx背景 = TJAPlayer3.tテクスチャの生成( this.strSTAGEFILE, false );
 			//this.txSongnamePlate = CDTXMania.tテクスチャの生成( CSkin.Path( @$"Graphics{Path.DirectorySeparatorChar}6_SongnamePlate.png" ) );

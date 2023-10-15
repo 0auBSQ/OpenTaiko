@@ -59,15 +59,8 @@ namespace TJAPlayer3
         {
             // Ressource allocation
 
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                pfTitleFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.TowerSelect_Title_Size);
-            else
-                pfTitleFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.TowerSelect_Title_Size);
-
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                pfSubTitleFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.TowerSelect_SubTitle_Size);
-            else
-                pfSubTitleFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.TowerSelect_SubTitle_Size);
+            pfTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerSelect_Title_Size);
+            pfSubTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerSelect_SubTitle_Size);
 
             base.CreateManagedResource();
         }

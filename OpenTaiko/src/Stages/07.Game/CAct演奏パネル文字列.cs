@@ -146,11 +146,8 @@ namespace TJAPlayer3
                 {
                     this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
                 }
-
-                if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                    pfGENRE = new CCachedFontRenderer(TJAPlayer3.ConfigIni.BoxFontName, TJAPlayer3.Skin.Game_GenreText_FontSize);
-                else
-                    pfGENRE = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Game_GenreText_FontSize);
+                
+                pfGENRE = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_GenreText_FontSize);
 
                 this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
 

@@ -164,20 +164,10 @@ namespace TJAPlayer3
                 && _pfModalTitleFull != null)
                 return;
 
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                _pfModalContentHalf = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Modal_Font_ModalContentHalf_Size);
-                _pfModalTitleHalf = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Modal_Font_ModalTitleHalf_Size);
-                _pfModalContentFull = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Modal_Font_ModalContentFull_Size);
-                _pfModalTitleFull = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Modal_Font_ModalTitleFull_Size);
-            }
-            else
-            {
-                _pfModalContentHalf = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Modal_Font_ModalContentHalf_Size);
-                _pfModalTitleHalf = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Modal_Font_ModalTitleHalf_Size);
-                _pfModalContentFull = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Modal_Font_ModalContentFull_Size);
-                _pfModalTitleFull = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Modal_Font_ModalTitleFull_Size);
-            }
+            _pfModalContentHalf = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Modal_Font_ModalContentHalf_Size);
+            _pfModalTitleHalf = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Modal_Font_ModalTitleHalf_Size);
+            _pfModalContentFull = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Modal_Font_ModalContentFull_Size);
+            _pfModalTitleFull = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Modal_Font_ModalTitleFull_Size);
         }
 
         #region [Enum definitions]

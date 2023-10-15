@@ -32,14 +32,7 @@ namespace TJAPlayer3
         private void tReloadFonts()
         {
             _pfEncyclopediaMenu?.Dispose();
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-            {
-                _pfEncyclopediaMenu = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
-            }
-            else
-            {
-                _pfEncyclopediaMenu = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
-            }
+            _pfEncyclopediaMenu = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
         }
 
         #endregion

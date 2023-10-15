@@ -60,14 +60,7 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-            if( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.FontName) )
-            {
-                this.pfMusicName = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Result_MusicName_FontSize);
-            }
-            else
-            {
-                this.pfMusicName = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Result_MusicName_FontSize);
-            }
+			this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Result_MusicName_FontSize);
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()

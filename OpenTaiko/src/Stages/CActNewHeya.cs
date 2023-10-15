@@ -218,11 +218,7 @@ namespace TJAPlayer3
 
         public override void CreateManagedResource()
         {
-            if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-                this.MenuFont = new CCachedFontRenderer(TJAPlayer3.ConfigIni.FontName, TJAPlayer3.Skin.Heya_Font_Scale);
-            else
-                this.MenuFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Heya_Font_Scale);
-
+            this.MenuFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Heya_Font_Scale);
             base.CreateManagedResource();
         }
 
