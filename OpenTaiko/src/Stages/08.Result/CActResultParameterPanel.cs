@@ -601,12 +601,22 @@ namespace TJAPlayer3
 							{
 								if (ct全体進行.CurrentValue >= AnimeCount + (Interval * k))
 								{
+									float numScale = 1.0f;
+
+									if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
+									{
+										numScale = TJAPlayer3.Skin.Result_Number_Scale_5P;
+									}
+									else if (TJAPlayer3.ConfigIni.nPlayerCount == 3 || TJAPlayer3.ConfigIni.nPlayerCount == 4)
+									{
+										numScale = TJAPlayer3.Skin.Result_Number_Scale_4P;
+									}
 									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = ct全体進行.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y = ct全体進行.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ct全体進行.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 
 									if ((k != 5 || TJAPlayer3.Skin.Result_ADLib_Show) && (k != 6 || TJAPlayer3.Skin.Result_Bomb_Show))
 									{
-										this.t小文字表示(num_x[k][pos] + uioffset_x, num_y[k][pos], scoresArr[k]);
+										this.t小文字表示(num_x[k][pos] + uioffset_x, num_y[k][pos], scoresArr[k], numScale);
 									}
 
 									TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X = 1f;
@@ -631,15 +641,18 @@ namespace TJAPlayer3
 
 							if (ct全体進行.CurrentValue >= AnimeCount + Interval * 4 + 840)
 							{
+								float numScale = 1.0f;
 								int score_x;
 								int score_y;
 								if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
 								{
+									numScale = TJAPlayer3.Skin.Result_Score_Scale_5P;
 									score_x = TJAPlayer3.Skin.Result_Score_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
 									score_y = TJAPlayer3.Skin.Result_Score_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
 								}
 								else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3)
 								{
+									numScale = TJAPlayer3.Skin.Result_Score_Scale_4P;
 									score_x = TJAPlayer3.Skin.Result_Score_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
 									score_y = TJAPlayer3.Skin.Result_Score_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
 								}
@@ -656,7 +669,7 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.Y = ct全体進行.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ct全体進行.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 																				  ct全体進行.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ct全体進行.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 
-								this.tスコア文字表示(score_x, score_y, (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+								this.tスコア文字表示(score_x, score_y, (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
 
 								if (!b音声再生[8])
 								{
@@ -1347,20 +1360,22 @@ namespace TJAPlayer3
 			}
 		}
 
-		public void t小文字表示(int x, int y, int num)
+		public void t小文字表示(int x, int y, int num, float scale)
 		{
+			TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.X *= scale;
+			TJAPlayer3.Tx.Result_Number.vc拡大縮小倍率.Y *= scale;
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++)
 			{
 				float offset = j;
 
-				float width = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Width / 11.0f;
-				float height = TJAPlayer3.Tx.Result_Number.sz画像サイズ.Height / 2.0f;
+				float width = (TJAPlayer3.Tx.Result_Number.sz画像サイズ.Width / 11.0f);
+				float height = (TJAPlayer3.Tx.Result_Number.sz画像サイズ.Height / 2.0f);
 
-				float _x = x - (TJAPlayer3.Skin.Result_Number_Interval[0] * offset) + (width * 2);
-				float _y = y - (TJAPlayer3.Skin.Result_Number_Interval[1] * offset);
+				float _x = x - ((TJAPlayer3.Skin.Result_Number_Interval[0] * scale) * offset) + (width * 2);
+				float _y = y - ((TJAPlayer3.Skin.Result_Number_Interval[1] * scale) * offset);
 
-				TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(_x + (width / 2), _y + (height / 2), 
+				TJAPlayer3.Tx.Result_Number.t2D拡大率考慮中央基準描画(_x + (width * scale / 2), _y + (height * scale / 2), 
 					new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
@@ -1393,19 +1408,21 @@ namespace TJAPlayer3
 			}
 		}
 
-		public void tスコア文字表示(int x, int y, int num)
+		public void tスコア文字表示(int x, int y, int num, float scale)
 		{
+			TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.X *= scale;
+			TJAPlayer3.Tx.Result_Score_Number.vc拡大縮小倍率.Y *= scale;
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++)
 			{
 				float offset = j;
-				float _x = x - (TJAPlayer3.Skin.Result_Score_Number_Interval[0] * offset);
-				float _y = y - (TJAPlayer3.Skin.Result_Score_Number_Interval[1] * offset);
+				float _x = x - (TJAPlayer3.Skin.Result_Score_Number_Interval[0] * scale * offset);
+				float _y = y - (TJAPlayer3.Skin.Result_Score_Number_Interval[1] * scale * offset);
 
-				float width = TJAPlayer3.Tx.Result_Score_Number.sz画像サイズ.Width / 10.0f;
-				float height = TJAPlayer3.Tx.Result_Score_Number.sz画像サイズ.Height;
+				float width = (TJAPlayer3.Tx.Result_Score_Number.sz画像サイズ.Width / 10.0f);
+				float height = (TJAPlayer3.Tx.Result_Score_Number.sz画像サイズ.Height);
 
-				TJAPlayer3.Tx.Result_Score_Number.t2D拡大率考慮中央基準描画(_x, _y + (height / 2), new RectangleF(width * nums[j], 0, width, height));
+				TJAPlayer3.Tx.Result_Score_Number.t2D拡大率考慮中央基準描画(_x, _y + (height * scale / 2), new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
 		//-----------------
