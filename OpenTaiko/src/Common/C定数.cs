@@ -646,6 +646,7 @@ namespace TJAPlayer3
 	}
 
 
+	[Serializable]
 	[StructLayout( LayoutKind.Sequential )]
 	public struct STAUTOPLAY								// Eレーンとindexを一致させること
 	{

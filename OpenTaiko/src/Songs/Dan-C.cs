@@ -8,6 +8,7 @@ namespace TJAPlayer3
     /// <summary>
     /// 段位認定を管理するクラス。
     /// </summary>
+	[Serializable]
     public class Dan_C
     {
         public Dan_C()

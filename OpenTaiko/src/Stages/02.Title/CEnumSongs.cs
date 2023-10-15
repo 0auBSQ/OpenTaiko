@@ -289,47 +289,6 @@ namespace TJAPlayer3
 					Trace.TraceInformation( "コンパクトモードなので残りの起動処理は省略します。" );
 					return;
 				}
-
-				#region [ 00) songlist.dbの読み込みによる曲リストの構築  ]
-				//-----------------------------
-				TJAPlayer3.stage起動.eフェーズID = CStage.Eフェーズ.起動00_songlistから曲リストを作成する;
-
-				Trace.TraceInformation( "1) songlist.dbを読み込みます。" );
-				Trace.Indent();
-
-				try
-				{
-					if ( !TJAPlayer3.ConfigIni.bConfigIniがないかDTXManiaのバージョンが異なる )
-					{
-						CSongs管理 s = new CSongs管理();
-						s = Deserialize( strPathSongList );		// 直接this.Songs管理にdeserialize()結果を代入するのは避ける。nullにされてしまうことがあるため。
-						if ( s != null )
-						{
-							this.Songs管理 = s;
-						}
-
-						int scores = this.Songs管理.n検索されたスコア数;
-						Trace.TraceInformation( "songlist.db の読み込みを完了しました。[{0}スコア]", scores );
-						lock ( TJAPlayer3.stage起動.list進行文字列 )
-						{
-							TJAPlayer3.stage起動.list進行文字列.Add( "SONG LIST...OK" );
-						}
-					}
-					else
-					{
-						Trace.TraceInformation( "初回の起動であるかまたはDTXManiaのバージョンが上がったため、songlist.db の読み込みをスキップします。" );
-						lock ( TJAPlayer3.stage起動.list進行文字列 )
-						{
-							TJAPlayer3.stage起動.list進行文字列.Add( "SONG LIST...SKIPPED" );
-						}
-					}
-				}
-				finally
-				{
-					Trace.Unindent();
-				}
-
-				#endregion
 			}
 			finally
 			{
@@ -359,6 +318,7 @@ namespace TJAPlayer3
 
 			try
 			{
+				Deserialize();
 
 				#region [ 2) 曲データの検索 ]
 				//-----------------------------
@@ -426,6 +386,7 @@ namespace TJAPlayer3
 				//-----------------------------
 				//					base.eフェーズID = CStage.Eフェーズ.起動4_スコアキャッシュになかった曲をファイルから読み込んで反映する;
 
+				/*
 				int num2 = this.Songs管理.n検索されたスコア数 - this.Songs管理.nスコアキャッシュから反映できたスコア数;
 
 				Trace.TraceInformation( "{0}, {1}", this.Songs管理.n検索されたスコア数, this.Songs管理.nスコアキャッシュから反映できたスコア数 );
@@ -450,6 +411,7 @@ namespace TJAPlayer3
 				//					{
 				//						this.list進行文字列.Add( string.Format( "{0} ... {1}/{2}", "Loading score properties from files", CDTXMania.Songs管理_裏読.nファイルから反映できたスコア数, CDTXMania.Songs管理_裏読.n検索されたスコア数 - cs.nスコアキャッシュから反映できたスコア数 ) );
 				//					}
+				*/
 				//-----------------------------
 				#endregion
 				#region [ 5) 曲リストへの後処理の適用 ]
@@ -485,7 +447,7 @@ namespace TJAPlayer3
 				Trace.TraceInformation( "enum7) 曲データの情報を songlist.db へ出力します。" );
 				Trace.Indent();
 
-				SerializeSongList( this.Songs管理, strPathSongList );
+				SerializeSongList();
 				Trace.TraceInformation("songlist.db への出力を完了しました。");
 				Trace.Unindent();
 				//-----------------------------
@@ -507,42 +469,15 @@ namespace TJAPlayer3
 		}
 
 
-
+#pragma warning disable SYSLIB0011
 		/// <summary>
 		/// 曲リストのserialize
 		/// </summary>
-		private static void SerializeSongList( CSongs管理 cs, string strPathSongList )
+		private void SerializeSongList()
 		{
-			bool bSucceededSerialize = true;
-			try
-			{
-				using(StreamWriter stream = new StreamWriter(strPathSongList))
-				{
-					string temp = JsonSerializer.Serialize(cs);
-					stream.Write(temp);
-				}
-			}
-			catch ( Exception e )
-			{
-				bSucceededSerialize = false;
-				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "例外が発生しましたが処理を継続します。 (9ad477a4-d922-412c-b87d-e3a49a608e92)" );
-			}
-			finally
-			{
-				if ( !bSucceededSerialize )
-				{
-					try
-					{
-						File.Delete( strPathSongList );	// serializeに失敗したら、songs2.dbファイルを消しておく
-					}
-					catch ( Exception e )
-					{
-						Trace.TraceError( e.ToString() );
-						Trace.TraceError( "例外が発生しましたが処理を継続します。 (62860c67-b44f-46f4-b4fc-999c6fe18cce)" );
-					}
-				}
-			}
+			BinaryFormatter songlistdb_ = new BinaryFormatter();
+			using Stream songlistdb = File.OpenWrite($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+			songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
 		}
 
 		/// <summary>
@@ -550,42 +485,25 @@ namespace TJAPlayer3
 		/// </summary>
 		/// <param name="songs管理"></param>
 		/// <param name="strPathSongList"></param>
-		private CSongs管理 Deserialize( string strPathSongList )
+		public void Deserialize()
 		{
-			try
-			{
-				#region [ SongListDB(songlist.db)を読み込む ]
-
-			    if (!File.Exists(strPathSongList))
-			    {
-			        return null;
-			    }
-
-				//	byte[] buf = File.ReadAllBytes( SongListDBファイル名 );			// 一旦メモリにまとめ読みしてからdeserializeした方が高速かと思ったら全く変わらなかったので削除
-				//	using ( MemoryStream input = new MemoryStream(buf, false) )
-				using ( StreamReader input = new StreamReader(strPathSongList) )
+				try
 				{
-					try
+					if (File.Exists($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db"))
 					{
-						return JsonSerializer.Deserialize<CSongs管理>(input.ReadToEnd());
-					}
-					catch ( Exception e )
-					{
-						// songs管理 = null;
-
-						Trace.TraceError( e.ToString() );
-						Trace.TraceError( "例外が発生しましたが処理を継続します。 (a4289e34-7140-4b67-b821-3b5370a725e1)" );
+						BinaryFormatter songlistdb_ = new BinaryFormatter();
+						using Stream songlistdb = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)songlistdb_.Deserialize(songlistdb);
 					}
 				}
-				#endregion
-			}
-			catch (Exception e)
-			{
-				Trace.TraceError( "songlist.db の読み込みに失敗しました。" );
-				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "例外が発生しましたが処理を継続します。 (5a907ed2-f849-4bc4-acd0-d2a6aa3c9c87)" );
-			}
-			return null;
+				catch(Exception exception)
+				{
+					this.Songs管理.listSongsDB = new();
+				}
+				finally
+				{
+				}
 		}
+		#pragma warning restore SYSLIB0011
 	}
 }

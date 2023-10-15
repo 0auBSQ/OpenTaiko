@@ -42,6 +42,7 @@ namespace TJAPlayer3
 
         #endregion
 
+	    [Serializable]
         public class Data
         {
             public string id = "";

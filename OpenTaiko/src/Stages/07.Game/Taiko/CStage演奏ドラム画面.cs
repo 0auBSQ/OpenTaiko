@@ -2583,13 +2583,10 @@ namespace TJAPlayer3
                         if (chkChip.n発声時刻ms <= (int)nowTime
                             && chkChip.nノーツ終了時刻ms + 500 >= (int)nowTime)
                         {
-                            if (i == 0 && chkChip.nRollCount == 0 && NotesManager.IsKusudama(chkChip))
-                            {
-                                this.n風船残り[0] = chkChip.nBalloon;
-                            }
+                            var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
                             if (!NotesManager.IsFuzeRoll(chkChip)) chkChip.bShow = false;
                             this.actBalloon.On進行描画(
-                                chkChip.nBalloon, 
+                                balloon, 
                                 this.n風船残り[i], 
                                 i,
                                 NotesManager.IsFuzeRoll(chkChip)

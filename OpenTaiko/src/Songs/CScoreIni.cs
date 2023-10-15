@@ -12,12 +12,15 @@ using TJAPlayer3;
 
 namespace TJAPlayer3
 {
+	[Serializable]
 	public class CScoreIni
 	{
 		// プロパティ
 
 		// [File] セクション
 		public STファイル stファイル;
+
+		[Serializable]
 		[StructLayout( LayoutKind.Sequential )]
 		public struct STファイル
 		{
@@ -42,6 +45,8 @@ namespace TJAPlayer3
 
 		// 演奏記録セクション（9種類）
 		public STセクション stセクション;
+
+		[Serializable]
 		[StructLayout( LayoutKind.Sequential )]
 		public struct STセクション
 		{
@@ -161,6 +166,8 @@ namespace TJAPlayer3
 			E = 6,
 			UNKNOWN = 99
 		}
+
+		[Serializable]
 		public class C演奏記録
 		{
 			public STAUTOPLAY bAutoPlay;

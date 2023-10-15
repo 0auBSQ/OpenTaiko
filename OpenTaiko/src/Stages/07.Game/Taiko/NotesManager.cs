@@ -26,7 +26,7 @@ namespace TJAPlayer3
             ["6"] = 6, // Big roll start | Konga pink roll
             ["7"] = 7, // Balloon
             ["8"] = 8, // Roll/Balloon end
-            ["9"] = 7, // Kusudama
+            ["9"] = 9, // Kusudama
             ["A"] = 10, // Joint Big Don (2P)
             ["B"] = 11, // Joint Big Ka (2P)
             ["C"] = 12, // Mine
