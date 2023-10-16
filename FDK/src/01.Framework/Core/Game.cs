@@ -429,10 +429,18 @@ namespace SampleFramework
 
         public void Window_Resize(Vector2D<int> size)
         {
-            float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
-            float currentAspect = (float)size.X / size.Y;
-            size.X = (int)(size.X * (resolutionAspect - currentAspect));
-            size.Y = (int)(size.Y / (resolutionAspect - currentAspect));
+            if (size.X > 0 && size.Y > 0)
+            {
+                float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
+                if (WindowSize.X != size.X)
+                {
+                    size.Y = (int)(size.X / (resolutionAspect));
+                }
+                else 
+                {
+                    size.X = (int)(size.Y * (resolutionAspect));
+                }
+            }
 
             WindowSize = size;
             GraphicsDevice.SetViewPort(0, 0, (uint)size.X, (uint)size.Y);
