@@ -411,6 +411,7 @@ namespace SampleFramework
         {
             double fps = 1.0f / deltaTime;
             TimeMs = (long)(Window_.Time * 1000);
+
             Update();
         }
 
@@ -428,6 +429,19 @@ namespace SampleFramework
 
         public void Window_Resize(Vector2D<int> size)
         {
+            if (size.X > 0 && size.Y > 0 && Window_.WindowState == WindowState.Normal)
+            {
+                float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
+                if (WindowSize.X != size.X)
+                {
+                    size.Y = (int)(size.X / (resolutionAspect));
+                }
+                else 
+                {
+                    size.X = (int)(size.Y * (resolutionAspect));
+                }
+            }
+
             WindowSize = size;
             GraphicsDevice.SetViewPort(0, 0, (uint)size.X, (uint)size.Y);
         }
