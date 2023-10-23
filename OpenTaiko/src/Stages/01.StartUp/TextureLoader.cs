@@ -304,7 +304,7 @@ namespace TJAPlayer3
                 for (int i = 0; i < genre_files.Length; i++)
                 {
                     string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[2];
-                    SongSelect_Bar_Genre.Add(name, TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_" + name + ".png"));
+                    if (name != "Overlap") SongSelect_Bar_Genre.Add(name, TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_" + name + ".png"));
                 }
             }
             {
