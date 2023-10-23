@@ -44,9 +44,9 @@ namespace TJAPlayer3
 		public bool isChangedBgColor;
 		public bool isChangedBgType;
 		public bool isChangedBoxType;
-		public int BoxType;
-		public int BgType;
-		public int BoxChara;
+		public string BoxType;
+		public string BgType;
+		public string BoxChara;
 		public bool isChangedBoxChara;
 
         public bool IsChangedForeColor;

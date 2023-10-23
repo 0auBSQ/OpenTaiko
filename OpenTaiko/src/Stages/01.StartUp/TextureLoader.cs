@@ -296,38 +296,44 @@ namespace TJAPlayer3
 
             SongSelect_ScoreWindow_Text = TxC(SONGSELECT + @$"ScoreWindow_Text.png");
 
-            TJAPlayer3.Skin.SongSelect_Bar_Genre_Count = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}"), "Bar_Genre_");
 
-            if (TJAPlayer3.Skin.SongSelect_Bar_Genre_Count != 0)
+
             {
-                SongSelect_Bar_Genre = new CTexture[TJAPlayer3.Skin.SongSelect_Bar_Genre_Count];
-                SongSelect_Bar_Genre_Overlap = new CTexture[TJAPlayer3.Skin.SongSelect_Bar_Genre_Count];
-                for (int i = 0; i < SongSelect_Bar_Genre.Length; i++)
+                string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}"), "Bar_Genre_*.png");
+                SongSelect_Bar_Genre = new ();
+                for (int i = 0; i < genre_files.Length; i++)
                 {
-                    SongSelect_Bar_Genre[i] = TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_" + i.ToString() + ".png");
-                    SongSelect_Bar_Genre_Overlap[i] = TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_Overlap_" + i.ToString() + ".png");
+                    string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[2];
+                    SongSelect_Bar_Genre.Add(name, TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_" + name + ".png"));
+                }
+            }
+            {
+                string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}"), "Bar_Genre_Overlap_*.png");
+                SongSelect_Bar_Genre_Overlap = new ();
+                for (int i = 0; i < genre_files.Length; i++)
+                {
+                    string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[3];
+                    SongSelect_Bar_Genre_Overlap.Add(name, TxC(SONGSELECT + @$"Bar_Genre{Path.DirectorySeparatorChar}Bar_Genre_Overlap_" + name + ".png"));
                 }
             }
 
-            TJAPlayer3.Skin.SongSelect_Genre_Background_Count = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}"), "GenreBackground_");
-
-            if (TJAPlayer3.Skin.SongSelect_Genre_Background_Count != 0)
             {
-                SongSelect_GenreBack = new CTexture[TJAPlayer3.Skin.SongSelect_Genre_Background_Count];
-                for (int i = 0; i < SongSelect_GenreBack.Length; i++)
+                string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}"), "GenreBackground_*.png");
+                SongSelect_GenreBack = new ();
+                for (int i = 0; i < genre_files.Length; i++)
                 {
-                    SongSelect_GenreBack[i] = TxC(SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}GenreBackground_" + i.ToString() + ".png");
+                    string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[1];
+                    SongSelect_GenreBack.Add(name, TxC(SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}GenreBackground_" + name + ".png"));
                 }
             }
-
-            TJAPlayer3.Skin.SongSelect_Box_Chara_Count = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + SONGSELECT + @$"Box_Chara{Path.DirectorySeparatorChar}"), "Box_Chara_");
-
-            if (TJAPlayer3.Skin.SongSelect_Box_Chara_Count != 0)
+            
             {
-                SongSelect_Box_Chara = new CTexture[TJAPlayer3.Skin.SongSelect_Box_Chara_Count];
-                for (int i = 0; i < SongSelect_Box_Chara.Length; i++)
+                string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Box_Chara{Path.DirectorySeparatorChar}"), "Box_Chara_*.png");
+                SongSelect_Box_Chara = new ();
+                for (int i = 0; i < genre_files.Length; i++)
                 {
-                    SongSelect_Box_Chara[i] = TxC(SONGSELECT + @$"Box_Chara{Path.DirectorySeparatorChar}Box_Chara_" + i.ToString() + ".png");
+                    string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[2];
+                    SongSelect_Box_Chara.Add(name, TxC(SONGSELECT + @$"Box_Chara{Path.DirectorySeparatorChar}Box_Chara_" + name + ".png"));
                 }
             }
 
@@ -359,14 +365,13 @@ namespace TJAPlayer3
             Difficulty_Select_Bar[3] = TxC(SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Select_Bar4.png");
             Difficulty_Select_Bar[4] = TxC(SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Select_Bar5.png");
 
-            TJAPlayer3.Skin.SongSelect_Difficulty_Background_Count = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}"), "Difficulty_Back_");
-
-            if (TJAPlayer3.Skin.SongSelect_Difficulty_Background_Count != 0)
             {
-                Difficulty_Back = new CTexture[TJAPlayer3.Skin.SongSelect_Difficulty_Background_Count];
-                for (int i = 0; i < Difficulty_Back.Length; i++)
+                string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}"), "Difficulty_Back_*.png");
+                Difficulty_Back = new ();
+                for (int i = 0; i < genre_files.Length; i++)
                 {
-                    Difficulty_Back[i] = TxC(SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}Difficulty_Back_" + i.ToString() + ".png");
+                    string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[2];
+                    Difficulty_Back.Add(name, TxC(SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}Difficulty_Back_" + name + ".png"));
                 }
             }
             #endregion
@@ -1189,6 +1194,8 @@ namespace TJAPlayer3
             Characters_Heya_Render = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters_Result_Clear_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters_Result_Failed_1P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Clear_2P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
+            Characters_Result_Failed_2P = new CTexture[TJAPlayer3.Skin.Characters_Ptn];
             Characters = new CCharacter[TJAPlayer3.Skin.Characters_Ptn];
 
             Characters_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1340,6 +1347,8 @@ namespace TJAPlayer3
                 Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Render.png");
                 Characters_Result_Clear_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Clear_1P.png");
                 Characters_Result_Failed_1P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Failed_1P.png");
+                Characters_Result_Clear_2P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Clear_2P.png");
+                Characters_Result_Failed_2P[i] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Result_Failed_2P.png");
 
                 TJAPlayer3.Skin.Characters_Resolution[i] = new int[] { 1280, 720 };
                 TJAPlayer3.Skin.Characters_Heya_Render_Offset[i] = new int[] { 0, 0 };
@@ -2382,10 +2391,11 @@ namespace TJAPlayer3
             SongSelect_Search_Window,
 
             SongSelect_ScoreWindow_Text;
-        public CTexture[] SongSelect_GenreBack,
+        public Dictionary<string, CTexture> SongSelect_GenreBack,
             SongSelect_Bar_Genre,
             SongSelect_Bar_Genre_Overlap,
-            SongSelect_Box_Chara,
+            SongSelect_Box_Chara;
+        public CTexture[] 
             SongSelect_ScoreWindow = new CTexture[(int)Difficulty.Total],
             SongSelect_Frame_Score = new CTexture[3],
             SongSelect_NamePlate = new CTexture[1],
@@ -2404,7 +2414,7 @@ namespace TJAPlayer3
         public CTexture Difficulty_Option_Select;
 
         public CTexture[] Difficulty_Select_Bar = new CTexture[5];
-        public CTexture[] Difficulty_Back;
+        public Dictionary<string, CTexture> Difficulty_Back;
         #endregion
 
         public CTexture NewHeya_Close;
@@ -2821,7 +2831,9 @@ Result_Mountain = new CTexture[4]*/;
         public CTexture[] Characters_Heya_Preview,
             Characters_Heya_Render,
             Characters_Result_Clear_1P,
-            Characters_Result_Failed_1P;
+            Characters_Result_Failed_1P,
+            Characters_Result_Clear_2P,
+            Characters_Result_Failed_2P;
         public CCharacter[] Characters;
 
         #endregion

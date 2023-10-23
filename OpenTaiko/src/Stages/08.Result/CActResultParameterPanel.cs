@@ -834,17 +834,18 @@ namespace TJAPlayer3
 					{
 						CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.CLEAR, pos);
 
-						if (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] && TJAPlayer3.Skin.Result_Use1PUI && TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId] != null)
+						var tex = pos == 0 ? TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId] : TJAPlayer3.Tx.Characters_Result_Clear_2P[_charaId];
+						if (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] && TJAPlayer3.Skin.Result_Use1PUI && tex != null)
 						{
-							TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].vc拡大縮小倍率.X = renderRatioX;
-							TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].vc拡大縮小倍率.Y = renderRatioY;
+							tex.vc拡大縮小倍率.X = renderRatioX;
+							tex.vc拡大縮小倍率.Y = renderRatioY;
 							if (is2PSide)
 							{
-								TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].t2D左右反転描画(p1chara_x, p1chara_y);
+								tex.t2D左右反転描画(p1chara_x, p1chara_y);
 							}
 							else 
 							{
-								TJAPlayer3.Tx.Characters_Result_Clear_1P[_charaId].t2D描画(p1chara_x, p1chara_y);
+								tex.t2D描画(p1chara_x, p1chara_y);
 							}
 						}
 					}

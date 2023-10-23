@@ -348,15 +348,10 @@ namespace TJAPlayer3
 
 
             // int boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
-            int boxType = TJAPlayer3.stage選曲.r現在選択中の曲.BoxType;
-
-            if (!TJAPlayer3.stage選曲.r現在選択中の曲.isChangedBoxType)
-            {
-                boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
-            }
+			var difficulty_back = HGenreBar.tGetGenreBar(TJAPlayer3.stage選曲.r現在選択中の曲.BoxType, TJAPlayer3.Tx.Difficulty_Back);
 
 
-            TJAPlayer3.Tx.Difficulty_Back[boxType].Opacity =
+            difficulty_back.Opacity =
                 (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.CurrentValue - 1255);
             TJAPlayer3.Tx.Difficulty_Bar.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.CurrentValue - 1255);
             TJAPlayer3.Tx.Difficulty_Number.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.CurrentValue - 1255);
@@ -366,9 +361,9 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.CurrentValue - 1255);
             TJAPlayer3.Tx.Difficulty_Star.Opacity = (TJAPlayer3.stage選曲.act曲リスト.ctDifficultyIn.CurrentValue - 1255);
 
-            TJAPlayer3.Tx.Difficulty_Back[boxType].color4 = CConversion.ColorToColor4(TJAPlayer3.stage選曲.r現在選択中の曲.BoxColor);
+            difficulty_back.color4 = CConversion.ColorToColor4(TJAPlayer3.stage選曲.r現在選択中の曲.BoxColor);
 
-            TJAPlayer3.Tx.Difficulty_Back[boxType].t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Difficulty_Back[0], TJAPlayer3.Skin.SongSelect_Difficulty_Back[1]);
+            difficulty_back.t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Difficulty_Back[0], TJAPlayer3.Skin.SongSelect_Difficulty_Back[1]);
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {

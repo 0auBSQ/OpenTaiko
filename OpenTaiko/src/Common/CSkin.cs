@@ -8895,10 +8895,7 @@ namespace TJAPlayer3
         public Color SongSelect_BackColor_Classic = ColorTranslator.FromHtml("#875600");
         public Color SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml("#412080");
         public Color SongSelect_BackColor_Namco = ColorTranslator.FromHtml("#980E00");
-        public int SongSelect_Bar_Genre_Count,
-            SongSelect_Genre_Background_Count,
-            SongSelect_Box_Chara_Count,
-            SongSelect_Difficulty_Background_Count;
+
         public string[] SongSelect_CorrectionX_Chara = { "ここにX座標を補正したい文字をカンマで区切って記入" };
         public string[] SongSelect_CorrectionY_Chara = { "ここにY座標を補正したい文字をカンマで区切って記入" };
         public int SongSelect_CorrectionX_Chara_Value = 0;
