@@ -143,6 +143,7 @@ namespace TJAPlayer3
                         this.list進行文字列.Add("LOADING TEXTURES...OK");
                         this.str現在進行中 = "Setup done.";
 						this.eフェーズID = Eフェーズ.起動7_完了;
+						TJAPlayer3.Skin.bgm起動画面.t停止する();
                         break;
 				}
 				//-----------------
