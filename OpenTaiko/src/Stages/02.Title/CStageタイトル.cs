@@ -184,7 +184,12 @@ namespace TJAPlayer3
 								TJAPlayer3.Skin.soundEntry.t再生する();
 						}
 						else
-							return (int)E戻り値.EXIT;
+						{
+							TJAPlayer3.Skin.sound決定音.t再生する();
+							n現在の選択行モード選択 = (int)E戻り値.EXIT + 1;
+							this.actFO.tフェードアウト開始(0, 500);
+							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+						}
 					}
 
 

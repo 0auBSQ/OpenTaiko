@@ -576,24 +576,34 @@ namespace TJAPlayer3
 		/// <param name="strFilename">保存するファイル名(フルパス)</param>
 		public bool SaveResultScreen( string strFullPath )
 		{
-			string strSavePath = Path.GetDirectoryName( strFullPath );
-			if ( !Directory.Exists( strSavePath ) )
+			bool success = true;
+
+			void save(SKBitmap sKBitmap)
 			{
-				try
+				string strSavePath = Path.GetDirectoryName( strFullPath );
+				if ( !Directory.Exists( strSavePath ) )
 				{
-					Directory.CreateDirectory( strSavePath );
+					try
+					{
+						Directory.CreateDirectory( strSavePath );
+					}
+					catch
+					{
+						Trace.TraceError(ToString());
+						Trace.TraceError( "例外が発生しましたが処理を継続します。 (0bfe6bff-2a56-4df4-9333-2df26d9b765b)" );
+						success = false;
+					}
 				}
-				catch
+				if (!File.Exists(strFullPath))
 				{
-					Trace.TraceError(ToString());
-					Trace.TraceError( "例外が発生しましたが処理を継続します。 (0bfe6bff-2a56-4df4-9333-2df26d9b765b)" );
-					return false;
+					using FileStream stream = File.OpenWrite(strFullPath);
+					sKBitmap.Encode(stream, SKEncodedImageFormat.Png, 80);
 				}
 			}
 
-			using SKBitmap sKBitmap = GetScreenShot();
-			using FileStream stream = File.OpenWrite(strFullPath);
-			return sKBitmap.Encode(stream, SKEncodedImageFormat.Png, 80);
+			GetScreenShotAsync(save);
+			
+			return success;
 		}
 		#endregion
 
@@ -2358,7 +2368,7 @@ for (int i = 0; i < 3; i++) {
 		{
 			return tテクスチャの生成( fileName, false );
 		}
-		public static CTexture tテクスチャの生成( string fileName, bool b黒を透過する )
+		public static CTexture tテクスチャの生成( string fileName, bool b黒を透過する)
 		{
 			if ( app == null )
 			{

@@ -30,6 +30,9 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
+				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
+				Background.Init();
+
 				this.list進行文字列 = new List<string>();
 				base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
 				base.Activate();
@@ -46,6 +49,8 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
+				TJAPlayer3.t安全にDisposeする(ref Background);
+
 				this.list進行文字列 = null;
 				if ( es != null )
 				{
@@ -66,12 +71,10 @@ namespace TJAPlayer3
 		}
 		public override void CreateManagedResource()
 		{
-			this.tx背景 = TJAPlayer3.tテクスチャの生成( CSkin.Path( @$"Graphics{Path.DirectorySeparatorChar}1_Title{Path.DirectorySeparatorChar}Background.png" ), false );
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()
 		{
-			TJAPlayer3.tテクスチャの解放( ref this.tx背景 );
 			base.ReleaseManagedResource();
 		}
 		public override int Draw()
@@ -98,8 +101,8 @@ namespace TJAPlayer3
 
 				// CSongs管理 s管理 = CDTXMania.Songs管理;
 
-				//if( this.tx背景 != null )
-				//	this.tx背景.t2D描画( CDTXMania.app.Device, 0, 0 );
+				Background.Update();
+				Background.Draw();
 
 				#region [ this.str現在進行中 の決定 ]
 				//-----------------
@@ -112,10 +115,6 @@ namespace TJAPlayer3
 					case CStage.Eフェーズ.起動00_songlistから曲リストを作成する:
 						this.str現在進行中 = "SONG LIST...";
 						break;
-
-					/*case CStage.Eフェーズ.起動1_SongsDBからスコアキャッシュを構築:
-						this.str現在進行中 = "SONG DATABASE...";
-						break;*/
 
 					case CStage.Eフェーズ.起動2_曲を検索してリストを作成する:
 						this.str現在進行中 = string.Format( "{0} ... {1}", "Enumerating songs", es.Songs管理.n検索されたスコア数 );
@@ -133,16 +132,20 @@ namespace TJAPlayer3
 						this.str現在進行中 = string.Format( "{0} ... ", "Building songlists" );
 						break;
 
-					/*case CStage.Eフェーズ.起動6_スコアキャッシュをSongsDBに出力する:
-						this.str現在進行中 = string.Format( "{0} ... ", "Saving songs.db" );
-						break;*/
-
 					case CStage.Eフェーズ.起動_テクスチャの読み込み:
-                        this.list進行文字列.Add("LOADING TEXTURES...");
-                        TJAPlayer3.Tx.LoadTexture();
-                        this.list進行文字列.Add("LOADING TEXTURES...OK");
-                        this.str現在進行中 = "Setup done.";
-						this.eフェーズID = Eフェーズ.起動7_完了;
+						if (!bIsLoadingTextures)
+						{
+							Task.Run(() =>
+							{
+								this.list進行文字列.Add("LOADING TEXTURES...");
+								TJAPlayer3.Tx.LoadTexture();
+								this.list進行文字列.Add("LOADING TEXTURES...OK");
+								this.str現在進行中 = "Setup done.";
+								this.eフェーズID = Eフェーズ.起動7_完了;
+								TJAPlayer3.Skin.bgm起動画面.t停止する();
+							});
+						}
+						bIsLoadingTextures = true;
                         break;
 				}
 				//-----------------
@@ -152,17 +155,14 @@ namespace TJAPlayer3
                 {
 					#region [ this.list進行文字列＋this.現在進行中 の表示 ]
 					//-----------------
-					lock (this.list進行文字列)
+					int x = 320;
+					int y = 20;
+					for(int i = 0; i < this.list進行文字列.Count; i++)
 					{
-						int x = 320;
-						int y = 20;
-						foreach (string str in this.list進行文字列)
-						{
-							TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, str);
-							y += 24;
-						}
-						TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, this.str現在進行中);
+						TJAPlayer3.act文字コンソール.tPrint((int)(x * TJAPlayer3.Skin.Resolution[0] / 1280.0), (int)(y * TJAPlayer3.Skin.Resolution[1] / 720.0), C文字コンソール.Eフォント種別.白, this.list進行文字列[i]);
+						y += 24;
 					}
+					TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, this.str現在進行中);
 					//-----------------
 					#endregion
 				}
@@ -191,8 +191,9 @@ namespace TJAPlayer3
 		#region [ private ]
 		//-----------------
 		private string str現在進行中 = "";
-		private CTexture tx背景;
+		private ScriptBG Background;
 		private CEnumSongs es;
+		private bool bIsLoadingTextures;
 
 #if false
 		private void t曲リストの構築()

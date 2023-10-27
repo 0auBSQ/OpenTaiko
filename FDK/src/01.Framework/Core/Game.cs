@@ -164,6 +164,8 @@ namespace SampleFramework
             }
         }
 
+        public static int MainThreadID { get; private set; }
+
         private GraphicsAPI GetGraphicsAPI()
         {
             switch (GraphicsDeviceType_)
@@ -180,6 +182,11 @@ namespace SampleFramework
         public unsafe SKBitmap GetScreenShot()
         {
             return GraphicsDevice.GetScreenPixels();
+        }
+
+        public void GetScreenShotAsync(Action<SKBitmap> action)
+        {
+            GraphicsDevice.GetScreenPixelsASync(action);
         }
 
         public static long TimeMs;
@@ -206,6 +213,7 @@ namespace SampleFramework
         /// </summary>
         protected Game()
         {
+            MainThreadID = Thread.CurrentThread.ManagedThreadId;
             Configuration();
             
             WindowOptions options = GraphicsDeviceType_ == GraphicsDeviceType.Vulkan ? WindowOptions.DefaultVulkan : WindowOptions.Default;

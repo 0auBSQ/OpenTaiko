@@ -1414,16 +1414,15 @@ namespace TJAPlayer3
 				//-----------------
 
 				// int boxType = nStrジャンルtoNum(stバー情報[nパネル番号].strジャンル);
-				int boxType = stバー情報[nパネル番号].BoxType;
+				string boxType = stバー情報[nパネル番号].BoxType;
+				var bar_genre = HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
+				var bar_genre_overlap = HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
 
-				if (!stバー情報[nパネル番号].BoxTypeChanged)
-					boxType = nStrジャンルtoNum(stバー情報[nパネル番号].strジャンル);
+				bar_genre.color4 = CConversion.ColorToColor4(stバー情報[nパネル番号].BoxColor);
 
-				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].color4 = CConversion.ColorToColor4(stバー情報[nパネル番号].BoxColor);
-
-				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType].vc拡大縮小倍率.X = 1.0f;
-				if (TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[boxType] != null)
-                    TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[boxType].vc拡大縮小倍率.X = 1.0f;
+				bar_genre.vc拡大縮小倍率.X = 1.0f;
+				if (bar_genre_overlap != null)
+                    bar_genre_overlap.vc拡大縮小倍率.X = 1.0f;
 
                 TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vc拡大縮小倍率.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.vc拡大縮小倍率.X = 1.0f;
@@ -1547,13 +1546,11 @@ namespace TJAPlayer3
 					#region [ Bar ]
 
 					//int boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
-					int boxType = r現在選択中の曲.BoxType;
+					var bar_genre = HGenreBar.tGetGenreBar(r現在選択中の曲.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
+					var bar_genre_overlap = HGenreBar.tGetGenreBar(r現在選択中の曲.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
 
-					if (!r現在選択中の曲.isChangedBoxType)
-						boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
-
-					DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
-                    DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, true);
+					DrawBarCenter(bar_genre, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
+                    DrawBarCenter(bar_genre_overlap, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, true);
 
                     #endregion
 
@@ -1652,15 +1649,13 @@ namespace TJAPlayer3
 					#region [ Box ]
 
 					//int boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
-					int boxType = r現在選択中の曲.BoxType;
-
-					if (!r現在選択中の曲.isChangedBoxType)
-						boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
+					var bar_genre = HGenreBar.tGetGenreBar(r現在選択中の曲.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
+					var bar_genre_overlap = HGenreBar.tGetGenreBar(r現在選択中の曲.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
 
 					//DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, true, false);
 
-                    DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
-                    DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, false);
+                    DrawBarCenter(bar_genre, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
+                    DrawBarCenter(bar_genre_overlap, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, false);
 
 
                     #endregion
@@ -1957,32 +1952,28 @@ namespace TJAPlayer3
 
 							// Chara here
 
-							int boxType = r現在選択中の曲.BoxChara;
-
-							if (!r現在選択中の曲.isChangedBoxChara)
-								boxType = this.nStrジャンルtoNumBox(r現在選択中の曲.strジャンル);
+							var box_chara = HGenreBar.tGetGenreBar(r現在選択中の曲.BoxChara, TJAPlayer3.Tx.SongSelect_Box_Chara);
 
 							// If BoxChara < 0, don't display any character
-							if (boxType >= 0 && boxType < TJAPlayer3.Skin.SongSelect_Box_Chara_Count)
                             {
 								if (!ctBoxOpen.IsEnded)
-									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
+									box_chara.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
 									ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
 								else
 								{
 									if (!TJAPlayer3.stage選曲.act難易度選択画面.bIsDifficltSelect)
-										TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)(BarAnimeCount * 255.0f);
+										box_chara.Opacity = (int)(BarAnimeCount * 255.0f);
 									else if (ctDifficultyIn.CurrentValue >= 1000)
-										TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+										box_chara.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
 								}
 
-								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType]?.t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Box_Chara_X[0] - (BarAnimeCount * TJAPlayer3.Skin.SongSelect_Box_Chara_Move), TJAPlayer3.Skin.SongSelect_Box_Chara_Y[0],
-									new Rectangle(0, 0, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2,
-									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
+								box_chara?.t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Box_Chara_X[0] - (BarAnimeCount * TJAPlayer3.Skin.SongSelect_Box_Chara_Move), TJAPlayer3.Skin.SongSelect_Box_Chara_Y[0],
+									new Rectangle(0, 0, box_chara.szテクスチャサイズ.Width / 2,
+									box_chara.szテクスチャサイズ.Height));
 
-								TJAPlayer3.Tx.SongSelect_Box_Chara[boxType]?.t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Box_Chara_X[1] + (BarAnimeCount * TJAPlayer3.Skin.SongSelect_Box_Chara_Move), TJAPlayer3.Skin.SongSelect_Box_Chara_Y[1],
-									new Rectangle(TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, 0,
-									TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.SongSelect_Box_Chara[boxType].szテクスチャサイズ.Height));
+								box_chara?.t2D中心基準描画(TJAPlayer3.Skin.SongSelect_Box_Chara_X[1] + (BarAnimeCount * TJAPlayer3.Skin.SongSelect_Box_Chara_Move), TJAPlayer3.Skin.SongSelect_Box_Chara_Y[1],
+									new Rectangle(box_chara.szテクスチャサイズ.Width / 2, 0,
+									box_chara.szテクスチャサイズ.Width / 2, box_chara.szテクスチャサイズ.Height));
 							}
 						}
 						break;
@@ -2423,9 +2414,9 @@ namespace TJAPlayer3
 			public Color BoxColor;
 
 			public Color BgColor;
-			public int BoxType;
-			public int BgType;
-			public int BoxChara;
+			public string BoxType;
+			public string BgType;
+			public string BoxChara;
 
 			public bool BoxTypeChanged;
 			public bool BgTypeChanged;
@@ -2868,7 +2859,7 @@ namespace TJAPlayer3
 			Eバー種別 eバー種別, 
 			int[][] クリア, 
 			int[][] スコアランク, 
-			int boxType, 
+			string boxType, 
 			int _songType = 0, 
 			CSongUniqueID csu = null,
             C曲リストノード reference = null
@@ -2886,12 +2877,15 @@ namespace TJAPlayer3
 
 			TJAPlayer3.Tx.SongSelect_Crown.Opacity = opct;
 			TJAPlayer3.Tx.SongSelect_ScoreRank.Opacity = opct;
-			for (int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Genre_Count; i++)
+
+			foreach(var tex in TJAPlayer3.Tx.SongSelect_Bar_Genre)
 			{
-                TJAPlayer3.Tx.SongSelect_Bar_Genre[i].Opacity = opct;
-				if (TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[i] != null)
-                    TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[i].Opacity = opct;
-            }
+                tex.Value.Opacity = opct;
+			}
+			foreach(var tex in TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap)
+			{
+                tex.Value.Opacity = opct;
+			}
 				
 			TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = opct;
 			TJAPlayer3.Tx.SongSelect_Bar_Genre_Random.Opacity = opct;
@@ -2924,8 +2918,8 @@ namespace TJAPlayer3
 			}
 			else if (eバー種別 != Eバー種別.BackBox)
 			{
-				TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType]?.t2D描画(x, y);
-                TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap[boxType]?.t2D描画(x, y);
+				HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre)?.t2D描画(x, y);
+				HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap)?.t2D描画(x, y);
 
                 if (TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay != null)
 					TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.t2D描画(x, y);

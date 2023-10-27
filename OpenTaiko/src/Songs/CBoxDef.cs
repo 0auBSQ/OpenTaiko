@@ -24,11 +24,11 @@ namespace TJAPlayer3
 		public bool IsChangedBoxColor;
 		public Color BgColor;
 		public bool IsChangedBgColor;
-		public int BoxType;
-		public int BgType;
+		public string BoxType;
+		public string BgType;
 		public bool IsChangedBoxType;
 		public bool IsChangedBgType;
-		public int BoxChara;
+		public string BoxChara;
 		public bool IsChangedBoxChara;
 		public string DefaultPreimage;
 		public string ScenePreset;
@@ -47,9 +47,9 @@ namespace TJAPlayer3
             ForeColor = Color.White;
             BackColor = Color.Black;
 			BoxColor = Color.White;
-			BoxType = 0;
-			BgType = 0;
-			BoxChara = 0;
+			BoxType = "0";
+			BgType = "0";
+			BoxChara = "0";
 			BgColor = Color.White;
 			DefaultPreimage = null;
 			ScenePreset = "";
@@ -132,17 +132,17 @@ namespace TJAPlayer3
 								}
 								else if (key == "#BGTYPE")
 								{
-									this.BgType = int.Parse(value.Trim(ignoreChars));
+									this.BgType = value.Trim(ignoreChars);
 									IsChangedBgType = true;
 								}
 								else if (key == "#BOXTYPE")
 								{
-									this.BoxType = int.Parse(value.Trim(ignoreChars));
+									this.BoxType = value.Trim(ignoreChars);
 									IsChangedBoxType = true;
 								}
 								else if (key == "#BOXCHARA")
 								{
-									this.BoxChara = int.Parse(value.Trim(ignoreChars));
+									this.BoxChara =  value.Trim(ignoreChars);
 									IsChangedBoxChara = true;
 								}
 								else if (key == "#SCENEPRESET")

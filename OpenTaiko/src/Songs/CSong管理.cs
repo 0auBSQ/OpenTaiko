@@ -352,6 +352,47 @@ namespace TJAPlayer3
 							listノードリスト.Add( value );
 							CSongDict.tAddSongNode(value.uniqueId, value);
                             value.r親ノード = node親;
+
+							if (value.r親ノード != null)
+							{
+								value.strScenePreset = value.r親ノード.strScenePreset;
+								if (value.r親ノード.IsChangedForeColor)
+								{
+									value.ForeColor = value.r親ノード.ForeColor;
+									value.IsChangedForeColor = true;
+								}
+								if (value.r親ノード.IsChangedBackColor)
+								{
+									value.BackColor = value.r親ノード.BackColor;
+									value.IsChangedBackColor = true;
+								}
+								if (value.r親ノード.isChangedBoxColor)
+								{
+									value.BoxColor = value.r親ノード.BoxColor;
+									value.isChangedBoxColor = true;
+								}
+								if (value.r親ノード.isChangedBgColor)
+								{
+									value.BgColor = value.r親ノード.BgColor;
+									value.isChangedBgColor = true;
+								}
+								if (value.r親ノード.isChangedBgType)
+								{
+									value.BgType = value.r親ノード.BgType;
+									value.isChangedBgType = true;
+								}
+								if (value.r親ノード.isChangedBoxType)
+								{
+									value.BoxType = value.r親ノード.BoxType;
+									value.isChangedBoxType = true;
+								}
+								if (value.r親ノード.isChangedBoxChara)
+								{
+									value.BoxChara = value.r親ノード.BoxChara;
+									value.isChangedBoxChara = true;
+								}
+							}
+
 							this.n検索された曲ノード数++;
 						}
 						else

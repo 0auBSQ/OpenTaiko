@@ -472,21 +472,12 @@ namespace TJAPlayer3
 
                 if (this.r現在選択中の曲 != null)
                 {
-                   // if (this.nStrジャンルtoNum(this.r現在選択中の曲.strジャンル) != 0 || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.BOX || r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
-                    // {
-                        if (this.NowUseGenre)
-                            nGenreBack = this.nStrジャンルtoNum(this.NowGenre);
-                        else
-                            nGenreBack = this.NowBg;
-
-                        if (this.OldUseGenre)
-                            nOldGenreBack = this.nStrジャンルtoNum(this.OldGenre);
-                        else
-                            nOldGenreBack = this.OldBg;
-                    // }
+                    nGenreBack = this.NowBg;
+                    nOldGenreBack = this.OldBg;
+                    
                     if (!TJAPlayer3.ConfigIni.bAIBattleMode)
                     {
-                        if (TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack] != null)
+                        if (txGenreBack != null)
                         {
                             float scale = TJAPlayer3.Skin.Resolution[1] / (float)txGenreBack.szテクスチャサイズ.Height;
                             for (int i = 0; i < (TJAPlayer3.Skin.Resolution[0] / (txGenreBack.szテクスチャサイズ.Width * scale)) + 2; i++)
@@ -1378,8 +1369,8 @@ namespace TJAPlayer3
         public CCounter ctBackgroundFade;
         public string NowGenre;
         public string OldGenre;
-        public int NowBg;
-        public int OldBg;
+        public string NowBg;
+        public string OldBg;
         public Color NowBgColor = Color.White;
         public Color OldBgColor = Color.White;
         public bool NowUseGenre;
@@ -1419,8 +1410,8 @@ namespace TJAPlayer3
 
         public PuchiChara PuchiChara;
 
-        private int nGenreBack;
-        private int nOldGenreBack;
+        private string nGenreBack;
+        private string nOldGenreBack;
         public bool bBGM再生済み;
         public bool bBGMIn再生した;
         private STキー反復用カウンタ ctキー反復用;
@@ -1466,7 +1457,7 @@ namespace TJAPlayer3
             {
                 if (txCustomSelectBG == null)
                 {
-                    return TJAPlayer3.Tx.SongSelect_GenreBack[nGenreBack];
+                    return HGenreBar.tGetGenreBar(nGenreBack, TJAPlayer3.Tx.SongSelect_GenreBack);
                 }
                 else
                 {
@@ -1480,7 +1471,7 @@ namespace TJAPlayer3
             {
                 if (txCustomPrevSelectBG == null)
                 {
-                    return TJAPlayer3.Tx.SongSelect_GenreBack[nOldGenreBack];
+                    return HGenreBar.tGetGenreBar(nOldGenreBack, TJAPlayer3.Tx.SongSelect_GenreBack);
                 }
                 else
                 {

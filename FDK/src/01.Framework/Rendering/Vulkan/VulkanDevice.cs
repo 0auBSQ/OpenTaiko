@@ -57,6 +57,10 @@ namespace SampleFramework
         {  
             return null;
         }
+        
+        public unsafe void GetScreenPixelsASync(Action<SKBitmap> action)
+        {
+        }
 
         public void Dispose()
         {

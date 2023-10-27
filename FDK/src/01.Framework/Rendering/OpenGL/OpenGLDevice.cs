@@ -15,6 +15,8 @@ namespace SampleFramework
 
         private int ViewportHeight;
 
+        internal static List<Action> AsyncActions = new();
+
         public OpenGLDevice(IWindow window)
         {
             Gl = window.CreateOpenGL();
@@ -40,6 +42,11 @@ namespace SampleFramework
 
         public void ClearBuffer()
         {
+            if (AsyncActions.Count > 0)
+            {
+                AsyncActions[0]?.Invoke();
+                AsyncActions.Remove(AsyncActions[0]);
+            }
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
@@ -138,6 +145,36 @@ namespace SampleFramework
                     return sKBitmap.Copy();
                 }
             }
+        }
+
+        public unsafe void GetScreenPixelsASync(Action<SKBitmap> action)
+        {
+            uint[] pixels = new uint[(uint)ViewportWidth * (uint)ViewportHeight];
+            Gl.ReadBuffer(GLEnum.Front);
+            fixed(uint* pix = pixels)
+            {
+                Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, GLEnum.Bgra, GLEnum.UnsignedByte, pix);
+            }
+
+            Task.Run(() =>{
+                fixed(uint* pixels2 = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
+                {
+                    for(int x = 0; x < ViewportWidth; x++)
+                    {
+                        for(int y = 1; y < ViewportHeight; y++)
+                        {
+                            int pos = x + ((y - 1) * ViewportWidth);
+                            int pos2 = x + ((ViewportHeight - y) * ViewportWidth);
+                            var p = pixels[pos2];
+                            pixels2[pos] = p;
+                        }
+                    }
+                        
+                    using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight - 1);
+                    sKBitmap.SetPixels((IntPtr)pixels2);
+                    action(sKBitmap);
+                }
+            });
         }
 
         public void Dispose()

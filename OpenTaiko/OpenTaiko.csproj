@@ -31,5 +31,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
   </PropertyGroup>
 </Project>
