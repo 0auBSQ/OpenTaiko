@@ -2368,7 +2368,7 @@ for (int i = 0; i < 3; i++) {
 		{
 			return tテクスチャの生成( fileName, false );
 		}
-		public static CTexture tテクスチャの生成( string fileName, bool b黒を透過する )
+		public static CTexture tテクスチャの生成( string fileName, bool b黒を透過する)
 		{
 			if ( app == null )
 			{

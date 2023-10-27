@@ -164,6 +164,8 @@ namespace SampleFramework
             }
         }
 
+        public static int MainThreadID { get; private set; }
+
         private GraphicsAPI GetGraphicsAPI()
         {
             switch (GraphicsDeviceType_)
@@ -211,6 +213,7 @@ namespace SampleFramework
         /// </summary>
         protected Game()
         {
+            MainThreadID = Thread.CurrentThread.ManagedThreadId;
             Configuration();
             
             WindowOptions options = GraphicsDeviceType_ == GraphicsDeviceType.Vulkan ? WindowOptions.DefaultVulkan : WindowOptions.Default;

@@ -18,6 +18,7 @@ namespace TJAPlayer3
         public static string CHARACTERS = @$"Characters{Path.DirectorySeparatorChar}";
 
         // Stage
+        public static string STARTUP = @$"0_Startup{Path.DirectorySeparatorChar}";
         public static string TITLE = @$"1_Title{Path.DirectorySeparatorChar}";
         public static string CONFIG = @$"2_Config{Path.DirectorySeparatorChar}";
         public static string SONGSELECT = @$"3_SongSelect{Path.DirectorySeparatorChar}";
@@ -73,7 +74,6 @@ namespace TJAPlayer3
 
         public Dictionary<string, CTexture> trackedTextures = new Dictionary<string, CTexture>();
 
-
         public TextureLoader()
         {
             // コンストラクタ
@@ -81,21 +81,21 @@ namespace TJAPlayer3
 
         internal CTexture TxC(string FileName)
         {
-            var tex = TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + FileName));
+            var tex = TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + FileName), false);
             listTexture.Add(tex);
             return tex;
         }
 
         internal CTexture TxCGlobal(string FileName)
         {
-            var tex = TJAPlayer3.tテクスチャの生成(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + FileName);
+            var tex = TJAPlayer3.tテクスチャの生成(TJAPlayer3.strEXEのあるフォルダ + GLOBAL + FileName, false);
             listTexture.Add(tex);
             return tex;
         }
 
         internal CTexture TxCAbsolute(string FileName)
         {
-            var tex = TJAPlayer3.tテクスチャの生成(FileName);
+            var tex = TJAPlayer3.tテクスチャの生成(FileName, false);
             listTexture.Add(tex);
             return tex;
         }
@@ -108,7 +108,7 @@ namespace TJAPlayer3
         }
         internal CTexture TxCGen(string FileName)
         {
-            return TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + GAME + GENRE + FileName + ".png"));
+            return TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + GAME + GENRE + FileName + ".png"), false);
         }
 
         internal CTexture TxCSong(string path)
@@ -135,7 +135,7 @@ namespace TJAPlayer3
 
         internal CTexture TxCUntrackedSong(string path)
         {
-            return TJAPlayer3.tテクスチャの生成(path);
+            return TJAPlayer3.tテクスチャの生成(path, false);
         }
 
         public void LoadTexture()

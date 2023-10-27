@@ -15,6 +15,8 @@ namespace SampleFramework
 
         private int ViewportHeight;
 
+        internal static List<Action> AsyncActions = new();
+
         public OpenGLDevice(IWindow window)
         {
             Gl = window.CreateOpenGL();
@@ -40,6 +42,11 @@ namespace SampleFramework
 
         public void ClearBuffer()
         {
+            if (AsyncActions.Count > 0)
+            {
+                AsyncActions[0]?.Invoke();
+                AsyncActions.Remove(AsyncActions[0]);
+            }
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
