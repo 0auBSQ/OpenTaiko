@@ -34,5 +34,7 @@ namespace SampleFramework
         void DrawPolygon(IPolygon polygon, IShader shader, ITexture texture, BlendType blendType);
 
         unsafe SKBitmap GetScreenPixels();
+
+        unsafe void GetScreenPixelsASync(Action<SKBitmap> action);
     }
 }

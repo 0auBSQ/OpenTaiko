@@ -182,6 +182,11 @@ namespace SampleFramework
             return GraphicsDevice.GetScreenPixels();
         }
 
+        public void GetScreenShotAsync(Action<SKBitmap> action)
+        {
+            GraphicsDevice.GetScreenPixelsASync(action);
+        }
+
         public static long TimeMs;
 
         public static Matrix4X4<float> Camera;
