@@ -22,48 +22,10 @@ namespace TJAPlayer3
         {
             //this.ct踊り子モーション = new CCounter();
 
-            string presetSection = "";
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-            {
-            }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-            {
-                presetSection = "Dan";
-            }
-            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
-            {
-            }
-            else
-            {
-                presetSection = "Regular";
-            }
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                return;
 
-            object _ps = null;
-
-            switch (presetSection)
-            {
-                case "Regular":
-                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
-                    break;
-                case "Dan":
-                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Dan;
-                    break;
-                default:
-                    break;
-            };
-            
-            var preset = (_ps != null 
-                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
-                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
-                : null;
-
-            if (_ps != null
-                    && TJAPlayer3.DTX.scenePreset != null
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
-            {
-                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
-            }
+            var preset = HScenePreset.GetBGPreset();
 
             Random random = new Random();
             Dancer = new CTexture[5][];
@@ -74,7 +36,7 @@ namespace TJAPlayer3
                 var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
                 if (dirs.Length > 0)
                 {
-                    var _presetPath = (preset != null) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
+                    var _presetPath = (preset != null && preset.DancerSet != null) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
                     var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
                         ?  _presetPath
                         : dirs[random.Next(0, dirs.Length)];
@@ -107,6 +69,9 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                return;
+                
             //this.ct踊り子モーション = null;
 
             for (int i = 0; i < 5; i++)

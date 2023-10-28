@@ -20,46 +20,7 @@ namespace TJAPlayer3
         public override void Activate()
         {
             var mobDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.MOB}");
-
-            string presetSection = "";
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
-            {
-            }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-            {
-                presetSection = "Dan";
-            }
-            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
-            {
-            }
-            else
-            {
-                presetSection = "Regular";
-            }
-
-            object _ps = null;
-
-            switch (presetSection)
-            {
-                case "Regular":
-                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
-                    break;
-                default:
-                    break;
-            };
-            
-            var preset = (_ps != null 
-                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
-                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
-                : null;
-
-            if (_ps != null
-                    && TJAPlayer3.DTX.scenePreset != null
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
-            {
-                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
-            }
+            var preset = HScenePreset.GetBGPreset();
 
             if (System.IO.Directory.Exists(mobDir))
             {
@@ -68,7 +29,7 @@ namespace TJAPlayer3
                 var upDirs = System.IO.Directory.GetFiles(mobDir);
                 if (upDirs.Length > 0)
                 {
-                    var _presetPath = (preset != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] + ".png" : "";
+                    var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] + ".png" : "";
                     var path = (preset != null && System.IO.File.Exists(_presetPath)) 
                         ?  _presetPath
                         : upDirs[random.Next(0, upDirs.Length)];
