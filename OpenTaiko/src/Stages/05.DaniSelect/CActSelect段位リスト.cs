@@ -322,6 +322,12 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Dani_DanPlates.Opacity = 255;
                     TJAPlayer3.Tx.Dani_DanPlates.color4 = CConversion.ColorToColor4(danTickColor);
                 }
+                TJAPlayer3.Tx.Dani_DanPlates_Back?.t2D中心基準描画(x, y, new Rectangle(
+                    unit * danTick,
+                    0,
+                    unit,
+                    TJAPlayer3.Tx.Dani_DanPlates_Back.szテクスチャサイズ.Height
+                ));
                 TJAPlayer3.Tx.Dani_DanPlates?.t2D中心基準描画(x, y, new Rectangle(
                     unit * danTick,
                     0,
