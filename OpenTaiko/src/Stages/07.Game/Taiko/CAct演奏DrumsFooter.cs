@@ -20,6 +20,7 @@ namespace TJAPlayer3
         public override void Activate()
         {
             var footerDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.FOOTER}");
+            var preset = HScenePreset.GetBGPreset();
 
             if (System.IO.Directory.Exists(footerDir))
             {
@@ -28,9 +29,12 @@ namespace TJAPlayer3
                 var upDirs = System.IO.Directory.GetFiles(footerDir);
                 if (upDirs.Length > 0)
                 {
-                    var upPath = upDirs[random.Next(0, upDirs.Length)];
+                    var _presetPath = (preset != null && preset.FooterSet != null) ? $@"{footerDir}" + preset.FooterSet[random.Next(0, preset.FooterSet.Length)] + ".png" : "";
+                    var path = (preset != null && System.IO.File.Exists(_presetPath)) 
+                        ?  _presetPath
+                        : upDirs[random.Next(0, upDirs.Length)];
 
-                    Mob_Footer = TJAPlayer3.tテクスチャの生成(upPath);
+                    Mob_Footer = TJAPlayer3.tテクスチャの生成(path);
                 }
             }
 

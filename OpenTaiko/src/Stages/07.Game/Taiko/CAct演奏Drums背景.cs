@@ -105,7 +105,7 @@ namespace TJAPlayer3
                 return;
 
             var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
-            string presetSection = "";
+            var preset = HScenePreset.GetBGPreset();
             if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
             {
                 bgOrigindir += "Tower";
@@ -113,7 +113,6 @@ namespace TJAPlayer3
             else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
             {
                 bgOrigindir += "Dan";
-                presetSection = "Dan";
             }
             else if (TJAPlayer3.ConfigIni.bAIBattleMode)
             {
@@ -122,34 +121,6 @@ namespace TJAPlayer3
             else
             {
                 bgOrigindir += "Normal";
-                presetSection = "Regular";
-            }
-
-            object _ps = null;
-
-            switch (presetSection)
-            {
-                case "Regular":
-                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
-                    break;
-                case "Dan":
-                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Dan;
-                    break;
-                default:
-                    break;
-            };
-
-            var preset = (_ps != null 
-                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
-                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
-                : null;
-
-            if (_ps != null
-                    && TJAPlayer3.DTX.scenePreset != null
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
-            {
-                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
             }
 
             Random random = new Random();
@@ -159,7 +130,7 @@ namespace TJAPlayer3
                 var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
 
                 // If there is a preset upper background and this preset exists on the skin use it, else random upper background
-                var _presetPath = (preset != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground : "";
+                var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
                 var upPath = (preset != null && System.IO.Directory.Exists(_presetPath)) 
                     ?  _presetPath
                     : upDirs[random.Next(0, upDirs.Length)];
@@ -179,7 +150,7 @@ namespace TJAPlayer3
                 var downDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Down");
 
                 // If there is a preset lower background and this preset exists on the skin use it, else random upper background
-                var _presetPath = (preset != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground : "";
+                var _presetPath = (preset != null && preset.LowerBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}" + preset.LowerBackground[random.Next(0, preset.LowerBackground.Length)] : "";
                 var downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
                     ? _presetPath
                     : downDirs[random.Next(0, downDirs.Length)];

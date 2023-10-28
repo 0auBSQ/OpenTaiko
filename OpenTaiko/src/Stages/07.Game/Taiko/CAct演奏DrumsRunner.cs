@@ -64,6 +64,8 @@ namespace TJAPlayer3
                 stRunners[i].ct進行 = new CCounter();
             }
             
+            var preset = HScenePreset.GetBGPreset();
+            
             Random random = new Random();
 
             var dancerOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.RUNNER}");
@@ -72,7 +74,10 @@ namespace TJAPlayer3
                 var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
                 if (dirs.Length > 0)
                 {
-                    var path = dirs[random.Next(0, dirs.Length)];
+                    var _presetPath = (preset != null && preset.RunnerSet != null) ? $@"{dancerOrigindir}" + preset.RunnerSet[random.Next(0, preset.RunnerSet.Length)] : "";
+                    var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
+                        ?  _presetPath
+                        : dirs[random.Next(0, dirs.Length)];
                     LoadRunnerConifg(path);
 
                     Runner = TJAPlayer3.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}Runner.png");

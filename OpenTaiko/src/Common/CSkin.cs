@@ -9126,7 +9126,6 @@ namespace TJAPlayer3
         #endregion
 
         #region Mob
-        public int Game_Mob_Ptn = 1;
         public int Game_Mob_Beat,
             Game_Mob_Ptn_Beat = 1;
         #endregion
