@@ -16,16 +16,28 @@ namespace TJAPlayer3
                 UpperBackground = null;
                 LowerBackground = null;
                 DancerSet = null;
+                FooterSet = null;
+                MobSet = null;
+                RunnerSet = null;
             }
 
             [JsonProperty("UP")]
-            public string UpperBackground;
+            public string[] UpperBackground;
 
             [JsonProperty("DOWN")]
-            public string LowerBackground;
+            public string[] LowerBackground;
 
             [JsonProperty("DANCER")]
-            public string DancerSet;
+            public string[] DancerSet;
+
+            [JsonProperty("FOOTER")]
+            public string[] FooterSet;
+
+            [JsonProperty("MOB")]
+            public string[] MobSet;
+
+            [JsonProperty("RUNNER")]
+            public string[] RunnerSet;
         }
         public class SkinPreset
         {
@@ -33,6 +45,8 @@ namespace TJAPlayer3
             {
                 Regular = new Dictionary<string, SkinScene>();
                 Dan = new Dictionary<string, SkinScene>();
+                Tower = new Dictionary<string, SkinScene>();
+                AI = new Dictionary<string, SkinScene>();
             }
 
 
@@ -41,6 +55,12 @@ namespace TJAPlayer3
 
             [JsonProperty("Dan")]
             public Dictionary<string, SkinScene> Dan;
+
+            [JsonProperty("Tower")]
+            public Dictionary<string, SkinScene> Tower;
+
+            [JsonProperty("AI")]
+            public Dictionary<string, SkinScene> AI;
 
         }
     }

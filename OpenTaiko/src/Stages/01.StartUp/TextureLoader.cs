@@ -480,13 +480,6 @@ namespace TJAPlayer3
 
             #region Mob
 
-            TJAPlayer3.Skin.Game_Mob_Ptn = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + MOB));
-            Mob = new CTexture[TJAPlayer3.Skin.Game_Mob_Ptn];
-            for (int i = 0; i < TJAPlayer3.Skin.Game_Mob_Ptn; i++)
-            {
-                Mob[i] = TxC(GAME + MOB + i.ToString() + ".png");
-            }
-
             #endregion
 
             #region Taiko
@@ -2493,7 +2486,6 @@ namespace TJAPlayer3
 
 
         #region モブ
-        public CTexture[] Mob;
         #endregion
         #region 太鼓
         public CTexture[] Taiko_Base,

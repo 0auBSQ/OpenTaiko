@@ -74,7 +74,7 @@ namespace TJAPlayer3
                 var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
                 if (dirs.Length > 0)
                 {
-                    var _presetPath = (preset != null) ? $@"{dancerOrigindir}" + preset.DancerSet : "";
+                    var _presetPath = (preset != null) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
                     var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
                         ?  _presetPath
                         : dirs[random.Next(0, dirs.Length)];

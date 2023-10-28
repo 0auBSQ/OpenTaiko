@@ -19,7 +19,64 @@ namespace TJAPlayer3
 
         public override void Activate()
         {
-            RandomMob = TJAPlayer3.Random.Next(TJAPlayer3.Skin.Game_Mob_Ptn);
+            var mobDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.MOB}");
+
+            string presetSection = "";
+            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            {
+            }
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            {
+                presetSection = "Dan";
+            }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+            {
+            }
+            else
+            {
+                presetSection = "Regular";
+            }
+
+            object _ps = null;
+
+            switch (presetSection)
+            {
+                case "Regular":
+                    _ps = TJAPlayer3.Skin.Game_SkinScenes.Regular;
+                    break;
+                default:
+                    break;
+            };
+            
+            var preset = (_ps != null 
+                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
+                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
+                : null;
+
+            if (_ps != null
+                    && TJAPlayer3.DTX.scenePreset != null
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
+            {
+                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
+            }
+
+            if (System.IO.Directory.Exists(mobDir))
+            {
+                Random random = new Random();
+
+                var upDirs = System.IO.Directory.GetFiles(mobDir);
+                if (upDirs.Length > 0)
+                {
+                    var _presetPath = (preset != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] + ".png" : "";
+                    var path = (preset != null && System.IO.File.Exists(_presetPath)) 
+                        ?  _presetPath
+                        : upDirs[random.Next(0, upDirs.Length)];
+
+                    Mob = TJAPlayer3.tテクスチャの生成(path);
+                }
+            }
+            
             nMobBeat = TJAPlayer3.Skin.Game_Mob_Beat;
 
             base.Activate();
@@ -44,17 +101,8 @@ namespace TJAPlayer3
         {
             if(!TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
             {
-                if (TJAPlayer3.Skin.Game_Mob_Ptn != 0 && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
                 {
-
-                    /*
-                    TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctMob.n現在の値.ToString());
-                    TJAPlayer3.act文字コンソール.tPrint(0, 20, C文字コンソール.Eフォント種別.白, ctMobPtn.n現在の値.ToString());
-                    TJAPlayer3.act文字コンソール.tPrint(0, 30, C文字コンソール.Eフォント種別.白, ((int)ctMobPtn.n現在の値).ToString());
-                    TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0].ToString());
-                    TJAPlayer3.act文字コンソール.tPrint(0, 10, C文字コンソール.Eフォント種別.白, Math.Sin((float)this.ctMob.n現在の値 * (Math.PI / 180)).ToString());
-                    */
-
                     if (HGaugeMethods.UNSAFE_IsRainbow(0))
                     {
 
@@ -66,9 +114,10 @@ namespace TJAPlayer3
                             nNowMobCounter = 0;
                         }
 
+                        int moveHeight = (int)(70 * (TJAPlayer3.Skin.Resolution[1] / 720.0));
 
-                        if (TJAPlayer3.Tx.Mob[RandomMob] != null)
-                            TJAPlayer3.Tx.Mob[RandomMob].t2D描画(0, (TJAPlayer3.Skin.Resolution[1] - (TJAPlayer3.Tx.Mob[RandomMob].szテクスチャサイズ.Height - 70)) + -((float)Math.Sin(nNowMobCounter * (Math.PI / 180)) * 70));
+                        if (Mob != null)
+                            Mob.t2D描画(0, (TJAPlayer3.Skin.Resolution[1] - (Mob.szテクスチャサイズ.Height - moveHeight)) + -((float)Math.Sin(nNowMobCounter * (Math.PI / 180)) * moveHeight));
                         
                     }
 
@@ -78,9 +127,9 @@ namespace TJAPlayer3
         }
         #region[ private ]
         //-----------------
+        public CTexture Mob;
         private float nNowMobCounter;
         private float nMobBeat;
-        private int RandomMob;
         //-----------------
         #endregion
     }
