@@ -138,7 +138,14 @@ namespace TJAPlayer3
 							Task.Run(() =>
 							{
 								this.list進行文字列.Add("LOADING TEXTURES...");
-								TJAPlayer3.Tx.LoadTexture();
+								try
+								{
+									TJAPlayer3.Tx.LoadTexture();
+								}
+								catch(Exception exception)
+								{
+									Trace.TraceError( exception.ToString() );
+								}
 								this.list進行文字列.Add("LOADING TEXTURES...OK");
 								this.str現在進行中 = "Setup done.";
 								this.eフェーズID = Eフェーズ.起動7_完了;
