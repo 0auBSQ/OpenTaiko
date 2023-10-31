@@ -45,6 +45,8 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
+            TJAPlayer3.tテクスチャの解放(ref Mob);
+            
             base.DeActivate();
         }
 
