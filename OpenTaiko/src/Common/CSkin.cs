@@ -4058,7 +4058,11 @@ namespace TJAPlayer3
                             }
                             else if (strCommand == nameof(Game_Lyric_FontName))
                             {
-                                Game_Lyric_FontName = strParam;
+                                strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                if (HPrivateFastFont.FontExists(strParam)) Game_Lyric_FontName = strParam;
+                                strParam = Path(strParam);
+                                if (HPrivateFastFont.FontExists(strParam)) Game_Lyric_FontName = strParam;
                             }
                             else if (strCommand == nameof(Game_Lyric_FontSize))
                             {

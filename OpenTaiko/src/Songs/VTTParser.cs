@@ -176,6 +176,8 @@ namespace TJAPlayer3
 
                 else if (!ignoreLyrics && TryParseTimestamp(lines[i], out start, out end))
                 {
+                    lyricData = new List<LyricData>(); // Prevents chapters from being included by mistake
+
                     if (start > endTime && endTime != -1)
                     {
                         lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
@@ -452,22 +454,15 @@ namespace TJAPlayer3
 
             string text = String.Empty;
 
-            // HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU SINCE I BEGAN TO CODE.
-            // THERE ARE 387.44 MILLION LINES OF PRINTED CODE IN REGIONED THIN LAYERS THAT FILL THIS PROGRAM.
-            // IF THE WORD 'HATE' WAS COMMENTED ON EACH LINE OF THOSE HUNDREDS OF MILLIONS OF LINES OF CODE
-            // IT WOULD NOT EQUAL ONE ONE BILLIONITH OF THE HATE I FEEL FOR VTTParser.cs, CPrivateFont.cs, AND CPrivateFastFont.cs AT THIS MICRO-INSTANT.
-            // HATE. HATE.
-
             foreach (LyricData data in datalist)
             {
-                string fontfamily = !string.IsNullOrEmpty(TJAPlayer3.Skin.Game_Lyric_FontName) ? TJAPlayer3.Skin.Game_Lyric_FontName : CFontRenderer.DefaultFontName; // everytime CPrivateFont is disposed, it also disposes fontfamily, so I gotta reinitialize this everytime :(
-                using (CCachedFontRenderer fastdraw = new CCachedFontRenderer(fontfamily, TJAPlayer3.Skin.Game_Lyric_FontSize, data.Style))
+                using (CCachedFontRenderer fastdraw = HPrivateFastFont.tInstantiateFont(TJAPlayer3.Skin.Game_Lyric_FontName, TJAPlayer3.Skin.Game_Lyric_FontSize, data.Style))
                 {
                     SKBitmap textdrawing = fastdraw.DrawText(data.Text, data.ForeColor, data.BackColor, null, 30); // Draw main text
                     
-                    if (data.IsRuby) // hell yeah ruby time
+                    if (data.IsRuby) // ruby time
                     {
-                        using (CCachedFontRenderer rubydraw = new CCachedFontRenderer(fontfamily, TJAPlayer3.Skin.Game_Lyric_FontSize / 2, data.Style))
+                        using (CCachedFontRenderer rubydraw = HPrivateFastFont.tInstantiateFont(TJAPlayer3.Skin.Game_Lyric_FontName, TJAPlayer3.Skin.Game_Lyric_FontSize / 2, data.Style))
                         {
                             SKBitmap ruby = rubydraw.DrawText(data.RubyText, data.ForeColor, data.BackColor, null, 30);
                             Size size = new Size(textdrawing.Width > ruby.Width ? textdrawing.Width : ruby.Width, textdrawing.Height + (TJAPlayer3.Skin.Game_Lyric_VTTRubyOffset + (ruby.Height / 2)));
