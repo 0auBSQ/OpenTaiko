@@ -17,21 +17,21 @@ namespace TJAPlayer3
             return CFontRenderer.FontExists(fontpath);
         }
 
-        public static CCachedFontRenderer tInstantiateFont(string fontName, int scale)
+        public static CCachedFontRenderer tInstantiateFont(string fontName, int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular)
         {
             if (FontExists(fontName))
-                return (new CCachedFontRenderer(fontName, scale));
-            return (new CCachedFontRenderer(DefaultFont, scale));
+                return (new CCachedFontRenderer(fontName, scale, style));
+            return (new CCachedFontRenderer(DefaultFont, scale, style));
         }
 
-        public static CCachedFontRenderer tInstantiateMainFont(int scale)
+        public static CCachedFontRenderer tInstantiateMainFont(int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular)
         {
-            return tInstantiateFont(TJAPlayer3.Skin.FontName, scale);
+            return tInstantiateFont(TJAPlayer3.Skin.FontName, scale, style);
         }
 
-        public static CCachedFontRenderer tInstantiateBoxFont(int scale)
+        public static CCachedFontRenderer tInstantiateBoxFont(int scale, CFontRenderer.FontStyle style = CFontRenderer.FontStyle.Regular)
         {
-            return tInstantiateFont(TJAPlayer3.Skin.BoxFontName, scale);
+            return tInstantiateFont(TJAPlayer3.Skin.BoxFontName, scale, style);
         }
     }
 }

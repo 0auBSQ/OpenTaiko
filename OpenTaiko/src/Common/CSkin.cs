@@ -4058,7 +4058,11 @@ namespace TJAPlayer3
                             }
                             else if (strCommand == nameof(Game_Lyric_FontName))
                             {
-                                Game_Lyric_FontName = strParam;
+                                strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                if (HPrivateFastFont.FontExists(strParam)) Game_Lyric_FontName = strParam;
+                                strParam = Path(strParam);
+                                if (HPrivateFastFont.FontExists(strParam)) Game_Lyric_FontName = strParam;
                             }
                             else if (strCommand == nameof(Game_Lyric_FontSize))
                             {
@@ -8458,7 +8462,16 @@ namespace TJAPlayer3
             Characters_Result_Clear_Ptn,
             Characters_Result_Failed_Ptn,
             Characters_Result_Failed_In_Ptn,
-            Characters_Result_Normal_Ptn;
+            Characters_Result_Normal_Ptn,
+            Characters_Tower_Standing_Ptn,
+            Characters_Tower_Climbing_Ptn,
+            Characters_Tower_Running_Ptn,
+            Characters_Tower_Clear_Ptn,
+            Characters_Tower_Fail_Ptn,
+            Characters_Tower_Standing_Tired_Ptn,
+            Characters_Tower_Climbing_Tired_Ptn,
+            Characters_Tower_Running_Tired_Ptn,
+            Characters_Tower_Clear_Tired_Ptn;
 
         // Config
 
@@ -8494,6 +8507,17 @@ namespace TJAPlayer3
             Characters_Motion_SoulIn,
             Characters_Motion_SoulOut,
             Characters_Motion_Return;
+            /*
+            Characters_Motion_Tower_Standing,
+            Characters_Motion_Tower_Climbing,
+            Characters_Motion_Tower_Running,
+            Characters_Motion_Tower_Clear,
+            Characters_Motion_Tower_Fail,
+            Characters_Motion_Tower_Standing_Tired,
+            Characters_Motion_Tower_Climbing_Tired,
+            Characters_Motion_Tower_Running_Tired,
+            Characters_Motion_Tower_Clear_Tired;
+            */
         public float[] Characters_Beat_Normal,
             Characters_Beat_10Combo,
             Characters_Beat_10Combo_Clear,
@@ -8512,7 +8536,16 @@ namespace TJAPlayer3
             Characters_Beat_GoGoMax,
             Characters_Beat_SoulIn,
             Characters_Beat_SoulOut,
-            Characters_Beat_Return;
+            Characters_Beat_Return,
+            Characters_Beat_Tower_Standing,
+            Characters_Beat_Tower_Climbing,
+            Characters_Beat_Tower_Running,
+            Characters_Beat_Tower_Clear,
+            Characters_Beat_Tower_Fail,
+            Characters_Beat_Tower_Standing_Tired,
+            Characters_Beat_Tower_Climbing_Tired,
+            Characters_Beat_Tower_Running_Tired,
+            Characters_Beat_Tower_Clear_Tired;
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
         public int[] Characters_Balloon_FadeOut;
