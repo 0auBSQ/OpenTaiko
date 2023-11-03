@@ -183,11 +183,19 @@ namespace TJAPlayer3
 
             this.ct炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
             
+            this.currentCharacter = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[0].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
 
             this.ctSlideAnimation = new CCounter();
-            this.ctClimbAnimation = new CCounter();
-            this.ctDonAnimation = new CCounter(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
-
+            this.ctClimbDuration = new CCounter();
+            this.ctStandingAnimation = new CCounter(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter]) / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+            this.ctClimbingAnimation = new CCounter();
+            this.ctRunningAnimation = new CCounter();
+            this.ctClearAnimation = new CCounter();
+            this.ctFailAnimation = new CCounter();
+            this.ctStandTiredAnimation = new CCounter();
+            this.ctClimbTiredAnimation = new CCounter();
+            this.ctRunTiredAnimation = new CCounter();
+            this.ctClearTiredAnimation = new CCounter();
 
             base.Activate();
         }
@@ -446,34 +454,92 @@ namespace TJAPlayer3
 
                 #region [Climbing don]
 
-                // Will be added in a future skinning update
-                int currentDon = 0;
+                bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
+                
+                bool stageEnded = TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_演奏終了演出 || TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト;
 
                 if (bFloorChanged == true)
                 {
-                    ctClimbAnimation.Start(0, 1500, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
-                    ctDonAnimation.Start(0, 1000, 24000f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20);
+                    ctClimbDuration.Start(0, 1500, 120f / floorBPM, TJAPlayer3.Timer);
+                    ctStandingAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctClimbingAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Climbing[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctRunningAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Running[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctClearAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Clear[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctFailAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Fail[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctStandTiredAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctClimbTiredAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Climbing_Tired[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctRunTiredAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Running_Tired[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
+                    ctClearTiredAnimation.Start(0, 1000, (24000f * TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter]) / floorBPM, TJAPlayer3.Timer);
                 }
-
-
-                if (ctClimbAnimation.CurrentValue == 0 || ctClimbAnimation.CurrentValue == 1500)
+                if (ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500)
                 {
-                    int animDon = ctDonAnimation.CurrentValue % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Standing[currentDon];
-                    TJAPlayer3.Tx.Tower_Don_Standing[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]); // Center X - 50
-                }
-                else if (ctClimbAnimation.CurrentValue <= 1000)
-                {
-                    int animDon = ctDonAnimation.CurrentValue % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Climbing[currentDon];
-                    int distDonX = (int)(ctClimbAnimation.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 1000f));
-                    int distDonY = (int)(ctClimbAnimation.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 1000f));
-                    TJAPlayer3.Tx.Tower_Don_Climbing[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    // Tired Climb
+                    if (ctIsTired && (ctClimbDuration.CurrentValue <= 1000) && TJAPlayer3.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctClimbTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
+                        int distDonX = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 1000f));
+                        int distDonY = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 1000f));
+                        TJAPlayer3.Tx.Characters_Tower_Climbing_Tired[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    }
+                    // Tired Run
+                    else if (ctIsTired && (ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctRunTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter];
+                        int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 500f));
+                        int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 500f));
+                        TJAPlayer3.Tx.Characters_Tower_Running_Tired[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    }
+                    // Climb
+                    else if ((ctClimbDuration.CurrentValue <= 1000) && TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctClimbingAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
+                        int distDonX = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 1000f));
+                        int distDonY = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 1000f));
+                        TJAPlayer3.Tx.Characters_Tower_Climbing[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    }
+                    // Run
+                    else if ((ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctRunningAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter];
+                        int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 500f));
+                        int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 500f));
+                        TJAPlayer3.Tx.Characters_Tower_Running[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    }
                 }
                 else
                 {
-                    int animDon = ctDonAnimation.CurrentValue % TJAPlayer3.Skin.Game_Tower_Ptn_Don_Running[currentDon];
-                    int distDonX = (int)((1500 - ctClimbAnimation.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 500f));
-                    int distDonY = (int)((1500 - ctClimbAnimation.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 500f));
-                    TJAPlayer3.Tx.Tower_Don_Running[currentDon][animDon]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+                    // Fail
+                    if (TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives == 0)
+                    {
+                        int animChar = ctFailAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter];
+                        TJAPlayer3.Tx.Characters_Tower_Fail[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+                    }
+                    // Tired Clear
+                    else if (ctIsTired && stageEnded && TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0)
+                    {
+                        int animChar = ctClearTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter];
+                        TJAPlayer3.Tx.Characters_Tower_Clear_Tired[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+                    }
+                    // Clear
+                    else if (stageEnded && TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0)
+                    {
+                        int animChar = ctClearAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter];
+                        TJAPlayer3.Tx.Characters_Tower_Clear[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+                    }
+                    
+                    // Tired Stand
+                    else if (ctIsTired && TJAPlayer3.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctStandTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter];
+                        TJAPlayer3.Tx.Characters_Tower_Standing_Tired[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]); // Center X - 50
+                    }
+                    // Stand
+                    else if (TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter] > 0)
+                    {
+                        int animChar = ctStandingAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter];
+                        TJAPlayer3.Tx.Characters_Tower_Standing[currentCharacter][animChar]?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]); // Center X - 50
+                    }
                 }
 
                 #endregion
@@ -490,8 +556,16 @@ namespace TJAPlayer3
                 #endregion
 
                 ctSlideAnimation?.Tick();
-                ctClimbAnimation?.Tick();
-                ctDonAnimation?.TickLoop();
+                ctClimbDuration?.Tick();
+                ctStandingAnimation?.TickLoop();
+                ctClimbingAnimation?.TickLoop();
+                ctRunningAnimation?.TickLoop();
+                ctClearAnimation?.TickLoop();
+                ctFailAnimation?.TickLoop();
+                ctStandTiredAnimation?.TickLoop();
+                ctClimbTiredAnimation?.TickLoop();
+                ctRunTiredAnimation?.TickLoop();
+                ctClearTiredAnimation?.TickLoop();
 
                 #endregion
             }
@@ -551,9 +625,18 @@ namespace TJAPlayer3
         private CCachedFontRenderer pfTowerText;
 
         private bool bFloorChanged = false;
+        private int currentCharacter;
         private CCounter ctSlideAnimation;
-        private CCounter ctDonAnimation;
-        private CCounter ctClimbAnimation;
+        private CCounter ctStandingAnimation;
+        private CCounter ctClimbingAnimation;
+        private CCounter ctRunningAnimation;
+        private CCounter ctClearAnimation;
+        private CCounter ctFailAnimation;
+        private CCounter ctStandTiredAnimation;
+        private CCounter ctClimbTiredAnimation;
+        private CCounter ctRunTiredAnimation;
+        private CCounter ctClearTiredAnimation;
+        private CCounter ctClimbDuration;
 
         private CCounter ct炎;
 
