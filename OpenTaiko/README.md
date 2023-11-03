@@ -132,7 +132,7 @@ BoxFontName=廻想体 ネクスト UP B
 
 ### About the OpenTaiko Original Soundtrack
 
-Songs within the `OpenTaiko Chapter` and the distinctive characters folders have non-exclusive licences (which means that you might see some of them in other games or projects).
+Songs within the `OpenTaiko Chapter` (at the exception of songs listed on the "Specific Licences" section below) and the distinctive characters folders have non-exclusive licences (which means that you might see some of them in other games or projects).
 It is permitted to use them in the following cases :
 ```
 - OpenTaiko streamings on services such as Twitch, Youtube streaming or similar
@@ -143,6 +143,25 @@ It is permitted to use them in the following cases :
 Each composer keep the rights on their songs, therefore you **must** ensure to have their authorization to use their songs for any different purpose than those listed above and/or to get an appropriate licence if necessary.
 
 If you liked a specific song and want to support the composer's work, please check their links on the credits.
+
+### Songs with specific licenses
+
+- CC BY-SA
+```
+061 - The Abyss : ok cheez
+077 - Meowmetic : HHS
+```
+
+- Non-commercial, Attribution required (CC BY-NC ?)
+```
+074 - Spatium Cursu : X3ll3n
+```
+
+- CC BY-NC-SA
+```
+078 - the garden : AZALI
+079 - MECHANICAL GOD : AZALI × Crow
+```
 
 ## Translations
 
