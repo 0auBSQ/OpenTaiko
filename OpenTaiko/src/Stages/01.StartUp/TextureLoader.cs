@@ -1274,6 +1274,9 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Tower_Climbing_Tired_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Tower_Clear_IsLooping = new bool[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Tower_Clear_Tired_IsLooping = new bool[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Tower_Fail_IsLooping = new bool[TJAPlayer3.Skin.Characters_Ptn];
 
             TJAPlayer3.Skin.Characters_Resolution = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Heya_Render_Offset = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1338,13 +1341,9 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Beat_SoulOut = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Return = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Tower_Standing = new float[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Tower_Climbing = new float[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Tower_Running = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Tower_Clear = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Tower_Fail = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired = new float[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Tower_Climbing_Tired = new float[TJAPlayer3.Skin.Characters_Ptn];
-            TJAPlayer3.Skin.Characters_Beat_Tower_Running_Tired = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired = new float[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Timer = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Delay = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1920,13 +1919,9 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Beat_SoulOut[i] = 1.5f;
                 TJAPlayer3.Skin.Characters_Beat_Return[i] = 1.5f;
                 TJAPlayer3.Skin.Characters_Beat_Tower_Standing[i] = 1;
-                TJAPlayer3.Skin.Characters_Beat_Tower_Climbing[i] = 1;
-                TJAPlayer3.Skin.Characters_Beat_Tower_Running[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Tower_Clear[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Tower_Fail[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired[i] = 1;
-                TJAPlayer3.Skin.Characters_Beat_Tower_Climbing_Tired[i] = 1;
-                TJAPlayer3.Skin.Characters_Beat_Tower_Running_Tired[i] = 1;
                 TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired[i] = 1;
                 TJAPlayer3.Skin.Characters_Balloon_Timer[i] = 28;
                 TJAPlayer3.Skin.Characters_Balloon_Delay[i] = 500;
@@ -2311,19 +2306,9 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Beat_Tower_Standing[i] = float.Parse(strParam);
                                         break;
                                     }
-                                    case "Game_Chara_Beat_Tower_Climbing":
+                                    case "Game_Chara_Beat_Tower_Standing_Tired":
                                     {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Climbing[i] = float.Parse(strParam);
-                                        break;
-                                    }
-                                    case "Game_Chara_Beat_Tower_Running":
-                                    {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Running[i] = float.Parse(strParam);
-                                        break;
-                                    }
-                                    case "Game_Chara_Beat_Tower_Clear":
-                                    {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Clear[i] = float.Parse(strParam);
+                                        TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired[i] = float.Parse(strParam);
                                         break;
                                     }
                                     case "Game_Chara_Beat_Tower_Fail":
@@ -2331,24 +2316,29 @@ namespace TJAPlayer3
                                         TJAPlayer3.Skin.Characters_Beat_Tower_Fail[i] = float.Parse(strParam);
                                         break;
                                     }
-                                    case "Game_Chara_Beat_Tower_Standing_Tired":
+                                    case "Game_Chara_Beat_Tower_Clear":
                                     {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired[i] = float.Parse(strParam);
-                                        break;
-                                    }
-                                    case "Game_Chara_Beat_Tower_Climbing_Tired":
-                                    {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Climbing_Tired[i] = float.Parse(strParam);
-                                        break;
-                                    }
-                                    case "Game_Chara_Beat_Tower_Running_Tired":
-                                    {
-                                        TJAPlayer3.Skin.Characters_Beat_Tower_Running_Tired[i] = float.Parse(strParam);
+                                        TJAPlayer3.Skin.Characters_Beat_Tower_Clear[i] = float.Parse(strParam);
                                         break;
                                     }
                                     case "Game_Chara_Beat_Tower_Clear_Tired":
                                     {
                                         TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired[i] = float.Parse(strParam);
+                                        break;
+                                    }
+                                    case "Game_Chara_Tower_Clear_IsLooping":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Tower_Clear_IsLooping[i] = int.Parse(strParam) != 0;
+                                        break;
+                                    }
+                                    case "Game_Chara_Tower_Clear_Tired_IsLooping":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Tower_Clear_Tired_IsLooping[i] = int.Parse(strParam) != 0;
+                                        break;
+                                    }
+                                    case "Game_Chara_Tower_Fail_IsLooping":
+                                    {
+                                        TJAPlayer3.Skin.Characters_Tower_Fail_IsLooping[i] = int.Parse(strParam) != 0;
                                         break;
                                     }
                                     case "Chara_Entry_AnimationDuration":

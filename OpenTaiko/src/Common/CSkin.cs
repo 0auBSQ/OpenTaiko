@@ -8472,6 +8472,9 @@ namespace TJAPlayer3
             Characters_Tower_Climbing_Tired_Ptn,
             Characters_Tower_Running_Tired_Ptn,
             Characters_Tower_Clear_Tired_Ptn;
+        public bool[] Characters_Tower_Clear_IsLooping,
+            Characters_Tower_Clear_Tired_IsLooping,
+            Characters_Tower_Fail_IsLooping;
 
         // Config
 
@@ -8538,13 +8541,9 @@ namespace TJAPlayer3
             Characters_Beat_SoulOut,
             Characters_Beat_Return,
             Characters_Beat_Tower_Standing,
-            Characters_Beat_Tower_Climbing,
-            Characters_Beat_Tower_Running,
-            Characters_Beat_Tower_Clear,
-            Characters_Beat_Tower_Fail,
             Characters_Beat_Tower_Standing_Tired,
-            Characters_Beat_Tower_Climbing_Tired,
-            Characters_Beat_Tower_Running_Tired,
+            Characters_Beat_Tower_Fail,
+            Characters_Beat_Tower_Clear,
             Characters_Beat_Tower_Clear_Tired;
         public int[] Characters_Balloon_Timer;
         public int[] Characters_Balloon_Delay;
