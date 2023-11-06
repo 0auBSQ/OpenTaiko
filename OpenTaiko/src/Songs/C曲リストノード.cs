@@ -83,7 +83,7 @@ namespace TJAPlayer3
 		// Tower Lives
 		public int nLife = 5;
 		public int nTotalFloor = 140;
-		public int nTowerType = 0;
+		public string nTowerType;
 
 		// Unique id
 		public CSongUniqueID uniqueId;

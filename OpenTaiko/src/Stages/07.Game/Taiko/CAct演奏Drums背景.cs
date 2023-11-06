@@ -416,7 +416,7 @@ namespace TJAPlayer3
 
                 int nightTime = Math.Max(140, maxFloor / 2);
 
-                int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+                int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType);
 
                 if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
                     currentTowerType = 0;
@@ -434,11 +434,14 @@ namespace TJAPlayer3
 
                 #region [Skybox]
 
-                int skyboxYPosition = (int)((TJAPlayer3.Tx.Tower_Sky_Gradient.szテクスチャサイズ.Height - TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]) * (1f - (currentFloorPositionMax140 + progressFactor)));
+                //int skyboxYPosition = (int)((TJAPlayer3.Tx.Tower_Sky_Gradient.szテクスチャサイズ.Height - TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]) * (1f - (currentFloorPositionMax140 + progressFactor)));
 
-                TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1], 
-                    new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
-
+                //TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1], 
+                    //new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
+                    
+                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
+                DownScript.Draw();
+                    
                 #endregion
 
 
@@ -522,7 +525,7 @@ namespace TJAPlayer3
                     ctRunTiredAnimation.Start(0, 1000, (60000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
                 }
 
-                bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500
+                bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
                 
                 if (stageEnded && !TowerFinished && !isClimbing)
                 {

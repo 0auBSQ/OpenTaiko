@@ -8507,17 +8507,6 @@ namespace TJAPlayer3
             Characters_Motion_SoulIn,
             Characters_Motion_SoulOut,
             Characters_Motion_Return;
-            /*
-            Characters_Motion_Tower_Standing,
-            Characters_Motion_Tower_Climbing,
-            Characters_Motion_Tower_Running,
-            Characters_Motion_Tower_Clear,
-            Characters_Motion_Tower_Fail,
-            Characters_Motion_Tower_Standing_Tired,
-            Characters_Motion_Tower_Climbing_Tired,
-            Characters_Motion_Tower_Running_Tired,
-            Characters_Motion_Tower_Clear_Tired;
-            */
         public float[] Characters_Beat_Normal,
             Characters_Beat_10Combo,
             Characters_Beat_10Combo_Clear,
@@ -9147,6 +9136,7 @@ namespace TJAPlayer3
         public int[] Game_Tower_Ptn_Deco,
             Game_Tower_Ptn_Base;
 
+        public string[] Game_Tower_Names;
         public int Game_Tower_Ptn_Result;
 
         public int Game_Tower_Ptn_Don;

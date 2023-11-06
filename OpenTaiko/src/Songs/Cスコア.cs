@@ -102,7 +102,7 @@ namespace TJAPlayer3
 			// Tower lifes
 			public int nLife;
 			public int nTotalFloor;
-			public int nTowerType;
+			public string nTowerType;
 
 			public int nDanTick;
 			public Color cDanTickColor;
