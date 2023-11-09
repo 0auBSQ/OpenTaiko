@@ -135,7 +135,7 @@ namespace TJAPlayer3
 					case CStage.Eフェーズ.起動_テクスチャの読み込み:
 						if (!bIsLoadingTextures)
 						{
-							Task.Run(() =>
+							void loadTexture()
 							{
 								this.list進行文字列.Add("LOADING TEXTURES...");
 								try
@@ -150,7 +150,15 @@ namespace TJAPlayer3
 								this.str現在進行中 = "Setup done.";
 								this.eフェーズID = Eフェーズ.起動7_完了;
 								TJAPlayer3.Skin.bgm起動画面.t停止する();
-							});
+							}
+							if (TJAPlayer3.ConfigIni.ASyncTextureLoad)
+							{
+								Task.Run(loadTexture);
+							}
+							else 
+							{
+								loadTexture();
+							}
 						}
 						bIsLoadingTextures = true;
                         break;
