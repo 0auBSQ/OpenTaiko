@@ -1957,7 +1957,7 @@ namespace TJAPlayer3
             ShinuchiMode = true; // Enable gen-4 score by default
 			TJAP3FolderMode = false;
 			FastRender = true;
-			ASyncTextureLoad = false;
+			ASyncTextureLoad = true;
 			PreAssetsLoading = true;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
