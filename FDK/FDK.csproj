@@ -22,12 +22,6 @@
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.5"/>
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.5"/>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="runtimes/win-x64/native/*" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="runtimes/win-x86/native/*" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="runtimes/osx-x64/native/*" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="runtimes/linux-x64/native/*" CopyToOutputDirectory="PreserveNewest"/>
-  </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="mplus-1p-medium.ttf"/>
   </ItemGroup>

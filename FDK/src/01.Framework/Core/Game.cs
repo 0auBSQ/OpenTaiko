@@ -283,11 +283,13 @@ namespace SampleFramework
             {
                 Window_.UpdatesPerSecond = 0;
                 Window_.FramesPerSecond = 0;
+                Context.SwapInterval(1);
             }
             else
             {
                 Window_.UpdatesPerSecond = value;
                 Window_.FramesPerSecond = value;
+                Context.SwapInterval(0);
             }
         }
 
@@ -399,6 +401,7 @@ namespace SampleFramework
 
             Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+            Context.SwapInterval(VSync ? 1 : 0);
 
             Initialize();
             LoadContent();
