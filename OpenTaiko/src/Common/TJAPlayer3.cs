@@ -636,9 +636,37 @@ namespace TJAPlayer3
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
 			}
-			
 
-			GraphicsDeviceType_ = (GraphicsDeviceType)ConfigIni.nGraphicsDeviceType;
+			switch(ConfigIni.nGraphicsDeviceType)
+			{
+				case 0:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				break;
+				/*
+				case 1:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D9;
+				break;
+				case 2:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+				break;
+				case 3:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				break;
+				case 4:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				break;
+				*/
+				case 1:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+				break;
+				case 2:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				break;
+				case 3:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				break;
+			}
+
 			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.n初期ウィンドウ開始位置X, ConfigIni.n初期ウィンドウ開始位置Y);
 			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nウインドウwidth, ConfigIni.nウインドウheight);
 			FullScreen = ConfigIni.b全画面モード;

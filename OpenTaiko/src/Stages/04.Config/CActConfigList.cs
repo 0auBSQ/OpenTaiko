@@ -109,12 +109,11 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(18));
 			this.list項目リスト.Add( this.iSystemTimeStretch );
 
-			/*
 			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString(9997), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nGraphicsDeviceType,
 				CLangManager.LangInstance.GetString(9996),
-				new string[] { "OpenGL", "Vulkan", "DirectX11", "DirectX12" });
+				//new string[] { "OpenGL", "DirectX9", "DirectX11", "Vulkan", "Metal" });
+				new string[] { "OpenGL", "DirectX11", "Vulkan", "Metal" });
 			this.list項目リスト.Add(this.iSystemGraphicsType);
-			*/
 
 			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.b全画面モード,
 				CLangManager.LangInstance.GetString(19));
@@ -1614,7 +1613,7 @@ namespace TJAPlayer3
             //CDTXMania.ConfigIni.eDark = (Eダークモード) this.iCommonDark.n現在選択されている項目番号;
 			TJAPlayer3.ConfigIni.n演奏速度 = this.iCommonPlaySpeed.n現在の値;
 
-			//TJAPlayer3.ConfigIni.nGraphicsDeviceType = this.iSystemGraphicsType.n現在選択されている項目番号;
+			TJAPlayer3.ConfigIni.nGraphicsDeviceType = this.iSystemGraphicsType.n現在選択されている項目番号;
 			TJAPlayer3.ConfigIni.b全画面モード = this.iSystemFullscreen.bON;
 			// TJAPlayer3.ConfigIni.bSTAGEFAILED有効 = this.iSystemStageFailed.bON;
 			TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする = this.iSystemRandomFromSubBox.bON;

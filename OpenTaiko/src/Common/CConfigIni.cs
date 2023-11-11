@@ -1896,7 +1896,7 @@ namespace TJAPlayer3
 			this.bIsEnabledSystemMenu = true;			// #28200 2012.5.1 yyagi System Menuの利用可否切替(使用可)
 			this.strSystemSkinSubfolderFullName = "";	// #28195 2012.5.2 yyagi 使用中のSkinサブフォルダ名
 			this.bTight = false;                        // #29500 2012.9.11 kairera0467 TIGHTモード
-			nGraphicsDeviceType = (int)GraphicsDeviceType.OpenGL;
+			nGraphicsDeviceType = 0;
 			#region [ WASAPI/ASIO ]
 			this.nSoundDeviceType = (int)ESoundDeviceTypeForConfig.Bass;	// #24820 2012.12.23 yyagi 初期値はACM | #31927 2013.8.25 yyagi OSにより初期値変更
 			nBassBufferSizeMs = 1;
@@ -2097,11 +2097,8 @@ namespace TJAPlayer3
             #endregion
 
             #region [ Window関連 ]
-            sw.WriteLine("; これは実験的な機能です");
-            sw.WriteLine("; 使用する描画API(0=OpenGL, 1=Vulkan, 2=DirectX11, 3=DirectX12)");
-            sw.WriteLine("; OpenGLは遅いが互換性が高く安定する、VulkanはLinuxで最速");
-            sw.WriteLine("; DirectX11はWindows限定だが安定していて早い、DirectX12はWindows限定な上GPUが良くないと動かないが爆速");
-            sw.WriteLine("; もう一回言いますこれは実験的な機能です");
+            //sw.WriteLine("; 使用する描画API(0=OpenGL, 1=DirectX9, 2=DirectX11, 3=Vulkan, 4=Metal)");
+            sw.WriteLine("; 使用する描画API(0=OpenGL, 1=DirectX11, 2=Vulkan, 3=Metal)");
 			sw.WriteLine( "GraphicsDeviceType={0}", (int) this.nGraphicsDeviceType );
 			sw.WriteLine();
             sw.WriteLine( "; 画面モード(0:ウィンドウ, 1:全画面)" );
@@ -2939,7 +2936,7 @@ namespace TJAPlayer3
                                             #region [ Window関係 ]
                                             else if ( str3.Equals( "GraphicsDeviceType" ) )
 											{
-												this.nGraphicsDeviceType = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 3, this.nGraphicsDeviceType );
+												this.nGraphicsDeviceType = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 4, this.nGraphicsDeviceType );
 											}
                                             else if (str3.Equals("FullScreen"))
                                             {

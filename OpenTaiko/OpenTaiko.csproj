@@ -13,7 +13,6 @@
     <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Shaders/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest"/>

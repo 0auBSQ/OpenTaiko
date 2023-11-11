@@ -214,13 +214,14 @@ namespace TJAPlayer3
 
 
 			[9996] = "描画の方式:\n" +
-					"OpenGL, Vulkan, DirectX11, DirectX12\n" +
+					"OpenGL, DirectX11, Vulkan, Metal\n" +
 					"の中からグラフィックスAPIを選択します。\n" +
 					"OpenGLは遅いですが互換性が高く安定してます\n" +
-					"VulkanはLinux環境で最速です\n" +
+					//"DirectX9は古いデバイスで高速です、\n" +
 					"DirectX11はWindowsでしか動作しませんが、\n" +
 					"早くて安定しています\n" +
-					"DirectX12はWindowsでしか動作しませんが非常に高速です\n" +
+					"VulkanはWindowsとLinux環境で最速です\n" +
+					"MetalはMacのみですが最速です\n" +
 					"\n" +
 					"この変更は再起動後に反映されます\n",
 			[9997] = "グラフィックスAPI",
