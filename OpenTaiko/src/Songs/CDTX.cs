@@ -1109,7 +1109,7 @@ namespace TJAPlayer3
         // Tower lifes
         public int LIFE;
 
-        public int TOWERTYPE;
+        public string TOWERTYPE;
 
         public int DANTICK = 0;
         public Color DANTICKCOLOR = Color.White;
@@ -7365,8 +7365,7 @@ namespace TJAPlayer3
             }
             else if (strCommandName.Equals("TOWERTYPE"))
             {
-                var tt = (int)Convert.ToDouble(strCommandParam);
-                this.TOWERTYPE = tt;
+                this.TOWERTYPE = strCommandParam;
             }
             else if (strCommandName.Equals("DANTICK"))
             {

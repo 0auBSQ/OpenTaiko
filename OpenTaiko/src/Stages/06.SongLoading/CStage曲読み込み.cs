@@ -384,12 +384,12 @@ namespace TJAPlayer3
 						int xFactor = 0;
 						float yFactor = 1f;
 
-						int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+						int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType);
 
-						if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
+						if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
 							currentTowerType = 0;
 
-						if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
+						if (TJAPlayer3.Tx.TowerResult_Background != null && currentTowerType < TJAPlayer3.Tx.TowerResult_Tower.Length && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
 						{
 							xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Width) / 2;
 							yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
@@ -399,7 +399,9 @@ namespace TJAPlayer3
 							((ct待機.CurrentValue <= 1200 ? ct待機.CurrentValue / 10f : 120) / 120f * (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1]));
 
 						TJAPlayer3.Tx.TowerResult_Background?.t2D描画(0, -1 * pos);
-						TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(xFactor, -1 * yFactor * pos);
+						
+						if (currentTowerType < TJAPlayer3.Tx.TowerResult_Tower.Length)
+							TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]?.t2D描画(xFactor, -1 * yFactor * pos);
 					}
 
 					#endregion

@@ -1434,7 +1434,7 @@ namespace TJAPlayer3
 							int xFactor = 0;
 							float yFactor = 1f;
 
-							int currentTowerType = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType;
+							int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType);
 
 							if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
 								currentTowerType = 0;
