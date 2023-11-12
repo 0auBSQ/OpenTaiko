@@ -759,6 +759,10 @@ namespace TJAPlayer3
 		}
 		protected override void Draw()
 		{
+			#if !DEBUG
+			try
+			#endif
+			{
 			// Sound管理?.t再生中の処理をする();
             Timer?.Update();
             SoundManager.PlayTimer?.Update();
@@ -2386,6 +2390,18 @@ for (int i = 0; i < 3; i++) {
 				this.b次のタイミングで垂直帰線同期切り替えを行う = false;
 			}
 			#endregion
+			}
+#if !DEBUG
+			catch( Exception e )
+			{
+				Trace.WriteLine( "" );
+				Trace.Write( e.ToString() );
+				Trace.WriteLine( "" );
+				Trace.WriteLine( "エラーだゴメン！（涙" );
+                AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
+				throw e;
+			}
+#endif
 		}
 
 		// その他
