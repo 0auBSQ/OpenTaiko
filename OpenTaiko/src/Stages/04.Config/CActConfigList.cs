@@ -265,6 +265,10 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(52));
             this.list項目リスト.Add(FastRender);
 
+            ASyncTextureLoad = new CItemToggle(CLangManager.LangInstance.GetString(9995), TJAPlayer3.ConfigIni.ASyncTextureLoad,
+				CLangManager.LangInstance.GetString(9994));
+            this.list項目リスト.Add(ASyncTextureLoad);
+
             ShowPuchiChara = new CItemToggle(CLangManager.LangInstance.GetString(10053), TJAPlayer3.ConfigIni.ShowPuchiChara,
 				CLangManager.LangInstance.GetString(53));
             this.list項目リスト.Add(ShowPuchiChara);
@@ -1571,6 +1575,7 @@ namespace TJAPlayer3
 		CItemToggle iShowExExtraAnime;
         CItemToggle ShinuchiMode;
         CItemToggle FastRender;
+        CItemToggle ASyncTextureLoad;
         CItemInteger MusicPreTimeMs;
 
 		private CItemInteger iInputAdjustTimeMs;
@@ -1689,6 +1694,7 @@ namespace TJAPlayer3
 
 			TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
 			TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
+			TJAPlayer3.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
 		}
 		private void tConfigIniへ記録する_Drums()
 		{

@@ -1360,6 +1360,7 @@ namespace TJAPlayer3
 		public int nMasterVolume;
         public bool ShinuchiMode; // 真打モード
         public bool FastRender; // 事前画像描画モード
+        public bool ASyncTextureLoad; // 事前画像描画モード
         public bool PreAssetsLoading; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
 
@@ -1956,6 +1957,7 @@ namespace TJAPlayer3
             ShinuchiMode = true; // Enable gen-4 score by default
 			TJAP3FolderMode = false;
 			FastRender = true;
+			ASyncTextureLoad = true;
 			PreAssetsLoading = true;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
@@ -2065,6 +2067,10 @@ namespace TJAPlayer3
             sw.WriteLine("; 事前画像描画機能を使うかどうか。(0: OFF, 1: ON)");
             sw.WriteLine("; Use pre-textures render.");
             sw.WriteLine("{0}={1}", nameof(FastRender), FastRender ? 1 : 0);
+            sw.WriteLine();
+            sw.WriteLine("; 非同期画像読み込みを行うかどうか。(0: OFF, 1: ON)");
+            sw.WriteLine("; Use pre-textures render.");
+            sw.WriteLine("{0}={1}", nameof(ASyncTextureLoad), ASyncTextureLoad ? 1 : 0);
             sw.WriteLine();
 			#endregion
 
@@ -2934,6 +2940,10 @@ namespace TJAPlayer3
                                             else if (str3.Equals(nameof(FastRender)))
                                             {
                                                 FastRender = CConversion.bONorOFF(str4[0]);
+                                            }
+                                            else if (str3.Equals(nameof(ASyncTextureLoad)))
+                                            {
+                                                ASyncTextureLoad = CConversion.bONorOFF(str4[0]);
                                             }
                                             #endregion
                                             #region [ Window関係 ]

@@ -728,13 +728,13 @@ namespace TJAPlayer3
 		}
 		protected override void Update()
 		{
+            Input管理?.Polling( TJAPlayer3.ConfigIni.bバッファ入力を行う );
 		}
 		protected override void Draw()
 		{
 			// Sound管理?.t再生中の処理をする();
             Timer?.Update();
             SoundManager.PlayTimer?.Update();
-            Input管理?.Polling( TJAPlayer3.ConfigIni.bバッファ入力を行う );
             FPS?.Update();
 
 			if (BeatScaling != null)
