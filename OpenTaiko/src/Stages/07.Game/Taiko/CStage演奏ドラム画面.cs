@@ -2569,6 +2569,8 @@ namespace TJAPlayer3
             int t = (int)SoundManager.PlayTimer.NowTimeMs;
             //CDTXMania.act文字コンソール.tPrint( 0, 16, C文字コンソール.Eフォント種別.白, t.ToString() );
 
+            this.actBalloon.tDrawKusudama();
+
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 var chkChip = this.chip現在処理中の連打チップ[i];

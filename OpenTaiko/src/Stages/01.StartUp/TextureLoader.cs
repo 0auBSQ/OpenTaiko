@@ -682,11 +682,7 @@ namespace TJAPlayer3
                 Balloon_Breaking[i] = TxC(GAME + BALLOON + @$"Breaking_" + i.ToString() + ".png");
             }
 
-            Kusudama = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama.png");
-            Kusudama_Clear = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama_Clear.png");
-            Kusudama_Fail = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama_Fail.png");
             Kusudama_Number = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama_Number.png");
-            Kusudama_Back = TxC(GAME + BALLOON + KUSUDAMA + @$"Kusudama_Back.png");
 
             Fuse_Number = TxC(GAME + BALLOON + FUSE + @$"Number_Fuse.png");
             Fuse_Balloon = TxC(GAME + BALLOON + FUSE + @$"Fuse.png");
@@ -1218,6 +1214,10 @@ namespace TJAPlayer3
             Characters_Balloon_Breaking = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Balloon_Broke = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Balloon_Miss = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Kusudama_Idle = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Kusudama_Breaking = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Kusudama_Broke = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
+            Characters_Kusudama_Miss = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Title_Entry = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Title_Normal = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
             Characters_Result_Clear = new CTexture[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1260,6 +1260,10 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
+            TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Title_Entry_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Title_Normal_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
             TJAPlayer3.Skin.Characters_Result_Clear_Ptn = new int[TJAPlayer3.Skin.Characters_Ptn];
@@ -1295,6 +1299,8 @@ namespace TJAPlayer3
             TJAPlayer3.Skin.Characters_Balloon_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_4P = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Balloon_5P = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Kusudama_X = new int[TJAPlayer3.Skin.Characters_Ptn][];
+            TJAPlayer3.Skin.Characters_Kusudama_Y = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Motion_Normal = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Motion_10Combo = new int[TJAPlayer3.Skin.Characters_Ptn][];
             TJAPlayer3.Skin.Characters_Motion_10Combo_Clear = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1607,6 +1613,18 @@ namespace TJAPlayer3
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]; j++)
                     Characters_Balloon_Miss[i][j]?.Dispose();
 
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[i]; j++)
+                    Characters_Kusudama_Idle[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[i]; j++)
+                    Characters_Kusudama_Breaking[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[i]; j++)
+                    Characters_Kusudama_Broke[i][j]?.Dispose();
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[i]; j++)
+                    Characters_Kusudama_Miss[i][j]?.Dispose();
+
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[i]; j++)
                     Characters_Tower_Standing[i][j]?.Dispose();
 
@@ -1673,6 +1691,10 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Balloon_Breaking{Path.DirectorySeparatorChar}");
                 TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Balloon_Broke{Path.DirectorySeparatorChar}");
                 TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Balloon_Miss{Path.DirectorySeparatorChar}");
+                TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Kusudama_Idle{Path.DirectorySeparatorChar}");
+                TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Kusudama_Breaking{Path.DirectorySeparatorChar}");
+                TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Kusudama_Broke{Path.DirectorySeparatorChar}");
+                TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Kusudama_Miss{Path.DirectorySeparatorChar}");
                 TJAPlayer3.Skin.Characters_Title_Entry_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Title_Entry{Path.DirectorySeparatorChar}");
                 TJAPlayer3.Skin.Characters_Title_Normal_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Title_Normal{Path.DirectorySeparatorChar}");
                 TJAPlayer3.Skin.Characters_Menu_Loop_Ptn[i] = TJAPlayer3.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Menu_Loop{Path.DirectorySeparatorChar}");
@@ -1714,6 +1736,10 @@ namespace TJAPlayer3
                 Characters_Balloon_Breaking[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[i]];
                 Characters_Balloon_Broke[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[i]];
                 Characters_Balloon_Miss[i] = new CTexture[TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]];
+                Characters_Kusudama_Idle[i] = new CTexture[TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[i]];
+                Characters_Kusudama_Breaking[i] = new CTexture[TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[i]];
+                Characters_Kusudama_Broke[i] = new CTexture[TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[i]];
+                Characters_Kusudama_Miss[i] = new CTexture[TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[i]];
                 Characters_Title_Entry[i] = new CTexture[TJAPlayer3.Skin.Characters_Title_Entry_Ptn[i]];
                 Characters_Title_Normal[i] = new CTexture[TJAPlayer3.Skin.Characters_Title_Normal_Ptn[i]];
                 Characters_Result_Clear[i] = new CTexture[TJAPlayer3.Skin.Characters_Result_Clear_Ptn[i]];
@@ -1830,6 +1856,18 @@ namespace TJAPlayer3
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[i]; j++)
                     Characters_Balloon_Miss[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Balloon_Miss{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
 
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[i]; j++)
+                    Characters_Kusudama_Idle[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Kusudama_Idle{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[i]; j++)
+                    Characters_Kusudama_Breaking[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Kusudama_Breaking{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[i]; j++)
+                    Characters_Kusudama_Broke[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Kusudama_Broke{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
+
+                for (int j = 0; j < TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[i]; j++)
+                    Characters_Kusudama_Miss[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Kusudama_Miss{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
+
                 for (int j = 0; j < TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[i]; j++)
                     Characters_Tower_Standing[i][j] = TxCGlobal(CHARACTERS + TJAPlayer3.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Tower_Char{Path.DirectorySeparatorChar}Standing{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
 
@@ -1873,6 +1911,8 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.Characters_Balloon_Y[i] = new int[] { 0, 297, 0, 0 };
                 TJAPlayer3.Skin.Characters_Balloon_4P[i] = new int[] { 0, -176 };
                 TJAPlayer3.Skin.Characters_Balloon_5P[i] = new int[] { 0, -168 };
+                TJAPlayer3.Skin.Characters_Kusudama_X[i] = new int[] { 290, 690, 90, 890, 490 };
+                TJAPlayer3.Skin.Characters_Kusudama_Y[i] = new int[] { 420, 420, 420, 420, 420 };
                 TJAPlayer3.Skin.Characters_Motion_Normal[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Normal_Ptn[i]);
                 TJAPlayer3.Skin.Characters_Motion_10Combo[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_10Combo_Ptn[i]);
                 TJAPlayer3.Skin.Characters_Motion_10Combo_Clear[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_10Combo_Clear_Ptn[i]);
@@ -2053,6 +2093,24 @@ namespace TJAPlayer3
                                         for (int k = 0; k < 2; k++)
                                         {
                                             TJAPlayer3.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
+                                    }
+                                    case "Game_Chara_Kusudama_X":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 5; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Kusudama_X[i][k] = int.Parse(strSplit[k]);
+                                        }
+                                        break;
+                                    }
+                                    case "Game_Chara_Kusudama_Y":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int k = 0; k < 5; k++)
+                                        {
+                                            TJAPlayer3.Skin.Characters_Kusudama_Y[i][k] = int.Parse(strSplit[k]);
                                         }
                                         break;
                                     }
@@ -2750,11 +2808,7 @@ namespace TJAPlayer3
             Balloon_Number_Roll,
             Balloon_Number_Combo/*,*/
                                 /*Balloon_Broken*/;
-        public CTexture Kusudama,
-            Kusudama_Clear,
-            Kusudama_Fail,
-            Kusudama_Number,
-            Kusudama_Back;
+        public CTexture Kusudama_Number;
 
         public CTexture Fuse_Number,
             Fuse_Balloon;
@@ -3025,6 +3079,10 @@ Result_Mountain = new CTexture[4]*/;
             Characters_Balloon_Breaking,
             Characters_Balloon_Broke,
             Characters_Balloon_Miss,
+            Characters_Kusudama_Idle,
+            Characters_Kusudama_Breaking,
+            Characters_Kusudama_Broke,
+            Characters_Kusudama_Miss,
             Characters_Title_Entry,
             Characters_Title_Normal,
             Characters_Menu_Loop,

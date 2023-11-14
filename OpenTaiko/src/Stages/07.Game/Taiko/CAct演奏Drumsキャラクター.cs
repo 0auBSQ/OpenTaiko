@@ -50,6 +50,7 @@ namespace TJAPlayer3
                 //CharaAction_Balloon_Broke[i] = new CCounter();
                 //CharaAction_Balloon_Miss[i] = new CCounter();
                 CharaAction_Balloon_Delay[i] = new CCounter();
+                ctKusuIn[i] = new();
 
                 // Currently used character
                 int p = TJAPlayer3.GetActualPlayer(i);
@@ -160,7 +161,7 @@ namespace TJAPlayer3
                 {
                     if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE)
                     {
-                        nNowCharaCounter[i] += ((Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]) / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) * (nCharaFrameCount[i] + 1) / nCharaBeat[i];
+                        nNowCharaCounter[i] += ((Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]) / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime) / nCharaBeat[i];
                     }
                 }
                 void updateBalloon()
@@ -170,8 +171,11 @@ namespace TJAPlayer3
                         nNowCharaCounter[i] += (float)TJAPlayer3.FPS.DeltaTime / nCharaBeat[i];
                     }
                 }
-                nNowCharaFrame[i] = (int)nNowCharaCounter[i];
-                bool endAnime = nNowCharaFrame[i] > nCharaFrameCount[i];
+
+                ctKusuIn[i].Tick();
+
+                bool endAnime = nNowCharaCounter[i] >= 1;
+                nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * (nCharaFrameCount[i] + 1));
                 nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
 
                 if (eNowAnime[i] != Anime.None)
@@ -426,7 +430,17 @@ namespace TJAPlayer3
                         case Anime.Balloon_Breaking:
                         case Anime.Balloon_Broke:
                         case Anime.Balloon_Miss:
+                        case Anime.Kusudama_Idle:
+                        case Anime.Kusudama_Breaking:
+                        case Anime.Kusudama_Broke:
                             {
+                                updateBalloon();
+                            }
+                            break;
+                        case Anime.Kusudama_Miss:
+                            {
+                                nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * 2 * (nCharaFrameCount[i] + 1));
+                                nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
                                 updateBalloon();
                             }
                             break;
@@ -539,17 +553,19 @@ namespace TJAPlayer3
                 //if (TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[iCurrentCharacter[i]] != 0) CharaAction_Balloon_Broke[i]?.t進行();
                 CharaAction_Balloon_Delay[i]?.Tick();
                 //if (TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[iCurrentCharacter[i]] != 0) CharaAction_Balloon_Miss[i]?.t進行();
-                CharaAction_Balloon_FadeOut[i].Tick();
+                //CharaAction_Balloon_FadeOut[i].Tick();
 
                 {
-                    bool endAnime = nNowCharaFrame[i] >= nCharaFrameCount[i];
-                    var nowOpacity = CharaAction_Balloon_FadeOut[i].Counter.IsTicked ? (int)CharaAction_Balloon_FadeOut[i].GetAnimation() : 255;
+                    bool endAnime = nNowCharaCounter[i] >= 1;
+                    var nowOpacity = 255;
 
                     float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[this.iCurrentCharacter[i]][0];
                     float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[this.iCurrentCharacter[i]][1];
 
                     float chara_x = 0;
                     float chara_y = 0;
+                    float kusu_chara_x = TJAPlayer3.Skin.Characters_Kusudama_X[this.iCurrentCharacter[i]][i] * resolutionScaleX;
+                    float kusu_chara_y = TJAPlayer3.Skin.Characters_Kusudama_Y[this.iCurrentCharacter[i]][i] * resolutionScaleY;
 
                     if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
                     {
@@ -576,14 +592,14 @@ namespace TJAPlayer3
                     float charaScale = resolutionScaleY;
 
 
-                    if (eNowAnime[i] == Anime.Balloon_Broke && TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[this.iCurrentCharacter[i]] != 0)
+                    if (eNowAnime[i] == Anime.Balloon_Broke)
                     {
                         if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][0])
                         {
                             CharaAction_Balloon_FadeOut[i].Start();
                         }
                         
-                        if (TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        if (TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
                         {
                             TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
                             TJAPlayer3.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
@@ -595,7 +611,7 @@ namespace TJAPlayer3
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
                             TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
-                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[i],
                                 TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (endAnime)
@@ -603,14 +619,14 @@ namespace TJAPlayer3
                             ReturnDefaultAnime(i, true);
                         }
                     }
-                    else if (eNowAnime[i] == Anime.Balloon_Miss && TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[this.iCurrentCharacter[i]] != 0)
+                    else if (eNowAnime[i] == Anime.Balloon_Miss)
                     {
                         if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][1])
                         {
                             CharaAction_Balloon_FadeOut[i].Start();
                         }
 
-                        if (TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        if (TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
                         {
                             TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
                             TJAPlayer3.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
@@ -622,7 +638,7 @@ namespace TJAPlayer3
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
                             TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
-                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[i],
                                 TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player : i);
                         
                         if (endAnime)
@@ -630,9 +646,9 @@ namespace TJAPlayer3
                             ReturnDefaultAnime(i, true);
                         }
                     }
-                    else if (eNowAnime[i] == Anime.Balloon_Breaking && TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[this.iCurrentCharacter[i]] != 0)
+                    else if (eNowAnime[i] == Anime.Balloon_Breaking)
                     {
-                        if (TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        if (TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
                         {
                             TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
                             TJAPlayer3.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
@@ -643,8 +659,159 @@ namespace TJAPlayer3
 
                         if (TJAPlayer3.ConfigIni.nPlayerCount <= 2)
                             TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
-                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[0],
+                                TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonX[i],
                                 TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(i) + TJAPlayer3.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player : i);
+                    }
+                    else if (eNowAnime[i] == Anime.Kusudama_Broke)
+                    {
+                        if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][0])
+                        {
+                            CharaAction_Balloon_FadeOut[i].Start();
+                        }
+                        float kusuOutX = ((1.0f - MathF.Cos(nNowCharaCounter[i] * MathF.PI)) * TJAPlayer3.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
+                        float kusuOutY = (MathF.Sin(nNowCharaCounter[i] * MathF.PI / 2) * TJAPlayer3.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
+                        
+                        if (TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        {
+                            TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
+                            TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
+                            TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
+                            if (i % 2 == 0)
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuOutX, kusu_chara_y - kusuOutY);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuOutX, kusu_chara_y - kusuOutY);
+                            }
+                        }
+                        if (i % 2 == 0)
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuOutX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] - (int)kusuOutY, false, nowOpacity, true, player : i);
+                        }
+                        else
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuOutX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] - (int)kusuOutY, false, nowOpacity, true, player : i);
+                        }
+                        
+                        if (endAnime)
+                        {
+                            ReturnDefaultAnime(i, true);
+                        }
+                    }
+                    else if (eNowAnime[i] == Anime.Kusudama_Miss)
+                    {
+                        if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][1])
+                        {
+                            CharaAction_Balloon_FadeOut[i].Start();
+                        }
+
+                        float kusuOutY = (Math.Max(nNowCharaCounter[i] - 0.5f, 0) * TJAPlayer3.Skin.Resolution[1] * 2) * resolutionScaleY;
+
+                        if (TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        {
+                            TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
+                            TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
+                            TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
+
+
+                            if (i % 2 == 0)
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x, kusu_chara_y + kusuOutY);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x, kusu_chara_y + kusuOutY);
+                            }
+                        }
+
+                        TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                            TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i],
+                            TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuOutY, false, nowOpacity, true, player : i);
+                        
+                        if (endAnime)
+                        {
+                            ReturnDefaultAnime(i, true);
+                        }
+                    }
+                    else if (eNowAnime[i] == Anime.Kusudama_Breaking)
+                    {
+                        float kusuInX = ((1.0f - MathF.Sin(ctKusuIn[i].CurrentValue / 2000.0f * MathF.PI)) * TJAPlayer3.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
+                        float kusuInY = -((MathF.Cos(ctKusuIn[i].CurrentValue / 1000.0f * MathF.PI / 2)) * TJAPlayer3.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
+                        
+                        
+                        if (TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        {
+                            TJAPlayer3.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
+                            TJAPlayer3.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
+                            if (i % 2 == 0)
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
+                            }
+                        }
+
+                        if (i % 2 == 0)
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuInX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player : i);
+                        }
+                        else
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuInX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player : i);
+                        }
+                        
+                        if (endAnime)
+                        {
+                            ChangeAnime(i, Anime.Kusudama_Idle, true);
+                        }
+                    }
+                    else if (eNowAnime[i] == Anime.Kusudama_Idle)
+                    {
+                        float kusuInX = ((1.0f - MathF.Sin(ctKusuIn[i].CurrentValue / 2000.0f * MathF.PI)) * TJAPlayer3.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
+                        float kusuInY = -((MathF.Cos(ctKusuIn[i].CurrentValue / 1000.0f * MathF.PI / 2)) * TJAPlayer3.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
+
+                        if (TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[this.iCurrentCharacter[i]] != 0 && TJAPlayer3.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null)
+                        {
+                            TJAPlayer3.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.X = charaScale;
+                            TJAPlayer3.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vc拡大縮小倍率.Y = charaScale;
+                            if (i % 2 == 0)
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
+                            }
+                            else
+                            {
+                                TJAPlayer3.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
+                            }
+                        }
+
+                        if (i % 2 == 0)
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuInX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player : i);
+                        }
+                        else
+                        {
+                            TJAPlayer3.stage演奏ドラム画面.PuchiChara.On進行描画(
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuInX,
+                                TJAPlayer3.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player : i);
+                        }
+                        
+                        if (endAnime)
+                        {
+                            ChangeAnime(i, Anime.Kusudama_Idle, true);
+                        }
                     }
                 }
             }
@@ -734,10 +901,26 @@ namespace TJAPlayer3
             Return,
             Balloon_Breaking,
             Balloon_Broke,
-            Balloon_Miss
+            Balloon_Miss,
+            Kusudama_Idle,
+            Kusudama_Breaking,
+            Kusudama_Broke,
+            Kusudama_Miss
         }
 
+
         public Anime[] eNowAnime = new Anime[5];
+
+        public CCounter[] ctKusuIn = new CCounter[5];
+
+        public void KusuIn()
+        {
+            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+            {
+                ChangeAnime(i, Anime.Kusudama_Idle, true);
+                ctKusuIn[i] = new CCounter(0, 1000, 0.4f, TJAPlayer3.Timer);
+            }
+        }
 
         public void ChangeAnime(int player, Anime anime, bool resetCounter)
         {
@@ -831,15 +1014,31 @@ namespace TJAPlayer3
                     break;
                 case Anime.Balloon_Breaking:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Balloon_Timer[iCurrentCharacter[player]] / 1000.0f;
+                    nCharaBeat[player] = 0.4f;
                     break;
                 case Anime.Balloon_Broke:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Balloon_Timer[iCurrentCharacter[player]] / 1000.0f;
+                    nCharaBeat[player] = 0.4f;
                     break;
                 case Anime.Balloon_Miss:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Balloon_Timer[iCurrentCharacter[player]] / 1000.0f;
+                    nCharaBeat[player] = 0.4f;
+                    break;
+                case Anime.Kusudama_Idle:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = 0.4f;
+                    break;
+                case Anime.Kusudama_Breaking:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Kusudama_Breaking_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = 0.2f;
+                    break;
+                case Anime.Kusudama_Broke:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Kusudama_Broke_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = 1f;
+                    break;
+                case Anime.Kusudama_Miss:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Kusudama_Miss_Ptn[iCurrentCharacter[player]] - 1;
+                    nCharaBeat[player] = 0.5f;
                     break;
             }
         }

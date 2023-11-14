@@ -435,6 +435,8 @@ namespace TJAPlayer3
         //public Cシステムサウンド soundRed = null;
         //public Cシステムサウンド soundBlue = null;
         public Cシステムサウンド soundBalloon = null;
+        public Cシステムサウンド soundKusudama = null;
+        public Cシステムサウンド soundKusudamaMiss = null;
 
 
         public readonly int nシステムサウンド数 = (int)Eシステムサウンド.Count;
@@ -759,6 +761,8 @@ namespace TJAPlayer3
             //this.soundRed               = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}dong.ogg",            false, false, true, ESoundType.SoundEffect );
             //this.soundBlue              = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}ka.ogg",              false, false, true, ESoundType.SoundEffect );
             this.soundBalloon = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
+            this.soundKusudama = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
+            this.soundKusudamaMiss = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
             this.sound曲決定音 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
             this.soundSongDecide_AI = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
@@ -5771,6 +5775,14 @@ namespace TJAPlayer3
                             {
                                 Game_PuchiChara_BalloonY = strParam.Split(',').Select(int.Parse).ToArray();
                             }
+                            else if (strCommand == nameof(Game_PuchiChara_KusudamaX))
+                            {
+                                Game_PuchiChara_KusudamaX = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
+                            else if (strCommand == nameof(Game_PuchiChara_KusudamaY))
+                            {
+                                Game_PuchiChara_KusudamaY = strParam.Split(',').Select(int.Parse).ToArray();
+                            }
                             else if (strCommand == nameof(Game_PuchiChara_Scale))
                             {
                                 Game_PuchiChara_Scale = strParam.Split(',').Select(float.Parse).ToArray();
@@ -8454,6 +8466,10 @@ namespace TJAPlayer3
             Characters_Balloon_Breaking_Ptn,
             Characters_Balloon_Broke_Ptn,
             Characters_Balloon_Miss_Ptn,
+            Characters_Kusudama_Idle_Ptn,
+            Characters_Kusudama_Breaking_Ptn,
+            Characters_Kusudama_Broke_Ptn,
+            Characters_Kusudama_Miss_Ptn,
             Characters_Title_Entry_Ptn,
             Characters_Title_Normal_Ptn,
             Characters_Menu_Loop_Ptn,
@@ -8488,6 +8504,8 @@ namespace TJAPlayer3
         public int[][] Characters_Balloon_Y;
         public int[][] Characters_Balloon_4P;
         public int[][] Characters_Balloon_5P;
+        public int[][] Characters_Kusudama_X;
+        public int[][] Characters_Kusudama_Y;
         public int[][] Characters_Motion_Normal,
             Characters_Motion_10Combo,
             Characters_Motion_10Combo_Clear,
@@ -9431,8 +9449,10 @@ namespace TJAPlayer3
         public int[] Game_PuchiChara_Y = new int[] { 140, 675 };
         public int[] Game_PuchiChara_4P = new int[] { 230, 162 };
         public int[] Game_PuchiChara_5P = new int[] { 230, 150 };
-        public int[] Game_PuchiChara_BalloonX = new int[] { 300, 300 };
+        public int[] Game_PuchiChara_BalloonX = new int[] { 300, 300 }; 
         public int[] Game_PuchiChara_BalloonY = new int[] { 240, 500 };
+        public int[] Game_PuchiChara_KusudamaX = new int[] { 290, 690, 90, 890, 490 };
+        public int[] Game_PuchiChara_KusudamaY = new int[] { 420, 420, 420, 420, 420 };
         public float[] Game_PuchiChara_Scale = new float[] { 0.6f, 0.8f }; // 通常時、 ふうせん連打時
         public int[] Game_PuchiChara = new int[] { 256, 256, 2 }; // Width, Height, Ptn
         public int Game_PuchiChara_Sine = 20;

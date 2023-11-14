@@ -76,6 +76,46 @@ namespace TJAPlayer3
                 Textures[fileName].color4 = new Color4((float)r, (float)g, (float)b, 1f);
             }
         }
+        public void SetBlendMode(string type, string fileName)
+        {
+            if (Textures[fileName] != null)
+            {
+                switch(type)
+                {
+                    case "Normal":
+                    default:
+                    Textures[fileName].b加算合成 = false;
+                    Textures[fileName].b乗算合成 = false;
+                    Textures[fileName].b減算合成 = false;
+                    Textures[fileName].bスクリーン合成 = false;
+                    break;
+                    case "Add":
+                    Textures[fileName].b加算合成 = true;
+                    Textures[fileName].b乗算合成 = false;
+                    Textures[fileName].b減算合成 = false;
+                    Textures[fileName].bスクリーン合成 = false;
+                    break;
+                    case "Multi":
+                    Textures[fileName].b加算合成 = false;
+                    Textures[fileName].b乗算合成 = true;
+                    Textures[fileName].b減算合成 = false;
+                    Textures[fileName].bスクリーン合成 = false;
+                    break;
+                    case "Sub":
+                    Textures[fileName].b加算合成 = false;
+                    Textures[fileName].b乗算合成 = false;
+                    Textures[fileName].b減算合成 = true;
+                    Textures[fileName].bスクリーン合成 = false;
+                    break;
+                    case "Screen":
+                    Textures[fileName].b加算合成 = false;
+                    Textures[fileName].b乗算合成 = false;
+                    Textures[fileName].b減算合成 = false;
+                    Textures[fileName].bスクリーン合成 = true;
+                    break;
+                }
+            }
+        }
     }
     class ScriptBG : IDisposable
     {
