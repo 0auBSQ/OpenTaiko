@@ -103,10 +103,6 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-            KusudamaScript.Update();
-            
-            KusudamaScript.Draw();
-
             return base.Draw();
         }
 
@@ -123,7 +119,10 @@ namespace TJAPlayer3
 
         public void tDrawKusudama()
         {
-            KusudamaScript.Update();
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE)
+            {
+                KusudamaScript.Update();
+            }
             KusudamaScript.Draw();
         }
 

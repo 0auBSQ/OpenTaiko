@@ -5334,10 +5334,10 @@ namespace TJAPlayer3
             TJAPlayer3.stage演奏ドラム画面.Activate();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
+                if (NotesManager.IsKusudama(this.chip現在処理中の連打チップ[ i ]) && this.actChara.b風船連打中[i]) actBalloon.KusuMiss();
                 this.chip現在処理中の連打チップ[ i ] = null;
                 this.actChara.b風船連打中[i] = false;
                 this.actChara.ReturnDefaultAnime(i, true);
-                actBalloon.KusuMiss();
             }
             this.bPAUSE = false;
         }
