@@ -74,13 +74,20 @@ namespace TJAPlayer3
             }
             
             this.ct風船ふきだしアニメ = new CCounter(0, 1, 100, TJAPlayer3.Timer);
+
+            KusudamaScript = new (CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}Script.lua"));
+            KusudamaScript.Init();
+
             base.Activate();
         }
 
         public override void DeActivate()
         {
+            KusudamaScript.Dispose();
+
             this.ct風船終了 = null;
             this.ct風船ふきだしアニメ = null;
+
             base.DeActivate();
         }
 
@@ -99,11 +106,24 @@ namespace TJAPlayer3
             return base.Draw();
         }
 
+        public void KusuIn() => KusudamaScript.KusuIn();
+        public void KusuBroke() => KusudamaScript.KusuBroke();
+        public void KusuMiss() => KusudamaScript.KusuMiss();
+
         public enum EBalloonType
         {
             BALLOON,
             KUSUDAMA,
             FUSEROLL
+        }
+
+        public void tDrawKusudama()
+        {
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE)
+            {
+                KusudamaScript.Update();
+            }
+            KusudamaScript.Draw();
         }
 
         public int On進行描画(int n連打ノルマ, int n連打数, int player, EBalloonType btype)
@@ -194,32 +214,36 @@ namespace TJAPlayer3
                 }
                 else if (btype == EBalloonType.KUSUDAMA && player == 0)
                 {
+                    /*
                     if (TJAPlayer3.Tx.Kusudama_Back != null)
                         TJAPlayer3.Tx.Kusudama_Back.t2D描画(0, 0);
                     if (TJAPlayer3.Tx.Kusudama != null)
                         TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
+                        */
                     this.tKusudamaNumber(n連打数);
                 }
                 
                 //CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
             }
-            if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player])
+            if (btype == EBalloonType.KUSUDAMA)
             {
-                if (btype == EBalloonType.KUSUDAMA)
+                /*
+                for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-                    for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                    {
-                        TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[i] = false;
-                        TJAPlayer3.stage演奏ドラム画面.b連打中[i] = false;
-                    }
+                    TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[i] = false;
+                    TJAPlayer3.stage演奏ドラム画面.b連打中[i] = false;
                 }
-                else
+                */
+            }
+            else
+            {
+                if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player])
                 {
                     TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
                     TJAPlayer3.stage演奏ドラム画面.b連打中[player] = false;
                 }
-
             }
+
 
 
 
@@ -227,7 +251,7 @@ namespace TJAPlayer3
             return base.Draw();
         }
 
-
+        private KusudamaScript KusudamaScript;
 
         //private CTexture tx連打枠;
         //private CTexture tx連打数字;

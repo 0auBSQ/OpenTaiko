@@ -2569,6 +2569,8 @@ namespace TJAPlayer3
             int t = (int)SoundManager.PlayTimer.NowTimeMs;
             //CDTXMania.act文字コンソール.tPrint( 0, 16, C文字コンソール.Eフォント種別.白, t.ToString() );
 
+            this.actBalloon.tDrawKusudama();
+
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 var chkChip = this.chip現在処理中の連打チップ[i];
@@ -2576,8 +2578,7 @@ namespace TJAPlayer3
                 {
                     long nowTime = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
                     //int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
-                    if (NotesManager.IsGenericBalloon(chkChip) && (this.b連打中[i] == true)
-                        || NotesManager.IsKusudama(chkChip))
+                    if ((NotesManager.IsGenericBalloon(chkChip) || NotesManager.IsKusudama(chkChip)) && (this.b連打中[i] == true))
                     {
                         //if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
                         if (chkChip.n発声時刻ms <= (int)nowTime
