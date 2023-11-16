@@ -26,26 +26,25 @@ namespace TJAPlayer3
             {
                 Random random = new Random();
 
-                var upDirs = System.IO.Directory.GetFiles(mobDir);
+                var upDirs = System.IO.Directory.GetDirectories(mobDir);
                 if (upDirs.Length > 0)
                 {
-                    var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] + ".png" : "";
-                    var path = (preset != null && System.IO.File.Exists(_presetPath)) 
+                    var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] : "";
+                    var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
                         ?  _presetPath
                         : upDirs[random.Next(0, upDirs.Length)];
 
-                    Mob = TJAPlayer3.tテクスチャの生成(path);
+                    MobScript = new ScriptBG($@"{path}{Path.DirectorySeparatorChar}Script.lua");
+                    MobScript.Init();
                 }
             }
             
-            nMobBeat = TJAPlayer3.Skin.Game_Mob_Beat;
-
             base.Activate();
         }
 
         public override void DeActivate()
         {
-            TJAPlayer3.tテクスチャの解放(ref Mob);
+            MobScript?.Dispose();
             
             base.DeActivate();
         }
@@ -66,6 +65,10 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
                 {
+                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
+                    MobScript?.Draw();
+
+                    /*
                     if (HGaugeMethods.UNSAFE_IsRainbow(0))
                     {
 
@@ -83,16 +86,14 @@ namespace TJAPlayer3
                             Mob.t2D描画(0, (TJAPlayer3.Skin.Resolution[1] - (Mob.szテクスチャサイズ.Height - moveHeight)) + -((float)Math.Sin(nNowMobCounter * (Math.PI / 180)) * moveHeight));
                         
                     }
-
+                    */
                 }
             }
             return base.Draw();
         }
         #region[ private ]
         //-----------------
-        public CTexture Mob;
-        private float nNowMobCounter;
-        private float nMobBeat;
+        private ScriptBG MobScript;
         //-----------------
         #endregion
     }
