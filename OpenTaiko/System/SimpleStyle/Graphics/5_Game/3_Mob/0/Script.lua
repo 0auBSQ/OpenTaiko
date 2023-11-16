@@ -54,7 +54,7 @@ function update()
     
 
 
-    if not(mob_state == 0) and gauge[0] == 100 then
+    if mob_state == 3 and gauge[0] == 100 then
         mobOut()
     end
 

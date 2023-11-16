@@ -5321,6 +5321,11 @@ namespace TJAPlayer3
             this.actPanel.t歌詞テクスチャを削除する();
             for (int i = 0; i < 5; i++)
             {
+                if (bIsAlreadyCleared[i])
+                {
+                    TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(i);
+                }
+
                 this.t演奏位置の変更(0, i);
                 this.actPlayInfo.NowMeasure[i] = 0;
                 JPOSCROLLX[i] = 0;
