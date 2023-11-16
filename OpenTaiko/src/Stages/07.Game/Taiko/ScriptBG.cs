@@ -116,6 +116,24 @@ namespace TJAPlayer3
                 }
             }
         }
+        
+        public double GetTextureWidth(string fileName)
+        {
+            if (Textures[fileName] != null)
+            {
+                return Textures[fileName].szテクスチャサイズ.Width;
+            }
+            return -1;
+        }
+        
+        public double GetTextureHeight(string fileName)
+        {
+            if (Textures[fileName] != null)
+            {
+                return Textures[fileName].szテクスチャサイズ.Height;
+            }
+            return -1;
+        }
     }
     class ScriptBG : IDisposable
     {
