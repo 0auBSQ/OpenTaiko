@@ -156,9 +156,9 @@ namespace TJAPlayer3
                     : downDirs[random.Next(0, downDirs.Length)];
 
                 DownScript = new ScriptBG($@"{downPath}{Path.DirectorySeparatorChar}Script.lua");
-                DownScript.Init();
+                DownScript?.Init();
 
-                IsDownNotFound = false;
+                if (DownScript.Exists()) IsDownNotFound = false;
             }
             else
             {
@@ -643,8 +643,8 @@ namespace TJAPlayer3
             {
                 if (!IsDownNotFound)
                 {
-                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
-                    DownScript.Draw();
+                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript?.Update();
+                    DownScript?.Draw();
                 }
             }
 
