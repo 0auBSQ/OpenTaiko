@@ -50,11 +50,10 @@ function update()
         mob_counter = 0
     end
 
-    mob_y = 1080 + ((1.0 - math.sin(mob_counter * math.pi)) * 105)
     
 
 
-    if mob_state == 3 and gauge[0] == 100 then
+    if mob_state == 3 and gauge[0] < 100 then
         mobOut()
     end
 
@@ -66,25 +65,25 @@ function update()
 
     elseif mob_state == 1 then
 
-        mob_in_counter = mob_in_counter + (5 * deltaTime)
+        mob_in_counter = mob_in_counter + (bpm[0] * deltaTime / 30.0)
         if mob_in_counter > 1 then
             mob_state = 3
+            mob_counter = 0.5
         end
         
-        mob_y = mob_y + (540 * (1.0 - math.sin(mob_in_counter * math.pi / 2)))
-
-
+        mob_y = 1080 + (540 * (1.0 - math.sin(mob_in_counter * math.pi / 2)))
 
     elseif mob_state == 2 then
 
-        mob_out_counter = mob_out_counter + (5 * deltaTime)
+        mob_out_counter = mob_out_counter + (bpm[0] * deltaTime / 30.0)
         if mob_out_counter > 1 then
             mob_state = 0
         end
         
-        mob_y = mob_y + (540 * (1 - math.cos(mob_out_counter * math.pi)))
+        mob_y = 1080 + (540 * (1 - math.cos(mob_out_counter * math.pi)))
 
     elseif mob_state == 3 then
+        mob_y = 1080 + ((1.0 - math.sin(mob_counter * math.pi)) * 105)
     end
 end
 
