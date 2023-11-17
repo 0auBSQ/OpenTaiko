@@ -76,7 +76,7 @@ public class AngleContext : IGLContext
         int[] configAttributes = new int[]
         {
             Egl.RENDERABLE_TYPE, Egl.OPENGL_ES2_BIT,
-            Egl.BUFFER_SIZE, 32,
+            Egl.BUFFER_SIZE, 0,
             Egl.NONE
         };
         unsafe 
