@@ -287,7 +287,8 @@ namespace TJAPlayer3
                     TJAPlayer3.stage演奏ドラム画面.AIBattleState,
                     TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
                     TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM);
+                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
+                    TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
