@@ -183,19 +183,20 @@ namespace TJAPlayer3
 				}
                 else
                 {
+					if ( es != null && es.IsSongListEnumCompletelyDone )							// 曲リスト作成が終わったら
+					{
+						TJAPlayer3.Songs管理 = ( es != null ) ? es.Songs管理 : null;		// 最後に、曲リストを拾い上げる
+
+						if(TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
+						{
+							TJAPlayer3.Skin.sound決定音.t再生する();
+							return 1;
+						}
+					}
+
 					TJAPlayer3.Tx.Readme.t2D描画(0, 0);
 				}
 
-				if ( es != null && es.IsSongListEnumCompletelyDone )							// 曲リスト作成が終わったら
-				{
-					TJAPlayer3.Songs管理 = ( es != null ) ? es.Songs管理 : null;		// 最後に、曲リストを拾い上げる
-
-					if(TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
-                    {
-						TJAPlayer3.Skin.sound決定音.t再生する();
-						return 1;
-                    }
-				}
 			}
 			return 0;
 		}

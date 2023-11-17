@@ -1014,15 +1014,15 @@ namespace TJAPlayer3
                     break;
                 case Anime.Balloon_Breaking:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Breaking_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 0.4f;
+                    nCharaBeat[player] = 0.2f;
                     break;
                 case Anime.Balloon_Broke:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Broke_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 0.4f;
+                    nCharaBeat[player] = 0.2f;
                     break;
                 case Anime.Balloon_Miss:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Balloon_Miss_Ptn[iCurrentCharacter[player]] - 1;
-                    nCharaBeat[player] = 0.4f;
+                    nCharaBeat[player] = 0.2f;
                     break;
                 case Anime.Kusudama_Idle:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Kusudama_Idle_Ptn[iCurrentCharacter[player]] - 1;
