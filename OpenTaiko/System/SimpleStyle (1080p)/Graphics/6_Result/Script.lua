@@ -13,8 +13,8 @@
 local bg_width = 1920
 local bg_height = 1080
 
-local cloud_width = 1800
-local cloud_height = 540
+local cloud_width = 1200
+local cloud_height = 360
 
 local cloud_count = 11
 
@@ -168,8 +168,6 @@ function draw()
         func:DrawGraph(0, 0 - ((mountainScale - 1.0) * bg_height), "Background_Mountain_"..tostring(index + 1)..".png")
 
         
-        func:SetScale(0.65, 0.65, "Cloud.png")
-
         cloudOpacity = 0
         if commonCounter >= mountainAppearValue and isClear[0] then 
             cloudOpacity = math.min(255, math.max(0, commonCounter - mountainAppearValue))
