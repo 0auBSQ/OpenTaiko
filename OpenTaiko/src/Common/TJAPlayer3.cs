@@ -636,9 +636,37 @@ namespace TJAPlayer3
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
 			}
-			
 
-			GraphicsDeviceType_ = (GraphicsDeviceType)ConfigIni.nGraphicsDeviceType;
+			switch(ConfigIni.nGraphicsDeviceType)
+			{
+				case 0:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				break;
+				/*
+				case 1:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D9;
+				break;
+				case 2:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+				break;
+				case 3:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				break;
+				case 4:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				break;
+				*/
+				case 1:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+				break;
+				case 2:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				break;
+				case 3:
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				break;
+			}
+
 			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.n初期ウィンドウ開始位置X, ConfigIni.n初期ウィンドウ開始位置Y);
 			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nウインドウwidth, ConfigIni.nウインドウheight);
 			FullScreen = ConfigIni.b全画面モード;
@@ -732,6 +760,10 @@ namespace TJAPlayer3
 		}
 		protected override void Draw()
 		{
+			#if !DEBUG
+			try
+			#endif
+			{
 			// Sound管理?.t再生中の処理をする();
             Timer?.Update();
             SoundManager.PlayTimer?.Update();
@@ -2358,6 +2390,18 @@ for (int i = 0; i < 3; i++) {
 				this.b次のタイミングで垂直帰線同期切り替えを行う = false;
 			}
 			#endregion
+			}
+#if !DEBUG
+			catch( Exception e )
+			{
+				Trace.WriteLine( "" );
+				Trace.Write( e.ToString() );
+				Trace.WriteLine( "" );
+				Trace.WriteLine( "エラーだゴメン！（涙" );
+                AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
+				throw e;
+			}
+#endif
 		}
 
 		// その他

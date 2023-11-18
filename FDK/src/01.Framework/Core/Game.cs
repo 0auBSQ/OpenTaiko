@@ -25,23 +25,24 @@ using System.Threading;
 using System.Collections.ObjectModel;
 using Silk.NET.Windowing;
 using Silk.NET.Maths;
+using Silk.NET.OpenGLES;
 using SkiaSharp;
+using FDK;
+using Silk.NET.GLFW;
+using System.Runtime.InteropServices;
 
 namespace SampleFramework
 {
-    public enum GraphicsDeviceType
-    {
-        OpenGL,
-        Vulkan,
-        DirectX11,
-        DirectX12
-    }
-
     /// <summary>
     /// Presents an easy to use wrapper for making games and samples.
     /// </summary>
     public abstract class Game : IDisposable
     {
+        public static GL Gl { get; private set; }
+        public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+
+        internal static List<Action> AsyncActions = new();
+
         protected string _Text = "";
         protected string Text
         {
@@ -59,15 +60,9 @@ namespace SampleFramework
             }
         }
 
-        public static GraphicsDeviceType GraphicsDeviceType_ = GraphicsDeviceType.OpenGL;
+        public static AnglePlatformType GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 
         public IWindow Window_;
-
-        public static IShader Shader_;
-
-        public static IPolygon Polygon_;
-
-        public static IGraphicsDevice GraphicsDevice;
 
         private Vector2D<int> _WindowSize;
         public Vector2D<int> WindowSize
@@ -156,37 +151,69 @@ namespace SampleFramework
             }
         }
 
-        internal static int VerticalFix
-        {
-            get 
-            {
-                return GraphicsDeviceType_ == GraphicsDeviceType.OpenGL ? -1 : 1;
-            }
-        }
-
         public static int MainThreadID { get; private set; }
-
-        private GraphicsAPI GetGraphicsAPI()
-        {
-            switch (GraphicsDeviceType_)
-            {
-                case GraphicsDeviceType.OpenGL:
-                    return GraphicsAPI.Default;
-                case GraphicsDeviceType.Vulkan:
-                    return GraphicsAPI.DefaultVulkan;
-                default:
-                    return GraphicsAPI.None;
-            }
-        }
 
         public unsafe SKBitmap GetScreenShot()
         {
-            return GraphicsDevice.GetScreenPixels();
+            int ViewportWidth = Window_.FramebufferSize.X;
+            int ViewportHeight = Window_.FramebufferSize.Y;
+            fixed(uint* pixels = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
+            {
+                Gl.ReadBuffer(GLEnum.Front);
+                Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pixels);
+
+                fixed(uint* pixels2 = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
+                {
+                    for(int x = 0; x < ViewportWidth; x++)
+                    {
+                        for(int y = 1; y < ViewportHeight; y++)
+                        {
+                            int pos = x + ((y - 1) * ViewportWidth);
+                            int pos2 = x + ((ViewportHeight - y) * ViewportWidth);
+                            var p = pixels[pos2];
+                            pixels2[pos] = p;
+                        }
+                    }
+                    
+                    using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight - 1);
+                    sKBitmap.SetPixels((IntPtr)pixels2);
+                    return sKBitmap.Copy();
+                }
+            }
         }
 
-        public void GetScreenShotAsync(Action<SKBitmap> action)
+        public unsafe void GetScreenShotAsync(Action<SKBitmap> action)
         {
-            GraphicsDevice.GetScreenPixelsASync(action);
+            int ViewportWidth = Window_.FramebufferSize.X;
+            int ViewportHeight = Window_.FramebufferSize.Y;
+            byte[] pixels = new byte[(uint)ViewportWidth * (uint)ViewportHeight * 4];
+            Gl.ReadBuffer(GLEnum.Front);
+            fixed(byte* pix = pixels)
+            {
+                Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pix);
+            }
+
+            Task.Run(() =>{
+                fixed(byte* pixels2 = new byte[(uint)ViewportWidth * (uint)ViewportHeight * 4])
+                {
+                    for(int x = 0; x < ViewportWidth; x++)
+                    {
+                        for(int y = 1; y < ViewportHeight; y++)
+                        {
+                            int pos = x + ((y - 1) * ViewportWidth);
+                            int pos2 = x + ((ViewportHeight - y) * ViewportWidth);
+                            pixels2[(pos * 4) + 0] = pixels[(pos2 * 4) + 0];
+                            pixels2[(pos * 4) + 1] = pixels[(pos2 * 4) + 1];
+                            pixels2[(pos * 4) + 2] = pixels[(pos2 * 4) + 2];
+                            pixels2[(pos * 4) + 3] = 255;
+                        }
+                    }
+                        
+                    using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight - 1);
+                    sKBitmap.SetPixels((IntPtr)pixels2);
+                    action(sKBitmap);
+                }
+            });
         }
 
         public static long TimeMs;
@@ -201,11 +228,17 @@ namespace SampleFramework
             }
         }
 
+        //[DllImportAttribute("libEGL", EntryPoint = "eglGetError")]
+        //public static extern Silk.NET.OpenGLES.ErrorCode GetError();
+
         /// <summary>
         /// Initializes the <see cref="Game"/> class.
         /// </summary>
         static Game()
         {
+            //GlfwProvider.UninitializedGLFW.Value.InitHint(InitHint.AnglePlatformType, (int)AnglePlatformType.OpenGL);
+            //GlfwProvider.UninitializedGLFW.Value.Init();
+            //GetError();
         }
 
         /// <summary>
@@ -215,8 +248,10 @@ namespace SampleFramework
         {
             MainThreadID = Thread.CurrentThread.ManagedThreadId;
             Configuration();
+
+            //GlfwProvider.GLFW.Value.WindowHint(WindowHintContextApi.ContextCreationApi, ContextApi.EglContextApi);
             
-            WindowOptions options = GraphicsDeviceType_ == GraphicsDeviceType.Vulkan ? WindowOptions.DefaultVulkan : WindowOptions.Default;
+            WindowOptions options = WindowOptions.Default;
 
             options.Size = WindowSize;
             options.Position = WindowPosition;
@@ -224,7 +259,8 @@ namespace SampleFramework
             options.FramesPerSecond = VSync ? 0 : Framerate;
             options.WindowState = FullScreen ? WindowState.Fullscreen : WindowState.Normal;
             options.VSync = VSync;
-            options.API = GetGraphicsAPI();
+            //options.API = new GraphicsAPI( ContextAPI.OpenGLES, ContextProfile.Core, ContextFlags.Default, new APIVersion(2, 0));
+            options.API = GraphicsAPI.None;
             options.WindowBorder = WindowBorder.Resizable;
             options.Title = Text;
             
@@ -247,11 +283,13 @@ namespace SampleFramework
             {
                 Window_.UpdatesPerSecond = 0;
                 Window_.FramesPerSecond = 0;
+                Context.SwapInterval(1);
             }
             else
             {
                 Window_.UpdatesPerSecond = value;
                 Window_.FramesPerSecond = value;
+                Context.SwapInterval(0);
             }
         }
 
@@ -352,52 +390,18 @@ namespace SampleFramework
 
         public void Window_Load()
         {
-            switch (GraphicsDeviceType_)
-            {
-                case GraphicsDeviceType.OpenGL:
-                    GraphicsDevice = new OpenGLDevice(Window_);
-                    break;
-                case GraphicsDeviceType.Vulkan:
-                    GraphicsDevice = new VulkanDevice(Window_);
-                    break;
-                case GraphicsDeviceType.DirectX11:
-                    GraphicsDevice = new DirectX11Device(Window_);
-                    break;
-                case GraphicsDeviceType.DirectX12:
-                    GraphicsDevice = new DirectX12Device(Window_);
-                    break;
-            }
+            Context = new AngleContext(GraphicsDeviceType_, Window_);
+            Context.MakeCurrent();
 
+            Gl = GL.GetApi(Context);
+            //Gl = Window_.CreateOpenGLES();
+            Gl.Enable(GLEnum.Blend);
+            BlendHelper.SetBlend(BlendType.Normal);
+            CTexture.Init();
 
-            GraphicsDevice.SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            GraphicsDevice.SetViewPort(0, 0, (uint)Window_.Size.X, (uint)Window_.FramebufferSize.Y);
-            GraphicsDevice.SetFrameBuffer((uint)Window_.FramebufferSize.X, (uint)Window_.FramebufferSize.Y);
-
-            Shader_ = GraphicsDevice.GenShader($@"Shaders{Path.AltDirectorySeparatorChar}Common");
-
-            Polygon_ = GraphicsDevice.GenPolygon(
-                new float[]
-                {
-                    1, 1 * VerticalFix, 0.0f,
-                    1, -1 * VerticalFix, 0.0f,
-                    -1, -1 * VerticalFix, 0.0f,
-                    -1, 1 * VerticalFix, 0.0f
-                }
-                ,
-                new uint[]
-                {
-                    0u, 1u, 3u,
-                    1u, 2u, 3u
-                }
-                ,
-                new float[]
-                {
-                    1.0f, 0.0f,
-                    1.0f, 1.0f,
-                    0.0f, 1.0f,
-                    0.0f, 0.0f,
-                }
-            );
+            Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+            Context.SwapInterval(VSync ? 1 : 0);
 
             Initialize();
             LoadContent();
@@ -405,14 +409,12 @@ namespace SampleFramework
 
         public void Window_Closing()
         {
-
+            CTexture.Terminate();
+            
             UnloadContent();
             OnExiting();
-            
-            Polygon_.Dispose();
-            Shader_.Dispose();
 
-            GraphicsDevice.Dispose();
+            Context.Dispose();
         }
 
         public void Window_Update(double deltaTime)
@@ -426,13 +428,19 @@ namespace SampleFramework
         public void Window_Render(double deltaTime)
         {
             Camera = Matrix4X4<float>.Identity;
-            GraphicsDevice.ClearBuffer();
+            
+            if (AsyncActions.Count > 0)
+            {
+                AsyncActions[0]?.Invoke();
+                AsyncActions.Remove(AsyncActions[0]);
+            }
+            Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             Draw();
 
-            GraphicsDevice.SwapBuffer();
-
             double fps = 1.0f / deltaTime;
+
+            Context.SwapBuffers();
         }
 
         public void Window_Resize(Vector2D<int> size)
@@ -451,7 +459,7 @@ namespace SampleFramework
             }
 
             WindowSize = size;
-            GraphicsDevice.SetViewPort(0, 0, (uint)size.X, (uint)size.Y);
+            Gl.Viewport(0, 0, (uint)size.X, (uint)size.Y);
         }
 
         public void Window_Move(Vector2D<int> size)
@@ -461,7 +469,6 @@ namespace SampleFramework
 
         public void Window_FramebufferResize(Vector2D<int> size)
         {
-            GraphicsDevice.SetFrameBuffer((uint)size.X, (uint)size.Y);
         }
     }
 }

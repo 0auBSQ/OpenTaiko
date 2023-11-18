@@ -138,14 +138,28 @@ namespace TJAPlayer3
 							void loadTexture()
 							{
 								this.list進行文字列.Add("LOADING TEXTURES...");
+
 								try
 								{
 									TJAPlayer3.Tx.LoadTexture();
+									
+									this.list進行文字列.Add("LOADING TEXTURES...OK");
+									this.str現在進行中 = "Setup done.";
+									this.eフェーズID = Eフェーズ.起動7_完了;
+									TJAPlayer3.Skin.bgm起動画面.t停止する();
 								}
 								catch(Exception exception)
 								{
+									TJAPlayer3.Skin.bgm起動画面.t停止する();
+
 									Trace.TraceError( exception.ToString() );
+									this.list進行文字列.Add("LOADING TEXTURES...NG");
+									foreach(var text in exception.ToString().Split('\n'))
+									{
+										this.list進行文字列.Add(text);
+									}
 								}
+
 								this.list進行文字列.Add("LOADING TEXTURES...OK");
 								this.str現在進行中 = "Setup done.";
 								this.eフェーズID = Eフェーズ.起動7_完了;
