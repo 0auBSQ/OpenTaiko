@@ -1,0 +1,4 @@
+[Results Screen Only]
+
+function skipAnime()
+Called once when any player skips the Results screen animation.

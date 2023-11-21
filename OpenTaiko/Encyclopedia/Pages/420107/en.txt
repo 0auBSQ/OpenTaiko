@@ -1,0 +1,4 @@
+[Image Manipulation]
+
+func:SetRotation(rotation, "filename");
+Set the rotation of your image. Value is typically between 0 and 360.

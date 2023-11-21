@@ -1,0 +1,6 @@
+Receiving Functions are commands that OpenTaiko sends to your
+script to use in updating your background.
+
+Some of these commands are sent every frame, while others are
+sent once when necessary. Some will be sent multiple times for
+each player.

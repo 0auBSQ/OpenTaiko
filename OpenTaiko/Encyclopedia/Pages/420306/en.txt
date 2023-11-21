@@ -1,0 +1,5 @@
+[Player Information (In-Game)]
+
+local gauge
+Gets a list of integers between 0-100 for each player
+that tell where the player is on the soul gauge.

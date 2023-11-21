@@ -1,0 +1,9 @@
+[Tower Information]
+
+local towerNightNum
+Gets a non-integral starting at 0 and going up to (but not always
+ending at) 1, which changes depending on how far the player has
+progressed through a Tower.
+
+The source code determining towerNightNum's value is:
+Math.Min(CurrentMeasure / Math.Max(140, MaxFloorCount / 2), 1);

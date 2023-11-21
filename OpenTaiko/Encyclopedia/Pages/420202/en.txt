@@ -1,0 +1,5 @@
+[General]
+
+function update()
+Called every frame. Used to calculate & update values.
+Temporarily stops being called if the game is paused.

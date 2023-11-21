@@ -1,0 +1,6 @@
+Variables are read-only items provided by OpenTaiko to get
+details about what's happening at that moment.
+
+Some details include information about what state a player is
+in, while others may provide detail about the gamemode status
+or certain application parameters.

@@ -1,0 +1,7 @@
+[Player Information (In-Game)]
+
+local bpm
+Gets a list of non-integral values for each player that tell
+what BPM their chart is currently on.
+
+Can be different for each player.

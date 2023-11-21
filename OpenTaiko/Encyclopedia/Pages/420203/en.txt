@@ -1,0 +1,4 @@
+[General]
+
+function draw()
+Called every frame. Used for manipulating & drawing images.

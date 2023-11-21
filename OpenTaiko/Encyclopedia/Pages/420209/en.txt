@@ -1,0 +1,7 @@
+[In-game Only (Ending Animation)]
+
+function playEndAnime(player)
+Called once when a course is finished.
+The player value is the player ID that is qualified to run this script.
+
+Can run multiple times in a single frame.

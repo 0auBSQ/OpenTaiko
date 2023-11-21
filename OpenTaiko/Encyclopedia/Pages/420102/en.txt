@@ -1,0 +1,5 @@
+[Image Drawing]
+
+func:AddGraph("filename");
+Load an image file to be used for your script. This is
+mandatory for drawing functions to work on your image.

@@ -1,0 +1,6 @@
+A Lua Script can have any number of variables & images that the
+skin creator wants to use for their backgrounds.
+
+In addition, the background script API provided includes readable
+variables that allow you to modify the behavior of a background
+depending on what's happening in-game at that moment.

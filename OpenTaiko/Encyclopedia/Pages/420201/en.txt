@@ -1,0 +1,5 @@
+[General]
+
+function init()
+Called once when the script is loaded. This is used to initialize
+important data, including images.

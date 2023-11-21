@@ -1,0 +1,5 @@
+[Player Information (In-Game)]
+
+local gogo
+Gets a list of booleans for each player that tell
+if Go-Go Time is currently active.

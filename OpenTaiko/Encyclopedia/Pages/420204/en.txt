@@ -1,0 +1,8 @@
+[In-game Only]
+
+function clearIn(player)
+Called once when a player has reached the clear range.
+The player value is the player ID that has entered the clear range.
+
+The player ID starts at 0 and ends at 4.
+0 for 1P, 1 for 2P, 2 for 3P, etc...

@@ -1,0 +1,7 @@
+Most menus, especially gameplay, include Lua files for creating
+smooth, dynamic animations without being required to modify the
+game's source code to achieve this.
+
+This allows Skins to be distributed with unique visuals without
+needing to distribute modifications of the entire game to
+accommodate them.

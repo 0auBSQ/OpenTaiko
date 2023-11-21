@@ -1,0 +1,8 @@
+[Player Information]
+
+local p1IsBlue
+Gets a bool stating if Player 1 is blue.
+(via. selecting Right in the title menu)
+
+1P only, returns false if not blue or if there are 2 or
+more players.
