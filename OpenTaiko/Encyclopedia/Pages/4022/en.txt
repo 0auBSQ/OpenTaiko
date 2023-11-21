@@ -1,0 +1,7 @@
+- Clear Voices :
+Clear/Failed
+Clear/Clear
+Clear/FullCombo
+Clear/AllPerfect
+Clear/AIBattle_Win
+Clear/AIBattle_Lose

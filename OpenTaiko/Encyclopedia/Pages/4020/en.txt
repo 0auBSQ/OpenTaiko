@@ -1,0 +1,5 @@
+All character voice samples are optional, and
+use either OGG or WAV file format.
+
+The following are shown in directory
+format :
