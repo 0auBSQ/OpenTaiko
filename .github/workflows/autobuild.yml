@@ -30,21 +30,22 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
+      - name: Observe the Directory
+        shell: cmd
+        run: |
+          dir
+
       - name: Build for Windows x64
         shell: cmd
         run: |
-          cd $Env:GITHUB_WORKSPACE
-          dir
           build-win-x64.bat
           
-      - name: Create Archive(x64) (Shallow)
+      - name: Create Archive (Win x64) (Shallow)
         shell: cmd
         run: |
-          cd $Env:GITHUB_WORKSPACE/
-          tar --exclude="Songs/*" --exclude="System/*" -cvzf OpenTaiko_win_x64_shallow.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
+          7z a OpenTaiko_win_x64_shallow.zip OpenTaiko/bin/Release/net7.0/win-x64/publish/* -xr!Songs/* -xr!System/* 
 
-      - name: Create Archive(x64)
+      - name: Create Archive (Win x64)
         shell: cmd
         run: |
-          cd $Env:GITHUB_WORKSPACE
-          tar -cvzf OpenTaiko_win_x64.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
+          7z a OpenTaiko_win_x64.zip OpenTaiko/bin/Release/net7.0/win-x64/publish/*
