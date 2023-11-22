@@ -8054,6 +8054,22 @@ namespace TJAPlayer3
                                     NamePlate_Name_Offset_Full[i] = int.Parse(strSplit[i]);
                                 }
                             }
+                            else if (strCommand == "NamePlate_Name_Width_Normal")
+                            {
+                                NamePlate_Name_Width_Normal = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Name_Width_Full")
+                            {
+                                NamePlate_Name_Width_Full = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Title_Width")
+                            {
+                                NamePlate_Title_Width = int.Parse(strParam);
+                            }
+                            else if (strCommand == "NamePlate_Dan_Width")
+                            {
+                                NamePlate_Dan_Width = int.Parse(strParam);
+                            }
                             else if (strCommand == "NamePlate_Font_Name_Size_Normal")
                             {
                                 NamePlate_Font_Name_Size_Normal = int.Parse(strParam);
@@ -9985,6 +10001,10 @@ namespace TJAPlayer3
         public int[] NamePlate_Name_Offset_Normal = new int[] { 121, 36 };
         public int[] NamePlate_Name_Offset_WithTitle = new int[] { 121, 44 };
         public int[] NamePlate_Name_Offset_Full = new int[] { 144, 44 };
+        public int NamePlate_Name_Width_Normal = 220;
+        public int NamePlate_Name_Width_Full = 120;
+        public int NamePlate_Title_Width = 160;
+        public int NamePlate_Dan_Width = 66;
 
         public int NamePlate_Font_Name_Size_Normal = 15;
         public int NamePlate_Font_Name_Size_WithTitle = 12;

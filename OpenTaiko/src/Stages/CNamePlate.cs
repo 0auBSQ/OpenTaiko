@@ -156,18 +156,18 @@ namespace TJAPlayer3
             // Name text squash (to add to skin config)
             if (TJAPlayer3.SaveFileInstances[player].data.Dan != "" && TJAPlayer3.SaveFileInstances[player].data.Dan != null)
             {
-                if (txName[player].szテクスチャサイズ.Width >= 120.0f)
-                    txName[player].vc拡大縮小倍率.X = 120.0f / txName[player].szテクスチャサイズ.Width;
+                if (txName[player].szテクスチャサイズ.Width > TJAPlayer3.Skin.NamePlate_Name_Width_Full)
+                    txName[player].vc拡大縮小倍率.X = (float)TJAPlayer3.Skin.NamePlate_Name_Width_Full / txName[player].szテクスチャサイズ.Width;
             }
             else
             {
-                if (txName[player].szテクスチャサイズ.Width >= 220.0f)
-                    txName[player].vc拡大縮小倍率.X = 220.0f / txName[player].szテクスチャサイズ.Width;
+                if (txName[player].szテクスチャサイズ.Width > TJAPlayer3.Skin.NamePlate_Name_Width_Normal)
+                    txName[player].vc拡大縮小倍率.X = (float)TJAPlayer3.Skin.NamePlate_Name_Width_Normal / txName[player].szテクスチャサイズ.Width;
             }
 
             // Dan text squash (to add to skin config)
-            if (txdan[player].szテクスチャサイズ.Width >= 66.0f)
-                txdan[player].vc拡大縮小倍率.X = 66.0f / txdan[player].szテクスチャサイズ.Width;
+            if (txdan[player].szテクスチャサイズ.Width > TJAPlayer3.Skin.NamePlate_Dan_Width)
+                txdan[player].vc拡大縮小倍率.X = (float)TJAPlayer3.Skin.NamePlate_Dan_Width / txdan[player].szテクスチャサイズ.Width;
 
             // Dan text
             if (TJAPlayer3.SaveFileInstances[player].data.Dan != "" && TJAPlayer3.SaveFileInstances[player].data.Dan != null)
@@ -185,10 +185,10 @@ namespace TJAPlayer3
             // Title text
             if (TJAPlayer3.SaveFileInstances[player].data.Title != "" && TJAPlayer3.SaveFileInstances[player].data.Title != null)
             {
-                if (txTitle[player].szテクスチャサイズ.Width >= 160)
+                if (txTitle[player].szテクスチャサイズ.Width > TJAPlayer3.Skin.NamePlate_Title_Width)
                 {
-                    txTitle[player].vc拡大縮小倍率.X = 160.0f / txTitle[player].szテクスチャサイズ.Width;
-                    txTitle[player].vc拡大縮小倍率.Y = 160.0f / txTitle[player].szテクスチャサイズ.Width;
+                    txTitle[player].vc拡大縮小倍率.X = (float)TJAPlayer3.Skin.NamePlate_Title_Width / txTitle[player].szテクスチャサイズ.Width;
+                    txTitle[player].vc拡大縮小倍率.Y = (float)TJAPlayer3.Skin.NamePlate_Title_Width / txTitle[player].szテクスチャサイズ.Width;
                 }
 
                 txTitle[player].t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.NamePlate_Title_Offset[0], y + TJAPlayer3.Skin.NamePlate_Title_Offset[1]);
