@@ -1,0 +1,5 @@
+Duration :
+Chara_Result_Normal_AnimationDuration=1000
+Chara_Result_Clear_AnimationDuration=1000
+Chara_Result_Failed_In_AnimationDuration=1000
+Chara_Result_Failed_AnimationDuration=1000

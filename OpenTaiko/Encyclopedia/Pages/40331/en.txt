@@ -1,0 +1,7 @@
+Beat :
+Game_Chara_Beat_MissIn=1
+Game_Chara_Beat_Miss=1
+Game_Chara_Beat_MissDownIn=1
+Game_Chara_Beat_MissDown=1
+Game_Chara_Beat_SoulIn=1
+Game_Chara_Beat_Return=1

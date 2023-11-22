@@ -1,0 +1,7 @@
+Coordinates :
+Game_Chara_X=(1P),(2P)
+Game_Chara_Y=(1P),(2P)
+Game_Chara_4P=(X),(Y)
+Game_Chara_5P=(X),(Y)
+Game_Chara_X_AI=(1P),(2P)
+Game_Chara_Y_AI=(1P),(2P)

@@ -1,0 +1,8 @@
+Duration, unlike Beat, is the animation duration
+measured in milliseconds. This category is most
+often used in menus outside of gameplay, but does
+get used in a few cases such as Balloon popping.
+
+Example :
+Chara_Normal_AnimationDuration=500
+Chara_Result_Clear_AnimationDuration=1000

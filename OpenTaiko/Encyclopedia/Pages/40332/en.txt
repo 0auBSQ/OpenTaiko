@@ -1,0 +1,7 @@
+Beat :
+Game_Chara_Beat_GoGoStart=1
+Game_Chara_Beat_GoGoStartClear=1
+Game_Chara_Beat_GoGoStartMax=1
+Game_Chara_Beat_GoGo=1
+Game_Chara_Beat_GoGoClear=1
+Game_Chara_Beat_GoGoMax=1

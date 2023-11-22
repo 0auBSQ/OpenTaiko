@@ -1,0 +1,7 @@
+Coordinates are used to specifying where the
+character should be standing, including positions
+for different events or different player counts.
+
+Example :
+Game_Chara_X=0,0
+Game_Chara_Y=0,805
