@@ -36,6 +36,7 @@ jobs:
       - name: Build for Windows x64
         run: |
           cd $Env:GITHUB_WORKSPACE
+          dir
           build-win-x64.bat
 
       - name: Create Archive(x64)
