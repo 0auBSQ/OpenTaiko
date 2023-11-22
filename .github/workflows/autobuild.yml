@@ -1,0 +1,49 @@
+# Original script from totoa553/OpenTaiko
+
+name: Build OpenTaiko
+
+on: 
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Merge upstream
+        run: |
+          git config --global user.name ${NAME}
+          git config --global user.email ${EMAIL}
+          git config --global pull.rebase merges
+          git pull --unshallow
+          git remote add upstream https://github.com/0auBSQ/OpenTaiko.git
+          git fetch upstream
+          git checkout auto
+          git merge --no-edit upstream/main
+          git push origin auto
+        env:
+          NAME: ${GITHUB_ACTOR}
+          EMAIL: ${GITHUB_ACTOR}@users.noreply.github.com
+
+#      - name: Setup NuGet
+#        uses: NuGet/setup-nuget@v1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Build for Windows x64
+        run: |
+          cd $Env:GITHUB_WORKSPACE
+          build-win-x64.bat
+
+      - name: Create Archive(x64)
+        run: |
+          cd $Env:GITHUB_WORKSPACE
+          tar -cvzf OpenTaiko_win_x64.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
+          
+      - name: Create Archive(x64) (Shallow)
+        run: |
+          cd $Env:GITHUB_WORKSPACE/
+          tar -cvzf OpenTaiko_win_x64.zip --exclude='Songs/*' --exclude='System/*' -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
