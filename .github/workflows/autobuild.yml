@@ -50,4 +50,4 @@ jobs:
         shell: cmd
         run: |
           cd $Env:GITHUB_WORKSPACE/
-          tar -cvzf OpenTaiko_win_x64.zip --exclude='Songs/*' --exclude='System/*' -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
+          tar --exclude='Songs/*' --exclude='System/*' -cvzf OpenTaiko_win_x64.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
