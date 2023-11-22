@@ -25,9 +25,6 @@ jobs:
           NAME: ${GITHUB_ACTOR}
           EMAIL: ${GITHUB_ACTOR}@users.noreply.github.com
 
-#      - name: Setup NuGet
-#        uses: NuGet/setup-nuget@v1
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -50,4 +47,4 @@ jobs:
         shell: cmd
         run: |
           cd $Env:GITHUB_WORKSPACE/
-          tar --exclude='Songs/*' --exclude='System/*' -cvzf OpenTaiko_win_x64.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
+          tar --exclude='./Songs/*' --exclude='./System/*' -cvzf OpenTaiko_win_x64.zip -C OpenTaiko/bin/Release/net7.0/win-x64/publish/ *
