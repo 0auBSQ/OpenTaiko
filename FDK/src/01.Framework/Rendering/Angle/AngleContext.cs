@@ -16,20 +16,25 @@ public class AngleContext : IGLContext
     {
         nint windowHandle;
         nint display;
-        if (OperatingSystem.IsWindows())
+        if (window.Native.Kind.HasFlag(NativeWindowFlags.Win32))
         {
             windowHandle = window.Native.Win32.Value.Hwnd;
             display = window.Native.Win32.Value.HDC;
         }
-        else if (OperatingSystem.IsLinux())
+        else if (window.Native.Kind.HasFlag(NativeWindowFlags.X11))
         {
             windowHandle = (nint)window.Native.X11.Value.Window;
-            display = window.Native.X11.Value.Display;
+            display = Egl.GetDisplay(window.Native.X11.Value.Display);
         }
-        else if (OperatingSystem.IsMacOS())
+        else if (window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa))
         {
             windowHandle = window.Native.Cocoa.Value;
             display = 0;
+        }
+        else if (window.Native.Kind.HasFlag(NativeWindowFlags.Wayland))
+        {
+            windowHandle = window.Native.Wayland.Value.Surface;
+            display = window.Native.Wayland.Value.Display;
         }
         else
         {
@@ -98,7 +103,8 @@ public class AngleContext : IGLContext
             Egl.NONE
         };
 
-        Surface = Egl.CreatePlatformWindowSurfaceEXT(Display, configs[0], windowHandle, null);
+        //Surface = Egl.CreatePlatformWindowSurfaceEXT(Display, configs[0], windowHandle, null);
+        Surface = Egl.CreateWindowSurface(Display, configs[0], windowHandle, 0);
 
         var error1 = Egl.GetError();
     }

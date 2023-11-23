@@ -152,15 +152,18 @@ namespace SampleFramework
         }
 
         public static int MainThreadID { get; private set; }
+        
+        private Vector2D<int> ViewPortSize = new Vector2D<int>();
+        private Vector2D<int> ViewPortOffset = new Vector2D<int>();
 
         public unsafe SKBitmap GetScreenShot()
         {
-            int ViewportWidth = Window_.FramebufferSize.X;
-            int ViewportHeight = Window_.FramebufferSize.Y;
+            int ViewportWidth = ViewPortSize.X;
+            int ViewportHeight = ViewPortSize.Y;
             fixed(uint* pixels = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
             {
                 Gl.ReadBuffer(GLEnum.Front);
-                Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pixels);
+                Gl.ReadPixels(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pixels);
 
                 fixed(uint* pixels2 = new uint[(uint)ViewportWidth * (uint)ViewportHeight])
                 {
@@ -184,13 +187,13 @@ namespace SampleFramework
 
         public unsafe void GetScreenShotAsync(Action<SKBitmap> action)
         {
-            int ViewportWidth = Window_.FramebufferSize.X;
-            int ViewportHeight = Window_.FramebufferSize.Y;
+            int ViewportWidth = ViewPortSize.X;
+            int ViewportHeight = ViewPortSize.Y;
             byte[] pixels = new byte[(uint)ViewportWidth * (uint)ViewportHeight * 4];
             Gl.ReadBuffer(GLEnum.Front);
             fixed(byte* pix = pixels)
             {
-                Gl.ReadPixels(0, 0, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pix);
+                Gl.ReadPixels(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewportWidth, (uint)ViewportHeight, PixelFormat.Bgra, GLEnum.UnsignedByte, pix);
             }
 
             Task.Run(() =>{
@@ -445,21 +448,27 @@ namespace SampleFramework
 
         public void Window_Resize(Vector2D<int> size)
         {
-            if (size.X > 0 && size.Y > 0 && Window_.WindowState == WindowState.Normal)
+            if (size.X > 0 && size.Y > 0)
             {
                 float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
-                if (WindowSize.X != size.X)
+                float windowAspect = (float)size.X / size.Y;
+                if (windowAspect > resolutionAspect)
                 {
-                    size.Y = (int)(size.X / (resolutionAspect));
+                    ViewPortSize.X = (int)(size.Y * resolutionAspect);
+                    ViewPortSize.Y = size.Y;
                 }
                 else 
                 {
-                    size.X = (int)(size.Y * (resolutionAspect));
+                    ViewPortSize.X = size.X;
+                    ViewPortSize.Y = (int)(size.X / resolutionAspect);
                 }
             }
 
+            ViewPortOffset.X = (size.X - ViewPortSize.X) / 2;
+            ViewPortOffset.Y = (size.Y - ViewPortSize.Y) / 2;
+
             WindowSize = size;
-            Gl.Viewport(0, 0, (uint)size.X, (uint)size.Y);
+            Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
         }
 
         public void Window_Move(Vector2D<int> size)
