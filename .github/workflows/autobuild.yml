@@ -66,9 +66,9 @@ jobs:
           7z a OpenTaiko_win_x86.zip OpenTaiko/bin/Release/net7.0/win-x86/publish/*
 
       - name: Build for Mac x64
+        shell: cmd
         run: |
-          chmod +x ./build-osx-x64.sh
-          ./build-osx-x64.sh
+          build-osx-x64.bat
           
       - name: Create Archive (Mac x64) (Shallow)
         shell: cmd
@@ -81,9 +81,9 @@ jobs:
           7z a OpenTaiko_osx_x64.zip OpenTaiko/bin/Release/net7.0/osx-x64/publish/*
 
       - name: Build for Linux x64
+        shell: cmd
         run: |
-          chmod +x ./build-linux-x64.sh
-          ./build-linux-x64.sh
+          build-linux-x64.bat
           
       - name: Create Archive (Linux x64) (Shallow)
         shell: cmd
