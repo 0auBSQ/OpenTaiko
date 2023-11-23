@@ -49,3 +49,51 @@ jobs:
         shell: cmd
         run: |
           7z a OpenTaiko_win_x64.zip OpenTaiko/bin/Release/net7.0/win-x64/publish/*
+
+      - name: Build for Windows x86
+        shell: cmd
+        run: |
+          build-win-x86.bat
+          
+      - name: Create Archive (Win x86) (Shallow)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_win_x86_shallow.zip OpenTaiko/bin/Release/net7.0/win-x86/publish/* -xr!Songs/ -xr!System/
+
+      - name: Create Archive (Win x86)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_win_x86.zip OpenTaiko/bin/Release/net7.0/win-x86/publish/*
+
+      - name: Build for Mac x64
+        run: |
+          chmod +x ./build-osx-x64.sh
+          ./build-osx-x64.sh
+          
+      - name: Create Archive (Mac x64) (Shallow)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_osx_x64_shallow.zip OpenTaiko/bin/Release/net7.0/osx-x64/publish/* -xr!Songs/ -xr!System/
+
+      - name: Create Archive (Mac x64)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_osx_x64.zip OpenTaiko/bin/Release/net7.0/osx-x64/publish/*
+
+      - name: Build for Linux x64
+        run: |
+          chmod +x ./build-linux-x64.sh
+          ./build-linux-x64.sh
+          
+      - name: Create Archive (Linux x64) (Shallow)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_linux_x64_shallow.zip OpenTaiko/bin/Release/net7.0/linux-x64/publish/* -xr!Songs/ -xr!System/
+
+      - name: Create Archive (Linux x64)
+        shell: cmd
+        run: |
+          7z a OpenTaiko_linux_x64.zip OpenTaiko/bin/Release/net7.0/linux-x64/publish/*
+
+#      - name: Upload All Builds
+#        run: gh release upload autobuild 
