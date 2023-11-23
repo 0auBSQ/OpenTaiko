@@ -94,6 +94,10 @@ jobs:
         shell: cmd
         run: |
           7z a OpenTaiko_linux_x64.zip OpenTaiko/bin/Release/net7.0/linux-x64/publish/*
-
-#      - name: Upload All Builds
-#        run: gh release upload autobuild 
+      
+      - name: Upload All Builds
+      - uses: AButler/upload-release-assets@v3.0
+        with:
+          files: "OpenTaiko_win_x64.zip;OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64.zip;OpenTaiko_linux_x64_shallow.zip"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: autobuild
