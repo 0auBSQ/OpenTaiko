@@ -95,8 +95,8 @@ jobs:
         run: |
           7z a OpenTaiko_linux_x64.zip OpenTaiko/bin/Release/net7.0/linux-x64/publish/*
       
-      - uses: AButler/upload-release-assets@v3.0
       - name: Upload All Builds
+        uses: AButler/upload-release-assets@v3.0
         with:
           files: "OpenTaiko_win_x64.zip;OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64.zip;OpenTaiko_linux_x64_shallow.zip"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
