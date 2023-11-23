@@ -1,0 +1,8 @@
+[Console Drawing]
+
+func:DrawText(x, y, text);
+func:DrawNum(x, y, num);
+Draws text/a number using the skin's Console Font.
+(\Graphics\Console_Font.png)
+
+You may only use Basic Latin unicode characters.

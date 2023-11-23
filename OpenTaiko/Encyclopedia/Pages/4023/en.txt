@@ -1,0 +1,8 @@
+- Menu Voices :
+Menu/SongSelect
+Menu/SongDecide
+Menu/SongDecide_AI
+Menu/DiffSelect
+Menu/DanSelectStart
+Menu/DanSelectPrompt
+Menu/DanSelectConfirm

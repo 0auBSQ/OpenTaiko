@@ -1,0 +1,6 @@
+[In-game Only]
+
+function clearOut(player)
+Called once when a player has dropped from the clear range.
+The player value is the player ID that has dropped from the
+clear range.

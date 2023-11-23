@@ -1,0 +1,5 @@
+[Application Information]
+
+local lang
+Gets the current selected language as a short string format
+(i.e. "en", "ja", "fr", etc.)

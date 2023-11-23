@@ -1,0 +1,5 @@
+[Player Information (In-Game)]
+
+local isClear
+Gets a list of booleans for each player that tell
+if each player is clearing their course.

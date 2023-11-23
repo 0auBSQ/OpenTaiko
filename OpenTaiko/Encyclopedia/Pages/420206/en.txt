@@ -1,0 +1,11 @@
+[In-game Only (Kusudama)]
+
+function kusuIn()
+Called once when a Kusudama sequence has started.
+
+function kusuBroke()
+Called once when a Kusudama was successfully cleared.
+
+function kusuMiss()
+Called once when a Kusudama has failed to clear before
+the sequence has ended.

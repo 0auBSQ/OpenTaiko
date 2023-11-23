@@ -1,0 +1,4 @@
+[Image Manipulation]
+
+func:SetOpacity(opacity, "filename");
+Set the opacity of a given image. Value must be between 0 and 255.

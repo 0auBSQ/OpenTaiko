@@ -1,0 +1,7 @@
+[AI Battle Information]
+
+local battleWin
+Gets a bool stating if the player is winning (or has won) against
+the AI in AI Battle.
+
+Can be used in the Results Screen menu.

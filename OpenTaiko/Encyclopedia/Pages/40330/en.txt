@@ -1,0 +1,7 @@
+Beat :
+Game_Chara_Beat_Normal=1
+Game_Chara_Beat_10Combo=1
+Game_Chara_Beat_10ComboMax=1
+Game_Chara_Beat_ClearIn=1
+Game_Chara_Beat_Clear=1
+Game_Chara_Beat_ClearMax=1

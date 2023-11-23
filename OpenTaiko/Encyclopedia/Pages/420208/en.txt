@@ -1,0 +1,8 @@
+[In-game Only (Ending Animation)]
+
+function draw(player)
+Called every frame. Used for manipulating & drawing images.
+Unlike the previous function, this is called for each player
+ID qualified to run this script.
+
+Can run multiple times in a single frame.

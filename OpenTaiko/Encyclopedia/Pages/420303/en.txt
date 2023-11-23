@@ -1,0 +1,4 @@
+[Player Information]
+
+local playerCount
+Gets the current number of active players.

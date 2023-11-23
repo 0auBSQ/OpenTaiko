@@ -1,0 +1,6 @@
+Calling Functions are commands that you send to OpenTaiko to
+execute a function.
+
+All of these functions are related to drawing and manipulating
+textures that your script imports, and does not modify the game
+itself.

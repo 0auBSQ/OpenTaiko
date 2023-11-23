@@ -1,0 +1,4 @@
+Duration :
+Game_Chara_Balloon_Timer=28
+Game_Chara_Balloon_Delay=500
+Game_Chara_Balloon_FadeOut=84

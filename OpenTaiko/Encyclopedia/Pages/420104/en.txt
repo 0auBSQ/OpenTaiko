@@ -1,0 +1,12 @@
+[Image Drawing]
+
+func:DrawRectGraph(x, y, rect_x, rect_y,
+	rect_width, rect_height, "filename");
+Draw a given image at a position.
+
+A rectangle is used to specify what portion of the
+image you want to draw.
+
+If a rectangle goes outside the bounds of the given
+image, it will loop back to continue drawing.
+This method can be used to repeat textures.

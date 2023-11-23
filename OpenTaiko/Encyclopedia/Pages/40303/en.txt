@@ -1,0 +1,8 @@
+Beat is used to control how fast your character is
+animating, relative to the beat of the song you're
+playing. A lower number means it moves faster,
+while a higher number means it moves slower.
+
+Example :
+Game_Chara_Beat_Normal=1
+Game_Chara_Beat_GoGo=2

@@ -1,0 +1,10 @@
+Examples include:
+
+* Being able to read the BPM, gauge percentage, go-go state, and
+clear status of each active player
+
+* Checking what language the user is currently using (allowing
+for multi-language support for skins)
+
+* Changing the visuals of a background depending on their Tower
+progress & AI battle state

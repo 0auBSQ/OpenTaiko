@@ -1,0 +1,6 @@
+CharaConfig.txt is used to control your character's
+appearance and animations.
+
+Coordinates, Motion, Beat, and Duration are the
+most common parameter types you'll see here, with
+a few extra options.

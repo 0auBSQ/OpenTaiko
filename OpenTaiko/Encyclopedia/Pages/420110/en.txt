@@ -1,0 +1,7 @@
+[Image Manipulation]
+
+func:SetBlendMode("mode", "filename");
+Specify how an image should blend into the background.
+
+Options available are : "Normal", "Add",
+"Multi" (Multiply), "Sub" (Subtract), "Screen"

@@ -1,0 +1,6 @@
+Beat :
+Game_Chara_Beat_Tower_Standing=1
+Game_Chara_Beat_Tower_Standing_Tired=1
+Game_Chara_Beat_Tower_Fail=1
+Game_Chara_Beat_Tower_Clear=1
+Game_Chara_Beat_Tower_Clear_Tired=1

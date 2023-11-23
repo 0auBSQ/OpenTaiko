@@ -1,0 +1,9 @@
+[Application Information]
+
+local fps
+Gets the current frames per second.
+
+local deltaTime
+Gets the amount of time that has passed since the last
+frame was drawn.
+Non-integral, valued in seconds (i.e. 0.0166666...)

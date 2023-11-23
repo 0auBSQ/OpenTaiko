@@ -1,0 +1,7 @@
+Coordinates :
+Game_Chara_Balloon_X=(1P),(2P)
+Game_Chara_Balloon_Y=(1P),(2P)
+Game_Chara_Balloon_4P=(X),(Y)
+Game_Chara_Balloon_5P=(X),(Y)
+Game_Chara_Kusudama_X=(1P),(2P),(3P),(4P),(5P)
+Game_Chara_Kusudama_Y=(1P),(2P),(3P),(4P),(5P)

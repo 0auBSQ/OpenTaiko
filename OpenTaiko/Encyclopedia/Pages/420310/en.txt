@@ -1,0 +1,8 @@
+[AI Battle Information]
+
+local battleState
+Gets an integer about the current state of the active AI Battle,
+valued between -9 and 9. Default is 0.
+
+Zero or higher number means the player is winning.
+Lower number means the AI is winning.
