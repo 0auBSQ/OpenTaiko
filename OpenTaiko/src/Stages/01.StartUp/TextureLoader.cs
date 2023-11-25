@@ -48,7 +48,7 @@ namespace TJAPlayer3
         public static string EFFECTS = @$"10_Effects{Path.DirectorySeparatorChar}";
         public static string BALLOON = @$"11_Balloon{Path.DirectorySeparatorChar}";
         public static string LANE = @$"12_Lane{Path.DirectorySeparatorChar}";
-        public static string GENRE = @$"13_Genre{Path.DirectorySeparatorChar}";
+        public static string GENRE = @$"13_GENRE{Path.DirectorySeparatorChar}";
         public static string GAMEMODE = @$"14_GameMode{Path.DirectorySeparatorChar}";
         public static string FAILED = @$"15_Failed{Path.DirectorySeparatorChar}";
         public static string RUNNER = @$"16_Runner{Path.DirectorySeparatorChar}";

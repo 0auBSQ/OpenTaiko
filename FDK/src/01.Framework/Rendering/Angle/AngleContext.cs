@@ -24,7 +24,9 @@ public class AngleContext : IGLContext
         else if (window.Native.Kind.HasFlag(NativeWindowFlags.X11))
         {
             windowHandle = (nint)window.Native.X11.Value.Window;
-            display = Egl.GetDisplay(window.Native.X11.Value.Display);
+            // Temporary fix for the segfaults
+            // Note than X11 Display number is NOT always 0, it can be 1, 2 and so on for example in cases of user switching
+            display = 0;// Egl.GetDisplay(window.Native.X11.Value.Display);
         }
         else if (window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa))
         {
