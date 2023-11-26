@@ -1,0 +1,125 @@
+# Original script from totoa553/OpenTaiko
+
+name: Build OpenTaiko
+
+on: 
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: auto
+      - name: Merge upstream
+        run: |
+          git config --global user.name ${NAME}
+          git config --global user.email ${EMAIL}
+          git config --global pull.rebase merges
+          git pull --unshallow
+          git remote add upstream https://github.com/0auBSQ/OpenTaiko.git
+          git fetch upstream
+          git checkout auto
+          git merge --no-edit upstream/main
+          git push origin auto
+        env:
+          NAME: ${GITHUB_ACTOR}
+          EMAIL: ${GITHUB_ACTOR}@users.noreply.github.com
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Observe the Directory
+        shell: cmd
+        run: |
+          dir
+
+      - name: Build for Windows x64
+        shell: cmd
+        run: |
+          build-win-x64.bat
+          
+      - name: Create Archive (Win x64) (Shallow)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
+          7z a ../../../../../../OpenTaiko_win_x64_shallow.zip * -xr!Songs/ -xr!System/
+          cd ..\..\..\..\..\..\
+
+      - name: Create Archive (Win x64)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
+          7z a ../../../../../../OpenTaiko_win_x64.zip *
+          cd ..\..\..\..\..\..\
+
+      - name: Build for Windows x86
+        shell: cmd
+        run: |
+          build-win-x86.bat
+          
+      - name: Create Archive (Win x86) (Shallow)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
+          7z a ../../../../../../OpenTaiko_win_x86_shallow.zip * -xr!Songs/ -xr!System/
+          cd ..\..\..\..\..\..\
+
+      - name: Create Archive (Win x86)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
+          7z a ../../../../../../OpenTaiko_win_x86.zip *
+          cd ..\..\..\..\..\..\
+
+      - name: Build for Mac x64
+        shell: cmd
+        run: |
+          build-osx-x64.bat
+          
+      - name: Create Archive (Mac x64) (Shallow)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
+          7z a ../../../../../../OpenTaiko_osx_x64_shallow.zip * -xr!Songs/ -xr!System/
+          cd ..\..\..\..\..\..\
+
+      - name: Create Archive (Mac x64)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
+          7z a ../../../../../../OpenTaiko_osx_x64.zip *
+          cd ..\..\..\..\..\..\
+
+      - name: Build for Linux x64
+        shell: cmd
+        run: |
+          build-linux-x64.bat
+          
+      - name: Create Archive (Linux x64) (Shallow)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
+          7z a ../../../../../../OpenTaiko_linux_x64_shallow.zip * -xr!Songs/ -xr!System/
+          cd ..\..\..\..\..\..\
+
+      - name: Create Archive (Linux x64)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
+          7z a ../../../../../../OpenTaiko_linux_x64.zip *
+          cd ..\..\..\..\..\..\
+      
+      - name: Upload All Builds
+        uses: xresloader/upload-to-github-release@v1.4.2
+        with:
+          file: "OpenTaiko_win_x64.zip;OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64.zip;OpenTaiko_linux_x64_shallow.zip"
+          overwrite: true
+          tag_name: "autobuild"
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}
