@@ -114,6 +114,24 @@ jobs:
           cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
           7z a ../../../../../../OpenTaiko_linux_x64.zip *
           cd ..\..\..\..\..\..\
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: autobuild
+          release_name: Autobuild Release
+          body: |
+            Auto-builds created by Github Actions, scheduled for every day at 00:00 UTC (or manually)
+
+            Shallow builds are the same builds but with the `Songs` and `System` folder excluded for quicker downloading (**remember to supply your own `Songs` and `System` folders if you download a shallow build**).
+
+            Be mindful when playing on these builds. They contain the latest commits for OpenTaiko, and may not be stable.
+
+            Please report any issues you come across at [the official repository](https://github.com/0auBSQ/OpenTaiko/issues), not mine.
+          draft: false
+          prerelease: true
       
       - name: Upload All Builds
         uses: xresloader/upload-to-github-release@v1.4.2
@@ -121,5 +139,4 @@ jobs:
           file: "OpenTaiko_win_x64.zip;OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64.zip;OpenTaiko_linux_x64_shallow.zip"
           overwrite: true
           tag_name: "autobuild"
-          draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
