@@ -128,6 +128,15 @@ BoxFontName=廻想体 ネクスト UP B
 081 - Taikonitos : Moox - https://soundcloud.com/themoox/moox-taikonitos (Chart by Colin (Extreme, Hard) and DragonRatTiger)
 082 - Comma, ～ 意味ト構造ノ分離 : Sparxe - https://soundcloud.com/sparxenic https://sparxe.bandcamp.com https://twitter.com/Sparxenic https://www.youtube.com/@SparxeMusic (Chart by 0AuBSQ)
 083 - <Bracket> ～破壊ト混沌ノ複製～ : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by bol (Extreme) and 0AuBSQ)
+084 - Next To You : Astedroid & X3ll3n - https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg https://www.youtube.com/channel/UCNTYFFcsN_0B5-eHf-u_uZg (Chart by sadkay)
+085 - i don't want to see the people i love see me in pain so i sometimes just wanna be left alone to cry in the dark : Sukima Altera - https://yokaicore.bandcamp.com/album/songs-i-made-in-my-spare-time-ep (Chart by Colin)
+086 - 怨念~漸消殘夢~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
+087 - Hero's Treasure : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by berdstep)
+088 - ...
+089 - FunkBoi : SenPi - https://senpimusic.com (Chart by 0AuBSQ, Colin, Shoxk and DragonRatTiger)
+090 - The Beat : MesoPhunk - www.soundcloud.com/djmesophunk https://twitter.com/DJMesoPhunk (Chart by 0AuBSQ)
+091 - thumb wrestling : ok cheez - https://rchase.bandcamp.com/ https://mastodon.social/@r23chase https://soundcloud.com/ok-cheez-96 https://cheez2600.newgrounds.com/ (Chart by DragonRatTiger and bol)
+092 - Rainy Night III ~幻虹~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
 ```
 
 ### About the OpenTaiko Original Soundtrack
@@ -146,15 +155,22 @@ If you liked a specific song and want to support the composer's work, please che
 
 ### Songs with specific licenses
 
+- CC by
+```
+085 - i don't want to see the people i love see me in pain so i sometimes just wanna be left alone to cry in the dark : Sukima Altera
+```
+
 - CC BY-SA
 ```
 061 - The Abyss : ok cheez
 077 - Meowmetic : HHS
+091 - thumb wrestling : ok cheez
 ```
 
 - Non-commercial, Attribution required (CC BY-NC ?)
 ```
 074 - Spatium Cursu : X3ll3n
+084 - Next To You : Astedroid & X3ll3n
 ```
 
 - CC BY-NC-SA
