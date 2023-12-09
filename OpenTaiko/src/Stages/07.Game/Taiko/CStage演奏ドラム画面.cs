@@ -2285,7 +2285,8 @@ namespace TJAPlayer3
                 //if( CDTXMania.ConfigIni.eScrollMode != EScrollMode.Normal )
                 //x -= 10;
 
-                if(x末端 > 0 - TJAPlayer3.Skin.Game_Notes_Size[0] && x < TJAPlayer3.Skin.Resolution[0])
+                //if(x末端 > 0 - TJAPlayer3.Skin.Game_Notes_Size[0] && x < TJAPlayer3.Skin.Resolution[0])
+                if((Math.Min(x, x末端) < TJAPlayer3.Skin.Resolution[0] && Math.Max(x, x末端) > 0 - TJAPlayer3.Skin.Game_Notes_Size[0]))
                 {
                     if (TJAPlayer3.Tx.Notes[(int)_gt] != null)
                     {
