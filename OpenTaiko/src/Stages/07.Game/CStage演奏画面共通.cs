@@ -563,7 +563,7 @@ namespace TJAPlayer3
             for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
-                switch (chara.effect.Gauge)
+                switch (chara.effect.tGetGaugeType())
                 {
                     default:
                     case "Normal":
@@ -2126,7 +2126,7 @@ namespace TJAPlayer3
                     this.bIsAlreadyCleared[nPlayer] = false;
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
 
-                    switch (chara.effect.Gauge)
+                    switch (chara.effect.tGetGaugeType())
                     {
                         case "Hard":
                         case "Extreme":
@@ -5319,13 +5319,10 @@ namespace TJAPlayer3
             }
 			this.actAVI.Stop();
             this.actPanel.t歌詞テクスチャを削除する();
+            bool[] cleared = new bool[5];
             for (int i = 0; i < 5; i++)
             {
-                if (bIsAlreadyCleared[i])
-                {
-                    TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(i);
-                }
-
+                cleared[i] = bIsAlreadyCleared[i];
                 this.t演奏位置の変更(0, i);
                 this.actPlayInfo.NowMeasure[i] = 0;
                 JPOSCROLLX[i] = 0;
@@ -5339,6 +5336,11 @@ namespace TJAPlayer3
             TJAPlayer3.stage演奏ドラム画面.Activate();
             for( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
+                if (!bIsAlreadyCleared[i] && cleared[i])
+                {
+                    TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(i);
+                }
+                
                 if (NotesManager.IsKusudama(this.chip現在処理中の連打チップ[ i ]) && this.actChara.b風船連打中[i]) actBalloon.KusuMiss();
                 this.chip現在処理中の連打チップ[ i ] = null;
                 this.actChara.b風船連打中[i] = false;

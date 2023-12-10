@@ -104,9 +104,6 @@ namespace TJAPlayer3
 
 		public override void Activate()
 		{
-
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-				bgmResultIn.t再生する();
 			
 			Trace.TraceInformation("結果ステージを活性化します。");
 			Trace.Indent();
@@ -848,6 +845,9 @@ namespace TJAPlayer3
 				Trace.TraceInformation("結果ステージの活性化を完了しました。");
 				Trace.Unindent();
 			}
+
+			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+				bgmResultIn.t再生する();
 		}
 		public override void DeActivate()
 		{

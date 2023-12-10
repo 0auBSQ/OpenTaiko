@@ -25,6 +25,11 @@ namespace TJAPlayer3
                 return mult;
             }
 
+            public string tGetGaugeType()
+            {
+                return TJAPlayer3.ConfigIni.bForceNormalGauge || TJAPlayer3.stage選曲.n確定された曲の難易度[0] >= 5 ? "Normal" : Gauge;
+            }
+
 
             [JsonProperty("gauge")]
             public string Gauge;

@@ -45,6 +45,11 @@ namespace TJAPlayer3
 					this.sd読み込み音 = null;
 				}
 
+				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] >= 5 || TJAPlayer3.ConfigIni.nPlayerCount != 1)
+				{
+					TJAPlayer3.ConfigIni.bTokkunMode = false;
+				}
+
 			    if (TJAPlayer3.bコンパクトモード)
 			    {
 			        string strDTXファイルパス = TJAPlayer3.strコンパクトモードファイル;

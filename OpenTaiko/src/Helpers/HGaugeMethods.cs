@@ -452,7 +452,7 @@ namespace TJAPlayer3
             return tNormaCheck(
                 (Difficulty)_dif,
                 TJAPlayer3.stage選曲.r確定された曲.arスコア[_dif].譜面情報.nレベル[_dif],
-                tGetGaugeTypeEnum(chara.effect.Gauge),
+                tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
                 (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
                 UNSAFE_KillZonePercent(player)
                 );
@@ -461,7 +461,7 @@ namespace TJAPlayer3
         public static bool UNSAFE_IsRainbow(int player)
         {
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
-            if (tGetGaugeTypeEnum(chara.effect.Gauge) != EGaugeType.NORMAL) return false;
+            if (tGetGaugeTypeEnum(chara.effect.tGetGaugeType()) != EGaugeType.NORMAL) return false;
             return (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player] >= 100f;
         }
 
@@ -489,7 +489,7 @@ namespace TJAPlayer3
             return tHardGaugeGetKillscreenRatio(
                 difficulty,
                 level,
-                tGetGaugeTypeEnum(chara.effect.Gauge),
+                tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
                 perfectHits,
                 totalHits);
         }
@@ -625,7 +625,7 @@ namespace TJAPlayer3
             float currentPercent = (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
 
             // Gauge type
-            EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.Gauge);
+            EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 
             // Textures
             int _4pGaugeIDX = (TJAPlayer3.ConfigIni.nPlayerCount >= 3) ? 1 : 0;
@@ -690,7 +690,7 @@ namespace TJAPlayer3
             int totalHits = dtxs[player].nノーツ数[3];
 
             // Gauge type
-            EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.Gauge);
+            EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 
             // Current percent
             float currentPercent = segmentsDisplayed * 2f;
