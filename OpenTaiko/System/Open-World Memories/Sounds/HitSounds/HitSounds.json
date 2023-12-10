@@ -1,0 +1,33 @@
+[
+	{
+		"name": "Taiko",
+		"path": "Sounds\\Taiko\\",
+		"format": "OGG",
+	},
+	{
+		"name": "Electro",
+		"path": "Sounds\\HitSounds\\Electro\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Konga",
+		"path": "Sounds\\HitSounds\\Konga\\",
+		"format": "WAV",
+	},
+	{
+		"name": "'08 Dual",
+		"path": "Sounds\\HitSounds\\'08 Dual\\",
+		"format": "WAV",
+
+	},
+	{
+		"name": "Break",
+		"path": "Sounds\\HitSounds\\Break\\",
+		"format": "WAV",
+	},
+	{
+		"name": "None",
+		"path": "Sounds\\HitSounds\\None\\",
+		"format": "WAV",
+	},
+]

@@ -1,0 +1,120 @@
+
+Chara_Resolution=1920,1080
+
+;キャラのX座標。(1P,2P)
+Game_Chara_X=0,0
+
+;キャラのY座標。(1P,2P)
+Game_Chara_Y=0,805
+
+;3人プレイ以上のキャラの座標。(X, Y)
+Game_Chara_4P=247,102
+
+;5人プレイのキャラの座標。(X, Y)
+Game_Chara_5P=247,60
+                
+;キャラのX座標。(1P,2P)
+Game_Chara_X_AI=708,903
+
+;キャラのY座標。(1P,2P)
+Game_Chara_Y_AI=228,228
+
+;キャラの通常時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Normal=0,1,2,3,4,5,6
+
+;キャラのミス時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Miss=0,1,2,3,4,5,6
+
+;キャラの連続でミス時モーション指定。(カンマ区切り)
+Game_Chara_Motion_MissDown=0,1,2,3,4,5,6
+
+;キャラのクリア時モーション指定。(カンマ区切り)
+Game_Chara_Motion_Clear=0,1,2,3,4,5,6,7
+
+;キャラのゴーゴータイム時モーション指定。(４分の4拍子換算)
+Game_Chara_Motion_GoGo=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+
+;キャラの通常時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Normal=1
+
+;キャラのミス時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Miss=1
+
+;キャラの連続でミス時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_MissDown=1
+
+;キャラのクリア時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_Clear=1
+
+;キャラのゴーゴータイム時モーションが何拍子でループするか。(カンマ区切り)
+Game_Chara_Beat_GoGo=2
+
+;ふうせん連打時のキャラ画像X座標。(X,Y)
+Game_Chara_Balloon_X=0,0
+
+;ふうせん連打時のキャラ画像Y座標。(X,Y)
+Game_Chara_Balloon_Y=0,445
+
+;3人プレイ以上のふうせん連打時のキャラ画像X座標。
+Game_Chara_Balloon_4P=0,-264
+
+;3人プレイ以上のふうせん連打時のキャラ画像Y座標。
+Game_Chara_Balloon_5P=0,-252
+
+;ふうせん連打アクション時に使用するタイマーの更新間隔。(ms)
+Game_Chara_Balloon_Timer=16
+
+;ふうせん連打成功 / 失敗 のフェードアウトにかける時間 (ms)
+Game_Chara_Balloon_FadeOut=500
+
+;エントリーアニメーションにかける時間 (ms)
+Chara_Entry_AnimationDuration=1000
+
+;演奏画面以外の通常アニメーションにかける時間 (ms)
+Chara_Normal_AnimationDuration=500
+
+;メニューのループアニメーションにかける時間 (ms)
+Chara_Menu_Loop_AnimationDuration=1000
+
+;メニューの選択アニメーションにかける時間 (ms)
+Chara_Menu_Select_AnimationDuration=1000
+
+;メニューの開始アニメーションにかける時間 (ms)
+Chara_Menu_Start_AnimationDuration=500
+
+;結果画面の通常アニメーションにかける時間 (ms)
+Chara_Result_Normal_AnimationDuration=1000
+
+;結果画面のクリアアニメーションにかける時間 (ms)
+Chara_Result_Clear_AnimationDuration=1000
+
+;結果画面のクリア失敗の最初のアニメーションにかける時間 (ms)
+Chara_Result_Failed_In_AnimationDuration=1000
+
+;結果画面のクリア失敗のアニメーションにかける時間 (ms)
+Chara_Result_Failed_AnimationDuration=1000
+
+;ふうせん連打時のキャラ画像X座標。(X,Y)
+Game_Chara_Kusudama_X=435,1035,135,1335,735
+
+;ふうせん連打時のキャラ画像Y座標。(X,Y)
+Game_Chara_Kusudama_Y=630,630,630,630,630
+
+Game_Chara_Beat_Tower_Standing=1
+
+Game_Chara_Beat_Tower_Standing_Tired=1
+
+Game_Chara_Beat_Tower_Clear=1
+
+Game_Chara_Beat_Tower_Clear_Tired=1
+
+Game_Chara_Beat_Tower_Clear_Fail=1
+
+;If Tower Clear animation should loop (0 = false, 1 = true)
+Game_Chara_Tower_Clear_IsLooping=0
+
+;If Tower Clear Tired animation should loop (0 = false, 1 = true)
+Game_Chara_Tower_Clear_Tired_IsLooping=0
+
+;If Tower Fail animation should loop (0 = false, 1 = true)
+Game_Chara_Tower_Fail_IsLooping=0
