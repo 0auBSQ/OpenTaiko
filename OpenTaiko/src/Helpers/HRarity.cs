@@ -33,10 +33,10 @@ namespace TJAPlayer3
         {
             ["Poor"] = 0.8f,
             ["Common"] = 1f,
-            ["Uncommon"] = 1.1f,
-            ["Rare"] = 1.2f,
-            ["Epic"] = 1.3f,
-            ["Legendary"] = 1.5f,
+            ["Uncommon"] = 1f,
+            ["Rare"] = 1f,
+            ["Epic"] = 1f,
+            ["Legendary"] = 1f,
         };
 
         public static Color tRarityToColor(string rarity)
