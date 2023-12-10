@@ -1,0 +1,21 @@
+# Graphics
+
+All graphics by Kaimaruz is licensed under Attribution-NonCommercial-ShareAlike 3.0 Spain. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.en
+
+# Music
+
+"B.Happy" © 2021 by Ace of Beat is licensed under Attribution-ShareAlike 4.0 International. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+https://www.teufelstruhe.de
+
+Software used:
+	FL Studio - version 20.8
+	https://www.image-line.com/legal/
+include Samples from Zero-G:
+	"Zero-G  Wired"
+	"Zero-G  Nu Disco"
+	"Zero-G  The Operating Table"
+	"Zero-G  SoundSense  Elektrolytic" 
+	https://zero-g.co.uk/pages/license-info
+includes Samples from Soundtrack Loops
+	"Soundtrack Loops  Study Beats Speech Phrases"
+	https://soundtrackloops.com/eula-legal/

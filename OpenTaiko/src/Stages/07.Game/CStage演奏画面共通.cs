@@ -3764,12 +3764,12 @@ namespace TJAPlayer3
                         break;
                     case 0x18:
                         {
-                            if( ( !pChip.bHit && (pChip.nバーからの距離dot.Drums < 0 ) ) )
+                            if( ( !pChip.bProcessed && (pChip.nバーからの距離dot.Drums < 0 ) ) )
                             {
                                 this.b連打中[ nPlayer ] = false;
                                 this.actRoll.b表示[ nPlayer ] = false;
                                 this.actChara.b風船連打中[nPlayer] = false;
-                                pChip.bHit = true;
+                                pChip.bProcessed = true;
                                 if( chip現在処理中の連打チップ[ nPlayer ] != null )
                                 {
                                     chip現在処理中の連打チップ[ nPlayer ].bHit = true;

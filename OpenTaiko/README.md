@@ -155,7 +155,7 @@ If you liked a specific song and want to support the composer's work, please che
 
 ### Songs with specific licenses
 
-- CC by
+- CC BY
 ```
 085 - i don't want to see the people i love see me in pain so i sometimes just wanna be left alone to cry in the dark : Sukima Altera
 ```
@@ -178,6 +178,25 @@ If you liked a specific song and want to support the composer's work, please che
 078 - the garden : AZALI
 079 - MECHANICAL GOD : AZALI × Crow
 ```
+
+## Collaborations
+
+### Project Outfox: Serenity
+
+Learn more about Project Outfox (and Serenity) at https://projectoutfox.com/serenity
+Showcases:
+- OpenTaiko: https://www.youtube.com/watch?v=WjDDhVwsjjM
+- Project Outfox: https://www.youtube.com/watch?v=Ai2pnhFuOag&t=0s
+
+The included songs are:
+```
+Relaxation Piece of Conclusion - Zenth (Chart by DiamondN1nja)
+B-Happy - Ace of Beat (Chart by Komi)
+What Year Is This (Outfox Edit) - Sevish (Chart by sadkay)
+Eradication of Light - Mintorment (Chart by Colin)
+brokenHeart resurrection ~estelle~ - RILEY (Chart by Komi)
+```
+The credits and links and licence information for each song are included on the attached credits/licence.txt file.
 
 ## Translations
 
