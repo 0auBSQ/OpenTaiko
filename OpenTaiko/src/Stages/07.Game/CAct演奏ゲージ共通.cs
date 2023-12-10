@@ -112,7 +112,7 @@ namespace TJAPlayer3
 
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
-                switch (chara.effect.Gauge)
+                switch (chara.effect.tGetGaugeType())
                 {
                     default:
                     case "Normal":
@@ -309,7 +309,7 @@ namespace TJAPlayer3
             for (int i = 0; i < 3; i++)
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
-                switch (chara.effect.Gauge)
+                switch (chara.effect.tGetGaugeType())
                 {
                     default:
                     case "Normal":
@@ -326,7 +326,7 @@ namespace TJAPlayer3
             for (int i = 0; i < 3; i++)
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
-                switch (chara.effect.Gauge)
+                switch (chara.effect.tGetGaugeType())
                 {
                     default:
                     case "Normal":
@@ -447,7 +447,7 @@ namespace TJAPlayer3
                         int nanidou = TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer];
                         int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
-                        switch (chara.effect.Gauge)
+                        switch (chara.effect.tGetGaugeType())
                         {
                             case "Hard":
                                 fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);

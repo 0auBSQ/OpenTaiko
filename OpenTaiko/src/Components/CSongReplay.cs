@@ -348,7 +348,7 @@ namespace TJAPlayer3
              * - 2 : Extreme
              */
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[actualPlayer].data.Character];
-            GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(chara.effect.Gauge);
+            GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
             // Gauge fill value
             GaugeFill = (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[storedPlayer];
             // Generation timestamp (in ticks)

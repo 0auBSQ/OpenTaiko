@@ -388,6 +388,10 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(92));
             this.list項目リスト.Add( this.iTaikoBigNotesJudge );
 
+            this.iTaikoForceNormalGauge = new CItemToggle(CLangManager.LangInstance.GetString(10126), TJAPlayer3.ConfigIni.bForceNormalGauge,
+				CLangManager.LangInstance.GetString(10127));
+            this.list項目リスト.Add( this.iTaikoForceNormalGauge );
+
             this.iTaikoJudgeCountDisp = new CItemToggle(CLangManager.LangInstance.GetString(93), TJAPlayer3.ConfigIni.bJudgeCountDisplay,
 				CLangManager.LangInstance.GetString(94));
             this.list項目リスト.Add( this.iTaikoJudgeCountDisp );
@@ -1564,6 +1568,7 @@ namespace TJAPlayer3
         private CItemToggle iTaikoJust;
         private CItemToggle iTaikoJudgeCountDisp;
         private CItemToggle iTaikoBigNotesJudge;
+        private CItemToggle iTaikoForceNormalGauge;
         private CItemInteger iTaikoPlayerCount;
         CItemToggle ShowChara;
         CItemToggle ShowDancer;
@@ -1734,6 +1739,8 @@ namespace TJAPlayer3
             TJAPlayer3.ConfigIni.bJudgeCountDisplay = this.iTaikoJudgeCountDisp.bON;
 			TJAPlayer3.ConfigIni.ShowExExtraAnime = this.iShowExExtraAnime.bON;
 			TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
+			TJAPlayer3.ConfigIni.bForceNormalGauge = this.iTaikoForceNormalGauge.bON;
+
 		}
 		//-----------------
 		#endregion

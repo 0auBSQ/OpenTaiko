@@ -222,6 +222,11 @@ namespace TJAPlayer3
             for (int i = 0; i < 5; i++) {
                 ifp[i] = false;
                 isDeniedPlaying[i] = false;
+
+                if (bIsAlreadyCleared[i])
+                {
+                    actBackground.ClearIn(i);
+                }
             }
             
             this.nStoredHit = new int[TJAPlayer3.ConfigIni.nPlayerCount];
