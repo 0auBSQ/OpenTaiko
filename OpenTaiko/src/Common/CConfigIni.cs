@@ -1205,6 +1205,7 @@ namespace TJAPlayer3
 		};
 
 		public bool b大音符判定;
+		public bool bForceNormalGauge;
 		public int n両手判定の待ち時間;
 		public int nBranchAnime;
 
@@ -1921,10 +1922,11 @@ namespace TJAPlayer3
 
             this.bBranchGuide = false;
             this.nScoreMode = 2;
-            this.nDefaultCourse = (int)Difficulty.Edit + 1;
+            this.nDefaultCourse = (int)Difficulty.Normal;
             this.nBranchAnime = 1;
 
             this.b大音符判定 = false;
+			bForceNormalGauge = false;
             this.n両手判定の待ち時間 = 50;
 
             this.bJudgeCountDisplay = false;
@@ -2527,6 +2529,9 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.WriteLine( "; 大音符の両手判定(0:OFF, 1:ON)" );
 			sw.WriteLine( "BigNotesJudge={0}", this.b大音符判定 ? 1 : 0 );
+			sw.WriteLine();
+			sw.WriteLine( "; ゲージをNormalに強制(0:OFF, 1:ON)" );
+			sw.WriteLine( "ForceNormalGauge={0}", this.bForceNormalGauge ? 1 : 0 );
 			sw.WriteLine();
 			sw.WriteLine( "; NoInfo(0:OFF, 1:ON)" );
 			sw.WriteLine( "NoInfo={0}", this.bNoInfo ? 1 : 0 );
@@ -3703,6 +3708,10 @@ namespace TJAPlayer3
 											else if ( str3.Equals( "BigNotesJudge" ) )
 											{
 												this.b大音符判定 = CConversion.bONorOFF( str4[ 0 ] );
+											}
+											else if ( str3.Equals( "ForceNormalGauge" ) )
+											{
+												this.bForceNormalGauge = CConversion.bONorOFF( str4[ 0 ] );
 											}
 											else if ( str3.Equals( "BranchAnime" ) )
 											{

@@ -306,6 +306,9 @@ namespace TJAPlayer3
             [10124] = "Use Extreme/Extra Transitions",
             [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
+			[10126] = "Always use normal gauge",
+			[10127] = "Always use normal gauge",
+
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",
             [102] = "Taiko Towers",

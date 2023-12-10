@@ -999,7 +999,7 @@ namespace TJAPlayer3
 
                                                         if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower)
                                                         {
-                                                            if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
+                                                            if (TJAPlayer3.ConfigIni.nPlayerCount == 1 && !TJAPlayer3.ConfigIni.bTokkunMode)
                                                             {
                                                                 // Init tower variables 
                                                                 if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
