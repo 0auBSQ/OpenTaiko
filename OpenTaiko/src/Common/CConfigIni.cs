@@ -2530,7 +2530,7 @@ namespace TJAPlayer3
 			sw.WriteLine( "; 大音符の両手判定(0:OFF, 1:ON)" );
 			sw.WriteLine( "BigNotesJudge={0}", this.b大音符判定 ? 1 : 0 );
 			sw.WriteLine();
-			sw.WriteLine( "; 大音符の両手判定(0:OFF, 1:ON)" );
+			sw.WriteLine( "; ゲージをNormalに強制(0:OFF, 1:ON)" );
 			sw.WriteLine( "ForceNormalGauge={0}", this.bForceNormalGauge ? 1 : 0 );
 			sw.WriteLine();
 			sw.WriteLine( "; NoInfo(0:OFF, 1:ON)" );
