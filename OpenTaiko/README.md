@@ -137,6 +137,12 @@ BoxFontName=廻想体 ネクスト UP B
 090 - The Beat : MesoPhunk - www.soundcloud.com/djmesophunk https://twitter.com/DJMesoPhunk (Chart by 0AuBSQ)
 091 - thumb wrestling : ok cheez - https://rchase.bandcamp.com/ https://mastodon.social/@r23chase https://soundcloud.com/ok-cheez-96 https://cheez2600.newgrounds.com/ (Chart by DragonRatTiger and bol)
 092 - Rainy Night III ~幻虹~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
+093 - Rainy Night : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
+094 - Rainy Night ~雲飛霧散~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
+095 - Rainy Night II : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
+096 - Rainy Night II ~水凝結~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
+097 - Rainy Night III : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
+098 - Rainy Night III ~輪回~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
 ```
 
 ### About the OpenTaiko Original Soundtrack
