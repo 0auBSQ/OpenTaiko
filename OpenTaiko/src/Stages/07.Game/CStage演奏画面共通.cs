@@ -3662,7 +3662,7 @@ namespace TJAPlayer3
 				{
 #region [ 01: BGM ]
 					case 0x01:	// BGM
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 							if ( configIni.bBGM音を発声する )
@@ -3674,7 +3674,7 @@ namespace TJAPlayer3
 #endregion
 #region [ 03: BPM変更 ]
 					case 0x03:	// BPM変更
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
                             this.actPlayInfo.dbBPM[nPlayer] = dTX.BASEBPM; //2016.07.10 kairera0467 太鼓の仕様にあわせて修正。(そもそもの仕様が不明&コードミス疑惑)
@@ -3684,7 +3684,7 @@ namespace TJAPlayer3
 #region [ 08: BPM変更(拡張) ]
 					case 0x08:	// BPM変更(拡張)
                         //CDTXMania.act文字コンソール.tPrint( 414 + pChip.nバーからの距離dot.Drums + 4, 192, C文字コンソール.Eフォント種別.白, "BRANCH START" + "  " + pChip.n整数値.ToString() );
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
                             //if( pChip.nコース == this.n現在のコース[ nPlayer ] )
@@ -3733,7 +3733,7 @@ namespace TJAPlayer3
                                         this.chip現在処理中の連打チップ[ nPlayer ] = pChip;
                                 }
                             }
-                            if ( !pChip.bProcessed && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                            if ( !pChip.bProcessed && time < 0)
 						    {
                                 if (NotesManager.IsKusudama(pChip))
                                 {
@@ -3764,7 +3764,7 @@ namespace TJAPlayer3
                         break;
                     case 0x18:
                         {
-                            if( ( !pChip.bProcessed && (pChip.nバーからの距離dot.Drums < 0 ) ) )
+                            if( ( !pChip.bProcessed && time < 0) )
                             {
                                 this.b連打中[ nPlayer ] = false;
                                 this.actRoll.b表示[ nPlayer ] = false;
@@ -3910,7 +3910,8 @@ namespace TJAPlayer3
 #region [ 50: 小節線 ]
 					case 0x50:	// 小節線
 						{
-                            if ( !pChip.bHit && ( pChip.nバーからの距離dot.Taiko < 0 ) )
+
+                            if ( !pChip.bHit && time < 0)
                             {
                                 //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
                                 if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0)
@@ -3944,7 +3945,7 @@ namespace TJAPlayer3
 #endregion
 #region [ 51: 拍線 ]
 					case 0x51:	// 拍線
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 						}
@@ -3952,7 +3953,7 @@ namespace TJAPlayer3
 #endregion
 #region [ 54: 動画再生 ]
 					case 0x54:	// 動画再生
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 							if ( configIni.bAVI有効 )
@@ -3970,7 +3971,7 @@ namespace TJAPlayer3
 						}
 						break;
 					case 0x55:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 							if ( configIni.bAVI有効 )
@@ -4055,7 +4056,7 @@ namespace TJAPlayer3
 #region[ 9B-9F: 太鼓 ]
                     case 0x9B:
                         // 段位認定モードの幕アニメーション
-                        if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0))
+                        if ( !pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.actPanel.t歌詞テクスチャを削除する();
@@ -4085,7 +4086,7 @@ namespace TJAPlayer3
                     //0x9C BPM変化(アニメーション用)
                     case 0x9C:
                         //CDTXMania.act文字コンソール.tPrint( 414 + pChip.nバーからの距離dot.Taiko + 8, 192, C文字コンソール.Eフォント種別.白, "BPMCHANGE" );
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
                             if( pChip.nコース == this.n現在のコース[ nPlayer ] )
@@ -4119,7 +4120,7 @@ namespace TJAPlayer3
                         break;
 
                     case 0x9D: //SCROLL
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 							//if ( dTX.listSCROLL.ContainsKey( pChip.n整数値_内部番号 ) )
@@ -4130,7 +4131,7 @@ namespace TJAPlayer3
                         break;
 
                     case 0x9E: //ゴーゴータイム
-                        if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                        if( !pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.bIsGOGOTIME[ nPlayer ] = true;
@@ -4172,7 +4173,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0x9F: //ゴーゴータイム
-                        if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                        if( !pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.bIsGOGOTIME[ nPlayer ] = false;
@@ -4182,7 +4183,7 @@ namespace TJAPlayer3
 
                     #region [ EXTENDED COMMANDS ]
                     case 0xa0: //camera vertical move start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamVMoveChip = pChip;
@@ -4190,13 +4191,13 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xa1: //camera vertical move end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xa2: //camera horizontal move start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamHMoveChip = pChip;
@@ -4204,13 +4205,13 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xa3: //camera horizontal move end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xa4: //camera zoom start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamZoomChip = pChip;
@@ -4218,13 +4219,13 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xa5: //camera zoom end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xa6: //camera rotation start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamRotateChip = pChip;
@@ -4232,13 +4233,13 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xa7: //camera rotation end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xa8: //camera vertical scaling start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamVScaleChip = pChip;
@@ -4246,13 +4247,13 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xa9: //camera vertical scaling end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xb0: //camera horizontal scaling start
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             this.currentCamHScaleChip = pChip;
@@ -4260,20 +4261,20 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb1: //camera horizontal scaling end
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xb2: //change border color
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             TJAPlayer3.borderColor = pChip.borderColor;
                         }
                         break;
                     case 0xb3: //set camera x offset
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4282,7 +4283,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb4: //set camera y offset
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4291,7 +4292,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb5: //set camera zoom factor
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4300,7 +4301,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb6: //set camera rotation
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4309,7 +4310,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb7: //set camera x scale
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4318,7 +4319,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb8: //set camera y scale
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4327,7 +4328,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xb9: //reset camera
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4353,21 +4354,21 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xba: //enable doron
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             bCustomDoron = true;
                         }
                         break;
                     case 0xbb: //disable doron
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             bCustomDoron = false;
                         }
                         break;
                     case 0xbc: //add object
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4378,7 +4379,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xbd: //remove object
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4392,7 +4393,7 @@ namespace TJAPlayer3
                     case 0xc4:
                     case 0xc6:
                     case 0xc8:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4406,13 +4407,13 @@ namespace TJAPlayer3
                     case 0xc5:
                     case 0xc7:
                     case 0xc9:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         break;
                     case 0xca: //set object color
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4426,7 +4427,7 @@ namespace TJAPlayer3
                     case 0xce: //set object horizontal scale
                     case 0xcf: //set object rotation
                     case 0xd0: //set object opacity
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4435,7 +4436,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd1: //change texture
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4453,7 +4454,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd2: //reset texture
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
 
@@ -4471,7 +4472,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd3: //set config
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             string[] split = pChip.strConfigValue.Split('=');
@@ -4481,7 +4482,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd4: //start object animation
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
@@ -4490,7 +4491,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd5: //start object animation (looping)
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
@@ -4499,7 +4500,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd6: //end object animation
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
@@ -4508,7 +4509,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0xd7: //set object frame
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                             dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject obj);
@@ -4520,14 +4521,14 @@ namespace TJAPlayer3
 
 #region [ d8-d9: EXTENDED2 ]
 					case 0xd8:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             TJAPlayer3.ConfigIni.nGameType[nPlayer] = pChip.eGameType;
                             pChip.bHit = true;
                         }
                         break;
                     case 0xd9:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             bSplitLane[nPlayer] = true;
                             pChip.bHit = true;
@@ -4537,7 +4538,7 @@ namespace TJAPlayer3
 
 #region [ da: ミキサーへチップ音追加 ]
 					case 0xDA:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 //Debug.WriteLine( "[DA(AddMixer)] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値.ToString( "x2" ) + ", time=" + pChip.n発声時刻ms );
 							pChip.bHit = true;
@@ -4557,7 +4558,7 @@ namespace TJAPlayer3
 #endregion
 #region [ db: ミキサーからチップ音削除 ]
 					case 0xDB:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 //Debug.WriteLine( "[DB(RemoveMixer)] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値.ToString( "x2" ) + ", time=" + pChip.n発声時刻ms );
 							pChip.bHit = true;
@@ -4581,7 +4582,7 @@ namespace TJAPlayer3
 
 #region[ dc-df:太鼓(特殊命令) ]
                     case 0xDC: //DELAY
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 							//if ( dTX.listDELAY.ContainsKey( pChip.n整数値_内部番号 ) )
@@ -4591,7 +4592,7 @@ namespace TJAPlayer3
 						}
                         break;
                     case 0xDD: //SECTION
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < -10))
+                        if (!pChip.bHit && time < 0)
                         {
                             // 分岐毎にリセットしていたのでSECTIONの命令が来たらリセットする。
                             this.tBranchReset(nPlayer);
@@ -4600,7 +4601,7 @@ namespace TJAPlayer3
                         break;
 
                     case 0xDE: //Judgeに応じたCourseを取得
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             this.b強制分岐譜面[nPlayer] = false;
                             //分岐の種類はプレイヤー関係ないと思う
@@ -4639,7 +4640,7 @@ namespace TJAPlayer3
                         }
                         break;
                     case 0x52://End処理
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
 
                             pChip.bHit = true;
@@ -4647,21 +4648,21 @@ namespace TJAPlayer3
 
                         break;
                     case 0xE0:
-                        //if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                        //if( !pChip.bHit && time < 0 )
                         //{
-                            //#BARLINEONと#BARLINEOFF
-                            //演奏中は使用しません。
+                        //#BARLINEONと#BARLINEOFF
+                        //演奏中は使用しません。
                         //}
                         break;
                     case 0xE1:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             //LEVELHOLD
                             this.bLEVELHOLD[nPlayer] = true;
                         }
                         break;
                     case 0xE2:
-                        if( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                        if( !pChip.bHit && time < 0)
                         {
                             TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.t判定枠移動(dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].db移動時間, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動距離px, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].n移動方向, nPlayer, dTX.listJPOSSCROLL[nJPOSSCROLL[nPlayer]].nVerticalMove);
                             this.nJPOSSCROLL[ nPlayer ]++;
@@ -4671,7 +4672,7 @@ namespace TJAPlayer3
 #endregion
 #region[ f1: 歌詞 ]
                     case 0xF1:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             if (TJAPlayer3.ConfigIni.nPlayerCount == 1)
                             {
@@ -4688,7 +4689,7 @@ namespace TJAPlayer3
 #region[ ff: 譜面の強制終了 ]
                     //バグで譜面がとてつもないことになっているため、#ENDがきたらこれを差し込む。
                     case 0xFF:
-                        if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+                        if ( !pChip.bHit && time < 0)
 						{
                             if (TJAPlayer3.ConfigIni.bTokkunMode)
                             {
@@ -4711,35 +4712,35 @@ namespace TJAPlayer3
 
                     #region [ d8-d9: EXTENDED2 ]
                     case 0xe3:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             bSplitLane[nPlayer] = false;
                             pChip.bHit = true;
                         }
                         break;
                     case 0xe4:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        if (!pChip.bHit && time < 0)
                         {
                             pChip.bHit = true;
                         }
                         this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
                         break;
                     case 0x09:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        if (!pChip.bHit && time < 0)
                         {
 
                             pChip.bHit = true;
                         }
                         break;
                     case 0x0A:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        if (!pChip.bHit && time < 0)
                         {
 
                             pChip.bHit = true;
                         }
                         break;
                     case 0x0B:
-                        if (!pChip.bHit && (pChip.nバーからの距離dot.Taiko < 0))
+                        if (!pChip.bHit && time < 0)
                         {
 
                             pChip.bHit = true;
@@ -4749,7 +4750,7 @@ namespace TJAPlayer3
 
                     #region [ その他(未定義) ]
                     default:
-						if ( !pChip.bHit && ( pChip.nバーからの距離dot.Drums < 0 ) )
+						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
 						}

@@ -1,54 +1,35 @@
 ﻿// PeepoDrumKit 2023/10/28
 TITLE:Rhythm Challenge Tower
+TITLEJA:挑戦! リズム感覚テスト!
 SUBTITLE:OPTK Sound Team "Dashy"
+SUBTITLEJA:OPTK Sound Team 「Dashy」
 BPM:120
 WAVE:rhythmtest.ogg
 OFFSET:0
 DEMOSTART:0
 MAKER:Dashy
-SEVOL:0
+LYRICS:rhythmtest.vtt
 
 COURSE:Tower
 LEVEL:6
+LIFE:5
+SIDE:Ex
 SCOREINIT:
 SCOREDIFF:
 
 #START
 #BARLINEOFF
-0,
-,
-#MEASURE 16/4
-#LYRIC Welcome to Rhythm Challenge Tower!
-0
-#LYRIC Things are a little different here.
-0
-#LYRIC You can't rely on looking at the notes!
-0
-#LYRIC just tap [KA] to the beat!
-0,
-#MEASURE 4/4
+FFFF,
+FFFF,
+FFFF,
+FFFF,
+FFFF,
+F0F0FFF0,
 #GOGOSTART
 #SCROLL 1
-#LYRIC just tap [KA] to the beat!
-2
-#LYRIC
-0
-#LYRIC just tap [KA] to the beat!
-2
-#LYRIC
-0
-#LYRIC just tap [KA] to the beat!
-2
-#LYRIC
-0
-#LYRIC just tap [KA] to the beat!
-2
-#LYRIC
-0,
-#LYRIC
+2222,
 2222,
 #SCROLL 2.52632
-#LYRIC The music will dissapear sometimes,
 2
 #SCROLL 4.05263
 2
@@ -57,7 +38,6 @@ SCOREDIFF:
 #SCROLL 7.10526
 2,
 #SCROLL 8.63158
-#LYRIC so let's use a metronome to practice.
 2
 #SCROLL 10.1579
 2
@@ -72,10 +52,9 @@ SCOREDIFF:
 #SCROLL 17.7895
 2
 #SCROLL 19.3158
-#JPOSSCROLL 3 -155 1
+#JPOSSCROLL 3 -145 1
 2,
 #SCROLL 20.8421
-#LYRIC
 2
 #SCROLL 22.3684
 2
@@ -90,53 +69,32 @@ SCOREDIFF:
 #SCROLL -30
 22,
 2222,
-#MEASURE 16/4
 #GOGOEND
-#JPOSSCROLL 0.2 155 1
-#LYRIC That wasn't so bad, was it?
+#JPOSSCROLL 0.2 145 1
 2
 #SCROLL 1
-000
-#LYRIC But be careful...
-0000
-#LYRIC The metronome won't be around forever!
-00000000,
-#MEASURE 4/4
+FFF,
+FFFF,
+FFFF,
+F0F0FFF0,
 #GOGOSTART
 #SCROLL 1
-#LYRIC Can you keep the beat?
-2
+2222,
 #SCROLL 5.14286
+#JPOSSCROLL 3 -145 1
 2
 #SCROLL 9.28571
 2
 #SCROLL 13.4286
-2,
-#SCROLL 17.5714
-#JPOSSCROLL 5 -155 1
 2
+#SCROLL 17.5714
+2,
 #SCROLL 21.7143
 2
 #SCROLL 25.8571
 2
 #SCROLL -30
-2,
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0,
+22,
 2222,
 2222,
 2222,
@@ -144,98 +102,48 @@ SCOREDIFF:
 2222,
 2222,
 2222,
-#MEASURE 24/4
 #GOGOEND
-#JPOSSCROLL 0.2 155 1
-#LYRIC Fantastic work!
-20
-#LYRIC You seem ready for the real thing!
-00
-#LYRIC Are you ready? It's a long way up there!
-00,
-#MEASURE 4/4
+#JPOSSCROLL 0.2 145 1
+2FFF,
+FFFF,
+FFFF,
+FFFF,
+FFFF,
+F0F0FFF0,
 #GOGOSTART
 #SCROLL 1
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 2.21875
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 3.4375
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 4.65625
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0,
+2,
 #SCROLL 5.875
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 7.09375
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 8.3125
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 9.53125
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0,
+2,
 #SCROLL 10.75
-#JPOSSCROLL 4 -155 1
-#LYRIC Can you keep the beat?
+#JPOSSCROLL 5 -145 1
 2
-#LYRIC
-0
 #SCROLL 11.9688
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 13.1875
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 14.4062
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0,
+2,
 #SCROLL 15.625
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 16.8438
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 18.0625
-#LYRIC Can you keep the beat?
 2
-#LYRIC
-0
 #SCROLL 19.2812
-#LYRIC Can you keep the beat?
-2
-#LYRIC
-0,
+2,
 #SCROLL -100
 2222,
 2222,
@@ -269,31 +177,19 @@ SCOREDIFF:
 2222,
 2222,
 2222,
-#LYRIC Almost there!
 2222,
 2222,
-#LYRIC
 2222,
 2222,
 22
-#JPOSSCROLL 7 155 1
+#JPOSSCROLL 7 145 1
 22,
 2222,
 2222,
 2222,
-#MEASURE 40/4
+#MEASURE 8/4
 #GOGOEND
-#SCROLL 0.1
-#LYRIC Impressive! You made it all the way to the top!
-40
-#LYRIC Oh...? I think I can see another tower from here...
-00
-#LYRIC I hope to see you rise to the challenge, but for now,
-00
-#LYRIC bask in the glory of this accomplishment!
-00
-#LYRIC For now, this is farewell. Thank you for visiting!
-00,
-,
-,
+#BPMCHANGE 20
+#SCROLL 0.5
+40,
 #END

@@ -10,6 +10,7 @@ PREIMAGE:until.png
 OFFSET:-5.4669
 DEMOSTART:114.462
 MAKER:Dashy
+LYRICS:until.vtt
 TOWERTYPE:8
 
 COURSE:Tower
@@ -176,7 +177,6 @@ SCOREDIFF:
 #GOGOEND
 #BPMCHANGE 174
 #SCROLL 1
-#LYRIC As the blue sky disappeared, you perservered
 30
 #SCROLL 0.96875
 00
@@ -206,7 +206,6 @@ SCOREDIFF:
 #SCROLL 0.640625
 0
 #SCROLL 0.625
-#LYRIC No matter how you felt,
 10
 #SCROLL 0.59375
 00
@@ -219,24 +218,19 @@ SCOREDIFF:
 #SCROLL 0.5
 1020,
 10
-#LYRIC You said "forward's the only path."
 21,
 1020,
 1122,
 #BPMCHANGE 178
-#LYRIC That flaming soul I hear,
 1020,
 1000
-#LYRIC Let your heart burn free
 2011,
 10012010,
 1
-#LYRIC With passion, you will gleam
 020,
 #BPMCHANGE 180
 10012010,
 1
-#LYRIC Until the sky turns black...
 020,
 10010070,
 #SCROLL 0.5
@@ -259,7 +253,6 @@ SCOREDIFF:
 #BARLINEON
 #BPMCHANGE 182
 #SCROLL 1
-#LYRIC Keep it up!
 10100101,
 01201120,
 10100101,
@@ -306,7 +299,6 @@ SCOREDIFF:
 0,
 #GOGOSTART
 #BPMCHANGE 200
-#LYRIC Just a little more!
 9008,
 10201120,
 #BPMCHANGE 202
