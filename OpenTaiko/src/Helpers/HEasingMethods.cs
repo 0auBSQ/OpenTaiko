@@ -358,7 +358,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static double tCalculateEase(EEaseType type, EEaseFunction function, double timeStart, double timeEnd, double timeCurrent, double valueStart, double valueEnd)
+        public static double tCalculateEase(EEaseType type, EEaseFunction function, double timeStart, double timeEnd, double timeCurrent, double valueStart = 0, double valueEnd = 1)
         {
             if (timeStart == timeEnd) return valueEnd;
             double ratio = (timeCurrent - timeStart) / (timeEnd - timeStart);
