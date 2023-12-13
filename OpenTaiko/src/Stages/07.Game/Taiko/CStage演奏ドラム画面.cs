@@ -1978,6 +1978,9 @@ namespace TJAPlayer3
                     }
                     #endregion
 
+                    long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                    long time = pChip.n発声時刻ms - __dbt;
+                    
                     if( pChip.dbSCROLL_Y != 0.0 )
                     {
                         var dbSCROLL = pChip.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL;
@@ -1986,8 +1989,6 @@ namespace TJAPlayer3
 
 
                         double _scrollSpeed = pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.0) / 10.0;
-                        long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                        long time = pChip.n発声時刻ms - __dbt;
                         float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
                         y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, TJAPlayer3.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
@@ -2005,7 +2006,7 @@ namespace TJAPlayer3
                         }
                     }
 
-                    if ( pChip.nバーからの距離dot.Drums < 0 )
+                    if ( time < 0 )
                     {
                         this.actGame.st叩ききりまショー.b最初のチップが叩かれた = true;
                     }
