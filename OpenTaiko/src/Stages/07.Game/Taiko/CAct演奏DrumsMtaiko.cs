@@ -63,11 +63,11 @@ namespace TJAPlayer3
         {
             if( base.IsFirstDraw )
 			{
-                this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
                 base.IsFirstDraw = false;
             }
 
-            long num = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+            long num = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
             if ( num < this.nフラッシュ制御タイマ )
 			{
 				this.nフラッシュ制御タイマ = num;

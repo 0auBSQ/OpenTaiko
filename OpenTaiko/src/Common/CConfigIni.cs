@@ -1067,6 +1067,12 @@ namespace TJAPlayer3
 		public int n非フォーカス時スリープms;       // #23568 2010.11.04 ikanick add
 		public int nフレーム毎スリープms;            // #xxxxx 2011.11.27 yyagi add
 		public int n演奏速度;
+
+		public double SongPlaybackSpeed
+		{
+			get => ((double)n演奏速度) / 20.0;
+		}
+
 		public bool b演奏速度が一倍速であるとき以外音声を再生しない;
 		public int n曲が選択されてからプレビュー音が鳴るまでのウェイトms;
 		public int n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms;

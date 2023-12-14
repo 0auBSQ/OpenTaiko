@@ -1457,7 +1457,7 @@ namespace TJAPlayer3
                     foreach (CVideoDecoder cvd in this.listVD.Values)
                     {
                         cvd.InitRead();
-                        cvd.dbPlaySpeed = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
+                        cvd.dbPlaySpeed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
                     }
                 }
             }
@@ -1892,7 +1892,7 @@ namespace TJAPlayer3
                     CSound sound = wc.rSound[index];
                     if (sound != null)
                     {
-                        sound.PlaySpeed = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
+                        sound.PlaySpeed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
                         // 再生速度によって、WASAPI/ASIOで使う使用mixerが決まるため、付随情報の設定(音量/PAN)は、再生速度の設定後に行う
 
                         // 2018-08-27 twopointzero - DON'T attempt to load (or queue scanning) loudness metadata here.

@@ -9,57 +9,6 @@ using System.Collections.Generic;
 
 namespace TJAPlayer3
 {
-    // Small static class which refers to the Tower mode important informations
-    static internal class CFloorManagement
-    {
-        public static void reinitialize(int life)
-        {
-            CFloorManagement.LastRegisteredFloor = 1;
-            CFloorManagement.MaxNumberOfLives = life;
-            CFloorManagement.CurrentNumberOfLives = life;
-            CFloorManagement.InvincibilityFrames = null;
-        }
-
-        public static void damage()
-        {
-            if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDuration)
-                return;
-
-            if (CFloorManagement.CurrentNumberOfLives > 0)
-            {
-                CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDuration + 1000, 1, TJAPlayer3.Timer);
-                CFloorManagement.CurrentNumberOfLives--;
-                //TJAPlayer3.Skin.soundTowerMiss.t再生する();
-                TJAPlayer3.Skin.voiceTowerMiss[TJAPlayer3.SaveFile]?.t再生する();
-            }
-        }
-
-        public static bool isBlinking()
-        {
-            if (CFloorManagement.InvincibilityFrames == null || CFloorManagement.InvincibilityFrames.CurrentValue >= CFloorManagement.InvincibilityDuration)
-                return false;
-
-            if (CFloorManagement.InvincibilityFrames.CurrentValue % 200 > 100)
-                return false;
-
-            return true;
-        }
-
-        public static void loopFrames()
-        {
-            if (CFloorManagement.InvincibilityFrames != null)
-                CFloorManagement.InvincibilityFrames.Tick();
-        }
-
-        public static int LastRegisteredFloor = 1;
-        public static int MaxNumberOfLives = 5;
-        public static int CurrentNumberOfLives = 5;
-
-        // ms
-        public static readonly int InvincibilityDuration = 2000;
-        public static CCounter InvincibilityFrames = null;
-    }
-
     internal class CAct演奏Drums背景 : CActivity
     {
         // 本家っぽい背景を表示させるメソッド。
@@ -237,7 +186,7 @@ namespace TJAPlayer3
 
             this.ctSlideAnimation = new CCounter();
             this.ctClimbDuration = new CCounter();
-            this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20)) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter], TJAPlayer3.Timer);
+            this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter], TJAPlayer3.Timer);
             this.ctClimbingAnimation = new CCounter();
             this.ctRunningAnimation = new CCounter();
             this.ctClearAnimation = new CCounter();
@@ -426,7 +375,7 @@ namespace TJAPlayer3
                 float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
                 if (bFloorChanged == true)
-                    ctSlideAnimation.Start(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20), TJAPlayer3.Timer);
+                    ctSlideAnimation.Start(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed), TJAPlayer3.Timer);
 
                 float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
 
@@ -515,7 +464,7 @@ namespace TJAPlayer3
 
                 if (bFloorChanged == true)
                 {
-                    float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20);
+                    float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
                     ctClimbDuration.Start(0, 1500, 120f / floorBPM, TJAPlayer3.Timer);
                     ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter], TJAPlayer3.Timer);
                     ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], TJAPlayer3.Timer);
@@ -529,7 +478,7 @@ namespace TJAPlayer3
                 
                 if (stageEnded && !TowerFinished && !isClimbing)
                 {
-                    float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.n演奏速度 / 20);
+                    float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
                     ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Clear[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter], TJAPlayer3.Timer);
                     ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
                     ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Fail[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter], TJAPlayer3.Timer);
@@ -616,7 +565,7 @@ namespace TJAPlayer3
 
                 #region [Miss icon]
 
-                if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDuration)
+                if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDurationSpeedDependent)
                 {
                     if (TJAPlayer3.Tx.Tower_Miss != null)
                         TJAPlayer3.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - CFloorManagement.InvincibilityFrames.CurrentValue);

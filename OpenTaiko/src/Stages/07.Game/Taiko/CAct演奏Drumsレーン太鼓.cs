@@ -71,7 +71,7 @@ namespace TJAPlayer3
             if (base.IsFirstDraw)
             {
                 for (int i = 0; i < 5; i++)
-                    this.stBranch[i].nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+                    this.stBranch[i].nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
                 base.IsFirstDraw = false;
             }
 
@@ -712,7 +712,7 @@ namespace TJAPlayer3
                 }
                 */
             }
-            var nTime = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+            var nTime = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
@@ -956,7 +956,7 @@ namespace TJAPlayer3
 
         public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs)
         {
-            this.n移動開始時刻[nPlayer] = (int)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+            this.n移動開始時刻[nPlayer] = (int)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
             this.n移動開始X[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLX[nPlayer];
             this.n移動開始Y[nPlayer] = TJAPlayer3.stage演奏ドラム画面.JPOSCROLLY[nPlayer];
             this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);
