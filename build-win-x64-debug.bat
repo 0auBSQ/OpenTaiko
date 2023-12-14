@@ -1,0 +1,1 @@
+dotnet publish OpenTaiko/OpenTaiko.csproj --configuration Debug -p:PublishSingleFile=true --self-contained true --runtime win-x64
