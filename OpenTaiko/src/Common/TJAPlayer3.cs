@@ -2338,34 +2338,42 @@ for (int i = 0; i < 3; i++) {
 			{
 				if (TJAPlayer3.Input管理.Keyboard.KeyPressed(capture.コード) && capture.コード != 0)
 				{
-					if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
-					{
-						if (r現在のステージ.eステージID != CStage.Eステージ.演奏)
+#if DEBUG
+						if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
 						{
-							RefleshSkin();
-							r現在のステージ.DeActivate();
-							if (!ConfigIni.PreAssetsLoading) 
+							if (r現在のステージ.eステージID != CStage.Eステージ.演奏)
 							{
-								r現在のステージ.ReleaseManagedResource();
-								r現在のステージ.ReleaseUnmanagedResource();
-							}
-							r現在のステージ.Activate();
-							if (!ConfigIni.PreAssetsLoading) 
-							{
-								r現在のステージ.CreateManagedResource();
-								r現在のステージ.CreateUnmanagedResource();
+								RefleshSkin();
+								r現在のステージ.DeActivate();
+								if (!ConfigIni.PreAssetsLoading) 
+								{
+									r現在のステージ.ReleaseManagedResource();
+									r現在のステージ.ReleaseUnmanagedResource();
+								}
+								r現在のステージ.Activate();
+								if (!ConfigIni.PreAssetsLoading) 
+								{
+									r現在のステージ.CreateManagedResource();
+									r現在のステージ.CreateUnmanagedResource();
+								}
 							}
 						}
-					}
-					else
-                    {
-						// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
+						else
+						{
+							// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
+							string strFullPath =
+							   Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+							strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+							SaveResultScreen(strFullPath);
+						}
+#else
 						string strFullPath =
-						   Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+							Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
 						strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
 						SaveResultScreen(strFullPath);
+#endif
 					}
-				}
+
 			}
 
 			/*
@@ -2582,9 +2590,9 @@ for (int i = 0; i < 3; i++) {
         }
 
         //-----------------
-        #endregion
+		#endregion
 
-        #region [ private ]
+		#region [ private ]
         //-----------------
         private bool bマウスカーソル表示中 = true;
 		private bool b終了処理完了済み;
@@ -3078,9 +3086,9 @@ for (int i = 0; i < 3; i++) {
 			}
 
             //---------------------
-            #endregion
+			#endregion
 
-            #region Discordの処理
+			#region Discordの処理
 			DiscordClient = new DiscordRpcClient("939341030141096007");
 			DiscordClient?.Initialize();
 			StartupTime = DateTime.UtcNow;
@@ -3095,13 +3103,13 @@ for (int i = 0; i < 3; i++) {
 					LargeImageText = TJAPlayer3.LargeImageText,
 				}
 			});
-            #endregion
+			#endregion
 
 
             Trace.TraceInformation( "アプリケーションの初期化を完了しました。" );
 
 
-            #region [ 最初のステージの起動 ]
+			#region [ 最初のステージの起動 ]
             //---------------------
             Trace.TraceInformation( "----------------------" );
 			Trace.TraceInformation( "■ 起動" );
@@ -3215,11 +3223,11 @@ for (int i = 0; i < 3; i++) {
 					}
 				}
                 //---------------------
-                #endregion
-                #region Discordの処理
+				#endregion
+				#region Discordの処理
 				DiscordClient?.Dispose();
-                #endregion
-                #region [ 曲リストの終了処理 ]
+				#endregion
+				#region [ 曲リストの終了処理 ]
                 //---------------------
                 if (Songs管理 != null)
 				{
@@ -3250,11 +3258,11 @@ for (int i = 0; i < 3; i++) {
 					}
 				}
                 //---------------------
-                #endregion
-                #region TextureLoaderの処理
+				#endregion
+				#region TextureLoaderの処理
                 Tx.DisposeTexture();
-                #endregion
-                #region [ スキンの終了処理 ]
+				#endregion
+				#region [ スキンの終了処理 ]
                 //---------------------
                 if (Skin != null)
 				{
