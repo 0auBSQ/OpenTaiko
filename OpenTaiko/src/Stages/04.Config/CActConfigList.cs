@@ -1070,7 +1070,7 @@ namespace TJAPlayer3
 			//-----------------
 			if( base.IsFirstDraw )
 			{
-				this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+				this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 				this.ct三角矢印アニメ.Start( 0, 9, 50, TJAPlayer3.Timer );
 			
 				base.IsFirstDraw = false;

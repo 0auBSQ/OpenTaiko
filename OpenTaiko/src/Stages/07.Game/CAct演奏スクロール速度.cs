@@ -43,7 +43,7 @@ namespace TJAPlayer3
 					//this.n速度変更制御タイマ.Drums = this.n速度変更制御タイマ.Guitar = this.n速度変更制御タイマ.Bass = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 					for (int i = 0; i < 5; i++)
                     {
-						this.n速度変更制御タイマ[i] = (long)(SoundManager.PlayTimer.NowTime * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+						this.n速度変更制御タイマ[i] = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 
 					}
 					

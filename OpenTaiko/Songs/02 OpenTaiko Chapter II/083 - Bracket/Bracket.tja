@@ -1,4 +1,4 @@
-﻿// PeepoDrumKit 2023/10/06
+﻿// PeepoDrumKit 2023/10/28
 TITLE:<Bracket> ～Duplicate of Chaos and Destruction～
 TITLEJA:<Bracket> ～破壊ト混沌ノ複製～
 SUBTITLE:--TFD500
@@ -6,7 +6,7 @@ SUBTITLEJA:TFD500
 BPM:150
 WAVE:Bracket.ogg
 OFFSET:-0.047
-DEMOSTART:0
+DEMOSTART:32.047
 MAKER:bol & Komi
 
 COURSE:Oni

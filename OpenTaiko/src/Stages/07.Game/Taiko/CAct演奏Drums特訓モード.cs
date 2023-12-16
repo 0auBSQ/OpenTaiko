@@ -64,7 +64,7 @@ namespace TJAPlayer3
 				{
 					bIsInGoGo = true;
 
-					var current = ((double)(pChip.db発声時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)));
+					var current = ((double)(pChip.db発声時刻ms * TJAPlayer3.ConfigIni.SongPlaybackSpeed));
 					var width = 0;
 					if (TJAPlayer3.Tx.Tokkun_ProgressBar != null) width = TJAPlayer3.Tx.Tokkun_ProgressBar.szテクスチャサイズ.Width;
 
@@ -142,7 +142,7 @@ namespace TJAPlayer3
 						{
 							for (int index = this.JumpPointList.Count - 1; index >= 0; index--)
 							{
-								if (this.JumpPointList[index].Time <= SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
+								if (this.JumpPointList[index].Time <= SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
 								{
 									this.n現在の小節線 = this.JumpPointList[index].Measure;
 									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
@@ -184,7 +184,7 @@ namespace TJAPlayer3
 						{
 							for (int index = 0; index < this.JumpPointList.Count; index++)
 							{
-								if (this.JumpPointList[index].Time >= SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))
+								if (this.JumpPointList[index].Time >= SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
 								{
 									this.n現在の小節線 = this.JumpPointList[index].Measure;
 									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
@@ -283,15 +283,15 @@ namespace TJAPlayer3
 						this.n現在の小節線 = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0];
 					}
 
-					if (SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0) > this.n最終演奏位置ms)
+					if (SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed > this.n最終演奏位置ms)
 					{
-						this.n最終演奏位置ms = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+						this.n最終演奏位置ms = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 					}
 				}
 
 			}
 
-			var current = (double)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+			var current = (double)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 			var percentage = current / length;
 
 			var currentWhite = (double)(this.n最終演奏位置ms);
@@ -373,7 +373,7 @@ namespace TJAPlayer3
 					x += TJAPlayer3.Skin.Game_Training_BigNumber_Width - 2;
 				}
 
-				var PlaySpdtmp = TJAPlayer3.ConfigIni.n演奏速度 / 20.0d * 10.0d;
+				var PlaySpdtmp = TJAPlayer3.ConfigIni.SongPlaybackSpeed * 10.0d;
 				PlaySpdtmp = Math.Round(PlaySpdtmp, MidpointRounding.AwayFromZero);
 
 				var playSpd = PlaySpdtmp / 10.0d;
@@ -510,14 +510,14 @@ namespace TJAPlayer3
 
 			if (doScroll)
 			{
-				this.nスクロール後ms = (long)(dTX.listChip[TJAPlayer3.stage演奏ドラム画面.n現在のトップChip].n発声時刻ms / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+				this.nスクロール後ms = (long)(dTX.listChip[TJAPlayer3.stage演奏ドラム画面.n現在のトップChip].n発声時刻ms / TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 				this.bスクロール中 = true;
 
 				this.ctスクロールカウンター = new CCounter(0, TJAPlayer3.Skin.Game_Training_ScrollTime, 1, TJAPlayer3.Timer);
 			}
 			else
 			{
-				SoundManager.PlayTimer.NowTimeMs = (long)(dTX.listChip[TJAPlayer3.stage演奏ドラム画面.n現在のトップChip].n発声時刻ms / (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
+				SoundManager.PlayTimer.NowTimeMs = (long)(dTX.listChip[TJAPlayer3.stage演奏ドラム画面.n現在のトップChip].n発声時刻ms / TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 				this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 			}
 		}
@@ -526,8 +526,8 @@ namespace TJAPlayer3
 		{
 			if (!this.bスクロール中 && this.b特訓PAUSE)
 			{
-				if (!JumpPointList.Contains(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), Measure = this.n現在の小節線 }))
-					JumpPointList.Add(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)), Measure = this.n現在の小節線 });
+				if (!JumpPointList.Contains(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed), Measure = this.n現在の小節線 }))
+					JumpPointList.Add(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed), Measure = this.n現在の小節線 });
 				TJAPlayer3.Skin.sound特訓ジャンプポイント.t再生する();
 				JumpPointList.Sort((a, b) => a.Time.CompareTo(b.Time));
 			}

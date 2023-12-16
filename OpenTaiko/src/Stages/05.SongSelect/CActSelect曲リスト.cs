@@ -3147,7 +3147,7 @@ namespace TJAPlayer3
         private TitleTextureKey ttkGenerateBPMTexture(C曲リストノード node, Color forecolor, Color backcolor)
         {
 			var _score = node.arスコア[tFetchDifficulty(node)].譜面情報;
-			var _speed = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
+			var _speed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
 
             double[] bpms = new double[3] {
 				_score.BaseBpm * _speed,
