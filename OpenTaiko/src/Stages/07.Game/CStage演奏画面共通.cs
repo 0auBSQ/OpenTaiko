@@ -3724,7 +3724,7 @@ namespace TJAPlayer3
                             //this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip);
                             //2015.04.13 kairera0467 ここを外さないと恋文2000の連打に対応できず、ここをつけないと他のコースと重なっている連打をどうにもできない。
                             //常時実行メソッドに渡したら対応できた!?
-                            //if ((!pChip.bHit && ( time < 0 )))
+                            //if ((!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0)))
                             {
                                 if( ( pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nノーツ終了時刻ms >= (int)n現在時刻ms ) )
                                 {
@@ -3910,6 +3910,7 @@ namespace TJAPlayer3
 #region [ 50: 小節線 ]
 					case 0x50:	// 小節線
 						{
+
                             if ( !pChip.bHit && time < 0)
                             {
                                 //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);

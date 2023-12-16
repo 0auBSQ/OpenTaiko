@@ -2272,7 +2272,7 @@ namespace TJAPlayer3
                         #region [ 拍子_拍線の挿入 ]
                         if (this.listChip.Count > 0)
                         {
-                            //this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
+                            this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
                                                         // 保守性確保を優先してここでのソートは残しておく
                                                         // なお、093時点では、このソートを削除しても動作するようにはしてある。
                                                         // (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
@@ -2369,7 +2369,7 @@ namespace TJAPlayer3
                             else if (chip.nチャンネル番号 == 0xF1) { }
                             else if (chip.nチャンネル番号 == 0xF2) { }
                             else if (chip.nチャンネル番号 == 0xFF) { }
-                            //else if (chip.nチャンネル番号 == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); }
+                            else if (chip.nチャンネル番号 == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); }
                             else if (chip.nチャンネル番号 == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); }
                             else if (chip.nチャンネル番号 < 0x93)
                                 chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
@@ -6550,7 +6550,6 @@ namespace TJAPlayer3
                 }
                 else
                 {
-                    /*
                     if (this.b小節線を挿入している == false)
                     {
                         // 小節線にもやってあげないと
@@ -6637,52 +6636,6 @@ namespace TJAPlayer3
 
                         #endregion
 
-                    }
-                    */
-
-                    int measureTime = (int)this.dbNowTime;
-                    void addMeasureLine(ECourse course)
-                    {
-                            CChip chip = new CChip();
-                            chip.n発声位置 = ((this.n現在の小節数) * 384);
-                            chip.nチャンネル番号 = 0x50;
-                            chip.n発声時刻ms = measureTime;
-                            chip.n整数値 = this.n現在の小節数;
-                            chip.n文字数 = n文字数;
-                            chip.n整数値_内部番号 = this.n現在の小節数;
-                            chip.dbBPM = this.dbNowBPM;
-                            chip.fNow_Measure_m = this.fNow_Measure_m;
-                            chip.fNow_Measure_s = this.fNow_Measure_s;
-                            chip.IsEndedBranching = IsEndedBranching;
-                            chip.dbSCROLL = this.dbNowScroll;
-                            chip.dbSCROLL_Y = this.dbNowScrollY;
-                            chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
-                            chip.eScrollMode = eScrollMode;
-
-                            chip.nコース = course;
-
-                            chip.b可視 = true;
-                            chip.bHideBarLine = this.bBARLINECUE[0] == 1;
-                            #region [ 作り直し ]  
-                            if (IsEndedBranching)
-                            {
-                                if (this.IsBranchBarDraw[(int)course])
-                                    chip.bBranch = true;
-                            }
-                            else
-                            {
-                                if (this.IsBranchBarDraw[(int)n現在のコース])
-                                    chip.bBranch = true;
-                            }
-                            #endregion
-
-                            this.listChip.Add(chip);
-
-                            #region [ 作り直し ]  
-                            if (IsEndedBranching)
-                                this.IsBranchBarDraw[(int)course] = false;
-                            else this.IsBranchBarDraw[(int)n現在のコース] = false;
-                            #endregion
                     }
 
                     for (int n = 0; n < InputText.Length; n++)
@@ -6991,11 +6944,7 @@ namespace TJAPlayer3
                                     this.listChip_Branch[(int)chip.nコース].Add(chip);
                                     this.listChip.Add(chip);
                                 }
-
-                                if (i == 0)
-                                {
-                                    addMeasureLine(chip.nコース);
-                                }
+                                    
                             }
                         }
 
@@ -8480,7 +8429,7 @@ namespace TJAPlayer3
             listChip.AddRange(listAddMixerChannel);
             listChip.AddRange(listRemoveMixerChannel);
             listChip.AddRange(listRemoveTiming);
-            //listChip.Sort();
+            listChip.Sort();
         }
         private void DebugOut_CChipList(List<CChip> c)
         {
