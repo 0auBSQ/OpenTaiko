@@ -7,19 +7,6 @@ namespace TJAPlayer3
 {
 	public class CStage : CActivity
 	{
-		// プロパティ
-
-		internal enum EHitDetection
-		{
-			PERFECT,
-			GREAT,
-			GOOD,
-			POOR,
-			MISS,
-			BAD,
-			AUTO
-		}
-
 		internal EStage eStageID;
 		public enum EStage
 		{
