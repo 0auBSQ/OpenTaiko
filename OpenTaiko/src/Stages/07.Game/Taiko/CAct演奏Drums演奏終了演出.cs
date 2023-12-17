@@ -593,7 +593,7 @@ namespace TJAPlayer3
             {
                 base.IsFirstDraw = false;
             }
-            if (this.ct進行メイン != null && (TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_演奏終了演出 || TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト))
+            if (this.ct進行メイン != null && (TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut))
             {
                 this.ct進行メイン.Tick();
 

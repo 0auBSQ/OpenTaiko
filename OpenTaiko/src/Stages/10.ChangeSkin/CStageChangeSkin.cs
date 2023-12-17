@@ -19,7 +19,7 @@ namespace TJAPlayer3
 
 		public CStageChangeSkin()
 		{
-			base.eステージID = CStage.Eステージ.ChangeSkin;
+			base.eStageID = CStage.EStage.ChangeSkin;
 			base.IsDeActivated = true;
 		}
 

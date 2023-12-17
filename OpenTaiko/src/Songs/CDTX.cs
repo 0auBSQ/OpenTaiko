@@ -6174,7 +6174,7 @@ namespace TJAPlayer3
             }
             else if (command == "#LYRIC" && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
             {
-                if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
+                if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
                     this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor, null, 30));
 
                 var chip = new CChip();
@@ -7745,7 +7745,7 @@ namespace TJAPlayer3
                         {
                             try
                             {
-                                if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)
+                                if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)
                                 {
                                     if (filePaths[i].EndsWith(".vtt"))
                                     {
@@ -7785,7 +7785,7 @@ namespace TJAPlayer3
                         {
                             try
                             {
-                                if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)//起動時に重たくなってしまう問題の修正用
+                                if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
                                     this.LyricFileParser(strFilePath[index], index);
                                 this.bLyrics = true;
                                 this.usingLyricsFile = true;
@@ -8494,7 +8494,7 @@ namespace TJAPlayer3
         private CCachedFontRenderer pf歌詞フォント;
         public override void Activate()
         {
-            if (TJAPlayer3.r現在のステージ.eステージID == CStage.Eステージ.曲読み込み)
+            if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)
             {
                 //まさかこれが原因で曲の読み込みが停止するとは思わなかった...
                 //どういうことかというとスキンを読み込むときに...いや厳密には

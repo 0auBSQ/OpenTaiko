@@ -19,8 +19,8 @@ namespace TJAPlayer3
 
 		public CStage曲読み込み()
 		{
-			base.eステージID = CStage.Eステージ.曲読み込み;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.SongLoading;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.IsDeActivated = true;
 			//base.list子Activities.Add( this.actFI = new CActFIFOBlack() );	// #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
 			//base.list子Activities.Add( this.actFO = new CActFIFOBlack() );
@@ -235,7 +235,7 @@ namespace TJAPlayer3
 					this.nBGMの総再生時間ms = TJAPlayer3.Skin.sound曲読込開始音.n長さ_現在のサウンド;
 				}
 				//this.actFI.tフェードイン開始();							// #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
-				base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 				base.IsFirstDraw = false;
 
 				nWAVcount = 1;
@@ -464,16 +464,16 @@ namespace TJAPlayer3
 				#endregion
 			}
 
-            switch ( base.eフェーズID )
+            switch ( base.ePhaseID )
 			{
-				case CStage.Eフェーズ.共通_フェードイン:
+				case CStage.EPhase.Common_FADEIN:
 					//if( this.actFI.On進行描画() != 0 )			    // #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
 																		// 必ず一度「CStaeg.Eフェーズ.共通_フェードイン」フェーズを経由させること。
 																		// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。 
-						base.eフェーズID = CStage.Eフェーズ.NOWLOADING_DTXファイルを読み込む;
+						base.ePhaseID = CStage.EPhase.SongLoading_LoadDTXFile;
 					return (int) E曲読込画面の戻り値.継続;
 
-				case CStage.Eフェーズ.NOWLOADING_DTXファイルを読み込む:
+				case CStage.EPhase.SongLoading_LoadDTXFile:
 					{
 						timeBeginLoad = DateTime.Now;
 						TimeSpan span;
@@ -554,21 +554,21 @@ namespace TJAPlayer3
 							#endregion
 						}
 
-                        base.eフェーズID = CStage.Eフェーズ.NOWLOADING_WAV読み込み待機;
+                        base.ePhaseID = CStage.EPhase.SongLoading_WaitToLoadWAVFile;
 						timeBeginLoadWAV = DateTime.Now;
 						return (int) E曲読込画面の戻り値.継続;
 					}
 
-                case CStage.Eフェーズ.NOWLOADING_WAV読み込み待機:
+                case CStage.EPhase.SongLoading_WaitToLoadWAVFile:
                     {
                         if( this.ct待機.CurrentValue > 260 )
                         {
-						    base.eフェーズID = CStage.Eフェーズ.NOWLOADING_WAVファイルを読み込む;
+						    base.ePhaseID = CStage.EPhase.SongLoading_LoadWAVFile;
                         }
 						return (int) E曲読込画面の戻り値.継続;
                     }
 
-				case CStage.Eフェーズ.NOWLOADING_WAVファイルを読み込む:
+				case CStage.EPhase.SongLoading_LoadWAVFile:
 					{
 						int looptime = (TJAPlayer3.ConfigIni.b垂直帰線待ちを行う)? 3 : 1;	// VSyncWait=ON時は1frame(1/60s)あたり3つ読むようにする
 						for ( int i = 0; i < looptime && nWAVcount <= TJAPlayer3.DTX.listWAV.Count; i++ )
@@ -604,12 +604,12 @@ namespace TJAPlayer3
 
 							span = (TimeSpan) ( DateTime.Now - timeBeginLoadWAV );
 
-							base.eフェーズID = CStage.Eフェーズ.NOWLOADING_BMPファイルを読み込む;
+							base.ePhaseID = CStage.EPhase.SongLoading_LoadBMPFile;
 						}
 						return (int) E曲読込画面の戻り値.継続;
 					}
 
-				case CStage.Eフェーズ.NOWLOADING_BMPファイルを読み込む:
+				case CStage.EPhase.SongLoading_LoadBMPFile:
 					{
 						TimeSpan span;
 						DateTime timeBeginLoadBMPAVI = DateTime.Now;
@@ -631,11 +631,11 @@ namespace TJAPlayer3
 
 						TJAPlayer3.Timer.Update();
                         //CSound管理.rc演奏用タイマ.t更新();
-						base.eフェーズID = CStage.Eフェーズ.NOWLOADING_システムサウンドBGMの完了を待つ;
+						base.ePhaseID = CStage.EPhase.SongLoading_WaitForSoundSystemBGM;
 						return (int) E曲読込画面の戻り値.継続;
 					}
 
-				case CStage.Eフェーズ.NOWLOADING_システムサウンドBGMの完了を待つ:
+				case CStage.EPhase.SongLoading_WaitForSoundSystemBGM:
 					{
 						long nCurrentTime = TJAPlayer3.Timer.NowTime;
 						if( nCurrentTime < this.nBGM再生開始時刻 )
@@ -644,12 +644,12 @@ namespace TJAPlayer3
 //						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) > ( this.nBGMの総再生時間ms - 1000 ) )
 						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) >= ( this.nBGMの総再生時間ms ) )	// #27787 2012.3.10 yyagi 1000ms == フェードイン分の時間
 						{
-							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						}
 						return (int) E曲読込画面の戻り値.継続;
 					}
 
-				case CStage.Eフェーズ.共通_フェードアウト:
+				case CStage.EPhase.Common_FADEOUT:
 					if ( this.ct待機.IsUnEnded )		// DTXVモード時は、フェードアウト省略
 						return (int)E曲読込画面の戻り値.継続;
 

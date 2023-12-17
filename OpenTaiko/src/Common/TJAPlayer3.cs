@@ -871,17 +871,17 @@ namespace TJAPlayer3
 				{
 					actEnumSongs.Draw();							// "Enumerating Songs..."アイコンの描画
 				}
-				switch ( r現在のステージ.eステージID )
+				switch ( r現在のステージ.eStageID )
 				{
-					case CStage.Eステージ.タイトル:
-					case CStage.Eステージ.コンフィグ:
-					case CStage.Eステージ.選曲:
-					case CStage.Eステージ.曲読み込み:
+					case CStage.EStage.Title:
+					case CStage.EStage.Config:
+					case CStage.EStage.SongSelect:
+					case CStage.EStage.SongLoading:
 						if ( EnumSongs != null )
 						{
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if ( r現在のステージ.eステージID == CStage.Eステージ.タイトル &&
-								 r直前のステージ.eステージID == CStage.Eステージ.起動 &&
+							if ( r現在のステージ.eStageID == CStage.EStage.Title &&
+								 r直前のステージ.eStageID == CStage.EStage.StartUp &&
 								 this.n進行描画の戻り値 == (int) CStageタイトル.E戻り値.継続 &&
 								 !EnumSongs.IsSongListEnumStarted )
 							{
@@ -898,7 +898,7 @@ namespace TJAPlayer3
 							#endregion
 							
 							#region [ 曲検索の中断と再開 ]
-							if ( r現在のステージ.eステージID == CStage.Eステージ.選曲 && !EnumSongs.IsSongListEnumCompletelyDone )
+							if ( r現在のステージ.eStageID == CStage.EStage.SongSelect && !EnumSongs.IsSongListEnumCompletelyDone )
 							{
 								switch ( this.n進行描画の戻り値 )
 								{
@@ -927,7 +927,7 @@ namespace TJAPlayer3
 							#endregion
 
 							#region [ 曲探索中断待ち待機 ]
-							if ( r現在のステージ.eステージID == CStage.Eステージ.曲読み込み && !EnumSongs.IsSongListEnumCompletelyDone &&
+							if ( r現在のステージ.eStageID == CStage.EStage.SongLoading && !EnumSongs.IsSongListEnumCompletelyDone &&
 								EnumSongs.thDTXFileEnumerate != null )							// #28700 2012.6.12 yyagi; at Compact mode, enumerating thread does not exist.
 							{
 								EnumSongs.WaitUntilSuspended();									// 念のため、曲検索が一時中断されるまで待機
@@ -946,7 +946,7 @@ namespace TJAPlayer3
 								}
 								TJAPlayer3.stage選曲.bIsEnumeratingSongs = false;
 
-								bool bRemakeSongTitleBar = ( r現在のステージ.eステージID == CStage.Eステージ.選曲 ) ? true : false;
+								bool bRemakeSongTitleBar = ( r現在のステージ.eStageID == CStage.EStage.SongSelect ) ? true : false;
 								TJAPlayer3.stage選曲.Refresh( EnumSongs.Songs管理, bRemakeSongTitleBar );
 								EnumSongs.SongListEnumCompletelyDone();
 							}
@@ -956,12 +956,12 @@ namespace TJAPlayer3
 				}
 				#endregion
 
-				switch ( r現在のステージ.eステージID )
+				switch ( r現在のステージ.eStageID )
 				{
-					case CStage.Eステージ.何もしない:
+					case CStage.EStage.None:
 						break;
 
-					case CStage.Eステージ.起動:
+					case CStage.EStage.StartUp:
 						#region [ *** ]
 						//-----------------------------
 						if( this.n進行描画の戻り値 != 0 )
@@ -1017,7 +1017,7 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.タイトル:
+					case CStage.EStage.Title:
 						#region [ *** ]
 						//-----------------------------
 						switch( this.n進行描画の戻り値 )
@@ -1251,14 +1251,14 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.コンフィグ:
+					case CStage.EStage.Config:
 						#region [ *** ]
 						//-----------------------------
 						if( this.n進行描画の戻り値 != 0 )
 						{
-							switch( r直前のステージ.eステージID )
+							switch( r直前のステージ.eStageID )
 							{
-								case CStage.Eステージ.タイトル:
+								case CStage.EStage.Title:
 									#region [ *** ]
 									//-----------------------------
 									r現在のステージ.DeActivate();
@@ -1291,7 +1291,7 @@ namespace TJAPlayer3
 								//-----------------------------
 									#endregion
 
-								case CStage.Eステージ.選曲:
+								case CStage.EStage.SongSelect:
 									#region [ *** ]
 									//-----------------------------
 									r現在のステージ.DeActivate();
@@ -1329,7 +1329,7 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.選曲:
+					case CStage.EStage.SongSelect:
 						#region [ *** ]
 						//-----------------------------
 						switch( this.n進行描画の戻り値 )
@@ -1498,7 +1498,7 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.段位選択:
+					case CStage.EStage.DanDojoSelect:
 						#region [ *** ]
 						switch (this.n進行描画の戻り値)
 						{
@@ -1577,7 +1577,7 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.Heya:
+					case CStage.EStage.Heya:
 						#region [ *** ]
 						switch (this.n進行描画の戻り値)
 						{
@@ -1619,7 +1619,7 @@ namespace TJAPlayer3
 						#endregion
 						break;
 
-					case CStage.Eステージ.曲読み込み:
+					case CStage.EStage.SongLoading:
 						#region [ *** ]
 						//-----------------------------
 						DTXVmode.Refreshed = false;		// 曲のリロード中に発生した再リロードは、無視する。
@@ -1717,7 +1717,7 @@ for (int i = 0; i < 3; i++) {
 						#endregion
 						break;
 
-					case CStage.Eステージ.演奏:
+					case CStage.EStage.Game:
 						#region [ *** ]
 
 						#region [ DTXVモード中にDTXCreatorから指示を受けた場合の処理 ]
@@ -2051,7 +2051,7 @@ for (int i = 0; i < 3; i++) {
 						#endregion
 						break;
 
-					case CStage.Eステージ.結果:
+					case CStage.EStage.Results:
 						#region [ *** ]
 						//-----------------------------
 						if( this.n進行描画の戻り値 != 0 )
@@ -2120,7 +2120,7 @@ for (int i = 0; i < 3; i++) {
 						break;
 
 
-					case CStage.Eステージ.TaikoTowers:
+					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
 						switch (this.n進行描画の戻り値)
 						{
@@ -2194,7 +2194,7 @@ for (int i = 0; i < 3; i++) {
 						#endregion
 						break;
 
-					case CStage.Eステージ.ChangeSkin:
+					case CStage.EStage.ChangeSkin:
 						#region [ *** ]
 						//-----------------------------
 						if ( this.n進行描画の戻り値 != 0 )
@@ -2221,7 +2221,7 @@ for (int i = 0; i < 3; i++) {
 						#endregion
 						break;
 
-					case CStage.Eステージ.終了:
+					case CStage.EStage.End:
 						#region [ *** ]
 						//-----------------------------
 						if( this.n進行描画の戻り値 != 0 )
@@ -2309,7 +2309,7 @@ for (int i = 0; i < 3; i++) {
 					Camera = Matrix4X4<float>.Identity;
 				}
 
-				if (r現在のステージ != null && r現在のステージ.eステージID != CStage.Eステージ.起動 && TJAPlayer3.Tx.Network_Connection != null)
+				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Network_Connection != null)
 				{
 					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.前回のシステム時刻ms) > 10000)
 					{
@@ -2328,7 +2328,7 @@ for (int i = 0; i < 3; i++) {
 				// Display log cards
 				VisualLogManager.Display();
 
-				if (r現在のステージ != null && r現在のステージ.eステージID != CStage.Eステージ.起動 && TJAPlayer3.Tx.Overlay != null)
+				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Overlay != null)
 				{
 					TJAPlayer3.Tx.Overlay.t2D描画(0, 0);
 				}
@@ -2341,7 +2341,7 @@ for (int i = 0; i < 3; i++) {
 #if DEBUG
 						if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
 						{
-							if (r現在のステージ.eステージID != CStage.Eステージ.演奏)
+							if (r現在のステージ.eStageID != CStage.EStage.Game)
 							{
 								RefleshSkin();
 								r現在のステージ.DeActivate();

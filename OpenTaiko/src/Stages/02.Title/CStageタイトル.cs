@@ -16,7 +16,7 @@ namespace TJAPlayer3
 
 		public CStageタイトル()
 		{
-			base.eステージID = CStage.Eステージ.タイトル;
+			base.eStageID = CStage.EStage.Title;
 			base.IsDeActivated = true;
 			base.ChildActivities.Add(this.actFIfromSetup = new CActFIFOBlack());
 			base.ChildActivities.Add(this.actFI = new CActFIFOBlack());
@@ -137,12 +137,12 @@ namespace TJAPlayer3
 					if (TJAPlayer3.r直前のステージ == TJAPlayer3.stage起動)
 					{
 						this.actFIfromSetup.tフェードイン開始();
-						base.eフェーズID = CStage.Eフェーズ.タイトル_起動画面からのフェードイン;
+						base.ePhaseID = CStage.EPhase.Title_FadeIn;
 					}
 					else
 					{
 						this.actFI.tフェードイン開始();
-						base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+						base.ePhaseID = CStage.EPhase.Common_FADEIN;
 					}
 					base.IsFirstDraw = false;
 				}
@@ -170,7 +170,7 @@ namespace TJAPlayer3
 
 				#region [ キー関係 ]
 
-				if (base.eフェーズID == CStage.Eフェーズ.共通_通常状態        // 通常状態、かつ
+				if (base.ePhaseID == CStage.EPhase.Common_NORMAL        // 通常状態、かつ
 					&& TJAPlayer3.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
 				{
 					if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
@@ -188,7 +188,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.sound決定音.t再生する();
 							n現在の選択行モード選択 = (int)E戻り値.EXIT + 1;
 							this.actFO.tフェードアウト開始(0, 500);
-							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						}
 					}
 
@@ -355,7 +355,7 @@ namespace TJAPlayer3
 							{
 								TJAPlayer3.Skin.sound決定音.t再生する();
 								this.actFO.tフェードアウト開始(0, 500);
-								base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							}
 							else
 								TJAPlayer3.Skin.soundError.t再生する();
@@ -946,34 +946,34 @@ namespace TJAPlayer3
 #endif
 				#endregion
 
-				CStage.Eフェーズ eフェーズid = base.eフェーズID;
+				CStage.EPhase eフェーズid = base.ePhaseID;
 				switch (eフェーズid)
 				{
-					case CStage.Eフェーズ.共通_フェードイン:
+					case CStage.EPhase.Common_FADEIN:
 						if (this.actFI.Draw() != 0)
 						{
-							base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+							base.ePhaseID = CStage.EPhase.Common_NORMAL;
 						}
 						break;
 
-					case CStage.Eフェーズ.共通_フェードアウト:
+					case CStage.EPhase.Common_FADEOUT:
 						if (this.actFO.Draw() == 0)
 						{
 							TJAPlayer3.Skin.bgmタイトル.t停止する();
 							TJAPlayer3.Skin.bgmタイトルイン.t停止する();
 							break;
 						}
-						base.eフェーズID = CStage.Eフェーズ.共通_終了状態;
+						base.ePhaseID = CStage.EPhase.Common_EXIT;
 
 
 						// Select Menu here
 
 						return ((int)CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp);
 
-					case CStage.Eフェーズ.タイトル_起動画面からのフェードイン:
+					case CStage.EPhase.Title_FadeIn:
 						if (this.actFIfromSetup.Draw() != 0)
 						{
-							base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+							base.ePhaseID = CStage.EPhase.Common_NORMAL;
 						}
 						break;
 				}

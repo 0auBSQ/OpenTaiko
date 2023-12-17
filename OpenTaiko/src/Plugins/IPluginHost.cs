@@ -27,12 +27,12 @@ namespace TJAPlayer3
 		/// <summary>
 		/// 現在のステージのIDを表します。
 		/// </summary>
-		global::TJAPlayer3.CStage.Eステージ e現在のステージ { get; }
+		global::TJAPlayer3.CStage.EStage e現在のステージ { get; }
 
 		/// <summary>
 		/// 現在のステージにおけるフェーズのIDを表します。
 		/// </summary>
-		global::TJAPlayer3.CStage.Eフェーズ e現在のフェーズ { get; }
+		global::TJAPlayer3.CStage.EPhase e現在のフェーズ { get; }
 
 		/// <summary>
 		/// <para>自分以外は入力データを扱ってはならないことを宣言します。</para>
