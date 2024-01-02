@@ -132,7 +132,7 @@ BoxFontName=廻想体 ネクスト UP B
 085 - i don't want to see the people i love see me in pain so i sometimes just wanna be left alone to cry in the dark : Sukima Altera - https://yokaicore.bandcamp.com/album/songs-i-made-in-my-spare-time-ep (Chart by Colin)
 086 - 怨念~漸消殘夢~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko (Extreme) and 0AuBSQ)
 087 - Hero's Treasure : TFD500 - https://www.youtube.com/channel/UCJjrxomZT2973fr8-9Yts_w (Chart by berdstep)
-088 - ...
+088 - II (Game cut) : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 089 - FunkBoi : SenPi - https://senpimusic.com (Chart by 0AuBSQ, Colin, Shoxk and DragonRatTiger)
 090 - The Beat : MesoPhunk - www.soundcloud.com/djmesophunk https://twitter.com/DJMesoPhunk (Chart by 0AuBSQ)
 091 - thumb wrestling : ok cheez - https://rchase.bandcamp.com/ https://mastodon.social/@r23chase https://soundcloud.com/ok-cheez-96 https://cheez2600.newgrounds.com/ (Chart by DragonRatTiger and bol)
@@ -144,6 +144,7 @@ BoxFontName=廻想体 ネクスト UP B
 097 - Rainy Night III : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
 098 - Rainy Night III ~輪回~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
 099 - Dreaming to be with you : Cusi ft. Kaeru from 虹信号 - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA https://twitter.com/nijishingoPH (Chart by Komi)
+100 - Puzzle of "The End." : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 ```
 
 ### Visuals
@@ -154,6 +155,7 @@ Some of the visuals (preimages and videos) are made by the composers themselves,
 064 - PLANETES (Illustration): gentu
 065 - Bounded Quietude (Illustration): Hiro (https://twitter.com/HiroChair?s=09) (https://www.pixiv.net/en/users/35926966)
 069 - Vanaheimr (Illustration): Transendium (https://twitter.com/ardentminus)
+087 - Hero's Treasure (Illustration): picture_game
 099 - Dreaming to be with you (Video & Illustration): Manic, RheaBee (https://twitter.com/rheabee5), Zhen (https://www.instagram.com/zhen_artz/)
 ```
 
