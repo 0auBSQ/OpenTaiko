@@ -12,8 +12,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: auto
       - name: Merge upstream
         run: |
           git config --global user.name ${NAME}
@@ -51,13 +49,6 @@ jobs:
           7z a ../../../../../../OpenTaiko_win_x64_shallow.zip * -xr!Songs/ -xr!System/
           cd ..\..\..\..\..\..\
 
-      - name: Create Archive (Win x64)
-        shell: cmd
-        run: |
-          cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
-          7z a ../../../../../../OpenTaiko_win_x64.zip *
-          cd ..\..\..\..\..\..\
-
       - name: Build for Windows x86
         shell: cmd
         run: |
@@ -68,13 +59,6 @@ jobs:
         run: |
           cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
           7z a ../../../../../../OpenTaiko_win_x86_shallow.zip * -xr!Songs/ -xr!System/
-          cd ..\..\..\..\..\..\
-
-      - name: Create Archive (Win x86)
-        shell: cmd
-        run: |
-          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
-          7z a ../../../../../../OpenTaiko_win_x86.zip *
           cd ..\..\..\..\..\..\
 
       - name: Build for Mac x64
@@ -89,13 +73,6 @@ jobs:
           7z a ../../../../../../OpenTaiko_osx_x64_shallow.zip * -xr!Songs/ -xr!System/
           cd ..\..\..\..\..\..\
 
-      - name: Create Archive (Mac x64)
-        shell: cmd
-        run: |
-          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
-          7z a ../../../../../../OpenTaiko_osx_x64.zip *
-          cd ..\..\..\..\..\..\
-
       - name: Build for Linux x64
         shell: cmd
         run: |
@@ -108,17 +85,24 @@ jobs:
           7z a ../../../../../../OpenTaiko_linux_x64_shallow.zip * -xr!Songs/ -xr!System/
           cd ..\..\..\..\..\..\
 
-      - name: Create Archive (Linux x64)
+      - name: Create Archive (Songs)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
-          7z a ../../../../../../OpenTaiko_linux_x64.zip *
-          cd ..\..\..\..\..\..\
+          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\Songs\
+          7z a ../../../../../../../Songs.zip *
+          cd ..\..\..\..\..\..\..\
+
+      - name: Create Archive (System)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\System\
+          7z a ../../../../../../../System.zip *
+          cd ..\..\..\..\..\..\..\
       
       - name: Upload All Builds
         uses: xresloader/upload-to-github-release@v1.4.2
         with:
-          file: "OpenTaiko_win_x64.zip;OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64.zip;OpenTaiko_linux_x64_shallow.zip"
+          file: "OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64_shallow.zip;Songs.zip;System.zip"
           overwrite: true
           tag_name: "autobuild"
           draft: false
