@@ -12,6 +12,7 @@ namespace TJAPlayer3
         private static CCounter[] ctCharacterNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterSelect = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterStart = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
+        private static CCounter[] ctCharacterWait = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterEntry = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
         private static CCounter[] ctCharacterEntryNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
@@ -21,6 +22,7 @@ namespace TJAPlayer3
             NORMAL,
             START,
             SELECT,
+            WAIT,
             // Main menu
             ENTRY,
             ENTRY_NORMAL,
@@ -50,6 +52,12 @@ namespace TJAPlayer3
                     case (ECharacterAnimation.SELECT):
                         {
                             if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length > 0)
+                                return false;
+                            break;
+                        }
+                    case (ECharacterAnimation.WAIT):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Menu_Wait[_charaId].Length > 0)
                                 return false;
                             break;
                         }
@@ -99,10 +107,18 @@ namespace TJAPlayer3
                         {
                             if (TJAPlayer3.Tx.Characters_Menu_Select[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_Menu_Select[_charaId];
-                            //if (TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId].Length > 0)
-                            //    return TJAPlayer3.Tx.Characters_10Combo_Maxed[_charaId];
                             if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
                                 return TJAPlayer3.Tx.Characters_10Combo[_charaId];
+                            break;
+                        }
+                    case (ECharacterAnimation.WAIT):
+                        {
+                            if (TJAPlayer3.Tx.Characters_Menu_Wait[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_Menu_Wait[_charaId];
+                            if (TJAPlayer3.Tx.Characters_Menu_Loop[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_Menu_Loop[_charaId];
+                            if (TJAPlayer3.Tx.Characters_GoGoTime[_charaId].Length > 0)
+                                return TJAPlayer3.Tx.Characters_GoGoTime[_charaId];
                             break;
                         }
                     case (ECharacterAnimation.ENTRY):
@@ -144,6 +160,10 @@ namespace TJAPlayer3
                     {
                         return ctCharacterSelect;
                     }
+                case (ECharacterAnimation.WAIT):
+                    {
+                        return ctCharacterWait;
+                    }
                 case (ECharacterAnimation.ENTRY):
                     {
                         return ctCharacterEntry;
@@ -173,6 +193,10 @@ namespace TJAPlayer3
                 case (ECharacterAnimation.SELECT):
                     {
                         return TJAPlayer3.Skin.Characters_Menu_Select_AnimationDuration[_charaId];
+                    }
+                case (ECharacterAnimation.WAIT):
+                    {
+                        return TJAPlayer3.Skin.Characters_Menu_Wait_AnimationDuration[_charaId];
                     }
                 case (ECharacterAnimation.ENTRY):
                     {
@@ -206,6 +230,12 @@ namespace TJAPlayer3
                     {
                         for (int i = 0; i < 5; i++)
                             ctCharacterSelect[i] = new CCounter();
+                        break;
+                    }
+                case (ECharacterAnimation.WAIT):
+                    {
+                        for (int i = 0; i < 5; i++)
+                            ctCharacterWait[i] = new CCounter();
                         break;
                     }
                 case (ECharacterAnimation.ENTRY):
@@ -254,7 +284,8 @@ namespace TJAPlayer3
 
             if (_ctref[player] != null && _ref != null && _ctref[player].CurrentValue < _ref.Length)
             {
-                if (eca == ECharacterAnimation.NORMAL
+                if (eca == ECharacterAnimation.NORMAL 
+                    || eca == ECharacterAnimation.WAIT 
                     || eca == ECharacterAnimation.ENTRY
                     || eca == ECharacterAnimation.ENTRY_NORMAL)
                     _ctref[player].TickLoop();

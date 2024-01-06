@@ -634,19 +634,37 @@ namespace TJAPlayer3
                     }
                     else
                     {
-                        for(int i = 0; i < 5; i++)
+                        for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
                             base.eフェーズID = CStage.Eフェーズ.演奏_演奏終了演出;
 
                             this.actEnd.Start();
 
                             int Character = this.actChara.iCurrentCharacter[i];
-                            if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
+
+                            if (HGaugeMethods.UNSAFE_IsRainbow(i))
                             {
-                                if (HGaugeMethods.UNSAFE_IsRainbow(i))
+                                if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0)
                                 {
-                                    double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]))));
-                                    this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Combo10_Max, true);
+                                    if (HGaugeMethods.UNSAFE_IsRainbow(i))
+                                    {
+                                        double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]))));
+                                        this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Combo10_Max, true);
+                                    }
+                                }
+                            }
+                            else if (HGaugeMethods.UNSAFE_FastNormaCheck(i))
+                            {
+                                if (TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0)
+                                {
+                                    this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Cleared, true);;
+                                }
+                            }
+                            else
+                            {
+                                if (TJAPlayer3.Skin.Characters_ClearOut_Ptn[Character] != 0)
+                                {
+                                    this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.ClearOut, true);
                                 }
                             }
                         }
