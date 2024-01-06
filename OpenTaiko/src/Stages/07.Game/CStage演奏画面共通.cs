@@ -2124,6 +2124,10 @@ namespace TJAPlayer3
                 if (!cleared && this.bIsAlreadyCleared[nPlayer] == true)
                 {
                     this.bIsAlreadyCleared[nPlayer] = false;
+                    if (TJAPlayer3.Skin.Characters_ClearOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                    {
+                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.ClearOut, true);
+                    }
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
 
                     switch (chara.effect.tGetGaugeType())

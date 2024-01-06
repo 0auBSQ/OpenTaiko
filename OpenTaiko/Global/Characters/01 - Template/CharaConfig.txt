@@ -82,6 +82,9 @@ Chara_Menu_Select_AnimationDuration=1000
 ;メニューの開始アニメーションにかける時間 (ms)
 Chara_Menu_Start_AnimationDuration=500
 
+;メニューの待機アニメーションにかける時間 (ms)
+Chara_Menu_Wait_AnimationDuration=500
+
 ;結果画面の通常アニメーションにかける時間 (ms)
 Chara_Result_Normal_AnimationDuration=1000
 
