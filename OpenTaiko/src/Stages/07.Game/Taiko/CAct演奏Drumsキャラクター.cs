@@ -414,6 +414,19 @@ namespace TJAPlayer3
                                 }
                             }
                             break;
+                        case Anime.ClearOut:
+                            {
+                                updateNormal();
+                                if (TJAPlayer3.Tx.Characters_ClearOut[Character] != null && TJAPlayer3.Skin.Characters_ClearOut_Ptn[Character] != 0)
+                                {
+                                    nowChara = TJAPlayer3.Tx.Characters_ClearOut[Character][TJAPlayer3.Skin.Characters_Motion_ClearOut[Character][nNowCharaFrame[i]]];
+                                }
+                                if (endAnime)
+                                {
+                                    ReturnDefaultAnime(i, true);
+                                }
+                            }
+                            break;
                         case Anime.Return:
                             {
                                 updateNormal();
@@ -898,6 +911,7 @@ namespace TJAPlayer3
             Become_Cleared,
             Become_Maxed,
             SoulOut,
+            ClearOut,
             Return,
             Balloon_Breaking,
             Balloon_Broke,
@@ -1007,6 +1021,10 @@ namespace TJAPlayer3
                 case Anime.SoulOut:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_SoulOut[iCurrentCharacter[player]].Length - 1;
                     nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_SoulOut[iCurrentCharacter[player]];
+                    break;
+                case Anime.ClearOut:
+                    nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_ClearOut[iCurrentCharacter[player]].Length - 1;
+                    nCharaBeat[player] = TJAPlayer3.Skin.Characters_Beat_ClearOut[iCurrentCharacter[player]];
                     break;
                 case Anime.Return:
                     nCharaFrameCount[player] = TJAPlayer3.Skin.Characters_Motion_Return[iCurrentCharacter[player]].Length - 1;

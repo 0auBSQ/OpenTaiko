@@ -325,6 +325,7 @@ namespace TJAPlayer3
                                     }
                                     else
                                     {
+                                        CMenuCharacter.tMenuResetTimer(i, CMenuCharacter.ECharacterAnimation.WAIT);
                                         TJAPlayer3.Skin.sound決定音.t再生する();
                                     }
                                 }

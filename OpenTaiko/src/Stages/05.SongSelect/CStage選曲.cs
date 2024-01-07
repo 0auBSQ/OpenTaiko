@@ -650,6 +650,12 @@ namespace TJAPlayer3
 
                             this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
                         }
+                        else if (act難易度選択画面.bIsDifficltSelect && act難易度選択画面.bSelect[player])
+                        {
+                            CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.WAIT);
+
+                            this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
+                        }
                         else
                         {
                             CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.NORMAL);

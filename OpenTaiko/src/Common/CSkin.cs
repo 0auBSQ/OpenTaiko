@@ -8478,6 +8478,7 @@ namespace TJAPlayer3
             Characters_Become_Cleared_Ptn,
             Characters_Become_Maxed_Ptn,
             Characters_SoulOut_Ptn,
+            Characters_ClearOut_Ptn,
             Characters_Return_Ptn,
             Characters_Balloon_Breaking_Ptn,
             Characters_Balloon_Broke_Ptn,
@@ -8491,6 +8492,7 @@ namespace TJAPlayer3
             Characters_Menu_Loop_Ptn,
             Characters_Menu_Select_Ptn,
             Characters_Menu_Start_Ptn,
+            Characters_Menu_Wait_Ptn,
             Characters_Result_Clear_Ptn,
             Characters_Result_Failed_Ptn,
             Characters_Result_Failed_In_Ptn,
@@ -8540,6 +8542,7 @@ namespace TJAPlayer3
             Characters_Motion_GoGoMax,
             Characters_Motion_SoulIn,
             Characters_Motion_SoulOut,
+            Characters_Motion_ClearOut,
             Characters_Motion_Return;
         public float[] Characters_Beat_Normal,
             Characters_Beat_10Combo,
@@ -8559,6 +8562,7 @@ namespace TJAPlayer3
             Characters_Beat_GoGoMax,
             Characters_Beat_SoulIn,
             Characters_Beat_SoulOut,
+            Characters_Beat_ClearOut,
             Characters_Beat_Return,
             Characters_Beat_Tower_Standing,
             Characters_Beat_Tower_Standing_Tired,
@@ -8577,6 +8581,7 @@ namespace TJAPlayer3
         public int[] Characters_Menu_Loop_AnimationDuration;
         public int[] Characters_Menu_Select_AnimationDuration;
         public int[] Characters_Menu_Start_AnimationDuration;
+        public int[] Characters_Menu_Wait_AnimationDuration;
         public int[] Characters_Result_Normal_AnimationDuration;
         public int[] Characters_Result_Clear_AnimationDuration;
         public int[] Characters_Result_Failed_In_AnimationDuration;
