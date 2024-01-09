@@ -231,9 +231,9 @@ namespace TJAPlayer3
                             if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
                                 pl = 1;
 
-                            if ( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == false )
+                            if ( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == false && !TJAPlayer3.ConfigIni.SimpleMode)
                                 base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 && TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? add_y[ this.stScore[ i ].nPlayer ] + yAdd : add_y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
-                            if( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == true )
+                            if( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == true && !TJAPlayer3.ConfigIni.SimpleMode)
                                 base.t小文字表示(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             else
                             {

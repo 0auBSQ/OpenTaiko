@@ -89,7 +89,7 @@ namespace TJAPlayer3
             //アニメーション中の分岐レイヤー(背景)の描画を行う。
             for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
-                if( TJAPlayer3.stage演奏ドラム画面.bUseBranch[ i ] == true )
+                if (TJAPlayer3.stage演奏ドラム画面.bUseBranch[i] == true)
                 {
 
                     #region NullCheck
@@ -107,7 +107,11 @@ namespace TJAPlayer3
 
                     #endregion
 
-                    if( this.ct分岐アニメ進行[ i ].IsTicked && !_laneNull)
+                    if (TJAPlayer3.ConfigIni.SimpleMode)
+                    {
+                        TJAPlayer3.Tx.Lane_Base[(int)nAfter[i]].t2D描画(x[i], y[i]);
+                    }
+                    else if( this.ct分岐アニメ進行[ i ].IsTicked && !_laneNull)
                     {
                         #region[ 普通譜面_レベルアップ ]
                         //普通→玄人

@@ -91,6 +91,9 @@ namespace TJAPlayer3
 
         public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255)
         {
+            float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / 1280.0f;
+            float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+
             int basePlayer = player;
             player = TJAPlayer3.GetActualPlayer(player);
 
@@ -123,7 +126,7 @@ namespace TJAPlayer3
                     if (_tex != null)
                     {
                         _tex.Opacity = Opacity;
-                        _tex.t2D描画(x - 2, y - 2);
+                        _tex.t2D描画(x - (2 * resolutionScaleX), y - (2 * resolutionScaleY));
                     }
                 }
             }
@@ -212,131 +215,134 @@ namespace TJAPlayer3
             if (Opacity == 0)
                 return;
 
-            if(TJAPlayer3.SaveFileInstances[player].data.TitleType != 0)
+            float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / 1280.0f;
+            float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+
+            if (TJAPlayer3.SaveFileInstances[player].data.TitleType != 0 && !TJAPlayer3.ConfigIni.SimpleMode)
             {
                 int Type = TJAPlayer3.SaveFileInstances[player].data.TitleType - 1;
                 if (this.ctNamePlateEffect.CurrentValue <= 10)
                 {
-                    tNamePlateStarDraw(player, 1.0f - (ctNamePlateEffect.CurrentValue / 10f * 1.0f), x + 63, y + 25);
+                    tNamePlateStarDraw(player, 1.0f - (ctNamePlateEffect.CurrentValue / 10f * 1.0f), x + (63 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 3 && this.ctNamePlateEffect.CurrentValue <= 10)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 3) / 7f * 1.0f), x + 38, y + 7);
+                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 3) / 7f * 1.0f), x + (38 * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 6 && this.ctNamePlateEffect.CurrentValue <= 10)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 6) / 4f * 1.0f), x + 51, y + 5);
+                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 6) / 4f * 1.0f), x + (51 * resolutionScaleX), y + (5 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 8 && this.ctNamePlateEffect.CurrentValue <= 10)
                 {
-                    tNamePlateStarDraw(player, 0.3f - ((ctNamePlateEffect.CurrentValue - 8) / 2f * 0.3f), x + 110, y + 25);
+                    tNamePlateStarDraw(player, 0.3f - ((ctNamePlateEffect.CurrentValue - 8) / 2f * 0.3f), x + (110 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 11 && this.ctNamePlateEffect.CurrentValue <= 13)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 11) / 2f * 1.0f), x + 38, y + 7);
+                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 11) / 2f * 1.0f), x + (38 * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 11 && this.ctNamePlateEffect.CurrentValue <= 15)
                 {
-                    tNamePlateStarDraw(player, 1.0f, x + 51, y + 5);
+                    tNamePlateStarDraw(player, 1.0f, x + (51 * resolutionScaleX), y + 5);
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 11 && this.ctNamePlateEffect.CurrentValue <= 17)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 11) / 7f * 1.0f), x + 110, y + 25);
+                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 11) / 7f * 1.0f), x + (110 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 16 && this.ctNamePlateEffect.CurrentValue <= 20)
                 {
-                    tNamePlateStarDraw(player, 0.2f - ((ctNamePlateEffect.CurrentValue - 16) / 4f * 0.2f), x + 63, y + 25);
+                    tNamePlateStarDraw(player, 0.2f - ((ctNamePlateEffect.CurrentValue - 16) / 4f * 0.2f), x + (63 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 17 && this.ctNamePlateEffect.CurrentValue <= 20)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 17) / 3f * 1.0f), x + 99, y + 1);
+                    tNamePlateStarDraw(player, 1.0f - ((ctNamePlateEffect.CurrentValue - 17) / 3f * 1.0f), x + (99 * resolutionScaleX), y + (1 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 20 && this.ctNamePlateEffect.CurrentValue <= 24)
                 {
-                    tNamePlateStarDraw(player, 0.4f, x + 63, y + 25);
+                    tNamePlateStarDraw(player, 0.4f, x + (63 * resolutionScaleX), y + 25);
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 20 && this.ctNamePlateEffect.CurrentValue <= 25)
                 {
-                    tNamePlateStarDraw(player, 1.0f, x + 99, y + 1);
+                    tNamePlateStarDraw(player, 1.0f, x + (99 * resolutionScaleX), y + 1);
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 20 && this.ctNamePlateEffect.CurrentValue <= 30)
                 {
-                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 20) / 10f * 0.5f), x + 152, y + 7);
+                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 20) / 10f * 0.5f), x + (152 * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 31 && this.ctNamePlateEffect.CurrentValue <= 37)
                 {
-                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 31) / 6f * 0.5f), x + 176, y + 8);
-                    tNamePlateStarDraw(player, 1.0f - ((this.ctNamePlateEffect.CurrentValue - 31) / 6f * 1.0f), x + 175, y + 25);
+                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 31) / 6f * 0.5f), x + (176 * resolutionScaleX), y + (8 * resolutionScaleY));
+                    tNamePlateStarDraw(player, 1.0f - ((this.ctNamePlateEffect.CurrentValue - 31) / 6f * 1.0f), x + (175 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 31 && this.ctNamePlateEffect.CurrentValue <= 40)
                 {
-                    tNamePlateStarDraw(player, 0.9f - ((this.ctNamePlateEffect.CurrentValue - 31) / 9f * 0.9f), x + 136, y + 24);
+                    tNamePlateStarDraw(player, 0.9f - ((this.ctNamePlateEffect.CurrentValue - 31) / 9f * 0.9f), x + (136 * resolutionScaleX), y + (24 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 34 && this.ctNamePlateEffect.CurrentValue <= 40)
                 {
-                    tNamePlateStarDraw(player, 0.7f - ((this.ctNamePlateEffect.CurrentValue - 34) / 6f * 0.7f), x + 159, y + 25);
+                    tNamePlateStarDraw(player, 0.7f - ((this.ctNamePlateEffect.CurrentValue - 34) / 6f * 0.7f), x + (159 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 41 && this.ctNamePlateEffect.CurrentValue <= 42)
                 {
-                    tNamePlateStarDraw(player, 0.7f, x + 159, y + 25);
+                    tNamePlateStarDraw(player, 0.7f, x + (159 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 43 && this.ctNamePlateEffect.CurrentValue <= 50)
                 {
-                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 43) / 7f * 0.8f), x + 196, y + 23);
+                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 43) / 7f * 0.8f), x + (196 * resolutionScaleX), y + (23 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 51 && this.ctNamePlateEffect.CurrentValue <= 57)
                 {
-                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 51) / 6f * 0.8f), x + 51, y + 5);
+                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 51) / 6f * 0.8f), x + (51 * resolutionScaleX), y + (5 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 51 && this.ctNamePlateEffect.CurrentValue <= 52)
                 {
-                    tNamePlateStarDraw(player, 0.2f, x + 166, y + 22);
+                    tNamePlateStarDraw(player, 0.2f, x + (166 * resolutionScaleX), y + (22 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 51 && this.ctNamePlateEffect.CurrentValue <= 53)
                 {
-                    tNamePlateStarDraw(player, 0.8f, x + 136, y + 24);
+                    tNamePlateStarDraw(player, 0.8f, x + (136 * resolutionScaleX), y + (24 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 51 && this.ctNamePlateEffect.CurrentValue <= 55)
                 {
-                    tNamePlateStarDraw(player, 1.0f, x + 176, y + 8);
+                    tNamePlateStarDraw(player, 1.0f, x + (176 * resolutionScaleX), y + (8 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 51 && this.ctNamePlateEffect.CurrentValue <= 55)
                 {
-                    tNamePlateStarDraw(player, 1.0f, x + 176, y + 8);
+                    tNamePlateStarDraw(player, 1.0f, x + (176 * resolutionScaleX), y + (8 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 61 && this.ctNamePlateEffect.CurrentValue <= 70)
                 {
-                    tNamePlateStarDraw(player, 1.0f - ((this.ctNamePlateEffect.CurrentValue - 61) / 9f * 1.0f), x + 196, y + 23);
+                    tNamePlateStarDraw(player, 1.0f - ((this.ctNamePlateEffect.CurrentValue - 61) / 9f * 1.0f), x + (196 * resolutionScaleX), y + (23 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 61 && this.ctNamePlateEffect.CurrentValue <= 67)
                 {
-                    tNamePlateStarDraw(player, 0.7f - ((this.ctNamePlateEffect.CurrentValue - 61) / 6f * 0.7f), x + 214, y + 14);
+                    tNamePlateStarDraw(player, 0.7f - ((this.ctNamePlateEffect.CurrentValue - 61) / 6f * 0.7f), x + (214 * resolutionScaleX), y + (14 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 63 && this.ctNamePlateEffect.CurrentValue <= 70)
                 {
-                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 63) / 7f * 0.5f), x + 129, y + 24);
+                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 63) / 7f * 0.5f), x + (129 * resolutionScaleX), y + (24 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 63 && this.ctNamePlateEffect.CurrentValue <= 70)
                 {
-                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 63) / 7f * 0.5f), x + 129, y + 24);
+                    tNamePlateStarDraw(player, 0.5f - ((this.ctNamePlateEffect.CurrentValue - 63) / 7f * 0.5f), x + (129 * resolutionScaleX), y + (24 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 65 && this.ctNamePlateEffect.CurrentValue <= 70)
                 {
-                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 65) / 5f * 0.8f), x + 117, y + 7);
+                    tNamePlateStarDraw(player, 0.8f - ((this.ctNamePlateEffect.CurrentValue - 65) / 5f * 0.8f), x + (117 * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 71 && this.ctNamePlateEffect.CurrentValue <= 72)
                 {
-                    tNamePlateStarDraw(player, 0.8f, x + 151, y + 25);
+                    tNamePlateStarDraw(player, 0.8f, x + (151 * resolutionScaleX), y + (25 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 71 && this.ctNamePlateEffect.CurrentValue <= 74)
                 {
-                    tNamePlateStarDraw(player, 0.8f, x + 117, y + 7);
+                    tNamePlateStarDraw(player, 0.8f, x + (117 * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 85 && this.ctNamePlateEffect.CurrentValue <= 112)
                 {
                     TJAPlayer3.Tx.NamePlate_Effect[4].Opacity = (int)(1400 - (this.ctNamePlateEffect.CurrentValue - 85) * 50f);
 
-                    TJAPlayer3.Tx.NamePlate_Effect[4].t2D描画(x + ((this.ctNamePlateEffect.CurrentValue - 85) * (150f / 27f)), y + 7);
+                    TJAPlayer3.Tx.NamePlate_Effect[4].t2D描画(x + ((((this.ctNamePlateEffect.CurrentValue - 85) * (150f / 27f))) * resolutionScaleX), y + (7 * resolutionScaleY));
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 105 && this.ctNamePlateEffect.CurrentValue <= 120)
                 {
@@ -352,14 +358,14 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.NamePlate_Title_Big[tt].Opacity = this.ctNamePlateEffect.CurrentValue >= 112 ? (int)(255 - (this.ctNamePlateEffect.CurrentValue - 112) * 31.875f) : 255;
                         TJAPlayer3.Tx.NamePlate_Title_Big[tt].vc拡大縮小倍率.X = this.ctNamePlateEffect.CurrentValue >= 112 ? 1.0f : (this.ctNamePlateEffect.CurrentValue - 105) / 8f;
                         TJAPlayer3.Tx.NamePlate_Title_Big[tt].vc拡大縮小倍率.Y = this.ctNamePlateEffect.CurrentValue >= 112 ? 1.0f : (this.ctNamePlateEffect.CurrentValue - 105) / 8f;
-                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].t2D拡大率考慮中央基準描画(x + 193, y + 6);
+                        TJAPlayer3.Tx.NamePlate_Title_Big[tt].t2D拡大率考慮中央基準描画(x + (193 * resolutionScaleX), y + (6 * resolutionScaleY));
                     }
 
                 }
             }
         }
 
-        private void tNamePlateStarDraw(int player, float Scale, int x, int y)
+        private void tNamePlateStarDraw(int player, float Scale, float x, float y)
         {
             /*
             TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.X = Scale;

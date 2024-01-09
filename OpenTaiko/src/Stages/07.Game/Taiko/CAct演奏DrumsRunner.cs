@@ -20,7 +20,7 @@ namespace TJAPlayer3
 
         public void Start(int Player, bool IsMiss, CDTX.CChip pChip)
         {
-            if (Runner != null)
+            if (Runner != null && !TJAPlayer3.ConfigIni.SimpleMode)
             {
                 while (stRunners[Index].b使用中)
                 {
@@ -57,6 +57,12 @@ namespace TJAPlayer3
 
         public override void Activate()
         {
+            if (TJAPlayer3.ConfigIni.SimpleMode)
+            {
+                base.Activate();
+                return;
+            }
+
             for (int i = 0; i < 128; i++)
             {
                 stRunners[i] = new STRunner();
@@ -90,6 +96,12 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
+            if (TJAPlayer3.ConfigIni.SimpleMode)
+            {
+                base.DeActivate();
+                return;
+            }
+
             for (int i = 0; i < 128; i++)
             {
                 stRunners[i].ct進行 = null;
@@ -112,6 +124,11 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
+            if (TJAPlayer3.ConfigIni.SimpleMode)
+            {
+                return base.Draw();
+            }
+
             for (int i = 0; i < 128; i++)
             {
                 if (stRunners[i].b使用中)

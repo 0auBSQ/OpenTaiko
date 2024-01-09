@@ -25,6 +25,8 @@ namespace TJAPlayer3
         /// <param name="nLane"></param>
         public virtual void Start(int nLane, int nPlayer, double x, double y)
         {
+            if (TJAPlayer3.ConfigIni.SimpleMode) return;
+
             for (int i = 0; i < 32; i++)
             {
                 if(!FireWork[i].IsUsing)
@@ -70,7 +72,7 @@ namespace TJAPlayer3
         }
         public override int Draw()
         {
-            if (!base.IsDeActivated)
+            if (!base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode)
             {
                 for (int i = 0; i < 32; i++)
                 {
