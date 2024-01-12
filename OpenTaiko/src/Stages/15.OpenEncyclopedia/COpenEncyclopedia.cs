@@ -13,8 +13,8 @@ namespace TJAPlayer3
     {
         public COpenEncyclopedia()
         {
-            base.eステージID = Eステージ.Template;
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.eStageID = EStage.TEMPLATE;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
             // Load CActivity objects here
             // base.list子Activities.Add(this.act = new CAct());
@@ -30,7 +30,7 @@ namespace TJAPlayer3
             if (base.IsActivated)
                 return;
 
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
             TJAPlayer3.Skin.soundEncyclopediaBGM?.t再生する();
@@ -177,7 +177,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Skin.soundEncyclopediaBGM?.t停止する();
                 this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                 this.actFOtoTitle.tフェードアウト開始();
-                base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                base.ePhaseID = CStage.EPhase.Common_FADEOUT;
             }
 
             #endregion
@@ -186,9 +186,9 @@ namespace TJAPlayer3
             #region [FadeOut]
 
             // Menu exit fade out transition
-            switch (base.eフェーズID)
+            switch (base.ePhaseID)
             {
-                case CStage.Eフェーズ.共通_フェードアウト:
+                case CStage.EPhase.Common_FADEOUT:
                     if (this.actFOtoTitle.Draw() == 0)
                     {
                         break;

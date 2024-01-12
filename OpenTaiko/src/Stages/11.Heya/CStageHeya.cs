@@ -17,8 +17,8 @@ namespace TJAPlayer3
     {
         public CStageHeya()
         {
-            base.eステージID = Eステージ.Heya;
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.eStageID = EStage.Heya;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
             base.ChildActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
 
@@ -31,7 +31,7 @@ namespace TJAPlayer3
             if (base.IsActivated)
                 return;
 
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = E戻り値.継続;
 
             ctDonchan_In = new CCounter();
@@ -566,7 +566,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Skin.soundHeyaBGM.t停止する();
                     this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                     this.actFOtoTitle.tフェードアウト開始();
-                    base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                    base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                 }
 
                 else if (iCurrentMenu == -1)
@@ -703,7 +703,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Skin.soundHeyaBGM.t停止する();
                     this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                     this.actFOtoTitle.tフェードアウト開始();
-                    base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                    base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                 }
                 else
                 {
@@ -718,9 +718,9 @@ namespace TJAPlayer3
 
             #endregion
 
-            switch (base.eフェーズID)
+            switch (base.ePhaseID)
             {
-                case CStage.Eフェーズ.共通_フェードアウト:
+                case CStage.EPhase.Common_FADEOUT:
                     if (this.actFOtoTitle.Draw() == 0)
                     {
                         break;

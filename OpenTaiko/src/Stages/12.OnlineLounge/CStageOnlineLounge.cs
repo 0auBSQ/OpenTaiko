@@ -16,8 +16,8 @@ namespace TJAPlayer3
 
         public CStageOnlineLounge()
         {
-            base.eステージID = Eステージ.OnlineLounge;
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.eStageID = EStage.OnlineLounge;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
             // Load CActivity objects here
             // base.list子Activities.Add(this.act = new CAct());
@@ -33,7 +33,7 @@ namespace TJAPlayer3
             if (base.IsActivated)
                 return;
 
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
             TJAPlayer3.Skin.soundOnlineLoungeBGM?.t再生する();
@@ -364,7 +364,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
                         this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                         this.actFOtoTitle.tフェードアウト開始();
-                        base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                        base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                     }
                     else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT)
                     {
@@ -406,7 +406,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
                                 this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                                 this.actFOtoTitle.tフェードアウト開始();
-                                base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                                base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                             }
                             else
                             {
@@ -513,9 +513,9 @@ namespace TJAPlayer3
             // Menu exit fade out transition
             #region [FadeOut]
 
-                switch (base.eフェーズID)
+                switch (base.ePhaseID)
             {
-                case CStage.Eフェーズ.共通_フェードアウト:
+                case CStage.EPhase.Common_FADEOUT:
                     if (this.actFOtoTitle.Draw() == 0)
                     {
                         break;

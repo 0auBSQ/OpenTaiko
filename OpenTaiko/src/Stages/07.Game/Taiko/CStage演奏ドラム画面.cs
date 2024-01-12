@@ -21,8 +21,8 @@ namespace TJAPlayer3
 
 		public CStage演奏ドラム画面()
 		{
-			base.eステージID = CStage.Eステージ.演奏;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.Game;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.IsDeActivated = true;
 			base.ChildActivities.Add( this.actPad = new CAct演奏Drumsパッド() );
 			base.ChildActivities.Add( this.actCombo = new CAct演奏DrumsコンボDGB() );
@@ -217,7 +217,7 @@ namespace TJAPlayer3
             }
 
             base.Activate();
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;//初期化すれば、リザルト変遷は止まる。
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;//初期化すれば、リザルト変遷は止まる。
 
             for (int i = 0; i < 5; i++) {
                 ifp[i] = false;
@@ -427,7 +427,7 @@ namespace TJAPlayer3
 					// ものすごく待たされる(2回目以降と比べると2,3桁tick違う)。そこで最初の画面フェードインの間に
 					// 一発Start()を掛けてJITの結果を生成させておく。
 
-					base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+					base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
                     this.actFI.tフェードイン開始();
 
@@ -446,11 +446,11 @@ namespace TJAPlayer3
 				if ( ( ( TJAPlayer3.ConfigIni.nRisky != 0 && this.actGauge.IsFailed( E楽器パート.TAIKO ) ) 
                     || this.actGame.st叩ききりまショー.ct残り時間.IsEnded 
                     || (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0)) 
-                    && ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ))
+                    && ( base.ePhaseID == CStage.EPhase.Common_NORMAL ))
 				{
 					this.actStageFailed.Start();
 					TJAPlayer3.DTX.t全チップの再生停止();
-					base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_FAILED;
+					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 				}
 
                 bool BGA_Hidden = TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listVD.Count > 0 && ShowVideo;
@@ -622,7 +622,7 @@ namespace TJAPlayer3
                 }
 
                 //演奏終了→演出表示→フェードアウト
-                if ( bIsFinishedPlaying && base.eフェーズID == CStage.Eフェーズ.共通_通常状態 )
+                if ( bIsFinishedPlaying && base.ePhaseID == CStage.EPhase.Common_NORMAL )
                 {
                     if (TJAPlayer3.ConfigIni.bTokkunMode)
                     {
@@ -636,7 +636,7 @@ namespace TJAPlayer3
                     {
                         for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
-                            base.eフェーズID = CStage.Eフェーズ.演奏_演奏終了演出;
+                            base.ePhaseID = CStage.EPhase.Game_EndStage;
 
                             this.actEnd.Start();
 
@@ -670,10 +670,10 @@ namespace TJAPlayer3
                         }
                     }
                 }
-                else if( bIsFinishedEndAnime && base.eフェーズID == Eフェーズ.演奏_演奏終了演出 )
+                else if( bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_EndStage )
                 {
                     this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージクリア;
-                    base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト;
+                    base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
                     this.actFOClear.tフェードアウト開始();
                 }
 

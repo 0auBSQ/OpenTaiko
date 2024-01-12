@@ -460,7 +460,7 @@ namespace TJAPlayer3
 
                 bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
                 
-                bool stageEnded = TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_演奏終了演出 || TJAPlayer3.stage演奏ドラム画面.eフェーズID == CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト || CFloorManagement.CurrentNumberOfLives == 0;
+                bool stageEnded = TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
 
                 if (bFloorChanged == true)
                 {

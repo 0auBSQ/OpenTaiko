@@ -22,8 +22,8 @@ namespace TJAPlayer3
 		public CStageコンフィグ()
 		{
 			CActDFPFont font;
-			base.eステージID = CStage.Eステージ.コンフィグ;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.Config;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.actFont = font = new CActDFPFont();
 			base.ChildActivities.Add( font );
 			base.ChildActivities.Add( this.actFIFO = new CActFIFOWhite() );
@@ -233,7 +233,7 @@ namespace TJAPlayer3
 
 			if( base.IsFirstDraw )
 			{
-				base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 				this.actFIFO.tフェードイン開始();
 				base.IsFirstDraw = false;
 			}
@@ -374,16 +374,16 @@ namespace TJAPlayer3
 
 			#region [ FadeOut ]
 			//---------------------
-			switch( base.eフェーズID )
+			switch( base.ePhaseID )
 			{
-				case CStage.Eフェーズ.共通_フェードイン:
+				case CStage.EPhase.Common_FADEIN:
 					if( this.actFIFO.Draw() != 0 )
 					{
-						base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+						base.ePhaseID = CStage.EPhase.Common_NORMAL;
 					}
 					break;
 
-				case CStage.Eフェーズ.共通_フェードアウト:
+				case CStage.EPhase.Common_FADEOUT:
 					if( this.actFIFO.Draw() == 0 )
 					{
 						break;
@@ -399,7 +399,7 @@ namespace TJAPlayer3
 
 			// キー入力
 
-			if( ( base.eフェーズID != CStage.Eフェーズ.共通_通常状態 )
+			if( ( base.ePhaseID != CStage.EPhase.Common_NORMAL )
 				|| this.actKeyAssign.bキー入力待ちの最中である
 				|| TJAPlayer3.act現在入力を占有中のプラグイン != null )
 				return 0;
@@ -427,7 +427,7 @@ namespace TJAPlayer3
 					else
 					{
 						this.actFIFO.tフェードアウト開始();
-						base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 				}
 				else if ( ( TJAPlayer3.Pad.b押されたDGB( Eパッド.CY ) || TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.RD ) ) || ( TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.LC ) || ( TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Return ) ) ) )
@@ -437,7 +437,7 @@ namespace TJAPlayer3
 						// Exit
 						TJAPlayer3.Skin.sound決定音.t再生する();
 						this.actFIFO.tフェードアウト開始();
-						base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 					else if ( this.bメニューにフォーカス中 )
 					{

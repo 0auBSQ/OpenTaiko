@@ -49,8 +49,8 @@ namespace TJAPlayer3
 			this.r空うちドラムチップ = new CDTX.CChip[10];
 			this.n総合ランク値 = -1;
 			this.nチャンネル0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 7, 0 };
-			base.eステージID = CStage.Eステージ.結果;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.Results;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.IsDeActivated = true;
 			base.ChildActivities.Add(this.actParameterPanel = new CActResultParameterPanel());
 			base.ChildActivities.Add(this.actSongBar = new CActResultSongBar());
@@ -906,7 +906,7 @@ namespace TJAPlayer3
 				{
 					this.ct登場用 = new CCounter(0, 100, 5, TJAPlayer3.Timer);
 					this.actFI.tフェードイン開始();
-					base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+					base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 					if (this.rResultSound != null)
 					{
@@ -1591,14 +1591,14 @@ namespace TJAPlayer3
 
 				#endregion
 
-				if (base.eフェーズID == CStage.Eフェーズ.共通_フェードイン)
+				if (base.ePhaseID == CStage.EPhase.Common_FADEIN)
 				{
 					if (this.actFI.Draw() != 0)
 					{
-						base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+						base.ePhaseID = CStage.EPhase.Common_NORMAL;
 					}
 				}
-				else if ((base.eフェーズID == CStage.Eフェーズ.共通_フェードアウト))         //&& ( this.actFO.On進行描画() != 0 ) )
+				else if ((base.ePhaseID == CStage.EPhase.Common_FADEOUT))         //&& ( this.actFO.On進行描画() != 0 ) )
 				{
 					return (int)this.eフェードアウト完了時の戻り値;
 				}
@@ -1617,7 +1617,7 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.act現在入力を占有中のプラグイン == null)
 				{
-					if (base.eフェーズID == CStage.Eフェーズ.共通_通常状態)
+					if (base.ePhaseID == CStage.EPhase.Common_NORMAL)
 					{
 						if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
 						{
@@ -1634,7 +1634,7 @@ namespace TJAPlayer3
 									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
 
 							t後処理();
-							base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 
 							#endregion
@@ -1687,7 +1687,7 @@ namespace TJAPlayer3
 									t後処理();
 
 									{
-										base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+										base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 										bgmResultLoop.t停止する();
 										TJAPlayer3.Skin.bgmDanResult.t停止する();

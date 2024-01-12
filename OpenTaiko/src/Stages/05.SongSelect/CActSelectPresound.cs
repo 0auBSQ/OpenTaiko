@@ -163,7 +163,7 @@ namespace TJAPlayer3
 		private void tプレビューサウンドの作成()
 		{
 			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
-			if( ( cスコア != null ) && !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) && TJAPlayer3.stage選曲.eフェーズID != CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト )
+			if( ( cスコア != null ) && !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) && TJAPlayer3.stage選曲.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading )
 			{
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try

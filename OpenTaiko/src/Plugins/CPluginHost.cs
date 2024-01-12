@@ -35,13 +35,13 @@ namespace TJAPlayer3
 		{
 			get { return new Size(TJAPlayer3.app.Window_.Size.X, TJAPlayer3.app.Window_.Size.Y); }
 		}
-		public CStage.Eステージ e現在のステージ
+		public CStage.EStage e現在のステージ
 		{
-			get { return ( TJAPlayer3.r現在のステージ != null ) ? TJAPlayer3.r現在のステージ.eステージID : CStage.Eステージ.何もしない; }
+			get { return ( TJAPlayer3.r現在のステージ != null ) ? TJAPlayer3.r現在のステージ.eStageID : CStage.EStage.None; }
 		}
-		public CStage.Eフェーズ e現在のフェーズ
+		public CStage.EPhase e現在のフェーズ
 		{
-			get { return ( TJAPlayer3.r現在のステージ != null ) ? TJAPlayer3.r現在のステージ.eフェーズID : CStage.Eフェーズ.共通_通常状態; }
+			get { return ( TJAPlayer3.r現在のステージ != null ) ? TJAPlayer3.r現在のステージ.ePhaseID : CStage.EPhase.Common_NORMAL; }
 		}
 		public bool t入力を占有する(IPluginActivity act)
 		{

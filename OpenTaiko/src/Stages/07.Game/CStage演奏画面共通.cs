@@ -3203,7 +3203,7 @@ namespace TJAPlayer3
 
 			IInputDevice keyboard = TJAPlayer3.Input管理.Keyboard;
 
-			if ( ( !this.bPAUSE && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
+			if ( ( !this.bPAUSE && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
 			{
 				this.t入力処理_ドラム();
 
@@ -3248,7 +3248,7 @@ namespace TJAPlayer3
 				}
                 */
                 
-				else if ( ( base.eフェーズID == CStage.Eフェーズ.共通_通常状態 ) && ( keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) ) && !this.actPauseMenu.bIsActivePopupMenu )
+				else if ( ( base.ePhaseID == CStage.EPhase.Common_NORMAL ) && ( keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) ) && !this.actPauseMenu.bIsActivePopupMenu )
 				{	// escape (exit)
                     if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
                     {
@@ -3389,7 +3389,7 @@ namespace TJAPlayer3
                     TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] = false;
             }
 #endif
-            if ( !this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && ( ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
+            if ( !this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
 			{
 				if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.UpArrow ) )
 				{	// UpArrow(scrollspeed up)
@@ -3441,7 +3441,7 @@ namespace TJAPlayer3
 		protected abstract void t進行描画_AVI();
 		protected void t進行描画_AVI(int x, int y)
 		{
-			if ( ( ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) && ( !TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bAVI有効 ) )
+			if ( ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) && ( !TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bAVI有効 ) )
 			{
 				this.actAVI.t進行描画( x, y );
 			}
@@ -3451,10 +3451,10 @@ namespace TJAPlayer3
 		protected void t進行描画_STAGEFAILED()
 		{
             // Transition for failed games
-			if ( ( ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED ) 
-                || ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) 
+			if ( ( ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED ) 
+                || ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) 
                 && ( ( this.actStageFailed.Draw() != 0 ) 
-                && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) )
+                && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) )
 			{
                 if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
                 {
@@ -3465,7 +3465,7 @@ namespace TJAPlayer3
                     this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージ失敗;
                     
                 }
-                base.eフェーズID = CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト;
+                base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
                 this.actFO.tフェードアウト開始();
             }
 		}
@@ -3473,7 +3473,7 @@ namespace TJAPlayer3
 		protected abstract void t進行描画_パネル文字列();
 		protected void t進行描画_パネル文字列( int x, int y )
 		{
-			if ( ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
+			if ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
 			{
 				this.actPanel.t進行描画( x, y );
 			}
@@ -3497,7 +3497,7 @@ namespace TJAPlayer3
 
 		protected void t進行描画_ゲージ()
 		{
-			if ( ( ( ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED ) && ( base.eフェーズID != CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) ) ) )
+			if ( ( ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) ) )
 			{
 				this.actGauge.Draw();
 			}
@@ -3513,7 +3513,7 @@ namespace TJAPlayer3
 
 		protected bool t進行描画_チップ( E楽器パート ePlayMode, int nPlayer )
 		{
-			if ( ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED ) || ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
+			if ( ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED ) || ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
 			{
 				return true;
 			}
@@ -4907,7 +4907,7 @@ namespace TJAPlayer3
 
         protected bool t進行描画_チップ_連打( E楽器パート ePlayMode, int nPlayer )
 		{
-			if ( ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED ) || ( base.eフェーズID == CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト ) )
+			if ( ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED ) || ( base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
 			{
 				return true;
 			}
@@ -5274,7 +5274,7 @@ namespace TJAPlayer3
 		{
 			TJAPlayer3.DTX.t全チップの再生停止とミキサーからの削除();
 			this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.再読込_再演奏;
-			base.eフェーズID = CStage.Eフェーズ.演奏_再読込;
+			base.ePhaseID = CStage.EPhase.Game_Reload;
 			this.bPAUSE = false;
 		}
 
@@ -5602,7 +5602,7 @@ namespace TJAPlayer3
         public void t演奏中止()
         {
             this.actFO.tフェードアウト開始();
-            base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+            base.ePhaseID = CStage.EPhase.Common_FADEOUT;
             this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.演奏中断;
         }
 
@@ -5683,24 +5683,24 @@ namespace TJAPlayer3
 
 		protected bool t進行描画_フェードイン_アウト()
 		{
-			switch ( base.eフェーズID )
+			switch ( base.ePhaseID )
 			{
-				case CStage.Eフェーズ.共通_フェードイン:
+				case CStage.EPhase.Common_FADEIN:
 					if ( this.actFI.Draw() != 0)
 					{
-						base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+						base.ePhaseID = CStage.EPhase.Common_NORMAL;
 					}
 					break;
 
-				case CStage.Eフェーズ.共通_フェードアウト:
-				case CStage.Eフェーズ.演奏_STAGE_FAILED_フェードアウト:
+				case CStage.EPhase.Common_FADEOUT:
+				case CStage.EPhase.Game_STAGE_FAILED_FadeOut:
 					if ( this.actFO.Draw() != 0 )
 					{
 						return true;
 					}
 					break;
 
-				case CStage.Eフェーズ.演奏_STAGE_CLEAR_フェードアウト:
+				case CStage.EPhase.Game_STAGE_CLEAR_FadeOut:
 					if ( this.actFOClear.Draw() == 0 )
 					{
 						break;

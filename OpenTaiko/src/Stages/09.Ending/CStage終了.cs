@@ -12,8 +12,8 @@ namespace TJAPlayer3
 
 		public CStage終了()
 		{
-			base.eステージID = CStage.Eステージ.終了;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.End;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.IsDeActivated = true;
 		}
 
