@@ -287,7 +287,7 @@ namespace TJAPlayer3
                                     case E判定.Perfect:
                                     case E判定.Great:
                                     case E判定.Auto:
-                                        TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
+                                        if (!TJAPlayer3.ConfigIni.SimpleMode) TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
                                         break;                                    
                                     case E判定.Good:
                                          TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
@@ -321,7 +321,7 @@ namespace TJAPlayer3
                                 case E判定.Perfect:
                                 case E判定.Great:
                                 case E判定.Auto:
-                                    if( this.st状態_大[ i ].nIsBig == 1 )
+                                    if( this.st状態_大[ i ].nIsBig == 1 && !TJAPlayer3.ConfigIni.SimpleMode)
                                     {
                                         //float fX = 415 - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Width * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X ) / 2.0f);
                                         //float fY = TJAPlayer3.Skin.nJudgePointY[ this.st状態_大[ i ].nPlayer ] - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Height * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y ) / 2.0f);

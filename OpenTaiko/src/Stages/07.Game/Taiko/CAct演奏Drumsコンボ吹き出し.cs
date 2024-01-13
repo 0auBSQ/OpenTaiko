@@ -66,7 +66,7 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated )
 			{
-                if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 2 || TJAPlayer3.ConfigIni.SimpleMode) return 0;
                 for( int i = 0; i < 2; i++ )
                 {
                     if (TJAPlayer3.ConfigIni.bAIBattleMode) break;

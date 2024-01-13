@@ -104,7 +104,12 @@ namespace TJAPlayer3
 				njudge = JudgesDict[judge];
             }
 
-			int height = TJAPlayer3.Tx.Judge.szテクスチャサイズ.Height / 5;
+            if (njudge == 0 && TJAPlayer3.ConfigIni.SimpleMode)
+            {
+                return;
+            }
+
+            int height = TJAPlayer3.Tx.Judge.szテクスチャサイズ.Height / 5;
 			judgeAnime.rc = new Rectangle(0, (int)njudge * height, TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width, height);
 
 			JudgeAnimes[player].Add(judgeAnime);

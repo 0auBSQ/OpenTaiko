@@ -32,7 +32,7 @@ namespace TJAPlayer3
         /// <returns></returns>
         public override int Draw()
         {
-            if (Splash == null) return base.Draw();
+            if (Splash == null || TJAPlayer3.ConfigIni.SimpleMode) return base.Draw();
             Splash.Tick();
             if (Splash.IsEnded)
             {

@@ -272,6 +272,10 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(53));
             this.list項目リスト.Add(ShowPuchiChara);
 
+            SimpleMode = new CItemToggle(CLangManager.LangInstance.GetString(9993), TJAPlayer3.ConfigIni.SimpleMode,
+                CLangManager.LangInstance.GetString(9992));
+            this.list項目リスト.Add(SimpleMode);
+
 
 
             this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString(10054), CItemBase.Eパネル種別.通常, nSkinIndex,
@@ -1576,7 +1580,8 @@ namespace TJAPlayer3
         CItemToggle ShowMob;
         CItemToggle ShowFooter;
         CItemToggle ShowPuchiChara;
-		CItemToggle iShowExExtraAnime;
+        CItemToggle SimpleMode;
+        CItemToggle iShowExExtraAnime;
         CItemToggle ShinuchiMode;
         CItemToggle FastRender;
         CItemToggle ASyncTextureLoad;
@@ -1698,8 +1703,9 @@ namespace TJAPlayer3
 
 			TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
 			TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
-			TJAPlayer3.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
-		}
+            TJAPlayer3.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
+            TJAPlayer3.ConfigIni.SimpleMode = this.SimpleMode.bON;
+        }
 		private void tConfigIniへ記録する_Drums()
 		{
             //TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = this.iTaikoAutoPlay.bON;

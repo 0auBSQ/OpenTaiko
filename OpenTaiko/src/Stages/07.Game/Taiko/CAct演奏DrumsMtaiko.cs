@@ -210,6 +210,18 @@ namespace TJAPlayer3
             }
             */
 
+            int getMTaikoOpacity(int brightness)
+            {
+                if (TJAPlayer3.ConfigIni.SimpleMode)
+                {
+                    return brightness <= 0 ? 0 : 255;
+                }
+                else
+                {
+                    return brightness * 73;
+                }
+            }
+
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
                 int taiko_x;
@@ -242,10 +254,10 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.Tx.Taiko_Don_Left != null && TJAPlayer3.Tx.Taiko_Don_Right != null && TJAPlayer3.Tx.Taiko_Ka_Left != null && TJAPlayer3.Tx.Taiko_Ka_Right != null)
                     {
-                        TJAPlayer3.Tx.Taiko_Ka_Left.Opacity = this.stパッド状態[playerShift].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Ka_Right.Opacity = this.stパッド状態[1 + playerShift].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Don_Left.Opacity = this.stパッド状態[2 + playerShift].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Don_Right.Opacity = this.stパッド状態[3 + playerShift].n明るさ * 73;
+                        TJAPlayer3.Tx.Taiko_Ka_Left.Opacity = getMTaikoOpacity(this.stパッド状態[playerShift].n明るさ);
+                        TJAPlayer3.Tx.Taiko_Ka_Right.Opacity = getMTaikoOpacity(this.stパッド状態[1 + playerShift].n明るさ);
+                        TJAPlayer3.Tx.Taiko_Don_Left.Opacity = getMTaikoOpacity(this.stパッド状態[2 + playerShift].n明るさ);
+                        TJAPlayer3.Tx.Taiko_Don_Right.Opacity = getMTaikoOpacity(this.stパッド状態[3 + playerShift].n明るさ);
 
                         TJAPlayer3.Tx.Taiko_Ka_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
                         TJAPlayer3.Tx.Taiko_Ka_Right.t2D描画(taiko_x + TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, taiko_y, new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
@@ -257,9 +269,9 @@ namespace TJAPlayer3
                 {
                     if (TJAPlayer3.Tx.Taiko_Konga_Clap != null && TJAPlayer3.Tx.Taiko_Konga_Don != null && TJAPlayer3.Tx.Taiko_Konga_Ka != null)
                     {
-                        TJAPlayer3.Tx.Taiko_Konga_Clap.Opacity = this.stパッド状態[4 + playerShift].n明るさ * 73;
-                        TJAPlayer3.Tx.Taiko_Konga_Don.Opacity = Math.Max(this.stパッド状態[2 + playerShift].n明るさ, this.stパッド状態[3 + playerShift].n明るさ) * 73;
-                        TJAPlayer3.Tx.Taiko_Konga_Ka.Opacity = Math.Max(this.stパッド状態[playerShift].n明るさ, this.stパッド状態[1 + playerShift].n明るさ) * 73;
+                        TJAPlayer3.Tx.Taiko_Konga_Clap.Opacity = getMTaikoOpacity(this.stパッド状態[4 + playerShift].n明るさ);
+                        TJAPlayer3.Tx.Taiko_Konga_Don.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[2 + playerShift].n明るさ, this.stパッド状態[3 + playerShift].n明るさ));
+                        TJAPlayer3.Tx.Taiko_Konga_Ka.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[playerShift].n明るさ, this.stパッド状態[1 + playerShift].n明るさ));
 
                         TJAPlayer3.Tx.Taiko_Konga_Ka.t2D描画(taiko_x, taiko_y);
                         TJAPlayer3.Tx.Taiko_Konga_Don.t2D描画(taiko_x, taiko_y);
@@ -274,7 +286,7 @@ namespace TJAPlayer3
 
             for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
             {
-                if (TJAPlayer3.ConfigIni.nPlayerCount > 2) break;
+                if (TJAPlayer3.ConfigIni.nPlayerCount > 2 || TJAPlayer3.ConfigIni.SimpleMode) break;
 
                 if ( !this.ctレベルアップダウン[ i ].IsStoped )
                 {
@@ -629,7 +641,7 @@ namespace TJAPlayer3
                         new System.Drawing.RectangleF(originX, originY, width, height));
                 }
 
-                if (TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
+                if (TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null && !TJAPlayer3.ConfigIni.SimpleMode)
                 {
                     int originX = 0;
                     int originY = 0;

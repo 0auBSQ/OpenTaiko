@@ -247,7 +247,7 @@ namespace TJAPlayer3
             if (LuaScript == null) return;
             try
             {
-                LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, TJAPlayer3.P1IsBlue(), TJAPlayer3.ConfigIni.sLang);
+                LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, TJAPlayer3.P1IsBlue(), TJAPlayer3.ConfigIni.sLang, TJAPlayer3.ConfigIni.SimpleMode);
                 LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime,
                     TJAPlayer3.FPS.NowFPS,
                     TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared,

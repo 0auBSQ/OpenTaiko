@@ -2035,7 +2035,7 @@ namespace TJAPlayer3
                         {
                             //int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
                             int num9 = 0;
-                            if (TJAPlayer3.Skin.Game_Notes_Anime)
+                            if (TJAPlayer3.Skin.Game_Notes_Anime && !TJAPlayer3.ConfigIni.SimpleMode)
                             {
                                 if (this.actCombo.n現在のコンボ数[nPlayer] >= 300 && ctChipAnimeLag[nPlayer].IsEnded)
                                 {
@@ -2325,7 +2325,7 @@ namespace TJAPlayer3
                         //{
                         //    num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
                         //}
-                        if (TJAPlayer3.Skin.Game_Notes_Anime)
+                        if (TJAPlayer3.Skin.Game_Notes_Anime && !TJAPlayer3.ConfigIni.SimpleMode)
                         {
                             if (this.actCombo.n現在のコンボ数[nPlayer] >= 300 && ctChipAnimeLag[nPlayer].IsEnded)
                             {
