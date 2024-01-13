@@ -327,8 +327,25 @@ namespace TJAPlayer3
 
                     #endregion
 
-
-                    if (TJAPlayer3.ConfigIni.nBranchAnime == 0 && !_laneNull)
+                    if (TJAPlayer3.ConfigIni.SimpleMode)
+                    {
+                        switch (TJAPlayer3.stage演奏ドラム画面.nレーン用表示コース[i])
+                        {
+                            case CDTX.ECourse.eNormal:
+                                TJAPlayer3.Tx.Lane_Text[0].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
+                                break;
+                            case CDTX.ECourse.eExpert:
+                                TJAPlayer3.Tx.Lane_Text[1].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
+                                break;
+                            case CDTX.ECourse.eMaster:
+                                TJAPlayer3.Tx.Lane_Text[2].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
+                                break;
+                        }
+                    }
+                    else if (TJAPlayer3.ConfigIni.nBranchAnime == 0 && !_laneNull)
                     {
                         if (!this.stBranch[i].ct分岐アニメ進行.IsTicked)
                         {
@@ -780,7 +797,7 @@ namespace TJAPlayer3
             #region[ ゴーゴー炎 ]
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i])
+                if (TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i] && !TJAPlayer3.ConfigIni.SimpleMode)
                 {
                     this.ctゴーゴー炎.TickLoop();
 
@@ -872,11 +889,14 @@ namespace TJAPlayer3
                             case E判定.Perfect:
                             case E判定.Great:
                             case E判定.Auto:
-                                //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
-                                if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
-                                else if (TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                                if (!TJAPlayer3.ConfigIni.SimpleMode)
+                                {
+                                    //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
+                                    if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
+                                        TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                                    else if (TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
+                                        TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                                }
                                 break;
 
                             case E判定.Good:

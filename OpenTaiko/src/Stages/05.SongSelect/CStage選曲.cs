@@ -183,8 +183,8 @@ namespace TJAPlayer3
         // コンストラクタ
         public CStage選曲()
         {
-            base.eステージID = CStage.Eステージ.選曲;
-            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+            base.eStageID = CStage.EStage.SongSelect;
+            base.ePhaseID = CStage.EPhase.Common_NORMAL;
             base.IsDeActivated = true;
             base.ChildActivities.Add(this.actオプションパネル = new CActオプションパネル());
             base.ChildActivities.Add(this.actFIFO = new CActFIFOBlack());
@@ -434,12 +434,12 @@ namespace TJAPlayer3
                     if (TJAPlayer3.r直前のステージ == TJAPlayer3.stage結果)
                     {
                         this.actFIfrom結果画面.tフェードイン開始();
-                        base.eフェーズID = CStage.Eフェーズ.選曲_結果画面からのフェードイン;
+                        base.ePhaseID = CStage.EPhase.SongSelect_FadeInFromResults;
                     }
                     else
                     {
                         this.actFIFO.tフェードイン開始();
-                        base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+                        base.ePhaseID = CStage.EPhase.Common_FADEIN;
                     }
                     this.t選択曲変更通知();
                     base.IsFirstDraw = false;
@@ -601,7 +601,7 @@ namespace TJAPlayer3
                 this.actShowCurrentPosition.Draw();                               // #27648 2011.3.28 yyagi
 
                 // Select screen song
-                if (base.eフェーズID == CStage.Eフェーズ.共通_通常状態)
+                if (base.ePhaseID == CStage.EPhase.Common_NORMAL)
                 {
                     CSongSelectSongManager.playSongIfPossible();
                 }
@@ -793,7 +793,7 @@ namespace TJAPlayer3
                 #region [ Inputs ]
 
                 // キー入力
-                if (base.eフェーズID == CStage.Eフェーズ.共通_通常状態
+                if (base.ePhaseID == CStage.EPhase.Common_NORMAL
                     && TJAPlayer3.act現在入力を占有中のプラグイン == null)
                 {
                     #region [ 簡易CONFIGでMore、またはShift+F1: 詳細CONFIG呼び出し ]
@@ -803,7 +803,7 @@ namespace TJAPlayer3
                         this.actPresound.tサウンド停止();
                         this.eフェードアウト完了時の戻り値 = E戻り値.コンフィグ呼び出し;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
                         this.actFIFO.tフェードアウト開始();
-                        base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                        base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                         TJAPlayer3.Skin.sound取消音.t再生する();
                         return 0;
                     }
@@ -870,7 +870,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Skin.sound取消音.t再生する();
                                 this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                                 this.actFIFO.tフェードアウト開始();
-                                base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                                base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                                 return 0;
                             }
                             else
@@ -896,7 +896,7 @@ namespace TJAPlayer3
                             this.actPresound.tサウンド停止();
                             this.eフェードアウト完了時の戻り値 = E戻り値.コンフィグ呼び出し;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
                             this.actFIFO.tフェードアウト開始();
-                            base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+                            base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                             TJAPlayer3.Skin.sound取消音.t再生する();
                             return 0;
                         }
@@ -1286,30 +1286,30 @@ namespace TJAPlayer3
 
                 if (actNewHeya.IsOpend) actNewHeya.Draw();
 
-                switch (base.eフェーズID)
+                switch (base.ePhaseID)
                 {
-                    case CStage.Eフェーズ.共通_フェードイン:
+                    case CStage.EPhase.Common_FADEIN:
                         if (this.actFIFO.Draw() != 0)
                         {
-                            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+                            base.ePhaseID = CStage.EPhase.Common_NORMAL;
                         }
                         break;
 
-                    case CStage.Eフェーズ.共通_フェードアウト:
+                    case CStage.EPhase.Common_FADEOUT:
                         if (this.actFIFO.Draw() == 0)
                         {
                             break;
                         }
                         return (int)this.eフェードアウト完了時の戻り値;
 
-                    case CStage.Eフェーズ.選曲_結果画面からのフェードイン:
+                    case CStage.EPhase.SongSelect_FadeInFromResults:
                         if (this.actFIfrom結果画面.Draw() != 0)
                         {
-                            base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+                            base.ePhaseID = CStage.EPhase.Common_NORMAL;
                         }
                         break;
 
-                    case CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト:
+                    case CStage.EPhase.SongSelect_FadeOutToNowLoading:
                         if (this.actFOtoNowLoading.Draw() == 0)
                         {
                             break;
@@ -1821,7 +1821,7 @@ namespace TJAPlayer3
 
             this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
             this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-            base.eフェーズID = CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト;
+            base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 
             #region [Log]
 
@@ -1938,7 +1938,7 @@ namespace TJAPlayer3
             {
                 this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
                 this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-                base.eフェーズID = CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト;
+                base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
             }
             // TJAPlayer3.Skin.bgm選曲画面.t停止する();
             CSongSelectSongManager.stopSong();
@@ -1956,7 +1956,7 @@ namespace TJAPlayer3
             {
                 this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
                 this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-                base.eフェーズID = CStage.Eフェーズ.選曲_NowLoading画面へのフェードアウト;
+                base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
             }
 
             // TJAPlayer3.Skin.bgm選曲画面.t停止する();

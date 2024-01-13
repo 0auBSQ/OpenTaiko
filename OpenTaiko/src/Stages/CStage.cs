@@ -7,32 +7,19 @@ namespace TJAPlayer3
 {
 	public class CStage : CActivity
 	{
-		// プロパティ
-
-		internal enum Eヒット判定
+		internal EStage eStageID;
+		public enum EStage
 		{
-			PERFECT,
-			GREAT,
-			GOOD,
-			POOR,
-			MISS,
-			BAD,
-			AUTO
-		}
-
-		internal Eステージ eステージID;
-		public enum Eステージ
-		{
-			何もしない,
-			起動,
-			タイトル,	// Title screen
-			オプション,
-			コンフィグ,
-			選曲,		// Ensou song select
-			段位選択,	// Dan-i dojo menu
-			曲読み込み,
-			演奏,		// In-game
-			結果,		// Result screen
+			None,
+			StartUp,
+			Title,	// Title screen
+			Options,
+			Config,
+			SongSelect,
+			DanDojoSelect,
+			SongLoading,
+			Game,
+			Results,
 			ChangeSkin,						// #28195 2011.5.4 yyagi
 			Heya,
 			TaikoTowers,
@@ -44,41 +31,39 @@ namespace TJAPlayer3
 			PlayerStats,
 			ChartEditor,
 			Toolbox,
-			Template,			// No effect, for template class
-			終了
+			TEMPLATE,			// No effect, for template class
+			End
 		}
 		
-		internal Eフェーズ eフェーズID;
-		public enum Eフェーズ
+		internal EPhase ePhaseID;
+		public enum EPhase
 		{
-			共通_通常状態,
-			共通_フェードイン,
-			共通_フェードアウト,
-			共通_終了状態,
-			起動0_システムサウンドを構築,
-			起動00_songlistから曲リストを作成する,
-			//起動1_SongsDBからスコアキャッシュを構築,
-			起動2_曲を検索してリストを作成する,
-			起動3_スコアキャッシュをリストに反映する,
-			起動4_スコアキャッシュになかった曲をファイルから読み込んで反映する,
-			起動5_曲リストへ後処理を適用する,
-			//起動6_スコアキャッシュをSongsDBに出力する,
-            起動_テクスチャの読み込み,
-			起動7_完了,
-			タイトル_起動画面からのフェードイン,
-			選曲_結果画面からのフェードイン,
-            選曲_コース選択画面へのフェードアウト, //2016.10.20 kairera0467
-			選曲_NowLoading画面へのフェードアウト,
-			NOWLOADING_DTXファイルを読み込む,
-            NOWLOADING_WAV読み込み待機,
-			NOWLOADING_WAVファイルを読み込む,
-			NOWLOADING_BMPファイルを読み込む,
-			NOWLOADING_システムサウンドBGMの完了を待つ,
-			演奏_STAGE_FAILED,
-			演奏_STAGE_FAILED_フェードアウト,
-			演奏_STAGE_CLEAR_フェードアウト,
-            演奏_演奏終了演出, //2016.07.15 kairera0467
-			演奏_再読込
+			Common_NORMAL,
+			Common_FADEIN,
+			Common_FADEOUT,
+			Common_EXIT,
+			Startup_0_CreateSystemSound,
+			Startup_1_InitializeSonglist,
+			Startup_2_EnumerateSongs,
+			Startup_3_ApplyScoreCache,
+			Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem,
+			Startup_5_PostProcessSonglist,
+            Startup_6_LoadTextures,
+			Startup_Complete,
+			Title_FadeIn,
+			SongSelect_FadeInFromResults,
+            SongSelect_FadeOutToCourseSelect, //2016.10.20 kairera0467
+			SongSelect_FadeOutToNowLoading,
+			SongLoading_LoadDTXFile,
+            SongLoading_WaitToLoadWAVFile,
+			SongLoading_LoadWAVFile,
+			SongLoading_LoadBMPFile,
+			SongLoading_WaitForSoundSystemBGM,
+			Game_STAGE_FAILED,
+			Game_STAGE_FAILED_FadeOut,
+			Game_STAGE_CLEAR_FadeOut,
+            Game_EndStage, //2016.07.15 kairera0467
+			Game_Reload
 		}
 	}
 }

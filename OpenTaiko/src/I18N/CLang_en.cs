@@ -158,7 +158,10 @@ namespace TJAPlayer3
             [98] = "Capture key assign:\nTo assign key for screen capture.\n (You can use keyboard only. You can't\nuse pads to capture screenshot.",
             [99] = "LeftRed",
 
-			[9994] = "Texture Loading Type:\n" +
+            [9992] = "Simplifies Drawing\n",
+            [9993] = "SimpleMode",
+
+            [9994] = "Texture Loading Type:\n" +
 					"Freeze on startup disappears\n" +
 					"Turn this option off if some textures turn black\n" +
 					"This change will take effect after restarting OpenTaiko\n",

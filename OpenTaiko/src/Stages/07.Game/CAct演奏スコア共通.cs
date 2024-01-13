@@ -353,7 +353,14 @@ namespace TJAPlayer3
                                 {
                                     //this.txScore.color4 = new SlimDX.Color4( 1.0f, 1.0f, 1.0f );
                                     TJAPlayer3.Tx.Taiko_Score[0].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
+                                    if (TJAPlayer3.ConfigIni.SimpleMode)
+                                    {
+                                        TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = 1;
+                                    }
+                                    else
+                                    {
+                                        TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
+                                    }
                                     TJAPlayer3.Tx.Taiko_Score[0].t2D拡大率考慮下基準描画( x , y, rectangle );
                                     
                                 }

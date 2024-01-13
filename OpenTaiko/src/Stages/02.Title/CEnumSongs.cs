@@ -236,7 +236,7 @@ namespace TJAPlayer3
 			{
 				#region [ 0) システムサウンドの構築  ]
 				//-----------------------------
-				TJAPlayer3.stage起動.eフェーズID = CStage.Eフェーズ.起動0_システムサウンドを構築;
+				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
 
 				Trace.TraceInformation( "0) システムサウンドを構築します。" );
 				Trace.Indent();
@@ -292,7 +292,7 @@ namespace TJAPlayer3
 			}
 			finally
 			{
-				TJAPlayer3.stage起動.eフェーズID = CStage.Eフェーズ.起動_テクスチャの読み込み;
+				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 				TimeSpan span = (TimeSpan) ( DateTime.Now - now );
 				Trace.TraceInformation( "起動所要時間: {0}", span.ToString() );
 				lock ( this )							// #28700 2012.6.12 yyagi; state change must be in finally{} for exiting as of compact mode.

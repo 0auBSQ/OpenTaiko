@@ -18,7 +18,7 @@ namespace TJAPlayer3
 		
         public virtual void Start( int player )
 		{
-            if (TJAPlayer3.Tx.Effects_Rainbow != null)
+            if (TJAPlayer3.Tx.Effects_Rainbow != null && !TJAPlayer3.ConfigIni.SimpleMode)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -71,7 +71,7 @@ namespace TJAPlayer3
 		}
 		public override int Draw()
 		{
-			if( !base.IsDeActivated )
+			if( !base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode)
 			{
                 if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return base.Draw();
                 for (int f = 0; f < 2; f++)

@@ -10,8 +10,11 @@ namespace FDK
 	{
 		// コンストラクタ
 
+		private IJoystick Joystick {get; set;}
+
 		public CInputJoystick(IJoystick joystick)
 		{
+			Joystick = joystick;
 			this.CurrentType = InputDeviceType.Joystick;
 			this.GUID = joystick.Index.ToString();
 			this.ID = joystick.Index;
@@ -64,6 +67,14 @@ namespace FDK
 		{
 			InputEvents.Clear();
 			
+			// BUG: In Silk.NET, GLFW input does not fire events, so we have to poll
+			// 			them instead.
+			// 			https://github.com/dotnet/Silk.NET/issues/1889
+			foreach (var button in Joystick.Buttons) {
+				// also, in GLFW the buttons don't have names, so the indices are the names
+				ButtonStates[button.Index].Item1 = button.Pressed;
+			}
+
 			for (int i = 0; i < ButtonStates.Length; i++)
 			{
 				if (ButtonStates[i].Item1)
@@ -153,7 +164,7 @@ namespace FDK
 
 		#region [ private ]
 		//-----------------
-		private (bool, int)[] ButtonStates = new (bool, int)[15];
+		private (bool, int)[] ButtonStates = new (bool, int)[18];
 		private bool IsDisposed;
 
 		private void Joystick_ButtonDown(IJoystick joystick, Button button)

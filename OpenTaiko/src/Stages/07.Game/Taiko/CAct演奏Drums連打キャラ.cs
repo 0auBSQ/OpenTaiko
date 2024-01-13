@@ -20,6 +20,8 @@ namespace TJAPlayer3
 		// メソッド
         public virtual void Start( int player )
 		{
+            if (TJAPlayer3.ConfigIni.SimpleMode) return;
+
             //if( CDTXMania.Tx.Effects_Roll[0] != null )
             //{
             //    int[] arXseed = new int[] { 56, -10, 200, 345, 100, 451, 600, 260, -30, 534, 156, 363 };
@@ -139,8 +141,8 @@ namespace TJAPlayer3
 			base.ReleaseManagedResource();
 		}
 		public override int Draw()
-		{
-			if( !base.IsDeActivated )
+        {
+            if ( !base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode)
 			{
                 //for( int i = 0; i < 64; i++ )
                 //{

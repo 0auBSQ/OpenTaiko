@@ -1369,6 +1369,7 @@ namespace TJAPlayer3
         public bool FastRender; // 事前画像描画モード
         public bool ASyncTextureLoad; // 事前画像描画モード
         public bool PreAssetsLoading; // 事前画像描画モード
+        public bool SimpleMode; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
 
 		public bool TJAP3FolderMode { get; private set; }
@@ -1967,6 +1968,7 @@ namespace TJAPlayer3
 			FastRender = true;
 			ASyncTextureLoad = true;
 			PreAssetsLoading = true;
+			SimpleMode = false;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
             #region[ Ver.K追加 ]
@@ -2080,12 +2082,16 @@ namespace TJAPlayer3
             sw.WriteLine("; Use pre-textures render.");
             sw.WriteLine("{0}={1}", nameof(ASyncTextureLoad), ASyncTextureLoad ? 1 : 0);
             sw.WriteLine();
-			#endregion
+            sw.WriteLine("; シンプルモードを使うかどうか。(0: OFF, 1: ON)");
+            sw.WriteLine("; Use simplemode");
+            sw.WriteLine("{0}={1}", nameof(SimpleMode), SimpleMode ? 1 : 0);
+            sw.WriteLine();
+            #endregion
 
 
-			#region [Language]
+            #region [Language]
 
-			sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
+            sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
 			sw.WriteLine("; Change the displayed language ingame and within the menus.");
 			sw.WriteLine("Lang={0}", this.sLang);
 			sw.WriteLine();
@@ -2952,6 +2958,10 @@ namespace TJAPlayer3
                                             else if (str3.Equals(nameof(ASyncTextureLoad)))
                                             {
                                                 ASyncTextureLoad = CConversion.bONorOFF(str4[0]);
+                                            }
+                                            else if (str3.Equals(nameof(SimpleMode)))
+                                            {
+                                                SimpleMode = CConversion.bONorOFF(str4[0]);
                                             }
                                             #endregion
                                             #region [ Window関係 ]
