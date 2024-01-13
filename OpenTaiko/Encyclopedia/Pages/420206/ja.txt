@@ -1,0 +1,10 @@
+[くす玉のみ]
+
+function kusuIn()
+くす玉の開始時に一回だけ呼び出されます
+
+function kusuBroke()
+くす玉が割れた時に一回だけ呼び出されます
+
+function kusuMiss()
+くす玉が割れすに失敗したときに一回だけ呼び出されます
