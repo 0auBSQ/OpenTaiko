@@ -902,21 +902,21 @@ namespace TJAPlayer3
                         }
                         #endregion
                         #region [ F2 簡易オプション ]
-                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F2))
+                        if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.QuickConfig))
                         {
                             TJAPlayer3.Skin.sound変更音.t再生する();
                             this.actQuickConfig.tActivatePopupMenu(E楽器パート.DRUMS);
                         }
                         #endregion
                         #region [ F3 1PオートON/OFF ]
-                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F3))
+                        if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleAutoP1))
                         {
                             TJAPlayer3.Skin.sound変更音.t再生する();
                             CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]);
                         }
                         #endregion
                         #region [ F4 2PオートON/OFF ]
-                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F4))
+                        if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleAutoP2))
                         {
                             if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
                             {
@@ -955,7 +955,7 @@ namespace TJAPlayer3
                         }
                         #endregion
                         #region [ F7 TokkunMode ]
-                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F7))
+                        if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleTrainingMode))
                         {
                             if (TJAPlayer3.ConfigIni.nPlayerCount < 2)
                             {
@@ -977,7 +977,7 @@ namespace TJAPlayer3
                         }
                         #endregion
                         #region [ F9  ]
-                        if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F9))
+                        if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.NewHeya))
                         {
                             actNewHeya.Open();
                         }
@@ -1197,7 +1197,7 @@ namespace TJAPlayer3
                             }
                             #endregion
                             #region [ BDx2: 簡易CONFIG ]
-                            if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Space))
+                            if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SortSongs))
                             {
                                 TJAPlayer3.Skin.sound変更音.t再生する();
                                 this.actSortSongs.tActivatePopupMenu(E楽器パート.DRUMS, ref this.act曲リスト);

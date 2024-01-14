@@ -2334,9 +2334,10 @@ for (int i = 0; i < 3; i++) {
 				}
 			}
 
-			foreach(var capture in ConfigIni.KeyAssign.System.Capture)
-			{
-				if (TJAPlayer3.Input管理.Keyboard.KeyPressed(capture.コード) && capture.コード != 0)
+			//foreach(var capture in ConfigIni.KeyAssign.System.Capture)
+			//{
+				//if (TJAPlayer3.Input管理.Keyboard.KeyPressed(capture.コード) && capture.コード != 0)
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.Capture))
 				{
 #if DEBUG
 						if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
@@ -2367,14 +2368,14 @@ for (int i = 0; i < 3; i++) {
 							SaveResultScreen(strFullPath);
 						}
 #else
-						string strFullPath =
-							Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
-						strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
-						SaveResultScreen(strFullPath);
+					string strFullPath =
+						Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+					strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+					SaveResultScreen(strFullPath);
 #endif
-					}
+				}
 
-			}
+			//}
 
 			/*
 			if ( Sound管理?.GetCurrentSoundDeviceType() != "DirectSound" )

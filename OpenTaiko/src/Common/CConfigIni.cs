@@ -234,17 +234,6 @@ namespace TJAPlayer3
 						this.padLBD = value;
 					}
 				}
-				public CConfigIni.CKeyAssign.STKEYASSIGN[] Capture
-				{
-					get
-					{
-						return this.padCapture;
-					}
-					set
-					{
-						this.padCapture = value;
-					}
-				}
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed
 				{
 					get
@@ -552,6 +541,127 @@ namespace TJAPlayer3
 						this.padRightChange = value;
 					}
 				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Capture
+				{
+					get
+					{
+						return this.padCapture;
+					}
+					set
+					{
+						this.padCapture = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolIncrease
+				{
+					get
+					{
+						return this.padSongVolIncrease;
+					}
+					set
+					{
+						this.padSongVolIncrease = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolDecrease
+				{
+					get
+					{
+						return this.padSongVolDecrease;
+					}
+					set
+					{
+						this.padSongVolDecrease = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayHits
+				{
+					get
+					{
+						return this.padDisplayHits;
+					}
+					set
+					{
+						this.padDisplayHits = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayDebug
+				{
+					get
+					{
+						return this.padDisplayDebug;
+					}
+					set
+					{
+						this.padDisplayDebug = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] QuickConfig
+				{
+					get
+					{
+						return this.padQuickConfig;
+					}
+					set
+					{
+						this.padQuickConfig = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] NewHeya
+				{
+					get
+					{
+						return this.padNewHeya;
+					}
+					set
+					{
+						this.padNewHeya = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SortSongs
+				{
+					get
+					{
+						return this.padSortSongs;
+					}
+					set
+					{
+						this.padSortSongs = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP1
+				{
+					get
+					{
+						return this.padToggleAutoP1;
+					}
+					set
+					{
+						this.padToggleAutoP1 = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP2
+				{
+					get
+					{
+						return this.padToggleAutoP2;
+					}
+					set
+					{
+						this.padToggleAutoP2 = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleTrainingMode
+				{
+					get
+					{
+						return this.padToggleTrainingMode;
+					}
+					set
+					{
+						this.padToggleTrainingMode = value;
+					}
+				}
 
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[int index]
 				{
@@ -678,6 +788,36 @@ namespace TJAPlayer3
 
 							case (int)EKeyConfigPad.Capture:
 								return this.padCapture;
+
+							case (int)EKeyConfigPad.SongVolumeIncrease:
+								return this.padSongVolIncrease;
+
+							case (int)EKeyConfigPad.SongVolumeDecrease:
+								return this.padSongVolDecrease;
+
+							case (int)EKeyConfigPad.DisplayHits:
+								return this.padDisplayHits;
+
+							case (int)EKeyConfigPad.DisplayDebug:
+								return this.padDisplayDebug;
+
+							case (int)EKeyConfigPad.QuickConfig:
+								return this.padQuickConfig;
+
+							case (int)EKeyConfigPad.NewHeya:
+								return this.padNewHeya;
+
+							case (int)EKeyConfigPad.SortSongs:
+								return this.padSortSongs;
+
+							case (int)EKeyConfigPad.ToggleAutoP1:
+								return this.padToggleAutoP1;
+
+							case (int)EKeyConfigPad.ToggleAutoP2:
+								return this.padToggleAutoP2;
+
+							case (int)EKeyConfigPad.ToggleTrainingMode:
+								return this.padToggleTrainingMode;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -844,6 +984,46 @@ namespace TJAPlayer3
 							case (int)EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
+
+							case (int)EKeyConfigPad.SongVolumeIncrease:
+								this.padSongVolIncrease = value;
+								return;
+
+							case (int)EKeyConfigPad.SongVolumeDecrease:
+								this.padSongVolDecrease = value;
+								return;
+
+							case (int)EKeyConfigPad.DisplayHits:
+								this.padDisplayHits = value;
+								return;
+
+							case (int)EKeyConfigPad.DisplayDebug:
+								this.padDisplayDebug = value;
+								return;
+
+							case (int)EKeyConfigPad.QuickConfig:
+								this.padQuickConfig = value;
+								return;
+
+							case (int)EKeyConfigPad.NewHeya:
+								this.padNewHeya = value;
+								return;
+
+							case (int)EKeyConfigPad.SortSongs:
+								this.padSortSongs = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleAutoP1:
+								this.padToggleAutoP1 = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleAutoP2:
+								this.padToggleAutoP2 = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleTrainingMode:
+								this.padToggleTrainingMode = value;
+								return;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -898,8 +1078,23 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRightChange;
 
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolIncrease;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolDecrease;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayHits;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayDebug;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padQuickConfig;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padNewHeya;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSortSongs;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP1;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP2;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleTrainingMode;
 				//-----------------
 				#endregion
+			}
+
+			public bool KeyIsPressed(STKEYASSIGN[] pad)
+			{
+				return TJAPlayer3.Input管理.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
 			}
 
 			[StructLayout(LayoutKind.Sequential)]
@@ -1285,7 +1480,7 @@ namespace TJAPlayer3
 			{
 				for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 				{
-					for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+					for( int j = 0; j < (int)EKeyConfigPad.MAX; j++ )
 					{
 						for( int k = 0; k < 0x10; k++ )
 						{
@@ -1990,7 +2185,7 @@ namespace TJAPlayer3
 			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
-				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+				for( int j = 0; j < (int)EKeyConfigPad.Capture; j++ ) // Do not restrict duplicate keybinds for System controls
 				{
 					if (isMenu ? 
 						(j != (int)EKeyConfigPad.LeftChange && j != (int)EKeyConfigPad.RightChange &&
@@ -2746,6 +2941,36 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.Write( "Capture=" );
 			this.tキーの書き出し( sw, this.KeyAssign.System.Capture );
+			sw.WriteLine();
+			sw.Write( "SongVolumeIncrease=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SongVolIncrease );
+			sw.WriteLine();
+			sw.Write( "SongVolumeDecrease=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SongVolDecrease );
+			sw.WriteLine();
+			sw.Write( "DisplayHits=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.DisplayHits );
+			sw.WriteLine();
+			sw.Write( "DisplayDebug=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.DisplayDebug );
+			sw.WriteLine();
+			sw.Write( "QuickConfig=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.QuickConfig );
+			sw.WriteLine();
+			sw.Write( "NewHeya=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.NewHeya );
+			sw.WriteLine();
+			sw.Write( "SortSongs=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SortSongs );
+			sw.WriteLine();
+			sw.Write( "ToggleAutoP1=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleAutoP1 );
+			sw.WriteLine();
+			sw.Write( "ToggleAutoP2=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleAutoP2 );
+			sw.WriteLine();
+			sw.Write( "ToggleTrainingMode=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleTrainingMode );
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -3974,11 +4199,53 @@ namespace TJAPlayer3
 									#region [ [SystemKeyAssign] ]
 									//-----------------------------
 									case Eセクション種別.SystemKeyAssign:
+									{
 										if( str3.Equals( "Capture" ) )
 										{
 											this.tキーの読み出しと設定( str4, this.KeyAssign.System.Capture );
 										}
+										else if( str3.Equals( "SongVolumeIncrease" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolIncrease );
+										}
+										else if( str3.Equals( "SongVolumeDecrease" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolDecrease );
+										}
+										else if( str3.Equals( "DisplayHits" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayHits );
+										}
+										else if( str3.Equals( "DisplayDebug" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayDebug );
+										}
+										else if( str3.Equals( "QuickConfig" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.QuickConfig );
+										}
+										else if( str3.Equals( "NewHeya" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.NewHeya );
+										}
+										else if( str3.Equals( "SortSongs" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SortSongs );
+										}
+										else if( str3.Equals( "ToggleAutoP1" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP1 );
+										}
+										else if( str3.Equals( "ToggleAutoP2" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP2 );
+										}
+										else if( str3.Equals( "ToggleTrainingMode" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleTrainingMode );
+										}
 										continue;
+									}
 									//-----------------------------
 									#endregion
 								}
@@ -4076,7 +4343,7 @@ namespace TJAPlayer3
 			this.KeyAssign = new CKeyAssign();
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
-				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+				for( int j = 0; j < (int)EKeyConfigPad.MAX; j++ )
 				{
 					this.KeyAssign[ i ][ j ] = new CKeyAssign.STKEYASSIGN[ 16 ];
 					for( int k = 0; k < 16; k++ )
@@ -4215,6 +4482,16 @@ RightChange=K020
 
 [SystemKeyAssign]
 Capture=K065
+SongVolumeIncrease=K074
+SongVolumeDecrease=K0115
+DisplayHits=K057
+DisplayDebug=K043
+QuickConfig=K055
+NewHeya=K062
+SortSongs=K0126
+ToggleAutoP1=K056
+ToggleAutoP2=K057
+ToggleTrainingMode=K060
 ";
 			t文字列から読み込み( strDefaultKeyAssign );
 		}
