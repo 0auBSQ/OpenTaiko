@@ -148,7 +148,7 @@ namespace TJAPlayer3
 		LC		= Eパッド.LC,
 		LP		= Eパッド.LP,		// #27029 2012.1.4 from
         LBD     = Eパッド.LBD,
-
+		#region [Gameplay Keys]
         LRed    = Eパッド.LRed,
         RRed    = Eパッド.RRed,
         LBlue   = Eパッド.LBlue,
@@ -181,8 +181,23 @@ namespace TJAPlayer3
 		Clap5P = Eパッド.CLAP5P,
 		LeftChange = Eパッド.LeftChange,
 		RightChange = Eパッド.RightChange,
-
+		#endregion
+		#region [System Keys]
 		Capture,
+		SongVolumeIncrease,
+		SongVolumeDecrease,
+		DisplayHits,
+		DisplayDebug,
+		#region [Song Select only]
+		QuickConfig,
+		NewHeya,
+		SortSongs,
+		ToggleAutoP1,
+		ToggleAutoP2,
+		ToggleTrainingMode,
+		#endregion
+		MAX,
+		#endregion
 		UNKNOWN = Eパッド.UNKNOWN
 	}
 	[Flags]
