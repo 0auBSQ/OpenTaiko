@@ -1,0 +1,7 @@
+[画像描画]
+
+func:DrawGraph(x, y, "ファイル名");
+指定された位置に指定された画像を描画します
+
+func:DrawGraphCenter(x, y, "filename");
+指定された位置に指定された画像を中心を基準にして描画します

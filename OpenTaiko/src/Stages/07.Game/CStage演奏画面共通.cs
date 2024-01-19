@@ -3231,7 +3231,7 @@ namespace TJAPlayer3
 					ドラムスクロール速度ダウン();
 				}
                 // Debug mode
-				else if (keyboard.KeyPressed( (int)SlimDXKeys.Key.Delete ) )
+				else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.DisplayDebug) )
 				{	// del (debug info)
 					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
 				}
@@ -3342,14 +3342,15 @@ namespace TJAPlayer3
                     this.b強制的に分岐させた[0] = true;
                 }
 
-                if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.F4 ) )
-				{
+                if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.DisplayHits) )
+                {
                     if( TJAPlayer3.ConfigIni.bJudgeCountDisplay == false )
                         TJAPlayer3.ConfigIni.bJudgeCountDisplay = true;
                     else
                         TJAPlayer3.ConfigIni.bJudgeCountDisplay = false;
-				}
-				else if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.F5 ) )
+                }
+
+				if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.F5 ) )
 				{
                     switch( TJAPlayer3.ConfigIni.eClipDispType  )
                     {
@@ -3367,6 +3368,7 @@ namespace TJAPlayer3
                             break;
                     }
 				}
+
                 if (TJAPlayer3.ConfigIni.bTokkunMode) 
                 {
                     if (keyboard.KeyPressed((int)SlimDXKeys.Key.F6))

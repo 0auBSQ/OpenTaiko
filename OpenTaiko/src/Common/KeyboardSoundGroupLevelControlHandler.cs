@@ -26,11 +26,10 @@ namespace TJAPlayer3
             CSkin skin,
             bool isSongPreview)
         {
-            var isAdjustmentPositive = keyboard.KeyPressed((int)SlimDXKeys.Key.RightBracket);
-            if (!(isAdjustmentPositive || keyboard.KeyPressed((int)SlimDXKeys.Key.LeftBracket)))
-            {
-                return;
-            }
+            bool isAdjustmentPositive = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolIncrease);
+            bool isAdjustmentNegative = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolDecrease);
+
+            if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 
             ESoundGroup soundGroup;
             CSkin.Cシステムサウンド システムサウンド = null;
@@ -46,10 +45,6 @@ namespace TJAPlayer3
             {
                 soundGroup = ESoundGroup.Voice;
                 システムサウンド = skin.soundゲーム開始音;
-            }
-            else if (isSongPreview)
-            {
-                soundGroup = ESoundGroup.SongPlayback;
             }
             else
             {

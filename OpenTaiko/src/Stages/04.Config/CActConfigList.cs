@@ -618,6 +618,46 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.Capture);
 			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemSongVolIncrease )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.SongVolumeIncrease);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemSongVolDecrease )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.SongVolumeDecrease);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemDisplayHit )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.DisplayHits);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemDisplayDebug )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.DisplayDebug);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemQuickConfig )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.QuickConfig);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemNewHeya )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.NewHeya);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemSortSongs )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.SortSongs);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemToggleAutoP1 )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleAutoP1);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemToggleAutoP2 )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleAutoP2);
+			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemToggleTrainingMode )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleTrainingMode);
+			}
 			#endregion
 			else
 			{
@@ -741,9 +781,40 @@ namespace TJAPlayer3
 			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iKeyAssignSystemReturnToMenu );
+
 			this.iKeyAssignSystemCapture = new CItemBase(CLangManager.LangInstance.GetString(97),
 				CLangManager.LangInstance.GetString(98));
 			this.list項目リスト.Add( this.iKeyAssignSystemCapture );
+			this.iKeyAssignSystemSongVolIncrease = new CItemBase(CLangManager.LangInstance.GetString(10128),
+				CLangManager.LangInstance.GetString(10129));
+			this.list項目リスト.Add( this.iKeyAssignSystemSongVolIncrease );
+			this.iKeyAssignSystemSongVolDecrease = new CItemBase(CLangManager.LangInstance.GetString(10130),
+				CLangManager.LangInstance.GetString(10131));
+			this.list項目リスト.Add( this.iKeyAssignSystemSongVolDecrease );
+			this.iKeyAssignSystemDisplayHit = new CItemBase(CLangManager.LangInstance.GetString(10132),
+				CLangManager.LangInstance.GetString(10133));
+			this.list項目リスト.Add( this.iKeyAssignSystemDisplayHit );
+			this.iKeyAssignSystemDisplayDebug = new CItemBase(CLangManager.LangInstance.GetString(10134),
+				CLangManager.LangInstance.GetString(10135));
+			this.list項目リスト.Add( this.iKeyAssignSystemDisplayDebug );
+			this.iKeyAssignSystemQuickConfig = new CItemBase(CLangManager.LangInstance.GetString(10136),
+				CLangManager.LangInstance.GetString(10137));
+			this.list項目リスト.Add( this.iKeyAssignSystemQuickConfig );
+			this.iKeyAssignSystemNewHeya = new CItemBase(CLangManager.LangInstance.GetString(10138),
+				CLangManager.LangInstance.GetString(10139));
+			this.list項目リスト.Add( this.iKeyAssignSystemNewHeya );
+			this.iKeyAssignSystemSortSongs = new CItemBase(CLangManager.LangInstance.GetString(10140),
+				CLangManager.LangInstance.GetString(10141));
+			this.list項目リスト.Add( this.iKeyAssignSystemSortSongs );
+			this.iKeyAssignSystemToggleAutoP1 = new CItemBase(CLangManager.LangInstance.GetString(10142),
+				CLangManager.LangInstance.GetString(10143));
+			this.list項目リスト.Add( this.iKeyAssignSystemToggleAutoP1);
+			this.iKeyAssignSystemToggleAutoP2 = new CItemBase(CLangManager.LangInstance.GetString(10144),
+				CLangManager.LangInstance.GetString(10145));
+			this.list項目リスト.Add( this.iKeyAssignSystemToggleAutoP2);
+			this.iKeyAssignSystemToggleTrainingMode = new CItemBase(CLangManager.LangInstance.GetString(10146),
+				CLangManager.LangInstance.GetString(10147));
+			this.list項目リスト.Add( this.iKeyAssignSystemToggleTrainingMode);
 
             OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
@@ -1422,6 +1493,16 @@ namespace TJAPlayer3
 		private Eメニュー種別 eメニュー種別;
 		#region [ キーコンフィグ ]
 		private CItemBase iKeyAssignSystemCapture;			// #24609
+		private CItemBase iKeyAssignSystemSongVolIncrease;
+		private CItemBase iKeyAssignSystemSongVolDecrease;
+		private CItemBase iKeyAssignSystemDisplayHit;
+		private CItemBase iKeyAssignSystemDisplayDebug;
+		private CItemBase iKeyAssignSystemQuickConfig;
+		private CItemBase iKeyAssignSystemNewHeya;
+		private CItemBase iKeyAssignSystemSortSongs;
+		private CItemBase iKeyAssignSystemToggleAutoP1;
+		private CItemBase iKeyAssignSystemToggleAutoP2;
+		private CItemBase iKeyAssignSystemToggleTrainingMode;
 		private CItemBase iKeyAssignSystemReturnToMenu;		// #24609
 		private CItemBase iKeyAssignDrumsReturnToMenu;
 
