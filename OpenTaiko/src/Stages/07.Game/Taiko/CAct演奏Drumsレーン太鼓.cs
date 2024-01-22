@@ -886,9 +886,9 @@ namespace TJAPlayer3
 
                         switch (st状態[i].judge)
                         {
-                            case E判定.Perfect:
-                            case E判定.Great:
-                            case E判定.Auto:
+                            case ENoteJudge.Perfect:
+                            case ENoteJudge.Great:
+                            case ENoteJudge.Auto:
                                 if (!TJAPlayer3.ConfigIni.SimpleMode)
                                 {
                                     //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
@@ -899,7 +899,7 @@ namespace TJAPlayer3
                                 }
                                 break;
 
-                            case E判定.Good:
+                            case ENoteJudge.Good:
                                 //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
                                 if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue] != null)
                                     TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
@@ -907,8 +907,8 @@ namespace TJAPlayer3
                                     TJAPlayer3.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
                                 break;
 
-                            case E判定.Miss:
-                            case E判定.Bad:
+                            case ENoteJudge.Miss:
+                            case ENoteJudge.Bad:
                                 break;
                         }
                     }
@@ -918,7 +918,7 @@ namespace TJAPlayer3
 
         }
 
-        public virtual void Start(int nLane, E判定 judge, bool b両手入力, int nPlayer)
+        public virtual void Start(int nLane, ENoteJudge judge, bool b両手入力, int nPlayer)
         {
             //2017.08.15 kairera0467 排他なので番地をそのまま各レーンの状態として扱う
 
@@ -1026,7 +1026,7 @@ namespace TJAPlayer3
         {
             public bool b使用中;
             public CCounter ct進行;
-            public E判定 judge;
+            public ENoteJudge judge;
             public int nIsBig;
             public int n透明度;
             public int nPlayer;

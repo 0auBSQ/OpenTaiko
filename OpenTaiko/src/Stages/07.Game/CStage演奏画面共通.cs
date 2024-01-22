@@ -1156,7 +1156,7 @@ namespace TJAPlayer3
 
 
 
-	    internal E判定 e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip, int player = 0)
+	    internal ENoteJudge e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip, int player = 0)
 	    {
 	        var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player);
 
@@ -1173,7 +1173,7 @@ namespace TJAPlayer3
 	        // other controller, etc. and the visuals of notes crossing the judgment position.
 	        if (TJAPlayer3.IsPerformingCalibration)
 	        {
-	            return e判定 < E判定.Good ? E判定.Good : e判定;
+	            return e判定 < ENoteJudge.Good ? ENoteJudge.Good : e判定;
 	        }
 	        else
 	        {
@@ -1224,7 +1224,7 @@ namespace TJAPlayer3
                 this.nHighestCombo[danSong] = this.nCombo[danSong];
         }
 
-		private E判定 e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip, int player = 0 )
+		private ENoteJudge e指定時刻からChipのJUDGEを返すImpl( long nTime, CDTX.CChip pChip, int player = 0 )
 		{
 
 			if ( pChip != null )
@@ -1236,14 +1236,14 @@ namespace TJAPlayer3
                 {
                     if ((SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed) > pChip.n発声時刻ms && (SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed) < pChip.nノーツ終了時刻ms)
                     {
-                        return E判定.Perfect;
+                        return ENoteJudge.Perfect;
 				    }
                 }
                 else if(NotesManager.IsGenericBalloon(pChip))
                 {
                     if ((SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed) >= pChip.n発声時刻ms - 17 && (SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed) < pChip.nノーツ終了時刻ms)
                     {
-                        return E判定.Perfect;
+                        return ENoteJudge.Perfect;
 				    }
                 }
 
@@ -1262,25 +1262,25 @@ namespace TJAPlayer3
 
                 if (nDeltaTime <= tz.nGoodZone * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
                 {
-                    return E判定.Perfect;
+                    return ENoteJudge.Perfect;
 				}
                 if (nDeltaTime <= tz.nOkZone * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
                 {
                     if ( TJAPlayer3.ConfigIni.bJust[actual] == 1 && NotesManager.IsMissableNote(pChip)) // Just
-                        return E判定.Poor;
-					return E判定.Good;
+                        return ENoteJudge.Poor;
+					return ENoteJudge.Good;
 				}
 
                 
                 if (nDeltaTime <= tz.nBadZone * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
                 {
                     if (TJAPlayer3.ConfigIni.bJust[actual] == 2 || !NotesManager.IsMissableNote(pChip)) // Safe
-                        return E判定.Good;
-                    return E判定.Poor;
+                        return ENoteJudge.Good;
+                    return ENoteJudge.Poor;
                 }
                 
 			}
-			return E判定.Miss;
+			return ENoteJudge.Miss;
 		}
 
 		protected CDTX.CChip r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮( long nTime, int nChannel, int nInputAdjustTime, int nPlayer )
@@ -1778,13 +1778,13 @@ namespace TJAPlayer3
             return true;
         }
 
-		protected abstract E判定 tチップのヒット処理( long nHitTime, CDTX.CChip pChip, bool bCorrectLane );
+		protected abstract ENoteJudge tチップのヒット処理( long nHitTime, CDTX.CChip pChip, bool bCorrectLane );
 
-		protected E判定 tチップのヒット処理( long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput )
+		protected ENoteJudge tチップのヒット処理( long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput )
 		{
 			return tチップのヒット処理( nHitTime, pChip, screenmode, bCorrectLane, nNowInput, 0 );
 		}
-        protected unsafe E判定 tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer, bool rollEffectHit = false)
+        protected unsafe ENoteJudge tチップのヒット処理(long nHitTime, CDTX.CChip pChip, E楽器パート screenmode, bool bCorrectLane, int nNowInput, int nPlayer, bool rollEffectHit = false)
         {
             //unsafeコードにつき、デバッグ中の変更厳禁!
 
@@ -1799,7 +1799,7 @@ namespace TJAPlayer3
             }
 
             if (!pChip.b可視)
-                return E判定.Auto;
+                return ENoteJudge.Auto;
 
             if (!NotesManager.IsGenericRoll(pChip))
             {
@@ -1810,7 +1810,7 @@ namespace TJAPlayer3
                 }
             }
 
-			E判定 eJudgeResult = E判定.Auto;
+			ENoteJudge eJudgeResult = ENoteJudge.Auto;
             switch (pChip.e楽器パート)
             {
                 case E楽器パート.DRUMS:
@@ -1820,12 +1820,12 @@ namespace TJAPlayer3
 				case E楽器パート.TAIKO:
 					{
                         //連打が短すぎると発声されない
-						eJudgeResult = (bCorrectLane)? this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer ) : E判定.Miss;
+						eJudgeResult = (bCorrectLane)? this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer ) : ENoteJudge.Miss;
 
                         // AI judges
                         eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
 
-                        if (!bAutoPlay && eJudgeResult != E判定.Miss)
+                        if (!bAutoPlay && eJudgeResult != ENoteJudge.Miss)
 					    {
 					        CLagLogger.Add(nPlayer, pChip);
                         }
@@ -1993,10 +1993,10 @@ namespace TJAPlayer3
                         }
                         else if (NotesManager.IsADLIB(pChip))
                         {
-                            if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
+                            if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss)
                             {
-                                this.actJudgeString.Start(nPlayer, eJudgeResult != E判定.Bad ? E判定.ADLIB : E判定.Bad);
-                                eJudgeResult = E判定.Perfect; // Prevent ADLIB notes breaking DFC runs
+                                this.actJudgeString.Start(nPlayer, eJudgeResult != ENoteJudge.Bad ? ENoteJudge.ADLIB : ENoteJudge.Bad);
+                                eJudgeResult = ENoteJudge.Perfect; // Prevent ADLIB notes breaking DFC runs
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, eJudgeResult, nPlayer);
                                 this.CChartScore[nPlayer].nADLIB++;
@@ -2009,13 +2009,13 @@ namespace TJAPlayer3
                         }
                         else if (NotesManager.IsMine(pChip))
                         {
-                            if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
+                            if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss)
                             {
-                                this.actJudgeString.Start(nPlayer, eJudgeResult != E判定.Bad ? E判定.Mine : E判定.Bad);
+                                this.actJudgeString.Start(nPlayer, eJudgeResult != ENoteJudge.Bad ? ENoteJudge.Mine : ENoteJudge.Bad);
                                 bBombHit = true;
-                                eJudgeResult = E判定.Bad;
+                                eJudgeResult = ENoteJudge.Bad;
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
-                                TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, E判定.Mine, nPlayer);
+                                TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, ENoteJudge.Mine, nPlayer);
                                 TJAPlayer3.Skin.soundBomb?.t再生する();
                                 actGauge.MineDamage(nPlayer);
                                 this.CChartScore[nPlayer].nMine++;
@@ -2028,16 +2028,16 @@ namespace TJAPlayer3
                         }
                         else
                         {
-                            if (eJudgeResult != E判定.Miss)
+                            if (eJudgeResult != ENoteJudge.Miss)
                             {
                                 pChip.bShow = false;
                             }
                         }
 
-                        if (eJudgeResult != E判定.Auto && eJudgeResult != E判定.Miss)
+                        if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss)
                         {
 
-                            this.actJudgeString.Start(nPlayer, (bAutoPlay && !TJAPlayer3.ConfigIni.bAIBattleMode) ? E判定.Auto : eJudgeResult);
+                            this.actJudgeString.Start(nPlayer, (bAutoPlay && !TJAPlayer3.ConfigIni.bAIBattleMode) ? ENoteJudge.Auto : eJudgeResult);
                             TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(pChip.nチャンネル番号, eJudgeResult, true, nPlayer);
                             TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(pChip.nチャンネル番号, eJudgeResult, nPlayer);
                         }
@@ -2062,7 +2062,7 @@ namespace TJAPlayer3
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
             bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
 
-            if (eJudgeResult != E判定.Poor && eJudgeResult != E判定.Miss)
+            if (eJudgeResult != ENoteJudge.Poor && eJudgeResult != ENoteJudge.Miss)
             {
                 double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer]))));
 
@@ -2090,7 +2090,7 @@ namespace TJAPlayer3
                 }
             }
 
-			if ( eJudgeResult == E判定.Poor || eJudgeResult == E判定.Miss || eJudgeResult == E判定.Bad )
+			if ( eJudgeResult == ENoteJudge.Poor || eJudgeResult == ENoteJudge.Miss || eJudgeResult == ENoteJudge.Bad )
             {
                 int Character = this.actChara.iCurrentCharacter[nPlayer];
 
@@ -2191,7 +2191,7 @@ namespace TJAPlayer3
 
 					    switch ( eJudgeResult )
 					    {
-                            case E判定.Perfect:
+                            case ENoteJudge.Perfect:
                                 {
                                     if (NotesManager.IsADLIB(pChip))
                                         break;
@@ -2234,8 +2234,8 @@ namespace TJAPlayer3
                                     this.bIsMiss[nPlayer] = false;
                                 }
                                 break;
-                            case E判定.Great:
-                            case E判定.Good:
+                            case ENoteJudge.Great:
+                            case ENoteJudge.Good:
                                 {
                                     this.CBranchScore[nPlayer].nGood++;
                                     this.CChartScore[nPlayer].nGood++;
@@ -2273,9 +2273,9 @@ namespace TJAPlayer3
                                     this.bIsMiss[nPlayer] = false;
                                 }
                                 break;
-                            case E判定.Poor:
-		    				case E判定.Miss:
-			    			case E判定.Bad:
+                            case ENoteJudge.Poor:
+		    				case ENoteJudge.Miss:
+			    			case ENoteJudge.Bad:
                                 {
                                     if(!NotesManager.IsMissableNote(pChip) && !bBombHit)
                                         break;
@@ -2315,7 +2315,7 @@ namespace TJAPlayer3
 					{
 						switch ( eJudgeResult )
 						{
-                            case E判定.Perfect:
+                            case ENoteJudge.Perfect:
                                 {
                                     if(!NotesManager.IsGenericRoll(pChip))
                                     {
@@ -2359,8 +2359,8 @@ namespace TJAPlayer3
                                 }
                                 break;
 
-                            case E判定.Great:
-                            case E判定.Good:
+                            case ENoteJudge.Great:
+                            case ENoteJudge.Good:
                                 {
                                     if (!NotesManager.IsGenericRoll(pChip))
                                     {
@@ -2507,7 +2507,7 @@ namespace TJAPlayer3
 				default:
 					break;
 			}
-			if ( ( ( pChip.e楽器パート != E楽器パート.UNKNOWN ) ) && ( eJudgeResult != E判定.Miss ) && ( eJudgeResult != E判定.Bad ) && ( eJudgeResult != E判定.Poor ) && (NotesManager.IsMissableNote(pChip)) )
+			if ( ( ( pChip.e楽器パート != E楽器パート.UNKNOWN ) ) && ( eJudgeResult != ENoteJudge.Miss ) && ( eJudgeResult != ENoteJudge.Bad ) && ( eJudgeResult != ENoteJudge.Poor ) && (NotesManager.IsMissableNote(pChip)) )
 			{
                 int nCombos = this.actCombo.n現在のコンボ数[nPlayer];
                 long nInit = TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer]];
@@ -2518,7 +2518,7 @@ namespace TJAPlayer3
                 {
                     nAddScore = (long)nAddScoreNiji[nPlayer];
 
-                    if (eJudgeResult == E判定.Great || eJudgeResult == E判定.Good)
+                    if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good)
                     {
                         nAddScore = (long)nAddScoreNiji[nPlayer] / 20;
                         nAddScore = (long)nAddScore * 10;
@@ -2549,7 +2549,7 @@ namespace TJAPlayer3
                         nAddScore = this.nScore[ 4 ];
                     }
 
-                    if (eJudgeResult == E判定.Great || eJudgeResult == E判定.Good)
+                    if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good)
                     {
                         nAddScore = nAddScore / 2;
                     }
@@ -2630,7 +2630,7 @@ namespace TJAPlayer3
                         nAddScore = this.nScore[10];
                     }
 
-                    if (eJudgeResult == E判定.Great || eJudgeResult == E判定.Good)
+                    if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good)
                     {
                         nAddScore = nAddScore / 2;
                     }
@@ -2651,7 +2651,7 @@ namespace TJAPlayer3
                 }
                 else
                 {
-                    if (eJudgeResult == E判定.Perfect)
+                    if (eJudgeResult == ENoteJudge.Perfect)
                     {
                         if (nCombos < 200)
                         {
@@ -2662,7 +2662,7 @@ namespace TJAPlayer3
                             nAddScore = 2000;
                         }
                     }
-                    else if (eJudgeResult == E判定.Great || eJudgeResult == E判定.Good)
+                    else if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good)
                     {
                         if (nCombos < 200)
                         {
@@ -2696,7 +2696,7 @@ namespace TJAPlayer3
             }
 
 
-            return E判定.Auto;
+            return ENoteJudge.Auto;
         }
 
         protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CDTX.ECourse eCourse, E楽器パート part);
@@ -2708,7 +2708,7 @@ namespace TJAPlayer3
 			cInvisibleChip.ShowChipTemporally( part );
 
             //ChipのCourseをベースにゲージの伸びを調節
-            actGauge.Damage(screenmode, part, E判定.Miss, 0);
+            actGauge.Damage(screenmode, part, ENoteJudge.Miss, 0);
             switch ( part )
 			{
 				case E楽器パート.DRUMS:
@@ -3620,7 +3620,7 @@ namespace TJAPlayer3
                         //こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
                         if (time <= 0)
                         {
-                            if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == E判定.Miss)
+                            if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss)
                             {
                                 pChip.IsMissed = true;
                                 pChip.eNoteState = ENoteState.bad;
@@ -3823,9 +3823,9 @@ namespace TJAPlayer3
                                     {
                                         if (pChip.n連打音符State == 13)
                                         {
-                                            this.actJudgeString.Start(nPlayer, E判定.Mine);
-                                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, E判定.Bad, true, nPlayer);
-                                            TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, E判定.Mine, nPlayer);
+                                            this.actJudgeString.Start(nPlayer, ENoteJudge.Mine);
+                                            TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, ENoteJudge.Bad, true, nPlayer);
+                                            TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, ENoteJudge.Mine, nPlayer);
                                             actGauge.MineDamage(nPlayer);
                                             TJAPlayer3.Skin.soundBomb?.t再生する();
                                             this.CChartScore[nPlayer].nMine++;
@@ -4956,7 +4956,7 @@ namespace TJAPlayer3
                         int instIndex = (int) pChip.e楽器パート;
                         if( pChip.nバーからの距離dot[instIndex] < -40 )
                         {
-                            if ( this.e指定時刻からChipのJUDGEを返す( n現在時刻ms, pChip, nPlayer ) == E判定.Miss )
+                            if ( this.e指定時刻からChipのJUDGEを返す( n現在時刻ms, pChip, nPlayer ) == ENoteJudge.Miss )
                             {
                                 this.tチップのヒット処理( n現在時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer );
                             }
@@ -5762,7 +5762,7 @@ namespace TJAPlayer3
 
         private int nDice = 0;
 
-        public E判定 AlterJudgement(int player, E判定 judgement, bool reroll)
+        public ENoteJudge AlterJudgement(int player, ENoteJudge judgement, bool reroll)
         {
             int AILevel = TJAPlayer3.ConfigIni.nAILevel;
             if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1)
@@ -5771,10 +5771,10 @@ namespace TJAPlayer3
                     nDice = TJAPlayer3.Random.Next(1000);
 
                 if (nDice < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds)
-                    return E判定.Poor;
+                    return ENoteJudge.Poor;
                 else if (nDice - TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nBadOdds
                     < TJAPlayer3.ConfigIni.apAIPerformances[AILevel - 1].nGoodOdds)
-                    return E判定.Good;
+                    return ENoteJudge.Good;
             }
             return judgement;
         }

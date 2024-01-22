@@ -341,7 +341,7 @@ namespace TJAPlayer3
         // Regular display
         public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = -1)
         {
-            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
                 return;
 
             if (length == -1)
@@ -392,7 +392,7 @@ namespace TJAPlayer3
         {
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
 
-            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != Eステルスモード.OFF || !chip.bShow)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
                 return;
 
             int _offset = 0;
@@ -485,7 +485,7 @@ namespace TJAPlayer3
         // SENotes
         public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip)
         {
-            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] == Eステルスモード.STEALTH)
+            if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] == EStealthMode.STEALTH)
                 return;
 
             EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];

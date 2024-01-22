@@ -761,34 +761,34 @@ namespace TJAPlayer3
                 this.st叩ききりまショー.n延長アニメ速度 = 500;
         }
 
-        public void t叩ききりまショー_判定から各数値を増加させる( E判定 eJudge, int nLagTime )
+        public void t叩ききりまショー_判定から各数値を増加させる( ENoteJudge eJudge, int nLagTime )
         {
             this.st叩ききりまショー.b最初のチップが叩かれた = true;
             this.st叩ききりまショー.n区間ノート数++;
             this.st叩ききりまショー.n現在通過したノート数++;
             switch( eJudge )
             {
-                case E判定.Perfect:
+                case ENoteJudge.Perfect:
                     this.st叩ききりまショー.nヒット数_PERFECT++;
                     break;
-                case E判定.Great:
+                case ENoteJudge.Great:
                     this.st叩ききりまショー.nヒット数_GREAT++;
                     break;
-                case E判定.Good:
+                case ENoteJudge.Good:
                     this.st叩ききりまショー.nヒット数_GOOD++;
                     break;
-                case E判定.Poor:
+                case ENoteJudge.Poor:
                     this.st叩ききりまショー.nヒット数_POOR++;
                     break;
-                case E判定.Miss:
+                case ENoteJudge.Miss:
                     this.st叩ききりまショー.nヒット数_MISS++;
                     break;
             }
             switch( eJudge )
             {
-                case E判定.Perfect:
-                case E判定.Great:
-                case E判定.Good:
+                case ENoteJudge.Perfect:
+                case ENoteJudge.Great:
+                case ENoteJudge.Good:
                     this.st叩ききりまショー.n現在のコンボ++;
                     if( this.st叩ききりまショー.n現在のコンボ >= this.st叩ききりまショー.n最大コンボ )
                         this.st叩ききりまショー.n最大コンボ = this.st叩ききりまショー.n現在のコンボ;

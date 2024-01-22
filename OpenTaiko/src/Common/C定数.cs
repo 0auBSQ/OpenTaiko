@@ -279,16 +279,16 @@ namespace TJAPlayer3
 		ChipがPadより優先,
 		PadがChipより優先
 	}
-	internal enum E入力デバイス
+	internal enum EInputDevice
 	{
-		キーボード		= 0,
-		MIDI入力		= 1,
-		ジョイパッド	= 2,
-		マウス			= 3,
+		Keyboard		= 0,
+		MIDIInput		= 1,
+		Joypad	= 2,
+		Mouse			= 3,
 		Gamepad = 4,
-		不明			= -1
+		Unknown			= -1
 	}
-	public enum E判定
+	public enum ENoteJudge
 	{
 		Perfect	= 0,
 		Great	= 1,
@@ -323,14 +323,6 @@ namespace TJAPlayer3
 		Unknown,
 		AVI,
 		AVIPAN
-	}
-	internal enum EBGA種別
-	{
-		Unknown,
-		BMP,
-		BMPTEX,
-		BGA,
-		BGAPAN
 	}
 	internal enum EFIFOモード
 	{
@@ -412,7 +404,7 @@ namespace TJAPlayer3
         potato
     }
 
-    public enum Eステルスモード
+    public enum EStealthMode
     {
         OFF = 0,
         DORON = 1,

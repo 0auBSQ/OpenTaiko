@@ -145,6 +145,11 @@ BoxFontName=廻想体 ネクスト UP B
 098 - Rainy Night III ~輪回~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
 099 - Dreaming to be with you : Cusi ft. Kaeru from 虹信号 - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA https://twitter.com/nijishingoPH (Chart by Komi)
 100 - Puzzle of "The End." : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+101 - おはよう : Tanger ft. Hatsune Miku - https://linktr.ee/Tangermusic (Chart by Komi)
+102 - GET REAL : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by Komi)
+103 - spliced : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
+104 - 〈11 : Tanger ft. Hatsune Miku - https://linktr.ee/Tangermusic (Chart by Colin)
+105 - CHAOTIC DIMENSION : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by sadkay)
 ```
 
 ### Visuals

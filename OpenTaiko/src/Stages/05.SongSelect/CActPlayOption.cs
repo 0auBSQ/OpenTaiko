@@ -613,7 +613,7 @@ namespace TJAPlayer3
 
             #region [ Doron ]
 
-            TJAPlayer3.ConfigIni.eSTEALTH[actual] = (Eステルスモード)nStealth;
+            TJAPlayer3.ConfigIni.eSTEALTH[actual] = (EStealthMode)nStealth;
 
             #endregion
 

@@ -102,7 +102,7 @@ namespace TJAPlayer3
             }
         }
 
-        public virtual void Start( int nLane, E判定 judge, int player )
+        public virtual void Start( int nLane, ENoteJudge judge, int player )
 		{
             for (int j = 0; j < 3 * 4; j++)
             {
@@ -284,19 +284,19 @@ namespace TJAPlayer3
 
                                 switch ( st状態[ i ].judge )
                                 {
-                                    case E判定.Perfect:
-                                    case E判定.Great:
-                                    case E判定.Auto:
+                                    case ENoteJudge.Perfect:
+                                    case ENoteJudge.Great:
+                                    case ENoteJudge.Auto:
                                         if (!TJAPlayer3.ConfigIni.SimpleMode) TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
                                         break;                                    
-                                    case E判定.Good:
+                                    case ENoteJudge.Good:
                                          TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
                                         break;
-                                    case E判定.Mine:
+                                    case ENoteJudge.Mine:
                                         TJAPlayer3.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
                                         break;
-                                    case E判定.Miss:
-                                    case E判定.Bad:
+                                    case ENoteJudge.Miss:
+                                    case ENoteJudge.Bad:
                                         break;
                                 }
 					        }
@@ -318,9 +318,9 @@ namespace TJAPlayer3
 
                             switch( st状態_大[ i ].judge )
                             {
-                                case E判定.Perfect:
-                                case E判定.Great:
-                                case E判定.Auto:
+                                case ENoteJudge.Perfect:
+                                case ENoteJudge.Great:
+                                case ENoteJudge.Auto:
                                     if( this.st状態_大[ i ].nIsBig == 1 && !TJAPlayer3.ConfigIni.SimpleMode)
                                     {
                                         //float fX = 415 - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Width * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X ) / 2.0f);
@@ -376,11 +376,11 @@ namespace TJAPlayer3
                                     }
                                     break;
                                     
-                                case E判定.Good:
+                                case ENoteJudge.Good:
                                     break;
 
-                                case E判定.Miss:
-                                case E判定.Bad:
+                                case ENoteJudge.Miss:
+                                case ENoteJudge.Bad:
                                     break;
                             }
 					    }
@@ -497,7 +497,7 @@ namespace TJAPlayer3
         {
             public bool b使用中;
             public CCounter ct進行;
-            public E判定 judge;
+            public ENoteJudge judge;
             public int nIsBig;
             public int n透明度;
             public int nPlayer;
@@ -506,7 +506,7 @@ namespace TJAPlayer3
         protected struct STSTATUS_B
         {
             public CCounter ct進行;
-            public E判定 judge;
+            public ENoteJudge judge;
             public int nIsBig;
             public int n透明度;
             public int nPlayer;

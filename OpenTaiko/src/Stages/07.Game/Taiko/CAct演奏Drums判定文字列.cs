@@ -90,7 +90,7 @@ namespace TJAPlayer3
             return 0;
 		}
 
-		public void Start(int player, E判定 judge)
+		public void Start(int player, ENoteJudge judge)
 		{
 			JudgeAnime judgeAnime = new();
 			judgeAnime.counter.Start(0, 410, 1, TJAPlayer3.Timer);
@@ -120,21 +120,21 @@ namespace TJAPlayer3
 		#region [ private ]
 		//-----------------
 
-		private static Dictionary<E判定, int> JudgesDict = new Dictionary<E判定, int>
+		private static Dictionary<ENoteJudge, int> JudgesDict = new Dictionary<ENoteJudge, int>
 		{
-			[E判定.Perfect] = 0,
-			[E判定.Auto] = 0,
-			[E判定.Good] = 1,
-			[E判定.Bad] = 2,
-			[E判定.Miss] = 2,
-			[E判定.ADLIB] = 3,
-			[E判定.Mine] = 4,
+			[ENoteJudge.Perfect] = 0,
+			[ENoteJudge.Auto] = 0,
+			[ENoteJudge.Good] = 1,
+			[ENoteJudge.Bad] = 2,
+			[ENoteJudge.Miss] = 2,
+			[ENoteJudge.ADLIB] = 3,
+			[ENoteJudge.Mine] = 4,
 		};
 
 		private List<JudgeAnime>[] JudgeAnimes = new List<JudgeAnime>[5];
 		private class JudgeAnime
         {
-			public E判定 Judge;
+			public ENoteJudge Judge;
 			public Rectangle rc;
 			public CCounter counter = new CCounter();
 		}

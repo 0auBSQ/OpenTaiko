@@ -43,7 +43,7 @@ namespace TJAPlayer3
 			base.IsDeActivated = true;
 		}
 
-        public override void Start(int nLane, E判定 judge, int player)
+        public override void Start(int nLane, ENoteJudge judge, int player)
         {
             for (int j = 0; j < 32; j++)
             {

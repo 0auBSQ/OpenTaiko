@@ -397,7 +397,7 @@ namespace TJAPlayer3
             this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
         }
 
-        public void Damage(E楽器パート screenmode, E楽器パート part, E判定 e今回の判定, int nPlayer)
+        public void Damage(E楽器パート screenmode, E楽器パート part, ENoteJudge e今回の判定, int nPlayer)
         {
             float fDamage;
             int nコース = (int)TJAPlayer3.stage演奏ドラム画面.n現在のコース[nPlayer];
@@ -406,8 +406,8 @@ namespace TJAPlayer3
 #if true    // DAMAGELEVELTUNING
             switch (e今回の判定)
             {
-                case E判定.Perfect:
-                case E判定.Great:
+                case ENoteJudge.Perfect:
+                case ENoteJudge.Great:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -417,7 +417,7 @@ namespace TJAPlayer3
                             fDamage = this.dbゲージ増加量[0][nPlayer];
                     }
                     break;
-                case E判定.Good:
+                case ENoteJudge.Good:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -427,8 +427,8 @@ namespace TJAPlayer3
                             fDamage = this.dbゲージ増加量[1][nPlayer];
                     }
                     break;
-                case E判定.Poor:
-                case E判定.Miss:
+                case ENoteJudge.Poor:
+                case ENoteJudge.Miss:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -541,7 +541,7 @@ namespace TJAPlayer3
 
         }
 
-        public virtual void Start(int nLane, E判定 judge, int player)
+        public virtual void Start(int nLane, ENoteJudge judge, int player)
         {
         }
 

@@ -202,7 +202,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(40));
             list項目リスト.Add(SendDiscordPlayingInformation);
 
-            this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString(10041), TJAPlayer3.ConfigIni.bバッファ入力を行う,
+            this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString(10041), TJAPlayer3.ConfigIni.bBufferedInputs,
 				CLangManager.LangInstance.GetString(41));
 			this.list項目リスト.Add( this.iSystemBufferedInput );
 			this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString(10042), TJAPlayer3.ConfigIni.bログ出力,
@@ -388,7 +388,7 @@ namespace TJAPlayer3
                 new string[] { "OFF", "TYPE-A", "TYPE-B" });
             this.list項目リスト.Add( this.iTaikoGameMode );
 
-            this.iTaikoBigNotesJudge = new CItemToggle(CLangManager.LangInstance.GetString(91), TJAPlayer3.ConfigIni.b大音符判定,
+            this.iTaikoBigNotesJudge = new CItemToggle(CLangManager.LangInstance.GetString(91), TJAPlayer3.ConfigIni.bJudgeBigNotes,
 				CLangManager.LangInstance.GetString(92));
             this.list項目リスト.Add( this.iTaikoBigNotesJudge );
 
@@ -1716,7 +1716,7 @@ namespace TJAPlayer3
 
 			//CDTXMania.ConfigIni.bWave再生位置自動調整機能有効 = this.iSystemAdjustWaves.bON;
 			TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = this.iSystemVSyncWait.bON;
-			TJAPlayer3.ConfigIni.bバッファ入力を行う = this.iSystemBufferedInput.bON;
+			TJAPlayer3.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
 			TJAPlayer3.ConfigIni.bAVI有効 = this.iSystemAVI.bON;
 			TJAPlayer3.ConfigIni.bBGA有効 = this.iSystemBGA.bON;
 //			CDTXMania.ConfigIni.bGraph有効 = this.iSystemGraph.bON;#24074 2011.01.23 comment-out ikanick オプション(Drums)へ移行
@@ -1825,7 +1825,7 @@ namespace TJAPlayer3
             //TJAPlayer3.ConfigIni.bJust = this.iTaikoJust.bON;
             TJAPlayer3.ConfigIni.bJudgeCountDisplay = this.iTaikoJudgeCountDisp.bON;
 			TJAPlayer3.ConfigIni.ShowExExtraAnime = this.iShowExExtraAnime.bON;
-			TJAPlayer3.ConfigIni.b大音符判定 = this.iTaikoBigNotesJudge.bON;
+			TJAPlayer3.ConfigIni.bJudgeBigNotes = this.iTaikoBigNotesJudge.bON;
 			TJAPlayer3.ConfigIni.bForceNormalGauge = this.iTaikoForceNormalGauge.bON;
 
 		}

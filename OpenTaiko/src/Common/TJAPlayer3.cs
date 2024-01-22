@@ -756,7 +756,7 @@ namespace TJAPlayer3
 		}
 		protected override void Update()
 		{
-            Input管理?.Polling( TJAPlayer3.ConfigIni.bバッファ入力を行う );
+            Input管理?.Polling( TJAPlayer3.ConfigIni.bBufferedInputs );
 		}
 		protected override void Draw()
 		{

@@ -336,8 +336,8 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.RANDOM) ModFlags |= (int)EModFlag.Random;
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.HYPERRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
-            if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == Eステルスモード.DORON) ModFlags |= (int)EModFlag.Invisible;
-            if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == Eステルスモード.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
+            if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
+            if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
             if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;
             if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.MINESWEEPER) ModFlags |= (int)EModFlag.Minesweeper;
             if (TJAPlayer3.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;

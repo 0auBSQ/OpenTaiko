@@ -757,11 +757,11 @@ namespace TJAPlayer3
         private readonly ST文字位置[] st大文字位置;
 		//-----------------
 
-		protected override E判定 tチップのヒット処理( long nHitTime, CDTX.CChip pChip, bool bCorrectLane )
+		protected override ENoteJudge tチップのヒット処理( long nHitTime, CDTX.CChip pChip, bool bCorrectLane )
 		{
-			E判定 eJudgeResult = tチップのヒット処理( nHitTime, pChip, E楽器パート.DRUMS, bCorrectLane, 0 );
+			ENoteJudge eJudgeResult = tチップのヒット処理( nHitTime, pChip, E楽器パート.DRUMS, bCorrectLane, 0 );
 			// #24074 2011.01.23 add ikanick
-            if( pChip.nコース == this.n現在のコース[ 0 ] && NotesManager.IsMissableNote(pChip) && pChip.bShow == true && eJudgeResult != E判定.Auto )
+            if( pChip.nコース == this.n現在のコース[ 0 ] && NotesManager.IsMissableNote(pChip) && pChip.bShow == true && eJudgeResult != ENoteJudge.Auto )
                 this.actGame.t叩ききりまショー_判定から各数値を増加させる( eJudgeResult, (int)( nHitTime - pChip.n発声時刻ms ) );
 			return eJudgeResult;
 		}
@@ -869,20 +869,20 @@ namespace TJAPlayer3
                 return false;
             }
 
-			E判定 e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer );
+			ENoteJudge e判定 = this.e指定時刻からChipのJUDGEを返す( nHitTime, pChip, nPlayer );
 
             e判定 = AlterJudgement(nPlayer, e判定, false);
 
             this.actGame.t叩ききりまショー_判定から各数値を増加させる( e判定, (int)( nHitTime - pChip.n発声時刻ms ) );
 
-			if( e判定 == E判定.Miss )
+			if( e判定 == ENoteJudge.Miss )
 			{
 				return false;
 			}
 
 			this.tチップのヒット処理( nHitTime, pChip, E楽器パート.TAIKO, true, nInput, nPlayer );
 			
-            if( ( e判定 != E判定.Poor ) && ( e判定 != E判定.Miss ) )
+            if( ( e判定 != ENoteJudge.Poor ) && ( e判定 != ENoteJudge.Miss ) )
 			{
                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start( pChip.nチャンネル番号, e判定, b両手入力, nPlayer );
 
@@ -1044,7 +1044,7 @@ namespace TJAPlayer3
                     var isDon = padTo < 2 ? true : false;
 
                     CDTX.CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
-                    E判定 e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : E判定.Miss;
+                    ENoteJudge e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : ENoteJudge.Miss;
 
                     e判定 = AlterJudgement(nUsePlayer, e判定, false);
 
@@ -1053,9 +1053,9 @@ namespace TJAPlayer3
                     bool b太鼓音再生フラグ = true;
                     if (chipNoHit != null)
                     {
-                        if (NotesManager.IsADLIB(chipNoHit) && (e判定 == E判定.Perfect || e判定 == E判定.Good))
+                        if (NotesManager.IsADLIB(chipNoHit) && (e判定 == ENoteJudge.Perfect || e判定 == ENoteJudge.Good))
                             b太鼓音再生フラグ = false;
-                        if (NotesManager.IsADLIB(chipNoHit) && (e判定 != E判定.Miss && e判定 != E判定.Poor))
+                        if (NotesManager.IsADLIB(chipNoHit) && (e判定 != ENoteJudge.Miss && e判定 != ENoteJudge.Poor))
                             this.soundAdlib[chipNoHit.nPlayerSide]?.PlayStart();
                     }
 
@@ -1333,7 +1333,7 @@ namespace TJAPlayer3
                     if (this.b連打中[nUsePlayer])
                     {
                         chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer];
-                        e判定 = E判定.Perfect;
+                        e判定 = ENoteJudge.Perfect;
                     }
 
                     if (chipNoHit == null)
@@ -1406,14 +1406,14 @@ namespace TJAPlayer3
                                 TJAPlayer3.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)_pad);
 
                                 // Process small note
-                                if (e判定 != E判定.Miss && _isSmallNote)
+                                if (e判定 != ENoteJudge.Miss && _isSmallNote)
                                 {
                                     this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                     bHitted = true;
                                 }
 
                                 // Process big notes (judge big notes off)
-                                if (e判定 != E判定.Miss && _isBigNoteTaiko && !TJAPlayer3.ConfigIni.b大音符判定)
+                                if (e判定 != ENoteJudge.Miss && _isBigNoteTaiko && !TJAPlayer3.ConfigIni.bJudgeBigNotes)
                                 {
                                     this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
                                     bHitted = true;
@@ -1423,11 +1423,11 @@ namespace TJAPlayer3
                                 }
 
                                 // Process big notes (judge big notes on)
-                                if (e判定 != E判定.Miss && ((_isBigNoteTaiko && TJAPlayer3.ConfigIni.b大音符判定) || _isPinkKonga))
+                                if (e判定 != ENoteJudge.Miss && ((_isBigNoteTaiko && TJAPlayer3.ConfigIni.bJudgeBigNotes) || _isPinkKonga))
                                 {
                                     double divided_songspeed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
                                     float time = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed);
-                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
+                                    int nWaitTime = TJAPlayer3.ConfigIni.nBigNoteWaitTimems;
 
                                     bool _timeB110 = time <= 110;
 
@@ -1478,7 +1478,7 @@ namespace TJAPlayer3
                                 }
 
                                 // Judge rolls
-                                if (e判定 != E判定.Miss 
+                                if (e判定 != ENoteJudge.Miss 
                                     && NotesManager.IsGenericRoll(chipNoHit) 
                                     && !NotesManager.IsRollEnd(chipNoHit))
                                 {
@@ -1514,14 +1514,14 @@ namespace TJAPlayer3
                                 var _pad = (Eパッド)nPad;
 
                                 // Process konga clap
-                                if (e判定 != E判定.Miss && _isClapKonga)
+                                if (e判定 != ENoteJudge.Miss && _isClapKonga)
                                 {
                                     this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
                                     bHitted = true;
                                 }
 
                                 // Judge rolls
-                                if (e判定 != E判定.Miss
+                                if (e判定 != ENoteJudge.Miss
                                     && NotesManager.IsGenericRoll(chipNoHit)
                                     && !NotesManager.IsRollEnd(chipNoHit))
                                 {
@@ -1540,13 +1540,13 @@ namespace TJAPlayer3
                     }
 
 
-                    if (e判定 != E判定.Miss && NotesManager.IsADLIB(chipNoHit))
+                    if (e判定 != ENoteJudge.Miss && NotesManager.IsADLIB(chipNoHit))
                     {
                         this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
                         bHitted = true;
                     }
 
-                    if (e判定 != E判定.Miss && NotesManager.IsMine(chipNoHit))
+                    if (e判定 != ENoteJudge.Miss && NotesManager.IsMine(chipNoHit))
                     {
                         this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
                         bHitted = true;
@@ -1835,7 +1835,7 @@ namespace TJAPlayer3
 		/// <param name="chipArray">ソート対象chip群</param>
 		/// <param name="e判定Array">ソート対象e判定群</param>
 		/// <param name="NumOfChips">チップ数</param>
-		private static void SortChipsByNTime( CDTX.CChip[] chipArray, E判定[] e判定Array, int NumOfChips )
+		private static void SortChipsByNTime( CDTX.CChip[] chipArray, ENoteJudge[] e判定Array, int NumOfChips )
 		{
 			for ( int i = 0; i < NumOfChips - 1; i++ )
 			{
@@ -1849,7 +1849,7 @@ namespace TJAPlayer3
 						CDTX.CChip chipTemp = chipArray[ j - 1 ];
 						chipArray[ j - 1 ] = chipArray[ j ];
 						chipArray[ j ] = chipTemp;
-						E判定 e判定Temp = e判定Array[ j - 1 ];
+						ENoteJudge e判定Temp = e判定Array[ j - 1 ];
 						e判定Array[ j - 1 ] = e判定Array[ j ];
 						e判定Array[ j ] = e判定Temp;
 					}
@@ -1990,7 +1990,7 @@ namespace TJAPlayer3
                     #endregion
 
                     #region[ HIDSUD & STEALTH ]
-                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
+                    if( TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == EStealthMode.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                     {
                         pChip.bShow = false;
                     }
@@ -2149,7 +2149,7 @@ namespace TJAPlayer3
                                     {
                                         int moveX = (int)(fHand * TJAPlayer3.Skin.Game_Notes_Arm_Move[0]);
                                         int moveY = (int)(fHand * TJAPlayer3.Skin.Game_Notes_Arm_Move[1]);
-                                        if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.OFF && pChip.bShow)
+                                        if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == EStealthMode.OFF && pChip.bShow)
                                         {
                                             if (nPlayer != TJAPlayer3.ConfigIni.nPlayerCount - 1)
                                             {
@@ -2299,7 +2299,7 @@ namespace TJAPlayer3
 
                 #region[ HIDSUD & STEALTH ]
 
-                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == Eステルスモード.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
+                if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(nPlayer)] == EStealthMode.STEALTH || TJAPlayer3.stage演奏ドラム画面.bCustomDoron)
                 {
                     pChip.bShow = false;
                 }
@@ -2645,7 +2645,7 @@ namespace TJAPlayer3
                 if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko))
                 {
                     float timeC = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
-                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
+                    int nWaitTime = TJAPlayer3.ConfigIni.nBigNoteWaitTimems;
                     if (chipNoHit.eNoteState == ENoteState.wait && timeC <= 110 
                         && chipNoHit.nProcessTime + nWaitTime <= (int)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed))
                     {
