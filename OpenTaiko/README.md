@@ -157,10 +157,12 @@ BoxFontName=廻想体 ネクスト UP B
 Some of the visuals (preimages and videos) are made by the composers themselves, please reach us on Discord if we missed anyone
 ```
 028 - Katharsis (Illustration): Komi/0AuBSQ
+046 - ΣxilƎ : Lirodon (From Project Outfox: Serenity)
 064 - PLANETES (Illustration): gentu
 065 - Bounded Quietude (Illustration): Hiro (https://twitter.com/HiroChair?s=09) (https://www.pixiv.net/en/users/35926966)
 069 - Vanaheimr (Illustration): Transendium (https://twitter.com/ardentminus)
 087 - Hero's Treasure (Illustration): picture_game
+089 - FunkBoi : Lirodon (From Project Outfox: Serenity)
 099 - Dreaming to be with you (Video & Illustration): Manic, RheaBee (https://twitter.com/rheabee5), Zhen (https://www.instagram.com/zhen_artz/)
 ```
 
