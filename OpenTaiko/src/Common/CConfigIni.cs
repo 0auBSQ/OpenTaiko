@@ -3926,7 +3926,7 @@ namespace TJAPlayer3
 											}
                                             else if ( str3.Equals( "DefaultCourse" ) ) //2017.01.30 DD
                                             {
-                                                this.nDefaultCourse = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 4, this.nDefaultCourse );
+                                                this.nDefaultCourse = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 5, this.nDefaultCourse );
                                             }
 											else if ( str3.Equals( "ScoreMode" ) )
 											{
