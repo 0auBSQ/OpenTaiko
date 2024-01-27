@@ -179,7 +179,7 @@ namespace TJAPlayer3
                 ctBarAnimeIn = new CCounter(0, 170, 4, TJAPlayer3.Timer);
                 // this.soundSelectAnnounce?.tサウンドを再生する();
                 //TJAPlayer3.Skin.soundSelectAnnounce.t再生する();
-                TJAPlayer3.Skin.voiceMenuDiffSelect[TJAPlayer3.SaveFile]?.t再生する();
+                TJAPlayer3.Skin.voiceMenuDiffSelect[TJAPlayer3.SaveFile]?.tPlay();
                 base.IsFirstDraw = false;
             }
             //-----------------
@@ -244,25 +244,25 @@ namespace TJAPlayer3
 
                         if (right)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.sound変更音.tPlay();
                             this.t次に移動(i);
                         }
                         else if (left)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.sound変更音.tPlay();
                             this.t前に移動(i);
                         }
                         if (decide)
                         {
                             if (n現在の選択行[i] == 0)
                             {
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                                 TJAPlayer3.stage選曲.act曲リスト.ctBarOpen.Start(100, 260, 2, TJAPlayer3.Timer);
                                 this.bIsDifficltSelect = false;
                             }
                             else if (n現在の選択行[i] == 1)
                             {
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                                 bOption[i] = true;
                             }
                             else
@@ -289,28 +289,28 @@ namespace TJAPlayer3
 
                                     if (allPlayerSelected)
                                     {
-                                        if (TJAPlayer3.Skin.soundSongDecide_AI.b読み込み成功 && TJAPlayer3.ConfigIni.bAIBattleMode)
+                                        if (TJAPlayer3.Skin.soundSongDecide_AI.bLoadedSuccessfuly && TJAPlayer3.ConfigIni.bAIBattleMode)
                                         {
-                                            TJAPlayer3.Skin.soundSongDecide_AI.t再生する();
+                                            TJAPlayer3.Skin.soundSongDecide_AI.tPlay();
                                         }
-                                        else if (TJAPlayer3.Skin.sound曲決定音.b読み込み成功)
+                                        else if (TJAPlayer3.Skin.sound曲決定音.bLoadedSuccessfuly)
                                         {
-                                            TJAPlayer3.Skin.sound曲決定音.t再生する();
+                                            TJAPlayer3.Skin.sound曲決定音.tPlay();
                                         }
                                         else
                                         {
-                                            TJAPlayer3.Skin.sound決定音.t再生する();
+                                            TJAPlayer3.Skin.sound決定音.tPlay();
                                         }
 
                                         for (int i2 = 0; i2 < TJAPlayer3.ConfigIni.nPlayerCount; i2++)
                                         {
                                             if (TJAPlayer3.ConfigIni.bAIBattleMode)
                                             {
-                                                TJAPlayer3.Skin.voiceMenuSongDecide_AI[TJAPlayer3.GetActualPlayer(i2)]?.t再生する();
+                                                TJAPlayer3.Skin.voiceMenuSongDecide_AI[TJAPlayer3.GetActualPlayer(i2)]?.tPlay();
                                             }
                                             else
                                             {
-                                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i2)]?.t再生する();
+                                                TJAPlayer3.Skin.voiceMenuSongDecide[TJAPlayer3.GetActualPlayer(i2)]?.tPlay();
                                             }
                                             CMenuCharacter.tMenuResetTimer(i2, CMenuCharacter.ECharacterAnimation.START);
                                             if (TJAPlayer3.ConfigIni.bAIBattleMode)
@@ -326,14 +326,14 @@ namespace TJAPlayer3
                                     else
                                     {
                                         CMenuCharacter.tMenuResetTimer(i, CMenuCharacter.ECharacterAnimation.WAIT);
-                                        TJAPlayer3.Skin.sound決定音.t再生する();
+                                        TJAPlayer3.Skin.sound決定音.tPlay();
                                     }
                                 }
                             }
                         }
                         if (cancel)
                         {
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.sound決定音.tPlay();
                             TJAPlayer3.stage選曲.act曲リスト.ctBarOpen.Start(100, 260, 2, TJAPlayer3.Timer);
                             this.bIsDifficltSelect = false;
                         }

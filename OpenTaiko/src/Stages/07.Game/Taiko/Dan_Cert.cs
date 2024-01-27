@@ -363,7 +363,7 @@ namespace TJAPlayer3
             for(int i = 0; i < IsEnded.Length; i++)
                 IsEnded[i] = false;
 
-            TJAPlayer3.t安全にDisposeする(ref this.pfExamFont);
+            TJAPlayer3.tDisposeSafely(ref this.pfExamFont);
             
             Dan_Plate?.Dispose();
 
@@ -372,9 +372,9 @@ namespace TJAPlayer3
 
         public override void CreateManagedResource()
         {
-            Sound_Section = TJAPlayer3.Sound管理.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section.ogg"), ESoundGroup.SoundEffect);
-            Sound_Section_First = TJAPlayer3.Sound管理.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section_First.wav"), ESoundGroup.SoundEffect);
-            Sound_Failed = TJAPlayer3.Sound管理.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+            Sound_Section = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section.ogg"), ESoundGroup.SoundEffect);
+            Sound_Section_First = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Section_First.wav"), ESoundGroup.SoundEffect);
+            Sound_Failed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
             base.CreateManagedResource();
         }
 

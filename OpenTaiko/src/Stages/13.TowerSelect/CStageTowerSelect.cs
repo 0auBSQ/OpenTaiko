@@ -50,7 +50,7 @@ namespace TJAPlayer3
         {
             // On de-activation
 
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
 
             base.DeActivate();
         }
@@ -69,8 +69,8 @@ namespace TJAPlayer3
         {
             // Ressource freeing
 
-            pfTitleFont.Dispose();
-            pfSubTitleFont.Dispose();
+            pfTitleFont?.Dispose();
+            pfSubTitleFont?.Dispose();
 
             base.ReleaseManagedResource();
         }
@@ -97,7 +97,7 @@ namespace TJAPlayer3
             {
                 int returnTitle()
                 {
-                    TJAPlayer3.Skin.sound取消音.t再生する();
+                    TJAPlayer3.Skin.sound取消音.tPlay();
                     this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                     this.actFOtoTitle.tフェードアウト開始();
                     base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -107,7 +107,7 @@ namespace TJAPlayer3
                 if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
                     TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
 
                     if (nCurrentSongIndex < BarInfos.Length - 1)
                     {
@@ -118,7 +118,7 @@ namespace TJAPlayer3
                 else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
                     TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
 
                     if (nCurrentSongIndex > 0)
                     {
@@ -132,7 +132,7 @@ namespace TJAPlayer3
 
                     #region [Fast return (Escape)]
 
-                    TJAPlayer3.Skin.sound取消音.t再生する();
+                    TJAPlayer3.Skin.sound取消音.tPlay();
                     returnTitle();
 
                     #endregion
@@ -143,7 +143,7 @@ namespace TJAPlayer3
                 {
                     #region [Decide]
 
-                    TJAPlayer3.Skin.sound決定音.t再生する();
+                    TJAPlayer3.Skin.sound決定音.tPlay();
 
                     switch(currentSong.eノード種別)
                     {

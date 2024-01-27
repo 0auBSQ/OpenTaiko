@@ -151,9 +151,9 @@ namespace TJAPlayer3
         public void tPlayModalSfx()
         {
             if (modalType == EModalType.Coin)
-                TJAPlayer3.Skin.soundModal[TJAPlayer3.Skin.soundModal.Length - 1].t再生する();
+                TJAPlayer3.Skin.soundModal[TJAPlayer3.Skin.soundModal.Length - 1].tPlay();
             else
-                TJAPlayer3.Skin.soundModal[Math.Max(0, Math.Min(TJAPlayer3.Skin.soundModal.Length - 2, rarity))].t再生する();
+                TJAPlayer3.Skin.soundModal[Math.Max(0, Math.Min(TJAPlayer3.Skin.soundModal.Length - 2, rarity))].tPlay();
         }
 
         public static void tInitModalFonts()

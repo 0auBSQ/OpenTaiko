@@ -159,7 +159,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
             
             base.DeActivate();
         }
@@ -490,7 +490,7 @@ namespace TJAPlayer3
 
             if (!ctDonchan_In.IsStarted)
             {
-                TJAPlayer3.Skin.soundHeyaBGM.t再生する();
+                TJAPlayer3.Skin.soundHeyaBGM.tPlay();
                 ctDonchan_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);    
             }
 
@@ -539,7 +539,7 @@ namespace TJAPlayer3
             {
                 if (this.tMove(1))
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
                 }
             }
 
@@ -548,7 +548,7 @@ namespace TJAPlayer3
             {
                 if (this.tMove(-1))
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
                 }
             }
 
@@ -563,7 +563,7 @@ namespace TJAPlayer3
                 // Return to main menu
                 if (iCurrentMenu == -1 && iMainMenuCurrent == 0)
                 {
-                    TJAPlayer3.Skin.soundHeyaBGM.t停止する();
+                    TJAPlayer3.Skin.soundHeyaBGM.tStop();
                     this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                     this.actFOtoTitle.tフェードアウト開始();
                     base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -591,7 +591,7 @@ namespace TJAPlayer3
                         //TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
                         TJAPlayer3.SaveFileInstances[iPlayer].data.PuchiChara = TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent];// iPuchiCharaCurrent;
                         TJAPlayer3.SaveFileInstances[iPlayer].tApplyHeyaChanges();
-                        TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].welcome.t再生する();
+                        TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].welcome.tPlay();
 
                         iCurrentMenu = -1;
                         this.tResetOpts();
@@ -622,7 +622,7 @@ namespace TJAPlayer3
                         TJAPlayer3.SaveFileInstances[iPlayer].tUpdateCharacterName(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
 
                         // Welcome voice using Sanka
-                        TJAPlayer3.Skin.voiceTitleSanka[iPlayer]?.t再生する();
+                        TJAPlayer3.Skin.voiceTitleSanka[iPlayer]?.tPlay();
 
                         CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
@@ -683,11 +683,11 @@ namespace TJAPlayer3
                 }
 
                 if (ess == ESelectStatus.SELECTED)
-                    TJAPlayer3.Skin.sound決定音.t再生する();
+                    TJAPlayer3.Skin.sound決定音.tPlay();
                 else if (ess == ESelectStatus.FAILED)
-                    TJAPlayer3.Skin.soundError.t再生する();
+                    TJAPlayer3.Skin.soundError.tPlay();
                 else
-                    TJAPlayer3.Skin.SoundBanapas.t再生する(); // To change with a more appropriate sfx sooner or later
+                    TJAPlayer3.Skin.SoundBanapas.tPlay(); // To change with a more appropriate sfx sooner or later
 
                 #endregion
             }
@@ -696,11 +696,11 @@ namespace TJAPlayer3
                 TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
             {
                 
-                TJAPlayer3.Skin.sound取消音.t再生する();
+                TJAPlayer3.Skin.sound取消音.tPlay();
 
                 if (iCurrentMenu == -1)
                 {
-                    TJAPlayer3.Skin.soundHeyaBGM.t停止する();
+                    TJAPlayer3.Skin.soundHeyaBGM.tStop();
                     this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                     this.actFOtoTitle.tフェードアウト開始();
                     base.ePhaseID = CStage.EPhase.Common_FADEOUT;

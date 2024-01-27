@@ -46,8 +46,8 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-			TJAPlayer3.t安全にDisposeする( ref this.txScrollBar );
-			TJAPlayer3.t安全にDisposeする( ref this.txScrollPosition );
+			TJAPlayer3.tDisposeSafely( ref this.txScrollBar );
+			TJAPlayer3.tDisposeSafely( ref this.txScrollPosition );
 
 			base.ReleaseManagedResource();
 		}

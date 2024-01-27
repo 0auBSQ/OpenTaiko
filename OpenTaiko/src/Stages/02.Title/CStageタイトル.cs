@@ -78,9 +78,9 @@ namespace TJAPlayer3
 
 				b音声再生 = false;
 				if (bSaveFileLoaded == false)
-					TJAPlayer3.Skin.soundEntry.t再生する();
+					TJAPlayer3.Skin.soundEntry.tPlay();
 				if (TJAPlayer3.ConfigIni.bBGM音を発声する)
-					TJAPlayer3.Skin.bgmタイトルイン.t再生する();
+					TJAPlayer3.Skin.bgmタイトルイン.tPlay();
 				base.Activate();
 			}
 			finally
@@ -95,7 +95,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 			}
 			finally
 			{
@@ -121,8 +121,8 @@ namespace TJAPlayer3
 		public override void ReleaseManagedResource()
 		{
             
-			TJAPlayer3.t安全にDisposeする(ref pfMenuTitle);
-			TJAPlayer3.t安全にDisposeする(ref pfBoxText);
+			TJAPlayer3.tDisposeSafely(ref pfMenuTitle);
+			TJAPlayer3.tDisposeSafely(ref pfBoxText);
 
 			base.ReleaseManagedResource();
 		}
@@ -157,11 +157,11 @@ namespace TJAPlayer3
 				this.ctどんちゃんイン.Tick();
 				this.ctBarMove.Tick();
 
-				if (!TJAPlayer3.Skin.bgmタイトルイン.b再生中)
+				if (!TJAPlayer3.Skin.bgmタイトルイン.bIsPlaying)
 				{
 					if (TJAPlayer3.ConfigIni.bBGM音を発声する && !b音声再生)
 					{
-						TJAPlayer3.Skin.bgmタイトル.t再生する();
+						TJAPlayer3.Skin.bgmタイトル.tPlay();
 						b音声再生 = true;
 					}
 				}
@@ -177,15 +177,15 @@ namespace TJAPlayer3
 					{
 						if (bモード選択)
 						{
-							TJAPlayer3.Skin.sound取消音.t再生する();
+							TJAPlayer3.Skin.sound取消音.tPlay();
 							bSaveFileLoaded = false;
 							UnloadSaveFile();
 							if (bSaveFileLoaded == false)
-								TJAPlayer3.Skin.soundEntry.t再生する();
+								TJAPlayer3.Skin.soundEntry.tPlay();
 						}
 						else
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 							n現在の選択行モード選択 = (int)E戻り値.EXIT + 1;
 							this.actFO.tフェードアウト開始(0, 500);
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -257,7 +257,7 @@ namespace TJAPlayer3
 						{
 							if (n現在の選択行プレイヤーエントリー + 1 <= 2)
 							{
-								TJAPlayer3.Skin.sound変更音.t再生する();
+								TJAPlayer3.Skin.sound変更音.tPlay();
 								n現在の選択行プレイヤーエントリー += 1;
 							}
 						}
@@ -267,7 +267,7 @@ namespace TJAPlayer3
 							//if (n現在の選択行モード選択 < this.nbModes - 1)
 							if (n現在の選択行モード選択 < usedMenusCount - 1)
 							{
-								TJAPlayer3.Skin.sound変更音.t再生する();
+								TJAPlayer3.Skin.sound変更音.tPlay();
 								ctBarMove.Start(0, 250, 1.2f, TJAPlayer3.Timer);
 								n現在の選択行モード選択++;
 								this.bDownPushed = true;
@@ -286,7 +286,7 @@ namespace TJAPlayer3
 						{
 							if (n現在の選択行プレイヤーエントリー - 1 >= 0)
 							{
-								TJAPlayer3.Skin.sound変更音.t再生する();
+								TJAPlayer3.Skin.sound変更音.tPlay();
 								n現在の選択行プレイヤーエントリー -= 1;
 							}
 						}
@@ -295,7 +295,7 @@ namespace TJAPlayer3
 						{
 							if (n現在の選択行モード選択 > 0)
 							{
-								TJAPlayer3.Skin.sound変更音.t再生する();
+								TJAPlayer3.Skin.sound変更音.tPlay();
 								ctBarMove.Start(0, 250, 1.2f, TJAPlayer3.Timer);
 								n現在の選択行モード選択--;
 								this.bDownPushed = false;
@@ -318,7 +318,7 @@ namespace TJAPlayer3
 							{
 								if (!bプレイヤーエントリー決定)
 								{
-									TJAPlayer3.Skin.sound決定音.t再生する();
+									TJAPlayer3.Skin.sound決定音.tPlay();
 									ctエントリーバー決定点滅.Start(0, 1055, 1, TJAPlayer3.Timer);
 									bプレイヤーエントリー決定 = true;
 									TJAPlayer3.PlayerSide = (n現在の選択行プレイヤーエントリー == 2) ? 1 : 0;
@@ -329,7 +329,7 @@ namespace TJAPlayer3
 							}
 							else
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 								bプレイヤーエントリー = false;
 								bバナパス読み込み = false;
 								TJAPlayer3.Skin.SoundBanapas.bPlayed = false;
@@ -353,12 +353,12 @@ namespace TJAPlayer3
 
 							if (operationSucceded == true)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 								this.actFO.tフェードアウト開始(0, 500);
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							}
 							else
-								TJAPlayer3.Skin.soundError.t再生する();
+								TJAPlayer3.Skin.soundError.tPlay();
 						}
 					}
 
@@ -366,7 +366,7 @@ namespace TJAPlayer3
 					{
 						if (!bバナパス読み込み)
 						{
-							TJAPlayer3.Skin.soundEntry.t停止する();
+							TJAPlayer3.Skin.soundEntry.tStop();
 							ctバナパス読み込み成功.Start(0, 3655, 1, TJAPlayer3.Timer);
 							bバナパス読み込み = true;
 							bどんちゃんカウンター初期化 = false;
@@ -383,7 +383,7 @@ namespace TJAPlayer3
 							*/
 
 							if (TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile] != null && !TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile].bPlayed)
-								TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile]?.t再生する();
+								TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile]?.tPlay();
 
 							ctどんちゃんイン.Start(0, 180, 2, TJAPlayer3.Timer);
 							ctBarAnimeIn.Start(0, 1295, 1, TJAPlayer3.Timer);
@@ -477,7 +477,7 @@ namespace TJAPlayer3
 										TJAPlayer3.Tx.Tile_Black.t2D描画(i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
 
 								if (!TJAPlayer3.Skin.soundError.bPlayed)
-									TJAPlayer3.Skin.soundError.t再生する();
+									TJAPlayer3.Skin.soundError.tPlay();
 
 								int count = this.ctバナパス読み込み失敗.CurrentValue;
 								TJAPlayer3.Tx.Banapas_Load_Failure[0].Opacity = count >= 872 ? 255 - (count - 872) * 2 : count * 2;
@@ -502,7 +502,7 @@ namespace TJAPlayer3
 										TJAPlayer3.Tx.Tile_Black.t2D描画(i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
 
 								if (!TJAPlayer3.Skin.SoundBanapas.bPlayed)
-									TJAPlayer3.Skin.SoundBanapas.t再生する();
+									TJAPlayer3.Skin.SoundBanapas.tPlay();
 
 								int count = this.ctバナパス読み込み成功.CurrentValue - 1000;
 								TJAPlayer3.Tx.Banapas_Load_Clear[0].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
@@ -959,8 +959,8 @@ namespace TJAPlayer3
 					case CStage.EPhase.Common_FADEOUT:
 						if (this.actFO.Draw() == 0)
 						{
-							TJAPlayer3.Skin.bgmタイトル.t停止する();
-							TJAPlayer3.Skin.bgmタイトルイン.t停止する();
+							TJAPlayer3.Skin.bgmタイトル.tStop();
+							TJAPlayer3.Skin.bgmタイトルイン.tStop();
 							break;
 						}
 						base.ePhaseID = CStage.EPhase.Common_EXIT;

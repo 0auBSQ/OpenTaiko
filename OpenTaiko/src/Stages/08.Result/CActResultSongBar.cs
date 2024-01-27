@@ -65,7 +65,7 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-            TJAPlayer3.t安全にDisposeする(ref this.pfMusicName);
+            TJAPlayer3.tDisposeSafely(ref this.pfMusicName);
             base.ReleaseManagedResource();
 		}
 		public override int Draw()

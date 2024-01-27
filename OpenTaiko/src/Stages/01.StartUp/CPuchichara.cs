@@ -14,7 +14,7 @@ namespace TJAPlayer3
     {
         public CTexture tx;
         public CTexture render;
-        public CSkin.Cシステムサウンド welcome;
+        public CSkin.CSystemSound welcome;
         public DBPuchichara.PuchicharaData metadata;
         public DBPuchichara.PuchicharaEffect effect;
         public DBUnlockables.CUnlockConditions unlock;
@@ -45,7 +45,7 @@ namespace TJAPlayer3
             render = TJAPlayer3.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Render.png");
 
             // Puchichara welcome sfx
-            welcome = new CSkin.Cシステムサウンド($@"{path}{Path.DirectorySeparatorChar}Welcome.ogg", false, false, true, ESoundGroup.Voice);
+            welcome = new CSkin.CSystemSound($@"{path}{Path.DirectorySeparatorChar}Welcome.ogg", false, false, true, ESoundGroup.Voice);
 
             // Puchichara metadata
             if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))

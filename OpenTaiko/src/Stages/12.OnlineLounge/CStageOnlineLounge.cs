@@ -36,7 +36,7 @@ namespace TJAPlayer3
             base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-            TJAPlayer3.Skin.soundOnlineLoungeBGM?.t再生する();
+            TJAPlayer3.Skin.soundOnlineLoungeBGM?.tPlay();
 
             this.currentMenu = ECurrentMenu.MAIN;
             this.menuPointer = ECurrentMenu.CDN_SELECT;
@@ -108,7 +108,7 @@ namespace TJAPlayer3
         {
             // On de-activation
 
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
 
             TJAPlayer3.Songs管理.UpdateDownloadBox();
 
@@ -128,8 +128,8 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
             // Ressource freeing
-            this.pfOLFont.Dispose();
-            this.pfOLFontLarge.Dispose();
+            this.pfOLFont?.Dispose();
+            this.pfOLFontLarge?.Dispose();
 
             base.ReleaseManagedResource();
         }
@@ -337,7 +337,7 @@ namespace TJAPlayer3
                 {
                     if (this.tMove(1))
                     {
-                        TJAPlayer3.Skin.sound変更音.t再生する();
+                        TJAPlayer3.Skin.sound変更音.tPlay();
                     }
                 }
 
@@ -346,7 +346,7 @@ namespace TJAPlayer3
                 {
                     if (this.tMove(-1))
                     {
-                        TJAPlayer3.Skin.sound変更音.t再生する();
+                        TJAPlayer3.Skin.sound変更音.tPlay();
                     }
                 }
 
@@ -356,12 +356,12 @@ namespace TJAPlayer3
 
                     #region [Fast return (Escape)]
 
-                    TJAPlayer3.Skin.sound取消音.t再生する();
+                    TJAPlayer3.Skin.sound取消音.tPlay();
 
                     if (currentMenu == ECurrentMenu.MAIN)
                     {
                         // Return to title screen
-                        TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                        TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
                         this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                         this.actFOtoTitle.tフェードアウト開始();
                         base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -402,20 +402,20 @@ namespace TJAPlayer3
                             if (currentMenu == ECurrentMenu.RETURN)
                             {
                                 // Quit
-                                TJAPlayer3.Skin.sound取消音.t再生する();
-                                TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                                TJAPlayer3.Skin.sound取消音.tPlay();
+                                TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
                                 this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                                 this.actFOtoTitle.tフェードアウト開始();
                                 base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                             }
                             else
                             {
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                             }
                         }
                         else
                         {
-                            TJAPlayer3.Skin.soundError.t再生する();
+                            TJAPlayer3.Skin.soundError.tPlay();
                         }
                     }
                     else if (currentMenu == ECurrentMenu.CDN_SELECT)
@@ -425,12 +425,12 @@ namespace TJAPlayer3
                         {
                             currentMenu = ECurrentMenu.CDN_OPTION;
                             dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.sound決定音.tPlay();
                         }
                         else
                         {
                             currentMenu = ECurrentMenu.MAIN;
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                         }
                     }
                     else if (currentMenu == ECurrentMenu.CDN_OPTION)
@@ -438,7 +438,7 @@ namespace TJAPlayer3
                         // CDN Option Menu
                         currentMenu = cdnOptMenu[cdnOptMenuIndex];
                         if (currentMenu == ECurrentMenu.CDN_SELECT)
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                         else
                         {
                             if (currentMenu == ECurrentMenu.CDN_SONGS)
@@ -470,7 +470,7 @@ namespace TJAPlayer3
 
                                 #endregion
                             }
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.sound決定音.tPlay();
                         }
 
                     }
@@ -478,7 +478,7 @@ namespace TJAPlayer3
                     {
                         if (this.cdnSongListIndex == 0)
                         {
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                             currentMenu = ECurrentMenu.CDN_OPTION;
                         }
                         else
@@ -491,11 +491,11 @@ namespace TJAPlayer3
 
                                 if (CSongDict.tContainsSongUrl(downloadLink) || song.DownloadNow)
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                                 else
                                 {
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
                                     System.Threading.Thread download =
                                         new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
                                     download.Start();
@@ -702,7 +702,7 @@ namespace TJAPlayer3
             catch (Exception e)
             {
                 Trace.TraceInformation(e.ToString());
-                TJAPlayer3.Skin.soundError.t再生する();
+                TJAPlayer3.Skin.soundError.tPlay();
             }
 
 

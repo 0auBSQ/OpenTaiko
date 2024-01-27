@@ -334,7 +334,7 @@ namespace TJAPlayer3
 			private set;
 		}
 
-		public static SoundManager Sound管理
+		public static SoundManager SoundManager
 		{
 			get;
 			private set;
@@ -2445,11 +2445,11 @@ for (int i = 0; i < 3; i++) {
 		}
 		public static void tテクスチャの解放(ref CTexture tx )
 		{
-			TJAPlayer3.t安全にDisposeする( ref tx );
+			TJAPlayer3.tDisposeSafely( ref tx );
 		}
         public static void tテクスチャの解放( ref CTextureAf tx )
 		{
-			TJAPlayer3.t安全にDisposeする( ref tx );
+			TJAPlayer3.tDisposeSafely( ref tx );
 		}
 		public static CTexture tテクスチャの生成( SKBitmap bitmap )
 		{
@@ -2507,7 +2507,7 @@ for (int i = 0; i < 3; i++) {
 		}
 
         /// <summary>プロパティ、インデクサには ref は使用できないので注意。</summary>
-        public static void t安全にDisposeする<T>(ref T obj)
+        public static void tDisposeSafely<T>(ref T obj)
         {
             if (obj == null)
                 return;
@@ -2915,7 +2915,7 @@ for (int i = 0; i < 3; i++) {
 						soundDeviceType = ESoundDeviceType.Unknown;
 						break;
 				}
-				Sound管理 = new SoundManager(Window_,
+				SoundManager = new SoundManager(Window_,
 											soundDeviceType,
 											TJAPlayer3.ConfigIni.nBassBufferSizeMs,
 											TJAPlayer3.ConfigIni.nWASAPIBufferSizeMs,
@@ -2957,7 +2957,7 @@ for (int i = 0; i < 3; i++) {
 
 				ShowWindowTitleWithSoundType();
 				FDK.SoundManager.bIsTimeStretch = TJAPlayer3.ConfigIni.bTimeStretch;
-				Sound管理.nMasterVolume = TJAPlayer3.ConfigIni.nMasterVolume;
+				SoundManager.nMasterVolume = TJAPlayer3.ConfigIni.nMasterVolume;
 				//FDK.CSound管理.bIsMP3DecodeByWindowsCodec = CDTXMania.ConfigIni.bNoMP3Streaming;
 				Trace.TraceInformation( "サウンドデバイスの初期化を完了しました。" );
 			}
@@ -3137,12 +3137,12 @@ for (int i = 0; i < 3; i++) {
 		public void ShowWindowTitleWithSoundType()
 		{
 			string delay = "";
-			if ( Sound管理.GetCurrentSoundDeviceType() != "DirectSound" )
+			if ( SoundManager.GetCurrentSoundDeviceType() != "DirectSound" )
 			{
-				delay = "(" + Sound管理.GetSoundDelay() + "ms)";
+				delay = "(" + SoundManager.GetSoundDelay() + "ms)";
 			}
             AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-            base.Text = asmApp.Name + " Ver." + VERSION + " (" + Sound管理.GetCurrentSoundDeviceType() + delay + ")";
+            base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
 		}
 
 		private void t終了処理()
@@ -3289,14 +3289,14 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ DirectSoundの終了処理 ]
 				//---------------------
-				if (Sound管理 != null)
+				if (SoundManager != null)
 				{
 					Trace.TraceInformation( "DirectSound の終了処理を行います。" );
 					Trace.Indent();
 					try
 					{
-						Sound管理.Dispose();
-						Sound管理 = null;
+						SoundManager.Dispose();
+						SoundManager = null;
 						Trace.TraceInformation( "DirectSound の終了処理を完了しました。" );
 					}
 					catch( Exception exception3 )

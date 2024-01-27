@@ -287,19 +287,19 @@ namespace TJAPlayer3
                 { 
                     OptionSelect(true);
                     tFetchMults(player);
-                    TJAPlayer3.Skin.sound変更音.t再生する(); 
+                    TJAPlayer3.Skin.sound変更音.tPlay(); 
                 }
 
                 if (_rightDrum || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
                 { 
                     OptionSelect(false);
                     tFetchMults(player);
-                    TJAPlayer3.Skin.sound変更音.t再生する(); 
+                    TJAPlayer3.Skin.sound変更音.tPlay(); 
                 }
 
                 if (_centerDrum && ctOpen.CurrentValue >= ctOpen.EndValue)
                 {
-                    TJAPlayer3.Skin.sound決定音.t再生する();
+                    TJAPlayer3.Skin.sound決定音.tPlay();
                     if (NowCount < nOptionCount)
                     {
                         NowCount++;
@@ -314,18 +314,18 @@ namespace TJAPlayer3
                 int cp1 = nOptionCount + 1;
 
                 if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
                     NowCount = (NowCount + cp1 - 1) % cp1;
                 }
 
                 if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
                     NowCount = (NowCount + 1) % cp1;
                 }
 
                 if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
                 {
-                    TJAPlayer3.Skin.sound決定音.t再生する();
+                    TJAPlayer3.Skin.sound決定音.tPlay();
                     bEnd = true;
                     ctClose.Start(0, 50, 6, TJAPlayer3.Timer);
                 }

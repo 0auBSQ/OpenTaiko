@@ -632,7 +632,7 @@ namespace TJAPlayer3
                     for (int i = 0; i < TJAPlayer3.ConfigIni.nPoliphonicSounds; i++) // 4
                     {
                         if (this.rSound[i] != null)
-                            TJAPlayer3.Sound管理.tDisposeSound(this.rSound[i]);
+                            TJAPlayer3.SoundManager.tDisposeSound(this.rSound[i]);
                         this.rSound[i] = null;
 
                         if ((i == 0) && TJAPlayer3.ConfigIni.bLog作成解放ログ出力)
@@ -1537,7 +1537,7 @@ namespace TJAPlayer3
                 #region [ 同時発音数を、チャンネルによって変える ]
 
                 int nPoly = nPolyphonicSounds;
-                if (TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+                if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
                 {
                     // チップのライフタイム管理を行わない
                     if (cwav.bIsBassSound) nPoly = (nPolyphonicSounds >= 2) ? 2 : 1;
@@ -1554,7 +1554,7 @@ namespace TJAPlayer3
                 {
                     try
                     {
-                        cwav.rSound[i] = TJAPlayer3.Sound管理.tCreateSound(str, ESoundGroup.SongPlayback);
+                        cwav.rSound[i] = TJAPlayer3.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
 
                         if (!TJAPlayer3.ConfigIni.bDynamicBassMixerManagement)
                         {
@@ -8240,7 +8240,7 @@ namespace TJAPlayer3
         /// </summary>
         public void PlanToAddMixerChannel()
         {
-            if (TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+            if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
             {                                                                       // チップのライフタイム管理を行わない
                 return;
             }
@@ -8695,7 +8695,7 @@ namespace TJAPlayer3
                     }
                     this.listVD = null;
                 }
-                TJAPlayer3.t安全にDisposeする(ref this.pf歌詞フォント);
+                TJAPlayer3.tDisposeSafely(ref this.pf歌詞フォント);
                 base.ReleaseManagedResource();
             }
         }

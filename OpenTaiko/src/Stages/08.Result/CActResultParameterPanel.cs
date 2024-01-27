@@ -183,7 +183,7 @@ namespace TJAPlayer3
 				ctゲージアニメ[i].CurrentValue = (int)ctゲージアニメ[i].EndValue;
 			}
 			
-			TJAPlayer3.Skin.soundGauge.t停止する();
+			TJAPlayer3.Skin.soundGauge.tStop();
 		}
 
 		// CActivity 実装
@@ -277,7 +277,7 @@ namespace TJAPlayer3
 
 			if (this.sdDTXで指定されたフルコンボ音 != null)
 			{
-				TJAPlayer3.Sound管理.tDisposeSound(this.sdDTXで指定されたフルコンボ音);
+				TJAPlayer3.SoundManager.tDisposeSound(this.sdDTXで指定されたフルコンボ音);
 				this.sdDTXで指定されたフルコンボ音 = null;
 			}
 			base.DeActivate();
@@ -291,8 +291,8 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-			TJAPlayer3.t安全にDisposeする(ref pfSpeechText);
-			TJAPlayer3.t安全にDisposeする(ref pfAISectionText);
+			TJAPlayer3.tDisposeSafely(ref pfSpeechText);
+			TJAPlayer3.tDisposeSafely(ref pfAISectionText);
 
 			base.ReleaseManagedResource();
 		}
@@ -452,7 +452,7 @@ namespace TJAPlayer3
 
 						if (!b音声再生[0])
 						{
-							TJAPlayer3.Skin.soundGauge.t再生する();
+							TJAPlayer3.Skin.soundGauge.tPlay();
 							b音声再生[0] = true;
 						}
 
@@ -472,14 +472,14 @@ namespace TJAPlayer3
 								// Gauge didn't reach rainbow
 								if (TJAPlayer3.ConfigIni.nPlayerCount < 2
 									|| ctゲージアニメ[(i == 0) ? 1 : 0].IsEnded)
-									TJAPlayer3.Skin.soundGauge.t停止する();
+									TJAPlayer3.Skin.soundGauge.tStop();
 							}
 							else
 							{
 								// Gauge reached rainbow
-								if (!TJAPlayer3.Skin.soundGauge.b再生中)
+								if (!TJAPlayer3.Skin.soundGauge.bIsPlaying)
                                 {
-									TJAPlayer3.Skin.soundGauge.t停止する();
+									TJAPlayer3.Skin.soundGauge.tStop();
 								}
 									
 								if (!ct虹ゲージアニメ.IsTicked)
@@ -626,7 +626,7 @@ namespace TJAPlayer3
 									{
 										if ((k != 5 || TJAPlayer3.Skin.Result_ADLib_Show) && (k != 6 || TJAPlayer3.Skin.Result_Bomb_Show))
 										{
-											TJAPlayer3.Skin.soundPon.t再生する();
+											TJAPlayer3.Skin.soundPon.tPlay();
 										}
 										this.b音声再生[1 + k] = true;
 									}
@@ -673,7 +673,7 @@ namespace TJAPlayer3
 
 								if (!b音声再生[8])
 								{
-									TJAPlayer3.Skin.soundScoreDon.t再生する();
+									TJAPlayer3.Skin.soundScoreDon.tPlay();
 									b音声再生[8] = true;
 								}
 							}
@@ -1093,12 +1093,12 @@ namespace TJAPlayer3
 							if (gaugeValues[p] >= 80.0f)
                             {
 								//TJAPlayer3.Skin.soundDonClear.t再生する();
-								TJAPlayer3.Skin.voiceResultClearSuccess[TJAPlayer3.GetActualPlayer(p)]?.t再生する();
+								TJAPlayer3.Skin.voiceResultClearSuccess[TJAPlayer3.GetActualPlayer(p)]?.tPlay();
 							}
 							else
                             {
 								//TJAPlayer3.Skin.soundDonFailed.t再生する();
-								TJAPlayer3.Skin.voiceResultClearFailed[TJAPlayer3.GetActualPlayer(p)]?.t再生する();
+								TJAPlayer3.Skin.voiceResultClearFailed[TJAPlayer3.GetActualPlayer(p)]?.tPlay();
 							}
 								
 							if (p == TJAPlayer3.ConfigIni.nPlayerCount - 1)
@@ -1176,7 +1176,7 @@ namespace TJAPlayer3
 
 								if (!b音声再生[9] && ct全体進行.CurrentValue >= ScoreApparitionTimeStamp + 1180)
 								{
-									TJAPlayer3.Skin.soundRankIn.t再生する();
+									TJAPlayer3.Skin.soundRankIn.tPlay();
 									b音声再生[9] = true;
 								}
 							}
@@ -1251,7 +1251,7 @@ namespace TJAPlayer3
 
 								if (!b音声再生[10] && ct全体進行.CurrentValue >= ScoreApparitionTimeStamp + 2680)
 								{
-									TJAPlayer3.Skin.soundCrownIn.t再生する();
+									TJAPlayer3.Skin.soundCrownIn.tPlay();
 									b音声再生[10] = true;
 								}
 							}

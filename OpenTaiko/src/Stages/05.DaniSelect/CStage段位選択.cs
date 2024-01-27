@@ -55,7 +55,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
             
             base.DeActivate();
         }
@@ -98,7 +98,7 @@ namespace TJAPlayer3
                 if (!bInSongPlayed)
                 {
                     this.段位リスト.ctDaniIn = new CCounter(0, 6000, 1, TJAPlayer3.Timer);
-                    TJAPlayer3.Skin.soundDanSongSelectIn.t再生する();
+                    TJAPlayer3.Skin.soundDanSongSelectIn.tPlay();
                     bInSongPlayed = true;
                 }
 
@@ -163,8 +163,8 @@ namespace TJAPlayer3
                 if (!ctDonchan_In.IsStarted)
                 {
                     //TJAPlayer3.Skin.soundDanSelectStart.t再生する();
-                    TJAPlayer3.Skin.voiceMenuDanSelectStart[TJAPlayer3.SaveFile]?.t再生する();
-                    TJAPlayer3.Skin.soundDanSelectBGM.t再生する();
+                    TJAPlayer3.Skin.voiceMenuDanSelectStart[TJAPlayer3.SaveFile]?.tPlay();
+                    TJAPlayer3.Skin.soundDanSelectBGM.tPlay();
                     ctDonchan_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);
                 }
 
@@ -177,8 +177,8 @@ namespace TJAPlayer3
                 {
                     int returnTitle()
                     {
-                        TJAPlayer3.Skin.soundDanSelectBGM.t停止する();
-                        TJAPlayer3.Skin.sound取消音.t再生する();
+                        TJAPlayer3.Skin.soundDanSelectBGM.tStop();
+                        TJAPlayer3.Skin.sound取消音.tPlay();
                         this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
                         this.actFOtoTitle.tフェードアウト開始();
                         base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -207,14 +207,14 @@ namespace TJAPlayer3
                                 {
                                     //this.t段位を選択する();
                                     //TJAPlayer3.Skin.soundDanSongSelectCheck.t再生する();
-                                    TJAPlayer3.Skin.voiceMenuDanSelectPrompt[TJAPlayer3.SaveFile]?.t再生する();
+                                    TJAPlayer3.Skin.voiceMenuDanSelectPrompt[TJAPlayer3.SaveFile]?.tPlay();
                                     this.bDifficultyIn = true;
                                     this.段位挑戦選択画面.ctBarIn.Start(0, 255, 1, TJAPlayer3.Timer);
                                 }
                                 break;
                             case C曲リストノード.Eノード種別.BOX:
                                 {
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
                                     段位リスト.tOpenFolder(段位リスト.currentBar);
                                 }
                                 break;
@@ -226,7 +226,7 @@ namespace TJAPlayer3
                                     }
                                     else
                                     {
-                                        TJAPlayer3.Skin.sound決定音.t再生する();
+                                        TJAPlayer3.Skin.sound決定音.tPlay();
                                         段位リスト.tCloseFolder(段位リスト.currentBar);
                                     }
                                 }
@@ -292,7 +292,7 @@ namespace TJAPlayer3
                     {
                         bDifficultyIn = false;
                         b選択した = false;
-                        TJAPlayer3.Skin.soundError.t再生する();
+                        TJAPlayer3.Skin.soundError.tPlay();
                     }
                 }
                 else

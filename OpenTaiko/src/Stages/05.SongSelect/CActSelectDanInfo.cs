@@ -54,8 +54,8 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
             // Ressource freeing
-            TJAPlayer3.t安全にDisposeする(ref pfTitleFont);
-            TJAPlayer3.t安全にDisposeする(ref pfExamFont);
+            TJAPlayer3.tDisposeSafely(ref pfTitleFont);
+            TJAPlayer3.tDisposeSafely(ref pfExamFont);
 
             base.ReleaseManagedResource();
         }

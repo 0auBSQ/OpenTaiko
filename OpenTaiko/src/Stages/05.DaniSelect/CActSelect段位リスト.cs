@@ -81,8 +81,8 @@ namespace TJAPlayer3
 
         public override void ReleaseManagedResource()
         {
-            TJAPlayer3.t安全にDisposeする(ref pfDanSong);
-            TJAPlayer3.t安全にDisposeする(ref pfExamFont);
+            TJAPlayer3.tDisposeSafely(ref pfDanSong);
+            TJAPlayer3.tDisposeSafely(ref pfExamFont);
             
             base.ReleaseManagedResource();
         }
@@ -283,8 +283,8 @@ namespace TJAPlayer3
 
         public static void RefleshSkin()
         {
-            TJAPlayer3.t安全にDisposeする(ref pfDanPlateTitle);
-            TJAPlayer3.t安全にDisposeする(ref pfDanIconTitle);
+            TJAPlayer3.tDisposeSafely(ref pfDanPlateTitle);
+            TJAPlayer3.tDisposeSafely(ref pfDanIconTitle);
         }
 
         public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y)
@@ -815,7 +815,7 @@ namespace TJAPlayer3
         {
             if(n現在の選択行 < stバー情報.Length - 1)
             {
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.sound変更音.tPlay();
                 this.bLeftMove = false;
                 this.ctDaniMoveAnime.Start(0, 90, 2f, TJAPlayer3.Timer);
             }
@@ -825,7 +825,7 @@ namespace TJAPlayer3
         {
             if (n現在の選択行 > 0)
             {
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.sound変更音.tPlay();
                 this.bLeftMove = true;
                 this.ctDaniMoveAnime.Start(0, 90, 2f, TJAPlayer3.Timer);
             }

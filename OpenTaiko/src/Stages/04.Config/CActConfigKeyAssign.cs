@@ -42,7 +42,7 @@ namespace TJAPlayer3
 		{
 			if( !this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.sound決定音.t再生する();
+				TJAPlayer3.Skin.sound決定音.tPlay();
 				switch( this.n現在の選択行 )
 				{
 					case 0x10:
@@ -65,7 +65,7 @@ namespace TJAPlayer3
 		{
 			if( !this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在の選択行 = ( this.n現在の選択行 + 1 ) % 0x12;
 			}
 		}
@@ -73,7 +73,7 @@ namespace TJAPlayer3
 		{
 			if( !this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在の選択行 = ( ( this.n現在の選択行 - 1 ) + 0x12 ) % 0x12;
 			}
 		}
@@ -118,7 +118,7 @@ namespace TJAPlayer3
 				{
 					if( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) )
 					{
-						TJAPlayer3.Skin.sound取消音.t再生する();
+						TJAPlayer3.Skin.sound取消音.tPlay();
 						this.bキー入力待ち = false;
 						TJAPlayer3.Input管理.Polling( false );
 					}
@@ -130,7 +130,7 @@ namespace TJAPlayer3
 				}
 				else if( ( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Delete ) && ( this.n現在の選択行 >= 0 ) ) && ( this.n現在の選択行 <= 15 ) )
 				{
-					TJAPlayer3.Skin.sound決定音.t再生する();
+					TJAPlayer3.Skin.sound決定音.tPlay();
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Unknown;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = 0;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].コード = 0;
@@ -347,7 +347,7 @@ namespace TJAPlayer3
 					{
 						if (device.KeyPressed(i))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Gamepad, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Gamepad;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
@@ -369,7 +369,7 @@ namespace TJAPlayer3
 					{
 						if (device.KeyPressed(i))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Joypad, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Joypad;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
@@ -394,7 +394,7 @@ namespace TJAPlayer3
 					i != (int)SlimDXKeys.Key.Delete &&
 					 TJAPlayer3.Input管理.Keyboard.KeyPressed( i ) )
 				{
-					TJAPlayer3.Skin.sound決定音.t再生する();
+					TJAPlayer3.Skin.sound決定音.tPlay();
 					TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Keyboard, 0, i, this.pad);
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Keyboard;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = 0;
@@ -414,7 +414,7 @@ namespace TJAPlayer3
 					{
 						if( device.KeyPressed( i ) )
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.MIDIInput, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.MIDIInput;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;

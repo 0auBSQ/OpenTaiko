@@ -117,12 +117,12 @@ namespace TJAPlayer3
 				{
 					if (this.b特訓PAUSE)
 					{
-						TJAPlayer3.Skin.sound特訓再生音.t再生する();
+						TJAPlayer3.Skin.sound特訓再生音.tPlay();
 						this.t演奏を再開する();
 					}
 					else
 					{
-						TJAPlayer3.Skin.sound特訓停止音.t再生する();
+						TJAPlayer3.Skin.sound特訓停止音.tPlay();
 						this.t演奏を停止する();
 					}
 				}
@@ -136,7 +136,7 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 							this.t譜面の表示位置を合わせる(true);
-							TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+							TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 						}
 						if (t配列の値interval以下か(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, TJAPlayer3.ConfigIni.TokkunMashInterval))
 						{
@@ -146,7 +146,7 @@ namespace TJAPlayer3
 								{
 									this.n現在の小節線 = this.JumpPointList[index].Measure;
 									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
-									TJAPlayer3.Skin.sound特訓スキップ音.t再生する();
+									TJAPlayer3.Skin.sound特訓スキップ音.tPlay();
 									this.t譜面の表示位置を合わせる(false);
 									break;
 								}
@@ -165,7 +165,7 @@ namespace TJAPlayer3
 						TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 						this.t譜面の表示位置を合わせる(true);
-						TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+						TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 					}
 				}
 				if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
@@ -178,7 +178,7 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 							this.t譜面の表示位置を合わせる(true);
-							TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+							TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 						}
 						if (t配列の値interval以下か(ref this.RBlue, SoundManager.PlayTimer.SystemTimeMs, TJAPlayer3.ConfigIni.TokkunMashInterval))
 						{
@@ -188,7 +188,7 @@ namespace TJAPlayer3
 								{
 									this.n現在の小節線 = this.JumpPointList[index].Measure;
 									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
-									TJAPlayer3.Skin.soundSkip.t再生する();
+									TJAPlayer3.Skin.soundSkip.tPlay();
 									this.t譜面の表示位置を合わせる(false);
 									break;
 								}
@@ -208,7 +208,7 @@ namespace TJAPlayer3
 						TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 						this.t譜面の表示位置を合わせる(true);
-						TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+						TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 					}
 				}
 				if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P))
@@ -243,7 +243,7 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 							this.t譜面の表示位置を合わせる(true);
-							TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+							TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 						}
 					}
 				}
@@ -257,7 +257,7 @@ namespace TJAPlayer3
 							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.n現在の小節線;
 
 							this.t譜面の表示位置を合わせる(true);
-							TJAPlayer3.Skin.sound特訓スクロール音.t再生する();
+							TJAPlayer3.Skin.sound特訓スクロール音.tPlay();
 						}
 					}
 				}
@@ -528,7 +528,7 @@ namespace TJAPlayer3
 			{
 				if (!JumpPointList.Contains(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed), Measure = this.n現在の小節線 }))
 					JumpPointList.Add(new STJUMPP() { Time = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed), Measure = this.n現在の小節線 });
-				TJAPlayer3.Skin.sound特訓ジャンプポイント.t再生する();
+				TJAPlayer3.Skin.sound特訓ジャンプポイント.tPlay();
 				JumpPointList.Sort((a, b) => a.Time.CompareTo(b.Time));
 			}
 		}

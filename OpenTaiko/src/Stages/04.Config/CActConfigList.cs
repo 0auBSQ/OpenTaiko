@@ -470,7 +470,7 @@ namespace TJAPlayer3
 		}
 		public void tEnter押下()
 		{
-			TJAPlayer3.Skin.sound決定音.t再生する();
+			TJAPlayer3.Skin.sound決定音.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.b要素値にフォーカス中 = false;
@@ -754,7 +754,7 @@ namespace TJAPlayer3
 
 				if ( txSkinSample1 != null )
 				{
-					TJAPlayer3.t安全にDisposeする( ref txSkinSample1 );
+					TJAPlayer3.tDisposeSafely( ref txSkinSample1 );
 				}
 				txSkinSample1 = TJAPlayer3.tテクスチャの生成( bmSrc, false );
 
@@ -937,7 +937,7 @@ namespace TJAPlayer3
 		#endregion
 		public void t次に移動()
 		{
-			TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+			TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.list項目リスト[ this.n現在の選択項目 ].t項目値を前へ移動();
@@ -950,7 +950,7 @@ namespace TJAPlayer3
 		}
 		public void t前に移動()
 		{
-			TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+			TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.list項目リスト[ this.n現在の選択項目 ].t項目値を次へ移動();
@@ -1067,7 +1067,7 @@ namespace TJAPlayer3
 						soundDeviceType = ESoundDeviceType.Unknown;
 						break;
 				}
-				TJAPlayer3.Sound管理.tInitialize( soundDeviceType,
+				TJAPlayer3.SoundManager.tInitialize( soundDeviceType,
 										this.iSystemBassBufferSizeMs.n現在の値,
 										this.iSystemWASAPIBufferSizeMs.n現在の値,
 										0,

@@ -71,7 +71,7 @@ namespace TJAPlayer3
                     {
                         if (n現在の選択行 - 1 >= 0)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.sound変更音.tPlay();
                             n現在の選択行--;
                         }
                     }
@@ -81,7 +81,7 @@ namespace TJAPlayer3
                     {
                         if (n現在の選択行 + 1 <= 2)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.sound変更音.tPlay();
                             n現在の選択行++;
                         }
                     }
@@ -93,14 +93,14 @@ namespace TJAPlayer3
                         if (n現在の選択行 == 0)
                         {
                             this.ctBarOut.Start(0, 255, 0.5f, TJAPlayer3.Timer);
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                             TJAPlayer3.stage段位選択.bDifficultyIn = false;
                         }
                         else if (n現在の選択行 == 1)
                         {
                             //TJAPlayer3.Skin.soundDanSongSelect.t再生する();
-                            TJAPlayer3.Skin.sound決定音.t再生する();
-                            TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.t再生する();
+                            TJAPlayer3.Skin.sound決定音.tPlay();
+                            TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.tPlay();
                             TJAPlayer3.stage段位選択.ct待機.Start(0, 3000, 1, TJAPlayer3.Timer);
                         }
                         else if (n現在の選択行 == 2)

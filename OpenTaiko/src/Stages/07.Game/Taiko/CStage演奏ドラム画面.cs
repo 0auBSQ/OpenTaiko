@@ -328,10 +328,10 @@ namespace TJAPlayer3
                     //this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual]), ESoundGroup.SoundEffect);
                     //this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual]), ESoundGroup.SoundEffect);
 
-                    this.soundRed[i] = TJAPlayer3.Sound管理.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.don[actual]), ESoundGroup.SoundEffect);
-                    this.soundBlue[i] = TJAPlayer3.Sound管理.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.ka[actual]), ESoundGroup.SoundEffect);
-                    this.soundAdlib[i] = TJAPlayer3.Sound管理.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.adlib[actual]), ESoundGroup.SoundEffect);
-                    this.soundClap[i] = TJAPlayer3.Sound管理.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.clap[actual]), ESoundGroup.SoundEffect);
+                    this.soundRed[i] = TJAPlayer3.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.don[actual]), ESoundGroup.SoundEffect);
+                    this.soundBlue[i] = TJAPlayer3.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.ka[actual]), ESoundGroup.SoundEffect);
+                    this.soundAdlib[i] = TJAPlayer3.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.adlib[actual]), ESoundGroup.SoundEffect);
+                    this.soundClap[i] = TJAPlayer3.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.clap[actual]), ESoundGroup.SoundEffect);
 
                     int _panning = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
                     if (this.soundRed[i] != null) this.soundRed[i].SoundPosition = _panning;
@@ -627,7 +627,7 @@ namespace TJAPlayer3
                     if (TJAPlayer3.ConfigIni.bTokkunMode)
                     {
                         bIsFinishedPlaying = false;
-                        TJAPlayer3.Skin.sound特訓停止音.t再生する();
+                        TJAPlayer3.Skin.sound特訓停止音.tPlay();
                         actTokkun.t演奏を停止する();
 
                         actTokkun.t譜面の表示位置を合わせる(true);
@@ -2672,7 +2672,7 @@ namespace TJAPlayer3
             {
                 if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
                 {
-                    TJAPlayer3.Skin.sound変更音.t再生する();
+                    TJAPlayer3.Skin.sound変更音.tPlay();
 
                     SoundManager.PlayTimer.Pause();
                     TJAPlayer3.Timer.Pause();

@@ -41,7 +41,7 @@ namespace TJAPlayer3
 				this.nBGMの総再生時間ms = 0;
 				if( this.sd読み込み音 != null )
 				{
-					TJAPlayer3.Sound管理.tDisposeSound( this.sd読み込み音 );
+					TJAPlayer3.SoundManager.tDisposeSound( this.sd読み込み音 );
 					this.sd読み込み音 = null;
 				}
 
@@ -197,8 +197,8 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-            TJAPlayer3.t安全にDisposeする(ref this.pfTITLE);
-            TJAPlayer3.t安全にDisposeする(ref this.pfSUBTITLE);
+            TJAPlayer3.tDisposeSafely(ref this.pfTITLE);
+            TJAPlayer3.tDisposeSafely(ref this.pfSUBTITLE);
 
             pfDanTitle?.Dispose();
             pfDanSubTitle?.Dispose();
@@ -220,9 +220,9 @@ namespace TJAPlayer3
 				Cスコア cスコア1 = TJAPlayer3.stage選曲.r確定されたスコア;
 				if( this.sd読み込み音 != null )
 				{
-					if( TJAPlayer3.Skin.sound曲読込開始音.b排他 && ( CSkin.Cシステムサウンド.r最後に再生した排他システムサウンド != null ) )
+					if( TJAPlayer3.Skin.sound曲読込開始音.bExclusive && ( CSkin.CSystemSound.r最後に再生した排他システムサウンド != null ) )
 					{
-						CSkin.Cシステムサウンド.r最後に再生した排他システムサウンド.t停止する();
+						CSkin.CSystemSound.r最後に再生した排他システムサウンド.tStop();
 					}
 					this.sd読み込み音.PlayStart();
 					this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTime;
@@ -230,7 +230,7 @@ namespace TJAPlayer3
 				}
 				else
 				{
-					TJAPlayer3.Skin.sound曲読込開始音.t再生する();
+					TJAPlayer3.Skin.sound曲読込開始音.tPlay();
 					this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTime;
 					this.nBGMの総再生時間ms = TJAPlayer3.Skin.sound曲読込開始音.n長さ_現在のサウンド;
 				}

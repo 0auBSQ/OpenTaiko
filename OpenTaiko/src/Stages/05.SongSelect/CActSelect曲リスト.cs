@@ -993,11 +993,11 @@ namespace TJAPlayer3
 			if( this.IsDeActivated )
 				return;
 
-		    TJAPlayer3.t安全にDisposeする(ref pfBoxName);
-		    TJAPlayer3.t安全にDisposeする(ref pfMusicName);
-		    TJAPlayer3.t安全にDisposeする(ref pfSubtitle);
-			TJAPlayer3.t安全にDisposeする(ref pfMaker);
-            TJAPlayer3.t安全にDisposeする(ref pfBPM);
+		    TJAPlayer3.tDisposeSafely(ref pfBoxName);
+		    TJAPlayer3.tDisposeSafely(ref pfMusicName);
+		    TJAPlayer3.tDisposeSafely(ref pfSubtitle);
+			TJAPlayer3.tDisposeSafely(ref pfMaker);
+            TJAPlayer3.tDisposeSafely(ref pfBPM);
 
 			tResetTitleKey();
 		    ClearTitleTextureCache();
@@ -1082,7 +1082,7 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-            TJAPlayer3.t安全にDisposeする( ref this.ft曲リスト用フォント );
+            TJAPlayer3.tDisposeSafely( ref this.ft曲リスト用フォント );
 
 			for( int i = 0; i < TJAPlayer3.Skin.SongSelect_Bar_Count; i++ )
             {
@@ -2213,7 +2213,7 @@ namespace TJAPlayer3
 			{
 				if (emc == eMenuContext.SearchByDifficulty)
 				{
-					TJAPlayer3.Skin.sound決定音.t再生する();
+					TJAPlayer3.Skin.sound決定音.tPlay();
 
 					_contextVars[2]++;
 					if (_contextVars[2] >= 2)
@@ -2244,7 +2244,7 @@ namespace TJAPlayer3
 				}
 				else if (emc == eMenuContext.Random)
 				{
-					TJAPlayer3.Skin.sound決定音.t再生する();
+					TJAPlayer3.Skin.sound決定音.tPlay();
 
 					_contextVars[5]++;
 					if (_contextVars[5] >= TJAPlayer3.ConfigIni.nPlayerCount)
@@ -2268,7 +2268,7 @@ namespace TJAPlayer3
             {
 				if (emc == eMenuContext.SearchByDifficulty)
 				{
-					TJAPlayer3.Skin.sound変更音.t再生する();
+					TJAPlayer3.Skin.sound変更音.tPlay();
 
 					_contextVars[_contextVars[2]]--;
 					// Clamp values
@@ -2277,7 +2277,7 @@ namespace TJAPlayer3
 				}
 				else if (emc == eMenuContext.Random)
 				{
-					TJAPlayer3.Skin.sound変更音.t再生する();
+					TJAPlayer3.Skin.sound変更音.tPlay();
 
 					_contextVars[_contextVars[5]]--;
 					// Clamp values
@@ -2294,7 +2294,7 @@ namespace TJAPlayer3
 			{
 				if (emc == eMenuContext.SearchByDifficulty)
 				{
-					TJAPlayer3.Skin.sound変更音.t再生する();
+					TJAPlayer3.Skin.sound変更音.tPlay();
 
 					_contextVars[_contextVars[2]]++;
 					// Clamp values
@@ -2303,7 +2303,7 @@ namespace TJAPlayer3
 				}
 				else if (emc == eMenuContext.Random)
 				{
-					TJAPlayer3.Skin.sound変更音.t再生する();
+					TJAPlayer3.Skin.sound変更音.tPlay();
 
 					_contextVars[_contextVars[5]]++;
 					// Clamp values

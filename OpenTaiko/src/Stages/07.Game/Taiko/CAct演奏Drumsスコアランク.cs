@@ -51,7 +51,7 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
 
-			TJAPlayer3.t安全にDisposeする(ref TowerResult_ScoreRankEffect);
+			TJAPlayer3.tDisposeSafely(ref TowerResult_ScoreRankEffect);
 
             base.ReleaseManagedResource();
         }

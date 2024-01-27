@@ -497,7 +497,7 @@ namespace TJAPlayer3
 			TJAPlayer3.Skin.tRemoveMixerAll();	// 効果音のストリームをミキサーから解除しておく
 
 			queueMixerSound = new Queue<stmixer>( 64 );
-			bIsDirectSound = ( TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() == "DirectSound" );
+			bIsDirectSound = ( TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() == "DirectSound" );
 			bUseOSTimer = TJAPlayer3.ConfigIni.bUseOSTimer;
 			this.bPAUSE = false;
 			if ( TJAPlayer3.DTXVmode.Enabled )
@@ -527,7 +527,7 @@ namespace TJAPlayer3
 							{
 								if ( wc.rSound[ i ] != null )
 								{
-									TJAPlayer3.Sound管理.AddMixer( wc.rSound[ i ], db再生速度, pChip.b演奏終了後も再生が続くチップである );
+									TJAPlayer3.SoundManager.AddMixer( wc.rSound[ i ], db再生速度, pChip.b演奏終了後も再生が続くチップである );
 									//AddMixer( wc.rSound[ i ] );		// 最初はqueueを介さず直接ミキサー登録する
 								}
 							}
@@ -1143,11 +1143,11 @@ namespace TJAPlayer3
 						stmixer stm = queueMixerSound.Dequeue();
 						if ( stm.bIsAdd )
 						{
-							TJAPlayer3.Sound管理.AddMixer( stm.csound, db再生速度, stm.b演奏終了後も再生が続くチップである );
+							TJAPlayer3.SoundManager.AddMixer( stm.csound, db再生速度, stm.b演奏終了後も再生が続くチップである );
 						}
 						else
 						{
-							TJAPlayer3.Sound管理.RemoveMixer( stm.csound );
+							TJAPlayer3.SoundManager.RemoveMixer( stm.csound );
 						}
 					}
 				}
@@ -1717,7 +1717,7 @@ namespace TJAPlayer3
                 {
                     if (IsKusudama)
                     {
-                        TJAPlayer3.Skin.soundKusudama.t再生する();
+                        TJAPlayer3.Skin.soundKusudama.tPlay();
                         pChip.bHit = true;
                         pChip.IsHitted = true;
                         chip現在処理中の連打チップ[player].bHit = true;
@@ -1734,7 +1734,7 @@ namespace TJAPlayer3
                     else
                     {
                         //ﾊﾟｧｰﾝ
-                        TJAPlayer3.Skin.soundBalloon.t再生する();
+                        TJAPlayer3.Skin.soundBalloon.tPlay();
                         //CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 3, player ); //ここで飛ばす。飛ばされるのは大音符のみ。
                         TJAPlayer3.stage演奏ドラム画面.FlyingNotes.Start(3, player);
                         TJAPlayer3.stage演奏ドラム画面.Rainbow.Start(player);
@@ -2016,7 +2016,7 @@ namespace TJAPlayer3
                                 eJudgeResult = ENoteJudge.Bad;
                                 TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, eJudgeResult, true, nPlayer);
                                 TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, ENoteJudge.Mine, nPlayer);
-                                TJAPlayer3.Skin.soundBomb?.t再生する();
+                                TJAPlayer3.Skin.soundBomb?.tPlay();
                                 actGauge.MineDamage(nPlayer);
                                 this.CChartScore[nPlayer].nMine++;
                                 this.CSectionScore[nPlayer].nMine++;
@@ -3252,7 +3252,7 @@ namespace TJAPlayer3
 				{	// escape (exit)
                     if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
                     {
-                        TJAPlayer3.Skin.sound変更音.t再生する();
+                        TJAPlayer3.Skin.sound変更音.tPlay();
 
                         SoundManager.PlayTimer.Pause();
                         TJAPlayer3.Timer.Pause();
@@ -3786,7 +3786,7 @@ namespace TJAPlayer3
                                             if ( nPlayer == 0) 
                                             {
                                                 actBalloon.KusuMiss();
-                                                TJAPlayer3.Skin.soundKusudamaMiss.t再生する();
+                                                TJAPlayer3.Skin.soundKusudamaMiss.tPlay();
                                                 for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
                                                 {
                                                     {
@@ -3827,7 +3827,7 @@ namespace TJAPlayer3
                                             TJAPlayer3.stage演奏ドラム画面.actLaneTaiko.Start(0x11, ENoteJudge.Bad, true, nPlayer);
                                             TJAPlayer3.stage演奏ドラム画面.actChipFireD.Start(0x11, ENoteJudge.Mine, nPlayer);
                                             actGauge.MineDamage(nPlayer);
-                                            TJAPlayer3.Skin.soundBomb?.t再生する();
+                                            TJAPlayer3.Skin.soundBomb?.tPlay();
                                             this.CChartScore[nPlayer].nMine++;
                                             this.CSectionScore[nPlayer].nMine++;
                                             this.CBranchScore[nPlayer].nMine++;

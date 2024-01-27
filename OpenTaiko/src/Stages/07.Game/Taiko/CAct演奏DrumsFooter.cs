@@ -43,7 +43,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            TJAPlayer3.t安全にDisposeする(ref Mob_Footer);
+            TJAPlayer3.tDisposeSafely(ref Mob_Footer);
 
             base.DeActivate();
         }

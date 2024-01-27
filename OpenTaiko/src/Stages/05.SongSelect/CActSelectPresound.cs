@@ -19,7 +19,7 @@ namespace TJAPlayer3
 			if( this.sound != null )
 			{
 				this.sound.Stop();
-				TJAPlayer3.Sound管理.tDisposeSound( this.sound );
+				TJAPlayer3.SoundManager.tDisposeSound( this.sound );
 				this.sound = null;
 			}
 		}
@@ -35,7 +35,7 @@ namespace TJAPlayer3
 				if( ( cスコア.譜面情報.strBGMファイル名 != null ) && ( cスコア.譜面情報.strBGMファイル名.Length > 0 ) )
 				{
 					//this.ct再生待ちウェイト = new CCounter( 0, CDTXMania.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms, 1, CDTXMania.Timer );
-                    if(TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() != "DirectSound")
+                    if(TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectSound")
                     {
                         this.ct再生待ちウェイト = new CCounter(0, 1, 270, TJAPlayer3.Timer);
                     } else
@@ -170,7 +170,7 @@ namespace TJAPlayer3
                 {
                     strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名;
 					if(TJAPlayer3.ConfigIni.bBGM音を発声する)
-                    this.sound = TJAPlayer3.Sound管理.tCreateSound( strPreviewFilename, ESoundGroup.SongPreview );
+                    this.sound = TJAPlayer3.SoundManager.tCreateSound( strPreviewFilename, ESoundGroup.SongPreview );
 					if (this.sound == null) return;
                     //this.sound.db再生速度 = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
 

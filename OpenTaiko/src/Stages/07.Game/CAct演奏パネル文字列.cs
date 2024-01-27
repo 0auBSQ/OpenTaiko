@@ -161,7 +161,7 @@ namespace TJAPlayer3
 
         public void t歌詞テクスチャを生成する( SKBitmap bmplyric )
         {
-            TJAPlayer3.t安全にDisposeする(ref this.tx歌詞テクスチャ);
+            TJAPlayer3.tDisposeSafely(ref this.tx歌詞テクスチャ);
             this.tx歌詞テクスチャ = TJAPlayer3.tテクスチャの生成( bmplyric );
         }
         public void t歌詞テクスチャを削除する()
@@ -214,14 +214,14 @@ namespace TJAPlayer3
 		public override void DeActivate()
 		{
 			this.ct進行用 = null;
-			TJAPlayer3.t安全にDisposeする( ref this.txPanel );
-			TJAPlayer3.t安全にDisposeする( ref this.txMusicName );
-            TJAPlayer3.t安全にDisposeする( ref this.txGENRE );
-            TJAPlayer3.t安全にDisposeする(ref this.pfGENRE);
-            TJAPlayer3.t安全にDisposeする(ref this.txPanel);
-            TJAPlayer3.t安全にDisposeする(ref this.pfMusicName);
-            TJAPlayer3.t安全にDisposeする(ref this.pf歌詞フォント);
-            TJAPlayer3.t安全にDisposeする(ref this.tx歌詞テクスチャ);
+			TJAPlayer3.tDisposeSafely( ref this.txPanel );
+			TJAPlayer3.tDisposeSafely( ref this.txMusicName );
+            TJAPlayer3.tDisposeSafely( ref this.txGENRE );
+            TJAPlayer3.tDisposeSafely(ref this.pfGENRE);
+            TJAPlayer3.tDisposeSafely(ref this.txPanel);
+            TJAPlayer3.tDisposeSafely(ref this.pfMusicName);
+            TJAPlayer3.tDisposeSafely(ref this.pf歌詞フォント);
+            TJAPlayer3.tDisposeSafely(ref this.tx歌詞テクスチャ);
 			base.DeActivate();
 		}
 		public override void CreateManagedResource()

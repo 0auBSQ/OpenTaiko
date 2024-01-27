@@ -847,15 +847,15 @@ namespace TJAPlayer3
 			}
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-				bgmResultIn.t再生する();
+				bgmResultIn.tPlay();
 		}
 		public override void DeActivate()
 		{
-			TJAPlayer3.t安全にDisposeする(ref Background);
+			TJAPlayer3.tDisposeSafely(ref Background);
 
 			if (this.rResultSound != null)
 			{
-				TJAPlayer3.Sound管理.tDisposeSound(this.rResultSound);
+				TJAPlayer3.SoundManager.tDisposeSound(this.rResultSound);
 				this.rResultSound = null;
 			}
 
@@ -882,13 +882,13 @@ namespace TJAPlayer3
 
 			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
 			{
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText);
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText48);
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText72);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText48);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText72);
 			}
 			else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
 			{
-				TJAPlayer3.t安全にDisposeする(ref pfDanTitles);
+				TJAPlayer3.tDisposeSafely(ref pfDanTitles);
 			}
 
 			base.ReleaseManagedResource();
@@ -938,9 +938,9 @@ namespace TJAPlayer3
                 {
                     #region [Ensou game result screen]
 
-                    if (!b音声再生 && !bgmResultIn.b再生中)
+                    if (!b音声再生 && !bgmResultIn.bIsPlaying)
 					{
-						bgmResultLoop.t再生する();
+						bgmResultLoop.tPlay();
 						b音声再生 = true;
 					}
 					if (!TJAPlayer3.ConfigIni.bAIBattleMode)
@@ -1212,9 +1212,9 @@ namespace TJAPlayer3
 					}
 					*/
 
-					if (!b音声再生 && !bgmResultIn.b再生中)
+					if (!b音声再生 && !bgmResultIn.bIsPlaying)
 					{
-						bgmResultLoop.t再生する();
+						bgmResultLoop.tPlay();
 						b音声再生 = true;
 					}
 
@@ -1255,9 +1255,9 @@ namespace TJAPlayer3
 
 						#region [DaniDoujou result screen]
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmDanResult.t再生する();
+							TJAPlayer3.Skin.bgmDanResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1404,9 +1404,9 @@ namespace TJAPlayer3
 
 						#endregion
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmDanResult.t再生する();
+							TJAPlayer3.Skin.bgmDanResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1417,9 +1417,9 @@ namespace TJAPlayer3
                     {
 						#region [Tower result screen]
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							TJAPlayer3.Skin.bgmTowerResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1499,9 +1499,9 @@ namespace TJAPlayer3
 
 						#endregion
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							TJAPlayer3.Skin.bgmTowerResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1623,10 +1623,10 @@ namespace TJAPlayer3
 						{
 							#region [ Return to song select screen (Faster method) ]
 
-							bgmResultLoop.t停止する();
-							TJAPlayer3.Skin.bgmDanResult.t停止する();
-							TJAPlayer3.Skin.bgmTowerResult.t停止する();
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							bgmResultLoop.tStop();
+							TJAPlayer3.Skin.bgmDanResult.tStop();
+							TJAPlayer3.Skin.bgmTowerResult.tStop();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 							actFI.tフェードアウト開始();
 							
 							if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
@@ -1645,7 +1645,7 @@ namespace TJAPlayer3
 							|| (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) 
 							|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.sound決定音.tPlay();
 
                             #region [ Skip animations ]
 
@@ -1689,9 +1689,9 @@ namespace TJAPlayer3
 									{
 										base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-										bgmResultLoop.t停止する();
-										TJAPlayer3.Skin.bgmDanResult.t停止する();
-										TJAPlayer3.Skin.bgmTowerResult.t停止する();
+										bgmResultLoop.tStop();
+										TJAPlayer3.Skin.bgmDanResult.tStop();
+										TJAPlayer3.Skin.bgmTowerResult.tStop();
 									}
 
 									#endregion
@@ -1704,7 +1704,7 @@ namespace TJAPlayer3
 							))) {
 							if (!mqModals.tIsQueueEmpty(1) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 
 								displayedModals[1] = mqModals.tPopModal(1);
 								displayedModals[1]?.tPlayModalSfx();
@@ -1717,7 +1717,7 @@ namespace TJAPlayer3
 						{
 							if (!mqModals.tIsQueueEmpty(2) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 
 								displayedModals[2] = mqModals.tPopModal(2);
 								displayedModals[2]?.tPlayModalSfx();
@@ -1730,7 +1730,7 @@ namespace TJAPlayer3
 						{
 							if (!mqModals.tIsQueueEmpty(3) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 
 								displayedModals[3] = mqModals.tPopModal(3);
 								displayedModals[3]?.tPlayModalSfx();
@@ -1743,7 +1743,7 @@ namespace TJAPlayer3
 						{
 							if (!mqModals.tIsQueueEmpty(4) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.sound決定音.tPlay();
 
 								displayedModals[4] = mqModals.tPopModal(4);
 								displayedModals[4]?.tPlayModalSfx();
@@ -1770,7 +1770,7 @@ namespace TJAPlayer3
 									else
 										examsShift = -examsShift;
 
-									TJAPlayer3.Skin.sound変更音.t再生する();
+									TJAPlayer3.Skin.sound変更音.tPlay();
 								}
 
 								#endregion
@@ -2149,7 +2149,7 @@ namespace TJAPlayer3
 		private CCachedFontRenderer pfTowerText48;
 		private CCachedFontRenderer pfTowerText72;
 
-		private CSkin.Cシステムサウンド bgmResultIn
+		private CSkin.CSystemSound bgmResultIn
 		{
 			get
 			{
@@ -2164,7 +2164,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		private CSkin.Cシステムサウンド bgmResultLoop
+		private CSkin.CSystemSound bgmResultLoop
 		{
 			get
 			{

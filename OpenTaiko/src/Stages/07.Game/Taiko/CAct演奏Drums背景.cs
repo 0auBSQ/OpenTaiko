@@ -206,10 +206,10 @@ namespace TJAPlayer3
             if (this.IsDeActivated)
                 return;
 
-            TJAPlayer3.t安全にDisposeする(ref UpScript);
-            TJAPlayer3.t安全にDisposeする(ref DownScript);
+            TJAPlayer3.tDisposeSafely(ref UpScript);
+            TJAPlayer3.tDisposeSafely(ref DownScript);
 
-            TJAPlayer3.t安全にDisposeする(ref pfTowerText);
+            TJAPlayer3.tDisposeSafely(ref pfTowerText);
 
             base.DeActivate();
         }

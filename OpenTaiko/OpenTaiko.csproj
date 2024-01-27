@@ -1,27 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\FDK\FDK.csproj"/>
+    <ProjectReference Include="..\FDK\FDK.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-    <PackageReference Include="SevenZip" Version="19.0.0"/>
-    <PackageReference Include="NLua" Version="1.6.3"/>
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0"/>
-    <PackageReference Include="DiscordRichPresence" Version="1.143.0"/>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SevenZip" Version="19.0.0" />
+    <PackageReference Include="NLua" Version="1.6.3" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
+    <PackageReference Include="DiscordRichPresence" Version="1.143.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="System/**" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="README.md" CopyToOutputDirectory="PreserveNewest"/>
-    <Content Include="Readme.txt" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <PropertyGroup>
     <Version>0.6.0</Version>

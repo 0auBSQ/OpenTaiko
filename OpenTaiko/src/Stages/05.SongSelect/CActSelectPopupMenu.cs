@@ -110,19 +110,19 @@ namespace TJAPlayer3
 
 		public void _RefleshSkin()
 		{
-			TJAPlayer3.t安全にDisposeする(ref prvFont);
+			TJAPlayer3.tDisposeSafely(ref prvFont);
 			ConditionallyInitializePrvFont();
 
 			using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem.str項目名, Color.White, Color.Black, null, 30))
 			{
-				TJAPlayer3.t安全にDisposeする(ref stqMenuTitle.txName);
+				TJAPlayer3.tDisposeSafely(ref stqMenuTitle.txName);
 				stqMenuTitle.txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
 			}
 			for (int i = 0; i < lciMenuItems.Length; i++)
 			{
 				using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem.str項目名, Color.White, Color.Black, null, 30))
 				{
-					TJAPlayer3.t安全にDisposeする(ref lciMenuItems[i].txName);
+					TJAPlayer3.tDisposeSafely(ref lciMenuItems[i].txName);
 					lciMenuItems[i].txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
 				}
 			}
@@ -132,7 +132,7 @@ namespace TJAPlayer3
 		{
 			if ( this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.sound決定音.t再生する();
+				TJAPlayer3.Skin.sound決定音.tPlay();
 
 				if ( this.n現在の選択行 != lciMenuItems.Length - 1 )
 				{
@@ -186,7 +186,7 @@ namespace TJAPlayer3
 		{
 			if ( this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				if ( bIsSelectingIntItem )
 				{
 					 lciMenuItems[ n現在の選択行 ].cItem.t項目値を前へ移動();		// 項目移動と数値上下は方向が逆になるので注意
@@ -204,7 +204,7 @@ namespace TJAPlayer3
 		{
 			if ( this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				if ( bIsSelectingIntItem )
 				{
 					lciMenuItems[ n現在の選択行 ].cItem.t項目値を次へ移動();		// 項目移動と数値上下は方向が逆になるので注意
@@ -267,7 +267,7 @@ namespace TJAPlayer3
 		{
 			//CDTXMania.tテクスチャの解放( ref this.txPopupMenuBackground );
 			//CDTXMania.tテクスチャの解放( ref this.txCursor );
-            TJAPlayer3.t安全にDisposeする( ref this.prvFont );
+            TJAPlayer3.tDisposeSafely( ref this.prvFont );
 			base.ReleaseManagedResource();
 		}
 
@@ -286,7 +286,7 @@ namespace TJAPlayer3
 					if ( ( TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.RightShift ) || TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.LeftShift ) ) &&
 						TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.F1 ) )
 					{	// [SHIFT] + [F1] CONFIG
-						TJAPlayer3.Skin.sound取消音.t再生する();
+						TJAPlayer3.Skin.sound取消音.tPlay();
 						tCancel();
 						this.bGotoDetailConfig = true;
 					}
@@ -297,7 +297,7 @@ namespace TJAPlayer3
 						|| TJAPlayer3.Pad.b押されたGB( Eパッド.Cancel ) )
                         && this.bEsc有効 )
 					{	// キャンセル
-						TJAPlayer3.Skin.sound取消音.t再生する();
+						TJAPlayer3.Skin.sound取消音.tPlay();
 						tCancel();
 						this.bIsActivePopupMenu = false;
 					}

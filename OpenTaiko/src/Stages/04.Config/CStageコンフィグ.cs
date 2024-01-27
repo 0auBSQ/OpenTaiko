@@ -59,7 +59,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.t再生する();
+				TJAPlayer3.Skin.bgmコンフィグ画面.tPlay();
 
 				this.n現在のメニュー番号 = 0;                                                    //
 				for( int i = 0; i < 4; i++ )													//
@@ -97,7 +97,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.t停止する();
+				TJAPlayer3.Skin.bgmコンフィグ画面.tStop();
 
 				TJAPlayer3.ConfigIni.t書き出し( TJAPlayer3.strEXEのあるフォルダ + "Config.ini" );	// CONFIGだけ
 				for( int i = 0; i < 4; i++ )
@@ -114,7 +114,7 @@ namespace TJAPlayer3
 				}
 				txMenuItemLeft = null;
 
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 
 				base.DeActivate();
 			}
@@ -409,7 +409,7 @@ namespace TJAPlayer3
 			{
 				if ( ( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.FT ) ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) )
 				{
-					TJAPlayer3.Skin.sound取消音.t再生する();
+					TJAPlayer3.Skin.sound取消音.tPlay();
 					if ( !this.bメニューにフォーカス中 )
 					{
 						if ( this.eItemPanelモード == EItemPanelモード.キーコード一覧 )
@@ -435,13 +435,13 @@ namespace TJAPlayer3
 					if ( this.n現在のメニュー番号 == 2 )
 					{
 						// Exit
-						TJAPlayer3.Skin.sound決定音.t再生する();
+						TJAPlayer3.Skin.sound決定音.tPlay();
 						this.actFIFO.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 					else if ( this.bメニューにフォーカス中 )
 					{
-						TJAPlayer3.Skin.sound決定音.t再生する();
+						TJAPlayer3.Skin.sound決定音.tPlay();
 						this.bメニューにフォーカス中 = false;
 						this.t説明文パネルに現在選択されている項目の説明を描画する();
 					}
@@ -588,7 +588,7 @@ namespace TJAPlayer3
 			}
 			else
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在のメニュー番号 = ( this.n現在のメニュー番号 + 1 ) % 3;
 				switch( this.n現在のメニュー番号 )
 				{
@@ -624,7 +624,7 @@ namespace TJAPlayer3
 			}
 			else
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 3) % 3;
 				switch ( this.n現在のメニュー番号 )
 				{

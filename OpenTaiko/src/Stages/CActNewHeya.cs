@@ -241,13 +241,13 @@ namespace TJAPlayer3
                         {
                             case 0:
                             Close();
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                             break;
                             default:
                             {
                                 CurrentPlayer = TJAPlayer3.GetActualPlayer(CurrentIndex - 1);
                                 SetState(SelectableInfo.ModeSelect);
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                             }
                             break;
                         }
@@ -259,12 +259,12 @@ namespace TJAPlayer3
                         {
                             case 0:
                             SetState(SelectableInfo.PlayerSelect);
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.sound取消音.tPlay();
                             break;
                             default:
                             {
                                 SetState(SelectableInfo.Select);
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                             }
                             break;
                         }
@@ -285,8 +285,8 @@ namespace TJAPlayer3
                                     //TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.PuchiChara = TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex];// iPuchiCharaCurrent;
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
-                                    TJAPlayer3.Tx.Puchichara[CurrentIndex].welcome.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
+                                    TJAPlayer3.Tx.Puchichara[CurrentIndex].welcome.tPlay();
 
                                     SetState(SelectableInfo.PlayerSelect);
                                 }
@@ -296,11 +296,11 @@ namespace TJAPlayer3
                                     //TJAPlayer3.NamePlateConfig.tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0], iPlayer);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Add(TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex]);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tSpendCoins(TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.Values[0]);
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
                                 }
                                 else 
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                             }
                             break;
@@ -320,8 +320,8 @@ namespace TJAPlayer3
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tUpdateCharacterName(TJAPlayer3.Skin.Characters_DirName[CurrentIndex]);
 
                                     // Welcome voice using Sanka
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
-                                    TJAPlayer3.Skin.voiceTitleSanka[CurrentPlayer]?.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
+                                    TJAPlayer3.Skin.voiceTitleSanka[CurrentPlayer]?.tPlay();
 
                                     CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
@@ -334,11 +334,11 @@ namespace TJAPlayer3
                                 {
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Add(TJAPlayer3.Skin.Characters_DirName[CurrentIndex]);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tSpendCoins(TJAPlayer3.Tx.Characters[CurrentIndex].unlock.Values[0]);
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.sound決定音.tPlay();
                                 }
                                 else 
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                             }
                             break;
@@ -361,7 +361,7 @@ namespace TJAPlayer3
 
                                 TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
 
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                                 SetState(SelectableInfo.PlayerSelect);
                             }
                             break;
@@ -381,7 +381,7 @@ namespace TJAPlayer3
 
                                 TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
 
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.sound決定音.tPlay();
                                 SetState(SelectableInfo.PlayerSelect);
                             }
                             break;
@@ -393,19 +393,19 @@ namespace TJAPlayer3
             else if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)))
             {
                 Close();
-                TJAPlayer3.Skin.sound取消音.t再生する();
+                TJAPlayer3.Skin.sound取消音.tPlay();
             }
             else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange)
 				|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
             {
                 ChangeIndex(-1);
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.sound変更音.tPlay();
             }
 			else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange)
 				|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
             {
                 ChangeIndex(1);
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.sound変更音.tPlay();
             }
 
             InFade.Tick();
