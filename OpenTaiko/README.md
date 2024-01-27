@@ -150,6 +150,12 @@ BoxFontName=廻想体 ネクスト UP B
 103 - spliced : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
 104 - 〈11 : Tanger ft. Hatsune Miku - https://linktr.ee/Tangermusic (Chart by Colin)
 105 - CHAOTIC DIMENSION : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by sadkay)
+106 - ：3 : Tanger - https://linktr.ee/Tangermusic (Chart by DragonRatTiger)
+107 - BONUS : Tanger - https://linktr.ee/Tangermusic (Chart by Tang)
+108 - FINAL HOPE : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by DiamondN1nja)
+109 - SUGARUSH~!! : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
+110 - ETHEREAL VELOCITY (Game Size) : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by Colin)
+111 - 2024 BPM IS NOT ENOUGH : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by goldenyoshi22 (Extreme) and Komi)
 ```
 
 ### Visuals
