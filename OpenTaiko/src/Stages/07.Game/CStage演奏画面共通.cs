@@ -879,7 +879,7 @@ namespace TJAPlayer3
         public CAct演奏DrumsMob actMob;
         public Dan_Cert actDan;
         public AIBattle actAIBattle;
-        public CAct演奏Drums特訓モード actTokkun;
+        public CAct演奏DrumsTrainingMode actTokkun;
         public bool bPAUSE;
         public bool[] bIsAlreadyCleared;
         public bool[] bIsAlreadyMaxed;

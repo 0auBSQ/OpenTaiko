@@ -398,9 +398,9 @@ namespace TJAPlayer3
 
         public CSystemSound sound特訓再生音 = null;
         public CSystemSound sound特訓停止音 = null;
-        public CSystemSound sound特訓ジャンプポイント = null;
+        public CSystemSound soundTrainingToggleBookmarkSFX = null;
         public CSystemSound sound特訓スキップ音 = null;
-        public CSystemSound sound特訓スクロール音 = null;
+        public CSystemSound soundTrainingModeScrollSFX = null;
         public CSystemSound soundPon = null;
         public CSystemSound soundGauge = null;
         public CSystemSound soundScoreDon = null;
@@ -516,13 +516,13 @@ namespace TJAPlayer3
                         return this.sound特訓停止音;
 
                     case Eシステムサウンド.sound特訓ジャンプポイント:
-                        return this.sound特訓ジャンプポイント;
+                        return this.soundTrainingToggleBookmarkSFX;
 
                     case Eシステムサウンド.sound特訓スキップ音:
                         return this.sound特訓スキップ音;
 
                     case Eシステムサウンド.SOUND特訓スクロール:
-                        return this.sound特訓スクロール音;
+                        return this.soundTrainingModeScrollSFX;
 
                 }
                 throw new IndexOutOfRangeException();
@@ -598,10 +598,10 @@ namespace TJAPlayer3
                         return this.sound特訓停止音;
 
                     case 21:
-                        return this.sound特訓スクロール音;
+                        return this.soundTrainingModeScrollSFX;
 
                     case 22:
-                        return this.sound特訓ジャンプポイント;
+                        return this.soundTrainingToggleBookmarkSFX;
 
                     case 23:
                         return this.sound特訓スキップ音;
@@ -789,8 +789,8 @@ namespace TJAPlayer3
 
             this.sound特訓再生音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓停止音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.sound特訓スクロール音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.sound特訓ジャンプポイント = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
+            this.soundTrainingModeScrollSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
+            this.soundTrainingToggleBookmarkSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.sound特訓スキップ音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundPon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
             this.soundGauge = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);

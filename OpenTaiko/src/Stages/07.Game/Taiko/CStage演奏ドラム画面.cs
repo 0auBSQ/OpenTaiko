@@ -70,7 +70,7 @@ namespace TJAPlayer3
             base.ChildActivities.Add(this.ScoreRank = new CAct演奏Drumsスコアランク());
 
             base.ChildActivities.Add(this.actDan = new Dan_Cert());
-            base.ChildActivities.Add(this.actTokkun = new CAct演奏Drums特訓モード());
+            base.ChildActivities.Add(this.actTokkun = new CAct演奏DrumsTrainingMode());
             base.ChildActivities.Add(this.actAIBattle = new AIBattle());
             #region[ 文字初期化 ]
             ST文字位置[] st文字位置Array = new ST文字位置[ 12 ];
@@ -628,9 +628,9 @@ namespace TJAPlayer3
                     {
                         bIsFinishedPlaying = false;
                         TJAPlayer3.Skin.sound特訓停止音.tPlay();
-                        actTokkun.t演奏を停止する();
+                        actTokkun.tPausePlay();
 
-                        actTokkun.t譜面の表示位置を合わせる(true);
+                        actTokkun.tMatchWithTheChartDisplayPosition(true);
                     }
                     else
                     {
@@ -715,7 +715,7 @@ namespace TJAPlayer3
         public CAct演奏Drumsレーン太鼓 actLaneTaiko;
         public CAct演奏Drums演奏終了演出 actEnd;
         private CAct演奏Drumsゲームモード actGame;
-        public CAct演奏Drums特訓モード actTokkun;
+        public CAct演奏DrumsTrainingMode actTokkun;
         public CAct演奏Drums背景 actBackground;
         public GoGoSplash GoGoSplash;
         public FlyingNotes FlyingNotes;
