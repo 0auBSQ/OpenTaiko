@@ -1034,7 +1034,7 @@ namespace TJAPlayer3
 			#region [ Skin変更 ]
 			if ( TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName( true ) != this.skinSubFolder_org )
 			{
-                TJAPlayer3.app.RefleshSkin();
+                TJAPlayer3.app.RefreshSkin();
             }
 			#endregion
 

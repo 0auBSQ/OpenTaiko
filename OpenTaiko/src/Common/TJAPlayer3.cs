@@ -768,6 +768,7 @@ namespace TJAPlayer3
             Timer?.Update();
             SoundManager.PlayTimer?.Update();
             FPS?.Update();
+			ShowWindowTitleWithSoundType();
 
 			if (BeatScaling != null)
 			{
@@ -2344,7 +2345,7 @@ for (int i = 0; i < 3; i++) {
 						{
 							if (r現在のステージ.eStageID != CStage.EStage.Game)
 							{
-								RefleshSkin();
+								RefreshSkin();
 								r現在のステージ.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -3142,7 +3143,7 @@ for (int i = 0; i < 3; i++) {
 				delay = "(" + SoundManager.GetSoundDelay() + "ms)";
 			}
             AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-            base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
+            base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ") (" + ((FPS != null) ? FPS.NowFPS : "??") + " FPS)";
 		}
 
 		private void t終了処理()
@@ -3590,7 +3591,7 @@ for (int i = 0; i < 3; i++) {
 			WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
 		}
 
-		public void RefleshSkin()
+		public void RefreshSkin()
         {
             Trace.TraceInformation("スキン変更:" + TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName(false));
 
