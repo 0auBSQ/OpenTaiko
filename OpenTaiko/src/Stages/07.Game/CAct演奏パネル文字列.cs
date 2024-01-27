@@ -63,7 +63,7 @@ namespace TJAPlayer3
         /// <param name="songName">曲名</param>
         /// <param name="genreName">ジャンル名</param>
         /// <param name="stageText">曲数</param>
-        public void SetPanelString(string songName, string genreName, string stageText = null, C曲リストノード songNode = null)
+        public void SetPanelString(string songName, string genreName, string stageText = null, CSongListNode songNode = null)
 		{
 			if( base.IsActivated )
 			{
@@ -78,14 +78,14 @@ namespace TJAPlayer3
 					    }
                         if (txMusicName != null)
                         {
-                            this.txMusicName.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName);
+                            this.txMusicName.vcScaleRatio.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName);
                         }
                     
                         SKBitmap bmpDiff;
                         string strDiff = "";
                         if (TJAPlayer3.Skin.eDiffDispMode == E難易度表示タイプ.n曲目に表示)
                         {
-                            switch (TJAPlayer3.stage選曲.n確定された曲の難易度[0])
+                            switch (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0])
                             {
                                 case 0:
                                     strDiff = "かんたん ";
@@ -177,15 +177,15 @@ namespace TJAPlayer3
             {
                 if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Left)
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X , TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X , TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
                 }
                 else if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Right)
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szTextureSize.Width, TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
                 }
                 else
                 {
-                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szテクスチャサイズ.Width / 2), TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szテクスチャサイズ.Height));
+                this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szTextureSize.Width / 2), TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
                 }
             }
         }
@@ -246,7 +246,7 @@ namespace TJAPlayer3
                 if( this.txGENRE != null )
                 {
                     this.txGENRE.t2D描画(TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Game_Genre_X + TJAPlayer3.Skin.Game_GenreText_Offset[0], TJAPlayer3.Skin.Game_Genre_Y + TJAPlayer3.Skin.Game_GenreText_Offset[1]);
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Game_Genre_X + TJAPlayer3.Skin.Game_GenreText_Offset[0], TJAPlayer3.Skin.Game_Genre_Y + TJAPlayer3.Skin.Game_GenreText_Offset[1]);
                 }
                 if( this.txStage != null )
                     this.txStage.t2D描画( TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y );
@@ -255,13 +255,13 @@ namespace TJAPlayer3
                 {
                     if( this.txMusicName != null )
                     {
-                        float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szテクスチャサイズ.Width;
-                        if (this.txMusicName.szテクスチャサイズ.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
+                        float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
+                        if (this.txMusicName.szTextureSize.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
                             fRate = 1.0f;
 
-                        this.txMusicName.vc拡大縮小倍率.X = fRate;
+                        this.txMusicName.vcScaleRatio.X = fRate;
 
-                        this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szテクスチャサイズ.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
+                        this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
                     }
                 }
                 else
@@ -298,13 +298,13 @@ namespace TJAPlayer3
                         }
                         if (this.txMusicName != null)
                         {
-                            float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szテクスチャサイズ.Width;
-                            if (this.txMusicName.szテクスチャサイズ.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
+                            float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
+                            if (this.txMusicName.szTextureSize.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
                                 fRate = 1.0f;
 
-                            this.txMusicName.vc拡大縮小倍率.X = fRate;
+                            this.txMusicName.vcScaleRatio.X = fRate;
 
-                            this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szテクスチャサイズ.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
+                            this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
                         }
                     }
                 }

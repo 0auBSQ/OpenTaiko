@@ -97,7 +97,7 @@ namespace TJAPlayer3
 				{
 					SKBitmap image = ftMessage.DrawText(strMessage[ ci ], Color.White);
 					this.txMessage = new CTexture( image );
-					this.txMessage.vc拡大縮小倍率 = new Vector3D<float>( 0.5f, 0.5f, 1f );
+					this.txMessage.vcScaleRatio = new Vector3D<float>( 0.5f, 0.5f, 1f );
 					image.Dispose();
 					TJAPlayer3.tDisposeSafely( ref ftMessage );
 				}

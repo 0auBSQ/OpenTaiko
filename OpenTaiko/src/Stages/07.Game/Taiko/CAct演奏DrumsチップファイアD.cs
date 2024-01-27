@@ -238,10 +238,10 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated )
             {
-                int nWidth = (TJAPlayer3.Tx.Effects_Hit_Explosion.szテクスチャサイズ.Width / 7);
-                int nHeight = (TJAPlayer3.Tx.Effects_Hit_Explosion.szテクスチャサイズ.Height / 4);
-                int nBombWidth = (TJAPlayer3.Tx.Effects_Hit_Bomb.szテクスチャサイズ.Width / 7);
-                int nBombHeight = (TJAPlayer3.Tx.Effects_Hit_Bomb.szテクスチャサイズ.Height / 4);
+                int nWidth = (TJAPlayer3.Tx.Effects_Hit_Explosion.szTextureSize.Width / 7);
+                int nHeight = (TJAPlayer3.Tx.Effects_Hit_Explosion.szTextureSize.Height / 4);
+                int nBombWidth = (TJAPlayer3.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
+                int nBombHeight = (TJAPlayer3.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
                 for ( int i = 0; i < 3 * 4; i++ )
 			    {
                     if( this.st状態[ i ].b使用中 )
@@ -367,11 +367,11 @@ namespace TJAPlayer3
                                         x += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
                                         y += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
 
-                                        x -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Width * (f倍率 - 1.0f) / 2.0f);
-                                        y -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szテクスチャサイズ.Height * (f倍率 - 1.0f) / 2.0f);
+                                        x -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
+                                        y -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
 
-                                        TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X = f倍率;
-                                        TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y = f倍率;
+                                        TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
+                                        TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
                                         TJAPlayer3.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
                                     }
                                     break;

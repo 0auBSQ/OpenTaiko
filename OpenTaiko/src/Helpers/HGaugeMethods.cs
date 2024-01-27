@@ -168,8 +168,8 @@ namespace TJAPlayer3
         {
             if (baseTexture != null)
             {
-                baseTexture.vc拡大縮小倍率.X = scale_x;
-                baseTexture.vc拡大縮小倍率.Y = scale_y;
+                baseTexture.vcScaleRatio.X = scale_x;
+                baseTexture.vcScaleRatio.Y = scale_y;
 
                 baseTexture.t2D描画(x, y,
                 new Rectangle(
@@ -189,8 +189,8 @@ namespace TJAPlayer3
 
             if (baseTexture != null)
             {
-                baseTexture.vc拡大縮小倍率.X = scale_x;
-                baseTexture.vc拡大縮小倍率.Y = scale_y;
+                baseTexture.vcScaleRatio.X = scale_x;
+                baseTexture.vcScaleRatio.Y = scale_y;
 
                 int gaugeTexLength = GaugeBox[2];
                 int clearPartLength = (int)(gaugeTexLength * (revnorma / 100f));
@@ -241,8 +241,8 @@ namespace TJAPlayer3
             // Fill
             if (fillTexture != null && !isRainbow)
             {
-                fillTexture.vc拡大縮小倍率.X = scale_x;
-                fillTexture.vc拡大縮小倍率.Y = scale_y;
+                fillTexture.vcScaleRatio.X = scale_x;
+                fillTexture.vcScaleRatio.Y = scale_y;
 
                 fillTexture.Opacity = 255;
                 if (gaugeType != EGaugeType.NORMAL && tIsDangerHardGauge(diff, level, gaugeType, percent, perfectHits, totalNotes)) fillTexture.Opacity = 255 - flashOpacity;
@@ -265,8 +265,8 @@ namespace TJAPlayer3
                 int differencial = closestTwo - closestNorma;
                 int xOff = (int)(scale_x * texStartPoint);
 
-                yellowTexture.vc拡大縮小倍率.X = scale_x;
-                yellowTexture.vc拡大縮小倍率.Y = scale_y;
+                yellowTexture.vcScaleRatio.X = scale_x;
+                yellowTexture.vcScaleRatio.Y = scale_y;
 
                 yellowTexture.Opacity = 255;
                 yellowTexture.t2D描画(x + xOff, y,
@@ -281,8 +281,8 @@ namespace TJAPlayer3
             // Rainbow
             if (rainbowTexture != null && percent >= 100f)
             {
-                rainbowTexture.vc拡大縮小倍率.X = scale_x;
-                rainbowTexture.vc拡大縮小倍率.Y = scale_y;
+                rainbowTexture.vcScaleRatio.X = scale_x;
+                rainbowTexture.vcScaleRatio.Y = scale_y;
 
                 rainbowTexture.t2D描画(rainbow_x, rainbow_y);
             }
@@ -298,8 +298,8 @@ namespace TJAPlayer3
             {
                 if (flashTexture != null)
                 {
-                    flashTexture.vc拡大縮小倍率.X = scale_x;
-                    flashTexture.vc拡大縮小倍率.Y = scale_y;
+                    flashTexture.vcScaleRatio.X = scale_x;
+                    flashTexture.vcScaleRatio.Y = scale_y;
 
                     flashTexture.Opacity = Opacity;
                     flashTexture.t2D描画(x, y,
@@ -320,8 +320,8 @@ namespace TJAPlayer3
             float currentFill = tHardGaugeGetKillscreenRatio(diff, level, gaugeType, perfectHits, totalNotes);
             if (killzoneTexture != null)
             {
-                killzoneTexture.vc拡大縮小倍率.X = scale_x;
-                killzoneTexture.vc拡大縮小倍率.Y = scale_y;
+                killzoneTexture.vcScaleRatio.X = scale_x;
+                killzoneTexture.vcScaleRatio.Y = scale_y;
 
                 killzoneTexture.t2D描画(x, y,
                     new Rectangle(
@@ -360,13 +360,13 @@ namespace TJAPlayer3
             if (gaugeType != EGaugeType.NORMAL || diff > Difficulty.Edit) return;
             float percent = Math.Min(100f, Math.Max(0f, currentPercent));
 
-            int soulfire_width = soulFire.szテクスチャサイズ.Width / 8;
-            int soulfire_height = soulFire.szテクスチャサイズ.Height;
+            int soulfire_width = soulFire.szTextureSize.Width / 8;
+            int soulfire_height = soulFire.szTextureSize.Height;
 
             if (percent >= 100.0)
             {
-                soulFire.vc拡大縮小倍率.X = scale_x;
-                soulFire.vc拡大縮小倍率.Y = scale_y;
+                soulFire.vcScaleRatio.X = scale_x;
+                soulFire.vcScaleRatio.Y = scale_y;
 
                 soulFire.t2D描画(fire_x, fire_y, new Rectangle(soulfire_width * fireFrame, 0, soulfire_width, soulfire_height));
             }
@@ -379,17 +379,17 @@ namespace TJAPlayer3
             float norma = tGetCurrentGaugeNorma(diff, level);
             float percent = Math.Min(100f, Math.Max(0f, currentPercent));
 
-            soulLetter.vc拡大縮小倍率.X = scale_x;
-            soulLetter.vc拡大縮小倍率.Y = scale_y;
+            soulLetter.vcScaleRatio.X = scale_x;
+            soulLetter.vcScaleRatio.Y = scale_y;
 
-            int soul_height = soulLetter.szテクスチャサイズ.Height / 2;
+            int soul_height = soulLetter.szTextureSize.Height / 2;
             if (tNormaCheck(diff, level, gaugeType, percent, 0))
             {
-                soulLetter.t2D描画(soul_x, soul_y, new Rectangle(0, 0, soulLetter.szテクスチャサイズ.Width, soul_height));
+                soulLetter.t2D描画(soul_x, soul_y, new Rectangle(0, 0, soulLetter.szTextureSize.Width, soul_height));
             }
             else
             {
-                soulLetter.t2D描画(soul_x, soul_y, new Rectangle(0, soul_height, soulLetter.szテクスチャサイズ.Width, soul_height));
+                soulLetter.t2D描画(soul_x, soul_y, new Rectangle(0, soul_height, soulLetter.szTextureSize.Width, soul_height));
             }
         }
 
@@ -448,10 +448,10 @@ namespace TJAPlayer3
         public static bool UNSAFE_FastNormaCheck(int player)
         {
             var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
-            var _dif = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
+            var _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
             return tNormaCheck(
                 (Difficulty)_dif,
-                TJAPlayer3.stage選曲.r確定された曲.arスコア[_dif].譜面情報.nレベル[_dif],
+                TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif],
                 tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
                 (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
                 UNSAFE_KillZonePercent(player)
@@ -482,9 +482,9 @@ namespace TJAPlayer3
             int totalHits = dtxs[player].nノーツ数[3];
 
             // Difficulty
-            int _dif = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
+            int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
             Difficulty difficulty = (Difficulty)_dif;
-            int level = TJAPlayer3.stage選曲.r確定された曲.arスコア[_dif].譜面情報.nレベル[_dif];
+            int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
             return tHardGaugeGetKillscreenRatio(
                 difficulty,
@@ -617,9 +617,9 @@ namespace TJAPlayer3
             }
 
             // Difficulty
-            int _dif = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
+            int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
             Difficulty difficulty = (Difficulty)_dif;
-            int level = TJAPlayer3.stage選曲.r確定された曲.arスコア[_dif].譜面情報.nレベル[_dif];
+            int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
             // Current percent
             float currentPercent = (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
@@ -703,9 +703,9 @@ namespace TJAPlayer3
             }
 
             // Difficulty
-            int _dif = TJAPlayer3.stage選曲.n確定された曲の難易度[player];
+            int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
             Difficulty difficulty = (Difficulty)_dif;
-            int level = TJAPlayer3.stage選曲.r確定された曲.arスコア[_dif].譜面情報.nレベル[_dif];
+            int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
             int gauge_x;
             int gauge_y;
@@ -825,13 +825,13 @@ namespace TJAPlayer3
             // Positionnings 
             if (soulLetter != null)
             {
-                soulText_x -= (int)((soulLetter.szテクスチャサイズ.Width / 2));
-                soulText_y -= (soulLetter.szテクスチャサイズ.Height / 4);
+                soulText_x -= (int)((soulLetter.szTextureSize.Width / 2));
+                soulText_y -= (soulLetter.szTextureSize.Height / 4);
             }
             if (soulFlame != null)
             {
-                soulFire_y -= (soulFlame.szテクスチャサイズ.Height / 2);
-                soulFire_x -= (int)((soulFlame.szテクスチャサイズ.Width / 16));
+                soulFire_y -= (soulFlame.szTextureSize.Height / 2);
+                soulFire_x -= (int)((soulFlame.szTextureSize.Width / 16));
             }
             
             tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, null, null, gauge_x, gauge_y, gauge_rainbow_x, gauge_rainbow_y, 0, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale_x, 1f, clearText_x, clearText_y, perfectHits, totalHits, soulText_x, soulText_y, soulFire_x, soulFire_y, clearRect, clearRectHighlight);

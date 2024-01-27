@@ -53,10 +53,10 @@ namespace TJAPlayer3
             */
 
             _boxRect = new Rectangle(
-                (modalFormat == EModalFormat.Full || player == 0) ? 0 : _box.szテクスチャサイズ.Width / 2,
+                (modalFormat == EModalFormat.Full || player == 0) ? 0 : _box.szTextureSize.Width / 2,
                 0,
-                (modalFormat == EModalFormat.Full) ? _box.szテクスチャサイズ.Width : _box.szテクスチャサイズ.Width / 2,
-                _box.szテクスチャサイズ.Height / (((TJAPlayer3.ConfigIni.nPlayerCount - 1) / 2) + 1));
+                (modalFormat == EModalFormat.Full) ? _box.szTextureSize.Width : _box.szTextureSize.Width / 2,
+                _box.szTextureSize.Height / (((TJAPlayer3.ConfigIni.nPlayerCount - 1) / 2) + 1));
 
             tGenerateTextures();
 
@@ -254,8 +254,8 @@ namespace TJAPlayer3
                 Color.Black,
                 1800);
 
-            _ModalText = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_content);
-            _ModalTitle = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_title);
+            _ModalText = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_content);
+            _ModalTitle = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_title);
         }
 
         private CTexture _box;

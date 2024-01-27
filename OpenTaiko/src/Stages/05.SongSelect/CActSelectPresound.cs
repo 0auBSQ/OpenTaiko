@@ -14,7 +14,7 @@ namespace TJAPlayer3
 		{
 			base.IsDeActivated = true;
 		}
-		public void tサウンド停止()
+		public void tStopSound()
 		{
 			if( this.sound != null )
 			{
@@ -25,11 +25,11 @@ namespace TJAPlayer3
 		}
 		public void t選択曲が変更された()
 		{
-			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
+			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
 			
             if( ( cスコア != null ) && ( ( !( cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名 ).Equals( this.str現在のファイル名 ) || ( this.sound == null ) ) || !this.sound.IsPlaying ) )
 			{
-				this.tサウンド停止();
+				this.tStopSound();
 				this.tBGMフェードイン開始();
                 this.long再生位置 = -1;
 				if( ( cスコア.譜面情報.strBGMファイル名 != null ) && ( cスコア.譜面情報.strBGMファイル名.Length > 0 ) )
@@ -72,7 +72,7 @@ namespace TJAPlayer3
 		}
 		public override void DeActivate()
 		{
-			this.tサウンド停止();
+			this.tStopSound();
 			this.ct再生待ちウェイト = null;
 			this.ctBGMフェードイン用 = null;
 			this.ctBGMフェードアウト用 = null;
@@ -104,7 +104,7 @@ namespace TJAPlayer3
 
                 if (this.sound != null)
                 {
-                    Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
+                    Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
                     if (long再生位置 == -1)
                     {
                         this.long再生開始時のシステム時刻 = SoundManager.PlayTimer.SystemTimeMs;
@@ -162,8 +162,8 @@ namespace TJAPlayer3
 		}
 		private void tプレビューサウンドの作成()
 		{
-			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
-			if( ( cスコア != null ) && !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) && TJAPlayer3.stage選曲.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading )
+			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
+			if( ( cスコア != null ) && !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) && TJAPlayer3.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading )
 			{
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try
@@ -222,7 +222,7 @@ namespace TJAPlayer3
 				if( !this.ct再生待ちウェイト.IsUnEnded )
 				{
 					this.ct再生待ちウェイト.Stop();
-					if( !TJAPlayer3.stage選曲.bスクロール中 )
+					if( !TJAPlayer3.stageSongSelect.bCurrentlyScrolling )
 					{
                         this.tプレビューサウンドの作成();
 					}

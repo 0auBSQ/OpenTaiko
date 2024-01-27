@@ -281,27 +281,27 @@ namespace TJAPlayer3
 
                     if (this.ctゴーゴー.CurrentValue <= 4)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.2f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.2f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 54);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 5)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.4f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.4f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 40);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 6)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.6f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.6f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 26);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 8)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.8f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.8f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 13);
                     }
                     else if (this.ctゴーゴー.CurrentValue >= 9)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 1.0f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 1.0f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i]);
                     }
                 }
@@ -666,7 +666,7 @@ namespace TJAPlayer3
                                 {
                                     tex = TJAPlayer3.Tx.Taiko_Frame[5];
                                 }
-                                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                                 {
                                     tex = TJAPlayer3.Tx.Taiko_Frame[2];
                                 }
@@ -818,8 +818,8 @@ namespace TJAPlayer3
 
                         //this.ctゴーゴー.n現在の値 = 6;
 
-                        int width = TJAPlayer3.Tx.Effects_Fire.szテクスチャサイズ.Width / 7;
-                        int height = TJAPlayer3.Tx.Effects_Fire.szテクスチャサイズ.Height;
+                        int width = TJAPlayer3.Tx.Effects_Fire.szTextureSize.Width / 7;
+                        int height = TJAPlayer3.Tx.Effects_Fire.szTextureSize.Height;
 
                         float x = -(width * (f倍率 - 1.0f) / 2.0f);
                         float y = -(height * (f倍率 - 1.0f) / 2.0f);
@@ -840,8 +840,8 @@ namespace TJAPlayer3
                             y += TJAPlayer3.Skin.Game_Effect_Fire_Y[i];
                         }
 
-                        TJAPlayer3.Tx.Effects_Fire.vc拡大縮小倍率.X = f倍率;
-                        TJAPlayer3.Tx.Effects_Fire.vc拡大縮小倍率.Y = f倍率;
+                        TJAPlayer3.Tx.Effects_Fire.vcScaleRatio.X = f倍率;
+                        TJAPlayer3.Tx.Effects_Fire.vcScaleRatio.Y = f倍率;
 
                         TJAPlayer3.Tx.Effects_Fire.t2D描画(x, y, 
                             new Rectangle(width * (this.ctゴーゴー炎.CurrentValue), 0, width, height));
@@ -953,7 +953,7 @@ namespace TJAPlayer3
         public void GOGOSTART()
         {
             this.ctゴーゴー = new CCounter(0, 17, 18, TJAPlayer3.Timer);
-            if(TJAPlayer3.ConfigIni.nPlayerCount == 1 && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) TJAPlayer3.stage演奏ドラム画面.GoGoSplash.StartSplash();
+            if(TJAPlayer3.ConfigIni.nPlayerCount == 1 && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) TJAPlayer3.stage演奏ドラム画面.GoGoSplash.StartSplash();
         }
 
 

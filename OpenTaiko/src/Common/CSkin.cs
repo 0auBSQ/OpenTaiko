@@ -366,9 +366,9 @@ namespace TJAPlayer3
         public CSystemSound soundフルコンボ音 = null;
         public CSystemSound sound歓声音 = null;
         public CSystemSound sound曲読込開始音 = null;
-        public CSystemSound sound決定音 = null;
-        public CSystemSound sound取消音 = null;
-        public CSystemSound sound変更音 = null;
+        public CSystemSound soundDecideSFX = null;
+        public CSystemSound soundCancelSFX = null;
+        public CSystemSound soundChangeSFX = null;
         public CSystemSound soundSongSelectChara = null;
         public CSystemSound soundSkip = null;
         public CSystemSound soundEntry = null;
@@ -450,13 +450,13 @@ namespace TJAPlayer3
                         return this.soundカーソル移動音;
 
                     case Eシステムサウンド.SOUND決定音:
-                        return this.sound決定音;
+                        return this.soundDecideSFX;
 
                     case Eシステムサウンド.SOUND変更音:
-                        return this.sound変更音;
+                        return this.soundChangeSFX;
 
                     case Eシステムサウンド.SOUND取消音:
-                        return this.sound取消音;
+                        return this.soundCancelSFX;
 
                     case Eシステムサウンド.SOUND歓声音:
                         return this.sound歓声音;
@@ -538,13 +538,13 @@ namespace TJAPlayer3
                         return this.soundカーソル移動音;
 
                     case 1:
-                        return this.sound決定音;
+                        return this.soundDecideSFX;
 
                     case 2:
-                        return this.sound変更音;
+                        return this.soundChangeSFX;
 
                     case 3:
-                        return this.sound取消音;
+                        return this.soundCancelSFX;
 
                     case 4:
                         return this.sound歓声音;
@@ -739,9 +739,9 @@ namespace TJAPlayer3
             }
 
             this.soundカーソル移動音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.sound決定音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.sound変更音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
-            this.sound取消音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
+            this.soundDecideSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
+            this.soundChangeSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
+            this.soundCancelSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
             this.sound歓声音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
             this.soundSTAGEFAILED音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
             this.soundゲーム開始音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);

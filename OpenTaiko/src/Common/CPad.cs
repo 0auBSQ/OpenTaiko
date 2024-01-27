@@ -41,7 +41,7 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public List<STInputEvent> GetEvents( E楽器パート part, Eパッド pad )
+		public List<STInputEvent> GetEvents( EInstrumentPad part, EPad pad )
 		{
 			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
 			List<STInputEvent> list = new List<STInputEvent>();
@@ -104,9 +104,9 @@ namespace TJAPlayer3
 			}
 			return list;
 		}
-		public bool b押された( E楽器パート part, Eパッド pad )
+		public bool bPressed( EInstrumentPad part, EPad pad )
 		{
-			if( part != E楽器パート.UNKNOWN )
+			if( part != EInstrumentPad.UNKNOWN )
 			{
 				
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
@@ -165,25 +165,25 @@ namespace TJAPlayer3
 			}
 			return false;
 		}
-		public bool b押されたDGB( Eパッド pad )
+		public bool bPressedDGB( EPad pad )
 		{
-			if( !this.b押された( E楽器パート.DRUMS, pad ) && !this.b押された( E楽器パート.GUITAR, pad ) )
+			if( !this.bPressed( EInstrumentPad.DRUMS, pad ) && !this.bPressed( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押された( E楽器パート.BASS, pad );
+				return this.bPressed( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}
-		public bool b押されたGB( Eパッド pad )
+		public bool bPressedGB( EPad pad )
 		{
-			if( !this.b押された( E楽器パート.GUITAR, pad ) )
+			if( !this.bPressed( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押された( E楽器パート.BASS, pad );
+				return this.bPressed( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}
-		public bool b押されている( E楽器パート part, Eパッド pad )
+		public bool b押されている( EInstrumentPad part, EPad pad )
 		{
-			if( part != E楽器パート.UNKNOWN )
+			if( part != EInstrumentPad.UNKNOWN )
 			{
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
 				for( int i = 0; i < stkeyassignArray.Length; i++ )
@@ -239,11 +239,11 @@ namespace TJAPlayer3
 			}
 			return false;
 		}
-		public bool b押されているGB( Eパッド pad )
+		public bool b押されているGB( EPad pad )
 		{
-			if( !this.b押されている( E楽器パート.GUITAR, pad ) )
+			if( !this.b押されている( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押されている( E楽器パート.BASS, pad );
+				return this.b押されている( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}

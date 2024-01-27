@@ -432,7 +432,7 @@ namespace TJAPlayer3
 		/// 4: Semi-Invisible
 		/// 5: Full-Invisible
 		/// </returns>
-		private int getDefaultSudHidValue( E楽器パート eInst )
+		private int getDefaultSudHidValue( EInstrumentPad eInst )
 		{
 			int defvar;
 			int nInst = (int) eInst;
@@ -470,7 +470,7 @@ namespace TJAPlayer3
 		}
 		public void tEnter押下()
 		{
-			TJAPlayer3.Skin.sound決定音.tPlay();
+			TJAPlayer3.Skin.soundDecideSFX.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.b要素値にフォーカス中 = false;
@@ -733,7 +733,7 @@ namespace TJAPlayer3
 					TJAPlayer3.actEnumSongs.Activate();
 					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
 
-					TJAPlayer3.stage選曲.act曲リスト.ResetSongIndex();
+					TJAPlayer3.stageSongSelect.actSongList.ResetSongIndex();
 				}
 				#endregion
 			}
@@ -758,7 +758,7 @@ namespace TJAPlayer3
 				}
 				txSkinSample1 = TJAPlayer3.tテクスチャの生成( bmSrc, false );
 
-				txSkinSample1.vc拡大縮小倍率 = new Silk.NET.Maths.Vector3D<float>(_w / (float)txSkinSample1.szテクスチャサイズ.Width, _h / (float)txSkinSample1.szテクスチャサイズ.Height, 0);
+				txSkinSample1.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(_w / (float)txSkinSample1.szTextureSize.Width, _h / (float)txSkinSample1.szTextureSize.Height, 0);
 
 				bmSrc.Dispose();
 				nSkinSampleIndex = nSkinIndex;

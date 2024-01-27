@@ -109,8 +109,8 @@ namespace TJAPlayer3
                 return;
             }
 
-            int height = TJAPlayer3.Tx.Judge.szテクスチャサイズ.Height / 5;
-			judgeAnime.rc = new Rectangle(0, (int)njudge * height, TJAPlayer3.Tx.Judge.szテクスチャサイズ.Width, height);
+            int height = TJAPlayer3.Tx.Judge.szTextureSize.Height / 5;
+			judgeAnime.rc = new Rectangle(0, (int)njudge * height, TJAPlayer3.Tx.Judge.szTextureSize.Width, height);
 
 			JudgeAnimes[player].Add(judgeAnime);
 		}

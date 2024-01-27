@@ -201,8 +201,8 @@ namespace TJAPlayer3
 
             if (TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent] != null)
             {
-                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vc拡大縮小倍率.X = renderRatioX;
-                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vc拡大縮小倍率.Y = renderRatioY;
+                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.X = renderRatioX;
+                TJAPlayer3.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.Y = renderRatioY;
             }
             if (iCurrentMenu == 0 || iCurrentMenu == 1) TJAPlayer3.Tx.Heya_Render_Field?.t2D描画(0, 0);
             if (iCurrentMenu == 0) TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
@@ -216,7 +216,7 @@ namespace TJAPlayer3
 
             for (int i = 0; i < this.ttkMainMenuOpt.Length; i++)
             {
-                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
+                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
 
                 if (iCurrentMenu != -1 || iMainMenuCurrent != i)
                 {
@@ -265,8 +265,8 @@ namespace TJAPlayer3
                     {
                         float puchiScale = TJAPlayer3.Skin.Resolution[1] / 1080.0f;
 
-                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.X = puchiScale;
-                        TJAPlayer3.Tx.Puchichara[pos].tx.vc拡大縮小倍率.Y = puchiScale;
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vcScaleRatio.X = puchiScale;
+                        TJAPlayer3.Tx.Puchichara[pos].tx.vcScaleRatio.Y = puchiScale;
                     }
 
                     TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0], 
@@ -282,7 +282,7 @@ namespace TJAPlayer3
 
                     if (ttkPuchiCharaNames[pos] != null)
                     {
-                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
+                        CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
                         tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[0],
                             scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
@@ -290,7 +290,7 @@ namespace TJAPlayer3
 
                     if (ttkPuchiCharaAuthors[pos] != null)
                     {
-                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
+                        CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
 
                         tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
                             scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
@@ -342,8 +342,8 @@ namespace TJAPlayer3
 
                     if (TJAPlayer3.Tx.Characters_Heya_Preview[pos] != null)
                     {
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vc拡大縮小倍率.X = charaRatioX;
-                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vc拡大縮小倍率.Y = charaRatioY;
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vcScaleRatio.X = charaRatioX;
+                        TJAPlayer3.Tx.Characters_Heya_Preview[pos].vcScaleRatio.Y = charaRatioY;
                     }
 
                     TJAPlayer3.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0],
@@ -355,7 +355,7 @@ namespace TJAPlayer3
 
                     if (ttkCharacterNames[pos] != null)
                     {
-                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterNames[pos]);
+                        CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterNames[pos]);
 
                         tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[0],
                             scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
@@ -363,7 +363,7 @@ namespace TJAPlayer3
 
                     if (ttkCharacterAuthors[pos] != null)
                     {
-                        CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterAuthors[pos]);
+                        CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterAuthors[pos]);
 
                         tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
                             scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
@@ -387,7 +387,7 @@ namespace TJAPlayer3
                 {
                     int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
 
-                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[pos]);
+                    CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[pos]);
 
                     if (i != 0)
                     {
@@ -411,8 +411,8 @@ namespace TJAPlayer3
                     var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
                     TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
-                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2, 
-                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Height / 24, 
+                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
+                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
                         (8 + danGrade));
                     TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
@@ -432,7 +432,7 @@ namespace TJAPlayer3
                 {
                     int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
 
-                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTitles[pos]);
+                    CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTitles[pos]);
 
                     if (i != 0)
                     {
@@ -480,7 +480,7 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Heya_Box?.t2D描画(0, 0);
 
                 if (this.ttkInfoSection != null)
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkInfoSection)
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
                         .t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_InfoSection[0], TJAPlayer3.Skin.Heya_InfoSection[1]);
             }
 
@@ -508,7 +508,7 @@ namespace TJAPlayer3
                 //int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + DonchanX));
                 //int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - DonchanY);
 
-                int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2;
+                int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
                 int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] - (int)DonchanY;
 
                 int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
@@ -534,26 +534,26 @@ namespace TJAPlayer3
 
             #region [ Inputs ]
 
-            if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
+            if (TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
+                TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange))
             {
                 if (this.tMove(1))
                 {
-                    TJAPlayer3.Skin.sound変更音.tPlay();
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay();
                 }
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
+                TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange))
             {
                 if (this.tMove(-1))
                 {
-                    TJAPlayer3.Skin.sound変更音.tPlay();
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay();
                 }
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+                TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide))
             {
 
                 #region [Decide]
@@ -683,7 +683,7 @@ namespace TJAPlayer3
                 }
 
                 if (ess == ESelectStatus.SELECTED)
-                    TJAPlayer3.Skin.sound決定音.tPlay();
+                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                 else if (ess == ESelectStatus.FAILED)
                     TJAPlayer3.Skin.soundError.tPlay();
                 else
@@ -692,11 +692,11 @@ namespace TJAPlayer3
                 #endregion
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+                TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel))
             {
                 
-                TJAPlayer3.Skin.sound取消音.tPlay();
+                TJAPlayer3.Skin.soundCancelSFX.tPlay();
 
                 if (iCurrentMenu == -1)
                 {
@@ -792,8 +792,8 @@ namespace TJAPlayer3
         private bool tMove(int off)
         {
             if (ScrollCounter.CurrentValue < ScrollCounter.EndValue
-                && (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow)
-                || TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow)))
+                && (TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow)
+                || TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow)))
                 return false;
 
             ScrollMode = off;

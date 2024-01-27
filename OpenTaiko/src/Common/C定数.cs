@@ -69,7 +69,7 @@ namespace TJAPlayer3
 		普通	= 1,
 		大きい	= 2
 	}
-	public enum Eパッド			// 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
+	public enum EPad			// 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
 	{
 		HH		= 0,
 		R		= 0,
@@ -129,58 +129,58 @@ namespace TJAPlayer3
 	}
 	public enum EKeyConfigPad		// #24609 キーコンフィグで使うenum。capture要素あり。
 	{
-		HH		= Eパッド.HH,
-		R		= Eパッド.R,
-		SD		= Eパッド.SD,
-		G		= Eパッド.G,
-		BD		= Eパッド.BD,
-		B		= Eパッド.B,
-		HT		= Eパッド.HT,
-		Pick	= Eパッド.Pick,
-		LT		= Eパッド.LT,
-		Wail	= Eパッド.Wail,
-		FT		= Eパッド.FT,
-		Cancel	= Eパッド.Cancel,
-		CY		= Eパッド.CY,
-		Decide	= Eパッド.Decide,
-		HHO		= Eパッド.HHO,
-		RD		= Eパッド.RD,
-		LC		= Eパッド.LC,
-		LP		= Eパッド.LP,		// #27029 2012.1.4 from
-        LBD     = Eパッド.LBD,
+		HH		= EPad.HH,
+		R		= EPad.R,
+		SD		= EPad.SD,
+		G		= EPad.G,
+		BD		= EPad.BD,
+		B		= EPad.B,
+		HT		= EPad.HT,
+		Pick	= EPad.Pick,
+		LT		= EPad.LT,
+		Wail	= EPad.Wail,
+		FT		= EPad.FT,
+		Cancel	= EPad.Cancel,
+		CY		= EPad.CY,
+		Decide	= EPad.Decide,
+		HHO		= EPad.HHO,
+		RD		= EPad.RD,
+		LC		= EPad.LC,
+		LP		= EPad.LP,		// #27029 2012.1.4 from
+        LBD     = EPad.LBD,
 		#region [Gameplay Keys]
-        LRed    = Eパッド.LRed,
-        RRed    = Eパッド.RRed,
-        LBlue   = Eパッド.LBlue,
-        RBlue   = Eパッド.RBlue,
+        LRed    = EPad.LRed,
+        RRed    = EPad.RRed,
+        LBlue   = EPad.LBlue,
+        RBlue   = EPad.RBlue,
 
-        LRed2P  = Eパッド.LRed2P,
-        RRed2P  = Eパッド.RRed2P,
-        LBlue2P = Eパッド.LBlue2P,
-        RBlue2P = Eパッド.RBlue2P,
+        LRed2P  = EPad.LRed2P,
+        RRed2P  = EPad.RRed2P,
+        LBlue2P = EPad.LBlue2P,
+        RBlue2P = EPad.RBlue2P,
 
-		LRed3P = Eパッド.LRed3P,
-		RRed3P = Eパッド.RRed3P,
-		LBlue3P = Eパッド.LBlue3P,
-		RBlue3P = Eパッド.RBlue3P,
+		LRed3P = EPad.LRed3P,
+		RRed3P = EPad.RRed3P,
+		LBlue3P = EPad.LBlue3P,
+		RBlue3P = EPad.RBlue3P,
 
-		LRed4P = Eパッド.LRed4P,
-		RRed4P = Eパッド.RRed4P,
-		LBlue4P = Eパッド.LBlue4P,
-		RBlue4P = Eパッド.RBlue4P,
+		LRed4P = EPad.LRed4P,
+		RRed4P = EPad.RRed4P,
+		LBlue4P = EPad.LBlue4P,
+		RBlue4P = EPad.RBlue4P,
 
-		LRed5P = Eパッド.LRed5P,
-		RRed5P = Eパッド.RRed5P,
-		LBlue5P = Eパッド.LBlue5P,
-		RBlue5P = Eパッド.RBlue5P,
+		LRed5P = EPad.LRed5P,
+		RRed5P = EPad.RRed5P,
+		LBlue5P = EPad.LBlue5P,
+		RBlue5P = EPad.RBlue5P,
 
-		Clap	= Eパッド.CLAP,
-		Clap2P = Eパッド.CLAP2P,
-		Clap3P = Eパッド.CLAP3P,
-		Clap4P = Eパッド.CLAP4P,
-		Clap5P = Eパッド.CLAP5P,
-		LeftChange = Eパッド.LeftChange,
-		RightChange = Eパッド.RightChange,
+		Clap	= EPad.CLAP,
+		Clap2P = EPad.CLAP2P,
+		Clap3P = EPad.CLAP3P,
+		Clap4P = EPad.CLAP4P,
+		Clap5P = EPad.CLAP5P,
+		LeftChange = EPad.LeftChange,
+		RightChange = EPad.RightChange,
 		#endregion
 		#region [System Keys]
 		Capture,
@@ -198,7 +198,7 @@ namespace TJAPlayer3
 		#endregion
 		MAX,
 		#endregion
-		UNKNOWN = Eパッド.UNKNOWN
+		UNKNOWN = EPad.UNKNOWN
 	}
 	[Flags]
 	public enum EパッドFlag		// #24063 2011.1.16 yyagi コマンド入力用 パッド入力のフラグ化
@@ -256,7 +256,7 @@ namespace TJAPlayer3
 		KONGA = 1,
     }
 
-	public enum E楽器パート		// ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
+	public enum EInstrumentPad		// ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
 	{
 		DRUMS	= 0,
 		GUITAR	= 1,
@@ -266,12 +266,12 @@ namespace TJAPlayer3
 	}
 	public enum EKeyConfigPart	// : E楽器パート
 	{
-		DRUMS	= E楽器パート.DRUMS,
-		GUITAR	= E楽器パート.GUITAR,
-		BASS	= E楽器パート.BASS,
-        TAIKO   = E楽器パート.TAIKO,
+		DRUMS	= EInstrumentPad.DRUMS,
+		GUITAR	= EInstrumentPad.GUITAR,
+		BASS	= EInstrumentPad.BASS,
+        TAIKO   = EInstrumentPad.TAIKO,
 		SYSTEM,
-		UNKNOWN	= E楽器パート.UNKNOWN
+		UNKNOWN	= EInstrumentPad.UNKNOWN
 	}
 
 	public enum E打ち分け時の再生の優先順位
@@ -440,19 +440,19 @@ namespace TJAPlayer3
 			{
 				switch( index )
 				{
-					case (int) E楽器パート.DRUMS:
+					case (int) EInstrumentPad.DRUMS:
 						return this.Drums;
 
-					case (int) E楽器パート.GUITAR:
+					case (int) EInstrumentPad.GUITAR:
 						return this.Guitar;
 
-					case (int) E楽器パート.BASS:
+					case (int) EInstrumentPad.BASS:
 						return this.Bass;
 
-                    case (int) E楽器パート.TAIKO:
+                    case (int) EInstrumentPad.TAIKO:
                         return this.Taiko;
 
-					case (int) E楽器パート.UNKNOWN:
+					case (int) EInstrumentPad.UNKNOWN:
 						return this.Unknown;
 				}
 				throw new IndexOutOfRangeException();
@@ -461,23 +461,23 @@ namespace TJAPlayer3
 			{
 				switch( index )
 				{
-					case (int) E楽器パート.DRUMS:
+					case (int) EInstrumentPad.DRUMS:
 						this.Drums = value;
 						return;
 
-					case (int) E楽器パート.GUITAR:
+					case (int) EInstrumentPad.GUITAR:
 						this.Guitar = value;
 						return;
 
-					case (int) E楽器パート.BASS:
+					case (int) EInstrumentPad.BASS:
 						this.Bass = value;
 						return;
 
-                    case (int) E楽器パート.TAIKO:
+                    case (int) EInstrumentPad.TAIKO:
                         this.Taiko = value;
                         return;
 
-					case (int) E楽器パート.UNKNOWN:
+					case (int) EInstrumentPad.UNKNOWN:
 						this.Unknown = value;
 						return;
 				}

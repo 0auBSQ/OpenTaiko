@@ -1094,7 +1094,7 @@ namespace TJAPlayer3
 
 			public bool KeyIsPressed(STKEYASSIGN[] pad)
 			{
-				return TJAPlayer3.Input管理.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
+				return TJAPlayer3.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
 			}
 
 			[StructLayout(LayoutKind.Sequential)]

@@ -201,9 +201,9 @@ namespace TJAPlayer3
 					{
 						TJAPlayer3.Songs管理 = ( es != null ) ? es.Songs管理 : null;		// 最後に、曲リストを拾い上げる
 
-						if(TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
+						if(TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
 						{
-							TJAPlayer3.Skin.sound決定音.tPlay();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							return 1;
 						}
 					}

@@ -108,29 +108,29 @@ namespace TJAPlayer3
 
         public static bool IsExpectedPad(int stored, int hit, CDTX.CChip chip, EGameType gt)
         {
-            var inPad = (Eパッド)hit;
-            var onPad = (Eパッド)stored;
+            var inPad = (EPad)hit;
+            var onPad = (EPad)stored;
 
             if (chip == null) return false;
 
             if (IsBigKaTaiko(chip, gt))
             {
-                return (inPad == Eパッド.LBlue && onPad == Eパッド.RBlue)
-                    || (inPad == Eパッド.RBlue && onPad == Eパッド.LBlue);
+                return (inPad == EPad.LBlue && onPad == EPad.RBlue)
+                    || (inPad == EPad.RBlue && onPad == EPad.LBlue);
             }
 
             if (IsBigDonTaiko(chip, gt))
             {
-                return (inPad == Eパッド.LRed && onPad == Eパッド.RRed)
-                    || (inPad == Eパッド.RRed && onPad == Eパッド.LRed);
+                return (inPad == EPad.LRed && onPad == EPad.RRed)
+                    || (inPad == EPad.RRed && onPad == EPad.LRed);
             }
 
             if (IsSwapNote(chip, gt))
             {
-                bool hitBlue = inPad == Eパッド.LBlue || inPad == Eパッド.RBlue;
-                bool hitRed = inPad == Eパッド.LRed || inPad == Eパッド.RRed;
-                bool storedBlue = onPad == Eパッド.LBlue || onPad == Eパッド.RBlue;
-                bool storedRed = onPad == Eパッド.LRed || onPad == Eパッド.RRed;
+                bool hitBlue = inPad == EPad.LBlue || inPad == EPad.RBlue;
+                bool hitRed = inPad == EPad.LRed || inPad == EPad.RRed;
+                bool storedBlue = onPad == EPad.LBlue || onPad == EPad.RBlue;
+                bool storedRed = onPad == EPad.LRed || onPad == EPad.RRed;
 
                 return (storedRed && hitBlue)
                     || (storedBlue && hitRed);
@@ -443,7 +443,7 @@ namespace TJAPlayer3
                 _texarr.color4 = normalColor;
 
             // Body
-            _texarr.vc拡大縮小倍率.X = (float)div;
+            _texarr.vcScaleRatio.X = (float)div;
             _texarr.fZ軸中心回転 = (float)theta;
             //var _x0 = x + _adjust;
             //var _y0 = y + 0f;
@@ -455,7 +455,7 @@ namespace TJAPlayer3
             //t2D拡大率考慮中央基準描画 t2D中心基準描画
 
             // Tail
-            _texarr.vc拡大縮小倍率.X = 1.0f;
+            _texarr.vcScaleRatio.X = 1.0f;
             //var _x0 = x末端 + _adjust;
             //var _y0 = y末端 + 0f;
             var _d = _adjust;

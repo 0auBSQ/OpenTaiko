@@ -5,12 +5,12 @@ using System.Drawing;
 namespace TJAPlayer3
 {
 	[Serializable]
-	internal class C曲リストノード
+	internal class CSongListNode
 	{
 		// プロパティ
 
-		public Eノード種別 eノード種別 = Eノード種別.UNKNOWN;
-		public enum Eノード種別
+		public ENodeType eノード種別 = ENodeType.UNKNOWN;
+		public enum ENodeType
 		{
 			SCORE,
 			SCORE_MIDI,
@@ -52,15 +52,15 @@ namespace TJAPlayer3
         public bool IsChangedForeColor;
         public bool IsChangedBackColor;
 		public bool isChangedBoxColor;
-		public List<C曲リストノード> listランダム用ノードリスト;
-		public List<C曲リストノード> list子リスト;
+		public List<CSongListNode> listランダム用ノードリスト;
+		public List<CSongListNode> list子リスト;
 		public int nGood範囲ms = -1;
 		public int nGreat範囲ms = -1;
 		public int nPerfect範囲ms = -1;
 		public int nPoor範囲ms = -1;
 		public int nスコア数;
 
-		public C曲リストノード r親ノード;
+		public CSongListNode rParentNode;
 		
 		public int Openindex;
 		public bool bIsOpenFolder;
@@ -102,21 +102,21 @@ namespace TJAPlayer3
 
 		// コンストラクタ
 
-		public C曲リストノード()
+		public CSongListNode()
 		{
 			this.nID = id++;
 		}
 
-		public C曲リストノード Clone()
+		public CSongListNode Clone()
 		{
-			return (C曲リストノード)MemberwiseClone();
+			return (CSongListNode)MemberwiseClone();
 		}
 
 		public override bool Equals(object other)
         {
-			if (other.GetType() == typeof(C曲リストノード))
+			if (other.GetType() == typeof(CSongListNode))
             {
-				C曲リストノード obj = (C曲リストノード)other;
+				CSongListNode obj = (CSongListNode)other;
 				return this.nID == obj.nID;
 			}
 			return this.GetHashCode() == other.GetHashCode();

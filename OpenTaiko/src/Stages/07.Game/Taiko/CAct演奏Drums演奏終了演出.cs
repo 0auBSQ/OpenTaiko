@@ -40,7 +40,7 @@ namespace TJAPlayer3
             */
 
             // モードの決定。クリア失敗・フルコンボも事前に作っとく。
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
                 if (CFloorManagement.CurrentNumberOfLives > 0)
                 {
@@ -57,7 +57,7 @@ namespace TJAPlayer3
                 else
                     this.Mode[0] = EndMode.Tower_Dropout;
             }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
             {
                 // 段位認定モード。
                 if (!TJAPlayer3.stage演奏ドラム画面.actDan.GetFailedAllChallenges())
@@ -147,7 +147,7 @@ namespace TJAPlayer3
             var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
             
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
                 Tower_DropoutScript = new EndAnimeScript($@"{origindir}Tower_Dropout{Path.DirectorySeparatorChar}Script.lua");
                 Tower_DropoutScript.Init();
@@ -166,7 +166,7 @@ namespace TJAPlayer3
                 this.soundTowerTopFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
                 this.soundTowerTopPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
             }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
             {
                 Dan_FailScript = new EndAnimeScript($@"{origindir}Dan_Fail{Path.DirectorySeparatorChar}Script.lua");
                 Dan_FailScript.Init();
@@ -240,14 +240,14 @@ namespace TJAPlayer3
         {
             this.ct進行メイン = null;
             
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
                 Tower_DropoutScript.Dispose();
                 Tower_TopReached_PassScript.Dispose();
                 Tower_TopReached_FullComboScript.Dispose();
                 Tower_TopReached_PerfectScript.Dispose();
             }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
             {
                 Dan_FailScript.Dispose();
                 Dan_Red_PassScript.Dispose();
@@ -906,15 +906,15 @@ namespace TJAPlayer3
 
                 if (count <= 11)
                 {
-                    TJAPlayer3.Tx.End_Star.vc拡大縮小倍率.X = count * 0.09f;
-                    TJAPlayer3.Tx.End_Star.vc拡大縮小倍率.Y = count * 0.09f;
+                    TJAPlayer3.Tx.End_Star.vcScaleRatio.X = count * 0.09f;
+                    TJAPlayer3.Tx.End_Star.vcScaleRatio.Y = count * 0.09f;
                     TJAPlayer3.Tx.End_Star.Opacity = 255;
                     TJAPlayer3.Tx.End_Star.t2D拡大率考慮中央基準描画(x, y);
                 }
                 else if (count <= 20)
                 {
-                    TJAPlayer3.Tx.End_Star.vc拡大縮小倍率.X = 1.0f;
-                    TJAPlayer3.Tx.End_Star.vc拡大縮小倍率.Y = 1.0f;
+                    TJAPlayer3.Tx.End_Star.vcScaleRatio.X = 1.0f;
+                    TJAPlayer3.Tx.End_Star.vcScaleRatio.Y = 1.0f;
                     TJAPlayer3.Tx.End_Star.Opacity = (int)(255 - (255.0f / 9.0f) * (count - 11));
                     TJAPlayer3.Tx.End_Star.t2D拡大率考慮中央基準描画(x, y);
                 }

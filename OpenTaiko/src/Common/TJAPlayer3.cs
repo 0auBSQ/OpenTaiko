@@ -231,7 +231,7 @@ namespace TJAPlayer3
 			get; 
 			private set;
 		}
-		public static CInputManager Input管理 
+		public static CInputManager InputManager 
 		{
 			get;
 			private set;
@@ -241,10 +241,10 @@ namespace TJAPlayer3
 		{
 			get
 			{
-				if( stage選曲.r確定された曲 != null )
+				if( stageSongSelect.rChoosenSong != null )
 				{
-					C曲リストノード c曲リストノード = stage選曲.r確定された曲.r親ノード;
-					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX ) ) && ( c曲リストノード.nPerfect範囲ms >= 0 ) )
+					CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
+					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX ) ) && ( c曲リストノード.nPerfect範囲ms >= 0 ) )
 					{
 						return c曲リストノード.nPerfect範囲ms;
 					}
@@ -256,10 +256,10 @@ namespace TJAPlayer3
 		{
 			get
 			{
-				if( stage選曲.r確定された曲 != null )
+				if( stageSongSelect.rChoosenSong != null )
 				{
-					C曲リストノード c曲リストノード = stage選曲.r確定された曲.r親ノード;
-					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX ) ) && ( c曲リストノード.nGreat範囲ms >= 0 ) )
+					CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
+					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX ) ) && ( c曲リストノード.nGreat範囲ms >= 0 ) )
 					{
 						return c曲リストノード.nGreat範囲ms;
 					}
@@ -271,10 +271,10 @@ namespace TJAPlayer3
 		{
 			get
 			{
-				if( stage選曲.r確定された曲 != null )
+				if( stageSongSelect.rChoosenSong != null )
 				{
-					C曲リストノード c曲リストノード = stage選曲.r確定された曲.r親ノード;
-					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX ) ) && ( c曲リストノード.nGood範囲ms >= 0 ) )
+					CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
+					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX ) ) && ( c曲リストノード.nGood範囲ms >= 0 ) )
 					{
 						return c曲リストノード.nGood範囲ms;
 					}
@@ -286,10 +286,10 @@ namespace TJAPlayer3
 		{
 			get
 			{
-				if( stage選曲.r確定された曲 != null )
+				if( stageSongSelect.rChoosenSong != null )
 				{
-					C曲リストノード c曲リストノード = stage選曲.r確定された曲.r親ノード;
-					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.BOX ) ) && ( c曲リストノード.nPoor範囲ms >= 0 ) )
+					CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
+					if( ( ( c曲リストノード != null ) && ( c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX ) ) && ( c曲リストノード.nPoor範囲ms >= 0 ) )
 					{
 						return c曲リストノード.nPoor範囲ms;
 					}
@@ -402,7 +402,7 @@ namespace TJAPlayer3
 			get; 
 			private set;
 		}
-		public static CStage選曲 stage選曲
+		public static CStage選曲 stageSongSelect
 		{
 			get;
 			private set;
@@ -756,7 +756,7 @@ namespace TJAPlayer3
 		}
 		protected override void Update()
 		{
-            Input管理?.Polling( TJAPlayer3.ConfigIni.bBufferedInputs );
+            InputManager?.Polling( TJAPlayer3.ConfigIni.bBufferedInputs );
 		}
 		protected override void Draw()
 		{
@@ -854,7 +854,7 @@ namespace TJAPlayer3
 					Directory.SetCurrentDirectory( sp.pluginDirectory );
 
 					if( TJAPlayer3.act現在入力を占有中のプラグイン == null || TJAPlayer3.act現在入力を占有中のプラグイン == sp.plugin )
-						sp.plugin.On進行描画(TJAPlayer3.Pad, TJAPlayer3.Input管理.Keyboard );
+						sp.plugin.On進行描画(TJAPlayer3.Pad, TJAPlayer3.InputManager.Keyboard );
 					else
 						sp.plugin.On進行描画( null, null );
 
@@ -891,7 +891,7 @@ namespace TJAPlayer3
 									actEnumSongs.CreateManagedResource();
 									actEnumSongs.CreateUnmanagedResource();
 								}
-								TJAPlayer3.stage選曲.bIsEnumeratingSongs = true;
+								TJAPlayer3.stageSongSelect.bIsEnumeratingSongs = true;
 								EnumSongs.Init();	// 取得した曲数を、新インスタンスにも与える
 								EnumSongs.StartEnumFromDisk();		// 曲検索スレッドの起動_開始
 							}
@@ -944,10 +944,10 @@ namespace TJAPlayer3
 									actEnumSongs.ReleaseManagedResource();
 									actEnumSongs.ReleaseUnmanagedResource();
 								}
-								TJAPlayer3.stage選曲.bIsEnumeratingSongs = false;
+								TJAPlayer3.stageSongSelect.bIsEnumeratingSongs = false;
 
 								bool bRemakeSongTitleBar = ( r現在のステージ.eStageID == CStage.EStage.SongSelect ) ? true : false;
-								TJAPlayer3.stage選曲.Refresh( EnumSongs.Songs管理, bRemakeSongTitleBar );
+								TJAPlayer3.stageSongSelect.Refresh( EnumSongs.Songs管理, bRemakeSongTitleBar );
 								EnumSongs.SongListEnumCompletelyDone();
 							}
 							#endregion
@@ -1033,16 +1033,16 @@ namespace TJAPlayer3
 								}
 								Trace.TraceInformation( "----------------------" );
 								Trace.TraceInformation( "■ 選曲" );
-								stage選曲.Activate();
+								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
-									stage選曲.CreateManagedResource();
-									stage選曲.CreateUnmanagedResource();
+									stageSongSelect.CreateManagedResource();
+									stageSongSelect.CreateUnmanagedResource();
 								}
 								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage選曲;
+								r現在のステージ = stageSongSelect;
 
-								TJAPlayer3.latestSongSelect = stage選曲;
+								TJAPlayer3.latestSongSelect = stageSongSelect;
 								//-----------------------------
 								#endregion
 								break;
@@ -1220,16 +1220,16 @@ namespace TJAPlayer3
 								}
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ 選曲");
-								stage選曲.Activate();
+								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
-									stage選曲.CreateManagedResource();
-									stage選曲.CreateUnmanagedResource();
+									stageSongSelect.CreateManagedResource();
+									stageSongSelect.CreateUnmanagedResource();
 								}		
 								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage選曲;
+								r現在のステージ = stageSongSelect;
 
-								TJAPlayer3.latestSongSelect = stage選曲;
+								TJAPlayer3.latestSongSelect = stageSongSelect;
 								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
                                 ConfigIni.nPlayerCount = 2;
 								ConfigIni.bAIBattleMode = true;
@@ -1302,14 +1302,14 @@ namespace TJAPlayer3
 									}
 									Trace.TraceInformation( "----------------------" );
 									Trace.TraceInformation( "■ 選曲" );
-									stage選曲.Activate();
+									stageSongSelect.Activate();
 									if (!ConfigIni.PreAssetsLoading) 
 									{
-										stage選曲.CreateManagedResource();
-										stage選曲.CreateUnmanagedResource();
+										stageSongSelect.CreateManagedResource();
+										stageSongSelect.CreateUnmanagedResource();
 									}
 									r直前のステージ = r現在のステージ;
-									r現在のステージ = stage選曲;
+									r現在のステージ = stageSongSelect;
 
 									foreach( STPlugin pg in this.PluginList )
 									{
@@ -1929,14 +1929,14 @@ for (int i = 0; i < 3; i++) {
 
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ 選曲");
-								stage選曲.Activate();
+								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
-									stage選曲.CreateManagedResource();
-									stage選曲.CreateUnmanagedResource();
+									stageSongSelect.CreateManagedResource();
+									stageSongSelect.CreateUnmanagedResource();
 								}
 								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage選曲;
+								r現在のステージ = stageSongSelect;
 
 								#region [ プラグイン Onステージ変更() の呼び出し ]
 								//---------------------
@@ -2104,7 +2104,7 @@ for (int i = 0; i < 3; i++) {
 							// Seek latest registered song select screen
 							r現在のステージ = TJAPlayer3.latestSongSelect;
 
-							stage選曲.NowSong++;
+							stageSongSelect.NowSong++;
 
 							foreach (STPlugin pg in this.PluginList)
 							{
@@ -2207,14 +2207,14 @@ for (int i = 0; i < 3; i++) {
 							}
 							Trace.TraceInformation( "----------------------" );
 							Trace.TraceInformation( "■ 選曲" );
-							stage選曲.Activate();
+							stageSongSelect.Activate();
 							if (!ConfigIni.PreAssetsLoading) 
 							{
-								stage選曲.CreateManagedResource();
-								stage選曲.CreateUnmanagedResource();
+								stageSongSelect.CreateManagedResource();
+								stageSongSelect.CreateUnmanagedResource();
 							}
 							r直前のステージ = r現在のステージ;
-							r現在のステージ = stage選曲;
+							r現在のステージ = stageSongSelect;
 							this.tガベージコレクションを実行する();
 						}
 						//-----------------------------
@@ -2321,7 +2321,7 @@ for (int i = 0; i < 3; i++) {
 							this.bネットワークに接続中 = reply.Status == IPStatus.Success;
 						});
 					}
-					TJAPlayer3.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2), GameWindowSize.Height - TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Height, new Rectangle((TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2) * (this.bネットワークに接続中 ? 0 : 1), 0, TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Network_Connection.szテクスチャサイズ.Height));
+					TJAPlayer3.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - TJAPlayer3.Tx.Network_Connection.szTextureSize.Height, new Rectangle((TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bネットワークに接続中 ? 0 : 1), 0, TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2, TJAPlayer3.Tx.Network_Connection.szTextureSize.Height));
 				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
@@ -2340,7 +2340,7 @@ for (int i = 0; i < 3; i++) {
 				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.Capture))
 				{
 #if DEBUG
-						if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
+						if (TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl))
 						{
 							if (r現在のステージ.eStageID != CStage.EStage.Game)
 							{
@@ -2556,8 +2556,8 @@ for (int i = 0; i < 3; i++) {
 		public static float GetSongNameXScaling(ref CTexture cTexture, int samePixel = 660)
 		{
             if (cTexture == null) return 1f;
-            float scalingRate = (float)samePixel / (float)cTexture.szテクスチャサイズ.Width;
-            if (cTexture.szテクスチャサイズ.Width <= samePixel)
+            float scalingRate = (float)samePixel / (float)cTexture.szTextureSize.Width;
+            if (cTexture.szTextureSize.Width <= samePixel)
                 scalingRate = 1.0f;
             return scalingRate;
         }
@@ -2808,8 +2808,8 @@ for (int i = 0; i < 3; i++) {
 			try
 			{
 				bool bUseMIDIIn = !DTXVmode.Enabled;
-				Input管理 = new CInputManager(Window_);
-				foreach( IInputDevice device in Input管理.InputDevices )
+				InputManager = new CInputManager(Window_);
+				foreach( IInputDevice device in InputManager.InputDevices )
 				{
 					if( ( device.CurrentType == InputDeviceType.Joystick ) && !ConfigIni.dicJoystick.ContainsValue( device.GUID ) )
 					{
@@ -2830,7 +2830,7 @@ for (int i = 0; i < 3; i++) {
 						ConfigIni.dicGamepad.Add( key, device.GUID );
 					}
 				}
-				foreach( IInputDevice device2 in Input管理.InputDevices )
+				foreach( IInputDevice device2 in InputManager.InputDevices )
 				{
 					if( device2.CurrentType == InputDeviceType.Joystick )
 					{
@@ -2876,7 +2876,7 @@ for (int i = 0; i < 3; i++) {
 			Trace.Indent();
 			try
 			{
-				Pad = new CPad( ConfigIni, Input管理 );
+				Pad = new CPad( ConfigIni, InputManager );
 				Trace.TraceInformation( "パッドの初期化を完了しました。" );
 			}
 			catch( Exception exception3 )
@@ -3007,7 +3007,7 @@ for (int i = 0; i < 3; i++) {
 			stageタイトル = new CStageタイトル();
 //			stageオプション = new CStageオプション();
 			stageコンフィグ = new CStageコンフィグ();
-			stage選曲 = new CStage選曲();
+			stageSongSelect = new CStage選曲();
 			stage段位選択 = new CStage段位選択();
 			stageHeya = new CStageHeya();
 			stageOnlineLounge = new CStageOnlineLounge();
@@ -3027,7 +3027,7 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add( stageタイトル );
 //			this.listトップレベルActivities.Add( stageオプション );
 			this.listトップレベルActivities.Add( stageコンフィグ );
-			this.listトップレベルActivities.Add( stage選曲 );
+			this.listトップレベルActivities.Add( stageSongSelect );
 			this.listトップレベルActivities.Add( stage段位選択 );
 			this.listトップレベルActivities.Add( stageHeya );
 			this.listトップレベルActivities.Add(stageOnlineLounge);
@@ -3336,14 +3336,14 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ DirectInput, MIDI入力の終了処理 ]
 				//---------------------
-				if (Input管理 != null)
+				if (InputManager != null)
 				{
 					Trace.TraceInformation( "DirectInput, MIDI入力の終了処理を行います。" );
 					Trace.Indent();
 					try
 					{
-						Input管理.Dispose();
-						Input管理 = null;
+						InputManager.Dispose();
+						InputManager = null;
 						Trace.TraceInformation( "DirectInput, MIDI入力の終了処理を完了しました。" );
 					}
 					catch( Exception exception5 )
@@ -3547,12 +3547,12 @@ for (int i = 0; i < 3; i++) {
 				ini.tヒストリを追加する( str新ヒストリ行 );
 				if( !bコンパクトモード )
 				{
-					stage選曲.r確定されたスコア.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
-					stage選曲.r確定されたスコア.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
-					stage選曲.r確定されたスコア.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
+					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
+					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
+					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
 					for( int j = 0; j < ini.stファイル.History.Length; j++ )
 					{
-						stage選曲.r確定されたスコア.譜面情報.演奏履歴[ j ] = ini.stファイル.History[ j ];
+						stageSongSelect.r確定されたスコア.譜面情報.演奏履歴[ j ] = ini.stファイル.History[ j ];
 					}
 				}
 			}

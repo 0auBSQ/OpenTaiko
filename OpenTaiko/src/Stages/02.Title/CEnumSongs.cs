@@ -493,7 +493,7 @@ namespace TJAPlayer3
 					{
 						BinaryFormatter songlistdb_ = new BinaryFormatter();
 						using Stream songlistdb = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
-						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)songlistdb_.Deserialize(songlistdb);
+						this.Songs管理.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
 					}
 				}
 				catch(Exception exception)

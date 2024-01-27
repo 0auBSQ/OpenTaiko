@@ -45,7 +45,7 @@ namespace TJAPlayer3
 			get;
 			private set;
 		}
-		public virtual void tActivatePopupMenu( E楽器パート einst )
+		public virtual void tActivatePopupMenu( EInstrumentPad einst )
 		{
 			nItemSelecting = -1;		// #24757 2011.4.1 yyagi: Clear sorting status in each stating menu.
 			this.eInst = einst;
@@ -132,7 +132,7 @@ namespace TJAPlayer3
 		{
 			if ( this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.sound決定音.tPlay();
+				TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
 				if ( this.n現在の選択行 != lciMenuItems.Length - 1 )
 				{
@@ -283,21 +283,21 @@ namespace TJAPlayer3
 				if ( this.bキー入力待ち )
 				{
 					#region [ Shift-F1: CONFIG画面 ]
-					if ( ( TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.RightShift ) || TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.LeftShift ) ) &&
-						TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.F1 ) )
+					if ( ( TJAPlayer3.InputManager.Keyboard.KeyPressing( (int)SlimDXKeys.Key.RightShift ) || TJAPlayer3.InputManager.Keyboard.KeyPressing( (int)SlimDXKeys.Key.LeftShift ) ) &&
+						TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.F1 ) )
 					{	// [SHIFT] + [F1] CONFIG
-						TJAPlayer3.Skin.sound取消音.tPlay();
+						TJAPlayer3.Skin.soundCancelSFX.tPlay();
 						tCancel();
 						this.bGotoDetailConfig = true;
 					}
 					#endregion
 					#region [ キー入力: キャンセル ]
-					else if ( ( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape )
-						|| TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.FT )
-						|| TJAPlayer3.Pad.b押されたGB( Eパッド.Cancel ) )
+					else if ( ( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape )
+						|| TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.FT )
+						|| TJAPlayer3.Pad.bPressedGB( EPad.Cancel ) )
                         && this.bEsc有効 )
 					{	// キャンセル
-						TJAPlayer3.Skin.sound取消音.tPlay();
+						TJAPlayer3.Skin.soundCancelSFX.tPlay();
 						tCancel();
 						this.bIsActivePopupMenu = false;
 					}
@@ -308,25 +308,25 @@ namespace TJAPlayer3
 						#region [ キー入力: 決定 ]
 						// E楽器パート eInst = E楽器パート.UNKNOWN;
 						ESortAction eAction = ESortAction.END;
-						if (TJAPlayer3.Pad.b押された(E楽器パート.GUITAR, Eパッド.Decide))
+						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.GUITAR, EPad.Decide))
 						{
-							eInst = E楽器パート.GUITAR;
+							eInst = EInstrumentPad.GUITAR;
 							eAction = ESortAction.Decide;
 						}
-						else if (TJAPlayer3.Pad.b押された(E楽器パート.BASS, Eパッド.Decide))
+						else if (TJAPlayer3.Pad.bPressed(EInstrumentPad.BASS, EPad.Decide))
 						{
-							eInst = E楽器パート.BASS;
+							eInst = EInstrumentPad.BASS;
 							eAction = ESortAction.Decide;
 						}
 						else if (
-							TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
-							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RD)
-							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LC)
-							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed)
-							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed)
-							|| (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))
+							TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
+							|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)
+							|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
+							|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)
+							|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)
+							|| (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))
 						{
-							eInst = E楽器パート.DRUMS;
+							eInst = EInstrumentPad.DRUMS;
 							eAction = ESortAction.Decide;
 						}
 						if (eAction == ESortAction.Decide)  // 決定
@@ -335,17 +335,17 @@ namespace TJAPlayer3
 						}
 						#endregion
 						#region [ キー入力: 前に移動 ]
-						this.ctキー反復用.Up.KeyIntervalFunc(TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
-						this.ctキー反復用.R.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(Eパッド.R), new CCounter.KeyProcess(this.t前に移動));
-						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.SD) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
+						this.ctキー反復用.Up.KeyIntervalFunc(TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
+						this.ctキー反復用.R.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
+						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.SD) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue))
 						{
 							this.t前に移動();
 						}
 						#endregion
 						#region [ キー入力: 次に移動 ]
-						this.ctキー反復用.Down.KeyIntervalFunc(TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
-						this.ctキー反復用.B.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(Eパッド.B), new CCounter.KeyProcess(this.t次に移動));
-						if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LT) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
+						this.ctキー反復用.Down.KeyIntervalFunc(TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
+						this.ctキー反復用.B.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
+						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LT) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue))
 						{
 							this.t次に移動();
 						}
@@ -367,8 +367,8 @@ namespace TJAPlayer3
 					int curX = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[0] + (TJAPlayer3.Skin.PopupMenu_Move[0] * (this.n現在の選択行 + 1));
 					int curY = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[1] + (TJAPlayer3.Skin.PopupMenu_Move[1] * (this.n現在の選択行 + 1));
 
-					int width = TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Width / 2;
-					int height = TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Height;
+					int width = TJAPlayer3.Tx.Menu_Highlight.szTextureSize.Width / 2;
+					int height = TJAPlayer3.Tx.Menu_Highlight.szTextureSize.Height;
 
 					TJAPlayer3.Tx.Menu_Highlight.t2D描画( curX, curY, new Rectangle( 0, 0, width, height) );
 					curX += width;
@@ -443,7 +443,7 @@ namespace TJAPlayer3
         protected bool bEsc有効;
 
 		internal int n現在の選択行;
-		internal E楽器パート eInst = E楽器パート.UNKNOWN;
+		internal EInstrumentPad eInst = EInstrumentPad.UNKNOWN;
 
 		//private CTexture txPopupMenuBackground;
 		//private CTexture txCursor;

@@ -305,8 +305,8 @@ namespace TJAPlayer3
                 //float _x = (x + (150.0f * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
                 //float _y = (y + (((_substitute == true) ? 290 : _ref[_ctref[player].n現在の値].szテクスチャサイズ.Height)) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f)) * resolutionRatioY;
 
-                _tex.vc拡大縮小倍率.X *= resolutionRatioX;
-                _tex.vc拡大縮小倍率.Y *= resolutionRatioY;
+                _tex.vcScaleRatio.X *= resolutionRatioX;
+                _tex.vcScaleRatio.Y *= resolutionRatioY;
 
                 float _x = x;
                 float _y = y;
@@ -335,8 +335,8 @@ namespace TJAPlayer3
                         );
                 }
 
-                _tex.vc拡大縮小倍率.X = 1f;
-                _tex.vc拡大縮小倍率.Y = 1f;
+                _tex.vcScaleRatio.X = 1f;
+                _tex.vcScaleRatio.Y = 1f;
 
                 _tex.Opacity = 255;
 

@@ -38,7 +38,7 @@ namespace TJAPlayer3
             tx = TJAPlayer3.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Chara.png");
             if (tx != null)
             {
-                tx.vc拡大縮小倍率 = new Vector3D<float>(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
+                tx.vcScaleRatio = new Vector3D<float>(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
             }
 
             // Heya render

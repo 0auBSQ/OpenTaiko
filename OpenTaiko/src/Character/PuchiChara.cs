@@ -102,9 +102,9 @@ namespace TJAPlayer3
             {
                 float puchiScale = TJAPlayer3.Skin.Resolution[1] / 720.0f;
 
-                chara.vc拡大縮小倍率 = new Vector3D<float>((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] * puchiScale : TJAPlayer3.Skin.Game_PuchiChara_Scale[0] * puchiScale));
-                chara.vc拡大縮小倍率.X *= scale;
-                chara.vc拡大縮小倍率.Y *= scale;
+                chara.vcScaleRatio = new Vector3D<float>((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] * puchiScale : TJAPlayer3.Skin.Game_PuchiChara_Scale[0] * puchiScale));
+                chara.vcScaleRatio.X *= scale;
+                chara.vcScaleRatio.Y *= scale;
                 chara.Opacity = alpha;
 
                 // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height

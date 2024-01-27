@@ -195,7 +195,7 @@ namespace TJAPlayer3
 			this.bフィルイン中 = false;
             this.n待機中の大音符の座標 = 0;
             this.actGame.t叩ききりまショー_初期化();
-            base.ReSetScore(TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stage選曲.n確定された曲の難易度[0]], TJAPlayer3.DTX.nScoreDiff[TJAPlayer3.stage選曲.n確定された曲の難易度[0]]);
+            base.ReSetScore(TJAPlayer3.DTX.nScoreInit[0, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]], TJAPlayer3.DTX.nScoreDiff[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]);
             
             #region [ branch ]
             for (int i = 0; i < 5; i++)
@@ -277,17 +277,17 @@ namespace TJAPlayer3
 					"+"
 				};
 
-				int level = TJAPlayer3.stage選曲.r確定された曲.nLevel[diff];
-				CDTX.ELevelIcon levelIcon = TJAPlayer3.stage選曲.r確定された曲.nLevelIcon[diff];
+				int level = TJAPlayer3.stageSongSelect.rChoosenSong.nLevel[diff];
+				CDTX.ELevelIcon levelIcon = TJAPlayer3.stageSongSelect.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
 
             // Discord Presence の更新
-			string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stage選曲.r確定された曲.strタイトル
-				+ diffToString(TJAPlayer3.stage選曲.n確定された曲の難易度[0]) : "";
+			string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
+				+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
 
-            var difficultyName = TJAPlayer3.DifficultyNumberToEnum(TJAPlayer3.stage選曲.n確定された曲の難易度[0]).ToString();
+            var difficultyName = TJAPlayer3.DifficultyNumberToEnum(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]).ToString();
 
 			TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
 			{
@@ -297,7 +297,7 @@ namespace TJAPlayer3
 				Assets = new Assets()
 				{
 					SmallImageKey = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? difficultyName.ToLower() : "",
-					SmallImageText = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, TJAPlayer3.stage選曲.n確定された曲の難易度[0]) : "",
+					SmallImageText = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "",
 					LargeImageKey = TJAPlayer3.LargeImageKey,
 					LargeImageText = TJAPlayer3.LargeImageText,
 				}
@@ -443,9 +443,9 @@ namespace TJAPlayer3
 					base.IsFirstDraw = false;
 				}
 				#endregion
-				if ( ( ( TJAPlayer3.ConfigIni.nRisky != 0 && this.actGauge.IsFailed( E楽器パート.TAIKO ) ) 
+				if ( ( ( TJAPlayer3.ConfigIni.nRisky != 0 && this.actGauge.IsFailed( EInstrumentPad.TAIKO ) ) 
                     || this.actGame.st叩ききりまショー.ct残り時間.IsEnded 
-                    || (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0)) 
+                    || (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0)) 
                     && ( base.ePhaseID == CStage.EPhase.Common_NORMAL ))
 				{
 					this.actStageFailed.Start();
@@ -527,18 +527,18 @@ namespace TJAPlayer3
                 for ( int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++ )
                 {
                     // bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
-                    bool btmp = this.t進行描画_チップ(E楽器パート.DRUMS, i);
+                    bool btmp = this.t進行描画_チップ(EInstrumentPad.DRUMS, i);
                     if (btmp == true)
                         ifp[i] = true;
 
 #if DEBUG
-                    if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.D0))
+                    if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.D0))
                     {
                         ifp[i] = true;
                     }
 #endif
 
-                    this.t進行描画_チップ_連打( E楽器パート.DRUMS, i );
+                    this.t進行描画_チップ_連打( EInstrumentPad.DRUMS, i );
                 }
 
                 this.actMtaiko.Draw();
@@ -595,7 +595,7 @@ namespace TJAPlayer3
                 actChara.OnDraw_Balloon();
 
                 // Floor voice
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                     this.actComboVoice.tPlayFloorSound();
 
                 this.t全体制御メソッド();
@@ -723,12 +723,12 @@ namespace TJAPlayer3
         public PuchiChara PuchiChara;
         public CAct演奏Drumsスコアランク ScoreRank;
         private bool bフィルイン中;
-		private readonly Eパッド[] eチャンネルtoパッド = new Eパッド[]
+		private readonly EPad[] eチャンネルtoパッド = new EPad[]
 		{
-			Eパッド.HH, Eパッド.SD, Eパッド.BD, Eパッド.HT,
-			Eパッド.LT, Eパッド.CY, Eパッド.FT, Eパッド.HHO,
-			Eパッド.RD, Eパッド.UNKNOWN, Eパッド.UNKNOWN, Eパッド.LC,
-            Eパッド.LP, Eパッド.LBD
+			EPad.HH, EPad.SD, EPad.BD, EPad.HT,
+			EPad.LT, EPad.CY, EPad.FT, EPad.HHO,
+			EPad.RD, EPad.UNKNOWN, EPad.UNKNOWN, EPad.LC,
+            EPad.LP, EPad.LBD
 		};
         private int[] nチャンネルtoX座標 = new int[] { 370, 470, 582, 527, 645, 748, 694, 373, 815, 298, 419, 419 };
         private CCounter ct手つなぎ;
@@ -759,20 +759,20 @@ namespace TJAPlayer3
 
 		protected override ENoteJudge tチップのヒット処理( long nHitTime, CDTX.CChip pChip, bool bCorrectLane )
 		{
-			ENoteJudge eJudgeResult = tチップのヒット処理( nHitTime, pChip, E楽器パート.DRUMS, bCorrectLane, 0 );
+			ENoteJudge eJudgeResult = tチップのヒット処理( nHitTime, pChip, EInstrumentPad.DRUMS, bCorrectLane, 0 );
 			// #24074 2011.01.23 add ikanick
             if( pChip.nコース == this.n現在のコース[ 0 ] && NotesManager.IsMissableNote(pChip) && pChip.bShow == true && eJudgeResult != ENoteJudge.Auto )
                 this.actGame.t叩ききりまショー_判定から各数値を増加させる( eJudgeResult, (int)( nHitTime - pChip.n発声時刻ms ) );
 			return eJudgeResult;
 		}
 
-        protected override void tチップのヒット処理_BadならびにTight時のMiss(CDTX.ECourse eCourse, E楽器パート part)
+        protected override void tチップのヒット処理_BadならびにTight時のMiss(CDTX.ECourse eCourse, EInstrumentPad part)
         {
-            this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, 0, E楽器パート.DRUMS);
+            this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, 0, EInstrumentPad.DRUMS);
         }
-        protected override void tチップのヒット処理_BadならびにTight時のMiss(CDTX.ECourse eCourse, E楽器パート part, int nLane)
+        protected override void tチップのヒット処理_BadならびにTight時のMiss(CDTX.ECourse eCourse, EInstrumentPad part, int nLane)
         {
-            this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, E楽器パート.DRUMS);
+            this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, EInstrumentPad.DRUMS);
         }
 
         private int ChannelNumToFlyNoteNum(CDTX.CChip pChip, int nPlayer, bool b両手入力 = false, int nInput = 0)
@@ -809,45 +809,45 @@ namespace TJAPlayer3
             return nFly;
         }
 
-        private bool tドラムヒット処理( long nHitTime, Eパッド type, CDTX.CChip pChip, bool b両手入力, int nPlayer )
+        private bool tドラムヒット処理( long nHitTime, EPad type, CDTX.CChip pChip, bool b両手入力, int nPlayer )
 		{
             int nInput = 0;
 
             switch( type )
             {
-                case Eパッド.LRed:
-                case Eパッド.RRed:
-                case Eパッド.LRed2P:
-                case Eパッド.RRed2P:
-                case Eパッド.LRed3P:
-                case Eパッド.RRed3P:
-                case Eパッド.LRed4P:
-                case Eパッド.RRed4P:
-                case Eパッド.LRed5P:
-                case Eパッド.RRed5P:
+                case EPad.LRed:
+                case EPad.RRed:
+                case EPad.LRed2P:
+                case EPad.RRed2P:
+                case EPad.LRed3P:
+                case EPad.RRed3P:
+                case EPad.LRed4P:
+                case EPad.RRed4P:
+                case EPad.LRed5P:
+                case EPad.RRed5P:
                     nInput = 0;
                     if( b両手入力 )
                         nInput = 2;
                     break;
-                case Eパッド.LBlue:
-                case Eパッド.RBlue:
-                case Eパッド.LBlue2P:
-                case Eパッド.RBlue2P:
-                case Eパッド.LBlue3P:
-                case Eパッド.RBlue3P:
-                case Eパッド.LBlue4P:
-                case Eパッド.RBlue4P:
-                case Eパッド.LBlue5P:
-                case Eパッド.RBlue5P:
+                case EPad.LBlue:
+                case EPad.RBlue:
+                case EPad.LBlue2P:
+                case EPad.RBlue2P:
+                case EPad.LBlue3P:
+                case EPad.RBlue3P:
+                case EPad.LBlue4P:
+                case EPad.RBlue4P:
+                case EPad.LBlue5P:
+                case EPad.RBlue5P:
                     nInput = 1;
                     if( b両手入力 )
                         nInput = 3;
                     break;
-                case Eパッド.CLAP:
-                case Eパッド.CLAP2P:
-                case Eパッド.CLAP3P:
-                case Eパッド.CLAP4P:
-                case Eパッド.CLAP5P:
+                case EPad.CLAP:
+                case EPad.CLAP2P:
+                case EPad.CLAP3P:
+                case EPad.CLAP4P:
+                case EPad.CLAP5P:
                     nInput = 4;
                     break;
             }
@@ -860,7 +860,7 @@ namespace TJAPlayer3
             
             if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip))
             {
-			    this.tチップのヒット処理( nHitTime, pChip, E楽器パート.TAIKO, true, nInput, nPlayer );
+			    this.tチップのヒット処理( nHitTime, pChip, EInstrumentPad.TAIKO, true, nInput, nPlayer );
                 return true;
             }
             
@@ -880,7 +880,7 @@ namespace TJAPlayer3
 				return false;
 			}
 
-			this.tチップのヒット処理( nHitTime, pChip, E楽器パート.TAIKO, true, nInput, nPlayer );
+			this.tチップのヒット処理( nHitTime, pChip, EInstrumentPad.TAIKO, true, nInput, nPlayer );
 			
             if( ( e判定 != ENoteJudge.Poor ) && ( e判定 != ENoteJudge.Miss ) )
 			{
@@ -911,7 +911,7 @@ namespace TJAPlayer3
 		}
 		protected override void t進行描画_DANGER()
 		{
-			this.actDANGER.t進行描画( this.actGauge.IsDanger(E楽器パート.DRUMS), false, false );
+			this.actDANGER.t進行描画( this.actGauge.IsDanger(EInstrumentPad.DRUMS), false, false );
 		}
 
 		private void t進行描画_グラフ()        
@@ -958,15 +958,15 @@ namespace TJAPlayer3
             // Input adjust deprecated
             var nInputAdjustTimeMs = 0; // TJAPlayer3.ConfigIni.nInputAdjustTimeMs;
 
-			for( int nPad = 0; nPad < (int) Eパッド.MAX; nPad++ )		// #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
+			for( int nPad = 0; nPad < (int) EPad.MAX; nPad++ )		// #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																		//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 			{
-				List<STInputEvent> listInputEvent = TJAPlayer3.Pad.GetEvents( E楽器パート.DRUMS, (Eパッド) nPad );
+				List<STInputEvent> listInputEvent = TJAPlayer3.Pad.GetEvents( EInstrumentPad.DRUMS, (EPad) nPad );
 
 				if( ( listInputEvent == null ) || ( listInputEvent.Count == 0 ) )
 					continue;
 
-				this.t入力メソッド記憶( E楽器パート.DRUMS );
+				this.t入力メソッド記憶( EInstrumentPad.DRUMS );
 
 				foreach( STInputEvent inputEvent in listInputEvent )
 				{
@@ -1230,7 +1230,7 @@ namespace TJAPlayer3
                                 this.soundBlue[4]?.PlayStart();
                             break;
                         // Clap
-                        case (int)Eパッド.CLAP:
+                        case (int)EPad.CLAP:
                             if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(0)] == EGameType.KONGA)
                             {
                                 nLane = (int)PlayerLane.FlashType.Clap;
@@ -1246,7 +1246,7 @@ namespace TJAPlayer3
                                 nLane = (int)PlayerLane.FlashType.Total;
                             }
                             break;
-                        case (int)Eパッド.CLAP2P:
+                        case (int)EPad.CLAP2P:
                             if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(1)] == EGameType.KONGA)
                             {
                                 nLane = (int)PlayerLane.FlashType.Clap;
@@ -1262,7 +1262,7 @@ namespace TJAPlayer3
                                 nLane = (int)PlayerLane.FlashType.Total;
                             }
                             break;
-                        case (int)Eパッド.CLAP3P:
+                        case (int)EPad.CLAP3P:
                             if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(1)] == EGameType.KONGA)
                             {
                                 nLane = (int)PlayerLane.FlashType.Clap;
@@ -1278,7 +1278,7 @@ namespace TJAPlayer3
                                 nLane = (int)PlayerLane.FlashType.Total;
                             }
                             break;
-                        case (int)Eパッド.CLAP4P:
+                        case (int)EPad.CLAP4P:
                             if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(1)] == EGameType.KONGA)
                             {
                                 nLane = (int)PlayerLane.FlashType.Clap;
@@ -1294,7 +1294,7 @@ namespace TJAPlayer3
                                 nLane = (int)PlayerLane.FlashType.Total;
                             }
                             break;
-                        case (int)Eパッド.CLAP5P:
+                        case (int)EPad.CLAP5P:
                             if (TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(1)] == EGameType.KONGA)
                             {
                                 nLane = (int)PlayerLane.FlashType.Clap;
@@ -1341,28 +1341,28 @@ namespace TJAPlayer3
                         break;
                     }
 
-                    switch (((Eパッド)nPad))
+                    switch (((EPad)nPad))
                     {
-                        case Eパッド.LRed:
-                        case Eパッド.LRed2P:
-                        case Eパッド.LRed3P:
-                        case Eパッド.LRed4P:
-                        case Eパッド.LRed5P:
-                        case Eパッド.RRed:
-                        case Eパッド.RRed2P:
-                        case Eパッド.RRed3P:
-                        case Eパッド.RRed4P:
-                        case Eパッド.RRed5P:
-                        case Eパッド.LBlue:
-                        case Eパッド.LBlue2P:
-                        case Eパッド.LBlue3P:
-                        case Eパッド.LBlue4P:
-                        case Eパッド.LBlue5P:
-                        case Eパッド.RBlue:
-                        case Eパッド.RBlue2P:
-                        case Eパッド.RBlue3P:
-                        case Eパッド.RBlue4P:
-                        case Eパッド.RBlue5P:
+                        case EPad.LRed:
+                        case EPad.LRed2P:
+                        case EPad.LRed3P:
+                        case EPad.LRed4P:
+                        case EPad.LRed5P:
+                        case EPad.RRed:
+                        case EPad.RRed2P:
+                        case EPad.RRed3P:
+                        case EPad.RRed4P:
+                        case EPad.RRed5P:
+                        case EPad.LBlue:
+                        case EPad.LBlue2P:
+                        case EPad.LBlue3P:
+                        case EPad.LBlue4P:
+                        case EPad.LBlue5P:
+                        case EPad.RBlue:
+                        case EPad.RBlue2P:
+                        case EPad.RBlue3P:
+                        case EPad.RBlue4P:
+                        case EPad.RBlue5P:
                             {
 
                                 // Regular notes
@@ -1370,29 +1370,29 @@ namespace TJAPlayer3
                                 #region [Fetch values]
 
                                 // Flatten pads from 8 to 4
-                                var _pad = (Eパッド)nPad;
-                                if ((Eパッド)nPad == Eパッド.LRed2P) _pad = Eパッド.LRed;
-                                if ((Eパッド)nPad == Eパッド.RRed2P) _pad = Eパッド.RRed;
-                                if ((Eパッド)nPad == Eパッド.LBlue2P) _pad = Eパッド.LBlue;
-                                if ((Eパッド)nPad == Eパッド.RBlue2P) _pad = Eパッド.RBlue;
+                                var _pad = (EPad)nPad;
+                                if ((EPad)nPad == EPad.LRed2P) _pad = EPad.LRed;
+                                if ((EPad)nPad == EPad.RRed2P) _pad = EPad.RRed;
+                                if ((EPad)nPad == EPad.LBlue2P) _pad = EPad.LBlue;
+                                if ((EPad)nPad == EPad.RBlue2P) _pad = EPad.RBlue;
 
-                                if ((Eパッド)nPad == Eパッド.LRed3P) _pad = Eパッド.LRed;
-                                if ((Eパッド)nPad == Eパッド.RRed3P) _pad = Eパッド.RRed;
-                                if ((Eパッド)nPad == Eパッド.LBlue3P) _pad = Eパッド.LBlue;
-                                if ((Eパッド)nPad == Eパッド.RBlue3P) _pad = Eパッド.RBlue;
+                                if ((EPad)nPad == EPad.LRed3P) _pad = EPad.LRed;
+                                if ((EPad)nPad == EPad.RRed3P) _pad = EPad.RRed;
+                                if ((EPad)nPad == EPad.LBlue3P) _pad = EPad.LBlue;
+                                if ((EPad)nPad == EPad.RBlue3P) _pad = EPad.RBlue;
 
-                                if ((Eパッド)nPad == Eパッド.LRed4P) _pad = Eパッド.LRed;
-                                if ((Eパッド)nPad == Eパッド.RRed4P) _pad = Eパッド.RRed;
-                                if ((Eパッド)nPad == Eパッド.LBlue4P) _pad = Eパッド.LBlue;
-                                if ((Eパッド)nPad == Eパッド.RBlue4P) _pad = Eパッド.RBlue;
+                                if ((EPad)nPad == EPad.LRed4P) _pad = EPad.LRed;
+                                if ((EPad)nPad == EPad.RRed4P) _pad = EPad.RRed;
+                                if ((EPad)nPad == EPad.LBlue4P) _pad = EPad.LBlue;
+                                if ((EPad)nPad == EPad.RBlue4P) _pad = EPad.RBlue;
 
-                                if ((Eパッド)nPad == Eパッド.LRed5P) _pad = Eパッド.LRed;
-                                if ((Eパッド)nPad == Eパッド.RRed5P) _pad = Eパッド.RRed;
-                                if ((Eパッド)nPad == Eパッド.LBlue5P) _pad = Eパッド.LBlue;
-                                if ((Eパッド)nPad == Eパッド.RBlue5P) _pad = Eパッド.RBlue;
+                                if ((EPad)nPad == EPad.LRed5P) _pad = EPad.LRed;
+                                if ((EPad)nPad == EPad.RRed5P) _pad = EPad.RRed;
+                                if ((EPad)nPad == EPad.LBlue5P) _pad = EPad.LBlue;
+                                if ((EPad)nPad == EPad.RBlue5P) _pad = EPad.RBlue;
 
-                                bool _isLeftPad = _pad == Eパッド.LRed || _pad == Eパッド.LBlue;
-                                bool _isBlue = _pad == Eパッド.RBlue || _pad == Eパッド.LBlue;
+                                bool _isLeftPad = _pad == EPad.LRed || _pad == EPad.LBlue;
+                                bool _isBlue = _pad == EPad.RBlue || _pad == EPad.LBlue;
 
                                 int waitInstr = _isLeftPad ? 2 : 1;
                                 int waitRec = waitInstr == 2 ? 1 : 2;
@@ -1505,13 +1505,13 @@ namespace TJAPlayer3
 
                             }
 
-                        case Eパッド.CLAP:
-                        case Eパッド.CLAP2P:
-                        case Eパッド.CLAP3P:
-                        case Eパッド.CLAP4P:
-                        case Eパッド.CLAP5P:
+                        case EPad.CLAP:
+                        case EPad.CLAP2P:
+                        case EPad.CLAP3P:
+                        case EPad.CLAP4P:
+                        case EPad.CLAP5P:
                             {
-                                var _pad = (Eパッド)nPad;
+                                var _pad = (EPad)nPad;
 
                                 // Process konga clap
                                 if (e判定 != ENoteJudge.Miss && _isClapKonga)
@@ -1542,13 +1542,13 @@ namespace TJAPlayer3
 
                     if (e判定 != ENoteJudge.Miss && NotesManager.IsADLIB(chipNoHit))
                     {
-                        this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
+                        this.tドラムヒット処理(nTime, (EPad)nPad, chipNoHit, false, nUsePlayer);
                         bHitted = true;
                     }
 
                     if (e判定 != ENoteJudge.Miss && NotesManager.IsMine(chipNoHit))
                     {
-                        this.tドラムヒット処理(nTime, (Eパッド)nPad, chipNoHit, false, nUsePlayer);
+                        this.tドラムヒット処理(nTime, (EPad)nPad, chipNoHit, false, nUsePlayer);
                         bHitted = true;
                     }
 
@@ -1821,7 +1821,7 @@ namespace TJAPlayer3
                     int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
                                     // BAD or TIGHT 時の処理。
                     if (TJAPlayer3.ConfigIni.bTight && !b連打中[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
-                        this.tチップのヒット処理_BadならびにTight時のMiss(chipNoHit.nコース, E楽器パート.DRUMS, 0, E楽器パート.TAIKO);
+                        this.tチップのヒット処理_BadならびにTight時のMiss(chipNoHit.nコース, EInstrumentPad.DRUMS, 0, EInstrumentPad.TAIKO);
                     //-----------------------------
                     #endregion
                 }
@@ -1909,7 +1909,7 @@ namespace TJAPlayer3
 
                             int n大音符 = (pChip.nチャンネル番号 == 0x11 || pChip.nチャンネル番号 == 0x12 ? 2 : 0);
 
-                            this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, true, nLane + n大音符, nPlayer, false);
+                            this.tチップのヒット処理(pChip.n発声時刻ms, pChip, EInstrumentPad.TAIKO, true, nLane + n大音符, nPlayer, false);
                             this.tサウンド再生(pChip, nPlayer);
                             return;
                         }
@@ -2433,9 +2433,9 @@ namespace TJAPlayer3
 
                                 if (!NotesManager.IsFuzeRoll(pChip))
                                 {
-                                    TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = x末端 - x - 44 - _shift;
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].vcScaleRatio.X = x末端 - x - 44 - _shift;
                                     TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
-                                    TJAPlayer3.Tx.SENotes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                    TJAPlayer3.Tx.SENotes[(int)_gt].vcScaleRatio.X = 1.0f;
                                     TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
                                     TJAPlayer3.Tx.SENotes[(int)_gt].t2D描画(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * pChip.nSenote, _size[0], _size[1]));
                                 }
@@ -2472,7 +2472,7 @@ namespace TJAPlayer3
                         {
                             //大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
                             if (TJAPlayer3.Tx.Notes[(int)_gt] != null)
-                                TJAPlayer3.Tx.Notes[(int)_gt].vc拡大縮小倍率.X = 1.0f;
+                                TJAPlayer3.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
                             int n = 0;
                             switch (pChip.n連打音符State)
                             {
@@ -2506,7 +2506,7 @@ namespace TJAPlayer3
                         ((nPlayer != 1 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] : 
                         (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)) || 
                         puchichara.effect.Autoroll > 0))
-                        this.tチップのヒット処理(pChip.n発声時刻ms, pChip, E楽器パート.TAIKO, false, 0, nPlayer, puchichara.effect.Autoroll > 0);
+                        this.tチップのヒット処理(pChip.n発声時刻ms, pChip, EInstrumentPad.TAIKO, false, 0, nPlayer, puchichara.effect.Autoroll > 0);
                 }
             }
             #endregion
@@ -2570,12 +2570,12 @@ namespace TJAPlayer3
                     if( pChip.bBranch )
                     {
                         //this.tx小節線_branch.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar_Branch?.t2D描画( x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
+                        TJAPlayer3.Tx.Bar_Branch?.t2D描画( x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar_Branch.szTextureSize.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar_Branch.szTextureSize.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                     else
                     {
                         //this.tx小節線.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
-                        TJAPlayer3.Tx.Bar?.t2D描画( x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar.szテクスチャサイズ.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
+                        TJAPlayer3.Tx.Bar?.t2D描画( x + ((TJAPlayer3.Skin.Game_Notes_Size[0] - TJAPlayer3.Tx.Bar.szTextureSize.Width) / 2), y, new Rectangle( 0, 0, TJAPlayer3.Tx.Bar.szTextureSize.Width, TJAPlayer3.Skin.Game_Notes_Size[1]) );
                     }
                 }
 			}
@@ -2651,7 +2651,7 @@ namespace TJAPlayer3
                     {
                         if (!_isSwapNote)
                         {
-                            this.tドラムヒット処理(chipNoHit.nProcessTime, Eパッド.RRed, chipNoHit, false, i);
+                            this.tドラムヒット処理(chipNoHit.nProcessTime, EPad.RRed, chipNoHit, false, i);
                             //this.nWaitButton = 0;
                             this.nStoredHit[i] = 0;
                             chipNoHit.bHit = true;
@@ -2668,11 +2668,11 @@ namespace TJAPlayer3
 
             //string strNull = "Found";
 
-            if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1))
+            if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1))
             {
                 if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false)
                 {
-                    TJAPlayer3.Skin.sound変更音.tPlay();
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay();
 
                     SoundManager.PlayTimer.Pause();
                     TJAPlayer3.Timer.Pause();

@@ -42,7 +42,7 @@ namespace TJAPlayer3
 		{
 			if( !this.bキー入力待ち )
 			{
-				TJAPlayer3.Skin.sound決定音.tPlay();
+				TJAPlayer3.Skin.soundDecideSFX.tPlay();
 				switch( this.n現在の選択行 )
 				{
 					case 0x10:
@@ -116,21 +116,21 @@ namespace TJAPlayer3
 			{
 				if( this.bキー入力待ち )
 				{
-					if( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) )
+					if( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) )
 					{
-						TJAPlayer3.Skin.sound取消音.tPlay();
+						TJAPlayer3.Skin.soundCancelSFX.tPlay();
 						this.bキー入力待ち = false;
-						TJAPlayer3.Input管理.Polling( false );
+						TJAPlayer3.InputManager.Polling( false );
 					}
 					else if( ( this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn() ) || ( this.tキーチェックとアサイン_Joypad() || tキーチェックとアサイン_Gamepad() || this.tキーチェックとアサイン_Mouse() ) )
 					{
 						this.bキー入力待ち = false;
-						TJAPlayer3.Input管理.Polling( false );
+						TJAPlayer3.InputManager.Polling( false );
 					}
 				}
-				else if( ( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Delete ) && ( this.n現在の選択行 >= 0 ) ) && ( this.n現在の選択行 <= 15 ) )
+				else if( ( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Delete ) && ( this.n現在の選択行 >= 0 ) ) && ( this.n現在の選択行 <= 15 ) )
 				{
-					TJAPlayer3.Skin.sound決定音.tPlay();
+					TJAPlayer3.Skin.soundDecideSFX.tPlay();
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Unknown;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = 0;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].コード = 0;
@@ -144,14 +144,14 @@ namespace TJAPlayer3
 					float scale = 0.55f;
 					for( int j = 0; j < 14; j++ )
 					{
-						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.X = scale;
-						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.Y = scale;
+						TJAPlayer3.Tx.Menu_Highlight.vcScaleRatio.X = scale;
+						TJAPlayer3.Tx.Menu_Highlight.vcScaleRatio.Y = scale;
 
 						TJAPlayer3.Tx.Menu_Highlight.t2D描画( num2, num3 );
-						num2 += (int)(TJAPlayer3.Tx.Menu_Highlight.szテクスチャサイズ.Width * scale);
+						num2 += (int)(TJAPlayer3.Tx.Menu_Highlight.szTextureSize.Width * scale);
 
-						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.X = 1;
-						TJAPlayer3.Tx.Menu_Highlight.vc拡大縮小倍率.Y = 1;
+						TJAPlayer3.Tx.Menu_Highlight.vcScaleRatio.X = 1;
+						TJAPlayer3.Tx.Menu_Highlight.vcScaleRatio.Y = 1;
 					}
 					//TJAPlayer3.Tx.Menu_Highlight.t2D描画( num2, num3, new Rectangle( 0x10, 0, 0x10, 0x20 ) );
 				}
@@ -339,7 +339,7 @@ namespace TJAPlayer3
 		
 		private bool tキーチェックとアサイン_Gamepad()
 		{
-			foreach( IInputDevice device in TJAPlayer3.Input管理.InputDevices )
+			foreach( IInputDevice device in TJAPlayer3.InputManager.InputDevices )
 			{
 				if( device.CurrentType == InputDeviceType.Gamepad )
 				{
@@ -347,7 +347,7 @@ namespace TJAPlayer3
 					{
 						if (device.KeyPressed(i))
 						{
-							TJAPlayer3.Skin.sound決定音.tPlay();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Gamepad, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Gamepad;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
@@ -361,7 +361,7 @@ namespace TJAPlayer3
 		}
 		private bool tキーチェックとアサイン_Joypad()
 		{
-			foreach( IInputDevice device in TJAPlayer3.Input管理.InputDevices )
+			foreach( IInputDevice device in TJAPlayer3.InputManager.InputDevices )
 			{
 				if( device.CurrentType == InputDeviceType.Joystick )
 				{
@@ -369,7 +369,7 @@ namespace TJAPlayer3
 					{
 						if (device.KeyPressed(i))
 						{
-							TJAPlayer3.Skin.sound決定音.tPlay();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Joypad, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Joypad;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
@@ -392,9 +392,9 @@ namespace TJAPlayer3
 					i != (int)SlimDXKeys.Key.LeftArrow &&
 					i != (int)SlimDXKeys.Key.RightArrow &&
 					i != (int)SlimDXKeys.Key.Delete &&
-					 TJAPlayer3.Input管理.Keyboard.KeyPressed( i ) )
+					 TJAPlayer3.InputManager.Keyboard.KeyPressed( i ) )
 				{
-					TJAPlayer3.Skin.sound決定音.tPlay();
+					TJAPlayer3.Skin.soundDecideSFX.tPlay();
 					TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Keyboard, 0, i, this.pad);
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Keyboard;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = 0;
@@ -406,7 +406,7 @@ namespace TJAPlayer3
 		}
 		private bool tキーチェックとアサイン_MidiIn()
 		{
-			foreach( IInputDevice device in TJAPlayer3.Input管理.InputDevices )
+			foreach( IInputDevice device in TJAPlayer3.InputManager.InputDevices )
 			{
 				if( device.CurrentType == InputDeviceType.MidiIn )
 				{
@@ -414,7 +414,7 @@ namespace TJAPlayer3
 					{
 						if( device.KeyPressed( i ) )
 						{
-							TJAPlayer3.Skin.sound決定音.tPlay();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.MIDIInput, device.ID, i, this.pad);
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.MIDIInput;
 							TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = device.ID;
@@ -430,7 +430,7 @@ namespace TJAPlayer3
 		{
 			for( int i = 0; i < 8; i++ )
 			{
-				if( TJAPlayer3.Input管理.Mouse.KeyPressed( i ) )
+				if( TJAPlayer3.InputManager.Mouse.KeyPressed( i ) )
 				{
 					TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Mouse, 0, i, this.pad);
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Mouse;

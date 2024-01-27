@@ -265,7 +265,7 @@ namespace TJAPlayer3
                 };
 
                 //★10の場合超激辛モードになる。
-                if( TJAPlayer3.DTX.LEVELtaiko[ TJAPlayer3.stage選曲.n確定された曲の難易度[0]] >= 10 )
+                if( TJAPlayer3.DTX.LEVELtaiko[ TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]] >= 10 )
                 {
                     #region[ 超激辛 ]
                     this.st叩ききりまショー.b超激辛 = true;
@@ -499,7 +499,7 @@ namespace TJAPlayer3
                     string str表示する残り時間 = ( this.st叩ききりまショー.ct残り時間.CurrentValue < 1000 ) ? "25" : ( ( 26000 - this.st叩ききりまショー.ct残り時間.CurrentValue ) / 1000 ).ToString();
                     
                     if (TJAPlayer3.Tx.GameMode_Timer_Frame != null)
-                        this.t小文字表示( 230 + (str表示する残り時間.Length * TJAPlayer3.Skin.Game_Taiko_Combo_Size[0] / 4 ), 84 + TJAPlayer3.Tx.GameMode_Timer_Frame.szテクスチャサイズ.Height / 2 , string.Format("{0,2:#0}", str表示する残り時間 ));
+                        this.t小文字表示( 230 + (str表示する残り時間.Length * TJAPlayer3.Skin.Game_Taiko_Combo_Size[0] / 4 ), 84 + TJAPlayer3.Tx.GameMode_Timer_Frame.szTextureSize.Height / 2 , string.Format("{0,2:#0}", str表示する残り時間 ));
                 }
 
                 if( !this.st叩ききりまショー.ct加算審査中.IsStoped )
@@ -870,8 +870,8 @@ namespace TJAPlayer3
                                 TJAPlayer3.Tx.Taiko_Combo[0].Opacity = 128;
                             if (this.st叩ききりまショー.b加算アニメ中)
                                 TJAPlayer3.Tx.Taiko_Combo[0].Opacity = 0;
-                            TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1f;
-                            TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1f;
+                            TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1f;
+                            TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.X = 1f;
                             TJAPlayer3.Tx.Taiko_Combo[0].t2D中心基準描画( x, y, rectangle );
 						}
 						break;
@@ -892,7 +892,7 @@ namespace TJAPlayer3
                         Rectangle rectangle = new Rectangle(TJAPlayer3.Skin.Game_Score_Size[0] * i, 0, TJAPlayer3.Skin.Game_Score_Size[0], TJAPlayer3.Skin.Game_Score_Size[1]);
                         if (TJAPlayer3.Tx.Taiko_Score[0] != null )
                         {
-                            TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = 1f;
+                            TJAPlayer3.Tx.Taiko_Score[0].vcScaleRatio.Y = 1f;
                             TJAPlayer3.Tx.Taiko_Score[0].t2D描画( x, y, rectangle );
                         }
                     }

@@ -121,7 +121,7 @@ namespace TJAPlayer3
             }
 
             for (int i = 0; i < OptionType.Length; i++)
-                OptionType[i].vc拡大縮小倍率.X = 0.96f;
+                OptionType[i].vcScaleRatio.X = 0.96f;
 
             base.Activate();
         }
@@ -167,7 +167,7 @@ namespace TJAPlayer3
 
             if (!ctOpen.IsTicked) ctOpen.Start(0, 50, 6, TJAPlayer3.Timer);
 
-            var act難易度 = TJAPlayer3.stage選曲.act難易度選択画面;
+            var act難易度 = TJAPlayer3.stageSongSelect.actDifficultySelectionScreen;
             var danAct = TJAPlayer3.stage段位選択.段位挑戦選択画面;
 
             #region [ Open & Close ]
@@ -204,8 +204,8 @@ namespace TJAPlayer3
             };
 
             var pos = player % 2;
-            var _shift = pos == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2) : 0;
-            var _rect = new Rectangle(_shift, 0, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Difficulty_Option.szテクスチャサイズ.Height);
+            var _shift = pos == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
+            var _rect = new Rectangle(_shift, 0, TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Width / 2, TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Height);
 
             TJAPlayer3.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
             TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(_shift + TJAPlayer3.Skin.SongSelect_Option_Select_Offset[0] + NowCount * TJAPlayer3.Skin.SongSelect_Option_Interval[0], 
@@ -254,52 +254,52 @@ namespace TJAPlayer3
                 switch (player)
                 {
                     case 0:
-                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
-                        _centerDrum = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) ||
-                            (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
-                        _cancel = (TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
+                        _rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+                        _leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+                        _centerDrum = (TJAPlayer3.Pad.bPressedDGB(EPad.Decide) ||
+                            (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+                        _cancel = (TJAPlayer3.Pad.bPressedDGB(EPad.Cancel) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
                         break;
                     case 1:
-                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue2P));
-                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue2P));
-                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed2P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed2P));
+                        _rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P));
+                        _leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P));
+                        _centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P));
                         break;
                     case 2:
-                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue3P));
-                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue3P));
-                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed3P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed3P));
+                        _rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue3P));
+                        _leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue3P));
+                        _centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed3P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed3P));
                         break;
                     case 3:
-                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue4P));
-                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue4P));
-                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed4P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed4P));
+                        _rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue4P));
+                        _leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue4P));
+                        _centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed4P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed4P));
                         break;
                     case 4:
-                        _rightDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue5P));
-                        _leftDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue5P));
-                        _centerDrum = (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed5P) || TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed5P));
+                        _rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue5P));
+                        _leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue5P));
+                        _centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed5P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed5P));
                         break;
                 }
 
 
-                if (_leftDrum || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
+                if (_leftDrum || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
                 { 
                     OptionSelect(true);
                     tFetchMults(player);
-                    TJAPlayer3.Skin.sound変更音.tPlay(); 
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay(); 
                 }
 
-                if (_rightDrum || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
+                if (_rightDrum || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
                 { 
                     OptionSelect(false);
                     tFetchMults(player);
-                    TJAPlayer3.Skin.sound変更音.tPlay(); 
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay(); 
                 }
 
                 if (_centerDrum && ctOpen.CurrentValue >= ctOpen.EndValue)
                 {
-                    TJAPlayer3.Skin.sound決定音.tPlay();
+                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                     if (NowCount < nOptionCount)
                     {
                         NowCount++;
@@ -313,19 +313,19 @@ namespace TJAPlayer3
 
                 int cp1 = nOptionCount + 1;
 
-                if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
-                    TJAPlayer3.Skin.sound変更音.tPlay();
+                if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay();
                     NowCount = (NowCount + cp1 - 1) % cp1;
                 }
 
-                if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
-                    TJAPlayer3.Skin.sound変更音.tPlay();
+                if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
+                    TJAPlayer3.Skin.soundChangeSFX.tPlay();
                     NowCount = (NowCount + 1) % cp1;
                 }
 
-                if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
+                if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
                 {
-                    TJAPlayer3.Skin.sound決定音.tPlay();
+                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                     bEnd = true;
                     ctClose.Start(0, 50, 6, TJAPlayer3.Timer);
                 }

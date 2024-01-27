@@ -104,7 +104,7 @@ namespace TJAPlayer3
 		}
 
 		// メソッド
-		public override void tActivatePopupMenu( E楽器パート einst )
+		public override void tActivatePopupMenu( EInstrumentPad einst )
 		{
 			this.CActSelectQuickConfigMain();
 			base.tActivatePopupMenu( einst );

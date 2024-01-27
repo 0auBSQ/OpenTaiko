@@ -38,7 +38,7 @@ namespace TJAPlayer3
                 keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl))
             {
                 soundGroup = ESoundGroup.SoundEffect;
-                システムサウンド = skin.sound決定音;
+                システムサウンド = skin.soundDecideSFX;
             }
             else if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift) ||
                      keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift))

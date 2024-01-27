@@ -22,7 +22,7 @@ namespace TJAPlayer3
 		{
             this.bEsc有効 = false;
 			lci = new List<List<List<CItemBase>>>();									// この画面に来る度に、メニューを作り直す。
-			for ( int nConfSet = 0; nConfSet < (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++ )
+			for ( int nConfSet = 0; nConfSet < (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++ )
 			{
 				lci.Add( new List<List<CItemBase>>() );									// ConfSet用の3つ分の枠。
 				for ( int nInst = 0; nInst < 3; nInst++ )
@@ -40,7 +40,7 @@ namespace TJAPlayer3
 
             #region [ 共通 SET切り替え/More/Return ]
             l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(900), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" }));
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(901), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" }));
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(901), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" }));
             l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(902), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "", "" }));
 			#endregion
 
@@ -48,7 +48,7 @@ namespace TJAPlayer3
 		}
 
 		// メソッド
-		public override void tActivatePopupMenu( E楽器パート einst )
+		public override void tActivatePopupMenu( EInstrumentPad einst )
 		{
             this.CAct演奏PauseMenuMain();
 			CActSelectPopupMenu.b選択した = false;
@@ -93,7 +93,7 @@ namespace TJAPlayer3
 					break;
 
 				case (int) EOrder.Redoing:
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
 					{
 						this.bやり直しを選択した = true;
 						CActSelectPopupMenu.b選択した = true;

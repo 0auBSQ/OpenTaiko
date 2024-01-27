@@ -173,15 +173,15 @@ namespace TJAPlayer3
             1f
         };
 
-        public double Get( E楽器パート part, int player )
+        public double Get( EInstrumentPad part, int player )
 		{
 			return this.n現在の本当のスコア[ player ][ (int) part ];
 		}
-		public void Set( E楽器パート part, double nScore, int player )
+		public void Set( EInstrumentPad part, double nScore, int player )
 		{
             //現状、TAIKOパートでの演奏記録を結果ステージに持っていけないので、ドラムパートにも加算することでお茶を濁している。
-            if( part == E楽器パート.TAIKO )
-                part = E楽器パート.DRUMS;
+            if( part == EInstrumentPad.TAIKO )
+                part = EInstrumentPad.DRUMS;
 
 			int nPart = (int) part;
 			if( this.n現在の本当のスコア[ player ][ nPart ] != nScore )
@@ -195,8 +195,8 @@ namespace TJAPlayer3
 				}
 			}
 
-            if( part == E楽器パート.DRUMS )
-                part = E楽器パート.TAIKO;
+            if( part == EInstrumentPad.DRUMS )
+                part = EInstrumentPad.TAIKO;
 
 			nPart = (int) part;
 			if( this.n現在の本当のスコア[ player ][ nPart ] != nScore )
@@ -217,18 +217,18 @@ namespace TJAPlayer3
 		/// <param name="part"></param>
 		/// <param name="bAutoPlay"></param>
 		/// <param name="delta"></param>
-		public void Add( E楽器パート part, STAUTOPLAY bAutoPlay, long delta, int player )
+		public void Add( EInstrumentPad part, STAUTOPLAY bAutoPlay, long delta, int player )
         {
             if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1) return;
 
             double rev = 1.0;
 
-            delta = (long)(delta * TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
+            delta = (long)(delta * TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
 
 			switch ( part )
 			{
 				#region [ Unknown ]
-				case E楽器パート.UNKNOWN:
+				case EInstrumentPad.UNKNOWN:
 					throw new ArgumentException();
 				#endregion
 			}
@@ -280,7 +280,7 @@ namespace TJAPlayer3
                 }
             }
 
-            this.Set( E楽器パート.TAIKO, this.Get( E楽器パート.TAIKO, player ) + 10000, player );
+            this.Set( EInstrumentPad.TAIKO, this.Get( EInstrumentPad.TAIKO, player ) + 10000, player );
         }
 
 		// CActivity 実装
@@ -355,11 +355,11 @@ namespace TJAPlayer3
                                     TJAPlayer3.Tx.Taiko_Score[0].Opacity = alpha;
                                     if (TJAPlayer3.ConfigIni.SimpleMode)
                                     {
-                                        TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = 1;
+                                        TJAPlayer3.Tx.Taiko_Score[0].vcScaleRatio.Y = 1;
                                     }
                                     else
                                     {
-                                        TJAPlayer3.Tx.Taiko_Score[0].vc拡大縮小倍率.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
+                                        TJAPlayer3.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
                                     }
                                     TJAPlayer3.Tx.Taiko_Score[0].t2D拡大率考慮下基準描画( x , y, rectangle );
                                     
@@ -371,7 +371,7 @@ namespace TJAPlayer3
                                     //this.txScore.color4 = new SlimDX.Color4( 1.0f, 0.5f, 0.4f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor1P;
                                     TJAPlayer3.Tx.Taiko_Score[1].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[1].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[1].vcScaleRatio.Y = 1;
                                     TJAPlayer3.Tx.Taiko_Score[1].t2D拡大率考慮下基準描画( x, y, rectangle );
                                 }
                                 break;
@@ -381,7 +381,7 @@ namespace TJAPlayer3
                                     //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
                                     TJAPlayer3.Tx.Taiko_Score[2].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[2].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[2].vcScaleRatio.Y = 1;
                                     TJAPlayer3.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画(x, y, rectangle);
                                 }
                                 break;
@@ -391,7 +391,7 @@ namespace TJAPlayer3
                                     //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
                                     TJAPlayer3.Tx.Taiko_Score[3].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[3].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[3].vcScaleRatio.Y = 1;
                                     TJAPlayer3.Tx.Taiko_Score[3].t2D拡大率考慮下基準描画(x, y, rectangle);
                                 }
                                 break;
@@ -401,7 +401,7 @@ namespace TJAPlayer3
                                     //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
                                     TJAPlayer3.Tx.Taiko_Score[4].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[4].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[4].vcScaleRatio.Y = 1;
                                     TJAPlayer3.Tx.Taiko_Score[4].t2D拡大率考慮下基準描画(x, y, rectangle);
                                 }
                                 break;
@@ -411,7 +411,7 @@ namespace TJAPlayer3
                                     //this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
                                     //this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
                                     TJAPlayer3.Tx.Taiko_Score[5].Opacity = alpha;
-                                    TJAPlayer3.Tx.Taiko_Score[5].vc拡大縮小倍率.Y = 1;
+                                    TJAPlayer3.Tx.Taiko_Score[5].vcScaleRatio.Y = 1;
                                     TJAPlayer3.Tx.Taiko_Score[5].t2D拡大率考慮下基準描画(x, y, rectangle);
                                 }
                                 break;
