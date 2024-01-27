@@ -539,7 +539,7 @@ namespace TJAPlayer3
 
         // コンストラクタ
 
-        public TJAPlayer3()
+        public TJAPlayer3() : base("OpenTaiko.ico")
 		{
 			TJAPlayer3.app = this;
 		}
