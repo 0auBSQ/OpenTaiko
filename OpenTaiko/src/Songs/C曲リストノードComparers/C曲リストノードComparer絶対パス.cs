@@ -2,7 +2,7 @@
 
 namespace TJAPlayer3.C曲リストノードComparers
 {
-    internal sealed class C曲リストノードComparer絶対パス : IComparer<C曲リストノード>
+    internal sealed class C曲リストノードComparer絶対パス : IComparer<CSongListNode>
     {
         private readonly int _order;
 
@@ -11,9 +11,9 @@ namespace TJAPlayer3.C曲リストノードComparers
             this._order = order;
         }
 
-        public int Compare(C曲リストノード n1, C曲リストノード n2)
+        public int Compare(CSongListNode n1, CSongListNode n2)
         {
-            if( ( n1.eノード種別 == C曲リストノード.Eノード種別.BOX ) && ( n2.eノード種別 == C曲リストノード.Eノード種別.BOX ) )
+            if( ( n1.eノード種別 == CSongListNode.ENodeType.BOX ) && ( n2.eノード種別 == CSongListNode.ENodeType.BOX ) )
             {
                 return _order * n1.arスコア[ 0 ].ファイル情報.フォルダの絶対パス.CompareTo( n2.arスコア[ 0 ].ファイル情報.フォルダの絶対パス );
             }
@@ -24,7 +24,7 @@ namespace TJAPlayer3.C曲リストノードComparers
             return _order * str.CompareTo( strB );
         }
 
-        private static string strファイルの絶対パス(C曲リストノード c曲リストノード)
+        private static string strファイルの絶対パス(CSongListNode c曲リストノード)
         {
             for (int i = 0; i < (int)Difficulty.Total; i++)
             {

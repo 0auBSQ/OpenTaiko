@@ -265,8 +265,8 @@ namespace TJAPlayer3
                 float _x = x;
                 float _y = y;
 
-                _tex.vc拡大縮小倍率.X *= resolutionRatioX;
-                _tex.vc拡大縮小倍率.Y *= resolutionRatioY;
+                _tex.vcScaleRatio.X *= resolutionRatioX;
+                _tex.vcScaleRatio.Y *= resolutionRatioY;
 
                 if (pos % 2 == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 2)
                 {
@@ -283,8 +283,8 @@ namespace TJAPlayer3
                         );
                 }
 
-                _tex.vc拡大縮小倍率.X = 1f;
-                _tex.vc拡大縮小倍率.Y = 1f;
+                _tex.vcScaleRatio.X = 1f;
+                _tex.vcScaleRatio.Y = 1f;
 
 
                 _tex.Opacity = 255;

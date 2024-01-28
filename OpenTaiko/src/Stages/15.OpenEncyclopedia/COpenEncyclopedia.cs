@@ -33,7 +33,7 @@ namespace TJAPlayer3
             base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-            TJAPlayer3.Skin.soundEncyclopediaBGM?.t再生する();
+            TJAPlayer3.Skin.soundEncyclopediaBGM?.tPlay();
 
             _controler = new CEncyclopediaControler();
 
@@ -47,7 +47,7 @@ namespace TJAPlayer3
         {
             // On de-activation
 
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
 
             base.DeActivate();
         }
@@ -93,8 +93,8 @@ namespace TJAPlayer3
                     _page.Item2?.t2D中心基準描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[1]);
                     if (_page.Item3 != null)
                     {
-                        _page.Item3.vc拡大縮小倍率.X = TJAPlayer3.Skin.Resolution[0] / (2f * _page.Item3.szテクスチャサイズ.Width);
-                        _page.Item3.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Resolution[1] / (2f * _page.Item3.szテクスチャサイズ.Height);
+                        _page.Item3.vcScaleRatio.X = TJAPlayer3.Skin.Resolution[0] / (2f * _page.Item3.szTextureSize.Width);
+                        _page.Item3.vcScaleRatio.Y = TJAPlayer3.Skin.Resolution[1] / (2f * _page.Item3.szTextureSize.Height);
                         _page.Item3.t2D描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[1]);
                     }
                     _controler.PageText?.t2D下中央基準描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[1]);
@@ -135,37 +135,37 @@ namespace TJAPlayer3
 
             #region [Inputs]
 
-            if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
+            if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange))
             {
                 _controler.tHandleRight();
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.soundChangeSFX.tPlay();
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange))
             {
                 _controler.tHandleLeft();
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.soundChangeSFX.tPlay();
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel))
             {
                 _backToMain = _controler.tHandleBack();
-                TJAPlayer3.Skin.sound取消音.t再生する();
+                TJAPlayer3.Skin.soundCancelSFX.tPlay();
             }
 
-            else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
+            else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide))
             {
                 var (_b1, _b2) = _controler.tHandleEnter();
                 _backToMain = _b2;
 
                 if (_b1)
-                    TJAPlayer3.Skin.sound決定音.t再生する();
+                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                 else
-                    TJAPlayer3.Skin.sound取消音.t再生する();
+                    TJAPlayer3.Skin.soundCancelSFX.tPlay();
             }
 
             #endregion
@@ -174,7 +174,7 @@ namespace TJAPlayer3
 
             if (_backToMain)
             {
-                TJAPlayer3.Skin.soundEncyclopediaBGM?.t停止する();
+                TJAPlayer3.Skin.soundEncyclopediaBGM?.tStop();
                 this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                 this.actFOtoTitle.tフェードアウト開始();
                 base.ePhaseID = CStage.EPhase.Common_FADEOUT;

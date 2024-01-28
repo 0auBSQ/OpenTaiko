@@ -277,7 +277,7 @@ namespace FDK
                 }
             }
         }
-        public Size szテクスチャサイズ
+        public Size szTextureSize
         {
             get;
             private set;
@@ -287,7 +287,7 @@ namespace FDK
             get;
             protected set;
         }
-        public Vector3D<float> vc拡大縮小倍率;
+        public Vector3D<float> vcScaleRatio;
 
         // 画面が変わるたび以下のプロパティを設定し治すこと。
 
@@ -307,22 +307,22 @@ namespace FDK
         public CTexture()
         {
             this.sz画像サイズ = new Size(0, 0);
-            this.szテクスチャサイズ = new Size(0, 0);
+            this.szTextureSize = new Size(0, 0);
             this._opacity = 0xff;
             this.b加算合成 = false;
             this.fZ軸中心回転 = 0f;
-            this.vc拡大縮小倍率 = new Vector3D<float>(1f, 1f, 1f);
+            this.vcScaleRatio = new Vector3D<float>(1f, 1f, 1f);
             //			this._txData = null;
         }
 
         public CTexture(CTexture tx)
         {
             this.sz画像サイズ = tx.sz画像サイズ;
-            this.szテクスチャサイズ = tx.szテクスチャサイズ;
+            this.szTextureSize = tx.szTextureSize;
             this._opacity = tx._opacity;
             this.b加算合成 = tx.b加算合成;
             this.fZ軸中心回転 = tx.fZ軸中心回転;
-            this.vc拡大縮小倍率 = tx.vc拡大縮小倍率;
+            this.vcScaleRatio = tx.vcScaleRatio;
             Texture_ = tx.Texture_;
             //			this._txData = null;
         }
@@ -331,7 +331,7 @@ namespace FDK
         {
             Texture_ = texture.Texture_;
             this.sz画像サイズ = new Size(n幅, n高さ);
-            this.szテクスチャサイズ = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+            this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
             this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
         }
 
@@ -344,7 +344,7 @@ namespace FDK
                 Texture_ = GenTexture(data, (uint)width, (uint)height, rgbaType);
             }
             this.sz画像サイズ = new Size(width, height);
-            this.szテクスチャサイズ = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+            this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
             this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
         }
 
@@ -379,7 +379,7 @@ namespace FDK
             try
             {
                 this.sz画像サイズ = new Size(n幅, n高さ);
-                this.szテクスチャサイズ = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+                this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
                 this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
             }
             catch
@@ -483,7 +483,7 @@ namespace FDK
 
                 this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);
                 this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
-                this.szテクスチャサイズ = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+                this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
             }
             catch
             {
@@ -498,17 +498,17 @@ namespace FDK
         // Rectangleを使う場合、座標調整のためにテクスチャサイズの値をそのまま使うとまずいことになるため、Rectragleから幅を取得して調整をする。
         public void t2D中心基準描画(int x, int y)
         {
-            this.t2D描画(x - (this.szテクスチャサイズ.Width / 2), y - (this.szテクスチャサイズ.Height / 2), 1f, this.rc全画像);
+            this.t2D描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
         }
 
         public void t2D中心基準描画Mirrored(int x, int y)
         {
-            this.t2D左右反転描画(x - (this.szテクスチャサイズ.Width / 2), y - (this.szテクスチャサイズ.Height / 2), 1f, this.rc全画像);
+            this.t2D左右反転描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
         }
 
         public void t2D中心基準描画Mirrored(float x, float y)
         {
-            this.t2D左右反転描画(x - (this.szテクスチャサイズ.Width / 2), y - (this.szテクスチャサイズ.Height / 2), 1f, this.rc全画像);
+            this.t2D左右反転描画(x - (this.szTextureSize.Width / 2), y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
         }
 
         public void t2D中心基準描画(int x, int y, Rectangle rc画像内の描画領域)
@@ -517,7 +517,7 @@ namespace FDK
         }
         public void t2D中心基準描画(float x, float y)
         {
-            this.t2D描画((int)x - (this.szテクスチャサイズ.Width / 2), (int)y - (this.szテクスチャサイズ.Height / 2), 1f, this.rc全画像);
+            this.t2D描画((int)x - (this.szTextureSize.Width / 2), (int)y - (this.szTextureSize.Height / 2), 1f, this.rc全画像);
         }
         public void t2D中心基準描画(float x, float y, Rectangle rc画像内の描画領域)
         {
@@ -531,33 +531,33 @@ namespace FDK
         // 下を基準にして描画する(拡大率考慮)メソッドを追加。 (AioiLight)
         public void t2D拡大率考慮下基準描画(int x, int y)
         {
-            this.t2D描画(x, y - (szテクスチャサイズ.Height * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D描画(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮下基準描画(int x, int y, Rectangle rc画像内の描画領域)
         {
-            this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vc拡大縮小倍率.Y), 1f, rc画像内の描画領域);
+            this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
         }
         public void t2D拡大率考慮下中心基準描画(int x, int y)
         {
-            this.t2D描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
 
         public void t2D拡大率考慮下中心基準描画Mirrored(int x, int y)
         {
-            this.t2D左右反転描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮下中心基準描画Mirrored(float x, float y)
         {
-            this.t2D左右反転描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
 
         public void t2D拡大率考慮下基準描画(float x, float y)
         {
-            this.t2D描画(x, y - (szテクスチャサイズ.Height * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D描画(x, y - (szTextureSize.Height * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮下基準描画(float x, float y, RectangleF rc画像内の描画領域)
         {
-            this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vc拡大縮小倍率.Y), 1f, rc画像内の描画領域);
+            this.t2D描画(x, y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
         }
         public void t2D拡大率考慮下中心基準描画(float x, float y)
         {
@@ -566,7 +566,7 @@ namespace FDK
 
         public void t2D拡大率考慮下中心基準描画(int x, int y, Rectangle rc画像内の描画領域)
         {
-            this.t2D描画(x - ((rc画像内の描画領域.Width / 2)), y - (rc画像内の描画領域.Height * this.vc拡大縮小倍率.Y), 1f, rc画像内の描画領域);
+            this.t2D描画(x - ((rc画像内の描画領域.Width / 2)), y - (rc画像内の描画領域.Height * this.vcScaleRatio.Y), 1f, rc画像内の描画領域);
         }
         public void t2D拡大率考慮下中心基準描画(float x, float y, Rectangle rc画像内の描画領域)
         {
@@ -574,7 +574,7 @@ namespace FDK
         }
         public void t2D下中央基準描画(int x, int y)
         {
-            this.t2D描画(x - (this.szテクスチャサイズ.Width / 2), y - (szテクスチャサイズ.Height), this.rc全画像);
+            this.t2D描画(x - (this.szTextureSize.Width / 2), y - (szTextureSize.Height), this.rc全画像);
         }
         public void t2D下中央基準描画(int x, int y, Rectangle rc画像内の描画領域)
         {
@@ -585,39 +585,39 @@ namespace FDK
 
         public void t2D拡大率考慮中央基準描画(int x, int y)
         {
-            this.t2D描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height / 2 * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮中央基準描画(int x, int y, RectangleF rc)
         {
-            this.t2D描画(x - (rc.Width / 2 * this.vc拡大縮小倍率.X), y - (rc.Height / 2 * this.vc拡大縮小倍率.Y), 1f, rc);
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
         }
         public void t2D_DisplayImage_AnchorCenterLeft(int x, int y, RectangleF rc)
         {
-            this.t2D描画(x, y - (rc.Height / 2 * this.vc拡大縮小倍率.Y), 1f, rc);
+            this.t2D描画(x, y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
         }
         public void t2D拡大率考慮上中央基準描画(int x, int y, RectangleF rc)
         {
-            this.t2D描画(x - (rc.Width / 2 * this.vc拡大縮小倍率.X), y, 1f, rc);
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y, 1f, rc);
         }
         public void t2D_DisplayImage_AnchorUpRight(int x, int y, RectangleF rc)
         {
-            this.t2D描画(x - (rc.Width * this.vc拡大縮小倍率.X), y, 1f, rc);
+            this.t2D描画(x - (rc.Width * this.vcScaleRatio.X), y, 1f, rc);
         }
         public void t2D拡大率考慮上中央基準描画(int x, int y)
         {
-            this.t2D描画(x - (rc全画像.Width / 2 * this.vc拡大縮小倍率.X), y, 1f, rc全画像);
+            this.t2D描画(x - (rc全画像.Width / 2 * this.vcScaleRatio.X), y, 1f, rc全画像);
         }
         public void t2D拡大率考慮中央基準描画(float x, float y)
         {
-            this.t2D描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height / 2 * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮中央基準描画Mirrored(float x, float y)
         {
-            this.t2D左右反転描画(x - (this.szテクスチャサイズ.Width / 2 * this.vc拡大縮小倍率.X), y - (szテクスチャサイズ.Height / 2 * this.vc拡大縮小倍率.Y), 1f, this.rc全画像);
+            this.t2D左右反転描画(x - (this.szTextureSize.Width / 2 * this.vcScaleRatio.X), y - (szTextureSize.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
         public void t2D拡大率考慮中央基準描画(float x, float y, RectangleF rc)
         {
-            this.t2D描画(x - (rc.Width / 2 * this.vc拡大縮小倍率.X), y - (rc.Height / 2 * this.vc拡大縮小倍率.Y), 1f, rc);
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
         }
         public void t2D拡大率考慮描画(RefPnt refpnt, float x, float y)
         {
@@ -635,28 +635,28 @@ namespace FDK
                     this.t2D描画(x, y, depth, rect);
                     break;
                 case RefPnt.Up:
-                    this.t2D描画(x - (rect.Width / 2 * this.vc拡大縮小倍率.X), y, depth, rect);
+                    this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y, depth, rect);
                     break;
                 case RefPnt.UpRight:
-                    this.t2D描画(x - rect.Width * this.vc拡大縮小倍率.X, y, depth, rect);
+                    this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y, depth, rect);
                     break;
                 case RefPnt.Left:
-                    this.t2D描画(x, y - (rect.Height / 2 * this.vc拡大縮小倍率.Y), depth, rect);
+                    this.t2D描画(x, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
                     break;
                 case RefPnt.Center:
-                    this.t2D描画(x - (rect.Width / 2 * this.vc拡大縮小倍率.X), y - (rect.Height / 2 * this.vc拡大縮小倍率.Y), depth, rect);
+                    this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
                     break;
                 case RefPnt.Right:
-                    this.t2D描画(x - rect.Width * this.vc拡大縮小倍率.X, y - (rect.Height / 2 * this.vc拡大縮小倍率.Y), depth, rect);
+                    this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y - (rect.Height / 2 * this.vcScaleRatio.Y), depth, rect);
                     break;
                 case RefPnt.DownLeft:
-                    this.t2D描画(x, y - rect.Height * this.vc拡大縮小倍率.Y, depth, rect);
+                    this.t2D描画(x, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
                     break;
                 case RefPnt.Down:
-                    this.t2D描画(x - (rect.Width / 2 * this.vc拡大縮小倍率.X), y - rect.Height * this.vc拡大縮小倍率.Y, depth, rect);
+                    this.t2D描画(x - (rect.Width / 2 * this.vcScaleRatio.X), y - rect.Height * this.vcScaleRatio.Y, depth, rect);
                     break;
                 case RefPnt.DownRight:
-                    this.t2D描画(x - rect.Width * this.vc拡大縮小倍率.X, y - rect.Height * this.vc拡大縮小倍率.Y, depth, rect);
+                    this.t2D描画(x - rect.Width * this.vcScaleRatio.X, y - rect.Height * this.vcScaleRatio.Y, depth, rect);
                     break;
                 default:
                     break;
@@ -742,7 +742,7 @@ namespace FDK
 
                 //スケーリング-----
                 mvp *= Matrix4X4.CreateScale(rc画像内の描画領域.Width / GameWindowSize.Width, rc画像内の描画領域.Height / GameWindowSize.Height, 1) * 
-                    Matrix4X4.CreateScale(flipX ? -vc拡大縮小倍率.X : vc拡大縮小倍率.X, flipY ? -vc拡大縮小倍率.Y : vc拡大縮小倍率.Y, 1.0f);
+                    Matrix4X4.CreateScale(flipX ? -vcScaleRatio.X : vcScaleRatio.X, flipY ? -vcScaleRatio.Y : vcScaleRatio.Y, 1.0f);
                 //-----
 
                 //回転-----
@@ -752,8 +752,8 @@ namespace FDK
                 //-----
 
                 //移動----
-                float offsetX = rc画像内の描画領域.Width * vc拡大縮小倍率.X / GameWindowSize.Width;
-                float offsetY = rc画像内の描画領域.Height * vc拡大縮小倍率.Y / GameWindowSize.Height;
+                float offsetX = rc画像内の描画領域.Width * vcScaleRatio.X / GameWindowSize.Width;
+                float offsetY = rc画像内の描画領域.Height * vcScaleRatio.Y / GameWindowSize.Height;
                 mvp *= Matrix4X4.CreateTranslation(offsetX, -offsetY, 0.0f);
                 mvp *= Matrix4X4.CreateTranslation(-1.0f, 1.0f, 0);
                 mvp *= Matrix4X4.CreateTranslation(x / GameWindowSize.Width * 2, -y / GameWindowSize.Height * 2, 0.0f);

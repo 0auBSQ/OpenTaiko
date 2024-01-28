@@ -33,7 +33,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            TJAPlayer3.t安全にDisposeする( ref this.ct分岐アニメ進行 );
+            TJAPlayer3.tDisposeSafely( ref this.ct分岐アニメ進行 );
             base.DeActivate();
         }
 

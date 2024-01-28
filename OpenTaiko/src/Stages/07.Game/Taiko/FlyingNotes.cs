@@ -101,7 +101,7 @@ namespace TJAPlayer3
                         {
                             Flying[i].Counter.Stop();
                             Flying[i].IsUsing = false;
-                            TJAPlayer3.stage演奏ドラム画面.actGauge.Start(Flying[i].Lane, E判定.Perfect, Flying[i].Player);
+                            TJAPlayer3.stage演奏ドラム画面.actGauge.Start(Flying[i].Lane, ENoteJudge.Perfect, Flying[i].Player);
                             TJAPlayer3.stage演奏ドラム画面.actChipEffects.Start(Flying[i].Player, Flying[i].Lane);
                         }
                         for (int n = Flying[i].OldValue; n < Flying[i].Counter.CurrentValue; n += 16)

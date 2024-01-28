@@ -127,12 +127,12 @@ namespace TJAPlayer3
 		/// <param name="bGRmode">GRmodeか否か</param>
 		/// <param name="bReverse">Reverseか否か</param>
 		/// <returns></returns>
-		public int n判定ラインY座標( E楽器パート eInst, bool bGRmode, bool bReverse )
+		public int n判定ラインY座標( EInstrumentPad eInst, bool bGRmode, bool bReverse )
 		{
 			return n判定ラインY座標( eInst, bGRmode, bReverse, false );
 		}
 
-		public int n判定ラインY座標( E楽器パート eInst, bool bGRmode, bool bReverse, bool bWailingFrame )
+		public int n判定ラインY座標( EInstrumentPad eInst, bool bGRmode, bool bReverse, bool bWailingFrame )
 		{
 			return n判定ラインY座標( eInst, bGRmode, bReverse, bWailingFrame, false );
 		}
@@ -146,13 +146,13 @@ namespace TJAPlayer3
 		/// <param name="bWailingFrame">Wailing枠の座標か、判定ラインの座標か</param>
 		/// <param name="b補正あり">プレーヤーのライン表示位置補正情報を加えるかどうか</param>
 		/// <returns></returns>
-		public int n判定ラインY座標( E楽器パート eInst, bool bGRmode, bool bReverse, bool bWailingFrame, bool b補正あり )
+		public int n判定ラインY座標( EInstrumentPad eInst, bool bGRmode, bool bReverse, bool bWailingFrame, bool b補正あり )
 		{
-			if ( eInst == E楽器パート.DRUMS )
+			if ( eInst == EInstrumentPad.DRUMS )
 			{
 				throw new NotImplementedException();
 			}
-			else if ( eInst == E楽器パート.UNKNOWN )
+			else if ( eInst == EInstrumentPad.UNKNOWN )
 			{
 				throw new ArgumentOutOfRangeException();
 			}
@@ -177,13 +177,13 @@ namespace TJAPlayer3
 			}
 		}
 
-		public int n演奏RGBボタンY座標( E楽器パート eInst, bool bGRmode, bool bReverse )
+		public int n演奏RGBボタンY座標( EInstrumentPad eInst, bool bGRmode, bool bReverse )
 		{
-			if ( eInst == E楽器パート.DRUMS )
+			if ( eInst == EInstrumentPad.DRUMS )
 			{
 				throw new NotImplementedException();
 			}
-			else if ( eInst == E楽器パート.UNKNOWN )
+			else if ( eInst == EInstrumentPad.UNKNOWN )
 			{
 				throw new ArgumentOutOfRangeException();
 			}

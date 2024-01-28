@@ -56,12 +56,12 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.AIBattle_SectionTime_Panel?.t2D描画(TJAPlayer3.Skin.Game_AIBattle_SectionTime_Panel[0], TJAPlayer3.Skin.Game_AIBattle_SectionTime_Panel[1]);
 
             TJAPlayer3.Tx.AIBattle_SectionTime_Bar_Base?.t2D描画(TJAPlayer3.Skin.Game_AIBattle_SectionTime_Bar[0], TJAPlayer3.Skin.Game_AIBattle_SectionTime_Bar[1],
-                new System.Drawing.RectangleF(0, 0, TJAPlayer3.Tx.AIBattle_SectionTime_Bar_Base.szテクスチャサイズ.Width, TJAPlayer3.Tx.AIBattle_SectionTime_Bar_Base.szテクスチャサイズ.Height));
+                new System.Drawing.RectangleF(0, 0, TJAPlayer3.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Width, TJAPlayer3.Tx.AIBattle_SectionTime_Bar_Base.szTextureSize.Height));
 
             void drawBar(CTexture barTex, float length)
             {
                 barTex?.t2D描画(TJAPlayer3.Skin.Game_AIBattle_SectionTime_Bar[0], TJAPlayer3.Skin.Game_AIBattle_SectionTime_Bar[1],
-                    new System.Drawing.RectangleF(0, 0, barTex.szテクスチャサイズ.Width * length, barTex.szテクスチャサイズ.Height));
+                    new System.Drawing.RectangleF(0, 0, barTex.szTextureSize.Width * length, barTex.szTextureSize.Height));
             }
 
             var nowSection = TJAPlayer3.stage演奏ドラム画面.NowAIBattleSection;
@@ -83,8 +83,8 @@ namespace TJAPlayer3
             {
                 int upDown = (i % 2);
 
-                int base_width = TJAPlayer3.Tx.AIBattle_Batch_Base.szテクスチャサイズ.Width / 6;
-                int base_height = TJAPlayer3.Tx.AIBattle_Batch_Base.szテクスチャサイズ.Height;
+                int base_width = TJAPlayer3.Tx.AIBattle_Batch_Base.szTextureSize.Width / 6;
+                int base_height = TJAPlayer3.Tx.AIBattle_Batch_Base.szTextureSize.Height;
 
                 int base_x = TJAPlayer3.Skin.Game_AIBattle_Batch_Base[0] + (TJAPlayer3.Skin.Game_AIBattle_Batch_Move[0] * i);
                 int base_y = TJAPlayer3.Skin.Game_AIBattle_Batch_Base[1] + (TJAPlayer3.Skin.Game_AIBattle_Batch_Move[1] * upDown);
@@ -114,8 +114,8 @@ namespace TJAPlayer3
 
                 int upDown = (i % 2);
 
-                int width = TJAPlayer3.Tx.AIBattle_Batch.szテクスチャサイズ.Width / 6;
-                int height = TJAPlayer3.Tx.AIBattle_Batch.szテクスチャサイズ.Height / 2;
+                int width = TJAPlayer3.Tx.AIBattle_Batch.szTextureSize.Width / 6;
+                int height = TJAPlayer3.Tx.AIBattle_Batch.szTextureSize.Height / 2;
 
                 float value = 0.0f;
 
@@ -161,8 +161,8 @@ namespace TJAPlayer3
                 float size_y = TJAPlayer3.Skin.Game_AIBattle_Batch_Anime_Size[1] +
                     ((TJAPlayer3.Skin.Game_AIBattle_Batch_Size[1] - TJAPlayer3.Skin.Game_AIBattle_Batch_Anime_Size[1]) * value);
 
-                TJAPlayer3.Tx.AIBattle_Batch.vc拡大縮小倍率.X = (size_x / (float)width) + inScale;
-                TJAPlayer3.Tx.AIBattle_Batch.vc拡大縮小倍率.Y = (size_y / (float)height) + inScale;
+                TJAPlayer3.Tx.AIBattle_Batch.vcScaleRatio.X = (size_x / (float)width) + inScale;
+                TJAPlayer3.Tx.AIBattle_Batch.vcScaleRatio.Y = (size_y / (float)height) + inScale;
 
                 switch (section.End)
                 {

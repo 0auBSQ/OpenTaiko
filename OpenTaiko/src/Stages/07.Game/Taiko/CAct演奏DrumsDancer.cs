@@ -22,7 +22,7 @@ namespace TJAPlayer3
         {
             //this.ct踊り子モーション = new CCounter();
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
                 return;
 
             var preset = HScenePreset.GetBGPreset();
@@ -116,7 +116,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower || TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
                 return;
                 
             //this.ct踊り子モーション = null;
@@ -148,7 +148,7 @@ namespace TJAPlayer3
                 this.IsFirstDraw = true;
             }
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
             {
                 if (TJAPlayer3.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0)
                 {

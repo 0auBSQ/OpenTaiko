@@ -9,7 +9,7 @@ using FDK;
 
 using Rectangle = System.Drawing.Rectangle;
 using Point = System.Drawing.Point;
-using static TJAPlayer3.C曲リストノード;
+using static TJAPlayer3.CSongListNode;
 
 namespace TJAPlayer3
 {
@@ -79,7 +79,7 @@ namespace TJAPlayer3
 				}
 				this.ct登場アニメ用.Tick();
 				this.ctセンサ光.TickLoop();
-				if( ( !TJAPlayer3.stage選曲.bスクロール中 && ( this.ct遅延表示 != null ) ) && this.ct遅延表示.IsTicked )
+				if( ( !TJAPlayer3.stageSongSelect.bCurrentlyScrolling && ( this.ct遅延表示 != null ) ) && this.ct遅延表示.IsTicked )
 				{
 					this.ct遅延表示.Tick();
 					if ( ( this.ct遅延表示.CurrentValue >= 0 ) && this.b新しいプレビューファイルをまだ読み込んでいない )
@@ -151,7 +151,7 @@ namespace TJAPlayer3
 		}
 		private bool tプレビュー画像の指定があれば構築する()
 		{
-            Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
+            Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
             if ((cスコア == null) || string.IsNullOrEmpty(cスコア.譜面情報.Preimage)) return false;
 
             string str = ((!Path.IsPathRooted(cスコア.譜面情報.Preimage)) ? cスコア.ファイル情報.フォルダの絶対パス : "") + cスコア.譜面情報.Preimage;
@@ -181,14 +181,14 @@ namespace TJAPlayer3
         /// </summary>
 		private void t描画処理_ジャンル文字列()
 		{
-			C曲リストノード c曲リストノード = TJAPlayer3.stage選曲.r現在選択中の曲;
-			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
+			CSongListNode c曲リストノード = TJAPlayer3.stageSongSelect.rNowSelectedSong;
+			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
 			if( ( c曲リストノード != null ) && ( cスコア != null ) )
 			{
 				string str = "";
 				switch( c曲リストノード.eノード種別 )
 				{
-					case C曲リストノード.Eノード種別.SCORE:
+					case CSongListNode.ENodeType.SCORE:
 						if( ( c曲リストノード.strジャンル == null ) || ( c曲リストノード.strジャンル.Length <= 0 ) )
 						{
 							if( ( cスコア.譜面情報.ジャンル != null ) && ( cスコア.譜面情報.ジャンル.Length > 0 ) )
@@ -228,19 +228,19 @@ namespace TJAPlayer3
 						str = c曲リストノード.strジャンル;
 						break;
 
-					case C曲リストノード.Eノード種別.SCORE_MIDI:
+					case CSongListNode.ENodeType.SCORE_MIDI:
 						str = "MIDI";
 						break;
 
-					case C曲リストノード.Eノード種別.BOX:
+					case CSongListNode.ENodeType.BOX:
 						str = "MusicBox";
 						break;
 
-					case C曲リストノード.Eノード種別.BACKBOX:
+					case CSongListNode.ENodeType.BACKBOX:
 						str = "BackBox";
 						break;
 
-					case C曲リストノード.Eノード種別.RANDOM:
+					case CSongListNode.ENodeType.RANDOM:
 						str = "Random";
 						break;
 
@@ -260,7 +260,7 @@ namespace TJAPlayer3
 				int y = this.n本体Y + 0x7b;
 				if( this.txセンサ光 != null )
 				{
-					this.txセンサ光.vc拡大縮小倍率 = new Vector3D<float>( 1f, 1f, 1f );
+					this.txセンサ光.vcScaleRatio = new Vector3D<float>( 1f, 1f, 1f );
 					this.txセンサ光.Opacity = 0xff;
 					this.txセンサ光.t2D描画( x, y, new Rectangle( ( num % 4 ) * 0x40, ( num / 4 ) * 0x40, 0x40, 0x40 ) );
 				}
@@ -276,7 +276,7 @@ namespace TJAPlayer3
 				int num10 = ( ( this.n本体Y + 0x7b ) + 0x20 ) - ( num8 / 2 );
 				if( this.txセンサ光 != null )
 				{
-					this.txセンサ光.vc拡大縮小倍率 = new Vector3D<float>( (float) num6, (float) num6, 1f );
+					this.txセンサ光.vcScaleRatio = new Vector3D<float>( (float) num6, (float) num6, 1f );
 					this.txセンサ光.Opacity = (int) ( 255.0 * ( 1.0 - num5 ) );
 					this.txセンサ光.t2D描画( num9, num10, this.rcセンサ光 );
 				}
@@ -317,7 +317,7 @@ namespace TJAPlayer3
 		}
 		private unsafe void t描画処理_プレビュー画像()
 		{
-			if( !TJAPlayer3.stage選曲.bスクロール中 && ( ( ( this.ct遅延表示 != null ) && ( this.ct遅延表示.CurrentValue > 0 ) ) && !this.b新しいプレビューファイルをまだ読み込んでいない ) )
+			if( !TJAPlayer3.stageSongSelect.bCurrentlyScrolling && ( ( ( this.ct遅延表示 != null ) && ( this.ct遅延表示.CurrentValue > 0 ) ) && !this.b新しいプレビューファイルをまだ読み込んでいない ) )
 			{
 				int x = this.n本体X + 0x12;
 				int y = this.n本体Y + 0x10;
@@ -349,8 +349,8 @@ namespace TJAPlayer3
 					y += ( 400 - ( (int) ( height * num4 ) ) ) / 2;
 
 					this.r表示するプレビュー画像.Opacity = (int) ( 255f * num3 );
-					this.r表示するプレビュー画像.vc拡大縮小倍率.X = num4 * xRatio;
-					this.r表示するプレビュー画像.vc拡大縮小倍率.Y = num4 * xRatio;
+					this.r表示するプレビュー画像.vcScaleRatio.X = num4 * xRatio;
+					this.r表示するプレビュー画像.vcScaleRatio.Y = num4 * xRatio;
 
 					// this.r表示するプレビュー画像.t2D描画( x + 22, y + 12, new Rectangle( 0, 0, width, height ) );
 

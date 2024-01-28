@@ -197,7 +197,7 @@ namespace TJAPlayer3
             public int n描画優先度; //(特殊)現状連打との判断目的で使用
             public ENoteState eNoteState;
             public EAVI種別 eAVI種別;
-            public E楽器パート e楽器パート = E楽器パート.UNKNOWN;
+            public EInstrumentPad e楽器パート = EInstrumentPad.UNKNOWN;
             public int nチャンネル番号;
             public int VideoStartTimeMs;
             public STDGBVALUE<int> nバーからの距離dot;
@@ -357,7 +357,7 @@ namespace TJAPlayer3
                 this.bHit = false;
                 this.IsMissed = false;
                 this.b可視 = true;
-                this.e楽器パート = E楽器パート.UNKNOWN;
+                this.e楽器パート = EInstrumentPad.UNKNOWN;
                 this.n透明度 = 0xff;
                 this.nバーからの距離dot.Drums = 0;
                 this.nバーからの距離dot.Guitar = 0;
@@ -632,7 +632,7 @@ namespace TJAPlayer3
                     for (int i = 0; i < TJAPlayer3.ConfigIni.nPoliphonicSounds; i++) // 4
                     {
                         if (this.rSound[i] != null)
-                            TJAPlayer3.Sound管理.tDisposeSound(this.rSound[i]);
+                            TJAPlayer3.SoundManager.tDisposeSound(this.rSound[i]);
                         this.rSound[i] = null;
 
                         if ((i == 0) && TJAPlayer3.ConfigIni.bLog作成解放ログ出力)
@@ -1537,7 +1537,7 @@ namespace TJAPlayer3
                 #region [ 同時発音数を、チャンネルによって変える ]
 
                 int nPoly = nPolyphonicSounds;
-                if (TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+                if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
                 {
                     // チップのライフタイム管理を行わない
                     if (cwav.bIsBassSound) nPoly = (nPolyphonicSounds >= 2) ? 2 : 1;
@@ -1554,7 +1554,7 @@ namespace TJAPlayer3
                 {
                     try
                     {
-                        cwav.rSound[i] = TJAPlayer3.Sound管理.tCreateSound(str, ESoundGroup.SongPlayback);
+                        cwav.rSound[i] = TJAPlayer3.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
 
                         if (!TJAPlayer3.ConfigIni.bDynamicBassMixerManagement)
                         {
@@ -6708,7 +6708,7 @@ namespace TJAPlayer3
                                     chip.nコース = n現在のコース;
 
                                 chip.n分岐回数 = this.n内部番号BRANCH1to;
-                                chip.e楽器パート = E楽器パート.TAIKO;
+                                chip.e楽器パート = EInstrumentPad.TAIKO;
                                 chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
                                 chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
                                 chip.nPlayerSide = this.nPlayerSide;
@@ -8240,7 +8240,7 @@ namespace TJAPlayer3
         /// </summary>
         public void PlanToAddMixerChannel()
         {
-            if (TJAPlayer3.Sound管理.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+            if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
             {                                                                       // チップのライフタイム管理を行わない
                 return;
             }
@@ -8695,7 +8695,7 @@ namespace TJAPlayer3
                     }
                     this.listVD = null;
                 }
-                TJAPlayer3.t安全にDisposeする(ref this.pf歌詞フォント);
+                TJAPlayer3.tDisposeSafely(ref this.pf歌詞フォント);
                 base.ReleaseManagedResource();
             }
         }
@@ -9498,15 +9498,15 @@ namespace TJAPlayer3
                 //-----------------
                 if ((nチャンネル番号 >= 0x11) && (nチャンネル番号 <= 0x1C))
                 {
-                    chip.e楽器パート = E楽器パート.DRUMS;
+                    chip.e楽器パート = EInstrumentPad.DRUMS;
                 }
                 if ((nチャンネル番号 >= 0x20) && (nチャンネル番号 <= 0x27))
                 {
-                    chip.e楽器パート = E楽器パート.GUITAR;
+                    chip.e楽器パート = EInstrumentPad.GUITAR;
                 }
                 if ((nチャンネル番号 >= 160) && (nチャンネル番号 <= 0xA7))
                 {
-                    chip.e楽器パート = E楽器パート.BASS;
+                    chip.e楽器パート = EInstrumentPad.BASS;
                 }
                 //-----------------
                 #endregion

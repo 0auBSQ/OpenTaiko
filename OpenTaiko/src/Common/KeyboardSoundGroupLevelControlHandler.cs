@@ -32,13 +32,13 @@ namespace TJAPlayer3
             if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 
             ESoundGroup soundGroup;
-            CSkin.Cシステムサウンド システムサウンド = null;
+            CSkin.CSystemSound システムサウンド = null;
 
             if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) ||
                 keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl))
             {
                 soundGroup = ESoundGroup.SoundEffect;
-                システムサウンド = skin.sound決定音;
+                システムサウンド = skin.soundDecideSFX;
             }
             else if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift) ||
                      keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift))
@@ -52,7 +52,7 @@ namespace TJAPlayer3
             }
 
             soundGroupLevelController.AdjustLevel(soundGroup, isAdjustmentPositive);
-            システムサウンド?.t再生する();
+            システムサウンド?.tPlay();
         }
     }
 }

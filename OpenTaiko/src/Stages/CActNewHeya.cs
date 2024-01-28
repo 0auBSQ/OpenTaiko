@@ -231,7 +231,7 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-			if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide)) || ((TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))
+			if ((TJAPlayer3.Pad.bPressedDGB(EPad.Decide)) || ((TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))
             {
                 switch(CurrentState)
                 {
@@ -241,13 +241,13 @@ namespace TJAPlayer3
                         {
                             case 0:
                             Close();
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                             break;
                             default:
                             {
                                 CurrentPlayer = TJAPlayer3.GetActualPlayer(CurrentIndex - 1);
                                 SetState(SelectableInfo.ModeSelect);
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.soundDecideSFX.tPlay();
                             }
                             break;
                         }
@@ -259,12 +259,12 @@ namespace TJAPlayer3
                         {
                             case 0:
                             SetState(SelectableInfo.PlayerSelect);
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                             break;
                             default:
                             {
                                 SetState(SelectableInfo.Select);
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.soundDecideSFX.tPlay();
                             }
                             break;
                         }
@@ -285,8 +285,8 @@ namespace TJAPlayer3
                                     //TJAPlayer3.NamePlateConfig.tApplyHeyaChanges();
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.PuchiChara = TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex];// iPuchiCharaCurrent;
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
-                                    TJAPlayer3.Tx.Puchichara[CurrentIndex].welcome.t再生する();
+                                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
+                                    TJAPlayer3.Tx.Puchichara[CurrentIndex].welcome.tPlay();
 
                                     SetState(SelectableInfo.PlayerSelect);
                                 }
@@ -296,11 +296,11 @@ namespace TJAPlayer3
                                     //TJAPlayer3.NamePlateConfig.tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0], iPlayer);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Add(TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex]);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tSpendCoins(TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.Values[0]);
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                                 }
                                 else 
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                             }
                             break;
@@ -320,8 +320,8 @@ namespace TJAPlayer3
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tUpdateCharacterName(TJAPlayer3.Skin.Characters_DirName[CurrentIndex]);
 
                                     // Welcome voice using Sanka
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
-                                    TJAPlayer3.Skin.voiceTitleSanka[CurrentPlayer]?.t再生する();
+                                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
+                                    TJAPlayer3.Skin.voiceTitleSanka[CurrentPlayer]?.tPlay();
 
                                     CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
@@ -334,11 +334,11 @@ namespace TJAPlayer3
                                 {
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Add(TJAPlayer3.Skin.Characters_DirName[CurrentIndex]);
                                     TJAPlayer3.SaveFileInstances[CurrentPlayer].tSpendCoins(TJAPlayer3.Tx.Characters[CurrentIndex].unlock.Values[0]);
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                                 }
                                 else 
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                             }
                             break;
@@ -361,7 +361,7 @@ namespace TJAPlayer3
 
                                 TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
 
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.soundDecideSFX.tPlay();
                                 SetState(SelectableInfo.PlayerSelect);
                             }
                             break;
@@ -381,7 +381,7 @@ namespace TJAPlayer3
 
                                 TJAPlayer3.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
 
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.soundDecideSFX.tPlay();
                                 SetState(SelectableInfo.PlayerSelect);
                             }
                             break;
@@ -390,22 +390,22 @@ namespace TJAPlayer3
                     break;
                 }
             }
-            else if ((TJAPlayer3.Pad.b押されたDGB(Eパッド.Cancel) || TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)))
+            else if ((TJAPlayer3.Pad.bPressedDGB(EPad.Cancel) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)))
             {
                 Close();
-                TJAPlayer3.Skin.sound取消音.t再生する();
+                TJAPlayer3.Skin.soundCancelSFX.tPlay();
             }
-            else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange)
-				|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
+            else if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)
+				|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
             {
                 ChangeIndex(-1);
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.soundChangeSFX.tPlay();
             }
-			else if (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange)
-				|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
+			else if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)
+				|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
             {
                 ChangeIndex(1);
-                TJAPlayer3.Skin.sound変更音.t再生する();
+                TJAPlayer3.Skin.soundChangeSFX.tPlay();
             }
 
             InFade.Tick();
@@ -413,11 +413,11 @@ namespace TJAPlayer3
 			if (TJAPlayer3.Tx.Tile_Black != null)
 			{
                 TJAPlayer3.Tx.Tile_Black.Opacity = InFade.CurrentValue / 2;
-				for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width); i++)		// #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
+				for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szTextureSize.Width); i++)		// #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 				{
-					for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height); j++)	// #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
+					for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szTextureSize.Height); j++)	// #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 					{
-                        TJAPlayer3.Tx.Tile_Black.t2D描画( i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
+                        TJAPlayer3.Tx.Tile_Black.t2D描画( i * TJAPlayer3.Tx.Tile_Black.szTextureSize.Width, j * TJAPlayer3.Tx.Tile_Black.szTextureSize.Height);
 					}
 				}
 			}
@@ -471,8 +471,8 @@ namespace TJAPlayer3
 
                             if (TJAPlayer3.Tx.Characters_Heya_Preview[index] != null)
                             {
-                                TJAPlayer3.Tx.Characters_Heya_Preview[index].vc拡大縮小倍率.X = charaRatioX;
-                                TJAPlayer3.Tx.Characters_Heya_Preview[index].vc拡大縮小倍率.Y = charaRatioY;
+                                TJAPlayer3.Tx.Characters_Heya_Preview[index].vcScaleRatio.X = charaRatioX;
+                                TJAPlayer3.Tx.Characters_Heya_Preview[index].vcScaleRatio.Y = charaRatioY;
                             }
 
                             TJAPlayer3.Tx.Characters_Heya_Preview[index]?.t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Chara_Offset[1]);
@@ -480,14 +480,14 @@ namespace TJAPlayer3
                             
                             if (ttkCharacterNames[index] != null)
                             {
-                                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterNames[index]);
+                                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterNames[index]);
 
                                 tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
                             }
 
                             if (ttkCharacterAuthors[index] != null)
                             {
-                                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCharacterAuthors[index]);
+                                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterAuthors[index]);
 
                                 tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
                             }
@@ -498,7 +498,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[1]);
                                 
                                 if (this.ttkInfoSection != null)
-                                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkInfoSection)
+                                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
                                         .t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
                             }
                         }
@@ -526,13 +526,13 @@ namespace TJAPlayer3
                             {
                                 float puchiScale = TJAPlayer3.Skin.Resolution[1] / 1080.0f;
 
-                                TJAPlayer3.Tx.Puchichara[index].tx.vc拡大縮小倍率.X = puchiScale;
-                                TJAPlayer3.Tx.Puchichara[index].tx.vc拡大縮小倍率.Y = puchiScale;
+                                TJAPlayer3.Tx.Puchichara[index].tx.vcScaleRatio.X = puchiScale;
+                                TJAPlayer3.Tx.Puchichara[index].tx.vcScaleRatio.Y = puchiScale;
                             }
 
                             TJAPlayer3.Tx.Puchichara[index].tx?.t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], 
-                                y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Chara_Offset[1] + (int)(TJAPlayer3.stage選曲.PuchiChara.sineY), 
-                                new Rectangle((TJAPlayer3.stage選曲.PuchiChara.Counter.CurrentValue + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
+                                y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Chara_Offset[1] + (int)(TJAPlayer3.stageSongSelect.PuchiChara.sineY), 
+                                new Rectangle((TJAPlayer3.stageSongSelect.PuchiChara.Counter.CurrentValue + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
                                 puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
                                 TJAPlayer3.Skin.Game_PuchiChara[0], 
                                 TJAPlayer3.Skin.Game_PuchiChara[1]));
@@ -542,14 +542,14 @@ namespace TJAPlayer3
 
                             if (ttkCharacterNames[index] != null)
                             {
-                                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaNames[index]);
+                                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaNames[index]);
 
                                 tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
                             }
 
                             if (ttkCharacterAuthors[index] != null)
                             {
-                                CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
+                                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
 
                                 tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
                             }
@@ -560,7 +560,7 @@ namespace TJAPlayer3
                                 TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[1]);
                                 
                                 if (this.ttkInfoSection != null)
-                                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkInfoSection)
+                                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
                                         .t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
                             }
                         }
@@ -579,7 +579,7 @@ namespace TJAPlayer3
                             {
                                 index -= CurrentMaxIndex; 
                             }
-                            CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTitles[index]);
+                            CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTitles[index]);
 
                             if (i != 0)
                             {
@@ -628,7 +628,7 @@ namespace TJAPlayer3
                             {
                                 index -= CurrentMaxIndex; 
                             }
-                            CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[index]);
+                            CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[index]);
 
                             if (i != 0)
                             {
@@ -653,8 +653,8 @@ namespace TJAPlayer3
                             }
 
                             TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
-                                x - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Width / 2, 
-                                y - TJAPlayer3.Tx.NamePlateBase.szテクスチャサイズ.Height / 24, 
+                                x - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
+                                y - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
                                 (8 + danGrade));
                             TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
@@ -679,7 +679,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.NewHeya_ModeBar.t2D描画(TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_X[i], TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Y[i]);
                 int title_x = TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_X[i] + TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[0];
                 int title_y = TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Y[i] + TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[1];
-                TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(MenuTitleKeys[i], false).t2D拡大率考慮中央基準描画(title_x, title_y);
+                TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(MenuTitleKeys[i], false).t2D拡大率考慮中央基準描画(title_x, title_y);
             }
 
             return base.Draw();

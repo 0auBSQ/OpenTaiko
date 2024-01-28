@@ -53,7 +53,7 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-            tFloorNumberDraw(TJAPlayer3.Skin.SongSelect_FloorNum_X, TJAPlayer3.Skin.SongSelect_FloorNum_Y, TJAPlayer3.stage選曲.r現在選択中の曲.nTotalFloor);
+            tFloorNumberDraw(TJAPlayer3.Skin.SongSelect_FloorNum_X, TJAPlayer3.Skin.SongSelect_FloorNum_Y, TJAPlayer3.stageSongSelect.rNowSelectedSong.nTotalFloor);
 
             return 0;
         }

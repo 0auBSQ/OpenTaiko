@@ -1503,12 +1503,12 @@ namespace TJAPlayer3
             return array;
         }
 
-        public CSkin.Cシステムサウンド VoiceSelectOggOrWav(string basePath)
+        public CSkin.CSystemSound VoiceSelectOggOrWav(string basePath)
         {
             if (File.Exists(basePath + @$".ogg"))
-                return new CSkin.Cシステムサウンド(basePath + @$".ogg", false, false, true, ESoundGroup.Voice);
+                return new CSkin.CSystemSound(basePath + @$".ogg", false, false, true, ESoundGroup.Voice);
             else
-                return new CSkin.Cシステムサウンド(basePath + @$".wav", false, false, true, ESoundGroup.Voice);
+                return new CSkin.CSystemSound(basePath + @$".wav", false, false, true, ESoundGroup.Voice);
         }
 
         public void ReloadCharacter(int old, int newC, int player, bool primary = false)

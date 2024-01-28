@@ -3,27 +3,27 @@ using System.Collections.Generic;
 
 namespace TJAPlayer3.C曲リストノードComparers
 {
-    internal sealed class C曲リストノードComparerノード種別 : IComparer<C曲リストノード>
+    internal sealed class C曲リストノードComparerノード種別 : IComparer<CSongListNode>
     {
-        public int Compare(C曲リストノード x, C曲リストノード y)
+        public int Compare(CSongListNode x, CSongListNode y)
         {
             return ToComparable(x.eノード種別).CompareTo(ToComparable(y.eノード種別));
         }
 
-        private static int ToComparable(C曲リストノード.Eノード種別 eノード種別)
+        private static int ToComparable(CSongListNode.ENodeType eノード種別)
         {
             switch (eノード種別)
             {
-                case C曲リストノード.Eノード種別.BOX:
+                case CSongListNode.ENodeType.BOX:
                     return 0;
-                case C曲リストノード.Eノード種別.SCORE:
-                case C曲リストノード.Eノード種別.SCORE_MIDI:
+                case CSongListNode.ENodeType.SCORE:
+                case CSongListNode.ENodeType.SCORE_MIDI:
                     return 1;
-                case C曲リストノード.Eノード種別.UNKNOWN:
+                case CSongListNode.ENodeType.UNKNOWN:
                     return 2;
-                case C曲リストノード.Eノード種別.RANDOM:
+                case CSongListNode.ENodeType.RANDOM:
                     return 4;
-                case C曲リストノード.Eノード種別.BACKBOX:
+                case CSongListNode.ENodeType.BACKBOX:
                     return 3;
                 default:
                     throw new ArgumentOutOfRangeException();

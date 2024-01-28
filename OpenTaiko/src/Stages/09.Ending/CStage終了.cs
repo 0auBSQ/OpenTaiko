@@ -45,7 +45,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 				base.DeActivate();
 			}
 			finally
@@ -89,7 +89,7 @@ namespace TJAPlayer3
 			{
 				if( base.IsFirstDraw )
 				{
-					TJAPlayer3.Skin.soundゲーム終了音.t再生する();
+					TJAPlayer3.Skin.soundゲーム終了音.tPlay();
 					this.ct時間稼ぎ.Start( 0, TJAPlayer3.Skin.Exit_Duration, 1, TJAPlayer3.Timer );
                     base.IsFirstDraw = false;
 				}
@@ -102,7 +102,7 @@ namespace TJAPlayer3
 
 				//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
-                if( this.ct時間稼ぎ.IsEnded && !TJAPlayer3.Skin.soundゲーム終了音.b再生中 )
+                if( this.ct時間稼ぎ.IsEnded && !TJAPlayer3.Skin.soundゲーム終了音.bIsPlaying )
 				{
 					return 1;
 				}

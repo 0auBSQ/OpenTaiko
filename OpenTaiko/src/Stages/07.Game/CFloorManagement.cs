@@ -35,7 +35,7 @@ namespace TJAPlayer3
                 CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDurationSpeedDependent + 1000, 1, TJAPlayer3.Timer);
                 CFloorManagement.CurrentNumberOfLives--;
                 //TJAPlayer3.Skin.soundTowerMiss.t再生する();
-                TJAPlayer3.Skin.voiceTowerMiss[TJAPlayer3.SaveFile]?.t再生する();
+                TJAPlayer3.Skin.voiceTowerMiss[TJAPlayer3.SaveFile]?.tPlay();
             }
         }
 

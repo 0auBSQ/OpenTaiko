@@ -29,7 +29,7 @@ namespace TJAPlayer3
 		}
 		public SoundManager Sound管理
 		{
-			get { return TJAPlayer3.Sound管理; }
+			get { return TJAPlayer3.SoundManager; }
 		}
 		public Size ClientSize
 		{
@@ -62,7 +62,7 @@ namespace TJAPlayer3
 		public void tシステムサウンドを再生する( Eシステムサウンド sound )
 		{
 			if( TJAPlayer3.Skin != null )
-				TJAPlayer3.Skin[ sound ].t再生する();
+				TJAPlayer3.Skin[ sound ].tPlay();
 		}
 		
 		

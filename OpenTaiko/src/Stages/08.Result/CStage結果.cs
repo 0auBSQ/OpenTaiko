@@ -70,7 +70,7 @@ namespace TJAPlayer3
 		public int GetTowerScoreRank()
         {
 			int tmpClear = 0;
-			double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor);
+			double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
 
 			// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
 			bool[] conditions =
@@ -107,7 +107,7 @@ namespace TJAPlayer3
 			
 			Trace.TraceInformation("結果ステージを活性化します。");
 			Trace.Indent();
-			b最近遊んだ曲追加済み = false;
+			bAddedToRecentlyPlayedSongs = false;
 			try
 			{
 				int[] ClearStatus_Replay = new int[5] { 0, 0, 0, 0, 0 };
@@ -172,7 +172,7 @@ namespace TJAPlayer3
 
 					#endregion
 
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
 					{
 						for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
                         {
@@ -189,7 +189,7 @@ namespace TJAPlayer3
 								}
 							}
 
-							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, p) < 500000)
+							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, p) < 500000)
 							{
 								this.nスコアランク[p] = 0;
 							}
@@ -199,7 +199,7 @@ namespace TJAPlayer3
 
 								for (int i = 0; i < 7; i++)
 								{
-									if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, p) >= sr[i])
+									if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, p) >= sr[i])
 									{
 										this.nスコアランク[p] = i + 1;
 									}
@@ -270,7 +270,7 @@ namespace TJAPlayer3
 
 					
 
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
                     {
                         // Regular (Ensou game) Score and Score Rank saves
 
@@ -278,11 +278,11 @@ namespace TJAPlayer3
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
-							int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[i];
+							int diff = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i];
 
 							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
 							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
-							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i));
+							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i));
 
 							ClearStatus_Replay[i] = this.nクリア[i];
 							ScoreRank_Replay[i] = this.nスコアランク[i];
@@ -301,7 +301,7 @@ namespace TJAPlayer3
 						#endregion
 
 					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					{
 						/* == Specific format for DaniDoujou charts ==
 						**
@@ -343,18 +343,18 @@ namespace TJAPlayer3
 						if (isAutoDisabled(0))
 						{
 							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
-							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
+							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0)); ;
 
 							ClearStatus_Replay[0] = clearValue;
 
 							#region [ Update Dan Dojo exam results ]
-							for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+							for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++)
                             {
-								for (int j = 0; j < TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C.Length; j++)
+								for (int j = 0; j < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++)
                                 {
-									if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetCleared()[0])
+									if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetCleared()[0])
                                     {
-										int amount = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetAmount();
+										int amount = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
 										int current = -1;
 										try
 										{
@@ -375,11 +375,11 @@ namespace TJAPlayer3
                                         {
 											ini[0].stセクション[0].nExamResult[i][j] = amount;
                                         }
-										else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More)
+										else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More)
                                         {
 											ini[0].stセクション[0].nExamResult[i][j] = (amount > current) ? amount : current;
 										}
-										else if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less)
+										else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less)
 										{
 											ini[0].stセクション[0].nExamResult[i][j] = (amount < current) ? amount : current;
 										}
@@ -405,7 +405,7 @@ namespace TJAPlayer3
 								TJAPlayer3.SaveFile);
 							*/
 
-                            this.newGradeGranted = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
+                            this.newGradeGranted = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tUpdateDanTitle(TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル.Substring(0, 2),
                                 clearValue % 2 == 0,
                                 (clearValue - 1) / 2);
                         }
@@ -413,7 +413,7 @@ namespace TJAPlayer3
 						#endregion
 
 					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 					{
 						// Clear if top reached, then FC or DFC like any regular chart
 						// Score Rank cointains highest reached floor
@@ -426,7 +426,7 @@ namespace TJAPlayer3
 						{
 							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
 							ini[0].stセクション[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
-							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0)); ;
+							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0)); ;
 
 							ClearStatus_Replay[0] = tmpClear;
 
@@ -474,14 +474,14 @@ namespace TJAPlayer3
 						"+"
 					};
 
-					int level = TJAPlayer3.stage選曲.r確定された曲.nLevel[diff];
-					CDTX.ELevelIcon levelIcon = TJAPlayer3.stage選曲.r確定された曲.nLevelIcon[diff];
+					int level = TJAPlayer3.stageSongSelect.rChoosenSong.nLevel[diff];
+					CDTX.ELevelIcon levelIcon = TJAPlayer3.stageSongSelect.rChoosenSong.nLevelIcon[diff];
 
 					return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 				}
 
-				string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stage選曲.r確定された曲.strタイトル
-					+ diffToString(TJAPlayer3.stage選曲.n確定された曲の難易度[0]) : "";
+				string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
+					+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
 
 				// Discord Presenseの更新
 				TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
@@ -520,11 +520,11 @@ namespace TJAPlayer3
 
 				float[] modMultipliers =
 				{
-					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 0),
-					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 1),
-					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 2),
-					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 3),
-					TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 4)
+					TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 0),
+					TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 1),
+					TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 2),
+					TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 3),
+					TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 4)
 				};
 
 				float getCoinMul(int player)
@@ -536,16 +536,16 @@ namespace TJAPlayer3
 					return chara.GetEffectCoinMultiplier() * puchichara.GetEffectCoinMultiplier();
 				}
 
-				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				{
 					diffModifier = 3;
 
-					int stars = TJAPlayer3.stage選曲.r確定された曲.arスコア[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower];
+					int stars = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower];
 
 					starRate = Math.Min(10, stars) / 2;
 					redStarRate = Math.Max(0, stars - 10) * 4;
 
-					int maxFloors = TJAPlayer3.stage選曲.r確定された曲.arスコア[(int)Difficulty.Tower].譜面情報.nTotalFloor;
+					int maxFloors = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nTotalFloor;
 
 					double floorRate = Math.Pow(CFloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
 					double lengthBonus = Math.Max(1, maxFloors / 140.0);
@@ -567,7 +567,7 @@ namespace TJAPlayer3
 					this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
 					this.nEarnedMedalsCount[0] = Math.Max(5, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0] * getCoinMul(0)));
 				}
-				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+				else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				{
 					int partialScore = 0;
 
@@ -596,12 +596,12 @@ namespace TJAPlayer3
 
 					#region [Partial scores]
 
-					for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+					for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++)
                     {
-						if (TJAPlayer3.stage選曲.r確定された曲.DanSongs[i] != null)
+						if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i] != null)
                         {
-							int diff = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Difficulty;
-							int stars = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Level;
+							int diff = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Difficulty;
+							int stars = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Level;
 
 							diffModifier = Math.Max(1, Math.Min(3, diff));
 
@@ -627,8 +627,8 @@ namespace TJAPlayer3
 				{
 					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                     {
-						int diff = TJAPlayer3.stage選曲.n確定された曲の難易度[i];
-						int stars = TJAPlayer3.stage選曲.r確定された曲.arスコア[diff].譜面情報.nレベル[diff];
+						int diff = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i];
+						int stars = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[diff].譜面情報.nレベル[diff];
 
 						diffModifier = Math.Max(1, Math.Min(3, diff));
 
@@ -713,8 +713,8 @@ namespace TJAPlayer3
                             }
                         }
 							
-						if (TJAPlayer3.stage選曲.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
-							_sf.tUpdateSongClearStatus(TJAPlayer3.stage選曲.r確定された曲, _cs, TJAPlayer3.stage選曲.n確定された曲の難易度[i]);
+						if (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
+							_sf.tUpdateSongClearStatus(TJAPlayer3.stageSongSelect.rChoosenSong, _cs, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]);
 					}
 				}
 
@@ -773,7 +773,7 @@ namespace TJAPlayer3
 
 				#endregion
 
-				TJAPlayer3.stage選曲.act曲リスト.bFirstCrownLoad = false;
+				TJAPlayer3.stageSongSelect.actSongList.bFirstCrownLoad = false;
 
 				this.ctPhase1 = null;
 				this.ctPhase2 = null;
@@ -789,7 +789,7 @@ namespace TJAPlayer3
 				ctWork_Plate = new CCounter(0, 4000, 1, TJAPlayer3.Timer);
 
 				if (TJAPlayer3.Tx.TowerResult_Background != null)
-					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height - TJAPlayer3.Skin.Resolution[1], 25, TJAPlayer3.Timer);
+					ctTower_Animation = new CCounter(0, TJAPlayer3.Tx.TowerResult_Background.szTextureSize.Height - TJAPlayer3.Skin.Resolution[1], 25, TJAPlayer3.Timer);
 				else
 					ctTower_Animation = new CCounter();
 
@@ -800,9 +800,9 @@ namespace TJAPlayer3
 				b音声再生 = false;
 				this.EndAnime = false;
 
-				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				{
-					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(1001), pfTowerText48, Color.Black, Color.Transparent, 700);
+					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(1001), pfTowerText48, Color.Black, Color.Transparent, 700);
 					this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString(1000), pfTowerText48, Color.White, Color.Black, 700);
 					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString(1002), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
@@ -810,7 +810,7 @@ namespace TJAPlayer3
 					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
-				else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+				else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				{
 					Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
 					Background.Init();
@@ -827,13 +827,13 @@ namespace TJAPlayer3
 					Background.Init();
 				}
 
-				this.ttkDanTitles = new TitleTextureKey[TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count];
+				this.ttkDanTitles = new TitleTextureKey[TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count];
 
-				for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
+				for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++)
 				{
-					this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].bTitleShow
+					this.ttkDanTitles[i] = new TitleTextureKey(TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].bTitleShow
 						? "???" 
-						: TJAPlayer3.stage選曲.r確定された曲.DanSongs[i].Title, 
+						: TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Title, 
 						pfDanTitles, 
 						Color.White, 
 						Color.Black, 
@@ -846,16 +846,16 @@ namespace TJAPlayer3
 				Trace.Unindent();
 			}
 
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
-				bgmResultIn.t再生する();
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
+				bgmResultIn.tPlay();
 		}
 		public override void DeActivate()
 		{
-			TJAPlayer3.t安全にDisposeする(ref Background);
+			TJAPlayer3.tDisposeSafely(ref Background);
 
 			if (this.rResultSound != null)
 			{
-				TJAPlayer3.Sound管理.tDisposeSound(this.rResultSound);
+				TJAPlayer3.SoundManager.tDisposeSound(this.rResultSound);
 				this.rResultSound = null;
 			}
 
@@ -880,15 +880,15 @@ namespace TJAPlayer3
 		public override void ReleaseManagedResource()
 		{
 
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 			{
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText);
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText48);
-				TJAPlayer3.t安全にDisposeする(ref pfTowerText72);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText48);
+				TJAPlayer3.tDisposeSafely(ref pfTowerText72);
 			}
-			else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+			else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			{
-				TJAPlayer3.t安全にDisposeする(ref pfDanTitles);
+				TJAPlayer3.tDisposeSafely(ref pfDanTitles);
 			}
 
 			base.ReleaseManagedResource();
@@ -934,13 +934,13 @@ namespace TJAPlayer3
 				Background?.Update();
 				Background?.Draw();
 
-				if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
                 {
                     #region [Ensou game result screen]
 
-                    if (!b音声再生 && !bgmResultIn.b再生中)
+                    if (!b音声再生 && !bgmResultIn.bIsPlaying)
 					{
-						bgmResultLoop.t再生する();
+						bgmResultLoop.tPlay();
 						b音声再生 = true;
 					}
 					if (!TJAPlayer3.ConfigIni.bAIBattleMode)
@@ -1212,9 +1212,9 @@ namespace TJAPlayer3
 					}
 					*/
 
-					if (!b音声再生 && !bgmResultIn.b再生中)
+					if (!b音声再生 && !bgmResultIn.bIsPlaying)
 					{
-						bgmResultLoop.t再生する();
+						bgmResultLoop.tPlay();
 						b音声再生 = true;
 					}
 
@@ -1224,13 +1224,13 @@ namespace TJAPlayer3
 				}
 				else
                 {
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					{
 						double screen_ratio_x = TJAPlayer3.Skin.Resolution[0] / 1280.0;
 
 						#region [Counter processings]
 
-						int songCount = TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count;
+						int songCount = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count;
 
 						/*
 						**	1600 => Dan plate 
@@ -1255,9 +1255,9 @@ namespace TJAPlayer3
 
 						#region [DaniDoujou result screen]
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmDanResult.t再生する();
+							TJAPlayer3.Skin.bgmDanResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1328,8 +1328,8 @@ namespace TJAPlayer3
                         {
 							TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
 
-							int rank_width = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Width / 7;
-							int rank_height = TJAPlayer3.Tx.DanResult_Rank.szテクスチャサイズ.Height;
+							int rank_width = TJAPlayer3.Tx.DanResult_Rank.szTextureSize.Width / 7;
+							int rank_height = TJAPlayer3.Tx.DanResult_Rank.szTextureSize.Height;
 
 							if (examStatus != Exam.Status.Failure)
 							{
@@ -1340,18 +1340,18 @@ namespace TJAPlayer3
 								if (unitsBeforeAppearance >= 90)
 								{
 									TJAPlayer3.Tx.DanResult_Rank.Opacity = (int)((270 - unitsBeforeAppearance) / 180.0f * 255.0f);
-									TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
-									TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
+									TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.X = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
+									TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.Y = 1.0f + (float)Math.Sin((360 - unitsBeforeAppearance) / 1.5f * (Math.PI / 180)) * 1.4f;
 								}
 								else if (unitsBeforeAppearance > 0)
 								{
-									TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.X = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
-									TJAPlayer3.Tx.Result_ScoreRankEffect.vc拡大縮小倍率.Y = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
+									TJAPlayer3.Tx.Result_ScoreRankEffect.vcScaleRatio.X = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
+									TJAPlayer3.Tx.Result_ScoreRankEffect.vcScaleRatio.Y = 0.5f + (float)Math.Sin((float)(90 - unitsBeforeAppearance) * (Math.PI / 180)) * 0.5f;
 								}
 								else
 								{
-									TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
-									TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
+									TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.X = 1f;
+									TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.Y = 1f;
 								}
 
 								#endregion
@@ -1390,8 +1390,8 @@ namespace TJAPlayer3
 									TJAPlayer3.Tx.DanResult_Rank.Opacity = (int)((270 - unitsBeforeAppearance) / 180.0f * 255.0f);
 								}
 
-								TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.X = 1f;
-								TJAPlayer3.Tx.DanResult_Rank.vc拡大縮小倍率.Y = 1f;
+								TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.X = 1f;
+								TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.Y = 1f;
 
 								#endregion
 
@@ -1404,9 +1404,9 @@ namespace TJAPlayer3
 
 						#endregion
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmDanResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmDanResult.t再生する();
+							TJAPlayer3.Skin.bgmDanResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1417,9 +1417,9 @@ namespace TJAPlayer3
                     {
 						#region [Tower result screen]
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							TJAPlayer3.Skin.bgmTowerResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1434,15 +1434,15 @@ namespace TJAPlayer3
 							int xFactor = 0;
 							float yFactor = 1f;
 
-							int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType);
+							int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
 
 							if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn_Result)
 								currentTowerType = 0;
 
 							if (TJAPlayer3.Tx.TowerResult_Background != null && TJAPlayer3.Tx.TowerResult_Tower[currentTowerType] != null)
 							{
-								xFactor = (TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Width) / 2;
-								yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szテクスチャサイズ.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szテクスチャサイズ.Height;
+								xFactor = (TJAPlayer3.Tx.TowerResult_Background.szTextureSize.Width - TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szTextureSize.Width) / 2;
+								yFactor = TJAPlayer3.Tx.TowerResult_Tower[currentTowerType].szTextureSize.Height / (float)TJAPlayer3.Tx.TowerResult_Background.szTextureSize.Height;
 							}
 
 							TJAPlayer3.Tx.TowerResult_Background?.t2D描画(0, -1 * this.ctTower_Animation.CurrentValue);
@@ -1461,12 +1461,12 @@ namespace TJAPlayer3
 
 						if (sc >= 0 && TJAPlayer3.Tx.TowerResult_ScoreRankEffect != null)
 						{
-							int scoreRankEffect_width = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Width / 7;
-							int scoreRankEffect_height = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szテクスチャサイズ.Height;
+							int scoreRankEffect_width = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;
+							int scoreRankEffect_height = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szTextureSize.Height;
 
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
-							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.X = 1f;
-							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vc拡大縮小倍率.Y = 1f;
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.X = 1f;
+							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.Y = 1f;
 							TJAPlayer3.Tx.TowerResult_ScoreRankEffect.t2D拡大率考慮中央基準描画(
 								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[0],
 								TJAPlayer3.Skin.TowerResult_ScoreRankEffect[1],
@@ -1479,29 +1479,29 @@ namespace TJAPlayer3
 
 						#region [Text elements]
 
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
-						TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
+						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
+						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
+						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
+						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
 
-						CTexture tmpScoreCount = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkScoreCount);
-						CTexture tmpCurrentFloor = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkReachedFloor);
-						CTexture tmpRemainingLifes = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkRemaningLifes);
+						CTexture tmpScoreCount = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkScoreCount);
+						CTexture tmpCurrentFloor = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkReachedFloor);
+						CTexture tmpRemainingLifes = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkRemaningLifes);
 
-						tmpCurrentFloor?.t2D描画(TJAPlayer3.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_CurrentFloor[1]);
-						tmpScoreCount?.t2D描画(TJAPlayer3.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_ScoreCount[1]);
-						tmpRemainingLifes?.t2D描画(TJAPlayer3.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szテクスチャサイズ.Width, TJAPlayer3.Skin.TowerResult_RemainingLifes[1]);
+						tmpCurrentFloor?.t2D描画(TJAPlayer3.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szTextureSize.Width, TJAPlayer3.Skin.TowerResult_CurrentFloor[1]);
+						tmpScoreCount?.t2D描画(TJAPlayer3.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, TJAPlayer3.Skin.TowerResult_ScoreCount[1]);
+						tmpRemainingLifes?.t2D描画(TJAPlayer3.Skin.TowerResult_RemainingLifes[0] - tmpRemainingLifes.szTextureSize.Width, TJAPlayer3.Skin.TowerResult_RemainingLifes[1]);
 
-						int soul_width = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width;
-						int soul_height = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Height / 2;
+						int soul_width = TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Width;
+						int soul_height = TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Height / 2;
 
 						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.Skin.TowerResult_Gauge_Soul[0], TJAPlayer3.Skin.TowerResult_Gauge_Soul[1], new Rectangle(0, 0, soul_width, soul_height));
 
 						#endregion
 
-						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.b再生中)
+						if (!b音声再生 && !TJAPlayer3.Skin.bgmTowerResult.bIsPlaying)
 						{
-							TJAPlayer3.Skin.bgmTowerResult.t再生する();
+							TJAPlayer3.Skin.bgmTowerResult.tPlay();
 							b音声再生 = true;
 						}
 
@@ -1536,7 +1536,7 @@ namespace TJAPlayer3
 					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) break;
 
 					int pos = i;
-					if (TJAPlayer3.P1IsBlue() && TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower)
+					if (TJAPlayer3.P1IsBlue() && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower)
 						pos = 1;
 
 					int namePlate_x;
@@ -1619,42 +1619,42 @@ namespace TJAPlayer3
 				{
 					if (base.ePhaseID == CStage.EPhase.Common_NORMAL)
 					{
-						if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
+						if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))
 						{
 							#region [ Return to song select screen (Faster method) ]
 
-							bgmResultLoop.t停止する();
-							TJAPlayer3.Skin.bgmDanResult.t停止する();
-							TJAPlayer3.Skin.bgmTowerResult.t停止する();
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							bgmResultLoop.tStop();
+							TJAPlayer3.Skin.bgmDanResult.tStop();
+							TJAPlayer3.Skin.bgmTowerResult.tStop();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							actFI.tフェードアウト開始();
 							
-							if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-								if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
-									TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+							if (TJAPlayer3.latestSongSelect == TJAPlayer3.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+								if (TJAPlayer3.stageSongSelect.rNowSelectedSong.rParentNode != null)
+									TJAPlayer3.stageSongSelect.actSongList.tCloseBOX();
 
-							t後処理();
+							tPostprocessing();
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 
 							#endregion
 						}
-						if (((TJAPlayer3.Pad.b押されたDGB(Eパッド.CY) 
-							|| TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RD)) 
-							|| (TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LC) 
-							|| (TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide) 
-							|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))))
+						if (((TJAPlayer3.Pad.bPressedDGB(EPad.CY) 
+							|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)) 
+							|| (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC) 
+							|| (TJAPlayer3.Pad.bPressedDGB(EPad.Decide) 
+							|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
                             #region [ Skip animations ]
 
-                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] < (int)Difficulty.Tower
-								&& this.actParameterPanel.ct全体進行.CurrentValue < this.actParameterPanel.MountainAppearValue)
+                            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
+								&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue)
                             {
 								this.actParameterPanel.tSkipResultAnimations();
                             }
-							else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan
+							else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
 								&& (ctPhase1 != null && ctPhase1.IsUnEnded))
                             {
 								ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
@@ -1666,8 +1666,8 @@ namespace TJAPlayer3
 							{
 								if (!mqModals.tIsQueueEmpty(0) 
 									&& (
-										TJAPlayer3.Pad.b押されたDGB(Eパッド.Decide)
-										|| TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+										TJAPlayer3.Pad.bPressedDGB(EPad.Decide)
+										|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
 										)
 									)
 								{
@@ -1680,18 +1680,18 @@ namespace TJAPlayer3
 
 									actFI.tフェードアウト開始();
 
-									if (TJAPlayer3.latestSongSelect == TJAPlayer3.stage選曲)
-										if (TJAPlayer3.stage選曲.r現在選択中の曲.r親ノード != null)
-											TJAPlayer3.stage選曲.act曲リスト.tBOXを出る();
+									if (TJAPlayer3.latestSongSelect == TJAPlayer3.stageSongSelect)
+										if (TJAPlayer3.stageSongSelect.rNowSelectedSong.rParentNode != null)
+											TJAPlayer3.stageSongSelect.actSongList.tCloseBOX();
 
-									t後処理();
+									tPostprocessing();
 
 									{
 										base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-										bgmResultLoop.t停止する();
-										TJAPlayer3.Skin.bgmDanResult.t停止する();
-										TJAPlayer3.Skin.bgmTowerResult.t停止する();
+										bgmResultLoop.tStop();
+										TJAPlayer3.Skin.bgmDanResult.tStop();
+										TJAPlayer3.Skin.bgmTowerResult.tStop();
 									}
 
 									#endregion
@@ -1699,51 +1699,51 @@ namespace TJAPlayer3
 							}
 						}
 						else if ((TJAPlayer3.ConfigIni.nPlayerCount > 1 && (
-								TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed2P)
-								|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed2P)
+								TJAPlayer3.Pad.bPressedDGB(EPad.LRed2P)
+								|| TJAPlayer3.Pad.bPressedDGB(EPad.RRed2P)
 							))) {
-							if (!mqModals.tIsQueueEmpty(1) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
+							if (!mqModals.tIsQueueEmpty(1) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
 								displayedModals[1] = mqModals.tPopModal(1);
 								displayedModals[1]?.tPlayModalSfx();
 							}
 						}
 						else if ((TJAPlayer3.ConfigIni.nPlayerCount > 2 && (
-								TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed3P)
-								|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed3P)
+								TJAPlayer3.Pad.bPressedDGB(EPad.LRed3P)
+								|| TJAPlayer3.Pad.bPressedDGB(EPad.RRed3P)
 							)))
 						{
-							if (!mqModals.tIsQueueEmpty(2) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
+							if (!mqModals.tIsQueueEmpty(2) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
 								displayedModals[2] = mqModals.tPopModal(2);
 								displayedModals[2]?.tPlayModalSfx();
 							}
 						}
 						else if ((TJAPlayer3.ConfigIni.nPlayerCount > 3 && (
-								TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed4P)
-								|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed4P)
+								TJAPlayer3.Pad.bPressedDGB(EPad.LRed4P)
+								|| TJAPlayer3.Pad.bPressedDGB(EPad.RRed4P)
 							)))
 						{
-							if (!mqModals.tIsQueueEmpty(3) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
+							if (!mqModals.tIsQueueEmpty(3) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
 								displayedModals[3] = mqModals.tPopModal(3);
 								displayedModals[3]?.tPlayModalSfx();
 							}
 						}
 						else if ((TJAPlayer3.ConfigIni.nPlayerCount > 4 && (
-								TJAPlayer3.Pad.b押されたDGB(Eパッド.LRed5P)
-								|| TJAPlayer3.Pad.b押されたDGB(Eパッド.RRed5P)
+								TJAPlayer3.Pad.bPressedDGB(EPad.LRed5P)
+								|| TJAPlayer3.Pad.bPressedDGB(EPad.RRed5P)
 							)))
 						{
-							if (!mqModals.tIsQueueEmpty(4) && this.actParameterPanel.ct全体進行.CurrentValue >= this.actParameterPanel.MountainAppearValue)
+							if (!mqModals.tIsQueueEmpty(4) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue)
 							{
-								TJAPlayer3.Skin.sound決定音.t再生する();
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
 								displayedModals[4] = mqModals.tPopModal(4);
 								displayedModals[4]?.tPlayModalSfx();
@@ -1751,12 +1751,12 @@ namespace TJAPlayer3
 						}
 
 
-						if (TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange) ||
-							TJAPlayer3.Input管理.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-								TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
+						if (TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
+								TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) ||
+							TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
+								TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange))
 						{
-							if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+							if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
                             {
 								#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
@@ -1770,7 +1770,7 @@ namespace TJAPlayer3
 									else
 										examsShift = -examsShift;
 
-									TJAPlayer3.Skin.sound変更音.t再生する();
+									TJAPlayer3.Skin.soundChangeSFX.tPlay();
 								}
 
 								#endregion
@@ -1818,7 +1818,7 @@ namespace TJAPlayer3
 				totalHit, 1.0f);
 
 			// Large digits
-			this.actParameterPanel.tスコア文字表示(TJAPlayer3.Skin.DanResult_Score[0] + offset, TJAPlayer3.Skin.DanResult_Score[1], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0), 1.0f);
+			this.actParameterPanel.tスコア文字表示(TJAPlayer3.Skin.DanResult_Score[0] + offset, TJAPlayer3.Skin.DanResult_Score[1], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0), 1.0f);
 
 			#endregion
 
@@ -1856,18 +1856,18 @@ namespace TJAPlayer3
 			int baseY = 100 + 183 * i;
 			*/
 
-			var song = TJAPlayer3.stage選曲.r確定された曲.DanSongs[i];
+			var song = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i];
 
 			// TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(scroll + 377, 180 + i * 73, new Rectangle(song.Difficulty * 53, 0, 53, 53));
 
-			int songPanel_main_width = TJAPlayer3.Tx.DanResult_SongPanel_Main.szテクスチャサイズ.Width;
-			int songPanel_main_height = TJAPlayer3.Tx.DanResult_SongPanel_Main.szテクスチャサイズ.Height / 3;
+			int songPanel_main_width = TJAPlayer3.Tx.DanResult_SongPanel_Main.szTextureSize.Width;
+			int songPanel_main_height = TJAPlayer3.Tx.DanResult_SongPanel_Main.szTextureSize.Height / 3;
 
 			TJAPlayer3.Tx.DanResult_SongPanel_Main.Opacity = opacity;
 			TJAPlayer3.Tx.DanResult_SongPanel_Main.t2D描画(TJAPlayer3.Skin.DanResult_SongPanel_Main_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_SongPanel_Main_Y[drawPos], new Rectangle(0, songPanel_main_height * Math.Min(i, 2), songPanel_main_width, songPanel_main_height));
 
-			int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Width / 5;
-			int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
+			int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
+			int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
 
 			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
 			TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_Difficulty_Cymbol_Y[drawPos], new Rectangle(song.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
@@ -1904,8 +1904,8 @@ namespace TJAPlayer3
 				this.actParameterPanel.t小文字表示(num_x[j] + offset, num_y[j], scoresArr[j], 1.0f);
 			TJAPlayer3.Tx.Result_Number.Opacity = 255;
 
-			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
-			TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
+			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
+			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
 
 			CActSelect段位リスト.tDisplayDanIcon(i + 1, TJAPlayer3.Skin.DanResult_DanIcon_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanIcon_Y[drawPos], opacity, 1.0f);
 
@@ -1914,20 +1914,20 @@ namespace TJAPlayer3
 		#endregion
 
 
-		public void t後処理()
+		public void tPostprocessing()
         {
 
-			if (!b最近遊んだ曲追加済み)
+			if (!bAddedToRecentlyPlayedSongs)
 			{
 				#region [ Apply new local status for song select screens ]
 				//---------------------
 				if (!TJAPlayer3.bコンパクトモード)
 				{
-					if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
 					{
                         #region [Update status]
 
-                        Cスコア cScore = TJAPlayer3.stage選曲.r確定されたスコア;
+                        Cスコア cScore = TJAPlayer3.stageSongSelect.r確定されたスコア;
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
@@ -1937,24 +1937,24 @@ namespace TJAPlayer3
 
 							int actualPlayer = TJAPlayer3.GetActualPlayer(i);
 
-							if (cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nクリア[i])
-								cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nクリア[i];
+							if (cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < nクリア[i])
+								cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = nクリア[i];
 
-							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < nスコアランク[i])
-								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = nスコアランク[i];
+							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < nスコアランク[i])
+								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = nスコアランク[i];
 
-							if (cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i))
-								cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, i);
+							if (cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i))
+								cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i);
 						}
 
 						#endregion
 
 					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
                     {
                         #region [Dan update status]
 
-                        Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+                        Cスコア cスコア = TJAPlayer3.stageSongSelect.r確定されたスコア;
 
 						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
 
@@ -1986,19 +1986,19 @@ namespace TJAPlayer3
                         {
 							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], clearValue);
 
-							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0))
-								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0);
+							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0))
+								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0);
 						}
 
 						#endregion
 
 						//cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
 					}
-					else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 					{
                         #region [Update Tower status]
 
-                        Cスコア cスコア = TJAPlayer3.stage選曲.r確定されたスコア;
+                        Cスコア cスコア = TJAPlayer3.stageSongSelect.r確定されたスコア;
 						int actualPlayer = TJAPlayer3.SaveFile;
 
 						int tmpClear = GetTowerScoreRank();
@@ -2008,8 +2008,8 @@ namespace TJAPlayer3
 							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], tmpClear);
 							cスコア.GPInfo[actualPlayer].nScoreRank[0] = Math.Max(cスコア.GPInfo[actualPlayer].nScoreRank[0], CFloorManagement.LastRegisteredFloor);
 
-							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0))
-								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(E楽器パート.DRUMS, 0);
+							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0))
+								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0);
 						}
 
 						#endregion
@@ -2020,9 +2020,9 @@ namespace TJAPlayer3
 
 				// Song added to recently added songs here
 
-				TJAPlayer3.RecentlyPlayedSongs.tAddChart(TJAPlayer3.stage選曲.r確定された曲.uniqueId.data.id);
+				TJAPlayer3.RecentlyPlayedSongs.tAddChart(TJAPlayer3.stageSongSelect.rChoosenSong.uniqueId.data.id);
 
-				b最近遊んだ曲追加済み = true;
+				bAddedToRecentlyPlayedSongs = true;
 			}
 
 		}
@@ -2038,7 +2038,7 @@ namespace TJAPlayer3
 		#region [ private ]
 		//-----------------
 
-		public bool b最近遊んだ曲追加済み;
+		public bool bAddedToRecentlyPlayedSongs;
 		public bool b音声再生;
 		public bool EndAnime;
 
@@ -2091,7 +2091,7 @@ namespace TJAPlayer3
 			ctDanSongInfoChange.CurrentValue = 0;
 
 			nNowDanSongInfo++;
-			if (nNowDanSongInfo >= Math.Ceiling(TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count / 3.0))
+			if (nNowDanSongInfo >= Math.Ceiling(TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count / 3.0))
 			{
 				nNowDanSongInfo = 0;
 			}
@@ -2149,7 +2149,7 @@ namespace TJAPlayer3
 		private CCachedFontRenderer pfTowerText48;
 		private CCachedFontRenderer pfTowerText72;
 
-		private CSkin.Cシステムサウンド bgmResultIn
+		private CSkin.CSystemSound bgmResultIn
 		{
 			get
 			{
@@ -2164,7 +2164,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		private CSkin.Cシステムサウンド bgmResultLoop
+		private CSkin.CSystemSound bgmResultLoop
 		{
 			get
 			{
@@ -2204,7 +2204,7 @@ namespace TJAPlayer3
 				{
 					if (this.b新記録ランク[i] == true || this.b新記録スキル[i] == true)
 					{
-						string strPart = ((E楽器パート)(i)).ToString();
+						string strPart = ((EInstrumentPad)(i)).ToString();
 						string strRank = ((CScoreIni.ERANK)(this.nランク値[i])).ToString();
 						string strFullPath = TJAPlayer3.DTX.strファイル名の絶対パス + "." + datetime + "_" + strPart + "_" + strRank + ".png";
 						//Surface.ToFile( pSurface, strFullPath, ImageFileFormat.Png );

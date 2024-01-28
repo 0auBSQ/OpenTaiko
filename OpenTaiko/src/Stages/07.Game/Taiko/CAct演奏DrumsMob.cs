@@ -63,7 +63,7 @@ namespace TJAPlayer3
         {
             if(!TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
             {
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+                if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
                 {
                     if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
                     MobScript?.Draw();

@@ -104,7 +104,7 @@ namespace TJAPlayer3
 		}
 
 		// メソッド
-		public override void tActivatePopupMenu( E楽器パート einst )
+		public override void tActivatePopupMenu( EInstrumentPad einst )
 		{
 			this.CActSelectQuickConfigMain();
 			base.tActivatePopupMenu( einst );
@@ -134,7 +134,7 @@ namespace TJAPlayer3
                     TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile] = (Eランダムモード)GetIndex( (int)EOrder.Random );
 					break;
 				case (int) EOrder.Stealth:
-                    TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile] = (Eステルスモード)GetIndex( (int)EOrder.Stealth );
+                    TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile] = (EStealthMode)GetIndex( (int)EOrder.Stealth );
 					break;
 				case (int) EOrder.GameMode:
                     EGame game = EGame.OFF;

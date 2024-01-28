@@ -117,13 +117,13 @@ namespace TJAPlayer3
             {
                 ExToExtraCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[0], TJAPlayer3.Timer);
                 ExToExtraScript.PlayAnimation();
-                TJAPlayer3.Skin.soundExToExtra[0]?.t再生する(); // Placeholder code
+                TJAPlayer3.Skin.soundExToExtra[0]?.tPlay(); // Placeholder code
             }
             else
             {
                 ExtraToExCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[1], TJAPlayer3.Timer);
                 ExtraToExScript.PlayAnimation();
-                TJAPlayer3.Skin.soundExtraToEx[0]?.t再生する(); // Placeholder code
+                TJAPlayer3.Skin.soundExtraToEx[0]?.tPlay(); // Placeholder code
             }
         }
 

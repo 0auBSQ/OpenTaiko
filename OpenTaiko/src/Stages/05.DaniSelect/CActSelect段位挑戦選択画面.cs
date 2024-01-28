@@ -66,41 +66,41 @@ namespace TJAPlayer3
 
                 if (ctBarIn.IsEnded && !TJAPlayer3.stage段位選択.b選択した && bOption == false)
                 {
-                    if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-                        TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RBlue))
+                    if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+                        TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue))
                     {
                         if (n現在の選択行 - 1 >= 0)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.soundChangeSFX.tPlay();
                             n現在の選択行--;
                         }
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LBlue))
+                    if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue))
                     {
                         if (n現在の選択行 + 1 <= 2)
                         {
-                            TJAPlayer3.Skin.sound変更音.t再生する();
+                            TJAPlayer3.Skin.soundChangeSFX.tPlay();
                             n現在の選択行++;
                         }
                     }
 
-                    if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-                        TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LRed) ||
-                        TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RRed))
+                    if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+                        TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed) ||
+                        TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed))
                     {
                         if (n現在の選択行 == 0)
                         {
                             this.ctBarOut.Start(0, 255, 0.5f, TJAPlayer3.Timer);
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                             TJAPlayer3.stage段位選択.bDifficultyIn = false;
                         }
                         else if (n現在の選択行 == 1)
                         {
                             //TJAPlayer3.Skin.soundDanSongSelect.t再生する();
-                            TJAPlayer3.Skin.sound決定音.t再生する();
-                            TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.t再生する();
+                            TJAPlayer3.Skin.soundDecideSFX.tPlay();
+                            TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.tPlay();
                             TJAPlayer3.stage段位選択.ct待機.Start(0, 3000, 1, TJAPlayer3.Timer);
                         }
                         else if (n現在の選択行 == 2)

@@ -2,7 +2,7 @@
 
 namespace TJAPlayer3.C曲リストノードComparers
 {
-    internal sealed class C曲リストノードComparerLevel : IComparer<C曲リストノード>
+    internal sealed class C曲リストノードComparerLevel : IComparer<CSongListNode>
     {
         private readonly int _order;
 
@@ -11,10 +11,10 @@ namespace TJAPlayer3.C曲リストノードComparers
             this._order = order;
         }
 
-        public int Compare(C曲リストノード n1, C曲リストノード n2)
+        public int Compare(CSongListNode n1, CSongListNode n2)
         {
-            int _n1s = (n1.eノード種別 != C曲リストノード.Eノード種別.SCORE) ? 0 : 1;
-            int _n2s = (n2.eノード種別 != C曲リストノード.Eノード種別.SCORE) ? 0 : 1;
+            int _n1s = (n1.eノード種別 != CSongListNode.ENodeType.SCORE) ? 0 : 1;
+            int _n2s = (n2.eノード種別 != CSongListNode.ENodeType.SCORE) ? 0 : 1;
 
 
             if (_n1s == 0 || _n2s == 0)
@@ -24,9 +24,9 @@ namespace TJAPlayer3.C曲リストノードComparers
             return _order * _diffOf(n1).CompareTo(_diffOf(n2));
         }
 
-        private int _diffOf(C曲リストノード n1)
+        private int _diffOf(CSongListNode n1)
         {
-            return n1.nLevel[TJAPlayer3.stage選曲.act曲リスト.tFetchDifficulty(n1)];
+            return n1.nLevel[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(n1)];
         }
     }
 }

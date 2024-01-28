@@ -49,7 +49,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 
 				this.list進行文字列 = null;
 				if ( es != null )
@@ -146,11 +146,11 @@ namespace TJAPlayer3
 									this.list進行文字列.Add("LOADING TEXTURES...OK");
 									this.str現在進行中 = "Setup done.";
 									this.ePhaseID = EPhase.Startup_Complete;
-									TJAPlayer3.Skin.bgm起動画面.t停止する();
+									TJAPlayer3.Skin.bgm起動画面.tStop();
 								}
 								catch(Exception exception)
 								{
-									TJAPlayer3.Skin.bgm起動画面.t停止する();
+									TJAPlayer3.Skin.bgm起動画面.tStop();
 
 									Trace.TraceError( exception.ToString() );
 									this.list進行文字列.Add("LOADING TEXTURES...NG");
@@ -163,7 +163,7 @@ namespace TJAPlayer3
 								this.list進行文字列.Add("LOADING TEXTURES...OK");
 								this.str現在進行中 = "Setup done.";
 								this.ePhaseID = EPhase.Startup_Complete;
-								TJAPlayer3.Skin.bgm起動画面.t停止する();
+								TJAPlayer3.Skin.bgm起動画面.tStop();
 							}
 							if (TJAPlayer3.ConfigIni.ASyncTextureLoad)
 							{
@@ -201,9 +201,9 @@ namespace TJAPlayer3
 					{
 						TJAPlayer3.Songs管理 = ( es != null ) ? es.Songs管理 : null;		// 最後に、曲リストを拾い上げる
 
-						if(TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
+						if(TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							return 1;
 						}
 					}

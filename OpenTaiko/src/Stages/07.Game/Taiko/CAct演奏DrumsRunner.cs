@@ -107,7 +107,7 @@ namespace TJAPlayer3
                 stRunners[i].ct進行 = null;
             }
             
-            TJAPlayer3.t安全にDisposeする(ref Runner);
+            TJAPlayer3.tDisposeSafely(ref Runner);
             
             base.DeActivate();
         }

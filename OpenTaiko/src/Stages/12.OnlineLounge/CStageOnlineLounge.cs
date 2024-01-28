@@ -36,7 +36,7 @@ namespace TJAPlayer3
             base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-            TJAPlayer3.Skin.soundOnlineLoungeBGM?.t再生する();
+            TJAPlayer3.Skin.soundOnlineLoungeBGM?.tPlay();
 
             this.currentMenu = ECurrentMenu.MAIN;
             this.menuPointer = ECurrentMenu.CDN_SELECT;
@@ -108,7 +108,7 @@ namespace TJAPlayer3
         {
             // On de-activation
 
-            TJAPlayer3.t安全にDisposeする(ref Background);
+            TJAPlayer3.tDisposeSafely(ref Background);
 
             TJAPlayer3.Songs管理.UpdateDownloadBox();
 
@@ -128,8 +128,8 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
             // Ressource freeing
-            this.pfOLFont.Dispose();
-            this.pfOLFontLarge.Dispose();
+            this.pfOLFont?.Dispose();
+            this.pfOLFontLarge?.Dispose();
 
             base.ReleaseManagedResource();
         }
@@ -170,7 +170,7 @@ namespace TJAPlayer3
 
                 for (int i = 0; i < _ref.Length; i++)
                 {
-                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[i]);
+                    CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_ref[i]);
 
                     if (_selector != i)
                     {
@@ -207,8 +207,8 @@ namespace TJAPlayer3
                 {
                     int pos = (_ref.Length * 5 + _selector + i) % _ref.Length;
 
-                    CTexture tmpTex = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(_ref[pos]);
-                    CTexture tmpSubtitle = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
+                    CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_ref[pos]);
+                    CTexture tmpSubtitle = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
 
                     var _color = CConversion.ColorToColor4(Color.DarkGray);
 
@@ -265,7 +265,7 @@ namespace TJAPlayer3
 
                         if (song_.charter != null && song_.charter.charter_name != null && song_.charter.charter_name != "")
                         {
-                            var charter_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                            var charter_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
                                     new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
                             charter_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Charter[0], TJAPlayer3.Skin.OnlineLounge_Context_Charter[1]);
                         }
@@ -276,7 +276,7 @@ namespace TJAPlayer3
 
                         if (song_.Genre != null && song_.Genre.genre != null && song_.Genre.genre != "")
                         {
-                            var genre_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                            var genre_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
                                     new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
                             genre_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Genre[0], TJAPlayer3.Skin.OnlineLounge_Context_Genre[1]);
                         }
@@ -298,7 +298,7 @@ namespace TJAPlayer3
                                     TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
                                     TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
 
-                                var difnb_ = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                                var difnb_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
                                     new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
                                 difnb_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Level[0] + column, TJAPlayer3.Skin.OnlineLounge_Context_Level[1] + row);
                             }
@@ -319,7 +319,7 @@ namespace TJAPlayer3
             {
                 TJAPlayer3.Tx.OnlineLounge_Box.t2D描画(0, 0);
 
-                var text = TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(
+                var text = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
                                     new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
                 text.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Downloading[0], TJAPlayer3.Skin.OnlineLounge_Downloading[1]);
             }
@@ -332,36 +332,36 @@ namespace TJAPlayer3
 
             //if (!IsDownloading)
             {
-                if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.RightChange))
+                if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange))
                 {
                     if (this.tMove(1))
                     {
-                        TJAPlayer3.Skin.sound変更音.t再生する();
+                        TJAPlayer3.Skin.soundChangeSFX.tPlay();
                     }
                 }
 
-                else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.LeftChange))
+                else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange))
                 {
                     if (this.tMove(-1))
                     {
-                        TJAPlayer3.Skin.sound変更音.t再生する();
+                        TJAPlayer3.Skin.soundChangeSFX.tPlay();
                     }
                 }
 
-                else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-                TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Cancel))
+                else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+                TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel))
                 {
 
                     #region [Fast return (Escape)]
 
-                    TJAPlayer3.Skin.sound取消音.t再生する();
+                    TJAPlayer3.Skin.soundCancelSFX.tPlay();
 
                     if (currentMenu == ECurrentMenu.MAIN)
                     {
                         // Return to title screen
-                        TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                        TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
                         this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                         this.actFOtoTitle.tフェードアウト開始();
                         base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -387,8 +387,8 @@ namespace TJAPlayer3
                     #endregion
                 }
 
-                else if (TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-                    TJAPlayer3.Pad.b押された(E楽器パート.DRUMS, Eパッド.Decide))
+                else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+                    TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide))
                 {
 
                     #region [Decide]
@@ -402,20 +402,20 @@ namespace TJAPlayer3
                             if (currentMenu == ECurrentMenu.RETURN)
                             {
                                 // Quit
-                                TJAPlayer3.Skin.sound取消音.t再生する();
-                                TJAPlayer3.Skin.soundOnlineLoungeBGM?.t停止する();
+                                TJAPlayer3.Skin.soundCancelSFX.tPlay();
+                                TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
                                 this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
                                 this.actFOtoTitle.tフェードアウト開始();
                                 base.ePhaseID = CStage.EPhase.Common_FADEOUT;
                             }
                             else
                             {
-                                TJAPlayer3.Skin.sound決定音.t再生する();
+                                TJAPlayer3.Skin.soundDecideSFX.tPlay();
                             }
                         }
                         else
                         {
-                            TJAPlayer3.Skin.soundError.t再生する();
+                            TJAPlayer3.Skin.soundError.tPlay();
                         }
                     }
                     else if (currentMenu == ECurrentMenu.CDN_SELECT)
@@ -425,12 +425,12 @@ namespace TJAPlayer3
                         {
                             currentMenu = ECurrentMenu.CDN_OPTION;
                             dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.soundDecideSFX.tPlay();
                         }
                         else
                         {
                             currentMenu = ECurrentMenu.MAIN;
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                         }
                     }
                     else if (currentMenu == ECurrentMenu.CDN_OPTION)
@@ -438,7 +438,7 @@ namespace TJAPlayer3
                         // CDN Option Menu
                         currentMenu = cdnOptMenu[cdnOptMenuIndex];
                         if (currentMenu == ECurrentMenu.CDN_SELECT)
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                         else
                         {
                             if (currentMenu == ECurrentMenu.CDN_SONGS)
@@ -470,7 +470,7 @@ namespace TJAPlayer3
 
                                 #endregion
                             }
-                            TJAPlayer3.Skin.sound決定音.t再生する();
+                            TJAPlayer3.Skin.soundDecideSFX.tPlay();
                         }
 
                     }
@@ -478,7 +478,7 @@ namespace TJAPlayer3
                     {
                         if (this.cdnSongListIndex == 0)
                         {
-                            TJAPlayer3.Skin.sound取消音.t再生する();
+                            TJAPlayer3.Skin.soundCancelSFX.tPlay();
                             currentMenu = ECurrentMenu.CDN_OPTION;
                         }
                         else
@@ -491,11 +491,11 @@ namespace TJAPlayer3
 
                                 if (CSongDict.tContainsSongUrl(downloadLink) || song.DownloadNow)
                                 {
-                                    TJAPlayer3.Skin.soundError.t再生する();
+                                    TJAPlayer3.Skin.soundError.tPlay();
                                 }
                                 else
                                 {
-                                    TJAPlayer3.Skin.sound決定音.t再生する();
+                                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
                                     System.Threading.Thread download =
                                         new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
                                     download.Start();
@@ -611,13 +611,13 @@ namespace TJAPlayer3
                 }
 
                 // Fetch closest Download folder node
-                C曲リストノード downloadBox = null;
+                CSongListNode downloadBox = null;
                 for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                 {
                     if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download")
                     {
                         downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
-                        if (downloadBox.r親ノード != null) downloadBox = downloadBox.r親ノード;
+                        if (downloadBox.rParentNode != null) downloadBox = downloadBox.rParentNode;
                         break;
                     }
                 }
@@ -634,11 +634,11 @@ namespace TJAPlayer3
                         Directory.CreateDirectory(genredPath);
 
                         // Search a corresponding box-def if exists
-                        C曲リストノード correspondingBox = null;
+                        CSongListNode correspondingBox = null;
                         for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++)
                         {
                             if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
-                                && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == C曲リストノード.Eノード種別.BOX)
+                                && TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
                                 correspondingBox = TJAPlayer3.Songs管理.list曲ルート[i];
                         }
 
@@ -702,7 +702,7 @@ namespace TJAPlayer3
             catch (Exception e)
             {
                 Trace.TraceInformation(e.ToString());
-                TJAPlayer3.Skin.soundError.t再生する();
+                TJAPlayer3.Skin.soundError.tPlay();
             }
 
 

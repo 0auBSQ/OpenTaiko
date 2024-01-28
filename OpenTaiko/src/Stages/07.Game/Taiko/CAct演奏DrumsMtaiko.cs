@@ -115,7 +115,7 @@ namespace TJAPlayer3
                 {
                     case 0:
                         {
-                            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+                            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
                             {
                                 tex = TJAPlayer3.Tx.Taiko_Background[2];
                             }
@@ -259,10 +259,10 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Taiko_Don_Left.Opacity = getMTaikoOpacity(this.stパッド状態[2 + playerShift].n明るさ);
                         TJAPlayer3.Tx.Taiko_Don_Right.Opacity = getMTaikoOpacity(this.stパッド状態[3 + playerShift].n明るさ);
 
-                        TJAPlayer3.Tx.Taiko_Ka_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
-                        TJAPlayer3.Tx.Taiko_Ka_Right.t2D描画(taiko_x + TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, taiko_y, new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
-                        TJAPlayer3.Tx.Taiko_Don_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
-                        TJAPlayer3.Tx.Taiko_Don_Right.t2D描画(taiko_x + TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, taiko_y, new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szテクスチャサイズ.Height));
+                        TJAPlayer3.Tx.Taiko_Ka_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Height));
+                        TJAPlayer3.Tx.Taiko_Ka_Right.t2D描画(taiko_x + TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, taiko_y, new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Height));
+                        TJAPlayer3.Tx.Taiko_Don_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Height));
+                        TJAPlayer3.Tx.Taiko_Don_Right.t2D描画(taiko_x + TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, taiko_y, new Rectangle(TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, 0, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, TJAPlayer3.Tx.Taiko_Ka_Right.szTextureSize.Height));
                     }
                 }
                 else if (_gt == EGameType.KONGA)
@@ -347,16 +347,16 @@ namespace TJAPlayer3
                     if ( this.After[ i ] - this.Before[ i ] >= 0 )
                     {
                         //レベルアップ
-                        TJAPlayer3.Tx.Taiko_LevelUp.vc拡大縮小倍率.X = fScale;
-                        TJAPlayer3.Tx.Taiko_LevelUp.vc拡大縮小倍率.Y = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelUp.vcScaleRatio.X = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelUp.vcScaleRatio.Y = fScale;
                         TJAPlayer3.Tx.Taiko_LevelUp.Opacity = nAlpha;
                         TJAPlayer3.Tx.Taiko_LevelUp.t2D拡大率考慮中央基準描画(levelChange_x,
                             levelChange_y);
                     }
                     else
                     {
-                        TJAPlayer3.Tx.Taiko_LevelDown.vc拡大縮小倍率.X = fScale;
-                        TJAPlayer3.Tx.Taiko_LevelDown.vc拡大縮小倍率.Y = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelDown.vcScaleRatio.X = fScale;
+                        TJAPlayer3.Tx.Taiko_LevelDown.vcScaleRatio.Y = fScale;
                         TJAPlayer3.Tx.Taiko_LevelDown.Opacity = nAlpha;
                         TJAPlayer3.Tx.Taiko_LevelDown.t2D拡大率考慮中央基準描画(levelChange_x,
                             levelChange_y);
@@ -400,9 +400,9 @@ namespace TJAPlayer3
 
                 ModIcons.tDisplayMods(modIcons_x, modIcons_y, i);
 
-                if (TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
+                if (TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] != null)
                 {
-                    TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].t2D描画(
+                    TJAPlayer3.Tx.Couse_Symbol[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
                         couse_symbol_x,
                         couse_symbol_y
                         );
@@ -613,12 +613,12 @@ namespace TJAPlayer3
                 }
 
 
-                if (TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null)
+                if (TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] != null)
                 {
                     int originX = 0;
                     int originY = 0;
-                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Width;
-                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Height;
+                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Width;
+                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Height;
 
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
                     {
@@ -635,18 +635,18 @@ namespace TJAPlayer3
                         height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[3];
                     }
 
-                    TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].t2D描画(
+                    TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
                         couse_symbol_x,
                         couse_symbol_y,
                         new System.Drawing.RectangleF(originX, originY, width, height));
                 }
 
-                if (TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]] != null && !TJAPlayer3.ConfigIni.SimpleMode)
+                if (TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] != null && !TJAPlayer3.ConfigIni.SimpleMode)
                 {
                     int originX = 0;
                     int originY = 0;
-                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Width;
-                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].szテクスチャサイズ.Height;
+                    int width = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Width;
+                    int height = TJAPlayer3.Tx.Couse_Symbol_Back[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Height;
 
                     if (TJAPlayer3.ConfigIni.nPlayerCount == 5)
                     {
@@ -663,8 +663,8 @@ namespace TJAPlayer3
                         height = TJAPlayer3.Skin.Game_CourseSymbol_Back_Rect_4P[3];
                     }
 
-                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
-                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stage選曲.n確定された曲の難易度[i]].t2D描画(
+                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
+                    TJAPlayer3.Tx.Couse_Symbol_Back_Flash[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
                         couse_symbol_x,
                         couse_symbol_y, 
                         new System.Drawing.RectangleF(originX, originY, width, height));

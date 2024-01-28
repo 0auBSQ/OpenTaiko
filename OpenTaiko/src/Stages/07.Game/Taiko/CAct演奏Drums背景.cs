@@ -55,11 +55,11 @@ namespace TJAPlayer3
 
             var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
             var preset = HScenePreset.GetBGPreset();
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
                 bgOrigindir += "Tower";
             }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
             {
                 bgOrigindir += "Dan";
             }
@@ -140,48 +140,48 @@ namespace TJAPlayer3
             // Scale tower chara
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Standing[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Climbing[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Running[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Clear[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Fail[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Standing_Tired[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Climbing_Tired[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Running_Tired[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
             foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Clear_Tired[currentCharacter])
             {
-                texture.vc拡大縮小倍率.X = resolutionScaleX;
-                texture.vc拡大縮小倍率.Y = resolutionScaleY;
+                texture.vcScaleRatio.X = resolutionScaleX;
+                texture.vcScaleRatio.Y = resolutionScaleY;
             }
 
             this.ctSlideAnimation = new CCounter();
@@ -206,10 +206,10 @@ namespace TJAPlayer3
             if (this.IsDeActivated)
                 return;
 
-            TJAPlayer3.t安全にDisposeする(ref UpScript);
-            TJAPlayer3.t安全にDisposeする(ref DownScript);
+            TJAPlayer3.tDisposeSafely(ref UpScript);
+            TJAPlayer3.tDisposeSafely(ref DownScript);
 
-            TJAPlayer3.t安全にDisposeする(ref pfTowerText);
+            TJAPlayer3.tDisposeSafely(ref pfTowerText);
 
             base.DeActivate();
         }
@@ -247,13 +247,13 @@ namespace TJAPlayer3
             {
                 if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) UpScript?.Update();
                 UpScript?.Draw();
-                if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                 {
                     #region [Tower animations variables]
 
                     this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
 
-                    int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+                    int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
                     int nightTime = Math.Max(140, maxFloor / 2);
 
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -262,10 +262,10 @@ namespace TJAPlayer3
 
                     #region [Tower background informations]
 
-                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                    if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                     {
-                        TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-                        TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_Kai[0], TJAPlayer3.Skin.Game_Tower_Font_Kai[1]);
+                        TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
+                        TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_Kai[0], TJAPlayer3.Skin.Game_Tower_Font_Kai[1]);
 
                         this.ct炎.TickLoop();
                         CFloorManagement.loopFrames();
@@ -279,11 +279,11 @@ namespace TJAPlayer3
 
                         int len = floorStr.Length;
 
-                        int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Width / 10;
+                        int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Width / 10;
 
                         TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
-                        TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.4f;
-                        TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.4f;
+                        TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.4f;
+                        TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.4f;
 
                         for (int idx = len - 1; idx >= 0; idx--)
                         {
@@ -292,20 +292,20 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
                                 TJAPlayer3.Skin.Game_Tower_Floor_Number[1],
                                 new Rectangle(digitLength * currentNum, 0,
-                                    digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
+                                    digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Height));
                         }
 
                         #endregion
 
                         #region [Life Tamashii icon]
 
-                        int soulfire_width = TJAPlayer3.Tx.Gauge_Soul_Fire.szテクスチャサイズ.Width / 8;
-                        int soulfire_height = TJAPlayer3.Tx.Gauge_Soul_Fire.szテクスチャサイズ.Height;
+                        int soulfire_width = TJAPlayer3.Tx.Gauge_Soul_Fire.szTextureSize.Width / 8;
+                        int soulfire_height = TJAPlayer3.Tx.Gauge_Soul_Fire.szTextureSize.Height;
 
-                        int soul_height = TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Height / 2;
+                        int soul_height = TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Height / 2;
 
                         TJAPlayer3.Tx.Gauge_Soul_Fire?.t2D描画(TJAPlayer3.Skin.Gauge_Soul_Fire_X_Tower, TJAPlayer3.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
-                        TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.Skin.Gauge_Soul_X_Tower, TJAPlayer3.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, TJAPlayer3.Tx.Gauge_Soul.szテクスチャサイズ.Width, soul_height));
+                        TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.Skin.Gauge_Soul_X_Tower, TJAPlayer3.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
 
                         #endregion
 
@@ -329,8 +329,8 @@ namespace TJAPlayer3
                                 : new Color4(1f, 0.2f, 0.2f, 1f));
 
                         TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
-                        TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.X = 1.1f;
-                        TJAPlayer3.Tx.Taiko_Combo[0].vc拡大縮小倍率.Y = 1.1f;
+                        TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.1f;
+                        TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.1f;
 
                         for (int idx = 0; idx < len; idx++)
                         {
@@ -339,7 +339,7 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
                                 TJAPlayer3.Skin.Game_Tower_Life_Number[1],
                                 new Rectangle(digitLength * currentNum, 0,
-                                    digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szテクスチャサイズ.Height));
+                                    digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Height));
                         }
 
                         TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
@@ -357,15 +357,15 @@ namespace TJAPlayer3
             #region [Lower background]
 
 
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
-                int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+                int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 
                 TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, maxFloor.ToString());
 
                 int nightTime = Math.Max(140, maxFloor / 2);
 
-                int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTowerType);
+                int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
 
                 if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
                     currentTowerType = 0;
@@ -438,13 +438,13 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
                         TJAPlayer3.Skin.Game_Tower_Floors_Body[0] - TJAPlayer3.Skin.Game_Tower_Floors_Move[0] + widthChange, 
                         TJAPlayer3.Skin.Game_Tower_Floors_Body[1] - TJAPlayer3.Skin.Game_Tower_Floors_Move[1] + heightChange,
-                        new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Width, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szテクスチャサイズ.Height - originY));
+                        new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
                 else if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 == maxFloor)
                 {
                     TJAPlayer3.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
                         TJAPlayer3.Skin.Game_Tower_Floors_Body[0] - TJAPlayer3.Skin.Game_Tower_Floors_Move[0] + widthChange,
                         TJAPlayer3.Skin.Game_Tower_Floors_Body[1] - TJAPlayer3.Skin.Game_Tower_Floors_Move[1] + heightChange,
-                        new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Top[currentTower].szテクスチャサイズ.Width, TJAPlayer3.Tx.Tower_Top[currentTower].szテクスチャサイズ.Height - originY));
+                        new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Top[currentTower].szTextureSize.Width, TJAPlayer3.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
                 }
 
                 // Next deco
@@ -588,7 +588,7 @@ namespace TJAPlayer3
 
                 #endregion
             }
-            else if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            else if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
             {
                 if (!IsDownNotFound)
                 {

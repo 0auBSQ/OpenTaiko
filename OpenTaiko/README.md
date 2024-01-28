@@ -145,6 +145,17 @@ BoxFontName=廻想体 ネクスト UP B
 098 - Rainy Night III ~輪回~ : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko)
 099 - Dreaming to be with you : Cusi ft. Kaeru from 虹信号 - https://youtube.com/channel/UCxx3wiFJxGwb_-tEePPa4RA https://twitter.com/nijishingoPH (Chart by Komi)
 100 - Puzzle of "The End." : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+101 - おはよう : Tanger ft. Hatsune Miku - https://linktr.ee/Tangermusic (Chart by Komi)
+102 - GET REAL : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by Komi)
+103 - spliced : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
+104 - 〈11 : Tanger ft. Hatsune Miku - https://linktr.ee/Tangermusic (Chart by Colin)
+105 - CHAOTIC DIMENSION : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by sadkay)
+106 - ：3 : Tanger - https://linktr.ee/Tangermusic (Chart by DragonRatTiger)
+107 - BONUS : Tanger - https://linktr.ee/Tangermusic (Chart by Tang)
+108 - FINAL HOPE : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by DiamondN1nja)
+109 - SUGARUSH~!! : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
+110 - ETHEREAL VELOCITY (Game Size) : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by Colin)
+111 - 2024 BPM IS NOT ENOUGH : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by goldenyoshi22 (Extreme) and Komi)
 ```
 
 ### Visuals
@@ -152,10 +163,12 @@ BoxFontName=廻想体 ネクスト UP B
 Some of the visuals (preimages and videos) are made by the composers themselves, please reach us on Discord if we missed anyone
 ```
 028 - Katharsis (Illustration): Komi/0AuBSQ
+046 - ΣxilƎ : Lirodon (From Project Outfox: Serenity)
 064 - PLANETES (Illustration): gentu
 065 - Bounded Quietude (Illustration): Hiro (https://twitter.com/HiroChair?s=09) (https://www.pixiv.net/en/users/35926966)
 069 - Vanaheimr (Illustration): Transendium (https://twitter.com/ardentminus)
 087 - Hero's Treasure (Illustration): picture_game
+089 - FunkBoi : Lirodon (From Project Outfox: Serenity)
 099 - Dreaming to be with you (Video & Illustration): Manic, RheaBee (https://twitter.com/rheabee5), Zhen (https://www.instagram.com/zhen_artz/)
 ```
 

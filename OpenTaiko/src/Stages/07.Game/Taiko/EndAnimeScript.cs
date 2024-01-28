@@ -45,9 +45,9 @@ namespace TJAPlayer3
             {
                 float currentFloorPositionMax140 = 0;
 
-                if (TJAPlayer3.stage選曲.r確定された曲.arスコア[5] != null)
+                if (TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5] != null)
                 {
-                    int maxFloor = TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor;
+                    int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
                     int nightTime = Math.Max(140, maxFloor / 2);
 
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);

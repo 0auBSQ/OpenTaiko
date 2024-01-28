@@ -83,8 +83,8 @@ namespace TJAPlayer3
 				this.txフォント8x16[ 0 ] = TJAPlayer3.Tx.TxC(@"Console_Font.png");
 				this.txフォント8x16[ 1 ] = TJAPlayer3.Tx.TxC(@"Console_Font_Small.png");
 
-				nFontWidth = this.txフォント8x16[0].szテクスチャサイズ.Width / 32;
-				nFontHeight = this.txフォント8x16[0].szテクスチャサイズ.Height / 16;
+				nFontWidth = this.txフォント8x16[0].szTextureSize.Width / 32;
+				nFontHeight = this.txフォント8x16[0].szTextureSize.Height / 16;
 
 				this.rc文字の矩形領域 = new Rectangle[3, str表記可能文字.Length];
 				for (int i = 0; i < 3; i++)

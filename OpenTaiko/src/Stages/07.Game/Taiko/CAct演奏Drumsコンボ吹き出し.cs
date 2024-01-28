@@ -126,8 +126,8 @@ namespace TJAPlayer3
 
                         if( this.ct進行[ i ].IsTicked )
                         {
-                            int plate_width = TJAPlayer3.Tx.Balloon_Combo[j].szテクスチャサイズ.Width / 3;
-                            int plate_height = TJAPlayer3.Tx.Balloon_Combo[j].szテクスチャサイズ.Height;
+                            int plate_width = TJAPlayer3.Tx.Balloon_Combo[j].szTextureSize.Width / 3;
+                            int plate_height = TJAPlayer3.Tx.Balloon_Combo[j].szTextureSize.Height;
                             TJAPlayer3.Tx.Balloon_Combo[ j ].t2D描画( TJAPlayer3.Skin.Game_Balloon_Combo_X[ i ], TJAPlayer3.Skin.Game_Balloon_Combo_Y[ i ], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height) );
                             if( this.nCombo_渡[ i ] < 1000 ) //2016.08.23 kairera0467 仮実装。
                             {
@@ -138,7 +138,7 @@ namespace TJAPlayer3
                             else
                             {
                                 this.t小文字表示( TJAPlayer3.Skin.Game_Balloon_Combo_Number_Ex_X[ i], TJAPlayer3.Skin.Game_Balloon_Combo_Number_Ex_Y[ i ], this.nCombo_渡[ i ], j );
-                                TJAPlayer3.Tx.Balloon_Number_Combo.vc拡大縮小倍率.X = 1.0f;
+                                TJAPlayer3.Tx.Balloon_Number_Combo.vcScaleRatio.X = 1.0f;
                                 TJAPlayer3.Tx.Balloon_Number_Combo.t2D描画( TJAPlayer3.Skin.Game_Balloon_Combo_Text_Ex_X[ i] + 6 - NowDrawBalloon * 3, TJAPlayer3.Skin.Game_Balloon_Combo_Text_Ex_Y[ i ],
                                     new Rectangle(TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[0], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[1], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[2], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[3]));
                             }

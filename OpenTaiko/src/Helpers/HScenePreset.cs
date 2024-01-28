@@ -14,11 +14,11 @@ namespace TJAPlayer3
         public static DBSkinPreset.SkinScene GetBGPreset()
         {
             string presetSection = "";
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
             {
                 presetSection = "Tower";
             }
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
             {
                 presetSection = "Dan";
             }
@@ -52,9 +52,9 @@ namespace TJAPlayer3
             };
 
             var preset = (_ps != null 
-                    && TJAPlayer3.stage選曲.r確定された曲.strScenePreset != null 
-                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stage選曲.r確定された曲.strScenePreset)) 
-                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stage選曲.r確定された曲.strScenePreset] 
+                    && TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset != null 
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset)) 
+                ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset] 
                 : null;
 
             if (_ps != null

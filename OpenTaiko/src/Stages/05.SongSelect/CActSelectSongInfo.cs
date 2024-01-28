@@ -51,27 +51,27 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-            if (TJAPlayer3.stage選曲.r現在選択中の曲 != null && TJAPlayer3.stage選曲.r現在選択中の曲.eノード種別 == C曲リストノード.Eノード種別.SCORE)
+            if (TJAPlayer3.stageSongSelect.rNowSelectedSong != null && TJAPlayer3.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE)
             {
                 int[] bpms = new int[3] {
-                        (int)TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[TJAPlayer3.stage選曲.act曲リスト.tFetchDifficulty(TJAPlayer3.stage選曲.r現在選択中の曲)].譜面情報.BaseBpm,
-                        (int)TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[TJAPlayer3.stage選曲.act曲リスト.tFetchDifficulty(TJAPlayer3.stage選曲.r現在選択中の曲)].譜面情報.MinBpm,
-                        (int)TJAPlayer3.stage選曲.r現在選択中の曲.arスコア[TJAPlayer3.stage選曲.act曲リスト.tFetchDifficulty(TJAPlayer3.stage選曲.r現在選択中の曲)].譜面情報.MaxBpm
+                        (int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
+                        (int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
+                        (int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
                     };
                 for (int i = 0; i < 3; i++)
                 {
                     tBPMNumberDraw(TJAPlayer3.Skin.SongSelect_Bpm_X[i], TJAPlayer3.Skin.SongSelect_Bpm_Y[i], bpms[i]);
                 }
 
-                if (TJAPlayer3.stage選曲.act曲リスト.ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show)
+                if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show)
                 {
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(TJAPlayer3.stage選曲.act曲リスト.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
                 }
-                if (TJAPlayer3.stage選曲.act曲リスト.ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show)
+                if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show)
                 {
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(TJAPlayer3.stage選曲.act曲リスト.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
                 }
-                if (TJAPlayer3.stage選曲.r現在選択中の曲.bExplicit == true)
+                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit == true)
                     TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
             }
 

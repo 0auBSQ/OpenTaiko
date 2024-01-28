@@ -76,7 +76,7 @@ namespace TJAPlayer3
             get;
             private set;
         }
-        public bool IsFailed(E楽器パート part)   // 閉店状態になったかどうか
+        public bool IsFailed(EInstrumentPad part)   // 閉店状態になったかどうか
         {
             if (bRisky)
             {
@@ -84,7 +84,7 @@ namespace TJAPlayer3
             }
             return this.db現在のゲージ値[(int)part] <= GAUGE_MIN;
         }
-        public bool IsDanger(E楽器パート part)   // DANGERかどうか
+        public bool IsDanger(EInstrumentPad part)   // DANGERかどうか
         {
             if (bRisky)
             {
@@ -140,7 +140,7 @@ namespace TJAPlayer3
             float gaugeRate = 0f;
             float dbDamageRate = 2.0f;
 
-            int nanidou = TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer];
+            int nanidou = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[nPlayer];
 
             switch (this.DTX[nPlayer].LEVELtaiko[nanidou])
             {
@@ -397,7 +397,7 @@ namespace TJAPlayer3
             this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
         }
 
-        public void Damage(E楽器パート screenmode, E楽器パート part, E判定 e今回の判定, int nPlayer)
+        public void Damage(EInstrumentPad screenmode, EInstrumentPad part, ENoteJudge e今回の判定, int nPlayer)
         {
             float fDamage;
             int nコース = (int)TJAPlayer3.stage演奏ドラム画面.n現在のコース[nPlayer];
@@ -406,8 +406,8 @@ namespace TJAPlayer3
 #if true    // DAMAGELEVELTUNING
             switch (e今回の判定)
             {
-                case E判定.Perfect:
-                case E判定.Great:
+                case ENoteJudge.Perfect:
+                case ENoteJudge.Great:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -417,7 +417,7 @@ namespace TJAPlayer3
                             fDamage = this.dbゲージ増加量[0][nPlayer];
                     }
                     break;
-                case E判定.Good:
+                case ENoteJudge.Good:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -427,8 +427,8 @@ namespace TJAPlayer3
                             fDamage = this.dbゲージ増加量[1][nPlayer];
                     }
                     break;
-                case E判定.Poor:
-                case E判定.Miss:
+                case ENoteJudge.Poor:
+                case ENoteJudge.Miss:
                     {
                         if (this.DTX[nPlayer].bチップがある.Branch)
                         {
@@ -444,7 +444,7 @@ namespace TJAPlayer3
 
                         var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
 
-                        int nanidou = TJAPlayer3.stage選曲.n確定された曲の難易度[nPlayer];
+                        int nanidou = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[nPlayer];
                         int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
                         switch (chara.effect.tGetGaugeType())
@@ -541,7 +541,7 @@ namespace TJAPlayer3
 
         }
 
-        public virtual void Start(int nLane, E判定 judge, int player)
+        public virtual void Start(int nLane, ENoteJudge judge, int player)
         {
         }
 
