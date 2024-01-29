@@ -20,6 +20,8 @@ namespace TJAPlayer3
 		// メソッド
         public virtual void Start( int player )
 		{
+            if (TJAPlayer3.ConfigIni.SimpleMode) return;
+
             //if( CDTXMania.Tx.Effects_Roll[0] != null )
             //{
             //    int[] arXseed = new int[] { 56, -10, 200, 345, 100, 451, 600, 260, -30, 534, 156, 363 };
@@ -139,8 +141,8 @@ namespace TJAPlayer3
 			base.ReleaseManagedResource();
 		}
 		public override int Draw()
-		{
-			if( !base.IsDeActivated )
+        {
+            if ( !base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode)
 			{
                 //for( int i = 0; i < 64; i++ )
                 //{
@@ -191,13 +193,13 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(RollCharas[i].X, RollCharas[i].Y);
                             
                             // 画面外にいたら描画をやめさせる
-                            if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Width || RollCharas[i].X > TJAPlayer3.Skin.Resolution[0])
+                            if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Width || RollCharas[i].X > TJAPlayer3.Skin.Resolution[0])
                             {
                                 RollCharas[i].Counter.Stop();
                                 RollCharas[i].IsUsing = false;
                             }
                             
-                            if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szテクスチャサイズ.Height || RollCharas[i].Y > TJAPlayer3.Skin.Resolution[1])
+                            if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Height || RollCharas[i].Y > TJAPlayer3.Skin.Resolution[1])
                             {
                                 RollCharas[i].Counter.Stop();
                                 RollCharas[i].IsUsing = false;

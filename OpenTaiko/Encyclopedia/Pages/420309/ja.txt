@@ -1,0 +1,8 @@
+[タワー情報]
+
+local towerNightNum
+0から始まり次の値までの数値を取得します(ただし常にそうとは限りません)
+終了は1 プレイヤーの上った高さによって変化します
+
+towerNightNumの値を決定するソースコードは以下の通りです
+Math.Min(CurrentMeasure / Math.Max(140, MaxFloorCount / 2), 1);

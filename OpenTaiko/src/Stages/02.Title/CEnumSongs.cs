@@ -236,25 +236,25 @@ namespace TJAPlayer3
 			{
 				#region [ 0) システムサウンドの構築  ]
 				//-----------------------------
-				TJAPlayer3.stage起動.eフェーズID = CStage.Eフェーズ.起動0_システムサウンドを構築;
+				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
 
 				Trace.TraceInformation( "0) システムサウンドを構築します。" );
 				Trace.Indent();
 
 				try
 				{
-					TJAPlayer3.Skin.bgm起動画面.t再生する();
+					TJAPlayer3.Skin.bgm起動画面.tPlay();
 					for ( int i = 0; i < TJAPlayer3.Skin.nシステムサウンド数; i++ )
 					{
-						if ( !TJAPlayer3.Skin[ i ].b排他 )	// BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+						if ( !TJAPlayer3.Skin[ i ].bExclusive )	// BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 						{
-							CSkin.Cシステムサウンド cシステムサウンド = TJAPlayer3.Skin[ i ];
+							CSkin.CSystemSound cシステムサウンド = TJAPlayer3.Skin[ i ];
 							if ( !TJAPlayer3.bコンパクトモード || cシステムサウンド.bCompact対象 )
 							{
 								try
 								{
-									cシステムサウンド.t読み込み();
-									Trace.TraceInformation( "システムサウンドを読み込みました。({0})", cシステムサウンド.strファイル名 );
+									cシステムサウンド.tLoading();
+									Trace.TraceInformation( "システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName );
 									//if ( ( cシステムサウンド == CDTXMania.Skin.bgm起動画面 ) && cシステムサウンド.b読み込み成功 )
 									//{
 									//	cシステムサウンド.t再生する();
@@ -262,12 +262,12 @@ namespace TJAPlayer3
 								}
 								catch ( FileNotFoundException )
 								{
-									Trace.TraceWarning( "システムサウンドが存在しません。({0})", cシステムサウンド.strファイル名 );
+									Trace.TraceWarning( "システムサウンドが存在しません。({0})", cシステムサウンド.strFileName );
 								}
 								catch ( Exception e )
 								{
 									Trace.TraceWarning( e.ToString() );
-									Trace.TraceWarning( "システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strファイル名 );
+									Trace.TraceWarning( "システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strFileName );
 								}
 							}
 						}
@@ -292,7 +292,7 @@ namespace TJAPlayer3
 			}
 			finally
 			{
-				TJAPlayer3.stage起動.eフェーズID = CStage.Eフェーズ.起動_テクスチャの読み込み;
+				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 				TimeSpan span = (TimeSpan) ( DateTime.Now - now );
 				Trace.TraceInformation( "起動所要時間: {0}", span.ToString() );
 				lock ( this )							// #28700 2012.6.12 yyagi; state change must be in finally{} for exiting as of compact mode.
@@ -493,7 +493,7 @@ namespace TJAPlayer3
 					{
 						BinaryFormatter songlistdb_ = new BinaryFormatter();
 						using Stream songlistdb = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
-						this.Songs管理.listSongsDB = (Dictionary<string, C曲リストノード>)songlistdb_.Deserialize(songlistdb);
+						this.Songs管理.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
 					}
 				}
 				catch(Exception exception)

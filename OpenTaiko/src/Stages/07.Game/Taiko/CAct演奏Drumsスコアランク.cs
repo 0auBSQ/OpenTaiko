@@ -51,7 +51,7 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
 
-			TJAPlayer3.t安全にDisposeする(ref TowerResult_ScoreRankEffect);
+			TJAPlayer3.tDisposeSafely(ref TowerResult_ScoreRankEffect);
 
             base.ReleaseManagedResource();
         }
@@ -82,16 +82,16 @@ namespace TJAPlayer3
                 tex.Opacity = 255;
 
                 float newSize = 1.0f + (float)Math.Sin((cct.CurrentValue - 255) * (Math.PI / 180)) * 0.2f;
-                tex.vc拡大縮小倍率.X = newSize;
-                tex.vc拡大縮小倍率.Y = newSize;
+                tex.vcScaleRatio.X = newSize;
+                tex.vcScaleRatio.Y = newSize;
                 x = 0;
                 y = 0;
             }
             if (cct.CurrentValue > 255 + 180 && cct.CurrentValue <= 2745)
             {
                 tex.Opacity = 255;
-                tex.vc拡大縮小倍率.X = 1.0f;
-                tex.vc拡大縮小倍率.Y = 1.0f;
+                tex.vcScaleRatio.X = 1.0f;
+                tex.vcScaleRatio.Y = 1.0f;
                 x = 0;
                 y = 0;
             }
@@ -128,12 +128,12 @@ namespace TJAPlayer3
             switch (mode)
             {
                 case 1:
-                    width = tex.szテクスチャサイズ.Width / 7;
-                    height = tex.szテクスチャサイズ.Height;
+                    width = tex.szTextureSize.Width / 7;
+                    height = tex.szTextureSize.Height;
                     break;
                 default:
-                    width = tex.szテクスチャサイズ.Width;
-                    height = tex.szテクスチャサイズ.Height / 7;
+                    width = tex.szTextureSize.Width;
+                    height = tex.szTextureSize.Height / 7;
                     break;
             }
 
@@ -145,14 +145,14 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-            if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
             {
                 float x = 0;
                 float y = 0;
 
                 for (int i = 0; i < 7; i++)
                 {
-                    if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Tower)
+                    if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
                     {
 
                         for (int player = 0; player < 5; player++)
@@ -206,11 +206,11 @@ namespace TJAPlayer3
                         }
                         #endregion
                     }
-                    else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                    else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                     {
                         #region [Tower score ranks]
 
-                        double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stage選曲.r確定された曲.arスコア[5].譜面情報.nTotalFloor);
+                        double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
 
                         bool[] conditions =
                         {

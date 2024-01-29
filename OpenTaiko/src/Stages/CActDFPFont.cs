@@ -60,7 +60,7 @@ namespace TJAPlayer3
 				CTexture texture = b強調 ? TJAPlayer3.Tx.Config_Font_Bold : TJAPlayer3.Tx.Config_Font;
 				if( texture != null )
 				{
-					texture.vc拡大縮小倍率 = new Vector3D<float>( fScale, fScale, 1f );
+					texture.vcScaleRatio = new Vector3D<float>( fScale, fScale, 1f );
 					foreach( char ch in str )
 					{
 						foreach( ST文字領域 st文字領域 in this.st文字領域 )
@@ -559,8 +559,8 @@ namespace TJAPlayer3
 				st文字領域Array[0x5e].ch = '`';
 				st文字領域Array[0x5e].rc = new Rectangle(69, 226, 14, 29);
 
-				float scaleX = TJAPlayer3.Tx.Config_Font.szテクスチャサイズ.Width / 256.0f;
-				float scaleY = TJAPlayer3.Tx.Config_Font.szテクスチャサイズ.Height / 256.0f;
+				float scaleX = TJAPlayer3.Tx.Config_Font.szTextureSize.Width / 256.0f;
+				float scaleY = TJAPlayer3.Tx.Config_Font.szTextureSize.Height / 256.0f;
 
 				for (int i = 0; i < st文字領域Array.Length; i++)
 				{

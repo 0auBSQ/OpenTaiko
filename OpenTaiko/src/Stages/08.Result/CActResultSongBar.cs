@@ -43,7 +43,7 @@ namespace TJAPlayer3
 
 		    {
 		        this.txMusicName = TJAPlayer3.tテクスチャの生成(bmpSongTitle, false);
-		        txMusicName.vc拡大縮小倍率.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName, TJAPlayer3.Skin.Result_MusicName_MaxSize);
+		        txMusicName.vcScaleRatio.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName, TJAPlayer3.Skin.Result_MusicName_MaxSize);
 		    }
 
 			base.Activate();
@@ -65,7 +65,7 @@ namespace TJAPlayer3
 		}
 		public override void ReleaseManagedResource()
 		{
-            TJAPlayer3.t安全にDisposeする(ref this.pfMusicName);
+            TJAPlayer3.tDisposeSafely(ref this.pfMusicName);
             base.ReleaseManagedResource();
 		}
 		public override int Draw()
@@ -83,7 +83,7 @@ namespace TJAPlayer3
 
             if (TJAPlayer3.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Center)
             {
-                this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - ((this.txMusicName.szテクスチャサイズ.Width * txMusicName.vc拡大縮小倍率.X) / 2), TJAPlayer3.Skin.Result_MusicName_Y);
+                this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - ((this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X) / 2), TJAPlayer3.Skin.Result_MusicName_Y);
             }
             else if (TJAPlayer3.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Left)
             {
@@ -91,7 +91,7 @@ namespace TJAPlayer3
             }
             else
             {
-                this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - this.txMusicName.szテクスチャサイズ.Width * txMusicName.vc拡大縮小倍率.X, TJAPlayer3.Skin.Result_MusicName_Y);
+                this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X, TJAPlayer3.Skin.Result_MusicName_Y);
             }
 
 			if( !this.ct登場用.IsEnded )

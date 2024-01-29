@@ -281,27 +281,27 @@ namespace TJAPlayer3
 
                     if (this.ctゴーゴー.CurrentValue <= 4)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.2f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.2f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 54);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 5)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.4f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.4f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 40);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 6)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.6f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.6f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 26);
                     }
                     else if (this.ctゴーゴー.CurrentValue <= 8)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 0.8f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.8f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 13);
                     }
                     else if (this.ctゴーゴー.CurrentValue >= 9)
                     {
-                        TJAPlayer3.Tx.Lane_Background_GoGo.vc拡大縮小倍率.Y = 1.0f;
+                        TJAPlayer3.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 1.0f;
                         TJAPlayer3.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i]);
                     }
                 }
@@ -327,8 +327,25 @@ namespace TJAPlayer3
 
                     #endregion
 
-
-                    if (TJAPlayer3.ConfigIni.nBranchAnime == 0 && !_laneNull)
+                    if (TJAPlayer3.ConfigIni.SimpleMode)
+                    {
+                        switch (TJAPlayer3.stage演奏ドラム画面.nレーン用表示コース[i])
+                        {
+                            case CDTX.ECourse.eNormal:
+                                TJAPlayer3.Tx.Lane_Text[0].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
+                                break;
+                            case CDTX.ECourse.eExpert:
+                                TJAPlayer3.Tx.Lane_Text[1].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
+                                break;
+                            case CDTX.ECourse.eMaster:
+                                TJAPlayer3.Tx.Lane_Text[2].Opacity = 255;
+                                TJAPlayer3.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
+                                break;
+                        }
+                    }
+                    else if (TJAPlayer3.ConfigIni.nBranchAnime == 0 && !_laneNull)
                     {
                         if (!this.stBranch[i].ct分岐アニメ進行.IsTicked)
                         {
@@ -649,7 +666,7 @@ namespace TJAPlayer3
                                 {
                                     tex = TJAPlayer3.Tx.Taiko_Frame[5];
                                 }
-                                else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower)
+                                else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
                                 {
                                     tex = TJAPlayer3.Tx.Taiko_Frame[2];
                                 }
@@ -780,7 +797,7 @@ namespace TJAPlayer3
             #region[ ゴーゴー炎 ]
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
-                if (TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i])
+                if (TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME[i] && !TJAPlayer3.ConfigIni.SimpleMode)
                 {
                     this.ctゴーゴー炎.TickLoop();
 
@@ -801,8 +818,8 @@ namespace TJAPlayer3
 
                         //this.ctゴーゴー.n現在の値 = 6;
 
-                        int width = TJAPlayer3.Tx.Effects_Fire.szテクスチャサイズ.Width / 7;
-                        int height = TJAPlayer3.Tx.Effects_Fire.szテクスチャサイズ.Height;
+                        int width = TJAPlayer3.Tx.Effects_Fire.szTextureSize.Width / 7;
+                        int height = TJAPlayer3.Tx.Effects_Fire.szTextureSize.Height;
 
                         float x = -(width * (f倍率 - 1.0f) / 2.0f);
                         float y = -(height * (f倍率 - 1.0f) / 2.0f);
@@ -823,8 +840,8 @@ namespace TJAPlayer3
                             y += TJAPlayer3.Skin.Game_Effect_Fire_Y[i];
                         }
 
-                        TJAPlayer3.Tx.Effects_Fire.vc拡大縮小倍率.X = f倍率;
-                        TJAPlayer3.Tx.Effects_Fire.vc拡大縮小倍率.Y = f倍率;
+                        TJAPlayer3.Tx.Effects_Fire.vcScaleRatio.X = f倍率;
+                        TJAPlayer3.Tx.Effects_Fire.vcScaleRatio.Y = f倍率;
 
                         TJAPlayer3.Tx.Effects_Fire.t2D描画(x, y, 
                             new Rectangle(width * (this.ctゴーゴー炎.CurrentValue), 0, width, height));
@@ -869,17 +886,20 @@ namespace TJAPlayer3
 
                         switch (st状態[i].judge)
                         {
-                            case E判定.Perfect:
-                            case E判定.Great:
-                            case E判定.Auto:
-                                //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
-                                if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
-                                else if (TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
-                                    TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                            case ENoteJudge.Perfect:
+                            case ENoteJudge.Great:
+                            case ENoteJudge.Auto:
+                                if (!TJAPlayer3.ConfigIni.SimpleMode)
+                                {
+                                    //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
+                                    if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
+                                        TJAPlayer3.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                                    else if (TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
+                                        TJAPlayer3.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+                                }
                                 break;
 
-                            case E判定.Good:
+                            case ENoteJudge.Good:
                                 //this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
                                 if (this.st状態[i].nIsBig == 1 && TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue] != null)
                                     TJAPlayer3.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
@@ -887,8 +907,8 @@ namespace TJAPlayer3
                                     TJAPlayer3.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
                                 break;
 
-                            case E判定.Miss:
-                            case E判定.Bad:
+                            case ENoteJudge.Miss:
+                            case ENoteJudge.Bad:
                                 break;
                         }
                     }
@@ -898,7 +918,7 @@ namespace TJAPlayer3
 
         }
 
-        public virtual void Start(int nLane, E判定 judge, bool b両手入力, int nPlayer)
+        public virtual void Start(int nLane, ENoteJudge judge, bool b両手入力, int nPlayer)
         {
             //2017.08.15 kairera0467 排他なので番地をそのまま各レーンの状態として扱う
 
@@ -933,7 +953,7 @@ namespace TJAPlayer3
         public void GOGOSTART()
         {
             this.ctゴーゴー = new CCounter(0, 17, 18, TJAPlayer3.Timer);
-            if(TJAPlayer3.ConfigIni.nPlayerCount == 1 && TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan) TJAPlayer3.stage演奏ドラム画面.GoGoSplash.StartSplash();
+            if(TJAPlayer3.ConfigIni.nPlayerCount == 1 && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) TJAPlayer3.stage演奏ドラム画面.GoGoSplash.StartSplash();
         }
 
 
@@ -1006,7 +1026,7 @@ namespace TJAPlayer3
         {
             public bool b使用中;
             public CCounter ct進行;
-            public E判定 judge;
+            public ENoteJudge judge;
             public int nIsBig;
             public int n透明度;
             public int nPlayer;

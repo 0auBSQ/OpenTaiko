@@ -16,7 +16,7 @@ namespace TJAPlayer3
 
 		public CStage起動()
 		{
-			base.eステージID = CStage.Eステージ.起動;
+			base.eStageID = CStage.EStage.StartUp;
 			base.IsDeActivated = true;
 		}
 
@@ -34,7 +34,7 @@ namespace TJAPlayer3
 				Background.Init();
 
 				this.list進行文字列 = new List<string>();
-				base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+				base.ePhaseID = CStage.EPhase.Common_NORMAL;
 				base.Activate();
 				Trace.TraceInformation( "起動ステージの活性化を完了しました。" );
 			}
@@ -49,7 +49,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 
 				this.list進行文字列 = null;
 				if ( es != null )
@@ -106,33 +106,33 @@ namespace TJAPlayer3
 
 				#region [ this.str現在進行中 の決定 ]
 				//-----------------
-				switch( base.eフェーズID )
+				switch( base.ePhaseID )
 				{
-					case CStage.Eフェーズ.起動0_システムサウンドを構築:
+					case CStage.EPhase.Startup_0_CreateSystemSound:
 						this.str現在進行中 = "SYSTEM SOUND...";
 						break;
 
-					case CStage.Eフェーズ.起動00_songlistから曲リストを作成する:
+					case CStage.EPhase.Startup_1_InitializeSonglist:
 						this.str現在進行中 = "SONG LIST...";
 						break;
 
-					case CStage.Eフェーズ.起動2_曲を検索してリストを作成する:
+					case CStage.EPhase.Startup_2_EnumerateSongs:
 						this.str現在進行中 = string.Format( "{0} ... {1}", "Enumerating songs", es.Songs管理.n検索されたスコア数 );
 						break;
 
-					case CStage.Eフェーズ.起動3_スコアキャッシュをリストに反映する:
+					case CStage.EPhase.Startup_3_ApplyScoreCache:
 						this.str現在進行中 = string.Format( "{0} ... {1}/{2}", "Loading score properties from songs.db", es.Songs管理.nスコアキャッシュから反映できたスコア数, es.Songs管理.n検索されたスコア数 );
 						break;
 
-					case CStage.Eフェーズ.起動4_スコアキャッシュになかった曲をファイルから読み込んで反映する:
+					case CStage.EPhase.Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem:
 						this.str現在進行中 = string.Format( "{0} ... {1}/{2}", "Loading score properties from files", es.Songs管理.nファイルから反映できたスコア数, es.Songs管理.n検索されたスコア数 - es.Songs管理.nスコアキャッシュから反映できたスコア数 );
 						break;
 
-					case CStage.Eフェーズ.起動5_曲リストへ後処理を適用する:
+					case CStage.EPhase.Startup_5_PostProcessSonglist:
 						this.str現在進行中 = string.Format( "{0} ... ", "Building songlists" );
 						break;
 
-					case CStage.Eフェーズ.起動_テクスチャの読み込み:
+					case CStage.EPhase.Startup_6_LoadTextures:
 						if (!bIsLoadingTextures)
 						{
 							void loadTexture()
@@ -145,12 +145,12 @@ namespace TJAPlayer3
 									
 									this.list進行文字列.Add("LOADING TEXTURES...OK");
 									this.str現在進行中 = "Setup done.";
-									this.eフェーズID = Eフェーズ.起動7_完了;
-									TJAPlayer3.Skin.bgm起動画面.t停止する();
+									this.ePhaseID = EPhase.Startup_Complete;
+									TJAPlayer3.Skin.bgm起動画面.tStop();
 								}
 								catch(Exception exception)
 								{
-									TJAPlayer3.Skin.bgm起動画面.t停止する();
+									TJAPlayer3.Skin.bgm起動画面.tStop();
 
 									Trace.TraceError( exception.ToString() );
 									this.list進行文字列.Add("LOADING TEXTURES...NG");
@@ -162,8 +162,8 @@ namespace TJAPlayer3
 
 								this.list進行文字列.Add("LOADING TEXTURES...OK");
 								this.str現在進行中 = "Setup done.";
-								this.eフェーズID = Eフェーズ.起動7_完了;
-								TJAPlayer3.Skin.bgm起動画面.t停止する();
+								this.ePhaseID = EPhase.Startup_Complete;
+								TJAPlayer3.Skin.bgm起動画面.tStop();
 							}
 							if (TJAPlayer3.ConfigIni.ASyncTextureLoad)
 							{
@@ -180,7 +180,7 @@ namespace TJAPlayer3
 				//-----------------
 				#endregion
 
-				if(eフェーズID != Eフェーズ.起動7_完了)
+				if(ePhaseID != EPhase.Startup_Complete)
                 {
 					#region [ this.list進行文字列＋this.現在進行中 の表示 ]
 					//-----------------
@@ -201,9 +201,9 @@ namespace TJAPlayer3
 					{
 						TJAPlayer3.Songs管理 = ( es != null ) ? es.Songs管理 : null;		// 最後に、曲リストを拾い上げる
 
-						if(TJAPlayer3.Input管理.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
+						if(TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
 						{
-							TJAPlayer3.Skin.sound決定音.t再生する();
+							TJAPlayer3.Skin.soundDecideSFX.tPlay();
 							return 1;
 						}
 					}

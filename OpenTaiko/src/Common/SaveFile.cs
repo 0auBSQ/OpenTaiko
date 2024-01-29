@@ -163,7 +163,7 @@ namespace TJAPlayer3
 
         #region [Player stats]
 
-        public void tUpdateSongClearStatus(C曲リストノード node, int clearStatus, int difficulty)
+        public void tUpdateSongClearStatus(CSongListNode node, int clearStatus, int difficulty)
         {
             if (difficulty > (int)Difficulty.Edit) return;
 

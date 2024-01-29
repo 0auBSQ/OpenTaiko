@@ -14,8 +14,8 @@ namespace TJAPlayer3
 		{
 			this.mode = EFIFOモード.フェードアウト;
 
-			TJAPlayer3.Skin.soundDanSelectBGM.t停止する();
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+			TJAPlayer3.Skin.soundDanSelectBGM.tStop();
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				this.counter = new CCounter(0, 1255, 1, TJAPlayer3.Timer);
 			else if (TJAPlayer3.ConfigIni.bAIBattleMode)
 			{
@@ -30,7 +30,7 @@ namespace TJAPlayer3
 		{
 			this.mode = EFIFOモード.フェードイン;
 
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			{
 				this.counter = new CCounter(0, 255, 1, TJAPlayer3.Timer);
 
@@ -72,16 +72,16 @@ namespace TJAPlayer3
 			}
 			this.counter.Tick();
 
-			if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] >= (int)Difficulty.Tower)
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower)
 			{
 				if (TJAPlayer3.Tx.Tile_Black != null)
 				{
 					TJAPlayer3.Tx.Tile_Black.Opacity = this.mode == EFIFOモード.フェードアウト ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
-					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
+					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 					{
-						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
+						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 						{
-							TJAPlayer3.Tx.Tile_Black.t2D描画(i * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Width, j * TJAPlayer3.Tx.Tile_Black.szテクスチャサイズ.Height);
+							TJAPlayer3.Tx.Tile_Black.t2D描画(i * TJAPlayer3.Tx.Tile_Black.szTextureSize.Width, j * TJAPlayer3.Tx.Tile_Black.szTextureSize.Height);
 						}
 					}
 				}
@@ -97,7 +97,7 @@ namespace TJAPlayer3
 
 					if (preTime > 500)
 					{
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Base.vc拡大縮小倍率.X = Math.Min(((preTime - 500) / 255.0f), 1.0f);
+						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Base.vcScaleRatio.X = Math.Min(((preTime - 500) / 255.0f), 1.0f);
 						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Base.t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Resolution[0] / 2, TJAPlayer3.Skin.Resolution[1] / 2);
 					}
 
@@ -119,8 +119,8 @@ namespace TJAPlayer3
 							value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 
 							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.t2D描画(TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[1],
-								new RectangleF(0, 0, TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szテクスチャサイズ.Width * value, 
-								TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szテクスチャサイズ.Height));
+								new RectangleF(0, 0, TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Width * value, 
+								TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Height));
 						}
 						else
 						{
@@ -215,15 +215,15 @@ namespace TJAPlayer3
 			if (ShowTex == null) return;
 			if (time - max >= end) time = end + max;
 
-			var SizeXHarf = ShowTex.szテクスチャサイズ.Width / 2f;
-			var SizeY = ShowTex.szテクスチャサイズ.Height;
+			var SizeXHarf = ShowTex.szTextureSize.Width / 2f;
+			var SizeY = ShowTex.szTextureSize.Height;
 			var StartScaleX = 0.5f;
 			var ScaleX = (float)((IsExit ? 1f - StartScaleX : 0f) - ((time >= max ? (time - max) : 0) * ((1f - StartScaleX) / end))) * (IsExit ? 1f : -1f);
 			var Value = (float)((IsExit ? 1f : 0f) - ((time >= max ? (time - max) : 0) * (1f / end))) * (IsExit ? 1f : -1f);
 
-			ShowTex.vc拡大縮小倍率.X = StartScaleX + ScaleX;
+			ShowTex.vcScaleRatio.X = StartScaleX + ScaleX;
 			ShowTex.t2D描画(-(SizeXHarf * StartScaleX) + (Value * (SizeXHarf * StartScaleX)), 0, new RectangleF(0, 0, SizeXHarf, SizeY));
-			ShowTex.t2D描画((SizeXHarf + (SizeXHarf * StartScaleX)) - (Value * (SizeXHarf * StartScaleX)) + ((1f - ShowTex.vc拡大縮小倍率.X) * SizeXHarf), 0, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
+			ShowTex.t2D描画((SizeXHarf + (SizeXHarf * StartScaleX)) - (Value * (SizeXHarf * StartScaleX)) + ((1f - ShowTex.vcScaleRatio.X) * SizeXHarf), 0, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 
 		}
 		/// <summary>
@@ -246,20 +246,20 @@ namespace TJAPlayer3
 		private void DrawPlate(float opacity, float scaleX, float scaleY = 1f)
 		{
 			if (TJAPlayer3.Tx.SongLoading_Plate is null) return;
-			var SizeX_Harf = TJAPlayer3.Tx.SongLoading_Plate.szテクスチャサイズ.Width / 2.0f;
-			var SizeY_Harf = TJAPlayer3.Tx.SongLoading_Plate.szテクスチャサイズ.Height / 2.0f;
+			var SizeX_Harf = TJAPlayer3.Tx.SongLoading_Plate.szTextureSize.Width / 2.0f;
+			var SizeY_Harf = TJAPlayer3.Tx.SongLoading_Plate.szTextureSize.Height / 2.0f;
 
 			TJAPlayer3.Tx.SongLoading_Plate.Opacity = (int)opacity;
-			TJAPlayer3.Tx.SongLoading_Plate.vc拡大縮小倍率.X = scaleX;
-			TJAPlayer3.Tx.SongLoading_Plate.vc拡大縮小倍率.Y = scaleY;
+			TJAPlayer3.Tx.SongLoading_Plate.vcScaleRatio.X = scaleX;
+			TJAPlayer3.Tx.SongLoading_Plate.vcScaleRatio.Y = scaleY;
 			TJAPlayer3.Tx.SongLoading_Plate.t2D描画(TJAPlayer3.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, TJAPlayer3.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
 		}
 
 		private void DrawChara(double time, float opacity, float X = -1, float Y = -1)
 		{
 			if (TJAPlayer3.Tx.SongLoading_Plate is null || (X == -1 && Y == -1 ? time <= 680 : false)) return;
-			var SizeXHarf = TJAPlayer3.Tx.SongLoading_Chara.szテクスチャサイズ.Width / 2f;
-			var SizeY = TJAPlayer3.Tx.SongLoading_Chara.szテクスチャサイズ.Height;
+			var SizeXHarf = TJAPlayer3.Tx.SongLoading_Chara.szTextureSize.Width / 2f;
+			var SizeY = TJAPlayer3.Tx.SongLoading_Chara.szTextureSize.Height;
 
 			if (X == -1 && Y == -1)
 			{

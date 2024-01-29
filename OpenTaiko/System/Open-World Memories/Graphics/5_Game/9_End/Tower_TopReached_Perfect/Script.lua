@@ -6,8 +6,10 @@
 --func:SetScale(xscale, yscale, "filename");
 --func:SetColor(r, g, b, "filename");
 
-local x = { 498, 498, 498, 498, 498 }
-local y = { 288, 552, 0, 0, 0 }
+local x = { 499, 499, 499, 499, 499 }
+local y = { 204, 468, 0, 0, 0 }
+
+local imageHeight = 324
 
 local animeCounter = { 0, 0, 0, 0, 0 }
 local nowFrame = { 0, 0, 0, 0, 0 }
@@ -27,11 +29,12 @@ end
 
 function init()
     if playerCount <= 2 then
-        y = { 288, 552, 0, 0, 0 }
+        y = { 204, 468, 0, 0, 0 }
     elseif playerCount == 5 then
-        y = { 36, 252, 468, 684, 900 }
+        y = { -71, 145, 361, 577, 793 }
+        imageHeight = 288
     else
-        y = { 69, 333, 597, 861, 0 }
+        y = { -60, 206, 469, 733, 0 }
     end
 
     func:AddGraph("bg.png")
@@ -46,10 +49,8 @@ function update(player)
 end
 
 function draw(player)
-    if nowFrame[player + 1] >= 34 then
-        func:DrawGraph(x[player + 1], y[player + 1], "bg.png")
-    end
     if nowFrame[player + 1] <= 20 or not(useExtraAnime) then
-        func:DrawGraph(x[player + 1] - 3, y[player + 1] - 213, tostring(math.min(nowFrame[player + 1], textureCount))..".png")
+        --func:DrawGraph(x[player + 1] - 3, y[player + 1], tostring(math.min(nowFrame[player + 1], textureCount))..".png")
+        func:DrawRectGraph(x[player + 1] - 3, y[player + 1], 0, 0, 1426, imageHeight, tostring(math.min(nowFrame[player + 1], textureCount))..".png")
     end
 end

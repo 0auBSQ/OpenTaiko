@@ -30,6 +30,7 @@ using SkiaSharp;
 using FDK;
 using Silk.NET.GLFW;
 using System.Runtime.InteropServices;
+using Silk.NET.Core;
 
 namespace SampleFramework
 {
@@ -42,6 +43,8 @@ namespace SampleFramework
         public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
 
         internal static List<Action> AsyncActions = new();
+
+        private string strIconFileName;
 
         protected string _Text = "";
         protected string Text
@@ -244,11 +247,20 @@ namespace SampleFramework
             //GetError();
         }
 
+        private RawImage GetIconData(string fileName)
+        {
+            SKCodec codec = SKCodec.Create(fileName);
+            using SKBitmap bitmap = SKBitmap.Decode(codec, new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Rgba8888));
+            return new RawImage(bitmap.Width, bitmap.Height, bitmap.GetPixelSpan().ToArray());
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Game"/> class.
         /// </summary>
-        protected Game()
+        protected Game(string iconFileName)
         {
+            strIconFileName = iconFileName;
+
             MainThreadID = Thread.CurrentThread.ManagedThreadId;
             Configuration();
 
@@ -266,11 +278,13 @@ namespace SampleFramework
             options.API = GraphicsAPI.None;
             options.WindowBorder = WindowBorder.Resizable;
             options.Title = Text;
-            
+
+
             Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
             //Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 
             Window_ = Window.Create(options);
+
             Window_.Load += Window_Load;
             Window_.Closing += Window_Closing;
             Window_.Update += Window_Update;
@@ -393,6 +407,8 @@ namespace SampleFramework
 
         public void Window_Load()
         {
+            Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
+
             Context = new AngleContext(GraphicsDeviceType_, Window_);
             Context.MakeCurrent();
 

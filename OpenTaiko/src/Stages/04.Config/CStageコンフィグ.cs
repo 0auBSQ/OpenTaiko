@@ -22,8 +22,8 @@ namespace TJAPlayer3
 		public CStageコンフィグ()
 		{
 			CActDFPFont font;
-			base.eステージID = CStage.Eステージ.コンフィグ;
-			base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+			base.eStageID = CStage.EStage.Config;
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.actFont = font = new CActDFPFont();
 			base.ChildActivities.Add( font );
 			base.ChildActivities.Add( this.actFIFO = new CActFIFOWhite() );
@@ -59,7 +59,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.t再生する();
+				TJAPlayer3.Skin.bgmコンフィグ画面.tPlay();
 
 				this.n現在のメニュー番号 = 0;                                                    //
 				for( int i = 0; i < 4; i++ )													//
@@ -97,7 +97,7 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.t停止する();
+				TJAPlayer3.Skin.bgmコンフィグ画面.tStop();
 
 				TJAPlayer3.ConfigIni.t書き出し( TJAPlayer3.strEXEのあるフォルダ + "Config.ini" );	// CONFIGだけ
 				for( int i = 0; i < 4; i++ )
@@ -114,7 +114,7 @@ namespace TJAPlayer3
 				}
 				txMenuItemLeft = null;
 
-				TJAPlayer3.t安全にDisposeする(ref Background);
+				TJAPlayer3.tDisposeSafely(ref Background);
 
 				base.DeActivate();
 			}
@@ -233,7 +233,7 @@ namespace TJAPlayer3
 
 			if( base.IsFirstDraw )
 			{
-				base.eフェーズID = CStage.Eフェーズ.共通_フェードイン;
+				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 				this.actFIFO.tフェードイン開始();
 				base.IsFirstDraw = false;
 			}
@@ -303,11 +303,11 @@ namespace TJAPlayer3
 					new Rectangle(width * 2, 0, width, height));
 
 				//Center
-				TJAPlayer3.Tx.Config_Cursor.vc拡大縮小倍率.X = (move / (float)width) * 2.0f;
+				TJAPlayer3.Tx.Config_Cursor.vcScaleRatio.X = (move / (float)width) * 2.0f;
 				TJAPlayer3.Tx.Config_Cursor.t2D拡大率考慮中央基準描画(x, y, 
 					new Rectangle(width, 0, width, height));
 
-				TJAPlayer3.Tx.Config_Cursor.vc拡大縮小倍率.X = 1.0f;
+				TJAPlayer3.Tx.Config_Cursor.vcScaleRatio.X = 1.0f;
 			}
             //---------------------
             #endregion
@@ -374,16 +374,16 @@ namespace TJAPlayer3
 
 			#region [ FadeOut ]
 			//---------------------
-			switch( base.eフェーズID )
+			switch( base.ePhaseID )
 			{
-				case CStage.Eフェーズ.共通_フェードイン:
+				case CStage.EPhase.Common_FADEIN:
 					if( this.actFIFO.Draw() != 0 )
 					{
-						base.eフェーズID = CStage.Eフェーズ.共通_通常状態;
+						base.ePhaseID = CStage.EPhase.Common_NORMAL;
 					}
 					break;
 
-				case CStage.Eフェーズ.共通_フェードアウト:
+				case CStage.EPhase.Common_FADEOUT:
 					if( this.actFIFO.Draw() == 0 )
 					{
 						break;
@@ -399,7 +399,7 @@ namespace TJAPlayer3
 
 			// キー入力
 
-			if( ( base.eフェーズID != CStage.Eフェーズ.共通_通常状態 )
+			if( ( base.ePhaseID != CStage.EPhase.Common_NORMAL )
 				|| this.actKeyAssign.bキー入力待ちの最中である
 				|| TJAPlayer3.act現在入力を占有中のプラグイン != null )
 				return 0;
@@ -407,9 +407,9 @@ namespace TJAPlayer3
 			// 曲データの一覧取得中は、キー入力を無効化する
 			if ( !TJAPlayer3.EnumSongs.IsEnumerating || TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 != true )
 			{
-				if ( ( TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.FT ) ) || TJAPlayer3.Pad.b押されたGB( Eパッド.FT ) )
+				if ( ( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.FT ) ) || TJAPlayer3.Pad.bPressedGB( EPad.FT ) )
 				{
-					TJAPlayer3.Skin.sound取消音.t再生する();
+					TJAPlayer3.Skin.soundCancelSFX.tPlay();
 					if ( !this.bメニューにフォーカス中 )
 					{
 						if ( this.eItemPanelモード == EItemPanelモード.キーコード一覧 )
@@ -427,21 +427,21 @@ namespace TJAPlayer3
 					else
 					{
 						this.actFIFO.tフェードアウト開始();
-						base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 				}
-				else if ( ( TJAPlayer3.Pad.b押されたDGB( Eパッド.CY ) || TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.RD ) ) || ( TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.LC ) || ( TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.Input管理.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Return ) ) ) )
+				else if ( ( TJAPlayer3.Pad.bPressedDGB( EPad.CY ) || TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.RD ) ) || ( TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.LC ) || ( TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Return ) ) ) )
 				{
 					if ( this.n現在のメニュー番号 == 2 )
 					{
 						// Exit
-						TJAPlayer3.Skin.sound決定音.t再生する();
+						TJAPlayer3.Skin.soundDecideSFX.tPlay();
 						this.actFIFO.tフェードアウト開始();
-						base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 					else if ( this.bメニューにフォーカス中 )
 					{
-						TJAPlayer3.Skin.sound決定音.t再生する();
+						TJAPlayer3.Skin.soundDecideSFX.tPlay();
 						this.bメニューにフォーカス中 = false;
 						this.t説明文パネルに現在選択されている項目の説明を描画する();
 					}
@@ -471,15 +471,15 @@ namespace TJAPlayer3
 						}
 					}
 				}
-				this.ctキー反復用.Up.KeyIntervalFunc( TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.UpArrow ), new CCounter.KeyProcess( this.tカーソルを上へ移動する ) );
-				this.ctキー反復用.R.KeyIntervalFunc( TJAPlayer3.Pad.b押されているGB( Eパッド.HH ), new CCounter.KeyProcess( this.tカーソルを上へ移動する ) );
-				if ( TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.SD ) )
+				this.ctキー反復用.Up.KeyIntervalFunc( TJAPlayer3.InputManager.Keyboard.KeyPressing( (int)SlimDXKeys.Key.UpArrow ), new CCounter.KeyProcess( this.tカーソルを上へ移動する ) );
+				this.ctキー反復用.R.KeyIntervalFunc( TJAPlayer3.Pad.b押されているGB( EPad.HH ), new CCounter.KeyProcess( this.tカーソルを上へ移動する ) );
+				if ( TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.SD ) )
 				{
 					this.tカーソルを上へ移動する();
 				}
-				this.ctキー反復用.Down.KeyIntervalFunc( TJAPlayer3.Input管理.Keyboard.KeyPressing( (int)SlimDXKeys.Key.DownArrow ), new CCounter.KeyProcess( this.tカーソルを下へ移動する ) );
-				this.ctキー反復用.B.KeyIntervalFunc( TJAPlayer3.Pad.b押されているGB( Eパッド.BD ), new CCounter.KeyProcess( this.tカーソルを下へ移動する ) );
-				if ( TJAPlayer3.Pad.b押された( E楽器パート.DRUMS, Eパッド.LT ) )
+				this.ctキー反復用.Down.KeyIntervalFunc( TJAPlayer3.InputManager.Keyboard.KeyPressing( (int)SlimDXKeys.Key.DownArrow ), new CCounter.KeyProcess( this.tカーソルを下へ移動する ) );
+				this.ctキー反復用.B.KeyIntervalFunc( TJAPlayer3.Pad.b押されているGB( EPad.BD ), new CCounter.KeyProcess( this.tカーソルを下へ移動する ) );
+				if ( TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.LT ) )
 				{
 					this.tカーソルを下へ移動する();
 				}
@@ -588,7 +588,7 @@ namespace TJAPlayer3
 			}
 			else
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在のメニュー番号 = ( this.n現在のメニュー番号 + 1 ) % 3;
 				switch( this.n現在のメニュー番号 )
 				{
@@ -624,7 +624,7 @@ namespace TJAPlayer3
 			}
 			else
 			{
-				TJAPlayer3.Skin.soundカーソル移動音.t再生する();
+				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 3) % 3;
 				switch ( this.n現在のメニュー番号 )
 				{

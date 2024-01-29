@@ -1433,7 +1433,7 @@ namespace TJAPlayer3
 			}
 			return (int)ERANK.E;
 		}
-		internal static double tゲーム型スキルを計算して返す( int nLevel, int nTotal, int nPerfect, int nCombo, E楽器パート inst, STAUTOPLAY bAutoPlay )
+		internal static double tゲーム型スキルを計算して返す( int nLevel, int nTotal, int nPerfect, int nCombo, EInstrumentPad inst, STAUTOPLAY bAutoPlay )
 		{
 			double ret;
 			if( ( nTotal == 0 ) || ( ( nPerfect == 0 ) && ( nCombo == 0 ) ) )
@@ -1444,7 +1444,7 @@ namespace TJAPlayer3
 
 			return ret;
 		}
-		internal static double t演奏型スキルを計算して返す( int nTotal, int nPerfect, int nGreat, int nGood, int nPoor, int nMiss, E楽器パート inst, STAUTOPLAY bAutoPlay)
+		internal static double t演奏型スキルを計算して返す( int nTotal, int nPerfect, int nGreat, int nGood, int nPoor, int nMiss, EInstrumentPad inst, STAUTOPLAY bAutoPlay)
 		{
 			if( nTotal == 0 )
 				return 0.0;
@@ -1456,7 +1456,7 @@ namespace TJAPlayer3
 			ret *= dbCalcReviseValForDrGtBsAutoLanes( inst, bAutoPlay );
 			return ret;
 		}
-		internal static double dbCalcReviseValForDrGtBsAutoLanes( E楽器パート inst, STAUTOPLAY bAutoPlay )
+		internal static double dbCalcReviseValForDrGtBsAutoLanes( EInstrumentPad inst, STAUTOPLAY bAutoPlay )
 		{
             //削除
 			return 1.0;

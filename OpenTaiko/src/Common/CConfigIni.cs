@@ -234,17 +234,6 @@ namespace TJAPlayer3
 						this.padLBD = value;
 					}
 				}
-				public CConfigIni.CKeyAssign.STKEYASSIGN[] Capture
-				{
-					get
-					{
-						return this.padCapture;
-					}
-					set
-					{
-						this.padCapture = value;
-					}
-				}
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed
 				{
 					get
@@ -552,6 +541,127 @@ namespace TJAPlayer3
 						this.padRightChange = value;
 					}
 				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] Capture
+				{
+					get
+					{
+						return this.padCapture;
+					}
+					set
+					{
+						this.padCapture = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolIncrease
+				{
+					get
+					{
+						return this.padSongVolIncrease;
+					}
+					set
+					{
+						this.padSongVolIncrease = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolDecrease
+				{
+					get
+					{
+						return this.padSongVolDecrease;
+					}
+					set
+					{
+						this.padSongVolDecrease = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayHits
+				{
+					get
+					{
+						return this.padDisplayHits;
+					}
+					set
+					{
+						this.padDisplayHits = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayDebug
+				{
+					get
+					{
+						return this.padDisplayDebug;
+					}
+					set
+					{
+						this.padDisplayDebug = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] QuickConfig
+				{
+					get
+					{
+						return this.padQuickConfig;
+					}
+					set
+					{
+						this.padQuickConfig = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] NewHeya
+				{
+					get
+					{
+						return this.padNewHeya;
+					}
+					set
+					{
+						this.padNewHeya = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] SortSongs
+				{
+					get
+					{
+						return this.padSortSongs;
+					}
+					set
+					{
+						this.padSortSongs = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP1
+				{
+					get
+					{
+						return this.padToggleAutoP1;
+					}
+					set
+					{
+						this.padToggleAutoP1 = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP2
+				{
+					get
+					{
+						return this.padToggleAutoP2;
+					}
+					set
+					{
+						this.padToggleAutoP2 = value;
+					}
+				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleTrainingMode
+				{
+					get
+					{
+						return this.padToggleTrainingMode;
+					}
+					set
+					{
+						this.padToggleTrainingMode = value;
+					}
+				}
 
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[int index]
 				{
@@ -678,6 +788,36 @@ namespace TJAPlayer3
 
 							case (int)EKeyConfigPad.Capture:
 								return this.padCapture;
+
+							case (int)EKeyConfigPad.SongVolumeIncrease:
+								return this.padSongVolIncrease;
+
+							case (int)EKeyConfigPad.SongVolumeDecrease:
+								return this.padSongVolDecrease;
+
+							case (int)EKeyConfigPad.DisplayHits:
+								return this.padDisplayHits;
+
+							case (int)EKeyConfigPad.DisplayDebug:
+								return this.padDisplayDebug;
+
+							case (int)EKeyConfigPad.QuickConfig:
+								return this.padQuickConfig;
+
+							case (int)EKeyConfigPad.NewHeya:
+								return this.padNewHeya;
+
+							case (int)EKeyConfigPad.SortSongs:
+								return this.padSortSongs;
+
+							case (int)EKeyConfigPad.ToggleAutoP1:
+								return this.padToggleAutoP1;
+
+							case (int)EKeyConfigPad.ToggleAutoP2:
+								return this.padToggleAutoP2;
+
+							case (int)EKeyConfigPad.ToggleTrainingMode:
+								return this.padToggleTrainingMode;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -844,6 +984,46 @@ namespace TJAPlayer3
 							case (int)EKeyConfigPad.Capture:
 								this.padCapture = value;
 								return;
+
+							case (int)EKeyConfigPad.SongVolumeIncrease:
+								this.padSongVolIncrease = value;
+								return;
+
+							case (int)EKeyConfigPad.SongVolumeDecrease:
+								this.padSongVolDecrease = value;
+								return;
+
+							case (int)EKeyConfigPad.DisplayHits:
+								this.padDisplayHits = value;
+								return;
+
+							case (int)EKeyConfigPad.DisplayDebug:
+								this.padDisplayDebug = value;
+								return;
+
+							case (int)EKeyConfigPad.QuickConfig:
+								this.padQuickConfig = value;
+								return;
+
+							case (int)EKeyConfigPad.NewHeya:
+								this.padNewHeya = value;
+								return;
+
+							case (int)EKeyConfigPad.SortSongs:
+								this.padSortSongs = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleAutoP1:
+								this.padToggleAutoP1 = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleAutoP2:
+								this.padToggleAutoP2 = value;
+								return;
+
+							case (int)EKeyConfigPad.ToggleTrainingMode:
+								this.padToggleTrainingMode = value;
+								return;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -898,17 +1078,32 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padRightChange;
 
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolIncrease;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolDecrease;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayHits;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayDebug;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padQuickConfig;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padNewHeya;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padSortSongs;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP1;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP2;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleTrainingMode;
 				//-----------------
 				#endregion
+			}
+
+			public bool KeyIsPressed(STKEYASSIGN[] pad)
+			{
+				return TJAPlayer3.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
 			}
 
 			[StructLayout(LayoutKind.Sequential)]
 			public struct STKEYASSIGN
 			{
-				public E入力デバイス 入力デバイス;
+				public EInputDevice 入力デバイス;
 				public int ID;
 				public int コード;
-				public STKEYASSIGN(E入力デバイス DeviceType, int nID, int nCode)
+				public STKEYASSIGN(EInputDevice DeviceType, int nID, int nCode)
 				{
 					this.入力デバイス = DeviceType;
 					this.ID = nID;
@@ -1210,9 +1405,9 @@ namespace TJAPlayer3
 			new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
 
-		public bool b大音符判定;
+		public bool bJudgeBigNotes;
 		public bool bForceNormalGauge;
-		public int n両手判定の待ち時間;
+		public int nBigNoteWaitTimems;
 		public int nBranchAnime;
 
 		// I18N choosen language
@@ -1236,7 +1431,7 @@ namespace TJAPlayer3
 		public bool ShowPuchiChara; // リザーブ
 
 		public bool bHispeedRandom;
-		public Eステルスモード[] eSTEALTH;
+		public EStealthMode[] eSTEALTH;
 		public bool bNoInfo;
 
 		public int nDefaultSongSort;
@@ -1269,27 +1464,21 @@ namespace TJAPlayer3
 		public STDGBVALUE<int> nJudgeLinePosOffset;	// #31602 2013.6.23 yyagi 判定ライン表示位置のオフセット
 		public bool bIsAutoResultCapture;			// #25399 2011.6.9 yyagi リザルト画像自動保存機能のON/OFF制御
 		public int nPoliphonicSounds;				// #28228 2012.5.1 yyagi レーン毎の最大同時発音数
-		public bool bバッファ入力を行う;
+		public bool bBufferedInputs;
 		public bool bIsEnabledSystemMenu;			// #28200 2012.5.1 yyagi System Menuの使用可否切替
 		public string strSystemSkinSubfolderFullName;	// #28195 2012.5.2 yyagi Skin切替用 System/以下のサブフォルダ名
-		public bool bConfigIniがないかDTXManiaのバージョンが異なる
-		{
-			get
-			{
-				return ( !this.bConfigIniが存在している || !TJAPlayer3.VERSION.Equals( this.strDTXManiaのバージョン ) );
-			}
-		}
+
 		public bool bEnterがキー割り当てのどこにも使用されていない
 		{
 			get
 			{
 				for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 				{
-					for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+					for( int j = 0; j < (int)EKeyConfigPad.MAX; j++ )
 					{
 						for( int k = 0; k < 0x10; k++ )
 						{
-							if( ( this.KeyAssign[ i ][ j ][ k ].入力デバイス == E入力デバイス.キーボード ) && ( this.KeyAssign[ i ][ j ][ k ].コード == (int)SlimDXKeys.Key.Return ) )
+							if( ( this.KeyAssign[ i ][ j ][ k ].入力デバイス == EInputDevice.Keyboard ) && ( this.KeyAssign[ i ][ j ][ k ].コード == (int)SlimDXKeys.Key.Return ) )
 							{
 								return false;
 							}
@@ -1369,6 +1558,7 @@ namespace TJAPlayer3
         public bool FastRender; // 事前画像描画モード
         public bool ASyncTextureLoad; // 事前画像描画モード
         public bool PreAssetsLoading; // 事前画像描画モード
+        public bool SimpleMode; // 事前画像描画モード
         public int MusicPreTimeMs; // 音源再生前の待機時間ms
 
 		public bool TJAP3FolderMode { get; private set; }
@@ -1896,7 +2086,7 @@ namespace TJAPlayer3
 			this.nRisky = 0;							// #23539 2011.7.26 yyagi RISKYモード
 			this.bIsAutoResultCapture = false;			// #25399 2011.6.9 yyagi リザルト画像自動保存機能ON/OFF
 
-			this.bバッファ入力を行う = true;
+			this.bBufferedInputs = true;
 			this.bIsAllowedDoubleClickFullscreen = false;	// #26752 2011.11.26 ダブルクリックでのフルスクリーンモード移行を許可
 			this.nPoliphonicSounds = 4;					// #28228 2012.5.1 yyagi レーン毎の最大同時発音数
 														// #24820 2013.1.15 yyagi 初期値を4から2に変更。BASS.net使用時の負荷軽減のため。
@@ -1931,9 +2121,9 @@ namespace TJAPlayer3
             this.nDefaultCourse = (int)Difficulty.Normal;
             this.nBranchAnime = 1;
 
-            this.b大音符判定 = false;
+            this.bJudgeBigNotes = false;
 			bForceNormalGauge = false;
-            this.n両手判定の待ち時間 = 50;
+            this.nBigNoteWaitTimems = 50;
 
             this.bJudgeCountDisplay = false;
 
@@ -1946,10 +2136,10 @@ namespace TJAPlayer3
             ShowMob = true;
             ShowPuchiChara = true;
 
-			this.eSTEALTH = new Eステルスモード[5];
+			this.eSTEALTH = new EStealthMode[5];
 
 			for (int i = 0; i < 5; i++) 
-				this.eSTEALTH[i] = Eステルスモード.OFF;
+				this.eSTEALTH[i] = EStealthMode.OFF;
 
             this.bNoInfo = false;
 
@@ -1967,6 +2157,7 @@ namespace TJAPlayer3
 			FastRender = true;
 			ASyncTextureLoad = true;
 			PreAssetsLoading = true;
+			SimpleMode = false;
             MusicPreTimeMs = 1000; // 一秒
             SendDiscordPlayingInformation = true;
             #region[ Ver.K追加 ]
@@ -1983,12 +2174,12 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( E入力デバイス DeviceType, int nID, int nCode, EKeyConfigPad pad )
+		public void t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad )
 		{
 			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
-				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+				for( int j = 0; j < (int)EKeyConfigPad.Capture; j++ ) // Do not restrict duplicate keybinds for System controls
 				{
 					if (isMenu ? 
 						(j != (int)EKeyConfigPad.LeftChange && j != (int)EKeyConfigPad.RightChange &&
@@ -2004,7 +2195,7 @@ namespace TJAPlayer3
 							{
 								this.KeyAssign[ i ][ j ][ m ] = this.KeyAssign[ i ][ j ][ m + 1 ];
 							}
-							this.KeyAssign[ i ][ j ][ 15 ].入力デバイス = E入力デバイス.不明;
+							this.KeyAssign[ i ][ j ][ 15 ].入力デバイス = EInputDevice.Unknown;
 							this.KeyAssign[ i ][ j ][ 15 ].ID = 0;
 							this.KeyAssign[ i ][ j ][ 15 ].コード = 0;
 							k--;
@@ -2080,12 +2271,16 @@ namespace TJAPlayer3
             sw.WriteLine("; Use pre-textures render.");
             sw.WriteLine("{0}={1}", nameof(ASyncTextureLoad), ASyncTextureLoad ? 1 : 0);
             sw.WriteLine();
-			#endregion
+            sw.WriteLine("; シンプルモードを使うかどうか。(0: OFF, 1: ON)");
+            sw.WriteLine("; Use simplemode");
+            sw.WriteLine("{0}={1}", nameof(SimpleMode), SimpleMode ? 1 : 0);
+            sw.WriteLine();
+            #endregion
 
 
-			#region [Language]
+            #region [Language]
 
-			sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
+            sw.WriteLine("; プレイ中やメニューの表示される言語を変更。");
 			sw.WriteLine("; Change the displayed language ingame and within the menus.");
 			sw.WriteLine("Lang={0}", this.sLang);
 			sw.WriteLine();
@@ -2322,7 +2517,7 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.WriteLine( "; バッファ入力モード(0:OFF, 1:ON)" );
 			sw.WriteLine( "; Using Buffered input (0:OFF, 1:ON)" );
-			sw.WriteLine( "BufferedInput={0}", this.bバッファ入力を行う ? 1 : 0 );
+			sw.WriteLine( "BufferedInput={0}", this.bBufferedInputs ? 1 : 0 );
 			sw.WriteLine();
 			sw.WriteLine( "; リザルト画像自動保存機能(0:OFF, 1:ON)" );						// #25399 2011.6.9 yyagi
 			sw.WriteLine( "; Set \"1\" if you'd like to save result screen image automatically");	//
@@ -2531,10 +2726,10 @@ namespace TJAPlayer3
             //sw.WriteLine( "HispeedRandom={0}", this.bHispeedRandom ? 1 : 0 );
             //sw.WriteLine();
             sw.WriteLine( "; 大音符の両手入力待機時間(ms)" );
-			sw.WriteLine( "BigNotesWaitTime={0}", this.n両手判定の待ち時間 );
+			sw.WriteLine( "BigNotesWaitTime={0}", this.nBigNoteWaitTimems );
 			sw.WriteLine();
 			sw.WriteLine( "; 大音符の両手判定(0:OFF, 1:ON)" );
-			sw.WriteLine( "BigNotesJudge={0}", this.b大音符判定 ? 1 : 0 );
+			sw.WriteLine( "BigNotesJudge={0}", this.bJudgeBigNotes ? 1 : 0 );
 			sw.WriteLine();
 			sw.WriteLine( "; ゲージをNormalに強制(0:OFF, 1:ON)" );
 			sw.WriteLine( "ForceNormalGauge={0}", this.bForceNormalGauge ? 1 : 0 );
@@ -2740,6 +2935,36 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.Write( "Capture=" );
 			this.tキーの書き出し( sw, this.KeyAssign.System.Capture );
+			sw.WriteLine();
+			sw.Write( "SongVolumeIncrease=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SongVolIncrease );
+			sw.WriteLine();
+			sw.Write( "SongVolumeDecrease=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SongVolDecrease );
+			sw.WriteLine();
+			sw.Write( "DisplayHits=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.DisplayHits );
+			sw.WriteLine();
+			sw.Write( "DisplayDebug=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.DisplayDebug );
+			sw.WriteLine();
+			sw.Write( "QuickConfig=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.QuickConfig );
+			sw.WriteLine();
+			sw.Write( "NewHeya=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.NewHeya );
+			sw.WriteLine();
+			sw.Write( "SortSongs=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.SortSongs );
+			sw.WriteLine();
+			sw.Write( "ToggleAutoP1=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleAutoP1 );
+			sw.WriteLine();
+			sw.Write( "ToggleAutoP2=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleAutoP2 );
+			sw.WriteLine();
+			sw.Write( "ToggleTrainingMode=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleTrainingMode );
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -2952,6 +3177,10 @@ namespace TJAPlayer3
                                             else if (str3.Equals(nameof(ASyncTextureLoad)))
                                             {
                                                 ASyncTextureLoad = CConversion.bONorOFF(str4[0]);
+                                            }
+                                            else if (str3.Equals(nameof(SimpleMode)))
+                                            {
+                                                SimpleMode = CConversion.bONorOFF(str4[0]);
                                             }
                                             #endregion
                                             #region [ Window関係 ]
@@ -3216,7 +3445,7 @@ namespace TJAPlayer3
 											#endregion
 											else if( str3.Equals( "BufferedInput" ) )
 											{
-												this.bバッファ入力を行う = CConversion.bONorOFF( str4[ 0 ] );
+												this.bBufferedInputs = CConversion.bONorOFF( str4[ 0 ] );
 											}
 											else if ( str3.Equals( "PolyphonicSounds" ) )		// #28228 2012.5.1 yyagi
 											{
@@ -3612,23 +3841,23 @@ namespace TJAPlayer3
 
 											else if (str3.Equals("TaikoStealth1P") || str3.Equals("TaikoStealth"))
 											{
-												this.eSTEALTH[0] = (Eステルスモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[0]);
+												this.eSTEALTH[0] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[0]);
 											}
 											else if (str3.Equals("TaikoStealth2P"))
 											{
-												this.eSTEALTH[1] = (Eステルスモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[1]);
+												this.eSTEALTH[1] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[1]);
 											}
 											else if (str3.Equals("TaikoStealth3P"))
 											{
-												this.eSTEALTH[2] = (Eステルスモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[2]);
+												this.eSTEALTH[2] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[2]);
 											}
 											else if (str3.Equals("TaikoStealth4P"))
 											{
-												this.eSTEALTH[3] = (Eステルスモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[3]);
+												this.eSTEALTH[3] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[3]);
 											}
 											else if (str3.Equals("TaikoStealth5P"))
 											{
-												this.eSTEALTH[4] = (Eステルスモード)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[4]);
+												this.eSTEALTH[4] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[4]);
 											}
 
 											#endregion
@@ -3697,7 +3926,7 @@ namespace TJAPlayer3
 											}
                                             else if ( str3.Equals( "DefaultCourse" ) ) //2017.01.30 DD
                                             {
-                                                this.nDefaultCourse = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 4, this.nDefaultCourse );
+                                                this.nDefaultCourse = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 5, this.nDefaultCourse );
                                             }
 											else if ( str3.Equals( "ScoreMode" ) )
 											{
@@ -3709,11 +3938,11 @@ namespace TJAPlayer3
 											}
 											else if ( str3.Equals( "BigNotesWaitTime" ) )
 											{
-												this.n両手判定の待ち時間 = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 100, this.n両手判定の待ち時間 );
+												this.nBigNoteWaitTimems = CConversion.n値を文字列から取得して範囲内に丸めて返す( str4, 1, 100, this.nBigNoteWaitTimems );
 											}
 											else if ( str3.Equals( "BigNotesJudge" ) )
 											{
-												this.b大音符判定 = CConversion.bONorOFF( str4[ 0 ] );
+												this.bJudgeBigNotes = CConversion.bONorOFF( str4[ 0 ] );
 											}
 											else if ( str3.Equals( "ForceNormalGauge" ) )
 											{
@@ -3964,11 +4193,53 @@ namespace TJAPlayer3
 									#region [ [SystemKeyAssign] ]
 									//-----------------------------
 									case Eセクション種別.SystemKeyAssign:
+									{
 										if( str3.Equals( "Capture" ) )
 										{
 											this.tキーの読み出しと設定( str4, this.KeyAssign.System.Capture );
 										}
+										else if( str3.Equals( "SongVolumeIncrease" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolIncrease );
+										}
+										else if( str3.Equals( "SongVolumeDecrease" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolDecrease );
+										}
+										else if( str3.Equals( "DisplayHits" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayHits );
+										}
+										else if( str3.Equals( "DisplayDebug" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayDebug );
+										}
+										else if( str3.Equals( "QuickConfig" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.QuickConfig );
+										}
+										else if( str3.Equals( "NewHeya" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.NewHeya );
+										}
+										else if( str3.Equals( "SortSongs" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SortSongs );
+										}
+										else if( str3.Equals( "ToggleAutoP1" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP1 );
+										}
+										else if( str3.Equals( "ToggleAutoP2" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP2 );
+										}
+										else if( str3.Equals( "ToggleTrainingMode" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleTrainingMode );
+										}
 										continue;
+									}
 									//-----------------------------
 									#endregion
 								}
@@ -4066,12 +4337,12 @@ namespace TJAPlayer3
 			this.KeyAssign = new CKeyAssign();
 			for( int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++ )
 			{
-				for( int j = 0; j <= (int)EKeyConfigPad.Capture; j++ )
+				for( int j = 0; j < (int)EKeyConfigPad.MAX; j++ )
 				{
 					this.KeyAssign[ i ][ j ] = new CKeyAssign.STKEYASSIGN[ 16 ];
 					for( int k = 0; k < 16; k++ )
 					{
-						this.KeyAssign[ i ][ j ][ k ] = new CKeyAssign.STKEYASSIGN( E入力デバイス.不明, 0, 0 );
+						this.KeyAssign[ i ][ j ][ k ] = new CKeyAssign.STKEYASSIGN( EInputDevice.Unknown, 0, 0 );
 					}
 				}
 			}
@@ -4081,7 +4352,7 @@ namespace TJAPlayer3
 			bool flag = true;
 			for( int i = 0; i < 0x10; i++ )
 			{
-				if( assign[ i ].入力デバイス == E入力デバイス.不明 )
+				if( assign[ i ].入力デバイス == EInputDevice.Unknown )
 				{
 					continue;
 				}
@@ -4092,23 +4363,23 @@ namespace TJAPlayer3
 				flag = false;
 				switch( assign[ i ].入力デバイス )
 				{
-					case E入力デバイス.キーボード:
+					case EInputDevice.Keyboard:
 						sw.Write( 'K' );
 						break;
 
-					case E入力デバイス.MIDI入力:
+					case EInputDevice.MIDIInput:
 						sw.Write( 'M' );
 						break;
 
-					case E入力デバイス.ジョイパッド:
+					case EInputDevice.Joypad:
 						sw.Write( 'J' );
 						break;
 
-					case E入力デバイス.Gamepad:
+					case EInputDevice.Gamepad:
 						sw.Write( 'G' );
 						break;
 
-					case E入力デバイス.マウス:
+					case EInputDevice.Mouse:
 						sw.Write( 'N' );
 						break;
 				}
@@ -4120,36 +4391,36 @@ namespace TJAPlayer3
 			string[] strArray = strキー記述.Split( new char[] { ',' } );
 			for( int i = 0; ( i < strArray.Length ) && ( i < 0x10 ); i++ )
 			{
-				E入力デバイス e入力デバイス;
+				EInputDevice e入力デバイス;
 				int id;
 				int code;
 				string str = strArray[ i ].Trim().ToUpper();
 				if ( str.Length >= 3 )
 				{
-					e入力デバイス = E入力デバイス.不明;
+					e入力デバイス = EInputDevice.Unknown;
 					switch ( str[ 0 ] )
 					{
 						case 'J':
-							e入力デバイス = E入力デバイス.ジョイパッド;
+							e入力デバイス = EInputDevice.Joypad;
 							break;
 							
 						case 'G':
-							e入力デバイス = E入力デバイス.Gamepad;
+							e入力デバイス = EInputDevice.Gamepad;
 							break;
 
 						case 'K':
-							e入力デバイス = E入力デバイス.キーボード;
+							e入力デバイス = EInputDevice.Keyboard;
 							break;
 
 						case 'L':
 							continue;
 
 						case 'M':
-							e入力デバイス = E入力デバイス.MIDI入力;
+							e入力デバイス = EInputDevice.MIDIInput;
 							break;
 
 						case 'N':
-							e入力デバイス = E入力デバイス.マウス;
+							e入力デバイス = EInputDevice.Mouse;
 							break;
 					}
 				}
@@ -4205,6 +4476,16 @@ RightChange=K020
 
 [SystemKeyAssign]
 Capture=K065
+SongVolumeIncrease=K074
+SongVolumeDecrease=K0115
+DisplayHits=K057
+DisplayDebug=K043
+QuickConfig=K055
+NewHeya=K062
+SortSongs=K0126
+ToggleAutoP1=K056
+ToggleAutoP2=K057
+ToggleTrainingMode=K060
 ";
 			t文字列から読み込み( strDefaultKeyAssign );
 		}

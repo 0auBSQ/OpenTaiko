@@ -93,7 +93,7 @@ namespace TJAPlayer3
 			this.ct進行 = null;
 			if( this.sd効果音 != null )
 			{
-				TJAPlayer3.Sound管理.tDisposeSound( this.sd効果音 );
+				TJAPlayer3.SoundManager.tDisposeSound( this.sd効果音 );
 				this.sd効果音 = null;
 			}
 			base.DeActivate();
@@ -105,7 +105,7 @@ namespace TJAPlayer3
 			//this.txStageFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_stage_failed.jpg" ) );
 			//this.txGameFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_GameFailed.png" ) );
 			//            this.tx数字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_RollNumber.png" ) );
-			this.soundFailed = TJAPlayer3.Sound管理.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+			this.soundFailed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()

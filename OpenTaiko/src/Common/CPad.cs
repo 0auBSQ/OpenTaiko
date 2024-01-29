@@ -41,7 +41,7 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public List<STInputEvent> GetEvents( E楽器パート part, Eパッド pad )
+		public List<STInputEvent> GetEvents( EInstrumentPad part, EPad pad )
 		{
 			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
 			List<STInputEvent> list = new List<STInputEvent>();
@@ -57,7 +57,7 @@ namespace TJAPlayer3
 						{
 							switch( stkeyassignArray[ i ].入力デバイス )
 							{
-								case E入力デバイス.キーボード:
+								case EInputDevice.Keyboard:
 									if( ( device.CurrentType == InputDeviceType.Keyboard ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
 										list.Add( event2 );
@@ -65,7 +65,7 @@ namespace TJAPlayer3
 									}
 									break;
 
-								case E入力デバイス.MIDI入力:
+								case EInputDevice.MIDIInput:
 									if( ( ( device.CurrentType == InputDeviceType.MidiIn ) && ( device.ID == stkeyassignArray[ i ].ID ) ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
 										list.Add( event2 );
@@ -73,7 +73,7 @@ namespace TJAPlayer3
 									}
 									break;
 
-								case E入力デバイス.ジョイパッド:
+								case EInputDevice.Joypad:
 									if( ( ( device.CurrentType == InputDeviceType.Joystick ) && ( device.ID == stkeyassignArray[ i ].ID ) ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
 										list.Add( event2 );
@@ -81,7 +81,7 @@ namespace TJAPlayer3
 									}
 									break;
 
-								case E入力デバイス.Gamepad:
+								case EInputDevice.Gamepad:
 									if( ( ( device.CurrentType == InputDeviceType.Gamepad ) && ( device.ID == stkeyassignArray[ i ].ID ) ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
 										list.Add( event2 );
@@ -89,7 +89,7 @@ namespace TJAPlayer3
 									}
 									break;
 
-								case E入力デバイス.マウス:
+								case EInputDevice.Mouse:
 									if( ( device.CurrentType == InputDeviceType.Mouse ) && ( event2.nKey == stkeyassignArray[ i ].コード ) )
 									{
 										list.Add( event2 );
@@ -104,9 +104,9 @@ namespace TJAPlayer3
 			}
 			return list;
 		}
-		public bool b押された( E楽器パート part, Eパッド pad )
+		public bool bPressed( EInstrumentPad part, EPad pad )
 		{
-			if( part != E楽器パート.UNKNOWN )
+			if( part != EInstrumentPad.UNKNOWN )
 			{
 				
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
@@ -114,14 +114,14 @@ namespace TJAPlayer3
 				{
 					switch( stkeyassignArray[ i ].入力デバイス )
 					{
-						case E入力デバイス.キーボード:
+						case EInputDevice.Keyboard:
 							if( !this.rInput管理.Keyboard.KeyPressed( stkeyassignArray[ i ].コード ) )
 								break;
 
 							this.st検知したデバイス.Keyboard = true;
 							return true;
 
-						case E入力デバイス.MIDI入力:
+						case EInputDevice.MIDIInput:
 							{
 								IInputDevice device2 = this.rInput管理.MidiIn( stkeyassignArray[ i ].ID );
 								if( ( device2 == null ) || !device2.KeyPressed( stkeyassignArray[ i ].コード ) )
@@ -130,7 +130,7 @@ namespace TJAPlayer3
 								this.st検知したデバイス.MIDIIN = true;
 								return true;
 							}
-						case E入力デバイス.ジョイパッド:
+						case EInputDevice.Joypad:
 							{
 								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
 									break;
@@ -142,7 +142,7 @@ namespace TJAPlayer3
 								this.st検知したデバイス.Joypad = true;
 								return true;
 							}
-						case E入力デバイス.Gamepad:
+						case EInputDevice.Gamepad:
 							{
 								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
 									break;
@@ -154,7 +154,7 @@ namespace TJAPlayer3
 								this.st検知したデバイス.Gamepad = true;
 								return true;
 							}
-						case E入力デバイス.マウス:
+						case EInputDevice.Mouse:
 							if( !this.rInput管理.Mouse.KeyPressed( stkeyassignArray[ i ].コード ) )
 								break;
 
@@ -165,32 +165,32 @@ namespace TJAPlayer3
 			}
 			return false;
 		}
-		public bool b押されたDGB( Eパッド pad )
+		public bool bPressedDGB( EPad pad )
 		{
-			if( !this.b押された( E楽器パート.DRUMS, pad ) && !this.b押された( E楽器パート.GUITAR, pad ) )
+			if( !this.bPressed( EInstrumentPad.DRUMS, pad ) && !this.bPressed( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押された( E楽器パート.BASS, pad );
+				return this.bPressed( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}
-		public bool b押されたGB( Eパッド pad )
+		public bool bPressedGB( EPad pad )
 		{
-			if( !this.b押された( E楽器パート.GUITAR, pad ) )
+			if( !this.bPressed( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押された( E楽器パート.BASS, pad );
+				return this.bPressed( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}
-		public bool b押されている( E楽器パート part, Eパッド pad )
+		public bool b押されている( EInstrumentPad part, EPad pad )
 		{
-			if( part != E楽器パート.UNKNOWN )
+			if( part != EInstrumentPad.UNKNOWN )
 			{
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[ (int) part ][ (int) pad ];
 				for( int i = 0; i < stkeyassignArray.Length; i++ )
 				{
 					switch( stkeyassignArray[ i ].入力デバイス )
 					{
-						case E入力デバイス.キーボード:
+						case EInputDevice.Keyboard:
 							if( !this.rInput管理.Keyboard.KeyPressing( stkeyassignArray[ i ].コード ) )
 							{
 								break;
@@ -198,7 +198,7 @@ namespace TJAPlayer3
 							this.st検知したデバイス.Keyboard = true;
 							return true;
 
-						case E入力デバイス.ジョイパッド:
+						case EInputDevice.Joypad:
 							{
 								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
 								{
@@ -213,7 +213,7 @@ namespace TJAPlayer3
 								return true;
 							}
 
-						case E入力デバイス.Gamepad:
+						case EInputDevice.Gamepad:
 							{
 								if( !this.rConfigIni.dicJoystick.ContainsKey( stkeyassignArray[ i ].ID ) )
 								{
@@ -227,7 +227,7 @@ namespace TJAPlayer3
 								this.st検知したデバイス.Gamepad = true;
 								return true;
 							}
-						case E入力デバイス.マウス:
+						case EInputDevice.Mouse:
 							if( !this.rInput管理.Mouse.KeyPressing( stkeyassignArray[ i ].コード ) )
 							{
 								break;
@@ -239,11 +239,11 @@ namespace TJAPlayer3
 			}
 			return false;
 		}
-		public bool b押されているGB( Eパッド pad )
+		public bool b押されているGB( EPad pad )
 		{
-			if( !this.b押されている( E楽器パート.GUITAR, pad ) )
+			if( !this.b押されている( EInstrumentPad.GUITAR, pad ) )
 			{
-				return this.b押されている( E楽器パート.BASS, pad );
+				return this.b押されている( EInstrumentPad.BASS, pad );
 			}
 			return true;
 		}

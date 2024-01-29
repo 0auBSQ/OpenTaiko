@@ -26,20 +26,19 @@ namespace TJAPlayer3
             CSkin skin,
             bool isSongPreview)
         {
-            var isAdjustmentPositive = keyboard.KeyPressed((int)SlimDXKeys.Key.RightBracket);
-            if (!(isAdjustmentPositive || keyboard.KeyPressed((int)SlimDXKeys.Key.LeftBracket)))
-            {
-                return;
-            }
+            bool isAdjustmentPositive = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolIncrease);
+            bool isAdjustmentNegative = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolDecrease);
+
+            if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 
             ESoundGroup soundGroup;
-            CSkin.Cシステムサウンド システムサウンド = null;
+            CSkin.CSystemSound システムサウンド = null;
 
             if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) ||
                 keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl))
             {
                 soundGroup = ESoundGroup.SoundEffect;
-                システムサウンド = skin.sound決定音;
+                システムサウンド = skin.soundDecideSFX;
             }
             else if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift) ||
                      keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift))
@@ -47,17 +46,13 @@ namespace TJAPlayer3
                 soundGroup = ESoundGroup.Voice;
                 システムサウンド = skin.soundゲーム開始音;
             }
-            else if (isSongPreview)
-            {
-                soundGroup = ESoundGroup.SongPlayback;
-            }
             else
             {
                 soundGroup = ESoundGroup.SongPlayback;
             }
 
             soundGroupLevelController.AdjustLevel(soundGroup, isAdjustmentPositive);
-            システムサウンド?.t再生する();
+            システムサウンド?.tPlay();
         }
     }
 }

@@ -84,9 +84,9 @@ namespace TJAPlayer3
         {
             var conf_ = TJAPlayer3.ConfigIni.eSTEALTH[player];
 
-            if (conf_ == Eステルスモード.DORON)
+            if (conf_ == EStealthMode.DORON)
                 TJAPlayer3.Tx.Mod_Doron?.t2D描画(x, y);
-            else if (conf_ == Eステルスモード.STEALTH)
+            else if (conf_ == EStealthMode.STEALTH)
                 TJAPlayer3.Tx.Mod_Stealth?.t2D描画(x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(x, y);

@@ -9,7 +9,7 @@ namespace TJAPlayer3
 {
     internal class CSongDict
     {
-        private static Dictionary<string, C曲リストノード> nodes = new Dictionary<string, C曲リストノード>();
+        private static Dictionary<string, CSongListNode> nodes = new Dictionary<string, CSongListNode>();
         private static HashSet<string> urls = new HashSet<string>();
 
         public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[5][]
@@ -33,14 +33,14 @@ namespace TJAPlayer3
 
         #region [General song dict methods]
 
-        public static C曲リストノード tGetNodeFromID(string id)
+        public static CSongListNode tGetNodeFromID(string id)
         {
             if (nodes.ContainsKey(id))
                 return nodes[id].Clone();
             return null;
         }
 
-        public static void tAddSongNode(CSongUniqueID sid, C曲リストノード node)
+        public static void tAddSongNode(CSongUniqueID sid, CSongListNode node)
         {
             if (sid != null && sid.data.id != null && sid.data.id != "" && !nodes.ContainsKey(sid.data.id))
                 nodes.Add(sid.data.id, node.Clone());
@@ -88,10 +88,10 @@ namespace TJAPlayer3
         #region [Extra methods]
 
         // Generate a back button
-        public static C曲リストノード tGenerateBackButton(C曲リストノード parent, string path = "/", List<string> listStrBoxDef = null)
+        public static CSongListNode tGenerateBackButton(CSongListNode parent, string path = "/", List<string> listStrBoxDef = null)
         {
-            C曲リストノード itemBack = new C曲リストノード();
-            itemBack.eノード種別 = C曲リストノード.Eノード種別.BACKBOX;
+            CSongListNode itemBack = new CSongListNode();
+            itemBack.eノード種別 = CSongListNode.ENodeType.BACKBOX;
 
 
             // とじる
@@ -108,9 +108,9 @@ namespace TJAPlayer3
             itemBack.strジャンル = parent.strジャンル;
             itemBack.strSelectBGPath = parent.strSelectBGPath;
             itemBack.nスコア数 = 1;
-            itemBack.r親ノード = parent;
-            itemBack.strSkinPath = (parent.r親ノード == null) ?
-                "" : parent.r親ノード.strSkinPath;
+            itemBack.rParentNode = parent;
+            itemBack.strSkinPath = (parent.rParentNode == null) ?
+                "" : parent.rParentNode.strSkinPath;
 
             // I guess this is used to count the number of box.def instances and only at startup, which makes using it here pretty weird
             if (listStrBoxDef != null && itemBack.strSkinPath != "" && !listStrBoxDef.Contains(itemBack.strSkinPath))
@@ -118,8 +118,8 @@ namespace TJAPlayer3
                 listStrBoxDef.Add(itemBack.strSkinPath);
             }
 
-            itemBack.strBreadcrumbs = (itemBack.r親ノード == null) ?
-                itemBack.strタイトル : itemBack.r親ノード.strBreadcrumbs + " > " + itemBack.strタイトル;
+            itemBack.strBreadcrumbs = (itemBack.rParentNode == null) ?
+                itemBack.strタイトル : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.strタイトル;
 
             itemBack.arスコア[0] = new Cスコア();
             itemBack.arスコア[0].ファイル情報.フォルダの絶対パス = "";
@@ -129,18 +129,18 @@ namespace TJAPlayer3
             return (itemBack);
         }
 
-        public static C曲リストノード tGenerateRandomButton(C曲リストノード parent, string path = "/")
+        public static CSongListNode tGenerateRandomButton(CSongListNode parent, string path = "/")
         {
-            C曲リストノード itemRandom = new C曲リストノード();
-            itemRandom.eノード種別 = C曲リストノード.Eノード種別.RANDOM;
+            CSongListNode itemRandom = new CSongListNode();
+            itemRandom.eノード種別 = CSongListNode.ENodeType.RANDOM;
 
             itemRandom.strタイトル = CLangManager.LangInstance.GetString(203) + " (" + path + ")"; ;
 
             itemRandom.nスコア数 = (int)Difficulty.Total;
-            itemRandom.r親ノード = parent;
+            itemRandom.rParentNode = parent;
 
-            itemRandom.strBreadcrumbs = (itemRandom.r親ノード == null) ?
-                itemRandom.strタイトル : itemRandom.r親ノード.strBreadcrumbs + " > " + itemRandom.strタイトル;
+            itemRandom.strBreadcrumbs = (itemRandom.rParentNode == null) ?
+                itemRandom.strタイトル : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.strタイトル;
 
             itemRandom.arスコア[0] = new Cスコア();
 
@@ -148,10 +148,10 @@ namespace TJAPlayer3
         }
 
         // Reset the position of all back buttons, also adds a random button at the end
-        public static List<C曲リストノード> tReinsertBackButtons(C曲リストノード parent, List<C曲リストノード> songList, string path = "/", List<string> listStrBoxDef = null)
+        public static List<CSongListNode> tReinsertBackButtons(CSongListNode parent, List<CSongListNode> songList, string path = "/", List<string> listStrBoxDef = null)
         {
             // Remove all the existing back boxes currently existing
-            songList.RemoveAll(e => e.eノード種別 == C曲リストノード.Eノード種別.BACKBOX || e.eノード種別 == C曲リストノード.Eノード種別.RANDOM);
+            songList.RemoveAll(e => e.eノード種別 == CSongListNode.ENodeType.BACKBOX || e.eノード種別 == CSongListNode.ENodeType.RANDOM);
 
             int songCount = songList.Count;
 
@@ -169,11 +169,11 @@ namespace TJAPlayer3
         }
 
 
-        private static C曲リストノード tReadaptChildNote(C曲リストノード parent, C曲リストノード node)
+        private static CSongListNode tReadaptChildNote(CSongListNode parent, CSongListNode node)
         {
             if (node != null)
             {
-                node.r親ノード = parent;
+                node.rParentNode = parent;
                 node.isChangedBgType = parent.isChangedBgType;
                 node.isChangedBgColor = parent.isChangedBgColor;
                 node.isChangedBoxType = parent.isChangedBoxType;
@@ -192,9 +192,9 @@ namespace TJAPlayer3
         }
 
         // Generate the favorite folder content
-        public static List<C曲リストノード> tFetchFavoriteFolder(C曲リストノード parent)
+        public static List<CSongListNode> tFetchFavoriteFolder(CSongListNode parent)
         {
-            List<C曲リストノード> childList = new List<C曲リストノード>();
+            List<CSongListNode> childList = new List<CSongListNode>();
 
             foreach (string id in TJAPlayer3.Favorites.data.favorites[TJAPlayer3.SaveFile])
             {
@@ -216,9 +216,9 @@ namespace TJAPlayer3
         }
 
         // Generate recently played songs folder
-        public static List<C曲リストノード> tFetchRecentlyPlayedSongsFolder(C曲リストノード parent)
+        public static List<CSongListNode> tFetchRecentlyPlayedSongsFolder(CSongListNode parent)
         {
-            List<C曲リストノード> childList = new List<C曲リストノード>();
+            List<CSongListNode> childList = new List<CSongListNode>();
 
             foreach (string id in TJAPlayer3.RecentlyPlayedSongs.data.recentlyplayedsongs[TJAPlayer3.SaveFile].Reverse())
             {
@@ -248,11 +248,11 @@ namespace TJAPlayer3
         }
 
         // Generate search by difficulty folder
-        public static List<C曲リストノード> tFetchSongsByDifficulty(C曲リストノード parent, int difficulty = (int)Difficulty.Oni, int level = 8)
+        public static List<CSongListNode> tFetchSongsByDifficulty(CSongListNode parent, int difficulty = (int)Difficulty.Oni, int level = 8)
         {
-            List<C曲リストノード> childList = new List<C曲リストノード>();
+            List<CSongListNode> childList = new List<CSongListNode>();
 
-            foreach (C曲リストノード nodeT in nodes.Values)
+            foreach (CSongListNode nodeT in nodes.Values)
             {
                 var score = nodeT.nLevel;
                 if (tLevelMatches(score[difficulty], level)
@@ -303,18 +303,18 @@ namespace TJAPlayer3
 
             #region [Load nodes]
 
-            foreach (C曲リストノード song in nodes.Values)
+            foreach (CSongListNode song in nodes.Values)
             {
                 for (int pl = 0; pl < 5; pl++)
                 {
                     CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
 
-                    if (song.eノード種別 == C曲リストノード.Eノード種別.SCORE
+                    if (song.eノード種別 == CSongListNode.ENodeType.SCORE
                         && song.strジャンル != "最近遊んだ曲"
                         && song.strジャンル != "Favorite"
                         && song.strジャンル != "SearchD")
                     {
-                        var score = song.arスコア[TJAPlayer3.stage選曲.act曲リスト.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+                        var score = song.arスコア[TJAPlayer3.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 
                         if (score != null)
                         {

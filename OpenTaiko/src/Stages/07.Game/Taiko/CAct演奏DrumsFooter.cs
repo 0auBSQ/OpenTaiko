@@ -43,7 +43,7 @@ namespace TJAPlayer3
 
         public override void DeActivate()
         {
-            TJAPlayer3.t安全にDisposeする(ref Mob_Footer);
+            TJAPlayer3.tDisposeSafely(ref Mob_Footer);
 
             base.DeActivate();
         }
@@ -62,7 +62,7 @@ namespace TJAPlayer3
         {
             if (this.Mob_Footer != null)
             {
-                this.Mob_Footer.t2D描画(0, TJAPlayer3.Skin.Resolution[1] - this.Mob_Footer.szテクスチャサイズ.Height);
+                this.Mob_Footer.t2D描画(0, TJAPlayer3.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
             }
             return base.Draw();
         }

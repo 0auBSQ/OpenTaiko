@@ -54,8 +54,8 @@ namespace TJAPlayer3
         public override void ReleaseManagedResource()
         {
             // Ressource freeing
-            TJAPlayer3.t安全にDisposeする(ref pfTitleFont);
-            TJAPlayer3.t安全にDisposeする(ref pfExamFont);
+            TJAPlayer3.tDisposeSafely(ref pfTitleFont);
+            TJAPlayer3.tDisposeSafely(ref pfExamFont);
 
             base.ReleaseManagedResource();
         }
@@ -72,12 +72,12 @@ namespace TJAPlayer3
 
             if (TJAPlayer3.Skin.SongSelect_DanInfo_Show)
             {
-                for(int i = 0; i < TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count; i++)
+                for(int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++)
                 {
-                    var dan = TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[i];
+                    var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
                     int songIndex = i / 3;
                     int opacity = 255;
-                    if (TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count > 3)
+                    if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3)
                     {
                         if (nNowSongIndex == songIndex)
                         {
@@ -96,23 +96,23 @@ namespace TJAPlayer3
                     int pos = i % 3;
                     CActSelect段位リスト.tDisplayDanIcon(i + 1, TJAPlayer3.Skin.SongSelect_DanInfo_Icon_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Icon_Y[pos], opacity, TJAPlayer3.Skin.SongSelect_DanInfo_Icon_Scale, false);
 
-                    int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Width / 5;
-                    int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szテクスチャサイズ.Height;
+                    int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
+                    int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
 
                     TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
-                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.X = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
-                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.Y = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
+                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
+                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
                     TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Y[pos], new Rectangle(dan.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
                     TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
-                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.X = 1;
-                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vc拡大縮小倍率.Y = 1;
+                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = 1;
+                    TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = 1;
 
                     TJAPlayer3.Tx.Dani_Level_Number.Opacity = opacity;
                     TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Scale);
                     TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
 
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
-                    TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(ttkTitles[i]).t2D描画(TJAPlayer3.Skin.SongSelect_DanInfo_Title_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Title_Y[pos]);
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTitles[i]).t2D描画(TJAPlayer3.Skin.SongSelect_DanInfo_Title_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Title_Y[pos]);
 
 
                 }
@@ -120,16 +120,16 @@ namespace TJAPlayer3
                 for (int j = 0; j < CExamInfo.cMaxExam; j++)
                 {
                     int index = j;
-                    Dan_C danc0 = TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[0].Dan_C[j];
+                    Dan_C danc0 = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 
                     if (danc0 != null)
                     {
-                        TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_X[index], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Y[index]);
+                        TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_X[index], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Y[index]);
                     }
 
-                    if (TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count - 1].Dan_C[j] == null)
+                    if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null)
                     {
-                        Dan_C danc = TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[0].Dan_C[j];
+                        Dan_C danc = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
                         if (danc != null)
                         {
                             TJAPlayer3.stage段位選択.段位リスト.tExamDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_X[0], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Scale);
@@ -137,13 +137,13 @@ namespace TJAPlayer3
                     }
                     else
                     {
-                        for (int i = 0; i < TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count; i++)
+                        for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++)
                         {
-                            Dan_C danc = TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[i].Dan_C[j];
+                            Dan_C danc = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i].Dan_C[j];
                             if (danc != null)
                             {
                                 int opacity = 255;
-                                if (TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count > 3)
+                                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3)
                                 {
                                     if (nNowSongIndex == i / 3)
                                     {
@@ -173,12 +173,12 @@ namespace TJAPlayer3
 
         public void UpdateSong()
         {
-            if (TJAPlayer3.stage選曲.r現在選択中の曲 == null || TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs == null) return;
+            if (TJAPlayer3.stageSongSelect.rNowSelectedSong == null || TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs == null) return;
 
-            ttkTitles = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count];
-            for (int i = 0; i < TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count; i++)
+            ttkTitles = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count];
+            for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++)
             {
-                var dan = TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs[i];
+                var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
                 ttkTitles[i] = new CActSelect曲リスト.TitleTextureKey(dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
             }
         }
@@ -199,7 +199,7 @@ namespace TJAPlayer3
         private void tNextStep()
         {
             nPrevSongIndex = nNowSongIndex;
-            nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(TJAPlayer3.stage選曲.r現在選択中の曲.DanSongs.Count / 3.0);
+            nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count / 3.0);
             ctStepFade = new CCounter(0, 255, 1, TJAPlayer3.Timer);
         }
 

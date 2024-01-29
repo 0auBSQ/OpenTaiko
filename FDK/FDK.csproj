@@ -6,23 +6,23 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ReadJEnc" Version="1.3.1.2"/>
-    <PackageReference Include="Silk.NET.Windowing" Version="2.17.1"/>
-    <PackageReference Include="Silk.NET.Maths" Version="2.17.1"/>
-    <PackageReference Include="Silk.NET.Input" Version="2.17.1"/>
-    <PackageReference Include="Silk.NET.OpenGLES" Version="2.17.1"/>
-    <PackageReference Include="ImGui.NET" Version="1.89.7.1"/>
-    <PackageReference Include="ManagedBass" Version="3.1.1"/>
-    <PackageReference Include="ManagedBass.Fx" Version="3.1.1"/>
-    <PackageReference Include="ManagedBass.Wasapi" Version="3.1.1"/>
-    <PackageReference Include="ManagedBass.Asio" Version="3.1.1"/>
-    <PackageReference Include="ManagedBass.Mix" Version="3.1.1"/>
-    <PackageReference Include="SkiaSharp" Version="2.88.5"/>
-    <PackageReference Include="FFmpeg.AutoGen" Version="5.1.1"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.5"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.5"/>
+    <PackageReference Include="ReadJEnc" Version="1.3.1.2" />
+    <PackageReference Include="Silk.NET.Windowing" Version="2.17.1" />
+    <PackageReference Include="Silk.NET.Maths" Version="2.17.1" />
+    <PackageReference Include="Silk.NET.Input" Version="2.17.1" />
+    <PackageReference Include="Silk.NET.OpenGLES" Version="2.17.1" />
+    <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
+    <PackageReference Include="ManagedBass" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Fx" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Wasapi" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Asio" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
+    <PackageReference Include="SkiaSharp" Version="2.88.7" />
+    <PackageReference Include="FFmpeg.AutoGen" Version="5.1.1" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.7" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.7" />
   </ItemGroup>
   <ItemGroup Label="Resources">
-    <EmbeddedResource Include="mplus-1p-medium.ttf"/>
+    <EmbeddedResource Include="mplus-1p-medium.ttf" />
   </ItemGroup>
 </Project>

@@ -306,8 +306,8 @@ namespace TJAPlayer3
         private void tKusudamaNumber(int num)
         {
             if (TJAPlayer3.Tx.Kusudama_Number == null) return;
-            TJAPlayer3.Tx.Kusudama_Number.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-            TJAPlayer3.Tx.Kusudama_Number.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Kusudama_Number.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Kusudama_Number.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
             int x = TJAPlayer3.Skin.Game_Kusudama_Number_X;
             int y = TJAPlayer3.Skin.Game_Kusudama_Number_Y;
 
@@ -327,8 +327,8 @@ namespace TJAPlayer3
         private void tFuseNumber(int x, int y, int num, int nPlayer)
         {
             if (TJAPlayer3.Tx.Fuse_Number == null) return;
-            TJAPlayer3.Tx.Fuse_Number.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-            TJAPlayer3.Tx.Fuse_Number.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
+            TJAPlayer3.Tx.Fuse_Number.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Fuse_Number.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
 
             _nbDisplay(TJAPlayer3.Tx.Fuse_Number, num, x, y);
         }
@@ -336,8 +336,8 @@ namespace TJAPlayer3
         private void t文字表示(int x, int y, int num, int nPlayer)
         {
             if (TJAPlayer3.Tx.Balloon_Number_Roll == null) return;
-            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-            TJAPlayer3.Tx.Balloon_Number_Roll.vc拡大縮小倍率.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
+            TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
+            TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
 
             _nbDisplay(TJAPlayer3.Tx.Balloon_Number_Roll, num, x, y);
         }
