@@ -79,7 +79,7 @@ namespace TJAPlayer3
 				}
 
                 //スキン変更処理
-                TJAPlayer3.app.RefreshSkin();
+                TJAPlayer3.app.RefleshSkin();
 
                 return 1;
 			}
