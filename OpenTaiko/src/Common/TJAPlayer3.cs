@@ -768,7 +768,6 @@ namespace TJAPlayer3
             Timer?.Update();
             SoundManager.PlayTimer?.Update();
             FPS?.Update();
-			ShowWindowTitleWithSoundType();
 
 			if (BeatScaling != null)
 			{
@@ -3143,7 +3142,7 @@ for (int i = 0; i < 3; i++) {
 				delay = "(" + SoundManager.GetSoundDelay() + "ms)";
 			}
             AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-            base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ") (" + ((FPS != null) ? FPS.NowFPS : "??") + " FPS)";
+            base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
 		}
 
 		private void t終了処理()
