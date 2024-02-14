@@ -6,7 +6,8 @@
 				"strings": {
 					"default": "First Steps",
 					"fr": "Premiers Pas",
-					"ja": "第一歩"
+					"ja": "第一歩",
+					"zh": "初来乍到"
 				}
 			}
 		},
@@ -18,7 +19,7 @@
 				0,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"A Normal Player": {
@@ -28,7 +29,8 @@
 				"strings": {
 					"default": "A Normal Player",
 					"fr": "Un joueur Normal",
-					"ja": "ふつうなプレイヤー"
+					"ja": "ふつうなプレイヤー",
+					"zh": "平凡无奇"
 				}
 			}
 		},
@@ -40,7 +42,7 @@
 				1,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"A very Normal Player": {
@@ -50,7 +52,8 @@
 				"strings": {
 					"default": "A very Normal Player",
 					"fr": "Un joueur très Normal",
-					"ja": "とてもふつうなプレイヤー"
+					"ja": "とてもふつうなプレイヤー",
+					"zh": "非常普通"
 				}
 			}
 		},
@@ -62,7 +65,7 @@
 				1,
 				0,
 				10
-			],
+			]
 		}	
 	},
 	"An extremely Normal player": {
@@ -72,7 +75,8 @@
 				"strings": {
 					"default": "An extremely Normal player",
 					"fr": "Un joueur extrèmement Normal",
-					"ja": "ずいぶんふつうなプレイヤー"
+					"ja": "ずいぶんふつうなプレイヤー",
+					"zh": "极其普通"
 				}
 			}
 		},
@@ -84,7 +88,7 @@
 				1,
 				0,
 				100
-			],
+			]
 		}	
 	},
 	"Hard-boiled": {
@@ -94,7 +98,8 @@
 				"strings": {
 					"default": "Hard-boiled",
 					"fr": "Dur à cuire",
-					"ja": "ハードボイルド"
+					"ja": "ハードボイルド",
+					"zh": "玉琢成器"
 				}
 			}
 		},
@@ -106,7 +111,7 @@
 				2,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Hard as rock": {
@@ -116,7 +121,8 @@
 				"strings": {
 					"default": "Hard as rock",
 					"fr": "Dur comme la pierre",
-					"ja": "ロックハード"
+					"ja": "ロックハード",
+					"zh": "坚如磐石"
 				}
 			}
 		},
@@ -128,7 +134,7 @@
 				2,
 				0,
 				10
-			],
+			]
 		}	
 	},
 	"Hard as diamonds": {
@@ -138,7 +144,8 @@
 				"strings": {
 					"default": "Hard as diamonds",
 					"fr": "Dur comme du diamant",
-					"ja": "ダイヤモンドハード"
+					"ja": "ダイヤモンドハード",
+					"zh": "金刚钻"
 				}
 			}
 		},
@@ -150,7 +157,7 @@
 				2,
 				0,
 				100
-			],
+			]
 		}	
 	},
 	"My first Extreme": {
@@ -160,7 +167,8 @@
 				"strings": {
 					"default": "My first Extreme",
 					"fr": "Mon premier Extrème",
-					"ja": "初めてのおに"
+					"ja": "初めてのおに",
+					"zh": "首战魔王"
 				}
 			}
 		},
@@ -172,7 +180,7 @@
 				3,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"An Extreme player": {
@@ -182,7 +190,8 @@
 				"strings": {
 					"default": "An Extreme player",
 					"fr": "Un joueur Extrème",
-					"ja": "おにのプレイヤー"
+					"ja": "おにのプレイヤー",
+					"zh": "魔王斗士"
 				}
 			}
 		},
@@ -194,7 +203,7 @@
 				3,
 				0,
 				10
-			],
+			]
 		}	
 	},
 	"A very Extreme player": {
@@ -204,7 +213,8 @@
 				"strings": {
 					"default": "A very Extreme player",
 					"fr": "Un joueur très Extrème",
-					"ja": "とてもおにのプレイヤー"
+					"ja": "とてもおにのプレイヤー",
+					"zh": "身经百战"
 				}
 			}
 		},
@@ -216,7 +226,7 @@
 				3,
 				0,
 				100
-			],
+			]
 		}	
 	},
 	"An extremely Extreme player": {
@@ -226,7 +236,8 @@
 				"strings": {
 					"default": "An extremely Extreme player",
 					"fr": "Un joueur extrèmement Extrème",
-					"ja": "ずいぶんおにのプレイヤー"
+					"ja": "ずいぶんおにのプレイヤー",
+					"zh": "横扫千军"
 				}
 			}
 		},
@@ -238,7 +249,7 @@
 				3,
 				0,
 				1000
-			],
+			]
 		}	
 	},
 	"Free from errors": {
@@ -248,7 +259,8 @@
 				"strings": {
 					"default": "Free from errors",
 					"fr": "Exempt d'erreurs",
-					"ja": "エラーに当たらない"
+					"ja": "エラーに当たらない",
+					"zh": "不容差错"
 				}
 			}
 		},
@@ -260,7 +272,7 @@
 				3,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Unbreakable combo": {
@@ -270,7 +282,8 @@
 				"strings": {
 					"default": "Unbreakable combo",
 					"fr": "Combo indestructible",
-					"ja": "アンブレイカブルコンボ"
+					"ja": "アンブレイカブルコンボ",
+					"zh": "连不可破"
 				}
 			}
 		},
@@ -282,7 +295,7 @@
 				3,
 				1,
 				10
-			],
+			]
 		}	
 	},
 	"Everlasting combo": {
@@ -292,7 +305,8 @@
 				"strings": {
 					"default": "Everlasting combo",
 					"fr": "Combo éternel",
-					"ja": "永遠のコンボ"
+					"ja": "永遠のコンボ",
+					"zh": "连击永恒"
 				}
 			}
 		},
@@ -304,7 +318,7 @@
 				3,
 				1,
 				100
-			],
+			]
 		}	
 	},
 	"100%": {
@@ -314,7 +328,8 @@
 				"strings": {
 					"default": "100%",
 					"fr": "100%",
-					"ja": "100点"
+					"ja": "100点",
+					"zh": "百发百中"
 				}
 			}
 		},
@@ -326,7 +341,7 @@
 				3,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"Aims for perfection": {
@@ -336,7 +351,8 @@
 				"strings": {
 					"default": "Aims for perfection",
 					"fr": "Vise la perfection",
-					"ja": "完璧主義"
+					"ja": "完璧主義",
+					"zh": "完美主义"
 				}
 			}
 		},
@@ -348,7 +364,7 @@
 				3,
 				2,
 				10
-			],
+			]
 		}	
 	},
 	"Flawless": {
@@ -358,7 +374,8 @@
 				"strings": {
 					"default": "Flawless",
 					"fr": "Sans défaut",
-					"ja": "寸分の狂いもない"
+					"ja": "寸分の狂いもない",
+					"zh": "完美无瑕"
 				}
 			}
 		},
@@ -370,7 +387,7 @@
 				3,
 				2,
 				100
-			],
+			]
 		}	
 	},
 	"Eight stars": {
@@ -380,7 +397,8 @@
 				"strings": {
 					"default": "Eight stars",
 					"fr": "Huit étoiles",
-					"ja": "八つ星"
+					"ja": "八つ星",
+					"zh": "八颗星"
 				}
 			}
 		},
@@ -392,7 +410,7 @@
 				8,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Nine stars": {
@@ -402,7 +420,8 @@
 				"strings": {
 					"default": "Nine stars",
 					"fr": "Neuf étoiles",
-					"ja": "九つ星"
+					"ja": "九つ星",
+					"zh": "九颗星"
 				}
 			}
 		},
@@ -414,7 +433,7 @@
 				9,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Challenger": {
@@ -424,7 +443,8 @@
 				"strings": {
 					"default": "Challenger",
 					"fr": "Challenger",
-					"ja": "チャレンジャー"
+					"ja": "チャレンジャー",
+					"zh": "挑战者"
 				}
 			}
 		},
@@ -436,7 +456,7 @@
 				10,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Sweaty challenger": {
@@ -446,7 +466,8 @@
 				"strings": {
 					"default": "Sweaty challenger",
 					"fr": "Challenger en sueur",
-					"ja": "汗だくのチャレンジャー"
+					"ja": "汗だくのチャレンジャー",
+					"zh": "汗流浃背"
 				}
 			}
 		},
@@ -458,7 +479,7 @@
 				11,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Challenger from another world": {
@@ -468,7 +489,8 @@
 				"strings": {
 					"default": "Challenger from another world",
 					"fr": "Challenger d'un autre monde",
-					"ja": "異世界から来たチャレンジャー"
+					"ja": "異世界から来たチャレンジャー",
+					"zh": "来自异世界的挑战者"
 				}
 			}
 		},
@@ -480,7 +502,7 @@
 				12,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Unbeatable warrior": {
@@ -490,7 +512,8 @@
 				"strings": {
 					"default": "Unbeatable warrior",
 					"fr": "Guerrier imbattable",
-					"ja": "無敵の勇者"
+					"ja": "無敵の勇者",
+					"zh": "所向披靡"
 				}
 			}
 		},
@@ -502,7 +525,7 @@
 				13,
 				0,
 				1
-			],
+			]
 		}	
 	},
 	"Eight shining stars": {
@@ -512,7 +535,8 @@
 				"strings": {
 					"default": "Eight shining stars",
 					"fr": "Huit étoiles brillantes",
-					"ja": "光る八つ星"
+					"ja": "光る八つ星",
+					"zh": "闪亮八星"
 				}
 			}
 		},
@@ -524,7 +548,7 @@
 				8,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Nine shining stars": {
@@ -534,7 +558,8 @@
 				"strings": {
 					"default": "Nine shining stars",
 					"fr": "Neuf étoiles brillantes",
-					"ja": "光る九つ星"
+					"ja": "光る九つ星",
+					"zh": "闪亮九星"
 				}
 			}
 		},
@@ -546,7 +571,7 @@
 				9,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Talented drummer": {
@@ -556,7 +581,8 @@
 				"strings": {
 					"default": "Talented drummer",
 					"fr": "Batteur talentueux",
-					"ja": "有能なドラマー"
+					"ja": "有能なドラマー",
+					"zh": "实力鼓手"
 				}
 			}
 		},
@@ -568,7 +594,7 @@
 				10,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Tenacious warrior": {
@@ -578,7 +604,8 @@
 				"strings": {
 					"default": "Tenacious warrior",
 					"fr": "Guerrier tenace",
-					"ja": "粘り強い勇者"
+					"ja": "粘り強い勇者",
+					"zh": "坚韧不拔"
 				}
 			}
 		},
@@ -590,7 +617,7 @@
 				11,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Drummer from another world": {
@@ -600,7 +627,8 @@
 				"strings": {
 					"default": "Drummer from another world",
 					"fr": "Batteur d'un autre monde",
-					"ja": "異世界から来たドラマー"
+					"ja": "異世界から来たドラマー",
+					"zh": "来自异世界的鼓手"
 				}
 			}
 		},
@@ -612,7 +640,7 @@
 				12,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Celestial divinity": {
@@ -622,7 +650,8 @@
 				"strings": {
 					"default": "Celestial divinity",
 					"fr": "Divinité celeste",
-					"ja": "天の神性"
+					"ja": "天の神性",
+					"zh": "天禀神赋"
 				}
 			}
 		},
@@ -634,7 +663,7 @@
 				13,
 				1,
 				1
-			],
+			]
 		}	
 	},
 	"Eight sparkling stars": {
@@ -644,7 +673,8 @@
 				"strings": {
 					"default": "Eight sparkling stars",
 					"fr": "Huit étoiles étincelantes",
-					"ja": "輝く八つ星"
+					"ja": "輝く八つ星",
+					"zh": "闪耀八星"
 				}
 			}
 		},
@@ -656,7 +686,7 @@
 				8,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"Nine sparkling stars": {
@@ -666,7 +696,8 @@
 				"strings": {
 					"default": "Nine sparkling stars",
 					"fr": "Neuf étoiles étincelantes",
-					"ja": "輝く九つ星"
+					"ja": "輝く九つ星",
+					"zh": "闪耀九星"
 				}
 			}
 		},
@@ -678,7 +709,7 @@
 				9,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"Outstanding drummer": {
@@ -688,7 +719,8 @@
 				"strings": {
 					"default": "Outstanding drummer",
 					"fr": "Batteur d'exception",
-					"ja": "優秀なドラマー"
+					"ja": "優秀なドラマー",
+					"zh": "杰出鼓手"
 				}
 			}
 		},
@@ -700,7 +732,7 @@
 				10,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"Eternal legend": {
@@ -710,7 +742,8 @@
 				"strings": {
 					"default": "Eternal legend",
 					"fr": "Légende éternelle",
-					"ja": "永遠の伝説"
+					"ja": "永遠の伝説",
+					"zh": "永恒传说"
 				}
 			}
 		},
@@ -722,7 +755,7 @@
 				11,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"Drummer from another dimension": {
@@ -732,7 +765,8 @@
 				"strings": {
 					"default": "Drummer from another dimension",
 					"fr": "Batteur d'une autre dimention",
-					"ja": "異次元から来たドラマー"
+					"ja": "異次元から来たドラマー",
+					"zh": "来自异次元的鼓手"
 				}
 			}
 		},
@@ -744,7 +778,7 @@
 				12,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"I sold my real life": {
@@ -754,7 +788,8 @@
 				"strings": {
 					"default": "I sold my real life",
 					"fr": "J'ai vendu ma vie réele",
-					"ja": "現実に手を離れてしまいました"
+					"ja": "現実に手を離れてしまいました",
+					"zh": "超越现世"
 				}
 			}
 		},
@@ -766,7 +801,7 @@
 				13,
 				2,
 				1
-			],
+			]
 		}	
 	},
 	"First Secret": {
@@ -776,7 +811,8 @@
 				"strings": {
 					"default": "First Secret",
 					"fr": "Mon premier secret",
-					"ja": "初めての秘密"
+					"ja": "初めての秘密",
+					"zh": "第一份秘密"
 				}
 			}
 		},
@@ -793,5 +829,5 @@
 				"Dashy's Secrets"
 			]
 		}	
-	},
+	}
 }
