@@ -593,7 +593,7 @@ namespace TJAPlayer3
             {
                 base.IsFirstDraw = false;
             }
-            if (this.ct進行メイン != null && (TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut))
+            if (this.ct進行メイン != null && (TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut))
             {
                 this.ct進行メイン.Tick();
 
@@ -896,29 +896,6 @@ namespace TJAPlayer3
             Dan_Gold_Pass,
             Dan_Gold_FullCombo,
             Dan_Gold_Perfect
-        }
-
-        void StarDraw(int x, int y, int count, int starttime = 0, int Endtime = 20)
-        {
-            if (count >= 0 && count <= Endtime)
-            {
-                count += starttime;
-
-                if (count <= 11)
-                {
-                    TJAPlayer3.Tx.End_Star.vcScaleRatio.X = count * 0.09f;
-                    TJAPlayer3.Tx.End_Star.vcScaleRatio.Y = count * 0.09f;
-                    TJAPlayer3.Tx.End_Star.Opacity = 255;
-                    TJAPlayer3.Tx.End_Star.t2D拡大率考慮中央基準描画(x, y);
-                }
-                else if (count <= 20)
-                {
-                    TJAPlayer3.Tx.End_Star.vcScaleRatio.X = 1.0f;
-                    TJAPlayer3.Tx.End_Star.vcScaleRatio.Y = 1.0f;
-                    TJAPlayer3.Tx.End_Star.Opacity = (int)(255 - (255.0f / 9.0f) * (count - 11));
-                    TJAPlayer3.Tx.End_Star.t2D拡大率考慮中央基準描画(x, y);
-                }
-            }
         }
 
         //-----------------
