@@ -60,11 +60,18 @@ namespace FDK
         private static int ColorID;
 
         /// <summary>
+        /// 拡大率のハンドル
+        /// </summary>
+        private static int ScaleID;
+
+        /// <summary>
         /// テクスチャの切り抜きのハンドル
         /// </summary>
         private static int TextureRectID;
 
         private static int CameraID;
+
+        private static int NoteModeID;
 
         /// <summary>
         /// 描画に使用する共通のバッファを作成
@@ -100,12 +107,23 @@ namespace FDK
                 uniform vec4 color;
                 uniform sampler2D texture1;
                 uniform vec4 textureRect;
+                uniform vec2 scale;
+                uniform bool noteMode;
 
                 varying vec2 texcoord;
 
                 void main()
                 {
-                    vec2 rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
+                    vec2 rect;
+                    if (noteMode)
+                    {
+                        rect = textureRect.xy + (texcoord * textureRect.zw * scale);
+                        rect = rect - (floor((rect - textureRect.xy) / textureRect.zw) * textureRect.zw);
+                    }
+                    else
+                    {
+                        rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
+                    }
                     gl_FragColor = texture2D(texture1, rect) * color;
                 }"
             );
@@ -114,8 +132,10 @@ namespace FDK
             //シェーダーに値を送るためのハンドルを取得------
             MVPID = Game.Gl.GetUniformLocation(ShaderProgram, "mvp"); //拡大縮小、移動、回転のMatrix
             ColorID = Game.Gl.GetUniformLocation(ShaderProgram, "color"); //色合い
+            ScaleID = Game.Gl.GetUniformLocation(ShaderProgram, "scale"); //スケール
             TextureRectID = Game.Gl.GetUniformLocation(ShaderProgram, "textureRect"); //テクスチャの切り抜きの座標と大きさ
             CameraID = Game.Gl.GetUniformLocation(ShaderProgram, "camera"); //テクスチャの切り抜きの座標と大きさ
+            NoteModeID = Game.Gl.GetUniformLocation(ShaderProgram, "noteMode"); //テクスチャの切り抜きの座標と大きさ
 
 
             //------
@@ -582,6 +602,10 @@ namespace FDK
             //this.t2D描画(devicek x, y, rc画像内の描画領域;
         }
 
+        public void t2D_DisplayImage_RollNote(int x, int y, RectangleF rc)
+        {
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc, true);
+        }
 
         public void t2D拡大率考慮中央基準描画(int x, int y)
         {
@@ -699,7 +723,7 @@ namespace FDK
         {
             this.t2D描画((int)x, (int)y, 1f, rc画像内の描画領域);
         }
-        public void t2D描画(float x, float y, float depth, RectangleF rc画像内の描画領域, bool flipX = false, bool flipY = false)
+        public void t2D描画(float x, float y, float depth, RectangleF rc画像内の描画領域, bool flipX = false, bool flipY = false, bool rollMode = false)
         {
             this.color4.Alpha = this._opacity / 255f;
 
@@ -729,7 +753,6 @@ namespace FDK
 
             Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
-            //Game.Gl.Uniform1(Texture1ID, Texture_);
             Game.Gl.BindTexture(TextureTarget.Texture2D, Texture_); //テクスチャをバインド
 
             //MVPを設定----
@@ -766,12 +789,14 @@ namespace FDK
             //------
 
             Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
-            
+            Game.Gl.Uniform2(ScaleID, new System.Numerics.Vector2(vcScaleRatio.X, vcScaleRatio.Y)); //変色用のカラーを設定
+
             //テクスチャの切り抜きの座標と大きさを設定
             Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
                 rc画像内の描画領域.X / rc全画像.Width, rc画像内の描画領域.Y / rc全画像.Height, //始まり
                 rc画像内の描画領域.Width / rc全画像.Width, rc画像内の描画領域.Height / rc全画像.Height)); //大きさ、終わりではない
 
+            Game.Gl.Uniform1(NoteModeID, rollMode ? 1 : 0);
 
             //描画-----
             Game.Gl.BindVertexArray(VAO);
@@ -921,14 +946,16 @@ namespace FDK
                 Game.Gl.UniformMatrix4(CameraID, 1, false, (float*)&camera);
             }
             //------
-
-            Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
             
+            Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
+            Game.Gl.Uniform2(ScaleID, new System.Numerics.Vector2(vcScaleRatio.X, vcScaleRatio.Y)); //変色用のカラーを設定
+
             //テクスチャの切り抜きの座標と大きさを設定
             Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
                 rc画像内の描画領域.X / rc全画像.Width, rc画像内の描画領域.Y / rc全画像.Height, //始まり
                 rc画像内の描画領域.Width / rc全画像.Width, rc画像内の描画領域.Height / rc全画像.Height)); //大きさ、終わりではない
 
+            Game.Gl.Uniform1(NoteModeID, 0);
 
             //描画-----
             Game.Gl.BindVertexArray(VAO);

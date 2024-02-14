@@ -451,7 +451,7 @@ namespace TJAPlayer3
             var _center_x = (x + x末端 + image_size) / 2;
             var _center_y = _adjust + (y + y末端) / 2;
             //TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-            _texarr.t2D拡大率考慮中央基準描画((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+            _texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
             //t2D拡大率考慮中央基準描画 t2D中心基準描画
 
             // Tail

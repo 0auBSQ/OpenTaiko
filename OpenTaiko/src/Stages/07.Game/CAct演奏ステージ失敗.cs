@@ -71,7 +71,6 @@ namespace TJAPlayer3
 		{
             this.dbFailedTime = TJAPlayer3.Timer.NowTime;
 			this.ct進行 = new CCounter( 0, 300, 22, TJAPlayer3.Timer );
-			this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
 			if ( TJAPlayer3.ConfigIni.eGameMode != EGame.OFF )
             {
 			    this.ct進行 = new CCounter( 0, 4000, 2, TJAPlayer3.Timer );
@@ -125,23 +124,6 @@ namespace TJAPlayer3
 		{
 			int[] y = new int[] { 0, 176 };
 
-			this.ctEnd_ClearFailed.Tick();
-			if (this.ctEnd_ClearFailed.CurrentValue <= 20 || TJAPlayer3.Tx.ClearFailed == null)
-			{
-				TJAPlayer3.Tx.End_ClearFailed[Math.Min(this.ctEnd_ClearFailed.CurrentValue, TJAPlayer3.Tx.End_ClearFailed.Length - 1)]?.t2D描画(505, y[i] + 145);
-			}
-			else if(this.ctEnd_ClearFailed.CurrentValue >= 20 && this.ctEnd_ClearFailed.CurrentValue <= 67)
-			{
-				TJAPlayer3.Tx.ClearFailed?.t2D描画(502, y[i] + 192);
-			}
-			else if (this.ctEnd_ClearFailed.CurrentValue == 68)
-			{
-				TJAPlayer3.Tx.ClearFailed1?.t2D描画(502, y[i] + 192);
-			}
-			else if (this.ctEnd_ClearFailed.CurrentValue >= 69)
-			{
-				TJAPlayer3.Tx.ClearFailed2?.t2D描画(502, y[i] + 192);
-			}
 		}
 
 		#endregion
@@ -251,7 +233,6 @@ namespace TJAPlayer3
 
 		private bool failedSongPlayed;
 		private CSound soundFailed;
-		private CCounter ctEnd_ClearFailed;
 		//private CTexture txStageFailed;
 		//      private CTexture txGameFailed;
 		//      private CTexture txBlack;
