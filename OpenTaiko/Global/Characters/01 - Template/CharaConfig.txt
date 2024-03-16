@@ -61,6 +61,12 @@ Game_Chara_Balloon_4P=0,-264
 ;3人プレイ以上のふうせん連打時のキャラ画像Y座標。
 Game_Chara_Balloon_5P=0,-252
 
+;ふうせん連打時のキャラ画像X座標。(X,Y)
+Game_Chara_Kusudama_X=435,1035,135,1335,735
+
+;ふうせん連打時のキャラ画像Y座標。(X,Y)
+Game_Chara_Kusudama_Y=630,630,630,630,630
+
 ;ふうせん連打アクション時に使用するタイマーの更新間隔。(ms)
 Game_Chara_Balloon_Timer=16
 

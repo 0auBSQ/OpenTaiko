@@ -449,7 +449,8 @@ namespace TJAPlayer3
                     && ( base.ePhaseID == CStage.EPhase.Common_NORMAL ))
 				{
 					this.actStageFailed.Start();
-					TJAPlayer3.DTX.t全チップの再生停止();
+                    this.actEnd.Start();
+                    TJAPlayer3.DTX.t全チップの再生停止();
 					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 				}
 
@@ -600,7 +601,6 @@ namespace TJAPlayer3
 
                 this.t全体制御メソッド();
                 
-                this.actPauseMenu.t進行描画();
                 //this.actEnd.On進行描画();
 				this.t進行描画_STAGEFAILED();
 
@@ -620,6 +620,8 @@ namespace TJAPlayer3
                 {
                     if (!ifp[i]) bIsFinishedPlaying = false;
                 }
+
+                this.actPauseMenu.t進行描画();
 
                 //演奏終了→演出表示→フェードアウト
                 if ( bIsFinishedPlaying && base.ePhaseID == CStage.EPhase.Common_NORMAL )
