@@ -761,63 +761,6 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region 終了演出
-
-            End_Clear_Chara = TxC(GAME + END + @$"Clear_Chara.png");
-            End_Star = TxC(GAME + END + @$"Star.png");
-
-            End_Clear_Text = new CTexture[2];
-            End_Clear_Text[0] = TxC(GAME + END + @$"Clear_Text.png");
-            End_Clear_Text[1] = TxC(GAME + END + @$"Clear_Text_End.png");
-
-            End_Clear_L = new CTexture[5];
-            End_Clear_R = new CTexture[5];
-            for (int i = 0; i < 5; i++)
-            {
-                End_Clear_L[i] = TxC(GAME + END + @$"Clear{Path.DirectorySeparatorChar}" + @$"Clear_L_" + i.ToString() + ".png");
-                End_Clear_R[i] = TxC(GAME + END + @$"Clear{Path.DirectorySeparatorChar}" + @$"Clear_R_" + i.ToString() + ".png");
-            
-            }
-            End_Clear_Text_ = TxC(GAME + END + @$"Clear{Path.DirectorySeparatorChar}" + @$"Clear_Text.png");
-            End_Clear_Text_Effect = TxC(GAME + END + @$"Clear{Path.DirectorySeparatorChar}" + @$"Clear_Text_Effect.png");
-            if (End_Clear_Text_Effect != null) End_Clear_Text_Effect.b加算合成 = true;
-
-            ClearFailed = TxC(GAME + END + @$"ClearFailed{Path.DirectorySeparatorChar}" + "Clear_Failed.png");
-            ClearFailed1 = TxC(GAME + END + @$"ClearFailed{Path.DirectorySeparatorChar}" + "Clear_Failed1.png");
-            ClearFailed2 = TxC(GAME + END + @$"ClearFailed{Path.DirectorySeparatorChar}" + "Clear_Failed2.png");
-
-            End_ClearFailed = new CTexture[26];
-            for (int i = 0; i < 26; i++)
-                End_ClearFailed[i] = TxC(GAME + END + @$"ClearFailed{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-
-            End_FullCombo = new CTexture[67];
-            for (int i = 0; i < 67; i++)
-                End_FullCombo[i] = TxC(GAME + END + @$"FullCombo{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-            
-            End_FullComboLoop = new CTexture[3];
-            for (int i = 0; i < 3; i++)
-                End_FullComboLoop[i] = TxC(GAME + END + @$"FullCombo{Path.DirectorySeparatorChar}" + "loop_" + i.ToString() + ".png");
-
-            End_DondaFullComboBg = TxC(GAME + END + @$"DondaFullCombo{Path.DirectorySeparatorChar}" + "bg.png");
-            
-            End_DondaFullCombo = new CTexture[62];
-            for (int i = 0; i < 62; i++)
-                End_DondaFullCombo[i] = TxC(GAME + END + @$"DondaFullCombo{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-
-            End_DondaFullComboLoop = new CTexture[3];
-            for (int i = 0; i < 3; i++)
-                End_DondaFullComboLoop[i] = TxC(GAME + END + @$"DondaFullCombo{Path.DirectorySeparatorChar}" + "loop_" + i.ToString() + ".png");
-
-
-            End_Goukaku = new CTexture[3];
-
-            for (int i = 0; i < End_Goukaku.Length; i++)
-            {
-                End_Goukaku[i] = TxC(GAME + END + @$"Dan" + i.ToString() + ".png");
-            }
-
-            #endregion
-
             #region GameMode
 
             GameMode_Timer_Tick = TxC(GAME + GAMEMODE + @$"Timer_Tick.png");
@@ -2876,27 +2819,6 @@ namespace TJAPlayer3
             Lane_Background_AI,
             Lane_Background_Sub,
             Lane_Background_GoGo;
-        #endregion
-        #region 終了演出
-        public CTexture End_Clear_Chara;
-        public CTexture[] End_Clear_Text;
-        public CTexture End_Star;
-
-        public CTexture[] End_Clear_L,
-            End_Clear_R,
-            End_ClearFailed,
-            End_FullCombo,
-            End_FullComboLoop,
-            End_DondaFullCombo,
-            End_DondaFullComboLoop,
-            End_Goukaku;
-        public CTexture End_Clear_Text_,
-            End_Clear_Text_Effect,
-            ClearFailed,
-            ClearFailed1,
-            ClearFailed2,
-            End_DondaFullComboBg;
-
         #endregion
         #region ゲームモード
         public CTexture GameMode_Timer_Frame,
