@@ -61,17 +61,19 @@ jobs:
           7z a ../../../../../../OpenTaiko_win_x86_shallow.zip * -xr!Songs/ -xr!System/
           cd ..\..\..\..\..\..\
 
-      - name: Build for Mac x64
-        shell: cmd
-        run: |
-          build-osx-x64.bat
+# Disable Mac builds for now
+
+#      - name: Build for Mac x64
+#        shell: cmd
+#        run: |
+#          build-osx-x64.bat
           
-      - name: Create Archive (Mac x64) (Shallow)
-        shell: cmd
-        run: |
-          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
-          7z a ../../../../../../OpenTaiko_osx_x64_shallow.zip * -xr!Songs/ -xr!System/
-          cd ..\..\..\..\..\..\
+#      - name: Create Archive (Mac x64) (Shallow)
+#        shell: cmd
+#        run: |
+#          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
+#          7z a ../../../../../../OpenTaiko_osx_x64_shallow.zip * -xr!Songs/ -xr!System/
+#          cd ..\..\..\..\..\..\
 
       - name: Build for Linux x64
         shell: cmd
