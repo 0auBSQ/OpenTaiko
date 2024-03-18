@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Merge upstream
         run: |
           git config --global user.name ${NAME}
@@ -28,9 +28,9 @@ jobs:
           EMAIL: ${GITHUB_ACTOR}@users.noreply.github.com
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 7.0.0
 
       - name: Observe the Directory
         shell: cmd
