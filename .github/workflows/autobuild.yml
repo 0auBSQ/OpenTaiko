@@ -104,7 +104,8 @@ jobs:
       - name: Upload All Builds
         uses: xresloader/upload-to-github-release@v1.4.2
         with:
-          file: "OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64_shallow.zip;Songs.zip;System.zip"
+#          file: "OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64_shallow.zip;Songs.zip;System.zip"
+          file: "OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_linux_x64_shallow.zip;Songs.zip;System.zip"
           overwrite: true
           tag_name: "autobuild"
           draft: false
