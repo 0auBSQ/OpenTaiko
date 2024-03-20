@@ -25,6 +25,9 @@ namespace TJAPlayer3
             [3] = "Return to left menu.",
             [4] = "Reload Songs",
             [5] = "Reload the song folder.",
+            [10148] = "Reload Songs (Hard Reload)",
+            [10149] = "Delete the existing database and\n" + 
+            "reload the song folder from scratch.",
             [6] = "Player Count",
             [7] = "Select whether to use 2 player mode.",
             [8] = "Kanpeki Mode",
@@ -101,9 +104,9 @@ namespace TJAPlayer3
             [54] = "Choose a skin to use from the system folder.",
             [55] = "A secondary menu for assigning system keys.",
             [56] = "Player 1 Auto Play",
-            [57] = "Toggle whether player 1 plays automatically.\nPress F3 on song select to toggle this.",
+            [57] = "Toggle whether player 1 plays automatically.",
             [58] = "Player 2 Auto Play",
-            [59] = "Toggle whether player 2 plays automatically.\nPress F4 on song select to toggle this.",
+            [59] = "Toggle whether player 2 plays automatically.",
             [60] = "Roll Speed",
             [61] = "When auto is enabled, rolls will be \nautomatically hit this many times per \nsecond. Has no effect on balloons. \n0 disables auto roll, and the \nmaximum value is one hit per frame.",
             [62] = "Scroll Speed",
@@ -156,7 +159,8 @@ namespace TJAPlayer3
             [96] = "A secondary menu to adjust keys used during gameplay.",
             [99] = "LeftRed",
 
-            [9992] = "Simplifies Drawing\n",
+            [9992] = "Simplifies drawing by hiding most visual\n" +
+                    "flare and effects during gameplay.\n",
             [9993] = "SimpleMode",
 
             [9994] = "Texture Loading Type:\n" +
@@ -167,13 +171,12 @@ namespace TJAPlayer3
 
             [9996] = "Drawing Method:\n" +
                     "Select from either OpenGL,\n" +
-                    "Vulkan, DirectX11, or DirectX12.\n" +
+                    "DirectX11, Vulkan, or Metal.\n" +
                     "OpenGL is slow, but compatible & stable.\n" +
-                    "Vulkan works fastest on Linux.\n" +
                     "DirectX11 is fast and stable, but only\n" +
                     "works on Windows.\n" +
-                    "DirectX12 is very fast but only works\n" +
-                    "on Windows.\n" +
+                    "Vulkan works fastest on Linux.\n" +
+                    "Metal only works on MacOS.\n" +
                     "\n" +
                     "This will take effect after game reboot.\n",
             [9997] = "Graphics API",
@@ -266,7 +269,7 @@ namespace TJAPlayer3
             [10085] = "System options",
             [10086] = "Gameplay options",
             [10087] = "Exit",
-            [10091] = "Settings for an overall systems.",
+            [10091] = "Settings for the overall system.",
             [10092] = "Settings to play the drums.",
             [10093] = "Save the settings and exit from CONFIGURATION menu.",
 
