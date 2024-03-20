@@ -126,7 +126,7 @@ namespace TJAPlayer3
 		/// <summary>
 		/// 曲検索スレッドの開始
 		/// </summary>
-		public void StartEnumFromDisk()
+		public void StartEnumFromDisk(bool hard_reload = false)
 		{
 			if ( state == DTXEnumState.None || state == DTXEnumState.CompletelyDone )
 			{
@@ -141,7 +141,10 @@ namespace TJAPlayer3
 				{
 					this.Songs管理 = new CSongs管理();
 				}
-				this.thDTXFileEnumerate = new Thread( new ThreadStart( this.t曲リストの構築2 ) );
+				if (hard_reload)
+					this.thDTXFileEnumerate = new Thread( new ThreadStart( this.HardReloadSongList ) );
+				else
+					this.thDTXFileEnumerate = new Thread( new ThreadStart( this.ReloadSongList ) );
 				this.thDTXFileEnumerate.Name = "曲リストの構築";
 				this.thDTXFileEnumerate.IsBackground = true;
 				this.thDTXFileEnumerate.Priority = System.Threading.ThreadPriority.Lowest;
@@ -149,6 +152,14 @@ namespace TJAPlayer3
 			}
 		}
 
+		private void HardReloadSongList()
+		{
+			this.t曲リストの構築2(true);
+		}
+		private void ReloadSongList()
+		{
+			this.t曲リストの構築2(false);
+		}
 
 		/// <summary>
 		/// 曲探索スレッドのサスペンド
@@ -307,7 +318,7 @@ namespace TJAPlayer3
 		/// 起動してタイトル画面に遷移した後にバックグラウンドで発生させる曲検索
 		/// #27060 2012.2.6 yyagi
 		/// </summary>
-		private void t曲リストの構築2()
+		private void t曲リストの構築2(bool hard_reload = false)
 		{
 			// ！注意！
 			// 本メソッドは別スレッドで動作するが、プラグイン側でカレントディレクトリを変更しても大丈夫なように、
@@ -318,6 +329,11 @@ namespace TJAPlayer3
 
 			try
 			{
+				if (hard_reload)
+				{
+					if (File.Exists($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db"))
+						File.Delete($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+				}
 				Deserialize();
 
 				#region [ 2) 曲データの検索 ]

@@ -25,6 +25,9 @@ namespace TJAPlayer3
             [3] = "Return to left menu.",
             [4] = "Reload Songs",
             [5] = "Reload the song folder.",
+            [10148] = "Reload Songs (Hard Reload)",
+            [10149] = "Delete the existing database and\n" + 
+            "reload the song folder from scratch.",
             [6] = "Player Count",
             [7] = "Select whether to use 2 player mode.",
             [8] = "Kanpeki Mode",
