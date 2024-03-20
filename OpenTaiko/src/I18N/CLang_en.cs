@@ -159,7 +159,8 @@ namespace TJAPlayer3
             [96] = "A secondary menu to adjust keys used during gameplay.",
             [99] = "LeftRed",
 
-            [9992] = "Simplifies Drawing\n",
+            [9992] = "Simplifies drawing by hiding most visual\n" +
+                    "flare and effects during gameplay.\n",
             [9993] = "SimpleMode",
 
             [9994] = "Texture Loading Type:\n" +
