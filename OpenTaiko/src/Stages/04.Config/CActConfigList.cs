@@ -77,6 +77,10 @@ namespace TJAPlayer3
 			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(4), CItemBase.Eパネル種別.通常,
 				CLangManager.LangInstance.GetString(5));
 			this.list項目リスト.Add( this.iSystemReloadDTX );
+			
+			this.iSystemHardReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(10148), CItemBase.Eパネル種別.通常,
+				CLangManager.LangInstance.GetString(10149));
+			this.list項目リスト.Add( this.iSystemHardReloadDTX );
 
 			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
 				CLangManager.LangInstance.GetString(0),
@@ -728,6 +732,23 @@ namespace TJAPlayer3
 					}
 
 					TJAPlayer3.EnumSongs.StartEnumFromDisk();
+					TJAPlayer3.EnumSongs.ChangeEnumeratePriority( ThreadPriority.Normal );
+					TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 = true;
+					TJAPlayer3.actEnumSongs.Activate();
+					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
+
+					TJAPlayer3.stageSongSelect.actSongList.ResetSongIndex();
+				}
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemHardReloadDTX )				// #32081 2013.10.21 yyagi
+				{
+					if ( TJAPlayer3.EnumSongs.IsEnumerating )
+					{
+						// Debug.WriteLine( "バックグラウンドでEnumeratingSongs中だったので、一旦中断します。" );
+						TJAPlayer3.EnumSongs.Abort();
+						TJAPlayer3.actEnumSongs.DeActivate();
+					}
+
+					TJAPlayer3.EnumSongs.StartEnumFromDisk(true);
 					TJAPlayer3.EnumSongs.ChangeEnumeratePriority( ThreadPriority.Normal );
 					TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 = true;
 					TJAPlayer3.actEnumSongs.Activate();
@@ -1673,6 +1694,7 @@ namespace TJAPlayer3
 
 		private CItemList iSystemSkinSubfolder;				// #28195 2012.5.2 yyagi
 		private CItemBase iSystemReloadDTX;					// #32081 2013.10.21 yyagi
+		private CItemBase iSystemHardReloadDTX;
 		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
 
 		private int t前の項目( int nItem )

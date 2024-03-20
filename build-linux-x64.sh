@@ -1,1 +1,1 @@
-dotnet publish OpenTaiko/OpenTaiko.csproj --configuration Release -p:PublishSingleFile=true --self-contained true --runtime linux-x64
+dotnet publish OpenTaiko/OpenTaiko.csproj --configuration Release --self-contained -p:PublishSingleFile=true --runtime linux-x64
