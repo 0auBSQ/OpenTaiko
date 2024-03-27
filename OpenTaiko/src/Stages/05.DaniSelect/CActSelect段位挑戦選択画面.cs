@@ -99,6 +99,7 @@ namespace TJAPlayer3
                         else if (n現在の選択行 == 1)
                         {
                             //TJAPlayer3.Skin.soundDanSongSelect.t再生する();
+                            TJAPlayer3.ConfigIni.bTokkunMode = false;
                             TJAPlayer3.Skin.soundDecideSFX.tPlay();
                             TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.tPlay();
                             TJAPlayer3.stage段位選択.ct待機.Start(0, 3000, 1, TJAPlayer3.Timer);
