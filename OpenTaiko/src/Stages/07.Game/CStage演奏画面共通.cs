@@ -2171,7 +2171,7 @@ namespace TJAPlayer3
                         // 魂ゲージMAXではない
                         // ジャンプ_ノーマル
                         this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Return, true);
-                        //this.actChara.マイどん_アクション_10コンボ();
+                        //this.actChara.キャラクター_アクション_10コンボ();
                     }
                 }
             }
@@ -2467,7 +2467,7 @@ namespace TJAPlayer3
 
                         if (this.actCombo.n現在のコンボ数[nPlayer] % 10 == 0 && this.actCombo.n現在のコンボ数[nPlayer] > 0)
                         {
-                            //if (this.actChara.bマイどんアクション中 == false)
+                            //if (this.actChara.bキャラクターアクション中 == false)
                             //{
                             int Character = this.actChara.iCurrentCharacter[nPlayer];
                                 // Edit character values here
@@ -4154,7 +4154,7 @@ namespace TJAPlayer3
                                         // 魂ゲージMAXではない
                                         // ゴーゴースタート_ノーマル
                                         this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart, true);
-                                        //this.actChara.マイどん_アクション_10コンボ();
+                                        //this.actChara.キャラクター_アクション_10コンボ();
                                     }
                                 }
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)

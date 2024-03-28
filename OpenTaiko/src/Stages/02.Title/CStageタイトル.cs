@@ -154,7 +154,7 @@ namespace TJAPlayer3
 				this.ctバナパス読み込み失敗.Tick();
 				this.ctエントリーバー点滅.TickLoop();
 				this.ctエントリーバー決定点滅.Tick();
-				this.ctどんちゃんイン.Tick();
+				this.ctキャライン.Tick();
 				this.ctBarMove.Tick();
 
 				if (!TJAPlayer3.Skin.bgmタイトルイン.bIsPlaying)
@@ -369,7 +369,7 @@ namespace TJAPlayer3
 							TJAPlayer3.Skin.soundEntry.tStop();
 							ctバナパス読み込み成功.Start(0, 3655, 1, TJAPlayer3.Timer);
 							bバナパス読み込み = true;
-							bどんちゃんカウンター初期化 = false;
+							bキャラカウンター初期化 = false;
 						}
 					}
 
@@ -385,7 +385,7 @@ namespace TJAPlayer3
 							if (TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile] != null && !TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile].bPlayed)
 								TJAPlayer3.Skin.voiceTitleSanka[TJAPlayer3.SaveFile]?.tPlay();
 
-							ctどんちゃんイン.Start(0, 180, 2, TJAPlayer3.Timer);
+							ctキャライン.Start(0, 180, 2, TJAPlayer3.Timer);
 							ctBarAnimeIn.Start(0, 1295, 1, TJAPlayer3.Timer);
 							bモード選択 = true;
 						}
@@ -560,12 +560,12 @@ namespace TJAPlayer3
 
 				if (bプレイヤーエントリー)
 				{
-					if (!this.bどんちゃんカウンター初期化)
+					if (!this.bキャラカウンター初期化)
 					{
-						//this.ctどんちゃんエントリーループ = new CCounter(0, Donchan_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
+						//this.ctキャラエントリーループ = new CCounter(0, Chara_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
 						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
 
-						this.bどんちゃんカウンター初期化 = true;
+						this.bキャラカウンター初期化 = true;
 					}
 
 					int alpha = ctエントリーバー決定点滅.CurrentValue >= 800 ? 255 - (ctエントリーバー決定点滅.CurrentValue - 800) : (this.ctバナパス読み込み成功.CurrentValue - 3400);
@@ -579,11 +579,11 @@ namespace TJAPlayer3
 					___ttx.Opacity = alpha;
 					*/
 
-					//Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].Opacity = alpha;
+					//Chara_Entry[this.ctキャラエントリーループ.n現在の値].Opacity = alpha;
 
 					TJAPlayer3.Tx.Entry_Player[0].t2D描画(0, 0);
 
-					//Donchan_Entry[this.ctどんちゃんエントリーループ.n現在の値].t2D描画(485, 140);
+					//Chara_Entry[this.ctキャラエントリーループ.n現在の値].t2D描画(485, 140);
 
 					int _actual = TJAPlayer3.GetActualPlayer(0);
 
@@ -675,31 +675,31 @@ namespace TJAPlayer3
 				{
 					this.ctBarAnimeIn.Tick();
 
-					#region [ どんちゃん描画 ]
+					#region [ キャラ描画 ]
 
 					for (int player = 0; player < TJAPlayer3.ConfigIni.nPlayerCount; player++)
 					{
 						if (player >= 2) continue;
 
-						float DonchanX = 0f, DonchanY = 0f;
+						float CharaX = 0f, CharaY = 0f;
 
-						DonchanX = -200 + ((float)Math.Sin(ctどんちゃんイン.CurrentValue / 2 * (Math.PI / 180)) * 200f);
-						DonchanY = ((float)Math.Sin((90 + (ctどんちゃんイン.CurrentValue / 2)) * (Math.PI / 180)) * 150f);
-						if (player == 1) DonchanX *= -1;
+						CharaX = -200 + ((float)Math.Sin(ctキャライン.CurrentValue / 2 * (Math.PI / 180)) * 200f);
+						CharaY = ((float)Math.Sin((90 + (ctキャライン.CurrentValue / 2)) * (Math.PI / 180)) * 150f);
+						if (player == 1) CharaX *= -1;
 
 						int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
 
-						//int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + DonchanX);
-						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - DonchanY);
+						//int chara_x = (int)(TJAPlayer3.Skin.Characters_Title_Normal_X[_charaId][player] + CharaX);
+						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - CharaY);
 
 
-                        int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
-                        int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player] - (int)DonchanY;
+                        int chara_x = (int)CharaX + TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+                        int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player] - (int)CharaY;
 
                         int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
                         int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
 
-                        //Entry_Donchan_Normal[ctどんちゃんループ.n現在の値].t2D描画(-200 + DonchanX, 341 - DonchanY);
+                        //Entry_Chara_Normal[ctキャラループ.n現在の値].t2D描画(-200 + CharaX, 341 - CharaY);
                         CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 
 						//int puchi_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
@@ -1016,7 +1016,7 @@ namespace TJAPlayer3
 				// bプレイヤーエントリー = true;
 				bバナパス読み込み = true;
 				bプレイヤーエントリー決定 = true;
-				bどんちゃんカウンター初期化 = true;
+				bキャラカウンター初期化 = true;
 
 				this.ctバナパス読み込み待機.Start(0, 600, 1, TJAPlayer3.Timer);
 				this.ctバナパス読み込み待機.CurrentValue = (int)this.ctバナパス読み込み待機.EndValue;
@@ -1025,7 +1025,7 @@ namespace TJAPlayer3
 				ctバナパス読み込み成功.Start(0, 3655, 1, TJAPlayer3.Timer);
 				ctバナパス読み込み成功.CurrentValue = (int)ctバナパス読み込み成功.EndValue;
 
-				ctどんちゃんイン.Start(0, 180, 2, TJAPlayer3.Timer);
+				ctキャライン.Start(0, 180, 2, TJAPlayer3.Timer);
 				ctBarAnimeIn.Start(0, 1295, 1, TJAPlayer3.Timer);
 
 				ctコインイン待機.CurrentValue = (int)ctコインイン待機.EndValue;
@@ -1049,10 +1049,10 @@ namespace TJAPlayer3
 			this.ctエントリーバー点滅 = new CCounter(0, 510, 2, TJAPlayer3.Timer);
 			this.ctエントリーバー決定点滅 = new CCounter();
 
-			//this.ctどんちゃんエントリーループ = new CCounter();
+			//this.ctキャラエントリーループ = new CCounter();
 			CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
-			this.ctどんちゃんイン = new CCounter();
-			//this.ctどんちゃんループ = new CCounter(0, Entry_Donchan_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
+			this.ctキャライン = new CCounter();
+			//this.ctキャラループ = new CCounter(0, Entry_Chara_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
 			CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 
 
@@ -1065,7 +1065,7 @@ namespace TJAPlayer3
 			this.bプレイヤーエントリー = false;
 			this.bプレイヤーエントリー決定 = false;
 			this.bモード選択 = false;
-			this.bどんちゃんカウンター初期化 = false;
+			this.bキャラカウンター初期化 = false;
 			this.n現在の選択行プレイヤーエントリー = 1;
 
 			TJAPlayer3.Skin.SoundBanapas.bPlayed = false;
@@ -1083,9 +1083,9 @@ namespace TJAPlayer3
 		private CCounter ctエントリーバー点滅;
 		private CCounter ctエントリーバー決定点滅;
 
-		//private CCounter ctどんちゃんエントリーループ;
-		private CCounter ctどんちゃんイン;
-		//private CCounter ctどんちゃんループ;
+		//private CCounter ctキャラエントリーループ;
+		private CCounter ctキャライン;
+		//private CCounter ctキャラループ;
 
 		private CCounter ctBarAnimeIn;
 		private CCounter ctBarMove;
@@ -1106,7 +1106,7 @@ namespace TJAPlayer3
 		private bool bプレイヤーエントリー;
 		private bool bプレイヤーエントリー決定;
 		private bool bモード選択;
-		private bool bどんちゃんカウンター初期化;
+		private bool bキャラカウンター初期化;
 
 		private int n現在の選択行プレイヤーエントリー;
 		private int n現在の選択行モード選択;

@@ -34,8 +34,8 @@ namespace TJAPlayer3
             base.ePhaseID = CStage.EPhase.Common_NORMAL;
             this.eフェードアウト完了時の戻り値 = E戻り値.継続;
 
-            ctDonchan_In = new CCounter();
-            //ctDonchan_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Donchan_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+            ctChara_In = new CCounter();
+            //ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
             CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
 
@@ -179,8 +179,8 @@ namespace TJAPlayer3
 
         public override int Draw()
         {
-            //ctDonchan_Normal.t進行Loop();
-            ctDonchan_In.Tick();
+            //ctChara_Normal.t進行Loop();
+            ctChara_In.Tick();
 
             ScrollCounter.Tick();
 
@@ -486,36 +486,36 @@ namespace TJAPlayer3
 
             #endregion
 
-            #region [General Don animations]
+            #region [General Chara animations]
 
-            if (!ctDonchan_In.IsStarted)
+            if (!ctChara_In.IsStarted)
             {
                 TJAPlayer3.Skin.soundHeyaBGM.tPlay();
-                ctDonchan_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);    
+                ctChara_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);    
             }
 
-            #region [ どんちゃん関連 ]
+            #region [ キャラ関連 ]
 
-            if (ctDonchan_In.CurrentValue != 90)
+            if (ctChara_In.CurrentValue != 90)
             {
-                float DonchanX = 0f, DonchanY = 0f;
+                float CharaX = 0f, CharaY = 0f;
 
-                DonchanX = -200 + (float)Math.Sin(ctDonchan_In.CurrentValue / 2 * (Math.PI / 180)) * 200f;
-                DonchanY = ((float)Math.Sin((90 + (ctDonchan_In.CurrentValue / 2)) * (Math.PI / 180)) * 150f);
+                CharaX = -200 + (float)Math.Sin(ctChara_In.CurrentValue / 2 * (Math.PI / 180)) * 200f;
+                CharaY = ((float)Math.Sin((90 + (ctChara_In.CurrentValue / 2)) * (Math.PI / 180)) * 150f);
 
                 //int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(0)];
 
-                //int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + DonchanX));
-                //int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - DonchanY);
+                //int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + CharaX));
+                //int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - CharaY);
 
-                int chara_x = (int)DonchanX + TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
-                int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] - (int)DonchanY;
+                int chara_x = (int)CharaX + TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+                int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] - (int)CharaY;
 
                 int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
                 int puchi_y = chara_y + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[0];
 
-                //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].Opacity = ctDonchan_In.n現在の値 * 2;
-                //TJAPlayer3.Tx.SongSelect_Donchan_Normal[ctDonchan_Normal.n現在の値].t2D描画(-200 + DonchanX, 336 - DonchanY);
+                //TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].Opacity = ctChara_In.n現在の値 * 2;
+                //TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
                 CMenuCharacter.tMenuDisplayCharacter(0, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.NORMAL);
 
@@ -741,8 +741,8 @@ namespace TJAPlayer3
 
         public bool bInSongPlayed;
 
-        private CCounter ctDonchan_In;
-        //private CCounter ctDonchan_Normal;
+        private CCounter ctChara_In;
+        //private CCounter ctChara_Normal;
 
         private PuchiChara PuchiChara;
 
