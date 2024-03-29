@@ -26,7 +26,7 @@ namespace TJAPlayer3
             [4] = "Recargar lista de canciones",
             [5] = "Recarga y actualiza la lista de canciones.",
             // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Delete the existing database and\n" + 
+            // [10149] = "Clean the existing database and\n" + 
             // "reload the song folder from scratch.",
 			// Please translate the text above!
             [6] = "Número de jugadores",

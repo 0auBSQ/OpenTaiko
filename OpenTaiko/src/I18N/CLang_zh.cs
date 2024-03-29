@@ -29,7 +29,7 @@ namespace TJAPlayer3
             [4] = "重新载入曲目",
             [5] = "重新扫描曲目文件夹并载入曲目。",
             // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Delete the existing database and\n" + 
+            // [10149] = "Clean the existing database and\n" + 
             // "reload the song folder from scratch.",
 			// Please translate the text above!
             [6] = "玩家数量",

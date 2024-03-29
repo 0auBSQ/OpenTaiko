@@ -26,7 +26,7 @@ namespace TJAPlayer3
             [4] = "曲データ再読み込み",
             [5] = "曲データの一覧情報を取得し直します。",
             // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Delete the existing database and\n" + 
+            // [10149] = "Clean the existing database and\n" + 
             // "reload the song folder from scratch.",
 			// Please translate the text above!
             [6] = "プレイ人数",

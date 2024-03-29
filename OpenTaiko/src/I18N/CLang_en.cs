@@ -26,7 +26,7 @@ namespace TJAPlayer3
             [4] = "Reload Songs",
             [5] = "Reload the song folder.",
             [10148] = "Reload Songs (Hard Reload)",
-            [10149] = "Delete the existing database and\n" + 
+            [10149] = "Clean the existing database and\n" + 
             "reload the song folder from scratch.",
             [6] = "Player Count",
             [7] = "Select how many players you want to play with. Up to 5 players can be active at once.",

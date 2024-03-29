@@ -26,7 +26,7 @@ namespace TJAPlayer3
             [4] = "Recharger les sons",
             [5] = "Met à jour et récupère les\nmodifications effectuées sur\nla liste de sons.",
             // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Delete the existing database and\n" + 
+            // [10149] = "Clean the existing database and\n" + 
             // "reload the song folder from scratch.",
 			// Please translate the text above!
             [6] = "Nombre de joueurs",
