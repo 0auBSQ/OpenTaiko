@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using DiscordRPC;
 using static TJAPlayer3.CActSelect曲リスト;
+using System.Text;
 
 namespace TJAPlayer3
 {
@@ -480,13 +481,22 @@ namespace TJAPlayer3
 					return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 				}
 
-				string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
-					+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+				string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
+				+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+
+				// Byte count must be used instead of String.Length.
+				// The byte count is what Discord is concerned with. Some chars are greater than one byte.
+				if (Encoding.UTF8.GetBytes(details).Length > 128)
+				{
+					byte[] details_byte = Encoding.UTF8.GetBytes(details);
+					Array.Resize(ref details_byte, 128);
+					details = Encoding.UTF8.GetString(details_byte);
+				}
 
 				// Discord Presenseの更新
 				TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
 				{
-					Details = Details.Substring(0, Math.Min(127, Details.Length)),
+					Details = details,
 					State = "Result" + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] == true ? " (Auto)" : ""),
 					Timestamps = new Timestamps(TJAPlayer3.StartupTime),
 					Assets = new Assets()
