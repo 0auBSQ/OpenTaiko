@@ -2434,6 +2434,15 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
+                                case "SongSelect_Movie":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        SongSelect_Movie[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
                                 case "SongSelect_FloorNum_Show":
                                 {
                                     SongSelect_FloorNum_Show = CConversion.bONorOFF(strParam[0]);
@@ -9744,6 +9753,7 @@ namespace TJAPlayer3
         public bool SongSelect_Bar_Select_Skip_Fade = false;
 
         public int[] SongSelect_Explicit = new int[] { 1240, 60 };
+        public int[] SongSelect_Movie = new int[] { 0, 0 };
 
         public int SongSelect_Bar_Center_Move = 62;
         public int SongSelect_Bar_Center_Move_X = 0;

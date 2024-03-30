@@ -28,8 +28,13 @@ namespace TJAPlayer3
             [3] = "返回至上级菜单。",
             [4] = "重新载入曲目",
             [5] = "重新扫描曲目文件夹并载入曲目。",
+            // [10148] = "Reload Songs (Hard Reload)",
+            // [10149] = "Clean the existing database and\n" + 
+            // "reload the song folder from scratch.",
+			// Please translate the text above!
             [6] = "玩家数量",
-            [7] = "选择是否使用双人模式。",
+            // [7] = "选择是否使用双人模式。",
+			// Please update the translation above. Up to 5 players can be active at a time.
             [8] = "完美模式",
             [9] = "选择多少个“不可”会导致演奏失败，\n" +
                 "将该选项设为 0 以禁用此选项。",
@@ -74,9 +79,10 @@ namespace TJAPlayer3
                 "没有任何作用",
             [27] = "选择是否开启 Debug 模式。开启后右下角会显示额外信息\n" +
                 "敲击音效关闭时会显示延迟校准。",
-            [28] = "调整背景视频透明度。背景视频不可见时请调高此选项。\n" +
-                "— 0：完全透明，\n" +
-                "— 255：完全不透明",
+            // [28] = "调整背景视频透明度。背景视频不可见时请调高此选项。\n" +
+            //     "— 0：完全透明，\n" +
+            //     "— 255：完全不透明",
+			// Please update the translation above. The lane background (the bar drawn behind the notes) opacity is what's being adjusted, and will only take effect when videos are playing.
             [29] = "选择是否播放音乐。",
             [30] = "选择是否在曲目文件夹中自动存储 score.ini 文件\n" +
                 "曲目偏移量被保存在该文件中，\n" +
@@ -110,18 +116,19 @@ namespace TJAPlayer3
                 "关闭时部分输入可能会被丢弃，但输入采样率会增高。",
             [42] = "选择游戏关闭时是否生成 TJAPlayer3.log 文件\n" +
                 "该文件用于追踪游戏的性能并记录报错信息。",
-            [43] = "ASIO：\n" +
-                "— 只在支持 ASIO 的音频设备上生效\n" +
-                "— 输入延迟最低。\n" +
-                "WASAPI Exclusive：\n" +
-                "— 关闭除此游戏外的所有音频输出\n" +
-                "— 输入延迟次低。\n" +
-                "WASAPI Shared：\n" +
-                "— 输入延迟次低。\n" +
-                "DSound：\n" +
-                "— 允许外部音频输出\n" +
-                "— 输入延迟最高。\n" +
-                "退出设置界面以使此选项生效。",
+            // [43] = "ASIO：\n" +
+            //     "— 只在支持 ASIO 的音频设备上生效\n" +
+            //     "— 输入延迟最低。\n" +
+            //     "WASAPI Exclusive：\n" +
+            //     "— 关闭除此游戏外的所有音频输出\n" +
+            //     "— 输入延迟次低。\n" +
+            //     "WASAPI Shared：\n" +
+            //     "— 输入延迟次低。\n" +
+            //     "DSound：\n" +
+            //     "— 允许外部音频输出\n" +
+            //     "— 输入延迟最高。\n" +
+            //     "退出设置界面以使此选项生效。",
+			// Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
             [44] = "不出现如曲目冻结或时间错误的声音问题时，该项设置越小越好。\n" +
                 "建议设为 0 以使用估计值或通过不断尝试进行调整。\n" +
                 "退出设置界面以使此选项生效。",
@@ -214,6 +221,27 @@ namespace TJAPlayer3
             [97] = "截屏",
             [98] = "分配截屏按键。\n" +
                 "（仅可使用键盘，不可使用手柄）",
+            // [10128] = "Increase Volume",
+            // [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10130] = "Decrease Volume",
+            // [10131] = "System key assign:\nAssign any key for decreasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10132] = "Display Hit Values",
+            // [10133] = "System key assign:\nAssign any key for displaying hit values.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10134] = "Display Debug Menu",
+            // [10135] = "System key assign:\nAssign any key for displaying debug menu.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10136] = "Quick Config",
+            // [10137] = "System key assign:\nAssign any key for accessing the quick config.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10138] = "Player Customization",
+            // [10139] = "System key assign:\nAssign any key for player customization.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10140] = "Change Song Sort",
+            // [10141] = "System key assign:\nAssign any key for resorting songs.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10142] = "Toggle Auto (P1)",
+            // [10143] = "System key assign:\nAssign any key for toggling auto (P1).\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10144] = "Toggle Auto (P2)",
+            // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // [10146] = "Toggle Training Mode",
+            // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
+			// Please translate the text above!
             [99] = "左红",
 	    [9994] = "材质加载方式：\n" +
     		"启动时不会未响应。\n" +
@@ -262,7 +290,8 @@ namespace TJAPlayer3
             [10025] = "曲目预览缓冲",
             [10026] = "图片预览缓冲",
             [10027] = "调试模式",
-            [10028] = "背景不透明度",
+            //[10028] = "背景不透明度",
+            // Please update the translation above. The actual title should read "Lane Background Opacity". Check comment on [28] for further details.
             [10029] = "播放背景音乐",
             [10030] = "保存得分",
             [10031] = "应用响度 (LOUDNESS) 元信息",

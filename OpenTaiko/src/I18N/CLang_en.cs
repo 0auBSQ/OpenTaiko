@@ -26,10 +26,10 @@ namespace TJAPlayer3
             [4] = "Reload Songs",
             [5] = "Reload the song folder.",
             [10148] = "Reload Songs (Hard Reload)",
-            [10149] = "Delete the existing database and\n" + 
+            [10149] = "Clean the existing database and\n" + 
             "reload the song folder from scratch.",
             [6] = "Player Count",
-            [7] = "Select whether to use 2 player mode.",
+            [7] = "Select how many players you want to play with. Up to 5 players can be active at once.",
             [8] = "Kanpeki Mode",
             [9] = "Choose how many BADs are allowed\nbefore a song is automatically failed.\nSet this to 0 to disable the mode.",
             [10] = "Song Playback Speed",
@@ -61,22 +61,22 @@ namespace TJAPlayer3
             [25] = "The time taken before a song preview is played.\nDecreasing this value may cause previews\nto begin while still scrolling.\nYou can specify from 0ms to 10000ms.",
             [26] = "This is a redundant setting\nported from DTXMania.\nIt does nothing.",
             [27] = "Toggle whether debug mode is enabled.\nThis will cause additional information\nto appear in the bottom right.\nThis will display your latency calibration\nfor hitsoundless play.",
-            [28] = "This controls the opacity of background videos.\nIncrease the value if videos aren’t playing.\n\n0 = completely transparent,\n255 = no transparency",
+            [28] = "This controls the lane background opacity\nwhile videos are playing.\n\n0 = completely transparent,\n255 = no transparency",
             [29] = "Toggles whether music is played.",
             [30] = "Toggles whether score.ini files are saved in song folders.\nSong offset is saved here,\nso if hitsounds are disabled turn this on.",
             [31] = "This is a redundant setting that intended to use BSGain\nsound settings.\nSince BSGain support is broken,\nthis setting does nothing.",
             [32] = "This is a redundant setting that intended to use BSGain\nto normalise sound volume.\nSince BSGain support is broken,\nthis setting does nothing.",
             [33] = "This is a partially redundant setting\nthat toggles whether SONGVOL metadata is used.\nValues between 0 and 100 will lower song volume,\nbut any values over 100 do nothing.",
             [34] = "Adjust the volume of sounds related to don and ka.\nTo play without hitsounds, set this to 0.\nYou must restart the game after leaving config\nfor this setting to save.",
-            [35] = "Adjust the volume of sounds related don-chan’s voice.\nYou must restart the game after leaving config\nfor this setting to save.",
+            [35] = "Adjust the volume of sounds related to a character's voice.\nYou must restart the game after leaving config\nfor this setting to save.",
             [36] = "Adjust the volume of song playback.\nYou must restart the game after leaving config\nfor this setting to save.",
-            [37] = "Use the [ key to decrease volume\nand use the ] key to increase volume.\nThis setting changes how much they change the volume by.\nYou can specify from 1 to 20.",
+            [37] = "Specify how much the Increase Volume and Decrease\nVolume system keys change the volume.\nYou can specify from 1 to 20.",
             [38] = "The time taken before song playback during gameplay.\nDecreasing the value may cause songs to play too early.",
             [39] = "Toggle whether results screenshots are automatically taken.\nThis will only occur when a highscore is achieved,\nwhich may not correlate to the best play on that song.",
-            [40] = "Toggle whether song information is shared with discord.",
+            [40] = "Toggle whether song information is shared with Discord.",
             [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
             [42] = "Toggle whether a TJAPlayer3.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
-            [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\n\nWasapi:\n- Disables sound playback from any source except TJAP3\n- Has the second lowest input delay\n\nDirect Sound:\n- Allows exterior sound playback\n- Has the most input delay\n" +
+            [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\n\nWasapi:\n- Only compatible with Windows\n- Disables sound playback from any source except TJAP3\n- Has the second lowest input delay\n\nBASS:\n- Supported on all platforms" +
                 "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
             [44] = "Change the sound buffer for wasapi sound playback mode.\nSet the number to be as low as possible\nwithout causing sound issues such as\nsong freezing and incorrect timing.\nSet it to 0 to use an estimated correct value,\nor use trial and error to find the correct value." +
@@ -134,7 +134,7 @@ namespace TJAPlayer3
                 "Can be set between -99 and 99ms.\n" +
                 "To decrease input lag, set minus value.",
             [80] = "Default Difficulty",
-            [81] = "Choose the default difficulty to be chosen on song select.\nIf ura is not chosen, it will not be visible\nunless the right arrow key is pressed\non that song’s oni difficulty.",
+            [81] = "Choose the default difficulty to be chosen on song select.\nIf ura is not chosen, it will not be visible\nunless the right arrow key is pressed\non that song's oni difficulty.",
             [82] = "Score Mode",
             [83] = "Chooses the formula used to determine scores.\n" +
                     "TYPE-A: Gen-1\n" +
@@ -142,12 +142,11 @@ namespace TJAPlayer3
                     "TYPE-C: Gen-3\n",
             [84] = "Makes every note worth\nthe same amount of points.\nUses the Gen-4 formula.",
             [85] = "Branch Guide",
-            [86] = "Toggle whether a numerical guide is displayed\nto view which branch is going to be picked.\nIt doesn’t display on auto mode.",
+            [86] = "Toggle whether a numerical guide is displayed\nto view which branch is going to be picked.\nIt doesn't display on auto mode.",
             [87] = "Branch Animation Set",
             [88] = "Changes the animation set used when a chart branches.\n" +
                     "TYPE-A: Gen-2\n" +
-                    "TYPE-B: Gen-3\n" +
-                    " \n",
+                    "TYPE-B: Gen-3\n",
             [89] = "Survival Mode",
             [90] = "This mode is broken.\nIt implements a timer system similar to stepmania courses,\nbut some code is missing so the functionality is limited.",
             [91] = "Big Note Judgement",
@@ -217,7 +216,7 @@ namespace TJAPlayer3
             [10025] = "Song Preview Buffer",
             [10026] = "Image Preview Buffer",
             [10027] = "Debug Mode",
-            [10028] = "Background Opacity",
+            [10028] = "Lane Background Opacity",
             [10029] = "Toggle Song Playback",
             [10030] = "Save Scores",
             [10031] = "Apply Loudness Metadata",
@@ -316,9 +315,9 @@ namespace TJAPlayer3
             [97] = "Capture",
             [98] = "System key assign:\nAssign any key for screen capture.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10128] = "Increase Volume",
-            [10129] = "System key assign:\nAssign any key for increasing volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10130] = "Decrease Volume",
-            [10131] = "System key assign:\nAssign any key for decreasing volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10131] = "System key assign:\nAssign any key for decreasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10132] = "Display Hit Values",
             [10133] = "System key assign:\nAssign any key for displaying hit values.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10134] = "Display Debug Menu",

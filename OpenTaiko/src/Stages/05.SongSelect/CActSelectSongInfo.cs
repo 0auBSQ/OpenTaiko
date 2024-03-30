@@ -71,8 +71,10 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
                 }
-                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit == true)
+                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit)
                     TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
+                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bMovie)
+                    TJAPlayer3.Tx.SongSelect_Movie?.t2D描画(TJAPlayer3.Skin.SongSelect_Movie[0], TJAPlayer3.Skin.SongSelect_Movie[1]);
             }
 
 

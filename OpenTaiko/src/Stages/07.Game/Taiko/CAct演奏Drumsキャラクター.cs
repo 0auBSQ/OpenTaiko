@@ -1067,7 +1067,7 @@ namespace TJAPlayer3
         //private readonly int[] CharaAction_Balloon_FadeOut_StartMs = new int[5];
         private readonly int[][] CharaAction_Balloon_FadeOut_StartMs = new int[5][];
 
-        //public bool[] bマイどんアクション中 = new bool[5];
+        //public bool[] bキャラクターアクション中 = new bool[5];
 
         public bool[] b風船連打中 = new bool[5];
         public bool[] b演奏中 = new bool[5];

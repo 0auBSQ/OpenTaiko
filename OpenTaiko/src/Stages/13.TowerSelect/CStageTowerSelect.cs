@@ -212,6 +212,7 @@ namespace TJAPlayer3
 
         public void tSelectSong()
         {
+            TJAPlayer3.ConfigIni.bTokkunMode = false;
             TJAPlayer3.stageSongSelect.rChoosenSong = listSongs[nCurrentSongIndex];
             TJAPlayer3.stageSongSelect.r確定されたスコア = listSongs[nCurrentSongIndex].arスコア[(int)Difficulty.Tower];
             TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
