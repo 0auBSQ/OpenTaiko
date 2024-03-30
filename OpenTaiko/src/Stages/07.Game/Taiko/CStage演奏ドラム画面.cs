@@ -13,6 +13,7 @@ using DiscordRPC;
 using Rectangle = System.Drawing.Rectangle;
 using Point = System.Drawing.Point;
 using Color = System.Drawing.Color;
+using DiscordRPC.Helper;
 namespace TJAPlayer3
 {
     internal class CStage演奏ドラム画面 : CStage演奏画面共通
@@ -284,14 +285,23 @@ namespace TJAPlayer3
 			}
 
             // Discord Presence の更新
-			string Details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
+			string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
 				+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+
+            // Byte count must be used instead of String.Length.
+            // The byte count is what Discord is concerned with. Some chars are greater than one byte.
+            if (Encoding.UTF8.GetBytes(details).Length > 128)
+            {
+                byte[] details_byte = Encoding.UTF8.GetBytes(details);
+                Array.Resize(ref details_byte, 128);
+                details = Encoding.UTF8.GetString(details_byte);
+            }
 
             var difficultyName = TJAPlayer3.DifficultyNumberToEnum(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]).ToString();
 
 			TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
 			{
-				Details = Details.Substring(0, Math.Min(127, Details.Length)),
+				Details = details,
 				State = "Playing" + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] == true ? " (Auto)" : ""),
 				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms / TJAPlayer3.ConfigIni.SongPlaybackSpeed)),
 				Assets = new Assets()

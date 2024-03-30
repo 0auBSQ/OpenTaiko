@@ -2910,6 +2910,7 @@ namespace TJAPlayer3
                 ResolveTitleTexture(ttkSelectedSongBPM)?.tUpdateOpacity(opct);
             }
 			TJAPlayer3.Tx.SongSelect_Explicit?.tUpdateOpacity(opct);
+			TJAPlayer3.Tx.SongSelect_Movie?.tUpdateOpacity(opct);
 
 
             if (eバー種別 == Eバー種別.Random)
