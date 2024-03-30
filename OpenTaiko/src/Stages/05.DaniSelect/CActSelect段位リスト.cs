@@ -937,7 +937,7 @@ namespace TJAPlayer3
 
             TJAPlayer3.Tx.Dani_Exam_Number.t2D描画(
                 x + ((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[0] + (width / 2)) * scale),
-                y + ((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] - (height / 2)) * scale),
+                y + ((TJAPlayer3.Skin.DaniSelect_Exam_Number_Interval[1] + (height / 2)) * scale),
                 new RectangleF(text_width * (int)Range, height, text_width, height));
 
             for (int j = 0; j < nums.Length; j++)
