@@ -73,7 +73,7 @@ namespace TJAPlayer3
                 }
                 if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit)
                     TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
-                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bMovie && TJAPlayer3.ConfigIni.bAVI有効)
+                if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bMovie)
                     TJAPlayer3.Tx.SongSelect_Movie?.t2D描画(TJAPlayer3.Skin.SongSelect_Movie[0], TJAPlayer3.Skin.SongSelect_Movie[1]);
             }
 
