@@ -76,7 +76,7 @@ namespace TJAPlayer3
             [40] = "Toggle whether song information is shared with Discord.",
             [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
             [42] = "Toggle whether a TJAPlayer3.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
-            [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\n\nWasapi:\n- Only compatible with Windows\n- Disables sound playback from any source except TJAP3\n- Has the second lowest input delay\n\nBASS:\n- Supported on all platforms" +
+            [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\nWasapi:\n- Only compatible with Windows\n- Has the second lowest input delay\nBASS:\n- Supported on all platforms\n" +
                 "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
             [44] = "Change the sound buffer for wasapi sound playback mode.\nSet the number to be as low as possible\nwithout causing sound issues such as\nsong freezing and incorrect timing.\nSet it to 0 to use an estimated correct value,\nor use trial and error to find the correct value." +
