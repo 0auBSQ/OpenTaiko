@@ -79,9 +79,11 @@ namespace TJAPlayer3
             // コンストラクタ
         }
 
-        internal CTexture TxC(string FileName)
+        internal CTexture TxC(string FileName, bool localize = true)
         {
-            var tex = TJAPlayer3.tテクスチャの生成(CSkin.Path(BASE + FileName), false);
+            var texpath = (localize) ? HLocalizedPath.GetAvailableLocalizedPath(CSkin.Path(BASE + FileName)) : CSkin.Path(BASE + FileName);
+            var tex = TJAPlayer3.tテクスチャの生成(texpath, false);
+
             listTexture.Add(tex);
             return tex;
         }
@@ -400,7 +402,12 @@ namespace TJAPlayer3
             Dani_Soul_Number = TxC(DANISELECT + "SoulNumber.png");
             Dani_Exam_Number = TxC(DANISELECT + "ExamNumber.png");
             Dani_Bar_Center = TxC(DANISELECT + "Bar_Center.png");
+            Dani_Bar_Back = TxC(DANISELECT + "Bar_Back.png");
+            Dani_Bar_Folder = TxC(DANISELECT + "Bar_Folder.png");
+            Dani_Bar_Folder_Back = TxC(DANISELECT + "Bar_Folder_Back.png");
+            Dani_Bar_Random = TxC(DANISELECT + "Bar_Random.png");
             Dani_Plate = TxC(DANISELECT + "Plate.png");
+            Dani_Plate_Extra = TxC(DANISELECT + "Plate_Extra.png");
 
             for (int i = 0; i < Challenge_Select.Length; i++)
                 Challenge_Select[i] = TxC(DANISELECT + "Challenge_Select_" + i.ToString() + ".png");
@@ -2682,7 +2689,12 @@ namespace TJAPlayer3
         public CTexture Dani_Soul_Number;
         public CTexture Dani_Exam_Number;
         public CTexture Dani_Bar_Center;
+        public CTexture Dani_Bar_Back;
+        public CTexture Dani_Bar_Folder;
+        public CTexture Dani_Bar_Folder_Back;
+        public CTexture Dani_Bar_Random;
         public CTexture Dani_Plate;
+        public CTexture Dani_Plate_Extra;
 
         public CTexture[] Challenge_Select = new CTexture[3];
 
