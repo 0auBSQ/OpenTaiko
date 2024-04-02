@@ -3696,6 +3696,33 @@ namespace TJAPlayer3
                                     DaniSelect_Exam_Number_Text_Width = int.Parse(strParam);
                                     break;
                                 }
+                                case "DaniSelect_Font_DanFolder_Size":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        DaniSelect_Font_DanFolder_Size[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case "DaniSelect_FolderText_X":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 4; i++)
+                                    {
+                                        DaniSelect_FolderText_X[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case "DaniSelect_FolderText_Y":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 4; i++)
+                                    {
+                                        DaniSelect_FolderText_Y[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
                                 case "DaniSelect_Font_DanSong_Size":
                                 {
                                     DaniSelect_Font_DanSong_Size = int.Parse(strParam);
@@ -10027,7 +10054,10 @@ namespace TJAPlayer3
 
         public int[] DaniSelect_Exam_Number_Interval = new int[] { 16, 0 };
         public int DaniSelect_Exam_Number_Text_Width = 45;
-
+        
+        public int[] DaniSelect_Font_DanFolder_Size = new int[] { 64, 32 };
+        public int[] DaniSelect_FolderText_X = new int[] { 640, 640, 640, 640 };
+        public int[] DaniSelect_FolderText_Y = new int[] { 320, 413, 460, 507 };
         public int DaniSelect_Font_DanSong_Size = 24;
         public int DaniSelect_Font_Exam_Size = 13;
 

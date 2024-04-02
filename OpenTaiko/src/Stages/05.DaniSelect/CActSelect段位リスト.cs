@@ -73,6 +73,8 @@ namespace TJAPlayer3
 
         public override void CreateManagedResource()
         {
+            this.pfDanFolder = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_DanFolder_Size[0]);
+            this.pfDanFolderDesc = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_DanFolder_Size[1]);
             this.pfDanSong = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_DanSong_Size);
             this.pfExamFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.DaniSelect_Font_Exam_Size);
 
@@ -81,6 +83,8 @@ namespace TJAPlayer3
 
         public override void ReleaseManagedResource()
         {
+            TJAPlayer3.tDisposeSafely(ref pfDanFolder);
+            TJAPlayer3.tDisposeSafely(ref pfDanFolderDesc);
             TJAPlayer3.tDisposeSafely(ref pfDanSong);
             TJAPlayer3.tDisposeSafely(ref pfExamFont);
             
@@ -152,6 +156,8 @@ namespace TJAPlayer3
 
             int tickWidth = TJAPlayer3.Tx.Dani_Plate.szTextureSize.Width / 7;
             int tickHeight = TJAPlayer3.Tx.Dani_Plate.szTextureSize.Height;
+            int tickExtraWidth = TJAPlayer3.Tx.Dani_Plate_Extra.szTextureSize.Width / 3;
+            int tickExtraHeight = TJAPlayer3.Tx.Dani_Plate_Extra.szTextureSize.Height;
 
             for (int idx = -13; idx < 14; idx++)
             {
@@ -176,17 +182,45 @@ namespace TJAPlayer3
                 int tick = Math.Max(0, Math.Min(5, stバー情報[currentSong].nDanTick));
                 Color tickColor = stバー情報[currentSong].cDanTickColor;
 
-                TJAPlayer3.Tx.Dani_Plate.Opacity = 255;
-                TJAPlayer3.Tx.Dani_Plate.color4 = CConversion.ColorToColor4(tickColor);
-                TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
+                switch (stバー情報[currentSong].eノード種別)
+                {
+                    case CSongListNode.ENodeType.BACKBOX:
+                    {
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(0, 0, tickExtraWidth, tickExtraHeight));
+                        break;
+                    }
+                    case CSongListNode.ENodeType.BOX:
+                    {
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickExtraWidth, 0, tickExtraWidth, tickExtraHeight));
+                        break;
+                    }
+                    case CSongListNode.ENodeType.RANDOM:
+                    {
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
+                        TJAPlayer3.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickExtraWidth * 2, 0, tickExtraWidth, tickExtraHeight));
+                        break;
+                    }
+                    default:
+                    {
+                        TJAPlayer3.Tx.Dani_Plate?.tUpdateOpacity(255);
+                        TJAPlayer3.Tx.Dani_Plate?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
+                        TJAPlayer3.Tx.Dani_Plate?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
+                        break;
+                    }
+                }
 
                 // Reset color for plate flash
-                TJAPlayer3.Tx.Dani_Plate.color4 = CConversion.ColorToColor4(Color.White);
+                TJAPlayer3.Tx.Dani_Plate?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 
                 #endregion
 
                 #region [Dan grade title]
-
+                if (stバー情報[currentSong].eノード種別 == CSongListNode.ENodeType.SCORE)
                 TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTextureTate(stバー情報[currentSong].ttkタイトル[stバー情報[currentSong].ttkタイトル.Length - 1])
                     .t2D拡大率考慮上中央基準描画(xPos + TJAPlayer3.Skin.DaniSelect_Plate_Title_Offset[0], yPos + TJAPlayer3.Skin.DaniSelect_Plate_Title_Offset[1]);
 
@@ -197,8 +231,8 @@ namespace TJAPlayer3
 
                 if (idx == 0)
                 {
-                    TJAPlayer3.Tx.Dani_Plate.Opacity = Math.Abs(255 - ctDanTick.CurrentValue);
-                    TJAPlayer3.Tx.Dani_Plate.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * 6, 0, tickWidth, tickHeight));
+                    TJAPlayer3.Tx.Dani_Plate?.tUpdateOpacity(Math.Abs(255 - ctDanTick.CurrentValue));
+                    TJAPlayer3.Tx.Dani_Plate?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * 6, 0, tickWidth, tickHeight));
                 }
 
                 #endregion
@@ -240,9 +274,7 @@ namespace TJAPlayer3
 
         private bool bLeftMove;
 
-        private CCachedFontRenderer pfDanSong;
-
-        public CCachedFontRenderer pfExamFont;
+        private CCachedFontRenderer pfDanFolder, pfDanFolderDesc, pfDanSong, pfExamFont;
         public TitleTextureKey[] ttkExams;
 
         private CStage選曲.STNumber[] stLevel = new CStage選曲.STNumber[10];
@@ -706,6 +738,27 @@ namespace TJAPlayer3
                         #endregion
                     }
                     break;
+                case CSongListNode.ENodeType.BACKBOX:
+                {
+                    TJAPlayer3.Tx.Dani_Bar_Back?.t2D描画(scroll + Anime, 0);
+                    break;
+                }
+                case CSongListNode.ENodeType.BOX:
+                {
+                    TJAPlayer3.Tx.Dani_Bar_Folder_Back?.t2D描画(scroll + Anime, 0);
+                    TJAPlayer3.Tx.Dani_Bar_Folder?.t2D描画(scroll + Anime, 0);
+                    TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[0])
+                    .t2D拡大率考慮上中央基準描画((int)(scroll + Anime + TJAPlayer3.Skin.DaniSelect_FolderText_X[0]), TJAPlayer3.Skin.DaniSelect_FolderText_Y[0]);
+                    for (int desc = 1; desc < 4; desc++)
+                        TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[desc])
+                        .t2D拡大率考慮上中央基準描画((int)(scroll + Anime + TJAPlayer3.Skin.DaniSelect_FolderText_X[desc]), TJAPlayer3.Skin.DaniSelect_FolderText_Y[desc]);
+                    break;
+                }
+                case CSongListNode.ENodeType.RANDOM:
+                {
+                    TJAPlayer3.Tx.Dani_Bar_Random?.t2D描画(scroll + Anime, 0);
+                    break;
+                }
             }
         }
 
@@ -787,8 +840,15 @@ namespace TJAPlayer3
                         break;
                     case CSongListNode.ENodeType.BOX:
                         {
-                            stバー情報[i].ttkタイトル = new TitleTextureKey[1];
-                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(song.strタイトル, pfDanSong, Color.White, Color.Black, 700);
+                            TJAPlayer3.Tx.Dani_Bar_Folder?.tUpdateColor4(CConversion.ColorToColor4(song.BoxColor));
+                            
+                            stバー情報[i].ttkタイトル = new TitleTextureKey[4];
+                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(song.strタイトル, pfDanFolder, Color.White, Color.Black, TJAPlayer3.Skin.Resolution[0]);
+                            for (int boxdesc = 0; boxdesc < 3; boxdesc++)
+                                if (song.strBoxText[boxdesc] != null)
+                                    stバー情報[i].ttkタイトル[boxdesc + 1] = new TitleTextureKey(song.strBoxText[boxdesc], pfDanFolderDesc, song.ForeColor, song.BackColor, TJAPlayer3.Skin.Resolution[0]);
+                                else
+                                    stバー情報[i].ttkタイトル[boxdesc + 1] = new TitleTextureKey("", pfDanFolderDesc, Color.White, Color.Black, TJAPlayer3.Skin.Resolution[0]);
                             stバー情報[i].cDanTickColor = song.BoxColor;
                         }
                         break;
