@@ -10,9 +10,10 @@
 
 Old TJAPlayer3-Develop-BSQ, a spiritual successor to TJAPlayer3.
 
-- Current version： v0.5.4
+- Current version： Pre v0.6.0 b2
 
 - Discord : https://discord.gg/aA8scTvZ6B
+- Japanese Discord : https://discord.gg/CJ4nTkpy7t
 
 ## Cautions before using （IMPORTANT）
 
