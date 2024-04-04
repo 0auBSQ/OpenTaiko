@@ -282,6 +282,8 @@ function init()
 
       if lang == "ja" then
         nokonFrames = {"Background/Nokon/Idle/ja/","Background/Nokon/Result_Bad/ja/","Background/Nokon/Result_Good/ja/","Background/Nokon/Result_Great/ja/"}
+      elseif lang == "zh" then
+        nokonFrames = {"Background/Nokon/Idle/zh/","Background/Nokon/Result_Bad/zh/","Background/Nokon/Result_Good/zh/","Background/Nokon/Result_Great/zh/"}
       elseif lang == "fr" then
         nokonFrames = {"Background/Nokon/Idle/fr/","Background/Nokon/Result_Bad/fr/","Background/Nokon/Result_Good/fr/","Background/Nokon/Result_Great/fr/"}
       end

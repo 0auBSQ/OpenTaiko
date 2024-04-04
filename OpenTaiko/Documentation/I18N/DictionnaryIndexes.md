@@ -179,7 +179,72 @@
 10087 : "Exit" menu title
 10090 : "System" description
 10091 : "Gameplay options" description
-10092 : "Exit" description
+10092 : "Drum options" description
+10093 : "Exit" description
+10094 : "Left red drum key settings for 3P" option title
+10095 : "Left red drum key settings for 3P" description
+10096 : "Right red drum key settings for 3P" option title
+10097 : "Right red drum key settings for 3P" description
+10098 : "Left blue drum key settings for 3P" option title
+10099 : "Left blue drum key settings for 3P" description
+10100 : "Right blue drum key settings for 3P" option title
+10101 : "Right blue drum key settings for 3P" description
+10102 : "Left red drum key settings for 4P" option title
+10103 : "Left red drum key settings for 4P" description
+10104 : "Right red drum key settings for 4P" option title
+10105 : "Right red drum key settings for 4P" description
+10106 : "Left blue drum key settings for 4P" option title
+10107 : "Left blue drum key settings for 4P" description
+10108 : "Right blue drum key settings for 4P" option title
+10109 : "Right blue drum key settings for 4P" description
+10110 : "Left red drum key settings for 5P" option title
+10111 : "Left red drum key settings for 5P" description
+10112 : "Right red drum key settings for 5P" option title
+10113 : "Right red drum key settings for 5P" description
+10114 : "Left blue drum key settings for 5P" option title
+10115 : "Left blue drum key settings for 5P" description
+10116 : "Right blue drum key settings for 5P" option title
+10117 : "Right blue drum key settings for 5P" description
+10118 : "Konga clap key settings for 3P" option title
+10119 : "Konga clap key settings for 3P" description
+10120 : "Konga clap key settings for 4P" option title
+10121 : "Konga clap key settings for 4P" description
+10122 : "Konga clap key settings for 5P" option title
+10123 : "Konga clap key settings for 5P" description
+10124 : "Toggle Extreme/Extra transition animations" option title
+10125 : "Toggle Extreme/Extra transition animations" description
+10126 : "Force normal gauge" option title
+10127 : "Force normal gauge" description
+10128 : "Increase music volume key settings" option title
+10129 : "Increase music volume key settings" description
+10130 : "Decrease music volume key settings" option title
+10131 : "Decrease music volume key settings" description
+10132 : "Display hit values box key settings" option title
+10133 : "Display hit values box key settings" description
+10134 : "Display debug menu key settings" option title
+10135 : "Display debug menu key settings" description
+10136 : "Quick Config menu key settings" option title
+10137 : "Quick Config menu key settings" description
+10138 : "Player Customization menu key settings" option title
+10139 : "Player Customization menu key settings" description
+10140 : "Change Song Sort menu key settings" option title
+10141 : "Change Song Sort menu key settings" description
+10142 : "Toggle Auto (P1) key settings" option title
+10143 : "Toggle Auto (P1) key settings" description
+10144 : "Toggle Auto (P2) key settings" option title
+10145 : "Toggle Auto (P2) key settings" description
+10146 : "Toggle Training Mode key settings" option title
+10147 : "Toggle Training Mode key settings" description
+10148 : "Reload songs (Hard Reload)" option title
+10149 : "Reload songs (Hard Reload)" description - Creates a fresh song database by rebuilding it from scratch
+9992 : "SimpleMode" description - Simplifies drawing by disabling most visual effects during gameplay
+9993 : "SimpleMode" option title
+9994 : "Async Texture Loading" description - Toggles whether the startup screen will be animated while loading
+9995 : "Async Texture Loading" option title
+9996 : "Graphics API" description - Choose between OpenGL, DirectX11, Vulkan, or Metal for rendering graphics; Benefits vary, refer to CLang_en entry for details
+9997 : "Graphics API" option title
+9998 : "Bass Buffer Size" description - User determines a value between 0~99999ms; A lower value reduces audio lag, but may also create abnormal audio. Set to 0 to let the OS decide the size.
+9999 : "Bass Buffer Size" option title
 
 # Main Menu text (001XX)
 

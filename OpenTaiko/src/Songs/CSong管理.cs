@@ -224,6 +224,7 @@ namespace TJAPlayer3
 									c曲リストノード.strMaker = dtx.MAKER;
                                     c曲リストノード.nSide = dtx.SIDE;
                                     c曲リストノード.bExplicit = dtx.EXPLICIT;
+									c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
                                     if (c曲リストノード.rParentNode != null && c曲リストノード.rParentNode.strジャンル != "")
                                     {
                                         c曲リストノード.strジャンル = c曲リストノード.rParentNode.strジャンル;
@@ -416,11 +417,7 @@ namespace TJAPlayer3
 									c曲リストノード.strMaker = dtx.MAKER;
 									c曲リストノード.nSide = dtx.SIDE;
 									c曲リストノード.bExplicit = dtx.EXPLICIT;
-
-									if (dtx.TITLE == "例2")
-									{
-
-									}
+									c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
 
 									c曲リストノード.DanSongs = new ();
 									if (dtx.List_DanSongs != null)

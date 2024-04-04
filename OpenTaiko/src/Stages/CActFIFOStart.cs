@@ -268,9 +268,9 @@ namespace TJAPlayer3
 			}
 
 			TJAPlayer3.Tx.SongLoading_Chara.Opacity = (int)opacity;
-			//左どんちゃん
+			//左キャラ
 			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(-TJAPlayer3.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
-			//左どんちゃん
+			//左キャラ
 			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(SizeXHarf + TJAPlayer3.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 		}
 

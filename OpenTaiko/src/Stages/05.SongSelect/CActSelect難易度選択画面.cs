@@ -269,7 +269,7 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[i] - 2] > 0)
                                 {
-                                    //TJAPlayer3.stage選曲.ctDonchan_Jump[0].t開始(0, SongSelect_Donchan_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+                                    //TJAPlayer3.stage選曲.ctChara_Jump[0].t開始(0, SongSelect_Chara_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
                                     
 
                                     this.bSelect[i] = true;
