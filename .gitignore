@@ -38,3 +38,5 @@
 /OpenTaiko/Global/Characters/Aitritus
 /OpenTaiko/Global/Characters/Kohaku
 *.score.ini
+
+/OpenTaiko Launcher/node_modules

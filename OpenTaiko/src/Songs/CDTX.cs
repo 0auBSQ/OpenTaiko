@@ -5933,6 +5933,7 @@ namespace TJAPlayer3
                     case "Taiko":
                         chip.eGameType = EGameType.TAIKO;
                         break;
+                    case "Bongo":
                     case "Konga":
                         chip.eGameType = EGameType.KONGA;
                         break;

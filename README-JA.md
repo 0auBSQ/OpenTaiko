@@ -6,9 +6,10 @@
 
 旧名称 TJAPlayer3-Develop-BSQ (非公式なTJAPlayer3の継続)
 
-- 現在のバージョン： v0.5.4
+- 現在のバージョン： Pre v0.6.0 b2
 
 - Discord : https://discord.gg/aA8scTvZ6B
+- Discord (日本語) : https://discord.gg/CJ4nTkpy7t
 
 ## 使用上の注意 （重要）
 

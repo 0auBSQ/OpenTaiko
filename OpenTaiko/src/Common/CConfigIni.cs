@@ -2689,7 +2689,7 @@ namespace TJAPlayer3
 			sw.WriteLine("TimingZones4P={0}", this.nTimingZones[3]);
 			sw.WriteLine("TimingZones5P={0}", this.nTimingZones[4]);
 			sw.WriteLine();
-			sw.WriteLine("; Gametype (0 : Taiko, 1 : Konga)");
+			sw.WriteLine("; Gametype (0 : Taiko, 1 : Bongo)");
 			sw.WriteLine("Gametype1P={0}", (int)this.nGameType[0]);
 			sw.WriteLine("Gametype2P={0}", (int)this.nGameType[1]);
 			sw.WriteLine("Gametype3P={0}", (int)this.nGameType[2]);
