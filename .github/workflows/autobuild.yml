@@ -42,7 +42,7 @@ jobs:
         run: |
           build-win-x64.bat
           
-      - name: Create Archive (Win x64) (Shallow)
+      - name: Create Archive (Win x64)
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
@@ -55,7 +55,7 @@ jobs:
         run: |
           build-win-x86.bat
           
-      - name: Create Archive (Win x86) (Shallow)
+      - name: Create Archive (Win x86)
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
@@ -68,7 +68,7 @@ jobs:
         run: |
           build-osx-x64.bat
           
-      - name: Create Archive (Mac x64) (Shallow)
+      - name: Create Archive (Mac x64)
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
@@ -81,7 +81,7 @@ jobs:
         run: |
           build-linux-x64.bat
           
-      - name: Create Archive (Linux x64) (Shallow)
+      - name: Create Archive (Linux x64)
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
