@@ -94,6 +94,7 @@ jobs:
         run: |
           cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\Songs\
           7z a ../../../../../../../Songs.zip *
+          7z d ../../../../../../../Songs.zip "L2 Custom Charts/" "L3 Downloaded Songs/" "X1 Favorite/" "X2 Recent/" "X3 Search By Difficulty/"
           cd ..\..\..\..\..\..\..\
 
       #- name: Create Archive (System)
