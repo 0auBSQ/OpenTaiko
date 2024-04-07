@@ -46,7 +46,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
-          7z a ../../../../../../OpenTaiko_win_x64_shallow.zip * -xr!Songs/
+          7z a ../../../../../../OpenTaiko_win_64bit_shallow.zip * -xr!Songs/
           cd ..\..\..\..\..\..\
 
       - name: Build for Windows x86
@@ -58,7 +58,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
-          7z a ../../../../../../OpenTaiko_win_x86_shallow.zip * -xr!Songs/
+          7z a ../../../../../../OpenTaiko_win_32bit_shallow.zip * -xr!Songs/
           cd ..\..\..\..\..\..\
 
       - name: Build for Mac x64
@@ -70,7 +70,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
-          7z a ../../../../../../OpenTaiko_osx_x64_shallow.zip * -xr!Songs/
+          7z a ../../../../../../OpenTaiko_osx_64bit_shallow.zip * -xr!Songs/
           cd ..\..\..\..\..\..\
       
       - name: Build for Linux x64
@@ -82,7 +82,7 @@ jobs:
         shell: cmd
         run: |
           cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
-          7z a ../../../../../../OpenTaiko_linux_x64_shallow.zip * -xr!Songs/
+          7z a ../../../../../../OpenTaiko_linux_64bit_shallow.zip * -xr!Songs/
           cd ..\..\..\..\..\..\
 
       - name: Create Archive (Songs)
@@ -102,7 +102,7 @@ jobs:
       - name: Upload All Builds
         uses: xresloader/upload-to-github-release@v1.4.2
         with:
-          file: "OpenTaiko_win_x64_shallow.zip;OpenTaiko_win_x86_shallow.zip;OpenTaiko_osx_x64_shallow.zip;OpenTaiko_linux_x64_shallow.zip;Songs.zip"
+          file: "OpenTaiko_win_64bit_shallow.zip;OpenTaiko_win_32bit_shallow.zip;OpenTaiko_osx_64bit_shallow.zip;OpenTaiko_linux_64bit_shallow.zip;Songs.zip"
           overwrite: true
           tag_name: "autobuild"
           draft: false
