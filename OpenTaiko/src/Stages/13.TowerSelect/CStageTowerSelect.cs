@@ -83,7 +83,7 @@ namespace TJAPlayer3
             for(int i = 0; i < TJAPlayer3.Skin.TowerSelect_Bar_Count; i++)
             {
                 int currentSong = nCurrentSongIndex + i - ((TJAPlayer3.Skin.TowerSelect_Bar_Count - 1) / 2);
-                if (currentSong < 0 || currentSong >= BarInfos.Length || currentSong >= TJAPlayer3.Skin.TowerSelect_Bar_Count) continue;
+                if (currentSong < 0 || currentSong >= BarInfos.Length) continue;
                 var bar = BarInfos[currentSong];
 
                 int x = TJAPlayer3.Skin.TowerSelect_Bar_X[i];
