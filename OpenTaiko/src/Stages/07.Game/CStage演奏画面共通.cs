@@ -7,6 +7,7 @@ using FDK;
 using FDK.ExtensionMethods;
 using TJAPlayer3;
 using System.Linq;
+using Silk.NET.Core;
 
 namespace TJAPlayer3
 {
@@ -5575,7 +5576,8 @@ namespace TJAPlayer3
                         else
                         {
                             this.actAVI.Seek(0);
-                        }  
+                        }
+                        break;
                     } 
                 }
             }
