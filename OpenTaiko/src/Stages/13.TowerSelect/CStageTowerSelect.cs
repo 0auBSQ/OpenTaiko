@@ -83,7 +83,7 @@ namespace TJAPlayer3
             for(int i = 0; i < TJAPlayer3.Skin.TowerSelect_Bar_Count; i++)
             {
                 int currentSong = nCurrentSongIndex + i - ((TJAPlayer3.Skin.TowerSelect_Bar_Count - 1) / 2);
-                if (currentSong < 0 || currentSong >= BarInfos.Length || currentSong >= TJAPlayer3.Skin.TowerSelect_Bar_Count) continue;
+                if (currentSong < 0 || currentSong >= BarInfos.Length) continue;
                 var bar = BarInfos[currentSong];
 
                 int x = TJAPlayer3.Skin.TowerSelect_Bar_X[i];
@@ -219,6 +219,7 @@ namespace TJAPlayer3
             TJAPlayer3.stageSongSelect.str確定された曲のジャンル = listSongs[nCurrentSongIndex].strジャンル;
             if ((TJAPlayer3.stageSongSelect.rChoosenSong != null) && (TJAPlayer3.stageSongSelect.r確定されたスコア != null))
             {
+                CFloorManagement.reinitialize(TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
                 this.eフェードアウト完了時の戻り値 = EReturnValue.SongChoosen;
                 this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
                 base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
@@ -282,6 +283,7 @@ namespace TJAPlayer3
             TJAPlayer3.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
             TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
+            CFloorManagement.reinitialize(TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
             TJAPlayer3.stageSongSelect.r確定されたスコア = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(TJAPlayer3.stageSongSelect.rChoosenSong)];
             TJAPlayer3.stageSongSelect.str確定された曲のジャンル = TJAPlayer3.stageSongSelect.rChoosenSong.strジャンル;
 

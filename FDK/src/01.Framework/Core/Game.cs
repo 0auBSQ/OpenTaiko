@@ -285,6 +285,11 @@ namespace SampleFramework
 
             Window_ = Window.Create(options);
 
+            ViewPortSize.X = Window_.Size.X;
+            ViewPortSize.Y = Window_.Size.Y;
+            ViewPortOffset.X = 0;
+            ViewPortOffset.Y = 0;
+
             Window_.Load += Window_Load;
             Window_.Closing += Window_Closing;
             Window_.Update += Window_Update;
@@ -419,6 +424,7 @@ namespace SampleFramework
             CTexture.Init();
 
             Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
             Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
             Context.SwapInterval(VSync ? 1 : 0);
 
