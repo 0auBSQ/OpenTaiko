@@ -44,9 +44,9 @@ namespace TJAPlayer3
 
 		public unsafe int t進行描画( int x, int y )
 		{
-			if ( !base.IsDeActivated )
+			if ( !base.IsDeActivated)
 			{
-				if (this.rVD == null)
+				if (this.rVD == null || !rVD.bDrawing)
 					return 0;
 					
 				this.rVD.GetNowFrame(ref this.tx描画用);

@@ -78,7 +78,8 @@ namespace FDK
 
 		public void Dispose()
 		{
-			close = true;
+			bDrawing = false;
+            close = true;
 			cts?.Cancel();
 			while (DS != DecodingState.Stopped) ;
 			frameconv.Dispose();
@@ -102,7 +103,9 @@ namespace FDK
 			CTimer.Reset();
 			CTimer.Resume();
 			this.bPlaying = true;
-		}
+            bDrawing = true;
+
+        }
 
 		public void PauseControl()
 		{
@@ -122,7 +125,8 @@ namespace FDK
 		{
 			CTimer.Pause();
 			this.bPlaying = false;
-		}
+			bDrawing = false;
+        }
 
 		public void InitRead()
 		{
@@ -329,7 +333,8 @@ namespace FDK
 
 		//for play
 		public bool bPlaying { get; private set; } = false;
-		private CTimer CTimer;
+        public bool bDrawing { get; private set; } = false;
+        private CTimer CTimer;
 		private AVRational Framerate;
 		private CTexture lastTexture;
 		private bool bqueueinitialized = false;
