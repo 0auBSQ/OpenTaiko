@@ -156,6 +156,11 @@ BoxFontName=廻想体 ネクスト UP B
 109 - SUGARUSH~!! : Tanger - https://linktr.ee/Tangermusic (Chart by Komi)
 110 - ETHEREAL VELOCITY (Game Size) : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by Colin)
 111 - 2024 BPM IS NOT ENOUGH : Underscore - https://www.youtube.com/c/UnderscoreOfficial (Chart by goldenyoshi22 (Extreme) and Komi)
+112 - ポゴはもう待てない！ : 托 a.k.a. Tokky - https://linkco.re/1TYC4hqN (Chart by DragonRatTiger)
+113 - 騒々しくなる : 托 a.k.a. Tokky - https://www.youtube.com/watch?v=sFMonEHpJhM  (Chart by DragonRatTiger)
+114 - pretty kitty, yes？ : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Komi)
+115 - 菖蒲日和 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Takkkom)
+116 - 卒業2000 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Komi)
 ```
 
 ### Visuals
