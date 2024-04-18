@@ -175,6 +175,9 @@ Some of the visuals (preimages and videos) are made by the composers themselves,
 087 - Hero's Treasure (Illustration): picture_game
 089 - FunkBoi : Lirodon (From Project Outfox: Serenity)
 099 - Dreaming to be with you (Video & Illustration): Manic, RheaBee (https://twitter.com/rheabee5), Zhen (https://www.instagram.com/zhen_artz/)
+114 - pretty kitty, yes？ : kotomi
+115 - 菖蒲日和 : kotomi
+116 - 卒業2000 : kotomi
 ```
 
 ### About the OpenTaiko Original Soundtrack
