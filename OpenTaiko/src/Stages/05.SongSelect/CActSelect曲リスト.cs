@@ -2985,7 +2985,7 @@ namespace TJAPlayer3
 				int scoreRankEffect_width = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;
 				int scoreRankEffect_height = TJAPlayer3.Tx.TowerResult_ScoreRankEffect.szTextureSize.Height;
 
-				TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
+				//TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = 255;
 				TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.X = _resize;
 				TJAPlayer3.Tx.TowerResult_ScoreRankEffect.vcScaleRatio.Y = _resize;
 				TJAPlayer3.Tx.TowerResult_ScoreRankEffect.t2D拡大率考慮中央基準描画(x, y, new Rectangle(grade * scoreRankEffect_width, 0, scoreRankEffect_width, scoreRankEffect_height));
@@ -3001,7 +3001,7 @@ namespace TJAPlayer3
 				int danResult_rank_width = TJAPlayer3.Tx.DanResult_Rank.szTextureSize.Width / 7;
 				int danResult_rank_height = TJAPlayer3.Tx.DanResult_Rank.szTextureSize.Height;
 
-				TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
+				//TJAPlayer3.Tx.DanResult_Rank.Opacity = 255;
 				TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.X = _resize;
 				TJAPlayer3.Tx.DanResult_Rank.vcScaleRatio.Y = _resize;
 				TJAPlayer3.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(x, y, new Rectangle(danResult_rank_width * (grade + 1), 0, danResult_rank_width, danResult_rank_height));
