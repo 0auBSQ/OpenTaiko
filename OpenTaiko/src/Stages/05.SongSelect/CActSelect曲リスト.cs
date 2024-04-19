@@ -391,11 +391,14 @@ namespace TJAPlayer3
 			}
 			else
 			{
-				this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
 				// Reindex the parent node
-				this.rCurrentlySelectedSong.rParentNode.Openindex = rCurrentlySelectedSong.rParentNode.list子リスト.IndexOf(this.rCurrentlySelectedSong);
-				tChangeSong(-this.rCurrentlySelectedSong.rParentNode.Openindex);
-			}
+				List<CSongListNode> currentSongList = flattenList(TJAPlayer3.Songs管理.list曲ルート, true);
+                this.rCurrentlySelectedSong.rParentNode.Openindex = currentSongList.IndexOf(this.rCurrentlySelectedSong) - currentSongList.IndexOf(this.rCurrentlySelectedSong.rParentNode.list子リスト[0]);
+                this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
+                tChangeSong(-this.rCurrentlySelectedSong.rParentNode.Openindex);
+
+
+            }
 
 			this.t現在選択中の曲を元に曲バーを再構成する();
 			this.t選択曲が変更された(false);                                 // #27648 項目数変更を反映させる

@@ -91,7 +91,7 @@ namespace TJAPlayer3
                     return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
                 case EScrollMode.BMSCROLL:
                     {
-                        return (int)((hbtime / 16.0) * interval * screen_ratio);
+                        return 0;
                     }
                 case EScrollMode.HBSCROLL:
                     {
@@ -427,7 +427,9 @@ namespace TJAPlayer3
 
             int index = x末端 - x;
 
-            var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
+
+            //var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
+            var theta = -Math.Atan2(y末端 - y, x末端 - x);
             // Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
             if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI) 
                 theta += 0.00000000001;
@@ -435,7 +437,7 @@ namespace TJAPlayer3
 
             var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
             var div = dist / image_size;
-            var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
+            //var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
 
             if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
                 _texarr.color4 = effectedColor;
