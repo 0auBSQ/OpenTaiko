@@ -241,7 +241,9 @@ namespace TJAPlayer3
             // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
             // [10146] = "Toggle Training Mode",
             // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
-			// Please translate the text above!
+            // [10152] = "Cycle Video Playback Display",
+            // [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // Please translate the text above!
             [99] = "左红",
 	    [9994] = "材质加载方式：\n" +
     		"启动时不会未响应。\n" +
@@ -380,11 +382,14 @@ namespace TJAPlayer3
             [10123] = "分配玩家 5 康加鼓按键",
             
             [10124] = "表里谱面切换动画效果",
-            [10125] = "播放由皮肤定义的表里谱面切换动画效果。",
-			
+            [10125] = "播放由皮肤定义的表里谱面切换动画效果。",	
    
             [10126] = "总是使用默认规格（魂条）",
-	    [10127] = "总是使用默认规格（魂条）",
+	        [10127] = "总是使用默认规格（魂条）",
+            
+            // [10150] = "Video Playback Display Mode",
+            // [10151] = "Change how videos are displayed\nin the background.",
+            // Please translate the text above!		
 
             [100] = "演奏模式",
             [101] = "段位道场",

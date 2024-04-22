@@ -28,7 +28,7 @@ namespace TJAPlayer3
             // [10148] = "Reload Songs (Hard Reload)",
             // [10149] = "Clean the existing database and\n" + 
             // "reload the song folder from scratch.",
-			// Please translate the text above!
+            // Please translate the text above!
             [6] = "Número de jugadores",
             // [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo\n la pantalla a la mitad.",
 			// Please update the translation above. Up to 5 players can be active at a time.
@@ -170,6 +170,17 @@ namespace TJAPlayer3
                 "(Solo en modo de un jugador)",
             [95] = "Ajustes de controles",
             [96] = "Ajustes de los botones/pads que se usarán.",
+            
+            // [10124] = "Use Extreme/Extra Transitions",
+            // [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
+
+			// [10126] = "Always use normal gauge",
+			// [10127] = "Always use normal gauge",
+
+            // [10150] = "Video Playback Display Mode",
+            // [10151] = "Change how videos are displayed\nin the background.",
+            // Please translate the text above!
+
             [97] = "Captura",
             [98] = "Botón para capturar:\nPara asignar una tecla a la captura de pantalla.\n (Solo puedes usar el teclado. No puedes\nusar un pad del tambor para tomar capturas.",
             // [10128] = "Increase Volume",
@@ -192,7 +203,10 @@ namespace TJAPlayer3
             // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
             // [10146] = "Toggle Training Mode",
             // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
-			// Please translate the text above!
+            // [10152] = "Cycle Video Playback Display",
+            // [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // Please translate the text above!
+
             [99] = "Rojo izquierdo",
             [10000] = "Asigna un botón o un pad para\n el Don (rojo) izquierdo.",
             [10001] = "Rojo derecho",

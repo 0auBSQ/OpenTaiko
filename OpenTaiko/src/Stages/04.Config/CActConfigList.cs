@@ -135,6 +135,21 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(23));
 			this.list項目リスト.Add( this.iSystemAVI );
 
+			if (CLangManager.fetchLang() == "ja")
+			{
+				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eClipDispType,
+					CLangManager.LangInstance.GetString(10151),
+					new string[] {"OFF","背景のみ","ウィンドウ","両方"});
+				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
+			}
+			else
+			{
+				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eClipDispType,
+					CLangManager.LangInstance.GetString(10151),
+					new string[] {"None","Full","Mini","Both"});
+				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
+			}			
+
 			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bBGA有効,
 				CLangManager.LangInstance.GetString(24));
 			this.list項目リスト.Add( this.iSystemBGA );
@@ -662,6 +677,10 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleTrainingMode);
 			}
+			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemCycleVideoDisplayMode )
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.CycleVideoDisplayMode);
+			}
 			#endregion
 			else
 			{
@@ -836,6 +855,9 @@ namespace TJAPlayer3
 			this.iKeyAssignSystemToggleTrainingMode = new CItemBase(CLangManager.LangInstance.GetString(10146),
 				CLangManager.LangInstance.GetString(10147));
 			this.list項目リスト.Add( this.iKeyAssignSystemToggleTrainingMode);
+			this.iKeyAssignSystemCycleVideoDisplayMode = new CItemBase(CLangManager.LangInstance.GetString(10152),
+				CLangManager.LangInstance.GetString(10153));
+			this.list項目リスト.Add( this.iKeyAssignSystemCycleVideoDisplayMode);
 
             OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
@@ -1524,6 +1546,7 @@ namespace TJAPlayer3
 		private CItemBase iKeyAssignSystemToggleAutoP1;
 		private CItemBase iKeyAssignSystemToggleAutoP2;
 		private CItemBase iKeyAssignSystemToggleTrainingMode;
+		private CItemBase iKeyAssignSystemCycleVideoDisplayMode;
 		private CItemBase iKeyAssignSystemReturnToMenu;		// #24609
 		private CItemBase iKeyAssignDrumsReturnToMenu;
 
@@ -1574,6 +1597,7 @@ namespace TJAPlayer3
 	    private CItemInteger iSystemSongPlaybackLevel;
 		private CItemInteger iSystemKeyboardSoundLevelIncrement;
 		private CItemToggle iSystemAVI;
+		private CItemList iSystemAVIDisplayMode;
 		private CItemToggle iSystemBGA;
 		private CItemInteger iSystemBGAlpha;
 		private CItemToggle iSystemBGMSound;
@@ -1740,6 +1764,7 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = this.iSystemVSyncWait.bON;
 			TJAPlayer3.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
 			TJAPlayer3.ConfigIni.bAVI有効 = this.iSystemAVI.bON;
+			TJAPlayer3.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 			TJAPlayer3.ConfigIni.bBGA有効 = this.iSystemBGA.bON;
 //			CDTXMania.ConfigIni.bGraph有効 = this.iSystemGraph.bON;#24074 2011.01.23 comment-out ikanick オプション(Drums)へ移行
 			TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = this.iSystemPreviewSoundWait.n現在の値;

@@ -237,7 +237,9 @@ namespace TJAPlayer3
             // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
             // [10146] = "Toggle Training Mode",
             // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
-			// Please translate the text above!
+            // [10152] = "Cycle Video Playback Display",
+            // [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // Please translate the text above!
 			[99] = "LeftRed",
 
             [9992] = "太鼓の数字がアニメーションしなくなります\n" +
@@ -405,6 +407,10 @@ namespace TJAPlayer3
 
 			[10126] = "ゲージをNormalに固定",
 			[10127] = "ゲージをNormalに固定します",
+			
+            // [10150] = "Video Playback Display Mode",
+            // [10151] = "Change how videos are displayed\nin the background.",
+            // Please translate the text above!
 
 			[100] = "演奏ゲーム",
             [101] = "段位道場",

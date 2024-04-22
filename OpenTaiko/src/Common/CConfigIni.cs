@@ -662,6 +662,17 @@ namespace TJAPlayer3
 						this.padToggleTrainingMode = value;
 					}
 				}
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] CycleVideoDisplayMode
+				{
+					get
+					{
+						return this.padCycleVideoDisplayMode;
+					}
+					set
+					{
+						this.padCycleVideoDisplayMode = value;
+					}
+				}
 
 				public CConfigIni.CKeyAssign.STKEYASSIGN[] this[int index]
 				{
@@ -818,6 +829,9 @@ namespace TJAPlayer3
 
 							case (int)EKeyConfigPad.ToggleTrainingMode:
 								return this.padToggleTrainingMode;
+
+							case (int)EKeyConfigPad.CycleVideoDisplayMode:
+								return this.padCycleVideoDisplayMode;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -1024,6 +1038,10 @@ namespace TJAPlayer3
 							case (int)EKeyConfigPad.ToggleTrainingMode:
 								this.padToggleTrainingMode = value;
 								return;
+
+							case (int)EKeyConfigPad.CycleVideoDisplayMode:
+								this.padCycleVideoDisplayMode = value;
+								return;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -1088,6 +1106,7 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP1;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP2;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleTrainingMode;
+				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCycleVideoDisplayMode;
 				//-----------------
 				#endregion
 			}
@@ -1960,6 +1979,7 @@ namespace TJAPlayer3
 			this.eダメージレベル = Eダメージレベル.普通;
 			this.bSTAGEFAILED有効 = true;
 			this.bAVI有効 = false;
+			this.eClipDispType = EClipDispType.背景のみ;
 			this.bBGA有効 = true;
 			this.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = 1000;
 			this.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms = 100;
@@ -1989,10 +2009,10 @@ namespace TJAPlayer3
 
 			// 2018-08-28 twopointzero:
 			// There exists a particular large, well-known, well-curated, and
-			// regularly-updated collection of content for use with Taiko no
-			// Tatsujin simulators. A statistical analysis was performed on the
-			// the integrated loudness and true peak loudness of the thousands
-			// of songs within this collection as of late August 2018.
+			// regularly-updated collection of content for use with simulators.
+			// A statistical analysis was performed on the the integrated loudness
+			// and true peak loudness of the thousands of songs within this
+			// collection as of late August 2018.
 			//
 			// The analysis allows us to select a target loudness which
 			// results in the smallest total amount of loudness adjustment
@@ -2965,6 +2985,9 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			sw.Write( "ToggleTrainingMode=" );
 			this.tキーの書き出し( sw, this.KeyAssign.System.ToggleTrainingMode );
+			sw.WriteLine();
+			sw.Write( "CycleVideoDisplayMode=" );
+			this.tキーの書き出し( sw, this.KeyAssign.System.CycleVideoDisplayMode );
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -4238,6 +4261,10 @@ namespace TJAPlayer3
 										{
 											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleTrainingMode );
 										}
+										else if( str3.Equals( "CycleVideoDisplayMode" ) )
+										{
+											this.tキーの読み出しと設定( str4, this.KeyAssign.System.CycleVideoDisplayMode );
+										}
 										continue;
 									}
 									//-----------------------------
@@ -4486,6 +4513,7 @@ SortSongs=K0126
 ToggleAutoP1=K056
 ToggleAutoP2=K057
 ToggleTrainingMode=K060
+CycleVideoDisplayMode=K058
 ";
 			t文字列から読み込み( strDefaultKeyAssign );
 		}
