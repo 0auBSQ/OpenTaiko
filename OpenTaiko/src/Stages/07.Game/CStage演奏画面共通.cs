@@ -3351,7 +3351,7 @@ namespace TJAPlayer3
                         TJAPlayer3.ConfigIni.bJudgeCountDisplay = false;
                 }
 
-				if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.F5 ) )
+				if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.CycleVideoDisplayMode) )
 				{
                     switch( TJAPlayer3.ConfigIni.eClipDispType  )
                     {

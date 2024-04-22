@@ -312,6 +312,9 @@ namespace TJAPlayer3
 			[10126] = "Always use normal gauge",
 			[10127] = "Always use normal gauge",
 
+            [10150] = "Video Playback Display Mode",
+            [10151] = "Change how videos are displayed\nin the background.",
+
             [97] = "Capture",
             [98] = "System key assign:\nAssign any key for screen capture.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10128] = "Increase Volume",
@@ -334,6 +337,8 @@ namespace TJAPlayer3
             [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10146] = "Toggle Training Mode",
             [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10152] = "Cycle Video Playback Display",
+            [10153] = "System key assign:\nAssign any key for cycling video playback\ndisplay modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
 
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",

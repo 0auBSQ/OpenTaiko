@@ -153,6 +153,17 @@ namespace TJAPlayer3
             [96] = "Menu pour l'assignation des \ntouches en jeu.",
             [97] = "Capture d'écran",
             [98] = "Assigner la touche pour le \ncapture d'écran.",
+
+            // [10124] = "Use Extreme/Extra Transitions",
+            // [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
+
+			// [10126] = "Always use normal gauge",
+			// [10127] = "Always use normal gauge",
+
+            // [10150] = "Video Playback Display Mode",
+            // [10151] = "Change how videos are displayed\nin the background.",
+            // Please translate the text above!
+
             // [10128] = "Increase Volume",
             // [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
             // [10130] = "Decrease Volume",
@@ -173,7 +184,10 @@ namespace TJAPlayer3
             // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
             // [10146] = "Toggle Training Mode",
             // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
-			// Please translate the text above!
+            // [10152] = "Cycle Video Playback Display",
+            // [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // Please translate the text above!
+
             [99] = "Rouge gauche",
             [10000] = "Assignation de la touche \nRouge gauche pour le tambour.",
             [10001] = "Rouge droit",
