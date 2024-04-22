@@ -196,6 +196,9 @@ namespace TJAPlayer3
 		ToggleAutoP2,
 		ToggleTrainingMode,
 		#endregion
+		#region [Gameplay/Training]
+		CycleVideoDisplayMode,
+		#endregion
 		MAX,
 		#endregion
 		UNKNOWN = EPad.UNKNOWN
