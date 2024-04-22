@@ -57,6 +57,9 @@ local dan_first_in_move = 0
 local dan_second_in_move = 0
 local dan_in_slam = 0
 
+local seed = 0
+local special_chance = 0
+
 local speech_text = "Speech/en/0.png"
 
 function playEndAnime(player)
@@ -75,8 +78,9 @@ function init()
     func:AddGraph("Message.png")
     func:AddGraph("Foxes.png")
 
-    math.randomseed(os.time())
-    local special_chance = math.random(1, 100)
+    seed = os.time()
+    math.randomseed(seed)
+    special_chance = math.random(1, 100)
 
     if special_chance == 1 then
       speech_text = "Speech/special/0.png"
