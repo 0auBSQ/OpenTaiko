@@ -179,7 +179,7 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++)
             {
                 var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
-                ttkTitles[i] = new CActSelect曲リスト.TitleTextureKey(dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
+                ttkTitles[i] = new CActSelect曲リスト.TitleTextureKey(dan.bTitleShow ? "???" : dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
             }
         }
 
