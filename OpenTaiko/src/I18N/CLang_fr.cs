@@ -25,13 +25,10 @@ namespace TJAPlayer3
             [3] = "Retour au menu principal.",
             [4] = "Recharger les sons",
             [5] = "Met à jour et récupère les\nmodifications effectuées sur\nla liste de sons.",
-            // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Clean the existing database and\n" + 
-            // "reload the song folder from scratch.",
-			// Please translate the text above!
+            [10148] = "Vider le cache et recharger les sons",
+            [10149] = "Supprime le fichier de base\nde données et recharge les sons.",
             [6] = "Nombre de joueurs",
-            // [7] = "Change le nombre de joueurs en jeu：\nEn le mettant à 2, il est possible de\njouer à 2 en mode écran scindé.\nDisponible seulement pour le mode partie \nrapide.",
-			// Please update the translation above. Up to 5 players can be active at a time.
+            [7] = "Change le nombre de joueurs en jeu：\nIl est possible de jouer jusqu'à 5 joueurs\nen même temps.",
             [8] = "Mort subite",
             [9] = "Mode mort subite :\nSi 1 ou plus, spécifiez le nombre de \nnotes ratées maximales autorisées avant \nde perdre la partie.\nSi 0 le mode mort subite est désactivé.",
             [10] = "Vitesse générale",
@@ -69,8 +66,7 @@ namespace TJAPlayer3
             [25] = "Temps pris avant la prévisualisation\nde la musique dans le menu.\nRéduire cette valeur\npeut faire que la prévisualisation\nsoit lancée avant l'animation du menu.",
             [26] = "Non utilisé, ancienne option de DTXMania.",
             [27] = "Activer ou non les informations \nde déboggage en jeu.",
-            // [28] = "Contrôle l'opacité des animations de décor.",
-			// Please update the translation above. The lane background (the bar drawn behind the notes) opacity is what's being adjusted, and will only take effect when videos are playing.
+            [28] = "Contrôle l'opacité de la lane lorsqu'une\nvideo est jouée en fond.",
             [29] = "Activer ou non la musique en jeu.",
             [30] = "Activer ou non la sauvegarde sous un fichier score.ini.",
             [31] = "Non utilisé, ancienne option de DTXMania.",
@@ -157,8 +153,8 @@ namespace TJAPlayer3
             // [10124] = "Use Extreme/Extra Transitions",
             // [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
-			// [10126] = "Always use normal gauge",
-			// [10127] = "Always use normal gauge",
+            [10126] = "Gauge normale par défaut",
+            [10127] = "Ignore les gauges définies par personnage.",
 
             // [10150] = "Video Playback Display Mode",
             // [10151] = "Change how videos are displayed\nin the background.",
@@ -214,8 +210,7 @@ namespace TJAPlayer3
             [10025] = "Délai avant la prévisualisation de la musique",
             [10026] = "Délai avant l'image",
             [10027] = "Mode Debug",
-            // [10028] = "Opacité du décor",
-            // Please update the translation above. The actual title should read "Lane Background Opacity". Check comment on [28] for further details.
+            [10028] = "Opacité de la lane",
             [10029] = "Activer la musique en jeu",
             [10030] = "Sauvegarder les scores",
             [10031] = "Apply Loudness Metadata (Non utilisé)",
