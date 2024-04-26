@@ -161,6 +161,7 @@ BoxFontName=廻想体 ネクスト UP B
 114 - pretty kitty, yes？ : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Komi)
 115 - 菖蒲日和 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Takkkom)
 116 - 卒業2000 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Komi)
+117 - M_《Ji：Ü》 : Masamune (Chart by bol)
 ```
 
 ### Visuals

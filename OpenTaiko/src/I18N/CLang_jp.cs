@@ -25,13 +25,10 @@ namespace TJAPlayer3
             [3] = "左側のメニューに戻ります。",
             [4] = "曲データ再読み込み",
             [5] = "曲データの一覧情報を取得し直します。",
-            // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Clean the existing database and\n" + 
-            // "reload the song folder from scratch.",
-			// Please translate the text above!
+            [10148] = "曲データ再読み込み（ハード）",
+            [10149] = "データベースファイルを消して\n曲データを再読み込みます。",
             [6] = "プレイ人数",
-            // [7] = "プレイ人数切り替え：\n2にすると演奏画面が2人プレイ専用のレイアウトになり、\n2P専用譜面を読み込むようになります。",
-			// Please update the translation above. Up to 5 players can be active at a time.
+            [7] = "プレイ人数切り替え：\n5人までプレイできます。",
             [8] = "完璧モード",
             [9] = "Riskyモードの設定:\n1以上の値にすると、その回数分の\n可/不可でFAILEDとなります。\n0にすると無効になり、\nDamageLevelに従ったゲージ増減と\nなります。\nStageFailedの設定と併用できます。",
             [10] = "再生速度",
