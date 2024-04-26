@@ -108,8 +108,7 @@ namespace TJAPlayer3
         /// <param name="nRiskyTimes_Initial_">Riskyの初期値(0でRisky未使用)</param>
         public void Init(int nRiskyTimes_InitialVal, int nPlayer)       // ゲージ初期化
         {
-            //ダメージ値の計算は太鼓の達人譜面Wikiのものを参考にしました。
-
+            //ダメージ値の計算
             {
                 var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
                 switch (chara.effect.tGetGaugeType())
