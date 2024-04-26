@@ -247,7 +247,25 @@ namespace TJAPlayer3
             if (LuaScript == null) return;
             try
             {
-                LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, TJAPlayer3.P1IsBlue(), TJAPlayer3.ConfigIni.sLang, TJAPlayer3.ConfigIni.SimpleMode);
+                // Preprocessing
+                string[] raritiesP = { "Common", "Common", "Common", "Common", "Common" };
+                string[] raritiesC = { "Common", "Common", "Common", "Common", "Common" };
+
+                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                {
+                    raritiesP[i] = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(i))].metadata.Rarity;
+                    raritiesC[i] = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character].metadata.Rarity;
+                }
+
+                // Initialisation
+                LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount, 
+                    TJAPlayer3.P1IsBlue(), 
+                    TJAPlayer3.ConfigIni.sLang, 
+                    TJAPlayer3.ConfigIni.SimpleMode,
+                    raritiesP,
+                    raritiesC
+                    );
+
                 LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime,
                     TJAPlayer3.FPS.NowFPS,
                     TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared,
@@ -255,7 +273,9 @@ namespace TJAPlayer3
                     TJAPlayer3.stage演奏ドラム画面.AIBattleState,
                     TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
                     TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM);
+                    TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
+                    new bool[] { false, false, false, false, false }
+                    );
 
                 LuaInit.Call();
             }
