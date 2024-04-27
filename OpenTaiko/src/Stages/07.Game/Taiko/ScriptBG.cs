@@ -251,10 +251,13 @@ namespace TJAPlayer3
                 string[] raritiesP = { "Common", "Common", "Common", "Common", "Common" };
                 string[] raritiesC = { "Common", "Common", "Common", "Common", "Common" };
 
-                for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                if (TJAPlayer3.Tx.Puchichara != null && TJAPlayer3.Tx.Characters != null)
                 {
-                    raritiesP[i] = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(i))].metadata.Rarity;
-                    raritiesC[i] = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character].metadata.Rarity;
+                    for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                    {
+                        raritiesP[i] = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(i))].metadata.Rarity;
+                        raritiesC[i] = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character].metadata.Rarity;
+                    }
                 }
 
                 // Initialisation

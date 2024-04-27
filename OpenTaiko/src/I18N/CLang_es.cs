@@ -25,13 +25,15 @@ namespace TJAPlayer3
             [3] = "Volver al menú de la izquierda.",
             [4] = "Recargar lista de canciones",
             [5] = "Recarga y actualiza la lista de canciones.",
-            // [10148] = "Reload Songs (Hard Reload)",
-            // [10149] = "Clean the existing database and\n" + 
-            // "reload the song folder from scratch.",
+            // ----------------------------------
+            [10148] = "Reload Songs (Hard Reload)",
+            [10149] = "Clean the existing database and\n" + 
+            "reload the song folder from scratch.",
             // Please translate the text above!
             [6] = "Número de jugadores",
-            // [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo\n la pantalla a la mitad.",
-			// Please update the translation above. Up to 5 players can be active at a time.
+            // ----------------------------------
+            [7] = "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo\n la pantalla a la mitad.",
+            // Please update the translation above. Up to 5 players can be active at a time.
             [8] = "Modo Kanpeki",
             [9] = "Modo Kanpeki:\nElige el número de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
             [10] = "Velocidad de la canción",
@@ -69,8 +71,9 @@ namespace TJAPlayer3
             [25] = "Tiempo de retraso(ms) para empezar a reproducir la\ndemo de la música en la pantalla\nSELECCIONAR CANCIÓN.\nPuedes especificar de 0ms a 10000ms",
             [26] = "Ajuste que proviene de DTXMania.\nEn OpenTaiko este no hace nada.",
             [27] = "Si está activado se mostrará información extra en\nla zona de BGA. (FPS, BPM, tiempo total, etc)\nPuedes activar o desactivar los indicadores\npresionando [Del] mientras juegas.",
-            // [28] = "Ajuste del grado de transparencia del fondo.\n\n0=completamente transparente,\n255=sin transparencia",
-			// Please update the translation above. The lane background (the bar drawn behind the notes) opacity is what's being adjusted, and will only take effect when videos are playing.
+            // ----------------------------------
+            [28] = "Ajuste del grado de transparencia del fondo.\n\n0=completamente transparente,\n255=sin transparencia",
+            // Please update the translation above. The lane background (the bar drawn behind the notes) opacity is what's being adjusted, and will only take effect when videos are playing.
             [29] = "Desactívalo si no quieres que\nse reproduzca música de fondo.",
             [30] = "Guarda tus récords en el juego.\nDesactívalo si prefieres que tus puntajes no\nse guarden automáticamente.\n",
             [31] = "Ajuste relacionado con BS1770GAIN\n y por lo mismo, inutilizable.",
@@ -85,11 +88,12 @@ namespace TJAPlayer3
             [40] = "Comparte la información del .tja que estas\n jugando en Discord.",
             [41] = "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
             [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
-            // [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
-            //     "\n" +
-            //     "Nota: Sal de la configuración\n" +
-            //     "     para aplicar los cambios.",
-			// Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
+            // ----------------------------------
+            [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
+                 "\n" +
+                 "Nota: Sal de la configuración\n" +
+                 "     para aplicar los cambios.",
+            // Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
             [44] = "Cambia el buffer de sonido para Wasapi.\nDeja el número más bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Déjalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error." +
                 "\n" +
                 "Nota: Sal de la configuración\n" +
@@ -170,41 +174,43 @@ namespace TJAPlayer3
                 "(Solo en modo de un jugador)",
             [95] = "Ajustes de controles",
             [96] = "Ajustes de los botones/pads que se usarán.",
-            
-            // [10124] = "Use Extreme/Extra Transitions",
-            // [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
-			// [10126] = "Always use normal gauge",
-			// [10127] = "Always use normal gauge",
+            // ----------------------------------
+            [10124] = "Use Extreme/Extra Transitions",
+            [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
-            // [10150] = "Video Playback Display Mode",
-            // [10151] = "Change how videos are displayed\nin the background.",
+            [10126] = "Always use normal gauge",
+            [10127] = "Always use normal gauge",
+
+            [10150] = "Video Playback Display Mode",
+            [10151] = "Change how videos are displayed\nin the background.",
             // Please translate the text above!
 
             [97] = "Captura",
             [98] = "Botón para capturar:\nPara asignar una tecla a la captura de pantalla.\n (Solo puedes usar el teclado. No puedes\nusar un pad del tambor para tomar capturas.",
-            // [10128] = "Increase Volume",
-            // [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10130] = "Decrease Volume",
-            // [10131] = "System key assign:\nAssign any key for decreasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10132] = "Display Hit Values",
-            // [10133] = "System key assign:\nAssign any key for displaying hit values.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10134] = "Display Debug Menu",
-            // [10135] = "System key assign:\nAssign any key for displaying debug menu.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10136] = "Quick Config",
-            // [10137] = "System key assign:\nAssign any key for accessing the quick config.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10138] = "Player Customization",
-            // [10139] = "System key assign:\nAssign any key for player customization.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10140] = "Change Song Sort",
-            // [10141] = "System key assign:\nAssign any key for resorting songs.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10142] = "Toggle Auto (P1)",
-            // [10143] = "System key assign:\nAssign any key for toggling auto (P1).\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10144] = "Toggle Auto (P2)",
-            // [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10146] = "Toggle Training Mode",
-            // [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
-            // [10152] = "Cycle Video Playback Display",
-            // [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // ----------------------------------
+            [10128] = "Increase Volume",
+            [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10130] = "Decrease Volume",
+            [10131] = "System key assign:\nAssign any key for decreasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10132] = "Display Hit Values",
+            [10133] = "System key assign:\nAssign any key for displaying hit values.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10134] = "Display Debug Menu",
+            [10135] = "System key assign:\nAssign any key for displaying debug menu.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10136] = "Quick Config",
+            [10137] = "System key assign:\nAssign any key for accessing the quick config.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10138] = "Player Customization",
+            [10139] = "System key assign:\nAssign any key for player customization.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10140] = "Change Song Sort",
+            [10141] = "System key assign:\nAssign any key for resorting songs.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10142] = "Toggle Auto (P1)",
+            [10143] = "System key assign:\nAssign any key for toggling auto (P1).\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10144] = "Toggle Auto (P2)",
+            [10145] = "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10146] = "Toggle Training Mode",
+            [10147] = "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            [10152] = "Cycle Video Playback Display",
+            [10153] = "System key assign:\nAssign any key for cycling video playback display modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
             // Please translate the text above!
 
             [99] = "Rojo izquierdo",
@@ -233,7 +239,8 @@ namespace TJAPlayer3
             [10025] = "Delay de la demo",
             [10026] = "Delay de la imagen",
             [10027] = "Informacion Debug",
-            // [10028] = "Transparencia del fondo",
+            // ----------------------------------
+            [10028] = "Transparencia del fondo",
             // Please update the translation above. The actual title should read "Lane Background Opacity". Check comment on [28] for further details.
             [10029] = "Volumen de música de fondo",
             [10030] = "Guardar Puntuación",
