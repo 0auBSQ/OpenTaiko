@@ -267,7 +267,7 @@ Disintegrated Laevatein - Taichenko https://space.bilibili.com/356518101 (Chart 
 Cirno in Quarantine - H5 https://linktr.ee/H5Music (Chart by bol)
 BLINDED CRITICISM - DeBisco & Zovi [DeBisco(https://soundcloud.com/debisco https://twitter.com/debiscomusic) Zovi(https://zovi.bandcamp.com/ https://soundcloud.com/zovi https://twitter.com/zovinoise)] (Chart by Komi)
 ```
-
+Songs that are not specified under the 'Songs with specific licenses' section are under the OpenTaiko Default Licence
 
 ## Translations
 
