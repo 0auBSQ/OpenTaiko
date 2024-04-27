@@ -74,7 +74,8 @@ namespace TJAPlayer3
             [25] = "プレビュー音演奏までの時間：\n曲にカーソルが合わされてからプレ\nビュー音が鳴り始めるまでの時間を\n指定します。\n0 ～ 10000 [ms] が指定可能です。",
             [26] = "プレビュー画像表示までの時間：\n曲にカーソルが合わされてからプレ\nビュー画像が表示されるまでの時間\nを指定します。\n0 ～ 10000 [ms] が指定可能です。",
             [27] = "演奏情報の表示：\n演奏中、BGA領域の下部に演奏情報\n（FPS、BPM、演奏時間など）を表示し\nます。\nまた、小節線の横に小節番号が表示\nされるようになります。",
-            //[28] = "背景画像の半透明割合：\n背景画像をDTXManiaのフレーム画像\nと合成する際の、背景画像の透明度\nを指定します。\n0 が完全透明で、255 が完全不透明\nとなります。",
+            // --------------------
+			[28] = "背景画像の半透明割合：\n背景画像をDTXManiaのフレーム画像\nと合成する際の、背景画像の透明度\nを指定します。\n0 が完全透明で、255 が完全不透明\nとなります。",
 			// Please update the translation above. The lane background (the bar drawn behind the notes) opacity is what's being adjusted, and will only take effect when videos are playing.
             [29] = "BGMの再生：\nこれをOFFにすると、BGM を再生しな\nくなります。",
             [30] = "演奏記録の保存：\nON で演奏記録を ～.score.ini ファイ\nルに保存します。\n",
@@ -90,21 +91,22 @@ namespace TJAPlayer3
 			[40] = "Discordに再生中の譜面情報を送信する",
 			[41] = "バッファ入力モード：\nON にすると、FPS を超える入力解像\n度を実現します。\nOFF にすると、入力解像度は FPS に\n等しくなります。",
 			[42] = "Traceログ出力：\nDTXManiaLog.txt にログを出力します。\n変更した場合は、DTXMania の再起動\n後に有効となります。",
-			// [43] = "サウンドの出力方式:\n" +
-			// 		"WASAPI, ASIO, DSound(DirectSound)\n" +
-			// 		"の中からサウンド出力方式を選択\n" +
-			// 		"します。\n" +
-			// 		"WASAPIはVista以降でのみ使用可能\n" +
-			// 		"です。ASIOは対応機器でのみ使用\n" +
-			// 		"可能です。\n" +
-			// 		"WASAPIかASIOを指定することで、\n" +
-			// 		"遅延の少ない演奏を楽しむことが\n" +
-			// 		"できます。\n" +
-			// 		"\n" +
-			// 		"※ 設定はCONFIGURATION画面の\n" +
-			// 		"　終了時に有効になります。",
-			// Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
-			[44] = "WASAPI使用時のバッファサイズ:\n" +
+            // --------------------
+            [43] = "サウンドの出力方式:\n" +
+             		"WASAPI, ASIO, DSound(DirectSound)\n" +
+             		"の中からサウンド出力方式を選択\n" +
+             		"します。\n" +
+             		"WASAPIはVista以降でのみ使用可能\n" +
+             		"です。ASIOは対応機器でのみ使用\n" +
+             		"可能です。\n" +
+             		"WASAPIかASIOを指定することで、\n" +
+             		"遅延の少ない演奏を楽しむことが\n" +
+             		"できます。\n" +
+             		"\n" +
+             		"※ 設定はCONFIGURATION画面の\n" +
+             		"　終了時に有効になります。",
+            // Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
+            [44] = "WASAPI使用時のバッファサイズ:\n" +
 					"0～99999ms を指定可能です。\n" +
 					"0を指定すると、OSがバッファの\n" +
 					"サイズを自動設定します。\n" +
@@ -236,7 +238,7 @@ namespace TJAPlayer3
             [10147] = "システムキー割り当て:\n特訓モード切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
             [10152] = "動画再生モード切替",
             [10153] = "システムキー割り当て:\n動画再生モード切替のキーを割り当てます\n(キーボード以外は割り当てられません)",
-            // Please translate the text above!
+
 			[99] = "LeftRed",
 
             [9992] = "太鼓の数字がアニメーションしなくなります\n" +
@@ -407,7 +409,6 @@ namespace TJAPlayer3
 			
             [10150] = "動画再生モード",
             [10151] = "動画の表示方法を変更します.",
-            // Please translate the text above!
 
 			[100] = "演奏ゲーム",
             [101] = "段位道場",
