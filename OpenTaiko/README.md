@@ -162,6 +162,8 @@ BoxFontName=廻想体 ネクスト UP B
 115 - 菖蒲日和 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Takkkom)
 116 - 卒業2000 : Y.W - https://soundcloud.com/pme_yw http://www.yw-works.com/ (Chart by Komi)
 117 - M_《Ji：Ü》 : Masamune (Chart by bol)
+118 - Froggy Forest Raceway : Baby Zionov https://twitter.com/babyzionov (Chart by Shoxk & DragonRatTiger)
+119 - Fractured Eternity : roər & Toneix [roər: SC ➜ https://soundcloud.com/rroer TW ➜ https://twitter.com/roerdtm YT ➜ https://www.youtube.com/@roer-music | Toneix: SC ➜ https://soundcloud.com/toneix TW ➜ https://twitter.com/Toneix1 YT ➜ https://www.youtube.com/@Toneix/featured] (Chart by Komi & bol) 
 ```
 
 ### Visuals
@@ -221,6 +223,11 @@ If you liked a specific song and want to support the composer's work, please che
 079 - MECHANICAL GOD : AZALI × Crow
 ```
 
+- CC-BY-NC-ND
+```
+T03 - レミリア, 私の影 ～ Ｔｈｅ Ｓｃａｒｌｅｔ Ｆｏｇ Ｍａｃｈｉｎｅ Ｉｎｃｉｄｅｎｔ : Jezebel Ciccone
+```
+
 ## Collaborations
 
 ### Project Outfox: Serenity
@@ -239,6 +246,30 @@ Eradication of Light - Mintorment (Chart by Colin)
 brokenHeart resurrection ~estelle~ - RILEY (Chart by Komi)
 ```
 The credits and links and licence information for each song are included on the attached credits/licence.txt file.
+
+### Touhou Arrangements
+
+Grazepoint: https://grazepoint.bandcamp.com/ https://grazepoint.bandcamp.com/album/touwho https://grazepoint.bandcamp.com/album/touwho-2
+TOHO EURO MISSION: https://djtimotei.bandcamp.com/album/toho-euro-mission-02 https://djtimotei.bandcamp.com/album/toho-euro-mission-03
+Showcases:
+(Coming soon)
+
+The included songs are:
+```
+Evil Gala - Moox https://soundcloud.com/themoox (Chart by Colin)
+Spread My Wings - DJ Timotei ft. Slothington [DJ Timotei (https://www.youtube.com/@DJ_Timotei); Slothington (https://www.youtube.com/@Slothington)] (Chart by Komi)
+レミリア, 私の影 ～ Ｔｈｅ Ｓｃａｒｌｅｔ Ｆｏｇ Ｍａｃｈｉｎｅ Ｉｎｃｉｄｅｎｔ - Jezebel Ciccone https://darkdandy13.bandcamp.com/ (Chart by Komi)
+Confession - TTL ft. Kanata [TTL (https://www.youtube.com/@ttlsound760)] (Chart by Komi)
+War Zone - WORLDWIDEWOLF feat. Timothy [https://takanashikoubou.com/ https://worldwidewolf.bandcamp.com/ https://soundcloud.com/worldwldewolf https://bsky.app/profile/worldwidewolf.bsky.social https://twitter.com/WORLDWlDEWOLF https://www.youtube.com/channel/UCWXNd52sTxn9ubwp2ixct6A https://www.youtube.com/@DJ_Timotei https://twitter.com/DJTimotei https://djtimotei.bandcamp.com/] (Chart by Komi)
+Journey - DJ Timotei ft. つぅ [DJ Timotei (https://www.youtube.com/@DJ_Timotei); つぅ(https://www.youtube.com/@K2ECradle)] (Chart by Komi)
+Abyss - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
+Exterminate - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
+Imperfect Cherry Blossom - Whitetail https://soundcloud.com/whitetail-music https://treepunk.bandcamp.com/ https://www.youtube.com/user/whitetailmusic (Chart by Komi)
+Disintegrated Laevatein - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
+Cirno in Quarantine - H5 https://linktr.ee/H5Music (Chart by bol)
+BLINDED CRITICISM - DeBisco & Zovi [DeBisco(https://soundcloud.com/debisco https://twitter.com/debiscomusic) Zovi(https://zovi.bandcamp.com/ https://soundcloud.com/zovi https://twitter.com/zovinoise)] (Chart by Komi)
+```
+Songs that are not specified under the 'Songs with specific licenses' section are under the OpenTaiko Default Licence
 
 ## Translations
 
