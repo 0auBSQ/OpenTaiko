@@ -90,10 +90,7 @@ namespace TJAPlayer3
             [46] = "Turning this on will create smoother note scroll,\nbut may introduce sound lag.\nTurning it off will create unstable note scroll,\nbut ensure no sound lag occurs.\n" +
                 "\n" +
                 "If OFF, DTXMania uses its original\n" +
-                "timer and the effect is vice versa.\n" +
-                "\n" +
-                "This settings is avilable only when\n" +
-                "you uses WASAPI/ASIO.\n",
+                "timer and the effect is vice versa.\n",
             [47] = "Show Character Images.\n",
             [48] = "Show Dancer Images.\n",
             [49] = "Show Mob Images.\n",
