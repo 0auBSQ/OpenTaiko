@@ -277,7 +277,8 @@ namespace TJAPlayer3
                     TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
                     TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
                     TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
-                    new bool[] { false, false, false, false, false }
+                    new bool[] { false, false, false, false, false },
+                    -1
                     );
 
                 LuaInit.Call();
@@ -302,6 +303,18 @@ namespace TJAPlayer3
 
                     currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
                 }
+                double timestamp = -1.0;
+
+                if (TJAPlayer3.DTX != null)
+                {
+                    double timeoffset = -2.0;
+                    if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+                        timeoffset = -8.2; // Due to the fact that all Dans use DELAY to offset instead of OFFSET, this can't be properly synced. ¯\_(ツ)_/¯
+
+                    timestamp = (((double)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) / 1000.0) +
+                            (-(TJAPlayer3.ConfigIni.MusicPreTimeMs + TJAPlayer3.DTX.nOFFSET) / 1000.0) +
+                            timeoffset;
+                }
 
                 LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, 
                     TJAPlayer3.FPS.NowFPS, 
@@ -311,7 +324,8 @@ namespace TJAPlayer3
                     TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
                     TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
                     TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
-                    TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME);
+                    TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME,
+                    timestamp);
                 /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
                 LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);

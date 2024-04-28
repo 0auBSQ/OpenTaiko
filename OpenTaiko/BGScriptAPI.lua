@@ -14,6 +14,7 @@ local battleWin = false
 local gauge = { 0, 0, 0, 0, 0 }
 local bpm = { 0, 0, 0, 0, 0 }
 local gogo = { false, false, false, false, false }
+local timeStamp = -1
 
 
 function setConstValues(_playerCount, _p1IsBlue, _lang, _simplemode, _puchicharaRarities, _characterRarities)
@@ -25,7 +26,7 @@ function setConstValues(_playerCount, _p1IsBlue, _lang, _simplemode, _puchichara
     characterRarities = _characterRarities
 end
 
-function updateValues(_deltaTime, _fps, _isClear, _towerNightNum, _battleState, _battleWin, _gauge, _bpm, _gogo)
+function updateValues(_deltaTime, _fps, _isClear, _towerNightNum, _battleState, _battleWin, _gauge, _bpm, _gogo, _timestamp)
     deltaTime = _deltaTime
     fps = _fps
     isClear = _isClear
@@ -35,4 +36,5 @@ function updateValues(_deltaTime, _fps, _isClear, _towerNightNum, _battleState, 
     gauge = _gauge
     bpm = _bpm
     gogo = _gogo
+    timeStamp = _timestamp
 end
