@@ -743,6 +743,14 @@ namespace TJAPlayer3
                             if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AILoseScript.Update(i);
                             AILoseScript.Draw(i);
                             break;
+                        case EndMode.AI_Win_FullCombo:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWin_FullComboScript.Update(i);
+                            AIWin_FullComboScript.Draw(i);
+                            break;
+                        case EndMode.AI_Win_Perfect:
+                            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWin_PerfectScript.Update(i);
+                            AIWin_PerfectScript.Draw(i);
+                            break;
 
                         case EndMode.Tower_Dropout:
                             if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_DropoutScript.Update(i);
