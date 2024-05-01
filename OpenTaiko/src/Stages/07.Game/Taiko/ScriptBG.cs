@@ -307,9 +307,8 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.DTX != null)
                 {
-                    double timeoffset = -2.0;
-                    if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-                        timeoffset = -8.2; // Due to the fact that all Dans use DELAY to offset instead of OFFSET, this can't be properly synced. ¯\_(ツ)_/¯
+                    double timeoffset = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? -2.0 : -8.2;
+                    // Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
                     timestamp = (((double)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) / 1000.0) +
                             (-(TJAPlayer3.ConfigIni.MusicPreTimeMs + TJAPlayer3.DTX.nOFFSET) / 1000.0) +

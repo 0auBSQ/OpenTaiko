@@ -10,10 +10,10 @@ namespace TJAPlayer3
 		public CActSortSongs()
 		{
 			List<CItemBase> lci = new List<CItemBase>();
-			lci.Add( new CItemList( CLangManager.LangInstance.GetString(9201),		CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "Z,Y,X,...",		"A,B,C,..." } ) );
-			lci.Add( new CItemList(CLangManager.LangInstance.GetString(9202),		CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "Z,Y,X,...",		"A,B,C,..." } ) );
-            lci.Add(new CItemList(CLangManager.LangInstance.GetString(9203), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
-            lci.Add( new CItemList(CLangManager.LangInstance.GetString(9204),		CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "13,12,11,...",	"1,2,3,..." } ) );
+			lci.Add( new CItemList( CLangManager.LangInstance.GetString(9201),		CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...",		"A,B,C,..." } ) );
+			lci.Add( new CItemList(CLangManager.LangInstance.GetString(9202),		CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...",		"A,B,C,..." } ) );
+            lci.Add(new CItemList(CLangManager.LangInstance.GetString(9203), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
+            lci.Add( new CItemList(CLangManager.LangInstance.GetString(9204),		CItemBase.EPanelType.Normal, 0, "", "", new string[] { "13,12,11,...",	"1,2,3,..." } ) );
             //lci.Add( new CItemList( "Best Rank",	CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "E,D,C,...",		"SS,S,A,..." } ) );
             //lci.Add( new CItemList( "PlayCount",	CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "10,9,8,...",		"1,2,3,..." } ) );
             
@@ -22,7 +22,7 @@ namespace TJAPlayer3
 			lci.Add( new CItemList( "BPM",			CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "300,200,...",	"70,80,90,..." } ) );
 #endif
 			//lci.Add( new CItemList( "ジャンル",			CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "AC15",	"AC8-14" } ) );
-			lci.Add( new CItemList(CLangManager.LangInstance.GetString(9200),		CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "", 				"" } ) );
+			lci.Add( new CItemList(CLangManager.LangInstance.GetString(9200),		CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", 				"" } ) );
 			
 			base.Initialize( lci, false, "SORT MENU" );
 		}

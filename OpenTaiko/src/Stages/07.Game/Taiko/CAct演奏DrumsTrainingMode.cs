@@ -113,7 +113,7 @@ namespace TJAPlayer3
 
 				TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, "TRAINING MODE (BETA)");
 
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Space)|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingPause))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -126,35 +126,21 @@ namespace TJAPlayer3
 						this.tPausePlay();
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
-						if (this.nCurrentMeasure > 1)
-						{
-							this.nCurrentMeasure--;
-							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+						this.nCurrentMeasure += TJAPlayer3.ConfigIni.TokkunSkipMeasures;
+						if (this.nCurrentMeasure > this.nMeasureCount)
+							this.nCurrentMeasure = this.nMeasureCount;
 
-							this.tMatchWithTheChartDisplayPosition(true);
-							TJAPlayer3.Skin.soundTrainingModeScrollSFX.tPlay();
-						}
-						if (t配列の値interval以下か(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, TJAPlayer3.ConfigIni.TokkunMashInterval))
-						{
-							for (int index = this.JumpPointList.Count - 1; index >= 0; index--)
-							{
-								if (this.JumpPointList[index].Time <= SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
-								{
-									this.nCurrentMeasure = this.JumpPointList[index].Measure;
-									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
-									TJAPlayer3.Skin.sound特訓スキップ音.tPlay();
-									this.tMatchWithTheChartDisplayPosition(false);
-									break;
-								}
-							}
-						}
+						TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+
+						this.tMatchWithTheChartDisplayPosition(true);
+						TJAPlayer3.Skin.soundTrainingModeScrollSFX.tPlay();
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.PageDown))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -168,7 +154,7 @@ namespace TJAPlayer3
 						TJAPlayer3.Skin.soundTrainingModeScrollSFX.tPlay();
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -197,21 +183,35 @@ namespace TJAPlayer3
 
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.PageUp))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
-						this.nCurrentMeasure += TJAPlayer3.ConfigIni.TokkunSkipMeasures;
-						if (this.nCurrentMeasure > this.nMeasureCount)
-							this.nCurrentMeasure = this.nMeasureCount;
+						if (this.nCurrentMeasure > 1)
+						{
+							this.nCurrentMeasure--;
+							TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
-						TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
-
-						this.tMatchWithTheChartDisplayPosition(true);
-						TJAPlayer3.Skin.soundTrainingModeScrollSFX.tPlay();
+							this.tMatchWithTheChartDisplayPosition(true);
+							TJAPlayer3.Skin.soundTrainingModeScrollSFX.tPlay();
+						}
+						if (t配列の値interval以下か(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, TJAPlayer3.ConfigIni.TokkunMashInterval))
+						{
+							for (int index = this.JumpPointList.Count - 1; index >= 0; index--)
+							{
+								if (this.JumpPointList[index].Time <= SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed)
+								{
+									this.nCurrentMeasure = this.JumpPointList[index].Measure;
+									TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+									TJAPlayer3.Skin.sound特訓スキップ音.tPlay();
+									this.tMatchWithTheChartDisplayPosition(false);
+									break;
+								}
+							}
+						}
 					}
 				}
-				if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -222,7 +222,7 @@ namespace TJAPlayer3
 						}
 					}
 				}
-				if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -233,7 +233,7 @@ namespace TJAPlayer3
 						}
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Home))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -247,7 +247,7 @@ namespace TJAPlayer3
 						}
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.End))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure))
 				{
 					if (this.bTrainingPAUSE)
 					{
@@ -261,7 +261,7 @@ namespace TJAPlayer3
 						}
 					}
 				}
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.A))
+				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBookmark))
 					this.tToggleBookmarkAtTheCurrentPosition();
 
 				if (this.bCurrentlyScrolling)

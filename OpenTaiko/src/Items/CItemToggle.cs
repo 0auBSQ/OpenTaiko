@@ -34,16 +34,16 @@ namespace TJAPlayer3
 			: this() {
 			this.t初期化(str項目名, b初期状態, str説明文jp, str説明文en);
 		}
-		public CItemToggle(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別)
+		public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別)
 			: this()
 		{
 			this.t初期化( str項目名, b初期状態, eパネル種別 );
 		}
-		public CItemToggle(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別, string str説明文jp)
+		public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp)
 			: this() {
 			this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp);
 		}
-		public CItemToggle(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別, string str説明文jp, string str説明文en)
+		public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en)
 			: this() {
 			this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp, str説明文en);
 		}
@@ -65,23 +65,23 @@ namespace TJAPlayer3
 		}
 		public void t初期化( string str項目名, bool b初期状態 )
 		{
-			this.t初期化( str項目名, b初期状態, CItemBase.Eパネル種別.通常 );
+			this.t初期化( str項目名, b初期状態, CItemBase.EPanelType.Normal );
 		}
 		public void t初期化(string str項目名, bool b初期状態, string str説明文jp) {
-			this.t初期化(str項目名, b初期状態, CItemBase.Eパネル種別.通常, str説明文jp, str説明文jp);
+			this.t初期化(str項目名, b初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文jp);
 		}
 		public void t初期化(string str項目名, bool b初期状態, string str説明文jp, string str説明文en) {
-			this.t初期化(str項目名, b初期状態, CItemBase.Eパネル種別.通常, str説明文jp, str説明文en);
+			this.t初期化(str項目名, b初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文en);
 		}
 
-		public void t初期化(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別)
+		public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別)
 		{
 			this.t初期化(str項目名, b初期状態, eパネル種別, "", "");
 		}
-		public void t初期化(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別, string str説明文jp) {
+		public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp) {
 			this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp, str説明文jp);
 		}
-		public void t初期化(string str項目名, bool b初期状態, CItemBase.Eパネル種別 eパネル種別, string str説明文jp, string str説明文en) {
+		public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en) {
 			base.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
 			this.bON = b初期状態;
 		}

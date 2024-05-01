@@ -39,9 +39,9 @@ namespace TJAPlayer3
 			List<CItemBase> l = new List<CItemBase>();
 
             #region [ 共通 SET切り替え/More/Return ]
-            l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(900), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" }));
-            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(901), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" }));
-            l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(902), CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "", "" }));
+            l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(900), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(901), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+            l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString(902), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 			#endregion
 
 			return l;
