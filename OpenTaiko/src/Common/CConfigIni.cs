@@ -3164,7 +3164,7 @@ namespace TJAPlayer3
             sw.Write("TrainingSkipForwardMeasure=");
             this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
             sw.WriteLine();
-            sw.Write("TrainingSkipBackwardMeasure=");
+            sw.Write("TrainingSkipBackMeasure=");
             this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
             sw.WriteLine();
             sw.Write("TrainingJumpToFirstMeasure=");
@@ -4822,7 +4822,7 @@ TrainingBookmark=K010
 TrainingMoveForwardMeasure=K0118,K020
 TrainingMoveBackMeasure=K076,K013
 TrainingSkipForwardMeasure=K0109
-TrainingSkipBackwardMeasure=K0108
+TrainingSkipBackMeasure=K0108
 TrainingJumpToFirstMeasure=K070
 TrainingJumpToLastMeasure=K051
 ";
