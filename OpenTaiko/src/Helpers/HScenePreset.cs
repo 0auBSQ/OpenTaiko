@@ -63,6 +63,10 @@ namespace TJAPlayer3
             {
                 preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
             }
+            else
+            {
+                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[""];
+            }
 
             return preset;
         }
