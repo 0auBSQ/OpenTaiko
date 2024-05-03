@@ -74,14 +74,14 @@ namespace TJAPlayer3
 				"Note: It also changes the songs' pitch." ) );
 			#endregion
 			#region [ 個別 Sud/Hid ]
-            l.Add( new CItemList( "ランダム", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
+            l.Add( new CItemList( "ランダム", CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
 				"いわゆるランダム。\n  RANDOM: ちょっと変わる\n  MIRROR: あべこべ \n  SUPER: そこそこヤバい\n  HYPER: 結構ヤバい\nなお、実装は適当な模様",
 				"Guitar chips come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
 				new string[] { "OFF", "RANDOM", "あべこべ", "SUPER", "HYPER" } ) );
-            l.Add( new CItemList( "ドロン", CItemBase.Eパネル種別.通常, (int) TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
+            l.Add( new CItemList( "ドロン", CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
 				"",
 				new string[] { "OFF", "ドロン", "ステルス" } ) );
-            l.Add( new CItemList( "ゲーム", CItemBase.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eGameMode,
+            l.Add( new CItemList( "ゲーム", CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
                 "ゲームモード\n" +
                 "TYPE-A: 完走!叩ききりまショー!\n" +
                 "TYPE-B: 完走!叩ききりまショー!(激辛)\n" +
@@ -91,13 +91,13 @@ namespace TJAPlayer3
                 " ",
                 new string[] { "OFF", "完走!", "完走!激辛" }) );
 
-            l.Add(new CItemList(nameof(TJAPlayer3.ConfigIni.ShinuchiMode), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { "OFF", "ON" }));
+            l.Add(new CItemList(nameof(TJAPlayer3.ConfigIni.ShinuchiMode), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { "OFF", "ON" }));
 
 			#endregion
 			#region [ 共通 SET切り替え/More/Return ]
 			l.Add(new CItemInteger("PlayerCount", 1, 5, TJAPlayer3.ConfigIni.nPlayerCount, "プレイヤーの人数を指定します。" ,"Set a player count."));
-			l.Add( new CSwitchItemList( "More...", CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "" } ) );
-			l.Add( new CSwitchItemList( "戻る", CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "", "" } ) );
+			l.Add( new CSwitchItemList( "More...", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" } ) );
+			l.Add( new CSwitchItemList( "戻る", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" } ) );
 			#endregion
 
 			return l;

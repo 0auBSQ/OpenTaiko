@@ -196,11 +196,29 @@ namespace TJAPlayer3
 		ToggleAutoP2,
 		ToggleTrainingMode,
 		#endregion
-		#region [Gameplay/Training]
+		#region [Gameplay/Training only]
 		CycleVideoDisplayMode,
-		#endregion
-		MAX,
-		#endregion
+        #endregion
+        #endregion
+        #region [Training Keys]
+		TrainingIncreaseScrollSpeed,
+		TrainingDecreaseScrollSpeed,
+		TrainingIncreaseSongSpeed,
+		TrainingDecreaseSongSpeed,
+		TrainingToggleAuto,
+		TrainingBranchNormal,
+		TrainingBranchExpert,
+		TrainingBranchMaster,
+		TrainingPause,
+		TrainingBookmark,
+		TrainingMoveForwardMeasure,
+		TrainingMoveBackMeasure,
+		TrainingSkipForwardMeasure,
+		TrainingSkipBackMeasure,
+		TrainingJumpToFirstMeasure,
+		TrainingJumpToLastMeasure,
+        #endregion
+        MAX,
 		UNKNOWN = EPad.UNKNOWN
 	}
 	[Flags]

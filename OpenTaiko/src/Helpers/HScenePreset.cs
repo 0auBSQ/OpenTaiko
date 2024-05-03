@@ -63,6 +63,16 @@ namespace TJAPlayer3
             {
                 preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
             }
+            else if (_ps != null
+                    && TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset != null
+                    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset))
+            {
+                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset];
+            }
+            else
+            {
+                preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[""];
+            }
 
             return preset;
         }
