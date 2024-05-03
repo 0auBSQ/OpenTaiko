@@ -27,6 +27,12 @@ namespace TJAPlayer3
                 case "fr":
                     CLangManager.LangInstance = new CLang_fr();
                     break;
+                case "nl":
+                    CLangManager.LangInstance = new CLang_nl();
+                    break;
+                case "ko":
+                    CLangManager.LangInstance = new CLang_ko();
+                    break;
                 case "en":
                     CLangManager.LangInstance = new CLang_en();
                     break;
@@ -41,6 +47,10 @@ namespace TJAPlayer3
         {
             switch (lang)
             {
+                case "ko":
+                    return 6;
+                case "nl":
+                    return 5;
                 case "zh":
                     return 4;
                 case "es":
@@ -67,6 +77,10 @@ namespace TJAPlayer3
                 return "es";
             else if (LangInstance is CLang_zh)
                 return "zh";
+            else if (LangInstance is CLang_nl)
+                return "nl";
+            else if (LangInstance is CLang_ko)
+                return "ko";
             return DefaultLanguage.Item1;
         }
 
@@ -74,6 +88,10 @@ namespace TJAPlayer3
         {
             switch (idx)
             {
+                case 6:
+                    return "ko";
+                case 5:
+                    return "nl";
                 case 4:
                     return "zh";
                 case 3:
@@ -88,7 +106,7 @@ namespace TJAPlayer3
             }
         }
 
-        public static readonly string[] Languages = new string[] { "日本語", "English", "Français", "Español", "中文" };
+        public static readonly string[] Languages = new string[] { "日本語 (Japanese)", "English", "Français (French)", "Español (Spanish)", "中文 (Chinese)", "nl (WIP)", "ko (WIP)" };
         public static ILang LangInstance { get; private set; }  = new CLang_jp();
     }
 }

@@ -832,7 +832,56 @@ namespace TJAPlayer3
 
 							case (int)EKeyConfigPad.CycleVideoDisplayMode:
 								return this.padCycleVideoDisplayMode;
-						}
+
+							case (int)EKeyConfigPad.TrainingIncreaseScrollSpeed:
+								return this.TrainingIncreaseScrollSpeed;
+
+							case (int)EKeyConfigPad.TrainingIncreaseSongSpeed:
+								return this.TrainingIncreaseSongSpeed;
+
+							case (int)EKeyConfigPad.TrainingDecreaseSongSpeed:
+								return this.TrainingDecreaseSongSpeed;
+
+							case (int)EKeyConfigPad.TrainingDecreaseScrollSpeed:
+								return this.TrainingDecreaseScrollSpeed;
+
+							case (int)EKeyConfigPad.TrainingToggleAuto:
+								return this.TrainingToggleAuto;
+
+							case (int)EKeyConfigPad.TrainingBranchNormal:
+								return this.TrainingBranchNormal;
+
+							case (int)EKeyConfigPad.TrainingBranchExpert:
+								return this.TrainingBranchExpert;
+
+							case (int)EKeyConfigPad.TrainingBranchMaster:
+								return this.TrainingBranchMaster;
+
+							case (int)EKeyConfigPad.TrainingPause:
+								return this.TrainingPause;
+
+							case (int)EKeyConfigPad.TrainingBookmark:
+								return this.TrainingBookmark;
+
+							case (int)EKeyConfigPad.TrainingMoveForwardMeasure:
+								return this.TrainingMoveForwardMeasure;
+
+							case (int)EKeyConfigPad.TrainingMoveBackMeasure:
+								return this.TrainingMoveBackMeasure;
+
+							case (int)EKeyConfigPad.TrainingSkipForwardMeasure:
+								return this.TrainingSkipForwardMeasure;
+
+							case (int)EKeyConfigPad.TrainingSkipBackMeasure:
+								return this.TrainingSkipBackMeasure;
+
+							case (int)EKeyConfigPad.TrainingJumpToFirstMeasure:
+								return this.TrainingJumpToFirstMeasure;
+
+							case (int)EKeyConfigPad.TrainingJumpToLastMeasure:
+								return this.TrainingJumpToLastMeasure;
+
+                        }
 						throw new IndexOutOfRangeException();
 					}
 					set
@@ -1042,7 +1091,71 @@ namespace TJAPlayer3
 							case (int)EKeyConfigPad.CycleVideoDisplayMode:
 								this.padCycleVideoDisplayMode = value;
 								return;
-						}
+
+                            case (int)EKeyConfigPad.TrainingIncreaseScrollSpeed:
+                                this.TrainingIncreaseScrollSpeed = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingDecreaseScrollSpeed:
+                                this.TrainingDecreaseScrollSpeed = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingIncreaseSongSpeed:
+                                this.TrainingIncreaseSongSpeed = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingDecreaseSongSpeed:
+                                this.TrainingDecreaseSongSpeed = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingToggleAuto:
+                                this.TrainingToggleAuto = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingBranchNormal:
+                                this.TrainingBranchNormal = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingBranchExpert:
+                                this.TrainingBranchExpert = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingBranchMaster:
+                                this.TrainingBranchMaster = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingPause:
+                                this.TrainingPause = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingBookmark:
+                                this.TrainingBookmark = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingMoveForwardMeasure:
+                                this.TrainingMoveForwardMeasure = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingMoveBackMeasure:
+                                this.TrainingMoveBackMeasure = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingSkipForwardMeasure:
+                                this.TrainingSkipForwardMeasure = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingSkipBackMeasure:
+                                this.TrainingSkipBackMeasure = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingJumpToFirstMeasure:
+                                this.TrainingJumpToFirstMeasure = value;
+								return;
+
+                            case (int)EKeyConfigPad.TrainingJumpToLastMeasure:
+                                this.TrainingJumpToLastMeasure = value;
+								return;
+                        }
 						throw new IndexOutOfRangeException();
 					}
 				}
@@ -1107,9 +1220,26 @@ namespace TJAPlayer3
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP2;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleTrainingMode;
 				private CConfigIni.CKeyAssign.STKEYASSIGN[] padCycleVideoDisplayMode;
-				//-----------------
-				#endregion
-			}
+
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingIncreaseScrollSpeed;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingDecreaseScrollSpeed;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingToggleAuto;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchNormal;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchExpert;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchMaster;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingPause;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBookmark;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingMoveForwardMeasure;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingMoveBackMeasure;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingSkipForwardMeasure;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingSkipBackMeasure;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingIncreaseSongSpeed;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingDecreaseSongSpeed;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingJumpToFirstMeasure;
+				public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingJumpToLastMeasure;
+                //-----------------
+                #endregion
+            }
 
 			public bool KeyIsPressed(STKEYASSIGN[] pad)
 			{
@@ -2950,7 +3080,7 @@ namespace TJAPlayer3
 
 			sw.WriteLine();
 			#endregion
-			#region [ SystemkeyAssign ]
+			#region [ SystemKeyAssign ]
 			sw.WriteLine( "[SystemKeyAssign]" );
 			sw.WriteLine();
 			sw.Write( "Capture=" );
@@ -2992,7 +3122,61 @@ namespace TJAPlayer3
 			sw.WriteLine();
 			#endregion
 
-			sw.Close();
+			#region [ TrainingKeyAssign ]
+			sw.WriteLine( "[TrainingKeyAssign]" );
+			sw.WriteLine();
+            sw.Write("TrainingIncreaseScrollSpeed=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+            sw.WriteLine();
+            sw.Write("TrainingDecreaseScrollSpeed=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+            sw.WriteLine();
+            sw.Write("TrainingIncreaseSongSpeed=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+            sw.WriteLine();
+            sw.Write("TrainingDecreaseSongSpeed=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+            sw.WriteLine();
+            sw.Write("TrainingToggleAuto=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingToggleAuto);
+            sw.WriteLine();
+            sw.Write("TrainingBranchNormal=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchNormal);
+            sw.WriteLine();
+            sw.Write("TrainingBranchExpert=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchExpert);
+            sw.WriteLine();
+            sw.Write("TrainingBranchMaster=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchMaster);
+            sw.WriteLine();
+            sw.Write("TrainingPause=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingPause);
+            sw.WriteLine();
+            sw.Write("TrainingBookmark=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBookmark);
+            sw.WriteLine();
+            sw.Write("TrainingMoveForwardMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+            sw.WriteLine();
+            sw.Write("TrainingMoveBackMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+            sw.WriteLine();
+            sw.Write("TrainingSkipForwardMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+            sw.WriteLine();
+            sw.Write("TrainingSkipBackMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+            sw.WriteLine();
+            sw.Write("TrainingJumpToFirstMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+            sw.WriteLine();
+            sw.Write("TrainingJumpToLastMeasure=");
+            this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+            sw.WriteLine();
+			sw.WriteLine();
+            #endregion
+
+            sw.Close();
 		}
 		public void tファイルから読み込み( string iniファイル名 )
 		{
@@ -3075,6 +3259,10 @@ namespace TJAPlayer3
 							else if ( str2.Equals( "SystemKeyAssign" ) )
 							{
 								unknown = Eセクション種別.SystemKeyAssign;
+							}
+							else if ( str2.Equals( "TrainingKeyAssign" ))
+							{
+								unknown = Eセクション種別.TrainingKeyAssign;
 							}
 							else if( str2.Equals( "Temp" ) )
 							{
@@ -4217,53 +4405,157 @@ namespace TJAPlayer3
 									//-----------------------------
 									case Eセクション種別.SystemKeyAssign:
 									{
-										if( str3.Equals( "Capture" ) )
+										switch (str3)
 										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.Capture );
-										}
-										else if( str3.Equals( "SongVolumeIncrease" ) )
+											case "Capture":
+											{
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.Capture);
+												break;
+                                            }
+											case "SongVolumeIncrease":
+											{
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.SongVolIncrease);
+												break;
+                                            }
+                                            case "SongVolumeDecrease":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.SongVolDecrease);
+												break;
+											}
+                                            case "DisplayHits":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.DisplayHits);
+												break;
+											}
+                                            case "DisplayDebug":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.DisplayDebug);
+												break;
+											}
+                                            case "QuickConfig":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.QuickConfig);
+												break;
+											}
+                                            case "NewHeya":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.NewHeya);
+												break;
+											}
+                                            case "SortSongs":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.SortSongs);
+												break;
+											}
+                                            case "ToggleAutoP1":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleAutoP1);
+												break;
+											}
+                                            case "ToggleAutoP2":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleAutoP2);
+												break;
+											}
+                                            case "ToggleTrainingMode":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleTrainingMode);
+												break;
+											}
+											case "CycleVideoDisplayMode":
+                                            {
+                                                this.tキーの読み出しと設定(str4, this.KeyAssign.System.CycleVideoDisplayMode);
+												break;
+											}
+                                        }
+										continue;
+									}
+                                    #endregion
+                                    #region [ [TrainingKeyAssign] ]
+                                    case Eセクション種別.TrainingKeyAssign:
+									{
+										switch (str3)
 										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolIncrease );
-										}
-										else if( str3.Equals( "SongVolumeDecrease" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SongVolDecrease );
-										}
-										else if( str3.Equals( "DisplayHits" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayHits );
-										}
-										else if( str3.Equals( "DisplayDebug" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.DisplayDebug );
-										}
-										else if( str3.Equals( "QuickConfig" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.QuickConfig );
-										}
-										else if( str3.Equals( "NewHeya" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.NewHeya );
-										}
-										else if( str3.Equals( "SortSongs" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.SortSongs );
-										}
-										else if( str3.Equals( "ToggleAutoP1" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP1 );
-										}
-										else if( str3.Equals( "ToggleAutoP2" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleAutoP2 );
-										}
-										else if( str3.Equals( "ToggleTrainingMode" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.ToggleTrainingMode );
-										}
-										else if( str3.Equals( "CycleVideoDisplayMode" ) )
-										{
-											this.tキーの読み出しと設定( str4, this.KeyAssign.System.CycleVideoDisplayMode );
+											case "TrainingIncreaseScrollSpeed":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+												break;
+											}
+											case "TrainingDecreaseScrollSpeed":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+												break;
+											}
+											case "TrainingIncreaseSongSpeed":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+												break;
+											}
+											case "TrainingDecreaseSongSpeed":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+												break;
+											}
+											case "TrainingToggleAuto":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingToggleAuto);
+												break;
+											}
+											case "TrainingBranchNormal":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchNormal);
+												break;
+											}
+											case "TrainingBranchExpert":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchExpert);
+												break;
+											}
+											case "TrainingBranchMaster":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchMaster);
+												break;
+											}
+											case "TrainingPause":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingPause);
+												break;
+											}
+											case "TrainingBookmark":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBookmark);
+												break;
+											}
+											case "TrainingMoveForwardMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+												break;
+											}
+											case "TrainingMoveBackMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+												break;
+											}
+											case "TrainingSkipForwardMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+												break;
+											}
+											case "TrainingSkipBackMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+												break;
+											}
+											case "TrainingJumpToFirstMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+												break;
+											}
+											case "TrainingJumpToLastMeasure":
+											{
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+												break;
+											}
 										}
 										continue;
 									}
@@ -4319,6 +4611,7 @@ namespace TJAPlayer3
 			GUID,
 			DrumsKeyAssign,
 			SystemKeyAssign,
+			TrainingKeyAssign,
 			Temp,
 		}
 
@@ -4506,7 +4799,7 @@ Capture=K065
 SongVolumeIncrease=K074
 SongVolumeDecrease=K0115
 DisplayHits=K057
-DisplayDebug=K043
+DisplayDebug=K049
 QuickConfig=K055
 NewHeya=K062
 SortSongs=K0126
@@ -4514,6 +4807,24 @@ ToggleAutoP1=K056
 ToggleAutoP2=K057
 ToggleTrainingMode=K060
 CycleVideoDisplayMode=K058
+
+[TrainingKeyAssign]
+TrainingIncreaseScrollSpeed=K0132
+TrainingDecreaseScrollSpeed=K050
+TrainingIncreaseSongSpeed=K047
+TrainingDecreaseSongSpeed=K012
+TrainingToggleAuto=K059
+TrainingBranchNormal=K01
+TrainingBranchExpert=K02
+TrainingBranchMaster=K03
+TrainingPause=K0126,K019
+TrainingBookmark=K010
+TrainingMoveForwardMeasure=K0118,K020
+TrainingMoveBackMeasure=K076,K013
+TrainingSkipForwardMeasure=K0109
+TrainingSkipBackMeasure=K0108
+TrainingJumpToFirstMeasure=K070
+TrainingJumpToLastMeasure=K051
 ";
 			t文字列から読み込み( strDefaultKeyAssign );
 		}

@@ -1312,6 +1312,8 @@ namespace TJAPlayer3
             this.BACKGROUND_GR = "";
             this.PATH_WAV = "";
             this.BPM = 120.0;
+            this.nOFFSET = TJAPlayer3.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
+            this.bOFFSETの値がマイナスである = nOFFSET < 0;
             STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
             stdgbvalue.Drums = 0;
             stdgbvalue.Guitar = 0;
@@ -6363,7 +6365,8 @@ namespace TJAPlayer3
 
                 nextSongnextSongChip.nチャンネル番号 = 0x01;
                 nextSongnextSongChip.n発声位置 = 384;
-                nextSongnextSongChip.n発声時刻ms = (int)this.dbNowTime - (bOFFSETの値がマイナスである ? -nOFFSET : nOFFSET);
+                //nextSongnextSongChip.n発声時刻ms = (int)this.dbNowTime - (bOFFSETの値がマイナスである ? -nOFFSET : nOFFSET);
+                nextSongnextSongChip.n発声時刻ms = (int)this.dbNowTime;
                 nextSongnextSongChip.fNow_Measure_m = this.fNow_Measure_m;
                 nextSongnextSongChip.fNow_Measure_s = this.fNow_Measure_s;
                 nextSongnextSongChip.n整数値 = 0x01;
