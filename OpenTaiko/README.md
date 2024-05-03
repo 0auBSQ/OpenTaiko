@@ -164,6 +164,7 @@ BoxFontName=廻想体 ネクスト UP B
 117 - M_《Ji：Ü》 : Masamune (Chart by bol)
 118 - Froggy Forest Raceway : Baby Zionov https://twitter.com/babyzionov (Chart by Shoxk & DragonRatTiger)
 119 - Fractured Eternity : roər & Toneix [roər: SC ➜ https://soundcloud.com/rroer TW ➜ https://twitter.com/roerdtm YT ➜ https://www.youtube.com/@roer-music | Toneix: SC ➜ https://soundcloud.com/toneix TW ➜ https://twitter.com/Toneix1 YT ➜ https://www.youtube.com/@Toneix/featured] (Chart by Komi & bol) 
+120 - the infinite cityscape : Makotora - https://soundcloud.com/kingmakotora (Chart by sadkay & Komi)
 ```
 
 ### Visuals
