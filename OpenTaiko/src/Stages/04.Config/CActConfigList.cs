@@ -18,7 +18,7 @@ namespace TJAPlayer3
 			get
 			{
 				Eメニュー種別 e = this.eメニュー種別;
-				if (e == Eメニュー種別.KeyAssignDrums || e == Eメニュー種別.KeyAssignSystem)
+				if (e == Eメニュー種別.KeyAssignDrums || e == Eメニュー種別.KeyAssignSystem || e == Eメニュー種別.KeyAssignTraining)
 				{
 					return true;
 				}
@@ -70,26 +70,26 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
+			this.iSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iSystemReturnToMenu );
 
-			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(4), CItemBase.Eパネル種別.通常,
+			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(4), CItemBase.EPanelType.Normal,
 				CLangManager.LangInstance.GetString(5));
 			this.list項目リスト.Add( this.iSystemReloadDTX );
 			
-			this.iSystemHardReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(10148), CItemBase.Eパネル種別.通常,
+			this.iSystemHardReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(10148), CItemBase.EPanelType.Normal,
 				CLangManager.LangInstance.GetString(10149));
 			this.list項目リスト.Add( this.iSystemHardReloadDTX );
 
-			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.Eパネル種別.通常, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
+			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.EPanelType.Normal, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
 				CLangManager.LangInstance.GetString(0),
 				CLangManager.Languages);
 			this.list項目リスト.Add(this.iSystemLanguage);
 
-			this.iLayoutType = new CItemInteger(CLangManager.LangInstance.GetString(16), 0, (int)eLayoutType.TOTAL - 1, TJAPlayer3.ConfigIni.nLayoutType,
-				CLangManager.LangInstance.GetString(17));
-			this.list項目リスト.Add(this.iLayoutType);
+			//this.iLayoutType = new CItemInteger(CLangManager.LangInstance.GetString(16), 0, (int)eLayoutType.TOTAL - 1, TJAPlayer3.ConfigIni.nLayoutType,
+			//	CLangManager.LangInstance.GetString(17));
+			//this.list項目リスト.Add(this.iLayoutType);
 
 			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount,
 				CLangManager.LangInstance.GetString(7));
@@ -113,7 +113,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(18));
 			this.list項目リスト.Add( this.iSystemTimeStretch );
 
-			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString(9997), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nGraphicsDeviceType,
+			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString(9997), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nGraphicsDeviceType,
 				CLangManager.LangInstance.GetString(9996),
 				//new string[] { "OpenGL", "DirectX9", "DirectX11", "Vulkan", "Metal" });
 				new string[] { "OpenGL", "DirectX11", "Vulkan", "Metal" });
@@ -137,14 +137,14 @@ namespace TJAPlayer3
 
 			if (CLangManager.fetchLang() == "ja")
 			{
-				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eClipDispType,
+				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
 					CLangManager.LangInstance.GetString(10151),
-					new string[] {"OFF","背景のみ","ウィンドウ","両方"});
+					new string[] {"OFF","背景","ウィンドウ","両方"});
 				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
 			}
 			else
 			{
-				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eClipDispType,
+				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
 					CLangManager.LangInstance.GetString(10151),
 					new string[] {"None","Full","Mini","Both"});
 				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
@@ -231,7 +231,7 @@ namespace TJAPlayer3
 			// #24820 2013.1.3 yyagi
 
 
-			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nSoundDeviceType,
+			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nSoundDeviceType,
 				CLangManager.LangInstance.GetString(43),
 				new string[] { "Bass", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
 			this.list項目リスト.Add(this.iSystemSoundType);
@@ -248,7 +248,7 @@ namespace TJAPlayer3
 
 			// #24820 2013.1.17 yyagi
 			string[] asiodevs = CEnumerateAllAsioDevices.GetAllASIODevices();
-			this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString(10045), CItemList.Eパネル種別.通常, TJAPlayer3.ConfigIni.nASIODevice,
+			this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString(10045), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nASIODevice,
 				CLangManager.LangInstance.GetString(45),
 				asiodevs );
 			this.list項目リスト.Add( this.iSystemASIODevice );
@@ -297,7 +297,7 @@ namespace TJAPlayer3
 
 
 
-            this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString(10054), CItemBase.Eパネル種別.通常, nSkinIndex,
+            this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString(10054), CItemBase.EPanelType.Normal, nSkinIndex,
 				CLangManager.LangInstance.GetString(54),
                 //"CONFIGURATIONを抜けると、設定した\n" +
                 //"スキンに変更されます。",
@@ -306,7 +306,7 @@ namespace TJAPlayer3
 
 
 
-            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10055), CItemBase.Eパネル種別.通常,
+            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10055), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString(55));
 			this.list項目リスト.Add( this.iSystemGoToKeyAssign );
 
@@ -331,7 +331,7 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
+			this.iDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
@@ -373,7 +373,7 @@ namespace TJAPlayer3
 			this.list項目リスト.Add(this.iGlobalOffsetMs);
 
 
-			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nDefaultCourse,
+			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nDefaultCourse,
 				CLangManager.LangInstance.GetString(81),
                 new string[] {
 					CLangManager.LangInstance.GetString(1040),
@@ -384,12 +384,12 @@ namespace TJAPlayer3
 					CLangManager.LangInstance.GetString(1045) });
             this.list項目リスト.Add(this.iTaikoDefaultCourse);
 
-            this.iTaikoScoreMode = new CItemList(CLangManager.LangInstance.GetString(82), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nScoreMode,
+            this.iTaikoScoreMode = new CItemList(CLangManager.LangInstance.GetString(82), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nScoreMode,
 				CLangManager.LangInstance.GetString(83),
                 new string[] { "TYPE-A", "TYPE-B", "TYPE-C"});
             this.list項目リスト.Add(this.iTaikoScoreMode);
 
-            this.ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString(10084), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.Eパネル種別.通常,
+            this.ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString(10084), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.EPanelType.Normal,
 				CLangManager.LangInstance.GetString(84));
             this.list項目リスト.Add(this.ShinuchiMode);
 
@@ -397,12 +397,12 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(86));
             this.list項目リスト.Add(this.iTaikoBranchGuide);
 
-            this.iTaikoBranchAnime = new CItemList(CLangManager.LangInstance.GetString(87), CItemBase.Eパネル種別.通常, TJAPlayer3.ConfigIni.nBranchAnime,
+            this.iTaikoBranchAnime = new CItemList(CLangManager.LangInstance.GetString(87), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nBranchAnime,
 				CLangManager.LangInstance.GetString(88),
                 new string[] { "TYPE-A", "TYPE-B" });
             this.list項目リスト.Add(this.iTaikoBranchAnime);
 
-            this.iTaikoGameMode = new CItemList(CLangManager.LangInstance.GetString(89), CItemBase.Eパネル種別.通常, (int)TJAPlayer3.ConfigIni.eGameMode,
+            this.iTaikoGameMode = new CItemList(CLangManager.LangInstance.GetString(89), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
 				CLangManager.LangInstance.GetString(90),
                 new string[] { "OFF", "TYPE-A", "TYPE-B" });
             this.list項目リスト.Add( this.iTaikoGameMode );
@@ -423,9 +423,21 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(10125));
 			this.list項目リスト.Add(this.iShowExExtraAnime);
 
-			this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(95), CItemBase.Eパネル種別.通常,
+			this.TokkunSkipCount = new CItemInteger(CLangManager.LangInstance.GetString(10154), 1, 99, TJAPlayer3.ConfigIni.TokkunSkipMeasures,
+                CLangManager.LangInstance.GetString(10155));
+			this.list項目リスト.Add(TokkunSkipCount);
+
+            this.TokkunMashInterval = new CItemInteger(CLangManager.LangInstance.GetString(10156), 1, 9999, TJAPlayer3.ConfigIni.TokkunMashInterval,
+                CLangManager.LangInstance.GetString(10157));
+            this.list項目リスト.Add(TokkunMashInterval);
+
+            this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(95), CItemBase.EPanelType.Normal,
 				CLangManager.LangInstance.GetString(96));
 			this.list項目リスト.Add( this.iDrumsGoToKeyAssign );
+
+			this.iDrumsGoToTrainingKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10158), CItemBase.EPanelType.Normal,
+                CLangManager.LangInstance.GetString(10159));
+			this.list項目リスト.Add( this.iDrumsGoToTrainingKeyAssign );
 
             OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
@@ -477,14 +489,17 @@ namespace TJAPlayer3
 				this.b要素値にフォーカス中 = false;
 			}
 
-			if ( this.eメニュー種別 == Eメニュー種別.KeyAssignSystem )
+			switch (eメニュー種別)
 			{
-				t項目リストの設定_System();
-			}
-			else if ( this.eメニュー種別 == Eメニュー種別.KeyAssignDrums )
-			{
-				t項目リストの設定_Drums();
-			}
+				case Eメニュー種別.KeyAssignSystem:
+                    t項目リストの設定_System();
+					break;
+				case Eメニュー種別.KeyAssignDrums:
+				case Eメニュー種別.KeyAssignTraining:
+					t項目リストの設定_Drums();
+					break;
+            }
+
 			// これ以外なら何もしない
 		}
 		public void tEnter押下()
@@ -616,6 +631,7 @@ namespace TJAPlayer3
 				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap5P);
 			}
 
+			// Menu controls
 			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide)
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Decide);
@@ -633,6 +649,7 @@ namespace TJAPlayer3
 				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RightChange);
 			}
 
+			// System controls
 			else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemCapture )
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.Capture);
@@ -681,8 +698,74 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.stageコンフィグ.tパッド選択通知( EKeyConfigPart.SYSTEM, EKeyConfigPad.CycleVideoDisplayMode);
 			}
-			#endregion
-			else
+
+            // Training controls
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingPause)
+			{
+                TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingPause);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingToggleAuto)
+			{
+                TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingToggleAuto);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBookmark)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBookmark);
+            }
+            else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseScrollSpeed)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingIncreaseScrollSpeed);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseScrollSpeed)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingDecreaseScrollSpeed);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseSongSpeed)
+			{
+                TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingIncreaseSongSpeed);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseSongSpeed)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingDecreaseSongSpeed);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchNormal)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchNormal);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchExpert)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchExpert);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchMaster)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchMaster);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveForwardMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingMoveForwardMeasure);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveBackMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingMoveBackMeasure);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipForwardMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingSkipForwardMeasure);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipBackMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingSkipBackMeasure);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToFirstMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingJumpToFirstMeasure);
+            }
+			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToLastMeasure)
+			{
+				TJAPlayer3.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingJumpToLastMeasure);
+            }
+            #endregion
+            else
 			{
 		 		// #27029 2012.1.5 from
                 //if( ( this.iSystemBDGroup.n現在選択されている項目番号 == (int) EBDGroup.どっちもBD ) &&
@@ -721,15 +804,23 @@ namespace TJAPlayer3
 				{
 					t項目リストの設定_KeyAssignSystem();
 				}
-				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemReturnToMenu )	// #24609 2011.4.12 yyagi
-				{
-					t項目リストの設定_System();
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignSystemReturnToMenu )    // #24609 2011.4.12 yyagi
+                {
+                    tConfigIniへ記録する();
+                    t項目リストの設定_System();
 				}
 				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iDrumsGoToKeyAssign )				// #24525 2011.3.15 yyagi
 				{
+					tConfigIniへ記録する();
 					t項目リストの設定_KeyAssignDrums();
 				}
-				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignDrumsReturnToMenu )		// #24525 2011.3.15 yyagi
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iDrumsGoToTrainingKeyAssign )
+                {
+                    tConfigIniへ記録する();
+                    t項目リストの設定_KeyAssignTraining();
+				}
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignDrumsReturnToMenu ||
+						this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignTrainingReturnToMenu )		// #24525 2011.3.15 yyagi
 				{
 					t項目リストの設定_Drums();
 				}
@@ -818,7 +909,7 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
+			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iKeyAssignSystemReturnToMenu );
 
@@ -870,7 +961,7 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iKeyAssignDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.Eパネル種別.その他,
+			this.iKeyAssignDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add(this.iKeyAssignDrumsReturnToMenu);
 
@@ -977,8 +1068,85 @@ namespace TJAPlayer3
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignDrums;
 		}
-		#endregion
-		public void t次に移動()
+		public void t項目リストの設定_KeyAssignTraining()
+        {
+            this.list項目リスト.Clear();
+
+            this.iKeyAssignTrainingReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
+                CLangManager.LangInstance.GetString(3));
+            this.list項目リスト.Add(this.iKeyAssignTrainingReturnToMenu);
+
+
+            this.iKeyAssignTrainingPause = new CItemBase(CLangManager.LangInstance.GetString(10160),
+                CLangManager.LangInstance.GetString(10161));
+            this.list項目リスト.Add(this.iKeyAssignTrainingPause);
+
+            this.iKeyAssignTrainingToggleAuto = new CItemBase(CLangManager.LangInstance.GetString(10162),
+                CLangManager.LangInstance.GetString(10163));
+            this.list項目リスト.Add(this.iKeyAssignTrainingToggleAuto);
+
+            this.iKeyAssignTrainingBookmark = new CItemBase(CLangManager.LangInstance.GetString(10164),
+                CLangManager.LangInstance.GetString(10165));
+            this.list項目リスト.Add(this.iKeyAssignTrainingBookmark);
+
+            this.iKeyAssignTrainingIncreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString(10166),
+                CLangManager.LangInstance.GetString(10167));
+			this.list項目リスト.Add(this.iKeyAssignTrainingIncreaseScrollSpeed);
+
+			this.iKeyAssignTrainingDecreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString(10168),
+                CLangManager.LangInstance.GetString(10169));
+            this.list項目リスト.Add(this.iKeyAssignTrainingDecreaseScrollSpeed);
+
+            this.iKeyAssignTrainingIncreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString(10170),
+                CLangManager.LangInstance.GetString(10171));
+            this.list項目リスト.Add(this.iKeyAssignTrainingIncreaseSongSpeed);
+
+            this.iKeyAssignTrainingDecreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString(10172),
+                CLangManager.LangInstance.GetString(10173));
+            this.list項目リスト.Add(this.iKeyAssignTrainingDecreaseSongSpeed);
+
+            this.iKeyAssignTrainingBranchNormal = new CItemBase(CLangManager.LangInstance.GetString(10174),
+                CLangManager.LangInstance.GetString(10175));
+            this.list項目リスト.Add(this.iKeyAssignTrainingBranchNormal);
+
+            this.iKeyAssignTrainingBranchExpert = new CItemBase(CLangManager.LangInstance.GetString(10176),
+                CLangManager.LangInstance.GetString(10177));
+            this.list項目リスト.Add(this.iKeyAssignTrainingBranchExpert);
+
+            this.iKeyAssignTrainingBranchMaster = new CItemBase(CLangManager.LangInstance.GetString(10178),
+                CLangManager.LangInstance.GetString(10179));
+            this.list項目リスト.Add(this.iKeyAssignTrainingBranchMaster);
+
+            this.iKeyAssignTrainingMoveForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString(10180),
+                CLangManager.LangInstance.GetString(10181));
+            this.list項目リスト.Add(this.iKeyAssignTrainingMoveForwardMeasure);
+
+            this.iKeyAssignTrainingMoveBackMeasure = new CItemBase(CLangManager.LangInstance.GetString(10182),
+                CLangManager.LangInstance.GetString(10183));
+            this.list項目リスト.Add(this.iKeyAssignTrainingMoveBackMeasure);
+
+            this.iKeyAssignTrainingSkipForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString(10184),
+                CLangManager.LangInstance.GetString(10185));
+            this.list項目リスト.Add(this.iKeyAssignTrainingSkipForwardMeasure);
+
+            this.iKeyAssignTrainingSkipBackMeasure = new CItemBase(CLangManager.LangInstance.GetString(10186),
+                CLangManager.LangInstance.GetString(10187));
+            this.list項目リスト.Add(this.iKeyAssignTrainingSkipBackMeasure);
+
+            this.iKeyAssignTrainingJumpToFirstMeasure = new CItemBase(CLangManager.LangInstance.GetString(10188),
+                CLangManager.LangInstance.GetString(10189));
+            this.list項目リスト.Add(this.iKeyAssignTrainingJumpToFirstMeasure);
+
+            this.iKeyAssignTrainingJumpToLastMeasure = new CItemBase(CLangManager.LangInstance.GetString(10190),
+                CLangManager.LangInstance.GetString(10191));
+            this.list項目リスト.Add(this.iKeyAssignTrainingJumpToLastMeasure);
+
+            OnListMenuの初期化();
+            this.n現在の選択項目 = 0;
+            this.eメニュー種別 = Eメニュー種別.KeyAssignTraining;
+        }
+        #endregion
+        public void t次に移動()
 		{
 			TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 			if( this.b要素値にフォーカス中 )
@@ -1322,8 +1490,8 @@ namespace TJAPlayer3
 				//-----------------
 				switch( this.list項目リスト[ nItem ].eパネル種別 )
 				{
-					case CItemBase.Eパネル種別.通常:
-                    case CItemBase.Eパネル種別.その他:
+					case CItemBase.EPanelType.Normal:
+                    case CItemBase.EPanelType.Other:
                         if ( TJAPlayer3.Tx.Config_ItemBox != null )
                             TJAPlayer3.Tx.Config_ItemBox.t2D描画( x, y );
 						break;
@@ -1526,6 +1694,7 @@ namespace TJAPlayer3
 			Drums,
 			KeyAssignSystem,		// #24609 2011.4.12 yyagi: 画面キャプチャキーのアサイン
 			KeyAssignDrums,
+			KeyAssignTraining,
 			Unknown
 
 		}
@@ -1534,8 +1703,14 @@ namespace TJAPlayer3
 		private bool b要素値にフォーカス中;
 		private CCounter ct三角矢印アニメ;
 		private Eメニュー種別 eメニュー種別;
-		#region [ キーコンフィグ ]
-		private CItemBase iKeyAssignSystemCapture;			// #24609
+        #region [ Key Config ]
+
+        private CItemBase iKeyAssignSystemReturnToMenu;     // #24609
+        private CItemBase iKeyAssignDrumsReturnToMenu;
+        private CItemBase iKeyAssignTrainingReturnToMenu;
+
+        #region [System]
+        private CItemBase iKeyAssignSystemCapture;			// #24609
 		private CItemBase iKeyAssignSystemSongVolIncrease;
 		private CItemBase iKeyAssignSystemSongVolDecrease;
 		private CItemBase iKeyAssignSystemDisplayHit;
@@ -1547,10 +1722,10 @@ namespace TJAPlayer3
 		private CItemBase iKeyAssignSystemToggleAutoP2;
 		private CItemBase iKeyAssignSystemToggleTrainingMode;
 		private CItemBase iKeyAssignSystemCycleVideoDisplayMode;
-		private CItemBase iKeyAssignSystemReturnToMenu;		// #24609
-		private CItemBase iKeyAssignDrumsReturnToMenu;
+        #endregion
 
-		private CItemBase iKeyAssignTaikoLRed;
+        #region [Drum]
+        private CItemBase iKeyAssignTaikoLRed;
 		private CItemBase iKeyAssignTaikoRRed;
 		private CItemBase iKeyAssignTaikoLBlue;
 		private CItemBase iKeyAssignTaikoRBlue;
@@ -1585,9 +1760,29 @@ namespace TJAPlayer3
 		private CItemBase iKeyAssignCancel;
 		private CItemBase iKeyAssignLeftChange;
 		private CItemBase iKeyAssignRightChange;
-
 		#endregion
-		private CItemToggle iLogOutputLog;
+
+		#region [Training]
+		private CItemBase iKeyAssignTrainingIncreaseScrollSpeed;
+        private CItemBase iKeyAssignTrainingDecreaseScrollSpeed;
+		private CItemBase iKeyAssignTrainingToggleAuto;
+		private CItemBase iKeyAssignTrainingBranchNormal;
+        private CItemBase iKeyAssignTrainingBranchExpert;
+        private CItemBase iKeyAssignTrainingBranchMaster;
+		private CItemBase iKeyAssignTrainingPause;
+		private CItemBase iKeyAssignTrainingBookmark;
+		private CItemBase iKeyAssignTrainingMoveForwardMeasure;
+		private CItemBase iKeyAssignTrainingMoveBackMeasure;
+		private CItemBase iKeyAssignTrainingSkipForwardMeasure;
+        private CItemBase iKeyAssignTrainingSkipBackMeasure;
+		private CItemBase iKeyAssignTrainingIncreaseSongSpeed;
+		private CItemBase iKeyAssignTrainingDecreaseSongSpeed;
+		private CItemBase iKeyAssignTrainingJumpToFirstMeasure;
+		private CItemBase iKeyAssignTrainingJumpToLastMeasure;
+        #endregion
+
+        #endregion
+        private CItemToggle iLogOutputLog;
 		private CItemToggle iSystemApplyLoudnessMetadata;
 		private CItemInteger iSystemTargetLoudness;
 		private CItemToggle iSystemApplySongVol;
@@ -1672,6 +1867,7 @@ namespace TJAPlayer3
 		private int nSkinIndex;						//
 
 		private CItemBase iDrumsGoToKeyAssign;
+		private CItemBase iDrumsGoToTrainingKeyAssign;
 		private CItemBase iSystemGoToKeyAssign;		// #24609
 		private CItemInteger iCommonPlaySpeed;
 
@@ -1712,6 +1908,8 @@ namespace TJAPlayer3
         CItemToggle FastRender;
         CItemToggle ASyncTextureLoad;
         CItemInteger MusicPreTimeMs;
+		CItemInteger TokkunSkipCount;
+		CItemInteger TokkunMashInterval;
 
 		private CItemInteger iInputAdjustTimeMs;
 		private CItemInteger iGlobalOffsetMs;
@@ -1829,7 +2027,7 @@ namespace TJAPlayer3
 
 			TJAPlayer3.ConfigIni.nPlayerCount = this.iTaikoPlayerCount.n現在の値;
 
-			TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
+			//TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
 			TJAPlayer3.ConfigIni.FastRender = this.FastRender.bON;
             TJAPlayer3.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
             TJAPlayer3.ConfigIni.SimpleMode = this.SimpleMode.bON;
@@ -1875,6 +2073,8 @@ namespace TJAPlayer3
 			TJAPlayer3.ConfigIni.bJudgeBigNotes = this.iTaikoBigNotesJudge.bON;
 			TJAPlayer3.ConfigIni.bForceNormalGauge = this.iTaikoForceNormalGauge.bON;
 
+			TJAPlayer3.ConfigIni.TokkunSkipMeasures = this.TokkunSkipCount.n現在の値;
+			TJAPlayer3.ConfigIni.TokkunMashInterval = this.TokkunMashInterval.n現在の値;
 		}
 		//-----------------
 		#endregion

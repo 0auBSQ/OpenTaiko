@@ -385,22 +385,34 @@ namespace TJAPlayer3
 		{
 			for( int i = 0; i < 144; i++ )
 			{
-				if (i != (int)SlimDXKeys.Key.Escape &&
-					i != (int)SlimDXKeys.Key.Return &&
-					i != (int)SlimDXKeys.Key.UpArrow &&
-					i != (int)SlimDXKeys.Key.DownArrow &&
-					i != (int)SlimDXKeys.Key.LeftArrow &&
-					i != (int)SlimDXKeys.Key.RightArrow &&
-					i != (int)SlimDXKeys.Key.Delete &&
-					 TJAPlayer3.InputManager.Keyboard.KeyPressed( i ) )
-				{
-					TJAPlayer3.Skin.soundDecideSFX.tPlay();
-					TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Keyboard, 0, i, this.pad);
+                //if (i != (int)SlimDXKeys.Key.Escape &&
+                //	i != (int)SlimDXKeys.Key.Return &&
+                //	i != (int)SlimDXKeys.Key.UpArrow &&
+                //	i != (int)SlimDXKeys.Key.DownArrow &&
+                //	i != (int)SlimDXKeys.Key.LeftArrow &&
+                //	i != (int)SlimDXKeys.Key.RightArrow &&
+                //	 TJAPlayer3.InputManager.Keyboard.KeyPressed( i ) )
+                //{
+                if (i != (int)SlimDXKeys.Key.Escape &&
+                    i != (int)SlimDXKeys.Key.Return &&
+                     TJAPlayer3.InputManager.Keyboard.KeyPressed(i))
+                {
+                    TJAPlayer3.Skin.soundDecideSFX.tPlay();
+					if (pad < EKeyConfigPad.Capture)
+						TJAPlayer3.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する( EInputDevice.Keyboard, 0, i, this.pad);
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].入力デバイス = EInputDevice.Keyboard;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].ID = 0;
 					TJAPlayer3.ConfigIni.KeyAssign[ (int) this.part ][ (int) this.pad ][ this.n現在の選択行 ].コード = i;
 					return true;
 				}
+				else if (i == (int)SlimDXKeys.Key.Return && TJAPlayer3.InputManager.Keyboard.KeyPressed(i)) // Remove keybind
+                {
+					TJAPlayer3.Skin.soundCancelSFX.tPlay();
+                    TJAPlayer3.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].入力デバイス = EInputDevice.Unknown;
+                    TJAPlayer3.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
+                    TJAPlayer3.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].コード = 0;
+					return true;
+                }
 			}
 			return false;
 		}

@@ -3221,13 +3221,13 @@ namespace TJAPlayer3
 					TJAPlayer3.DTX.tWave再生位置自動補正();
 				}
                 // Tokkun only
-                else if (TJAPlayer3.ConfigIni.bTokkunMode && 
-                    keyboard.KeyPressed( (int)SlimDXKeys.Key.UpArrow ) )
+                else if (TJAPlayer3.ConfigIni.bTokkunMode &&
+                    TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingIncreaseScrollSpeed) )
 				{	// UpArrow(scrollspeed up)
 					ドラムスクロール速度アップ();
 				}
-				else if (TJAPlayer3.ConfigIni.bTokkunMode && 
-                    keyboard.KeyPressed( (int)SlimDXKeys.Key.DownArrow ) )
+				else if (TJAPlayer3.ConfigIni.bTokkunMode &&
+                    TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingDecreaseScrollSpeed) )
 				{	// DownArrow (scrollspeed down)
 					ドラムスクロール速度ダウン();
 				}
@@ -3265,7 +3265,8 @@ namespace TJAPlayer3
                     }
                     // this.t演奏中止();
 				}
-                else if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.D1 ) )
+                else if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchNormal) && 
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]) )
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3291,7 +3292,8 @@ namespace TJAPlayer3
 
                     this.b強制的に分岐させた[0] = true;
                 }
-                else if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.D2 ) )		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
+                else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchExpert) &&
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3317,7 +3319,8 @@ namespace TJAPlayer3
 
                     this.b強制的に分岐させた[0] = true;
                 }
-                else if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.D3 ) )		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
+                else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchMaster) &&
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3370,15 +3373,9 @@ namespace TJAPlayer3
                     }
 				}
 
-                if (TJAPlayer3.ConfigIni.bTokkunMode) 
+                if (TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingToggleAuto) ) 
                 {
-                    if (keyboard.KeyPressed((int)SlimDXKeys.Key.F6))
-                    {
-                        if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] == false)
-                            TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] = true;
-                        else
-                            TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] = false;
-                    }
+                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
                 }
             }
 
@@ -3386,10 +3383,7 @@ namespace TJAPlayer3
 
             if (keyboard.KeyPressed((int)SlimDXKeys.Key.F7))
             {
-                if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] == false)
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] = true;
-                else
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] = false;
+                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1];
             }
 #endif
             if ( !this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
@@ -3402,7 +3396,7 @@ namespace TJAPlayer3
 				{	// DownArrow (scrollspeed down)
 					ドラムスクロール速度ダウン();
 				}
-				else if ( keyboard.KeyPressed( (int)SlimDXKeys.Key.Delete ) )
+				else if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.DisplayDebug) )
 				{	// del (debug info)
 					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
 				}
