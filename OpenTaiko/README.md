@@ -165,6 +165,7 @@ BoxFontName=廻想体 ネクスト UP B
 118 - Froggy Forest Raceway : Baby Zionov https://twitter.com/babyzionov (Chart by Shoxk & DragonRatTiger)
 119 - Fractured Eternity : roər & Toneix [roər: SC ➜ https://soundcloud.com/rroer TW ➜ https://twitter.com/roerdtm YT ➜ https://www.youtube.com/@roer-music | Toneix: SC ➜ https://soundcloud.com/toneix TW ➜ https://twitter.com/Toneix1 YT ➜ https://www.youtube.com/@Toneix/featured] (Chart by Komi & bol) 
 120 - the infinite cityscape : Makotora - https://soundcloud.com/kingmakotora (Chart by sadkay & Komi)
+121 - PARANOiA Perpetuity : funkyzukin - https://funkyzukin.bandcamp.com/ (Chart by Komi) 
 ```
 
 ### Visuals
@@ -253,7 +254,7 @@ The credits and links and licence information for each song are included on the 
 Grazepoint: https://grazepoint.bandcamp.com/ https://grazepoint.bandcamp.com/album/touwho https://grazepoint.bandcamp.com/album/touwho-2
 TOHO EURO MISSION: https://djtimotei.bandcamp.com/album/toho-euro-mission-02 https://djtimotei.bandcamp.com/album/toho-euro-mission-03
 Showcases:
-(Coming soon)
+https://youtu.be/QloCXN6TFhY
 
 The included songs are:
 ```
@@ -263,10 +264,10 @@ Spread My Wings - DJ Timotei ft. Slothington [DJ Timotei (https://www.youtube.co
 Confession - TTL ft. Kanata [TTL (https://www.youtube.com/@ttlsound760)] (Chart by Komi)
 War Zone - WORLDWIDEWOLF feat. Timothy [https://takanashikoubou.com/ https://worldwidewolf.bandcamp.com/ https://soundcloud.com/worldwldewolf https://bsky.app/profile/worldwidewolf.bsky.social https://twitter.com/WORLDWlDEWOLF https://www.youtube.com/channel/UCWXNd52sTxn9ubwp2ixct6A https://www.youtube.com/@DJ_Timotei https://twitter.com/DJTimotei https://djtimotei.bandcamp.com/] (Chart by Komi)
 Journey - DJ Timotei ft. つぅ [DJ Timotei (https://www.youtube.com/@DJ_Timotei); つぅ(https://www.youtube.com/@K2ECradle)] (Chart by Komi)
-Abyss - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
-Exterminate - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
+Abyss - Taichenko https://space.bilibili.com/356518101 (Chart by Taichenko & Komi)
+Exterminate - Taichenko https://space.bilibili.com/356518101 (Chart by Taichenko & Komi)
 Imperfect Cherry Blossom - Whitetail https://soundcloud.com/whitetail-music https://treepunk.bandcamp.com/ https://www.youtube.com/user/whitetailmusic (Chart by Komi)
-Disintegrated Laevatein - Taichenko https://space.bilibili.com/356518101 (Chart by Taichanko & Komi)
+Disintegrated Laevatein - Taichenko https://space.bilibili.com/356518101 (Chart by Taichenko & Komi)
 Cirno in Quarantine - H5 https://linktr.ee/H5Music (Chart by bol)
 BLINDED CRITICISM - DeBisco & Zovi [DeBisco(https://soundcloud.com/debisco https://twitter.com/debiscomusic) Zovi(https://zovi.bandcamp.com/ https://soundcloud.com/zovi https://twitter.com/zovinoise)] (Chart by Komi)
 ```
