@@ -221,20 +221,20 @@ namespace TJAPlayer3
             [9995] = "异步贴图加载",
 
             [9996] = "绘制方式：\n" +
-                    "从 OpenGL，Vulkan，DirectX11 或 DirectX12 中选择。\n" +
-                    "OpenGL 速度较慢，但稳定性和兼容性较好。\n" +
-                    "Vulkan 在 Linux 上速度最快。\n" +
-                    "DirectX11 较快且稳定，但只能在 Windows 上使用。\n" +
-                    "DirectX12 效率很高，但只能在 Windows 上使用。\n" +
-                    "\n" +
-                    "该项设置将会在游戏重启后生效。\n",
+                     "从 OpenGL，Vulkan，DirectX11 或 DirectX12 中选择。\n" +
+                     "OpenGL 速度较慢，但稳定性和兼容性较好。\n" +
+                     "Vulkan 在 Linux 上速度最快。\n" +
+                     "DirectX11 较快且稳定，但只能在 Windows 上使用。\n" +
+                     "DirectX12 效率很高，但只能在 Windows 上使用。\n" +
+                     "\n" +
+                     "该项设置将会在游戏重启后生效。\n",
             [9997] = "画面渲染 API",
 
             [9998] = "当使用 Bass 模式时的缓冲区大小：\n" +
-                    "— 范围： 0-99999ms。\n" +
-                    "— 0：系统决定该值的大小。\n" +
-                    "该值越小，音频卡顿/延迟会更小，但或导致声音异常或爆音。\n" +
-                    "退出设置界面以使此选项生效。",
+                     "— 范围： 0-99999ms。\n" +
+                     "— 0：系统决定该值的大小。\n" +
+                     "该值越小，音频卡顿/延迟会更小，但或导致声音异常或爆音。\n" +
+                     "退出设置界面以使此选项生效。",
             [9999] = "Bass 模式缓冲区大小",
             [10000] = "鼓按键分配：\n分配左红按键",
             [10001] = "右红",
@@ -383,46 +383,45 @@ namespace TJAPlayer3
             [10152] = "循环视频播放显示",
             [10153] = "系统按键分配：\n分配循环视频播放显示模式按键。\n（仅可使用键盘，不可使用手柄）",	
 
-            [10154] = "Measure Skip Count",
-            [10155] = "The number of measures to skip while\npressing Skip Forward/Back Measure in\nTraining Mode.",
-            [10156] = "Measure Jump Time Interval",
-            [10157] = "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
-            [10158] = "Training Mode Key Config",
-            [10159] = "A secondary menu to adjust keys used during\nTraining Mode.",
+            [10154] = "跳转小节数",
+            [10155] = "训练模式中按下前进/后退多个小节\n跳转的小节数。",
+            [10156] = "跳转小节时间间隔",
+            [10157] = "训练模式中跳转至带书签的小节\n交替按下左/右蓝按键所需毫秒数。",
+            [10158] = "训练模式按键设置",
+            [10159] = "二级菜单：设置训练模式下的按键。",
 
-            [10160] = "Pause Training",
-            [10161] = "Drums key assign:\nAssign any key for pausing.",
-            [10162] = "Toggle Auto",
-            [10163] = "Drums key assign:\nAssign any key for toggling auto.",
-            [10164] = "Add/Remove Bookmark",
-            [10165] = "Drums key assign:\nAssign any key for adding/removing bookmarks.",
-            [10166] = "Increase Scroll Speed",
-            [10167] = "Drums key assign:\nAssign any key for increasing scroll speed.",
-            [10168] = "Decrease Scroll Speed",
-            [10169] = "Drums key assign:\nAssign any key for decreasing scroll speed.",
-            [10170] = "Increase Song Speed",
-            [10171] = "Drums key assign:\nAssign any key for increasing song speed.",
-            [10172] = "Decrease Song Speed",
-            [10173] = "Drums key assign:\nAssign any key for decreasing song speed.",
-            [10174] = "Set Branch to Normal",
-            [10175] = "Drums key assign:\nAssign any key for setting a chart's branch\nto normal.",
-            [10176] = "Set Branch to Expert",
-            [10177] = "Drums key assign:\nAssign any key for setting a chart's branch\nto expert.",
-            [10178] = "Set Branch to Master",
-            [10179] = "Drums key assign:\nAssign any key for setting a chart's branch\nto master.",
-            [10180] = "Move Forward Measure",
-            [10181] = "Drums key assign:\nAssign any key for moving forward a measure.",
-            [10182] = "Move Back Measure",
-            [10183] = "Drums key assign:\nAssign any key for moving back a measure.",
-            [10184] = "Skip Forward Measures",
-            [10185] = "Drums key assign:\nAssign any key for skipping forward measures.",
-            [10186] = "Skip Back Measures",
-            [10187] = "Drums key assign:\nAssign any key for skipping back measures.",
-            [10188] = "Jump to First Measure",
-            [10189] = "Drums key assign:\nAssign any key for jumping to the first measure.",
-            [10190] = "Jump to Last Measure",
-            [10191] = "Drums key assign:\nAssign any key for jumping to the last measure.",
-            // Please translate the text above!
+            [10160] = "暂停训练",
+            [10161] = "鼓按键分配：\n分配暂停训练按键。",
+            [10162] = "切换自动演奏",
+            [10163] = "鼓按键分配：\n分配切换自动演奏按键。",
+            [10164] = "添加/移除书签",
+            [10165] = "鼓按键分配：\n分配添加/移除书签按键。",
+            [10166] = "提高卷动速度",
+            [10167] = "鼓按键分配：\n分配提高卷动速度按键。",
+            [10168] = "降低卷动速度",
+            [10169] = "鼓按键分配：\n分配降低卷动速度按键。",
+            [10170] = "提高音乐播放速度",
+            [10171] = "鼓按键分配：\n分配提高音乐播放速度按键。",
+            [10172] = "降低音乐播放速度",
+            [10173] = "鼓按键分配：\n分配降低音乐播放速度按键。",
+            [10174] = "切换分歧为普通谱面",
+            [10175] = "鼓按键分配：\n分配切换分歧为普通谱面按键。",
+            [10176] = "切换分歧为进阶谱面",
+            [10177] = "鼓按键分配：\n分配切换分歧为进阶谱面按键。",
+            [10178] = "切换分歧为达人谱面",
+            [10179] = "鼓按键分配：\n分配切换分歧为达人谱面按键。",
+            [10180] = "前进至下一小节",
+            [10181] = "鼓按键分配：\n分配前进至下一小节按键。",
+            [10182] = "后退至上一小节",
+            [10183] = "鼓按键分配：\n分配后退至上一小节按键。",
+            [10184] = "前进多个小节",
+            [10185] = "鼓按键分配：\n分配前进多个小节按键。",
+            [10186] = "后退多个小节",
+            [10187] = "鼓按键分配：\n分配后退多个小节按键。",
+            [10188] = "跳转至第一小节",
+            [10189] = "鼓按键分配：\n分配跳转至第一小节按键。",
+            [10190] = "跳转至最后一小节",
+            [10191] = "鼓按键分配：\n分配跳转至最后一小节按键。",
 
             [100] = "演奏模式",
             [101] = "段位道场",
