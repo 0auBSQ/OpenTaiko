@@ -513,12 +513,12 @@ namespace TJAPlayer3
 		}
 		public static DiscordRpcClient DiscordClient;
 
-		// 0 : 1P, 1 : 2P
+		// 0: 1P, 1: 2P
 		public static int SaveFile = 0;
 
 		public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
-		// 0 : Hidari, 1 : Migi (1P only)
+		// 0: Left, 1: Right (1P only)
 		public static int PlayerSide = 0;
 
 		public static int GetActualPlayer(int player)
@@ -975,7 +975,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ タイトル" );
+								Trace.TraceInformation( "■ Title" );
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -994,7 +994,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 曲読み込み" );
+								Trace.TraceInformation( "■ Song Loading" );
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1057,7 +1057,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 段位選択" );
+								Trace.TraceInformation( "■ Dan Select" );
 								stage段位選択.Activate();	
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1268,7 +1268,7 @@ namespace TJAPlayer3
 										r現在のステージ.ReleaseUnmanagedResource();
 									}
 									Trace.TraceInformation( "----------------------" );
-									Trace.TraceInformation( "■ タイトル" );
+									Trace.TraceInformation( "■ Title" );
 									stageタイトル.Activate();
 									if (!ConfigIni.PreAssetsLoading) 
 									{
@@ -1344,7 +1344,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ タイトル" );
+								Trace.TraceInformation( "■ Title" );
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1512,7 +1512,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1552,7 +1552,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 曲読み込み");
+								Trace.TraceInformation("■ Song Loading");
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1591,7 +1591,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1689,7 +1689,7 @@ namespace TJAPlayer3
 							#endregion
 
 							Trace.TraceInformation( "----------------------" );
-							Trace.TraceInformation( "■ 演奏（ドラム画面）" );
+                                Trace.TraceInformation("■ In-game [Drum Screen]");
 #if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 for (int i = 0; i < 5; i++)
 {
@@ -2134,7 +2134,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
@@ -2169,7 +2169,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 曲読み込み");
+								Trace.TraceInformation("■ Song Loading");
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -2247,7 +2247,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -2606,6 +2606,7 @@ for (int i = 0; i < 3; i++) {
 		public List<CActivity> listトップレベルActivities;
 		private int n進行描画の戻り値;
 		private string strWindowTitle
+			// another DTX reference that we still don't know how to delete
 		{
 			get
 			{
@@ -2615,7 +2616,7 @@ for (int i = 0; i < 3; i++) {
 				}
 				else
 				{
-					return "TJAPlayer3 feat.DTXMania";
+					return "OpenTaiko feat.DTXMania";
 				}
 			}
 		}
@@ -2663,27 +2664,24 @@ for (int i = 0; i < 3; i++) {
 			{
 				try
 				{
-					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "TJAPlayer3.log" ), false, Encoding.GetEncoding(TJAPlayer3.sEncType) ) ) );
+					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "OpenTaiko.log" ), false, Encoding.GetEncoding(TJAPlayer3.sEncType) ) ) );
 				}
-				catch ( System.UnauthorizedAccessException )			// #24481 2011.2.20 yyagi
-				{
-					int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja")? 0 : 1;
 					string[] mes_writeErr = {
 						"DTXManiaLog.txtへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
-						"Failed to write DTXManiaLog.txt. Please set it writable and try again."
+						"Failed to write DTXManiaLog.txt. Please set your device to READ/WRITE and try again."
 					};
-					//MessageBox.Show( mes_writeErr[c], "DTXMania boot error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+					//MessageBox.Show( mes_writeErr[c], "OpenTaiko boot error", MessageBoxButtons.OK, MessageBoxIcon.Error );
 					Environment.Exit(1);
 				}
 			}
 			Trace.WriteLine("");
-			Trace.WriteLine( "DTXMania powered by YAMAHA Silent Session Drums" );
-			Trace.WriteLine( string.Format( "Release: {0}", VERSION ) );
+			Trace.WriteLine( "Welcome to OpenTaiko! Starting log..." );
+			Trace.WriteLine( string.Format( "Version: {0}", VERSION ) );
 			Trace.WriteLine( "" );
 			Trace.TraceInformation( "----------------------" );
-			Trace.TraceInformation( "■ アプリケーションの初期化" );
+			Trace.TraceInformation( "■ Application Info" );
 			Trace.TraceInformation( "OS Version: " + Environment.OSVersion );
-			Trace.TraceInformation( "ProcessorCount: " + Environment.ProcessorCount.ToString() );
+			Trace.TraceInformation( "Processors: " + Environment.ProcessorCount.ToString() );
 			Trace.TraceInformation( "CLR Version: " + Environment.Version.ToString() );
 			//---------------------
 			#endregion
@@ -2710,7 +2708,7 @@ for (int i = 0; i < 3; i++) {
 
 			#region [ Skin の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "スキンの初期化を行います。" );
+			Trace.TraceInformation( "Initalizing skin..." );
 			Trace.Indent();
 #if !DEBUG
 			try
@@ -2721,12 +2719,12 @@ for (int i = 0; i < 3; i++) {
 
 				ChangeResolution(TJAPlayer3.Skin.Resolution[0], TJAPlayer3.Skin.Resolution[1]);
 
-				Trace.TraceInformation( "スキンの初期化を完了しました。" );
+				Trace.TraceInformation( "Skin initialized." );
 			}
 #if !DEBUG
 			catch (Exception e)
 			{
-				Trace.TraceInformation( "スキンの初期化に失敗しました。" );
+				Trace.TraceInformation( "Skin initialization failed." );
 				throw;
 			}
 			finally
@@ -2892,7 +2890,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Sound管理 の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "サウンドデバイスの初期化を行います。" );
+			Trace.TraceInformation( "Initializing sound device..." );
 			Trace.Indent();
 			try
 			{
@@ -2959,11 +2957,11 @@ for (int i = 0; i < 3; i++) {
 				FDK.SoundManager.bIsTimeStretch = TJAPlayer3.ConfigIni.bTimeStretch;
 				SoundManager.nMasterVolume = TJAPlayer3.ConfigIni.nMasterVolume;
 				//FDK.CSound管理.bIsMP3DecodeByWindowsCodec = CDTXMania.ConfigIni.bNoMP3Streaming;
-				Trace.TraceInformation( "サウンドデバイスの初期化を完了しました。" );
+				Trace.TraceInformation( "Sound device initialized." );
 			}
 			catch (Exception e)
 			{
-                throw new NullReferenceException("サウンドデバイスがひとつも有効になっていないため、サウンドデバイスの初期化ができませんでした。", e);
+                throw new NullReferenceException("Sound device failed to initialize. Please check if your sound device is plugged in correctly.", e);
 			}
 			finally
 			{
@@ -3150,7 +3148,7 @@ for (int i = 0; i < 3; i++) {
 			if( !this.b終了処理完了済み )
 			{
 				Trace.TraceInformation( "----------------------" );
-				Trace.TraceInformation( "■ アプリケーションの終了" );
+				Trace.TraceInformation( "■ Application Closing" );
 				#region [ 曲検索の終了処理 ]
 				//---------------------
 				
@@ -3622,7 +3620,6 @@ for (int i = 0; i < 3; i++) {
 			if( !Directory.Exists( PluginFolderPath ) )
 			{
 				Trace.TraceWarning( "The plugin folder does not exist. (" + PluginFolderPath + ")" );
-				return;
 			}
 
 			// (1) すべての *.dll について…

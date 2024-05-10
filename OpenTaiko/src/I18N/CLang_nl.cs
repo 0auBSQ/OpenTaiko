@@ -75,7 +75,7 @@ namespace TJAPlayer3
             [39] = "Toggle whether results screenshots are automatically taken.\nThis will only occur when a highscore is achieved,\nwhich may not correlate to the best play on that song.",
             [40] = "Toggle whether song information is shared with Discord.",
             [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
-            [42] = "Toggle whether a TJAPlayer3.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
+            [42] = "Toggle whether a OpenTaiko.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
             [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\nWasapi:\n- Only compatible with Windows\n- Has the second lowest input delay\nBASS:\n- Supported on all platforms\n" +
                 "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",

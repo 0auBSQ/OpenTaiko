@@ -75,7 +75,7 @@ namespace TJAPlayer3
             [39] = "Toggle whether results screenshots are automatically taken.\nThis will only occur when a highscore is achieved,\nwhich may not correlate to the best play on that song.",
             [40] = "Toggle whether song information is shared with Discord.",
             [41] = "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
-            [42] = "Toggle whether a TJAPlayer3.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
+            [42] = "Toggle whether a OpenTaiko.log file is generated\nwhen the game is closed.\nThis tracks the performance of the game\nand identifies errors.",
             [43] = "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\nWasapi:\n- Only compatible with Windows\n- Has the second lowest input delay\nBASS:\n- Supported on all platforms\n" +
                 "Note: Exit CONFIGURATION to make\n" +
                 "     the setting take effect.",
@@ -89,7 +89,7 @@ namespace TJAPlayer3
                 "     the setting take effect.",
             [46] = "Turning this on will create smoother note scroll,\nbut may introduce sound lag.\nTurning it off will create unstable note scroll,\nbut ensure no sound lag occurs.\n" +
                 "\n" +
-                "If OFF, DTXMania uses its original\n" +
+                "If OFF, OpenTaiko uses its original\n" +
                 "timer and the effect is vice versa.\n",
             [47] = "Show Character Images.\n",
             [48] = "Show Dancer Images.\n",
@@ -315,6 +315,7 @@ namespace TJAPlayer3
             // System Key Assign
             [97] = "Capture",
             [98] = "System key assign:\nAssign any key for screen capture.\n(You can only use keyboard. You can't\nuse gamepads.)",
+            // PLEASE LET US USE THESE WITHOUT BEING TOO OBSCURE :sob: - tfd
             [10128] = "Increase Volume",
             [10129] = "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
             [10130] = "Decrease Volume",
@@ -396,29 +397,29 @@ namespace TJAPlayer3
             [113] = "Open Toolbox",
 
             [150] = "Play your favorite\nsongs at your own pace !",
-            [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank !",
-            [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower !",
-            [153] = "Buy new songs, petit-chara or characters\nusing the medals you earned in game !",
-            [154] = "Surpass various obstacles and\nunlock new content and horizons !",
-            [155] = "Change your nameplate info\n or your character visuals !",
-            [156] = "Change your game style\n or general settings !",
-            [157] = "Quit the game.\nSee you next time !",
-            [158] = "Download new charts\nand content from\n the internet !",
-            [159] = "Learn about OpenTaiko\nrelated features and\nhow to install new content !",
-            [160] = "Fight a strong AI through\nmultiple sections and\naim for victory !",
-            [161] = "Watch and track your\nprogression !",
-            [162] = "Create your own .tja charts\nbased on your favorite songs !",
-            [163] = "Use various tools to insert\nnew custom content !",
+            [151] = "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank!",
+            [152] = "Play long charts within a limited\ncount of lives and reach\nthe top of the tower!",
+            [153] = "Buy new songs, petit-chara or characters\nusing the medals you earned in game!",
+            [154] = "Surpass various obstacles and\nunlock new content and horizons!",
+            [155] = "Change your nameplate info\n or your character visuals!",
+            [156] = "Change your game style\n or general settings!",
+            [157] = "Quit the game.\nSee you next time!",
+            [158] = "Download new charts\nand content from\n the internet!",
+            [159] = "Learn about OpenTaiko\nrelated features and\nhow to install new content!",
+            [160] = "Fight a strong AI through\nmultiple sections and\naim for victory!",
+            [161] = "Watch and track your\nprogression!",
+            [162] = "Create your own .tja charts\nbased on your favorite songs!",
+            [163] = "Use various tools to insert\nnew custom content!",
 
             [200] = "Return",
             [201] = "Recently played songs",
-            [202] = "Play recently played songs !",
+            [202] = "Play recently played songs!",
             [203] = "Random song",
 
-            [300] = "Coins got !",
-            [301] = "Character got !",
-            [302] = "Puchichara got !",
-            [303] = "Title got !",
+            [300] = "Coins got!",
+            [301] = "Character got!",
+            [302] = "Puchichara got!",
+            [303] = "Title got!",
             [304] = "Notice",
             [305] = "Confirm",
             [306] = "Coins",
@@ -439,8 +440,8 @@ namespace TJAPlayer3
             [503] = "Normal",
             [504] = "Strict",
             [505] = "Rigorous",
-            [510] = "Score Multiplier : ",
-            [511] = "Coins Multiplier : ",
+            [510] = "Score Multiplier: ",
+            [511] = "Coins Multiplier: ",
             [512] = "Game Type",
             [513] = "Taiko",
             [514] = "Konga",
@@ -455,7 +456,7 @@ namespace TJAPlayer3
 
             [1010] = "Soul gauge",
             [1011] = "Good count",
-            [1012] = "Ok count",
+            [1012] = "OK count",
             [1013] = "Bad count",
             [1014] = "Score",
             [1015] = "Rolls count",
@@ -480,10 +481,10 @@ namespace TJAPlayer3
 
             [90000] = "[ERROR] Invalid condition",
             [90001] = "Item only avaliable at the Shop.",
-            [90002] = "Coin price : ",
-            [90003] = "Item bought !",
-            [90004] = "Not enough coins !",
-            [90005] = "The following condition : ",
+            [90002] = "Coin price: ",
+            [90003] = "Item bought!",
+            [90004] = "Not enough coins!",
+            [90005] = "The following condition: ",
 
             [900] = "Resume",
             [901] = "Restart",

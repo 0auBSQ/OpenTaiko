@@ -80,7 +80,7 @@ namespace TJAPlayer3
             [39] = "Permet la prise automatique de capture d'écran\nà la fin d'une partie.\nSeulement déclanché en cas de meilleur score,\nqui peut ne pas refleter parfaitement\nla qualité de celui-ci.",
             [40] = "Active ou non le partage d'informations\nde jeu avec Discord.",
             [41] = "Permet d'éviter la perte de frappes en\ncas de chute de FPS.\nSi désactivé, des frappes peuvent être\nperdues mais seront plus souvent mises\nen attendes en cas de freeze.",
-            [42] = "Génère un fichier TJAPlayer3.log file à la fermeture\ndu jeu.\nPermet l'évaluation des performances et\nfacilite l'identification des erreurs.",
+            [42] = "Génère un fichier OpenTaiko.log file à la fermeture\ndu jeu.\nPermet l'évaluation des performances et\nfacilite l'identification des erreurs.",
             // --------------------------------
             [43] = "ASIO:\n- Fonctionne seulement avec les appareils compatibles.\n- Latence d'entrée les plus faibles\nWasapi:\n- Latence d'entrée généralement faible\n- Bloque les sons exterieurs à OpenTaiko\nDirect Sound:\n- Permet les sons exterieurs à OpenTaiko\n- Latence d'entrée élevée\n",
 			// Please update the translation above; DirectSound is no longer used, and has been replaced with BASS. BASS is compatible with all platforms.
