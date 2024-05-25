@@ -19,6 +19,7 @@ namespace TJAPlayer3
                 FooterSet = null;
                 MobSet = null;
                 RunnerSet = null;
+                RollEffectSet = null;
             }
 
             [JsonProperty("UP")]
@@ -38,6 +39,9 @@ namespace TJAPlayer3
 
             [JsonProperty("RUNNER")]
             public string[] RunnerSet;
+
+            [JsonProperty("ROLLEFFECT")]
+            public string[] RollEffectSet;
         }
         public class SkinPreset
         {
