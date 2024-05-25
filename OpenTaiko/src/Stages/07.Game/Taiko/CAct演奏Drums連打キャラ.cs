@@ -141,7 +141,7 @@ namespace TJAPlayer3
                         foreach (string line in strSingleLine)
                         {
                             var line2 = line.Replace(" ", "");
-                            if (line2.StartsWith("Game_Effect_Roll_StartPoint_X=")) // required for Heya resolution compatibility
+                            if (line2.StartsWith("Game_Effect_Roll_StartPoint_X="))
                             {
                                 int[] values = line2.Substring(30).Trim().Split(',').Select(int.Parse).ToArray();
                                 Game_Effect_Roll_StartPoint_X = values;
