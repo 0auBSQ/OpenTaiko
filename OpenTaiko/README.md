@@ -166,6 +166,7 @@ BoxFontName=廻想体 ネクスト UP B
 119 - Fractured Eternity : roər & Toneix [roər: SC ➜ https://soundcloud.com/rroer TW ➜ https://twitter.com/roerdtm YT ➜ https://www.youtube.com/@roer-music | Toneix: SC ➜ https://soundcloud.com/toneix TW ➜ https://twitter.com/Toneix1 YT ➜ https://www.youtube.com/@Toneix/featured] (Chart by Komi & bol) 
 120 - the infinite cityscape : Makotora - https://soundcloud.com/kingmakotora (Chart by sadkay & Komi)
 121 - PARANOiA Perpetuity : funkyzukin - https://funkyzukin.bandcamp.com/ (Chart by Komi) 
+122 - Incoherent Hysteria : OfficialAz3 - https://www.youtube.com/channel/UCG00E-P8y_hQZZ_f88Oka8w (Chart by sadkay)
 ```
 
 ### Visuals
