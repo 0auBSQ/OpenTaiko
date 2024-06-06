@@ -26,5 +26,10 @@ namespace TJAPlayer3
                 return Strings["default"];
             return defaultsDefault;
         }
+
+        public void SetString(string langcode, string str)
+        {
+            Strings[langcode] = str;
+        }
     }
 }

@@ -31,6 +31,11 @@ namespace TJAPlayer3
         public void tEarnCoins(int amount)
         {
             data.Medals += amount;
+            data.TotalEarnedMedals += amount;
+
+            // Small trick here, each actual play (excluding Auto, AI, etc) are worth at least 5 coins for the player, whatever which mode it is (Dan, Tower, Taiko mode, etc)
+            // Earn Coins is also called once per play, so we just add 1 here to the total playcount
+            data.TotalPlaycount += 1;
             tSaveFile();
         }
 
@@ -210,6 +215,12 @@ namespace TJAPlayer3
 
             [JsonProperty("medals")]
             public int Medals = 0;
+
+            [JsonProperty("totalEarnedMedals")]
+            public int TotalEarnedMedals = 0;
+
+            [JsonProperty("totalPlaycount")]
+            public int TotalPlaycount = 0;
 
             [JsonProperty("character")]
             public int Character = 0;

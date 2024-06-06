@@ -107,6 +107,7 @@ namespace TJAPlayer3
         }
 
         public static readonly string[] Languages = new string[] { "日本語 (Japanese)", "English", "Français (French)", "Español (Spanish)", "中文 (Chinese)", "nl (WIP)", "ko (WIP)" };
+        public static readonly string[] Langcodes = new string[] { "ja", "en", "fr", "es", "zh", "nl", "ko" };
         public static ILang LangInstance { get; private set; }  = new CLang_jp();
     }
 }
