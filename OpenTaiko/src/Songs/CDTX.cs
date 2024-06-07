@@ -1095,6 +1095,7 @@ namespace TJAPlayer3
         public double db再生速度;
         public string GENRE;
         public string MAKER;
+        public string[] NOTESDESIGNER = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
         public bool EXPLICIT;
         public string SELECTBG;
         public Eジャンル eジャンル;
@@ -7356,6 +7357,10 @@ namespace TJAPlayer3
                 this.LEVEL.Drums = (int)level;
                 this.LEVEL.Taiko = (int)level;
                 this.LEVELtaiko[this.n参照中の難易度] = (int)level;
+            }
+            else if (strCommandName.StartsWith("NOTESDESIGNER"))
+            {
+                this.NOTESDESIGNER[this.n参照中の難易度] = strCommandParam;
             }
             else if (strCommandName.Equals("LIFE"))
             {

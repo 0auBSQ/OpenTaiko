@@ -192,6 +192,9 @@ namespace TJAPlayer3
 
         public class Data
         {
+            [JsonProperty("saveId")]
+            public long SaveId = 0;
+
             [JsonProperty("name")]
             public string Name = "プレイヤー1";
 
