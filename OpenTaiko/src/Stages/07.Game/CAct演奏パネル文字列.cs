@@ -147,7 +147,7 @@ namespace TJAPlayer3
                     this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
                 }
                 
-                pfGENRE = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_GenreText_FontSize);
+                pfGENRE = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.Game_GenreText_FontSize);
 
                 this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
 
