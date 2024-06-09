@@ -27,6 +27,13 @@ function init()
     func:AddGraph("Stars_3.png");
     func:AddGraph("Stars_4.png");
     func:AddGraph("Clouds.png");
+
+    if simplemode then
+        starsFade1 = 0.83
+        starsFade2 = 0.75
+        starsFade3 = 0.25
+        starsFade4 = 0.49
+    end
 end
 
 function update()
@@ -44,15 +51,19 @@ function update()
         bgClearFade = 0;
     end
 
-    starsFadeTime = starsFadeTime + deltaTime
+    if not simplemode then
+        starsFadeTime = starsFadeTime + deltaTime
 
-    starsFade1 = 0.38 * math.sin(((5 * starsFadeTime) / 1.37)) + 0.83
-    starsFade2 = 0.38 * math.cos(((5 * starsFadeTime) / 1.56)) + 0.75
-    starsFade3 = 0.38 * math.sin(((5 * starsFadeTime) / 1.71)) + 0.25
-    starsFade4 = 0.38 * math.cos(((5 * starsFadeTime) / 2.3)) + 0.49
+        starsFade1 = 0.38 * math.sin(((5 * starsFadeTime) / 1.37)) + 0.83
+        starsFade2 = 0.38 * math.cos(((5 * starsFadeTime) / 1.56)) + 0.75
+        starsFade3 = 0.38 * math.sin(((5 * starsFadeTime) / 1.71)) + 0.25
+        starsFade4 = 0.38 * math.cos(((5 * starsFadeTime) / 2.3)) + 0.49
+    end
 
     -- Cloud scroll
-    bgScrollX = bgScrollX + (50 * deltaTime);
+    if not simplemode then
+        bgScrollX = bgScrollX + (50 * deltaTime);
+    end
 end
 
 function draw()
