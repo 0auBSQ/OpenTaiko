@@ -30,7 +30,7 @@ function update()
     bgClearFade = bgClearFade + (clearMultiplier * 2000 * deltaTime);
 
     -- Don't scroll while SimpleMode is active
-    if not simplestyle then
+    if not simplemode then
         effectBGScrollY = effectBGScrollY + (60 * deltaTime);
         effectFGScrollY = effectFGScrollY + (100 * deltaTime);
     end
