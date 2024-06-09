@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TJAPlayer3
 {
@@ -46,6 +47,8 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Mod_None != null)
                 TJAPlayer3.Tx.Mod_None.Opacity = 255;
         }
+
+        #region [Displayables]
 
         static private void tDisplayHSIcon(int x, int y, int player)
         {
@@ -155,5 +158,27 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.Mod_None?.t2D描画(x, y);
         }
 
+        #endregion
+
+        #region [Mod flags]
+
+        static public Int64 tModsToPlayModsFlags(int player)
+        {
+            byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 }; 
+            int actual = TJAPlayer3.GetActualPlayer(player);
+
+            _flags[0] = (byte)Math.Min(255, TJAPlayer3.ConfigIni.nScrollSpeed[actual]);
+            _flags[1] = (byte)TJAPlayer3.ConfigIni.eSTEALTH[actual];
+            _flags[2] = (byte)TJAPlayer3.ConfigIni.eRandom[actual];
+            _flags[3] = (byte)Math.Min(255, TJAPlayer3.ConfigIni.n演奏速度);
+            _flags[4] = (byte)TJAPlayer3.ConfigIni.nTimingZones[actual];
+            _flags[5] = (byte)TJAPlayer3.ConfigIni.bJust[actual];
+            _flags[7] = (byte)TJAPlayer3.ConfigIni.nFunMods[actual];
+            
+            return BitConverter.ToInt64(_flags, 0);
+        }
+
+
+        #endregion
     }
 }

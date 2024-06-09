@@ -111,10 +111,44 @@ namespace TJAPlayer3
 			bAddedToRecentlyPlayedSongs = false;
 			try
 			{
+				/*
+				 * Notes about the difference between Replay - Save statuses and the "Assisted clear" clear status
+				 * 
+				 * - The values for replay files are 0 if no status, while for save files they start by -1
+				 * - The "Assisted clear" status is used on the save files, but NOT on the replay files
+				 * - The "Assisted clear" status is also not used in the coins evaluations
+				*/
 				int[] ClearStatus_Replay = new int[5] { 0, 0, 0, 0, 0 };
 				int[] ScoreRank_Replay = new int[5] { 0, 0, 0, 0, 0 };
 
-				{
+                int[] clearStatuses =
+                {
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1
+                };
+
+                int[] scoreRanks =
+                {
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                    -1
+                };
+
+                bool[] assistedClear =
+                {
+                    (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 0) < 1f),
+                    (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 1) < 1f),
+                    (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 2) < 1f),
+                    (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 3) < 1f),
+                    (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 4) < 1f)
+                };
+
+                {
 					#region [ 初期化 ]
 					//---------------------
 					this.eフェードアウト完了時の戻り値 = E戻り値.継続;
@@ -188,7 +222,11 @@ namespace TJAPlayer3
 									this.nクリア[p] = 2;
 									if (ccf.nGood == 0) this.nクリア[p] = 3;
 								}
-							}
+
+								if (assistedClear[p]) clearStatuses[p] = 0;
+								else clearStatuses[p] = this.nクリア[p];
+
+                            }
 
 							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, p) < 500000)
 							{
@@ -206,7 +244,9 @@ namespace TJAPlayer3
 									}
 								}
 							}
-						}
+							scoreRanks[p] = this.nスコアランク[p] - 1;
+
+                        }
 
 						
 					}
@@ -339,7 +379,11 @@ namespace TJAPlayer3
 								if (this.st演奏記録.Drums.nGreat数 == 0)
 									clearValue += 2;
 							}
-						}
+
+							if (assistedClear[0]) clearStatuses[0] = (examStatus == Exam.Status.Better_Success) ? 1 : 0;
+							else clearStatuses[0] = clearValue + 1;
+
+                        }
 
 						if (isAutoDisabled(0))
 						{
@@ -422,6 +466,8 @@ namespace TJAPlayer3
 						#region [Tower scores]
 
 						int tmpClear = GetTowerScoreRank();
+
+						if (tmpClear != 0) clearStatuses[0] = assistedClear[0] ? 0 : tmpClear;
 
 						if (isAutoDisabled(0))
 						{
@@ -546,7 +592,7 @@ namespace TJAPlayer3
 					return chara.GetEffectCoinMultiplier() * puchichara.GetEffectCoinMultiplier();
 				}
 
-				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+                if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				{
 					diffModifier = 3;
 
@@ -563,13 +609,15 @@ namespace TJAPlayer3
 					#region [Clear modifier]
 
 					int clearModifier = 0;
-
-					if (this.st演奏記録.Drums.nMiss数 == 0)
-					{
-						clearModifier = (int)(5 * lengthBonus);
-						if (this.st演奏記録.Drums.nGreat数 == 0)
-							clearModifier = (int)(12 * lengthBonus);
-					}
+					
+                    if (this.st演奏記録.Drums.nMiss数 == 0)
+                    {
+                        clearModifier = (int)(5 * lengthBonus);
+                        if (this.st演奏記録.Drums.nGreat数 == 0)
+						{
+                            clearModifier = (int)(12 * lengthBonus);
+                        }
+                    }
 
 					#endregion
 
@@ -722,6 +770,9 @@ namespace TJAPlayer3
                                     _cs = 2;
                             }
                         }
+
+						// Unsafe function, it is the only appropriate place to call it
+						HDatabaseHelpers.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
 							
 						if (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
 							_sf.tUpdateSongClearStatus(TJAPlayer3.stageSongSelect.rChoosenSong, _cs, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]);

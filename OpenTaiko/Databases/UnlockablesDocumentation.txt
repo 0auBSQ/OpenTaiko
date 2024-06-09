@@ -16,3 +16,15 @@
 * me : "More or equal"  (Default)
 * m : "More than"
 * d : "Different"
+
+== PlayMods flags ==
+
+A 8 bytes value, from upper to lower bytes: 
+* Byte 1: Scroll speed: The mod value (x0.1 = 0, +1 per 0.1 increment) capped to 255
+* Byte 2: Doron: The mod value (0 - 2 for None/Doron/Stealth)
+* Byte 3: Random: The mod value (0 - 5 for None/Mirror/Random/SuperRandom/HyperRandom)
+* Byte 4: Song speed: The mod value (x1 is 20, +-1 per 0.05 change) capped to 255
+* Byte 5: Timing : The mod value (0 - 5 from Loose to Rigorous)
+* Byte 6: Just: The mod value (0 - 2 for None/Just/Safe)
+* Byte 7: Unused
+* Byte 8: Fun mods: The mod value (0 - 2 for None/Avalanche/Minesweeper)
