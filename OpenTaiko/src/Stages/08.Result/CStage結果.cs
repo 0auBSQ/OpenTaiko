@@ -772,7 +772,7 @@ namespace TJAPlayer3
                         }
 
 						// Unsafe function, it is the only appropriate place to call it
-						HDatabaseHelpers.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
+						DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
 							
 						if (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
 							_sf.tUpdateSongClearStatus(TJAPlayer3.stageSongSelect.rChoosenSong, _cs, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]);
