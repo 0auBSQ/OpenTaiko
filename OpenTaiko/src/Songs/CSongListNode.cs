@@ -72,7 +72,8 @@ namespace TJAPlayer3
 		public Dan_C[] Dan_C;
 		public string strサブタイトル = "";
 		public string strMaker = "";
-		public CDTX.ESide nSide = CDTX.ESide.eEx;
+		public string[] strNotesDesigner = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
+        public CDTX.ESide nSide = CDTX.ESide.eEx;
 		public bool bExplicit = false;
 		public bool bMovie = false;
 		public string strBreadcrumbs = "";		// #27060 2011.2.27 yyagi; MUSIC BOXのパンくずリスト (曲リスト構造内の絶対位置捕捉のために使う)

@@ -222,6 +222,9 @@ namespace TJAPlayer3
                                     c曲リストノード.strサブタイトル = dtx.SUBTITLE;
                                     c曲リストノード.strジャンル = dtx.GENRE;
 									c曲リストノード.strMaker = dtx.MAKER;
+
+									c曲リストノード.strNotesDesigner = dtx.NOTESDESIGNER.Select(x => x.Equals("") ? c曲リストノード.strMaker : x).ToArray();
+
                                     c曲リストノード.nSide = dtx.SIDE;
                                     c曲リストノード.bExplicit = dtx.EXPLICIT;
 									c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
@@ -415,7 +418,8 @@ namespace TJAPlayer3
 									c曲リストノード.strタイトル = dtx.TITLE;
 									c曲リストノード.strサブタイトル = dtx.SUBTITLE;
 									c曲リストノード.strMaker = dtx.MAKER;
-									c曲リストノード.nSide = dtx.SIDE;
+									c曲リストノード.strNotesDesigner = dtx.NOTESDESIGNER.Select(x => x.Equals("") ? c曲リストノード.strMaker : x).ToArray();
+                                    c曲リストノード.nSide = dtx.SIDE;
 									c曲リストノード.bExplicit = dtx.EXPLICIT;
 									c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
 

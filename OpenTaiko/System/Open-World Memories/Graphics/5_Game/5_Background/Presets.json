@@ -2,7 +2,7 @@
     "Regular": {
         "": {
             "UP": [ "0","1" ],
-            "DOWN": [ "0","1" ],
+            "DOWN": [ "0","1","2" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
             "MOB": [ "0" ],
@@ -36,7 +36,15 @@
             "UP": [ "8" ],
             "DOWN": [ "8" ],
             "DANCER": [ "Dashy" ],
-            "FOOTER": [ "0" ],
+            "FOOTER": [ "8" ],
+            "MOB": [ "0" ],
+            "RUNNER": [ "0" ]
+        },
+        "Outfox": {
+            "UP": [ "Outfox" ],
+            "DOWN": [ "Outfox" ],
+            "DANCER": [ "0" ],
+            "FOOTER": [ "Outfox" ],
             "MOB": [ "0" ],
             "RUNNER": [ "0" ]
         }
@@ -57,19 +65,24 @@
     },
   "Tower": {
     "": {
-      "DOWN": [ "Day", "Sunset", "Mountain" ]
+      "DOWN": [ "Day", "Sunset", "Mountain" ],
+      "FOOTER": [ "0" ]
     },
     "Day": {
-      "DOWN": [ "Day" ]
+      "DOWN": [ "Day" ],
+      "FOOTER": [ "0" ]
     },
     "Sunset": {
-      "DOWN": [ "Sunset" ]
+      "DOWN": [ "Sunset" ],
+      "FOOTER": [ "0" ]
     },
     "Mountain": {
-      "DOWN": [ "Mountain" ]
+      "DOWN": [ "Mountain" ],
+      "FOOTER": [ "0" ]
     },
     "Event": {
-      "DOWN": [ "Event" ]
+      "DOWN": [ "Event" ],
+      "FOOTER": [ "0" ]
     }
   }
 }
