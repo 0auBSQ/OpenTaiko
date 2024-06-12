@@ -1233,6 +1233,14 @@ namespace TJAPlayer3
 
                                 #region 新・SkinConfig
 
+                                #region Startup
+                                case nameof(StartUp_LangSelect_FontSize):
+                                {
+                                    StartUp_LangSelect_FontSize = int.Parse(strParam);
+                                    break;
+                                }
+                                #endregion
+
                                 #region Title
                                 case nameof(Title_LoadingPinInstances):
                                 {
@@ -9651,6 +9659,10 @@ namespace TJAPlayer3
         public int[] Adjustments_MenuPuchichara_X = new int[] { -100, 100 };
         public int[] Adjustments_MenuPuchichara_Y = new int[] { -100, -100 };
 
+        #endregion
+
+        #region [Startup]
+        public int StartUp_LangSelect_FontSize = 16;
         #endregion
 
         #region [Title Screen]
