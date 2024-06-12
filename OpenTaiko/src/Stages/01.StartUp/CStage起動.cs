@@ -253,7 +253,6 @@ namespace TJAPlayer3
                     }
 
 					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
-
                     {
 						langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
 					}
