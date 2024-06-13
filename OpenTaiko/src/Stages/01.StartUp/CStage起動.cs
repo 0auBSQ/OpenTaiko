@@ -7,6 +7,7 @@ using System.IO;
 using FDK;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Input;
+using SkiaSharp;
 
 namespace TJAPlayer3
 {
@@ -33,7 +34,22 @@ namespace TJAPlayer3
 				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
 				Background.Init();
 
-				this.list進行文字列 = new List<string>();
+				if (TJAPlayer3.ConfigIsNew)
+				{
+					langSelectFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.StartUp_LangSelect_FontSize);
+					langSelectTitle = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
+                    langList = new CTexture[CLangManager.Languages.Length];
+					langListHighlighted = new CTexture[CLangManager.Languages.Length];
+
+					for (int i = 0; i < langList.Length; i++)
+					{
+						langList[i] = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
+                        langListHighlighted[i] = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
+                    }
+					langSelectOffset = new int[2] { SampleFramework.GameWindowSize.Width / 2, (SampleFramework.GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
+				}
+
+                this.list進行文字列 = new List<string>();
 				base.ePhaseID = CStage.EPhase.Common_NORMAL;
 				base.Activate();
 				Trace.TraceInformation( "起動ステージの活性化を完了しました。" );
@@ -50,6 +66,17 @@ namespace TJAPlayer3
 			try
 			{
 				TJAPlayer3.tDisposeSafely(ref Background);
+
+				TJAPlayer3.tDisposeSafely(ref langSelectFont);
+				TJAPlayer3.tDisposeSafely(ref langSelectTitle);
+				if (langList != null)
+				{
+					for (int i = 0; i < langList.Length; i++)
+					{
+						TJAPlayer3.tDisposeSafely(ref langList[i]);
+						TJAPlayer3.tDisposeSafely(ref langListHighlighted[i]);
+					}
+				}
 
 				this.list進行文字列 = null;
 				if ( es != null )
@@ -195,6 +222,52 @@ namespace TJAPlayer3
 					//-----------------
 					#endregion
 				}
+				else if (TJAPlayer3.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
+				{
+					if (TJAPlayer3.Tx.Tile_Black != null)
+					{
+						TJAPlayer3.Tx.Tile_Black.Opacity = 255;
+                        for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += TJAPlayer3.Tx.Tile_Black.szTextureSize.Width)
+                        {
+                            for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += TJAPlayer3.Tx.Tile_Black.szTextureSize.Height)
+                            {
+                                TJAPlayer3.Tx.Tile_Black.t2D描画(i, j);
+                            }
+                        }
+                    }
+
+					int x = langSelectOffset[0];
+					int y = langSelectOffset[1];
+
+					langSelectTitle.t2D中心基準描画(x, y);
+					y += langSelectTitle.szTextureSize.Height;
+
+					for (int i = 0; i < langList.Length; i++)
+					{
+						if (i == langSelectIndex)
+							langListHighlighted[i].t2D中心基準描画(x, y);
+						else
+							langList[i].t2D中心基準描画(x, y);
+
+						y += langList[i].szTextureSize.Height;
+                    }
+
+					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
+                    {
+						langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
+					}
+					else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
+                    {
+						langSelectIndex = Math.Max(langSelectIndex - 1, 0);
+					}
+					else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
+                    {
+                        TJAPlayer3.Skin.soundDecideSFX.tPlay();
+                        TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
+                        CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
+                        bLanguageSelected = true;
+					}
+                }
                 else
                 {
 					if ( es != null && es.IsSongListEnumCompletelyDone )							// 曲リスト作成が終わったら
@@ -224,6 +297,15 @@ namespace TJAPlayer3
 		private ScriptBG Background;
 		private CEnumSongs es;
 		private bool bIsLoadingTextures;
+
+		private bool bLanguageSelected;
+		private int langSelectIndex = 0;
+
+		private CFontRenderer langSelectFont;
+		private CTexture langSelectTitle;
+		private CTexture[] langList;
+		private CTexture[] langListHighlighted;
+		private int[] langSelectOffset;
 
 #if false
 		private void t曲リストの構築()

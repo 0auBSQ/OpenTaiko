@@ -564,6 +564,12 @@ namespace TJAPlayer3
 
 		public static CCounter BeatScaling;
 
+        /// <summary>
+        /// Returns true for this session if the game fails to locate Config.ini.<br/>
+        /// This could be treated as the player's first time launching the game.
+        /// </summary>
+        public static bool ConfigIsNew;
+
 		
 
 		// メソッド
@@ -635,6 +641,10 @@ namespace TJAPlayer3
 					Trace.TraceError( e.ToString() );
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
+			}
+			else
+			{
+				ConfigIsNew = true;
 			}
 
 			switch(ConfigIni.nGraphicsDeviceType)
