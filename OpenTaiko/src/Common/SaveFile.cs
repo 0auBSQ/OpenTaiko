@@ -24,7 +24,12 @@ namespace TJAPlayer3
             }
                 
             tLoadFile();
+
+            data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+            data.tFactorizeBestPlays();
         }
+
+        
 
         #region [Medals]
 
@@ -193,7 +198,7 @@ namespace TJAPlayer3
         public class Data
         {
             [JsonProperty("saveId")]
-            public long SaveId = 0;
+            public Int64 SaveId = 0;
 
             [JsonProperty("name")]
             public string Name = "プレイヤー1";
@@ -249,6 +254,80 @@ namespace TJAPlayer3
             [JsonProperty("standardPasses")]
             public Dictionary<string, CPassStatus> standardPasses = new Dictionary<string, CPassStatus>();
 
+            [JsonProperty("___unused_00")]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord> ();
+
+            [JsonProperty("___unused_01")]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctCharts = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonProperty("___unused_02")]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonProperty("___unused_03")]
+            public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats ();
+
+            #region [Factorize best plays]
+
+            public void tFactorizeBestPlays()
+            {
+                bestPlaysDistinctCharts = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+                foreach (BestPlayRecords.CBestPlayRecord bestPlay in bestPlays.Values)
+                {
+                    string key = bestPlay.ChartUniqueId + bestPlay.ChartDifficulty.ToString();
+                    if (!bestPlaysDistinctCharts.ContainsKey(key))
+                    {
+                        bestPlaysDistinctCharts[key] = bestPlay;
+                    }
+                    else
+                    {
+                        if (bestPlay.HighScore > bestPlaysDistinctCharts[key].HighScore)
+                        {
+                            bestPlaysDistinctCharts[key].HighScore = bestPlay.HighScore;
+                            bestPlaysDistinctCharts[key].HighScoreGoodCount = bestPlay.HighScoreGoodCount;
+                            bestPlaysDistinctCharts[key].HighScoreOkCount = bestPlay.HighScoreOkCount;
+                            bestPlaysDistinctCharts[key].HighScoreBadCount = bestPlay.HighScoreBadCount;
+                            bestPlaysDistinctCharts[key].HighScoreRollCount = bestPlay.HighScoreRollCount;
+                            bestPlaysDistinctCharts[key].HighScoreBoomCount = bestPlay.HighScoreBoomCount;
+                            bestPlaysDistinctCharts[key].HighScoreMaxCombo = bestPlay.HighScoreMaxCombo;
+                            bestPlaysDistinctCharts[key].HighScoreADLibCount = bestPlay.HighScoreADLibCount;
+                        }
+                        bestPlaysDistinctCharts[key].ScoreRank = Math.Max(bestPlaysDistinctCharts[key].ScoreRank, bestPlay.ScoreRank);
+                        bestPlaysDistinctCharts[key].ClearStatus = Math.Max(bestPlaysDistinctCharts[key].ClearStatus, bestPlay.ClearStatus);
+                    }
+                }
+
+                bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+                foreach (BestPlayRecords.CBestPlayRecord bestPlay in bestPlaysDistinctCharts.Values)
+                {
+                    string key = bestPlay.ChartUniqueId;
+                    if (!bestPlaysDistinctSongs.ContainsKey(key))
+                    {
+                        bestPlaysDistinctSongs[key] = bestPlay;
+                    }
+                    else
+                    {
+                        if (bestPlay.HighScore > bestPlaysDistinctSongs[key].HighScore)
+                        {
+                            bestPlaysDistinctSongs[key].HighScore = bestPlay.HighScore;
+                            bestPlaysDistinctSongs[key].HighScoreGoodCount = bestPlay.HighScoreGoodCount;
+                            bestPlaysDistinctSongs[key].HighScoreOkCount = bestPlay.HighScoreOkCount;
+                            bestPlaysDistinctSongs[key].HighScoreBadCount = bestPlay.HighScoreBadCount;
+                            bestPlaysDistinctSongs[key].HighScoreRollCount = bestPlay.HighScoreRollCount;
+                            bestPlaysDistinctSongs[key].HighScoreBoomCount = bestPlay.HighScoreBoomCount;
+                            bestPlaysDistinctSongs[key].HighScoreMaxCombo = bestPlay.HighScoreMaxCombo;
+                            bestPlaysDistinctSongs[key].HighScoreADLibCount = bestPlay.HighScoreADLibCount;
+                        }
+                        bestPlaysDistinctSongs[key].ScoreRank = Math.Max(bestPlaysDistinctSongs[key].ScoreRank, bestPlay.ScoreRank);
+                        bestPlaysDistinctSongs[key].ClearStatus = Math.Max(bestPlaysDistinctSongs[key].ClearStatus, bestPlay.ClearStatus);
+                    }
+                }
+
+                bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);
+            }
+
+            #endregion
         }
 
         public Data data = new Data();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using static TJAPlayer3.BestPlayRecords;
 
 namespace TJAPlayer3
 {
@@ -15,7 +16,7 @@ namespace TJAPlayer3
             ["dp"] = 3,
             ["lp"] = 3,
             ["sp"] = 2,
-            ["sg"] = 3,
+            ["sg"] = 2,
         };
 
         public class CUnlockConditions
@@ -94,10 +95,10 @@ namespace TJAPlayer3
              * ch : "Coins here", coin requirement, payable within the heya menu, 1 value : [Coin price]
              * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
              * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
-             * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
-             * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
-             * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
-             * sg : "Song genre (performance)", count of any song pass within a specific genre folder, unlock check during the results screen, condition 3 x n values for n songs : [Song count, Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
+             * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
+             * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
+             * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~4), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
+             * sg : "Song genre (performance)", count of any unique song pass within a specific genre folder, unlock check during the results screen, condition 2 x n values for n songs : [Song count, Clear status (0~4), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
              * 
              * 
             */
@@ -237,47 +238,32 @@ namespace TJAPlayer3
                 {
                     _aimedDifficulty = this.Values[0]; // Difficulty if dp, Level if lp
                     _aimedStatus = this.Values[1];
+
+                    // dp and lp only work for regular (Dan and Tower excluded) charts
+                    if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return 0;
+                    if (this.Condition == "dp" && (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit)) return 0;  
                 }
 
-                var _sf = TJAPlayer3.SaveFileInstances[player].data.standardPasses;
-                if (_sf == null 
-                    || _aimedDifficulty < 0 
-                    || _aimedStatus < 0 
-                    || (this.Condition == "dp" && _aimedDifficulty > 4) 
-                    || _aimedStatus > 2)
-                    return -1;
+                var bpDistinctCharts = TJAPlayer3.SaveFileInstances[player].data.bestPlaysDistinctCharts;
+                var chartStats = TJAPlayer3.SaveFileInstances[player].data.bestPlaysStats;
 
                 switch (this.Condition)
                 {
                     case "dp":
+                        var _table = chartStats.ClearStatuses[_aimedDifficulty];
+                        var _ura = chartStats.ClearStatuses[(int)Difficulty.Edit];
                         int _count = 0;
-                        foreach (KeyValuePair<string, SaveFile.CPassStatus> cps in _sf)
+                        for (int i = _aimedStatus; i < (int)EClearStatus.TOTAL; i++)
                         {
-                            var _values = cps.Value.d;
-                            if (_values[_aimedDifficulty] >= _aimedStatus)
-                                _count++;
-                            // Extreme includes Extra
-                            if (_aimedDifficulty == 3 && _values[4] >= _aimedStatus)
-                                _count++;
+                            _count += _table[i];
+                            if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
                         }
                         return _count;
                     case "lp":
-                        _count = 0;
-                        foreach (KeyValuePair<string, SaveFile.CPassStatus> cps in _sf)
-                        {
-                            var _node = CSongDict.tGetNodeFromID(cps.Key);
-                            if (_node != null)
-                            {
-                                var _values = cps.Value.d;
-                                var _levels = _node.nLevel;
-                                for (int i = 0; i <= (int)Difficulty.Edit; i++)
-                                {
-                                    if (_levels[i] == _aimedDifficulty && _values[i] >= _aimedStatus)
-                                        _count++;
-                                }
-                            }
-                        }
-                        return _count;
+                        if (_aimedStatus == (int)EClearStatus.NONE) return chartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                        else if (_aimedStatus <= (int)EClearStatus.CLEAR) return chartStats.LevelClears.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                        else if (_aimedStatus == (int)EClearStatus.FC) return chartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                        else return chartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
                     case "sp":
                         _count = 0;
                         for (int i = 0; i < this.Values.Length / this.RequiredArgCount; i++)
@@ -287,18 +273,24 @@ namespace TJAPlayer3
                             _aimedDifficulty = this.Values[_base];
                             _aimedStatus = this.Values[_base + 1];
 
-                            if (_sf.ContainsKey(_songId))
+                            if (_aimedDifficulty >= (int)Difficulty.Easy && _aimedDifficulty <= (int)Difficulty.Edit)
                             {
-                                var _values = _sf[_songId].d;
-                                if (_aimedDifficulty >= 0 && _aimedDifficulty < 4)
+                                string key = _songId + _aimedDifficulty.ToString();
+                                var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                if (_cht != null && _cht.ClearStatus >= _aimedStatus) _count++;
+
+                            }
+                            else if (_aimedDifficulty < (int)Difficulty.Easy)
+                            {
+                                for (int diff = (int)Difficulty.Easy; diff <= (int)Difficulty.Edit; diff++)
                                 {
-                                    if (_values[_aimedDifficulty] >= _aimedStatus)
+                                    string key = _songId + diff.ToString();
+                                    var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                    if (_cht != null && _cht.ClearStatus >= _aimedStatus)
+                                    {
                                         _count++;
-                                }
-                                else
-                                {
-                                    if (Array.Exists(_values, _v => _v >= _aimedStatus))
-                                        _count++;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -310,33 +302,15 @@ namespace TJAPlayer3
                             int _base = i * this.RequiredArgCount;
                             string _genreName = this.Reference[i];
                             int _songCount = this.Values[_base];
-                            _aimedDifficulty = this.Values[_base + 1];
-                            _aimedStatus = this.Values[_base + 2];
-                            int _innerCount = 0;
+                            _aimedStatus = this.Values[_base + 1];
 
-                            var _songList = CSongDict.tGetNodesByGenreName(_genreName);
-                            foreach (string songId in _songList)
-                            {
-                                _innerCount = 0;
-                                if (_sf.ContainsKey(songId))
-                                {
-                                    var _values = _sf[songId].d;
-                                    if (_aimedDifficulty >= 0 && _aimedDifficulty < 4)
-                                    {
-                                        if (_values[_aimedDifficulty] >= _aimedStatus)
-                                            _innerCount++;
-                                    }
-                                    else
-                                    {
-                                        if (Array.Exists(_values, _v => _v >= _aimedStatus))
-                                            _innerCount++;
-                                    }
-                                }
-                            }
+                            int _satifsiedCount = 0;
+                            if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = chartStats.SongGenrePlays.TryGetValue(_genreName, out var value) ? value : 0;
+                            else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = chartStats.SongGenreClears.TryGetValue(_genreName, out var value) ? value : 0;
+                            else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = chartStats.SongGenreFCs.TryGetValue(_genreName, out var value) ? value : 0;
+                            else return _satifsiedCount = chartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
 
-                            if (_innerCount >= _songCount)
-                                _count++;
-
+                            if (_satifsiedCount >= _songCount) _count++;
                         }
                         return _count;
                 }
