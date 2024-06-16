@@ -335,6 +335,10 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
+			this.iDrumsGoToCalibration = new CItemBase("CALIBRATION", CItemBase.EPanelType.Other,
+				"CALIBRATION");
+			this.list項目リスト.Add(this.iDrumsGoToCalibration);
+
 			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
 				CLangManager.LangInstance.GetString(61));
 			this.list項目リスト.Add(this.iRollsPerSec);
@@ -818,6 +822,10 @@ namespace TJAPlayer3
                 {
                     tConfigIniへ記録する();
                     t項目リストの設定_KeyAssignTraining();
+				}
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iDrumsGoToCalibration )
+				{
+					TJAPlayer3.stageコンフィグ.actCalibrationMode.Start();
 				}
 				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignDrumsReturnToMenu ||
 						this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignTrainingReturnToMenu )		// #24525 2011.3.15 yyagi
@@ -1866,9 +1874,10 @@ namespace TJAPlayer3
 		private int nSkinSampleIndex;				//
 		private int nSkinIndex;						//
 
+		private CItemBase iDrumsGoToCalibration;
 		private CItemBase iDrumsGoToKeyAssign;
 		private CItemBase iDrumsGoToTrainingKeyAssign;
-		private CItemBase iSystemGoToKeyAssign;		// #24609
+		private CItemBase iSystemGoToKeyAssign;
 		private CItemInteger iCommonPlaySpeed;
 
 		private CItemInteger iLayoutType;

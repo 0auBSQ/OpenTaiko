@@ -421,6 +421,8 @@ namespace TJAPlayer3
         public CSystemSound[] soundExToExtra = null;
         public CSystemSound[] soundExtraToEx = null;
 
+        public CSystemSound calibrationTick = null;
+
         public CSystemSound[] soundModal = null;
 
         public CSystemSound soundCrownIn = null;
@@ -808,6 +810,8 @@ namespace TJAPlayer3
 
             soundExToExtra = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
             soundExtraToEx = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
+
+            calibrationTick = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
 
             soundModal = new CSystemSound[6];
             for (int i = 0; i < soundModal.Length - 1; i++)
