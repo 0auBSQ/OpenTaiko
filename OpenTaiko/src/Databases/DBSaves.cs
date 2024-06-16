@@ -11,55 +11,102 @@ namespace TJAPlayer3
 {
     internal class DBSaves
     {
-        private static string _savesDBPath = @$"{TJAPlayer3.strEXEのあるフォルダ}Saves.db3";
+        private static string _savesDBFilename = $@"Saves.db3";
+        private static string _savesDBPath = @$"{TJAPlayer3.strEXEのあるフォルダ}{_savesDBFilename}";
         private static SqliteConnection SavesDBConnection = new SqliteConnection(@$"Data Source={_savesDBPath}");
 
-        public static SqliteConnection GetSavesDBConnection()
+        private static string _DBNotFoundError = @$"The database {_savesDBFilename} was not found or the connection failed";
+
+        public static SqliteConnection? GetSavesDBConnection()
         {
-            if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) SavesDBConnection.Open();
-            return SavesDBConnection;
+            try
+            {
+                if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) SavesDBConnection.Open();
+                return SavesDBConnection;
+            }
+            catch
+            {
+                LogNotification.PopError(_DBNotFoundError);
+                return null;
+            }
         }
 
-        public class CBestPlayRecord
+        public static Int64 GetPlayerSaveId(int player)
         {
-            public string ChartUniqueId = "none";
-            public string ChartGenre = "none";
-            public string Charter = "none";
-            public string Artist = "none";
-            public Int64 PlayMods = 0;
-            public Int64 ChartDifficulty = 3;
-            public Int64 ChartLevel = 8;
-            public Int64 ClearStatus = -1;
-            public Int64 ScoreRank = -1;
-            public Int64 HighScore = 0;
-            public Int64 TowerBestFloor = 0;
-            public List<int> DanExam1 = new List<int> { -1 };
-            public List<int> DanExam2 = new List<int> { -1 };
-            public List<int> DanExam3 = new List<int> { -1 };
-            public List<int> DanExam4 = new List<int> { -1 };
-            public List<int> DanExam5 = new List<int> { -1 };
-            public List<int> DanExam6 = new List<int> { -1 };
-            public List<int> DanExam7 = new List<int> { -1 };
-            public Int64 PlayCount = 1;
-            public Int64 HighScoreGoodCount = 0;
-            public Int64 HighScoreOkCount = 0;
-            public Int64 HighScoreBadCount = 0;
-            public Int64 HighScoreMaxCombo = 0;
-            public Int64 HighScoreRollCount = 0;
-            public Int64 HighScoreADLibCount = 0;
-            public Int64 HighScoreBoomCount = 0;
+            return TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.SaveId;
         }
+
+        
 
         #region [best_plays Table]
+
+        public static Dictionary<string, BestPlayRecords.CBestPlayRecord> GetBestPlaysAsDict(Int64 saveId)
+        {
+            Dictionary<string, BestPlayRecords.CBestPlayRecord> _bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return _bestPlays;
+
+            var command = connection.CreateCommand();
+            command.CommandText =
+            @$"
+                    SELECT *
+                    FROM best_plays
+                    WHERE SaveId={saveId};
+                ";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                BestPlayRecords.CBestPlayRecord record = new BestPlayRecords.CBestPlayRecord();
+
+                record.ChartUniqueId = (string)reader["ChartUniqueId"];
+                record.ChartGenre = (string)reader["ChartGenre"];
+                record.Charter = (string)reader["Charter"];
+                record.Artist = (string)reader["Artist"];
+                record.PlayMods = (Int64)reader["PlayMods"];
+                record.ChartDifficulty = (Int64)reader["ChartDifficulty"]; ;
+                record.ChartLevel = (Int64)reader["ChartLevel"];
+                record.ClearStatus = (Int64)reader["ClearStatus"];
+                record.ScoreRank = (Int64)reader["ScoreRank"];
+                record.HighScore = (Int64)reader["HighScore"];
+                record.TowerBestFloor = (Int64)reader["TowerBestFloor"];
+                record.DanExam1 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam1"] ?? "[]") ?? new List<int>();
+                record.DanExam2 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam2"] ?? "[]") ?? new List<int>();
+                record.DanExam3 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam3"] ?? "[]") ?? new List<int>();
+                record.DanExam4 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam4"] ?? "[]") ?? new List<int>();
+                record.DanExam5 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam5"] ?? "[]") ?? new List<int>();
+                record.DanExam6 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam6"] ?? "[]") ?? new List<int>();
+                record.DanExam7 = JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam7"] ?? "[]") ?? new List<int>();
+                record.PlayCount = (Int64)reader["PlayCount"];
+                record.HighScoreGoodCount = (Int64)reader["HighScoreGoodCount"];
+                record.HighScoreOkCount = (Int64)reader["HighScoreOkCount"];
+                record.HighScoreBadCount = (Int64)reader["HighScoreBadCount"];
+                record.HighScoreMaxCombo = (Int64)reader["HighScoreMaxCombo"];
+                record.HighScoreRollCount = (Int64)reader["HighScoreRollCount"];
+                record.HighScoreADLibCount = (Int64)reader["HighScoreADLibCount"];
+                record.HighScoreBoomCount = (Int64)reader["HighScoreBoomCount"];
+
+                string key = record.ChartUniqueId + record.ChartDifficulty.ToString() + record.PlayMods.ToString();
+                _bestPlays[key] = record;
+            }
+            reader.Close();
+
+            return _bestPlays;
+        }
+
         public static void RegisterPlay(int player, int clearStatus, int scoreRank)
         {
-            SqliteConnection connection = GetSavesDBConnection();
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
             SaveFile.Data saveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data;
-            CBestPlayRecord currentPlay = new CBestPlayRecord();
+            BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
             var choosenSong = TJAPlayer3.stageSongSelect.rChoosenSong;
             var choosenDifficulty = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
             var chartScore = TJAPlayer3.stage演奏ドラム画面.CChartScore[player];
             List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+
+            // Do not register the play if Dan/Tower and any mod is ON
+            if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return;
 
             // 1st step: Init best play record class
 
@@ -167,6 +214,7 @@ namespace TJAPlayer3
                         }
                     }
                 }
+                reader.Close();
             }
 
             // Intermede: Dan results to Dan exams
@@ -181,6 +229,13 @@ namespace TJAPlayer3
                     currentPlay.DanExam6 = danResults[5];
                     currentPlay.DanExam7 = danResults[6];
                 }
+            }
+
+            // Intermede: Update locally the play on the save file to reload it without requerying the database
+            {
+                string key = currentPlay.ChartUniqueId + currentPlay.ChartDifficulty.ToString() + currentPlay.PlayMods.ToString();
+                saveData.bestPlays[key] = currentPlay;
+                saveData.tFactorizeBestPlays();
             }
 
             // 3rd step: Insert/Update to database

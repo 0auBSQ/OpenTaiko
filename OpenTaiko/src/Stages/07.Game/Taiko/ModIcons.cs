@@ -162,6 +162,20 @@ namespace TJAPlayer3
 
         #region [Mod flags]
 
+        static public bool tPlayIsStock(int player)
+        {
+            int actual = TJAPlayer3.GetActualPlayer(player);
+
+            if (TJAPlayer3.ConfigIni.nFunMods[actual] != EFunMods.NONE) return false;
+            if (TJAPlayer3.ConfigIni.bJust[actual] != 0) return false;
+            if (TJAPlayer3.ConfigIni.nTimingZones[actual] != 2) return false;
+            if (TJAPlayer3.ConfigIni.n演奏速度 != 20) return false;
+            if (TJAPlayer3.ConfigIni.eRandom[actual] != Eランダムモード.OFF) return false;
+            if (TJAPlayer3.ConfigIni.eSTEALTH[actual] != EStealthMode.OFF) return false;
+            if (TJAPlayer3.ConfigIni.nScrollSpeed[actual] != 9) return false;
+
+            return true;
+        }
         static public Int64 tModsToPlayModsFlags(int player)
         {
             byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 }; 
