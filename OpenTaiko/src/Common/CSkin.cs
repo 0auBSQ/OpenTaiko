@@ -2675,7 +2675,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_1P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[0][i] = int.Parse(strSplit[i]);
                                     }
@@ -2684,7 +2684,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_1P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[0][i] = int.Parse(strSplit[i]);
                                     }
@@ -2693,7 +2693,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_2P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[1][i] = int.Parse(strSplit[i]);
                                     }
@@ -2702,7 +2702,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_2P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[1][i] = int.Parse(strSplit[i]);
                                     }
@@ -2711,7 +2711,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_3P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[2][i] = int.Parse(strSplit[i]);
                                     }
@@ -2720,7 +2720,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_3P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[2][i] = int.Parse(strSplit[i]);
                                     }
@@ -2729,7 +2729,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_4P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[3][i] = int.Parse(strSplit[i]);
                                     }
@@ -2738,7 +2738,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_4P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[3][i] = int.Parse(strSplit[i]);
                                     }
@@ -2747,7 +2747,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_5P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[4][i] = int.Parse(strSplit[i]);
                                     }
@@ -2756,7 +2756,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_5P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[4][i] = int.Parse(strSplit[i]);
                                     }
@@ -9878,19 +9878,19 @@ namespace TJAPlayer3
         public int[] SongSelect_High_Score_Difficulty_Cymbol_Y = new int[] { 418, 418, 214, 214, 418 };
 
         public int[][] SongSelect_BoardNumber_X = new int[][] {
-            new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, 190, 74, 114 },
-            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, 1224, 1214, 1148 },
+            new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, -100, 190, 74, 114 },
+            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, -100, 1224, 1214, 1148 },
 
-            new int[] { 242, 305, 370, 242, 305, 370, 370, 242, 305, 370, 254, 294 },
-            new int[] { 916, 979, 1044, 916, 979, 1044, 1044, 916, 979, 1044, 1034, 968 },
-            new int[] { 422, 485, 550, 422, 485, 550, 550, 422, 485, 550, 434, 474 }
+            new int[] { 242, 305, 370, 242, 305, 370, 370, 242, 305, -100, 370, 254, 294 },
+            new int[] { 916, 979, 1044, 916, 979, 1044, 1044, 916, 979, -100, 1044, 1034, 968 },
+            new int[] { 422, 485, 550, 422, 485, 550, 550, 422, 485, 550, -100, 434, 474 }
         };
         public int[][] SongSelect_BoardNumber_Y = new int[][] {
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
-            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
-            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 }
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 },
+            new int[] { 72,72,72,47,47,47,22,100,100, -100, 100, 149,211 },
+            new int[] { 72,72,72,47,47,47,22,100,100, -100, 100, 149,211 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 }
         };
         public int[] SongSelect_BoardNumber_Interval = new int[] { 9, 0 };
 

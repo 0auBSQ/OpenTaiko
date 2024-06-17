@@ -280,13 +280,6 @@ namespace TJAPlayer3
                                     c曲リストノード.arスコア[ n ].ファイル情報.フォルダの絶対パス = str基点フォルダ;
                                     c曲リストノード.arスコア[ n ].ファイル情報.ファイルサイズ = fileinfo.Length;
                                     c曲リストノード.arスコア[ n ].ファイル情報.最終更新日時 = fileinfo.LastWriteTime;
-                                    string strFileNameScoreIni = c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス + ".score.ini";
-                                    if( File.Exists( strFileNameScoreIni ) )
-                                    {
-                                        FileInfo infoScoreIni = new FileInfo( strFileNameScoreIni );
-                                        c曲リストノード.arスコア[ n ].ScoreIni情報.ファイルサイズ = infoScoreIni.Length;
-                                        c曲リストノード.arスコア[ n ].ScoreIni情報.最終更新日時 = infoScoreIni.LastWriteTime;
-                                    }
 
 									LoadChartInfo(c曲リストノード, dtx, n);
 
@@ -561,14 +554,6 @@ namespace TJAPlayer3
 									if (c曲リストノード.rParentNode != null && String.IsNullOrEmpty(c曲リストノード.arスコア[n].譜面情報.Preimage))
 									{
 										c曲リストノード.arスコア[n].譜面情報.Preimage = c曲リストノード.rParentNode.arスコア[0].譜面情報.Preimage;
-									}
-
-									string strFileNameScoreIni = c曲リストノード.arスコア[ n ].ファイル情報.ファイルの絶対パス + ".score.ini";
-									if( File.Exists( strFileNameScoreIni ) )
-									{
-										FileInfo infoScoreIni = new FileInfo( strFileNameScoreIni );
-										c曲リストノード.arスコア[ n ].ScoreIni情報.ファイルサイズ = infoScoreIni.Length;
-										c曲リストノード.arスコア[ n ].ScoreIni情報.最終更新日時 = infoScoreIni.LastWriteTime;
 									}
 
 									LoadChartInfo(c曲リストノード, dtx, n);
@@ -917,32 +902,6 @@ namespace TJAPlayer3
 									Trace.TraceError( "曲データファイルの読み込みに失敗しました。({0})", path );
 								}
 							}
-							//-----------------
-							#endregion
-
-							#region [ 対応する .score.ini が存在していれば読み込み、Cスコア.譜面情報 に追加設定する ]
-							//-----------------
-                            try
-                            {
-								this.tScoreIniを読み込んで譜面情報を設定する(c曲リストノード.arスコア[i].ファイル情報.ファイルの絶対パス, c曲リストノード.arスコア[i]);
-								// Legacy save files from DTX mania
-								/*
-                                else
-                                {
-                                    string[] dtxscoreini = Directory.GetFiles(c曲リストノード.arスコア[i].ファイル情報.フォルダの絶対パス, "*.dtx.score.ini");
-                                    if (dtxscoreini.Length != 0 && File.Exists(dtxscoreini[0]))
-                                    {
-                                        this.tScoreIniを読み込んで譜面情報を設定する(dtxscoreini[0], c曲リストノード.arスコア[i]);
-                                    }
-                                }
-								*/
-                            }
-                            catch (Exception e)
-                            {
-                                Trace.TraceError( e.ToString() );
-                                Trace.TraceError( "例外が発生しましたが処理を継続します。 (c8b6538c-46a1-403e-8cc3-fc7e7ff914fb)" );
-                            }
-
 							//-----------------
 							#endregion
 						}
@@ -1473,172 +1432,6 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 #endif
         //-----------------
         #endregion
-
-        #region [ .score.ini を読み込んで Cスコア.譜面情報に設定する ]
-        //-----------------
-        public void tScoreIniを読み込んで譜面情報を設定する( string strScoreIniファイルパス, Cスコア score )
-		{
-			// New format
-			string[] fp =
-			{
-				//strScoreIniファイルパス + "1P.score.ini",
-				//strScoreIniファイルパス + "2P.score.ini",
-                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[0].name + @".score.ini",
-                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[1].name + @".score.ini",
-                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[2].name + @".score.ini",
-                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[3].name + @".score.ini",
-                strScoreIniファイルパス + TJAPlayer3.SaveFileInstances[4].name + @".score.ini"
-            };
-
-			// Load legacy format if new doesn't exist yet
-			if (!File.Exists(fp[0]))
-				fp[0] = strScoreIniファイルパス + ".score.ini";
-
-
-			/*
-			if ( !File.Exists( strScoreIniファイルパス ) )
-				return;
-			*/
-
-			// Select the main file for the common informations
-			/*
-			int mainFile = 0;
-			if (!File.Exists(fp[0]))
-				mainFile = 1;
-			if (!File.Exists(fp[1]) && mainFile == 1)
-				return;
-			*/
-
-			// Only the necessary scores are read from the auxilliary score file
-			//int auxFile = mainFile ^ 1;
-
-			try
-			{
-				//var ini = new CScoreIni( strScoreIniファイルパス );
-
-				/*
-				CScoreIni getScoreIni(string filePath)
-				{
-					if (!File.Exists(filePath))
-					{
-						var result = new CScoreIni(filePath);
-						return result;
-					}
-
-					using SHA1 hashProvider = SHA1.Create();
-					var fs = File.OpenRead(filePath);
-    				byte[] rawhash = hashProvider.ComputeHash(fs);
-					string hash = "";
-					for (int i = 0; i < rawhash.Length; i++) {
-						hash += string.Format("{0:X2}", rawhash[i]);
-					}
-
-					fs.Dispose();
-
-					if (listScoreDB.TryGetValue(hash, out CScoreIni value))
-					{
-						return value;
-					}
-					else 
-					{
-						var result = new CScoreIni(filePath);
-						listScoreDB.Add(hash, result);
-						return result;
-					}
-				}
-				*/
-
-				CScoreIni[] csi =
-				{
-					//new CScoreIni(fp[mainFile]),
-					//File.Exists(fp[auxFile]) ? new CScoreIni(fp[auxFile]) : null,
-                    new CScoreIni(fp[0]),
-                    new CScoreIni(fp[1]),
-                    new CScoreIni(fp[2]),
-                    new CScoreIni(fp[3]),
-                    new CScoreIni(fp[4])
-                };
-
-				var ini = csi[0];
-
-				ini.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
-				csi[1]?.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
-
-				for ( int n楽器番号 = 0; n楽器番号 < 3; n楽器番号++ )
-				{
-					int n = ( n楽器番号 * 2 ) + 1;	// n = 0～5
-
-					#region score.譜面情報.最大ランク[ n楽器番号 ] = ... 
-					//-----------------
-					if( ini.stセクション[ n ].b演奏にMIDI入力を使用した ||
-						ini.stセクション[ n ].b演奏にキーボードを使用した ||
-						ini.stセクション[ n ].b演奏にジョイパッドを使用した ||
-						ini.stセクション[ n ].b演奏にマウスを使用した )
-					{
-						// (A) 全オートじゃないようなので、演奏結果情報を有効としてランクを算出する。
-
-						score.譜面情報.最大ランク[ n楽器番号 ] =
-							CScoreIni.tランク値を計算して返す( 
-								ini.stセクション[ n ].n全チップ数,
-								ini.stセクション[ n ].nPerfect数, 
-								ini.stセクション[ n ].nGreat数,
-								ini.stセクション[ n ].nGood数, 
-								ini.stセクション[ n ].nPoor数,
-								ini.stセクション[ n ].nMiss数 );
-					}
-					else
-					{
-						// (B) 全オートらしいので、ランクは無効とする。
-
-						score.譜面情報.最大ランク[ n楽器番号 ] = (int) CScoreIni.ERANK.UNKNOWN;
-					}
-					//-----------------
-					#endregion
-
-					score.譜面情報.最大スキル[ n楽器番号 ] = ini.stセクション[ n ].db演奏型スキル値;
-					score.譜面情報.フルコンボ[ n楽器番号 ] = ini.stセクション[ n ].bフルコンボである;
-				}
-
-				// Legacy
-				score.譜面情報.ハイスコア = (int)ini.stセクション.HiScoreDrums.nスコア;
-				score.譜面情報.nクリア = ini.stセクション.HiScoreDrums.nクリア;
-				score.譜面情報.nスコアランク = ini.stセクション.HiScoreDrums.nスコアランク;
-
-				for (int i = 0; i < (int)Difficulty.Total; i++)
-				{
-					score.譜面情報.nハイスコア[i] = (int)ini.stセクション.HiScoreDrums.nハイスコア[i];
-				}
-
-				// Load GPInfo for each save file
-				for (int i = 0; i < 5; i++)
-                {
-					if (csi[i] == null)
-						continue;
-
-					score.GPInfo[i].nClear = csi[i].stセクション.HiScoreDrums.nクリア;
-					score.GPInfo[i].nScoreRank = csi[i].stセクション.HiScoreDrums.nスコアランク;
-
-					for (int j = 0; j < (int)Difficulty.Total; j++)
-					{
-						score.GPInfo[i].nHighScore[j] = (int)csi[i].stセクション.HiScoreDrums.nハイスコア[j];
-					}
-                }
-
-				score.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
-				score.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
-				score.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
-				for( int i = 0; i < (int)Difficulty.Total; i++ )
-					score.譜面情報.演奏履歴[ i ] = ini.stファイル.History[ i ];
-			}
-			catch (Exception e)
-			{
-				Trace.TraceError( "演奏記録ファイルの読み込みに失敗しました。[{0}]", strScoreIniファイルパス );
-				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "例外が発生しましたが処理を継続します。 (801f823d-a952-4809-a1bb-cf6a56194f5c)" );
-			}
-		}
-		//-----------------
-		#endregion
 
 		// その他
 

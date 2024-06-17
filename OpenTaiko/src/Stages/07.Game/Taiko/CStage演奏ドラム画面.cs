@@ -232,16 +232,6 @@ namespace TJAPlayer3
             
             this.nStoredHit = new int[TJAPlayer3.ConfigIni.nPlayerCount];
 
-            // MODIFY_BEGIN #25398 2011.06.07 FROM
-            if ( TJAPlayer3.bコンパクトモード )
-			{
-				var score = new Cスコア();
-                TJAPlayer3.Songs管理.tScoreIniを読み込んで譜面情報を設定する(TJAPlayer3.strコンパクトモードファイル, score);// + ".score.ini", score );
-			}
-			else
-			{
-			}
-			// MODIFY_END #25398
 			dtLastQueueOperation = DateTime.MinValue;
 
             PuchiChara.ChangeBPM(60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0]);

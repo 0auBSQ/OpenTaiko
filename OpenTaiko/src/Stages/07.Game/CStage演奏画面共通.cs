@@ -28,8 +28,8 @@ namespace TJAPlayer3
 			//if (  )
 			{
 				Drums.nスコア = (long) this.actScore.Get( EInstrumentPad.DRUMS, 0 );
-                Drums.dbゲーム型スキル値 = CScoreIni.tゲーム型スキルを計算して返す(TJAPlayer3.DTX.LEVEL.Drums, TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.actCombo.n現在のコンボ数.最高値[0], EInstrumentPad.DRUMS, bIsAutoPlay);
-                Drums.db演奏型スキル値 = CScoreIni.t演奏型スキルを計算して返す( TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.nヒット数_Auto含まない.Drums.Great, this.nヒット数_Auto含まない.Drums.Good, this.nヒット数_Auto含まない.Drums.Poor, this.nヒット数_Auto含まない.Drums.Miss, EInstrumentPad.DRUMS, bIsAutoPlay );
+                Drums.dbゲーム型スキル値 = 0;
+                Drums.db演奏型スキル値 = 0;
 				Drums.nPerfect数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Perfect : this.nヒット数_Auto含まない.Drums.Perfect;
 				Drums.nGreat数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Great : this.nヒット数_Auto含まない.Drums.Great;
 				Drums.nGood数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Good : this.nヒット数_Auto含まない.Drums.Good;
@@ -74,7 +74,7 @@ namespace TJAPlayer3
 				Drums.nPoorになる範囲ms = TJAPlayer3.nPoor範囲ms;
 				Drums.strDTXManiaのバージョン = TJAPlayer3.VERSION;
 				Drums.最終更新日時 = DateTime.Now.ToString();
-				Drums.Hash = CScoreIni.t演奏セクションのMD5を求めて返す( Drums );
+				Drums.Hash = "00000000000000000000000000000000";
                 Drums.fゲージ = (float)this.actGauge.db現在のゲージ値[ 0 ];
                 if( !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
                 {

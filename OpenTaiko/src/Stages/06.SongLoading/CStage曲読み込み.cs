@@ -483,23 +483,20 @@ namespace TJAPlayer3
 						else
 							str = TJAPlayer3.strコンパクトモードファイル;
 
-						CScoreIni ini = new CScoreIni( str + ".score.ini" );
-						ini.t全演奏記録セクションの整合性をチェックし不整合があればリセットする();
-
 						if( ( TJAPlayer3.DTX != null ) && TJAPlayer3.DTX.IsActivated )
 							TJAPlayer3.DTX.DeActivate();
 
                         //if( CDTXMania.DTX == null )
                         {
-							TJAPlayer3.DTX = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 0, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]);
+							TJAPlayer3.DTX = new CDTX(str, false, 1.0, 0, 0, 0, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]);
 							if ( TJAPlayer3.ConfigIni.nPlayerCount >= 2 )
-								TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 1, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[1]);
+								TJAPlayer3.DTX_2P = new CDTX(str, false, 1.0, 0, 0, 1, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[1]);
 							if (TJAPlayer3.ConfigIni.nPlayerCount >= 3)
-								TJAPlayer3.DTX_3P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 2, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[2]);
+								TJAPlayer3.DTX_3P = new CDTX(str, false, 1.0, 0, 0, 2, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[2]);
 							if (TJAPlayer3.ConfigIni.nPlayerCount >= 4)
-								TJAPlayer3.DTX_4P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 3, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[3]);
+								TJAPlayer3.DTX_4P = new CDTX(str, false, 1.0, 0, 0, 3, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[3]);
 							if (TJAPlayer3.ConfigIni.nPlayerCount >= 5)
-								TJAPlayer3.DTX_5P = new CDTX(str, false, 1.0, ini.stファイル.BGMAdjust, 0, 4, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[4]);
+								TJAPlayer3.DTX_5P = new CDTX(str, false, 1.0, 0, 0, 4, true, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[4]);
 
 							if (TJAPlayer3.DTX.listErrors.Count != 0)
                             {

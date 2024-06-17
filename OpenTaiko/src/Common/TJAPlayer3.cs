@@ -1835,7 +1835,6 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.演奏中断:
 								#region [ 演奏キャンセル ]
 								//-----------------------------
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( "Play canceled" );
 
 								#region [ プラグイン On演奏キャンセル() の呼び出し ]
 								//---------------------
@@ -1913,7 +1912,6 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.ステージ失敗:
 								#region [ 演奏失敗(StageFailed) ]
 								//-----------------------------
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( "Stage failed" );
 
 								#region [ プラグイン On演奏失敗() の呼び出し ]
 								//---------------------
@@ -1967,51 +1965,11 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.ステージクリア:
 								#region [ 演奏クリア ]
 								//-----------------------------
+
+								// Fetch the results of the just finished play
 								CScoreIni.C演奏記録 c演奏記録_Drums;
 								stage演奏ドラム画面.t演奏結果を格納する( out c演奏記録_Drums );
 
-                                double ps = 0.0, gs = 0.0;
-								if ( !c演奏記録_Drums.b全AUTOである && c演奏記録_Drums.n全チップ数 > 0) {
-									ps = c演奏記録_Drums.db演奏型スキル値;
-									gs = c演奏記録_Drums.dbゲーム型スキル値;
-								}
-								string str = "Cleared";
-								switch( CScoreIni.t総合ランク値を計算して返す( c演奏記録_Drums, null, null ) )
-								{
-									case (int)CScoreIni.ERANK.SS:
-										str = string.Format( "Cleared (SS: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.S:
-										str = string.Format( "Cleared (S: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.A:
-										str = string.Format( "Cleared (A: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.B:
-										str = string.Format( "Cleared (B: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.C:
-										str = string.Format( "Cleared (C: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.D:
-										str = string.Format( "Cleared (D: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.E:
-										str = string.Format( "Cleared (E: {0:F2})", ps );
-										break;
-
-									case (int)CScoreIni.ERANK.UNKNOWN:	// #23534 2010.10.28 yyagi add: 演奏チップが0個のとき
-										str = "Cleared (No chips)";
-										break;
-								}
-
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( str );
 
 								#region [ プラグイン On演奏クリア() の呼び出し ]
 								//---------------------
@@ -3520,59 +3478,7 @@ for (int i = 0; i < 3; i++) {
 				this.b終了処理完了済み = true;
 			}
 		}
-		private CScoreIni tScoreIniへBGMAdjustとHistoryとPlayCountを更新(string str新ヒストリ行)
-		{
-			bool bIsUpdatedDrums, bIsUpdatedGuitar, bIsUpdatedBass;
-			string strFilename = DTX.strファイル名の絶対パス + ".score.ini";
-			CScoreIni ini = new CScoreIni( strFilename );
-			if( !File.Exists( strFilename ) )
-			{
-				ini.stファイル.Title = DTX.TITLE;
-				ini.stファイル.Name = DTX.strファイル名;
-				ini.stファイル.Hash = CScoreIni.tファイルのMD5を求めて返す( DTX.strファイル名の絶対パス );
-				for( int i = 0; i < 6; i++ )
-				{
-					ini.stセクション[ i ].nPerfectになる範囲ms = nPerfect範囲ms;
-					ini.stセクション[ i ].nGreatになる範囲ms = nGreat範囲ms;
-					ini.stセクション[ i ].nGoodになる範囲ms = nGood範囲ms;
-					ini.stセクション[ i ].nPoorになる範囲ms = nPoor範囲ms;
-				}
-			}
-			ini.stファイル.BGMAdjust = DTX.nBGMAdjust;
-			CScoreIni.t更新条件を取得する( out bIsUpdatedDrums, out bIsUpdatedGuitar, out bIsUpdatedBass );
-			if( bIsUpdatedDrums || bIsUpdatedGuitar || bIsUpdatedBass )
-			{
-				if( bIsUpdatedDrums )
-				{
-					ini.stファイル.PlayCountDrums++;
-				}
-				if( bIsUpdatedGuitar )
-				{
-					ini.stファイル.PlayCountGuitar++;
-				}
-				if( bIsUpdatedBass )
-				{
-					ini.stファイル.PlayCountBass++;
-				}
-				ini.tヒストリを追加する( str新ヒストリ行 );
-				if( !bコンパクトモード )
-				{
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
-					for( int j = 0; j < ini.stファイル.History.Length; j++ )
-					{
-						stageSongSelect.r確定されたスコア.譜面情報.演奏履歴[ j ] = ini.stファイル.History[ j ];
-					}
-				}
-			}
-			if( ConfigIni.bScoreIniを出力する )
-			{
-				ini.t書き出し( strFilename );
-			}
 
-			return ini;
-		}
 		private void tガベージコレクションを実行する()
 		{
 			GC.Collect(GC.MaxGeneration);

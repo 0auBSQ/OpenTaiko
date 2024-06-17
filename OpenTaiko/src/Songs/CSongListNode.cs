@@ -102,6 +102,11 @@ namespace TJAPlayer3
 
 		public string strScenePreset = null;
 
+		public string tGetUniqueId()
+		{
+			return uniqueId?.data.id ?? "";
+		}
+
 		// コンストラクタ
 
 		public CSongListNode()
