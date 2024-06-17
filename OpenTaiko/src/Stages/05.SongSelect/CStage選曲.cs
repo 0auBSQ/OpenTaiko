@@ -714,7 +714,7 @@ namespace TJAPlayer3
                     CActSelect曲リスト.CScorePad[] SPArrRef = CSongDict.ScorePads[p];
 
                     // Current board
-                    for (int j = 0; j < 10; j++)
+                    for (int j = 0; j < 11; j++)
                     {
                         tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][j], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][j], j < 7 ?
                             SPArrRef[currentPads[i]].ScoreRankCount[j]
@@ -740,7 +740,7 @@ namespace TJAPlayer3
                     int p = TJAPlayer3.GetActualPlayer(i);
 
                     if (TJAPlayer3.SaveFileInstances[p].data.Medals >= 0)
-                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][10], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][10], TJAPlayer3.SaveFileInstances[p].data.Medals);
+                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][11], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][11], TJAPlayer3.SaveFileInstances[p].data.Medals);
 
                     #region [HiScore plate]
 
@@ -765,7 +765,8 @@ namespace TJAPlayer3
                             else
                                 table = closest;
 
-                            displayedScore = score.GPInfo[p].nHighScore[table];
+                            var TableEntry = TJAPlayer3.SaveFileInstances[p].data.tGetSongSelectTableEntry(TJAPlayer3.stageSongSelect.rNowSelectedSong.tGetUniqueId());
+                            displayedScore = TableEntry.HighScore[table];
 
                             if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit)
                             {
@@ -779,7 +780,7 @@ namespace TJAPlayer3
                                     new Rectangle(table * width, 0, width, height));
                             }
 
-                            tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][11], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][11], displayedScore);
+                            tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][12], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][12], displayedScore);
                         }
 
                     }

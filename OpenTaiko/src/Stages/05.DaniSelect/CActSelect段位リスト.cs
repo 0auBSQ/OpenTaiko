@@ -239,7 +239,7 @@ namespace TJAPlayer3
 
                 #region [Goukaku plate]
 
-                int currentRank = Math.Min(stバー情報[currentSong].clearGrade, 6) - 1;
+                int currentRank = Math.Min(stバー情報[currentSong].clearGrade, 8) - 3;
 
                 if (currentRank >= 0)
                 {
@@ -477,7 +477,7 @@ namespace TJAPlayer3
 
                         #region [Goukaku plate]
 
-                        int currentRank = Math.Min(stバー情報[currentSong].clearGrade, 6) - 1;
+                        int currentRank = Math.Min(stバー情報[currentSong].clearGrade, 8) - 3;
 
                         if (currentRank >= 0)
                         {
@@ -813,7 +813,8 @@ namespace TJAPlayer3
                             stバー情報[i].cDanTickColor = song.arスコア[6].譜面情報.cDanTickColor;
 
                             //stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
-                            stバー情報[i].clearGrade = song.arスコア[6].GPInfo[TJAPlayer3.SaveFile].nClear[0];
+                            var TableEntry = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.tGetSongSelectTableEntry(song.tGetUniqueId());
+                            stバー情報[i].clearGrade = TableEntry.ClearStatuses[(int)Difficulty.Dan];
 
                             string barCenter = Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";
                             if (BarTexCache.TryGetValue(barCenter, out CTexture texture1))

@@ -437,25 +437,27 @@ namespace TJAPlayer3
 
                     Cスコア.ST譜面情報 idx = TJAPlayer3.stageSongSelect.r現在選択中のスコア.譜面情報;
 
-                    var GPInfo = TJAPlayer3.stageSongSelect.r現在選択中のスコア.GPInfo[p];
+                    //var GPInfo = TJAPlayer3.stageSongSelect.r現在選択中のスコア.GPInfo[p];
+
+                    var TableEntry = TJAPlayer3.SaveFileInstances[p].data.tGetSongSelectTableEntry(TJAPlayer3.stageSongSelect.rNowSelectedSong.tGetUniqueId());
 
                     //Difficulty_Crown.t2D描画(445 + screenPos * 144, 284, new RectangleF(idx.nクリア[i] * 24.5f, 0, 24.5f, 26));
 
-                    int crown_width = TJAPlayer3.Tx.Difficulty_Crown.szTextureSize.Width / 4;
+                    int crown_width = TJAPlayer3.Tx.Difficulty_Crown.szTextureSize.Width / 5;
                     int crown_height = TJAPlayer3.Tx.Difficulty_Crown.szTextureSize.Height;
                     TJAPlayer3.Tx.Difficulty_Crown.t2D描画(
                         TJAPlayer3.Skin.SongSelect_Difficulty_Crown_X[j][i], 
                         TJAPlayer3.Skin.SongSelect_Difficulty_Crown_Y[j][i], 
-                        new RectangleF(GPInfo.nClear[i] * crown_width, 0, crown_width, crown_height));
+                        new RectangleF(TableEntry.ClearStatuses[i] * crown_width, 0, crown_width, crown_height));
 
                     int scoreRank_width = TJAPlayer3.Tx.SongSelect_ScoreRank.szTextureSize.Width;
                     int scoreRank_height = TJAPlayer3.Tx.SongSelect_ScoreRank.szTextureSize.Height / 7;
 
-                    if (GPInfo.nScoreRank[i] != 0)
+                    if (TableEntry.ScoreRanks[i] != 0)
                         TJAPlayer3.Tx.SongSelect_ScoreRank.t2D描画(
                             TJAPlayer3.Skin.SongSelect_Difficulty_ScoreRank_X[j][i],
                             TJAPlayer3.Skin.SongSelect_Difficulty_ScoreRank_Y[j][i],
-                            new RectangleF(0, (GPInfo.nScoreRank[i] - 1) * scoreRank_height, scoreRank_width, scoreRank_height));
+                            new RectangleF(0, (TableEntry.ScoreRanks[i] - 1) * scoreRank_height, scoreRank_width, scoreRank_height));
 
                     /*
                     if (idx.nスコアランク[i] != 0)

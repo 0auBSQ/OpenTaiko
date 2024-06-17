@@ -171,30 +171,6 @@ namespace TJAPlayer3
 
         #endregion
 
-        #region [Player stats]
-
-        public void tUpdateSongClearStatus(CSongListNode node, int clearStatus, int difficulty)
-        {
-            if (difficulty > (int)Difficulty.Edit) return;
-
-            string _id = node.uniqueId.data.id;
-            var _sdp = data.standardPasses;
-
-            if (!_sdp.ContainsKey(_id))
-                _sdp[_id] = new CPassStatus();
-
-            var cps = _sdp[_id];
-
-            var _values = cps.d;
-            if (clearStatus > _values[difficulty])
-            {
-                cps.d[difficulty] = clearStatus;
-                tSaveFile();
-            }
-        }
-
-        #endregion
-
         public class Data
         {
             [JsonProperty("saveId")]
@@ -251,20 +227,29 @@ namespace TJAPlayer3
             [JsonProperty("activeTriggers")]
             public HashSet<string> ActiveTriggers = new HashSet<string>();
 
-            [JsonProperty("standardPasses")]
-            public Dictionary<string, CPassStatus> standardPasses = new Dictionary<string, CPassStatus>();
-
-            [JsonProperty("___unused_00")]
+            [JsonIgnore]
             public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord> ();
 
-            [JsonProperty("___unused_01")]
+            [JsonIgnore]
             public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctCharts = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
 
-            [JsonProperty("___unused_02")]
+            [JsonIgnore]
             public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
 
-            [JsonProperty("___unused_03")]
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysSongSelectTables = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CSongSelectTableEntry> songSelectTableEntries = new Dictionary<string, BestPlayRecords.CSongSelectTableEntry>();
+
+            [JsonIgnore]
             public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats ();
+
+            public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId)
+            {
+                if (songSelectTableEntries.ContainsKey(uniqueId)) return songSelectTableEntries[uniqueId];
+                return new BestPlayRecords.CSongSelectTableEntry();
+            }
 
             #region [Factorize best plays]
 
@@ -298,6 +283,7 @@ namespace TJAPlayer3
                 }
 
                 bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+                songSelectTableEntries = new Dictionary<string, BestPlayRecords.CSongSelectTableEntry>();
 
                 foreach (BestPlayRecords.CBestPlayRecord bestPlay in bestPlaysDistinctCharts.Values)
                 {
@@ -322,6 +308,26 @@ namespace TJAPlayer3
                         bestPlaysDistinctSongs[key].ScoreRank = Math.Max(bestPlaysDistinctSongs[key].ScoreRank, bestPlay.ScoreRank);
                         bestPlaysDistinctSongs[key].ClearStatus = Math.Max(bestPlaysDistinctSongs[key].ClearStatus, bestPlay.ClearStatus);
                     }
+
+                    // Entries to replace score.GPInfo on the song select menus
+                    if (!songSelectTableEntries.ContainsKey(key))
+                    {
+                        songSelectTableEntries[key] = new BestPlayRecords.CSongSelectTableEntry();
+                    }
+                    if (bestPlay.ChartDifficulty > songSelectTableEntries[key].ScoreRankDifficulty && bestPlay.ScoreRank >= 0)
+                    {
+                        songSelectTableEntries[key].ScoreRankDifficulty = (int)bestPlay.ChartDifficulty;
+                        songSelectTableEntries[key].ScoreRank = (int)bestPlay.ScoreRank;
+                    }
+                    if (bestPlay.ChartDifficulty > songSelectTableEntries[key].ClearStatusDifficulty && bestPlay.ClearStatus >= 0)
+                    {
+                        songSelectTableEntries[key].ClearStatusDifficulty = (int)bestPlay.ChartDifficulty;
+                        songSelectTableEntries[key].ClearStatus = (int)bestPlay.ClearStatus;
+                    }
+                    if ((int)bestPlay.ChartDifficulty == (int)Difficulty.Tower) songSelectTableEntries[key].TowerReachedFloor = (int)bestPlay.TowerBestFloor;
+                    songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
+                    songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
+                    songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
                 }
 
                 bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);

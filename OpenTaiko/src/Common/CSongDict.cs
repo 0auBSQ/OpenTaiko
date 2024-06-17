@@ -281,77 +281,27 @@ namespace TJAPlayer3
 
         public static void tRefreshScoreTables()
         {
-            #region [Reset nodes]
-
             for (int pl = 0; pl < 5; pl++)
             {
                 CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
+                var BestPlayStats = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(pl)].data.bestPlaysStats;
 
                 for (int s = 0; s <= (int)Difficulty.Edit + 1; s++)
                 {
                     CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
 
-                    for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
-                        SPRef.ScoreRankCount[i] = 0;
-
-                    for (int i = 0; i < SPRef.CrownCount.Length; i++)
-                        SPRef.CrownCount[i] = 0;
-                }
-            }
-
-            #endregion
-
-            #region [Load nodes]
-
-            foreach (CSongListNode song in nodes.Values)
-            {
-                for (int pl = 0; pl < 5; pl++)
-                {
-                    CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
-
-                    if (song.eノード種別 == CSongListNode.ENodeType.SCORE
-                        && song.strジャンル != "最近遊んだ曲"
-                        && song.strジャンル != "Favorite"
-                        && song.strジャンル != "SearchD")
+                    if (s <=  (int)Difficulty.Edit)
                     {
-                        var score = song.arスコア[TJAPlayer3.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
-
-                        if (score != null)
-                        {
-                            var gp = score.GPInfo[pl];
-
-                            for (int s = 0; s <= (int)Difficulty.Edit; s++)
-                            {
-                                CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
-
-                                for (int i = 0; i < SPRef.ScoreRankCount.Length; i++)
-                                {
-                                    int increment = (gp.nScoreRank[s] == i + 1) ? 1 : 0;
-
-                                    SPRef.ScoreRankCount[i] += increment;
-                                    if (s >= (int)Difficulty.Oni)
-                                        SPArrRef[(int)Difficulty.Edit + 1].ScoreRankCount[i] += increment;
-                                }
-                                for (int i = 0; i < SPRef.CrownCount.Length; i++)
-                                {
-                                    int increment = (gp.nClear[s] == i + 1) ? 1 : 0;
-
-                                    SPRef.CrownCount[i] += increment;
-                                    if (s >= (int)Difficulty.Oni)
-                                        SPArrRef[(int)Difficulty.Edit + 1].CrownCount[i] += increment;
-                                }
-                                
-                            }
-
-                            
-                        }
+                        SPRef.ScoreRankCount = BestPlayStats.ScoreRanks[s].Skip(1).ToArray(); ;
+                        SPRef.CrownCount= BestPlayStats.ClearStatuses[s].Skip(1).ToArray(); ;
+                    }
+                    else
+                    {
+                        SPRef.ScoreRankCount = BestPlayStats.ScoreRanks[(int)Difficulty.Oni].Skip(1).Zip(BestPlayStats.ScoreRanks[(int)Difficulty.Edit].Skip(1).ToArray(), (x, y) => x + y).ToArray();
+                        SPRef.CrownCount = BestPlayStats.ClearStatuses[(int)Difficulty.Oni].Skip(1).Zip(BestPlayStats.ClearStatuses[(int)Difficulty.Edit].Skip(1).ToArray(), (x, y) => x + y).ToArray();
                     }
                 }
             }
-
-            #endregion
-
-
         }
 
         #endregion
