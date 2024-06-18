@@ -394,8 +394,8 @@ Trace.TraceInformation( "Command: " + s[ (int) this.Command ] );
 			}
 
 			//cc.nViewerScrollSpeed[0]  = TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile];
-			cc.bViewerShowDebugStatus = TJAPlayer3.ConfigIni.b演奏情報を表示する;
-			cc.bViewerVSyncWait       = TJAPlayer3.ConfigIni.b垂直帰線待ちを行う;
+			cc.bViewerShowDebugStatus = TJAPlayer3.ConfigIni.bDisplayDebugInfo;
+			cc.bViewerVSyncWait       = TJAPlayer3.ConfigIni.bEnableVSync;
 			cc.bViewerTimeStretch     = TJAPlayer3.ConfigIni.bTimeStretch;
 			cc.bViewerDrums有効       = true;
 

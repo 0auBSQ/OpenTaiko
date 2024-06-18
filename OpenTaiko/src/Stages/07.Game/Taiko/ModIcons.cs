@@ -111,13 +111,13 @@ namespace TJAPlayer3
         {
             var rand_ = TJAPlayer3.ConfigIni.eRandom[player];
 
-            if (rand_ == Eランダムモード.MIRROR)
+            if (rand_ == ERandomMode.MIRROR)
                 TJAPlayer3.Tx.Mod_Mirror?.t2D描画(x, y);
-            else if (rand_ == Eランダムモード.RANDOM)
+            else if (rand_ == ERandomMode.RANDOM)
                 TJAPlayer3.Tx.Mod_Random?.t2D描画(x, y);
-            else if (rand_ == Eランダムモード.SUPERRANDOM)
+            else if (rand_ == ERandomMode.SUPERRANDOM)
                 TJAPlayer3.Tx.Mod_Super?.t2D描画(x, y);
-            else if (rand_ == Eランダムモード.HYPERRANDOM)
+            else if (rand_ == ERandomMode.HYPERRANDOM)
                 TJAPlayer3.Tx.Mod_Hyper?.t2D描画(x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(x, y);
@@ -125,9 +125,9 @@ namespace TJAPlayer3
         
         static private void tDisplaySongSpeedIcon(int x, int y, int player)
         {
-            if (TJAPlayer3.ConfigIni.n演奏速度 > 20)
+            if (TJAPlayer3.ConfigIni.nSongSpeed > 20)
                 TJAPlayer3.Tx.Mod_SongSpeed[1]?.t2D描画(x, y);
-            else if (TJAPlayer3.ConfigIni.n演奏速度 < 20)
+            else if (TJAPlayer3.ConfigIni.nSongSpeed < 20)
                 TJAPlayer3.Tx.Mod_SongSpeed[0]?.t2D描画(x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(x, y);
@@ -169,8 +169,8 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.nFunMods[actual] != EFunMods.NONE) return false;
             if (TJAPlayer3.ConfigIni.bJust[actual] != 0) return false;
             if (TJAPlayer3.ConfigIni.nTimingZones[actual] != 2) return false;
-            if (TJAPlayer3.ConfigIni.n演奏速度 != 20) return false;
-            if (TJAPlayer3.ConfigIni.eRandom[actual] != Eランダムモード.OFF) return false;
+            if (TJAPlayer3.ConfigIni.nSongSpeed != 20) return false;
+            if (TJAPlayer3.ConfigIni.eRandom[actual] != ERandomMode.OFF) return false;
             if (TJAPlayer3.ConfigIni.eSTEALTH[actual] != EStealthMode.OFF) return false;
             if (TJAPlayer3.ConfigIni.nScrollSpeed[actual] != 9) return false;
 
@@ -184,7 +184,7 @@ namespace TJAPlayer3
             _flags[0] = (byte)Math.Min(255, TJAPlayer3.ConfigIni.nScrollSpeed[actual]);
             _flags[1] = (byte)TJAPlayer3.ConfigIni.eSTEALTH[actual];
             _flags[2] = (byte)TJAPlayer3.ConfigIni.eRandom[actual];
-            _flags[3] = (byte)Math.Min(255, TJAPlayer3.ConfigIni.n演奏速度);
+            _flags[3] = (byte)Math.Min(255, TJAPlayer3.ConfigIni.nSongSpeed);
             _flags[4] = (byte)TJAPlayer3.ConfigIni.nTimingZones[actual];
             _flags[5] = (byte)TJAPlayer3.ConfigIni.bJust[actual];
             _flags[7] = (byte)TJAPlayer3.ConfigIni.nFunMods[actual];

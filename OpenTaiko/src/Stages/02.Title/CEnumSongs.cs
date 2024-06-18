@@ -345,10 +345,10 @@ namespace TJAPlayer3
 
 				try
 				{
-					if ( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.str曲データ検索パス ) )
+					if ( !string.IsNullOrEmpty( TJAPlayer3.ConfigIni.strSongsPath ) )
 					{
 						CSongDict.tClearSongNodes();
-						string[] strArray = TJAPlayer3.ConfigIni.str曲データ検索パス.Split( new char[] { ';' } );
+						string[] strArray = TJAPlayer3.ConfigIni.strSongsPath.Split( new char[] { ';' } );
 						if ( strArray.Length > 0 )
 						{
 							// 全パスについて…

@@ -2001,7 +2001,7 @@ namespace TJAPlayer3
                         }
                             
                     }
-                    if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
+                    if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect)
                     {
                         this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory);
                     }
@@ -2044,7 +2044,7 @@ namespace TJAPlayer3
 
                         }
                     }
-                    if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする)
+                    if ((c曲リストノード.list子リスト != null) && TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect)
                     {
                         this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory, dan, difficulty);
                     }

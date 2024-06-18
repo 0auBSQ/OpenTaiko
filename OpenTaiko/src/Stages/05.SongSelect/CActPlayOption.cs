@@ -490,27 +490,27 @@ namespace TJAPlayer3
 
             var rand_ = TJAPlayer3.ConfigIni.eRandom[actual];
 
-            if (rand_ == Eランダムモード.HYPERRANDOM)
+            if (rand_ == ERandomMode.HYPERRANDOM)
             {
                 nRandom = 2;
                 nAbekobe = 1;
             }
-            else if (rand_ == Eランダムモード.SUPERRANDOM)
+            else if (rand_ == ERandomMode.SUPERRANDOM)
             {
                 nRandom = 2;
                 nAbekobe = 0;
             }
-            else if (rand_ == Eランダムモード.RANDOM)
+            else if (rand_ == ERandomMode.RANDOM)
             {
                 nRandom = 1;
                 nAbekobe = 0;
             }
-            else if (rand_ == Eランダムモード.MIRROR)
+            else if (rand_ == ERandomMode.MIRROR)
             {
                 nRandom = 0;
                 nAbekobe = 1;
             }
-            else if (rand_ == Eランダムモード.OFF)
+            else if (rand_ == ERandomMode.OFF)
             {
                 nRandom = 0;
                 nAbekobe = 0;
@@ -570,7 +570,7 @@ namespace TJAPlayer3
 
             #region [ Song speed ]
 
-            nSongSpeed = Math.Max(0, Math.Min(txSongSpeed.Length - 1, (TJAPlayer3.ConfigIni.n演奏速度 / 2) - 5));
+            nSongSpeed = Math.Max(0, Math.Min(txSongSpeed.Length - 1, (TJAPlayer3.ConfigIni.nSongSpeed / 2) - 5));
 
             #endregion
 
@@ -621,27 +621,27 @@ namespace TJAPlayer3
 
             if (nRandom == 2 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.HYPERRANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.HYPERRANDOM;
             }
             else if (nRandom == 2 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.SUPERRANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.SUPERRANDOM;
             }
             else if (nRandom == 1 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.RANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
             }
             else if (nRandom == 1 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.RANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
             }
             else if (nRandom == 0 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.MIRROR;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.MIRROR;
             }
             else if (nRandom == 0 && nAbekobe == 0)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = Eランダムモード.OFF;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.OFF;
             }
 
             #endregion
@@ -705,7 +705,7 @@ namespace TJAPlayer3
 
             #region [ Song speed ]
 
-            TJAPlayer3.ConfigIni.n演奏速度 = (nSongSpeed + 5) * 2;
+            TJAPlayer3.ConfigIni.nSongSpeed = (nSongSpeed + 5) * 2;
 
             #endregion
         }
@@ -723,7 +723,7 @@ namespace TJAPlayer3
 
         public float tGetSongSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0)
         {
-            var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : TJAPlayer3.ConfigIni.n演奏速度) / 20f;
+            var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : TJAPlayer3.ConfigIni.nSongSpeed) / 20f;
 
             if (ebt == EBalancingType.SCORE || _compare <= 1f)
                 return Math.Min(1f, (float)Math.Pow(_compare, 1.3));
