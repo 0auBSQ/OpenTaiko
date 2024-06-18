@@ -1809,6 +1809,34 @@ namespace TJAPlayer3
                                     Config_KeyAssign_Move = int.Parse(strParam);
                                     break;
                                 }
+                                case nameof(Config_Calibration_OffsetText):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Config_Calibration_OffsetText[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case nameof(Config_Calibration_InfoText):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Config_Calibration_InfoText[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case nameof(Config_Calibration_Highlights):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    int recs = Math.Min(strSplit.Length, 12);
+                                    for (int i = 0; i+3 < recs; i+=4)
+                                    {
+                                        Config_Calibration_Highlights[i] = new Rectangle(int.Parse(strSplit[i]), int.Parse(strSplit[i+1]), int.Parse(strSplit[i+2]), int.Parse(strSplit[i+3]));
+                                    }
+                                    break;
+                                }
                                 #endregion
 
                                 #region [Mod Icons]
@@ -9516,6 +9544,14 @@ namespace TJAPlayer3
         public int[] Config_KeyAssign_Menu_Highlight = new int[] { 324, 66 };
         public int[] Config_KeyAssign_Font = new int[] { 308, 64 };
         public int Config_KeyAssign_Move = 20;
+
+        public int[] Config_Calibration_OffsetText = new int[] { 300, 288 };
+        public int[] Config_Calibration_InfoText = new int[] { 8, 550 };
+        public Rectangle[] Config_Calibration_Highlights = new Rectangle[] {
+            new Rectangle(371, 724, 371, 209),
+            new Rectangle(774, 724, 371, 209),
+            new Rectangle(1179, 724, 371, 209)
+        };
 
         #endregion
 

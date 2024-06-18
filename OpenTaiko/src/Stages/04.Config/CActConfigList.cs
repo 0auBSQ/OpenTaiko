@@ -335,8 +335,8 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
-			this.iDrumsGoToCalibration = new CItemBase("CALIBRATION", CItemBase.EPanelType.Other,
-				"CALIBRATION");
+			this.iDrumsGoToCalibration = new CItemBase(CLangManager.LangInstance.GetString(10192), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString(10193));
 			this.list項目リスト.Add(this.iDrumsGoToCalibration);
 
 			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
@@ -1921,7 +1921,7 @@ namespace TJAPlayer3
 		CItemInteger TokkunMashInterval;
 
 		private CItemInteger iInputAdjustTimeMs;
-		private CItemInteger iGlobalOffsetMs;
+		public CItemInteger iGlobalOffsetMs;
 
 		private CItemList iSystemSkinSubfolder;				// #28195 2012.5.2 yyagi
 		private CItemBase iSystemReloadDTX;					// #32081 2013.10.21 yyagi

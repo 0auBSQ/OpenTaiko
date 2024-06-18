@@ -566,7 +566,7 @@ namespace TJAPlayer3
 		//private CCounter ctBackgroundAnime;
 		private CActFIFOWhite actFIFO;
 		private CActConfigKeyAssign actKeyAssign;
-		private CActConfigList actList;
+		public CActConfigList actList;
 		private CActオプションパネル actオプションパネル;
 		private bool bメニューにフォーカス中;
 		private STキー反復用カウンタ ctキー反復用;
