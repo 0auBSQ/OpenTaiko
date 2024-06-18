@@ -1833,7 +1833,7 @@ namespace TJAPlayer3
                                     int recs = Math.Min(strSplit.Length, 12);
                                     for (int i = 0; i+3 < recs; i+=4)
                                     {
-                                        Config_Calibration_Highlights[i] = new Rectangle(int.Parse(strSplit[i]), int.Parse(strSplit[i+1]), int.Parse(strSplit[i+2]), int.Parse(strSplit[i+3]));
+                                        Config_Calibration_Highlights[i/4] = new Rectangle(int.Parse(strSplit[i]), int.Parse(strSplit[i+1]), int.Parse(strSplit[i+2]), int.Parse(strSplit[i+3]));
                                     }
                                     break;
                                 }
