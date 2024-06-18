@@ -381,7 +381,7 @@ namespace TJAPlayer3
             [10191] = "Drums key assign:\nAssign any key for jumping to the last measure.",
 
             [10192] = "Calibrate Offset",
-            [10193] = "Calibrate your offset.\nGlobal Offset will be overriden if saved.",
+            [10193] = "Calibrate your offset.\nGlobal Offset will be overwritten if saved.",
 
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",
