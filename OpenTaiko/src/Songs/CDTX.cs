@@ -1725,7 +1725,7 @@ namespace TJAPlayer3
 
             switch (eRandom)
             {
-                case Eランダムモード.MIRROR:
+                case ERandomMode.MIRROR:
                     foreach (var chip in this.listChip)
                     {
                         switch (chip.nチャンネル番号)
@@ -1747,7 +1747,7 @@ namespace TJAPlayer3
                         }
                     }
                     break;
-                case Eランダムモード.RANDOM:
+                case ERandomMode.RANDOM:
                     foreach (var chip in this.listChip)
                     {
                         int n = rnd.Next(100);
@@ -1774,7 +1774,7 @@ namespace TJAPlayer3
                         }
                     }
                     break;
-                case Eランダムモード.SUPERRANDOM:
+                case ERandomMode.SUPERRANDOM:
                     foreach (var chip in this.listChip)
                     {
                         int n = rnd.Next(100);
@@ -1801,7 +1801,7 @@ namespace TJAPlayer3
                         }
                     }
                     break;
-                case Eランダムモード.HYPERRANDOM:
+                case ERandomMode.HYPERRANDOM:
                     foreach (var chip in this.listChip)
                     {
                         int n = rnd.Next(100);
@@ -1828,7 +1828,7 @@ namespace TJAPlayer3
                         }
                     }
                     break;
-                case Eランダムモード.OFF:
+                case ERandomMode.OFF:
                 default:
                     break;
             }
@@ -1851,7 +1851,7 @@ namespace TJAPlayer3
                 }
             }
 
-            if (eRandom != Eランダムモード.OFF)
+            if (eRandom != ERandomMode.OFF)
             {
                 #region[ list作成 ]
                 //ひとまずチップだけのリストを作成しておく。
@@ -1879,7 +1879,7 @@ namespace TJAPlayer3
         #region [ チップの再生と停止 ]
         public void tチップの再生(CChip pChip, long n再生開始システム時刻ms)
         {
-            if (TJAPlayer3.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && TJAPlayer3.ConfigIni.n演奏速度 != 20)
+            if (TJAPlayer3.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && TJAPlayer3.ConfigIni.nSongSpeed != 20)
                 return;
 
             if (pChip.n整数値_内部番号 >= 0)

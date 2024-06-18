@@ -24,7 +24,12 @@ namespace TJAPlayer3
             }
                 
             tLoadFile();
+
+            data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+            data.tFactorizeBestPlays();
         }
+
+        
 
         #region [Medals]
 
@@ -166,34 +171,10 @@ namespace TJAPlayer3
 
         #endregion
 
-        #region [Player stats]
-
-        public void tUpdateSongClearStatus(CSongListNode node, int clearStatus, int difficulty)
-        {
-            if (difficulty > (int)Difficulty.Edit) return;
-
-            string _id = node.uniqueId.data.id;
-            var _sdp = data.standardPasses;
-
-            if (!_sdp.ContainsKey(_id))
-                _sdp[_id] = new CPassStatus();
-
-            var cps = _sdp[_id];
-
-            var _values = cps.d;
-            if (clearStatus > _values[difficulty])
-            {
-                cps.d[difficulty] = clearStatus;
-                tSaveFile();
-            }
-        }
-
-        #endregion
-
         public class Data
         {
             [JsonProperty("saveId")]
-            public long SaveId = 0;
+            public Int64 SaveId = 0;
 
             [JsonProperty("name")]
             public string Name = "プレイヤー1";
@@ -246,9 +227,113 @@ namespace TJAPlayer3
             [JsonProperty("activeTriggers")]
             public HashSet<string> ActiveTriggers = new HashSet<string>();
 
-            [JsonProperty("standardPasses")]
-            public Dictionary<string, CPassStatus> standardPasses = new Dictionary<string, CPassStatus>();
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord> ();
 
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctCharts = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlaysSongSelectTables = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+            [JsonIgnore]
+            public Dictionary<string, BestPlayRecords.CSongSelectTableEntry> songSelectTableEntries = new Dictionary<string, BestPlayRecords.CSongSelectTableEntry>();
+
+            [JsonIgnore]
+            public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats ();
+
+            public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId)
+            {
+                if (songSelectTableEntries.ContainsKey(uniqueId)) return songSelectTableEntries[uniqueId];
+                return new BestPlayRecords.CSongSelectTableEntry();
+            }
+
+            #region [Factorize best plays]
+
+            public void tFactorizeBestPlays()
+            {
+                bestPlaysDistinctCharts = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+
+                foreach (BestPlayRecords.CBestPlayRecord bestPlay in bestPlays.Values)
+                {
+                    string key = bestPlay.ChartUniqueId + bestPlay.ChartDifficulty.ToString();
+                    if (!bestPlaysDistinctCharts.ContainsKey(key))
+                    {
+                        bestPlaysDistinctCharts[key] = bestPlay;
+                    }
+                    else
+                    {
+                        if (bestPlay.HighScore > bestPlaysDistinctCharts[key].HighScore)
+                        {
+                            bestPlaysDistinctCharts[key].HighScore = bestPlay.HighScore;
+                            bestPlaysDistinctCharts[key].HighScoreGoodCount = bestPlay.HighScoreGoodCount;
+                            bestPlaysDistinctCharts[key].HighScoreOkCount = bestPlay.HighScoreOkCount;
+                            bestPlaysDistinctCharts[key].HighScoreBadCount = bestPlay.HighScoreBadCount;
+                            bestPlaysDistinctCharts[key].HighScoreRollCount = bestPlay.HighScoreRollCount;
+                            bestPlaysDistinctCharts[key].HighScoreBoomCount = bestPlay.HighScoreBoomCount;
+                            bestPlaysDistinctCharts[key].HighScoreMaxCombo = bestPlay.HighScoreMaxCombo;
+                            bestPlaysDistinctCharts[key].HighScoreADLibCount = bestPlay.HighScoreADLibCount;
+                        }
+                        bestPlaysDistinctCharts[key].ScoreRank = Math.Max(bestPlaysDistinctCharts[key].ScoreRank, bestPlay.ScoreRank);
+                        bestPlaysDistinctCharts[key].ClearStatus = Math.Max(bestPlaysDistinctCharts[key].ClearStatus, bestPlay.ClearStatus);
+                    }
+                }
+
+                bestPlaysDistinctSongs = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();
+                songSelectTableEntries = new Dictionary<string, BestPlayRecords.CSongSelectTableEntry>();
+
+                foreach (BestPlayRecords.CBestPlayRecord bestPlay in bestPlaysDistinctCharts.Values)
+                {
+                    string key = bestPlay.ChartUniqueId;
+                    if (!bestPlaysDistinctSongs.ContainsKey(key))
+                    {
+                        bestPlaysDistinctSongs[key] = bestPlay;
+                    }
+                    else
+                    {
+                        if (bestPlay.HighScore > bestPlaysDistinctSongs[key].HighScore)
+                        {
+                            bestPlaysDistinctSongs[key].HighScore = bestPlay.HighScore;
+                            bestPlaysDistinctSongs[key].HighScoreGoodCount = bestPlay.HighScoreGoodCount;
+                            bestPlaysDistinctSongs[key].HighScoreOkCount = bestPlay.HighScoreOkCount;
+                            bestPlaysDistinctSongs[key].HighScoreBadCount = bestPlay.HighScoreBadCount;
+                            bestPlaysDistinctSongs[key].HighScoreRollCount = bestPlay.HighScoreRollCount;
+                            bestPlaysDistinctSongs[key].HighScoreBoomCount = bestPlay.HighScoreBoomCount;
+                            bestPlaysDistinctSongs[key].HighScoreMaxCombo = bestPlay.HighScoreMaxCombo;
+                            bestPlaysDistinctSongs[key].HighScoreADLibCount = bestPlay.HighScoreADLibCount;
+                        }
+                        bestPlaysDistinctSongs[key].ScoreRank = Math.Max(bestPlaysDistinctSongs[key].ScoreRank, bestPlay.ScoreRank);
+                        bestPlaysDistinctSongs[key].ClearStatus = Math.Max(bestPlaysDistinctSongs[key].ClearStatus, bestPlay.ClearStatus);
+                    }
+
+                    // Entries to replace score.GPInfo on the song select menus
+                    if (!songSelectTableEntries.ContainsKey(key))
+                    {
+                        songSelectTableEntries[key] = new BestPlayRecords.CSongSelectTableEntry();
+                    }
+                    if (bestPlay.ChartDifficulty > songSelectTableEntries[key].ScoreRankDifficulty && bestPlay.ScoreRank >= 0)
+                    {
+                        songSelectTableEntries[key].ScoreRankDifficulty = (int)bestPlay.ChartDifficulty;
+                        songSelectTableEntries[key].ScoreRank = (int)bestPlay.ScoreRank;
+                    }
+                    if (bestPlay.ChartDifficulty > songSelectTableEntries[key].ClearStatusDifficulty && bestPlay.ClearStatus >= 0)
+                    {
+                        songSelectTableEntries[key].ClearStatusDifficulty = (int)bestPlay.ChartDifficulty;
+                        songSelectTableEntries[key].ClearStatus = (int)bestPlay.ClearStatus;
+                    }
+                    if ((int)bestPlay.ChartDifficulty == (int)Difficulty.Tower) songSelectTableEntries[key].TowerReachedFloor = (int)bestPlay.TowerBestFloor;
+                    songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
+                    songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
+                    songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
+                }
+
+                bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);
+            }
+
+            #endregion
         }
 
         public Data data = new Data();

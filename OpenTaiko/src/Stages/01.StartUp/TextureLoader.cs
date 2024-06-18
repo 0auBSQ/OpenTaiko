@@ -142,6 +142,9 @@ namespace TJAPlayer3
 
         public void LoadTexture()
         {
+            CalibrateFG = TxC(CONFIG + $@"Calibration{Path.DirectorySeparatorChar}FG.png");
+            CalibrateBG = TxC(CONFIG + $@"Calibration{Path.DirectorySeparatorChar}BG.png");
+
             #region 共通
             Tile_Black = TxC(@$"Tile_Black.png");
             Menu_Title = TxC(@$"Menu_Title.png");
@@ -2544,6 +2547,12 @@ namespace TJAPlayer3
 				}
 			}
         }
+        #region Calibration
+
+        public CTexture CalibrateFG,
+            CalibrateBG;
+
+        #endregion
 
         #region 共通
         public CTexture Tile_Black,

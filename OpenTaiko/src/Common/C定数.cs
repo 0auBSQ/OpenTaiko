@@ -63,12 +63,7 @@ namespace TJAPlayer3
         左下 = 1,
         中央下 = 2
     }
-	public enum Eダメージレベル
-	{
-		少ない	= 0,
-		普通	= 1,
-		大きい	= 2
-	}
+
 	public enum EPad			// 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
 	{
 		HH		= 0,
@@ -254,7 +249,7 @@ namespace TJAPlayer3
         RBlue2P = 64,
 		UNKNOWN = 4096
 	}
-	public enum Eランダムモード
+	public enum ERandomMode
 	{
 		OFF,
 		RANDOM,

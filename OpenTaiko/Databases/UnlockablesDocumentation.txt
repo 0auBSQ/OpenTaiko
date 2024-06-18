@@ -3,10 +3,10 @@
 * ch : "Coins here", coin requirement, payable within the heya menu, 1 value : [Coin price]
 * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
 * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
-* dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
-* lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~2), Number of performances], input 1 value [Plays fitting the condition]
+* dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
+* lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
 * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
-* sg : "Song genre (performance)", count of any song pass within a specific genre folder, unlock check during the results screen, condition 3 x n values for n songs : [Song count, Difficulty int (0~4, if -1 : Any), Clear status (0~2), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
+* sg : "Song genre (performance)", count of any song pass within a specific genre folder, unlock check during the results screen, condition 2 x n values for n songs : [Song count, Clear status (0~4), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
 
 
 == UnlockType ==

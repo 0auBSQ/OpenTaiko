@@ -499,10 +499,12 @@ namespace TJAPlayer3
 					this.stバー情報[index].nスコアランク[i] = new int[5];
 
 					int ap = TJAPlayer3.GetActualPlayer(i);
-					var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+					//var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 
-					this.stバー情報[index].nクリア[i] = sr.GPInfo[ap].nClear;
-					this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
+                    var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());
+
+                    this.stバー情報[index].nクリア[i] = TableEntry.ClearStatuses;
+					this.stバー情報[index].nスコアランク[i] = TableEntry.ScoreRanks;
 				}
 
 				this.stバー情報[index].csu = song.uniqueId;
@@ -640,10 +642,11 @@ namespace TJAPlayer3
 					this.stバー情報[index].nスコアランク[i] = new int[5];
 
 					int ap = TJAPlayer3.GetActualPlayer(i);
-					var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+                    //var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+                    var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());
 
-					this.stバー情報[index].nクリア[i] = sr.GPInfo[ap].nClear;
-					this.stバー情報[index].nスコアランク[i] = sr.GPInfo[ap].nScoreRank;
+                    this.stバー情報[index].nクリア[i] = TableEntry.ClearStatuses;
+					this.stバー情報[index].nスコアランク[i] = TableEntry.ScoreRanks;
 				}
 
 				this.stバー情報[index].csu = song.uniqueId;
@@ -1571,9 +1574,11 @@ namespace TJAPlayer3
 
 							int ap = TJAPlayer3.GetActualPlayer(i);
 
-							int[] clear = this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Dan].GPInfo[ap].nClear;
+                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
 
-							int currentRank = Math.Min(clear[0], 6) - 1;
+							int[] clear = TableEntry.ClearStatuses; 
+
+							int currentRank = Math.Min(clear[(int)Difficulty.Dan], 8) - 3;
 
 							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i];
 							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i];
@@ -1591,10 +1596,11 @@ namespace TJAPlayer3
 							if (i >= 2) continue;
 
 							int ap = TJAPlayer3.GetActualPlayer(i);
+                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
 
-							int[] clear = this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Tower].GPInfo[ap].nClear;
+                            int[] clear = TableEntry.ClearStatuses;
 
-							int currentRank = Math.Min(clear[0], 7) - 1;
+							int currentRank = Math.Min(clear[(int)Difficulty.Tower], 8) - 2;
 
 							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_X[i];
 							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_Y[i];
@@ -1604,17 +1610,18 @@ namespace TJAPlayer3
 					}
 					else if (this.rCurrentlySelectedSong.arスコア[3] != null || this.rCurrentlySelectedSong.arスコア[4] != null)
 					{
-						var sr = this.rCurrentlySelectedSong.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.rCurrentlySelectedSong)];
+						//var sr = this.rCurrentlySelectedSong.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.rCurrentlySelectedSong)];
 
 						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
 						{
 							if (i >= 2) continue;
 
 							int ap = TJAPlayer3.GetActualPlayer(i);
+                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(TJAPlayer3.stageSongSelect.rNowSelectedSong.tGetUniqueId());
 
-							int[] クリア = sr.GPInfo[ap].nClear;
+                            int[] クリア = TableEntry.ClearStatuses;
 
-							int[] スコアランク = sr.GPInfo[ap].nScoreRank;
+							int[] スコアランク = TableEntry.ScoreRanks;
 
 							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_X[i];
 							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_Y[i];
@@ -2359,7 +2366,7 @@ namespace TJAPlayer3
 		public class CScorePad
         {
 			public int[] ScoreRankCount = new int[7];
-			public int[] CrownCount = new int[3];
+			public int[] CrownCount = new int[4];
         }
 
 		private struct STバー
@@ -2830,10 +2837,12 @@ namespace TJAPlayer3
 					if (this.stバー情報[i].eバー種別 == Eバー種別.Score)
 					{
 						int ap = TJAPlayer3.GetActualPlayer(d);
-						var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
+						//var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 
-						this.stバー情報[i].nクリア[d] = sr.GPInfo[ap].nClear;
-						this.stバー情報[i].nスコアランク[d] = sr.GPInfo[ap].nScoreRank;
+                        var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());
+
+                        this.stバー情報[i].nクリア[d] = TableEntry.ClearStatuses;
+						this.stバー情報[i].nスコアランク[d] = TableEntry.ScoreRanks;
 					}
 				}
 
@@ -3036,10 +3045,10 @@ namespace TJAPlayer3
 
 			if (bestCrown >= 0)
 			{
-				float width = TJAPlayer3.Tx.SongSelect_Crown.szTextureSize.Width / 15.0f;
+				float width = TJAPlayer3.Tx.SongSelect_Crown.szTextureSize.Width / 4.0f;
 				int height = TJAPlayer3.Tx.SongSelect_Crown.szTextureSize.Height;
 				TJAPlayer3.Tx.SongSelect_Crown?.t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.SongSelect_RegularCrowns_ScoreRank_Offset_X[0], y + TJAPlayer3.Skin.SongSelect_RegularCrowns_ScoreRank_Offset_Y[0], 
-					new RectangleF(12 * width + (クリア[bestCrown] - 1) * width, 0, width, height));
+					new RectangleF((クリア[bestCrown] - 1) * width, 0, width, height));
 			}
 
 			if (bestScoreRank >= 0)

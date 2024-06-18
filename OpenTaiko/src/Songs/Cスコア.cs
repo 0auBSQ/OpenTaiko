@@ -49,18 +49,6 @@ namespace TJAPlayer3
 
 		public ST譜面情報 譜面情報;
 
-		// Smaller version of ST譜面情報 to keep the main info for each player (High scores, clear status, score ranks
-		public STGamePlayInformations[] GPInfo = new STGamePlayInformations[5];
-
-		[Serializable]
-		[StructLayout(LayoutKind.Sequential)]
-		public struct STGamePlayInformations
-        {
-			public int[] nHighScore;
-			public int[] nClear;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
-			public int[] nScoreRank;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
-		}
-
 		[Serializable]
 		[StructLayout( LayoutKind.Sequential )]
 		public struct ST譜面情報
@@ -74,7 +62,6 @@ namespace TJAPlayer3
 			public string Presound;
 			public string Backgound;
 			public STDGBVALUE<int> レベル;
-			public STRANK 最大ランク;
 			public STSKILL 最大スキル;
 			public STDGBVALUE<bool> フルコンボ;
 			public STDGBVALUE<int> 演奏回数;
@@ -189,46 +176,6 @@ namespace TJAPlayer3
 				public int Drums;
 				public int Guitar;
 				public int Bass;
-				public int this[ int index ]
-				{
-					get
-					{
-						switch( index )
-						{
-							case 0:
-								return this.Drums;
-
-							case 1:
-								return this.Guitar;
-
-							case 2:
-								return this.Bass;
-						}
-						throw new IndexOutOfRangeException();
-					}
-					set
-					{
-						if ( ( value < (int)CScoreIni.ERANK.SS ) || ( ( value != (int)CScoreIni.ERANK.UNKNOWN ) && ( value > (int)CScoreIni.ERANK.E ) ) )
-						{
-							throw new ArgumentOutOfRangeException();
-						}
-						switch( index )
-						{
-							case 0:
-								this.Drums = value;
-								return;
-
-							case 1:
-								this.Guitar = value;
-								return;
-
-							case 2:
-								this.Bass = value;
-								return;
-						}
-						throw new IndexOutOfRangeException();
-					}
-				}
 			}
 
 			[Serializable]
@@ -308,10 +255,6 @@ namespace TJAPlayer3
 			this.譜面情報.Presound = "";
 			this.譜面情報.Backgound = "";
 			this.譜面情報.レベル = new STDGBVALUE<int>();
-			this.譜面情報.最大ランク = new ST譜面情報.STRANK();
-			this.譜面情報.最大ランク.Drums =  (int)CScoreIni.ERANK.UNKNOWN;
-			this.譜面情報.最大ランク.Guitar = (int)CScoreIni.ERANK.UNKNOWN;
-			this.譜面情報.最大ランク.Bass =   (int)CScoreIni.ERANK.UNKNOWN;
 			this.譜面情報.フルコンボ = new STDGBVALUE<bool>();
 			this.譜面情報.演奏回数 = new STDGBVALUE<int>();
 			this.譜面情報.演奏履歴 = new ST譜面情報.STHISTORY();
@@ -341,14 +284,7 @@ namespace TJAPlayer3
             this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
             this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
-		
-			for (int i = 0; i < 5; i++)
-            {
-				this.GPInfo[i].nHighScore = new int[(int)Difficulty.Total];
-				this.GPInfo[i].nClear = new int[5];
-				this.GPInfo[i].nScoreRank = new int[5];
-			}
-
+	
 			this.譜面情報.nExamResult = new List<int[]> { };
 			//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
 			//{

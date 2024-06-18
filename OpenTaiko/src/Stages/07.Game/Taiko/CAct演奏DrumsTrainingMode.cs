@@ -215,9 +215,9 @@ namespace TJAPlayer3
 				{
 					if (this.bTrainingPAUSE)
 					{
-						if (TJAPlayer3.ConfigIni.n演奏速度 > 6)
+						if (TJAPlayer3.ConfigIni.nSongSpeed > 6)
 						{
-							TJAPlayer3.ConfigIni.n演奏速度 = TJAPlayer3.ConfigIni.n演奏速度 - 2;
+							TJAPlayer3.ConfigIni.nSongSpeed = TJAPlayer3.ConfigIni.nSongSpeed - 2;
 							this.tMatchWithTheChartDisplayPosition(false);
 						}
 					}
@@ -226,9 +226,9 @@ namespace TJAPlayer3
 				{
 					if (this.bTrainingPAUSE)
 					{
-						if (TJAPlayer3.ConfigIni.n演奏速度 < 399)
+						if (TJAPlayer3.ConfigIni.nSongSpeed < 399)
 						{
-							TJAPlayer3.ConfigIni.n演奏速度 = TJAPlayer3.ConfigIni.n演奏速度 + 2;
+							TJAPlayer3.ConfigIni.nSongSpeed = TJAPlayer3.ConfigIni.nSongSpeed + 2;
 							this.tMatchWithTheChartDisplayPosition(false);
 						}
 					}

@@ -1002,15 +1002,15 @@ namespace TJAPlayer3
 						else if (gaugeValues[p] >= 40.0f)
 							Mood = 1;
 
-						if (TJAPlayer3.stage結果.nクリア[p] == 3)
+						if (TJAPlayer3.stage結果.nクリア[p] == 4)
 						{
 							MoodV2 = 5;
 						}
-						else if (TJAPlayer3.stage結果.nクリア[p] == 2)
+						else if (TJAPlayer3.stage結果.nクリア[p] == 3)
 						{
 							MoodV2 = 4;
 						}
-						else if (TJAPlayer3.stage結果.nクリア[p] == 1)
+						else if (TJAPlayer3.stage結果.nクリア[p] >= 1)
 						{
 							if (gaugeValues[p] >= 100.0f)
 							{
@@ -1192,7 +1192,7 @@ namespace TJAPlayer3
 						{
 							#region [Crown apparition]
 
-							int crownEffect_width = TJAPlayer3.Tx.Result_CrownEffect.szTextureSize.Width / 3;
+							int crownEffect_width = TJAPlayer3.Tx.Result_CrownEffect.szTextureSize.Width / 4;
 							int crownEffect_height = TJAPlayer3.Tx.Result_CrownEffect.szTextureSize.Height / 4;
 
 							if (ctMainCounter.CurrentValue <= ScoreApparitionTimeStamp + 2680)

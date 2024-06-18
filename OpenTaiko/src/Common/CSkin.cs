@@ -421,6 +421,8 @@ namespace TJAPlayer3
         public CSystemSound[] soundExToExtra = null;
         public CSystemSound[] soundExtraToEx = null;
 
+        public CSystemSound calibrationTick = null;
+
         public CSystemSound[] soundModal = null;
 
         public CSystemSound soundCrownIn = null;
@@ -808,6 +810,8 @@ namespace TJAPlayer3
 
             soundExToExtra = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
             soundExtraToEx = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
+
+            calibrationTick = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
 
             soundModal = new CSystemSound[6];
             for (int i = 0; i < soundModal.Length - 1; i++)
@@ -1232,6 +1236,14 @@ namespace TJAPlayer3
 
 
                                 #region 新・SkinConfig
+
+                                #region Startup
+                                case nameof(StartUp_LangSelect_FontSize):
+                                {
+                                    StartUp_LangSelect_FontSize = int.Parse(strParam);
+                                    break;
+                                }
+                                #endregion
 
                                 #region Title
                                 case nameof(Title_LoadingPinInstances):
@@ -1795,6 +1807,34 @@ namespace TJAPlayer3
                                 case "Config_KeyAssign_Move":
                                 {
                                     Config_KeyAssign_Move = int.Parse(strParam);
+                                    break;
+                                }
+                                case nameof(Config_Calibration_OffsetText):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Config_Calibration_OffsetText[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case nameof(Config_Calibration_InfoText):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Config_Calibration_InfoText[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
+                                case nameof(Config_Calibration_Highlights):
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    int recs = Math.Min(strSplit.Length, 12);
+                                    for (int i = 0; i+3 < recs; i+=4)
+                                    {
+                                        Config_Calibration_Highlights[i/4] = new Rectangle(int.Parse(strSplit[i]), int.Parse(strSplit[i+1]), int.Parse(strSplit[i+2]), int.Parse(strSplit[i+3]));
+                                    }
                                     break;
                                 }
                                 #endregion
@@ -2667,7 +2707,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_1P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[0][i] = int.Parse(strSplit[i]);
                                     }
@@ -2676,7 +2716,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_1P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[0][i] = int.Parse(strSplit[i]);
                                     }
@@ -2685,7 +2725,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_2P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[1][i] = int.Parse(strSplit[i]);
                                     }
@@ -2694,7 +2734,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_2P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[1][i] = int.Parse(strSplit[i]);
                                     }
@@ -2703,7 +2743,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_3P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[2][i] = int.Parse(strSplit[i]);
                                     }
@@ -2712,7 +2752,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_3P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[2][i] = int.Parse(strSplit[i]);
                                     }
@@ -2721,7 +2761,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_4P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[3][i] = int.Parse(strSplit[i]);
                                     }
@@ -2730,7 +2770,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_4P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[3][i] = int.Parse(strSplit[i]);
                                     }
@@ -2739,7 +2779,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_5P_X":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_X[4][i] = int.Parse(strSplit[i]);
                                     }
@@ -2748,7 +2788,7 @@ namespace TJAPlayer3
                                 case "SongSelect_BoardNumber_5P_Y":
                                 {
                                     string[] strSplit = strParam.Split(',');
-                                    for (int i = 0; i < 12; i++)
+                                    for (int i = 0; i < 13; i++)
                                     {
                                         SongSelect_BoardNumber_Y[4][i] = int.Parse(strSplit[i]);
                                     }
@@ -9505,6 +9545,14 @@ namespace TJAPlayer3
         public int[] Config_KeyAssign_Font = new int[] { 308, 64 };
         public int Config_KeyAssign_Move = 20;
 
+        public int[] Config_Calibration_OffsetText = new int[] { 300, 288 };
+        public int[] Config_Calibration_InfoText = new int[] { 8, 550 };
+        public Rectangle[] Config_Calibration_Highlights = new Rectangle[] {
+            new Rectangle(371, 724, 371, 209),
+            new Rectangle(774, 724, 371, 209),
+            new Rectangle(1179, 724, 371, 209)
+        };
+
         #endregion
 
         #region Puchichara
@@ -9651,6 +9699,10 @@ namespace TJAPlayer3
         public int[] Adjustments_MenuPuchichara_X = new int[] { -100, 100 };
         public int[] Adjustments_MenuPuchichara_Y = new int[] { -100, -100 };
 
+        #endregion
+
+        #region [Startup]
+        public int StartUp_LangSelect_FontSize = 16;
         #endregion
 
         #region [Title Screen]
@@ -9866,19 +9918,19 @@ namespace TJAPlayer3
         public int[] SongSelect_High_Score_Difficulty_Cymbol_Y = new int[] { 418, 418, 214, 214, 418 };
 
         public int[][] SongSelect_BoardNumber_X = new int[][] {
-            new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, 190, 74, 114 },
-            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, 1224, 1214, 1148 },
+            new int[] { 62, 125, 190, 62, 125, 190, 190, 62, 125, -100, 190, 74, 114 },
+            new int[] { 1096, 1159, 1224, 1096, 1159, 1224, 1224, 1096, 1159, -100, 1224, 1214, 1148 },
 
-            new int[] { 242, 305, 370, 242, 305, 370, 370, 242, 305, 370, 254, 294 },
-            new int[] { 916, 979, 1044, 916, 979, 1044, 1044, 916, 979, 1044, 1034, 968 },
-            new int[] { 422, 485, 550, 422, 485, 550, 550, 422, 485, 550, 434, 474 }
+            new int[] { 242, 305, 370, 242, 305, 370, 370, 242, 305, -100, 370, 254, 294 },
+            new int[] { 916, 979, 1044, 916, 979, 1044, 1044, 916, 979, -100, 1044, 1034, 968 },
+            new int[] { 422, 485, 550, 422, 485, 550, 550, 422, 485, 550, -100, 434, 474 }
         };
         public int[][] SongSelect_BoardNumber_Y = new int[][] {
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 },
-            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
-            new int[] { 72,72,72,47,47,47,22,100,100,100,149,211 },
-            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, 304, 353, 415 }
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 },
+            new int[] { 72,72,72,47,47,47,22,100,100, -100, 100, 149,211 },
+            new int[] { 72,72,72,47,47,47,22,100,100, -100, 100, 149,211 },
+            new int[] { 276, 276, 276, 251, 251, 251, 226, 304, 304, -100, 304, 353, 415 }
         };
         public int[] SongSelect_BoardNumber_Interval = new int[] { 9, 0 };
 

@@ -232,16 +232,6 @@ namespace TJAPlayer3
             
             this.nStoredHit = new int[TJAPlayer3.ConfigIni.nPlayerCount];
 
-            // MODIFY_BEGIN #25398 2011.06.07 FROM
-            if ( TJAPlayer3.bコンパクトモード )
-			{
-				var score = new Cスコア();
-                TJAPlayer3.Songs管理.tScoreIniを読み込んで譜面情報を設定する(TJAPlayer3.strコンパクトモードファイル, score);// + ".score.ini", score );
-			}
-			else
-			{
-			}
-			// MODIFY_END #25398
 			dtLastQueueOperation = DateTime.MinValue;
 
             PuchiChara.ChangeBPM(60.0 / TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0]);
@@ -464,19 +454,19 @@ namespace TJAPlayer3
 					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 				}
 
-                bool BGA_Hidden = TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listVD.Count > 0 && ShowVideo;
+                bool BGA_Hidden = TJAPlayer3.ConfigIni.bEnableAVI && TJAPlayer3.DTX.listVD.Count > 0 && ShowVideo;
 
                 // (????)
-                if ( !String.IsNullOrEmpty( TJAPlayer3.DTX.strBGIMAGE_PATH ) || ( TJAPlayer3.DTX.listVD.Count == 0 ) || !ShowVideo || !TJAPlayer3.ConfigIni.bAVI有効 ) //背景動画があったら背景画像を描画しない。
+                if ( !String.IsNullOrEmpty( TJAPlayer3.DTX.strBGIMAGE_PATH ) || ( TJAPlayer3.DTX.listVD.Count == 0 ) || !ShowVideo || !TJAPlayer3.ConfigIni.bEnableAVI ) //背景動画があったら背景画像を描画しない。
                 {
 				    this.t進行描画_背景();
                 }
 
-                if (TJAPlayer3.ConfigIni.bAVI有効 && TJAPlayer3.DTX.listVD.Count > 0 && ShowVideo && !TJAPlayer3.ConfigIni.bTokkunMode)
+                if (TJAPlayer3.ConfigIni.bEnableAVI && TJAPlayer3.DTX.listVD.Count > 0 && ShowVideo && !TJAPlayer3.ConfigIni.bTokkunMode)
                 {
                     this.t進行描画_AVI();
                 }
-                else if (TJAPlayer3.ConfigIni.bBGA有効)
+                else if (TJAPlayer3.ConfigIni.bEnableBGA)
                 {
                     if (TJAPlayer3.ConfigIni.bTokkunMode) actTokkun.On進行描画_背景();
                     else actBackground.Draw();
@@ -926,27 +916,11 @@ namespace TJAPlayer3
 			this.actDANGER.t進行描画( this.actGauge.IsDanger(EInstrumentPad.DRUMS), false, false );
 		}
 
-		private void t進行描画_グラフ()        
-        {
-			if( TJAPlayer3.ConfigIni.bGraph.Drums )
-			{
-                this.actGraph.Draw();
-            }
-        }
-
 		private void t進行描画_チップファイアD()
 		{
 			this.actChipFireD.Draw();
 		}
 
-
-		private void t進行描画_ドラムパッド()
-		{
-			if( TJAPlayer3.ConfigIni.eDark != Eダークモード.FULL )
-			{
-				this.actPad.Draw();
-			}
-		}
 		protected override void t進行描画_パネル文字列()
 		{
 			base.t進行描画_パネル文字列( 336, 427 );
@@ -1840,37 +1814,6 @@ namespace TJAPlayer3
             }
 		}
 
-		// t入力処理_ドラム()からメソッドを抽出したもの。
-		/// <summary>
-		/// chipArrayの中を, n発生位置の小さい順に並べる + nullを大きい方に退かす。セットでe判定Arrayも並べ直す。
-		/// </summary>
-		/// <param name="chipArray">ソート対象chip群</param>
-		/// <param name="e判定Array">ソート対象e判定群</param>
-		/// <param name="NumOfChips">チップ数</param>
-		private static void SortChipsByNTime( CDTX.CChip[] chipArray, ENoteJudge[] e判定Array, int NumOfChips )
-		{
-			for ( int i = 0; i < NumOfChips - 1; i++ )
-			{
-				//num9 = 2;
-				//while( num9 > num8 )
-				for ( int j = NumOfChips - 1; j > i; j-- )
-				{
-					if ( ( chipArray[ j - 1 ] == null ) || ( ( chipArray[ j ] != null ) && ( chipArray[ j - 1 ].n発声位置 > chipArray[ j ].n発声位置 ) ) )
-					{
-						// swap
-						CDTX.CChip chipTemp = chipArray[ j - 1 ];
-						chipArray[ j - 1 ] = chipArray[ j ];
-						chipArray[ j ] = chipTemp;
-						ENoteJudge e判定Temp = e判定Array[ j - 1 ];
-						e判定Array[ j - 1 ] = e判定Array[ j ];
-						e判定Array[ j ] = e判定Temp;
-					}
-					//num9--;
-				}
-				//num8++;
-			}
-		}
-
 		protected override void t背景テクスチャの生成()
 		{
 			Rectangle bgrect = new Rectangle( 0, 0, 1280, 720 );
@@ -2555,26 +2498,6 @@ namespace TJAPlayer3
                 //y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
             }
 
-            if ( !pChip.bHit && pChip.n発声時刻ms > SoundManager.PlayTimer.NowTime )
-			{
-				//pChip.bHit = true;
-				//this.actPlayInfo.n小節番号 = n小節番号plus1 - 1;
-                //this.actPlayInfo.n小節番号++;
-				if ( configIni.bWave再生位置自動調整機能有効 && ( bIsDirectSound || bUseOSTimer ) )
-				{
-					dTX.tWave再生位置自動補正();
-				}
-			}
-            /*
-            if (configIni.b演奏情報を表示する || TJAPlayer3.ConfigIni.bTokkunMode)
-            {
-                var nowMeasure = pChip.n整数値_内部番号;
-                if ( x >= 310 )
-                {
-				    TJAPlayer3.act文字コンソール.tPrint(x + 8, y - 26, C文字コンソール.Eフォント種別.白, nowMeasure.ToString());
-                }
-			}
-            */
 			if ( (pChip.b可視 && !pChip.bHideBarLine) && (TJAPlayer3.Tx.Bar != null ) )
 			{
                 if( x >= 0 && x <= SampleFramework.GameWindowSize.Width )
@@ -2592,11 +2515,6 @@ namespace TJAPlayer3
                 }
 			}
 		}
-
-        protected void t進行描画_レーン()
-        {
-            this.actLane.Draw();
-        }
 
         /// <summary>
         /// 全体にわたる制御をする。

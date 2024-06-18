@@ -169,44 +169,6 @@ namespace TJAPlayer3
                     #region [ Results calculus ]
                     //---------------------
 
-                    #region [ Maybe legacy ? ]
-
-                    for (int i = 0; i < 3; i++)
-					{
-						this.nランク値[i] = -1;
-						this.fPerfect率[i] = this.fGreat率[i] = this.fGood率[i] = this.fPoor率[i] = this.fMiss率[i] = 0.0f;  // #28500 2011.5.24 yyagi
-						if ((((i != 0) || (TJAPlayer3.DTX.bチップがある.Drums))))
-						{
-							CScoreIni.C演奏記録 part = this.st演奏記録[i];
-							bool bIsAutoPlay = true;
-							switch (i)
-							{
-								case 0:
-									bIsAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
-									break;
-
-								case 1:
-									bIsAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
-									break;
-
-								case 2:
-									bIsAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
-									break;
-							}
-							this.fPerfect率[i] = bIsAutoPlay ? 0f : ((100f * part.nPerfect数) / ((float)part.n全チップ数));
-							this.fGreat率[i] = bIsAutoPlay ? 0f : ((100f * part.nGreat数) / ((float)part.n全チップ数));
-							this.fGood率[i] = bIsAutoPlay ? 0f : ((100f * part.nGood数) / ((float)part.n全チップ数));
-							this.fPoor率[i] = bIsAutoPlay ? 0f : ((100f * part.nPoor数) / ((float)part.n全チップ数));
-							this.fMiss率[i] = bIsAutoPlay ? 0f : ((100f * part.nMiss数) / ((float)part.n全チップ数));
-							this.bオート[i] = bIsAutoPlay; // #23596 10.11.16 add ikanick そのパートがオートなら1
-														//        10.11.17 change (int to bool) ikanick
-							this.nランク値[i] = CScoreIni.tランク値を計算して返す(part);
-						}
-					}
-					this.n総合ランク値 = CScoreIni.t総合ランク値を計算して返す(this.st演奏記録.Drums, this.st演奏記録.Guitar, this.st演奏記録.Bass);
-
-					#endregion
-
 					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
 					{
 						for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
@@ -216,15 +178,16 @@ namespace TJAPlayer3
 							this.nクリア[p] = 0;
 							if (HGaugeMethods.UNSAFE_FastNormaCheck(p))
                             {
-								this.nクリア[p] = 1;
+								this.nクリア[p] = 2;
 								if (ccf.nMiss == 0 && ccf.nMine == 0)
                                 {
-									this.nクリア[p] = 2;
-									if (ccf.nGood == 0) this.nクリア[p] = 3;
+									this.nクリア[p] = 3;
+									if (ccf.nGood == 0) this.nクリア[p] = 4;
 								}
 
-								if (assistedClear[p]) clearStatuses[p] = 0;
-								else clearStatuses[p] = this.nクリア[p];
+								if (assistedClear[p]) this.nクリア[p] = 1;
+
+								clearStatuses[p] = this.nクリア[p] - 1;
 
                             }
 
@@ -254,58 +217,8 @@ namespace TJAPlayer3
 					//---------------------
 					#endregion
 
-
-
-					#region [ .score.ini file output ]
+					#region [ Saves calculus ]
 					//---------------------
-
-					//int currentSaveFile = TJAPlayer3.SaveFile + 1;
-					//int secondSaveFile = (currentSaveFile == 1) ? 2 : 1;
-
-					string[] str = {
-						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(0)].name + @".score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(1)].name + @".score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(2)].name + @".score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(3)].name + @".score.ini",
-						TJAPlayer3.DTX.strファイル名の絶対パス + TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(4)].name + @".score.ini"
-					};
-
-					#region [Transfer legacy file format to new file format (P1)]
-
-					string legacyStr = TJAPlayer3.DTX.strファイル名の絶対パス + ".score.ini";
-
-					if (!File.Exists(str[TJAPlayer3.GetActualPlayer(0)]) && File.Exists(legacyStr))
-                    {
-						if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-                        {
-							CScoreIni tmpini = new CScoreIni(legacyStr);
-							tmpini.t書き出し(str[TJAPlayer3.GetActualPlayer(0)]);
-						}
-                    }
-
-					#endregion
-
-					CScoreIni[] ini = {
-						new CScoreIni(str[0]),
-						new CScoreIni(str[1]),
-						new CScoreIni(str[2]),
-						new CScoreIni(str[3]),
-						new CScoreIni(str[4])
-					};
-
-					bool[] b今までにフルコンボしたことがある = new bool[] { false, false, false };
-
-					// フルコンボチェックならびに新記録ランクチェックは、ini.Record[] が、スコアチェックや演奏型スキルチェックの IF 内で書き直されてしまうよりも前に行う。(2010.9.10)
-
-					b今までにフルコンボしたことがある[0] = ini[0].stセクション[0].bフルコンボである | ini[0].stセクション[0].bフルコンボである;
-
-					// #24459 上記の条件だと[HiSkill.***]でのランクしかチェックしていないので、BestRankと比較するよう変更。
-					if (this.nランク値[0] >= 0 && ini[0].stファイル.BestRank[0] > this.nランク値[0])       // #24459 2011.3.1 yyagi update BestRank
-					{
-						this.b新記録ランク[0] = true;
-						ini[0].stファイル.BestRank[0] = this.nランク値[0];
-					}
-
 
 					// Clear and score ranks
 
@@ -321,22 +234,8 @@ namespace TJAPlayer3
                         {
 							int diff = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i];
 
-							var clear = Math.Max(ini[i].stセクション[0].nクリア[diff], this.nクリア[i]);
-							var scoreRank = Math.Max(ini[i].stセクション[0].nスコアランク[diff], this.nスコアランク[i]);
-							var highscore = Math.Max(ini[i].stセクション[0].nハイスコア[diff], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i));
-
 							ClearStatus_Replay[i] = this.nクリア[i];
 							ScoreRank_Replay[i] = this.nスコアランク[i];
-
-							if (isAutoDisabled(i))
-							{
-								ini[i].stセクション[0].nクリア[diff] = clear;
-								ini[i].stセクション[0].nスコアランク[diff] = scoreRank;
-								ini[i].stセクション[0].nハイスコア[diff] = highscore;
-
-								if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-									ini[i].t書き出し(str[i]);
-							}
 						}
 
 						#endregion
@@ -371,12 +270,12 @@ namespace TJAPlayer3
 								clearValue += 1;
 
 							// Gold Iki
-							if (this.st演奏記録.Drums.nMiss数 == 0)
+							if (this.st演奏記録.Drums.nBadCount == 0)
 							{
 								clearValue += 2;
 
 								// Rainbow Iki
-								if (this.st演奏記録.Drums.nGreat数 == 0)
+								if (this.st演奏記録.Drums.nOkCount == 0)
 									clearValue += 2;
 							}
 
@@ -387,55 +286,7 @@ namespace TJAPlayer3
 
 						if (isAutoDisabled(0))
 						{
-							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
-							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0)); ;
-
 							ClearStatus_Replay[0] = clearValue;
-
-							#region [ Update Dan Dojo exam results ]
-							for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++)
-                            {
-								for (int j = 0; j < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++)
-                                {
-									if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null && TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetCleared()[0])
-                                    {
-										int amount = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
-										int current = -1;
-										try
-										{
-											current = ini[0].stセクション[0].nExamResult[i][j];
-										}
-										catch (ArgumentOutOfRangeException)
-										{
-											ini[0].stセクション[0].nExamResult.Insert(i, new int[CExamInfo.cMaxExam]);
-											for (int part = 0; part < ini[0].stセクション[0].nExamResult[i].Length; part++)
-											{
-												// Default all values to -1, will not be saved to ScoreIni if value is not changed.
-												ini[0].stセクション[0].nExamResult[i][part] = -1;
-											}
-											current = ini[0].stセクション[0].nExamResult[i][j];
-										}
-
-										if (ini[0].stセクション[0].nExamResult[i][j] == -1)
-                                        {
-											ini[0].stセクション[0].nExamResult[i][j] = amount;
-                                        }
-										else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More)
-                                        {
-											ini[0].stセクション[0].nExamResult[i][j] = (amount > current) ? amount : current;
-										}
-										else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less)
-										{
-											ini[0].stセクション[0].nExamResult[i][j] = (amount < current) ? amount : current;
-										}
-
-									}
-								}
-                            }
-							#endregion
-
-							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-								ini[0].t書き出し(str[0]);
 						}
 
 						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
@@ -471,19 +322,8 @@ namespace TJAPlayer3
 
 						if (isAutoDisabled(0))
 						{
-							ini[0].stセクション[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
-							ini[0].stセクション[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
-							ini[0].stセクション[0].nハイスコア[0] = Math.Max(ini[0].stセクション[0].nハイスコア[0], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0)); ;
-
 							ClearStatus_Replay[0] = tmpClear;
-
-							if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-								ini[0].t書き出し(str[0]);
 						}
-
-
-						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], tmpClear);
-						// this.st演奏記録[0].nスコアランク[0] = Math.Max(ini[0].stセクション[0].nスコアランク[0], CFloorManagement.LastRegisteredFloor);
 
 						#endregion
 
@@ -492,14 +332,6 @@ namespace TJAPlayer3
                     //---------------------
                     #endregion
 
-                    #region [ リザルト画面への演奏回数の更新 #24281 2011.1.30 yyagi]
-                    if (TJAPlayer3.ConfigIni.bScoreIniを出力する)
-					{
-						this.n演奏回数.Drums = ini[0].stファイル.PlayCountDrums;
-						this.n演奏回数.Guitar = ini[0].stファイル.PlayCountGuitar;
-						this.n演奏回数.Bass = ini[0].stファイル.PlayCountBass;
-					}
-					#endregion
 				}
 
 				string diffToString(int diff)
@@ -565,9 +397,9 @@ namespace TJAPlayer3
 
 				// Medals
 
-				int nTotalHits = this.st演奏記録.Drums.nGreat数 + this.st演奏記録.Drums.nMiss数 + this.st演奏記録.Drums.nPerfect数;
+				int nTotalHits = this.st演奏記録.Drums.nOkCount + this.st演奏記録.Drums.nBadCount + this.st演奏記録.Drums.nGoodCount;
 
-				double dAccuracyRate = Math.Pow((50 * this.st演奏記録.Drums.nGreat数 + 100 * this.st演奏記録.Drums.nPerfect数) / (double)(100 * nTotalHits), 3);
+				double dAccuracyRate = Math.Pow((50 * this.st演奏記録.Drums.nOkCount + 100 * this.st演奏記録.Drums.nGoodCount) / (double)(100 * nTotalHits), 3);
 
 				int diffModifier;
 				float starRate;
@@ -610,10 +442,10 @@ namespace TJAPlayer3
 
 					int clearModifier = 0;
 					
-                    if (this.st演奏記録.Drums.nMiss数 == 0)
+                    if (this.st演奏記録.Drums.nBadCount == 0)
                     {
                         clearModifier = (int)(5 * lengthBonus);
-                        if (this.st演奏記録.Drums.nGreat数 == 0)
+                        if (this.st演奏記録.Drums.nOkCount == 0)
 						{
                             clearModifier = (int)(12 * lengthBonus);
                         }
@@ -639,10 +471,10 @@ namespace TJAPlayer3
 					if (examStatus != Exam.Status.Failure)
 					{
 						clearModifier = 0;
-						if (this.st演奏記録.Drums.nMiss数 == 0)
+						if (this.st演奏記録.Drums.nBadCount == 0)
 						{
 							clearModifier = 4;
-							if (this.st演奏記録.Drums.nGreat数 == 0)
+							if (this.st演奏記録.Drums.nOkCount == 0)
 								clearModifier = 6;
 						}
 
@@ -773,9 +605,6 @@ namespace TJAPlayer3
 
 						// Unsafe function, it is the only appropriate place to call it
 						DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
-							
-						if (TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, i) == 1f)
-							_sf.tUpdateSongClearStatus(TJAPlayer3.stageSongSelect.rChoosenSong, _cs, TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]);
 					}
 				}
 
@@ -869,7 +698,7 @@ namespace TJAPlayer3
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString(1003), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
-					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage結果.st演奏記録.Drums.nスコア.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
 				else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				{
@@ -1425,11 +1254,11 @@ namespace TJAPlayer3
 									successType += 1;
 
 								int comboType = 0;
-								if (this.st演奏記録.Drums.nMiss数 == 0)
+								if (this.st演奏記録.Drums.nBadCount == 0)
 								{
 									comboType += 1;
 
-									if (this.st演奏記録.Drums.nGreat数 == 0)
+									if (this.st演奏記録.Drums.nOkCount == 0)
 										comboType += 1;
 								}
 
@@ -1666,10 +1495,13 @@ namespace TJAPlayer3
 
 				#region [ #24609 2011.3.14 yyagi ランク更新or演奏型スキル更新時、リザルト画像をpngで保存する ]
 				if (this.bアニメが完了 == true && this.bIsCheckedWhetherResultScreenShouldSaveOrNot == false  // #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
-					&& TJAPlayer3.ConfigIni.bScoreIniを出力する
 					&& TJAPlayer3.ConfigIni.bIsAutoResultCapture)                                               // #25399 2011.6.9 yyagi
 				{
-					CheckAndSaveResultScreen(true);
+                    string strFullPath =
+                               Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Capture_img");
+                    strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+                    TJAPlayer3.app.SaveResultScreen(strFullPath);
+
 					this.bIsCheckedWhetherResultScreenShouldSaveOrNot = true;
 				}
 				#endregion
@@ -1977,9 +1809,10 @@ namespace TJAPlayer3
 
 		public void tPostprocessing()
         {
-
+			
 			if (!bAddedToRecentlyPlayedSongs)
 			{
+				/*
 				#region [ Apply new local status for song select screens ]
 				//---------------------
 				if (!TJAPlayer3.bコンパクトモード)
@@ -2078,6 +1911,7 @@ namespace TJAPlayer3
 				}
 				//---------------------
 				#endregion
+				*/
 
 				// Song added to recently added songs here
 
@@ -2247,56 +2081,7 @@ namespace TJAPlayer3
 		// Coins information 
 		private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };
 
-		#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
-		/// <summary>
-		/// リザルト画像のキャプチャと保存。
-		/// 自動保存モード時は、ランク更新or演奏型スキル更新時に自動保存。
-		/// 手動保存モード時は、ランクに依らず保存。
-		/// </summary>
-		/// <param name="bIsAutoSave">true=自動保存モード, false=手動保存モード</param>
-		private void CheckAndSaveResultScreen(bool bIsAutoSave)
-		{
-			string path = Path.GetDirectoryName(TJAPlayer3.DTX.strファイル名の絶対パス);
-			string datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
-			if (bIsAutoSave)
-			{
-				// リザルト画像を自動保存するときは、dtxファイル名.yyMMddHHmmss_DRUMS_SS.png という形式で保存。
-				for (int i = 0; i < 3; i++)
-				{
-					if (this.b新記録ランク[i] == true || this.b新記録スキル[i] == true)
-					{
-						string strPart = ((EInstrumentPad)(i)).ToString();
-						string strRank = ((CScoreIni.ERANK)(this.nランク値[i])).ToString();
-						string strFullPath = TJAPlayer3.DTX.strファイル名の絶対パス + "." + datetime + "_" + strPart + "_" + strRank + ".png";
-						//Surface.ToFile( pSurface, strFullPath, ImageFileFormat.Png );
-						TJAPlayer3.app.SaveResultScreen(strFullPath);
-					}
-				}
-			}
-			#region [ #24609 2011.4.11 yyagi; リザルトの手動保存ロジックは、CDTXManiaに移管した。]
-			//			else
-			//			{
-			//				// リザルト画像を手動保存するときは、dtxファイル名.yyMMddHHmmss_SS.png という形式で保存。(楽器名無し)
-			//				string strRank = ( (CScoreIni.ERANK) ( CDTXMania.stage結果.n総合ランク値 ) ).ToString();
-			//				string strSavePath = CDTXMania.strEXEのあるフォルダ + "\\" + "Capture_img";
-			//				if ( !Directory.Exists( strSavePath ) )
-			//				{
-			//					try
-			//					{
-			//						Directory.CreateDirectory( strSavePath );
-			//					}
-			//					catch
-			//					{
-			//					}
-			//				}
-			//				string strFullPath = strSavePath + "\\" + CDTXMania.DTX.TITLE +
-			//					"." + datetime + "_" + strRank + ".png";
-			//				// Surface.ToFile( pSurface, strFullPath, ImageFileFormat.Png );
-			//				CDTXMania.app.SaveResultScreen( strFullPath );
-			//			}
-			#endregion
-		}
-		#endregion
+
 		//-----------------
 		#endregion
 	}

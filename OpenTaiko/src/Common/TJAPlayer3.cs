@@ -564,6 +564,12 @@ namespace TJAPlayer3
 
 		public static CCounter BeatScaling;
 
+        /// <summary>
+        /// Returns true for this session if the game fails to locate Config.ini.<br/>
+        /// This could be treated as the player's first time launching the game.
+        /// </summary>
+        public static bool ConfigIsNew;
+
 		
 
 		// メソッド
@@ -636,6 +642,10 @@ namespace TJAPlayer3
 					Trace.TraceError( "例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)" );
 				}
 			}
+			else
+			{
+				ConfigIsNew = true;
+			}
 
 			switch(ConfigIni.nGraphicsDeviceType)
 			{
@@ -667,10 +677,10 @@ namespace TJAPlayer3
 				break;
 			}
 
-			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.n初期ウィンドウ開始位置X, ConfigIni.n初期ウィンドウ開始位置Y);
-			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nウインドウwidth, ConfigIni.nウインドウheight);
-			FullScreen = ConfigIni.b全画面モード;
-			VSync = ConfigIni.b垂直帰線待ちを行う;
+			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
+			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
+			FullScreen = ConfigIni.bFullScreen;
+			VSync = ConfigIni.bEnableVSync;
 			Framerate = 0;
 			
 			base.Configuration();
@@ -743,12 +753,12 @@ namespace TJAPlayer3
 		}
 		protected override void OnExiting()
 		{
-			ConfigIni.n初期ウィンドウ開始位置X = WindowPosition.X;
-			ConfigIni.n初期ウィンドウ開始位置Y = WindowPosition.Y;
-			ConfigIni.nウインドウwidth = WindowSize.X;
-			ConfigIni.nウインドウheight = WindowSize.Y;
-			ConfigIni.b全画面モード = FullScreen;
-			ConfigIni.b垂直帰線待ちを行う = VSync;
+			ConfigIni.nWindowBaseXPosition = WindowPosition.X;
+			ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
+			ConfigIni.nWindowWidth = WindowSize.X;
+			ConfigIni.nWindowHeight = WindowSize.Y;
+			ConfigIni.bFullScreen = FullScreen;
+			ConfigIni.bEnableVSync = VSync;
 			Framerate = 0;
 			
 			this.t終了処理();
@@ -1774,9 +1784,9 @@ for (int i = 0; i < 3; i++) {
 
 									TJAPlayer3.ConfigIni.bTimeStretch = DTXVmode.TimeStretch;
 									SoundManager.bIsTimeStretch = DTXVmode.TimeStretch;
-									if ( TJAPlayer3.ConfigIni.b垂直帰線待ちを行う != DTXVmode.VSyncWait )
+									if ( TJAPlayer3.ConfigIni.bEnableVSync != DTXVmode.VSyncWait )
 									{
-										TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = DTXVmode.VSyncWait;
+										TJAPlayer3.ConfigIni.bEnableVSync = DTXVmode.VSyncWait;
 										TJAPlayer3.app.b次のタイミングで垂直帰線同期切り替えを行う = true;
 									}
 								}
@@ -1825,7 +1835,6 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.演奏中断:
 								#region [ 演奏キャンセル ]
 								//-----------------------------
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( "Play canceled" );
 
 								#region [ プラグイン On演奏キャンセル() の呼び出し ]
 								//---------------------
@@ -1903,7 +1912,6 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.ステージ失敗:
 								#region [ 演奏失敗(StageFailed) ]
 								//-----------------------------
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( "Stage failed" );
 
 								#region [ プラグイン On演奏失敗() の呼び出し ]
 								//---------------------
@@ -1957,51 +1965,11 @@ for (int i = 0; i < 3; i++) {
 							case (int) E演奏画面の戻り値.ステージクリア:
 								#region [ 演奏クリア ]
 								//-----------------------------
+
+								// Fetch the results of the just finished play
 								CScoreIni.C演奏記録 c演奏記録_Drums;
 								stage演奏ドラム画面.t演奏結果を格納する( out c演奏記録_Drums );
 
-                                double ps = 0.0, gs = 0.0;
-								if ( !c演奏記録_Drums.b全AUTOである && c演奏記録_Drums.n全チップ数 > 0) {
-									ps = c演奏記録_Drums.db演奏型スキル値;
-									gs = c演奏記録_Drums.dbゲーム型スキル値;
-								}
-								string str = "Cleared";
-								switch( CScoreIni.t総合ランク値を計算して返す( c演奏記録_Drums, null, null ) )
-								{
-									case (int)CScoreIni.ERANK.SS:
-										str = string.Format( "Cleared (SS: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.S:
-										str = string.Format( "Cleared (S: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.A:
-										str = string.Format( "Cleared (A: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.B:
-										str = string.Format( "Cleared (B: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.C:
-										str = string.Format( "Cleared (C: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.D:
-										str = string.Format( "Cleared (D: {0:F2})", ps );
-										break;
-
-									case (int) CScoreIni.ERANK.E:
-										str = string.Format( "Cleared (E: {0:F2})", ps );
-										break;
-
-									case (int)CScoreIni.ERANK.UNKNOWN:	// #23534 2010.10.28 yyagi add: 演奏チップが0個のとき
-										str = "Cleared (No chips)";
-										break;
-								}
-
-								scoreIni = this.tScoreIniへBGMAdjustとHistoryとPlayCountを更新( str );
 
 								#region [ プラグイン On演奏クリア() の呼び出し ]
 								//---------------------
@@ -2387,7 +2355,7 @@ for (int i = 0; i < 3; i++) {
 			#region [ 全画面_ウインドウ切り替え ]
 			if ( this.b次のタイミングで全画面_ウィンドウ切り替えを行う )
 			{
-				ConfigIni.b全画面モード = !ConfigIni.b全画面モード;
+				ConfigIni.bFullScreen = !ConfigIni.bFullScreen;
 				app.ToggleWindowMode();
 				this.b次のタイミングで全画面_ウィンドウ切り替えを行う = false;
 			}
@@ -2395,7 +2363,7 @@ for (int i = 0; i < 3; i++) {
 			#region [ 垂直基線同期切り替え ]
 			if ( this.b次のタイミングで垂直帰線同期切り替えを行う )
 			{
-				VSync = ConfigIni.b垂直帰線待ちを行う;
+				VSync = ConfigIni.bEnableVSync;
 				this.b次のタイミングで垂直帰線同期切り替えを行う = false;
 			}
 			#endregion
@@ -2659,7 +2627,7 @@ for (int i = 0; i < 3; i++) {
 			#region [ ログ出力開始 ]
 			//---------------------
 			Trace.AutoFlush = true;
-			if( ConfigIni.bログ出力 )
+			if( ConfigIni.bOutputLogs )
 			{
 				try
 				{
@@ -3510,59 +3478,7 @@ for (int i = 0; i < 3; i++) {
 				this.b終了処理完了済み = true;
 			}
 		}
-		private CScoreIni tScoreIniへBGMAdjustとHistoryとPlayCountを更新(string str新ヒストリ行)
-		{
-			bool bIsUpdatedDrums, bIsUpdatedGuitar, bIsUpdatedBass;
-			string strFilename = DTX.strファイル名の絶対パス + ".score.ini";
-			CScoreIni ini = new CScoreIni( strFilename );
-			if( !File.Exists( strFilename ) )
-			{
-				ini.stファイル.Title = DTX.TITLE;
-				ini.stファイル.Name = DTX.strファイル名;
-				ini.stファイル.Hash = CScoreIni.tファイルのMD5を求めて返す( DTX.strファイル名の絶対パス );
-				for( int i = 0; i < 6; i++ )
-				{
-					ini.stセクション[ i ].nPerfectになる範囲ms = nPerfect範囲ms;
-					ini.stセクション[ i ].nGreatになる範囲ms = nGreat範囲ms;
-					ini.stセクション[ i ].nGoodになる範囲ms = nGood範囲ms;
-					ini.stセクション[ i ].nPoorになる範囲ms = nPoor範囲ms;
-				}
-			}
-			ini.stファイル.BGMAdjust = DTX.nBGMAdjust;
-			CScoreIni.t更新条件を取得する( out bIsUpdatedDrums, out bIsUpdatedGuitar, out bIsUpdatedBass );
-			if( bIsUpdatedDrums || bIsUpdatedGuitar || bIsUpdatedBass )
-			{
-				if( bIsUpdatedDrums )
-				{
-					ini.stファイル.PlayCountDrums++;
-				}
-				if( bIsUpdatedGuitar )
-				{
-					ini.stファイル.PlayCountGuitar++;
-				}
-				if( bIsUpdatedBass )
-				{
-					ini.stファイル.PlayCountBass++;
-				}
-				ini.tヒストリを追加する( str新ヒストリ行 );
-				if( !bコンパクトモード )
-				{
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Drums = ini.stファイル.PlayCountDrums;
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Guitar = ini.stファイル.PlayCountGuitar;
-					stageSongSelect.r確定されたスコア.譜面情報.演奏回数.Bass = ini.stファイル.PlayCountBass;
-					for( int j = 0; j < ini.stファイル.History.Length; j++ )
-					{
-						stageSongSelect.r確定されたスコア.譜面情報.演奏履歴[ j ] = ini.stファイル.History[ j ];
-					}
-				}
-			}
-			if( ConfigIni.bScoreIniを出力する )
-			{
-				ini.t書き出し( strFilename );
-			}
 
-			return ini;
-		}
 		private void tガベージコレクションを実行する()
 		{
 			GC.Collect(GC.MaxGeneration);

@@ -315,7 +315,7 @@ namespace TJAPlayer3
             // Scroll speed value (as on ConfigIni, 9 is x1)
             ScrollSpeedValue = TJAPlayer3.ConfigIni.nScrollSpeed[actualPlayer];
             // Song speed value (as on ConfigIni, 20 is x1)
-            SongSpeedValue = TJAPlayer3.ConfigIni.n演奏速度;
+            SongSpeedValue = TJAPlayer3.ConfigIni.nSongSpeed;
             // Just strictess adjust mod value (as on ConfigIni, between -2 for lenient and 2 for rigorous)
             JudgeStrictnessAdjust = TJAPlayer3.ConfigIni.nTimingZones[actualPlayer];
 
@@ -332,10 +332,10 @@ namespace TJAPlayer3
              * - 8 (256) : Safe (Bad => Ok)
              */
             ModFlags = (int)EModFlag.None;
-            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.MIRROR) ModFlags |= (int)EModFlag.Mirror;
-            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.RANDOM) ModFlags |= (int)EModFlag.Random;
-            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
-            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == Eランダムモード.HYPERRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
+            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRROR) ModFlags |= (int)EModFlag.Mirror;
+            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.RANDOM) ModFlags |= (int)EModFlag.Random;
+            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
+            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.HYPERRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
             if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
             if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
             if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;

@@ -25,63 +25,11 @@ namespace TJAPlayer3
 		{
 			Drums = new CScoreIni.C演奏記録();
 
-			//if (  )
 			{
-				Drums.nスコア = (long) this.actScore.Get( EInstrumentPad.DRUMS, 0 );
-                Drums.dbゲーム型スキル値 = CScoreIni.tゲーム型スキルを計算して返す(TJAPlayer3.DTX.LEVEL.Drums, TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.actCombo.n現在のコンボ数.最高値[0], EInstrumentPad.DRUMS, bIsAutoPlay);
-                Drums.db演奏型スキル値 = CScoreIni.t演奏型スキルを計算して返す( TJAPlayer3.DTX.n可視チップ数.Drums, this.nヒット数_Auto含まない.Drums.Perfect, this.nヒット数_Auto含まない.Drums.Great, this.nヒット数_Auto含まない.Drums.Good, this.nヒット数_Auto含まない.Drums.Poor, this.nヒット数_Auto含まない.Drums.Miss, EInstrumentPad.DRUMS, bIsAutoPlay );
-				Drums.nPerfect数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Perfect : this.nヒット数_Auto含まない.Drums.Perfect;
-				Drums.nGreat数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Great : this.nヒット数_Auto含まない.Drums.Great;
-				Drums.nGood数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Good : this.nヒット数_Auto含まない.Drums.Good;
-				Drums.nPoor数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Poor : this.nヒット数_Auto含まない.Drums.Poor;
-				Drums.nMiss数 = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Miss : this.nヒット数_Auto含まない.Drums.Miss;
-				Drums.nPerfect数_Auto含まない = this.nヒット数_Auto含まない.Drums.Perfect;
-				Drums.nGreat数_Auto含まない = this.nヒット数_Auto含まない.Drums.Great;
-				Drums.nGood数_Auto含まない = this.nヒット数_Auto含まない.Drums.Good;
-				Drums.nPoor数_Auto含まない = this.nヒット数_Auto含まない.Drums.Poor;
-				Drums.nMiss数_Auto含まない = this.nヒット数_Auto含まない.Drums.Miss;
-                Drums.n連打数 = this.n合計連打数[ 0 ]; 
-                Drums.n最大コンボ数 = this.actCombo.n現在のコンボ数.最高値[0];
-                Drums.n全チップ数 = TJAPlayer3.DTX.n可視チップ数.Drums;
-				for ( int i = 0; i < (int) Eレーン.MAX;  i++ )
-				{
-					Drums.bAutoPlay[ i ] = bIsAutoPlay[ i ];
-				}
-				Drums.bTight = TJAPlayer3.ConfigIni.bTight;
-				for ( int i = 0; i < 3; i++ )
-				{
-					Drums.bSudden[ i ] = TJAPlayer3.ConfigIni.bSudden[ i ];
-					Drums.bHidden[ i ] = TJAPlayer3.ConfigIni.bHidden[ i ];
-					Drums.eInvisible[ i ] = TJAPlayer3.ConfigIni.eInvisible[ i ];
-					Drums.bReverse[ i ] = TJAPlayer3.ConfigIni.bReverse[ i ];
-					Drums.eRandom[ i ] = TJAPlayer3.ConfigIni.eRandom[ i ];
-					Drums.bLight[ i ] = TJAPlayer3.ConfigIni.bLight[ i ];
-					Drums.bLeft[ i ] = TJAPlayer3.ConfigIni.bLeft[ i ];
-					Drums.f譜面スクロール速度[ i ] = ( (float) ( TJAPlayer3.ConfigIni.nScrollSpeed[ i ] + 1 ) ) * 0.5f;
-				}
-				Drums.eDark = TJAPlayer3.ConfigIni.eDark;
-				Drums.n演奏速度分子 = TJAPlayer3.ConfigIni.n演奏速度;
-				Drums.n演奏速度分母 = 20;
-				Drums.bSTAGEFAILED有効 = TJAPlayer3.ConfigIni.bSTAGEFAILED有効;
-				Drums.eダメージレベル = TJAPlayer3.ConfigIni.eダメージレベル;
-				Drums.b演奏にキーボードを使用した = this.b演奏にキーボードを使った;
-				Drums.b演奏にMIDI入力を使用した = this.b演奏にMIDI入力を使った;
-				Drums.b演奏にジョイパッドを使用した = this.b演奏にジョイパッドを使った;
-				Drums.b演奏にマウスを使用した = this.b演奏にマウスを使った;
-				Drums.nPerfectになる範囲ms = TJAPlayer3.nPerfect範囲ms;
-				Drums.nGreatになる範囲ms = TJAPlayer3.nGreat範囲ms;
-				Drums.nGoodになる範囲ms = TJAPlayer3.nGood範囲ms;
-				Drums.nPoorになる範囲ms = TJAPlayer3.nPoor範囲ms;
-				Drums.strDTXManiaのバージョン = TJAPlayer3.VERSION;
-				Drums.最終更新日時 = DateTime.Now.ToString();
-				Drums.Hash = CScoreIni.t演奏セクションのMD5を求めて返す( Drums );
-                Drums.fゲージ = (float)this.actGauge.db現在のゲージ値[ 0 ];
-                if( !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
-                {
-                    Drums.nハイスコア = TJAPlayer3.stageSongSelect.r確定されたスコア.譜面情報.nハイスコア; //2015.06.16 kairera0467 他難易度の上書き防止。
-                    if( TJAPlayer3.stageSongSelect.r確定されたスコア.譜面情報.nハイスコア[ TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]] < (int)this.actScore.Get( EInstrumentPad.DRUMS, 0 ) )
-                        Drums.nハイスコア[ TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]] = (int)this.actScore.Get( EInstrumentPad.DRUMS, 0 );
-                }
+				Drums.nGoodCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Perfect : this.nヒット数_Auto含まない.Drums.Perfect;
+				Drums.nOkCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Great : this.nヒット数_Auto含まない.Drums.Great;
+				Drums.nBadCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Miss : this.nヒット数_Auto含まない.Drums.Miss;
+
                 var danC = TJAPlayer3.stage演奏ドラム画面.actDan.GetExam();
                 for (int i = 0; i < danC.Length; i++)
                 {
@@ -388,7 +336,6 @@ namespace TJAPlayer3
 			}
 
 			cInvisibleChip = new CInvisibleChip( TJAPlayer3.ConfigIni.nDisplayTimesMs, TJAPlayer3.ConfigIni.nFadeoutTimeMs );
-			this.演奏判定ライン座標 = new C演奏判定ライン座標共通();
 			for ( int k = 0; k < 4; k++ )
 			{
 				//for ( int n = 0; n < 5; n++ )
@@ -396,25 +343,13 @@ namespace TJAPlayer3
 					this.nヒット数_Auto含まない[ k ] = new CHITCOUNTOFRANK();
 					this.nヒット数_Auto含む[ k ] = new CHITCOUNTOFRANK();
 				//}
-				this.queWailing[ k ] = new Queue<CDTX.CChip>();
 				this.r現在の歓声Chip[ k ] = null;
 				cInvisibleChip.eInvisibleMode[ k ] = TJAPlayer3.ConfigIni.eInvisible[ k ];
 
-                /*
-				if ( TJAPlayer3.DTXVmode.Enabled )
-				{
-					TJAPlayer3.ConfigIni.nScrollSpeed[ k ] = TJAPlayer3.ConfigIni.nViewerScrollSpeed[ k ];
-				}
-                */
 
-				//this.nJudgeLinePosY_delta[ k ] = CDTXMania.ConfigIni.nJudgeLinePosOffset[ k ];		// #31602 2013.6.23 yyagi
-
-				this.演奏判定ライン座標.n判定位置[ k ] = TJAPlayer3.ConfigIni.e判定位置[ k ];
-				this.演奏判定ライン座標.nJudgeLinePosY_delta[ k ] = TJAPlayer3.ConfigIni.nJudgeLinePosOffset[ k ];
-				this.bReverse[ k ]             = TJAPlayer3.ConfigIni.bReverse[ k ];					//
+				this.bReverse[ k ]             = TJAPlayer3.ConfigIni.bReverse[ k ];
 
 			}
-			actCombo.演奏判定ライン座標 = 演奏判定ライン座標;
 
             this.b演奏にキーボードを使った = false;
             this.b演奏にジョイパッドを使った = false;
@@ -493,7 +428,6 @@ namespace TJAPlayer3
                 eFirstGameType[i] = TJAPlayer3.ConfigIni.nGameType[i];
             }
 			this.nPolyphonicSounds = TJAPlayer3.ConfigIni.nPoliphonicSounds;
-			e判定表示優先度 = TJAPlayer3.ConfigIni.e判定表示優先度;
 
 			TJAPlayer3.Skin.tRemoveMixerAll();	// 効果音のストリームをミキサーから解除しておく
 
@@ -504,7 +438,7 @@ namespace TJAPlayer3
 			if ( TJAPlayer3.DTXVmode.Enabled )
 			{
 				db再生速度 = TJAPlayer3.DTX.dbDTXVPlaySpeed;
-				TJAPlayer3.ConfigIni.n演奏速度 = (int) (TJAPlayer3.DTX.dbDTXVPlaySpeed * 20 + 0.5 );
+				TJAPlayer3.ConfigIni.nSongSpeed = (int) (TJAPlayer3.DTX.dbDTXVPlaySpeed * 20 + 0.5 );
 			}
 			else
 			{
@@ -847,7 +781,6 @@ namespace TJAPlayer3
 
         public CAct演奏AVI actAVI;
         public Rainbow Rainbow;
-		protected CAct演奏チップファイアGB actChipFireGB;
 		public CAct演奏Combo共通 actCombo;
 		protected CAct演奏Danger共通 actDANGER;
         //protected CActFIFOBlack actFI;
@@ -866,7 +799,6 @@ namespace TJAPlayer3
 		public CAct演奏ステージ失敗 actStageFailed;
 		protected CAct演奏ステータスパネル共通 actStatusPanels;
 		protected CAct演奏スクロール速度 act譜面スクロール速度;
-		public    C演奏判定ライン座標共通 演奏判定ライン座標;
         protected CAct演奏Drums連打 actRoll;
         protected CAct演奏Drums風船 actBalloon;
         public CAct演奏Drumsキャラクター actChara;
@@ -930,7 +862,6 @@ namespace TJAPlayer3
 //		protected bool bDTXVmode;
 		protected STDGBVALUE<bool> bReverse;
 
-		protected STDGBVALUE<Queue<CDTX.CChip>> queWailing;
 		protected STDGBVALUE<CDTX.CChip> r現在の歓声Chip;
 		protected CTexture txチップ;
 		protected CTexture txヒットバー;
@@ -1481,67 +1412,42 @@ namespace TJAPlayer3
                 this.n合計連打数[ nPlayer ]++;
                 if(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
-                //2017.01.28 DD CDTXから直接呼び出す
-                if (!TJAPlayer3.ConfigIni.ShinuchiMode) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
-                {
-                    if (pChip.bGOGOTIME) //non-Shin'uchi / GoGo-Time　／　真打OFF・ゴーゴータイム
-                    {
-                        // 旧配点・旧筐体配点
-                        if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
-                        {
-                            if (pChip.nチャンネル番号 == 0x15)
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(300 * 1.2f), nPlayer);
-                            else
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(360 * 1.2f), nPlayer);
-                        }
-                        // 新配点
-                        else
-                        {
-                            if (pChip.nチャンネル番号 == 0x15)
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(100 * 1.2f), nPlayer);
-                            else
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(200 * 1.2f), nPlayer);
-                        }
-                    }
-                    else //non-Shin'uchi / non-GoGo-Time　／　真打OFF・非ゴーゴータイム
-                    {
-                        // 旧配点・旧筐体配点
-                        if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
-                        {
-                            if (pChip.nチャンネル番号 == 0x15)
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(300L), nPlayer);
-                            else
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(360L), nPlayer);
-                        }
-                        // 新配点
-                        else
-                        {
-                            if (pChip.nチャンネル番号 == 0x15)
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(100L), nPlayer);
-                            else
-                                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(200L), nPlayer);
-                        }
-                    }
-                }
-                else  //Shin'uchi　／　真打
+
+                long nAddScore = 0;
+
+                if (!TJAPlayer3.ConfigIni.ShinuchiMode)
                 {
                     // 旧配点・旧筐体配点
                     if (TJAPlayer3.DTX.nScoreModeTmp == 0 || TJAPlayer3.DTX.nScoreModeTmp == 1)
                     {
                         if (pChip.nチャンネル番号 == 0x15)
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
+                            nAddScore = 300L;
                         else
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
+                            nAddScore = 360L;
                     }
                     // 新配点
                     else
                     {
                         if (pChip.nチャンネル番号 == 0x15)
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
+                            nAddScore = 100L;
                         else
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 100L, nPlayer);
+                            nAddScore = 200L;
                     }
                 }
+                else
+                {
+                    nAddScore = 100L;
+                }
+
+                if (!TJAPlayer3.ConfigIni.ShinuchiMode && pChip.bGOGOTIME) this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(nAddScore * 1.2f), nPlayer);
+                else this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, nAddScore, nPlayer);
+              
+
+                // Refresh scores after roll hits as well
+                int __score = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+                this.CBranchScore[nPlayer].nScore = __score;
+                this.CChartScore[nPlayer].nScore = __score;
+                this.CSectionScore[nPlayer].nScore = __score;
 
                 EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
@@ -1689,28 +1595,38 @@ namespace TJAPlayer3
 
                 //赤か青かの分岐
 
+                long nAddScore = 0;
+
                 if (!TJAPlayer3.ConfigIni.ShinuchiMode)
                 {
-                    if (pChip.bGOGOTIME) //non-Shin'uchi / GoGo-Time　／　真打OFF・ゴーゴータイム
+                    if (pChip.bGOGOTIME)
                     {
                         if (balloon == rollCount)
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 6000L, player);
+                            nAddScore = 6000L;
                         else
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 360L, player);
+                            nAddScore = 360L;
                     }
-                    else //non-Shin'uchi / non-GoGo-Time　／　真打OFF・非ゴーゴータイム
+                    else
                     {
                         if (balloon == rollCount)
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 5000L, player);
+                            nAddScore = 5000L;
                         else
-                            this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 300L, player);
+                            nAddScore = 300L;
                     }
                 }
-                else //Shin'uchi　／　真打
+                else
                 {
-                    this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, 100L, player);
+                    nAddScore = 100L;
                 }
-                //CDTXMania.Skin.soundRed.t再生する();
+
+                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, nAddScore, player);
+
+                // Refresh scores after roll hits as well
+                int __score = (int)(this.actScore.GetScore(player) + nAddScore);
+                this.CBranchScore[player].nScore = __score;
+                this.CChartScore[player].nScore = __score;
+                this.CSectionScore[player].nScore = __score;
+
                 this.soundRed[pChip.nPlayerSide]?.PlayStart();
 
 
@@ -3234,7 +3150,7 @@ namespace TJAPlayer3
                 // Debug mode
 				else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.DisplayDebug) )
 				{	// del (debug info)
-					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
+					TJAPlayer3.ConfigIni.bDisplayDebugInfo = !TJAPlayer3.ConfigIni.bDisplayDebugInfo;
 				}
 
                 
@@ -3398,7 +3314,7 @@ namespace TJAPlayer3
 				}
 				else if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.DisplayDebug) )
 				{	// del (debug info)
-					TJAPlayer3.ConfigIni.b演奏情報を表示する = !TJAPlayer3.ConfigIni.b演奏情報を表示する;
+					TJAPlayer3.ConfigIni.bDisplayDebugInfo = !TJAPlayer3.ConfigIni.bDisplayDebugInfo;
 				}
                 else if ((keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)))
                 {   // escape (exit)
@@ -3438,7 +3354,7 @@ namespace TJAPlayer3
 		protected abstract void t進行描画_AVI();
 		protected void t進行描画_AVI(int x, int y)
 		{
-			if ( ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) && ( !TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bAVI有効 ) )
+			if ( ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) ) && ( !TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bEnableAVI ) )
 			{
 				this.actAVI.t進行描画( x, y );
 			}
@@ -3957,12 +3873,12 @@ namespace TJAPlayer3
 						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
-							if ( configIni.bAVI有効 )
+							if ( configIni.bEnableAVI )
 							{
                                 if ((dTX.listVD.TryGetValue(pChip.n整数値_内部番号, out CVideoDecoder vd)))
                                 {
                                     ShowVideo = true;
-                                    if (TJAPlayer3.ConfigIni.bAVI有効 && vd != null)
+                                    if (TJAPlayer3.ConfigIni.bEnableAVI && vd != null)
                                     {
                                         this.actAVI.Start(pChip.nチャンネル番号, vd);
                                         this.actAVI.Seek(pChip.VideoStartTimeMs);
@@ -3975,12 +3891,12 @@ namespace TJAPlayer3
 						if ( !pChip.bHit && time < 0)
 						{
 							pChip.bHit = true;
-							if ( configIni.bAVI有効 )
+							if ( configIni.bEnableAVI )
 							{
                                 if ((dTX.listVD.TryGetValue(pChip.n整数値_内部番号, out CVideoDecoder vd)))
                                 {
                                     ShowVideo = false;
-                                    if (TJAPlayer3.ConfigIni.bAVI有効 && vd != null)
+                                    if (TJAPlayer3.ConfigIni.bEnableAVI && vd != null)
                                     {
                                         this.actAVI.Stop();
                                     }
@@ -3989,7 +3905,7 @@ namespace TJAPlayer3
                                 if ((dTX.listVD.TryGetValue(1, out CVideoDecoder vd2)))
                                 {
                                     ShowVideo = true;
-                                    if (TJAPlayer3.ConfigIni.bAVI有効 && vd != null)
+                                    if (TJAPlayer3.ConfigIni.bEnableAVI && vd != null)
                                     {
                                         this.actAVI.Start(pChip.nチャンネル番号, vd);
                                     }
@@ -5578,7 +5494,7 @@ namespace TJAPlayer3
 #endregion
 #region [ PAUSEしていたサウンドを一斉に再生再開する(ただしタイマを止めているので、ここではまだ再生開始しない) ]
 
-            if (!(TJAPlayer3.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && TJAPlayer3.ConfigIni.n演奏速度 != 20))
+            if (!(TJAPlayer3.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && TJAPlayer3.ConfigIni.nSongSpeed != 20))
                 foreach (CSound cs in pausedCSound)
                 {
                     cs.tPlaySound();
@@ -5634,29 +5550,19 @@ namespace TJAPlayer3
 
 			this.bIsAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay;
 
-			TJAPlayer3.ConfigIni.bAVI有効 = true;
-			TJAPlayer3.ConfigIni.bBGA有効 = true;
+			TJAPlayer3.ConfigIni.bEnableAVI = true;
+			TJAPlayer3.ConfigIni.bEnableBGA = true;
 			for ( int i = 0; i < 3; i++ )
 			{
-				TJAPlayer3.ConfigIni.bGraph[ i ] = false;
-				TJAPlayer3.ConfigIni.bHidden[ i ] = false;
-				TJAPlayer3.ConfigIni.bLeft[ i ] = false;
-				TJAPlayer3.ConfigIni.bLight[ i ] = false;
 				TJAPlayer3.ConfigIni.bReverse[ i ] = false;
-				TJAPlayer3.ConfigIni.bSudden[ i ] = false;
 				TJAPlayer3.ConfigIni.eInvisible[ i ] = EInvisible.OFF;
-				TJAPlayer3.ConfigIni.eRandom[ i ] = Eランダムモード.OFF;
+				TJAPlayer3.ConfigIni.eRandom[ i ] = ERandomMode.OFF;
 				TJAPlayer3.ConfigIni.n表示可能な最小コンボ数[ i ] = 65535;
 				TJAPlayer3.ConfigIni.判定文字表示位置[ i ] = E判定文字表示位置.表示OFF;
 				// CDTXMania.ConfigIni.n譜面スクロール速度[ i ] = CDTXMania.ConfigIni.nViewerScrollSpeed[ i ];	// これだけはOn活性化()で行うこと。
 																												// そうしないと、演奏開始直後にスクロール速度が変化して見苦しい。
 			}
-
-			TJAPlayer3.ConfigIni.eDark = Eダークモード.OFF;
-
-			TJAPlayer3.ConfigIni.b演奏情報を表示する = TJAPlayer3.ConfigIni.bViewerShowDebugStatus;
-			TJAPlayer3.ConfigIni.bScoreIniを出力する = false;
-			TJAPlayer3.ConfigIni.bSTAGEFAILED有効 = false;
+			TJAPlayer3.ConfigIni.bDisplayDebugInfo = TJAPlayer3.ConfigIni.bViewerShowDebugStatus;
 			TJAPlayer3.ConfigIni.bTight = false;
 			TJAPlayer3.ConfigIni.bストイックモード = false;
 

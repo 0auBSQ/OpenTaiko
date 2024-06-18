@@ -62,7 +62,7 @@ namespace TJAPlayer3
 				"(ScrollSpeed=x0.5 means half speed)" ) );
 			#endregion
 			#region [ 共通 Dark/Risky/PlaySpeed ]
-			l.Add( new CItemInteger( "演奏速度", 5, 400, TJAPlayer3.ConfigIni.n演奏速度,
+			l.Add( new CItemInteger( "演奏速度", 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
 				"曲の演奏速度を、速くしたり遅くした\n" +
 				"りすることができます。\n" +
 				"（※一部のサウンドカードでは正しく\n" +
@@ -128,10 +128,10 @@ namespace TJAPlayer3
 					break;
 
 				case (int) EOrder.PlaySpeed:
-					TJAPlayer3.ConfigIni.n演奏速度 = (int) GetObj現在値( (int) EOrder.PlaySpeed );
+					TJAPlayer3.ConfigIni.nSongSpeed = (int) GetObj現在値( (int) EOrder.PlaySpeed );
 					break;
 				case (int) EOrder.Random:
-                    TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile] = (Eランダムモード)GetIndex( (int)EOrder.Random );
+                    TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile] = (ERandomMode)GetIndex( (int)EOrder.Random );
 					break;
 				case (int) EOrder.Stealth:
                     TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile] = (EStealthMode)GetIndex( (int)EOrder.Stealth );

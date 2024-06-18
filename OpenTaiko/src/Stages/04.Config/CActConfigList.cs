@@ -105,7 +105,7 @@ namespace TJAPlayer3
 			this.list項目リスト.Add( this.iSystemRisky );
 			*/
 
-			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString(10), 5, 400, TJAPlayer3.ConfigIni.n演奏速度,
+			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString(10), 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
 				CLangManager.LangInstance.GetString(11));
 			this.list項目リスト.Add( this.iCommonPlaySpeed );
 
@@ -119,19 +119,19 @@ namespace TJAPlayer3
 				new string[] { "OpenGL", "DirectX11", "Vulkan", "Metal" });
 			this.list項目リスト.Add(this.iSystemGraphicsType);
 
-			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.b全画面モード,
+			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.bFullScreen,
 				CLangManager.LangInstance.GetString(19));
 			this.list項目リスト.Add( this.iSystemFullscreen );
 
-			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString(10021), TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする,
+			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString(10021), TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect,
 				CLangManager.LangInstance.GetString(21));
 			this.list項目リスト.Add( this.iSystemRandomFromSubBox );
 
-			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString(10022), TJAPlayer3.ConfigIni.b垂直帰線待ちを行う,
+			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString(10022), TJAPlayer3.ConfigIni.bEnableVSync,
 				CLangManager.LangInstance.GetString(22));
 			this.list項目リスト.Add( this.iSystemVSyncWait );
 
-			this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString(10023), TJAPlayer3.ConfigIni.bAVI有効,
+			this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString(10023), TJAPlayer3.ConfigIni.bEnableAVI,
 				CLangManager.LangInstance.GetString(23));
 			this.list項目リスト.Add( this.iSystemAVI );
 
@@ -150,7 +150,7 @@ namespace TJAPlayer3
 				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
 			}			
 
-			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bBGA有効,
+			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bEnableBGA,
 				CLangManager.LangInstance.GetString(24));
 			this.list項目リスト.Add( this.iSystemBGA );
 
@@ -162,7 +162,7 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString(26));
 			this.list項目リスト.Add( this.iSystemPreviewImageWait );
 
-			this.iSystemDebugInfo = new CItemToggle(CLangManager.LangInstance.GetString(10027), TJAPlayer3.ConfigIni.b演奏情報を表示する,
+			this.iSystemDebugInfo = new CItemToggle(CLangManager.LangInstance.GetString(10027), TJAPlayer3.ConfigIni.bDisplayDebugInfo,
 				CLangManager.LangInstance.GetString(27));
 			this.list項目リスト.Add( this.iSystemDebugInfo );
 
@@ -173,11 +173,6 @@ namespace TJAPlayer3
 			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString(10029), TJAPlayer3.ConfigIni.bBGM音を発声する,
 				CLangManager.LangInstance.GetString(29));
 			this.list項目リスト.Add( this.iSystemBGMSound );
-
-
-			this.iSystemSaveScore = new CItemToggle(CLangManager.LangInstance.GetString(10030), TJAPlayer3.ConfigIni.bScoreIniを出力する,
-				CLangManager.LangInstance.GetString(30));
-			this.list項目リスト.Add( this.iSystemSaveScore );
 
 		    this.iSystemApplySongVol = new CItemToggle(CLangManager.LangInstance.GetString(10033), TJAPlayer3.ConfigIni.ApplySongVol,
 				CLangManager.LangInstance.GetString(33));
@@ -224,7 +219,7 @@ namespace TJAPlayer3
             this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString(10041), TJAPlayer3.ConfigIni.bBufferedInputs,
 				CLangManager.LangInstance.GetString(41));
 			this.list項目リスト.Add( this.iSystemBufferedInput );
-			this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString(10042), TJAPlayer3.ConfigIni.bログ出力,
+			this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString(10042), TJAPlayer3.ConfigIni.bOutputLogs,
 				CLangManager.LangInstance.GetString(42));
 			this.list項目リスト.Add( this.iLogOutputLog );
 
@@ -334,6 +329,10 @@ namespace TJAPlayer3
 			this.iDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
 				CLangManager.LangInstance.GetString(3));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
+
+			this.iDrumsGoToCalibration = new CItemBase(CLangManager.LangInstance.GetString(10192), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString(10193));
+			this.list項目リスト.Add(this.iDrumsGoToCalibration);
 
 			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
 				CLangManager.LangInstance.GetString(61));
@@ -446,38 +445,6 @@ namespace TJAPlayer3
 
 		#endregion
 
-
-
-
-
-
-
-
-		/// <summary>Sud+Hidの初期値を返す</summary>
-		/// <param name="eInst"></param>
-		/// <returns>
-		/// 0: None
-		/// 1: Sudden
-		/// 2: Hidden
-		/// 3: Sud+Hid
-		/// 4: Semi-Invisible
-		/// 5: Full-Invisible
-		/// </returns>
-		private int getDefaultSudHidValue( EInstrumentPad eInst )
-		{
-			int defvar;
-			int nInst = (int) eInst;
-			if ( TJAPlayer3.ConfigIni.eInvisible[ nInst ] != EInvisible.OFF )
-			{
-				defvar = (int) TJAPlayer3.ConfigIni.eInvisible[ nInst ] + 3;
-			}
-			else
-			{
-				defvar = ( TJAPlayer3.ConfigIni.bSudden[ nInst ] ? 1 : 0 ) +
-						 ( TJAPlayer3.ConfigIni.bHidden[ nInst ] ? 2 : 0 );
-			}
-			return defvar;
-		}
 
 		/// <summary>
 		/// ESC押下時の右メニュー描画
@@ -796,7 +763,7 @@ namespace TJAPlayer3
 				}
 				else if( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemVSyncWait )
 				{
-					TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = this.iSystemVSyncWait.bON;
+					TJAPlayer3.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
 					TJAPlayer3.app.b次のタイミングで垂直帰線同期切り替えを行う = true;
 				}
 				#region [ キーアサインへの遷移と脱出 ]
@@ -818,6 +785,10 @@ namespace TJAPlayer3
                 {
                     tConfigIniへ記録する();
                     t項目リストの設定_KeyAssignTraining();
+				}
+				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iDrumsGoToCalibration )
+				{
+					TJAPlayer3.stageコンフィグ.actCalibrationMode.Start();
 				}
 				else if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignDrumsReturnToMenu ||
 						this.list項目リスト[ this.n現在の選択項目 ] == this.iKeyAssignTrainingReturnToMenu )		// #24525 2011.3.15 yyagi
@@ -1804,8 +1775,6 @@ namespace TJAPlayer3
 		private CItemInteger iSystemPreviewSoundWait;
 		private CItemToggle iSystemRandomFromSubBox;
 		private CItemBase iSystemReturnToMenu;
-		private CItemToggle iSystemSaveScore;
-		private CItemToggle iSystemStageFailed;
 		private CItemToggle iSystemVSyncWait;
 		private CItemToggle iSystemAutoResultCapture;		// #25399 2011.6.9 yyagi
         private CItemToggle SendDiscordPlayingInformation;
@@ -1866,9 +1835,10 @@ namespace TJAPlayer3
 		private int nSkinSampleIndex;				//
 		private int nSkinIndex;						//
 
+		private CItemBase iDrumsGoToCalibration;
 		private CItemBase iDrumsGoToKeyAssign;
 		private CItemBase iDrumsGoToTrainingKeyAssign;
-		private CItemBase iSystemGoToKeyAssign;		// #24609
+		private CItemBase iSystemGoToKeyAssign;
 		private CItemInteger iCommonPlaySpeed;
 
 		private CItemInteger iLayoutType;
@@ -1912,7 +1882,7 @@ namespace TJAPlayer3
 		CItemInteger TokkunMashInterval;
 
 		private CItemInteger iInputAdjustTimeMs;
-		private CItemInteger iGlobalOffsetMs;
+		public CItemInteger iGlobalOffsetMs;
 
 		private CItemList iSystemSkinSubfolder;				// #28195 2012.5.2 yyagi
 		private CItemBase iSystemReloadDTX;					// #32081 2013.10.21 yyagi
@@ -1950,29 +1920,23 @@ namespace TJAPlayer3
 		}
 		private void tConfigIniへ記録する_System()
 		{
-            //CDTXMania.ConfigIni.eDark = (Eダークモード) this.iCommonDark.n現在選択されている項目番号;
-			TJAPlayer3.ConfigIni.n演奏速度 = this.iCommonPlaySpeed.n現在の値;
+			TJAPlayer3.ConfigIni.nSongSpeed = this.iCommonPlaySpeed.n現在の値;
 
 			TJAPlayer3.ConfigIni.nGraphicsDeviceType = this.iSystemGraphicsType.n現在選択されている項目番号;
-			TJAPlayer3.ConfigIni.b全画面モード = this.iSystemFullscreen.bON;
-			// TJAPlayer3.ConfigIni.bSTAGEFAILED有効 = this.iSystemStageFailed.bON;
-			TJAPlayer3.ConfigIni.bランダムセレクトで子BOXを検索対象とする = this.iSystemRandomFromSubBox.bON;
+			TJAPlayer3.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
+			TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
 			//CDTXMania.ConfigIni.bWave再生位置自動調整機能有効 = this.iSystemAdjustWaves.bON;
-			TJAPlayer3.ConfigIni.b垂直帰線待ちを行う = this.iSystemVSyncWait.bON;
+			TJAPlayer3.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
 			TJAPlayer3.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
-			TJAPlayer3.ConfigIni.bAVI有効 = this.iSystemAVI.bON;
+			TJAPlayer3.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 			TJAPlayer3.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
-			TJAPlayer3.ConfigIni.bBGA有効 = this.iSystemBGA.bON;
-//			CDTXMania.ConfigIni.bGraph有効 = this.iSystemGraph.bON;#24074 2011.01.23 comment-out ikanick オプション(Drums)へ移行
+			TJAPlayer3.ConfigIni.bEnableBGA = this.iSystemBGA.bON;
 			TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = this.iSystemPreviewSoundWait.n現在の値;
 			TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms = this.iSystemPreviewImageWait.n現在の値;
-			TJAPlayer3.ConfigIni.b演奏情報を表示する = this.iSystemDebugInfo.bON;
+			TJAPlayer3.ConfigIni.bDisplayDebugInfo = this.iSystemDebugInfo.bON;
 			TJAPlayer3.ConfigIni.n背景の透過度 = this.iSystemBGAlpha.n現在の値;
 			TJAPlayer3.ConfigIni.bBGM音を発声する = this.iSystemBGMSound.bON;
-			//CDTXMania.ConfigIni.b歓声を発声する = this.iSystemAudienceSound.bON;
-			//CDTXMania.ConfigIni.eダメージレベル = (Eダメージレベル) this.iSystemDamageLevel.n現在選択されている項目番号;
-			TJAPlayer3.ConfigIni.bScoreIniを出力する = this.iSystemSaveScore.bON;
 
 			TJAPlayer3.ConfigIni.bDanTowerHide = this.iDanTowerHide.bON;
 
@@ -1986,7 +1950,7 @@ namespace TJAPlayer3
 		    TJAPlayer3.ConfigIni.KeyboardSoundLevelIncrement = this.iSystemKeyboardSoundLevelIncrement.n現在の値;
             TJAPlayer3.ConfigIni.MusicPreTimeMs = this.MusicPreTimeMs.n現在の値;
 
-			TJAPlayer3.ConfigIni.bログ出力 = this.iLogOutputLog.bON;
+			TJAPlayer3.ConfigIni.bOutputLogs = this.iLogOutputLog.bON;
 			//CDTXMania.ConfigIni.bストイックモード = this.iSystemStoicMode.bON;
 
 			//CDTXMania.ConfigIni.nShowLagType = this.iSystemShowLag.n現在選択されている項目番号;				// #25370 2011.6.3 yyagi

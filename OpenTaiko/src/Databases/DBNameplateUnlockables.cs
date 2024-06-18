@@ -53,7 +53,7 @@ namespace TJAPlayer3
 
                     data[((Int64)reader["NameplateId"]).ToString()] = nu;
                 }
-
+                reader.Close();
             }            
         }
         public class NameplateUnlockable
