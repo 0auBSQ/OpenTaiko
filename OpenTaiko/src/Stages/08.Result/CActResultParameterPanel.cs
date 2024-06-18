@@ -669,7 +669,7 @@ namespace TJAPlayer3
 								TJAPlayer3.Tx.Result_Score_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 																				  ctMainCounter.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 
-								this.tスコア文字表示(score_x, score_y, (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+								this.tスコア文字表示(score_x, score_y, (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
 
 								if (!b音声再生[8])
 								{

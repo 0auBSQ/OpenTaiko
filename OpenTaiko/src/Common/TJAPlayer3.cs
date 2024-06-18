@@ -68,7 +68,7 @@ namespace TJAPlayer3
 			get;
 			private set;
 		}
-		public static C文字コンソール act文字コンソール
+		public static CTextConsole actTextConsole
 		{ 
 			get;
 			private set;
@@ -2747,13 +2747,13 @@ for (int i = 0; i < 3; i++) {
 			Trace.Indent();
 			try
 			{
-				act文字コンソール = new C文字コンソール();
+				actTextConsole = new CTextConsole();
 				Trace.TraceInformation( "文字コンソールを生成しました。" );
-				act文字コンソール.Activate();
+				actTextConsole.Activate();
 				//if (!ConfigIni.PreAssetsLoading) 
 				{
-					act文字コンソール.CreateManagedResource();
-					act文字コンソール.CreateUnmanagedResource();
+					actTextConsole.CreateManagedResource();
+					actTextConsole.CreateUnmanagedResource();
 				}
 				Trace.TraceInformation( "文字コンソールを活性化しました。" );
 				Trace.TraceInformation( "文字コンソールの初期化を完了しました。" );
@@ -2990,7 +2990,7 @@ for (int i = 0; i < 3; i++) {
 			SaveFile = 0;
 			this.listトップレベルActivities = new List<CActivity>();
 			this.listトップレベルActivities.Add( actEnumSongs );
-			this.listトップレベルActivities.Add( act文字コンソール );
+			this.listトップレベルActivities.Add( actTextConsole );
 			this.listトップレベルActivities.Add( stage起動 );
 			this.listトップレベルActivities.Add( stageタイトル );
 //			this.listトップレベルActivities.Add( stageオプション );
@@ -3328,19 +3328,19 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ 文字コンソールの終了処理 ]
 				//---------------------
-				if (act文字コンソール != null)
+				if (actTextConsole != null)
 				{
 					Trace.TraceInformation( "文字コンソールの終了処理を行います。" );
 					Trace.Indent();
 					try
 					{
-						act文字コンソール.DeActivate();
+						actTextConsole.DeActivate();
 						//if (!ConfigIni.PreAssetsLoading) 
 						{
-							act文字コンソール.ReleaseManagedResource();
-							act文字コンソール.ReleaseUnmanagedResource();
+							actTextConsole.ReleaseManagedResource();
+							actTextConsole.ReleaseUnmanagedResource();
 						}
-						act文字コンソール = null;
+						actTextConsole = null;
 						Trace.TraceInformation( "文字コンソールの終了処理を完了しました。" );
 					}
 					catch( Exception exception6 )
@@ -3510,9 +3510,9 @@ for (int i = 0; i < 3; i++) {
         {
             Trace.TraceInformation("スキン変更:" + TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName(false));
 
-            TJAPlayer3.act文字コンソール.DeActivate();
-			act文字コンソール.ReleaseManagedResource();
-			act文字コンソール.ReleaseUnmanagedResource();
+            TJAPlayer3.actTextConsole.DeActivate();
+			actTextConsole.ReleaseManagedResource();
+			actTextConsole.ReleaseUnmanagedResource();
 
             TJAPlayer3.Skin.Dispose();
             TJAPlayer3.Skin = null;
@@ -3524,9 +3524,9 @@ for (int i = 0; i < 3; i++) {
 
 			TJAPlayer3.Tx.LoadTexture();
 
-            TJAPlayer3.act文字コンソール.Activate();
-			act文字コンソール.CreateManagedResource();
-			act文字コンソール.CreateUnmanagedResource();
+            TJAPlayer3.actTextConsole.Activate();
+			actTextConsole.CreateManagedResource();
+			actTextConsole.CreateUnmanagedResource();
 			TJAPlayer3.NamePlate.RefleshSkin();
 			CActSelectPopupMenu.RefleshSkin();
 			CActSelect段位リスト.RefleshSkin();

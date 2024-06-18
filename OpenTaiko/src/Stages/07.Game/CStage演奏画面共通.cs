@@ -26,9 +26,9 @@ namespace TJAPlayer3
 			Drums = new CScoreIni.C演奏記録();
 
 			{
-				Drums.nGoodCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Perfect : this.nヒット数_Auto含まない.Drums.Perfect;
-				Drums.nOkCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Great : this.nヒット数_Auto含まない.Drums.Great;
-				Drums.nBadCount = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Miss : this.nヒット数_Auto含まない.Drums.Miss;
+				Drums.nGoodCount = TJAPlayer3.ConfigIni.bAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Perfect : this.nヒット数_Auto含まない.Drums.Perfect;
+				Drums.nOkCount = TJAPlayer3.ConfigIni.bAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Great : this.nヒット数_Auto含まない.Drums.Great;
+				Drums.nBadCount = TJAPlayer3.ConfigIni.bAutoPlay[0] ? this.nヒット数_Auto含む.Drums.Miss : this.nヒット数_Auto含まない.Drums.Miss;
 
                 var danC = TJAPlayer3.stage演奏ドラム画面.actDan.GetExam();
                 for (int i = 0; i < danC.Length; i++)
@@ -328,8 +328,6 @@ namespace TJAPlayer3
 			this.n現在のトップChip = ( listChip[0].Count > 0 ) ? 0 : -1;
 			this.L最後に再生したHHの実WAV番号 = new List<int>( 16 );
 			this.n最後に再生したHHのチャンネル番号 = 0;
-			this.n最後に再生した実WAV番号.Guitar = -1;
-			this.n最後に再生した実WAV番号.Bass = -1;
 			for ( int i = 0; i < 50; i++ )
 			{
 				this.n最後に再生したBGMの実WAV番号[ i ] = -1;
@@ -415,12 +413,6 @@ namespace TJAPlayer3
             this.nLoopCount_Clear = 1;
 
             this.tBranchReset(0);
-
-            this.bIsAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay;                                  // #24239 2011.1.23 yyagi
-
-            //this.bIsAutoPlay.Guitar = CDTXMania.ConfigIni.bギターが全部オートプレイである;
-            //this.bIsAutoPlay.Bass = CDTXMania.ConfigIni.bベースが全部オートプレイである;
-            //			this.nRisky = CDTXMania.ConfigIni.nRisky;											// #23559 2011.7.28 yyagi
 
             for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
             {
@@ -792,7 +784,6 @@ namespace TJAPlayer3
         public CAct演奏DrumsDancer actDancer;
 		protected CAct演奏Drums判定文字列 actJudgeString;
 		public TaikoLaneFlash actTaikoLaneFlash;
-		protected CAct演奏レーンフラッシュGB共通 actLaneFlushGB;
 		public CAct演奏パネル文字列 actPanel;
 		public CAct演奏演奏情報 actPlayInfo;
 		public CAct演奏スコア共通 actScore;
@@ -849,10 +840,6 @@ namespace TJAPlayer3
         protected int[] n最後に再生したBGMの実WAV番号 = new int[ 50 ];
 		protected int n最後に再生したHHのチャンネル番号;
 		protected List<int> L最後に再生したHHの実WAV番号;		// #23921 2011.1.4 yyagi: change "int" to "List<int>", for recording multiple wav No.
-		protected STLANEVALUE<int> n最後に再生した実WAV番号;	// #26388 2011.11.8 yyagi: change "n最後に再生した実WAV番号.GUITAR" and "n最後に再生した実WAV番号.BASS"
-																//							into "n最後に再生した実WAV番号";
-//		protected int n最後に再生した実WAV番号.GUITAR;
-//		protected int n最後に再生した実WAV番号.BASS;
 
 		protected volatile Queue<stmixer> queueMixerSound;		// #24820 2013.1.21 yyagi まずは単純にAdd/Removeを1個のキューでまとめて管理するやり方で設計する
 		protected DateTime dtLastQueueOperation;				//
@@ -868,14 +855,12 @@ namespace TJAPlayer3
 
 		protected CTexture tx背景;
 
-		protected STAUTOPLAY bIsAutoPlay;		// #24239 2011.1.23 yyagi
 //		protected int nRisky_InitialVar, nRiskyTime;		// #23559 2011.7.28 yyagi → CAct演奏ゲージ共通クラスに隠蔽
 		protected int nPolyphonicSounds;
 		protected List<CDTX.CChip>[] listChip = new List<CDTX.CChip>[5];
 		protected Dictionary<int, CDTX.CWAV> listWAV;
 		protected CInvisibleChip cInvisibleChip;
 		protected bool bUseOSTimer;
-		protected E判定表示優先度 e判定表示優先度;
 
         public CBRANCHSCORE[] CBranchScore = new CBRANCHSCORE[6];
         public CBRANCHSCORE[] CChartScore = new CBRANCHSCORE[5];
@@ -1439,8 +1424,8 @@ namespace TJAPlayer3
                     nAddScore = 100L;
                 }
 
-                if (!TJAPlayer3.ConfigIni.ShinuchiMode && pChip.bGOGOTIME) this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, (long)(nAddScore * 1.2f), nPlayer);
-                else this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, nAddScore, nPlayer);
+                if (!TJAPlayer3.ConfigIni.ShinuchiMode && pChip.bGOGOTIME) this.actScore.Add((long)(nAddScore * 1.2f), nPlayer);
+                else this.actScore.Add(nAddScore, nPlayer);
               
 
                 // Refresh scores after roll hits as well
@@ -1619,7 +1604,7 @@ namespace TJAPlayer3
                     nAddScore = 100L;
                 }
 
-                this.actScore.Add(EInstrumentPad.TAIKO, this.bIsAutoPlay, nAddScore, player);
+                this.actScore.Add(nAddScore, player);
 
                 // Refresh scores after roll hits as well
                 int __score = (int)(this.actScore.GetScore(player) + nAddScore);
@@ -1705,13 +1690,13 @@ namespace TJAPlayer3
         {
             //unsafeコードにつき、デバッグ中の変更厳禁!
 
-            bool bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer];
+            bool bAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay[nPlayer];
             bool bBombHit = false;
 
             switch (nPlayer)
             {
                 case 1:
-                    bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                    bAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                     break;
             }
 
@@ -2441,7 +2426,7 @@ namespace TJAPlayer3
                         nAddScore = (long)nAddScore * 10;
                     }
 
-                    this.actScore.Add( EInstrumentPad.TAIKO, bIsAutoPlay, (long)nAddScore, nPlayer );
+                    this.actScore.Add((long)nAddScore, nPlayer );
                 }
                 else if( TJAPlayer3.DTX.nScoreModeTmp == 2 )
                 {
@@ -2497,8 +2482,7 @@ namespace TJAPlayer3
                         nAddScore = nAddScore * 2;
                     }
 
-                    this.actScore.Add(EInstrumentPad.TAIKO, bIsAutoPlay, nAddScore, nPlayer);
-                    //this.actScore.Add( E楽器パート.DRUMS, bIsAutoPlay, nAddScore );
+                    this.actScore.Add(nAddScore, nPlayer);
                 }
                 else if (TJAPlayer3.DTX.nScoreModeTmp == 1)
                 {
@@ -2564,7 +2548,7 @@ namespace TJAPlayer3
                         nAddScore = nAddScore * 2;
                     }
 
-                    this.actScore.Add(EInstrumentPad.TAIKO, bIsAutoPlay, nAddScore, nPlayer);
+                    this.actScore.Add(nAddScore, nPlayer);
                 }
                 else
                 {
@@ -2601,8 +2585,7 @@ namespace TJAPlayer3
                         nAddScore = nAddScore * 2;
                     }
 
-                    this.actScore.Add(EInstrumentPad.TAIKO, bIsAutoPlay, nAddScore, nPlayer);
-                    //this.actScore.Add( E楽器パート.DRUMS, bIsAutoPlay, nAddScore );              
+                    this.actScore.Add(nAddScore, nPlayer);          
                 }
 
                 //キーを押したときにスコア情報 + nAddScoreを置き換える様に
@@ -3182,7 +3165,7 @@ namespace TJAPlayer3
                     // this.t演奏中止();
 				}
                 else if ( TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchNormal) && 
-                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]) )
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.bAutoPlay[0]) )
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3209,7 +3192,7 @@ namespace TJAPlayer3
                     this.b強制的に分岐させた[0] = true;
                 }
                 else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchExpert) &&
-                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.bAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3236,7 +3219,7 @@ namespace TJAPlayer3
                     this.b強制的に分岐させた[0] = true;
                 }
                 else if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingBranchMaster) &&
-                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
+                    (TJAPlayer3.ConfigIni.bTokkunMode || TJAPlayer3.ConfigIni.bAutoPlay[0]))		// #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
                 {
                     if (!TJAPlayer3.DTX.bHasBranch[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
@@ -3291,7 +3274,7 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingToggleAuto) ) 
                 {
-                    TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0];
+                    TJAPlayer3.ConfigIni.bAutoPlay[0] = !TJAPlayer3.ConfigIni.bAutoPlay[0];
                 }
             }
 
@@ -3299,7 +3282,7 @@ namespace TJAPlayer3
 
             if (keyboard.KeyPressed((int)SlimDXKeys.Key.F7))
             {
-                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] = !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1];
+                TJAPlayer3.ConfigIni.bAutoPlay[1] = !TJAPlayer3.ConfigIni.bAutoPlay[1];
             }
 #endif
             if ( !this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && ( ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED ) ) && ( base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut ) )
@@ -3462,11 +3445,11 @@ namespace TJAPlayer3
 			CConfigIni configIni = TJAPlayer3.ConfigIni;
 
 			CDTX dTX = TJAPlayer3.DTX;
-            bool bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer];
+            bool bAutoPlay = configIni.bAutoPlay[nPlayer];
             switch ( nPlayer ) //2017.08.11 kairera0467
             {
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                    bAutoPlay = configIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 case 2:
@@ -4832,11 +4815,11 @@ namespace TJAPlayer3
 			CConfigIni configIni = TJAPlayer3.ConfigIni;
 
 			CDTX dTX = TJAPlayer3.DTX;
-            bool bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer];
+            bool bAutoPlay = configIni.bAutoPlay[nPlayer];
             switch ( nPlayer ) //2017.08.11 kairera0467
             {
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                    bAutoPlay = configIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                     dTX = TJAPlayer3.DTX_2P;
                     break;
                 case 2:
@@ -5526,47 +5509,7 @@ namespace TJAPlayer3
 		/// </summary>
 		protected void tDTXV用の設定()
 		{
-			TJAPlayer3.ConfigIni.bAutoPlay.HH = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.SD = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BD = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.HT = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.LT = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.CY = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.FT = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.RD = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.LC = true;
-            TJAPlayer3.ConfigIni.bAutoPlay.LP = true;
-            TJAPlayer3.ConfigIni.bAutoPlay.LBD = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.GtR = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.GtB = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.GtB = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.GtPick = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.GtW = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BsR = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BsB = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BsB = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BsPick = true;
-			TJAPlayer3.ConfigIni.bAutoPlay.BsW = true;
 
-			this.bIsAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay;
-
-			TJAPlayer3.ConfigIni.bEnableAVI = true;
-			TJAPlayer3.ConfigIni.bEnableBGA = true;
-			for ( int i = 0; i < 3; i++ )
-			{
-				TJAPlayer3.ConfigIni.bReverse[ i ] = false;
-				TJAPlayer3.ConfigIni.eInvisible[ i ] = EInvisible.OFF;
-				TJAPlayer3.ConfigIni.eRandom[ i ] = ERandomMode.OFF;
-				TJAPlayer3.ConfigIni.n表示可能な最小コンボ数[ i ] = 65535;
-				TJAPlayer3.ConfigIni.判定文字表示位置[ i ] = E判定文字表示位置.表示OFF;
-				// CDTXMania.ConfigIni.n譜面スクロール速度[ i ] = CDTXMania.ConfigIni.nViewerScrollSpeed[ i ];	// これだけはOn活性化()で行うこと。
-																												// そうしないと、演奏開始直後にスクロール速度が変化して見苦しい。
-			}
-			TJAPlayer3.ConfigIni.bDisplayDebugInfo = TJAPlayer3.ConfigIni.bViewerShowDebugStatus;
-			TJAPlayer3.ConfigIni.bTight = false;
-			TJAPlayer3.ConfigIni.bストイックモード = false;
-
-			TJAPlayer3.ConfigIni.nRisky = 0;
 		}
 
 		protected abstract void t進行描画_チップ_ドラムス( CConfigIni configIni, ref CDTX dTX, ref CDTX.CChip pChip );

@@ -466,14 +466,14 @@ namespace TJAPlayer3
         public void tMtaikoEvent( int nChannel, int nHand, int nPlayer )
         {
             CConfigIni configIni = TJAPlayer3.ConfigIni;
-            bool bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer];
+            bool bAutoPlay = configIni.bAutoPlay[nPlayer];
             int playerShift = 5 * nPlayer;
             var _gt = configIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
             switch (nPlayer)
             {
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                    bAutoPlay = configIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                     break;
             }
 

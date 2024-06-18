@@ -335,7 +335,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRROR) ModFlags |= (int)EModFlag.Mirror;
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.RANDOM) ModFlags |= (int)EModFlag.Random;
             if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
-            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.HYPERRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
+            if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRRORRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
             if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
             if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
             if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;

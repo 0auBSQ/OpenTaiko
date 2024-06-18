@@ -92,7 +92,7 @@ namespace TJAPlayer3
 			    // player and the special song title and subtitle
 			    // of the .tja used to perform input calibration
 			    TJAPlayer3.IsPerformingCalibration =
-			        !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] &&
+			        !TJAPlayer3.ConfigIni.bAutoPlay[0] &&
 			        TJAPlayer3.ConfigIni.nPlayerCount == 1 &&
 			        str曲タイトル == "Input Calibration" &&
 			        strサブタイトル == "TJAPlayer3 Developers";

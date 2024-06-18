@@ -1501,7 +1501,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		public bool[] b太鼓パートAutoPlay = new bool[5];
+		public bool[] bAutoPlay = new bool[5];
 
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
@@ -1577,7 +1577,7 @@ namespace TJAPlayer3
 			new int[1] { 0 },
             new int[2] { -100, 100 },
             new int[3] { -100, 0, 100 },
-            new int[4] { -75, -25, 25, 75 },
+            new int[4] { -100, -33, 33, 100 },
             new int[5] { -100, -50, 0, 50, 100 },
         };
 		public string[] sSaveFile = new string[5] { "1P", "2P", "3P", "4P", "5P" };
@@ -1662,7 +1662,6 @@ namespace TJAPlayer3
 		public int nGraphicsDeviceType;
 		public int nRisky;						// #23559 2011.6.20 yyagi Riskyでの残ミス数。0で閉店
 		public bool bIsAllowedDoubleClickFullscreen;	// #26752 2011.11.27 yyagi ダブルクリックしてもフルスクリーンに移行しない
-		public STAUTOPLAY bAutoPlay;
 		public int nSoundDeviceType;				// #24820 2012.12.23 yyagi 出力サウンドデバイス(0=ACM(にしたいが設計がきつそうならDirectShow), 1=ASIO, 2=WASAPI)
 		public int nBassBufferSizeMs;				// #24820 2013.1.15 yyagi WASAPIのバッファサイズ
 		public int nWASAPIBufferSizeMs;				// #24820 2013.1.15 yyagi WASAPIのバッファサイズ
@@ -1696,155 +1695,7 @@ namespace TJAPlayer3
 		/// DiscordのRitch Presenceに再生中の.tjaファイルの情報を送信するかどうか。
 		/// </summary>
 		public bool SendDiscordPlayingInformation;
-#if false
-		[StructLayout( LayoutKind.Sequential )]
-		public struct STAUTOPLAY								// C定数のEレーンとindexを一致させること
-		{
-			public bool LC;			// 0
-			public bool HH;			// 1
-			public bool SD;			// 2
-			public bool BD;			// 3
-			public bool HT;			// 4
-			public bool LT;			// 5
-			public bool FT;			// 6
-			public bool CY;			// 7
-			public bool RD;			// 8
-			public bool Guitar;		// 9	(not used)
-			public bool Bass;		// 10	(not used)
-			public bool GtR;		// 11
-			public bool GtG;		// 12
-			public bool GtB;		// 13
-			public bool GtPick;		// 14
-			public bool GtW;		// 15
-			public bool BsR;		// 16
-			public bool BsG;		// 17
-			public bool BsB;		// 18
-			public bool BsPick;		// 19
-			public bool BsW;		// 20
-			public bool this[ int index ]
-			{
-				get
-				{
-					switch ( index )
-					{
-						case (int) Eレーン.LC:
-							return this.LC;
-						case (int) Eレーン.HH:
-							return this.HH;
-						case (int) Eレーン.SD:
-							return this.SD;
-						case (int) Eレーン.BD:
-							return this.BD;
-						case (int) Eレーン.HT:
-							return this.HT;
-						case (int) Eレーン.LT:
-							return this.LT;
-						case (int) Eレーン.FT:
-							return this.FT;
-						case (int) Eレーン.CY:
-							return this.CY;
-						case (int) Eレーン.RD:
-							return this.RD;
-						case (int) Eレーン.Guitar:
-							return this.Guitar;
-						case (int) Eレーン.Bass:
-							return this.Bass;
-						case (int) Eレーン.GtR:
-							return this.GtR;
-						case (int) Eレーン.GtG:
-							return this.GtG;
-						case (int) Eレーン.GtB:
-							return this.GtB;
-						case (int) Eレーン.GtPick:
-							return this.GtPick;
-						case (int) Eレーン.GtW:
-							return this.GtW;
-						case (int) Eレーン.BsR:
-							return this.BsR;
-						case (int) Eレーン.BsG:
-							return this.BsG;
-						case (int) Eレーン.BsB:
-							return this.BsB;
-						case (int) Eレーン.BsPick:
-							return this.BsPick;
-						case (int) Eレーン.BsW:
-							return this.BsW;
-					}
-					throw new IndexOutOfRangeException();
-				}
-				set
-				{
-					switch ( index )
-					{
-						case (int) Eレーン.LC:
-							this.LC = value;
-							return;
-						case (int) Eレーン.HH:
-							this.HH = value;
-							return;
-						case (int) Eレーン.SD:
-							this.SD = value;
-							return;
-						case (int) Eレーン.BD:
-							this.BD = value;
-							return;
-						case (int) Eレーン.HT:
-							this.HT = value;
-							return;
-						case (int) Eレーン.LT:
-							this.LT = value;
-							return;
-						case (int) Eレーン.FT:
-							this.FT = value;
-							return;
-						case (int) Eレーン.CY:
-							this.CY = value;
-							return;
-						case (int) Eレーン.RD:
-							this.RD = value;
-							return;
-						case (int) Eレーン.Guitar:
-							this.Guitar = value;
-							return;
-						case (int) Eレーン.Bass:
-							this.Bass = value;
-							return;
-						case (int) Eレーン.GtR:
-							this.GtR = value;
-							return;
-						case (int) Eレーン.GtG:
-							this.GtG = value;
-							return;
-						case (int) Eレーン.GtB:
-							this.GtB = value;
-							return;
-						case (int) Eレーン.GtPick:
-							this.GtPick = value;
-							return;
-						case (int) Eレーン.GtW:
-							this.GtW = value;
-							return;
-						case (int) Eレーン.BsR:
-							this.BsR = value;
-							return;
-						case (int) Eレーン.BsG:
-							this.BsG = value;
-							return;
-						case (int) Eレーン.BsB:
-							this.BsB = value;
-							return;
-						case (int) Eレーン.BsPick:
-							this.BsPick = value;
-							return;
-						case (int) Eレーン.BsW:
-							this.BsW = value;
-							return;
-					}
-					throw new IndexOutOfRangeException();
-				}
-			}
-		}
-#endif
+
 		#region [ STRANGE ]
 		public STRANGE nヒット範囲ms;
 		[StructLayout( LayoutKind.Sequential )]
@@ -2053,24 +1904,6 @@ namespace TJAPlayer3
 
 		public CConfigIni()
 		{
-#if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
-			//----------------------------------------
-			this.fGaugeFactor[0,0] =  0.004f;
-			this.fGaugeFactor[0,1] =  0.006f;
-			this.fGaugeFactor[1,0] =  0.002f;
-			this.fGaugeFactor[1,1] =  0.003f;
-			this.fGaugeFactor[2,0] =  0.000f;
-			this.fGaugeFactor[2,1] =  0.000f;
-			this.fGaugeFactor[3,0] = -0.020f;
-			this.fGaugeFactor[3,1] = -0.030f;
-			this.fGaugeFactor[4,0] = -0.050f;
-			this.fGaugeFactor[4,1] = -0.050f;
-
-			this.fDamageLevelFactor[0] = 0.5f;
-			this.fDamageLevelFactor[1] = 1.0f;
-			this.fDamageLevelFactor[2] = 1.5f;
-			//----------------------------------------
-#endif
 			this.strSongsPath = "Songs" + Path.DirectorySeparatorChar;
 			this.bFullScreen = false;
 			this.bEnableVSync = true;
@@ -2160,11 +1993,10 @@ namespace TJAPlayer3
 			this.nSongSpeed = 20;
 			this.b演奏速度が一倍速であるとき以外音声を再生しない = false;
 			#region [ AutoPlay ]
-			this.bAutoPlay = new STAUTOPLAY();
 
 			for (int i = 0; i < 5; i++)
 			{
-				this.b太鼓パートAutoPlay[i] = false;
+				this.bAutoPlay[i] = false;
 			}
             this.bAuto先生の連打 = true;
 			#endregion
@@ -2320,18 +2152,6 @@ namespace TJAPlayer3
 			sw.WriteLine( "[System]" );
 			sw.WriteLine();
 
-#if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
-	//------------------------------
-			sw.WriteLine("; ライフゲージのパラメータ調整(調整完了後削除予定)");
-			sw.WriteLine("; GaugeFactorD: ドラムのPerfect, Great,... の回復量(ライフMAXを1.0としたときの値を指定)");
-			sw.WriteLine("; GaugeFactorG:  Gt/BsのPerfect, Great,... の回復量(ライフMAXを1.0としたときの値を指定)");
-			sw.WriteLine("; DamageFactorD: DamageLevelがSmall, Normal, Largeの時に対するダメージ係数");
-			sw.WriteLine("GaugeFactorD={0}, {1}, {2}, {3}, {4}", this.fGaugeFactor[0, 0], this.fGaugeFactor[1, 0], this.fGaugeFactor[2, 0], this.fGaugeFactor[3, 0], this.fGaugeFactor[4, 0]);
-			sw.WriteLine("GaugeFactorG={0}, {1}, {2}, {3}, {4}", this.fGaugeFactor[0, 1], this.fGaugeFactor[1, 1], this.fGaugeFactor[2, 1], this.fGaugeFactor[3, 1], this.fGaugeFactor[4, 1]);
-			sw.WriteLine("DamageFactor={0}, {1}, {2}", this.fDamageLevelFactor[0], this.fDamageLevelFactor[1], fDamageLevelFactor[2]);
-			sw.WriteLine();
-	//------------------------------
-#endif
 			#region [ Version ]
 			sw.WriteLine( "; リリースバージョン" );
 			sw.WriteLine( "; Release Version." );
@@ -2670,11 +2490,11 @@ namespace TJAPlayer3
             sw.WriteLine("[AutoPlay]");
             sw.WriteLine();
             sw.WriteLine("; 自動演奏(0:OFF, 1:ON)");
-            sw.WriteLine("Taiko={0}", this.b太鼓パートAutoPlay[0] ? 1 : 0);
-			sw.WriteLine("Taiko2P={0}", this.b太鼓パートAutoPlay[1] ? 1 : 0);
-			sw.WriteLine("Taiko3P={0}", this.b太鼓パートAutoPlay[2] ? 1 : 0);
-			sw.WriteLine("Taiko4P={0}", this.b太鼓パートAutoPlay[3] ? 1 : 0);
-			sw.WriteLine("Taiko5P={0}", this.b太鼓パートAutoPlay[4] ? 1 : 0);
+            sw.WriteLine("Taiko={0}", this.bAutoPlay[0] ? 1 : 0);
+			sw.WriteLine("Taiko2P={0}", this.bAutoPlay[1] ? 1 : 0);
+			sw.WriteLine("Taiko3P={0}", this.bAutoPlay[2] ? 1 : 0);
+			sw.WriteLine("Taiko4P={0}", this.bAutoPlay[3] ? 1 : 0);
+			sw.WriteLine("Taiko5P={0}", this.bAutoPlay[4] ? 1 : 0);
 			sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 			sw.WriteLine("AILevel={0}", this.nAILevel);
@@ -3561,23 +3381,23 @@ namespace TJAPlayer3
                                     case Eセクション種別.AutoPlay:
                                         if (str3.Equals("Taiko"))
                                         {
-                                            this.b太鼓パートAutoPlay[0] = CConversion.bONorOFF(str4[0]);
+                                            this.bAutoPlay[0] = CConversion.bONorOFF(str4[0]);
 										}
 										else if (str3.Equals("Taiko2P"))
 										{
-											this.b太鼓パートAutoPlay[1] = CConversion.bONorOFF(str4[0]);
+											this.bAutoPlay[1] = CConversion.bONorOFF(str4[0]);
 										}
 										else if (str3.Equals("Taiko3P"))
 										{
-											this.b太鼓パートAutoPlay[2] = CConversion.bONorOFF(str4[0]);
+											this.bAutoPlay[2] = CConversion.bONorOFF(str4[0]);
 										}
 										else if (str3.Equals("Taiko4P"))
 										{
-											this.b太鼓パートAutoPlay[3] = CConversion.bONorOFF(str4[0]);
+											this.bAutoPlay[3] = CConversion.bONorOFF(str4[0]);
 										}
 										else if (str3.Equals("Taiko5P"))
 										{
-											this.b太鼓パートAutoPlay[4] = CConversion.bONorOFF(str4[0]);
+											this.bAutoPlay[4] = CConversion.bONorOFF(str4[0]);
 										}
 										else if (str3.Equals("TaikoAutoRoll"))
                                         {

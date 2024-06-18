@@ -174,30 +174,13 @@ namespace TJAPlayer3
 			// (Autoのパラメータ切り替え時は実際に値設定していないため、キャンセルまたはRetern, More...時に値設定する必要有り)
 		}
 
-		/// <summary>
-		/// 1つの値を、全targetに適用する。RiskyやDarkなど、全tatgetで共通の設定となるもので使う。
-		/// </summary>
-		/// <param name="order">設定項目リストの順番</param>
-		/// <param name="index">設定値(index)</param>
-		private void SetValueToAllTarget( int order, int index )
-		{
-			for ( int i = 0; i < 3; i++ )
-			{
-				lci[ nCurrentConfigSet ][ i ][ order ].SetIndex( index );
-			}
-		}
-		
 
 		/// <summary>
 		/// ConfigIni.bAutoPlayに簡易CONFIGの状態を反映する
 		/// </summary>
 		private void SetAutoParameters()
 		{
-			for ( int target = 0; target < 3; target++ )
-			{
-				int[] pa = { (int) Eレーン.LC, (int) Eレーン.GtR, (int) Eレーン.BsR };
-				int start = pa[ target ];
-            }
+
         }
 
 		// CActivity 実装

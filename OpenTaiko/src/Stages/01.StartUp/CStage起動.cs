@@ -215,10 +215,10 @@ namespace TJAPlayer3
 					int y = 20;
 					for(int i = 0; i < this.list進行文字列.Count; i++)
 					{
-						TJAPlayer3.act文字コンソール.tPrint((int)(x * TJAPlayer3.Skin.Resolution[0] / 1280.0), (int)(y * TJAPlayer3.Skin.Resolution[1] / 720.0), C文字コンソール.Eフォント種別.白, this.list進行文字列[i]);
+						TJAPlayer3.actTextConsole.tPrint((int)(x * TJAPlayer3.Skin.Resolution[0] / 1280.0), (int)(y * TJAPlayer3.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
 						y += 24;
 					}
-					TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, this.str現在進行中);
+					TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.White, this.str現在進行中);
 					//-----------------
 					#endregion
 				}

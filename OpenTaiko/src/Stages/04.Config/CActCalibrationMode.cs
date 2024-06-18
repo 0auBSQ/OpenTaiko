@@ -160,14 +160,14 @@ namespace TJAPlayer3
 
             offsettext?.t2D描画(TJAPlayer3.Skin.Config_Calibration_OffsetText[0] - offsettext.szTextureSize.Width, TJAPlayer3.Skin.Config_Calibration_OffsetText[1]);
 
-            TJAPlayer3.act文字コンソール.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1], C文字コンソール.Eフォント種別.赤,
+            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1], CTextConsole.EFontType.Cyan,
                 "MEDIAN OFFSET : " + GetMedianOffset() + "ms\n");
-            TJAPlayer3.act文字コンソール.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + TJAPlayer3.act文字コンソール.nFontHeight, C文字コンソール.Eフォント種別.白,
+            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + TJAPlayer3.actTextConsole.nFontHeight, CTextConsole.EFontType.White,
                 "MIN OFFSET    : " + GetLowestOffset() + "ms\n" +
                 "MAX OFFSET    : " + GetHighestOffset() + "ms\n" +
                 "LAST OFFSET   : " + LastOffset + "ms\n" +
                 "OFFSET COUNT  : " + (Offsets != null ? Offsets.Count : 0));
-            TJAPlayer3.act文字コンソール.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + (TJAPlayer3.act文字コンソール.nFontHeight * 5), C文字コンソール.Eフォント種別.白,
+            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + (TJAPlayer3.actTextConsole.nFontHeight * 5), CTextConsole.EFontType.White,
                 "CURRENT OFFSET: " + CurrentOffset() + "ms");
 
             #endregion

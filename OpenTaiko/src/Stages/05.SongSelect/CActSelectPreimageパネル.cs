@@ -248,7 +248,7 @@ namespace TJAPlayer3
 						str = "Unknown";
 						break;
 				}
-				TJAPlayer3.act文字コンソール.tPrint( this.n本体X + 0x12, this.n本体Y - 1, C文字コンソール.Eフォント種別.赤細, str );
+				TJAPlayer3.actTextConsole.tPrint( this.n本体X + 0x12, this.n本体Y - 1, CTextConsole.EFontType.CyanSlim, str );
 			}
 		}
 		private void t描画処理_センサ光()

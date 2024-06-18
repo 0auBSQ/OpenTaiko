@@ -361,7 +361,7 @@ namespace TJAPlayer3
             {
                 int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 
-                TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, maxFloor.ToString());
+                TJAPlayer3.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
                 int nightTime = Math.Max(140, maxFloor / 2);
 

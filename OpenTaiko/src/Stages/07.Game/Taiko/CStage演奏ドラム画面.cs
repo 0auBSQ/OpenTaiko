@@ -34,7 +34,6 @@ namespace TJAPlayer3
             base.ChildActivities.Add( this.actGraph = new CAct演奏Drumsグラフ() ); // #24074 2011.01.23 add ikanick
 			base.ChildActivities.Add( this.actJudgeString = new CAct演奏Drums判定文字列() );
 			base.ChildActivities.Add( this.actTaikoLaneFlash = new TaikoLaneFlash() );
-			base.ChildActivities.Add( this.actLaneFlushGB = new CAct演奏DrumsレーンフラッシュGB() );
 			base.ChildActivities.Add( this.actScore = new CAct演奏Drumsスコア() );
 			base.ChildActivities.Add( this.actStatusPanels = new CAct演奏Drumsステータスパネル() );
 			base.ChildActivities.Add( this.act譜面スクロール速度 = new CAct演奏スクロール速度() );
@@ -292,7 +291,7 @@ namespace TJAPlayer3
 			TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
 			{
 				Details = details,
-				State = "Playing" + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] == true ? " (Auto)" : ""),
+				State = "Playing" + (TJAPlayer3.ConfigIni.bAutoPlay[0] == true ? " (Auto)" : ""),
 				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms / TJAPlayer3.ConfigIni.SongPlaybackSpeed)),
 				Assets = new Assets()
 				{
@@ -1013,15 +1012,15 @@ namespace TJAPlayer3
 
                     if (TJAPlayer3.stage演奏ドラム画面.isDeniedPlaying[nUsePlayer]) break;
 
-                    if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
+                    if (!TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.ConfigIni.bAutoPlay[0] && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
                         break;
-                    else if ((TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1] || TJAPlayer3.ConfigIni.bAIBattleMode) && isPad2P)
+                    else if ((TJAPlayer3.ConfigIni.bAutoPlay[1] || TJAPlayer3.ConfigIni.bAIBattleMode) && isPad2P)
                         break;
-                    else if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[2] && isPad3P)
+                    else if (TJAPlayer3.ConfigIni.bAutoPlay[2] && isPad3P)
                         break;
-                    else if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[3] && isPad4P)
+                    else if (TJAPlayer3.ConfigIni.bAutoPlay[3] && isPad4P)
                         break;
-                    else if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[4] && isPad5P)
+                    else if (TJAPlayer3.ConfigIni.bAutoPlay[4] && isPad5P)
                         break;
                     //var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
                     var padTo = nPad - 12;
@@ -1838,11 +1837,11 @@ namespace TJAPlayer3
                     long nPlayTime = (long)(SoundManager.PlayTimer.NowTimeMs * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
                     if ((!pChip.bHit) && (pChip.n発声時刻ms <= nPlayTime))
                     {
-                        bool bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer];
+                        bool bAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay[nPlayer];
                         switch (nPlayer)
                         {
                             case 1:
-                                bAutoPlay = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                                bAutoPlay = TJAPlayer3.ConfigIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                                 break;
                         }
 
@@ -2458,8 +2457,8 @@ namespace TJAPlayer3
 
                     //時間内でかつ0x9Aじゃないならならヒット処理
                     if (!NotesManager.IsRollEnd(pChip) &&
-                        ((nPlayer != 1 ? TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] : 
-                        (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)) || 
+                        ((nPlayer != 1 ? TJAPlayer3.ConfigIni.bAutoPlay[nPlayer] : 
+                        (TJAPlayer3.ConfigIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode)) || 
                         puchichara.effect.Autoroll > 0))
                         this.tチップのヒット処理(pChip.n発声時刻ms, pChip, EInstrumentPad.TAIKO, false, 0, nPlayer, puchichara.effect.Autoroll > 0);
                 }
@@ -2621,7 +2620,7 @@ namespace TJAPlayer3
         {
             var showJudgeInfo = false;
 
-            if (TJAPlayer3.ConfigIni.nPlayerCount == 1 ? (TJAPlayer3.ConfigIni.bJudgeCountDisplay && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]) : false) showJudgeInfo = true;
+            if (TJAPlayer3.ConfigIni.nPlayerCount == 1 ? (TJAPlayer3.ConfigIni.bJudgeCountDisplay && !TJAPlayer3.ConfigIni.bAutoPlay[0]) : false) showJudgeInfo = true;
             if (TJAPlayer3.ConfigIni.bTokkunMode) showJudgeInfo = true;
 
             if (showJudgeInfo)
