@@ -29,7 +29,7 @@ namespace TJAPlayer3
             [10149] = "Clean the existing database and\n" + 
             "reload the song folder from scratch.",
             [6] = "Player Count",
-            [7] = "Select how many players you want to play with. Up to 5 players can be active at once.",
+            [7] = "Select how many players you want to play with.\nUp to 5 players can be active at once.",
             [8] = "Kanpeki Mode",
             [9] = "Choose how many BADs are allowed\nbefore a song is automatically failed.\nSet this to 0 to disable the mode.",
             [10] = "Song Playback Speed",
@@ -379,6 +379,9 @@ namespace TJAPlayer3
             [10189] = "Drums key assign:\nAssign any key for jumping to the first measure.",
             [10190] = "Jump to Last Measure",
             [10191] = "Drums key assign:\nAssign any key for jumping to the last measure.",
+
+            [10192] = "Calibrate Offset",
+            [10193] = "Calibrate your offset.\nGlobal Offset will be overwritten if saved.",
 
             [100] = "Taiko Mode",
             [101] = "Dan-i Dojo",

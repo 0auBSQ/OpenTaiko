@@ -15,6 +15,7 @@ namespace TJAPlayer3
 		// プロパティ
 
 		public CActDFPFont actFont { get; private set; }
+		public CActCalibrationMode actCalibrationMode;
 
 
 		// コンストラクタ
@@ -30,6 +31,7 @@ namespace TJAPlayer3
 			base.ChildActivities.Add( this.actList = new CActConfigList() );
 			base.ChildActivities.Add( this.actKeyAssign = new CActConfigKeyAssign() );
 			base.ChildActivities.Add( this.actオプションパネル = new CActオプションパネル() );
+			base.ChildActivities.Add( this.actCalibrationMode = new CActCalibrationMode() );
 			base.IsDeActivated = true;
 		}
 		
@@ -404,10 +406,21 @@ namespace TJAPlayer3
 				|| TJAPlayer3.act現在入力を占有中のプラグイン != null )
 				return 0;
 
-			// 曲データの一覧取得中は、キー入力を無効化する
-			if ( !TJAPlayer3.EnumSongs.IsEnumerating || TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 != true )
+			if (actCalibrationMode.IsStarted)
 			{
-				if ( ( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.FT ) ) || TJAPlayer3.Pad.bPressedGB( EPad.FT ) )
+				if (TJAPlayer3.Skin.bgmコンフィグ画面.bIsPlaying)
+					TJAPlayer3.Skin.bgmコンフィグ画面.tStop();
+
+				actCalibrationMode.Update();
+				actCalibrationMode.Draw();
+			}
+			// 曲データの一覧取得中は、キー入力を無効化する
+			else if ( !TJAPlayer3.EnumSongs.IsEnumerating || TJAPlayer3.actEnumSongs.bコマンドでの曲データ取得 != true )
+            {
+                if (!TJAPlayer3.Skin.bgmコンフィグ画面.bIsPlaying)
+                    TJAPlayer3.Skin.bgmコンフィグ画面.tPlay();
+
+                if ( ( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) || TJAPlayer3.Pad.bPressed( EInstrumentPad.DRUMS, EPad.FT ) ) || TJAPlayer3.Pad.bPressedGB( EPad.FT ) )
 				{
 					TJAPlayer3.Skin.soundCancelSFX.tPlay();
 					if ( !this.bメニューにフォーカス中 )
@@ -553,7 +566,7 @@ namespace TJAPlayer3
 		//private CCounter ctBackgroundAnime;
 		private CActFIFOWhite actFIFO;
 		private CActConfigKeyAssign actKeyAssign;
-		private CActConfigList actList;
+		public CActConfigList actList;
 		private CActオプションパネル actオプションパネル;
 		private bool bメニューにフォーカス中;
 		private STキー反復用カウンタ ctキー反復用;

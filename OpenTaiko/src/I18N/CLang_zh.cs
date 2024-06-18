@@ -423,6 +423,9 @@ namespace TJAPlayer3
             [10190] = "跳转至最后一小节",
             [10191] = "鼓按键分配：\n分配跳转至最后一小节按键。",
 
+            [10192] = "Calibrate Offset",
+            [10193] = "Calibrate your offset.\nGlobal Offset will be overwritten if saved.",
+
             [100] = "演奏模式",
             [101] = "段位道场",
             [102] = "太鼓塔",

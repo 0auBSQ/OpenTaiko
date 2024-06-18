@@ -51,30 +51,32 @@ namespace TJAPlayer3
                     break;
             };
 
-            var preset = (_ps != null 
+            bool sectionIsValid = _ps != null ? ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).Count > 0 : false;
+
+            var preset = (sectionIsValid 
                     && TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset != null 
                     && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset)) 
                 ? ((Dictionary<string,DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset] 
                 : null;
 
-            if (_ps != null
+            if (sectionIsValid
                     && TJAPlayer3.DTX.scenePreset != null
                     && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
             {
                 preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.DTX.scenePreset];
             }
-            else if (_ps != null
+            else if (sectionIsValid
                     && TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset != null
                     && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset))
             {
                 preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[TJAPlayer3.stageSongSelect.rChoosenSong.strScenePreset];
             }
-            else if (_ps != null 
+            else if (sectionIsValid 
                     && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(""))
             {
                 preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[""];
             }
-            else if (_ps != null)
+            else if (sectionIsValid)
             {
                 var cstps = (Dictionary<string, DBSkinPreset.SkinScene>)_ps;
                 Random rand = new Random();
