@@ -2547,7 +2547,7 @@ namespace TJAPlayer3
 				}
 			}
         }
-        #region TEMPORARY
+        #region Calibration
 
         public CTexture CalibrateFG,
             CalibrateBG;
