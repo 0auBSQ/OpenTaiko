@@ -9,11 +9,11 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3
 {
-    internal class CAct演奏Drumsチップエフェクト : CActivity
+    internal class CActImplChipEffects : CActivity
     {
         // コンストラクタ
 
-        public CAct演奏Drumsチップエフェクト()
+        public CActImplChipEffects()
         {
             //base.b活性化してない = true;
         }

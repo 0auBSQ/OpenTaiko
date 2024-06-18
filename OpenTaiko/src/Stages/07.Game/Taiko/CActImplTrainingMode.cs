@@ -9,9 +9,9 @@ using System.Drawing;
 
 namespace TJAPlayer3
 {
-	class CAct演奏DrumsTrainingMode : CActivity
+	class CActImplTrainingMode : CActivity
 	{
-		public CAct演奏DrumsTrainingMode()
+		public CActImplTrainingMode()
 		{
 			base.IsDeActivated = true;
 		}

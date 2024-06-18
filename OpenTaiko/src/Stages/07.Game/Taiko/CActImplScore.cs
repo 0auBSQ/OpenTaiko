@@ -7,7 +7,7 @@ using FDK;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏Drumsスコア : CAct演奏スコア共通
+	internal class CActImplScore : CAct演奏スコア共通
 	{
 		// CActivity 実装（共通クラスからの差分のみ）
 

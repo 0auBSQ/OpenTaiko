@@ -318,9 +318,6 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		protected virtual void tコンボ表示_ドラム(int nCombo値, int nジャンプインデックス)
-		{
-		}
 
 		private void showComboEffect(int cat, int i, int rightX, int y, int nPlayer)
         {
@@ -600,25 +597,6 @@ namespace TJAPlayer3
 			//-----------------
 			#endregion
 		}
-
-		protected virtual void tコンボ表示_ギター(int nCombo値, int nジャンプインデックス)
-		{
-		}
-		protected virtual void tコンボ表示_ベース(int nCombo値, int nジャンプインデックス)
-		{
-		}
-		protected void tコンボ表示_ギター(int nCombo値, int n表示中央X, int n表示中央Y, int nジャンプインデックス)
-		{
-
-		}
-		protected void tコンボ表示_ベース(int nCombo値, int n表示中央X, int n表示中央Y, int nジャンプインデックス)
-		{
-
-		}
-		protected void tコンボ表示_ギターベース(int nCombo値, int n表示中央X, int n表示中央Y, int nジャンプインデックス)
-		{
-		}
-
 
 		// CActivity 実装
 

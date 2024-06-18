@@ -8,11 +8,11 @@ using System.Drawing;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏Drums判定文字列 : CActivity
+	internal class CActImplJudgeText : CActivity
 	{
 		// コンストラクタ
 
-		public CAct演奏Drums判定文字列()
+		public CActImplJudgeText()
 		{
 			base.IsDeActivated = true;
 		}

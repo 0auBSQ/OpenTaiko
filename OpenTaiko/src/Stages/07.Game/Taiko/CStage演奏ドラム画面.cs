@@ -25,17 +25,14 @@ namespace TJAPlayer3
 			base.eStageID = CStage.EStage.Game;
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.IsDeActivated = true;
-			base.ChildActivities.Add( this.actPad = new CAct演奏Drumsパッド() );
-			base.ChildActivities.Add( this.actCombo = new CAct演奏DrumsコンボDGB() );
-			base.ChildActivities.Add( this.actDANGER = new CAct演奏DrumsDanger() );
-			base.ChildActivities.Add( this.actChipFireD = new CAct演奏DrumsチップファイアD() );
+			base.ChildActivities.Add( this.actPad = new CActImplPad() );
+			base.ChildActivities.Add( this.actCombo = new CActImplCombo() );
+			base.ChildActivities.Add( this.actChipFireD = new CActImplFireworks() );
 			base.ChildActivities.Add( this.Rainbow = new Rainbow() );
-            base.ChildActivities.Add( this.actGauge = new CAct演奏Drumsゲージ() );
-            base.ChildActivities.Add( this.actGraph = new CAct演奏Drumsグラフ() ); // #24074 2011.01.23 add ikanick
-			base.ChildActivities.Add( this.actJudgeString = new CAct演奏Drums判定文字列() );
+            base.ChildActivities.Add( this.actGauge = new CActImplGauge() );
+			base.ChildActivities.Add( this.actJudgeString = new CActImplJudgeText() );
 			base.ChildActivities.Add( this.actTaikoLaneFlash = new TaikoLaneFlash() );
-			base.ChildActivities.Add( this.actScore = new CAct演奏Drumsスコア() );
-			base.ChildActivities.Add( this.actStatusPanels = new CAct演奏Drumsステータスパネル() );
+			base.ChildActivities.Add( this.actScore = new CActImplScore() );
 			base.ChildActivities.Add( this.act譜面スクロール速度 = new CAct演奏スクロール速度() );
 			base.ChildActivities.Add( this.actAVI = new CAct演奏AVI() );
 			base.ChildActivities.Add( this.actPanel = new CAct演奏パネル文字列() );
@@ -45,32 +42,32 @@ namespace TJAPlayer3
             base.ChildActivities.Add( this.actFI = new CActFIFOStart() );
 			base.ChildActivities.Add( this.actFO = new CActFIFOBlack() );
 			base.ChildActivities.Add( this.actFOClear = new CActFIFOResult() );
-            base.ChildActivities.Add( this.actLane = new CAct演奏Drumsレーン() );
-            base.ChildActivities.Add( this.actEnd = new CAct演奏Drums演奏終了演出() );
-            base.ChildActivities.Add( this.actDancer = new CAct演奏DrumsDancer() );
-            base.ChildActivities.Add( this.actMtaiko = new CAct演奏DrumsMtaiko() );
-            base.ChildActivities.Add( this.actLaneTaiko = new CAct演奏Drumsレーン太鼓() );
-            base.ChildActivities.Add( this.actRoll = new CAct演奏Drums連打() );
-            base.ChildActivities.Add( this.actBalloon = new CAct演奏Drums風船() );
-            base.ChildActivities.Add( this.actChara = new CAct演奏Drumsキャラクター() );
+            base.ChildActivities.Add( this.actLane = new CActImplLane() );
+            base.ChildActivities.Add( this.actEnd = new CActImplClearAnimation() );
+            base.ChildActivities.Add( this.actDancer = new CActImplDancer() );
+            base.ChildActivities.Add( this.actMtaiko = new CActImplMtaiko() );
+            base.ChildActivities.Add( this.actLaneTaiko = new CActImplLaneTaiko() );
+            base.ChildActivities.Add( this.actRoll = new CActImplRoll() );
+            base.ChildActivities.Add( this.actBalloon = new CActImplBalloon() );
+            base.ChildActivities.Add( this.actChara = new CActImplCharacter() );
             base.ChildActivities.Add( this.actGame = new CAct演奏Drumsゲームモード() );
-            base.ChildActivities.Add( this.actBackground = new CAct演奏Drums背景() );
-            base.ChildActivities.Add( this.actRollChara = new CAct演奏Drums連打キャラ() );
-            base.ChildActivities.Add( this.actComboBalloon = new CAct演奏Drumsコンボ吹き出し() );
+            base.ChildActivities.Add( this.actBackground = new CActImplBackground() );
+            base.ChildActivities.Add( this.actRollChara = new CActImplRollEffect() );
+            base.ChildActivities.Add( this.actComboBalloon = new CActImplComboBalloon() );
             base.ChildActivities.Add( this.actComboVoice = new CAct演奏Combo音声() );
             base.ChildActivities.Add( this.actPauseMenu = new CAct演奏PauseMenu() );
-            base.ChildActivities.Add(this.actChipEffects = new CAct演奏Drumsチップエフェクト());
-            base.ChildActivities.Add(this.actFooter = new CAct演奏DrumsFooter());
-            base.ChildActivities.Add(this.actRunner = new CAct演奏DrumsRunner());
-            base.ChildActivities.Add(this.actMob = new CAct演奏DrumsMob());
+            base.ChildActivities.Add(this.actChipEffects = new CActImplChipEffects());
+            base.ChildActivities.Add(this.actFooter = new CActImplFooter());
+            base.ChildActivities.Add(this.actRunner = new CActImplRunner());
+            base.ChildActivities.Add(this.actMob = new CActImplMob());
             base.ChildActivities.Add(this.GoGoSplash = new GoGoSplash());
             base.ChildActivities.Add(this.FlyingNotes = new FlyingNotes());
             base.ChildActivities.Add(this.FireWorks = new FireWorks());
             base.ChildActivities.Add(this.PuchiChara = new PuchiChara());
-            base.ChildActivities.Add(this.ScoreRank = new CAct演奏Drumsスコアランク());
+            base.ChildActivities.Add(this.ScoreRank = new CActImplScoreRank());
 
             base.ChildActivities.Add(this.actDan = new Dan_Cert());
-            base.ChildActivities.Add(this.actTokkun = new CAct演奏DrumsTrainingMode());
+            base.ChildActivities.Add(this.actTokkun = new CActImplTrainingMode());
             base.ChildActivities.Add(this.actAIBattle = new AIBattle());
             #region[ 文字初期化 ]
             ST文字位置[] st文字位置Array = new ST文字位置[ 12 ];
@@ -650,7 +647,7 @@ namespace TJAPlayer3
                                     if (HGaugeMethods.UNSAFE_IsRainbow(i))
                                     {
                                         double dbUnit = (((60.0 / (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[i]))));
-                                        this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Combo10_Max, true);
+                                        this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
                                     }
                                 }
                             }
@@ -658,14 +655,14 @@ namespace TJAPlayer3
                             {
                                 if (TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0)
                                 {
-                                    this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Cleared, true);;
+                                    this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Cleared, true);;
                                 }
                             }
                             else
                             {
                                 if (TJAPlayer3.Skin.Characters_ClearOut_Ptn[Character] != 0)
                                 {
-                                    this.actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.ClearOut, true);
+                                    this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
                                 }
                             }
                         }
@@ -707,22 +704,21 @@ namespace TJAPlayer3
 			public char ch;
 			public Point pt;
 		}
-		public CAct演奏DrumsチップファイアD actChipFireD;
+		public CActImplFireworks actChipFireD;
 
-        private CAct演奏Drumsグラフ actGraph;   // #24074 2011.01.23 add ikanick
-		private CAct演奏Drumsパッド actPad;
-        public CAct演奏Drumsレーン actLane;
-        public CAct演奏DrumsMtaiko actMtaiko;
-        public CAct演奏Drumsレーン太鼓 actLaneTaiko;
-        public CAct演奏Drums演奏終了演出 actEnd;
+		private CActImplPad actPad;
+        public CActImplLane actLane;
+        public CActImplMtaiko actMtaiko;
+        public CActImplLaneTaiko actLaneTaiko;
+        public CActImplClearAnimation actEnd;
         private CAct演奏Drumsゲームモード actGame;
-        public CAct演奏DrumsTrainingMode actTokkun;
-        public CAct演奏Drums背景 actBackground;
+        public CActImplTrainingMode actTokkun;
+        public CActImplBackground actBackground;
         public GoGoSplash GoGoSplash;
         public FlyingNotes FlyingNotes;
         public FireWorks FireWorks;
         public PuchiChara PuchiChara;
-        public CAct演奏Drumsスコアランク ScoreRank;
+        public CActImplScoreRank ScoreRank;
         private bool bフィルイン中;
 		private readonly EPad[] eチャンネルtoパッド = new EPad[]
 		{
@@ -909,10 +905,6 @@ namespace TJAPlayer3
 		protected override void t進行描画_AVI()
 		{
 			base.t進行描画_AVI( 0, 0 );
-		}
-		protected override void t進行描画_DANGER()
-		{
-			this.actDANGER.t進行描画( this.actGauge.IsDanger(EInstrumentPad.DRUMS), false, false );
 		}
 
 		private void t進行描画_チップファイアD()
@@ -2545,10 +2537,10 @@ namespace TJAPlayer3
                                 this.n風船残り[i], 
                                 i,
                                 NotesManager.IsFuzeRoll(chkChip)
-                                 ? CAct演奏Drums風船.EBalloonType.FUSEROLL
+                                 ? CActImplBalloon.EBalloonType.FUSEROLL
                                  : NotesManager.IsKusudama(chkChip)
-                                    ? CAct演奏Drums風船.EBalloonType.KUSUDAMA
-                                    : CAct演奏Drums風船.EBalloonType.BALLOON
+                                    ? CActImplBalloon.EBalloonType.KUSUDAMA
+                                    : CActImplBalloon.EBalloonType.BALLOON
                                 );
                         }
                         else

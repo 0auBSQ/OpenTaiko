@@ -356,7 +356,6 @@ namespace TJAPlayer3
 
 			cInvisibleChip.Reset();
 			base.Activate();
-			this.tステータスパネルの選択();
 			this.tパネル文字列の設定();
             //this.演奏判定ライン座標();
             this.bIsGOGOTIME = new bool[] { false, false, false, false, false };
@@ -774,36 +773,34 @@ namespace TJAPlayer3
         public CAct演奏AVI actAVI;
         public Rainbow Rainbow;
 		public CAct演奏Combo共通 actCombo;
-		protected CAct演奏Danger共通 actDANGER;
         //protected CActFIFOBlack actFI;
         public CActFIFOStart actFI;
         protected CActFIFOBlack actFO;
         protected CActFIFOResult actFOClear;
 		public    CAct演奏ゲージ共通 actGauge;
 
-        public CAct演奏DrumsDancer actDancer;
-		protected CAct演奏Drums判定文字列 actJudgeString;
+        public CActImplDancer actDancer;
+		protected CActImplJudgeText actJudgeString;
 		public TaikoLaneFlash actTaikoLaneFlash;
 		public CAct演奏パネル文字列 actPanel;
 		public CAct演奏演奏情報 actPlayInfo;
 		public CAct演奏スコア共通 actScore;
 		public CAct演奏ステージ失敗 actStageFailed;
-		protected CAct演奏ステータスパネル共通 actStatusPanels;
 		protected CAct演奏スクロール速度 act譜面スクロール速度;
-        protected CAct演奏Drums連打 actRoll;
-        protected CAct演奏Drums風船 actBalloon;
-        public CAct演奏Drumsキャラクター actChara;
-        protected CAct演奏Drums連打キャラ actRollChara;
-        protected CAct演奏Drumsコンボ吹き出し actComboBalloon;
+        protected CActImplRoll actRoll;
+        protected CActImplBalloon actBalloon;
+        public CActImplCharacter actChara;
+        protected CActImplRollEffect actRollChara;
+        protected CActImplComboBalloon actComboBalloon;
         protected CAct演奏Combo音声 actComboVoice;
         protected CAct演奏PauseMenu actPauseMenu;
-        public CAct演奏Drumsチップエフェクト actChipEffects;
-        public CAct演奏DrumsFooter actFooter;
-        public CAct演奏DrumsRunner actRunner;
-        public CAct演奏DrumsMob actMob;
+        public CActImplChipEffects actChipEffects;
+        public CActImplFooter actFooter;
+        public CActImplRunner actRunner;
+        public CActImplMob actMob;
         public Dan_Cert actDan;
         public AIBattle actAIBattle;
-        public CAct演奏DrumsTrainingMode actTokkun;
+        public CActImplTrainingMode actTokkun;
         public bool bPAUSE;
         public bool[] bIsAlreadyCleared;
         public bool[] bIsAlreadyMaxed;
@@ -1328,18 +1325,6 @@ namespace TJAPlayer3
                 this.nHand[ nPlayer ] = 0;
 		}
 
-		protected void tステータスパネルの選択()
-		{
-			if ( TJAPlayer3.bコンパクトモード )
-			{
-				this.actStatusPanels.tラベル名からステータスパネルを決定する( null );
-			}
-			else if ( TJAPlayer3.stageSongSelect.rChoosenSong != null )
-			{
-				this.actStatusPanels.tラベル名からステータスパネルを決定する( TJAPlayer3.stageSongSelect.rChoosenSong.ar難易度ラベル[ TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]] );
-			}
-		}
-
         protected bool tRollProcess( CDTX.CChip pChip, double dbProcess_time, int num, int sort, int Input, int nPlayer )
         {
             if (dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.nノーツ終了時刻ms)
@@ -1513,7 +1498,7 @@ namespace TJAPlayer3
                 {
                     if (nCurrentKusudamaCount > 0)
                     {
-                        actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Kusudama_Breaking, true);
+                        actChara.ChangeAnime(player, CActImplCharacter.Anime.Kusudama_Breaking, true);
                         for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
                             this.b連打中[i] = true;
@@ -1534,7 +1519,7 @@ namespace TJAPlayer3
                 else 
                 {
                     this.b連打中[player] = true;
-                    actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Breaking, true);
+                    actChara.ChangeAnime(player, CActImplCharacter.Anime.Balloon_Breaking, true);
                     
 
                     if (this.actBalloon.ct風船アニメ[player].IsUnEnded)
@@ -1629,7 +1614,7 @@ namespace TJAPlayer3
                         actBalloon.KusuBroke();
                         for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                         {
-                            actChara.ChangeAnime(i, CAct演奏Drumsキャラクター.Anime.Kusudama_Broke, true);
+                            actChara.ChangeAnime(i, CActImplCharacter.Anime.Kusudama_Broke, true);
                             if (actChara.CharaAction_Balloon_Delay[i] != null) actChara.CharaAction_Balloon_Delay[i] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[i]] - 1, 1, TJAPlayer3.Timer);
                         }
                     }
@@ -1648,7 +1633,7 @@ namespace TJAPlayer3
                         //this.actChara.b風船連打中 = false;
                         pChip.b可視 = false;
                         {
-                            actChara.ChangeAnime(player, CAct演奏Drumsキャラクター.Anime.Balloon_Broke, true);
+                            actChara.ChangeAnime(player, CActImplCharacter.Anime.Balloon_Broke, true);
                             if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, TJAPlayer3.Timer);
                         }
                     }
@@ -1977,7 +1962,7 @@ namespace TJAPlayer3
                 {
                     if(TJAPlayer3.Skin.Characters_Become_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                     {
-                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Become_Maxed, true);
+                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Become_Maxed, true);
                     }
                     this.bIsAlreadyMaxed[nPlayer] = true;
                 }
@@ -1985,7 +1970,7 @@ namespace TJAPlayer3
                 {
                     if(TJAPlayer3.Skin.Characters_Become_Cleared_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                     {
-                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Become_Cleared, true);
+                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Become_Cleared, true);
                     }
                     this.bIsAlreadyCleared[nPlayer] = true;
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearIn(nPlayer);
@@ -2003,7 +1988,7 @@ namespace TJAPlayer3
                     this.bIsAlreadyMaxed[nPlayer] = false;
                     if(TJAPlayer3.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                     {
-                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.SoulOut, true);
+                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.SoulOut, true);
                     }
                 }
                 else if (!bIsGOGOTIME[nPlayer])
@@ -2012,14 +1997,14 @@ namespace TJAPlayer3
                     {
                         if(TJAPlayer3.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                         {
-                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissIn, true);
+                            this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissIn, true);
                         }
                     }
                     else if (Chara_MissCount[nPlayer] == 6 - 1)
                     {
                         if(TJAPlayer3.Skin.Characters_MissDownIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                         {
-                            this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.MissDownIn, true);
+                            this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissDownIn, true);
                         }
                     }
                 }
@@ -2028,7 +2013,7 @@ namespace TJAPlayer3
                     this.bIsAlreadyCleared[nPlayer] = false;
                     if (TJAPlayer3.Skin.Characters_ClearOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                     {
-                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.ClearOut, true);
+                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.ClearOut, true);
                     }
                     TJAPlayer3.stage演奏ドラム画面.actBackground.ClearOut(nPlayer);
 
@@ -2072,7 +2057,7 @@ namespace TJAPlayer3
                     {
                         // 魂ゲージMAXではない
                         // ジャンプ_ノーマル
-                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Return, true);
+                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Return, true);
                         //this.actChara.キャラクター_アクション_10コンボ();
                     }
                 }
@@ -2375,22 +2360,22 @@ namespace TJAPlayer3
                                 // Edit character values here
                                 if (!pChip.bGOGOTIME) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
                                 {
-                                    if (TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CAct演奏Drumsキャラクター.Anime.Combo10 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                                    if (TJAPlayer3.Skin.Characters_10Combo_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                                     {
                                         if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                         {
                                             // 魂ゲージMAXではない
                                             // ジャンプ_ノーマル
-                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Combo10, true);
+                                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Combo10, true);
                                         }
                                     }
-                                    if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CAct演奏Drumsキャラクター.Anime.Combo10_Max && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
+                                    if (TJAPlayer3.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
                                     {
                                         if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer))
                                         {
                                             // 魂ゲージMAX
                                             // ジャンプ_MAX
-                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Combo10_Max, true);
+                                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Combo10_Max, true);
                                         }
                                     }
                                 }
@@ -3342,8 +3327,6 @@ namespace TJAPlayer3
 				this.actAVI.t進行描画( x, y );
 			}
 		}
-		protected abstract void t進行描画_DANGER();
-
 		protected void t進行描画_STAGEFAILED()
 		{
             // Transition for failed games
@@ -3684,7 +3667,7 @@ namespace TJAPlayer3
                                                 for (int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
                                                 {
                                                     {
-                                                        this.actChara.ChangeAnime(p, CAct演奏Drumsキャラクター.Anime.Kusudama_Miss, true);
+                                                        this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
 
                                                         if (actChara.CharaAction_Balloon_Delay[p] != null) actChara.CharaAction_Balloon_Delay[p] = new CCounter(0, 
                                                             TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[p]] - 1, 
@@ -3704,7 +3687,7 @@ namespace TJAPlayer3
                                             && chip現在処理中の連打チップ[nPlayer].nRollCount > 0)
                                         {
                                             {
-                                                this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.Balloon_Miss, true);
+                                                this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Balloon_Miss, true);
 
                                                 if (actChara.CharaAction_Balloon_Delay[nPlayer] != null) actChara.CharaAction_Balloon_Delay[nPlayer] = new CCounter(0, 
                                                     TJAPlayer3.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[nPlayer]] - 1, 
@@ -4047,7 +4030,7 @@ namespace TJAPlayer3
                                     {
                                         // 魂ゲージMAXではない
                                         // ゴーゴースタート_ノーマル
-                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart, true);
+                                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart, true);
                                         //this.actChara.キャラクター_アクション_10コンボ();
                                     }
                                 }
@@ -4055,7 +4038,7 @@ namespace TJAPlayer3
                                 {
                                     if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer))
                                     {
-                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart_Clear, true);
+                                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart_Clear, true);
                                     }
                                 }
                                 if (TJAPlayer3.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded)
@@ -4064,7 +4047,7 @@ namespace TJAPlayer3
                                     {
                                         // 魂ゲージMAX
                                         // ゴーゴースタート_MAX
-                                        this.actChara.ChangeAnime(nPlayer, CAct演奏Drumsキャラクター.Anime.GoGoStart_Max, true);
+                                        this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart_Max, true);
                                     }
                                 }
 
