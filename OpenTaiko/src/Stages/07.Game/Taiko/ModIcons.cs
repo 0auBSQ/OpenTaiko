@@ -74,7 +74,7 @@ namespace TJAPlayer3
         {
             bool _displayed = false;
 
-            if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player])
+            if (TJAPlayer3.ConfigIni.bAutoPlay[player])
                 _displayed = true;
 
             if (_displayed == true)
@@ -117,7 +117,7 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Mod_Random?.t2D描画(x, y);
             else if (rand_ == ERandomMode.SUPERRANDOM)
                 TJAPlayer3.Tx.Mod_Super?.t2D描画(x, y);
-            else if (rand_ == ERandomMode.HYPERRANDOM)
+            else if (rand_ == ERandomMode.MIRRORRANDOM)
                 TJAPlayer3.Tx.Mod_Hyper?.t2D描画(x, y);
             else
                 TJAPlayer3.Tx.Mod_None?.t2D描画(x, y);

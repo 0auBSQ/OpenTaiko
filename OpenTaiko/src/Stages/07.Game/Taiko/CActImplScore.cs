@@ -7,7 +7,7 @@ using FDK;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏Drumsスコア : CAct演奏スコア共通
+	internal class CActImplScore : CAct演奏スコア共通
 	{
 		// CActivity 実装（共通クラスからの差分のみ）
 
@@ -102,7 +102,7 @@ namespace TJAPlayer3
                 {
                     if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
 
-                    base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.n現在表示中のスコア[i].Taiko), 0, 256, i);
+                    base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.nCurrentlyDisplayedScore[i]), 0, 256, i);
                 }
 
                 for( int i = 0; i < 256; i++ )
@@ -115,7 +115,7 @@ namespace TJAPlayer3
                             if( this.stScore[ i ].ctTimer.IsEnded )
                             {
                                 if( this.stScore[ i ].b表示中 == true )
-                                    this.n現在表示中のAddScore--;
+                                    this.nNowDisplayedAddScore--;
                                 this.stScore[ i ].ctTimer.Stop();
                                 this.stScore[ i ].b使用中 = false;
                                 TJAPlayer3.stage演奏ドラム画面.actDan.Update();
@@ -123,7 +123,7 @@ namespace TJAPlayer3
 
                             if (!stScore[i].bAddEnd)
                             {
-                                this.n現在表示中のスコア[this.stScore[i].nPlayer].Taiko += (long)this.stScore[i].nAddScore;
+                                this.nCurrentlyDisplayedScore[this.stScore[i].nPlayer] += (long)this.stScore[i].nAddScore;
                                 stScore[i].bAddEnd = true;
                                 if (ct点数アニメタイマ[stScore[i].nPlayer].IsUnEnded)
                                 {
@@ -231,13 +231,13 @@ namespace TJAPlayer3
                             if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
                                 pl = 1;
 
-                            if ( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == false && !TJAPlayer3.ConfigIni.SimpleMode)
+                            if ( this.nNowDisplayedAddScore < 10 && this.stScore[ i ].bBonusScore == false && !TJAPlayer3.ConfigIni.SimpleMode)
                                 base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[ i ].nPlayer == 0 && TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? add_y[ this.stScore[ i ].nPlayer ] + yAdd : add_y[ this.stScore[ i ].nPlayer ] - yAdd, string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
-                            if( this.n現在表示中のAddScore < 10 && this.stScore[ i ].bBonusScore == true && !TJAPlayer3.ConfigIni.SimpleMode)
+                            if( this.nNowDisplayedAddScore < 10 && this.stScore[ i ].bBonusScore == true && !TJAPlayer3.ConfigIni.SimpleMode)
                                 base.t小文字表示(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[ this.stScore[ i ].nPlayer ], string.Format( "{0,7:######0}", this.stScore[ i ].nAddScore ), pl + 1 , alpha, stScore[i].nPlayer);
                             else
                             {
-                                this.n現在表示中のAddScore--;
+                                this.nNowDisplayedAddScore--;
                                 this.stScore[ i ].b表示中 = false;
                             }
                         }

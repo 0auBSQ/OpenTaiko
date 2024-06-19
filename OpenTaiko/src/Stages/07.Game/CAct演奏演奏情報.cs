@@ -57,33 +57,33 @@ namespace TJAPlayer3
 			if ( !base.IsDeActivated )
 			{
 				y += 0x153;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Song/G. Offset:{0:####0}/{1:####0} ms", TJAPlayer3.DTX.nBGMAdjust, TJAPlayer3.ConfigIni.nGlobalOffsetMs ) );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, string.Format( "Song/G. Offset:{0:####0}/{1:####0} ms", TJAPlayer3.DTX.nBGMAdjust, TJAPlayer3.ConfigIni.nGlobalOffsetMs ) );
 				y -= 0x10;
 				int num = ( TJAPlayer3.DTX.listChip.Count > 0 ) ? TJAPlayer3.DTX.listChip[ TJAPlayer3.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
 				string str = "Time:          " + ((((double)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) / 1000.0)).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, str );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, str );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1] ) );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, string.Format( "Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1] ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "BPM:           {0:####0.0000}", this.dbBPM[0] ) );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, string.Format( "BPM:           {0:####0.0000}", this.dbBPM[0] ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Frame:         {0:####0} fps", TJAPlayer3.FPS.NowFPS ) );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, string.Format( "Frame:         {0:####0} fps", TJAPlayer3.FPS.NowFPS ) );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, NotesTextN);
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, NotesTextN);
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, NotesTextE );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, NotesTextE );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, NotesTextM );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, NotesTextM );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, NotesTextC );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, NotesTextC );
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "SCROLL:        {0:####0.00}", this.dbSCROLL ) );
+				TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, string.Format( "SCROLL:        {0:####0.00}", this.dbSCROLL ) );
                 y -= 0x10;
-                TJAPlayer3.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, ScoreModeText );
+                TJAPlayer3.actTextConsole.tPrint( x, y, CTextConsole.EFontType.White, ScoreModeText );
                 y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, ListChipText);
+				TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.White, ListChipText);
 				y -= 0x10;
-				TJAPlayer3.act文字コンソール.tPrint(x, y, C文字コンソール.Eフォント種別.白, ListChipMText);
+				TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.White, ListChipMText);
 
 				//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound CPU :    {0:####0.00}%", CDTXMania.Sound管理.GetCPUusage() ) );
 				//y -= 0x10;

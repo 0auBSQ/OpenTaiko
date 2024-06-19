@@ -6,9 +6,9 @@ using FDK;
 
 namespace TJAPlayer3
 {
-    internal class CAct演奏Drumsレーン : CActivity
+    internal class CActImplLane : CActivity
     {
-        public CAct演奏Drumsレーン()
+        public CActImplLane()
         {
             base.IsDeActivated = true;
         }

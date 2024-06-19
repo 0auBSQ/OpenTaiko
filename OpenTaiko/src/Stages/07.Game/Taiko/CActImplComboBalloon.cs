@@ -7,7 +7,7 @@ using FDK;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏Drumsコンボ吹き出し : CActivity
+	internal class CActImplComboBalloon : CActivity
 	{
         // コンストラクタ
 
@@ -15,7 +15,7 @@ namespace TJAPlayer3
         /// 100コンボごとに出る吹き出し。
         /// 本当は「10000点」のところも動かしたいけど、技術不足だし保留。
         /// </summary>
-        public CAct演奏Drumsコンボ吹き出し()
+        public CActImplComboBalloon()
         {
             for (int i = 0; i < 10; i++)
             {

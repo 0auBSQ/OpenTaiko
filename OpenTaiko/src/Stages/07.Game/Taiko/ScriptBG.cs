@@ -21,11 +21,11 @@ namespace TJAPlayer3
         }
         public void DrawText(double x, double y, string text)
         {
-            TJAPlayer3.act文字コンソール.tPrint((int)x, (int)y, C文字コンソール.Eフォント種別.白, text);
+            TJAPlayer3.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text);
         }
         public void DrawNum(double x, double y, double text)
         {
-            TJAPlayer3.act文字コンソール.tPrint((int)x, (int)y, C文字コンソール.Eフォント種別.白, text.ToString());
+            TJAPlayer3.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
         }
         public void AddGraph(string fileName)
         {

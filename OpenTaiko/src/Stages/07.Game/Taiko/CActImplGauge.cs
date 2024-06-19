@@ -8,7 +8,7 @@ using FDK;
 
 namespace TJAPlayer3
 {
-	internal class CAct演奏Drumsゲージ : CAct演奏ゲージ共通
+	internal class CActImplGauge : CAct演奏ゲージ共通
 	{
 		// プロパティ
 
@@ -38,7 +38,7 @@ namespace TJAPlayer3
         /// _Danger時にゲージの色が変わる演出の実装。
         /// _Danger、MAX時のアニメーション実装。
         /// </summary>
-		public CAct演奏Drumsゲージ()
+		public CActImplGauge()
 		{
 			base.IsDeActivated = true;
 		}

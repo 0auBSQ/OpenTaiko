@@ -7,12 +7,12 @@ using FDK;
 
 namespace TJAPlayer3
 {
-    internal class CAct演奏DrumsMob : CActivity
+    internal class CActImplMob : CActivity
     {
         /// <summary>
         /// 踊り子
         /// </summary>
-        public CAct演奏DrumsMob()
+        public CActImplMob()
         {
             base.IsDeActivated = true;
         }

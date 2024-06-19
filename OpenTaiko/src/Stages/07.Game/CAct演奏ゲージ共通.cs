@@ -401,8 +401,6 @@ namespace TJAPlayer3
             float fDamage;
             int nコース = (int)TJAPlayer3.stage演奏ドラム画面.n現在のコース[nPlayer];
 
-
-#if true    // DAMAGELEVELTUNING
             switch (e今回の判定)
             {
                 case ENoteJudge.Perfect:
@@ -468,64 +466,18 @@ namespace TJAPlayer3
 
                 default:
                     {
-                        if (nPlayer == 0 ? TJAPlayer3.ConfigIni.bAutoPlay[0] : TJAPlayer3.ConfigIni.bAutoPlay[1])
+                        if (this.DTX[nPlayer].bチップがある.Branch)
                         {
-                            if (this.DTX[nPlayer].bチップがある.Branch)
-                            {
-                                fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
-                            }
-                            else
-                                fDamage = this.dbゲージ増加量[0][nPlayer];
+                            fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
                         }
                         else
-                            fDamage = 0;
+                            fDamage = this.dbゲージ増加量[0][nPlayer];
                         break;
                     }
 
 
             }
-#else                                                  // before applying #23625 modifications
-			switch (e今回の判定)
-			{
-				case E判定.Perfect:
-					fDamage = ( part == E楽器パート.DRUMS ) ? 0.01 : 0.015;
-					break;
 
-				case E判定.Great:
-					fDamage = ( part == E楽器パート.DRUMS ) ? 0.006 : 0.009;
-					break;
-
-				case E判定.Good:
-					fDamage = ( part == E楽器パート.DRUMS ) ? 0.002 : 0.003;
-					break;
-
-				case E判定.Poor:
-					fDamage = ( part == E楽器パート.DRUMS ) ? 0.0 : 0.0;
-					break;
-
-				case E判定.Miss:
-					fDamage = ( part == E楽器パート.DRUMS ) ? -0.035 : -0.035;
-					switch( CDTXMania.ConfigIni.eダメージレベル )
-					{
-						case Eダメージレベル.少ない:
-							fDamage *= 0.6;
-							break;
-
-						case Eダメージレベル.普通:
-							fDamage *= 1.0;
-							break;
-
-						case Eダメージレベル.大きい:
-							fDamage *= 1.6;
-							break;
-					}
-					break;
-
-				default:
-					fDamage = 0.0;
-					break;
-			}
-#endif
 
 
             this.db現在のゲージ値[nPlayer] = Math.Round(this.db現在のゲージ値[nPlayer] + fDamage, 5, MidpointRounding.ToEven);

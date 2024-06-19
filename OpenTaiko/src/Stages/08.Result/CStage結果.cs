@@ -63,8 +63,8 @@ namespace TJAPlayer3
 
 		public bool isAutoDisabled(int player)
         {
-			return ((player != 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player])
-					|| (player == 1 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player] && !TJAPlayer3.ConfigIni.bAIBattleMode));
+			return ((player != 1 && !TJAPlayer3.ConfigIni.bAutoPlay[player])
+					|| (player == 1 && !TJAPlayer3.ConfigIni.bAutoPlay[player] && !TJAPlayer3.ConfigIni.bAIBattleMode));
 		}
 
 
@@ -191,7 +191,7 @@ namespace TJAPlayer3
 
                             }
 
-							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, p) < 500000)
+							if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(p) < 500000)
 							{
 								this.nスコアランク[p] = 0;
 							}
@@ -201,7 +201,7 @@ namespace TJAPlayer3
 
 								for (int i = 0; i < 7; i++)
 								{
-									if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, p) >= sr[i])
+									if ((int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(p) >= sr[i])
 									{
 										this.nスコアランク[p] = i + 1;
 									}
@@ -292,7 +292,7 @@ namespace TJAPlayer3
 						// this.st演奏記録[0].nクリア[0] = Math.Max(ini[0].stセクション[0].nクリア[0], clearValue);
 
 						// Unlock dan grade
-						if (clearValue > 0 && !TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
+						if (clearValue > 0 && !TJAPlayer3.ConfigIni.bAutoPlay[0])
 						{
 							/*
 							this.newGradeGranted = TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
@@ -375,7 +375,7 @@ namespace TJAPlayer3
 				TJAPlayer3.DiscordClient?.SetPresence(new RichPresence()
 				{
 					Details = details,
-					State = "Result" + (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0] == true ? " (Auto)" : ""),
+					State = "Result" + (TJAPlayer3.ConfigIni.bAutoPlay[0] == true ? " (Auto)" : ""),
 					Timestamps = new Timestamps(TJAPlayer3.StartupTime),
 					Assets = new Assets()
 					{
@@ -579,7 +579,7 @@ namespace TJAPlayer3
                 {
 					this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
 
-					if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i])
+					if (TJAPlayer3.ConfigIni.bAutoPlay[i])
 						this.nEarnedMedalsCount[i] = 0;
 					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1)
 						this.nEarnedMedalsCount[i] = 0;
@@ -588,7 +588,7 @@ namespace TJAPlayer3
 
                     _sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
-					if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i]
+					if (!TJAPlayer3.ConfigIni.bAutoPlay[i]
 						&& !(TJAPlayer3.ConfigIni.bAIBattleMode && i == 1))
 					{
 						int _cs = -1;
@@ -617,7 +617,7 @@ namespace TJAPlayer3
 
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					if (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i])
+					if (TJAPlayer3.ConfigIni.bAutoPlay[i])
 						continue;
 					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 1)
 						continue;
@@ -1347,7 +1347,7 @@ namespace TJAPlayer3
 
 						int sc = GetTowerScoreRank() - 1;
 
-						TJAPlayer3.act文字コンソール.tPrint(0, 40, C文字コンソール.Eフォント種別.白, sc.ToString());
+						TJAPlayer3.actTextConsole.tPrint(0, 40, CTextConsole.EFontType.White, sc.ToString());
 
 						if (sc >= 0 && TJAPlayer3.Tx.TowerResult_ScoreRankEffect != null)
 						{
@@ -1711,7 +1711,7 @@ namespace TJAPlayer3
 				totalHit, 1.0f);
 
 			// Large digits
-			this.actParameterPanel.tスコア文字表示(TJAPlayer3.Skin.DanResult_Score[0] + offset, TJAPlayer3.Skin.DanResult_Score[1], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0), 1.0f);
+			this.actParameterPanel.tスコア文字表示(TJAPlayer3.Skin.DanResult_Score[0] + offset, TJAPlayer3.Skin.DanResult_Score[1], (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(0), 1.0f);
 
 			#endregion
 

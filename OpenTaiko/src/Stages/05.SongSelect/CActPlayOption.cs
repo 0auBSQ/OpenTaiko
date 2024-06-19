@@ -490,7 +490,7 @@ namespace TJAPlayer3
 
             var rand_ = TJAPlayer3.ConfigIni.eRandom[actual];
 
-            if (rand_ == ERandomMode.HYPERRANDOM)
+            if (rand_ == ERandomMode.MIRRORRANDOM)
             {
                 nRandom = 2;
                 nAbekobe = 1;
@@ -553,7 +553,7 @@ namespace TJAPlayer3
 
             #region [ AutoMode ]
 
-            bool _auto = TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player];
+            bool _auto = TJAPlayer3.ConfigIni.bAutoPlay[player];
 
             if (_auto == true)
                 nAutoMode = 1;
@@ -621,7 +621,7 @@ namespace TJAPlayer3
 
             if (nRandom == 2 && nAbekobe == 1)
             {
-                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.HYPERRANDOM;
+                TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.MIRRORRANDOM;
             }
             else if (nRandom == 2 && nAbekobe == 0)
             {
@@ -687,11 +687,11 @@ namespace TJAPlayer3
 
             if (nAutoMode == 1)
             {
-                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player] = true;
+                TJAPlayer3.ConfigIni.bAutoPlay[player] = true;
             }
             else
             {
-                TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[player] = false;
+                TJAPlayer3.ConfigIni.bAutoPlay[player] = false;
             }
 
             #endregion

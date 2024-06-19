@@ -94,7 +94,6 @@ namespace TJAPlayer3
 		public Color cDanTickColor = Color.White;
 		
 		public string[] strBoxText = new string[3];
-        public Eジャンル eジャンル = Eジャンル.None;
 		
 		public string strSelectBGPath;
 

@@ -579,13 +579,13 @@ namespace TJAPlayer3
 
 
                 if (TJAPlayer3.ConfigIni.bTokkunMode)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, "GAME: TRAINING MODE");
+                    TJAPlayer3.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
                 if (TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 16, C文字コンソール.Eフォント種別.白, "GAME: SURVIVAL");
+                    TJAPlayer3.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
                 if (TJAPlayer3.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 16, C文字コンソール.Eフォント種別.白, "GAME: SURVIVAL HARD");
+                    TJAPlayer3.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
                 if (TJAPlayer3.ConfigIni.bSuperHard)
-                    TJAPlayer3.act文字コンソール.tPrint(0, 32, C文字コンソール.Eフォント種別.赤, "SUPER HARD MODE : ON");
+                    TJAPlayer3.actTextConsole.tPrint(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
 
                 #endregion
 
@@ -913,7 +913,7 @@ namespace TJAPlayer3
                         if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleAutoP1))
                         {
                             TJAPlayer3.Skin.soundChangeSFX.tPlay();
-                            CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0]);
+                            CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.bAutoPlay[0]);
                         }
                         #endregion
                         #region [ F4 2PオートON/OFF ]
@@ -922,7 +922,7 @@ namespace TJAPlayer3
                             if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
                             {
                                 TJAPlayer3.Skin.soundChangeSFX.tPlay();
-                                CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[1]);
+                                CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.bAutoPlay[1]);
                             }
                         }
                         #endregion
@@ -1209,8 +1209,8 @@ namespace TJAPlayer3
                             #region [ HHx2: 難易度変更 ]
                             if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HH) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HHO))
                             {   // [HH]x2 難易度変更
-                                CommandHistory.Add(EInstrumentPad.DRUMS, EパッドFlag.HH);
-                                EパッドFlag[] comChangeDifficulty = new EパッドFlag[] { EパッドFlag.HH, EパッドFlag.HH };
+                                CommandHistory.Add(EInstrumentPad.DRUMS, EPadFlag.HH);
+                                EPadFlag[] comChangeDifficulty = new EPadFlag[] { EPadFlag.HH, EPadFlag.HH };
                                 if (CommandHistory.CheckCommand(comChangeDifficulty, EInstrumentPad.DRUMS))
                                 {
                                     Debug.WriteLine("ドラムス難易度変更");
@@ -1449,7 +1449,7 @@ namespace TJAPlayer3
         private struct STCommandTime        // #24063 2011.1.16 yyagi コマンド入力時刻の記録用
         {
             public EInstrumentPad eInst;        // 使用楽器
-            public EパッドFlag ePad;       // 押されたコマンド(同時押しはOR演算で列挙する)
+            public EPadFlag ePad;       // 押されたコマンド(同時押しはOR演算で列挙する)
             public long time;               // コマンド入力時刻
         }
 
@@ -1560,7 +1560,7 @@ namespace TJAPlayer3
             /// </summary>
             /// <param name="_eInst">楽器の種類</param>
             /// <param name="_ePad">入力コマンド(同時押しはOR演算で列挙すること)</param>
-            public void Add(EInstrumentPad _eInst, EパッドFlag _ePad)
+            public void Add(EInstrumentPad _eInst, EPadFlag _ePad)
             {
                 STCommandTime _stct = new STCommandTime
                 {
@@ -1587,7 +1587,7 @@ namespace TJAPlayer3
             /// <param name="_ePad">入力が成功したか調べたいコマンド</param>
             /// <param name="_eInst">対象楽器</param>
             /// <returns>コマンド入力成功時true</returns>
-            public bool CheckCommand(EパッドFlag[] _ePad, EInstrumentPad _eInst)
+            public bool CheckCommand(EPadFlag[] _ePad, EInstrumentPad _eInst)
             {
                 int targetCount = _ePad.Length;
                 int stciCount = stct.Count;

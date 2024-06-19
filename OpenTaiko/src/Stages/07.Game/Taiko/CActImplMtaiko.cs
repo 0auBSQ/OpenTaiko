@@ -9,13 +9,13 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3
 {
-    internal class CAct演奏DrumsMtaiko : CActivity
+    internal class CActImplMtaiko : CActivity
     {
         /// <summary>
         /// mtaiko部分を描画するクラス。左側だけ。
         /// 
         /// </summary>
-        public CAct演奏DrumsMtaiko()
+        public CActImplMtaiko()
         {
             base.IsDeActivated = true;
         }
@@ -466,14 +466,14 @@ namespace TJAPlayer3
         public void tMtaikoEvent( int nChannel, int nHand, int nPlayer )
         {
             CConfigIni configIni = TJAPlayer3.ConfigIni;
-            bool bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer];
+            bool bAutoPlay = configIni.bAutoPlay[nPlayer];
             int playerShift = 5 * nPlayer;
             var _gt = configIni.nGameType[TJAPlayer3.GetActualPlayer(nPlayer)];
 
             switch (nPlayer)
             {
                 case 1:
-                    bAutoPlay = configIni.b太鼓パートAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
+                    bAutoPlay = configIni.bAutoPlay[nPlayer] || TJAPlayer3.ConfigIni.bAIBattleMode;
                     break;
             }
 

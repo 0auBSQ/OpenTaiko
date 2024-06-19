@@ -27,18 +27,7 @@ namespace TJAPlayer3
         BMSCROLL,
         HBSCROLL
     }
-    public enum Eジャンル
-    {
-        None = 0,
-        JPOP = 1,
-        ゲーム = 2,
-        ナムコ = 3,
-        クラシック = 4,
-        バラエティ = 5,
-        どうよう = 6,
-        ボーカロイド = 7,
-        アニメ = 8
-    }
+
     public enum EGame
     {
         OFF = 0,
@@ -50,18 +39,6 @@ namespace TJAPlayer3
         OFF = 0,
         n曲目に表示 = 1,
         mtaikoに画像で表示 = 2,
-    }
-	public enum Eダークモード
-	{
-		OFF,
-		HALF,
-		FULL
-	}
-    public enum EWindowMovieMode
-    {
-        OFF = 0,
-        左下 = 1,
-        中央下 = 2
     }
 
 	public enum EPad			// 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
@@ -217,7 +194,7 @@ namespace TJAPlayer3
 		UNKNOWN = EPad.UNKNOWN
 	}
 	[Flags]
-	public enum EパッドFlag		// #24063 2011.1.16 yyagi コマンド入力用 パッド入力のフラグ化
+	public enum EPadFlag		// #24063 2011.1.16 yyagi コマンド入力用 パッド入力のフラグ化
 	{
 		None	= 0,
 		HH		= 1,
@@ -255,7 +232,7 @@ namespace TJAPlayer3
 		RANDOM,
         MIRROR,
 		SUPERRANDOM,
-		HYPERRANDOM
+		MIRRORRANDOM
 	}
 
 	public enum EFunMods
@@ -290,11 +267,6 @@ namespace TJAPlayer3
 		UNKNOWN	= EInstrumentPad.UNKNOWN
 	}
 
-	public enum E打ち分け時の再生の優先順位
-	{
-		ChipがPadより優先,
-		PadがChipより優先
-	}
 	internal enum EInputDevice
 	{
 		Keyboard		= 0,
@@ -323,69 +295,13 @@ namespace TJAPlayer3
 		判定ライン上,
 		コンボ下
 	}
-	internal enum E判定位置
-	{
-		標準	= 0,
-		Lower,
-		MAX
-	}
-	internal enum E判定表示優先度
-	{
-		Chipより下,
-		Chipより上
-	}
-	internal enum EAVI種別
-	{
-		Unknown,
-		AVI,
-		AVIPAN
-	}
+
 	internal enum EFIFOモード
 	{
 		フェードイン,
 		フェードアウト
 	}
-	internal enum Eレーン
-	{
-		LC = 0,
-		HH,
-		SD,
-		BD,
-		HT,
-		LT,
-		FT,
-		CY,
-        LP,
-		RD,		// 将来の独立レーン化/独立AUTO設定を見越して追加
-        LBD = 10,
-		Guitar,	// AUTOレーン判定を容易にするため、便宜上定義しておく(未使用)
-		Bass,	// (未使用)
-		GtR,
-		GtG,
-		GtB,
-		GtPick,
-		GtW,
-		BsR,
-		BsG,
-		BsB,
-		BsPick,
-		BsW,
-		MAX,	// 要素数取得のための定義 ("BGM"は使わない前提で)
-		BGM
-	}
-	internal enum Eレーン数
-	{
-		物理 = 8,	   // LC, HH,             SD, BD, HT, LT, FT, CY
-		論理 = 10,	   // LC, HO, HC,         SD, BD, HT, LT, FT, RC, RD
-        DTXG物理 = 10, // LC, HH,     LP,     SD, BD, HT, LT, FT, CY, RD
-        DTXG論理 = 12  // LC, HO, HC, LP, LB, SD, BD, HT, LT, FT, CY, RD 
-	}
-	internal enum Eログ出力
-	{
-		OFF,
-		ON通常,
-		ON詳細あり
-	}
+
 	internal enum E演奏画面の戻り値
 	{
 		継続,
@@ -502,344 +418,6 @@ namespace TJAPlayer3
 		}
 	}
 
-	/// <summary>
-	/// レーンの値を扱う汎用の構造体。列挙型"Eドラムレーン"に準拠。
-	/// </summary>
-	/// <typeparam name="T">値の型。</typeparam>
-	[StructLayout( LayoutKind.Sequential )]
-	public struct STLANEVALUE<T>
-	{
-		public T LC;
-		public T HH;
-		public T SD;
-        public T LP;
-        public T LBD;
-		public T BD;
-		public T HT;
-		public T LT;
-		public T FT;
-		public T CY;
-		public T RD;
-		public T Guitar;
-		public T Bass;
-		public T GtR;
-		public T GtG;
-		public T GtB;
-		public T GtPick;
-		public T GtW;
-		public T BsR;
-		public T BsG;
-		public T BsB;
-		public T BsPick;
-		public T BsW;
-		public T BGM;
-
-		public T this[ int index ]
-		{
-			get
-			{
-				switch ( index )
-				{
-					case (int) Eレーン.LC:
-						return this.LC;
-					case (int) Eレーン.HH:
-						return this.HH;
-					case (int) Eレーン.SD:
-						return this.SD;
-                    case (int) Eレーン.LP:
-                        return this.LP;
-                    case (int) Eレーン.LBD:
-                        return this.LBD;
-					case (int) Eレーン.BD:
-						return this.BD;
-					case (int) Eレーン.HT:
-						return this.HT;
-					case (int) Eレーン.LT:
-						return this.LT;
-					case (int) Eレーン.FT:
-						return this.FT;
-					case (int) Eレーン.CY:
-						return this.CY;
-					case (int) Eレーン.RD:
-						return this.RD;
-					case (int) Eレーン.Guitar:
-						return this.Guitar;
-					case (int) Eレーン.Bass:
-						return this.Bass;
-					case (int) Eレーン.GtR:
-						return this.GtR;
-					case (int) Eレーン.GtG:
-						return this.GtG;
-					case (int) Eレーン.GtB:
-						return this.GtB;
-					case (int) Eレーン.GtPick:
-						return this.GtPick;
-					case (int) Eレーン.GtW:
-						return this.GtW;
-					case (int) Eレーン.BsR:
-						return this.BsR;
-					case (int) Eレーン.BsG:
-						return this.BsG;
-					case (int) Eレーン.BsB:
-						return this.BsB;
-					case (int) Eレーン.BsPick:
-						return this.BsPick;
-					case (int) Eレーン.BsW:
-						return this.BsW;
-				}
-				throw new IndexOutOfRangeException();
-			}
-			set
-			{
-				switch ( index )
-				{
-					case (int) Eレーン.LC:
-						this.LC = value;
-						return;
-					case (int) Eレーン.HH:
-						this.HH = value;
-						return;
-					case (int) Eレーン.SD:
-						this.SD = value;
-						return;
-                    case (int) Eレーン.LP:
-                        this.LP = value;
-                        return;
-                    case (int) Eレーン.LBD:
-                        this.LBD = value;
-                        return;
-					case (int) Eレーン.BD:
-						this.BD = value;
-						return;
-					case (int) Eレーン.HT:
-						this.HT = value;
-						return;
-					case (int) Eレーン.LT:
-						this.LT = value;
-						return;
-					case (int) Eレーン.FT:
-						this.FT = value;
-						return;
-					case (int) Eレーン.CY:
-						this.CY = value;
-						return;
-					case (int) Eレーン.RD:
-						this.RD = value;
-						return;
-					case (int) Eレーン.Guitar:
-						this.Guitar = value;
-						return;
-					case (int) Eレーン.Bass:
-						this.Bass = value;
-						return;
-					case (int) Eレーン.GtR:
-						this.GtR = value;
-						return;
-					case (int) Eレーン.GtG:
-						this.GtG = value;
-						return;
-					case (int) Eレーン.GtB:
-						this.GtB = value;
-						return;
-					case (int) Eレーン.GtPick:
-						this.GtPick = value;
-						return;
-					case (int) Eレーン.GtW:
-						this.GtW = value;
-						return;
-					case (int) Eレーン.BsR:
-						this.BsR = value;
-						return;
-					case (int) Eレーン.BsG:
-						this.BsG = value;
-						return;
-					case (int) Eレーン.BsB:
-						this.BsB = value;
-						return;
-					case (int) Eレーン.BsPick:
-						this.BsPick = value;
-						return;
-					case (int) Eレーン.BsW:
-						this.BsW = value;
-						return;
-				}
-				throw new IndexOutOfRangeException();
-			}
-		}
-	}
-
-
-	[Serializable]
-	[StructLayout( LayoutKind.Sequential )]
-	public struct STAUTOPLAY								// Eレーンとindexを一致させること
-	{
-		public bool LC;			// 0
-		public bool HH;			// 1
-		public bool SD;			// 2
-		public bool BD;			// 3
-		public bool HT;			// 4
-		public bool LT;			// 5
-		public bool FT;			// 6
-		public bool CY;			// 7
-        public bool LP;
-		public bool RD;			// 8
-        public bool LBD;
-		public bool Guitar;		// 9	(not used)
-		public bool Bass;		// 10	(not used)
-		public bool GtR;		// 11
-		public bool GtG;		// 12
-		public bool GtB;		// 13
-		public bool GtPick;		// 14
-		public bool GtW;		// 15
-		public bool BsR;		// 16
-		public bool BsG;		// 17
-		public bool BsB;		// 18
-		public bool BsPick;		// 19
-		public bool BsW;		// 20
-		public bool this[ int index ]
-		{
-			get
-			{
-				switch ( index )
-				{
-					case (int) Eレーン.LC:
-						return this.LC;
-					case (int) Eレーン.HH:
-						return this.HH;
-					case (int) Eレーン.SD:
-						return this.SD;
-					case (int) Eレーン.BD:
-						return this.BD;
-					case (int) Eレーン.HT:
-						return this.HT;
-					case (int) Eレーン.LT:
-						return this.LT;
-					case (int) Eレーン.FT:
-						return this.FT;
-					case (int) Eレーン.CY:
-						return this.CY;
-                    case (int) Eレーン.LP:
-                        return this.LP;
-					case (int) Eレーン.RD:
-						return this.RD;
-                    case (int) Eレーン.LBD:
-                        return this.LBD;
-					case (int) Eレーン.Guitar:
-						if ( !this.GtR ) return false;
-						if ( !this.GtG ) return false;
-						if ( !this.GtB ) return false;
-						if ( !this.GtPick ) return false;
-						if ( !this.GtW ) return false;
-						return true;
-					case (int) Eレーン.Bass:
-						if ( !this.BsR ) return false;
-						if ( !this.BsG ) return false;
-						if ( !this.BsB) return false;
-						if ( !this.BsPick ) return false;
-						if ( !this.BsW ) return false;
-						return true;
-					case (int) Eレーン.GtR:
-						return this.GtR;
-					case (int) Eレーン.GtG:
-						return this.GtG;
-					case (int) Eレーン.GtB:
-						return this.GtB;
-					case (int) Eレーン.GtPick:
-						return this.GtPick;
-					case (int) Eレーン.GtW:
-						return this.GtW;
-					case (int) Eレーン.BsR:
-						return this.BsR;
-					case (int) Eレーン.BsG:
-						return this.BsG;
-					case (int) Eレーン.BsB:
-						return this.BsB;
-					case (int) Eレーン.BsPick:
-						return this.BsPick;
-					case (int) Eレーン.BsW:
-						return this.BsW;
-				}
-				throw new IndexOutOfRangeException();
-			}
-			set
-			{
-				switch ( index )
-				{
-					case (int) Eレーン.LC:
-						this.LC = value;
-						return;
-					case (int) Eレーン.HH:
-						this.HH = value;
-						return;
-					case (int) Eレーン.SD:
-						this.SD = value;
-						return;
-					case (int) Eレーン.BD:
-						this.BD = value;
-						return;
-					case (int) Eレーン.HT:
-						this.HT = value;
-						return;
-					case (int) Eレーン.LT:
-						this.LT = value;
-						return;
-					case (int) Eレーン.FT:
-						this.FT = value;
-						return;
-					case (int) Eレーン.CY:
-						this.CY = value;
-						return;
-                    case (int) Eレーン.LP:
-                        this.LP = value;
-                        return;
-					case (int) Eレーン.RD:
-						this.RD = value;
-						return;
-                    case (int) Eレーン.LBD:
-                        this.LBD = value;
-                        return;
-					case (int) Eレーン.Guitar:
-						this.GtR = this.GtG = this.GtB = this.GtPick = this.GtW = value;
-						return;
-					case (int) Eレーン.Bass:
-						this.BsR = this.BsG = this.BsB = this.BsPick = this.BsW = value;
-						return;
-					case (int) Eレーン.GtR:
-						this.GtR = value;
-						return;
-					case (int) Eレーン.GtG:
-						this.GtG = value;
-						return;
-					case (int) Eレーン.GtB:
-						this.GtB = value;
-						return;
-					case (int) Eレーン.GtPick:
-						this.GtPick = value;
-						return;
-					case (int) Eレーン.GtW:
-						this.GtW = value;
-						return;
-					case (int) Eレーン.BsR:
-						this.BsR = value;
-						return;
-					case (int) Eレーン.BsG:
-						this.BsG = value;
-						return;
-					case (int) Eレーン.BsB:
-						this.BsB = value;
-						return;
-					case (int) Eレーン.BsPick:
-						this.BsPick = value;
-						return;
-					case (int) Eレーン.BsW:
-						this.BsW = value;
-						return;
-				}
-				throw new IndexOutOfRangeException();
-			}
-		}
-    }
-
 	public enum EReturnValue : int
 	{
 		Continuation,
@@ -869,7 +447,5 @@ namespace TJAPlayer3
     }
     #endregion
 
-    internal class C定数
-	{
-	}
+
 }

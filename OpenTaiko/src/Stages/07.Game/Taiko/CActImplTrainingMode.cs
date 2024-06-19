@@ -9,9 +9,9 @@ using System.Drawing;
 
 namespace TJAPlayer3
 {
-	class CAct演奏DrumsTrainingMode : CActivity
+	class CActImplTrainingMode : CActivity
 	{
-		public CAct演奏DrumsTrainingMode()
+		public CActImplTrainingMode()
 		{
 			base.IsDeActivated = true;
 		}
@@ -111,7 +111,7 @@ namespace TJAPlayer3
 					base.IsFirstDraw = false;
 				}
 
-				TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, "TRAINING MODE (BETA)");
+				TJAPlayer3.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
 				if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.Drums.TrainingPause))
 				{
