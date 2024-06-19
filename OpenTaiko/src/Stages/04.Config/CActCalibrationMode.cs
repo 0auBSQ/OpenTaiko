@@ -23,8 +23,8 @@ namespace TJAPlayer3
         {
             Stop();
             Offsets.Clear();
-            font.Dispose();
-            offsettext.Dispose();
+            font?.Dispose();
+            offsettext?.Dispose();
             //hitSound?.tDispose();
 
             base.DeActivate();
