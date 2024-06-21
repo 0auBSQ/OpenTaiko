@@ -740,7 +740,7 @@ namespace TJAPlayer3
                     int p = TJAPlayer3.GetActualPlayer(i);
 
                     if (TJAPlayer3.SaveFileInstances[p].data.Medals >= 0)
-                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][11], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][11], TJAPlayer3.SaveFileInstances[p].data.Medals);
+                        tBoardNumberDraw(TJAPlayer3.Skin.SongSelect_BoardNumber_X[i][11], TJAPlayer3.Skin.SongSelect_BoardNumber_Y[i][11], (int)TJAPlayer3.SaveFileInstances[p].data.Medals);
 
                     #region [HiScore plate]
 

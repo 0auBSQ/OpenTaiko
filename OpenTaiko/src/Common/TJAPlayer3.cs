@@ -2599,6 +2599,8 @@ for (int i = 0; i < 3; i++) {
 
 			#region [ Read Config.ini and Database files ]
 			//---------------------
+
+			// Port <= 0.5.4 NamePlate.json to Pre 0.6.0 b1 Saves\
 			NamePlateConfig = new NamePlateConfig();
 			NamePlateConfig.tNamePlateConfig();
 
@@ -2614,19 +2616,23 @@ for (int i = 0; i < 3; i++) {
 			VisualLogManager = new CVisualLogManager();
 
 
+			// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
+			SaveFileInstances = DBSaves.FetchSaveInstances(); 
+            /*
             for (int i = 0; i < 5; i++)
             {
                 SaveFileInstances[i] = new SaveFile();
                 SaveFileInstances[i].tSaveFile(TJAPlayer3.ConfigIni.sSaveFile[i]);
             }
-			// 2012.8.22 Config.iniが無いときに初期値が適用されるよう、この設定行をifブロック外に移動
+			*/
 
-			//---------------------
-			#endregion
 
-			#region [ ログ出力開始 ]
-			//---------------------
-			Trace.AutoFlush = true;
+            //---------------------
+            #endregion
+
+            #region [ ログ出力開始 ]
+            //---------------------
+            Trace.AutoFlush = true;
 			if( ConfigIni.bOutputLogs )
 			{
 				try

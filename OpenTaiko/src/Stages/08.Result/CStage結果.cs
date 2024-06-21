@@ -586,6 +586,11 @@ namespace TJAPlayer3
 
 					var _sf = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)];
 
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 0)
+					{
+						_sf.tRegisterAIBattleModePlay(bClear[0]);
+                    }
+
                     _sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
 					if (!TJAPlayer3.ConfigIni.bAutoPlay[i]

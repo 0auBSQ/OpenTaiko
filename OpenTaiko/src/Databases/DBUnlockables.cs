@@ -113,7 +113,7 @@ namespace TJAPlayer3
                     case "cs":
                     case "cm":
                         if (this.Values.Length == 1)
-                            return tConditionMet(new int[] { TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
                         else
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
                     case "dp":
