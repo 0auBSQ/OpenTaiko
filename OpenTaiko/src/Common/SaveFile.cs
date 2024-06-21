@@ -298,7 +298,7 @@ namespace TJAPlayer3
                     string key = bestPlay.ChartUniqueId + bestPlay.ChartDifficulty.ToString();
                     if (!bestPlaysDistinctCharts.ContainsKey(key))
                     {
-                        bestPlaysDistinctCharts[key] = bestPlay;
+                        bestPlaysDistinctCharts[key] = bestPlay.Copy();
                     }
                     else
                     {
@@ -326,7 +326,7 @@ namespace TJAPlayer3
                     string key = bestPlay.ChartUniqueId;
                     if (!bestPlaysDistinctSongs.ContainsKey(key))
                     {
-                        bestPlaysDistinctSongs[key] = bestPlay;
+                        bestPlaysDistinctSongs[key] = bestPlay.Copy();
                     }
                     else
                     {
