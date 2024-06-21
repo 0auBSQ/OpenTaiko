@@ -577,7 +577,8 @@ namespace TJAPlayer3
 				// ADLIB bonuses : 1 coin per ADLIB
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
+					// Too broken on some charts, ADLibs should get either no bonus or just extra stats
+					//this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
 
 					if (TJAPlayer3.ConfigIni.bAutoPlay[i])
 						this.nEarnedMedalsCount[i] = 0;
@@ -591,7 +592,8 @@ namespace TJAPlayer3
 						_sf.tRegisterAIBattleModePlay(bClear[0]);
                     }
 
-                    _sf.tEarnCoins(this.nEarnedMedalsCount[i]);
+					if (this.nEarnedMedalsCount[i] > 0)
+						_sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
 					if (!TJAPlayer3.ConfigIni.bAutoPlay[i]
 						&& !(TJAPlayer3.ConfigIni.bAIBattleMode && i == 1))

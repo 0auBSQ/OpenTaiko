@@ -314,10 +314,10 @@ namespace TJAPlayer3
             // 1st step: Init best play record class
 
             {
-                currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id.Replace(@"'", @"''");
-                currentPlay.ChartGenre = choosenSong.strジャンル.Replace(@"'", @"''");
-                currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty].Replace(@"'", @"''");
-                currentPlay.Artist = choosenSong.strサブタイトル.Replace(@"'", @"''"); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
+                currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id;
+                currentPlay.ChartGenre = choosenSong.strジャンル;
+                currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty];
+                currentPlay.Artist = choosenSong.strサブタイトル; // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
                 currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
                 currentPlay.ChartDifficulty = choosenDifficulty;
                 currentPlay.ChartLevel = choosenSong.arスコア[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
@@ -447,10 +447,10 @@ namespace TJAPlayer3
                 cmd.CommandText = $@"
                     INSERT INTO best_plays(ChartUniqueId,ChartGenre,Charter,Artist,PlayMods,ChartDifficulty,ChartLevel,ClearStatus,ScoreRank,HighScore,SaveId,TowerBestFloor,DanExam1,DanExam2,DanExam3,DanExam4,DanExam5,DanExam6,DanExam7,PlayCount,HighScoreGoodCount,HighScoreOkCount,HighScoreBadCount,HighScoreMaxCombo,HighScoreRollCount,HighScoreADLibCount,HighScoreBoomCount)
                        VALUES(
-                            '{currentPlay.ChartUniqueId}',
-                            '{currentPlay.ChartGenre}',
-                            '{currentPlay.Charter}',
-                            '{currentPlay.Artist}',
+                            '{currentPlay.ChartUniqueId.Replace(@"'", @"''")}',
+                            '{currentPlay.ChartGenre.Replace(@"'", @"''")}',
+                            '{currentPlay.Charter.Replace(@"'", @"''")}',
+                            '{currentPlay.Artist.Replace(@"'", @"''")}',
                             {currentPlay.PlayMods},
                             {currentPlay.ChartDifficulty},
                             {currentPlay.ChartLevel},
