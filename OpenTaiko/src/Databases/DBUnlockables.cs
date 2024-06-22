@@ -68,6 +68,7 @@ namespace TJAPlayer3
             }
 
             /*
+             * (Note: Currently only me is relevant, the other types might be used in the future)
              * == Types of conditions ==
              * l : "Less than"
              * le : "Less or equal"
@@ -114,7 +115,7 @@ namespace TJAPlayer3
              * ig : "Impossible to Get", (not recommanded) used to be able to have content in database that is impossible to unlock, no values
              * 
             */
-            public (bool, string) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
+            public (bool, string?) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
             {
                 if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
                     RequiredArgCount = RequiredArgs[Condition];
@@ -170,7 +171,7 @@ namespace TJAPlayer3
             }
 
 
-            public (bool, string) tConditionMet(int[] inputValues, EScreen screen)
+            public (bool, string?) tConditionMet(int[] inputValues, EScreen screen)
             {
                 // Trying to unlock an item from the My Room menu (If my room buy => check if enough coints, else => Display a hint to how to get the item)
                 if (screen == EScreen.MyRoom)
@@ -182,8 +183,8 @@ namespace TJAPlayer3
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
                             return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
-                        case "cs":
-                            return (false, CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                        default:
+                            return (false, null); // Return the same text if my room
                     }
                 }
                 // Unlockables from result screen or specific events (If any buy event => Invalid command, else check)
@@ -252,6 +253,7 @@ namespace TJAPlayer3
 
                 // Only the player loaded as 1P can check unlockables in real time
                 var SaveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data;
+                var ChartStats = SaveData.bestPlaysStats;
 
                 switch (this.Condition)
                 {
@@ -260,8 +262,52 @@ namespace TJAPlayer3
                     case "cs":
                         return (CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
                     case "ce":
-                        return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0]);
+                        return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0], SaveData.TotalEarnedMedals);
+                    case "ap":
+                        return CLangManager.LangInstance.GetString(90007).SafeFormat(this.Values[0], SaveData.AIBattleModePlaycount);
+                    case "aw":
+                        return CLangManager.LangInstance.GetString(90008).SafeFormat(this.Values[0], SaveData.AIBattleModeWins);
+                    case "tp":
+                        return CLangManager.LangInstance.GetString(90009).SafeFormat(this.Values[0], SaveData.TotalPlaycount);
+                    case "dp":
+                        {
+                            var _aimedDifficulty = this.Values[0];
+                            var _aimedStatus = this.Values[1];
+
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
+                            if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString(90000));
+
+                            var _table = ChartStats.ClearStatuses[_aimedDifficulty];
+                            var _ura = ChartStats.ClearStatuses[(int)Difficulty.Edit];
+                            int _count = 0;
+                            for (int i = _aimedStatus; i < (int)EClearStatus.TOTAL; i++)
+                            {
+                                _count += _table[i];
+                                if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
+                            }
+                            var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString(92013) : CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
+                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                            return CLangManager.LangInstance.GetString(90010).SafeFormat(statusString, this.Values[2], diffString, _count);
+                        }
+                    case "lp":
+                        {
+                            var _aimedDifficulty = this.Values[0];
+                            var _aimedStatus = this.Values[1];
+
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
+
+                            int _count = 0;
+                            if (_aimedStatus == (int)EClearStatus.NONE) _count = ChartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else if (_aimedStatus <= (int)EClearStatus.CLEAR) _count = ChartStats.LevelClears.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else if (_aimedStatus == (int)EClearStatus.FC) _count = ChartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+
+                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                            return CLangManager.LangInstance.GetString(90011).SafeFormat(statusString, this.Values[2], _aimedDifficulty, _count);
+                        }  
+
                 }
+                // Includes cm or ig which are not supposed to be displayed in My Room
                 return (CLangManager.LangInstance.GetString(90000));
             }
 

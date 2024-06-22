@@ -496,6 +496,7 @@ namespace TJAPlayer3
             [90011] = "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
 
             [91000] = "Play",
+            [91010] = "Play",
             [91001] = "Get an Assisted Clear on",
             [91011] = "Get at least an Assisted Clear on",
             [91002] = "Get a Clear on",
@@ -503,6 +504,7 @@ namespace TJAPlayer3
             [91003] = "Get a Full Combo on",
             [91013] = "Get at least a Full Combo on",
             [91004] = "Get a Perfect on",
+            [91014] = "Get a Perfect on",
 
             [92000] = "Easy",
             [92001] = "Normal",
@@ -512,6 +514,7 @@ namespace TJAPlayer3
             [92013] = "Extreme/Extra Extreme",
             [92005] = "Tower",
             [92006] = "Dan",
+            [92100] = "Any",
 
             [900] = "Resume",
             [901] = "Restart",

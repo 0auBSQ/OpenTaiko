@@ -1,7 +1,9 @@
 {
-	"condition": "ch",
+	"condition": "dp",
 	"type": "me",
 	"values": [
-		960,
+		3,
+		3,
+		10
 	],
 }
