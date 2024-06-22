@@ -25,13 +25,25 @@ namespace TJAPlayer3
                 
             tLoadFile();
 
+            tInitSaveFile();
+        }
+
+        public void tInitSaveFile()
+        {
             data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
             data.tFactorizeBestPlays();
         }
 
+        public void tLoadUnlockables()
+        {
+            data.UnlockedCharacters = DBSaves.FetchStringUnlockedAsset(data.SaveId, "unlocked_characters");
+            data.UnlockedPuchicharas = DBSaves.FetchStringUnlockedAsset(data.SaveId, "unlocked_puchicharas");
+            data.UnlockedNameplateIds = DBSaves.FetchUnlockedNameplateIds(data.SaveId);
+            data.DanTitles = DBSaves.FetchUnlockedDanTitles(data.SaveId);
+        }
         
 
-        #region [Medals]
+        #region [Medals and PlayCount]
 
         public void tEarnCoins(int amount)
         {
@@ -41,7 +53,8 @@ namespace TJAPlayer3
             // Small trick here, each actual play (excluding Auto, AI, etc) are worth at least 5 coins for the player, whatever which mode it is (Dan, Tower, Taiko mode, etc)
             // Earn Coins is also called once per play, so we just add 1 here to the total playcount
             data.TotalPlaycount += 1;
-            tSaveFile();
+            DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, amount, 1);
+            //tSaveFile();
         }
 
         // Return false if the current amount of coins is to low
@@ -51,10 +64,15 @@ namespace TJAPlayer3
                 return false;
 
             data.Medals -= amount;
-
-            tSaveFile();
+            DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, -amount, 0);
+            //tSaveFile();
 
             return true;
+        }
+
+        public void tRegisterAIBattleModePlay(bool IsWon)
+        {
+            DBSaves.RegisterAIBattleModePlay(data.SaveId, IsWon);
         }
 
         #endregion
@@ -84,6 +102,7 @@ namespace TJAPlayer3
 
             if (!this.data.DanTitles.ContainsKey(title) || cs != clearStatus || iG != isGold)
             {
+                DBSaves.RegisterDanTitle(data.SaveId, title, clearStatus, isGold);
                 changed = true;
                 /*
                 TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
@@ -97,7 +116,7 @@ namespace TJAPlayer3
 
             this.data.DanTitles[title] = danTitle;
 
-            tSaveFile();
+            //tSaveFile();
 
             return changed;
         }
@@ -112,6 +131,12 @@ namespace TJAPlayer3
             {
                 isGold = iG;
                 clearStatus = cs;
+            }
+
+            public CDanTitle()
+            {
+                isGold = false;
+                clearStatus = 0;
             }
 
             [JsonProperty("isGold")]
@@ -166,7 +191,8 @@ namespace TJAPlayer3
 
         public void tApplyHeyaChanges()
         {
-            this.tSaveFile();
+            DBSaves.ApplyChangesFromMyRoom(this);
+            //this.tSaveFile();
         }
 
         #endregion
@@ -198,13 +224,19 @@ namespace TJAPlayer3
             public string PuchiChara = "0";
 
             [JsonProperty("medals")]
-            public int Medals = 0;
+            public Int64 Medals = 0;
 
-            [JsonProperty("totalEarnedMedals")]
-            public int TotalEarnedMedals = 0;
+            [JsonIgnore]
+            public Int64 TotalEarnedMedals = 0;
 
-            [JsonProperty("totalPlaycount")]
+            [JsonIgnore]
             public int TotalPlaycount = 0;
+
+            [JsonIgnore]
+            public int AIBattleModePlaycount = 0;
+
+            [JsonIgnore]
+            public int AIBattleModeWins = 0;
 
             [JsonProperty("character")]
             public int Character = 0;
@@ -215,6 +247,7 @@ namespace TJAPlayer3
             [JsonProperty("danTitles")]
             public Dictionary<string, CDanTitle> DanTitles = new Dictionary<string, CDanTitle>();
 
+            // Deprecated
             [JsonProperty("namePlateTitles")]
             public Dictionary<string, CNamePlateTitle> NamePlateTitles = new Dictionary<string, CNamePlateTitle>();
 
@@ -223,6 +256,9 @@ namespace TJAPlayer3
 
             [JsonProperty("unlockedPuchicharas")]
             public List<string> UnlockedPuchicharas = new List<string>();
+
+            [JsonIgnore]
+            public List<int> UnlockedNameplateIds = new List<int>();
 
             [JsonProperty("activeTriggers")]
             public HashSet<string> ActiveTriggers = new HashSet<string>();
@@ -243,7 +279,7 @@ namespace TJAPlayer3
             public Dictionary<string, BestPlayRecords.CSongSelectTableEntry> songSelectTableEntries = new Dictionary<string, BestPlayRecords.CSongSelectTableEntry>();
 
             [JsonIgnore]
-            public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats ();
+            public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats();
 
             public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId)
             {
@@ -262,7 +298,7 @@ namespace TJAPlayer3
                     string key = bestPlay.ChartUniqueId + bestPlay.ChartDifficulty.ToString();
                     if (!bestPlaysDistinctCharts.ContainsKey(key))
                     {
-                        bestPlaysDistinctCharts[key] = bestPlay;
+                        bestPlaysDistinctCharts[key] = bestPlay.Copy();
                     }
                     else
                     {
@@ -290,7 +326,7 @@ namespace TJAPlayer3
                     string key = bestPlay.ChartUniqueId;
                     if (!bestPlaysDistinctSongs.ContainsKey(key))
                     {
-                        bestPlaysDistinctSongs[key] = bestPlay;
+                        bestPlaysDistinctSongs[key] = bestPlay.Copy();
                     }
                     else
                     {

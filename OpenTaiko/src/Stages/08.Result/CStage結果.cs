@@ -577,7 +577,8 @@ namespace TJAPlayer3
 				// ADLIB bonuses : 1 coin per ADLIB
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
+					// Too broken on some charts, ADLibs should get either no bonus or just extra stats
+					//this.nEarnedMedalsCount[i] += Math.Min(10, TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nADLIB);
 
 					if (TJAPlayer3.ConfigIni.bAutoPlay[i])
 						this.nEarnedMedalsCount[i] = 0;
@@ -586,7 +587,13 @@ namespace TJAPlayer3
 
 					var _sf = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)];
 
-                    _sf.tEarnCoins(this.nEarnedMedalsCount[i]);
+					if (TJAPlayer3.ConfigIni.bAIBattleMode && i == 0)
+					{
+						_sf.tRegisterAIBattleModePlay(bClear[0]);
+                    }
+
+					if (this.nEarnedMedalsCount[i] > 0)
+						_sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
 					if (!TJAPlayer3.ConfigIni.bAutoPlay[i]
 						&& !(TJAPlayer3.ConfigIni.bAIBattleMode && i == 1))
@@ -648,7 +655,9 @@ namespace TJAPlayer3
 
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					if (this.nEarnedMedalsCount[i] > 0)
+					if (TJAPlayer3.ConfigIni.bAutoPlay[i] || TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) continue;
+
+                    if (this.nEarnedMedalsCount[i] > 0)
 						mqModals.tAddModal(
 							new Modal(
 								Modal.EModalType.Coin, 

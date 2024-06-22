@@ -36,7 +36,210 @@ namespace TJAPlayer3
             return TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.SaveId;
         }
 
-        
+        #region [Unlocked Dan Titles]
+
+        public static Dictionary<string, SaveFile.CDanTitle> FetchUnlockedDanTitles(Int64 sid)
+        {
+            Dictionary<string, SaveFile.CDanTitle> _dans = new Dictionary<string, SaveFile.CDanTitle>();
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return _dans;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"SELECT * FROM dan_titles WHERE SaveId={sid};";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                SaveFile.CDanTitle dt = new SaveFile.CDanTitle();
+
+                string key = (string)reader["DanTitleText"];
+                dt.isGold = Convert.ToBoolean((int)(Int64)reader["DanIsGold"]);
+                dt.clearStatus = (int)(Int64)reader["DanClearStatus"];
+                _dans[key] = dt;
+            }
+            reader.Close();
+
+            return _dans;
+        }
+
+        public static void RegisterDanTitle(Int64 SaveId, string DanTitle, int DanClearStatus, bool DanIsGold)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = $@"INSERT INTO dan_titles(DanTitleText,DanClearStatus,DanIsGold,SaveId)
+	                VALUES(
+		                '{DanTitle.Replace(@"'", @"''")}',
+		                {DanClearStatus},
+		                {Convert.ToInt64(DanIsGold)},
+		                {SaveId}
+	                )
+                    ON CONFLICT(DanTitleText) DO UPDATE SET
+	                    DanClearStatus = MAX(DanClearStatus, EXCLUDED.DanClearStatus),
+	                    DanIsGold = MAX(DanIsGold, EXCLUDED.DanIsGold),
+	                    SaveId = EXCLUDED.SaveId
+                    ;";
+            command.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region [Unlocked Nameplates]
+
+        public static List<int> FetchUnlockedNameplateIds(Int64 sid)
+        {
+            List<int> _nps = new List<int>();
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return _nps;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"SELECT * FROM nameplate_titles WHERE SaveId={sid};";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                _nps.Add((int)(Int64)reader["NameplateId"]);
+            }
+            reader.Close();
+
+            return _nps;
+        }
+
+        public static void RegisterUnlockedNameplate(Int64 SaveId, Int64 NameplateId)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"INSERT INTO nameplate_titles(NameplateId,SaveId) VALUES({NameplateId}, {SaveId});";
+            command.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region [Characters and Puchicharas]
+
+        public static List<string> FetchStringUnlockedAsset(Int64 sid, string table)
+        {
+            List<string> _chara = new List<string>();
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return _chara;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"SELECT * FROM {table} WHERE SaveId={sid};";
+            SqliteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                _chara.Add((string)reader["Asset"]);
+            }
+            reader.Close();
+
+            return _chara;
+        }
+
+        public static void RegisterStringUnlockedAsset(Int64 SaveId, string table, string asset)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"INSERT INTO {table}(Asset,SaveId) VALUES('{asset.Replace(@"'", @"''")}', {SaveId});";
+            command.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region [saves Table]
+
+        public static SaveFile[] FetchSaveInstances()
+        {
+            SaveFile[] _instances = new SaveFile[5] { new SaveFile(), new SaveFile(), new SaveFile(), new SaveFile(), new SaveFile() };
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return _instances;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"SELECT * FROM saves WHERE CurrentSlot IS NOT NULL ORDER BY CurrentSlot ASC;";
+            SqliteDataReader reader = command.ExecuteReader();
+            int _file = 0;
+            while (reader.Read())
+            {
+                SaveFile sf = new SaveFile();
+
+                sf.data.SaveId = (Int64)reader["SaveId"];
+                sf.data.Name = (string)reader["PlayerName"];
+                sf.data.Title = (string)reader["PlayerNameplateTitle"];
+                sf.data.Dan = (string)reader["PlayerDanTitle"];
+                sf.data.DanGold = Convert.ToBoolean((Int64)reader["PlayerDanGold"]);
+                sf.data.DanType = (int)(Int64)reader["PlayerDanType"];
+                sf.data.TitleType = (int)(Int64)reader["PlayerNameplateType"];
+                sf.data.PuchiChara = (string)reader["PlayerPuchichara"];
+                sf.data.Character = (int)(Int64)reader["PlayerCharacter"];
+                sf.data.CharacterName = (string)reader["PlayerCharacterName"];
+                sf.data.Medals = (Int64)reader["CurrentMedals"];
+                sf.data.TotalEarnedMedals = (Int64)reader["TotalEarnedMedals"];
+                sf.data.TotalPlaycount = (int)(Int64)reader["TotalPlaycount"];
+                sf.data.AIBattleModePlaycount = (int)(Int64)reader["AIBattleModePlaycount"];
+                sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
+                sf.tInitSaveFile();
+                sf.tLoadUnlockables();
+
+                _instances[_file] = sf;
+                _file++;
+                if (_file >= 5) break;
+            }
+            reader.Close();
+
+            return _instances;
+        }
+
+        public static void AlterCoinsAndTotalPlayCount(Int64 SaveId, Int64 CoinsDelta, int PlayCountDelta)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            Int64 TotalEarnedCoinsDelta = Math.Max(0, CoinsDelta);
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"UPDATE saves SET TotalPlaycount = TotalPlaycount + {PlayCountDelta}, CurrentMedals = CurrentMedals + {CoinsDelta}, TotalEarnedMedals = TotalEarnedMedals + {TotalEarnedCoinsDelta} WHERE SaveId = {SaveId};";
+            command.ExecuteNonQuery();
+        }
+
+        public static void RegisterAIBattleModePlay(Int64 SaveId, bool IsWon)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            Int64 AIBattleWinsDelta = (IsWon) ? 1 : 0;
+
+            var command = connection.CreateCommand();
+            command.CommandText = @$"UPDATE saves SET AIBattleModePlaycount = AIBattleModePlaycount + 1, AIBattleModeWins = AIBattleModeWins + {AIBattleWinsDelta} WHERE SaveId = {SaveId};";
+            command.ExecuteNonQuery();
+        }
+
+        public static void ApplyChangesFromMyRoom(SaveFile File)
+        {
+            SqliteConnection? connection = GetSavesDBConnection();
+            if (connection == null) return;
+
+            SaveFile.Data SaveData = File.data;
+
+            var command = connection.CreateCommand();
+            command.CommandText = $@" UPDATE saves SET
+                PlayerName = '{SaveData.Name.Replace(@"'", @"''")}',
+                PlayerNameplateTitle = '{SaveData.Title.Replace(@"'", @"''")}',
+                PlayerDanTitle = '{SaveData.Dan.Replace(@"'", @"''")}',
+                PlayerDanGold = {SaveData.DanGold},
+                PlayerDanType = {SaveData.DanType},
+                PlayerNameplateType = {SaveData.TitleType},
+                PlayerPuchichara = '{SaveData.PuchiChara.Replace(@"'", @"''")}',
+                PlayerCharacter = {SaveData.Character},
+                PlayerCharacterName = '{SaveData.CharacterName.Replace(@"'", @"''")}'
+                WHERE SaveId = {SaveData.SaveId};
+            ;";
+            command.ExecuteNonQuery();
+        }
+
+        #endregion
 
         #region [best_plays Table]
 
@@ -111,10 +314,10 @@ namespace TJAPlayer3
             // 1st step: Init best play record class
 
             {
-                currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id.Replace(@"'", @"''");
-                currentPlay.ChartGenre = choosenSong.strジャンル.Replace(@"'", @"''");
-                currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty].Replace(@"'", @"''");
-                currentPlay.Artist = choosenSong.strサブタイトル.Replace(@"'", @"''"); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
+                currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id;
+                currentPlay.ChartGenre = choosenSong.strジャンル;
+                currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty];
+                currentPlay.Artist = choosenSong.strサブタイトル; // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
                 currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
                 currentPlay.ChartDifficulty = choosenDifficulty;
                 currentPlay.ChartLevel = choosenSong.arスコア[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
@@ -244,10 +447,10 @@ namespace TJAPlayer3
                 cmd.CommandText = $@"
                     INSERT INTO best_plays(ChartUniqueId,ChartGenre,Charter,Artist,PlayMods,ChartDifficulty,ChartLevel,ClearStatus,ScoreRank,HighScore,SaveId,TowerBestFloor,DanExam1,DanExam2,DanExam3,DanExam4,DanExam5,DanExam6,DanExam7,PlayCount,HighScoreGoodCount,HighScoreOkCount,HighScoreBadCount,HighScoreMaxCombo,HighScoreRollCount,HighScoreADLibCount,HighScoreBoomCount)
                        VALUES(
-                            '{currentPlay.ChartUniqueId}',
-                            '{currentPlay.ChartGenre}',
-                            '{currentPlay.Charter}',
-                            '{currentPlay.Artist}',
+                            '{currentPlay.ChartUniqueId.Replace(@"'", @"''")}',
+                            '{currentPlay.ChartGenre.Replace(@"'", @"''")}',
+                            '{currentPlay.Charter.Replace(@"'", @"''")}',
+                            '{currentPlay.Artist.Replace(@"'", @"''")}',
                             {currentPlay.PlayMods},
                             {currentPlay.ChartDifficulty},
                             {currentPlay.ChartLevel},

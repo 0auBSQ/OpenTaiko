@@ -17,6 +17,12 @@ namespace TJAPlayer3
             ["lp"] = 3,
             ["sp"] = 2,
             ["sg"] = 2,
+
+            ["sc"] = 2,
+            ["ce"] = 1,
+            ["tp"] = 1,
+            ["ap"] = 1,
+            ["aw"] = 1,
         };
 
         public class CUnlockConditions
@@ -95,10 +101,15 @@ namespace TJAPlayer3
              * ch : "Coins here", coin requirement, payable within the heya menu, 1 value : [Coin price]
              * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
              * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
+             * ce : "Coins earned", coins earned since the creation of the save file, 1 value : [Total earned coins]
              * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
              * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
              * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~4), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
              * sg : "Song genre (performance)", count of any unique song pass within a specific genre folder, unlock check during the results screen, condition 2 x n values for n songs : [Song count, Clear status (0~4), ...], input 1 value [Count of fullfiled genres], n references for n genres (Genre names)
+             * sc : "Song charter (performance)", count of any chart pass by a specific charter, unlock check during the results screen, condition 2 x n values for n songs : [Song count, Clear status (0~4), ...], input 1 value [Count of fullfiled charters], n references for n charters (Charter names)
+             * tp : "Total plays", 1 value : [Total playcount]
+             * ap : "AI battle plays", 1 value : [AI battle playcount]
+             * aw : "AI battle wins", 1 value : [AI battle wins count]
              * 
              * 
             */
@@ -113,7 +124,27 @@ namespace TJAPlayer3
                     case "cs":
                     case "cm":
                         if (this.Values.Length == 1)
-                            return tConditionMet(new int[] { TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    case "ce":
+                        if (this.Values.Length == 1)
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalEarnedMedals }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    case "ap":
+                        if (this.Values.Length == 1)
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModePlaycount }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    case "aw":
+                        if (this.Values.Length == 1)
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModeWins }, screen);
+                        else
+                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    case "tp":
+                        if (this.Values.Length == 1)
+                            return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalPlaycount }, screen);
                         else
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
                     case "dp":
@@ -124,6 +155,7 @@ namespace TJAPlayer3
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
                     case "sp":
                     case "sg":
+                    case "sc":
                         if (this.Values.Length % this.RequiredArgCount == 0
                             && this.Reference.Length == this.Values.Length / this.RequiredArgCount)
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
@@ -162,12 +194,19 @@ namespace TJAPlayer3
                         case "cs":
                         case "cm":
                             return (false, CLangManager.LangInstance.GetString(90000));
+                        case "ce":
+                        case "tp":
+                        case "ap":
+                        case "aw":
+                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+                            return (fulfiled, "");
                         case "dp":
                         case "lp":
-                            bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
+                            fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
                             return (fulfiled, "");
                         case "sp":
                         case "sg":
+                        case "sc":
                             fulfiled = this.tValueRequirementMet(inputValues[0], this.Reference.Length);
                             return (fulfiled, "");
                     }
@@ -308,7 +347,25 @@ namespace TJAPlayer3
                             if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = chartStats.SongGenrePlays.TryGetValue(_genreName, out var value) ? value : 0;
                             else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = chartStats.SongGenreClears.TryGetValue(_genreName, out var value) ? value : 0;
                             else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = chartStats.SongGenreFCs.TryGetValue(_genreName, out var value) ? value : 0;
-                            else return _satifsiedCount = chartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
+                            else _satifsiedCount = chartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
+
+                            if (_satifsiedCount >= _songCount) _count++;
+                        }
+                        return _count;
+                    case "sc":
+                        _count = 0;
+                        for (int i = 0; i < this.Values.Length / this.RequiredArgCount; i++)
+                        {
+                            int _base = i * this.RequiredArgCount;
+                            string _charterName = this.Reference[i];
+                            int _songCount = this.Values[_base];
+                            _aimedStatus = this.Values[_base + 1];
+
+                            int _satifsiedCount = 0;
+                            if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = chartStats.CharterPlays.TryGetValue(_charterName, out var value) ? value : 0;
+                            else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = chartStats.CharterClears.TryGetValue(_charterName, out var value) ? value : 0;
+                            else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = chartStats.CharterFCs.TryGetValue(_charterName, out var value) ? value : 0;
+                            else _satifsiedCount = chartStats.CharterPerfects.TryGetValue(_charterName, out var value) ? value : 0;
 
                             if (_satifsiedCount >= _songCount) _count++;
                         }

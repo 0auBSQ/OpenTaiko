@@ -88,24 +88,29 @@ namespace TJAPlayer3
             #region [Plate title]
 
             amount = 1;
-            if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null)
-                amount += TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.Count;
+            if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null)
+                amount += TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Count;
 
             this.ttkTitles = new TitleTextureKey[amount];
-            this.titlesKeys = new string[amount];
+            this.titlesKeys = new int[amount];
 
-            // Wood shojinsha (default title) always avaliable by default
+            // Wood shoshinsha (default title) always avaliable by default
             this.ttkTitles[0] = new TitleTextureKey("初心者", this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
-            this.titlesKeys[0] = "初心者";
+            this.titlesKeys[0] = 0; // Regular nameplate unlockable start by 1 (Important)
 
             idx = 1;
-            if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null)
+            if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null)
             {
-                foreach (var item in TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles)
+                foreach (var _ref in TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds)
                 {
-                    this.ttkTitles[idx] = new TitleTextureKey(item.Value.cld.GetString(item.Key), this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
-                    this.titlesKeys[idx] = item.Key;
-                    idx++;
+                    var item = TJAPlayer3.Databases.DBNameplateUnlockables.data?[_ref];
+                    if (item != null)
+                    {
+                        this.ttkTitles[idx] = new TitleTextureKey(item.nameplateInfo.cld.GetString(""), this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
+                        this.titlesKeys[idx] = _ref;
+                        idx++;
+                    }
+                    
                 }
             }
 
@@ -449,9 +454,13 @@ namespace TJAPlayer3
 
                     int iType = -1;
 
-                    if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null &&
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[pos]))
-                        iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
+                    if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null &&
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Contains(this.titlesKeys[pos]))
+                    {
+                        var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[pos]];
+                        iType = _dc.nameplateInfo.iType;
+                        //iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
+                    }   
                     else if (pos == 0)
                         iType = 0;
 
@@ -601,6 +610,7 @@ namespace TJAPlayer3
                         //TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
                         //TJAPlayer3.NamePlateConfig.tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0], iPlayer);
                         TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Add(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
+                        DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[iPlayer].data.SaveId, "unlocked_puchicharas", TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
                         TJAPlayer3.SaveFileInstances[iPlayer].tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0]);
 
                     }
@@ -634,8 +644,8 @@ namespace TJAPlayer3
                     else if (ess == ESelectStatus.SUCCESS)
                     {
                         TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Add(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
+                        DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[iPlayer].data.SaveId, "unlocked_characters", TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
                         TJAPlayer3.SaveFileInstances[iPlayer].tSpendCoins(TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.Values[0]);
-
                     }
                 }
 
@@ -666,9 +676,13 @@ namespace TJAPlayer3
                 {
                     TJAPlayer3.SaveFileInstances[iPlayer].data.Title = this.ttkTitles[iTitleCurrent].str文字;
 
-                    if (TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles != null
-                        && TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[iTitleCurrent]))
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[iTitleCurrent]].iType;
+                    if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null
+                        && TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Contains(this.titlesKeys[iTitleCurrent]))
+                    {
+                        var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[iTitleCurrent]];
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = _dc.nameplateInfo.iType;
+                    }
+                        
                     else if (iTitleCurrent == 0)
                         TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = 0;
                     else
@@ -766,15 +780,19 @@ namespace TJAPlayer3
         private void tResetOpts()
         {
             // Retrieve titles if they exist
-            var _titles = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles;
+            //var _titles = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles;
+            var _titles = TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds;
             var _title = TJAPlayer3.SaveFileInstances[iPlayer].data.Title;
             var _dans = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles;
             var _dan = TJAPlayer3.SaveFileInstances[iPlayer].data.Dan;
 
             iTitleCurrent = 0;
 
-            if (_titles != null && _titles.ContainsKey(_title))
+            // Think of a replacement later
+            /*
+            if (_titles != null && _titles.ContainsKey(_title)) { }
                 iTitleCurrent = _titles.Keys.ToList().IndexOf(_title) + 1;
+            */
 
             iDanTitleCurrent = 0;
 
@@ -962,7 +980,7 @@ namespace TJAPlayer3
         private TitleTextureKey[] ttkDanTitles;
 
         private TitleTextureKey[] ttkTitles;
-        private string[] titlesKeys;
+        private int[] titlesKeys;
 
         private int iPuchiCharaCount;
         private int iCharacterCount;

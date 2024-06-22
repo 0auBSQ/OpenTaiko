@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FFmpeg.AutoGen;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,7 +7,7 @@ using static TJAPlayer3.DBNameplateUnlockables;
 
 namespace TJAPlayer3
 {
-    internal class DBNameplateUnlockables : CSavableT<Dictionary<string, NameplateUnlockable>>
+    internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnlockable>>
     {
         public DBNameplateUnlockables()
         {
@@ -51,7 +52,7 @@ namespace TJAPlayer3
                             nu.nameplateInfo.cld.SetString(tr, (string)reader[@$"{tr}_String"]);
                     }
 
-                    data[((Int64)reader["NameplateId"]).ToString()] = nu;
+                    data[((Int64)reader["NameplateId"])] = nu;
                 }
                 reader.Close();
             }            
@@ -71,27 +72,31 @@ namespace TJAPlayer3
         public void tGetUnlockedItems(int _player, ModalQueue mq)
         {
             int player = TJAPlayer3.GetActualPlayer(_player);
-            var _sf = TJAPlayer3.SaveFileInstances[player].data.NamePlateTitles;
+            //var _sf = TJAPlayer3.SaveFileInstances[player].data.NamePlateTitles;
+            var _sf = TJAPlayer3.SaveFileInstances[player].data.UnlockedNameplateIds;
             bool _edited = false;
 
-            foreach (KeyValuePair<string, NameplateUnlockable> item in data)
+            foreach (KeyValuePair<Int64, NameplateUnlockable> item in data)
             {
-                var _npvKey = item.Key;
-                if (!_sf.ContainsKey(_npvKey))
+                var _npvKey = (int)item.Key;
+                if (!_sf.Contains(_npvKey))// !_sf.ContainsKey(_npvKey))
                 {
                     var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
 
                     if (_fulfilled)
                     {
-                        _sf.Add(_npvKey, item.Value.nameplateInfo);
+                        //_sf.Add(_npvKey, item.Value.nameplateInfo);
+                        _sf.Add(_npvKey);
                         _edited = true;
                         mq.tAddModal(
                             new Modal(
                                 Modal.EModalType.Title, 
                                 HRarity.tRarityToModalInt(item.Value.rarity), 
-                                item.Value.nameplateInfo.cld.GetString(item.Key)
+                                item.Value.nameplateInfo.cld.GetString("")          // Cannot be null on database
                                 ), 
                             _player);
+
+                        DBSaves.RegisterUnlockedNameplate(TJAPlayer3.SaveFileInstances[player].data.SaveId, _npvKey);
                     } 
                 }
             }
