@@ -445,7 +445,7 @@ namespace TJAPlayer3
 
             [90000] = "[ERREUR] Condition invalide",
             [90001] = "L'article n'est disponible que dans le Magasin.",
-            [90002] = "Prix en jetons : ",
+            [90002] = "Prix en jetons : {0}",
             [90003] = "Article acheté !",
             [90004] = "Nombre de jetons insuffisant !",
             [90005] = "La condition suivante : ",

@@ -26,7 +26,7 @@ namespace TJAPlayer3
             [4] = "Reload Songs",
             [5] = "Reload the song folder.",
             [10148] = "Reload Songs (Hard Reload)",
-            [10149] = "Clean the existing database and\n" + 
+            [10149] = "Clean the existing database and\n" +
             "reload the song folder from scratch.",
             [6] = "Player Count",
             [7] = "Select how many players you want to play with.\nUp to 5 players can be active at once.",
@@ -160,10 +160,10 @@ namespace TJAPlayer3
             [9993] = "SimpleMode",
 
             [9994] = "Texture Loading Type:\n" +
-					"Freeze on startup disappears\n" +
-					"Turn this option off if some textures turn black\n" +
-					"This change will take effect after restarting OpenTaiko\n",
-			[9995] = "ASync Texture Loading",
+                    "Freeze on startup disappears\n" +
+                    "Turn this option off if some textures turn black\n" +
+                    "This change will take effect after restarting OpenTaiko\n",
+            [9995] = "ASync Texture Loading",
 
             [9996] = "Drawing Method:\n" +
                     "Select from either OpenGL,\n" +
@@ -306,8 +306,8 @@ namespace TJAPlayer3
             [10124] = "Use Extreme/Extra Transitions",
             [10125] = "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
 
-			[10126] = "Always use normal gauge",
-			[10127] = "Always use normal gauge",
+            [10126] = "Always use normal gauge",
+            [10127] = "Always use normal gauge",
 
             [10150] = "Video Playback Display Mode",
             [10151] = "Change how videos are displayed\nin the background.",
@@ -482,11 +482,36 @@ namespace TJAPlayer3
             [1045] = "Extreme / Extra",
 
             [90000] = "[ERROR] Invalid condition",
-            [90001] = "Item only avaliable at the Shop.",
-            [90002] = "Coin price : ",
-            [90003] = "Item bought !",
-            [90004] = "Not enough coins !",
-            [90005] = "The following condition : ",
+            [90001] = "Item only avaliable at the Shop.",                                       // cs
+            [90002] = "Coin price : {0}",                                                       // ch, cs, cm
+            [90003] = "Item bought!",
+            [90004] = "Not enough coins!",
+            [90005] = "The following condition: ",
+
+            [90006] = "Earn a total of {0} coins to unlock this item! ({1}/{0})",               // ce
+            [90007] = "Play {0} AI battle matches to unlock this item! ({1}/{0})",              // ap
+            [90008] = "Win {0} AI battle matches to unlock this item! ({1}/{0})",               // aw
+            [90009] = "Play {0} songs to unlock this item! ({1}/{0})",                          // tp
+            [90010] = "{0} {1} songs on {2} difficulty to unlock this item! ({3}/{1})",         // dp
+            [90011] = "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
+
+            [91000] = "Play",
+            [91001] = "Get an Assisted Clear on",
+            [91011] = "Get at least an Assisted Clear on",
+            [91002] = "Get a Clear on",
+            [91012] = "Get at least a Clear on",
+            [91003] = "Get a Full Combo on",
+            [91013] = "Get at least a Full Combo on",
+            [91004] = "Get a Perfect on",
+
+            [92000] = "Easy",
+            [92001] = "Normal",
+            [92002] = "Hard",
+            [92003] = "Extreme",
+            [92004] = "Extra Extreme",
+            [92013] = "Extreme/Extra Extreme",
+            [92005] = "Tower",
+            [92006] = "Dan",
 
             [900] = "Resume",
             [901] = "Restart",

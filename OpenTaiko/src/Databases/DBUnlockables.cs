@@ -23,6 +23,7 @@ namespace TJAPlayer3
             ["tp"] = 1,
             ["ap"] = 1,
             ["aw"] = 1,
+            ["ig"] = 0,
         };
 
         public class CUnlockConditions
@@ -110,7 +111,7 @@ namespace TJAPlayer3
              * tp : "Total plays", 1 value : [Total playcount]
              * ap : "AI battle plays", 1 value : [AI battle playcount]
              * aw : "AI battle wins", 1 value : [AI battle wins count]
-             * 
+             * ig : "Impossible to Get", (not recommanded) used to be able to have content in database that is impossible to unlock, no values
              * 
             */
             public (bool, string) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
@@ -161,7 +162,8 @@ namespace TJAPlayer3
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
                         else
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires (" + this.RequiredArgCount.ToString() + " * n) values and n references.");
-
+                    case "ig":
+                        return (false, "");
                 }
 
                 return (false, CLangManager.LangInstance.GetString(90000));
@@ -248,12 +250,17 @@ namespace TJAPlayer3
                 if (this.Values.Length < this.RequiredArgCount)
                     return (CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
 
+                // Only the player loaded as 1P can check unlockables in real time
+                var SaveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data;
+
                 switch (this.Condition)
                 {
                     case "ch":
-                        return (CLangManager.LangInstance.GetString(90002) + this.Values[0]);
+                        return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
                     case "cs":
                         return (CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                    case "ce":
+                        return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0]);
                 }
                 return (CLangManager.LangInstance.GetString(90000));
             }
@@ -316,7 +323,7 @@ namespace TJAPlayer3
                             {
                                 string key = _songId + _aimedDifficulty.ToString();
                                 var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
-                                if (_cht != null && _cht.ClearStatus >= _aimedStatus) _count++;
+                                if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
 
                             }
                             else if (_aimedDifficulty < (int)Difficulty.Easy)
@@ -325,7 +332,7 @@ namespace TJAPlayer3
                                 {
                                     string key = _songId + diff.ToString();
                                     var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
-                                    if (_cht != null && _cht.ClearStatus >= _aimedStatus)
+                                    if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus)
                                     {
                                         _count++;
                                         break;

@@ -130,4 +130,21 @@ namespace System
         }
     }
 
+
+    // Below methods are added by 0AuBSQ
+
+    public static class StringExtensions
+    {
+        public static string SafeFormat(this string format, params object?[] args)
+        {
+            try
+            {
+                return String.Format(format, args);
+            }
+            catch
+            {
+                return format;
+            }
+        }
+    }
 }
