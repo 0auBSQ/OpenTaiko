@@ -414,7 +414,8 @@ namespace TJAPlayer3
 				}
 				else if (TJAPlayer3.ConfigIni.bAIBattleMode)
 				{
-					TJAPlayer3.Tx.SongLoading_Bg_AI_Wait.t2D描画(0, 0);
+                    TJAPlayer3.ConfigIni.tInitializeAILevel();
+                    TJAPlayer3.Tx.SongLoading_Bg_AI_Wait.t2D描画(0, 0);
 					drawPlate_AI();
 				}
 				else

@@ -19,8 +19,8 @@ namespace TJAPlayer3
             {
                 float mult = 1f;
 
-                if (Gauge == "Hard") mult *= 1.5f;
-                if (Gauge == "Extreme") mult *= 1.8f;
+                if (Gauge == "Hard" && !TJAPlayer3.ConfigIni.bForceNormalGauge) mult *= 1.5f;
+                if (Gauge == "Extreme" && !TJAPlayer3.ConfigIni.bForceNormalGauge) mult *= 1.8f;
 
                 return mult;
             }

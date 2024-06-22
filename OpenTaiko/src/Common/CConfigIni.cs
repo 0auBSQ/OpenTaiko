@@ -1505,7 +1505,8 @@ namespace TJAPlayer3
 
 		public bool bAuto先生の連打;
 		public int nRollsPerSec;
-		public int nAILevel;
+		public int nDefaultAILevel = 4;
+		public int nAILevel = 4;
 		public bool bAIBattleMode = false;
 
 		public CAIPerformances[] apAIPerformances =
@@ -1594,6 +1595,11 @@ namespace TJAPlayer3
 		public bool bBufferedInputs;
 		public bool bIsEnabledSystemMenu;			// #28200 2012.5.1 yyagi System Menuの使用可否切替
 		public string strSystemSkinSubfolderFullName;	// #28195 2012.5.2 yyagi Skin切替用 System/以下のサブフォルダ名
+
+		public void tInitializeAILevel()
+		{
+			this.nAILevel = this.nDefaultAILevel;
+		}
 
 		public bool bEnterがキー割り当てのどこにも使用されていない
 		{
@@ -2497,7 +2503,7 @@ namespace TJAPlayer3
 			sw.WriteLine("Taiko5P={0}", this.bAutoPlay[4] ? 1 : 0);
 			sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
-			sw.WriteLine("AILevel={0}", this.nAILevel);
+			sw.WriteLine("DefaultAILevel={0}", this.nDefaultAILevel);
 			//sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
 			sw.WriteLine();
             sw.WriteLine(";-------------------");
@@ -3407,9 +3413,10 @@ namespace TJAPlayer3
                                         {
 											this.nRollsPerSec = int.Parse(str4);
                                         }
-										else if (str3.Equals("AILevel"))
+										else if (str3.Equals("DefaultAILevel"))
                                         {
-											this.nAILevel = int.Parse(str4);
+											this.nDefaultAILevel = int.Parse(str4);
+											this.nAILevel = this.nDefaultAILevel;
 										}
 										/*
 										if (str3.Equals("AIBattleMode"))

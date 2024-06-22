@@ -1243,6 +1243,7 @@ namespace TJAPlayer3
 								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
                                 ConfigIni.nPlayerCount = 2;
 								ConfigIni.bAIBattleMode = true;
+								ConfigIni.tInitializeAILevel();
 								//-----------------------------
 								#endregion
 								break;
