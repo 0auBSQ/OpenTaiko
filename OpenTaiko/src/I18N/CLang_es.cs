@@ -87,7 +87,7 @@ namespace TJAPlayer3
             [39] = "Si activas esto, se tomará una captura\n cuando obtengas un nuevo récord.",
             [40] = "Comparte la información del .tja que estas\n jugando en Discord.",
             [41] = "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
-            [42] = "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
+            [42] = "Actívalo para guardar info. de depuración\n en OpenTaiko.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
             // ----------------------------------
             [43] = "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n" +
                  "\n" +
