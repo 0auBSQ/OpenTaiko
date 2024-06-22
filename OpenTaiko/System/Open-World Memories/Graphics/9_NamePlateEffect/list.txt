@@ -19,3 +19,6 @@
 18 - Sky Purple
 19 - AI
 20 - Cyan
+21 - OpTk Yellow (Roll)
+22 - Bol white
+23 - Saturated blue

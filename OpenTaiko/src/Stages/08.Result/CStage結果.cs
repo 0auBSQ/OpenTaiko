@@ -655,7 +655,9 @@ namespace TJAPlayer3
 
 				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
-					if (this.nEarnedMedalsCount[i] > 0)
+					if (TJAPlayer3.ConfigIni.bAutoPlay[i] || TJAPlayer3.ConfigIni.bAIBattleMode && i == 1) continue;
+
+                    if (this.nEarnedMedalsCount[i] > 0)
 						mqModals.tAddModal(
 							new Modal(
 								Modal.EModalType.Coin, 
