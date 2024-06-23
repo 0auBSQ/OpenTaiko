@@ -494,6 +494,10 @@ namespace TJAPlayer3
             [90009] = "Play {0} songs to unlock this item! ({1}/{0})",                          // tp
             [90010] = "{0} {1} songs on {2} difficulty to unlock this item! ({3}/{1})",         // dp
             [90011] = "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
+            [90012] = "Get the following performances to unlock this item:  ({0}/{1})",         // sp, sg, sc
+            [90013] = "- {0} {1} on {2} difficulty.",                                           // sp
+            [90014] = "- {0} {1} songs within the {2} folder. ({3}/{1})",                       // sg
+            [90015] = "- {0} {1} charts made by {2}. ({3}/{1})",                                // sc
 
             [91000] = "Play",
             [91010] = "Play",

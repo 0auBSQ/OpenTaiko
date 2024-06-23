@@ -304,7 +304,70 @@ namespace TJAPlayer3
 
                             var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
                             return CLangManager.LangInstance.GetString(90011).SafeFormat(statusString, this.Values[2], _aimedDifficulty, _count);
-                        }  
+                        }
+                    case "sp":
+                        {
+                            List<string> _rows = new List<string>();
+                            var _challengeCount = this.Values.Length / this.RequiredArgCount;
+
+                            var _count = 0;
+                            for (int i = 0; i < _challengeCount; i++)
+                            {
+                                int _base = i * this.RequiredArgCount;
+                                string _songId = this.Reference[i];
+                                var _aimedDifficulty = this.Values[_base];
+                                var _aimedStatus = this.Values[_base + 1];
+
+                                var diffString = CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
+                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                                var _songName = CSongDict.tGetNodeFromID(_songId)?.strタイトル ?? "[Not found]";
+
+                                _rows.Add(CLangManager.LangInstance.GetString(90013).SafeFormat(statusString, _songName, diffString));
+
+
+                                // Safisfied count
+                                if (_aimedDifficulty >= (int)Difficulty.Easy && _aimedDifficulty <= (int)Difficulty.Edit)
+                                {
+                                    string key = _songId + _aimedDifficulty.ToString();
+                                    var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                    if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
+
+                                }
+                                else if (_aimedDifficulty < (int)Difficulty.Easy)
+                                {
+                                    for (int diff = (int)Difficulty.Easy; diff <= (int)Difficulty.Edit; diff++)
+                                    {
+                                        string key = _songId + diff.ToString();
+                                        var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                        if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus)
+                                        {
+                                            _count++;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Push front
+                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
+                            return String.Join("\n", _rows);
+                        }
+                    case "sg":
+                        {
+                            List<string> _rows = new List<string>();
+
+
+
+                            return String.Join("\n", _rows);
+                        }
+                    case "sc":
+                        {
+                            List<string> _rows = new List<string>();
+
+
+
+                            return String.Join("\n", _rows);
+                        }
 
                 }
                 // Includes cm or ig which are not supposed to be displayed in My Room
