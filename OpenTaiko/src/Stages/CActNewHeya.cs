@@ -704,7 +704,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock != null
                 && !TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                (bool, string?) response = TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
                 //tConditionMet(
                 //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -712,7 +712,7 @@ namespace TJAPlayer3
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-                this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2, this.MenuFont, responseColor, Color.Black, 1000);
+                this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
 
                 return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
             }
@@ -759,7 +759,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Characters[CurrentIndex].unlock != null
                 && !TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[CurrentIndex]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Characters[CurrentIndex].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                (bool, string?) response = TJAPlayer3.Tx.Characters[CurrentIndex].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
                     //TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
                     //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -767,7 +767,7 @@ namespace TJAPlayer3
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-                this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2, this.MenuFont, responseColor, Color.Black, 1000);
+                this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
 
                 return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
             }

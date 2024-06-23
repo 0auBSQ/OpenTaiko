@@ -23,6 +23,7 @@ namespace TJAPlayer3
             ["tp"] = 1,
             ["ap"] = 1,
             ["aw"] = 1,
+            ["ig"] = 0,
         };
 
         public class CUnlockConditions
@@ -67,6 +68,7 @@ namespace TJAPlayer3
             }
 
             /*
+             * (Note: Currently only me is relevant, the other types might be used in the future)
              * == Types of conditions ==
              * l : "Less than"
              * le : "Less or equal"
@@ -110,10 +112,10 @@ namespace TJAPlayer3
              * tp : "Total plays", 1 value : [Total playcount]
              * ap : "AI battle plays", 1 value : [AI battle playcount]
              * aw : "AI battle wins", 1 value : [AI battle wins count]
-             * 
+             * ig : "Impossible to Get", (not recommanded) used to be able to have content in database that is impossible to unlock, no values
              * 
             */
-            public (bool, string) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
+            public (bool, string?) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom)
             {
                 if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
                     RequiredArgCount = RequiredArgs[Condition];
@@ -161,14 +163,15 @@ namespace TJAPlayer3
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
                         else
                             return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires (" + this.RequiredArgCount.ToString() + " * n) values and n references.");
-
+                    case "ig":
+                        return (false, "");
                 }
 
                 return (false, CLangManager.LangInstance.GetString(90000));
             }
 
 
-            public (bool, string) tConditionMet(int[] inputValues, EScreen screen)
+            public (bool, string?) tConditionMet(int[] inputValues, EScreen screen)
             {
                 // Trying to unlock an item from the My Room menu (If my room buy => check if enough coints, else => Display a hint to how to get the item)
                 if (screen == EScreen.MyRoom)
@@ -180,8 +183,8 @@ namespace TJAPlayer3
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
                             return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
-                        case "cs":
-                            return (false, CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                        default:
+                            return (false, null); // Return the same text if my room
                     }
                 }
                 // Unlockables from result screen or specific events (If any buy event => Invalid command, else check)
@@ -248,13 +251,126 @@ namespace TJAPlayer3
                 if (this.Values.Length < this.RequiredArgCount)
                     return (CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
 
+                // Only the player loaded as 1P can check unlockables in real time
+                var SaveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data;
+                var ChartStats = SaveData.bestPlaysStats;
+
                 switch (this.Condition)
                 {
                     case "ch":
-                        return (CLangManager.LangInstance.GetString(90002) + this.Values[0]);
+                        return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
                     case "cs":
                         return (CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                    case "ce":
+                        return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0], SaveData.TotalEarnedMedals);
+                    case "ap":
+                        return CLangManager.LangInstance.GetString(90007).SafeFormat(this.Values[0], SaveData.AIBattleModePlaycount);
+                    case "aw":
+                        return CLangManager.LangInstance.GetString(90008).SafeFormat(this.Values[0], SaveData.AIBattleModeWins);
+                    case "tp":
+                        return CLangManager.LangInstance.GetString(90009).SafeFormat(this.Values[0], SaveData.TotalPlaycount);
+                    case "dp":
+                        {
+                            var _aimedDifficulty = this.Values[0];
+                            var _aimedStatus = this.Values[1];
+
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
+                            if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString(90000));
+
+                            var _table = ChartStats.ClearStatuses[_aimedDifficulty];
+                            var _ura = ChartStats.ClearStatuses[(int)Difficulty.Edit];
+                            int _count = 0;
+                            for (int i = _aimedStatus; i < (int)EClearStatus.TOTAL; i++)
+                            {
+                                _count += _table[i];
+                                if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
+                            }
+                            var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString(92013) : CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
+                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                            return CLangManager.LangInstance.GetString(90010).SafeFormat(statusString, this.Values[2], diffString, _count);
+                        }
+                    case "lp":
+                        {
+                            var _aimedDifficulty = this.Values[0];
+                            var _aimedStatus = this.Values[1];
+
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
+
+                            int _count = 0;
+                            if (_aimedStatus == (int)EClearStatus.NONE) _count = ChartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else if (_aimedStatus <= (int)EClearStatus.CLEAR) _count = ChartStats.LevelClears.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else if (_aimedStatus == (int)EClearStatus.FC) _count = ChartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+                            else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+
+                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                            return CLangManager.LangInstance.GetString(90011).SafeFormat(statusString, this.Values[2], _aimedDifficulty, _count);
+                        }
+                    case "sp":
+                        {
+                            List<string> _rows = new List<string>();
+                            var _challengeCount = this.Values.Length / this.RequiredArgCount;
+
+                            var _count = 0;
+                            for (int i = 0; i < _challengeCount; i++)
+                            {
+                                int _base = i * this.RequiredArgCount;
+                                string _songId = this.Reference[i];
+                                var _aimedDifficulty = this.Values[_base];
+                                var _aimedStatus = this.Values[_base + 1];
+
+                                var diffString = CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
+                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                                var _songName = CSongDict.tGetNodeFromID(_songId)?.strタイトル ?? "[Not found]";
+
+                                _rows.Add(CLangManager.LangInstance.GetString(90013).SafeFormat(statusString, _songName, diffString));
+
+
+                                // Safisfied count
+                                if (_aimedDifficulty >= (int)Difficulty.Easy && _aimedDifficulty <= (int)Difficulty.Edit)
+                                {
+                                    string key = _songId + _aimedDifficulty.ToString();
+                                    var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                    if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
+
+                                }
+                                else if (_aimedDifficulty < (int)Difficulty.Easy)
+                                {
+                                    for (int diff = (int)Difficulty.Easy; diff <= (int)Difficulty.Edit; diff++)
+                                    {
+                                        string key = _songId + diff.ToString();
+                                        var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
+                                        if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus)
+                                        {
+                                            _count++;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Push front
+                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
+                            return String.Join("\n", _rows);
+                        }
+                    case "sg":
+                        {
+                            List<string> _rows = new List<string>();
+
+
+
+                            return String.Join("\n", _rows);
+                        }
+                    case "sc":
+                        {
+                            List<string> _rows = new List<string>();
+
+
+
+                            return String.Join("\n", _rows);
+                        }
+
                 }
+                // Includes cm or ig which are not supposed to be displayed in My Room
                 return (CLangManager.LangInstance.GetString(90000));
             }
 
@@ -316,7 +432,7 @@ namespace TJAPlayer3
                             {
                                 string key = _songId + _aimedDifficulty.ToString();
                                 var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
-                                if (_cht != null && _cht.ClearStatus >= _aimedStatus) _count++;
+                                if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
 
                             }
                             else if (_aimedDifficulty < (int)Difficulty.Easy)
@@ -325,7 +441,7 @@ namespace TJAPlayer3
                                 {
                                     string key = _songId + diff.ToString();
                                     var _cht = bpDistinctCharts.TryGetValue(key, out var value) ? value : null;
-                                    if (_cht != null && _cht.ClearStatus >= _aimedStatus)
+                                    if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus)
                                     {
                                         _count++;
                                         break;

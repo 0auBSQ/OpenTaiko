@@ -1,7 +1,11 @@
 {
-	"condition": "ch",
+	"condition": "sp",
 	"type": "me",
 	"values": [
-		8888,
+		3,
+		3
+	],
+	"references": [
+		"lostemDashy",
 	],
 }

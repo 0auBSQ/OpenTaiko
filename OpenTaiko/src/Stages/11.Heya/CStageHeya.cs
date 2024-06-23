@@ -893,8 +893,11 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]))
             {
-                this.ttkInfoSection = new TitleTextureKey(TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage()
-                    , this.pfHeyaFont, Color.White, Color.Black, 1000);
+                string _cond = "???";
+                if (HRarity.tRarityToModalInt(TJAPlayer3.Tx.Characters[iCharacterCurrent].metadata.Rarity) 
+                    < HRarity.tRarityToModalInt("Epic"))
+                    _cond = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage();
+                this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
             else
                 this.ttkInfoSection = null;
@@ -908,7 +911,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                (bool, string?) response = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
                     //TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
                     //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -916,7 +919,7 @@ namespace TJAPlayer3
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-                this.ttkInfoSection = new TitleTextureKey(response.Item2, this.pfHeyaFont, responseColor, Color.Black, 1000);
+                this.ttkInfoSection = new TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.pfHeyaFont, responseColor, Color.Black, 1000);
 
                 return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
             }
@@ -935,8 +938,11 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
             {
-                this.ttkInfoSection = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMessage()
-                    , this.pfHeyaFont, Color.White, Color.Black, 1000);
+                string _cond = "???";
+                if (HRarity.tRarityToModalInt(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].metadata.Rarity)
+                    < HRarity.tRarityToModalInt("Epic"))
+                    _cond = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMessage();
+                this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
             else
                 this.ttkInfoSection = null;
@@ -951,7 +957,7 @@ namespace TJAPlayer3
             if (TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]))
             {
-                (bool, string) response = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
+                (bool, string?) response = TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMetWrapper(TJAPlayer3.SaveFile);
                 //tConditionMet(
                 //new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -959,7 +965,7 @@ namespace TJAPlayer3
 
                 // Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-                this.ttkInfoSection = new TitleTextureKey(response.Item2, this.pfHeyaFont, responseColor, Color.Black, 1000);
+                this.ttkInfoSection = new TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.pfHeyaFont, responseColor, Color.Black, 1000);
 
                 return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
             }

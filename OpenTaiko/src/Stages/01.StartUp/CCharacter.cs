@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FDK;
 using System.IO;
+using static TJAPlayer3.DBNameplateUnlockables;
 
 namespace TJAPlayer3
 {
@@ -23,6 +24,38 @@ namespace TJAPlayer3
             mult *= effect.GetCoinMultiplier();
 
             return mult;
+        }
+
+        public void tGetUnlockedItems(int _player, ModalQueue mq)
+        {
+            int player = TJAPlayer3.GetActualPlayer(_player);
+            var _sf = TJAPlayer3.SaveFileInstances[player].data.UnlockedCharacters;
+            bool _edited = false;
+
+            var _npvKey = Path.GetFileName(_path);
+
+            if (!_sf.Contains(_npvKey))
+            {
+                var _fulfilled = unlock?.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1 ?? false;
+
+                if (_fulfilled)
+                {
+                    _sf.Add(_npvKey);
+                    _edited = true;
+                    mq.tAddModal(
+                        new Modal(
+                            Modal.EModalType.Character,
+                            HRarity.tRarityToModalInt(metadata.Rarity),
+                            _npvKey
+                            ),
+                        _player);
+
+                    DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[player].data.SaveId, "unlocked_characters", _npvKey);
+                }
+            }
+
+            if (_edited)
+                TJAPlayer3.SaveFileInstances[player].tApplyHeyaChanges();
         }
 
         public CCharacter(string path)

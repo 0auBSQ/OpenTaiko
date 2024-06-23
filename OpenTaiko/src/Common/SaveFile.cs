@@ -72,6 +72,8 @@ namespace TJAPlayer3
 
         public void tRegisterAIBattleModePlay(bool IsWon)
         {
+            data.AIBattleModePlaycount++;
+            if (IsWon) data.AIBattleModeWins++;
             DBSaves.RegisterAIBattleModePlay(data.SaveId, IsWon);
         }
 

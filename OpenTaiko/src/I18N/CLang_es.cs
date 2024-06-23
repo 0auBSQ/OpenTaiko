@@ -474,7 +474,7 @@ namespace TJAPlayer3
 
             [90000] = "[ERROR] Condicion no valida",
             [90001] = "Item solamente disponible en la tienda.",
-            [90002] = "Precio: ",
+            [90002] = "Precio: {0}",
             [90003] = "Item comprado!",
             [90004] = "Monedas insuficientes!",
             [90005] = "Esta condición: ",

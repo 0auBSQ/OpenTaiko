@@ -481,7 +481,7 @@ namespace TJAPlayer3
 
             [90000] = "[ERROR] Invalid condition",
             [90001] = "Item only avaliable at the Shop.",
-            [90002] = "Coin price : ",
+            [90002] = "Coin price : {0}",
             [90003] = "Item bought !",
             [90004] = "Not enough coins !",
             [90005] = "The following condition : ",
