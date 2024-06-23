@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using DiscordRPC;
 using static TJAPlayer3.CActSelect曲リスト;
 using System.Text;
+using System.ArrayExtensions;
 
 namespace TJAPlayer3
 {
@@ -665,7 +666,21 @@ namespace TJAPlayer3
 								this.nEarnedMedalsCount[i]), 
 							i);
 
-					TJAPlayer3.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, mqModals);
+					// Check unlockables
+					{
+                        TJAPlayer3.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, mqModals);
+
+                        foreach (var puchi in TJAPlayer3.Tx.Puchichara)
+                        {
+                            puchi.tGetUnlockedItems(i, mqModals);
+                        }
+
+                        foreach (var chara in TJAPlayer3.Tx.Characters)
+                        {
+                            chara.tGetUnlockedItems(i, mqModals);
+                        }
+                    }
+					
                 }
 
 				displayedModals = new Modal[] { null, null, null, null, null };

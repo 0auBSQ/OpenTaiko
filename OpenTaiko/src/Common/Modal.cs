@@ -17,6 +17,7 @@ namespace TJAPlayer3
             rarity = ra;
             reference = re;
             _isSet = false;
+            // TODO: Add an int (?) or string to find the Puchichara/Character/Song asset to display it
         }
 
         public void tSetupModal()
@@ -180,6 +181,8 @@ namespace TJAPlayer3
             Title = 3,
             Text = 4,
             Confirm = 5,
+            Song = 6,
+            Total = 7,
         }
 
         // Full : 1P standard modal, Half : Splitted screen modal
@@ -241,6 +244,18 @@ namespace TJAPlayer3
                     );
             }
             else if (modalType == EModalType.Title)
+            {
+                content = (string)reference;
+            }
+            else if (modalType == EModalType.Character)
+            {
+                content = (string)reference;
+            }
+            else if (modalType == EModalType.Puchichara)
+            {
+                content = (string)reference;
+            }
+            else if (modalType == EModalType.Song)
             {
                 content = (string)reference;
             }
