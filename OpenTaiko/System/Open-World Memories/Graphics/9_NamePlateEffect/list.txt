@@ -14,8 +14,8 @@
 13 - Platinum
 14 - Kohaku (Character plate)
 15 - Dashy (Character plate)
-16 - OpTk Blue
-17 - OpTk Red
+16 - Blue
+17 - Red
 18 - Sky Purple
 19 - AI
 20 - Cyan
@@ -26,3 +26,6 @@
 25 - OpTk Chapter I
 26 - OpTk Chapter II
 27 - OpTk Chapter III
+28 - OpTk Light
+29 - OpTk Dark
+30 - NEP0

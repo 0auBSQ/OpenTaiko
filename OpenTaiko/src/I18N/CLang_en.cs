@@ -422,8 +422,7 @@ namespace TJAPlayer3
             [301] = "Character got !",
             [302] = "Puchichara got !",
             [303] = "Title got !",
-            [304] = "Notice",
-            [305] = "Confirm",
+            [304] = "Song got !",
             [306] = "Coins",
             [307] = "Total",
 

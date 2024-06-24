@@ -1,11 +1,11 @@
 {
-	"condition": "sg",
+	"condition": "sc",
 	"type": "me",
 	"values": [
-		3,
+		20,
 		2
 	],
 	"references": [
-		"Dashy's Secrets",
+		"bol",
 	],
 }

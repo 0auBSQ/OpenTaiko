@@ -669,6 +669,7 @@ namespace TJAPlayer3
 					// Check unlockables
 					{
                         TJAPlayer3.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, mqModals);
+						TJAPlayer3.Databases.DBSongUnlockables.tGetUnlockedItems(i, mqModals);
 
                         foreach (var puchi in TJAPlayer3.Tx.Puchichara)
                         {

@@ -265,6 +265,7 @@ namespace TJAPlayer3
             SongSelect_Frame_Random = TxC(SONGSELECT + @$"Frame_Random.png");
             SongSelect_Bar_Genre_Back = TxC(SONGSELECT + @$"Bar_Genre_Back.png");
             SongSelect_Bar_Genre_Locked = TxC(SONGSELECT + @$"Bar_Genre_Locked.png");
+            SongSelect_Bar_Genre_Locked_Top = TxC(SONGSELECT + @$"Bar_Genre_Locked_Top.png");
             SongSelect_Bar_Genre_Random = TxC(SONGSELECT + @$"Bar_Genre_Random.png");
             SongSelect_Bar_Genre_RecentryPlaySong = TxC(SONGSELECT + @$"Bar_Genre_RecentryPlaySong.png");
             SongSelect_Bar_Select = TxC(SONGSELECT + @$"Bar_Select.png");
@@ -286,6 +287,7 @@ namespace TJAPlayer3
             SongSelect_ScoreRank = TxC(SONGSELECT + @$"ScoreRank.png");
             SongSelect_BoardNumber = TxC(SONGSELECT + @$"BoardNumber.png");
             SongSelect_Difficulty_Cymbol = TxC(SONGSELECT + "Difficulty_Cymbol.png");
+            SongSelect_Unlock_Conditions = TxC(SONGSELECT + "Unlock_Conditions.png");
 
             SongSelect_Favorite = TxC(SONGSELECT + @$"Favorite.png");
             SongSelect_High_Score = TxC(SONGSELECT + @$"High_Score.png");
@@ -2621,6 +2623,7 @@ namespace TJAPlayer3
             SongSelect_Bar_Center,
             SongSelect_Bar_Genre_Back, 
             SongSelect_Bar_Genre_Locked,
+            SongSelect_Bar_Genre_Locked_Top,
             SongSelect_Bar_Genre_Random,
             SongSelect_Bar_Genre_RecentryPlaySong,
             SongSelect_Level_Number,
@@ -2642,6 +2645,7 @@ namespace TJAPlayer3
             SongSelect_Song_Number,
             SongSelect_BoardNumber,
             SongSelect_Difficulty_Cymbol,
+            SongSelect_Unlock_Conditions,
             SongSelect_Tower_Side,
 
             SongSelect_Favorite,

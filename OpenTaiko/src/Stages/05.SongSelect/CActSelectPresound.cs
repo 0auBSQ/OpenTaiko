@@ -30,7 +30,7 @@ namespace TJAPlayer3
             if( ( cスコア != null ) && ( ( !( cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名 ).Equals( this.str現在のファイル名 ) || ( this.sound == null ) ) || !this.sound.IsPlaying ) )
 			{
 				this.tStopSound();
-				this.tBGMフェードイン開始();
+                this.tBGMフェードイン開始();
                 this.long再生位置 = -1;
 				if( ( cスコア.譜面情報.strBGMファイル名 != null ) && ( cスコア.譜面情報.strBGMファイル名.Length > 0 ) )
 				{
@@ -163,7 +163,12 @@ namespace TJAPlayer3
 		private void tプレビューサウンドの作成()
 		{
 			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
-			if( ( cスコア != null ) && !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) && TJAPlayer3.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading )
+            var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(TJAPlayer3.stageSongSelect.rNowSelectedSong);
+            if ( ( cスコア != null ) 
+				&& !string.IsNullOrEmpty( cスコア.譜面情報.strBGMファイル名 ) 
+				&& TJAPlayer3.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading 
+				&& HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED
+                )
 			{
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try
