@@ -17,6 +17,8 @@ using Point = System.Drawing.Point;
 using Color = System.Drawing.Color;
 using RectangleF = System.Drawing.RectangleF;
 using SkiaSharp;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Runtime.ExceptionServices;
 
 namespace TJAPlayer3
 {
@@ -91,7 +93,9 @@ namespace TJAPlayer3
 			}
 		}
 
-		public void ResetSongIndex()
+        public TitleTextureKey ttkNowUnlockConditionText = null;
+
+        public void ResetSongIndex()
         {
 			nSelectSongIndex = 0;
 			this.rCurrentlySelectedSong = TJAPlayer3.Songs管理.list曲ルート[nSelectSongIndex];
@@ -1142,7 +1146,7 @@ namespace TJAPlayer3
 			// 描画。
 			if (this.rCurrentlySelectedSong == null)
 			{
-				#region [ 曲が１つもないなら「Songs not found.」を表示してここで帰れ。]
+				#region [Songs not found / Enumerating song screens]
 				//-----------------
 				if (bIsEnumeratingSongs)
 				{
@@ -1483,10 +1487,19 @@ namespace TJAPlayer3
 				else if (n見た目の行番号 != barCenterNum)
 					ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, TJAPlayer3.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(
 						xAnime - Box_X + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別), y - Box_Y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別));
-				#endregion
+                #endregion
 
-				//-----------------					
-			}
+                var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(stバー情報[nパネル番号].reference);
+                var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(stバー情報[nパネル番号].reference);
+
+				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED)
+				{
+                    TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画(xAnime - (int)Box_X, y - ((int)Box_Y));
+                }
+                
+
+                //-----------------					
+            }
 			#endregion
 
 			
@@ -1547,119 +1560,139 @@ namespace TJAPlayer3
 
                 if (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE)
                 {
-					#region [ Score ]
+                    #region [ Score ]
 
-					#region [ Bar ]
+                    var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+                    var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
 
-					//int boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
-					var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
-					var bar_genre_overlap = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
+                    #region [ Bar ]
 
-					DrawBarCenter(bar_genre, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
-                    DrawBarCenter(bar_genre_overlap, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, true);
+					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED)
+					{
+                        DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
+                    }
+					else
+					{
+                        var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
+                        var bar_genre_overlap = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
+
+                        DrawBarCenter(bar_genre, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, false, false);
+                        DrawBarCenter(bar_genre_overlap, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, true, true);
+
+                        #region [ Crown and ScoreRank ]
+
+                        // Mark
+
+                        if (this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Dan] != null)
+                        {
+                            //int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Dan].譜面情報.nクリア;
+
+                            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                            {
+                                if (i >= 2) continue;
+
+                                int ap = TJAPlayer3.GetActualPlayer(i);
+
+                                var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
+
+                                int[] clear = TableEntry.ClearStatuses;
+
+                                int currentRank = Math.Min(clear[(int)Difficulty.Dan], 8) - 3;
+
+                                int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i];
+                                int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i];
+
+                                displayDanStatus((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), currentRank, 0.2f);
+                            }
+
+                        }
+                        else if (this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Tower] != null)
+                        {
+                            //int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nクリア;
+
+                            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                            {
+                                if (i >= 2) continue;
+
+                                int ap = TJAPlayer3.GetActualPlayer(i);
+                                var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
+
+                                int[] clear = TableEntry.ClearStatuses;
+
+                                int currentRank = Math.Min(clear[(int)Difficulty.Tower], 8) - 2;
+
+                                int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_X[i];
+                                int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_Y[i];
+
+                                displayTowerStatus((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), currentRank, 0.3f);
+                            }
+                        }
+                        else if (this.rCurrentlySelectedSong.arスコア[3] != null || this.rCurrentlySelectedSong.arスコア[4] != null)
+                        {
+                            //var sr = this.rCurrentlySelectedSong.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.rCurrentlySelectedSong)];
+
+                            for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
+                            {
+                                if (i >= 2) continue;
+
+                                int ap = TJAPlayer3.GetActualPlayer(i);
+                                var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(TJAPlayer3.stageSongSelect.rNowSelectedSong.tGetUniqueId());
+
+                                int[] クリア = TableEntry.ClearStatuses;
+
+                                int[] スコアランク = TableEntry.ScoreRanks;
+
+                                int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_X[i];
+                                int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_Y[i];
+
+                                displayRegularCrowns((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
+
+                            }
+                        }
+
+
+                        #endregion
+
+                        #region [Favorite status and Locked icon]
+
+                        if (IsSongLocked)
+                        {
+                            displayVisibleLockStatus(
+                                (int)(TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0] - centerMoveX / 1.1f),
+                                (int)(TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1] - centerMove / 1.1f), 1f);
+                        }
+                        else
+                        {
+                            displayFavoriteStatus(
+                            (int)(TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0] - centerMoveX / 1.1f),
+                            (int)(TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1] - centerMove / 1.1f), this.rCurrentlySelectedSong.uniqueId, 1f + BarAnimeCount / 620f);
+                        }
+                        #endregion
+
+                        #region [Level number big]
+
+                        tPrintLevelNumberBig(
+                            (int)(TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_Level_Offset[0] - centerMoveX / 1.1f),
+                            (int)(TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_Level_Offset[1] - centerMove / 1.1f),
+                            this.rCurrentlySelectedSong
+                            );
+
+                        #endregion
+                    }
 
                     #endregion
 
-                    #region [ Crown and ScoreRank ]
-
-                    // Mark
-
-                    if (this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Dan] != null)
-                    {
-						//int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Dan].譜面情報.nクリア;
-
-						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-						{
-							if (i >= 2) continue;
-
-							int ap = TJAPlayer3.GetActualPlayer(i);
-
-                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
-
-							int[] clear = TableEntry.ClearStatuses; 
-
-							int currentRank = Math.Min(clear[(int)Difficulty.Dan], 8) - 3;
-
-							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_X[i];
-							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_DanStatus_Offset_Y[i];
-
-							displayDanStatus((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), currentRank, 0.2f);
-						}
-
-					}
-					else if (this.rCurrentlySelectedSong.arスコア[(int)Difficulty.Tower] != null)
-					{
-						//int[] clear = this.r現在選択中の曲.arスコア[(int)Difficulty.Tower].譜面情報.nクリア;
-
-						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-						{
-							if (i >= 2) continue;
-
-							int ap = TJAPlayer3.GetActualPlayer(i);
-                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
-
-                            int[] clear = TableEntry.ClearStatuses;
-
-							int currentRank = Math.Min(clear[(int)Difficulty.Tower], 8) - 2;
-
-							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_X[i];
-							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_TowerStatus_Offset_Y[i];
-
-							displayTowerStatus((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), currentRank, 0.3f);
-						}
-					}
-					else if (this.rCurrentlySelectedSong.arスコア[3] != null || this.rCurrentlySelectedSong.arスコア[4] != null)
-					{
-						//var sr = this.rCurrentlySelectedSong.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.rCurrentlySelectedSong)];
-
-						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-						{
-							if (i >= 2) continue;
-
-							int ap = TJAPlayer3.GetActualPlayer(i);
-                            var TableEntry = TJAPlayer3.SaveFileInstances[ap].data.tGetSongSelectTableEntry(TJAPlayer3.stageSongSelect.rNowSelectedSong.tGetUniqueId());
-
-                            int[] クリア = TableEntry.ClearStatuses;
-
-							int[] スコアランク = TableEntry.ScoreRanks;
-
-							int x = TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_X[i];
-							int y = TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_RegularCrowns_Offset_Y[i];
-
-							displayRegularCrowns((int)(x - centerMoveX / 1.1f), (int)(y - centerMove / 1.1f), クリア, スコアランク, 0.8f + BarAnimeCount / 620f);
-							
-						}
-					}
 
 
-					#endregion
-
-					#region [Favorite status]
-
-					displayFavoriteStatus(
-						(int)(TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0] - centerMoveX / 1.1f),
-						(int)(TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1] - centerMove / 1.1f), this.rCurrentlySelectedSong.uniqueId, 1f + BarAnimeCount / 620f);
 
                     #endregion
-
-                    #region [Level number big]
-
-                    tPrintLevelNumberBig(
-						(int)(TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum] + TJAPlayer3.Skin.SongSelect_Level_Offset[0] - centerMoveX / 1.1f),
-						(int)(TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum] + TJAPlayer3.Skin.SongSelect_Level_Offset[1] - centerMove / 1.1f),
-                        this.rCurrentlySelectedSong
-                        );
-
-					#endregion
-
-					#endregion
-				}
+                }
                 if (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX)
                 {
 					#region [ Box ]
 
 					//int boxType = nStrジャンルtoNum(r現在選択中の曲.strジャンル);
-					var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre);
+					var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre); // Box
 					var bar_genre_overlap = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap);
 
 					//DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre[boxType], TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, true, true, false);
@@ -1693,7 +1726,12 @@ namespace TJAPlayer3
 				{
 					case CSongListNode.ENodeType.SCORE:
 						{
-							if (TJAPlayer3.Tx.SongSelect_Frame_Score != null)
+                            var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+                            var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
+
+                            #region [Difficulty bars]
+
+                            if (TJAPlayer3.Tx.SongSelect_Frame_Score != null && HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED)
 							{
 								// 難易度がTower、Danではない
 								if (TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan)
@@ -1937,12 +1975,16 @@ namespace TJAPlayer3
 								}
 
 							}
-						}
-						break;
+
+                            #endregion
+                        }
+                        break;
 
 					case CSongListNode.ENodeType.BOX:
 						{
-							for (int j = 0; j < 3; j++)
+                            #region [Box explanation]
+
+                            for (int j = 0; j < 3; j++)
 							{
 								if (!ctBoxOpen.IsEnded && ctBoxOpen.CurrentValue != 0)
 								{
@@ -1960,9 +2002,11 @@ namespace TJAPlayer3
 								this.txBoxText[j].t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.SongSelect_BoxExplanation_X, TJAPlayer3.Skin.SongSelect_BoxExplanation_Y + j * TJAPlayer3.Skin.SongSelect_BoxExplanation_Interval);
 							}
 
-							// Chara here
+                            #endregion
 
-							var box_chara = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxChara, TJAPlayer3.Tx.SongSelect_Box_Chara);
+                            #region [Box chara]
+
+                            var box_chara = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxChara, TJAPlayer3.Tx.SongSelect_Box_Chara);
 
 							// If BoxChara < 0, don't display any character
                             {
@@ -1985,6 +2029,8 @@ namespace TJAPlayer3
 									new Rectangle(box_chara.szTextureSize.Width / 2, 0,
 									box_chara.szTextureSize.Width / 2, box_chara.szTextureSize.Height));
 							}
+
+							#endregion
 						}
 						break;
 
@@ -2054,7 +2100,7 @@ namespace TJAPlayer3
 
 					// (A) スクロールが停止しているときの選択曲バーの描画。
 
-					#region [ タイトル名テクスチャを描画。]
+					#region [ Nastiest Song Title display method I ever saw]
 
 					// Fonts here
 
@@ -2127,9 +2173,18 @@ namespace TJAPlayer3
 								(rCurrentlySelectedSong.eノード種別 != CSongListNode.ENodeType.BACKBOX ? (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMove : centerMove / 1.1f) : 0));
 						}
 					}
-					//-----------------
-					#endregion
-				}
+                    //-----------------
+                    #endregion
+
+                    var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+                    var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
+
+					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED)
+					{
+                        DrawBarCenter(TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top, TJAPlayer3.Skin.SongSelect_Bar_X[barCenterNum], TJAPlayer3.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
+                        //TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画();
+					}
+                }
 			}
 			//-----------------
 
@@ -2761,7 +2816,21 @@ namespace TJAPlayer3
 			}
 			nSelectSongIndex = index;
 			rCurrentlySelectedSong = list[index];
-		}
+
+            var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+			if (IsSongLocked)
+			{
+				var SongUnlockable = TJAPlayer3.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(rCurrentlySelectedSong);
+				if (SongUnlockable != null)
+				{
+                    string _cond = "???";
+                    if (HRarity.tRarityToModalInt(SongUnlockable.rarity)
+                        < HRarity.tRarityToModalInt("Epic"))
+                        _cond = SongUnlockable.unlockConditions.tConditionMessage();
+                    this.ttkNowUnlockConditionText = new TitleTextureKey(_cond, this.pfBoxText, Color.White, Color.Black, 1000);
+                }
+            }
+        }
 		public CSongListNode rGetSideSong(int change)
 		{
 			if (rCurrentlySelectedSong == null) return null; 
@@ -2781,7 +2850,9 @@ namespace TJAPlayer3
 				index += list.Count;
 			}
 
-			return list[index];
+			var _sideNode = list[index];
+
+            return _sideNode;
 		}
 
 		public void tバーの初期化()
@@ -2880,7 +2951,11 @@ namespace TJAPlayer3
 			if (x >= SampleFramework.GameWindowSize.Width || y >= SampleFramework.GameWindowSize.Height)
 				return;
 
-			var rc = new Rectangle(0, 48, 128, 48);
+			var IsSongLocked = TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(reference);
+			var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(reference);
+
+
+            var rc = new Rectangle(0, 48, 128, 48);
 
 			int opct = 255;
 
@@ -2931,11 +3006,17 @@ namespace TJAPlayer3
 			}
 			else if (eバー種別 != Eバー種別.BackBox)
 			{
-				HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre)?.t2D描画(x, y);
-				HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap)?.t2D描画(x, y);
-
-                if (TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay != null)
-					TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.t2D描画(x, y);
+				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED)
+				{
+                    TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked?.t2D描画(x, y);
+					return;
+                }
+				else
+				{
+                    HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre)?.t2D描画(x, y);
+                    HGenreBar.tGetGenreBar(boxType, TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlap)?.t2D描画(x, y);
+                    TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay?.t2D描画(x, y);    
+                }
 			}
 			else
 			{
@@ -2978,12 +3059,20 @@ namespace TJAPlayer3
 					}
 				}
 
-				displayFavoriteStatus(x + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0], y + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1], csu, 1f);
+				if (IsSongLocked)
+				{
+					displayVisibleLockStatus(x + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0], y + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1], 1f);
+				}
+				else
+				{
+                    displayFavoriteStatus(x + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[0], y + TJAPlayer3.Skin.SongSelect_FavoriteStatus_Offset[1], csu, 1f);
+                }
+
                 tPrintLevelNumberBig(
-                        x + TJAPlayer3.Skin.SongSelect_Level_Offset[0],
-                        y + TJAPlayer3.Skin.SongSelect_Level_Offset[1],
-                        reference
-                        );
+                            x + TJAPlayer3.Skin.SongSelect_Level_Offset[0],
+                            y + TJAPlayer3.Skin.SongSelect_Level_Offset[1],
+                            reference
+                            );
             }
 		}
 
@@ -3103,6 +3192,16 @@ namespace TJAPlayer3
 				TJAPlayer3.Tx.SongSelect_Favorite.t2D拡大率考慮中央基準描画(x, y);
 			}
         }
+
+		public void displayVisibleLockStatus(int x, int y, float _resize)
+		{
+			if (TJAPlayer3.Tx.SongSelect_Lock != null)
+			{
+                TJAPlayer3.Tx.SongSelect_Lock.vcScaleRatio.X = _resize;
+                TJAPlayer3.Tx.SongSelect_Lock.vcScaleRatio.Y = _resize;
+                TJAPlayer3.Tx.SongSelect_Lock.t2D拡大率考慮中央基準描画(x, y);
+            }
+		}
 
 		public int nStrジャンルtoNum(string strジャンル)
 		{

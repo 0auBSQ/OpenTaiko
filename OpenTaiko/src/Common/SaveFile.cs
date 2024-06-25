@@ -38,6 +38,7 @@ namespace TJAPlayer3
         {
             data.UnlockedCharacters = DBSaves.FetchStringUnlockedAsset(data.SaveId, "unlocked_characters");
             data.UnlockedPuchicharas = DBSaves.FetchStringUnlockedAsset(data.SaveId, "unlocked_puchicharas");
+            data.UnlockedSongs = DBSaves.FetchStringUnlockedAsset(data.SaveId, "unlocked_songs");
             data.UnlockedNameplateIds = DBSaves.FetchUnlockedNameplateIds(data.SaveId);
             data.DanTitles = DBSaves.FetchUnlockedDanTitles(data.SaveId);
         }
@@ -258,6 +259,9 @@ namespace TJAPlayer3
 
             [JsonProperty("unlockedPuchicharas")]
             public List<string> UnlockedPuchicharas = new List<string>();
+
+            [JsonIgnore]
+            public List<string> UnlockedSongs = new List<string>();
 
             [JsonIgnore]
             public List<int> UnlockedNameplateIds = new List<int>();

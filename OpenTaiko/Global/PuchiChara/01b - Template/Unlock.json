@@ -1,0 +1,17 @@
+{
+	"condition": "sg",
+	"type": "me",
+	"values": [
+		5,
+		2,
+		5,
+		2,
+		5,
+		2
+	],
+	"references": [
+		"OpenTaiko Chapter I",
+		"OpenTaiko Chapter II",
+		"OpenTaiko Chapter III"
+	],
+}

@@ -2296,6 +2296,15 @@ namespace TJAPlayer3
                                     SongSelect_Box_Opening_Interval = float.Parse(strParam);
                                     break;
                                 }
+                                case "SongSelect_Unlock_Conditions_Text":
+                                    {
+                                        string[] strSplit = strParam.Split(',');
+                                        for (int i = 0; i < 2; i++)
+                                        {
+                                            SongSelect_Unlock_Conditions_Text[i] = int.Parse(strSplit[i]);
+                                        }
+                                        break;
+                                    }
                                 case "SongSelect_Difficulty_Select_Title":
                                 {
                                     string[] strSplit = strParam.Split(',');
@@ -9850,6 +9859,8 @@ namespace TJAPlayer3
         public int[] SongSelect_Level_X = new int[] { 485, 607, 729, 851 };
         public int[] SongSelect_Level_Y = new int[] { 400, 400, 400, 400 };
         public int[] SongSelect_Level_Move = new int[] { 0, -17 };
+
+        public int[] SongSelect_Unlock_Conditions_Text = new int[] { 72, 128 };
 
         public int[] SongSelect_Level_Number_Interval = new int[] { 11, 0 };
 

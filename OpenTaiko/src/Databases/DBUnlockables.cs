@@ -355,17 +355,59 @@ namespace TJAPlayer3
                     case "sg":
                         {
                             List<string> _rows = new List<string>();
+                            var _challengeCount = this.Values.Length / this.RequiredArgCount;
+
+                            var _count = 0;
+                            for (int i = 0; i < _challengeCount; i++)
+                            {
+                                int _base = i * this.RequiredArgCount;
+                                string _genreName = this.Reference[i];
+                                int _songCount = this.Values[_base];
+                                var _aimedStatus = this.Values[_base + 1];
+
+                                int _satifsiedCount = 0;
+                                if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.SongGenrePlays.TryGetValue(_genreName, out var value) ? value : 0;
+                                else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.SongGenreClears.TryGetValue(_genreName, out var value) ? value : 0;
+                                else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.SongGenreFCs.TryGetValue(_genreName, out var value) ? value : 0;
+                                else _satifsiedCount = ChartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
+
+                                if (_satifsiedCount >= _songCount) _count++;
 
 
+                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                                _rows.Add(CLangManager.LangInstance.GetString(90014).SafeFormat(statusString, _songCount, _genreName, _satifsiedCount));
+                            }
 
+                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
                             return String.Join("\n", _rows);
                         }
                     case "sc":
                         {
                             List<string> _rows = new List<string>();
+                            var _challengeCount = this.Values.Length / this.RequiredArgCount;
+
+                            var _count = 0;
+                            for (int i = 0; i < _challengeCount; i++)
+                            {
+                                int _base = i * this.RequiredArgCount;
+                                string _charterName = this.Reference[i];
+                                int _songCount = this.Values[_base];
+                                var _aimedStatus = this.Values[_base + 1];
+
+                                int _satifsiedCount = 0;
+                                if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.CharterPlays.TryGetValue(_charterName, out var value) ? value : 0;
+                                else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.CharterClears.TryGetValue(_charterName, out var value) ? value : 0;
+                                else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.CharterFCs.TryGetValue(_charterName, out var value) ? value : 0;
+                                else _satifsiedCount = ChartStats.CharterPerfects.TryGetValue(_charterName, out var value) ? value : 0;
+
+                                if (_satifsiedCount >= _songCount) _count++;
 
 
+                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                                _rows.Add(CLangManager.LangInstance.GetString(90015).SafeFormat(statusString, _songCount, _charterName, _satifsiedCount));
+                            }
 
+                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
                             return String.Join("\n", _rows);
                         }
 
