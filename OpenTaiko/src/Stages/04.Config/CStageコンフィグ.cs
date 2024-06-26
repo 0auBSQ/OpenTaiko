@@ -141,9 +141,9 @@ namespace TJAPlayer3
 		public void ReloadMenus()
         {
 			string[] strMenuItem = {
-					CLangManager.LangInstance.GetString(10085),
-					CLangManager.LangInstance.GetString(10086),
-					CLangManager.LangInstance.GetString(10087)
+					CLangManager.LangInstance.GetString("SETTINGS_SYSTEM"),
+					CLangManager.LangInstance.GetString("SETTINGS_GAME"),
+					CLangManager.LangInstance.GetString("SETTINGS_EXIT")
 			};
 
 			txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
@@ -664,13 +664,13 @@ namespace TJAPlayer3
 				switch( this.n現在のメニュー番号 )
 				{
 					case 0:
-						text = CLangManager.LangInstance.GetString(10091);
+						text = CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DESC");
 						break;
 					case 1:
-						text = CLangManager.LangInstance.GetString(10092);
+						text = CLangManager.LangInstance.GetString("SETTINGS_GAME_DESC");
 						break;
 					case 2:
-						text = CLangManager.LangInstance.GetString(10093);
+						text = CLangManager.LangInstance.GetString("SETTINGS_EXIT_DESC");
 						break;
                 }
 				SKBitmap image = ftフォント.DrawText(text, Color.White, Color.Black, null, 30);

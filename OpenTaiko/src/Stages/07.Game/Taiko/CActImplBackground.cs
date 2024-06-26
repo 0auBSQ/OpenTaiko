@@ -127,8 +127,8 @@ namespace TJAPlayer3
             }
             */
 
-            this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString(1000), pfTowerText, Color.White, Color.Black, 700);
-            this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString(1001), pfTowerText, Color.White, Color.Black, 700);
+            this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText, Color.White, Color.Black, 700);
+            this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText, Color.White, Color.Black, 700);
 
             this.ct炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
             

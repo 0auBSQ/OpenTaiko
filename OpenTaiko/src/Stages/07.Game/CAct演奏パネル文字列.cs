@@ -138,7 +138,7 @@ namespace TJAPlayer3
                 {
                     this.txGENRE.color4 = tTagDict[genreName];
                 }
-                else if (genreName == CLangManager.LangInstance.GetString(101))
+                else if (genreName == CLangManager.LangInstance.GetString("TITLE_MODE_DAN"))
                 {
                     this.txGENRE.color4 = tTagDict["段位道場"];
                 }
