@@ -10,7 +10,6 @@ namespace TJAPlayer3
 {
 	internal class CAct演奏PauseMenu : CActSelectPopupMenu
 	{
-		private readonly string QuickCfgTitle = "ポーズ";
 		// コンストラクタ
 
 		public CAct演奏PauseMenu()
@@ -31,7 +30,7 @@ namespace TJAPlayer3
 					lci[ nConfSet ][ nInst ] = MakeListCItemBase( nConfSet, nInst );
 				}
 			}
-			base.Initialize( lci[ nCurrentConfigSet ][ 0 ], true, QuickCfgTitle, 0 );	// ConfSet=0, nInst=Drums
+			base.Initialize( lci[ nCurrentConfigSet ][ 0 ], true, CLangManager.LangInstance.GetString("PAUSE_TITLE"), 0 );	// ConfSet=0, nInst=Drums
 		}
 
 		private List<CItemBase> MakeListCItemBase( int nConfigSet, int nInst )

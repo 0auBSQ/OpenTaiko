@@ -174,16 +174,18 @@ namespace TJAPlayer3
 
 		public override void CreateManagedResource()											// OPTIONと画像以外共通
 		{
-            if (HPrivateFastFont.FontExists(TJAPlayer3.Skin.FontName))
-            {
-                this.ftフォント = new CCachedFontRenderer(TJAPlayer3.Skin.FontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-            }
-            else
-            {
-                this.ftフォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-            }
+            //if (HPrivateFastFont.FontExists(TJAPlayer3.Skin.FontName))
+            //{
+            //    this.ftフォント = new CCachedFontRenderer(TJAPlayer3.Skin.FontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+            //}
+            //else
+            //{
+            //    this.ftフォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+            //}
+			this.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 
-			TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
+
+            TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
 
 				//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
@@ -573,7 +575,7 @@ namespace TJAPlayer3
 		private const int DESC_H = 0x80;
 		private const int DESC_W = 220;
 		private EItemPanelモード eItemPanelモード;
-		private CCachedFontRenderer ftフォント;
+		internal CCachedFontRenderer ftフォント;
 		private int n現在のメニュー番号;
 		//private CTexture txMenuカーソル;
 		//private CTexture tx下部パネル;

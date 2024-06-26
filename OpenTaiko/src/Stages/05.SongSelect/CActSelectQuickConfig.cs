@@ -10,7 +10,6 @@ namespace TJAPlayer3
 {
 	internal class CActSelectQuickConfig : CActSelectPopupMenu
 	{
-		private readonly string QuickCfgTitle = "Quick Config";
 		// コンストラクタ
 
 		public CActSelectQuickConfig()
@@ -42,7 +41,7 @@ namespace TJAPlayer3
 					lci[ nConfSet ][ nInst ] = MakeListCItemBase( nConfSet, nInst );
 				}
 			}
-			base.Initialize( lci[ nCurrentConfigSet ][ 0 ], true, QuickCfgTitle, 0 );	// ConfSet=0, nInst=Drums
+			base.Initialize( lci[ nCurrentConfigSet ][ 0 ], true, CLangManager.LangInstance.GetString("SONGSELECT_QUICKCONFIG"), 0 );	// ConfSet=0, nInst=Drums
 		}
 
 		private List<CItemBase> MakeListCItemBase( int nConfigSet, int nInst )
@@ -52,52 +51,31 @@ namespace TJAPlayer3
 			#region [ 共通 Target/AutoMode/AutoLane ]
 			#endregion
 			#region [ 個別 ScrollSpeed ]
-			l.Add( new CItemInteger( "ばいそく", 0, 1999, TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile],
-				"演奏時のドラム譜面のスクロールの\n" +
-				"速度を指定します。\n" +
-				"x0.1 ～ x200.0 を指定可能です。",
-				"To change the scroll speed for the\n" +
-				"drums lanes.\n" +
-				"You can set it from x0.5 to x1000.0.\n" +
-				"(ScrollSpeed=x0.5 means half speed)" ) );
+			l.Add( new CItemInteger( CLangManager.LangInstance.GetString("MOD_SPEED"), 0, 1999, TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile],
+				"" ) );
 			#endregion
 			#region [ 共通 Dark/Risky/PlaySpeed ]
-			l.Add( new CItemInteger( "演奏速度", 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
-				"曲の演奏速度を、速くしたり遅くした\n" +
-				"りすることができます。\n" +
-				"（※一部のサウンドカードでは正しく\n" +
-				"再生できない可能性があります。）",
-				"It changes the song speed.\n" +
-				"For example, you can play in half\n" +
-				" speed by setting PlaySpeed = 0.500\n" +
-				" for your practice.\n" +
-				"Note: It also changes the songs' pitch." ) );
+			l.Add( new CItemInteger( CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
+				"" ) );
 			#endregion
 			#region [ 個別 Sud/Hid ]
-            l.Add( new CItemList( "ランダム", CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
-				"いわゆるランダム。\n  RANDOM: ちょっと変わる\n  MIRROR: あべこべ \n  SUPER: そこそこヤバい\n  HYPER: 結構ヤバい\nなお、実装は適当な模様",
-				"Guitar chips come randomly.\n\n Part: swapping lanes randomly for each\n  measures.\n Super: swapping chip randomly\n Hyper: swapping randomly\n  (number of lanes also changes)",
-				new string[] { "OFF", "RANDOM", "あべこべ", "SUPER", "HYPER" } ) );
-            l.Add( new CItemList( "ドロン", CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
+            l.Add( new CItemList( CLangManager.LangInstance.GetString("MOD_RANDOM"), CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
 				"",
-				new string[] { "OFF", "ドロン", "ステルス" } ) );
-            l.Add( new CItemList( "ゲーム", CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
-                "ゲームモード\n" +
-                "TYPE-A: 完走!叩ききりまショー!\n" +
-                "TYPE-B: 完走!叩ききりまショー!(激辛)\n" +
-                " \n",
-                " \n" +
-                " \n" +
-                " ",
-                new string[] { "OFF", "完走!", "完走!激辛" }) );
+				new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_RANDOM"), CLangManager.LangInstance.GetString("MOD_FLIP"), "SUPER", "HYPER" } ) );
+            l.Add( new CItemList( CLangManager.LangInstance.GetString("MOD_HIDE"), CItemBase.EPanelType.Normal, (int) TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
+				"",
+				new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_HIDE"), CLangManager.LangInstance.GetString("MOD_STEALTH") } ) );
+            l.Add( new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL"), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
+                "",
+                new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), "TYPE-A", "TYPE-B" }) );
 
-            l.Add(new CItemList(nameof(TJAPlayer3.ConfigIni.ShinuchiMode), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { "OFF", "ON" }));
+            l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI"), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_SWITCH_ON") }));
 
 			#endregion
 			#region [ 共通 SET切り替え/More/Return ]
-			l.Add(new CItemInteger("PlayerCount", 1, 5, TJAPlayer3.ConfigIni.nPlayerCount, "プレイヤーの人数を指定します。" ,"Set a player count."));
-			l.Add( new CSwitchItemList( "More...", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" } ) );
-			l.Add( new CSwitchItemList( "戻る", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" } ) );
+			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT"), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount, ""));
+			l.Add( new CSwitchItemList( CLangManager.LangInstance.GetString("SONGSELECT_QUICKCONFIG_MORE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" } ) );
+			l.Add( new CSwitchItemList( CLangManager.LangInstance.GetString("MENU_RETURN"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" } ) );
 			#endregion
 
 			return l;

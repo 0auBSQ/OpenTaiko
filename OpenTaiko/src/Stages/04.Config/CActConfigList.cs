@@ -303,7 +303,7 @@ namespace TJAPlayer3
 
 
 
-            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"), CItemBase.EPanelType.Normal,
+            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"));
 			this.list項目リスト.Add( this.iSystemGoToKeyAssign );
 
@@ -752,7 +752,18 @@ namespace TJAPlayer3
                 {
 					TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
 					CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
-					t項目リストの設定_System(refresh : false);
+
+					prvFont?.Dispose();
+					TJAPlayer3.stageコンフィグ.ftフォント?.Dispose();
+					TJAPlayer3.stageタイトル.pfMenuTitle?.Dispose();
+					TJAPlayer3.stageタイトル.pfBoxText?.Dispose();
+
+                    prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Config_Font_Scale);
+					TJAPlayer3.stageコンフィグ.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+					TJAPlayer3.stageタイトル.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[0]);
+                    TJAPlayer3.stageタイトル.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[1]);
+
+                    t項目リストの設定_System(refresh : false);
 					TJAPlayer3.stageコンフィグ.ReloadMenus();
 				}
                 //}

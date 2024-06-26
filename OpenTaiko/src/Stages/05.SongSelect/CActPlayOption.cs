@@ -115,9 +115,9 @@ namespace TJAPlayer3
             OptionType[11] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_FUN"), Color.White, Color.Black);
 
             var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
-            for (int i = 1; i <= 5; i++)
+            for (int i = 0; i < 5; i++)
             {
-                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString($"MOD_TIMING{i}"), _timingColors[i], Color.Black);
+                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString($"MOD_TIMING{i+1}"), _timingColors[i], Color.Black);
             }
 
             for (int i = 0; i < OptionType.Length; i++)
@@ -130,8 +130,8 @@ namespace TJAPlayer3
         {
             var scoreMult = tGetModMultiplier(EBalancingType.SCORE, true, player);
             var coinMult = tGetModMultiplier(EBalancingType.COINS, true, player);
-            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SCOREMULTIPLY") + scoreMult.ToString("n2"), Color.White, Color.Black);
-            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_COINMULTIPLY") + coinMult.ToString("n2"), Color.White, Color.Black);
+            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SCOREMULTIPLY", scoreMult.ToString("n2")), Color.White, Color.Black);
+            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_COINMULTIPLY", coinMult.ToString("n2")), Color.White, Color.Black);
         }
 
         public override void DeActivate()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using FDK;
 using Newtonsoft.Json;
@@ -41,8 +43,19 @@ namespace TJAPlayer3
             CLang clang = new CLang(id);
             if (clang.LangPathIsValid(out string path))
             {
-                clang = JsonConvert.DeserializeObject<CLang>(path);
+                string data = File.ReadAllText(path);
+
+                JsonNodeOptions options = new JsonNodeOptions() { PropertyNameCaseInsensitive = false };
+                JsonDocumentOptions doc = new JsonDocumentOptions() { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
+                JsonNode node = JsonNode.Parse(data, options, doc);
+
                 clang.Id = id;
+                clang.Language = node["Language"].Deserialize<string>();
+                clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>();
+                clang.InvalidKey = node["InvalidKey"].Deserialize<string>();
+                clang.FontName = node["FontName"].Deserialize<string>();
+                clang.BoxFontName = node["BoxFontName"].Deserialize<string>();
+
                 return clang;
             }
             else
@@ -51,14 +64,15 @@ namespace TJAPlayer3
                 return clang;
             }
         }
+        public static string GetLanguage(string id)
+        {
+            CLang clang = GetCLang(id);
+            return clang.Language;
+        }
         private bool LangPathIsValid(out string out_path)
         {
             out_path = Path.Combine(Folder, "lang.json");
-            if (File.Exists(out_path))
-            {
-                return true;
-            }
-            return false;
+            return File.Exists(out_path);
         }
 
         public string GetString(string key)
@@ -93,6 +107,7 @@ namespace TJAPlayer3
                     return GetString("DIFF_UNKNOWN");
             }
         }
+        public string GetDifficulty(Difficulty diff) { return GetDifficulty((int)diff); }
         public string GetExamName(int exam)
         {
             switch (exam)
