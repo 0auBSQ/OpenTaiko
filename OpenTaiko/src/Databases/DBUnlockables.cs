@@ -242,6 +242,8 @@ namespace TJAPlayer3
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
                             return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
+                        default:
+                            return (false, null);
                     }
                 }
                 // Trying to unlock an item from the Song Select screen (If song select => check if enough coins, else => Invalid command)
@@ -278,20 +280,20 @@ namespace TJAPlayer3
                     case "ch":
                         {
                             if (screen == EScreen.MyRoom)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90000));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
                         }
                     case "cs":
                         {
                             if (screen == EScreen.Shop)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90001));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_SHOP"));
                         }
                     case "cm":
                         {
                             if (screen == EScreen.SongSelect)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90000));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
                         }
                     case "ce":
                         return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN", this.Values[0], SaveData.TotalEarnedMedals);
