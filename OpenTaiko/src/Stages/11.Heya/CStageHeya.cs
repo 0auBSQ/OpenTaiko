@@ -130,8 +130,8 @@ namespace TJAPlayer3
             for (int i = 0; i < iPuchiCharaCount; i++)
             {
                 var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
-                ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
-                ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
+                ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetName(), this.pfHeyaFont, textColor, Color.Black, 1000);
+                ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetAuthor(), this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
 
             #endregion
@@ -146,8 +146,8 @@ namespace TJAPlayer3
             for (int i = 0; i < iCharacterCount; i++)
             {
                 var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
-                ttkCharacterNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Name, this.pfHeyaFont, textColor, Color.Black, 1000);
-                ttkCharacterAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Author, this.pfHeyaFont, Color.White, Color.Black, 1000);
+                ttkCharacterNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetName(), this.pfHeyaFont, textColor, Color.Black, 1000);
+                ttkCharacterAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetAuthor(), this.pfHeyaFont, Color.White, Color.Black, 1000);
             }
 
             #endregion
@@ -646,6 +646,7 @@ namespace TJAPlayer3
                         TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Add(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
                         DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[iPlayer].data.SaveId, "unlocked_characters", TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]);
                         TJAPlayer3.SaveFileInstances[iPlayer].tSpendCoins(TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.Values[0]);
+                        // Play modal animation here ?
                     }
                 }
 

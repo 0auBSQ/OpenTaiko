@@ -31,7 +31,7 @@ namespace TJAPlayer3
 
         private static Dictionary<string, float> RarityToCoinMultiplier = new Dictionary<string, float>
         {
-            ["Poor"] = 0.8f,
+            ["Poor"] = 1f,
             ["Common"] = 1f,
             ["Uncommon"] = 1f,
             ["Rare"] = 1f,

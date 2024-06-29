@@ -236,6 +236,8 @@ namespace TJAPlayer3
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
                             return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                        default:
+                            return (false, null);
                     }
                 }
 
@@ -243,7 +245,7 @@ namespace TJAPlayer3
             }
 
             // My Room menu usage, to improve later
-            public string tConditionMessage()
+            public string tConditionMessage(EScreen screen = EScreen.MyRoom)
             {
                 if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
                     RequiredArgCount = RequiredArgs[Condition];
@@ -258,9 +260,23 @@ namespace TJAPlayer3
                 switch (this.Condition)
                 {
                     case "ch":
-                        return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
+                        {
+                            if (screen == EScreen.MyRoom)
+                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
+                            return (CLangManager.LangInstance.GetString(90000));
+                        }
                     case "cs":
-                        return (CLangManager.LangInstance.GetString(90001)); // Will be buyable later from the randomized shop
+                        {
+                            if (screen == EScreen.Shop)
+                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
+                            return (CLangManager.LangInstance.GetString(90001));
+                        }
+                    case "cm":
+                        {
+                            if (screen == EScreen.SongSelect)
+                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
+                            return (CLangManager.LangInstance.GetString(90000));
+                        }
                     case "ce":
                         return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0], SaveData.TotalEarnedMedals);
                     case "ap":
