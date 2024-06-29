@@ -1,5 +1,10 @@
 {
-	"name" : "Template",
+	"name" : {
+		"strings": {
+			"default": "OpenTaiko-Kun",
+			"ja": "OpenTaiko君"
+		}
+	},
     "rarity": "Common",
-	"author": "[Author]",
+	"author": "Komi"
 }
