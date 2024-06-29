@@ -1,0 +1,7 @@
+其他：
+Chara_Resolution（应用的分辨率）=1920,1080
+Heya_Chara_Render_Offset（我的房间界面描绘偏移量）=0,0
+Result_UseResult1P（结算界面是否使用玩家１）=1
+Game_Chara_Tower_Clear_IsLooping（塔模式成功是否循环）=1
+Game_Chara_Tower_Clear_Tired_IsLooping（塔模式疲惫时成功是否循环）=1
+Game_Chara_Tower_Fail_IsLooping（塔模式失败是否循环）=1

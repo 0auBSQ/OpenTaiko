@@ -1,0 +1,4 @@
+[玩家信息]
+
+local playerCount
+获得当前活跃的玩家数。

@@ -1,0 +1,8 @@
+[塔信息]
+
+local towerNightNum
+获得非整型数，开始于 0 并到达最高（但不总是
+结束于） 1 ，其变化取决于玩家通过塔进行的程度。
+
+源代码决定 towerNightNum 的值是：
+Math.Min(CurrentMeasure / Math.Max(140, MaxFloorCount / 2), 1);

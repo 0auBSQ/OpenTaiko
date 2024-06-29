@@ -1,0 +1,6 @@
+节拍：
+Game_Chara_Beat_Tower_Standing（塔模式站立时）=1
+Game_Chara_Beat_Tower_Standing_Tired（塔模式疲惫时）=1
+Game_Chara_Beat_Tower_Fail（塔模式失败）=1
+Game_Chara_Beat_Tower_Clear（塔模式成功）=1
+Game_Chara_Beat_Tower_Clear_Tired（塔模式疲惫时成功）=1

@@ -1,0 +1,7 @@
+坐标：
+Game_Chara_X（角色Ｘ坐标）=(玩家１),(玩家２)
+Game_Chara_Y（角色Ｙ坐标）=(玩家１),(玩家２)
+Game_Chara_4P（４玩家模式下角色坐标）=(Ｘ),(Ｙ)
+Game_Chara_5P（５玩家模式下角色坐标）=(Ｘ),(Ｙ)
+Game_Chara_X_AI（AI对战模式角色Ｘ坐标）=(玩家),(AI)
+Game_Chara_Y_AI（AI对战模式角色Ｙ坐标）=(玩家),(AI)

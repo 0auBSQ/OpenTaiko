@@ -1,0 +1,7 @@
+节拍：
+Game_Chara_Beat_GoGoStart（高潮段开始时）=1
+Game_Chara_Beat_GoGoStartClear（成功时高潮段开始时）=1
+Game_Chara_Beat_GoGoStartMax（魂条满时高潮段开始时）=1
+Game_Chara_Beat_GoGo（高潮段）=1
+Game_Chara_Beat_GoGoClear（成功时高潮段）=1
+Game_Chara_Beat_GoGoMax（魂条满时高潮段）=1

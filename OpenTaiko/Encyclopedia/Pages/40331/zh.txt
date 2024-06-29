@@ -1,0 +1,7 @@
+节拍：
+Game_Chara_Beat_MissIn（失误时）=1
+Game_Chara_Beat_Miss（失误）=1
+Game_Chara_Beat_MissDownIn（持续失误时）=1
+Game_Chara_Beat_MissDown（持续失误）=1
+Game_Chara_Beat_SoulIn（魂条满时）=1
+Game_Chara_Beat_Return（从失误中回复）=1
