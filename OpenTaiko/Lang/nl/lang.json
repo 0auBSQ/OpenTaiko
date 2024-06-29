@@ -372,6 +372,15 @@
     "SONGSELECT_SORT_SUBTITLE": "Subtitle",
     "SONGSELECT_SORT_LEVEL": "Displayed Level",
 
+    // {0}: Main BPM
+    "SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+    // {0}: Main BPM
+    // {1}: Minimum BPM
+    // {2}: Maximum BPM
+    "SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+    // {0}: Charter name
+    "SONGSELECT_INFO_CHARTER": "Charter: {0}",
+
     "SONGSELECT_QUICKCONFIG": "Quick Config",
     "SONGSELECT_QUICKCONFIG_MORE": "More...",
 

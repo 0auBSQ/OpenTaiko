@@ -3298,7 +3298,7 @@ namespace TJAPlayer3
 
 		private TitleTextureKey ttkGenerateMakerTexture(string str文字, Color forecolor, Color backcolor)
 		{
-			return new TitleTextureKey("Maker: " + str文字, pfMaker, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_Maker_MaxSize);
+			return new TitleTextureKey(CLangManager.LangInstance.GetString("SONGSELECT_INFO_CHARTER", str文字), pfMaker, forecolor, backcolor, TJAPlayer3.Skin.SongSelect_Maker_MaxSize);
 		}
 
         private TitleTextureKey ttkGenerateBPMTexture(CSongListNode node, Color forecolor, Color backcolor)
@@ -3312,11 +3312,11 @@ namespace TJAPlayer3
 				_score.MaxBpm * _speed
             };
 
-			string bpm_str = "BPM: " + String.Format("{0:0.###}", bpms[0]);
+			string bpm_str = CLangManager.LangInstance.GetString("SONGSELECT_INFO_BPM", bpms[0]);
 			if (bpms[1] != bpms[0] || bpms[2] != bpms[0])
-				bpm_str += " (" + String.Format("{0:0.###}", bpms[1]) + "-" + String.Format("{0:0.###}", bpms[2]) + ")";
+				bpm_str = CLangManager.LangInstance.GetString("SONGSELECT_INFO_BPM_VARIABLE", bpms[0], bpms[1], bpms[2]);
 
-			var _color = forecolor;
+            var _color = forecolor;
 			if (_speed > 1)
 				_color = Color.Red;
 			else if (_speed < 1)
