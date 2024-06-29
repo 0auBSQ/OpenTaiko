@@ -93,7 +93,7 @@ namespace TJAPlayer3
 			}
 		}
 
-        public TitleTextureKey ttkNowUnlockConditionText = null;
+        public TitleTextureKey? ttkNowUnlockConditionText = null;
 
         public void ResetSongIndex()
         {
@@ -975,14 +975,36 @@ namespace TJAPlayer3
 			// strboxText here
 			if (this.rCurrentlySelectedSong != null)
 			{
-				for (int i = 0; i < 3; i++)
-				{
-					using (var texture = pfBoxText.DrawText(this.rCurrentlySelectedSong.strBoxText[i], rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, null, 26))
-					{
-						this.txBoxText[i] = TJAPlayer3.tテクスチャの生成(texture);
-						this.strBoxText = this.rCurrentlySelectedSong.strBoxText[0] + this.rCurrentlySelectedSong.strBoxText[1] + this.rCurrentlySelectedSong.strBoxText[2];
-					}
-				}
+                #region [Box text]
+
+                string _append = "";
+                if (HSongTraverse.IsRegularFolder(rCurrentlySelectedSong))
+                {
+                    int countTotalSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (_) => true);
+                    int countUnlockedSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (song) => !TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(song));
+                    _append = " ({0}/{1})".SafeFormat(countUnlockedSongs, countTotalSongs);
+                }
+
+                string[] boxText = new string[3]
+                {
+                rCurrentlySelectedSong.strBoxText[0],
+                rCurrentlySelectedSong.strBoxText[1],
+                rCurrentlySelectedSong.strBoxText[2] + _append
+                };
+
+                if (strBoxText != boxText[0] + boxText[1] + boxText[2])
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        using (var texture = pfBoxText.DrawText(boxText[i], rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, null, 26))
+                        {
+                            this.txBoxText[i] = TJAPlayer3.tテクスチャの生成(texture);
+                            this.strBoxText = boxText[0] + boxText[1] + boxText[2];
+                        }
+                    }
+                }
+
+                #endregion
 			}
             else
             {
@@ -1166,19 +1188,38 @@ namespace TJAPlayer3
 				return 0;
 			}
 
-			// 本ステージは、(1)登場アニメフェーズ → (2)通常フェーズ　と二段階にわけて進む。
+            // 本ステージは、(1)登場アニメフェーズ → (2)通常フェーズ　と二段階にわけて進む。
 
-			if (strBoxText != rCurrentlySelectedSong.strBoxText[0] + rCurrentlySelectedSong.strBoxText[1] + rCurrentlySelectedSong.strBoxText[2])
+            #region [Box text]
+
+            string _append = "";
+			if (HSongTraverse.IsRegularFolder(rCurrentlySelectedSong)) 
+			{
+				int countTotalSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (_) => true);
+				int countUnlockedSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (song) => !TJAPlayer3.Databases.DBSongUnlockables.tIsSongLocked(song));
+                _append = " ({0}/{1})".SafeFormat(countUnlockedSongs, countTotalSongs);
+            }
+
+			string[] boxText = new string[3]
+			{
+                rCurrentlySelectedSong.strBoxText[0],
+                rCurrentlySelectedSong.strBoxText[1],
+                rCurrentlySelectedSong.strBoxText[2] + _append
+            };
+
+			if (strBoxText != boxText[0] + boxText[1] + boxText[2])
 			{
 				for (int i = 0; i < 3; i++)
 				{
-					using (var texture = pfBoxText.DrawText(this.rCurrentlySelectedSong.strBoxText[i], rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, null, 26))
+					using (var texture = pfBoxText.DrawText(boxText[i], rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, null, 26))
 					{
 						this.txBoxText[i] = TJAPlayer3.tテクスチャの生成(texture);
-						this.strBoxText = this.rCurrentlySelectedSong.strBoxText[0] + this.rCurrentlySelectedSong.strBoxText[1] + this.rCurrentlySelectedSong.strBoxText[2];
+						this.strBoxText = boxText[0] + boxText[1] + boxText[2];
 					}
 				}
 			}
+
+			#endregion
 
 			this.ctScrollCounter.Tick();
 
@@ -2826,7 +2867,7 @@ namespace TJAPlayer3
                     string _cond = "???";
                     if (HRarity.tRarityToModalInt(SongUnlockable.rarity)
                         < HRarity.tRarityToModalInt("Epic"))
-                        _cond = SongUnlockable.unlockConditions.tConditionMessage();
+                        _cond = SongUnlockable.unlockConditions.tConditionMessage(DBUnlockables.CUnlockConditions.EScreen.SongSelect);
                     this.ttkNowUnlockConditionText = new TitleTextureKey(_cond, this.pfBoxText, Color.White, Color.Black, 1000);
                 }
             }
@@ -2974,15 +3015,19 @@ namespace TJAPlayer3
                 tex.Value.Opacity = opct;
 			}
 				
-			TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.Opacity = opct;
-			TJAPlayer3.Tx.SongSelect_Bar_Genre_Random.Opacity = opct;
-			TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.Opacity = opct;
-			TJAPlayer3.Tx.SongSelect_Favorite.Opacity = opct; 
-			TJAPlayer3.Tx.TowerResult_ScoreRankEffect.Opacity = opct;
-			TJAPlayer3.Tx.DanResult_Rank.Opacity = opct;
-			TJAPlayer3.Tx.SongSelect_Level_Number_Big?.tUpdateOpacity(opct);
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Back?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.SongSelect_Bar_Genre_Random?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.SongSelect_Favorite?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.TowerResult_ScoreRankEffect?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.DanResult_Rank?.tUpdateOpacity(opct);
+            TJAPlayer3.Tx.SongSelect_Level_Number_Big?.tUpdateOpacity(opct);
             TJAPlayer3.Tx.SongSelect_Level_Number_Big_Colored?.tUpdateOpacity(opct);
             TJAPlayer3.Tx.SongSelect_Level_Number_Big_Icon?.tUpdateOpacity(opct);
+			TJAPlayer3.Tx.SongSelect_Lock?.tUpdateOpacity(opct);
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked?.tUpdateOpacity(opct);
+			TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top?.tUpdateOpacity(opct);
+
             for (int i = 0; i < TJAPlayer3.Tx.SongSelect_Song_Panel.Length; i++)
 			{
 				TJAPlayer3.Tx.SongSelect_Song_Panel[i]?.tUpdateOpacity(opct);
@@ -3267,9 +3312,9 @@ namespace TJAPlayer3
 				_score.MaxBpm * _speed
             };
 
-			string bpm_str = "BPM: " + bpms[0].ToString();
+			string bpm_str = "BPM: " + String.Format("{0:0.###}", bpms[0]);
 			if (bpms[1] != bpms[0] || bpms[2] != bpms[0])
-				bpm_str += " (" + bpms[1].ToString() + "-" + bpms[2].ToString() + ")";
+				bpm_str += " (" + String.Format("{0:0.###}", bpms[1]) + "-" + String.Format("{0:0.###}", bpms[2]) + ")";
 
 			var _color = forecolor;
 			if (_speed > 1)
