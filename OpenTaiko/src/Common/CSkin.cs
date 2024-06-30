@@ -8725,6 +8725,15 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
+                                case "Heya_DescriptionTextOrigin":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Heya_DescriptionTextOrigin[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
                                 #endregion
 
                                 #region OnlineLounge 
@@ -11059,6 +11068,7 @@ namespace TJAPlayer3
         public int[] Heya_Side_Menu_Y = new int[] { -80, -10, 60, 130, 200, 270, 340, 410, 480, 550, 620, 690, 760 };
         public int[] Heya_Side_Menu_Font_Offset = new int[] { 0, 14 };
         public int[] Heya_InfoSection = new int[] { 620, 560 };
+        public int[] Heya_DescriptionTextOrigin = new int[] { 0, 0 };
         public int Heya_Font_Scale = 14;
 
         #endregion

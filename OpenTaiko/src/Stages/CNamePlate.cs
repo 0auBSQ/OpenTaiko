@@ -1,6 +1,7 @@
 ﻿using FDK;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -80,12 +81,13 @@ namespace TJAPlayer3
             {
                 name = TJAPlayer3.SaveFileInstances[player].data.Name;
                 title = TJAPlayer3.SaveFileInstances[player].data.Title;
-                dan = TJAPlayer3.SaveFileInstances[player].data.Dan;
+                dan = TJAPlayer3.SaveFileInstances[player].data.Dan;                
             }
 
             txTitle[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(title, pfTitle, Color.Black, Color.Empty, 1000));
             txName[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(name, pfName[player], Color.White, Color.Black, 1000));
-            txdan[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
+            if (TJAPlayer3.SaveFileInstances[player].data.DanGold) txdan[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey($"<g.#FFE34A.#EA9622>{dan}</g>", pfdan, Color.White, Color.Black, 1000));
+            else txdan[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
         }
 
 
@@ -176,13 +178,6 @@ namespace TJAPlayer3
             if (TJAPlayer3.SaveFileInstances[player].data.Dan != "" && TJAPlayer3.SaveFileInstances[player].data.Dan != null)
             {
                 this.txdan[player].t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.NamePlate_Dan_Offset[0], y + TJAPlayer3.Skin.NamePlate_Dan_Offset[1]);
-
-                if (TJAPlayer3.SaveFileInstances[player].data.DanGold)
-                {
-                    TJAPlayer3.Tx.NamePlateBase.b乗算合成 = true;
-                    tNamePlateDisplayNamePlateBase(x, y, 11);
-                    TJAPlayer3.Tx.NamePlateBase.b乗算合成 = false;
-                }
             }
 
             // Title text
