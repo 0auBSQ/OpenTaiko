@@ -6,7 +6,7 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "ko (WIP)",
+  "Language": "한국인 (WIP)",
   "Entries": {
 
     // Common
