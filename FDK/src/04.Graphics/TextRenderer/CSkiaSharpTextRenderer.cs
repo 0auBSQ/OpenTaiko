@@ -91,14 +91,11 @@ namespace FDK
             public bool UseGradiant;
             public Color GradiantTop;
             public Color GradiantBottom;
-
-            public override string ToString()
-            {
-                if (UseGradiant == false)
-                    return $"{s} (TextColor: {TextColor})";
-                return $"{s} (TextColor: {TextColor}, GradiantTop: {GradiantTop}, GradiantBottom: {GradiantBottom})";
-            }
+            public bool UseOutline;
+            public Color OutlineColor;
         }
+
+        // Purify is equivalent to RemoveTags on ObjectExtensions.cs, update both if changing TagRegex
 
         private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
 
@@ -132,7 +129,8 @@ namespace FDK
                         GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
                         GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
                         TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
-
+                        UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
+                        OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
                     };
                     tokens.Add(token);
                 }
@@ -153,6 +151,8 @@ namespace FDK
                         GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
                         GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
                         TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
+                        UseOutline = tokenStack.Count > 0 ? tokenStack.Peek().UseOutline : false,
+                        OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
                     };
 
                     string[] _varSplit = match.Groups[2].Value.Split(".");
@@ -177,6 +177,11 @@ namespace FDK
                                     {
                                         newToken.TextColor = ColorTranslator.FromHtml(_varSplit[1]);
                                     }
+                                    if (_varSplit.Length > 2)
+                                    {
+                                        newToken.UseOutline = true;
+                                        newToken.OutlineColor = ColorTranslator.FromHtml(_varSplit[2]);
+                                    }
                                     break;
                                 }
 
@@ -197,6 +202,8 @@ namespace FDK
                     GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
                     GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
                     TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
+                    UseOutline = tokenStack.Count > 0 && tokenStack.Peek().UseOutline,
+                    OutlineColor = (tokenStack.Count == 0) ? edgeColor : tokenStack.Peek().OutlineColor,
                 };
                 tokens.Add(token);
             }
@@ -238,7 +245,7 @@ namespace FDK
                 {
                     int token_width = (int)Math.Ceiling(paint.MeasureText(tok.s, ref bounds));
 
-                    if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge))
+                    if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge) || tok.UseOutline)
                     {
 
                         SKPath path = paint.GetTextPath(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25);
@@ -257,7 +264,7 @@ namespace FDK
                         SKPaint edgePaint = new SKPaint();
                         edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
                         edgePaint.StrokeJoin = SKStrokeJoin.Round;
-                        edgePaint.Color = new SKColor(edgeColor.R, edgeColor.G, edgeColor.B, edgeColor.A);
+                        edgePaint.Color = new SKColor(tok.OutlineColor.R, tok.OutlineColor.G, tok.OutlineColor.B, tok.OutlineColor.A);
                         edgePaint.Style = SKPaintStyle.Stroke;
                         edgePaint.IsAntialias = true;
                         canvas.DrawPath(path, edgePaint);

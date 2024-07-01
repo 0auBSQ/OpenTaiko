@@ -52,8 +52,8 @@ namespace TJAPlayer3
             }
             else if (gaugeType == "Extreme")
             {
-                description += "Gauge Type: <c.#360404>Extreme</c>\n";
-                description += "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error progressively through the song...\n";
+                description += "Gauge Type: <c.#8c0000>Extreme</c>\n";
+                description += "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...\n";
             }
 
             var bombFactor = character.effect.BombFactor;
@@ -73,8 +73,8 @@ namespace TJAPlayer3
                 ttkDescription = new TitleTextureKey(description, pf, Color.White, Color.Black, 1000);
             }
 
+            TJAPlayer3.Tx.Heya_Description_Panel?.t2D描画(0, 0);
             TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
-
         }
 
         public static void DisplayPuchicharaInfo(CCachedFontRenderer pf, CPuchichara puchi)
@@ -96,6 +96,7 @@ namespace TJAPlayer3
                 ttkDescription = new TitleTextureKey(description, pf, Color.White, Color.Black, 1000);
             }
 
+            TJAPlayer3.Tx.Heya_Description_Panel?.t2D描画(0, 0);
             TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
         }
 

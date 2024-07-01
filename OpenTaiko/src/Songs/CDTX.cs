@@ -7930,6 +7930,7 @@ namespace TJAPlayer3
         /// </summary>
         private void tParsedComplexNumber(string strScroll, ref double[] dbScroll)
         {
+            /*
             bool bFirst = true; //最初の数値か
             bool bUse = false; //数値扱い中
             string[] arScroll = new string[2];
@@ -7949,9 +7950,13 @@ namespace TJAPlayer3
                     bFirst = false;
 
             }
-
             dbScroll[0] = Convert.ToDouble(arScroll[0]);
             dbScroll[1] = Convert.ToDouble(arScroll[1]);
+            */
+
+            var cpx = strScroll.ParseComplex();
+            dbScroll[0] = cpx[0];
+            dbScroll[1] = cpx[1];
             return;
         }
 

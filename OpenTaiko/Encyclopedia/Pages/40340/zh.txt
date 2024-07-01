@@ -1,0 +1,4 @@
+持续时间：
+Game_Chara_Balloon_Timer（吹气球）=28
+Game_Chara_Balloon_Delay（吹气球延迟）=500
+Game_Chara_Balloon_FadeOut（吹气球淡出）=84

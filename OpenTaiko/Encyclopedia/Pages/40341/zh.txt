@@ -1,0 +1,6 @@
+持续时间：
+Chara_Entry_AnimationDuration（进入）=1000
+Chara_Normal_AnimationDuration（正常）=1000
+Chara_Menu_Loop_AnimationDuration（菜单中循环）=1000
+Chara_Menu_Select_AnimationDuration（菜单中选择）=1000
+Chara_Menu_Start_AnimationDuration（菜单中开始）=1000
