@@ -1,0 +1,7 @@
+- 结算界面语音：
+Result/BestScore（取得最高分）
+Result/ClearFailed（演奏失败）
+Result/ClearSuccess（演奏成功）
+Result/DanFailed（段位不合格）
+Result/DanRedPass（段位赤合格）
+Result/DanGoldPass（段位金合格）

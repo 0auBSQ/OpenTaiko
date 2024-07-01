@@ -1,0 +1,7 @@
+动作指定动画期间
+关键帧播放顺序。这些关键帧可以
+再利用以节省存储空间。
+
+例：
+Game_Chara_Motion_Normal=0,1,2,3,4,3,2,1
+Game_Chara_Motion_Clear=0,1,2,3,4,5,6,7

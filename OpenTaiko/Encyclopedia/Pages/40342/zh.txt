@@ -1,0 +1,5 @@
+持续时间：
+Chara_Result_Normal_AnimationDuration（结算界面通常）=1000
+Chara_Result_Clear_AnimationDuration（结算界面成功）=1000
+Chara_Result_Failed_In_AnimationDuration（结算界面失败时）=1000
+Chara_Result_Failed_AnimationDuration（结算界面失败）=1000

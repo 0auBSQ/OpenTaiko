@@ -1,0 +1,8 @@
+[控制台绘制]
+
+func:DrawText(Ｘ, Ｙ, 文本);
+func:DrawNum(Ｘ, Ｙ, 数字);
+绘制文本或数字，使用皮肤的控制台字体。
+（\Graphics\Console_Font.png）
+
+您只可以使用 Unicode 基本拉丁文字符。
