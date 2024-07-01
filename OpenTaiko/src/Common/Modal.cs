@@ -243,19 +243,19 @@ namespace TJAPlayer3
             }
             else if (modalType == EModalType.Title)
             {
-                content = (string)reference[0];
+                content = ((string)reference[0]).RemoveTags();
             }
             else if (modalType == EModalType.Character)
             {
-                content = (string)reference[0];
+                content = ((string)reference[0]).RemoveTags();
             }
             else if (modalType == EModalType.Puchichara)
             {
-                content = (string)reference[0];
+                content = ((string)reference[0]).RemoveTags();
             }
             else if (modalType == EModalType.Song)
             {
-                content = (string)reference[0];
+                content = ((string)reference[0]).RemoveTags();
             }
 
             TitleTextureKey _content = new TitleTextureKey(
