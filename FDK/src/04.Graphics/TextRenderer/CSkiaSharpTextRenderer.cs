@@ -6,9 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SkiaSharp;
+using System.Text.RegularExpressions;
 
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
+using System.Drawing;
+using static FDK.CSkiaSharpTextRenderer;
 
 namespace FDK
 {
@@ -81,6 +84,126 @@ namespace FDK
             paint.IsAntialias = true;
         }
 
+        internal struct SStringToken
+        {
+            public string s;
+            public Color TextColor;
+            public bool UseGradiant;
+            public Color GradiantTop;
+            public Color GradiantBottom;
+
+            public override string ToString()
+            {
+                if (UseGradiant == false)
+                    return $"{s} (TextColor: {TextColor})";
+                return $"{s} (TextColor: {TextColor}, GradiantTop: {GradiantTop}, GradiantBottom: {GradiantBottom})";
+            }
+        }
+
+        private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
+
+        private string Purify(string input)
+        {
+            return Regex.Replace(input, TagRegex, "");
+        }
+
+        private List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor)
+        {
+            List<SStringToken> tokens = new List<SStringToken>();
+            Stack<string> tags = new Stack<string>();
+            Stack<SStringToken> tokenStack = new Stack<SStringToken>();
+            int lastPos = 0;
+
+            var tagRegex = new Regex(TagRegex);
+            var matches = tagRegex.Matches(input);
+
+            foreach (Match match in matches)
+            {
+                int pos = match.Index;
+                string text = input.Substring(lastPos, pos - lastPos);
+
+                // First
+                if (text.Length > 0)
+                {
+                    SStringToken token = new SStringToken
+                    {
+                        s = text,
+                        UseGradiant = tokenStack.Count > 0 && tokenStack.Peek().UseGradiant,
+                        GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
+                        GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
+                        TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
+
+                    };
+                    tokens.Add(token);
+                }
+
+                lastPos = pos + match.Length;
+
+                if (match.Groups[1].Value == "/")
+                {
+                    if (tags.Count > 0) tags.Pop();
+                    if (tokenStack.Count > 0) tokenStack.Pop();
+                }
+                else
+                {
+                    tags.Push(match.Groups[2].Value);
+                    SStringToken newToken = new SStringToken
+                    {
+                        UseGradiant = tokenStack.Count > 0 ? tokenStack.Peek().UseGradiant : false,
+                        GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
+                        GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
+                        TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
+                    };
+
+                    string[] _varSplit = match.Groups[2].Value.Split(".");
+
+                    if (_varSplit.Length > 0)
+                    {
+                        switch (_varSplit[0])
+                        {
+                            case "g":
+                                {
+                                    if (_varSplit.Length > 2)
+                                    {
+                                        newToken.UseGradiant = true;
+                                        newToken.GradiantTop = ColorTranslator.FromHtml(_varSplit[1]);
+                                        newToken.GradiantBottom = ColorTranslator.FromHtml(_varSplit[2]);
+                                    }
+                                    break;
+                                }
+                            case "c":
+                                {
+                                    if (_varSplit.Length > 1)
+                                    {
+                                        newToken.TextColor = ColorTranslator.FromHtml(_varSplit[1]);
+                                    }
+                                    break;
+                                }
+
+                        }
+                    }
+
+                    tokenStack.Push(newToken);
+                }
+            }
+
+            // Last
+            if (lastPos < input.Length)
+            {
+                SStringToken token = new SStringToken
+                {
+                    s = input.Substring(lastPos),
+                    UseGradiant = tokenStack.Count > 0 && tokenStack.Peek().UseGradiant,
+                    GradiantTop = (tokenStack.Count == 0) ? gradationTopColor : tokenStack.Peek().GradiantTop,
+                    GradiantBottom = (tokenStack.Count == 0) ? gradationBottomColor : tokenStack.Peek().GradiantBottom,
+                    TextColor = (tokenStack.Count == 0) ? fontColor : tokenStack.Peek().TextColor,
+                };
+                tokens.Add(token);
+            }
+
+            return tokens;
+        }
+
         public SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawMode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter)
         {
             if (string.IsNullOrEmpty(drawstr))
@@ -90,62 +213,83 @@ namespace FDK
             }
 
             string[] strs = drawstr.Split("\n");
+            List<SStringToken>[] tokens = new List<SStringToken>[strs.Length];
+
+            for (int i = 0; i < strs.Length; i++)
+            {
+                tokens[i] = Tokenize(strs[i], fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor);
+            }
+
             SKBitmap[] images = new SKBitmap[strs.Length];
 
             for (int i = 0; i < strs.Length; i++) {
                 SKRect bounds = new SKRect();
-                int width = (int)Math.Ceiling(paint.MeasureText(strs[i], ref bounds)) + 50;
+
+                int width = (int)Math.Ceiling(paint.MeasureText(Purify(strs[i]), ref bounds)) + 50;
                 int height = (int)Math.Ceiling(paint.FontMetrics.Descent - paint.FontMetrics.Ascent) + 50;
 
                 //少し大きめにとる(定数じゃない方法を考えましょう)
                 SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
                 SKCanvas canvas = new SKCanvas(bitmap);
 
-                if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge))
-                {
-                    
-                    SKPath path = paint.GetTextPath(strs[i], 25, -paint.FontMetrics.Ascent + 25);
+                int x_offset = 0;
 
-                    if (secondEdgeColor != null)
+                foreach (SStringToken tok in tokens[i])
+                {
+                    int token_width = (int)Math.Ceiling(paint.MeasureText(tok.s, ref bounds));
+
+                    if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge))
                     {
-                        SKPaint secondEdgePaint = new SKPaint();
-                        secondEdgePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
-                        secondEdgePaint.StrokeJoin = SKStrokeJoin.Round;
-                        secondEdgePaint.Color = new SKColor(secondEdgeColor.Value.R, secondEdgeColor.Value.G, secondEdgeColor.Value.B, secondEdgeColor.Value.A);
-                        secondEdgePaint.Style = SKPaintStyle.Stroke;
-                        secondEdgePaint.IsAntialias = true;
-                        canvas.DrawPath(path, secondEdgePaint);
+
+                        SKPath path = paint.GetTextPath(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25);
+
+                        if (secondEdgeColor != null)
+                        {
+                            SKPaint secondEdgePaint = new SKPaint();
+                            secondEdgePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
+                            secondEdgePaint.StrokeJoin = SKStrokeJoin.Round;
+                            secondEdgePaint.Color = new SKColor(secondEdgeColor.Value.R, secondEdgeColor.Value.G, secondEdgeColor.Value.B, secondEdgeColor.Value.A);
+                            secondEdgePaint.Style = SKPaintStyle.Stroke;
+                            secondEdgePaint.IsAntialias = true;
+                            canvas.DrawPath(path, secondEdgePaint);
+                        }
+
+                        SKPaint edgePaint = new SKPaint();
+                        edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
+                        edgePaint.StrokeJoin = SKStrokeJoin.Round;
+                        edgePaint.Color = new SKColor(edgeColor.R, edgeColor.G, edgeColor.B, edgeColor.A);
+                        edgePaint.Style = SKPaintStyle.Stroke;
+                        edgePaint.IsAntialias = true;
+                        canvas.DrawPath(path, edgePaint);
                     }
 
-                    SKPaint edgePaint = new SKPaint();
-                    edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
-                    edgePaint.StrokeJoin = SKStrokeJoin.Round;
-                    edgePaint.Color = new SKColor(edgeColor.R, edgeColor.G, edgeColor.B, edgeColor.A);
-                    edgePaint.Style = SKPaintStyle.Stroke;
-                    edgePaint.IsAntialias = true;
-                    canvas.DrawPath(path, edgePaint);
+                    if (tok.UseGradiant)
+                    {
+                        //https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
+                        paint.Shader = SKShader.CreateLinearGradient(
+                            new SKPoint(0, 25),
+                            new SKPoint(0, height - 25),
+                            new SKColor[] {
+                        new SKColor(tok.GradiantTop.R, tok.GradiantTop.G, tok.GradiantTop.B, tok.GradiantTop.A),
+                        new SKColor(tok.GradiantBottom.R, tok.GradiantBottom.G, tok.GradiantBottom.B, tok.GradiantBottom.A) },
+                            new float[] { 0, 1 },
+                            SKShaderTileMode.Clamp);
+                        paint.Color = new SKColor(0xffffffff);
+                    }
+                    else
+                    {
+                        paint.Shader = null;
+                        paint.Color = new SKColor(tok.TextColor.R, tok.TextColor.G, tok.TextColor.B);
+                    }
+
+                    canvas.DrawText(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25, paint);
+
+                    x_offset += token_width;
                 }
 
-                if (drawMode.HasFlag(CFontRenderer.DrawMode.Gradation))
-                {
-                    //https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
-                    paint.Shader = SKShader.CreateLinearGradient(
-                        new SKPoint(0, 25),
-                        new SKPoint(0, height - 25),
-                        new SKColor[] {
-                        new SKColor(gradationTopColor.R, gradationTopColor.G, gradationTopColor.B, gradationTopColor.A),
-                        new SKColor(gradationBottomColor.R, gradationBottomColor.G, gradationBottomColor.B, gradationBottomColor.A) },
-                        new float[] { 0, 1 },
-                        SKShaderTileMode.Clamp);
-                    paint.Color = new SKColor(0xffffffff);
-                }
-                else
-                {
-                    paint.Shader = null;
-                    paint.Color = new SKColor(fontColor.R, fontColor.G, fontColor.B);
-                }
+                
 
-                canvas.DrawText(strs[i], 25, -paint.FontMetrics.Ascent + 25, paint);
+                
                 canvas.Flush();
 
                 images[i] = bitmap;
