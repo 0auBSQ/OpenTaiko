@@ -1,0 +1,16 @@
+{
+	"name" : {
+		"strings": {
+			"default": "OpenTaiko-Kun (Rich edition)",
+			"ja": "OpenTaiko君 （金持ち版）"
+		}
+	},
+    "rarity": "Common",
+	"description": {
+		"strings": {
+			"default": "The rich brother of OpenTaiko-Kun.\nRolls over others businesses.",
+			"ja": "OpenTaiko君のお金持ちな兄弟。\nコインの大部分と引き換えに連打の支援になります。"
+		}
+	},
+	"author": "Komi"
+}
