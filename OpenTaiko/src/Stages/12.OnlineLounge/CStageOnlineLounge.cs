@@ -26,6 +26,30 @@ namespace TJAPlayer3
 
         }
 
+        private static string GetMenuName(int menu)
+        {
+            switch (menu)
+            {
+                case (int)ECurrentMenu.RETURN:
+                default:
+                    return CLangManager.LangInstance.GetString("ONLINE_EXIT");
+                case (int)ECurrentMenu.MAIN:
+                    return CLangManager.LangInstance.GetString("MENU_RETURN");
+                case (int)ECurrentMenu.CDN_SELECT:
+                    return CLangManager.LangInstance.GetString("ONLINE_DOWNLOAD");
+                case (int)ECurrentMenu.CDN_OPTION:
+                    return CLangManager.LangInstance.GetString("ONLINE_DOWNLOAD_CDN");
+                case (int)ECurrentMenu.CDN_SONGS:
+                    return CLangManager.LangInstance.GetString("ONLINE_DOWNLOAD_SONG");
+                case (int)ECurrentMenu.CDN_CHARACTERS:
+                    return CLangManager.LangInstance.GetString("ONLINE_DOWNLOAD_CHARA");
+                case (int)ECurrentMenu.CDN_PUCHICHARAS:
+                    return CLangManager.LangInstance.GetString("ONLINE_DOWNLOAD_PUCHI");
+                case (int)ECurrentMenu.MULTI_SELECT:
+                    return CLangManager.LangInstance.GetString("ONLINE_MULTIPLAYER");
+            }
+        }
+
         public override void Activate()
         {
             // On activation
@@ -43,7 +67,7 @@ namespace TJAPlayer3
             this.menus = new CMenuInfo[(int)ECurrentMenu.TOTAL];
 
             for (int i = 0; i < (int)ECurrentMenu.TOTAL; i++)
-                this.menus[i] = new CMenuInfo(CLangManager.LangInstance.GetString(400 + i));
+                this.menus[i] = new CMenuInfo(GetMenuName(i));
                 
 
 
@@ -56,9 +80,9 @@ namespace TJAPlayer3
 
             this.ttkMainMenuOpt = new TitleTextureKey[3];
 
-            this.ttkMainMenuOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(400), this.pfOLFont, Color.White, Color.DarkRed, 1000);
-            this.ttkMainMenuOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString(402), this.pfOLFont, Color.White, Color.DarkRed, 1000);
-            this.ttkMainMenuOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString(407) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkMainMenuOpt[0] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.RETURN), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkMainMenuOpt[1] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.CDN_SELECT), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkMainMenuOpt[2] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.MULTI_SELECT), this.pfOLFont, Color.White, Color.DarkRed, 1000);
 
             this.mainMenu = new ECurrentMenu[] { ECurrentMenu.RETURN, ECurrentMenu.CDN_SELECT, ECurrentMenu.MULTI_SELECT };
 
@@ -72,7 +96,7 @@ namespace TJAPlayer3
 
             this.ttkCDNSelectOpt = new TitleTextureKey[keyCount + 1];
 
-            this.ttkCDNSelectOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNSelectOpt[0] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.MAIN), this.pfOLFont, Color.White, Color.DarkRed, 1000);
 
             for (int i = 0; i < keyCount; i++)
             {
@@ -87,10 +111,10 @@ namespace TJAPlayer3
 
             this.ttkCDNOptionOpt = new TitleTextureKey[4];
 
-            this.ttkCDNOptionOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
-            this.ttkCDNOptionOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString(404), this.pfOLFont, Color.White, Color.DarkRed, 1000);
-            this.ttkCDNOptionOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString(405) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
-            this.ttkCDNOptionOpt[3] = new TitleTextureKey(CLangManager.LangInstance.GetString(406) + " (Not available)", this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[0] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.MAIN), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[1] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.CDN_SONGS), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[2] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.CDN_CHARACTERS), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+            this.ttkCDNOptionOpt[3] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.CDN_PUCHICHARAS), this.pfOLFont, Color.White, Color.DarkRed, 1000);
 
             this.cdnOptMenu = new ECurrentMenu[] { ECurrentMenu.CDN_SELECT, ECurrentMenu.CDN_SONGS, ECurrentMenu.CDN_CHARACTERS, ECurrentMenu.CDN_PUCHICHARAS };
 
@@ -453,7 +477,7 @@ namespace TJAPlayer3
                                 this.ttkCDNSongList = new TitleTextureKey[songCountPlusOne];
                                 this.ttkCDNSongSubtitles = new TitleTextureKey[songCountPlusOne];
 
-                                this.ttkCDNSongList[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(401), this.pfOLFont, Color.White, Color.DarkRed, 1000);
+                                this.ttkCDNSongList[0] = new TitleTextureKey(GetMenuName((int)ECurrentMenu.MAIN), this.pfOLFont, Color.White, Color.DarkRed, 1000);
                                 this.ttkCDNSongSubtitles[0] = new TitleTextureKey("", this.pfOLFont, Color.White, Color.DarkRed, 1000);
 
                                 for (int i = 0; i < apiMethods.FetchedSongsList.Length; i++)

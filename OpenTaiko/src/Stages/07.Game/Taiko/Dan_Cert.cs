@@ -91,7 +91,7 @@ namespace TJAPlayer3
             //段位道場
             //TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
             TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, 
-                CLangManager.LangInstance.GetString(101), 
+                CLangManager.LangInstance.GetString("TITLE_MODE_DAN"), 
                 1 + NowShowingNumber + "曲目");
             
             if (number == 0) Sound_Section_First?.PlayStart();
@@ -129,7 +129,7 @@ namespace TJAPlayer3
             this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < this.ttkExams.Length; i++)
             {
-                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
+                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
             }
 
             NowCymbolShowingNumber = 0;

@@ -51,11 +51,16 @@ namespace TJAPlayer3
             #region [Main menu]
 
             this.ttkMainMenuOpt = new TitleTextureKey[5];
-            
-            for (int i = 0; i < ttkMainMenuOpt.Length; i++)
-            {
-                this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
-            }
+
+            this.ttkMainMenuOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[3] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[4] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            //for (int i = 1; i < ttkMainMenuOpt.Length; i++)
+            //{
+            //    this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            //}
 
             #endregion
 

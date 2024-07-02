@@ -221,8 +221,24 @@ namespace TJAPlayer3
         // Generate the modal title and content text textures
         private void tGenerateTextures()
         {
+            string modalKey = "MODAL_TITLE_COIN";
+            switch (modalType)
+            {
+                case EModalType.Character:
+                    modalKey = "MODAL_TITLE_CHARA";
+                    break;
+                case EModalType.Puchichara:
+                    modalKey = "MODAL_TITLE_PUCHI";
+                    break;
+                case EModalType.Title:
+                    modalKey = "MODAL_TITLE_NAMEPLATE";
+                    break;
+                case EModalType.Song:
+                    modalKey = "MODAL_TITLE_SONG";
+                    break;
+            }
             TitleTextureKey _title = new TitleTextureKey(
-                CLangManager.LangInstance.GetString(300 + (int)modalType), 
+                CLangManager.LangInstance.GetString(modalKey), 
                 (modalFormat == EModalFormat.Full)
                     ? _pfModalTitleFull
                     : _pfModalTitleHalf, 
@@ -234,12 +250,13 @@ namespace TJAPlayer3
 
             if (modalType == EModalType.Coin)
             {
-                content = String.Format("+{0} {1} ({2}: {3})",
-                    (int)reference[0],
-                    CLangManager.LangInstance.GetString(306),
-                    CLangManager.LangInstance.GetString(307),
-                    TJAPlayer3.SaveFileInstances[player].data.Medals
-                    );
+                content = CLangManager.LangInstance.GetString("MODAL_MESSAGE_COIN", reference[0].ToString(), TJAPlayer3.SaveFileInstances[player].data.Medals.ToString());
+                //content = String.Format("+{0} {1} ({2}: {3})",
+                //    (int)reference[0],
+                //    CLangManager.LangInstance.GetString(306),
+                //    CLangManager.LangInstance.GetString(307),
+                //    TJAPlayer3.SaveFileInstances[player].data.Medals
+                //    );
             }
             else if (modalType == EModalType.Title)
             {

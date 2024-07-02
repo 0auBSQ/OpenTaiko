@@ -73,8 +73,8 @@ namespace TJAPlayer3
 
             string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
-            string name = CLangManager.LangInstance.GetString(910);
-            string title = CLangManager.LangInstance.GetString(911);
+            string name = CLangManager.LangInstance.GetString("AI_NAME");
+            string title = CLangManager.LangInstance.GetString("AI_TITLE");
             string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
 
             if (!TJAPlayer3.ConfigIni.bAIBattleMode || actualPlayer == 0)

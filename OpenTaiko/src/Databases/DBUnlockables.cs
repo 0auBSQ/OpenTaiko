@@ -98,6 +98,24 @@ namespace TJAPlayer3
                 }
             }
 
+            public string GetRequiredClearStatus(int status, bool exact = false)
+            {
+                switch (status)
+                {
+                    case (int)EClearStatus.PERFECT:
+                        return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_PERFECT" : "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE");
+                    case (int)EClearStatus.FC:
+                        return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_FC" : "UNLOCK_CONDITION_REQUIRE_FC_MORE");
+                    case (int)EClearStatus.CLEAR:
+                        return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_CLEAR" : "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE");
+                    case (int)EClearStatus.ASSISTED_CLEAR:
+                        return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_ASSIST" : "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE");
+                    case (int)EClearStatus.NONE:
+                    default:
+                        return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_PLAY" : "UNLOCK_CONDITION_REQUIRE_PLAY_MORE");
+                }
+            }
+
             /*
              * == Condition avaliable ==
              * ch : "Coins here", coin requirement, payable within the heya menu, 1 value : [Coin price]
@@ -128,33 +146,33 @@ namespace TJAPlayer3
                         if (this.Values.Length == 1)
                             return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "ce":
                         if (this.Values.Length == 1)
                             return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalEarnedMedals }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "ap":
                         if (this.Values.Length == 1)
                             return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModePlaycount }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "aw":
                         if (this.Values.Length == 1)
                             return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModeWins }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "tp":
                         if (this.Values.Length == 1)
                             return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalPlaycount }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "dp":
                     case "lp":
                         if (this.Values.Length == 3)
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
                     case "sp":
                     case "sg":
                     case "sc":
@@ -162,12 +180,12 @@ namespace TJAPlayer3
                             && this.Reference.Length == this.Values.Length / this.RequiredArgCount)
                             return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
                         else
-                            return (false, CLangManager.LangInstance.GetString(90005) + this.Condition + " requires (" + this.RequiredArgCount.ToString() + " * n) values and n references.");
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR2", this.Condition, this.RequiredArgCount.ToString()));
                     case "ig":
                         return (false, "");
                 }
 
-                return (false, CLangManager.LangInstance.GetString(90000));
+                return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
             }
 
 
@@ -182,7 +200,7 @@ namespace TJAPlayer3
                             // Coins are strictly more or equal
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
-                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                            return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
                         default:
                             return (false, null); // Return the same text if my room
                     }
@@ -196,7 +214,7 @@ namespace TJAPlayer3
                         case "ch":
                         case "cs":
                         case "cm":
-                            return (false, CLangManager.LangInstance.GetString(90000));
+                            return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
                         case "ce":
                         case "tp":
                         case "ap":
@@ -223,7 +241,9 @@ namespace TJAPlayer3
                             // Coins are strictly more or equal
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
-                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
+                            return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
+                        default:
+                            return (false, null);
                     }
                 }
                 // Trying to unlock an item from the Song Select screen (If song select => check if enough coins, else => Invalid command)
@@ -235,13 +255,11 @@ namespace TJAPlayer3
                             // Coins are strictly more or equal
                             this.Type = "me";
                             bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
-                            return (fulfiled, CLangManager.LangInstance.GetString(90003 + ((fulfiled == false) ? 1 : 0)));
-                        default:
-                            return (false, null);
+                            return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
                     }
                 }
 
-                return (false, CLangManager.LangInstance.GetString(90000));
+                return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
             }
 
             // My Room menu usage, to improve later
@@ -251,7 +269,7 @@ namespace TJAPlayer3
                     RequiredArgCount = RequiredArgs[Condition];
 
                 if (this.Values.Length < this.RequiredArgCount)
-                    return (CLangManager.LangInstance.GetString(90005) + this.Condition + " requires " + this.RequiredArgCount.ToString() + " values.");
+                    return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount);
 
                 // Only the player loaded as 1P can check unlockables in real time
                 var SaveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data;
@@ -262,36 +280,36 @@ namespace TJAPlayer3
                     case "ch":
                         {
                             if (screen == EScreen.MyRoom)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90000));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
                         }
                     case "cs":
                         {
                             if (screen == EScreen.Shop)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90001));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_SHOP"));
                         }
                     case "cm":
                         {
                             if (screen == EScreen.SongSelect)
-                                return CLangManager.LangInstance.GetString(90002).SafeFormat(this.Values[0]);
-                            return (CLangManager.LangInstance.GetString(90000));
+                                return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+                            return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
                         }
                     case "ce":
-                        return CLangManager.LangInstance.GetString(90006).SafeFormat(this.Values[0], SaveData.TotalEarnedMedals);
+                        return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN", this.Values[0], SaveData.TotalEarnedMedals);
                     case "ap":
-                        return CLangManager.LangInstance.GetString(90007).SafeFormat(this.Values[0], SaveData.AIBattleModePlaycount);
+                        return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIPLAY", this.Values[0], SaveData.AIBattleModePlaycount);
                     case "aw":
-                        return CLangManager.LangInstance.GetString(90008).SafeFormat(this.Values[0], SaveData.AIBattleModeWins);
+                        return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIWIN", this.Values[0], SaveData.AIBattleModeWins);
                     case "tp":
-                        return CLangManager.LangInstance.GetString(90009).SafeFormat(this.Values[0], SaveData.TotalPlaycount);
+                        return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY", this.Values[0], SaveData.TotalPlaycount);
                     case "dp":
                         {
                             var _aimedDifficulty = this.Values[0];
                             var _aimedStatus = this.Values[1];
 
-                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
-                            if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString(90000));
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+                            if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
 
                             var _table = ChartStats.ClearStatuses[_aimedDifficulty];
                             var _ura = ChartStats.ClearStatuses[(int)Difficulty.Edit];
@@ -301,16 +319,17 @@ namespace TJAPlayer3
                                 _count += _table[i];
                                 if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
                             }
-                            var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString(92013) : CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
-                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
-                            return CLangManager.LangInstance.GetString(90010).SafeFormat(statusString, this.Values[2], diffString, _count);
+
+                            var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString("DIFF_EXEXTRA") : CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
+                            var statusString = GetRequiredClearStatus(_aimedStatus);
+                            return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF", statusString, this.Values[2], diffString, _count);
                         }
                     case "lp":
                         {
                             var _aimedDifficulty = this.Values[0];
                             var _aimedStatus = this.Values[1];
 
-                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString(90000));
+                            if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
 
                             int _count = 0;
                             if (_aimedStatus == (int)EClearStatus.NONE) _count = ChartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
@@ -318,8 +337,8 @@ namespace TJAPlayer3
                             else if (_aimedStatus == (int)EClearStatus.FC) _count = ChartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
                             else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
 
-                            var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
-                            return CLangManager.LangInstance.GetString(90011).SafeFormat(statusString, this.Values[2], _aimedDifficulty, _count);
+                            var statusString = GetRequiredClearStatus(_aimedStatus);
+                            return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL", statusString, this.Values[2], _aimedDifficulty, _count);
                         }
                     case "sp":
                         {
@@ -334,11 +353,11 @@ namespace TJAPlayer3
                                 var _aimedDifficulty = this.Values[_base];
                                 var _aimedStatus = this.Values[_base + 1];
 
-                                var diffString = CLangManager.LangInstance.GetString(92000 + _aimedDifficulty);
-                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
+                                var diffString = CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
+                                var statusString = GetRequiredClearStatus(_aimedStatus);
                                 var _songName = CSongDict.tGetNodeFromID(_songId)?.strタイトル ?? "[Not found]";
 
-                                _rows.Add(CLangManager.LangInstance.GetString(90013).SafeFormat(statusString, _songName, diffString));
+                                _rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYDIFF", statusString, _songName, diffString));
 
 
                                 // Safisfied count
@@ -365,7 +384,7 @@ namespace TJAPlayer3
                             }
 
                             // Push front
-                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
+                            _rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
                             return String.Join("\n", _rows);
                         }
                     case "sg":
@@ -390,11 +409,11 @@ namespace TJAPlayer3
                                 if (_satifsiedCount >= _songCount) _count++;
 
 
-                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
-                                _rows.Add(CLangManager.LangInstance.GetString(90014).SafeFormat(statusString, _songCount, _genreName, _satifsiedCount));
+                                var statusString = GetRequiredClearStatus(_aimedStatus);
+                                _rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE", statusString, _songCount, _genreName, _satifsiedCount));
                             }
 
-                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
+                            _rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
                             return String.Join("\n", _rows);
                         }
                     case "sc":
@@ -419,17 +438,17 @@ namespace TJAPlayer3
                                 if (_satifsiedCount >= _songCount) _count++;
 
 
-                                var statusString = CLangManager.LangInstance.GetString(91010 + _aimedStatus);
-                                _rows.Add(CLangManager.LangInstance.GetString(90015).SafeFormat(statusString, _songCount, _charterName, _satifsiedCount));
+                                var statusString = GetRequiredClearStatus(_aimedStatus);
+                                _rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER", statusString, _songCount, _charterName, _satifsiedCount));
                             }
 
-                            _rows.Insert(0, CLangManager.LangInstance.GetString(90012).SafeFormat(_count, _challengeCount));
+                            _rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
                             return String.Join("\n", _rows);
                         }
 
                 }
                 // Includes cm or ig which are not supposed to be displayed in My Room
-                return (CLangManager.LangInstance.GetString(90000));
+                return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
             }
 
             public enum EScreen

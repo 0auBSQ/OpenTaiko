@@ -1,0 +1,557 @@
+﻿{
+  // The folder's name is used as the ID, which is used to identify which localized data to use.
+  // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
+  // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
+  // If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+
+  // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
+  // i.e. "日本語 (Japanese)"
+  "Language": "日本語 (Japanese)",
+  "Entries": {
+
+    // Common
+    "MENU_RETURN": "とじる",
+    // Difficulties (Any Menu)
+    "DIFF_EASY": "かんたん",
+    "DIFF_NORMAL": "ふつう",
+    "DIFF_HARD": "むずかしい",
+    "DIFF_EX": "おに（表）",
+    "DIFF_EXTRA": "おに（裏）",
+    "DIFF_EXEXTRA": "おに（裏表）",
+    "DIFF_TOWER": "タワー",
+    "DIFF_DAN": "段位",
+    "DIFF_ANY": "難易度問わず",
+    "DIFF_UNKNOWN": "Unknown",
+
+    // Settings
+    "SETTINGS_SYSTEM": "システム設定",
+    "SETTINGS_SYSTEM_DESC": "システムに関係する項目を設定します。",
+    "SETTINGS_GAME": "ゲームプレイ設定",
+    "SETTINGS_GAME_DESC": "ドラムの演奏に関する項目を設定します。",
+    "SETTINGS_EXIT": "出る",
+    "SETTINGS_EXIT_DESC": "設定を保存し、コンフィグ画面を終了します。",
+
+    "SETTINGS_MENU_RETURN": "<< 戻る",
+    "SETTINGS_MENU_RETURN_DESC": "左側のメニューに戻ります。",
+
+    "SETTINGS_KEYASSIGN_SYSTEM": "システムのキー設定",
+    "SETTINGS_KEYASSIGN_SYSTEM_DESC": "システムのキー入力に関する項目を設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME": "入力設定",
+    "SETTINGS_KEYASSIGN_GAME_DESC": "ドラムのキー入力に関する項目を設",
+    "SETTINGS_KEYASSIGN_TRAINING": "Training Mode Key Config",
+    "SETTINGS_KEYASSIGN_TRAINING_DESC": "A secondary menu to adjust keys used during\nTraining Mode.",
+
+    // Settings - System
+    "SETTINGS_SYSTEM_LANGUAGE": "システム言語",
+    "SETTINGS_SYSTEM_LANGUAGE_DESC": "プレイ中やメニューの\n言語を変更。",
+    "SETTINGS_SYSTEM_PLAYERCOUNT": "プレイ人数",
+    "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "プレイ人数切り替え：\n5人までプレイできます。",
+    "SETTINGS_SYSTEM_RELOADSONG": "曲データ再読み込み",
+    "SETTINGS_SYSTEM_RELOADSONG_DESC": "曲データの一覧情報を取得し直します。",
+    "SETTINGS_SYSTEM_RELOADSONGCACHE": "キャッシュをクリアして曲データ再読み込み",
+    "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "キャッシュをクリアして曲データの一覧情報を取得し直します。",
+    "SETTINGS_SYSTEM_HIDEDANTOWER": "段・タワー譜面省略",
+    "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "演奏選曲画面にタワー及び\n段の譜面を省略設定です。\nONに設けると別々の画面\nにしか表示されていません。\n※ 設定は譜面の再読み込み時\n  に有効になります。",
+
+    // Settings - System - Graphics
+    "SETTINGS_SYSTEM_FULLSCREEN": "全画面モード",
+    "SETTINGS_SYSTEM_FULLSCREEN_DESC": "画面モード設定：\nON で全画面モード、OFF でウィンド\nウモードになります。",
+    "SETTINGS_SYSTEM_VSYNC": "垂直帰線同期",
+    "SETTINGS_SYSTEM_VSYNC_DESC": "垂直帰線同期：\n画面の描画をディスプレイの垂直帰\n線中に行なう場合には ON を指定し\nます。ON にすると、ガタつきのない\n滑らかな画面描画が実現されます。",
+    "SETTINGS_SYSTEM_GRAPHICSAPI": "グラフィックスAPI",
+    "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Bass使用時のバッファサイズ:\n0～99999ms を指定可能です。\n0を指定すると、OSがバッファの\nサイズを自動設定します。\n値を小さくするほど発音ラグが\n減少しますが、音割れや異常動作を\n引き起こす場合があります。\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
+    "SETTINGS_SYSTEM_TEXTUREASYNC": "非同期テクスチャ読み込み",
+    "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "テクスチャの読み込み方法:\n起動時のフリーズが消えます\nテクスチャが黒くなる場合はこのオプションをOFFにしてください\nこの変更は再起動後に反映されます",
+
+    "SETTINGS_SYSTEM_BGMOVIE": "AVI",
+    "SETTINGS_SYSTEM_BGMOVIE_DESC": "AVIの使用：\n動画(AVI)を再生可能にする場合に\nON にします。AVI の再生には、それ\nなりのマシンパワーが必要とされます。",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "動画再生モード",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "動画の表示方法を変更します.",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "OFF",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "背景",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "ウィンドウ",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "両方",
+    "SETTINGS_SYSTEM_LANEOPACITY": "レーンBG透明度",
+    "SETTINGS_SYSTEM_LANEOPACITY_DESC": "This controls the lane background opacity\nwhile videos are playing.\n\n0 = completely transparent,\n255 = no transparency",
+
+    "SETTINGS_SYSTEM_BGA": "BGA",
+    "SETTINGS_SYSTEM_BGA_DESC": "BGAの使用：\n画像(BGA)を表示可能にする場合に\nON にします。BGA の再生には、それ\nなりのマシンパワーが必要とされます。",
+    "SETTINGS_SYSTEM_DISPLAYCHARA": "キャラクター表示",
+    "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "キャラクター画像を表示するかどうか",
+    "SETTINGS_SYSTEM_DISPLAYDANCER": "踊り子表示",
+    "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "ダンサー画像を表示するかどうか",
+    "SETTINGS_SYSTEM_DISPLAYMOB": "モブ表示",
+    "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "モブ画像を表示するかどうか",
+    "SETTINGS_SYSTEM_DISPLAYRUNNER": "ランナー表示",
+    "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "ランナー画像を表示するかどうか",
+    "SETTINGS_SYSTEM_DISPLAYFOOTER": "フッター表示",
+    "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "フッター画像を表示するかどうか",
+    "SETTINGS_SYSTEM_DISPLAYPUCHI": "プチキャラ表示",
+    "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "プチキャラ画像を表示するかどうか",
+    "SETTINGS_SYSTEM_SIMPLEMODE": "シンプルモード",
+    "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "太鼓の数字がアニメーションしなくなります\nCombo_Textが非表示になります\nScoreのアニメーションがなくなります\nTaikoのフラッシュがシンプルになります\nCouse_Symbol_Back_Flashが光らなくなります\nRunnerが非表示になります\n判定枠のPerfectのアニメーションが非表示になります\n分岐アニメーションがなくなります\nノーツが飛ばなくなります\nFireworkが非表示になります\nRainbowが非表示になります\n音符がアニメーションしなくなります\nNamePlateのアニメーションがなくなります\n連打の飛んでいく画像が非表示になります",
+
+    "SETTINGS_SYSTEM_SKIN": "スキン (全体)",
+    "SETTINGS_SYSTEM_SKIN_DESC": "スキン切替：\nスキンを切り替えます。",
+
+    // Settings - System - Audio
+    "SETTINGS_SYSTEM_SONGPLAYBACK": "音源使用",
+    "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "BGMの再生：\nこれをOFFにすると、BGM を再生しな\nくなります。",
+    "SETTINGS_SYSTEM_USESONGVOL": "SONGVOL使用",
+    "SETTINGS_SYSTEM_USESONGVOL_DESC": ".tjaファイルのSONGVOLヘッダを音源の音量に適用します。設定による音量調整を使用する場合はこの設定をOFFにしてください。",
+    "SETTINGS_SYSTEM_SEVOL": "効果音音量",
+    "SETTINGS_SYSTEM_SEVOL_DESC": "効果音の音量を調節します。",
+    "SETTINGS_SYSTEM_VOICEVOL": "ボイス音量",
+    "SETTINGS_SYSTEM_VOICEVOL_DESC": "各画面で流れるボイス、コンボボイスの音量を調節します。",
+    "SETTINGS_SYSTEM_SONGVOL": "音源音量",
+    "SETTINGS_SYSTEM_SONGVOL_DESC": "ゲーム中の音源の音量を調節します。",
+    "SETTINGS_SYSTEM_SONGPREVIEWVOL": "プレビュー音量",
+    "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "プレビュー時の音源の音量を調節します。",
+    "SETTINGS_SYSTEM_VOLINCREMENT": "キーボード音量調整",
+    "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "キーボードで音量調整をするときの増加量、減少量を指定します。\n1 ～ 20 の値が指定可能です。",
+
+    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "MusicPreTimeMs",
+    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "音源再生前の空白時間 (ms)。",
+    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "プレビュー音量",
+    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "プレビュー時の音源の音量を調節します。",
+
+    "SETTINGS_SYSTEM_AUDIOPLAYBACK": "サウンド出力方式",
+    "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "サウンドの出力方式:\nWASAPI, ASIO, DSound(DirectSound)\nの中からサウンド出力方式を選択\nします。\nWASAPIはVista以降でのみ使用可能\nです。ASIOは対応機器でのみ使用\n可能です。\nWASAPIかASIOを指定することで、\n遅延の少ない演奏を楽しむことが\nできます。\n\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
+    "SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIOデバイス",
+    "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "ASIOデバイス:\nASIO使用時のサウンドデバイスを\n選択します。\n\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
+    "SETTINGS_SYSTEM_WASAPIBUFFER": "WASAPIバッファサイズ",
+    "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "WASAPI使用時のバッファサイズ:\n0～99999ms を指定可能です。\n0を指定すると、OSがバッファの\nサイズを自動設定します。\n値を小さくするほど発音ラグが\n減少しますが、音割れや異常動作を\n引き起こす場合があります。\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
+    "SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Size",
+    "SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
+    "SETTINGS_SYSTEM_OSTIMER": "OSタイマー使用",
+    "SETTINGS_SYSTEM_OSTIMER_DESC": "OSタイマーを使用するかどうか:\n演奏タイマーとして、OpenTaiko独自の\nタイマーを使うか、OS標準のタイマー\nを使うかを選択します。\nOS標準タイマーを使うとスクロールが\n滑らかになりますが、演奏で音ズレが\n発生することがあります。(そのため\nAdjustWavesの効果が適用されます。)\n\nこの指定はWASAPI/ASIO使用時のみ有効\nです。",
+
+    // Settings - System - Misc.
+    "SETTINGS_SYSTEM_LOG": "Traceログ出力",
+    "SETTINGS_SYSTEM_LOG_DESC": "Traceログ出力：\nTJAPlayer3.txt にログを出力します。\n変更した場合は、OpenTaiko の再起動\n後に有効となります。",
+    "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "RandSubBox",
+    "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "子BOXをRANDOMの対象とする：\nON にすると、RANDOM SELECT 時\nに子BOXも選択対象とします。",
+    "SETTINGS_SYSTEM_DEBUGMODE": "デバッグ情報",
+    "SETTINGS_SYSTEM_DEBUGMODE_DESC": "演奏情報の表示：\n演奏中、BGA領域の下部に演奏情報\n（FPS、BPM、演奏時間など）を表示し\nます。\nまた、小節線の横に小節番号が表示\nされるようになります。",
+    "SETTINGS_SYSTEM_AUTOSCREENSHOT": "リザルト画像自動保存",
+    "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "リザルト画像自動保存機能：\nONにすると、ハイスコア/ハイスキル時に\n自動でリザルト画像を曲データと同じ\nフォルダに保存します。",
+    "SETTINGS_SYSTEM_DISCORDRPC": "Discord送信",
+    "SETTINGS_SYSTEM_DISCORDRPC_DESC": "Discordに再生中の譜面情報を送信する",
+    "SETTINGS_SYSTEM_BUFFEREDINPUT": "バッファ入力モード",
+    "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "バッファ入力モード：\nON にすると、FPS を超える入力解像\n度を実現します。\nOFF にすると、入力解像度は FPS に\n等しくなります。",
+
+    // Settings - Gameplay
+    "SETTINGS_GAME_GLOBALOFFSET": "グローバルオフセット",
+    "SETTINGS_GAME_GLOBALOFFSET_DESC": "全譜面のOFFSETメタデータ\nを変化設定です。\n-999から999msまで設ける可能です。\n入力遅れを減るためマイナス値をご設定ください。",
+
+    "SETTINGS_GAME_CALIBRATION": "Calibrate Offset",
+    "SETTINGS_GAME_CALIBRATION_DESC": "Calibrate your offset.\nGlobal Offset will be overwritten if saved.",
+    "SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+
+    "SETTINGS_GAME_BADCOUNT": "完璧モード",
+    "SETTINGS_GAME_BADCOUNT_DESC": "Riskyモードの設定:\n1以上の値にすると、その回数分の\n不可で演奏が強制終了します。\n0にすると無効になり、\nノルマゲージのみになります。\n",
+    "SETTINGS_GAME_NOTELOCK": "タイト",
+    "SETTINGS_GAME_NOTELOCK_DESC": "ドラムチップのないところでパッドを\n叩くとミスになります。",
+    "SETTINGS_GAME_AILEVEL": "AIレベル",
+    "SETTINGS_GAME_AILEVEL_DESC": "AIの制度を定める設定です。\n０ならAIはオフされます。\n１以上なら2PはAIとして自動でやります。\nAUTO 2PはオンならAI使用できません。",
+    "SETTINGS_GAME_NORMALGAUGE": "ゲージをNormalに固定",
+    "SETTINGS_GAME_NORMALGAUGE_DESC": "ゲージをNormalに固定します",
+
+    "SETTINGS_GAME_AUTOP1": "AUTO 1P",
+    "SETTINGS_GAME_AUTOP1_DESC": "すべての音符を自動で演奏します。",
+    "SETTINGS_GAME_AUTOP2": "AUTO 2P",
+    "SETTINGS_GAME_AUTOP2_DESC": "すべての音符を自動で演奏します。",
+    "SETTINGS_GAME_AUTOROLL": "連打速度",
+    "SETTINGS_GAME_AUTOROLL_DESC": "AUTO中で黄色連打の速度を変化します。\n０で設けったら叩きません。\n多くとも各フレーム１打。",
+
+    "SETTINGS_GAME_NOINFO": "情報なし",
+    "SETTINGS_GAME_NOINFO_DESC": "有効にすると曲情報などが見えなくなります。",
+    "SETTINGS_GAME_COMBODISPLAY": "最低表示コンボ",
+    "SETTINGS_GAME_COMBODISPLAY_DESC": "表示可能な最小コンボ数（ドラム）：\n画面に表示されるコンボの最小の数\nを指定します。\n1 ～ 99999 の値が指定可能です。",
+    "SETTINGS_GAME_SCOREDISPLAY": "判定数表示",
+    "SETTINGS_GAME_SCOREDISPLAY_DESC": "左下に判定数を表示します。\n(1人プレイ専用)",
+    "SETTINGS_GAME_BRANCHANIME": "譜面分岐時アニメーション",
+    "SETTINGS_GAME_BRANCHANIME_DESC": "譜面分岐時のアニメーション\nTYPE-A: 太鼓7～太鼓14\nTYPE-B: 太鼓15～",
+
+    "SETTINGS_GAME_DEFAULTDIFF": "デフォルト難易度",
+    "SETTINGS_GAME_DEFAULTDIFF_DESC": "デフォルトで選択される難易度",
+    "SETTINGS_GAME_EXEXTRAANIME": "裏表移行アニメーション",
+    "SETTINGS_GAME_EXEXTRAANIME_DESC": "裏表移行アニメーションを有効する",
+
+    // Settings - Gameplay - Training Mode
+    "SETTINGS_TRAINING_SKIPCOUNT": "Measure Skip Count",
+    "SETTINGS_TRAINING_SKIPCOUNT_DESC": "The number of measures to skip while\npressing Skip Forward/Back Measure in\nTraining Mode.",
+    "SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
+    "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
+
+    // Settings - Broken/Unused/Might Deprecate/Might Update
+    // Translate these anyways, even if their future is uncertain.
+    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "PreImageWait",
+    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "プレビュー画像表示までの時間：\n曲にカーソルが合わされてからプレ\nビュー画像が表示されるまでの時間\nを指定します。\n0 ～ 10000 [ms] が指定可能です。",
+    "SETTINGS_SYSTEM_TIMESTRETCH": "タイムストレッチ",
+    "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "演奏速度の変更方式:\nONにすると、演奏速度の変更を、\n周波数変更ではなく\nタイムストレッチで行います。\nこれをONにすると、サウンド処理に\nより多くのCPU性能を使用します。\nまた、演奏速度をx0.850以下にすると、\nチップのズレが大きくなります。",
+    "SETTINGS_SYSTEM_FASTRENDER": "FastRender",
+    "SETTINGS_SYSTEM_FASTRENDER_DESC": "事前画像描画機能を使うかどうか。",
+    "SETTINGS_GAME_BRANCHGUIDE": "譜面分岐ガイド",
+    "SETTINGS_GAME_BRANCHGUIDE_DESC": "譜面分岐の参考になる数値などを表示します。\nオートプレイだと表示されません。",
+    "SETTINGS_GAME_BIGNOTEJUDGE": "大音符判定",
+    "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "大音符の両手判定を有効にします。",
+    "SETTINGS_GAME_SURVIVAL": "ゲームモード",
+    "SETTINGS_GAME_SURVIVAL_DESC": "(1人プレイ専用)\n=TYPE-A: 完走!叩ききりまショー!\n=TYPE-B: 完走!叩ききりまショー!(激辛)",
+    "SETTINGS_GAME_SCOREMODE": "スコア計算方法",
+    "SETTINGS_GAME_SCOREMODE_DESC": "スコア計算方法\nTYPE-A: 旧配点\nTYPE-B: 旧筐体配点\nTYPE-C: 新配点",
+    "SETTINGS_GAME_SHINUCHI": "真打モード",
+    "SETTINGS_GAME_SHINUCHI_DESC": "真打モードを有効にする。",
+
+    // Key Assignment - System
+    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "キャプチャ",
+    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "キャプチャキー設定：\n画面キャプチャのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "音量を上げる",
+    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "システムキー割り当て:\n音量を上げるキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "音量を下げる",
+    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "システムキー割り当て:\n音量を下げるキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "叩いた数の表示切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "システムキー割り当て:\n叩いた数の表示切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "デバッグ表示切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "システムキー割り当て:\nデバッグ表示切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "簡易設定",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "システムキー割り当:\n簡易設定のキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "プレイヤーカスタマイズ",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "システムキー割り当て:\nプレイヤーカスタマイズのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "曲リストのソート切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "システムキー割り当て:\n曲リストのソート切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "1Pオート切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "システムキー割り当て:\n1Pオート切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "2Pオート切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "システムキー割り当て:\n2Pオート切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "特訓モード切り替え",
+    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "システムキー割り当て:\n特訓モード切り替えのキーを割り当てます\n(キーボード以外は割り当てられません)",
+    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "動画再生モード切替",
+    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "システムキー割り当て:\n動画再生モード切替のキーを割り当てます\n(キーボード以外は割り当てられません)",
+
+    // Key Assignment - Gameplay
+    "SETTINGS_KEYASSIGN_GAME_DECIDE": "Decide",
+    "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "選択のキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_CANCEL": "Cancel",
+    "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "キャンセルのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "LeftChange",
+    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "左のキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "RightChange",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "右のキーの割り当てを設\n定します。",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED": "LeftRed",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "左側の面へのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "RightRed",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "右側の面へのキーの割り当て\nを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "LeftBlue",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "左側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "RightBlue",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_CLAP": "Clap",
+    "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "LeftRed2P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "左側の面へのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "RightRed2P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "右側の面へのキーの割り当て\nを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "LeftBlue2P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "左側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "RightBlue2P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_CLAP2P": "Clap2P",
+    "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "LeftRed3P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "左側の面へのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "RightRed3P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "右側の面へのキーの割り当て\nを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "LeftBlue3P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "左側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "RightBlue3P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_CLAP3P": "Clap3P",
+    "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "LeftRed4P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "左側の面へのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "RightRed4P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "右側の面へのキーの割り当て\nを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "LeftBlue4P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "左側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "RightBlue4P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_CLAP4P": "Clap4P",
+    "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "LeftRed5P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "左側の面へのキーの割り当てを設\n定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "RightRed5P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "右側の面へのキーの割り当て\nを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "LeftBlue5P",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "左側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "RightBlue5P",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+    "SETTINGS_KEYASSIGN_GAME_CLAP5P": "Clap5P",
+    "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
+
+    // Key Assignment - Training
+    "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Pause Training",
+    "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Drums key assign:\nAssign any key for pausing.",
+    "SETTINGS_KEYASSIGN_TRAINING_AUTO": "Toggle Auto",
+    "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Drums key assign:\nAssign any key for toggling auto.",
+    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Add/Remove Bookmark",
+    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Drums key assign:\nAssign any key for adding/removing bookmarks.",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Increase Scroll Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Drums key assign:\nAssign any key for increasing scroll speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Decrease Scroll Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Drums key assign:\nAssign any key for decreasing scroll speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Increase Song Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Drums key assign:\nAssign any key for increasing song speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Decrease Song Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Drums key assign:\nAssign any key for decreasing song speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Set Branch to Normal",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto normal.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Set Branch to Expert",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto expert.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Set Branch to Master",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto master.",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Move Forward Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Drums key assign:\nAssign any key for moving forward a measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Move Back Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Drums key assign:\nAssign any key for moving back a measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Skip Forward Measures",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Drums key assign:\nAssign any key for skipping forward measures.",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Skip Back Measures",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Drums key assign:\nAssign any key for skipping back measures.",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Jump to First Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Drums key assign:\nAssign any key for jumping to the first measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Jump to Last Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drums key assign:\nAssign any key for jumping to the last measure.",
+
+    // Title Screen
+    "TITLE_MODE_TAIKO": "演奏ゲーム",
+    "TITLE_MODE_DAN": "段位道場",
+    "TITLE_MODE_TOWER": "太鼓タワー",
+    "TITLE_MODE_SHOP": "メダル商店",
+    "TITLE_MODE_STORY": "太鼓大冒険",
+    "TITLE_MODE_HEYA": "太鼓部屋",
+    "TITLE_MODE_SETTINGS": "設定",
+    "TITLE_MODE_EXIT": "ゲーム終了",
+    "TITLE_MODE_ONLINE": "オンライン喫茶店",
+    "TITLE_MODE_DOCUMENT": "Open百科事典",
+    "TITLE_MODE_AI": "AIバトル演奏",
+    "TITLE_MODE_STATS": "プレイヤースタッツ",
+    "TITLE_MODE_EDITOR": "譜面エディター",
+    "TITLE_MODE_TOOLS": "Open工具箱",
+
+    "TITLE_MODE_TAIKO_DESC": "Play your favorite\nsongs at your own pace!",
+    "TITLE_MODE_DAN_DESC": "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank!",
+    "TITLE_MODE_TOWER_DESC": "有限のライフを持って、\nタワーの頂上を登って\n挑戦できるよ！",
+    "TITLE_MODE_SHOP_DESC": "稼いだメダルを費やして、\n新しい曲やプチキャラを買えるよ！",
+    "TITLE_MODE_STORY_DESC": "様々な障害に挑んで、\n新しい場所を発見出来るよ！",
+    "TITLE_MODE_HEYA_DESC": "キャラクタ、プチキャラ、\nネームプレートの情報を変えるよ！",
+    "TITLE_MODE_SETTINGS_DESC": "ゲームスタイルや\n一般的な設定を設けられるよ！",
+    "TITLE_MODE_EXIT_DESC": "セッションを終了できるよ。\nまた遊んでね！",
+    "TITLE_MODE_ONLINE_DESC": "インターネットで新しい譜面\nまたはコンテンツを\nダウンロードできるよ！",
+    "TITLE_MODE_DOCUMENT_DESC": "OpenTaikoの機能または新しい\nコンテンツを追加方法\nについて勉強できるよ！",
+    "TITLE_MODE_AI_DESC": "Fight a strong AI through\nmultiple sections and\naim for victory!",
+    "TITLE_MODE_STATS_DESC": "自分の進歩を認められるよ！",
+    "TITLE_MODE_EDITOR_DESC": "好きな曲を使って\n創作.tja譜面を作られるよ！",
+    "TITLE_MODE_TOOLS_DESC": "様々な役に立つツールを\n使って楽に新しい\nコンテンツを追加できるよ！",
+
+    // Song Select
+    // {0}: Folder path
+    "SONGSELECT_RETURN_PATH": "とじる ({0})",
+    "SONGSELECT_RANDOM": "おまかせ",
+    // {0}: Folder path
+    "SONGSELECT_RANDOM_PATH": "おまかせ ({0})",
+
+    "SONGSELECT_SORT": "Sort Menu",
+    "SONGSELECT_SORT_PATH": "絶対パス",
+    "SONGSELECT_SORT_TITLE": "曲名",
+    "SONGSELECT_SORT_SUBTITLE": "作者名",
+    "SONGSELECT_SORT_LEVEL": "表示レベル",
+
+    // {0}: Main BPM
+    "SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+    // {0}: Main BPM
+    // {1}: Minimum BPM
+    // {2}: Maximum BPM
+    "SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+    // {0}: Charter name
+    "SONGSELECT_INFO_CHARTER": "Charter: {0}",
+
+    "SONGSELECT_QUICKCONFIG": "Quick Config",
+    "SONGSELECT_QUICKCONFIG_MORE": "More...",
+
+    // Modals
+    "MODAL_TITLE_COIN": "コイン取得！",
+    "MODAL_TITLE_CHARA": "キャラクター取得！",
+    "MODAL_TITLE_PUCHI": "プチキャラ取得！",
+    "MODAL_TITLE_NAMEPLATE": "タイトル取得！",
+    "MODAL_TITLE_SONG": "楽曲取得！",
+    // {0}: Newly obtained coins
+    // {1}: New total coin count
+    "MODAL_MESSAGE_COIN": "+{0}コイン (累計: {1})",
+
+    // Online Lounge
+    "ONLINE_EXIT": "タイトルへ戻る",
+    "ONLINE_DOWNLOAD": "コンテンツダウンロード",
+    "ONLINE_DOWNLOAD_CDN": "CDN選択",
+    "ONLINE_DOWNLOAD_SONG": "曲・譜面ダウンロード",
+    "ONLINE_DOWNLOAD_CHARA": "キャラクターダウンロード (Not available)",
+    "ONLINE_DOWNLOAD_PUCHI": "プチキャラダウンロード (Not available)",
+    "ONLINE_MULTIPLAYER": "オンラインマルチプレイヤー (Not available)",
+
+    // Taiko Towers
+    "TOWER_FLOOR_REACHED": "到達階数",
+    "TOWER_FLOOR_INITIAL": "階",
+    "TOWER_SCORE": "スコア",
+    "TOWER_SCORE_INITIAL": "点",
+
+    // Dan Dojo
+    "DAN_CONDITION_NAME_SOUL": "魂ゲージ",
+    "DAN_CONDITION_NAME_GOOD": "良の数",
+    "DAN_CONDITION_NAME_OK": "可の数",
+    "DAN_CONDITION_NAME_BAD": "不可の数",
+    "DAN_CONDITION_NAME_SCORE": "スコア",
+    "DAN_CONDITION_NAME_ROLL": "連打数",
+    "DAN_CONDITION_NAME_HIT": "叩けた数",
+    "DAN_CONDITION_NAME_COMBO": "コンボ数",
+    "DAN_CONDITION_NAME_ACCURACY": "精度",
+    "DAN_CONDITION_NAME_ADLIB": "ADLIBの数",
+    "DAN_CONDITION_NAME_BOMB": "叩けた爆弾",
+
+    // Heya / Quick Heya
+    "HEYA_PUCHI": "プチキャラ",
+    "HEYA_CHARA": "キャラクター",
+    "HEYA_DAN": "段位称号",
+    "HEYA_NAMEPLATE": "名札称号",
+
+    // Unlock requirements & messages (Any Menu)
+    "UNLOCK_CONDITION_INVALID": "[エラー] 無効な条件",
+    "UNLOCK_CONDITION_SHOP": "上記の商品はコイン商店に限りです、部屋に購入ができません。", // cs
+    // {0}: Price of item
+    "UNLOCK_CONDITION_COST": "コインの値段 : {0}", // ch, cs, cm
+    "UNLOCK_COIN_BOUGHT": "商品購入済み !",
+    "UNLOCK_COIN_MORE": "コインが足りません !",
+
+    "UNLOCK_CONDITION_ERROR": "下記の条件 : {0} requires {1} values.",
+    "UNLOCK_CONDITION_ERROR2": "下記の条件 : {0} requires ({1} * n) values and n references.",
+
+    // {0}: Coin earn requirement
+    // {1}: Current progress
+    "UNLOCK_CONDITION_EARN": "{0}コイン以上手に入れた ({1}/{0})", // ce
+    // {0}: Total AI plays needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_AIPLAY": "AI演奏バトルを{0}回プレイ ({1}/{0})", // ap
+    // {0}: Total AI wins needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_AIWIN": "AI演奏バトルで{0}回勝利 ({1}/{0})", // aw
+    // {0}: Total plays needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_PLAY": "{0}回プレイ ({1}/{0})", // tp
+    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+    // {1}: # of songs needed
+    // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_PLAYDIFF": "{2}で{1}譜面を{0} ({3}/{1})", // dp
+    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+    // {1}: # of songs needed
+    // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_PLAYLEVEL": "{2}★の{1}譜面を{0} ({3}/{1})", // lp
+    // {0}: Current progress
+    // {1}: Total # of challenges
+    "UNLOCK_CONDITION_CHALLENGE": "以下の条件をクリアしましょう！： ({0}/{1})", // sp, sg, sc
+    // {0}: Clear type
+    // {1}: Song name
+    // {2}: Difficulty type
+    "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "※{1}{2}を{0}", // sp
+    // {0}: Clear type
+    // {1}: # of songs needed
+    // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "※{2}ジャンルの{1}譜面を{0} ({3}/{1})", // sg
+    // {0}: Clear type
+    // {1} # of songs needed
+    // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+    // {3} Current progress
+    "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "※{2}さんの{1}譜面を{0} ({3}/{1})", // sc
+
+    "UNLOCK_CONDITION_REQUIRE_PLAY": "プレイ",
+    "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "プレイ",
+    "UNLOCK_CONDITION_REQUIRE_ASSIST": "アシストクリア",
+    "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "アシストクリア（以上）",
+    "UNLOCK_CONDITION_REQUIRE_CLEAR": "クリア",
+    "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "クリア（以上）",
+    "UNLOCK_CONDITION_REQUIRE_FC": "フルコンボ",
+    "UNLOCK_CONDITION_REQUIRE_FC_MORE": "フルコンボ（以上）",
+    "UNLOCK_CONDITION_REQUIRE_PERFECT": "全良",
+    "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "全良",
+
+    // Pause Menu (Taiko/Tower/Dan Mode)
+    "PAUSE_TITLE": "ポーズ",
+    "PAUSE_RESUME": "もどる",
+    "PAUSE_RESTART": "やりなおす",
+    "PAUSE_EXIT": "演奏中止",
+
+    // AI Info
+    "AI_NAME": "AI",
+    "AI_TITLE": "デウス・エクス・マキナ",
+
+    // Mods
+    "MOD_NONE": "なし",
+    "MOD_BLANK": "使用不可",
+    "MOD_SWITCH_OFF": "しない",
+    "MOD_SWITCH_ON": "する",
+    "MOD_SCOREMULTIPLY": "スコア乗数：{0}",
+    "MOD_COINMULTIPLY": "コイン乗数：{0}",
+
+    "MOD_SPEED": "はやさ",
+
+    "MOD_HIDE": "ドロン",
+    "MOD_STEALTH": "ステルス",
+
+    "MOD_FLIP": "あべこべ",
+
+    "MOD_RANDOM": "ランダム",
+    "MOD_RANDOM_SHUFFLE": "きまぐれ",
+    "MOD_RANDOM_CHAOS": "でたらめ",
+
+    "MOD_TIMING": "タイミング",
+    "MOD_TIMING1": "緩い",
+    "MOD_TIMING2": "易しい",
+    "MOD_TIMING3": "通常",
+    "MOD_TIMING4": "厳しい",
+    "MOD_TIMING5": "過酷",
+
+    "MOD_JUSTICE": "厳密",
+    "MOD_SAFE": "無難",
+    "MOD_JUST": "厳密",
+
+    "MOD_GAMETYPE": "ゲームタイプ",
+    "MOD_GAMETYPE_TAIKO": "太鼓",
+    "MOD_GAMETYPE_KONGA": "コンガ",
+
+    "MOD_GAMEMODE": "ゲームモード",
+    "MOD_GAMEMODE_TRAINING": "特訓モード",
+
+    "MOD_AUTO": "オート",
+
+    "MOD_SONGSPEED": "再生速度",
+    "SETTINGS_MOD_SONGSPEED_DESC": "曲の演奏速度を、速くしたり遅くした\nりすることができます。\n（※一部のサウンドカードでは正しく\n　再生できない可能性があります。）\n\nTimeStretchがONのときに、演奏\n速度をx0.850以下にすると、音の\nズレが大きくなります。",
+
+    "MOD_HITSOUND": "音色",
+
+    "MOD_FUN": "余分なモード",
+    "MOD_FUN_AVALANCHE": "雪崩",
+    "MOD_FUN_MINESWEEPER": "掃海"
+  },
+  // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
+  "InvalidKey": "KEY NOT FOUND: {0}",
+  // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
+  // Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
+  "FontName": "NotoSansJP-Medium.ttf",
+  "BoxFontName": "NotoSansJP-Regular.ttf"
+}

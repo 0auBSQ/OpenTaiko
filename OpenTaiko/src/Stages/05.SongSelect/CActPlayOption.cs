@@ -57,32 +57,32 @@ namespace TJAPlayer3
                 txSongSpeed[i] = OptionTypeTx((0.5f + i * 0.1f).ToString("n1"), _c, Color.Black);
             }
 
-            txSwitch[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txSwitch[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9001), Color.White, Color.Black);
+            txSwitch[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), Color.White, Color.Black);
+            txSwitch[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SWITCH_ON"), Color.White, Color.Black);
 
-            txRandom[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
-            txRandom[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9003), Color.White, Color.Black);
-            txRandom[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9004), Color.White, Color.Black);
+            txRandom[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_NONE"), Color.White, Color.Black);
+            txRandom[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_RANDOM_SHUFFLE"), Color.White, Color.Black);
+            txRandom[2] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_RANDOM_CHAOS"), Color.White, Color.Black);
 
-            txStealth[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txStealth[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
-            txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9016), Color.White, Color.Black);
+            txStealth[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), Color.White, Color.Black);
+            txStealth[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_HIDE"), Color.White, Color.Black);
+            txStealth[2] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_STEALTH"), Color.White, Color.Black);
 
-            txJust[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9018), Color.Red, Color.Black);
-            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9017), Color.LimeGreen, Color.Black);
+            txJust[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), Color.White, Color.Black);
+            txJust[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_JUST"), Color.Red, Color.Black);
+            txJust[2] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SAFE"), Color.LimeGreen, Color.Black);
 
-            txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9002), Color.White, Color.Black);
-            txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9006), Color.White, Color.Black);
+            txGameMode[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_NONE"), Color.White, Color.Black);
+            txGameMode[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_GAMEMODE_TRAINING"), Color.White, Color.Black);
 
-            txGameType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(513), Color.White, Color.Black);
-            txGameType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(514), Color.White, Color.Black);
+            txGameType[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_GAMETYPE_TAIKO"), Color.White, Color.Black);
+            txGameType[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_GAMETYPE_KONGA"), Color.White, Color.Black);
 
-            txFunMods[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9000), Color.White, Color.Black);
-            txFunMods[1] = OptionTypeTx(CLangManager.LangInstance.GetString(516), Color.White, Color.Black);
-            txFunMods[2] = OptionTypeTx(CLangManager.LangInstance.GetString(517), Color.White, Color.Black);
+            txFunMods[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), Color.White, Color.Black);
+            txFunMods[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_FUN_AVALANCHE"), Color.White, Color.Black);
+            txFunMods[2] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_FUN_MINESWEEPER"), Color.White, Color.Black);
 
-            txNone = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
+            txNone = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_BLANK"), Color.White, Color.Black);
 
             hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
 
@@ -98,26 +98,26 @@ namespace TJAPlayer3
             else
             {
                 txOtoiro = new CTexture[1];
-                txOtoiro[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9007), Color.White, Color.Black);
+                txOtoiro[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_BLANK"), Color.White, Color.Black);
             }
             
-            OptionType[0] = OptionTypeTx(CLangManager.LangInstance.GetString(9008), Color.White, Color.Black);
-            OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString(9009), Color.White, Color.Black);
-            OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString(9010), Color.White, Color.Black);
-            OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString(9011), Color.White, Color.Black);
-            OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString(500), Color.White, Color.Black);
-            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString(72), Color.White, Color.Black);
-            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString(512), Color.White, Color.Black);
-            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString(9012), Color.White, Color.Black);
-            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString(9013), Color.White, Color.Black);
-            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString(10), Color.White, Color.Black);
-            OptionType[10] = OptionTypeTx(CLangManager.LangInstance.GetString(9015), Color.White, Color.Black);
-            OptionType[11] = OptionTypeTx(CLangManager.LangInstance.GetString(515), Color.White, Color.Black);
+            OptionType[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SPEED"), Color.White, Color.Black);
+            OptionType[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_HIDE"), Color.White, Color.Black);
+            OptionType[2] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_FLIP"), Color.White, Color.Black);
+            OptionType[3] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_RANDOM"), Color.White, Color.Black);
+            OptionType[4] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_TIMING"), Color.White, Color.Black);
+            OptionType[5] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_JUSTICE"), Color.White, Color.Black);
+            OptionType[6] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_GAMETYPE"), Color.White, Color.Black);
+            OptionType[7] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_GAMEMODE"), Color.White, Color.Black);
+            OptionType[8] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_AUTO"), Color.White, Color.Black);
+            OptionType[9] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), Color.White, Color.Black);
+            OptionType[10] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_HITSOUND"), Color.White, Color.Black);
+            OptionType[11] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_FUN"), Color.White, Color.Black);
 
             var _timingColors = new Color[] { Color.LimeGreen, Color.YellowGreen, Color.White, Color.Orange, Color.Red };
             for (int i = 0; i < 5; i++)
             {
-                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString(501 + i), _timingColors[i], Color.Black);
+                txTiming[i] = OptionTypeTx(CLangManager.LangInstance.GetString($"MOD_TIMING{i+1}"), _timingColors[i], Color.Black);
             }
 
             for (int i = 0; i < OptionType.Length; i++)
@@ -130,8 +130,8 @@ namespace TJAPlayer3
         {
             var scoreMult = tGetModMultiplier(EBalancingType.SCORE, true, player);
             var coinMult = tGetModMultiplier(EBalancingType.COINS, true, player);
-            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString(510) + scoreMult.ToString("n2"), Color.White, Color.Black);
-            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString(511) + coinMult.ToString("n2"), Color.White, Color.Black);
+            txModMults[0] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_SCOREMULTIPLY", scoreMult.ToString("n2")), Color.White, Color.Black);
+            txModMults[1] = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_COINMULTIPLY", coinMult.ToString("n2")), Color.White, Color.Black);
         }
 
         public override void DeActivate()

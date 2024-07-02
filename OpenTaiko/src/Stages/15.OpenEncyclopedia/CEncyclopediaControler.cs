@@ -95,7 +95,7 @@ namespace TJAPlayer3
 
             Submenus[0].Item1 = -1;
             Submenus[0].Item2 = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
-                          new TitleTextureKey(CLangManager.LangInstance.GetString(401), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
+                          new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
 
             for (int i = 1; i < _count; i++)
             {

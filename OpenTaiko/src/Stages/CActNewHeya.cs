@@ -180,10 +180,11 @@ namespace TJAPlayer3
             InFade = new CCounter();
             CharaBoxAnime = new CCounter();
 
-            for(int i = 0; i < 5; i++)
-            {
-                MenuTitleKeys[i] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), MenuFont, Color.White, Color.Black, 9999);
-            }
+            MenuTitleKeys[0] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[1] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[2] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[3] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[4] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), MenuFont, Color.White, Color.Black, 9999);
             
             ttkPuchiCharaNames = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
             ttkPuchiCharaAuthors = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];

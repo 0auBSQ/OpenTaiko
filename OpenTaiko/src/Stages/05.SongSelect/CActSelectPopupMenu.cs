@@ -396,25 +396,39 @@ namespace TJAPlayer3
                     if (bItemBold || bShowAllItems)
                     {
                         string s;
-                        switch (lciMenuItems[i].cItem.str項目名)
-                        {
-                            case "演奏速度":
-                                {
-                                    double d = (double)((int)lciMenuItems[i].cItem.obj現在値() / 20.0);
-                                    s = "x" + d.ToString("0.000");
-                                }
-                                break;
-                            case "ばいそく":
-                                {
-									double d = (double)((((int)lciMenuItems[i].cItem.obj現在値()) + 1) / 10.0);
-									s = "x" + d.ToString("0.0");
-                                }
-                                break;
-
-                            default:
-                                s = lciMenuItems[i].cItem.obj現在値().ToString();
-                                break;
+						if (lciMenuItems[i].cItem.str項目名 == CLangManager.LangInstance.GetString("MOD_SONGSPEED"))
+						{
+                            double d = (double)((int)lciMenuItems[i].cItem.obj現在値() / 20.0);
+                            s = "x" + d.ToString("0.00");
                         }
+						else if (lciMenuItems[i].cItem.str項目名 == CLangManager.LangInstance.GetString("MOD_SPEED"))
+						{
+                            double d = (double)((((int)lciMenuItems[i].cItem.obj現在値()) + 1) / 10.0);
+                            s = "x" + d.ToString("0.0");
+                        }
+						else
+						{
+                            s = lciMenuItems[i].cItem.obj現在値().ToString();
+                        }
+         //               switch (lciMenuItems[i].cItem.str項目名)
+         //               {
+         //                   case "演奏速度":
+         //                       {
+         //                           double d = (double)((int)lciMenuItems[i].cItem.obj現在値() / 20.0);
+         //                           s = "x" + d.ToString("0.000");
+         //                       }
+         //                       break;
+         //                   case "ばいそく":
+         //                       {
+									//double d = (double)((((int)lciMenuItems[i].cItem.obj現在値()) + 1) / 10.0);
+									//s = "x" + d.ToString("0.0");
+         //                       }
+         //                       break;
+
+         //                   default:
+         //                       s = lciMenuItems[i].cItem.obj現在値().ToString();
+         //                       break;
+         //               }
                         //font.t文字列描画( (int)(340 * Scale.X), (int)(80 + i * 32), s, bValueBold, 1.0f * Scale.Y);
                         using (var bmpStr = bValueBold ?
                             prvFont.DrawText(s, Color.White, Color.Black, null, Color.Yellow, Color.OrangeRed, 30) :
