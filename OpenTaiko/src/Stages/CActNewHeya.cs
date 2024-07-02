@@ -180,10 +180,11 @@ namespace TJAPlayer3
             InFade = new CCounter();
             CharaBoxAnime = new CCounter();
 
-            for(int i = 0; i < 5; i++)
-            {
-                MenuTitleKeys[i] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), MenuFont, Color.White, Color.Black, 9999);
-            }
+            MenuTitleKeys[0] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[1] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[2] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[3] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), MenuFont, Color.White, Color.Black, 9999);
+            MenuTitleKeys[4] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), MenuFont, Color.White, Color.Black, 9999);
             
             ttkPuchiCharaNames = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
             ttkPuchiCharaAuthors = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
@@ -191,8 +192,8 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++)
             {
                 var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
-                ttkPuchiCharaNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Name, this.MenuFont, textColor, Color.Black, 1000);
-                ttkPuchiCharaAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.Author, this.MenuFont, Color.White, Color.Black, 1000);
+                ttkPuchiCharaNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
+                ttkPuchiCharaAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
             }
 
             
@@ -202,8 +203,8 @@ namespace TJAPlayer3
             for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++)
             {
                 var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
-                ttkCharacterNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Name, this.MenuFont, textColor, Color.Black, 1000);
-                ttkCharacterAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.Author, this.MenuFont, Color.White, Color.Black, 1000);
+                ttkCharacterNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
+                ttkCharacterAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
             }
             
 

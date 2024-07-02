@@ -1,0 +1,7 @@
+- 演奏结束语音：
+Clear/Failed（演奏失败）
+Clear/Clear（演奏成功）
+Clear/FullCombo（全连）
+Clear/AllPerfect（全良）
+Clear/AIBattle_Win（AI对战胜利）
+Clear/AIBattle_Lose（AI对战失败）

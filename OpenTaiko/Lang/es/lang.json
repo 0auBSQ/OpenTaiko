@@ -1,0 +1,558 @@
+﻿{
+  // The folder's name is used as the ID, which is used to identify which localized data to use.
+  // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
+  // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
+  // If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+
+  // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
+  // i.e. "日本語 (Japanese)"
+  "Language": "Español (Spanish)",
+  "Entries": {
+
+    // Common
+    "MENU_RETURN": "Regresar",
+    // Difficulties (Any Menu)
+    "DIFF_EASY": "Fácil",
+    "DIFF_NORMAL": "Normal",
+    "DIFF_HARD": "Difícil",
+    "DIFF_EX": "Extremo",
+    "DIFF_EXTRA": "Extra",
+    "DIFF_EXEXTRA": "Extremo / Extra",
+    "DIFF_TOWER": "Tower",
+    "DIFF_DAN": "Dan",
+    "DIFF_ANY": "Any",
+    "DIFF_UNKNOWN": "Unknown",
+
+    // Settings
+    "SETTINGS_SYSTEM": "Opciones principales",
+    "SETTINGS_SYSTEM_DESC": "Ajustes generales del simulador.",
+    "SETTINGS_GAME": "Opciones del juego",
+    "SETTINGS_GAME_DESC": "Ajustes para los controles.",
+    "SETTINGS_EXIT": "Salir",
+    "SETTINGS_EXIT_DESC": "Guarda los cambios y sal del menú de configuración.",
+
+    "SETTINGS_MENU_RETURN": "<< Volver al menú",
+    "SETTINGS_MENU_RETURN_DESC": "Volver al menú de la izquierda.",
+
+    "SETTINGS_KEYASSIGN_SYSTEM": "Teclas del sistema",
+    "SETTINGS_KEYASSIGN_SYSTEM_DESC": "Menú secundario para cambiar las teclas que\nusa el juego.",
+    "SETTINGS_KEYASSIGN_GAME": "Ajustes de controles",
+    "SETTINGS_KEYASSIGN_GAME_DESC": "Ajustes de los botones/pads que se usarán.",
+    "SETTINGS_KEYASSIGN_TRAINING": "Training Mode Key Config",
+    "SETTINGS_KEYASSIGN_TRAINING_DESC": "A secondary menu to adjust keys used during\nTraining Mode.",
+
+    // Settings - System
+    "SETTINGS_SYSTEM_LANGUAGE": "Idioma del sistema",
+    "SETTINGS_SYSTEM_LANGUAGE_DESC": "Cambia el idioma que se usa\n en el juego y menús.",
+    "SETTINGS_SYSTEM_PLAYERCOUNT": "Número de jugadores",
+    "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Cambia el número de jugadores.\nAjustarlo a 2 permite jugar\n canciones regulares a dos jugadores dividiendo\n la pantalla a la mitad.",
+    // Please update the translation above. Up to 5 players can be active at a time. Remove this comment when updated.
+    "SETTINGS_SYSTEM_RELOADSONG": "Recargar lista de canciones",
+    "SETTINGS_SYSTEM_RELOADSONG_DESC": "Recarga y actualiza la lista de canciones.",
+    "SETTINGS_SYSTEM_RELOADSONGCACHE": "Reload Songs (Hard Reload)",
+    "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Clear the existing cache and\nreload the song folder from scratch.",
+    "SETTINGS_SYSTEM_HIDEDANTOWER": "Ocultar Dans/Torres",
+    "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Ocultar charts de Dans y torres\nen el menú de Modo Taiko.\nNota: Recarga las canciones para\n     aplicar los cambios.",
+
+    // Settings - System - Graphics
+    "SETTINGS_SYSTEM_FULLSCREEN": "Pantalla completa",
+    "SETTINGS_SYSTEM_FULLSCREEN_DESC": "Modo de ventana o pantalla completa.",
+    "SETTINGS_SYSTEM_VSYNC": "Sincronización vertical",
+    "SETTINGS_SYSTEM_VSYNC_DESC": "Activa la sincronización vertical.\nActivarlo limitará los FPS a 60, aumentará\nel retraso de entrada y suavizará el desplazamiento.\nDesactivarlo no limitará los FPS,\ndisminuirá el retraso de la entrada pero\nel desplazamiento se verá afectado.",
+    "SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
+    "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Drawing Method:\nSelect from either OpenGL,\nDirectX11, Vulkan, or Metal.\nOpenGL is slow, but compatible & stable.\nDirectX11 is fast and stable, but only\nworks on Windows.\nVulkan works fastest on Linux.\nMetal only works on MacOS.\n\nThis will take effect after game reboot.",
+    "SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture Loading",
+    "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Texture Loading Type:\nFreeze on startup disappears\nTurn this option off if some textures turn black\nThis change will take effect after restarting OpenTaiko\n",
+
+    "SETTINGS_SYSTEM_BGMOVIE": "Reproducción de video",
+    "SETTINGS_SYSTEM_BGMOVIE_DESC": "Usar la reproducción AVI o no.",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Playback Display Mode",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Change how videos are displayed\nin the background.",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "None",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Full Display",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Mini Display",
+    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Both",
+    "SETTINGS_SYSTEM_LANEOPACITY": "Lane Background Opacity",
+    "SETTINGS_SYSTEM_LANEOPACITY_DESC": "This controls the lane background opacity\nwhile videos are playing.\n\n0 = completely transparent,\n255 = no transparency",
+
+    "SETTINGS_SYSTEM_BGA": "BGA",
+    "SETTINGS_SYSTEM_BGA_DESC": "Activar BGA (animaciones de fondo) o no.",
+    "SETTINGS_SYSTEM_DISPLAYCHARA": "Mostrar Personaje",
+    "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Mostrar imágenes del Personaje.",
+    "SETTINGS_SYSTEM_DISPLAYDANCER": "Mostrar Dancer",
+    "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Mostrar imágenes de Dancer.",
+    "SETTINGS_SYSTEM_DISPLAYMOB": "Mostrar Mob",
+    "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "Mostrar imágenes de Mob.",
+    "SETTINGS_SYSTEM_DISPLAYRUNNER": "Mostrar Runner",
+    "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Mostrar imágenes de Runner.",
+    "SETTINGS_SYSTEM_DISPLAYFOOTER": "Mostrar Footer",
+    "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Mostrar imagen del Footer.",
+    "SETTINGS_SYSTEM_DISPLAYPUCHI": "Mostrar Puchi-Chara",
+    "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Mostrar imágenes del Puchi-Chara.",
+    "SETTINGS_SYSTEM_SIMPLEMODE": "SimpleMode",
+    "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifies drawing by hiding most visual\nflare and effects during gameplay.",
+
+    "SETTINGS_SYSTEM_SKIN": "Skin (Full)",
+    "SETTINGS_SYSTEM_SKIN_DESC": "Elige una skin desde la carpeta de skins.",
+
+    // Settings - System - Audio
+    "SETTINGS_SYSTEM_SONGPLAYBACK": "Volumen de música de fondo",
+    "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Desactívalo si no quieres que\nse reproduzca música de fondo.",
+    "SETTINGS_SYSTEM_USESONGVOL": "Usar SONGVOL",
+    "SETTINGS_SYSTEM_USESONGVOL_DESC": "Actívalo para usar el valor SONGVOL desde\n el .tja, Desactívalo si quieres usar los\ncontroles de volumen del juego.",
+    "SETTINGS_SYSTEM_SEVOL": "Volumen de efectos",
+    "SETTINGS_SYSTEM_SEVOL_DESC": "Ajusta el volumen de los efectos de sonido.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+    "SETTINGS_SYSTEM_VOICEVOL": "Volumen de voces",
+    "SETTINGS_SYSTEM_VOICEVOL_DESC": "Ajusta el volumen de las voces de personaje.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+    "SETTINGS_SYSTEM_SONGVOL": "Volumen de la música",
+    "SETTINGS_SYSTEM_SONGVOL_DESC": "Ajusta el volumen de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+    "SETTINGS_SYSTEM_SONGPREVIEWVOL": "Volumen de la demo",
+    "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Ajusta el volumen de la demo de la música.\nDebes reiniciar el juego después de salir\nde la configuración para aplicar los cambios",
+    "SETTINGS_SYSTEM_VOLINCREMENT": "Aumento de volumen",
+    "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "La cantidad de volumen que cambia\nal presionar las teclas de control de volumen.\nPuedes especificar desde 1 a 20.",
+
+    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Retardo de la música",
+    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "Tiempo antes de que la música comience. (ms)",
+    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Song Preview Buffer",
+    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "The time taken before a song preview is played.\nDecreasing this value may cause previews\nto begin while still scrolling.\nYou can specify from 0ms to 10000ms.",
+
+    "SETTINGS_SYSTEM_AUDIOPLAYBACK": "Sistema de sonido",
+    "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay\nWasapi:\n- Only compatible with Windows\n- Has the second lowest input delay\nBASS:\n- Supported on all platforms\nNote: Exit CONFIGURATION to make\n     the setting take effect.",
+    "SETTINGS_SYSTEM_ASIOPLAYBACK": "Dispositivo ASIO",
+    "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "ASIO:\nSolo funciona en dispositivos compatibles con ASIO.\nTiene la menor latencia de entrada.\n\nWasapi:\nDesactiva cualquier otra fuente de sonido.\nTiene la segunda menor latencia de entrada.\n\nDirect Sound:\nPermite sonido desde otras fuentes.\nTiene la mayor latencia de entrada.\n\nNota: Sal de la configuración\n     para aplicar los cambios.",
+    "SETTINGS_SYSTEM_WASAPIBUFFER": "Tamaño del buffer WASAPI",
+    "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Cambia el buffer de sonido para Wasapi.\nDeja el número más bajo posible\n evitando problemas como congelamiento de la canción y\n timing incorrecto. Déjalo en 0 para usar un valor\n estimado, o encuentra el valor correcto para ti a base de\nprueba y error.\nNota: Sal de la configuración\n     para aplicar los cambios.",
+    "SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Size",
+    "SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
+    "SETTINGS_SYSTEM_OSTIMER": "Usar timer del sistema",
+    "SETTINGS_SYSTEM_OSTIMER_DESC": "Usar esto puede hacer que las notas se vean\n más suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\n pero sin ningún tipo de lag.\n\nEste ajuste solo está disponible\n usando WASAPI o ASIO.\n",
+
+    // Settings - System - Misc.
+    "SETTINGS_SYSTEM_LOG": "Guardar registros",
+    "SETTINGS_SYSTEM_LOG_DESC": "Actívalo para guardar info. de depuración\n en TJAPlayer3.log cuando cierres el juego.\nAquí se guarda información del rendimiento y\n eventuales errores del simulador.",
+    "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Use Subfolders in Random Selection",
+    "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Toggle whether subfolders are used\nduring random song selection.",
+    "SETTINGS_SYSTEM_DEBUGMODE": "Debug Mode",
+    "SETTINGS_SYSTEM_DEBUGMODE_DESC": "Toggle whether debug mode is enabled.\nThis will cause additional information\nto appear in the bottom right.\nThis will display your latency calibration\nfor hitsoundless play.",
+    "SETTINGS_SYSTEM_AUTOSCREENSHOT": "Autoguardar Resultado",
+    "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Si activas esto, se tomará una captura\n cuando obtengas un nuevo récord.",
+    "SETTINGS_SYSTEM_DISCORDRPC": "Enviar info. a Discord",
+    "SETTINGS_SYSTEM_DISCORDRPC_DESC": "Comparte la información del .tja que estas\n jugando en Discord.",
+    "SETTINGS_SYSTEM_BUFFEREDINPUT": "Entrada con buffer",
+    "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
+
+    // Settings - Gameplay
+    "SETTINGS_GAME_GLOBALOFFSET": "Compensación global de sonido",
+    "SETTINGS_GAME_GLOBALOFFSET_DESC": "Cambia el retardo de la canción\npara todos los charts.\nPuedes elegir entre -999 a 999ms.\nPara disminuir el retraso de la entrada,\n disminuye este valor.",
+
+    "SETTINGS_GAME_CALIBRATION": "Calibrate Offset",
+    "SETTINGS_GAME_CALIBRATION_DESC": "Calibrate your offset.\nGlobal Offset will be overwritten if saved.",
+    "SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+
+    "SETTINGS_GAME_BADCOUNT": "Modo Kanpeki",
+    "SETTINGS_GAME_BADCOUNT_DESC": "Modo Kanpeki:\nElige el número de fallos antes de\n que se considere un intento fallido.\nDejar en 0 para deshabilitar el modo Kanpeki.",
+    "SETTINGS_GAME_NOTELOCK": "Bloqueo de notas",
+    "SETTINGS_GAME_NOTELOCK_DESC": "Activa si golpear en espacios vacíos\ncuenta como una falla.",
+    "SETTINGS_GAME_AILEVEL": "Nivel de la IA",
+    "SETTINGS_GAME_AILEVEL_DESC": "Determina que tan precisa es la IA.",
+    "SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
+    "SETTINGS_GAME_NORMALGAUGE_DESC": "Force the normal gauge to be used at all times\nregardless of a character's modifiers.",
+
+    "SETTINGS_GAME_AUTOP1": "Player 1 Auto Play",
+    "SETTINGS_GAME_AUTOP1_DESC": "Toggle whether player 1 plays automatically.",
+    "SETTINGS_GAME_AUTOP2": "Player 2 Auto Play",
+    "SETTINGS_GAME_AUTOP2_DESC": "Toggle whether player 2 plays automatically.",
+    "SETTINGS_GAME_AUTOROLL": "Velocidad del redoble",
+    "SETTINGS_GAME_AUTOROLL_DESC": "Redobles por segundo cuando se usa el\nmodo automático.\nNo tiene efecto en los globos.\nDesactivado si está en 0,\nbloqueado a un redoble por frame.",
+
+    "SETTINGS_GAME_NOINFO": "Sin información",
+    "SETTINGS_GAME_NOINFO_DESC": "Oculta la información de la canción.",
+    "SETTINGS_GAME_COMBODISPLAY": "Combo mínimo",
+    "SETTINGS_GAME_COMBODISPLAY_DESC": "Número mínimo para mostrar el combo\nen el tambor.\nPuedes elegir desde 1 a 99999.",
+    "SETTINGS_GAME_SCOREDISPLAY": "Mostrar conteo de notas",
+    "SETTINGS_GAME_SCOREDISPLAY_DESC": "Mostrar el conteo de las notas\n(Solo en modo de un jugador)",
+    "SETTINGS_GAME_BRANCHANIME": "Animación de división",
+    "SETTINGS_GAME_BRANCHANIME_DESC": "Tipo de animación para las divisiones\nTYPE-A: Animación de Gen-2\nTYPE-B: Animación de Gen-3\n",
+
+    "SETTINGS_GAME_DEFAULTDIFF": "Dificultad por defecto",
+    "SETTINGS_GAME_DEFAULTDIFF_DESC": "Dificultad seleccionada por defecto.",
+    "SETTINGS_GAME_EXEXTRAANIME": "Use Extreme/Extra Transitions",
+    "SETTINGS_GAME_EXEXTRAANIME_DESC": "Play a skin-defined animation\nwhile switching between\nExtreme & Extra.",
+
+    // Settings - Gameplay - Training Mode
+    "SETTINGS_TRAINING_SKIPCOUNT": "Measure Skip Count",
+    "SETTINGS_TRAINING_SKIPCOUNT_DESC": "The number of measures to skip while\npressing Skip Forward/Back Measure in\nTraining Mode.",
+    "SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
+    "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
+
+    // Settings - Broken/Unused/Might Deprecate/Might Update
+    // Translate these anyways, even if their future is uncertain.
+    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Image Preview Buffer",
+    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "This is a redundant setting\nported from DTXMania.\nIt does nothing.",
+    "SETTINGS_SYSTEM_TIMESTRETCH": "Time Stretch Mode",
+    "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Not sure what this option does.\nIt uses more CPU power,\nand might cause sound issues below 0.9x playback speed.",
+    "SETTINGS_SYSTEM_FASTRENDER": "Renderizado Rápido",
+    "SETTINGS_SYSTEM_FASTRENDER_DESC": "Usar texturas pre-renderizadas.",
+    "SETTINGS_GAME_BRANCHGUIDE": "Guía de divisiones",
+    "SETTINGS_GAME_BRANCHGUIDE_DESC": "Activa una guía numérica para ver\n que división se elegirá.\nNo se muestra en modo automático.",
+    "SETTINGS_GAME_BIGNOTEJUDGE": "Considerar notas grandes",
+    "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Requerir usar los dos lados para golpear las\n notas grandes.",
+    "SETTINGS_GAME_SURVIVAL": "Modo de supervivencia",
+    "SETTINGS_GAME_SURVIVAL_DESC": "Esta opción no funciona.\nImplementa un contador parecido al de Stepmania,\n pero el código está incompleto así que su\n funcionamiento es limitado.",
+    "SETTINGS_GAME_SCOREMODE": "Modo de puntuación",
+    "SETTINGS_GAME_SCOREMODE_DESC": "Elige el método para calcular la puntuación\nTYPE-A: Puntuación de Gen-1\nTYPE-B: Puntuación de Gen-2\nTYPE-C: Puntuación de Gen-3\n",
+    "SETTINGS_GAME_SHINUCHI": "Modo Shinuchi",
+    "SETTINGS_GAME_SHINUCHI_DESC": "Hace que todas las notas\n valgan los mismos puntos.\nUsa la fórmula de Gen-4.",
+
+    // Key Assignment - System
+    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "Captura",
+    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "Botón para capturar:\nPara asignar una tecla a la captura de pantalla.\n (Solo puedes usar el teclado. No puedes\nusar un pad del tambor para tomar capturas.",
+    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "Increase Volume",
+    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "System key assign:\nAssign any key for increasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "Decrease Volume",
+    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "System key assign:\nAssign any key for decreasing music volume.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "Display Hit Values",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "System key assign:\nAssign any key for displaying hit values.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "Display Debug Menu",
+    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "System key assign:\nAssign any key for displaying debug menu.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Quick Config",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "System key assign:\nAssign any key for accessing the quick config.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Player Customization",
+    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "System key assign:\nAssign any key for player customization.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Change Song Sort",
+    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "System key assign:\nAssign any key for resorting songs.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Toggle Auto (P1)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "System key assign:\nAssign any key for toggling auto (P1).\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "Toggle Auto (P2)",
+    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "System key assign:\nAssign any key for toggling auto (P2).\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "Toggle Training Mode",
+    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "System key assign:\nAssign any key for toggling training mode.\n(You can only use keyboard. You can't\nuse gamepads.)",
+    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "Cycle Video Playback Display",
+    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "System key assign:\nAssign any key for cycling video playback\ndisplay modes.\n(You can only use keyboard. You can't\nuse gamepads.)",
+
+    // Key Assignment - Gameplay
+    "SETTINGS_KEYASSIGN_GAME_DECIDE": "Confirmar",
+    "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "Tecla de confirmacion en los menus.",
+    "SETTINGS_KEYASSIGN_GAME_CANCEL": "Cancelar",
+    "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "Tecla para cancelar en los menus.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "Menu Izquierda",
+    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "Tecla para cambiar a la izquierda en los menus.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "Menu Derecha",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "Tecla para cambiar a la derecha en los menus.",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED": "Rojo izquierdo",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "Asigna un botón o un pad para\n el Don (rojo) izquierdo.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "Rojo derecho",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "Asigna un botón o un pad para\nel Don (rojo) derecho.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "Azul izquierdo",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Asigna un botón o un pad para\n el Ka (azul) izquierdo.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "Azul derecho",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "Asigna un botón o un pad para\n el Ka (azul) derecho.",
+    "SETTINGS_KEYASSIGN_GAME_CLAP": "Aplauso",
+    "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso.",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "Rojo izquierdo J2",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J2.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "Rojo derecho J2",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "Asigna un botón o un pad para\n el Don (rojo) derecho del J2.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "Azul izquierdo J2",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J2.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "Azul derecho J2",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Asigna un botón o un pad para\n el Ka (azul) derecho del J2.",
+    "SETTINGS_KEYASSIGN_GAME_CLAP2P": "Aplauso J2",
+    "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso J2.",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "Rojo izquierdo J3",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J3.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "Rojo derecho J3",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "Asigna un botón o un pad para\n el Don (rojo) derecho del J3.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "Azul izquierdo J3",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J3.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "Azul derecho J3",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Asigna un botón o un pad para\n el Ka (azul) derecho del J3.",
+    "SETTINGS_KEYASSIGN_GAME_CLAP3P": "Aplauso J3",
+    "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso J3.",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "Rojo izquierdo J4",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J4.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "Rojo derecho J4",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "Asigna un botón o un pad para\n el Don (rojo) derecho del J4.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "Azul izquierdo J4",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J4.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "Azul derecho J4",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Asigna un botón o un pad para\n el Ka (azul) derecho del J4.",
+    "SETTINGS_KEYASSIGN_GAME_CLAP4P": "Aplauso J4",
+    "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso J4.",
+
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "Rojo izquierdo J5",
+    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "Asigna un botón o un pad para\n el Don (rojo) izquierdo del J5.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "Rojo derecho J5",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "Asigna un botón o un pad para\n el Don (rojo) derecho del J5.",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "Azul izquierdo J5",
+    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Asigna un botón o un pad para\n el Ka (azul) izquierdo del J5.",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "Azul derecho J5",
+    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Asigna un botón o un pad para\n el Ka (azul) derecho del J5.",
+    "SETTINGS_KEYASSIGN_GAME_CLAP5P": "Aplauso J5",
+    "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Asignación para teclas Konga:\nAsignar teclas/pads para el\n Aplauso J5.",
+
+    // Key Assignment - Training
+    "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Pause Training",
+    "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Drums key assign:\nAssign any key for pausing.",
+    "SETTINGS_KEYASSIGN_TRAINING_AUTO": "Toggle Auto",
+    "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Drums key assign:\nAssign any key for toggling auto.",
+    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Add/Remove Bookmark",
+    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Drums key assign:\nAssign any key for adding/removing bookmarks.",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Increase Scroll Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Drums key assign:\nAssign any key for increasing scroll speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Decrease Scroll Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Drums key assign:\nAssign any key for decreasing scroll speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Increase Song Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Drums key assign:\nAssign any key for increasing song speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Decrease Song Speed",
+    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Drums key assign:\nAssign any key for decreasing song speed.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Set Branch to Normal",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto normal.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Set Branch to Expert",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto expert.",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Set Branch to Master",
+    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Drums key assign:\nAssign any key for setting a chart's branch\nto master.",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Move Forward Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Drums key assign:\nAssign any key for moving forward a measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Move Back Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Drums key assign:\nAssign any key for moving back a measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Skip Forward Measures",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Drums key assign:\nAssign any key for skipping forward measures.",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Skip Back Measures",
+    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Drums key assign:\nAssign any key for skipping back measures.",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Jump to First Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Drums key assign:\nAssign any key for jumping to the first measure.",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Jump to Last Measure",
+    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drums key assign:\nAssign any key for jumping to the last measure.",
+
+    // Title Screen
+    "TITLE_MODE_TAIKO": "Modo Taiko",
+    "TITLE_MODE_DAN": "Dan-i Dojo",
+    "TITLE_MODE_TOWER": "Torres Taiko",
+    "TITLE_MODE_SHOP": "Tienda",
+    "TITLE_MODE_STORY": "Aventura Taiko",
+    "TITLE_MODE_HEYA": "Mi Habitación",
+    "TITLE_MODE_SETTINGS": "Ajustes",
+    "TITLE_MODE_EXIT": "Salir",
+    "TITLE_MODE_ONLINE": "Sala en línea",
+    "TITLE_MODE_DOCUMENT": "Abrir enciclopedia",
+    "TITLE_MODE_AI": "Modo de batalla IA",
+    "TITLE_MODE_STATS": "Estadisticas del jugador",
+    "TITLE_MODE_EDITOR": "Editor de charts",
+    "TITLE_MODE_TOOLS": "Abrir herramientas",
+
+    "TITLE_MODE_TAIKO_DESC": "¡Juega tus canciones\nfavoritas a tu propio gusto!",
+    "TITLE_MODE_DAN_DESC": "¡Juega varias canciones mientras cumples\nretos que te pondrán a prueba\npara completar el desafío!",
+    "TITLE_MODE_TOWER_DESC": "¡Juega canciones largas con un\nnúmero de vidas limitado y llega\na la punta de la torre!",
+    "TITLE_MODE_SHOP_DESC": "¡Compra nuevas canciones, PuchiCharas o personajes\nusando las medallas que ganaste jugando!",
+    "TITLE_MODE_STORY_DESC": "¡Atraviesa varios obstáculos y\ndesbloquea nuevo contenido!",
+    "TITLE_MODE_HEYA_DESC": "¡Cambia la información de tu placa\n o el aspecto de tu personaje!",
+    "TITLE_MODE_SETTINGS_DESC": "¡Cambia tu estilo de juego\no ajustes generales!",
+    "TITLE_MODE_EXIT_DESC": "Salir del juego.\n¡Hasta la próxima!",
+    "TITLE_MODE_ONLINE_DESC": "¡Descarga nuevos charts\ny contenido desde\n internet!",
+    "TITLE_MODE_DOCUMENT_DESC": "¡Aprende sobre las funciones relacionadas\na OpenTaiko y como instalar\nnuevo contenido!",
+    "TITLE_MODE_AI_DESC": "¡Lucha contra una IA en\nmultiples secciones y\nhazte con la victoria!",
+    "TITLE_MODE_STATS_DESC": "¡Revisa tu progreso!",
+    "TITLE_MODE_EDITOR_DESC": "¡Crea tus propios charts .tja\ncon tus canciones favoritas!",
+    "TITLE_MODE_TOOLS_DESC": "¡Usa varias herramientas para insertar\nnuevo contenido personalizado!",
+
+    // Song Select
+    // {0}: Folder path
+    "SONGSELECT_RETURN_PATH": "Regresar ({0})",
+    "SONGSELECT_RANDOM": "Canción aleatoria",
+    // {0}: Folder path
+    "SONGSELECT_RANDOM_PATH": "Canción aleatoria ({0})",
+
+    "SONGSELECT_SORT": "Sort Menu",
+    "SONGSELECT_SORT_PATH": "Ruta",
+    "SONGSELECT_SORT_TITLE": "Titulo",
+    "SONGSELECT_SORT_SUBTITLE": "Subtitulo",
+    "SONGSELECT_SORT_LEVEL": "Dificultad mostrada",
+
+    // {0}: Main BPM
+    "SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+    // {0}: Main BPM
+    // {1}: Minimum BPM
+    // {2}: Maximum BPM
+    "SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+    // {0}: Charter name
+    "SONGSELECT_INFO_CHARTER": "Charter: {0}",
+
+    "SONGSELECT_QUICKCONFIG": "Quick Config",
+    "SONGSELECT_QUICKCONFIG_MORE": "More...",
+
+    // Modals
+    "MODAL_TITLE_COIN": "Monedas conseguidas!",
+    "MODAL_TITLE_CHARA": "Personaje conseguido!",
+    "MODAL_TITLE_PUCHI": "Puchichara conseguido!",
+    "MODAL_TITLE_NAMEPLATE": "Titulo conseguido!",
+    "MODAL_TITLE_SONG": "Canción conseguido!",
+    // {0}: Newly obtained coins
+    // {1}: New total coin count
+    "MODAL_MESSAGE_COIN": "+{0} Monedas (Total: {1})",
+
+    // Online Lounge
+    "ONLINE_EXIT": "Volver al menú principal",
+    "ONLINE_DOWNLOAD": "Descargar contenido",
+    "ONLINE_DOWNLOAD_CDN": "Selecciona un CDN",
+    "ONLINE_DOWNLOAD_SONG": "Descargar canciones",
+    "ONLINE_DOWNLOAD_CHARA": "Descargar personajes (Not available)",
+    "ONLINE_DOWNLOAD_PUCHI": "Descargar Puchicharas (Not available)",
+    "ONLINE_MULTIPLAYER": "Multijugador en línea (Not available)",
+
+    // Taiko Towers
+    "TOWER_FLOOR_REACHED": "Piso alcanzado",
+    "TOWER_FLOOR_INITIAL": "P",
+    "TOWER_SCORE": "Puntuación",
+    "TOWER_SCORE_INITIAL": "P",
+
+    // Dan Dojo
+    "DAN_CONDITION_NAME_SOUL": "Indicador de almas",
+    "DAN_CONDITION_NAME_GOOD": "Cantidad de Perfectas",
+    "DAN_CONDITION_NAME_OK": "Cantidad de OK",
+    "DAN_CONDITION_NAME_BAD": "Cantidad de Malas",
+    "DAN_CONDITION_NAME_SCORE": "Puntuación",
+    "DAN_CONDITION_NAME_ROLL": "Cantidad de redobles",
+    "DAN_CONDITION_NAME_HIT": "Cantidad de golpes",
+    "DAN_CONDITION_NAME_COMBO": "Combo",
+    "DAN_CONDITION_NAME_ACCURACY": "Precisión",
+    "DAN_CONDITION_NAME_ADLIB": "Cantidad de ADLIBs",
+    "DAN_CONDITION_NAME_BOMB": "Bombas golpeadas",
+
+    // Heya / Quick Heya
+    "HEYA_PUCHI": "Puchi-Chara",
+    "HEYA_CHARA": "Personaje",
+    "HEYA_DAN": "Título de Dan",
+    "HEYA_NAMEPLATE": "Título de la placa",
+
+    // Unlock requirements & messages (Any Menu)
+    "UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",
+    "UNLOCK_CONDITION_SHOP": "Item only avaliable at the Shop.", // cs
+    // {0}: Price of item
+    "UNLOCK_CONDITION_COST": "Coin price: {0}", // ch, cs, cm
+    "UNLOCK_COIN_BOUGHT": "Item bought!",
+    "UNLOCK_COIN_MORE": "Not enough coins!",
+
+    "UNLOCK_CONDITION_ERROR": "The following condition: {0} requires {1} values.",
+    "UNLOCK_CONDITION_ERROR2": "The following condition: {0} requires ({1} * n) values and n references.",
+
+    // {0}: Coin earn requirement
+    // {1}: Current progress
+    "UNLOCK_CONDITION_EARN": "Earn a total of {0} coins to unlock this item! ({1}/{0})", // ce
+    // {0}: Total AI plays needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_AIPLAY": "Play {0} AI battle matches to unlock this item! ({1}/{0})", // ap
+    // {0}: Total AI wins needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_AIWIN": "Win {0} AI battle matches to unlock this item! ({1}/{0})", // aw
+    // {0}: Total plays needed
+    // {1}: Current progress
+    "UNLOCK_CONDITION_PLAY": "Play {0} songs to unlock this item! ({1}/{0})", // tp
+    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+    // {1}: # of songs needed
+    // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_PLAYDIFF": "{0} {1} songs on {2} difficulty to unlock this item! ({3}/{1})", // dp
+    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+    // {1}: # of songs needed
+    // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
+    // {0}: Current progress
+    // {1}: Total # of challenges
+    "UNLOCK_CONDITION_CHALLENGE": "Get the following performances to unlock this item:  ({0}/{1})", // sp, sg, sc
+    // {0}: Clear type
+    // {1}: Song name
+    // {2}: Difficulty type
+    "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} on {2} difficulty.", // sp
+    // {0}: Clear type
+    // {1}: # of songs needed
+    // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+    // {3}: Current progress
+    "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} songs within the {2} folder. ({3}/{1})", // sg
+    // {0}: Clear type
+    // {1} # of songs needed
+    // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+    // {3} Current progress
+    "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} charts made by {2}. ({3}/{1})", // sc
+
+    "UNLOCK_CONDITION_REQUIRE_PLAY": "Play",
+    "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Play",
+    "UNLOCK_CONDITION_REQUIRE_ASSIST": "Get an Assisted Clear on",
+    "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Get at least an Assisted Clear on",
+    "UNLOCK_CONDITION_REQUIRE_CLEAR": "Get a Clear on",
+    "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Get at least a Clear on",
+    "UNLOCK_CONDITION_REQUIRE_FC": "Get a Full Combo on",
+    "UNLOCK_CONDITION_REQUIRE_FC_MORE": "Get at least a Full Combo on",
+    "UNLOCK_CONDITION_REQUIRE_PERFECT": "Get a Perfect on",
+    "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Get a Perfect on",
+
+    // Pause Menu (Taiko/Tower/Dan Mode)
+    "PAUSE_TITLE": "Pause",
+    "PAUSE_RESUME": "Reanudar",
+    "PAUSE_RESTART": "Reiniciar",
+    "PAUSE_EXIT": "Salir",
+
+    // AI Info
+    "AI_NAME": "AI",
+    "AI_TITLE": "Deus-Ex-Machina",
+
+    // Mods
+    "MOD_NONE": "Nada",
+    "MOD_BLANK": "-",
+    "MOD_SWITCH_OFF": "No",
+    "MOD_SWITCH_ON": "Sí",
+    "MOD_SCOREMULTIPLY": "Multiplicador de puntuación: {0}",
+    "MOD_COINMULTIPLY": "Multiplicador de monedas: {0}",
+
+    "MOD_SPEED": "Velocidad",
+
+    "MOD_HIDE": "Notas invisibles",
+    "MOD_STEALTH": "Cauteloso",
+
+    "MOD_FLIP": "Notas opuestas",
+
+    "MOD_RANDOM": "Aleatorio",
+    "MOD_RANDOM_SHUFFLE": "Caprichoso",
+    "MOD_RANDOM_CHAOS": "Caótico",
+
+    "MOD_TIMING": "Timing",
+    "MOD_TIMING1": "Relajado",
+    "MOD_TIMING2": "Leve",
+    "MOD_TIMING3": "Normal",
+    "MOD_TIMING4": "Estricto",
+    "MOD_TIMING5": "Rigoroso",
+
+    "MOD_JUSTICE": "Modo estricto",
+    "MOD_SAFE": "Seguro",
+    "MOD_JUST": "Exacto",
+
+    "MOD_GAMETYPE": "Tipo de juego",
+    "MOD_GAMETYPE_TAIKO": "Taiko",
+    "MOD_GAMETYPE_KONGA": "Konga",
+
+    "MOD_GAMEMODE": "Modo de juego",
+    "MOD_GAMEMODE_TRAINING": "Modo Entrenamiento",
+
+    "MOD_AUTO": "Auto",
+
+    "MOD_SONGSPEED": "Velocidad de la canción",
+    "SETTINGS_MOD_SONGSPEED_DESC": "Cambia la velocidad de la canción.\nPor ejemplo, puedes jugar a mitad de\n velocidad ajustando el valor PlaySpeed = 0.500\n para practicar.\n\nNota: También cambia el tono de la canción.\nSi Time Stretch está encendido, puede haber\n lag de audio si se usa en menos de x0.9.",
+
+    "MOD_HITSOUND": "Instrument",
+
+    "MOD_FUN": "Fun Mods",
+    "MOD_FUN_AVALANCHE": "Avalancha",
+    "MOD_FUN_MINESWEEPER": "Buscaminas"
+  },
+  // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
+  "InvalidKey": "KEY NOT FOUND: {0}",
+  // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
+  // Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
+  "FontName": "Arial",
+  "BoxFontName": "font.ttf"
+}

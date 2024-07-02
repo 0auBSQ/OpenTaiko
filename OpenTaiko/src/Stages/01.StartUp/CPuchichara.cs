@@ -50,7 +50,7 @@ namespace TJAPlayer3
                         new Modal(
                             Modal.EModalType.Puchichara,
                             HRarity.tRarityToModalInt(metadata.Rarity),
-                            _npvKey
+                            metadata.Name
                             ),
                         _player);
 

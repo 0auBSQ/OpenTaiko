@@ -1,0 +1,7 @@
+坐标：
+Game_Chara_Balloon_X（吹气球时角色Ｘ坐标）=(玩家１),(玩家２)
+Game_Chara_Balloon_Y（吹气球时角色Ｙ坐标）=(玩家１),(玩家２)
+Game_Chara_Balloon_4P（４玩家模式下吹气球时角色坐标）=(Ｘ),(Ｙ)
+Game_Chara_Balloon_5P（５玩家模式下吹气球时角色坐标）=(Ｘ),(Ｙ)
+Game_Chara_Kusudama_X（敲击彩球时角色Ｘ坐标）=(玩家１),(玩家２),(玩家３),(玩家４),(玩家５)
+Game_Chara_Kusudama_Y（敲击彩球时角色Ｙ坐标）=(玩家１),(玩家２),(玩家３),(玩家４),(玩家５)

@@ -1118,24 +1118,24 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
-                                case "FontName":
-                                {
-                                    strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
-                                    strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
-                                    if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
-                                    strParam = Path(strParam);
-                                    if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
-                                    break;
-                                }
-                                case "BoxFontName":
-                                {
-                                    strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
-                                    strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
-                                    if (HPrivateFastFont.FontExists(strParam)) BoxFontName = strParam;
-                                    strParam = Path(strParam);
-                                    if (HPrivateFastFont.FontExists(Path(strParam))) BoxFontName = strParam;
-                                    break;
-                                }
+                                //case "FontName":
+                                //{
+                                //    strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                //    strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                //    if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
+                                //    strParam = Path(strParam);
+                                //    if (HPrivateFastFont.FontExists(strParam)) FontName = strParam;
+                                //    break;
+                                //}
+                                //case "BoxFontName":
+                                //{
+                                //    strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                //    strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                //    if (HPrivateFastFont.FontExists(strParam)) BoxFontName = strParam;
+                                //    strParam = Path(strParam);
+                                //    if (HPrivateFastFont.FontExists(Path(strParam))) BoxFontName = strParam;
+                                //    break;
+                                //}
                                 #endregion
 
                                 #region [Background Scroll]
@@ -8725,6 +8725,15 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
+                                case "Heya_DescriptionTextOrigin":
+                                {
+                                    string[] strSplit = strParam.Split(',');
+                                    for (int i = 0; i < 2; i++)
+                                    {
+                                        Heya_DescriptionTextOrigin[i] = int.Parse(strSplit[i]);
+                                    }
+                                    break;
+                                }
                                 #endregion
 
                                 #region OnlineLounge 
@@ -9353,9 +9362,28 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
-                                default:
-                                    break;
                             #endregion
+                                default:
+                                    foreach (string code in CLangManager.Langcodes)
+                                    {
+                                        if (strCommand == "FontName" + code.ToUpper())
+                                        {
+                                            strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                            strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                            if (HPrivateFastFont.FontExists(strParam)) _fontNameLocalized.Add(code, strParam);
+                                            strParam = Path(strParam);
+                                            if (HPrivateFastFont.FontExists(strParam)) _fontNameLocalized.Add(code, strParam);
+                                        }
+                                        if (strCommand == "BoxFontName" + code.ToUpper())
+                                        {
+                                            strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                                            strParam = strParam.Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                                            if (HPrivateFastFont.FontExists(strParam)) _boxFontNameLocalized.Add(code, strParam);
+                                            strParam = Path(strParam);
+                                            if (HPrivateFastFont.FontExists(Path(strParam))) _boxFontNameLocalized.Add(code, strParam);
+                                        }
+                                    }
+                                    break;
 
                             #endregion
                             }
@@ -9514,8 +9542,10 @@ namespace TJAPlayer3
         public string Skin_Version = "Unknown";
         public string Skin_Creator = "Unknown";
         public int[] Resolution = new int[] { 1280, 720 };
-        public string FontName = TJAPlayer3.ConfigIni.FontName;
-        public string BoxFontName = TJAPlayer3.ConfigIni.BoxFontName;
+        public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+        private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
+        public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
+        private Dictionary<string, string> _boxFontNameLocalized = new Dictionary<string, string>();
         #endregion
 
         #region Config
@@ -11059,6 +11089,7 @@ namespace TJAPlayer3
         public int[] Heya_Side_Menu_Y = new int[] { -80, -10, 60, 130, 200, 270, 340, 410, 480, 550, 620, 690, 760 };
         public int[] Heya_Side_Menu_Font_Offset = new int[] { 0, 14 };
         public int[] Heya_InfoSection = new int[] { 620, 560 };
+        public int[] Heya_DescriptionTextOrigin = new int[] { 0, 0 };
         public int Heya_Font_Scale = 14;
 
         #endregion

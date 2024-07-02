@@ -95,7 +95,7 @@ namespace TJAPlayer3
 
 
             // とじる
-            itemBack.strタイトル = CLangManager.LangInstance.GetString(200) + " (" + path + ")";
+            itemBack.strタイトル = CLangManager.LangInstance.GetString("SONGSELECT_RETURN_PATH", path);
 
             itemBack.BackColor = ColorTranslator.FromHtml("#513009");
             itemBack.BoxColor = Color.White;
@@ -134,7 +134,7 @@ namespace TJAPlayer3
             CSongListNode itemRandom = new CSongListNode();
             itemRandom.eノード種別 = CSongListNode.ENodeType.RANDOM;
 
-            itemRandom.strタイトル = CLangManager.LangInstance.GetString(203) + " (" + path + ")"; ;
+            itemRandom.strタイトル = CLangManager.LangInstance.GetString("SONGSELECT_RANDOM_PATH", path);
 
             itemRandom.nスコア数 = (int)Difficulty.Total;
             itemRandom.rParentNode = parent;

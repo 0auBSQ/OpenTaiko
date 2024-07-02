@@ -1,0 +1,7 @@
+节拍：
+Game_Chara_Beat_Normal（正常）=1
+Game_Chara_Beat_10Combo（每10连击）=1
+Game_Chara_Beat_10ComboMax（魂条满时每10连击）=1
+Game_Chara_Beat_ClearIn（成功时）=1
+Game_Chara_Beat_Clear（成功）=1
+Game_Chara_Beat_ClearMax（魂条满时）=1

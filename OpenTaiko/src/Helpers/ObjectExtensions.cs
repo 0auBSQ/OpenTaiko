@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using System.ArrayExtensions;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using TJAPlayer3;
 
 // https://github.com/Burtsev-Alexey/net-object-deep-copy/blob/master/ObjectExtensions.cs
 
@@ -135,6 +138,15 @@ namespace System
 
     public static class StringExtensions
     {
+        // TagRegex and RemoveTags are copies of TagRegex and Purify from the CSkiaSharpTextRenderer class (Have two instances because of both being in 2 different projects)
+
+        private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
+
+        public static string RemoveTags(this string input)
+        {
+            return Regex.Replace(input, TagRegex, "");
+        }
+
         public static string SafeFormat(this string format, params object?[] args)
         {
             try
@@ -144,6 +156,98 @@ namespace System
             catch
             {
                 return format;
+            }
+        }
+
+        public static string[] SplitByCommas(this string input)
+        {
+            // Regular expression to split by commas, but not by escaped commas (\,)
+            var pattern = @"(?<!\\),";
+            var parts = Regex.Split(input, pattern);
+
+            // Replace escaped commas with actual commas in the parts
+            for (int i = 0; i < parts.Length; i++)
+            {
+                parts[i] = parts[i].Replace(@"\,", ",");
+            }
+
+            // Filter out empty strings
+            var filteredParts = parts.Where(part => !string.IsNullOrEmpty(part)).ToArray();
+
+            return filteredParts;
+        }
+
+        public static double[] ParseComplex(this string input)
+        {
+            try
+            {
+                // Removing all spaces from the input for easier processing
+                input = input.Replace(" ", "").ToLower();
+
+                double real = 0;
+                double imaginary = 0;
+
+                // If the input contains 'i', we need to handle the imaginary part
+                if (input.Contains("i"))
+                {
+                    // Special cases for 'i', '-i', '1+i', '1-i'
+                    if (input == "i")
+                    {
+                        imaginary = 1;
+                    }
+                    else if (input == "-i")
+                    {
+                        imaginary = -1;
+                    }
+                    else
+                    {
+                        // Remove 'i' for further processing
+                        input = input.Replace("i", "");
+
+                        // Check if input ends with '+' or '-', meaning it was something like '1+i' or '1-i'
+                        if (input.EndsWith("+") || input.EndsWith("-"))
+                        {
+                            real = double.Parse(input.TrimEnd('+', '-'), CultureInfo.InvariantCulture);
+                            imaginary = input.EndsWith("+") ? 1 : -1;
+                        }
+                        else
+                        {
+                            // Split the input into real and imaginary parts
+                            string[] parts = input.Split(new[] { '+', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (input.Contains("+"))
+                            {
+                                real = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                                imaginary = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                            }
+                            else if (input.LastIndexOf('-') > 0) // handling cases like "1-2i"
+                            {
+                                real = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                                imaginary = -double.Parse(parts[1], CultureInfo.InvariantCulture);
+                            }
+                            else if (input.StartsWith("-"))
+                            {
+                                imaginary = -double.Parse(parts[0], CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                imaginary = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // If there is no 'i', it is purely a real number
+                    real = double.Parse(input, CultureInfo.InvariantCulture);
+                }
+
+                return new double[] { real, imaginary };
+            }
+            catch (Exception ex)
+            {
+                LogNotification.PopWarning($"'{input}': Incorrect complex number formatting, defaulting to 0");
+                return new double[] { 0, 0 }; // Return default value in case of error
             }
         }
     }

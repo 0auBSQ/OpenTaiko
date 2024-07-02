@@ -1128,6 +1128,8 @@ namespace TJAPlayer3
             Heya_Center_Menu_Box_Slot = TxC(HEYA + @$"Center_Menu_Box_Slot.png");
             Heya_Side_Menu = TxC(HEYA + @$"Side_Menu.png");
             Heya_Render_Field = TxC(HEYA + @$"Render_Field.png");
+            Heya_Center_Menu_Background = TxC(HEYA + @$"Center_Menu_Background.png");
+            Heya_Description_Panel = TxC(HEYA + @$"Description_Panel.png");
             Heya_Box = TxC(HEYA + @$"Box.png");
             Heya_Lock = TxC(HEYA + @$"Lock.png");
 
@@ -3036,6 +3038,8 @@ Result_Mountain = new CTexture[4]*/;
             Heya_Side_Menu,
             Heya_Box,
             Heya_Render_Field,
+            Heya_Center_Menu_Background,
+            Heya_Description_Panel,
             Heya_Lock;
 
         #endregion

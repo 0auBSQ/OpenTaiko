@@ -717,11 +717,11 @@ namespace TJAPlayer3
 
 				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				{
-					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString(1001), pfTowerText48, Color.Black, Color.Transparent, 700);
-					this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString(1000), pfTowerText48, Color.White, Color.Black, 700);
-					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString(1002), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkMaxFloors = new TitleTextureKey("/" + TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
+					this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48, Color.White, Color.Black, 700);
+					this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
-					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString(1003), pfTowerText, Color.Black, Color.Transparent, 700);
+					this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 					this.ttkScoreCount = new TitleTextureKey(TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				}
@@ -1837,107 +1837,6 @@ namespace TJAPlayer3
 			
 			if (!bAddedToRecentlyPlayedSongs)
 			{
-				/*
-				#region [ Apply new local status for song select screens ]
-				//---------------------
-				if (!TJAPlayer3.bコンパクトモード)
-				{
-					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
-					{
-                        #region [Update status]
-
-                        Cスコア cScore = TJAPlayer3.stageSongSelect.r確定されたスコア;
-
-						for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-                        {
-							if ((i != 1 && TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i])
-								|| (i == 1 && (TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[i] || TJAPlayer3.ConfigIni.bAIBattleMode)))
-								continue;
-
-							int actualPlayer = TJAPlayer3.GetActualPlayer(i);
-
-							if (cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < nクリア[i])
-								cScore.GPInfo[actualPlayer].nClear[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = nクリア[i];
-
-							if (cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < nスコアランク[i])
-								cScore.GPInfo[actualPlayer].nScoreRank[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = nスコアランク[i];
-
-							if (cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i))
-								cScore.GPInfo[actualPlayer].nHighScore[TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[i]] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, i);
-						}
-
-						#endregion
-
-					}
-					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-                    {
-                        #region [Dan update status]
-
-                        Cスコア cスコア = TJAPlayer3.stageSongSelect.r確定されたスコア;
-
-						Exam.Status examStatus = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C);
-
-						int clearValue = 0;
-
-						if (examStatus != Exam.Status.Failure)
-						{
-							// Red Goukaku
-							clearValue += 1;
-
-							// Gold Goukaku
-							if (examStatus == Exam.Status.Better_Success)
-								clearValue += 1;
-
-							// Gold Iki
-							if (this.st演奏記録.Drums.nMiss数 == 0)
-							{
-								clearValue += 2;
-
-								// Rainbow Iki
-								if (this.st演奏記録.Drums.nGreat数 == 0)
-									clearValue += 2;
-							}
-						}
-
-						int actualPlayer = TJAPlayer3.SaveFile;
-
-						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
-                        {
-							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], clearValue);
-
-							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0))
-								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0);
-						}
-
-						#endregion
-
-						//cスコア.譜面情報.nクリア[0] = Math.Max(cスコア.譜面情報.nクリア[0], clearValue);
-					}
-					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-					{
-                        #region [Update Tower status]
-
-                        Cスコア cスコア = TJAPlayer3.stageSongSelect.r確定されたスコア;
-						int actualPlayer = TJAPlayer3.SaveFile;
-
-						int tmpClear = GetTowerScoreRank();
-
-						if (!TJAPlayer3.ConfigIni.b太鼓パートAutoPlay[0])
-						{
-							cスコア.GPInfo[actualPlayer].nClear[0] = Math.Max(cスコア.GPInfo[actualPlayer].nClear[0], tmpClear);
-							cスコア.GPInfo[actualPlayer].nScoreRank[0] = Math.Max(cスコア.GPInfo[actualPlayer].nScoreRank[0], CFloorManagement.LastRegisteredFloor);
-
-							if (cスコア.GPInfo[actualPlayer].nHighScore[0] < (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0))
-								cスコア.GPInfo[actualPlayer].nHighScore[0] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.Get(EInstrumentPad.DRUMS, 0);
-						}
-
-						#endregion
-					}
-				}
-				//---------------------
-				#endregion
-				*/
-
 				// Song added to recently added songs here
 
 				TJAPlayer3.RecentlyPlayedSongs.tAddChart(TJAPlayer3.stageSongSelect.rChoosenSong.uniqueId.data.id);

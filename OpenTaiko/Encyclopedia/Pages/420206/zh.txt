@@ -1,0 +1,10 @@
+[仅游玩（花球）]
+
+function kusuIn()
+呼叫一次，当花球序列开始时。
+
+function kusuBroke()
+呼叫一次，当花球序列成功清除。
+
+function kusuMiss()
+呼叫一次，当花球序列在结束之前未能清除。
