@@ -51,11 +51,16 @@ namespace TJAPlayer3
             #region [Main menu]
 
             this.ttkMainMenuOpt = new TitleTextureKey[5];
-            
-            for (int i = 0; i < ttkMainMenuOpt.Length; i++)
-            {
-                this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
-            }
+
+            this.ttkMainMenuOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[3] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            this.ttkMainMenuOpt[4] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            //for (int i = 1; i < ttkMainMenuOpt.Length; i++)
+            //{
+            //    this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+            //}
 
             #endregion
 
@@ -66,17 +71,20 @@ namespace TJAPlayer3
                 amount += TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles.Count;
 
             this.ttkDanTitles = new TitleTextureKey[amount];
+            this.sDanTitles = new string[amount];
 
             // Silver Shinjin (default rank) always avaliable by default
             this.ttkDanTitles[0] = new TitleTextureKey("新人", this.pfHeyaFont, Color.White, Color.Black, 1000);
+            this.sDanTitles[0] = "新人";
 
             int idx = 1;
             if (TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles != null)
             {
                 foreach (var item in TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles)
                 {
+                    this.sDanTitles[idx] = item.Key;
                     if (item.Value.isGold == true)
-                        this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.Gold, Color.Black, 1000);
+                        this.ttkDanTitles[idx] = new TitleTextureKey($"<g.#FFE34A.#EA9622>{item.Key}</g>", this.pfHeyaFont, Color.Gold, Color.Black, 1000);
                     else 
                         this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.White, Color.Black, 1000);
                     idx++;
@@ -193,6 +201,38 @@ namespace TJAPlayer3
             Background.Draw();
             //Heya_Background.t2D描画(0, 0);
 
+            #region [Main menu (Side bar)]
+
+            for (int i = 0; i < this.ttkMainMenuOpt.Length; i++)
+            {
+                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
+
+                if (iCurrentMenu != -1 || iMainMenuCurrent != i)
+                {
+                    tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
+                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
+                }
+                else
+                {
+                    tmpTex.color4 = CConversion.ColorToColor4(Color.White);
+                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+                }
+
+                TJAPlayer3.Tx.Heya_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_Main_Menu_X[i], TJAPlayer3.Skin.Heya_Main_Menu_Y[i]);
+                tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_Main_Menu_X[i] + TJAPlayer3.Skin.Heya_Main_Menu_Font_Offset[0], TJAPlayer3.Skin.Heya_Main_Menu_Y[i] + TJAPlayer3.Skin.Heya_Main_Menu_Font_Offset[1]);
+            }
+
+            #endregion
+
+            #region [Background center]
+
+            if (iCurrentMenu >= 0)
+            {
+                TJAPlayer3.Tx.Heya_Center_Menu_Background?.t2D描画(0, 0);
+            }
+
+            #endregion
+
             #region [Render field]
 
             float renderRatioX = 1.0f;
@@ -216,29 +256,6 @@ namespace TJAPlayer3
             #endregion
 
             #region [Menus display]
-
-            #region [Main menu (Side bar)]
-
-            for (int i = 0; i < this.ttkMainMenuOpt.Length; i++)
-            {
-                CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
-
-                if (iCurrentMenu != -1 || iMainMenuCurrent != i)
-                {
-                    tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
-                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
-                }
-                else
-                {
-                    tmpTex.color4 = CConversion.ColorToColor4(Color.White);
-                    TJAPlayer3.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
-                }
-
-                TJAPlayer3.Tx.Heya_Side_Menu?.t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_Main_Menu_X[i], TJAPlayer3.Skin.Heya_Main_Menu_Y[i]);
-                tmpTex.t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_Main_Menu_X[i] + TJAPlayer3.Skin.Heya_Main_Menu_Font_Offset[0], TJAPlayer3.Skin.Heya_Main_Menu_Y[i] + TJAPlayer3.Skin.Heya_Main_Menu_Font_Offset[1]);
-            }
-
-            #endregion
 
             #region [Petit chara]
 
@@ -410,7 +427,7 @@ namespace TJAPlayer3
                     int danGrade = 0;
                     if (pos > 0)
                     {
-                        danGrade = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.ttkDanTitles[pos].str文字].clearStatus;
+                        danGrade = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.sDanTitles[pos]].clearStatus;
                     }
 
                     var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
@@ -478,19 +495,32 @@ namespace TJAPlayer3
 
             #endregion
 
-
             #endregion
 
-            #region [Unlockable information zone]
+            #region [Description area]
 
             if (iCurrentMenu >= 0)
             {
+                #region [Unlockable information zone]
+
                 if (this.ttkInfoSection != null && this.ttkInfoSection.str文字 != "")
                     TJAPlayer3.Tx.Heya_Box?.t2D描画(0, 0);
 
                 if (this.ttkInfoSection != null)
                     TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
                         .t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_InfoSection[0], TJAPlayer3.Skin.Heya_InfoSection[1]);
+
+                #endregion
+
+                #region [Asset description]
+
+                if (this.ttkInfoSection == null || this.ttkInfoSection.str文字 == "")
+                {
+                    if (iCurrentMenu == 0) CHeyaDisplayAssetInformations.DisplayPuchicharaInfo(this.pfHeyaFont, TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent]);
+                    if (iCurrentMenu == 1) CHeyaDisplayAssetInformations.DisplayCharacterInfo(this.pfHeyaFont, TJAPlayer3.Tx.Characters[iCharacterCurrent]);
+                }
+
+                #endregion
             }
 
             #endregion
@@ -540,6 +570,8 @@ namespace TJAPlayer3
             TJAPlayer3.NamePlate.tNamePlateDraw(TJAPlayer3.Skin.SongSelect_NamePlate_X[0], TJAPlayer3.Skin.SongSelect_NamePlate_Y[0] + 5, 0);
 
             #endregion
+
+            
 
             #region [ Inputs ]
 
@@ -657,11 +689,11 @@ namespace TJAPlayer3
 
                     if (iDanTitleCurrent > 0)
                     {
-                        iG = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.ttkDanTitles[iDanTitleCurrent].str文字].isGold;
-                        cs = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.ttkDanTitles[iDanTitleCurrent].str文字].clearStatus;
+                        iG = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.sDanTitles[iDanTitleCurrent]].isGold;
+                        cs = TJAPlayer3.SaveFileInstances[iPlayer].data.DanTitles[this.sDanTitles[iDanTitleCurrent]].clearStatus;
                     }
 
-                    TJAPlayer3.SaveFileInstances[iPlayer].data.Dan = this.ttkDanTitles[iDanTitleCurrent].str文字;
+                    TJAPlayer3.SaveFileInstances[iPlayer].data.Dan = this.sDanTitles[iDanTitleCurrent];
                     TJAPlayer3.SaveFileInstances[iPlayer].data.DanGold = iG;
                     TJAPlayer3.SaveFileInstances[iPlayer].data.DanType = cs;
 
@@ -985,6 +1017,7 @@ namespace TJAPlayer3
         private CCachedFontRenderer pfHeyaFont;
 
         private TitleTextureKey[] ttkDanTitles;
+        private string[] sDanTitles;
 
         private TitleTextureKey[] ttkTitles;
         private int[] titlesKeys;

@@ -17,6 +17,7 @@
     <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Lang/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />

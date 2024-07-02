@@ -1087,8 +1087,8 @@ namespace TJAPlayer3
 
 		private PuchiChara PuchiChara;
 
-		private CCachedFontRenderer pfMenuTitle;
-		private CCachedFontRenderer pfBoxText;
+		internal CCachedFontRenderer pfMenuTitle;
+		internal CCachedFontRenderer pfBoxText;
 
 		private int[] usedMenus;
 		private int[] usedMenusPos;

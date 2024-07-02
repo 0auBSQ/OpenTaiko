@@ -207,7 +207,7 @@ namespace TJAPlayer3
         private void UpdateText()
         {
             offsettext?.Dispose();
-            offsettext = new CTexture(font.DrawText("OFFSET: " + GetMedianOffset().ToString(), Color.White, Color.Black, null, 32));
+            offsettext = new CTexture(font.DrawText(CLangManager.LangInstance.GetString("SETTINGS_GAME_CALIBRATION_OFFSET", GetMedianOffset().ToString()), Color.White, Color.Black, null, 32));
         }
 
         public bool IsStarted { get { return CalibrateTick.IsStarted; } }

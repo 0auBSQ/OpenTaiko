@@ -29,7 +29,7 @@ namespace TJAPlayer3
             ttkExams = new CActSelect曲リスト.TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < ttkExams.Length; i++)
             {
-                ttkExams[i] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), pfExamFont, Color.Black, Color.Transparent, 700);
+                ttkExams[i] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetExamName(i), pfExamFont, Color.Black, Color.Transparent, 700);
             }
 
             base.Activate();

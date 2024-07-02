@@ -56,7 +56,7 @@ namespace TJAPlayer3
             this.ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
             for (int i = 0; i < this.ttkExams.Length; i++)
             {
-                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1010 + i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
+                this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
             }
 
             listSongs = TJAPlayer3.Songs管理.list曲ルート_Dan;
@@ -856,14 +856,14 @@ namespace TJAPlayer3
                     case CSongListNode.ENodeType.BACKBOX:
                         {
                             stバー情報[i].ttkタイトル = new TitleTextureKey[1];
-                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(200), pfDanSong, Color.White, Color.Black, 700);
+                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), pfDanSong, Color.White, Color.Black, 700);
                             stバー情報[i].cDanTickColor = Color.FromArgb(180, 150, 70);
                         }
                         break;
                     case CSongListNode.ENodeType.RANDOM:
                         {
                             stバー情報[i].ttkタイトル = new TitleTextureKey[1];
-                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(CLangManager.LangInstance.GetString(203), pfDanSong, Color.White, Color.Black, 700);
+                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("SONGSELECT_RANDOM"), pfDanSong, Color.White, Color.Black, 700);
                             stバー情報[i].cDanTickColor = Color.FromArgb(150, 250, 255);
                         }
                         break;

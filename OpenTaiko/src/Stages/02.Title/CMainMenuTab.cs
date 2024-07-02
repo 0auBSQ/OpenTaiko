@@ -25,11 +25,11 @@ namespace TJAPlayer3
 
         public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CStageタイトル.E戻り値 returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara)
         {
-            string title = CLangManager.LangInstance.GetString(100 + boxId);
+            string title = GetBoxText(boxId);
 
             ttkTitle = new TitleTextureKey(title, tpf, Color.White, col, 1280, Color.Black);
 
-            string boxText = CLangManager.LangInstance.GetString(150 + boxId);
+            string boxText = GetBoxText(boxId, false);
 
             ttkBoxText = new TitleTextureKey(boxText, boxpf, Color.White, Color.Black, 1000);
 
@@ -39,6 +39,43 @@ namespace TJAPlayer3
             implemented = impl;
             barTex = (modeSelect_Bar.Length > boxId) ? modeSelect_Bar[boxId] : null;
             barChara = (modeSelect_Bar_Chara.Length > boxId) ? modeSelect_Bar_Chara[boxId] : null;
+        }
+
+        private static string GetBoxText(int boxid, bool isTitle = true)
+        {
+            string append = isTitle ? "" : "_DESC";
+            switch (boxid)
+            {
+                case 0:
+                default:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_TAIKO{append}");
+                case 1:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_DAN{append}");
+                case 2:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_TOWER{append}");
+                case 3:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_SHOP{append}");
+                case 4:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_STORY{append}");
+                case 5:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_HEYA{append}");
+                case 6:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_SETTINGS{append}");
+                case 7:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_EXIT{append}");
+                case 8:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_ONLINE{append}");
+                case 9:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_DOCUMENT{append}");
+                case 10:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_AI{append}");
+                case 11:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_STATS{append}");
+                case 12:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_EDITOR{append}");
+                case 13:
+                    return CLangManager.LangInstance.GetString($"TITLE_MODE_TOOLS{append}");
+            }
         }
 
         public static void tInitMenus(CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara)
