@@ -3,6 +3,7 @@ using System.Reflection;
 using System.ArrayExtensions;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using TJAPlayer3;
 
 // https://github.com/Burtsev-Alexey/net-object-deep-copy/blob/master/ObjectExtensions.cs
 
@@ -158,6 +159,24 @@ namespace System
             }
         }
 
+        public static string[] SplitByCommas(this string input)
+        {
+            // Regular expression to split by commas, but not by escaped commas (\,)
+            var pattern = @"(?<!\\),";
+            var parts = Regex.Split(input, pattern);
+
+            // Replace escaped commas with actual commas in the parts
+            for (int i = 0; i < parts.Length; i++)
+            {
+                parts[i] = parts[i].Replace(@"\,", ",");
+            }
+
+            // Filter out empty strings
+            var filteredParts = parts.Where(part => !string.IsNullOrEmpty(part)).ToArray();
+
+            return filteredParts;
+        }
+
         public static double[] ParseComplex(this string input)
         {
             try
@@ -227,7 +246,7 @@ namespace System
             }
             catch (Exception ex)
             {
-                // Log Error
+                LogNotification.PopWarning($"'{input}': Incorrect complex number formatting, defaulting to 0");
                 return new double[] { 0, 0 }; // Return default value in case of error
             }
         }

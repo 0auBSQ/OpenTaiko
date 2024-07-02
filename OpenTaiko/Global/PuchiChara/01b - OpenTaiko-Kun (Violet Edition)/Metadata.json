@@ -1,0 +1,16 @@
+{
+	"name" : {
+		"strings": {
+			"default": "OpenTaiko-Kun (Violet edition)",
+			"ja": "OpenTaiko君 （バイオレット版）"
+		}
+	},
+    "rarity": "Common",
+	"description": {
+		"strings": {
+			"default": "The evil brother of OpenTaiko-Kun.\nBeware of the sneaky Swap notes.",
+			"ja": "OpenTaiko君の邪悪な兄弟。\nこそこそなカドン音符に注意しましょう。"
+		}
+	},
+	"author": "Komi"
+}
