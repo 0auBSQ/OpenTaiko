@@ -1,0 +1,37 @@
+{
+    "background":{
+        "scroll_interval":20.0
+    },
+    "item":{
+        "width":150,
+        "font_offset":{
+            "x":0,
+            "y":12
+        },
+        "x":[423,423,423],
+        "y":[230,288,347]
+    },
+    "font_size":{
+        "normal":30,
+        "description":21
+    },
+    "description_panel":{
+        "x":100,
+        "y":573
+    },
+    "itembox":{
+        "count":9,
+        "center":4,
+        "x":[903,903,903,903,903,903,903,903,903],
+        "y":[6,119,231,344,456,569,681,794,906]
+    },
+    "keyassign":{
+        "x":583,
+        "y":322
+    },
+    "enum_song":{
+        "x":180,
+        "y":177
+    }
+    
+}

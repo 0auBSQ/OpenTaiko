@@ -182,35 +182,6 @@ namespace TJAPlayer3
             {
                 this.ftフォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
             }
-
-			TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
-
-				//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
-
-				/*
-				string[] strMenuItem = {
-					CLangManager.LangInstance.GetString(10085),
-					CLangManager.LangInstance.GetString(10086),
-					CLangManager.LangInstance.GetString(10087)
-				};
-			    
-				txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
-
-			    using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" :  TJAPlayer3.ConfigIni.FontName), 20))
-			    {
-			        for (int i = 0; i < strMenuItem.Length; i++)
-			        {
-			            using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black))
-			            {
-			                txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-			            }
-			            using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
-			            {
-			                txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-			            }
-			        }
-			    }
-				*/
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()											// OPTIONと同じ(COnfig.iniの書き出しタイミングのみ異なるが、無視して良い)
@@ -220,10 +191,6 @@ namespace TJAPlayer3
 				this.ftフォント.Dispose();
 				this.ftフォント = null;
 			}
-				//CDTXMania.tテクスチャの解放( ref this.tx背景 );
-				//CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
-				//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
-				//CDTXMania.tテクスチャの解放( ref this.txMenuカーソル );
 
 			TJAPlayer3.tテクスチャの解放( ref this.tx説明文パネル );
 			base.ReleaseManagedResource();
@@ -244,75 +211,6 @@ namespace TJAPlayer3
 
 			// 描画
 
-			#region [ Background ]
-
-			//---------------------
-			/*
-			for(int i = 0; i < 2; i++)
-				if (TJAPlayer3.Tx.Config_Background != null )
-					TJAPlayer3.Tx.Config_Background.t2D描画( 0 + -(TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width * i) + ctBackgroundAnime.n現在の値, 0 );
-			if(TJAPlayer3.Tx.Config_Header != null )
-                TJAPlayer3.Tx.Config_Header.t2D描画( 0, 0 );
-			*/
-			Background.Update();
-			Background.Draw();
-			//---------------------
-
-			#endregion
-
-			#region [ Menu Cursor ]
-			//---------------------
-			if ( TJAPlayer3.Tx.Config_Cursor != null )
-			{
-				#region Old
-				/*
-				Rectangle rectangle;
-                TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.Opacity = this.bメニューにフォーカス中 ? 255 : 128;
-				int x = 110;
-				int y = (int)( 145.5 + ( this.n現在のメニュー番号 * 37.5 ) );
-				int num3 = 340;
-                TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( x, y, new Rectangle( 0, 0, 32, 48 ) );
-                TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( ( x + num3 ) - 32, y, new Rectangle( 20, 0, 32, 48 ) );
-				x += 32;
-				for( num3 -= 64; num3 > 0; num3 -= rectangle.Width )
-				{
-					rectangle = new Rectangle( 16, 0, 32, 48 );
-					if( num3 < 32 )
-					{
-						rectangle.Width -= 32 - num3;
-					}
-                    TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( x, y, rectangle );
-					x += rectangle.Width;
-				}
-				*/
-				#endregion
-
-
-				int x = TJAPlayer3.Skin.Config_Item_X[this.n現在のメニュー番号];
-				int y = TJAPlayer3.Skin.Config_Item_Y[this.n現在のメニュー番号];
-
-				int width = TJAPlayer3.Tx.Config_Cursor.sz画像サイズ.Width / 3;
-				int height = TJAPlayer3.Tx.Config_Cursor.sz画像サイズ.Height;
-
-				int move = TJAPlayer3.Skin.Config_Item_Width;
-
-				//Left
-				TJAPlayer3.Tx.Config_Cursor.t2D中心基準描画(x - (width / 2) - move, y, 
-					new Rectangle(0, 0, width, height));
-
-				//Right
-				TJAPlayer3.Tx.Config_Cursor.t2D中心基準描画(x + (width / 2) + move, y, 
-					new Rectangle(width * 2, 0, width, height));
-
-				//Center
-				TJAPlayer3.Tx.Config_Cursor.vcScaleRatio.X = (move / (float)width) * 2.0f;
-				TJAPlayer3.Tx.Config_Cursor.t2D拡大率考慮中央基準描画(x, y, 
-					new Rectangle(width, 0, width, height));
-
-				TJAPlayer3.Tx.Config_Cursor.vcScaleRatio.X = 1.0f;
-			}
-            //---------------------
-            #endregion
 
             #region [ Menu ]
             //---------------------
@@ -352,31 +250,37 @@ namespace TJAPlayer3
 					this.actKeyAssign.Draw();
 					break;
 			}
-			//---------------------
-			#endregion
-			
+            //---------------------
+            #endregion
+
+            TJAPlayer3.Tx.lcConfigStage.Info.nCursorIndex = n現在のメニュー番号;
+            TJAPlayer3.Tx.lcConfigStage.Info.nItembarIndex = actList.n現在の選択項目;
+
+            TJAPlayer3.Tx.lcConfigStage.Update();
+            TJAPlayer3.Tx.lcConfigStage.Draw();
+            
 			//#region [ 上部パネル ]
-			////---------------------
-			//if( this.tx上部パネル != null )
-			//	this.tx上部パネル.t2D描画( CDTXMania.app.Device, 0, 0 );
-			////---------------------
-			//#endregion
-			//#region [ 下部パネル ]
-			////---------------------
-			//if( this.tx下部パネル != null )
-			//	this.tx下部パネル.t2D描画( CDTXMania.app.Device, 0, 720 - this.tx下部パネル.szテクスチャサイズ.Height );
-			////---------------------
-			//#endregion
+            ////---------------------
+            //if( this.tx上部パネル != null )
+            //	this.tx上部パネル.t2D描画( CDTXMania.app.Device, 0, 0 );
+            ////---------------------
+            //#endregion
+            //#region [ 下部パネル ]
+            ////---------------------
+            //if( this.tx下部パネル != null )
+            //	this.tx下部パネル.t2D描画( CDTXMania.app.Device, 0, 720 - this.tx下部パネル.szテクスチャサイズ.Height );
+            ////---------------------
+            //#endregion
 
-			#region [ Option Panel ]
-			//---------------------
+            #region [ Option Panel ]
+            //---------------------
             //this.actオプションパネル.On進行描画();
-			//---------------------
-			#endregion
+            //---------------------
+            #endregion
 
-			#region [ FadeOut ]
-			//---------------------
-			switch( base.ePhaseID )
+            #region [ FadeOut ]
+            //---------------------
+            switch ( base.ePhaseID )
 			{
 				case CStage.EPhase.Common_FADEIN:
 					if( this.actFIFO.Draw() != 0 )

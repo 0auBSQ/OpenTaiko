@@ -229,13 +229,8 @@ namespace TJAPlayer3
             #region 2_コンフィグ画面
             //Config_Background = TxC(CONFIG + @$"Background.png");
             //Config_Header = TxC(CONFIG + @$"Header.png");
-            Config_Cursor = TxC(CONFIG + @$"Cursor.png");
-            Config_ItemBox = TxC(CONFIG + @$"ItemBox.png");
-            Config_Arrow = TxC(CONFIG + @$"Arrow.png");
-            Config_KeyAssign = TxC(CONFIG + @$"KeyAssign.png");
-            Config_Font = TxC(CONFIG + @$"Font.png");
-            Config_Font_Bold = TxC(CONFIG + @$"Font_Bold.png");
-            Config_Enum_Song = TxC(CONFIG + @$"Enum_Song.png");
+            listTexture.Add(lcConfigStage = new CLuaConfigStageScript(CSkin.Path("Modules/ConfigStage")));
+            listTexture.Add(lcConfigFont = new CLuaConfigFontScript(CSkin.Path("Modules/ConfigFont")));
             #endregion
 
             #region 3_選曲画面
@@ -2534,7 +2529,7 @@ namespace TJAPlayer3
             foreach (var tex in listTexture)
             {
                 var texture = tex;
-                TJAPlayer3.tテクスチャの解放(ref texture);
+                TJAPlayer3.tDisposeSafely(ref texture);
                 texture?.Dispose();
                 texture = null;
             }
@@ -2595,16 +2590,8 @@ namespace TJAPlayer3
         #endregion
 
         #region 2_コンフィグ画面
-        public CTexture 
-            /*Config_Background,
-            Config_Header,*/
-            Config_Cursor,
-            Config_ItemBox,
-            Config_Arrow,
-            Config_KeyAssign,
-            Config_Font,
-            Config_Font_Bold,
-            Config_Enum_Song;
+        public CLuaConfigStageScript lcConfigStage;
+        public CLuaConfigFontScript lcConfigFont;
         #endregion
 
         #region 3_選曲画面
@@ -3140,7 +3127,7 @@ Result_Mountain = new CTexture[4]*/;
 
 
         #region [ 解放用 ]
-        public List<CTexture> listTexture = new List<CTexture>();
+        public List<IDisposable> listTexture = new List<IDisposable>();
         #endregion
 
     }

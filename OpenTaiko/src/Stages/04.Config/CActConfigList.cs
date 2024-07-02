@@ -1463,8 +1463,8 @@ namespace TJAPlayer3
 				{
 					case CItemBase.EPanelType.Normal:
                     case CItemBase.EPanelType.Other:
-                        if ( TJAPlayer3.Tx.Config_ItemBox != null )
-                            TJAPlayer3.Tx.Config_ItemBox.t2D描画( x, y );
+                        //if ( TJAPlayer3.Tx.Config_ItemBox != null )
+                        //    TJAPlayer3.Tx.Config_ItemBox.t2D描画( x, y );
 						break;
 				}
 				//-----------------
@@ -1643,11 +1643,13 @@ namespace TJAPlayer3
 
 				// 描画。
 				
+				/*
 				if( TJAPlayer3.Tx.Config_Arrow != null )
 				{
                     TJAPlayer3.Tx.Config_Arrow.t2D描画( x_upper, y_upper, new Rectangle( 0, 0, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Width, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2) );
                     TJAPlayer3.Tx.Config_Arrow.t2D描画( x_lower, y_lower, new Rectangle( 0, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Width, TJAPlayer3.Tx.Config_Arrow.sz画像サイズ.Height / 2) );
 				}
+				*/
 			}
 			//-----------------
 			#endregion
@@ -1800,7 +1802,7 @@ namespace TJAPlayer3
 
 		private CItemToggle iSystemTimeStretch;				// #23664 2013.2.24 yyagi
 
-		private List<CItemBase> list項目リスト;
+		public List<CItemBase> list項目リスト;
 		private long nスクロール用タイマ値;
 		private int n現在のスクロールカウンタ;
 		private int n目標のスクロールカウンタ;

@@ -136,11 +136,16 @@ namespace TJAPlayer3
                 TJAPlayer3.Tx.Enum_Song.Opacity = (int) ( 176.0 + 80.0 * Math.Sin( (double) (2 * Math.PI * this.ctNowEnumeratingSongs.CurrentValue * 2 / 100.0 ) ) );
                 TJAPlayer3.Tx.Enum_Song.t2D描画( 18, 7 );
 			}
-			if ( bコマンドでの曲データ取得 && TJAPlayer3.Tx.Config_Enum_Song != null )
+
+			TJAPlayer3.Tx.lcConfigStage.Info.bEnumeratingSongs = bコマンドでの曲データ取得;
+
+			/*
+            if ( bコマンドでの曲データ取得 && TJAPlayer3.Tx.Config_Enum_Song != null )
 			{
                 TJAPlayer3.Tx.Config_Enum_Song.t2D描画( 180, 177 );
 				this.txMessage.t2D描画( 190, 197 );
 			}
+			*/
 
 			return 0;
 		}

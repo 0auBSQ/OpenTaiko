@@ -57,6 +57,8 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated && !string.IsNullOrEmpty( str ) )
 			{
+				TJAPlayer3.Tx.lcConfigFont.tDrawText(x, y, str, b強調, fScale);
+				/*
 				CTexture texture = b強調 ? TJAPlayer3.Tx.Config_Font_Bold : TJAPlayer3.Tx.Config_Font;
 				if( texture != null )
 				{
@@ -74,6 +76,7 @@ namespace TJAPlayer3
 						}
 					}
 				}
+				*/
 			}
 		}
 

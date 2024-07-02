@@ -114,7 +114,9 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated )
 			{
-				if( this.bキー入力待ち )
+				TJAPlayer3.Tx.lcConfigStage.Info.bWaitingKeyInput = bキー入力待ち;
+
+                if ( this.bキー入力待ち )
 				{
 					if( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) )
 					{
@@ -195,10 +197,12 @@ namespace TJAPlayer3
 				y += num5;
 				TJAPlayer3.stageコンフィグ.actFont.t文字列描画( x + num5, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f );
 				y += num5;
+				/*
 				if( this.bキー入力待ち && ( TJAPlayer3.Tx.Config_KeyAssign != null ) )
 				{
                     TJAPlayer3.Tx.Config_KeyAssign.t2D描画( TJAPlayer3.Skin.Config_KeyAssign[0], TJAPlayer3.Skin.Config_KeyAssign[1]);
 				}
+				*/
 			}
 			return 0;
 		}
