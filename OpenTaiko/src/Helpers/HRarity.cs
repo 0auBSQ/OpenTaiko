@@ -17,6 +17,7 @@ namespace TJAPlayer3
             ["Rare"] = Color.Blue,
             ["Epic"] = Color.Purple,
             ["Legendary"] = Color.Orange,
+            ["Mythical"] = Color.Pink,
         };
 
         private static Dictionary<string, int> RarityToModalInt = new Dictionary<string, int>
@@ -27,6 +28,18 @@ namespace TJAPlayer3
             ["Rare"] = 2,
             ["Epic"] = 3,
             ["Legendary"] = 4,
+            ["Mythical"] = 4,
+        };
+
+        private static Dictionary<string, int> RarityToLangInt = new Dictionary<string, int>
+        {
+            ["Poor"] = 0,
+            ["Common"] = 1,
+            ["Uncommon"] = 2,
+            ["Rare"] = 3,
+            ["Epic"] = 4,
+            ["Legendary"] = 5,
+            ["Mythical"] = 6,
         };
 
         private static Dictionary<string, float> RarityToCoinMultiplier = new Dictionary<string, float>
@@ -37,6 +50,7 @@ namespace TJAPlayer3
             ["Rare"] = 1f,
             ["Epic"] = 1f,
             ["Legendary"] = 1f,
+            ["Mythical"] = 1f,
         };
 
         public static Color tRarityToColor(string rarity)
@@ -57,6 +71,16 @@ namespace TJAPlayer3
 
             if (RarityToModalInt.ContainsKey(rarity))
                 modalInt = RarityToModalInt[rarity];
+
+            return modalInt;
+        }
+
+        public static int tRarityToLangInt(string rarity)
+        {
+            int modalInt = 1;
+
+            if (RarityToLangInt.ContainsKey(rarity))
+                modalInt = RarityToLangInt[rarity];
 
             return modalInt;
         }

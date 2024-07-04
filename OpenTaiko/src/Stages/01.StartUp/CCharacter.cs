@@ -46,7 +46,7 @@ namespace TJAPlayer3
                         new Modal(
                             Modal.EModalType.Character,
                             HRarity.tRarityToModalInt(metadata.Rarity),
-                            metadata.Name
+                            metadata.tGetName()
                             ),
                         _player);
 
