@@ -165,8 +165,15 @@ BoxFontName=廻想体 ネクスト UP B
 118 - Froggy Forest Raceway : Baby Zionov https://twitter.com/babyzionov (Chart by Shoxk & DragonRatTiger)
 119 - Fractured Eternity : roər & Toneix [roər: SC ➜ https://soundcloud.com/rroer TW ➜ https://twitter.com/roerdtm YT ➜ https://www.youtube.com/@roer-music | Toneix: SC ➜ https://soundcloud.com/toneix TW ➜ https://twitter.com/Toneix1 YT ➜ https://www.youtube.com/@Toneix/featured] (Chart by Komi & bol) 
 120 - the infinite cityscape : Makotora - https://soundcloud.com/kingmakotora (Chart by sadkay & Komi)
-121 - PARANOiA Perpetuity : funkyzukin - https://funkyzukin.bandcamp.com/ (Chart by Komi) 
+121 - PARANOiA Perpetuality : funkyzukin - https://funkyzukin.bandcamp.com/ (Chart by Komi) 
 122 - Incoherent Hysteria : OfficialAz3 - https://www.youtube.com/channel/UCG00E-P8y_hQZZ_f88Oka8w (Chart by sadkay)
+123 - HEAT CONDUCTORS : OfficialAz3 - https://www.youtube.com/channel/UCG00E-P8y_hQZZ_f88Oka8w (Chart by berdstep and Komi)
+124 - five states of weirdness : OfficialAz3 - Youtube - https://youtube.com/@OfficialAz3 Soundcloud - https://soundcloud.com/official-az3 Newgrounds - https://officialaz3.newgrounds.com/ Spotify - https://open.spotify.com/artist/2DomkwykZq7v7XEvMwRBXf Twitter/X - https://x.com/OfficialAz3_m BMSSearch - https://bmssearch.net/artists/-URS8oXk2q_dIL (Chart by Komi)
+125 - MajETCMAT : OfficialAz3 - https://www.youtube.com/channel/UCG00E-P8y_hQZZ_f88Oka8w (Chart by Komi)
+126 - BLACK DIAMOND : Thomas Dingwall a.k.a. td - https://www.youtube.com/channel/UCQhx1BpM1nEu3s8lPZ8HYEA (Chart by berdstep)
+127 - A symphony of a million years : oxoplasmaP ft. 唄音ウタ - https://www.youtube.com/watch?v=dbyiAZRQt8g (Chart by Komi)
+128 - Mayhem : X3ll3n & Benji-G - Follow X3ll3n : • Newgrounds : https://x3ll3n.newgrounds.com/ • Soundcloud : https://soundcloud.com/x3ll3n • Youtube : https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg • Spotify : https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX • Instagram : https://www.instagram.com/x3ll3n_music/ • Other Platforms : https://linktr.ee/x3ll3n  Follow Benji-G : • Newgrounds : https://benji-g.newgrounds.com/ • Soundcloud : https://soundcloud.com/user-763424064 • Youtube : https://www.youtube.com/channel/UC20XOQOSZCS90d4b6Fr0-HA • Spotify : https://open.spotify.com/artist/6YQx6KHLda3S3sd3lxWfa6?si=5gTPy-gBQgOHXm7ZSs8w5A • Twitter: https://twitter.com/Hactastic_ (Chart by DiamondN1nja)
+129 - Cybernetic Pressure : X3ll3n & BARY - Follow X3ll3n : • Newgrounds : https://x3ll3n.newgrounds.com/ • Soundcloud : https://soundcloud.com/x3ll3n • Youtube : https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg • Spotify : https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX • Instagram : https://www.instagram.com/x3ll3n_music/ • Twitter : https://twitter.com/Dem_X3ll3n • Other Platforms : https://linktr.ee/x3ll3n  Follow BARY : • Newgrounds : https://baryiscool.newgrounds.com/ • Soundcloud : https://soundcloud.com/bary_is_cool • Youtube : https://www.youtube.com/@bary_music • Spotify : https://open.spotify.com/artist/6kIojqA7iiEtPcbUivolci? • Twitter : https://twitter.com/cool_bary (Chart by Komi)
 ```
 
 ### Visuals
@@ -205,6 +212,7 @@ If you liked a specific song and want to support the composer's work, please che
 - CC BY
 ```
 085 - i don't want to see the people i love see me in pain so i sometimes just wanna be left alone to cry in the dark : Sukima Altera
+127 - A symphony of a million years : oxoplasmaP ft. 唄音ウタ
 ```
 
 - CC BY-SA
