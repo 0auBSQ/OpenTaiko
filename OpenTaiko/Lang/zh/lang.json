@@ -7,547 +7,575 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
   "Language": "中文 (Chinese)",
-  "Entries": {
+    "Entries": {
 
-    // Common
-    "MENU_RETURN": "返回",
-    // Difficulties (Any Menu)
-    "DIFF_EASY": "简单",
-    "DIFF_NORMAL": "普通",
-    "DIFF_HARD": "困难",
-    "DIFF_EX": "魔王（表）",
-    "DIFF_EXTRA": "魔王（里）",
-    "DIFF_EXEXTRA": "魔王（表·里）",
-    "DIFF_TOWER": "太鼓塔",
-    "DIFF_DAN": "段位道场",
-    "DIFF_ANY": "任意",
-    "DIFF_UNKNOWN": "未知",
+        // Common
+        "MENU_RETURN": "返回",
+        // Difficulties (Any Menu)
+        "DIFF_EASY": "简单",
+        "DIFF_NORMAL": "普通",
+        "DIFF_HARD": "困难",
+        "DIFF_EX": "魔王（表）",
+        "DIFF_EXTRA": "魔王（里）",
+        "DIFF_EXEXTRA": "魔王（表·里）",
+        "DIFF_TOWER": "太鼓塔",
+        "DIFF_DAN": "段位道场",
+        "DIFF_ANY": "任意",
+        "DIFF_UNKNOWN": "未知",
 
-    // Settings
-    "SETTINGS_SYSTEM": "系统选项",
-    "SETTINGS_SYSTEM_DESC": "系统整体设置",
-    "SETTINGS_GAME": "游戏选项",
-    "SETTINGS_GAME_DESC": "敲鼓相关设置",
-    "SETTINGS_EXIT": "退出",
-    "SETTINGS_EXIT_DESC": "保存设定并退出设置菜单。",
+        // Settings
+        "SETTINGS_SYSTEM": "系统选项",
+        "SETTINGS_SYSTEM_DESC": "系统整体设置",
+        "SETTINGS_GAME": "游戏选项",
+        "SETTINGS_GAME_DESC": "敲鼓相关设置",
+        "SETTINGS_EXIT": "退出",
+        "SETTINGS_EXIT_DESC": "保存设定并退出设置菜单。",
 
-    "SETTINGS_MENU_RETURN": "<< 返回上级菜单",
-    "SETTINGS_MENU_RETURN_DESC": "返回至上级菜单。",
+        "SETTINGS_MENU_RETURN": "<< 返回上级菜单",
+        "SETTINGS_MENU_RETURN_DESC": "返回至上级菜单。",
 
-    "SETTINGS_KEYASSIGN_SYSTEM": "系统按键设置",
-    "SETTINGS_KEYASSIGN_SYSTEM_DESC": "二级菜单：设置系统按键",
-    "SETTINGS_KEYASSIGN_GAME": "游戏按键设置",
-    "SETTINGS_KEYASSIGN_GAME_DESC": "二级菜单：设置游戏按键",
-    "SETTINGS_KEYASSIGN_TRAINING": "训练模式按键设置",
-    "SETTINGS_KEYASSIGN_TRAINING_DESC": "二级菜单：设置训练模式按键。",
+        "SETTINGS_KEYASSIGN_SYSTEM": "系统按键设置",
+        "SETTINGS_KEYASSIGN_SYSTEM_DESC": "二级菜单：设置系统按键",
+        "SETTINGS_KEYASSIGN_GAME": "游戏按键设置",
+        "SETTINGS_KEYASSIGN_GAME_DESC": "二级菜单：设置游戏按键",
+        "SETTINGS_KEYASSIGN_TRAINING": "训练模式按键设置",
+        "SETTINGS_KEYASSIGN_TRAINING_DESC": "二级菜单：设置训练模式按键。",
 
-    // Settings - System
-    "SETTINGS_SYSTEM_LANGUAGE": "系统语言",
-    "SETTINGS_SYSTEM_LANGUAGE_DESC": "更改游戏及菜单的显示语言。",
-    "SETTINGS_SYSTEM_PLAYERCOUNT": "玩家数量",
-    "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "选择游玩的玩家数量，最多同时可有 5 人游玩。",
-    "SETTINGS_SYSTEM_RELOADSONG": "重新载入曲目",
-    "SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描曲目文件夹并载入曲目。",
-    "SETTINGS_SYSTEM_RELOADSONGCACHE": "重新载入曲目（硬重新加载）",
-    "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "删除既有数据库并\n从空白重新扫描曲目文件夹并载入曲目。",
-    "SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
-    "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新载入曲目以使此选项生效。",
+        // Settings - System
+        "SETTINGS_SYSTEM_LANGUAGE": "系统语言",
+        "SETTINGS_SYSTEM_LANGUAGE_DESC": "更改游戏及菜单的显示语言。",
+        "SETTINGS_SYSTEM_PLAYERCOUNT": "玩家数量",
+        "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "选择游玩的玩家数量，最多同时可有 5 人游玩。",
+        "SETTINGS_SYSTEM_RELOADSONG": "重新载入曲目",
+        "SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描曲目文件夹并载入曲目。",
+        "SETTINGS_SYSTEM_RELOADSONGCACHE": "重新载入曲目（硬重新加载）",
+        "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "删除既有数据库并\n从空白重新扫描曲目文件夹并载入曲目。",
+        "SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
+        "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新载入曲目以使此选项生效。",
 
-    // Settings - System - Graphics
-    "SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
-    "SETTINGS_SYSTEM_FULLSCREEN_DESC": "切换全屏/窗口模式。",
-    "SETTINGS_SYSTEM_VSYNC": "垂直同步",
-    "SETTINGS_SYSTEM_VSYNC_DESC": "选择是否开启垂直同步。打开后帧率会上限为 60 FPS，音符滚动会更加顺畅，\n但输入延迟会增加。",
-    "SETTINGS_SYSTEM_GRAPHICSAPI": "画面渲染 API",
-    "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "绘制方式：\n从 OpenGL、DirectX11、Vulkan，或 Metal 中选择。\nOpenGL 速度较慢，但稳定性和兼容性较好。\nDirectX11 较快且稳定，但只能在 Windows 上使用。\nVulkan 在 Linux 上速度最快。\nMetal 只能在 MacOS 上使用。\n\n该项设置将在重启 OpenTaiko 后生效。",
-    "SETTINGS_SYSTEM_TEXTUREASYNC": "异步贴图加载",
-    "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "贴图加载方式：\n启动画面消失时冻结。\n如果有些贴图变黑，请关闭这项设置。\n该项设置将在重启 OpenTaiko 后生效。",
+        // Settings - System - Graphics
+        "SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
+        "SETTINGS_SYSTEM_FULLSCREEN_DESC": "切换全屏/窗口模式。",
+        "SETTINGS_SYSTEM_VSYNC": "垂直同步",
+        "SETTINGS_SYSTEM_VSYNC_DESC": "选择是否开启垂直同步。打开后帧率会上限为 60 FPS，音符滚动会更加顺畅，\n但输入延迟会增加。",
+        "SETTINGS_SYSTEM_GRAPHICSAPI": "画面渲染 API",
+        "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "绘制方式：\n从 OpenGL、DirectX11、Vulkan，或 Metal 中选择。\nOpenGL 速度较慢，但稳定性和兼容性较好。\nDirectX11 较快且稳定，但只能在 Windows 上使用。\nVulkan 在 Linux 上速度最快。\nMetal 只能在 MacOS 上使用。\n\n该项设置将在重启 OpenTaiko 后生效。",
+        "SETTINGS_SYSTEM_TEXTUREASYNC": "异步贴图加载",
+        "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "贴图加载方式：\n启动画面消失时冻结。\n如果有些贴图变黑，请关闭这项设置。\n该项设置将在重启 OpenTaiko 后生效。",
 
-    "SETTINGS_SYSTEM_BGMOVIE": "播放背景视频",
-    "SETTINGS_SYSTEM_BGMOVIE_DESC": "选择是否开启背景视频。若此选项开启但文件夹中没有视频，背景会变为全黑",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "视频播放显示模式",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "调整背景视频播放方式。",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "不显示",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "完全显示",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "迷你显示",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "两者",
-    "SETTINGS_SYSTEM_LANEOPACITY": "跑道不透明度",
-    "SETTINGS_SYSTEM_LANEOPACITY_DESC": "调整视频播放时音符跑道的透明度。\n— 0：完全透明，\n— 255：完全不透明",
+        "SETTINGS_SYSTEM_BGMOVIE": "播放背景视频",
+        "SETTINGS_SYSTEM_BGMOVIE_DESC": "选择是否开启背景视频。若此选项开启但文件夹中没有视频，背景会变为全黑",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "视频播放显示模式",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "调整背景视频播放方式。",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "不显示",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "完全显示",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "迷你显示",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "两者",
+        "SETTINGS_SYSTEM_LANEOPACITY": "跑道不透明度",
+        "SETTINGS_SYSTEM_LANEOPACITY_DESC": "调整视频播放时音符跑道的透明度。\n— 0：完全透明，\n— 255：完全不透明",
 
-    "SETTINGS_SYSTEM_BGA": "显示背景动画",
-    "SETTINGS_SYSTEM_BGA_DESC": "选择是否播放背景动画。",
-    "SETTINGS_SYSTEM_DISPLAYCHARA": "显示角色（Character）",
-    "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "显示角色（Character）图片。",
-    "SETTINGS_SYSTEM_DISPLAYDANCER": "显示舞者（Dancer）",
-    "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "显示舞者（Dancer）图片。",
-    "SETTINGS_SYSTEM_DISPLAYMOB": "显示人群（Mob）",
-    "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "显示人群（Mob）图片。",
-    "SETTINGS_SYSTEM_DISPLAYRUNNER": "显示跑者（Runner）",
-    "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "显示跑者（Runner）图片。",
-    "SETTINGS_SYSTEM_DISPLAYFOOTER": "显示页脚（Footer）",
-    "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "显示页脚（Footer）图片。",
-    "SETTINGS_SYSTEM_DISPLAYPUCHI": "显示迷你角色",
-    "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "显示迷你角色图片。",
-    "SETTINGS_SYSTEM_SIMPLEMODE": "简化模式",
-    "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "通过游玩期间隐藏多数视觉火焰和效果简化描绘。",
+        "SETTINGS_SYSTEM_BGA": "显示背景动画",
+        "SETTINGS_SYSTEM_BGA_DESC": "选择是否播放背景动画。",
+        "SETTINGS_SYSTEM_DISPLAYCHARA": "显示角色（Character）",
+        "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "显示角色（Character）图片。",
+        "SETTINGS_SYSTEM_DISPLAYDANCER": "显示舞者（Dancer）",
+        "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "显示舞者（Dancer）图片。",
+        "SETTINGS_SYSTEM_DISPLAYMOB": "显示人群（Mob）",
+        "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "显示人群（Mob）图片。",
+        "SETTINGS_SYSTEM_DISPLAYRUNNER": "显示跑者（Runner）",
+        "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "显示跑者（Runner）图片。",
+        "SETTINGS_SYSTEM_DISPLAYFOOTER": "显示页脚（Footer）",
+        "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "显示页脚（Footer）图片。",
+        "SETTINGS_SYSTEM_DISPLAYPUCHI": "显示迷你角色",
+        "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "显示迷你角色图片。",
+        "SETTINGS_SYSTEM_SIMPLEMODE": "简化模式",
+        "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "通过游玩期间隐藏多数视觉火焰和效果简化描绘。",
 
-    "SETTINGS_SYSTEM_SKIN": "当前皮肤",
-    "SETTINGS_SYSTEM_SKIN_DESC": "从 System 文件夹中选择皮肤。\n（安装皮肤时请将皮肤文件夹放入 System 文件夹中，重启游戏并在此选择）",
+        "SETTINGS_SYSTEM_SKIN": "当前皮肤",
+        "SETTINGS_SYSTEM_SKIN_DESC": "从 System 文件夹中选择皮肤。\n（安装皮肤时请将皮肤文件夹放入 System 文件夹中，重启游戏并在此选择）",
 
-    // Settings - System - Audio
-    "SETTINGS_SYSTEM_SONGPLAYBACK": "播放背景音乐",
-    "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "选择是否播放音乐。",
-    "SETTINGS_SYSTEM_USESONGVOL": "应用音量（SONGVOL）元信息",
-    "SETTINGS_SYSTEM_USESONGVOL_DESC": "切换是否使用 SONGVOL 元数据的部分无效选项。— 0—99：降低音量，\n— 100+：没有任何作用。",
-    "SETTINGS_SYSTEM_SEVOL": "音效音量",
-    "SETTINGS_SYSTEM_SEVOL_DESC": "调整“咚”“咔”音量。\n— 0：关闭敲击音效\n你必须在调整完成该项设置后重启游戏才能应用更改。",
-    "SETTINGS_SYSTEM_VOICEVOL": "语音音量",
-    "SETTINGS_SYSTEM_VOICEVOL_DESC": "调整小咚的语音音量\n你必须在调整完成该项设置后重启游戏才能应用更改。",
-    "SETTINGS_SYSTEM_SONGVOL": "背景音乐音量",
-    "SETTINGS_SYSTEM_SONGVOL_DESC": "调整背景音乐音量\n你必须在调整完成该项设置后重启游戏才能应用更改。",
-    "SETTINGS_SYSTEM_SONGPREVIEWVOL": "曲目预览音量",
-    "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "调整曲目预览音量。\n必须在调整完成该项设置后重启游戏才能应用更改。",
-    "SETTINGS_SYSTEM_VOLINCREMENT": "键盘音量更改幅度",
-    "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "控制每次按下调整音量按键时音量的更改幅度。\n更改范围：1—20",
+        // Settings - System - Audio
+        "SETTINGS_SYSTEM_SONGPLAYBACK": "播放背景音乐",
+        "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "选择是否播放音乐。",
+        "SETTINGS_SYSTEM_USESONGVOL": "应用音量（SONGVOL）元信息",
+        "SETTINGS_SYSTEM_USESONGVOL_DESC": "切换是否使用 SONGVOL 元数据的部分无效选项。— 0—99：降低音量，\n— 100+：没有任何作用。",
+        "SETTINGS_SYSTEM_SEVOL": "音效音量",
+        "SETTINGS_SYSTEM_SEVOL_DESC": "调整“咚”“咔”音量。\n— 0：关闭敲击音效\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+        "SETTINGS_SYSTEM_VOICEVOL": "语音音量",
+        "SETTINGS_SYSTEM_VOICEVOL_DESC": "调整小咚的语音音量\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+        "SETTINGS_SYSTEM_SONGVOL": "背景音乐音量",
+        "SETTINGS_SYSTEM_SONGVOL_DESC": "调整背景音乐音量\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+        "SETTINGS_SYSTEM_SONGPREVIEWVOL": "曲目预览音量",
+        "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "调整曲目预览音量。\n必须在调整完成该项设置后重启游戏才能应用更改。",
+        "SETTINGS_SYSTEM_VOLINCREMENT": "键盘音量更改幅度",
+        "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "控制每次按下调整音量按键时音量的更改幅度。\n更改范围：1—20",
 
-    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "曲目播放缓冲",
-    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "游戏开始前的等待时间\n降低该值可能会导致曲目过早开始播放。.",
-    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "曲目预览缓冲",
-    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "曲目预览等待时间\n降低该值或将导致预览在滚动曲目列表时就开始播放\n范围：0—10000ms",
+        "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "曲目播放缓冲",
+        "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "游戏开始前的等待时间\n降低该值可能会导致曲目过早开始播放。.",
+        "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "曲目预览缓冲",
+        "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "曲目预览等待时间\n降低该值或将导致预览在滚动曲目列表时就开始播放\n范围：0—10000ms",
 
-    "SETTINGS_SYSTEM_AUDIOPLAYBACK": "声音播放模式",
-    "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO：\n— 只在支持 ASIO 的音频设备上生效\n— 输入延迟最低\nWASAPI：\n— 仅与 Windows 兼容\n— 输入延迟次低\nBASS：\n— 支持所有平台\n退出设置界面以使此选项生效。",
-    "SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO 播放设备",
-    "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "选择播放模式为 ASIO 时合适的设备\n退出设置界面以使此选项生效。",
-    "SETTINGS_SYSTEM_WASAPIBUFFER": "WASAPI 缓冲区大小",
-    "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "调整声音播放模式为 WASAPI 时的声音缓冲。\n没有出现如曲目冻结或时间错误的声音问题时，该项设置越小越好。\n建议设为 0 以使用估计值或通过不断尝试进行调整。\n退出设置界面以使此选项生效。",
-    "SETTINGS_SYSTEM_BASSBUFFER": "Bass 模式缓冲区大小",
-    "SETTINGS_SYSTEM_BASSBUFFER_DESC": "当使用 Bass 模式时的缓冲区大小：\n— 范围： 0-99999ms。\n— 0：系统决定该值的大小。\n该值越小，音频卡顿/延迟会更小，但或导致声音异常或爆音。\n退出设置界面以使此选项生效。",
-    "SETTINGS_SYSTEM_OSTIMER": "操作系统计时器模式",
-    "SETTINGS_SYSTEM_OSTIMER_DESC": "开启时音符滚动会更加顺畅，但或将导致声音延迟。\n关闭会确保无声音延迟，但音符滚动会更加不稳定。\n关闭时 DTXMania 会使用其原始的计时器。\n其效果反之亦然。",
+        "SETTINGS_SYSTEM_AUDIOPLAYBACK": "声音播放模式",
+        "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO：\n— 只在支持 ASIO 的音频设备上生效\n— 输入延迟最低\nWASAPI：\n— 仅与 Windows 兼容\n— 输入延迟次低\nBASS：\n— 支持所有平台\n退出设置界面以使此选项生效。",
+        "SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO 播放设备",
+        "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "选择播放模式为 ASIO 时合适的设备\n退出设置界面以使此选项生效。",
+        "SETTINGS_SYSTEM_WASAPIBUFFER": "WASAPI 缓冲区大小",
+        "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "调整声音播放模式为 WASAPI 时的声音缓冲。\n没有出现如曲目冻结或时间错误的声音问题时，该项设置越小越好。\n建议设为 0 以使用估计值或通过不断尝试进行调整。\n退出设置界面以使此选项生效。",
+        "SETTINGS_SYSTEM_BASSBUFFER": "Bass 模式缓冲区大小",
+        "SETTINGS_SYSTEM_BASSBUFFER_DESC": "当使用 Bass 模式时的缓冲区大小：\n— 范围： 0-99999ms。\n— 0：系统决定该值的大小。\n该值越小，音频卡顿/延迟会更小，但或导致声音异常或爆音。\n退出设置界面以使此选项生效。",
+        "SETTINGS_SYSTEM_OSTIMER": "操作系统计时器模式",
+        "SETTINGS_SYSTEM_OSTIMER_DESC": "开启时音符滚动会更加顺畅，但或将导致声音延迟。\n关闭会确保无声音延迟，但音符滚动会更加不稳定。\n关闭时 DTXMania 会使用其原始的计时器。\n其效果反之亦然。",
 
-    // Settings - System - Misc.
-    "SETTINGS_SYSTEM_LOG": "创建报错记录",
-    "SETTINGS_SYSTEM_LOG_DESC": "选择游戏关闭时是否生成 TJAPlayer3.log 文件\n该文件用于追踪游戏的性能并记录报错信息。",
-    "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "随机选曲时访问子文件夹",
-    "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "选择随机选曲时是否访问子文件夹",
-    "SETTINGS_SYSTEM_DEBUGMODE": "调试模式",
-    "SETTINGS_SYSTEM_DEBUGMODE_DESC": "选择是否开启 Debug 模式。开启后右下角会显示额外信息\n敲击音效关闭时会显示延迟校准。",
-    "SETTINGS_SYSTEM_AUTOSCREENSHOT": "自动截屏",
-    "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "选择是否自动保存结果自动截屏\n只有当获得新高分时才会截屏，\n但最高分并不一定是最佳演奏。",
-    "SETTINGS_SYSTEM_DISCORDRPC": "Discord 状态显示",
-    "SETTINGS_SYSTEM_DISCORDRPC_DESC": "选择是否在 Discord 上共享曲目信息。",
-    "SETTINGS_SYSTEM_BUFFEREDINPUT": "输入缓冲模式",
-    "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时所有输入都会被保留，但输入采样率会会降低，\n关闭时部分输入可能会被丢弃，但输入采样率会增高。",
+        // Settings - System - Misc.
+        "SETTINGS_SYSTEM_LOG": "创建报错记录",
+        "SETTINGS_SYSTEM_LOG_DESC": "选择游戏关闭时是否生成 TJAPlayer3.log 文件\n该文件用于追踪游戏的性能并记录报错信息。",
+        "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "随机选曲时访问子文件夹",
+        "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "选择随机选曲时是否访问子文件夹",
+        "SETTINGS_SYSTEM_DEBUGMODE": "调试模式",
+        "SETTINGS_SYSTEM_DEBUGMODE_DESC": "选择是否开启 Debug 模式。开启后右下角会显示额外信息\n敲击音效关闭时会显示延迟校准。",
+        "SETTINGS_SYSTEM_AUTOSCREENSHOT": "自动截屏",
+        "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "选择是否自动保存结果自动截屏\n只有当获得新高分时才会截屏，\n但最高分并不一定是最佳演奏。",
+        "SETTINGS_SYSTEM_DISCORDRPC": "Discord 状态显示",
+        "SETTINGS_SYSTEM_DISCORDRPC_DESC": "选择是否在 Discord 上共享曲目信息。",
+        "SETTINGS_SYSTEM_BUFFEREDINPUT": "输入缓冲模式",
+        "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时所有输入都会被保留，但输入采样率会会降低，\n关闭时部分输入可能会被丢弃，但输入采样率会增高。",
 
-    // Settings - Gameplay
-    "SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",
-    "SETTINGS_GAME_GLOBALOFFSET_DESC": "更改所有谱面的偏移量。\n设定范围：-999—999ms\n可设为负值以减少输入延迟。",
+        // Settings - Gameplay
+        "SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",
+        "SETTINGS_GAME_GLOBALOFFSET_DESC": "更改所有谱面的偏移量。\n设定范围：-999—999ms\n可设为负值以减少输入延迟。",
 
-    "SETTINGS_GAME_CALIBRATION": "校准偏移量",
-    "SETTINGS_GAME_CALIBRATION_DESC": "校准您的偏移量。\n如果保存，将覆盖全局偏移量。",
-    "SETTINGS_GAME_CALIBRATION_OFFSET": "偏移量：{0}",
+        "SETTINGS_GAME_CALIBRATION": "校准偏移量",
+        "SETTINGS_GAME_CALIBRATION_DESC": "校准您的偏移量。\n如果保存，将覆盖全局偏移量。",
+        "SETTINGS_GAME_CALIBRATION_OFFSET": "偏移量：{0}",
 
-    "SETTINGS_GAME_BADCOUNT": "完美模式",
-    "SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
-    "SETTINGS_GAME_NOTELOCK": "锁定音符模式",
-    "SETTINGS_GAME_NOTELOCK_DESC": "切换是否会将空白处的敲击判断为“不可”。",
-    "SETTINGS_GAME_AILEVEL": "AI 等级",
-    "SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：关闭\n— 1+：2P 会变为 AI\n此选项会在自动模式开启时禁用。",
-    "SETTINGS_GAME_NORMALGAUGE": "总是使用默认规格（魂条）",
-    "SETTINGS_GAME_NORMALGAUGE_DESC": "总是使用默认规格（魂条）",
+        "SETTINGS_GAME_BADCOUNT": "完美模式",
+        "SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
+        "SETTINGS_GAME_NOTELOCK": "锁定音符模式",
+        "SETTINGS_GAME_NOTELOCK_DESC": "切换是否会将空白处的敲击判断为“不可”。",
+        "SETTINGS_GAME_AILEVEL": "AI 等级",
+        "SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：关闭\n— 1+：2P 会变为 AI\n此选项会在自动模式开启时禁用。",
+        "SETTINGS_GAME_NORMALGAUGE": "总是使用默认规格（魂条）",
+        "SETTINGS_GAME_NORMALGAUGE_DESC": "总是使用默认规格（魂条）",
 
-    "SETTINGS_GAME_AUTOP1": "玩家 1 自动演奏",
-    "SETTINGS_GAME_AUTOP1_DESC": "切换玩家 1 是否自动演奏。",
-    "SETTINGS_GAME_AUTOP2": "玩家 2 自动演奏",
-    "SETTINGS_GAME_AUTOP2_DESC": "切换玩家 2 是否自动演奏。",
-    "SETTINGS_GAME_AUTOROLL": "连打速度",
-    "SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。\n不对气球生效。\n0 关闭自动滚奏，最快每帧一次。",
+        "SETTINGS_GAME_AUTOP1": "玩家 1 自动演奏",
+        "SETTINGS_GAME_AUTOP1_DESC": "切换玩家 1 是否自动演奏。",
+        "SETTINGS_GAME_AUTOP2": "玩家 2 自动演奏",
+        "SETTINGS_GAME_AUTOP2_DESC": "切换玩家 2 是否自动演奏。",
+        "SETTINGS_GAME_AUTOROLL": "连打速度",
+        "SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。\n不对气球生效。\n0 关闭自动滚奏，最快每帧一次。",
 
-    "SETTINGS_GAME_NOINFO": "无信息模式",
-    "SETTINGS_GAME_NOINFO_DESC": "打开会关闭曲目信息显示，\n关闭会打开曲目信息显示。",
-    "SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
-    "SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量\n。范围：1—99999",
-    "SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
-    "SETTINGS_GAME_SCOREDISPLAY_DESC": "在左下方显示良、可、不可数量。\n（仅在单人模式下生效）",
-    "SETTINGS_GAME_BRANCHANIME": "谱面分歧动画",
-    "SETTINGS_GAME_BRANCHANIME_DESC": "— TYPE-A：第二代\n— TYPE-B：第三代",
+        "SETTINGS_GAME_NOINFO": "无信息模式",
+        "SETTINGS_GAME_NOINFO_DESC": "打开会关闭曲目信息显示，\n关闭会打开曲目信息显示。",
+        "SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
+        "SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量\n。范围：1—99999",
+        "SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
+        "SETTINGS_GAME_SCOREDISPLAY_DESC": "在左下方显示良、可、不可数量。\n（仅在单人模式下生效）",
+        "SETTINGS_GAME_BRANCHANIME": "谱面分歧动画",
+        "SETTINGS_GAME_BRANCHANIME_DESC": "— TYPE-A：第二代\n— TYPE-B：第三代",
 
-    "SETTINGS_GAME_DEFAULTDIFF": "默认难度",
-    "SETTINGS_GAME_DEFAULTDIFF_DESC": "除非该选项被设为魔王（里）或在选择难度时\n在魔王（表）上按右方向键，魔王（里）难度不会显示。",
-    "SETTINGS_GAME_EXEXTRAANIME": "表里谱面切换动画效果",
-    "SETTINGS_GAME_EXEXTRAANIME_DESC": "播放由皮肤定义的表里谱面切换动画效果。",
+        "SETTINGS_GAME_DEFAULTDIFF": "默认难度",
+        "SETTINGS_GAME_DEFAULTDIFF_DESC": "除非该选项被设为魔王（里）或在选择难度时\n在魔王（表）上按右方向键，魔王（里）难度不会显示。",
+        "SETTINGS_GAME_EXEXTRAANIME": "表里谱面切换动画效果",
+        "SETTINGS_GAME_EXEXTRAANIME_DESC": "播放由皮肤定义的表里谱面切换动画效果。",
 
-    // Settings - Gameplay - Training Mode
-    "SETTINGS_TRAINING_SKIPCOUNT": "跳转小节数",
-    "SETTINGS_TRAINING_SKIPCOUNT_DESC": "训练模式中按下前进/后退多个小节\n跳转的小节数。",
-    "SETTINGS_TRAINING_JUMPINTERVAL": "跳转小节时间间隔",
-    "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "训练模式中跳转至带书签的小节\n交替按下左/右蓝按键所需毫秒数。",
+        // Settings - Gameplay - Training Mode
+        "SETTINGS_TRAINING_SKIPCOUNT": "跳转小节数",
+        "SETTINGS_TRAINING_SKIPCOUNT_DESC": "训练模式中按下前进/后退多个小节\n跳转的小节数。",
+        "SETTINGS_TRAINING_JUMPINTERVAL": "跳转小节时间间隔",
+        "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "训练模式中跳转至带书签的小节\n交替按下左/右蓝按键所需毫秒数。",
 
-    // Settings - Broken/Unused/Might Deprecate/Might Update
-    // Translate these anyways, even if their future is uncertain.
-    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "图片预览缓冲",
-    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "移植 DTXMania 导致的无效设置\n没有任何作用",
-    "SETTINGS_SYSTEM_TIMESTRETCH": "时间拉伸模式",
-    "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "此选项作用不明，会导致 CPU 占用增加，\n并且当曲目播放速度低于 0.9x 时可能会出现问题。",
-    "SETTINGS_SYSTEM_FASTRENDER": "快速渲染",
-    "SETTINGS_SYSTEM_FASTRENDER_DESC": "选择是否在加载曲目时就开始渲染图片。",
-    "SETTINGS_GAME_BRANCHGUIDE": "谱面分歧提示",
-    "SETTINGS_GAME_BRANCHGUIDE_DESC": "切换是否打开谱面分歧条件显示。\n自动演奏模式下此项不起作用。",
-    "SETTINGS_GAME_BIGNOTEJUDGE": "大音符判断",
-    "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "切换双击大音符时是否获得奖励。\n开启时单击大音符会导致音符消失前出现视觉延迟，\n双击会获得双倍分数。\n关闭时单击与敲击普通音符效果一致并会获得双倍分数。\n尝试双击或将导致下个音符被敲击。",
-    "SETTINGS_GAME_SURVIVAL": "生存模式",
-    "SETTINGS_GAME_SURVIVAL_DESC": "此模式不可用\n此模式实现了一个类似 StepMania 的计时器系统，\n但部分代码缺失导致功能受限。",
-    "SETTINGS_GAME_SCOREMODE": "记分模式",
-    "SETTINGS_GAME_SCOREMODE_DESC": "— TYPE-A：第一代\n— TYPE-B：第二代\n— TYPE-C：第三代",
-    "SETTINGS_GAME_SHINUCHI": "真打模式",
-    "SETTINGS_GAME_SHINUCHI_DESC": "使所有音符得分相同，\n使用第四代公式。",
+        // Settings - Broken/Unused/Might Deprecate/Might Update
+        // Translate these anyways, even if their future is uncertain.
+        "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "图片预览缓冲",
+        "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "移植 DTXMania 导致的无效设置\n没有任何作用",
+        "SETTINGS_SYSTEM_TIMESTRETCH": "时间拉伸模式",
+        "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "此选项作用不明，会导致 CPU 占用增加，\n并且当曲目播放速度低于 0.9x 时可能会出现问题。",
+        "SETTINGS_SYSTEM_FASTRENDER": "快速渲染",
+        "SETTINGS_SYSTEM_FASTRENDER_DESC": "选择是否在加载曲目时就开始渲染图片。",
+        "SETTINGS_GAME_BRANCHGUIDE": "谱面分歧提示",
+        "SETTINGS_GAME_BRANCHGUIDE_DESC": "切换是否打开谱面分歧条件显示。\n自动演奏模式下此项不起作用。",
+        "SETTINGS_GAME_BIGNOTEJUDGE": "大音符判断",
+        "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "切换双击大音符时是否获得奖励。\n开启时单击大音符会导致音符消失前出现视觉延迟，\n双击会获得双倍分数。\n关闭时单击与敲击普通音符效果一致并会获得双倍分数。\n尝试双击或将导致下个音符被敲击。",
+        "SETTINGS_GAME_SURVIVAL": "生存模式",
+        "SETTINGS_GAME_SURVIVAL_DESC": "此模式不可用\n此模式实现了一个类似 StepMania 的计时器系统，\n但部分代码缺失导致功能受限。",
+        "SETTINGS_GAME_SCOREMODE": "记分模式",
+        "SETTINGS_GAME_SCOREMODE_DESC": "— TYPE-A：第一代\n— TYPE-B：第二代\n— TYPE-C：第三代",
+        "SETTINGS_GAME_SHINUCHI": "真打模式",
+        "SETTINGS_GAME_SHINUCHI_DESC": "使所有音符得分相同，\n使用第四代公式。",
 
-    // Key Assignment - System
-    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "截屏",
-    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "系统按键分配：\n分配截屏按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "提高音量",
-    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "系统按键分配：\n分配提高音乐音量按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "降低音量",
-    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "系统按键分配：\n分配降低音乐音量按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "显示判定情况",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "系统按键分配：\n分配显示判定情况按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "显示调试菜单",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "系统按键分配：\n分配显示调试菜单按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "快速设置",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "系统按键分配：\n分配访问快速设置按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "玩家自定义",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "系统按键分配：\n分配玩家自定义按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "切换歌曲排序方式",
-    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "系统按键分配：\n分配切换歌曲排序方式按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "切换自动演奏（玩家 1）",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "系统按键分配：\n分配切换自动演奏（玩家 1）按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "切换自动演奏（玩家 2）",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "系统按键分配：\n分配切换自动演奏（玩家 2）按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "切换训练模式",
-    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "系统按键分配：\n分配切换训练模式按键。\n（仅可使用键盘，不可使用手柄）",
-    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "循环视频播放显示",
-    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "系统按键分配：\n分配循环视频播放显示模式按键。\n（仅可使用键盘，不可使用手柄）",
+        // Key Assignment - System
+        "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "截屏",
+        "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "系统按键分配：\n分配截屏按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "提高音量",
+        "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "系统按键分配：\n分配提高音乐音量按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "降低音量",
+        "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "系统按键分配：\n分配降低音乐音量按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "显示判定情况",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "系统按键分配：\n分配显示判定情况按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "显示调试菜单",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "系统按键分配：\n分配显示调试菜单按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "快速设置",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "系统按键分配：\n分配访问快速设置按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "玩家自定义",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "系统按键分配：\n分配玩家自定义按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "切换歌曲排序方式",
+        "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "系统按键分配：\n分配切换歌曲排序方式按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "切换自动演奏（玩家 1）",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "系统按键分配：\n分配切换自动演奏（玩家 1）按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "切换自动演奏（玩家 2）",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "系统按键分配：\n分配切换自动演奏（玩家 2）按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "切换训练模式",
+        "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "系统按键分配：\n分配切换训练模式按键。\n（仅可使用键盘，不可使用手柄）",
+        "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "循环视频播放显示",
+        "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "系统按键分配：\n分配循环视频播放显示模式按键。\n（仅可使用键盘，不可使用手柄）",
 
-    // Key Assignment - Gameplay
-    "SETTINGS_KEYASSIGN_GAME_DECIDE": "确认",
-    "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "菜单确认按键",
-    "SETTINGS_KEYASSIGN_GAME_CANCEL": "取消",
-    "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "菜单取消按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "向左",
-    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "菜单向左按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "向右",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "菜单向右按键",
+        // Key Assignment - Gameplay
+        "SETTINGS_KEYASSIGN_GAME_DECIDE": "确认",
+        "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "菜单确认按键",
+        "SETTINGS_KEYASSIGN_GAME_CANCEL": "取消",
+        "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "菜单取消按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "向左",
+        "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "菜单向左按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "向右",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "菜单向右按键",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED": "左红",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "鼓按键分配：\n分配左红按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "右红",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "鼓按键分配：\n分配右红按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "左蓝",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "鼓按键分配：\n分配左蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "右蓝",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "鼓按键分配：\n分配右蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_CLAP": "拍手",
-    "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "康加鼓按键分配：\n分配拍手按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED": "左红",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "鼓按键分配：\n分配左红按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "右红",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "鼓按键分配：\n分配右红按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "左蓝",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "鼓按键分配：\n分配左蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "右蓝",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "鼓按键分配：\n分配右蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_CLAP": "拍手",
+        "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "康加鼓按键分配：\n分配拍手按键",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "左红（玩家 2）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "鼓按键分配：\n分配 玩家 2 左红按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "右红（玩家 2）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "鼓按键分配：\n分配 玩家 2 右红按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "左蓝（玩家 2）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "鼓按键分配：\n分配 玩家 2 左蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "右蓝（玩家 2）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "鼓按键分配：\n分配 玩家 2 右蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_CLAP2P": "拍手（玩家 2）",
-    "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "康加鼓按键分配：\n分配 玩家 2 拍手按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "左红（玩家 2）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "鼓按键分配：\n分配 玩家 2 左红按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "右红（玩家 2）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "鼓按键分配：\n分配 玩家 2 右红按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "左蓝（玩家 2）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "鼓按键分配：\n分配 玩家 2 左蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "右蓝（玩家 2）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "鼓按键分配：\n分配 玩家 2 右蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_CLAP2P": "拍手（玩家 2）",
+        "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "康加鼓按键分配：\n分配 玩家 2 拍手按键",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "左红（玩家 3）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "鼓按键分配：\n分配 玩家 3 左红按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "右红（玩家 3）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "鼓按键分配：\n分配 玩家 3 右红按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "左蓝（玩家 3）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "鼓按键分配：\n分配 玩家 3 左蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "右蓝（玩家 3）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "鼓按键分配：\n分配 玩家 3 右蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_CLAP3P": "拍手（玩家 3）",
-    "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "康加鼓按键分配：\n分配 玩家 3 拍手按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "左红（玩家 3）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "鼓按键分配：\n分配 玩家 3 左红按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "右红（玩家 3）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "鼓按键分配：\n分配 玩家 3 右红按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "左蓝（玩家 3）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "鼓按键分配：\n分配 玩家 3 左蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "右蓝（玩家 3）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "鼓按键分配：\n分配 玩家 3 右蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_CLAP3P": "拍手（玩家 3）",
+        "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "康加鼓按键分配：\n分配 玩家 3 拍手按键",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "左红（玩家 4）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "鼓按键分配：\n分配 玩家 4 左红按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "右红（玩家 4）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "鼓按键分配：\n分配 玩家 4 右红按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "左蓝（玩家 4）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "鼓按键分配：\n分配 玩家 4 左蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "右蓝（玩家 4）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "鼓按键分配：\n分配 玩家 4 右蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_CLAP4P": "拍手（玩家 4）",
-    "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "康加鼓按键分配：\n分配 玩家 4 拍手按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "左红（玩家 4）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "鼓按键分配：\n分配 玩家 4 左红按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "右红（玩家 4）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "鼓按键分配：\n分配 玩家 4 右红按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "左蓝（玩家 4）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "鼓按键分配：\n分配 玩家 4 左蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "右蓝（玩家 4）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "鼓按键分配：\n分配 玩家 4 右蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_CLAP4P": "拍手（玩家 4）",
+        "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "康加鼓按键分配：\n分配 玩家 4 拍手按键",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "左红（玩家 5）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "鼓按键分配：\n分配 玩家 5 左红按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "右红（玩家 5）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "鼓按键分配：\n分配 玩家 5 右红按键",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "左蓝（玩家 5）",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "鼓按键分配：\n分配 玩家 5 左蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "右蓝（玩家 5）",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "鼓按键分配：\n分配 玩家 5 右蓝按键",
-    "SETTINGS_KEYASSIGN_GAME_CLAP5P": "拍手（玩家 5）",
-    "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "康加鼓按键分配：\n分配 玩家 5 拍手按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "左红（玩家 5）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "鼓按键分配：\n分配 玩家 5 左红按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "右红（玩家 5）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "鼓按键分配：\n分配 玩家 5 右红按键",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "左蓝（玩家 5）",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "鼓按键分配：\n分配 玩家 5 左蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "右蓝（玩家 5）",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "鼓按键分配：\n分配 玩家 5 右蓝按键",
+        "SETTINGS_KEYASSIGN_GAME_CLAP5P": "拍手（玩家 5）",
+        "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "康加鼓按键分配：\n分配 玩家 5 拍手按键",
 
-    // Key Assignment - Training
-    "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "暂停训练",
-    "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "鼓按键分配：\n分配暂停训练按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_AUTO": "切换自动演奏",
-    "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "鼓按键分配：\n分配切换自动演奏按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "添加/移除书签",
-    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "鼓按键分配：\n分配添加/移除书签按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "提高卷动速度",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "鼓按键分配：\n分配提高卷动速度按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "降低卷动速度",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "鼓按键分配：\n分配降低卷动速度按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "提高音乐播放速度",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "鼓按键分配：\n分配提高音乐播放速度按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "降低音乐播放速度",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "鼓按键分配：\n分配降低音乐播放速度按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "切换分歧为普通谱面",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "鼓按键分配：\n分配切换分歧为普通谱面按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "切换分歧为进阶谱面",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "鼓按键分配：\n分配切换分歧为进阶谱面按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "切换分歧为达人谱面",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "鼓按键分配：\n分配切换分歧为达人谱面按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "前进至下一小节",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "鼓按键分配：\n分配前进至下一小节按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "后退至上一小节",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "鼓按键分配：\n分配后退至上一小节按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "前进多个小节",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "鼓按键分配：\n分配前进多个小节按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "后退多个小节",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "鼓按键分配：\n分配后退多个小节按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "跳转至第一小节",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "鼓按键分配：\n分配跳转至第一小节按键。",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "跳转至最后一小节",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "鼓按键分配：\n分配跳转至最后一小节按键。",
+        // Key Assignment - Training
+        "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "暂停训练",
+        "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "鼓按键分配：\n分配暂停训练按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_AUTO": "切换自动演奏",
+        "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "鼓按键分配：\n分配切换自动演奏按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "添加/移除书签",
+        "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "鼓按键分配：\n分配添加/移除书签按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "提高卷动速度",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "鼓按键分配：\n分配提高卷动速度按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "降低卷动速度",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "鼓按键分配：\n分配降低卷动速度按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "提高音乐播放速度",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "鼓按键分配：\n分配提高音乐播放速度按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "降低音乐播放速度",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "鼓按键分配：\n分配降低音乐播放速度按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "切换分歧为普通谱面",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "鼓按键分配：\n分配切换分歧为普通谱面按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "切换分歧为进阶谱面",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "鼓按键分配：\n分配切换分歧为进阶谱面按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "切换分歧为达人谱面",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "鼓按键分配：\n分配切换分歧为达人谱面按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "前进至下一小节",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "鼓按键分配：\n分配前进至下一小节按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "后退至上一小节",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "鼓按键分配：\n分配后退至上一小节按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "前进多个小节",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "鼓按键分配：\n分配前进多个小节按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "后退多个小节",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "鼓按键分配：\n分配后退多个小节按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "跳转至第一小节",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "鼓按键分配：\n分配跳转至第一小节按键。",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "跳转至最后一小节",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "鼓按键分配：\n分配跳转至最后一小节按键。",
 
-    // Title Screen
-    "TITLE_MODE_TAIKO": "演奏模式",
-    "TITLE_MODE_DAN": "段位道场",
-    "TITLE_MODE_TOWER": "太鼓塔",
-    "TITLE_MODE_SHOP": "商店",
-    "TITLE_MODE_STORY": "太鼓冒险",
-    "TITLE_MODE_HEYA": "我的房间",
-    "TITLE_MODE_SETTINGS": "设置",
-    "TITLE_MODE_EXIT": "退出",
-    "TITLE_MODE_ONLINE": "在线大厅",
-    "TITLE_MODE_DOCUMENT": "开放大百科",
-    "TITLE_MODE_AI": "AI 对战模式",
-    "TITLE_MODE_STATS": "玩家数据",
-    "TITLE_MODE_EDITOR": "谱面编辑器",
-    "TITLE_MODE_TOOLS": "开放工具箱",
+        // Title Screen
+        "TITLE_MODE_TAIKO": "演奏模式",
+        "TITLE_MODE_DAN": "段位道场",
+        "TITLE_MODE_TOWER": "太鼓塔",
+        "TITLE_MODE_SHOP": "商店",
+        "TITLE_MODE_STORY": "太鼓冒险",
+        "TITLE_MODE_HEYA": "我的房间",
+        "TITLE_MODE_SETTINGS": "设置",
+        "TITLE_MODE_EXIT": "退出",
+        "TITLE_MODE_ONLINE": "在线大厅",
+        "TITLE_MODE_DOCUMENT": "开放大百科",
+        "TITLE_MODE_AI": "AI 对战模式",
+        "TITLE_MODE_STATS": "玩家数据",
+        "TITLE_MODE_EDITOR": "谱面编辑器",
+        "TITLE_MODE_TOOLS": "开放工具箱",
 
-    "TITLE_MODE_TAIKO_DESC": "按照您自己的节奏演奏曲目！",
-    "TITLE_MODE_DAN_DESC": "连续演奏多个谱面并通过挑战测试！",
-    "TITLE_MODE_TOWER_DESC": "在限定条命内演奏长谱面并到达塔顶！",
-    "TITLE_MODE_SHOP_DESC": "使用游戏中获得的金币购买曲目和角色！",
-    "TITLE_MODE_STORY_DESC": "克服各种障碍来获得新内容！",
-    "TITLE_MODE_HEYA_DESC": "更改名牌信息或角色外观！",
-    "TITLE_MODE_SETTINGS_DESC": "更改游戏风格或设置！",
-    "TITLE_MODE_EXIT_DESC": "退出游戏，下次再见！",
-    "TITLE_MODE_ONLINE_DESC": "从网络下载新谱面和内容！",
-    "TITLE_MODE_DOCUMENT_DESC": "了解与 OpenTaiko 相关的功能及如何安装新内容！",
-    "TITLE_MODE_AI_DESC": "与强大的 AI 进行多轮对战并取胜！",
-    "TITLE_MODE_STATS_DESC": "观看并追踪您的进度！",
-    "TITLE_MODE_EDITOR_DESC": "为您喜爱的乐曲制作 .tja 谱面！",
-    "TITLE_MODE_TOOLS_DESC": "用多种工具插入自制内容！",
+        "TITLE_MODE_TAIKO_DESC": "按照您自己的节奏演奏曲目！",
+        "TITLE_MODE_DAN_DESC": "连续演奏多个谱面并通过挑战测试！",
+        "TITLE_MODE_TOWER_DESC": "在限定条命内演奏长谱面并到达塔顶！",
+        "TITLE_MODE_SHOP_DESC": "使用游戏中获得的金币购买曲目和角色！",
+        "TITLE_MODE_STORY_DESC": "克服各种障碍来获得新内容！",
+        "TITLE_MODE_HEYA_DESC": "更改名牌信息或角色外观！",
+        "TITLE_MODE_SETTINGS_DESC": "更改游戏风格或设置！",
+        "TITLE_MODE_EXIT_DESC": "退出游戏，下次再见！",
+        "TITLE_MODE_ONLINE_DESC": "从网络下载新谱面和内容！",
+        "TITLE_MODE_DOCUMENT_DESC": "了解与 OpenTaiko 相关的功能及如何安装新内容！",
+        "TITLE_MODE_AI_DESC": "与强大的 AI 进行多轮对战并取胜！",
+        "TITLE_MODE_STATS_DESC": "观看并追踪您的进度！",
+        "TITLE_MODE_EDITOR_DESC": "为您喜爱的乐曲制作 .tja 谱面！",
+        "TITLE_MODE_TOOLS_DESC": "用多种工具插入自制内容！",
 
-    // Song Select
-    // {0}: Folder path
-    "SONGSELECT_RETURN_PATH": "返回（{0}）",
-    "SONGSELECT_RANDOM": "随机曲目",
-    // {0}: Folder path
-    "SONGSELECT_RANDOM_PATH": "随机曲目（{0}）",
+        // Song Select
+        // {0}: Folder path
+        "SONGSELECT_RETURN_PATH": "返回（{0}）",
+        "SONGSELECT_RANDOM": "随机曲目",
+        // {0}: Folder path
+        "SONGSELECT_RANDOM_PATH": "随机曲目（{0}）",
 
-    "SONGSELECT_SORT": "排序菜单",
-    "SONGSELECT_SORT_PATH": "文件路径",
-    "SONGSELECT_SORT_TITLE": "标题",
-    "SONGSELECT_SORT_SUBTITLE": "副标题",
-    "SONGSELECT_SORT_LEVEL": "显示等级",
+        "SONGSELECT_SORT": "排序菜单",
+        "SONGSELECT_SORT_PATH": "文件路径",
+        "SONGSELECT_SORT_TITLE": "标题",
+        "SONGSELECT_SORT_SUBTITLE": "副标题",
+        "SONGSELECT_SORT_LEVEL": "显示等级",
 
-    // {0}: Main BPM
-    "SONGSELECT_INFO_BPM": "BPM：{0:0.###}",
-    // {0}: Main BPM
-    // {1}: Minimum BPM
-    // {2}: Maximum BPM
-    "SONGSELECT_INFO_BPM_VARIABLE": "BPM：{0:0.###}（{1:0.###}-{2:0.###}）",
-    // {0}: Charter name
-    "SONGSELECT_INFO_CHARTER": "谱面作者：{0}",
+        // {0}: Main BPM
+        "SONGSELECT_INFO_BPM": "BPM：{0:0.###}",
+        // {0}: Main BPM
+        // {1}: Minimum BPM
+        // {2}: Maximum BPM
+        "SONGSELECT_INFO_BPM_VARIABLE": "BPM：{0:0.###}（{1:0.###}-{2:0.###}）",
+        // {0}: Charter name
+        "SONGSELECT_INFO_CHARTER": "谱面作者：{0}",
 
-    "SONGSELECT_QUICKCONFIG": "快速设置",
-    "SONGSELECT_QUICKCONFIG_MORE": "更多……",
+        "SONGSELECT_QUICKCONFIG": "快速设置",
+        "SONGSELECT_QUICKCONFIG_MORE": "更多……",
 
-    // Modals
-    "MODAL_TITLE_COIN": "获得金币！",
-    "MODAL_TITLE_CHARA": "获得新角色！",
-    "MODAL_TITLE_PUCHI": "获得迷你角色！",
-    "MODAL_TITLE_NAMEPLATE": "获得新称号！",
-    "MODAL_TITLE_SONG": "获得新歌曲！",
-    // {0}: Newly obtained coins
-    // {1}: New total coin count
-    "MODAL_MESSAGE_COIN": "+{0}金币（总计：{1}）",
+        // Modals
+        "MODAL_TITLE_COIN": "获得金币！",
+        "MODAL_TITLE_CHARA": "获得新角色！",
+        "MODAL_TITLE_PUCHI": "获得迷你角色！",
+        "MODAL_TITLE_NAMEPLATE": "获得新称号！",
+        "MODAL_TITLE_SONG": "获得新歌曲！",
+        // {0}: Newly obtained coins
+        // {1}: New total coin count
+        "MODAL_MESSAGE_COIN": "+{0}金币（总计：{1}）",
 
-    // Online Lounge
-    "ONLINE_EXIT": "返回主菜单",
-    "ONLINE_DOWNLOAD": "下载内容",
-    "ONLINE_DOWNLOAD_CDN": "选择 CDN 服务器",
-    "ONLINE_DOWNLOAD_SONG": "下载曲目",
-    "ONLINE_DOWNLOAD_CHARA": "下载角色（不可用）",
-    "ONLINE_DOWNLOAD_PUCHI": "下载迷你角色（不可用）",
-    "ONLINE_MULTIPLAYER": "在线多人（不可用）",
+        // Online Lounge
+        "ONLINE_EXIT": "返回主菜单",
+        "ONLINE_DOWNLOAD": "下载内容",
+        "ONLINE_DOWNLOAD_CDN": "选择 CDN 服务器",
+        "ONLINE_DOWNLOAD_SONG": "下载曲目",
+        "ONLINE_DOWNLOAD_CHARA": "下载角色（不可用）",
+        "ONLINE_DOWNLOAD_PUCHI": "下载迷你角色（不可用）",
+        "ONLINE_MULTIPLAYER": "在线多人（不可用）",
 
-    // Taiko Towers
-    "TOWER_FLOOR_REACHED": "到达楼层",
-    "TOWER_FLOOR_INITIAL": "层",
-    "TOWER_SCORE": "分数",
-    "TOWER_SCORE_INITIAL": "点",
+        // Taiko Towers
+        "TOWER_FLOOR_REACHED": "到达楼层",
+        "TOWER_FLOOR_INITIAL": "层",
+        "TOWER_SCORE": "分数",
+        "TOWER_SCORE_INITIAL": "点",
 
-    // Dan Dojo
-    "DAN_CONDITION_NAME_SOUL": "魂条",
-    "DAN_CONDITION_NAME_GOOD": "“良”数",
-    "DAN_CONDITION_NAME_OK": "“可”数",
-    "DAN_CONDITION_NAME_BAD": "“不可”数",
-    "DAN_CONDITION_NAME_SCORE": "分数",
-    "DAN_CONDITION_NAME_ROLL": "连打数",
-    "DAN_CONDITION_NAME_HIT": "击打数",
-    "DAN_CONDITION_NAME_COMBO": "连击",
-    "DAN_CONDITION_NAME_ACCURACY": "准确率",
-    "DAN_CONDITION_NAME_ADLIB": "隐藏音符",
-    "DAN_CONDITION_NAME_BOMB": "踩中地雷",
+        // Dan Dojo
+        "DAN_CONDITION_NAME_SOUL": "魂条",
+        "DAN_CONDITION_NAME_GOOD": "“良”数",
+        "DAN_CONDITION_NAME_OK": "“可”数",
+        "DAN_CONDITION_NAME_BAD": "“不可”数",
+        "DAN_CONDITION_NAME_SCORE": "分数",
+        "DAN_CONDITION_NAME_ROLL": "连打数",
+        "DAN_CONDITION_NAME_HIT": "击打数",
+        "DAN_CONDITION_NAME_COMBO": "连击",
+        "DAN_CONDITION_NAME_ACCURACY": "准确率",
+        "DAN_CONDITION_NAME_ADLIB": "隐藏音符",
+        "DAN_CONDITION_NAME_BOMB": "踩中地雷",
 
-    // Heya / Quick Heya
-    "HEYA_PUCHI": "迷你角色",
-    "HEYA_CHARA": "角色",
-    "HEYA_DAN": "段位称号",
-    "HEYA_NAMEPLATE": "名牌称号",
+        // Heya / Quick Heya
+        "HEYA_PUCHI": "迷你角色",
+        "HEYA_CHARA": "角色",
+        "HEYA_DAN": "段位称号",
+        "HEYA_NAMEPLATE": "名牌称号",
 
-    // Unlock requirements & messages (Any Menu)
-    "UNLOCK_CONDITION_INVALID": "【错误】未达成条件",
-    "UNLOCK_CONDITION_SHOP": "物品仅在商店可用。", // cs
-    // {0}: Price of item
-    "UNLOCK_CONDITION_COST": "金币价格：{0}", // ch, cs, cm
-    "UNLOCK_COIN_BOUGHT": "购买成功！",
-    "UNLOCK_COIN_MORE": "金币不足！",
+        // {0}: Asset name
+        "HEYA_DESCRIPTION_NAME": "Name: {0}",
+        // {0}: Asset rarity
+        "HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
+        "HEYA_DESCRIPTION_RARITY0": "Poor",
+        "HEYA_DESCRIPTION_RARITY1": "Common",
+        "HEYA_DESCRIPTION_RARITY2": "Uncommon",
+        "HEYA_DESCRIPTION_RARITY3": "Rare",
+        "HEYA_DESCRIPTION_RARITY4": "Epic",
+        "HEYA_DESCRIPTION_RARITY5": "Legendary",
+        "HEYA_DESCRIPTION_RARITY6": "Mythical",
+        // {0}: Asset author
+        "HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
+        // {0}: Gauge type
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
+        // {0}: Percentage of mines
+        "HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
+        // {0}: Percentage of fuse rolls
+        "HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
+        // {0}: Coin multiplier
+        "HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
 
-    "UNLOCK_CONDITION_ERROR": "需求条件：{0}需要 {1} 个值。",
-    "UNLOCK_CONDITION_ERROR2": "需求条件：{0}需要（{1} × n）个值和 n 项参考。",
+        // Unlock requirements & messages (Any Menu)
+        "UNLOCK_CONDITION_INVALID": "【错误】未达成条件",
+        "UNLOCK_CONDITION_SHOP": "物品仅在商店可用。", // cs
+        // {0}: Price of item
+        "UNLOCK_CONDITION_COST": "金币价格：{0}", // ch, cs, cm
+        "UNLOCK_COIN_BOUGHT": "购买成功！",
+        "UNLOCK_COIN_MORE": "金币不足！",
 
-    // {0}: Coin earn requirement
-    // {1}: Current progress
-    "UNLOCK_CONDITION_EARN": "累计获得 {0} 金币以解锁该物品！（{1}／{0}）", // ce
-    // {0}: Total AI plays needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_AIPLAY": "游玩 {0} 次 AI 对战以解锁该物品！（{1}／{0}）", // ap
-    // {0}: Total AI wins needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_AIWIN": "获胜 {0} 次 AI 对战以解锁该物品！（{1}／{0}）", // aw
-    // {0}: Total plays needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_PLAY": "游玩 {0} 首歌曲以解锁该物品！（{1}／{0}）", // tp
-    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-    // {1}: # of songs needed
-    // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_PLAYDIFF": "在{2}难度下{0} {1} 首歌曲以解锁该物品！（{3}／{1}）", // dp
-    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-    // {1}: # of songs needed
-    // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} 首 {2} ★歌曲以解锁该物品！（{3}／{1}）", // lp
-    // {0}: Current progress
-    // {1}: Total # of challenges
-    "UNLOCK_CONDITION_CHALLENGE": "获得以下表现以解锁该物品：　（{0}／{1}）", // sp, sg, sc
-    // {0}: Clear type
-    // {1}: Song name
-    // {2}: Difficulty type
-    "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- 在{2}难度下{0} {1} 。", // sp
-    // {0}: Clear type
-    // {1}: # of songs needed
-    // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- 在文件夹 {2} 下{0} {1} 首歌曲。（{3}／{1}）", // sg
-    // {0}: Clear type
-    // {1} # of songs needed
-    // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-    // {3} Current progress
-    "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {2} 制作的 {1} 张谱面。（{3}／{1}）", // sc
+        "UNLOCK_CONDITION_ERROR": "需求条件：{0}需要 {1} 个值。",
+        "UNLOCK_CONDITION_ERROR2": "需求条件：{0}需要（{1} × n）个值和 n 项参考。",
 
-    "UNLOCK_CONDITION_REQUIRE_PLAY": "游玩",
-    "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "游玩",
-    "UNLOCK_CONDITION_REQUIRE_ASSIST": "协助成功游玩",
-    "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "至少协助成功游玩",
-    "UNLOCK_CONDITION_REQUIRE_CLEAR": "成功游玩",
-    "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "至少成功游玩",
-    "UNLOCK_CONDITION_REQUIRE_FC": "全连",
-    "UNLOCK_CONDITION_REQUIRE_FC_MORE": "至少全连",
-    "UNLOCK_CONDITION_REQUIRE_PERFECT": "全良",
-    "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "全良",
+        // {0}: Coin earn requirement
+        // {1}: Current progress
+        "UNLOCK_CONDITION_EARN": "累计获得 {0} 金币以解锁该物品！（{1}／{0}）", // ce
+        // {0}: Total AI plays needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_AIPLAY": "游玩 {0} 次 AI 对战以解锁该物品！（{1}／{0}）", // ap
+        // {0}: Total AI wins needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_AIWIN": "获胜 {0} 次 AI 对战以解锁该物品！（{1}／{0}）", // aw
+        // {0}: Total plays needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_PLAY": "游玩 {0} 首歌曲以解锁该物品！（{1}／{0}）", // tp
+        // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+        // {1}: # of songs needed
+        // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_PLAYDIFF": "在{2}难度下{0} {1} 首歌曲以解锁该物品！（{3}／{1}）", // dp
+        // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+        // {1}: # of songs needed
+        // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} 首 {2} ★歌曲以解锁该物品！（{3}／{1}）", // lp
+        // {0}: Current progress
+        // {1}: Total # of challenges
+        "UNLOCK_CONDITION_CHALLENGE": "获得以下表现以解锁该物品：　（{0}／{1}）", // sp, sg, sc
+        // {0}: Clear type
+        // {1}: Song name
+        // {2}: Difficulty type
+        "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- 在{2}难度下{0} {1} 。", // sp
+        // {0}: Clear type
+        // {1}: # of songs needed
+        // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- 在文件夹 {2} 下{0} {1} 首歌曲。（{3}／{1}）", // sg
+        // {0}: Clear type
+        // {1} # of songs needed
+        // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+        // {3} Current progress
+        "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {2} 制作的 {1} 张谱面。（{3}／{1}）", // sc
 
-    // Pause Menu (Taiko/Tower/Dan Mode)
-    "PAUSE_TITLE": "暂停",
-    "PAUSE_RESUME": "继续",
-    "PAUSE_RESTART": "重新开始",
-    "PAUSE_EXIT": "退出",
+        "UNLOCK_CONDITION_REQUIRE_PLAY": "游玩",
+        "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "游玩",
+        "UNLOCK_CONDITION_REQUIRE_ASSIST": "协助成功游玩",
+        "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "至少协助成功游玩",
+        "UNLOCK_CONDITION_REQUIRE_CLEAR": "成功游玩",
+        "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "至少成功游玩",
+        "UNLOCK_CONDITION_REQUIRE_FC": "全连",
+        "UNLOCK_CONDITION_REQUIRE_FC_MORE": "至少全连",
+        "UNLOCK_CONDITION_REQUIRE_PERFECT": "全良",
+        "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "全良",
 
-    // AI Info
-    "AI_NAME": "AI",
-    "AI_TITLE": "机械降神",
+        // Pause Menu (Taiko/Tower/Dan Mode)
+        "PAUSE_TITLE": "暂停",
+        "PAUSE_RESUME": "继续",
+        "PAUSE_RESTART": "重新开始",
+        "PAUSE_EXIT": "退出",
 
-    // Mods
-    "MOD_NONE": "无",
-    "MOD_BLANK": "-",
-    "MOD_SWITCH_OFF": "关闭",
-    "MOD_SWITCH_ON": "开启",
-    "MOD_SCOREMULTIPLY": "分数倍率：{0}",
-    "MOD_COINMULTIPLY": "金币倍率：{0}",
+        // AI Info
+        "AI_NAME": "AI",
+        "AI_TITLE": "机械降神",
 
-    "MOD_SPEED": "速度",
+        // Mods
+        "MOD_NONE": "无",
+        "MOD_BLANK": "-",
+        "MOD_SWITCH_OFF": "关闭",
+        "MOD_SWITCH_ON": "开启",
+        "MOD_SCOREMULTIPLY": "分数倍率：{0}",
+        "MOD_COINMULTIPLY": "金币倍率：{0}",
 
-    "MOD_HIDE": "隐藏音符",
-    "MOD_STEALTH": "隐形",
+        "MOD_SPEED": "速度",
 
-    "MOD_FLIP": "翻转",
+        "MOD_HIDE": "隐藏音符",
+        "MOD_STEALTH": "隐形",
 
-    "MOD_RANDOM": "随机",
-    "MOD_RANDOM_SHUFFLE": "轻度",
-    "MOD_RANDOM_CHAOS": "重度",
+        "MOD_FLIP": "翻转",
 
-    "MOD_TIMING": "时机判断",
-    "MOD_TIMING1": "非常宽松",
-    "MOD_TIMING2": "宽松",
-    "MOD_TIMING3": "一般",
-    "MOD_TIMING4": "严格",
-    "MOD_TIMING5": "非常严格",
+        "MOD_RANDOM": "随机",
+        "MOD_RANDOM_SHUFFLE": "轻度",
+        "MOD_RANDOM_CHAOS": "重度",
 
-    "MOD_JUSTICE": "严格模式",
-    "MOD_SAFE": "安全",
-    "MOD_JUST": "严格",
+        "MOD_TIMING": "时机判断",
+        "MOD_TIMING1": "非常宽松",
+        "MOD_TIMING2": "宽松",
+        "MOD_TIMING3": "一般",
+        "MOD_TIMING4": "严格",
+        "MOD_TIMING5": "非常严格",
 
-    "MOD_GAMETYPE": "游戏类型",
-    "MOD_GAMETYPE_TAIKO": "太鼓",
-    "MOD_GAMETYPE_KONGA": "康加鼓",
+        "MOD_JUSTICE": "严格模式",
+        "MOD_SAFE": "安全",
+        "MOD_JUST": "严格",
 
-    "MOD_GAMEMODE": "游戏模式",
-    "MOD_GAMEMODE_TRAINING": "特训模式",
+        "MOD_GAMETYPE": "游戏类型",
+        "MOD_GAMETYPE_TAIKO": "太鼓",
+        "MOD_GAMETYPE_KONGA": "康加鼓",
 
-    "MOD_AUTO": "自动",
+        "MOD_GAMEMODE": "游戏模式",
+        "MOD_GAMEMODE_TRAINING": "特训模式",
 
-    "MOD_SONGSPEED": "曲目播放速度",
-    "SETTINGS_MOD_SONGSPEED_DESC": "调整曲目播放速度\n当时间拉伸模式开启，且曲目播放速度低于 0.9x 时\n可能会出现问题。\n提示：此选项会影响曲目音高。",
+        "MOD_AUTO": "自动",
 
-    "MOD_HITSOUND": "音色",
+        "MOD_SONGSPEED": "曲目播放速度",
+        "SETTINGS_MOD_SONGSPEED_DESC": "调整曲目播放速度\n当时间拉伸模式开启，且曲目播放速度低于 0.9x 时\n可能会出现问题。\n提示：此选项会影响曲目音高。",
 
-    "MOD_FUN": "趣味模组",
-    "MOD_FUN_AVALANCHE": "雪崩",
-    "MOD_FUN_MINESWEEPER": "扫雷"
-  },
+        "MOD_HITSOUND": "音色",
+
+        "MOD_FUN": "趣味模组",
+        "MOD_FUN_AVALANCHE": "雪崩",
+        "MOD_FUN_MINESWEEPER": "扫雷"
+    },
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "键值找不到：{0}",
   // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.

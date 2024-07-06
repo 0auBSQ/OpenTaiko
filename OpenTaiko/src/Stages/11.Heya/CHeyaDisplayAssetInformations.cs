@@ -34,38 +34,44 @@ namespace TJAPlayer3
         public static void DisplayCharacterInfo(CCachedFontRenderer pf, CCharacter character)
         {
             string description = "";
-            description += ("Name: " + character.metadata.tGetName() + "\n");
-            description += ("Rarity: " + "<c." + ToHex(HRarity.tRarityToColor(character.metadata.Rarity)) + ">" + character.metadata.Rarity + "</c>" + "\n");
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_NAME").SafeFormat(character.metadata.tGetName())}\n";
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_RARITY").SafeFormat(
+                "<c." + ToHex(HRarity.tRarityToColor(character.metadata.Rarity)) + ">"
+                  + CLangManager.LangInstance.GetString($"HEYA_DESCRIPTION_RARITY{HRarity.tRarityToLangInt(character.metadata.Rarity)}")
+                  + "</c>"
+                )}\n";
             if (character.metadata.tGetDescription() != "") description += character.metadata.tGetDescription() + "\n";
-            description += ("Author: " + character.metadata.tGetAuthor() + "\n\n");
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_AUTHOR").SafeFormat(character.metadata.tGetAuthor())}\n\n";
 
             var gaugeType = character.effect.Gauge;
             if (gaugeType == "Normal")
             {
-                description += "Gauge Type: Normal\n";
-                description += "Finish the play within the clear zone to pass the song!\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE").SafeFormat(CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL"))}\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC")}\n";
             }
             else if (gaugeType == "Hard")
             {
-                description += "Gauge Type: <c.#ff4444>Hard</c>\n";
-                description += "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE").SafeFormat("<c.#ff4444>" + CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD") + "</c>")}\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC")}\n";
             }
             else if (gaugeType == "Extreme")
             {
-                description += "Gauge Type: <c.#8c0000>Extreme</c>\n";
-                description += "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE").SafeFormat("<c.#8c0000>" + CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME") + "</c>")}\n";
+                description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC")}\n";
             }
 
             var bombFactor = character.effect.BombFactor;
-            if (bombFactor < 10) description += $"Bomb Factor: {bombFactor}% of notes converted to mines in Minesweeper\n";
-            else if (bombFactor < 25) description += $"Bomb Factor: <c.#b0b0b0>{bombFactor}</c>% of notes converted to mines in Minesweeper\n";
-            else description += $"Bomb Factor: <c.#6b6b6b>{bombFactor}</c>% of notes converted to mines in Minesweeper\n";
+
+            
+            if (bombFactor < 10) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR").SafeFormat($"{bombFactor}")}\n";
+            else if (bombFactor < 25) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR").SafeFormat($"<c.#b0b0b0>{bombFactor}</c>")}\n"; 
+            else description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR").SafeFormat($"<c.#6b6b6b>{bombFactor}</c>")}\n";
 
             var fuseFactor = character.effect.FuseRollFactor;
-            if (fuseFactor < 10) description += $"Fuse Factor: {fuseFactor}% of balloons converted to fuse rolls in Minesweeper\n";
-            else if (fuseFactor < 25) description += $"Fuse Factor: <c.#b474c4>{fuseFactor}</c>% of balloons converted to fuse rolls in Minesweeper\n";
-            else description += $"Fuse Factor: <c.#7c009c>{fuseFactor}</c>% of balloons converted to fuse rolls in Minesweeper\n";
-            description += $"Coin multiplier: x{character.effect.GetCoinMultiplier()}";
+            if (fuseFactor < 10) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"{fuseFactor}")}\n";
+            else if (fuseFactor < 25) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"<c.#b474c4>{fuseFactor}</c>")}\n";
+            else description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"<c.#7c009c>{fuseFactor}</c>")}\n";
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(character.effect.GetCoinMultiplier())}\n";
 
 
             if (ttkDescription is null || ttkDescription.str文字 != description)
@@ -80,16 +86,20 @@ namespace TJAPlayer3
         public static void DisplayPuchicharaInfo(CCachedFontRenderer pf, CPuchichara puchi)
         {
             string description = "";
-            description += ("Name: " + puchi.metadata.tGetName() + "\n");
-            description += ("Rarity: " + "<c." + ToHex(HRarity.tRarityToColor(puchi.metadata.Rarity)) + ">" + puchi.metadata.Rarity + "</c>" + "\n");
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_NAME").SafeFormat(puchi.metadata.tGetName())}\n";
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_RARITY").SafeFormat(
+                "<c." + ToHex(HRarity.tRarityToColor(puchi.metadata.Rarity)) + ">"
+                  + CLangManager.LangInstance.GetString($"HEYA_DESCRIPTION_RARITY{HRarity.tRarityToLangInt(puchi.metadata.Rarity)}")
+                  + "</c>"
+                )}\n";
             if (puchi.metadata.tGetDescription() != "") description += puchi.metadata.tGetDescription() + "\n";
-            description += ("Author: " + puchi.metadata.tGetAuthor() + "\n\n");
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_AUTHOR").SafeFormat(puchi.metadata.tGetAuthor())}\n\n";
 
             if (puchi.effect.AllPurple) description += "All big notes become <c.#c800ff>Swap</c> notes\n";
             if (puchi.effect.ShowAdlib) description += "<c.#c4ffe2>ADLib</c> notes become visible\n";
             if (puchi.effect.Autoroll > 0) description += $"Automatic <c.#ffff00>Rolls</c> at {puchi.effect.Autoroll} hits/s\n";
             if (puchi.effect.SplitLane) description += "<c.#ff4040>Split</c> <c.#4053ff>Lanes</c>\n";
-            description += $"Coin multiplier: x{puchi.effect.GetCoinMultiplier()}";
+            description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(puchi.effect.GetCoinMultiplier())}\n";
 
             if (ttkDescription is null || ttkDescription.str文字 != description)
             {
