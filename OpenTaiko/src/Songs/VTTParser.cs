@@ -400,7 +400,11 @@ namespace TJAPlayer3
                     }
                 }
             }
-            if (lyricData.Count > 0) { lrclist.Add(CreateLyric(lyricData, order)); }
+            // Add last lyric to list
+            if (lyricData.Count > 0) { 
+                lyricData.RemoveAll(empty => String.IsNullOrEmpty(empty.Text));
+                lrclist.Add(CreateLyric(lyricData, order));
+            }
             lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
             return lrclist;
 
