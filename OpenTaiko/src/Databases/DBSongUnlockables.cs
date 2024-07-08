@@ -33,7 +33,7 @@ namespace TJAPlayer3
                 connection.Open();
 
 
-                // Get nameplates
+                // Get songs info
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @$"

@@ -527,28 +527,8 @@ namespace TJAPlayer3
             {
                 using (SKCanvas canvas = new SKCanvas(lyrictex))
                 {
-                    //canvas.Clear(Color.Transparent);
                     canvas.Clear();
 
-                    /*
-                    int x = 0;
-                    int y = 0;
-                    for (int i = 0; i < textures.Count; i++)
-                    {
-                        int tempwidth = (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 2) * (textures[i].Count - 1);
-                        x = (max_width - width[i]) / 2;
-                        for (int j = 0; j < textures[i].Count; j++)
-                        {
-                            canvas.DrawBitmap(textures[i][j], x + tempwidth, y + ((height[i] - textures[i][j].Height) / 2) + (rubyheightoffset[i] / 2));
-                            tempwidth += textures[i][j].Width - (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 4) + 2 - j; // i don't know why this works, please don't ask me why this works
-
-                            // disabled ruby width adjustment by コミ's request, original code below
-                            // textures[i][j].Width - (10 * TJAPlayer3.Skin.Game_Lyric_FontSize / TJAPlayer3.Skin.Font_Edge_Ratio * 4) + 2 - j - rubywidthoffset[i][j];
-                        }
-                        y += height[i] - rubyheightoffset[i];
-                    }
-                    */
-                    
                     int y = 0;
                     for (int i = 0; i < textures.Count; i++)
                     {

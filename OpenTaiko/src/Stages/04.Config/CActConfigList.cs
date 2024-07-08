@@ -70,20 +70,20 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
-				CLangManager.LangInstance.GetString(3));
+			this.iSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
 			this.list項目リスト.Add( this.iSystemReturnToMenu );
 
-			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(4), CItemBase.EPanelType.Normal,
-				CLangManager.LangInstance.GetString(5));
+			this.iSystemReloadDTX = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONG"), CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONG_DESC"));
 			this.list項目リスト.Add( this.iSystemReloadDTX );
 			
-			this.iSystemHardReloadDTX = new CItemBase(CLangManager.LangInstance.GetString(10148), CItemBase.EPanelType.Normal,
-				CLangManager.LangInstance.GetString(10149));
+			this.iSystemHardReloadDTX = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONGCACHE"), CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONGCACHE_DESC"));
 			this.list項目リスト.Add( this.iSystemHardReloadDTX );
 
-			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString(1), CItemList.EPanelType.Normal, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
-				CLangManager.LangInstance.GetString(0),
+			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANGUAGE"), CItemList.EPanelType.Normal, CLangManager.langToInt(TJAPlayer3.ConfigIni.sLang),
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANGUAGE_DESC"),
 				CLangManager.Languages);
 			this.list項目リスト.Add(this.iSystemLanguage);
 
@@ -91,12 +91,12 @@ namespace TJAPlayer3
 			//	CLangManager.LangInstance.GetString(17));
 			//this.list項目リスト.Add(this.iLayoutType);
 
-			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString(6), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount,
-				CLangManager.LangInstance.GetString(7));
+			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT"), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT_DESC"));
             this.list項目リスト.Add( this.iTaikoPlayerCount );
 
-			this.iDanTowerHide = new CItemToggle(CLangManager.LangInstance.GetString(10056), TJAPlayer3.ConfigIni.bDanTowerHide,
-				CLangManager.LangInstance.GetString(10057));
+			this.iDanTowerHide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_HIDEDANTOWER"), TJAPlayer3.ConfigIni.bDanTowerHide,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_HIDEDANTOWER_DESC"));
 			this.list項目リスト.Add(this.iDanTowerHide);
 
 			/*
@@ -105,101 +105,104 @@ namespace TJAPlayer3
 			this.list項目リスト.Add( this.iSystemRisky );
 			*/
 
-			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString(10), 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
-				CLangManager.LangInstance.GetString(11));
+			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
+				CLangManager.LangInstance.GetString("SETTINGS_MOD_SONGSPEED_DESC"));
 			this.list項目リスト.Add( this.iCommonPlaySpeed );
 
-			this.iSystemTimeStretch = new CItemToggle(CLangManager.LangInstance.GetString(10018), TJAPlayer3.ConfigIni.bTimeStretch,
-				CLangManager.LangInstance.GetString(18));
+			this.iSystemTimeStretch = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH"), TJAPlayer3.ConfigIni.bTimeStretch,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH_DESC"));
 			this.list項目リスト.Add( this.iSystemTimeStretch );
 
-			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString(9997), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nGraphicsDeviceType,
-				CLangManager.LangInstance.GetString(9996),
+			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nGraphicsDeviceType,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
 				//new string[] { "OpenGL", "DirectX9", "DirectX11", "Vulkan", "Metal" });
 				new string[] { "OpenGL", "DirectX11", "Vulkan", "Metal" });
 			this.list項目リスト.Add(this.iSystemGraphicsType);
 
-			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString(10019), TJAPlayer3.ConfigIni.bFullScreen,
-				CLangManager.LangInstance.GetString(19));
+			this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), TJAPlayer3.ConfigIni.bFullScreen,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN_DESC"));
 			this.list項目リスト.Add( this.iSystemFullscreen );
 
-			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString(10021), TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect,
-				CLangManager.LangInstance.GetString(21));
+			this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER"), TJAPlayer3.ConfigIni.bIncludeSubfoldersOnRandomSelect,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC"));
 			this.list項目リスト.Add( this.iSystemRandomFromSubBox );
 
-			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString(10022), TJAPlayer3.ConfigIni.bEnableVSync,
-				CLangManager.LangInstance.GetString(22));
+			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC"), TJAPlayer3.ConfigIni.bEnableVSync,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC_DESC"));
 			this.list項目リスト.Add( this.iSystemVSyncWait );
 
-			this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString(10023), TJAPlayer3.ConfigIni.bEnableAVI,
-				CLangManager.LangInstance.GetString(23));
+			this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE"), TJAPlayer3.ConfigIni.bEnableAVI,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE_DESC"));
 			this.list項目リスト.Add( this.iSystemAVI );
 
-			if (CLangManager.fetchLang() == "ja")
-			{
-				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
-					CLangManager.LangInstance.GetString(10151),
-					new string[] {"OFF","背景","ウィンドウ","両方"});
-				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
-			}
-			else
-			{
-				this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
-					CLangManager.LangInstance.GetString(10151),
-					new string[] {"None","Full","Mini","Both"});
-				this.list項目リスト.Add( this.iSystemAVIDisplayMode );
-			}			
+			//if (CLangManager.fetchLang() == "ja")
+			//{
+			//	this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
+			//		CLangManager.LangInstance.GetString(10151),
+			//		new string[] {"OFF","背景","ウィンドウ","両方"});
+			//	this.list項目リスト.Add( this.iSystemAVIDisplayMode );
+			//}
+			//else
+			this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY"), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC"),
+				new string[] { 
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE"),
+                CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL"),
+                CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI"),
+                CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH")
+				});
+			this.list項目リスト.Add( this.iSystemAVIDisplayMode );
 
-			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString(10024), TJAPlayer3.ConfigIni.bEnableBGA,
-				CLangManager.LangInstance.GetString(24));
+			this.iSystemBGA = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGA"), TJAPlayer3.ConfigIni.bEnableBGA,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGA_DESC"));
 			this.list項目リスト.Add( this.iSystemBGA );
 
-			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString(10025), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms,
-				CLangManager.LangInstance.GetString(25));
+			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER"), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC"));
 			this.list項目リスト.Add( this.iSystemPreviewSoundWait );
 
-			this.iSystemPreviewImageWait = new CItemInteger(CLangManager.LangInstance.GetString(10026), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms,
-				CLangManager.LangInstance.GetString(26));
+			this.iSystemPreviewImageWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER"), 0, 0x2710, TJAPlayer3.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC"));
 			this.list項目リスト.Add( this.iSystemPreviewImageWait );
 
-			this.iSystemDebugInfo = new CItemToggle(CLangManager.LangInstance.GetString(10027), TJAPlayer3.ConfigIni.bDisplayDebugInfo,
-				CLangManager.LangInstance.GetString(27));
+			this.iSystemDebugInfo = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DEBUGMODE"), TJAPlayer3.ConfigIni.bDisplayDebugInfo,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DEBUGMODE_DESC"));
 			this.list項目リスト.Add( this.iSystemDebugInfo );
 
-			this.iSystemBGAlpha = new CItemInteger(CLangManager.LangInstance.GetString(10028), 0, 0xff, TJAPlayer3.ConfigIni.n背景の透過度,
-				CLangManager.LangInstance.GetString(28));
+			this.iSystemBGAlpha = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANEOPACITY"), 0, 0xff, TJAPlayer3.ConfigIni.n背景の透過度,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANEOPACITY_DESC"));
 			this.list項目リスト.Add( this.iSystemBGAlpha );
 
-			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString(10029), TJAPlayer3.ConfigIni.bBGM音を発声する,
-				CLangManager.LangInstance.GetString(29));
+			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACK"), TJAPlayer3.ConfigIni.bBGM音を発声する,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACK_DESC"));
 			this.list項目リスト.Add( this.iSystemBGMSound );
 
-		    this.iSystemApplySongVol = new CItemToggle(CLangManager.LangInstance.GetString(10033), TJAPlayer3.ConfigIni.ApplySongVol,
-				CLangManager.LangInstance.GetString(33));
+		    this.iSystemApplySongVol = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_USESONGVOL"), TJAPlayer3.ConfigIni.ApplySongVol,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_USESONGVOL_DESC"));
 		    this.list項目リスト.Add( this.iSystemApplySongVol );
 
-		    this.iSystemSoundEffectLevel = new CItemInteger(CLangManager.LangInstance.GetString(10034), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SoundEffectLevel,
-				CLangManager.LangInstance.GetString(34));
+		    this.iSystemSoundEffectLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SEVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SoundEffectLevel,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SEVOL_DESC"));
 		    this.list項目リスト.Add( this.iSystemSoundEffectLevel );
 
-		    this.iSystemVoiceLevel = new CItemInteger(CLangManager.LangInstance.GetString(10035), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.VoiceLevel,
-				CLangManager.LangInstance.GetString(35));
+		    this.iSystemVoiceLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VOICEVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.VoiceLevel,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VOICEVOL_DESC"));
 		    this.list項目リスト.Add( this.iSystemVoiceLevel );
 
-		    this.iSystemSongPreviewLevel = new CItemInteger(CLangManager.LangInstance.GetString(10058), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPreviewLevel,
-				CLangManager.LangInstance.GetString(10059));
+		    this.iSystemSongPreviewLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPreviewLevel,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC"));
 		    this.list項目リスト.Add( this.iSystemSongPreviewLevel );
 			
-			this.iSystemSongPlaybackLevel = new CItemInteger(CLangManager.LangInstance.GetString(10036), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPlaybackLevel,
-				CLangManager.LangInstance.GetString(36));
+			this.iSystemSongPlaybackLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, TJAPlayer3.ConfigIni.SongPlaybackLevel,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGVOL_DESC"));
 		    this.list項目リスト.Add( this.iSystemSongPlaybackLevel );
 
-		    this.iSystemKeyboardSoundLevelIncrement = new CItemInteger(CLangManager.LangInstance.GetString(10037), 1, 20, TJAPlayer3.ConfigIni.KeyboardSoundLevelIncrement,
-				CLangManager.LangInstance.GetString(37));
+		    this.iSystemKeyboardSoundLevelIncrement = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VOLINCREMENT"), 1, 20, TJAPlayer3.ConfigIni.KeyboardSoundLevelIncrement,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VOLINCREMENT_DESC"));
 		    this.list項目リスト.Add( this.iSystemKeyboardSoundLevelIncrement );
 
-            this.MusicPreTimeMs = new CItemInteger(CLangManager.LangInstance.GetString(10038), 0, 10000, TJAPlayer3.ConfigIni.MusicPreTimeMs,
-				CLangManager.LangInstance.GetString(38));
+            this.MusicPreTimeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACKBUFFER"), 0, 10000, TJAPlayer3.ConfigIni.MusicPreTimeMs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC"));
             this.list項目リスト.Add(this.MusicPreTimeMs);
 
             //this.iSystemStoicMode = new CItemToggle( "StoicMode", CDTXMania.ConfigIni.bストイックモード,
@@ -207,93 +210,92 @@ namespace TJAPlayer3
             //    "Turn ON to disable drawing\n * preview image / movie\n * result image / movie\n * nowloading image\n * wallpaper (in playing screen)\n * BGA / AVI (in playing screen)" );
             //this.list項目リスト.Add( this.iSystemStoicMode );
 
-            this.iSystemAutoResultCapture = new CItemToggle(CLangManager.LangInstance.GetString(10039), TJAPlayer3.ConfigIni.bIsAutoResultCapture,
-				CLangManager.LangInstance.GetString(39));
+            this.iSystemAutoResultCapture = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUTOSCREENSHOT"), TJAPlayer3.ConfigIni.bIsAutoResultCapture,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC"));
 			this.list項目リスト.Add( this.iSystemAutoResultCapture );
 
-            SendDiscordPlayingInformation = new CItemToggle(CLangManager.LangInstance.GetString(10040),
+            SendDiscordPlayingInformation = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISCORDRPC"),
                 TJAPlayer3.ConfigIni.SendDiscordPlayingInformation,
-				CLangManager.LangInstance.GetString(40));
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISCORDRPC_DESC"));
             list項目リスト.Add(SendDiscordPlayingInformation);
 
-            this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString(10041), TJAPlayer3.ConfigIni.bBufferedInputs,
-				CLangManager.LangInstance.GetString(41));
+            this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT"), TJAPlayer3.ConfigIni.bBufferedInputs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT_DESC"));
 			this.list項目リスト.Add( this.iSystemBufferedInput );
-			this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString(10042), TJAPlayer3.ConfigIni.bOutputLogs,
-				CLangManager.LangInstance.GetString(42));
+			this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG"), TJAPlayer3.ConfigIni.bOutputLogs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG_DESC"));
 			this.list項目リスト.Add( this.iLogOutputLog );
 
 			// #24820 2013.1.3 yyagi
 
 
-			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString(10043), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nSoundDeviceType,
-				CLangManager.LangInstance.GetString(43),
+			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK"), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nSoundDeviceType,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC"),
 				new string[] { "Bass", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
 			this.list項目リスト.Add(this.iSystemSoundType);
 
 			// #24820 2013.1.15 yyagi
-			this.iSystemBassBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString(9999), 0, 99999, TJAPlayer3.ConfigIni.nBassBufferSizeMs,
-				CLangManager.LangInstance.GetString(9998));
+			this.iSystemBassBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BASSBUFFER"), 0, 99999, TJAPlayer3.ConfigIni.nBassBufferSizeMs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BASSBUFFER_DESC"));
 			this.list項目リスト.Add( this.iSystemBassBufferSizeMs );
 
 			// #24820 2013.1.15 yyagi
-			this.iSystemWASAPIBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString(10044), 0, 99999, TJAPlayer3.ConfigIni.nWASAPIBufferSizeMs,
-				CLangManager.LangInstance.GetString(44));
+			this.iSystemWASAPIBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER"), 0, 99999, TJAPlayer3.ConfigIni.nWASAPIBufferSizeMs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER_DESC"));
 			this.list項目リスト.Add( this.iSystemWASAPIBufferSizeMs );
 
 			// #24820 2013.1.17 yyagi
-			string[] asiodevs = CEnumerateAllAsioDevices.GetAllASIODevices();
-			this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString(10045), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nASIODevice,
-				CLangManager.LangInstance.GetString(45),
-				asiodevs );
+			this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK"), CItemList.EPanelType.Normal, TJAPlayer3.ConfigIni.nASIODevice,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK_DESC"),
+                CEnumerateAllAsioDevices.GetAllASIODevices() );
 			this.list項目リスト.Add( this.iSystemASIODevice );
 
 			// #33689 2014.6.17 yyagi
-			this.iSystemSoundTimerType = new CItemToggle(CLangManager.LangInstance.GetString(10046), TJAPlayer3.ConfigIni.bUseOSTimer,
-				CLangManager.LangInstance.GetString(46));
+			this.iSystemSoundTimerType = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_OSTIMER"), TJAPlayer3.ConfigIni.bUseOSTimer,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_OSTIMER_DESC"));
 			this.list項目リスト.Add( this.iSystemSoundTimerType );
 
 
-            ShowChara = new CItemToggle(CLangManager.LangInstance.GetString(10047), TJAPlayer3.ConfigIni.ShowChara,
-				CLangManager.LangInstance.GetString(47));
+            ShowChara = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYCHARA"), TJAPlayer3.ConfigIni.ShowChara,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYCHARA_DESC"));
             this.list項目リスト.Add(ShowChara);
 
-            ShowDancer = new CItemToggle(CLangManager.LangInstance.GetString(10048), TJAPlayer3.ConfigIni.ShowDancer,
-				CLangManager.LangInstance.GetString(48));
+            ShowDancer = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYDANCER"), TJAPlayer3.ConfigIni.ShowDancer,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYDANCER_DESC"));
             this.list項目リスト.Add(ShowDancer);
 
-            ShowMob = new CItemToggle(CLangManager.LangInstance.GetString(10049), TJAPlayer3.ConfigIni.ShowMob,
-				CLangManager.LangInstance.GetString(49));
+            ShowMob = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYMOB"), TJAPlayer3.ConfigIni.ShowMob,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYMOB_DESC"));
             this.list項目リスト.Add(ShowMob);
 
-            ShowRunner = new CItemToggle(CLangManager.LangInstance.GetString(10050), TJAPlayer3.ConfigIni.ShowRunner,
-				CLangManager.LangInstance.GetString(50));
+            ShowRunner = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYRUNNER"), TJAPlayer3.ConfigIni.ShowRunner,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYRUNNER_DESC"));
             this.list項目リスト.Add(ShowRunner);
 
-            ShowFooter = new CItemToggle(CLangManager.LangInstance.GetString(10051), TJAPlayer3.ConfigIni.ShowFooter,
-				CLangManager.LangInstance.GetString(51));
+            ShowFooter = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYFOOTER"), TJAPlayer3.ConfigIni.ShowFooter,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYFOOTER_DESC"));
             this.list項目リスト.Add(ShowFooter);
 
-            FastRender = new CItemToggle(CLangManager.LangInstance.GetString(10052), TJAPlayer3.ConfigIni.FastRender,
-				CLangManager.LangInstance.GetString(52));
+            FastRender = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FASTRENDER"), TJAPlayer3.ConfigIni.FastRender,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FASTRENDER_DESC"));
             this.list項目リスト.Add(FastRender);
 
-            ASyncTextureLoad = new CItemToggle(CLangManager.LangInstance.GetString(9995), TJAPlayer3.ConfigIni.ASyncTextureLoad,
-				CLangManager.LangInstance.GetString(9994));
-            this.list項目リスト.Add(ASyncTextureLoad);
-
-            ShowPuchiChara = new CItemToggle(CLangManager.LangInstance.GetString(10053), TJAPlayer3.ConfigIni.ShowPuchiChara,
-				CLangManager.LangInstance.GetString(53));
+            ShowPuchiChara = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYPUCHI"), TJAPlayer3.ConfigIni.ShowPuchiChara,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYPUCHI_DESC"));
             this.list項目リスト.Add(ShowPuchiChara);
 
-            SimpleMode = new CItemToggle(CLangManager.LangInstance.GetString(9993), TJAPlayer3.ConfigIni.SimpleMode,
-                CLangManager.LangInstance.GetString(9992));
+            SimpleMode = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SIMPLEMODE"), TJAPlayer3.ConfigIni.SimpleMode,
+                CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SIMPLEMODE_DESC"));
             this.list項目リスト.Add(SimpleMode);
 
+            ASyncTextureLoad = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TEXTUREASYNC"), TJAPlayer3.ConfigIni.ASyncTextureLoad,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TEXTUREASYNC_DESC"));
+            this.list項目リスト.Add(ASyncTextureLoad);
 
 
-            this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString(10054), CItemBase.EPanelType.Normal, nSkinIndex,
-				CLangManager.LangInstance.GetString(54),
+
+            this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SKIN"), CItemBase.EPanelType.Normal, nSkinIndex,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SKIN_DESC"),
                 //"CONFIGURATIONを抜けると、設定した\n" +
                 //"スキンに変更されます。",
                 skinNames);
@@ -301,8 +303,8 @@ namespace TJAPlayer3
 
 
 
-            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10055), CItemBase.EPanelType.Normal,
-			CLangManager.LangInstance.GetString(55));
+            this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM"), CItemBase.EPanelType.Normal,
+			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"));
 			this.list項目リスト.Add( this.iSystemGoToKeyAssign );
 
 			OnListMenuの初期化();
@@ -326,36 +328,36 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
-				CLangManager.LangInstance.GetString(3));
+			this.iDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
 			this.list項目リスト.Add( this.iDrumsReturnToMenu );
 
-			this.iDrumsGoToCalibration = new CItemBase(CLangManager.LangInstance.GetString(10192), CItemBase.EPanelType.Other,
-				CLangManager.LangInstance.GetString(10193));
+			this.iDrumsGoToCalibration = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_GAME_CALIBRATION"), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_CALIBRATION_DESC"));
 			this.list項目リスト.Add(this.iDrumsGoToCalibration);
 
-			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString(60), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
-				CLangManager.LangInstance.GetString(61));
+			this.iRollsPerSec = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_AUTOROLL"), 0, 1000, TJAPlayer3.ConfigIni.nRollsPerSec,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_AUTOROLL_DESC"));
 			this.list項目リスト.Add(this.iRollsPerSec);
 
-			this.iAILevel = new CItemInteger(CLangManager.LangInstance.GetString(12), 1, 10, TJAPlayer3.ConfigIni.nDefaultAILevel,
-				CLangManager.LangInstance.GetString(13));
+			this.iAILevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_AILEVEL"), 1, 10, TJAPlayer3.ConfigIni.nDefaultAILevel,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_AILEVEL_DESC"));
 			this.list項目リスト.Add(this.iAILevel);
 
-			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(64), 0, 10, TJAPlayer3.ConfigIni.nRisky,
-				CLangManager.LangInstance.GetString(65));
+			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_BADCOUNT"), 0, 10, TJAPlayer3.ConfigIni.nRisky,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_BADCOUNT_DESC"));
 			this.list項目リスト.Add( this.iSystemRisky );
 
-			this.iTaikoNoInfo = new CItemToggle(CLangManager.LangInstance.GetString(70), TJAPlayer3.ConfigIni.bNoInfo,
-				CLangManager.LangInstance.GetString(71));
+			this.iTaikoNoInfo = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_NOINFO"), TJAPlayer3.ConfigIni.bNoInfo,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_NOINFO_DESC"));
 			this.list項目リスト.Add( this.iTaikoNoInfo );
 
-			this.iDrumsTight = new CItemToggle(CLangManager.LangInstance.GetString(74), TJAPlayer3.ConfigIni.bTight,
-				CLangManager.LangInstance.GetString(75));
+			this.iDrumsTight = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_NOTELOCK"), TJAPlayer3.ConfigIni.bTight,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_NOTELOCK_DESC"));
 			this.list項目リスト.Add( this.iDrumsTight );
             
-			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString(76), 1, 0x1869f, TJAPlayer3.ConfigIni.n表示可能な最小コンボ数.Drums,
-				CLangManager.LangInstance.GetString(77));
+			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, TJAPlayer3.ConfigIni.n表示可能な最小コンボ数.Drums,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY_DESC"));
 			this.list項目リスト.Add( this.iSystemMinComboDrums );
 
 
@@ -367,75 +369,76 @@ namespace TJAPlayer3
 			this.list項目リスト.Add( this.iInputAdjustTimeMs );
 			*/
 
-			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString(14), -9999, 9999, TJAPlayer3.ConfigIni.nGlobalOffsetMs,
-				CLangManager.LangInstance.GetString(15));
+			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_GLOBALOFFSET"), -9999, 9999, TJAPlayer3.ConfigIni.nGlobalOffsetMs,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_GLOBALOFFSET_DESC"));
 			this.list項目リスト.Add(this.iGlobalOffsetMs);
 
 
-			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString(80), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nDefaultCourse,
-				CLangManager.LangInstance.GetString(81),
+			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_DEFAULTDIFF"), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nDefaultCourse,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_DEFAULTDIFF_DESC"),
                 new string[] {
-					CLangManager.LangInstance.GetString(1040),
-					CLangManager.LangInstance.GetString(1041),
-					CLangManager.LangInstance.GetString(1042),
-					CLangManager.LangInstance.GetString(1043),
-					CLangManager.LangInstance.GetString(1044),
-					CLangManager.LangInstance.GetString(1045) });
+					CLangManager.LangInstance.GetString("DIFF_EASY"),
+					CLangManager.LangInstance.GetString("DIFF_NORMAL"),
+					CLangManager.LangInstance.GetString("DIFF_HARD"),
+					CLangManager.LangInstance.GetString("DIFF_EX"),
+					CLangManager.LangInstance.GetString("DIFF_EXTRA"),
+					CLangManager.LangInstance.GetString("DIFF_EXEXTRA") });
             this.list項目リスト.Add(this.iTaikoDefaultCourse);
 
-            this.iTaikoScoreMode = new CItemList(CLangManager.LangInstance.GetString(82), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nScoreMode,
-				CLangManager.LangInstance.GetString(83),
+            this.iTaikoScoreMode = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SCOREMODE"), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nScoreMode,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_SCOREMODE_DESC"),
                 new string[] { "TYPE-A", "TYPE-B", "TYPE-C"});
             this.list項目リスト.Add(this.iTaikoScoreMode);
 
-            this.ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString(10084), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.EPanelType.Normal,
-				CLangManager.LangInstance.GetString(84));
+            this.ShinuchiMode = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI"), TJAPlayer3.ConfigIni.ShinuchiMode, CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI_DESC"));
             this.list項目リスト.Add(this.ShinuchiMode);
 
-            this.iTaikoBranchGuide = new CItemToggle(CLangManager.LangInstance.GetString(85), TJAPlayer3.ConfigIni.bBranchGuide,
-				CLangManager.LangInstance.GetString(86));
+			// This does nothing vvv
+            this.iTaikoBranchGuide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE"), TJAPlayer3.ConfigIni.bBranchGuide,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE_DESC"));
             this.list項目リスト.Add(this.iTaikoBranchGuide);
 
-            this.iTaikoBranchAnime = new CItemList(CLangManager.LangInstance.GetString(87), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nBranchAnime,
-				CLangManager.LangInstance.GetString(88),
+            this.iTaikoBranchAnime = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHANIME"), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.nBranchAnime,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHANIME_DESC"),
                 new string[] { "TYPE-A", "TYPE-B" });
             this.list項目リスト.Add(this.iTaikoBranchAnime);
 
-            this.iTaikoGameMode = new CItemList(CLangManager.LangInstance.GetString(89), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
-				CLangManager.LangInstance.GetString(90),
+            this.iTaikoGameMode = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL"), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL_DESC"),
                 new string[] { "OFF", "TYPE-A", "TYPE-B" });
             this.list項目リスト.Add( this.iTaikoGameMode );
 
-            this.iTaikoBigNotesJudge = new CItemToggle(CLangManager.LangInstance.GetString(91), TJAPlayer3.ConfigIni.bJudgeBigNotes,
-				CLangManager.LangInstance.GetString(92));
+            this.iTaikoBigNotesJudge = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_BIGNOTEJUDGE"), TJAPlayer3.ConfigIni.bJudgeBigNotes,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_BIGNOTEJUDGE_DESC"));
             this.list項目リスト.Add( this.iTaikoBigNotesJudge );
 
-            this.iTaikoForceNormalGauge = new CItemToggle(CLangManager.LangInstance.GetString(10126), TJAPlayer3.ConfigIni.bForceNormalGauge,
-				CLangManager.LangInstance.GetString(10127));
+            this.iTaikoForceNormalGauge = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_NORMALGAUGE"), TJAPlayer3.ConfigIni.bForceNormalGauge,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_NORMALGAUGE_DESC"));
             this.list項目リスト.Add( this.iTaikoForceNormalGauge );
 
-            this.iTaikoJudgeCountDisp = new CItemToggle(CLangManager.LangInstance.GetString(93), TJAPlayer3.ConfigIni.bJudgeCountDisplay,
-				CLangManager.LangInstance.GetString(94));
+            this.iTaikoJudgeCountDisp = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_SCOREDISPLAY"), TJAPlayer3.ConfigIni.bJudgeCountDisplay,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_SCOREDISPLAY_DESC"));
             this.list項目リスト.Add( this.iTaikoJudgeCountDisp );
 
-			this.iShowExExtraAnime = new CItemToggle(CLangManager.LangInstance.GetString(10124), TJAPlayer3.ConfigIni.ShowExExtraAnime,
-				CLangManager.LangInstance.GetString(10125));
+			this.iShowExExtraAnime = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_EXEXTRAANIME"), TJAPlayer3.ConfigIni.ShowExExtraAnime,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_EXEXTRAANIME_DESC"));
 			this.list項目リスト.Add(this.iShowExExtraAnime);
 
-			this.TokkunSkipCount = new CItemInteger(CLangManager.LangInstance.GetString(10154), 1, 99, TJAPlayer3.ConfigIni.TokkunSkipMeasures,
-                CLangManager.LangInstance.GetString(10155));
+			this.TokkunSkipCount = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_TRAINING_SKIPCOUNT"), 1, 99, TJAPlayer3.ConfigIni.TokkunSkipMeasures,
+                CLangManager.LangInstance.GetString("SETTINGS_TRAINING_SKIPCOUNT_DESC"));
 			this.list項目リスト.Add(TokkunSkipCount);
 
-            this.TokkunMashInterval = new CItemInteger(CLangManager.LangInstance.GetString(10156), 1, 9999, TJAPlayer3.ConfigIni.TokkunMashInterval,
-                CLangManager.LangInstance.GetString(10157));
+            this.TokkunMashInterval = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_TRAINING_JUMPINTERVAL"), 1, 9999, TJAPlayer3.ConfigIni.TokkunMashInterval,
+                CLangManager.LangInstance.GetString("SETTINGS_TRAINING_JUMPINTERVAL_DESC"));
             this.list項目リスト.Add(TokkunMashInterval);
 
-            this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(95), CItemBase.EPanelType.Normal,
-				CLangManager.LangInstance.GetString(96));
+            this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DESC"));
 			this.list項目リスト.Add( this.iDrumsGoToKeyAssign );
 
-			this.iDrumsGoToTrainingKeyAssign = new CItemBase(CLangManager.LangInstance.GetString(10158), CItemBase.EPanelType.Normal,
-                CLangManager.LangInstance.GetString(10159));
+			this.iDrumsGoToTrainingKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING"), CItemBase.EPanelType.Normal,
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_DESC"));
 			this.list項目リスト.Add( this.iDrumsGoToTrainingKeyAssign );
 
             OnListMenuの初期化();
@@ -749,7 +752,18 @@ namespace TJAPlayer3
                 {
 					TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
 					CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
-					t項目リストの設定_System(refresh : false);
+
+					prvFont?.Dispose();
+					TJAPlayer3.stageコンフィグ.ftフォント?.Dispose();
+					TJAPlayer3.stageタイトル.pfMenuTitle?.Dispose();
+					TJAPlayer3.stageタイトル.pfBoxText?.Dispose();
+
+                    prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Config_Font_Scale);
+					TJAPlayer3.stageコンフィグ.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+					TJAPlayer3.stageタイトル.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[0]);
+                    TJAPlayer3.stageタイトル.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.Title_ModeSelect_Title_Scale[1]);
+
+                    t項目リストの設定_System(refresh : false);
 					TJAPlayer3.stageコンフィグ.ReloadMenus();
 				}
                 //}
@@ -880,45 +894,45 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
-				CLangManager.LangInstance.GetString(3));
+			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemReturnToMenu );
 
-			this.iKeyAssignSystemCapture = new CItemBase(CLangManager.LangInstance.GetString(97),
-				CLangManager.LangInstance.GetString(98));
+			this.iKeyAssignSystemCapture = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_CAPTURE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemCapture );
-			this.iKeyAssignSystemSongVolIncrease = new CItemBase(CLangManager.LangInstance.GetString(10128),
-				CLangManager.LangInstance.GetString(10129));
+			this.iKeyAssignSystemSongVolIncrease = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemSongVolIncrease );
-			this.iKeyAssignSystemSongVolDecrease = new CItemBase(CLangManager.LangInstance.GetString(10130),
-				CLangManager.LangInstance.GetString(10131));
+			this.iKeyAssignSystemSongVolDecrease = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemSongVolDecrease );
-			this.iKeyAssignSystemDisplayHit = new CItemBase(CLangManager.LangInstance.GetString(10132),
-				CLangManager.LangInstance.GetString(10133));
+			this.iKeyAssignSystemDisplayHit = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemDisplayHit );
-			this.iKeyAssignSystemDisplayDebug = new CItemBase(CLangManager.LangInstance.GetString(10134),
-				CLangManager.LangInstance.GetString(10135));
+			this.iKeyAssignSystemDisplayDebug = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemDisplayDebug );
-			this.iKeyAssignSystemQuickConfig = new CItemBase(CLangManager.LangInstance.GetString(10136),
-				CLangManager.LangInstance.GetString(10137));
+			this.iKeyAssignSystemQuickConfig = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemQuickConfig );
-			this.iKeyAssignSystemNewHeya = new CItemBase(CLangManager.LangInstance.GetString(10138),
-				CLangManager.LangInstance.GetString(10139));
+			this.iKeyAssignSystemNewHeya = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemNewHeya );
-			this.iKeyAssignSystemSortSongs = new CItemBase(CLangManager.LangInstance.GetString(10140),
-				CLangManager.LangInstance.GetString(10141));
+			this.iKeyAssignSystemSortSongs = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_SONGSORT"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemSortSongs );
-			this.iKeyAssignSystemToggleAutoP1 = new CItemBase(CLangManager.LangInstance.GetString(10142),
-				CLangManager.LangInstance.GetString(10143));
+			this.iKeyAssignSystemToggleAutoP1 = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_AUTO1P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemToggleAutoP1);
-			this.iKeyAssignSystemToggleAutoP2 = new CItemBase(CLangManager.LangInstance.GetString(10144),
-				CLangManager.LangInstance.GetString(10145));
+			this.iKeyAssignSystemToggleAutoP2 = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_AUTO2P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemToggleAutoP2);
-			this.iKeyAssignSystemToggleTrainingMode = new CItemBase(CLangManager.LangInstance.GetString(10146),
-				CLangManager.LangInstance.GetString(10147));
+			this.iKeyAssignSystemToggleTrainingMode = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_TRAINING"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemToggleTrainingMode);
-			this.iKeyAssignSystemCycleVideoDisplayMode = new CItemBase(CLangManager.LangInstance.GetString(10152),
-				CLangManager.LangInstance.GetString(10153));
+			this.iKeyAssignSystemCycleVideoDisplayMode = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemCycleVideoDisplayMode);
 
             OnListMenuの初期化();
@@ -932,107 +946,102 @@ namespace TJAPlayer3
 
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
-			this.iKeyAssignDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
-				CLangManager.LangInstance.GetString(3));
+			this.iKeyAssignDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+				CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignDrumsReturnToMenu);
 
-			this.iKeyAssignTaikoLRed = new CItemBase(CLangManager.LangInstance.GetString(99),
-				CLangManager.LangInstance.GetString(10000));
+			this.iKeyAssignTaikoLRed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLRed);
-			this.iKeyAssignTaikoRRed = new CItemBase(CLangManager.LangInstance.GetString(10001),
-				CLangManager.LangInstance.GetString(10002));
+			this.iKeyAssignTaikoRRed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRRed);
-			this.iKeyAssignTaikoLBlue = new CItemBase(CLangManager.LangInstance.GetString(10003),
-				CLangManager.LangInstance.GetString(10004));
+			this.iKeyAssignTaikoLBlue = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoLBlue );
-            this.iKeyAssignTaikoRBlue = new CItemBase(CLangManager.LangInstance.GetString(10005),
-				CLangManager.LangInstance.GetString(10006));
+            this.iKeyAssignTaikoRBlue = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoRBlue );
+            this.iKeyAssignKongaClap = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP_DESC"));
+            this.list項目リスト.Add(this.iKeyAssignKongaClap);
 
-			this.iKeyAssignTaikoLRed2P = new CItemBase(CLangManager.LangInstance.GetString(10007),
-				CLangManager.LangInstance.GetString(10008));
+            this.iKeyAssignTaikoLRed2P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED2P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoLRed2P );
-			this.iKeyAssignTaikoRRed2P = new CItemBase(CLangManager.LangInstance.GetString(10009),
-				CLangManager.LangInstance.GetString(10010));
+			this.iKeyAssignTaikoRRed2P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED2P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoRRed2P );
-			this.iKeyAssignTaikoLBlue2P = new CItemBase(CLangManager.LangInstance.GetString(10011),
-				CLangManager.LangInstance.GetString(10012));
+			this.iKeyAssignTaikoLBlue2P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoLBlue2P );
-            this.iKeyAssignTaikoRBlue2P = new CItemBase(CLangManager.LangInstance.GetString(10013),
-				CLangManager.LangInstance.GetString(10014));
+            this.iKeyAssignTaikoRBlue2P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignTaikoRBlue2P );
+            this.iKeyAssignKongaClap2P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP2P"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC"));
+            this.list項目リスト.Add(this.iKeyAssignKongaClap2P);
 
-			this.iKeyAssignTaikoLRed3P = new CItemBase(CLangManager.LangInstance.GetString(10094),
-				CLangManager.LangInstance.GetString(10095));
+            this.iKeyAssignTaikoLRed3P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED3P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLRed3P);
-			this.iKeyAssignTaikoRRed3P = new CItemBase(CLangManager.LangInstance.GetString(10096),
-				CLangManager.LangInstance.GetString(10097));
+			this.iKeyAssignTaikoRRed3P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED3P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRRed3P);
-			this.iKeyAssignTaikoLBlue3P = new CItemBase(CLangManager.LangInstance.GetString(10098),
-				CLangManager.LangInstance.GetString(10099));
+			this.iKeyAssignTaikoLBlue3P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue3P);
-			this.iKeyAssignTaikoRBlue3P = new CItemBase(CLangManager.LangInstance.GetString(10100),
-				CLangManager.LangInstance.GetString(10101));
+			this.iKeyAssignTaikoRBlue3P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue3P);
+            this.iKeyAssignKongaClap3P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP3P"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC"));
+            this.list項目リスト.Add(this.iKeyAssignKongaClap3P);
 
-			this.iKeyAssignTaikoLRed4P = new CItemBase(CLangManager.LangInstance.GetString(10102),
-				CLangManager.LangInstance.GetString(10103));
+            this.iKeyAssignTaikoLRed4P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED4P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLRed4P);
-			this.iKeyAssignTaikoRRed4P = new CItemBase(CLangManager.LangInstance.GetString(10104),
-				CLangManager.LangInstance.GetString(10105));
+			this.iKeyAssignTaikoRRed4P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED4P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRRed4P);
-			this.iKeyAssignTaikoLBlue4P = new CItemBase(CLangManager.LangInstance.GetString(10106),
-				CLangManager.LangInstance.GetString(10107));
+			this.iKeyAssignTaikoLBlue4P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue4P);
-			this.iKeyAssignTaikoRBlue4P = new CItemBase(CLangManager.LangInstance.GetString(10108),
-				CLangManager.LangInstance.GetString(10109));
+			this.iKeyAssignTaikoRBlue4P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue4P);
+            this.iKeyAssignKongaClap4P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP4P"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC"));
+            this.list項目リスト.Add(this.iKeyAssignKongaClap4P);
 
-			this.iKeyAssignTaikoLRed5P = new CItemBase(CLangManager.LangInstance.GetString(10110),
-				CLangManager.LangInstance.GetString(10111));
+            this.iKeyAssignTaikoLRed5P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED5P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLRed5P);
-			this.iKeyAssignTaikoRRed5P = new CItemBase(CLangManager.LangInstance.GetString(10112),
-				CLangManager.LangInstance.GetString(10113));
+			this.iKeyAssignTaikoRRed5P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED5P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRRed5P);
-			this.iKeyAssignTaikoLBlue5P = new CItemBase(CLangManager.LangInstance.GetString(10114),
-				CLangManager.LangInstance.GetString(10115));
+			this.iKeyAssignTaikoLBlue5P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoLBlue5P);
-			this.iKeyAssignTaikoRBlue5P = new CItemBase(CLangManager.LangInstance.GetString(10116),
-				CLangManager.LangInstance.GetString(10117));
+			this.iKeyAssignTaikoRBlue5P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTaikoRBlue5P);
+            this.iKeyAssignKongaClap5P = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP5P"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC"));
+            this.list項目リスト.Add(this.iKeyAssignKongaClap5P);
 
-			this.iKeyAssignKongaClap = new CItemBase(CLangManager.LangInstance.GetString(10060),
-				CLangManager.LangInstance.GetString(10061));
-			this.list項目リスト.Add(this.iKeyAssignKongaClap);
-
-			this.iKeyAssignKongaClap2P = new CItemBase(CLangManager.LangInstance.GetString(10062),
-				CLangManager.LangInstance.GetString(10063));
-			this.list項目リスト.Add(this.iKeyAssignKongaClap2P);
-
-			this.iKeyAssignKongaClap3P = new CItemBase(CLangManager.LangInstance.GetString(10118),
-				CLangManager.LangInstance.GetString(10119));
-			this.list項目リスト.Add(this.iKeyAssignKongaClap3P);
-
-			this.iKeyAssignKongaClap4P = new CItemBase(CLangManager.LangInstance.GetString(10120),
-				CLangManager.LangInstance.GetString(10121));
-			this.list項目リスト.Add(this.iKeyAssignKongaClap4P);
-
-			this.iKeyAssignKongaClap5P = new CItemBase(CLangManager.LangInstance.GetString(10122),
-				CLangManager.LangInstance.GetString(10123));
-			this.list項目リスト.Add(this.iKeyAssignKongaClap5P);
-
-			this.iKeyAssignDecide = new CItemBase(CLangManager.LangInstance.GetString(10064),
-				CLangManager.LangInstance.GetString(10065));
+            this.iKeyAssignDecide = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DECIDE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DECIDE_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignDecide);
-			this.iKeyAssignCancel = new CItemBase(CLangManager.LangInstance.GetString(10066),
-				CLangManager.LangInstance.GetString(10067));
+			this.iKeyAssignCancel = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CANCEL"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_CANCEL_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignCancel);
 
-			this.iKeyAssignLeftChange = new CItemBase(CLangManager.LangInstance.GetString(10068),
-				CLangManager.LangInstance.GetString(10069));
+			this.iKeyAssignLeftChange = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTCHANGE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignLeftChange);
-			this.iKeyAssignRightChange = new CItemBase(CLangManager.LangInstance.GetString(10070),
-				CLangManager.LangInstance.GetString(10071));
+			this.iKeyAssignRightChange = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE"),
+				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignRightChange);
 
 			OnListMenuの初期化();
@@ -1043,73 +1052,73 @@ namespace TJAPlayer3
         {
             this.list項目リスト.Clear();
 
-            this.iKeyAssignTrainingReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString(2), CItemBase.EPanelType.Other,
-                CLangManager.LangInstance.GetString(3));
+            this.iKeyAssignTrainingReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+                CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingReturnToMenu);
 
 
-            this.iKeyAssignTrainingPause = new CItemBase(CLangManager.LangInstance.GetString(10160),
-                CLangManager.LangInstance.GetString(10161));
+            this.iKeyAssignTrainingPause = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_PAUSE"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingPause);
 
-            this.iKeyAssignTrainingToggleAuto = new CItemBase(CLangManager.LangInstance.GetString(10162),
-                CLangManager.LangInstance.GetString(10163));
+            this.iKeyAssignTrainingToggleAuto = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_AUTO"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingToggleAuto);
 
-            this.iKeyAssignTrainingBookmark = new CItemBase(CLangManager.LangInstance.GetString(10164),
-                CLangManager.LangInstance.GetString(10165));
+            this.iKeyAssignTrainingBookmark = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BOOKMARK"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingBookmark);
 
-            this.iKeyAssignTrainingIncreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString(10166),
-                CLangManager.LangInstance.GetString(10167));
+            this.iKeyAssignTrainingIncreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignTrainingIncreaseScrollSpeed);
 
-			this.iKeyAssignTrainingDecreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString(10168),
-                CLangManager.LangInstance.GetString(10169));
+			this.iKeyAssignTrainingDecreaseScrollSpeed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingDecreaseScrollSpeed);
 
-            this.iKeyAssignTrainingIncreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString(10170),
-                CLangManager.LangInstance.GetString(10171));
+            this.iKeyAssignTrainingIncreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingIncreaseSongSpeed);
 
-            this.iKeyAssignTrainingDecreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString(10172),
-                CLangManager.LangInstance.GetString(10173));
+            this.iKeyAssignTrainingDecreaseSongSpeed = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingDecreaseSongSpeed);
 
-            this.iKeyAssignTrainingBranchNormal = new CItemBase(CLangManager.LangInstance.GetString(10174),
-                CLangManager.LangInstance.GetString(10175));
+            this.iKeyAssignTrainingBranchNormal = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingBranchNormal);
 
-            this.iKeyAssignTrainingBranchExpert = new CItemBase(CLangManager.LangInstance.GetString(10176),
-                CLangManager.LangInstance.GetString(10177));
+            this.iKeyAssignTrainingBranchExpert = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingBranchExpert);
 
-            this.iKeyAssignTrainingBranchMaster = new CItemBase(CLangManager.LangInstance.GetString(10178),
-                CLangManager.LangInstance.GetString(10179));
+            this.iKeyAssignTrainingBranchMaster = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingBranchMaster);
 
-            this.iKeyAssignTrainingMoveForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString(10180),
-                CLangManager.LangInstance.GetString(10181));
+            this.iKeyAssignTrainingMoveForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingMoveForwardMeasure);
 
-            this.iKeyAssignTrainingMoveBackMeasure = new CItemBase(CLangManager.LangInstance.GetString(10182),
-                CLangManager.LangInstance.GetString(10183));
+            this.iKeyAssignTrainingMoveBackMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingMoveBackMeasure);
 
-            this.iKeyAssignTrainingSkipForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString(10184),
-                CLangManager.LangInstance.GetString(10185));
+            this.iKeyAssignTrainingSkipForwardMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingSkipForwardMeasure);
 
-            this.iKeyAssignTrainingSkipBackMeasure = new CItemBase(CLangManager.LangInstance.GetString(10186),
-                CLangManager.LangInstance.GetString(10187));
+            this.iKeyAssignTrainingSkipBackMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingSkipBackMeasure);
 
-            this.iKeyAssignTrainingJumpToFirstMeasure = new CItemBase(CLangManager.LangInstance.GetString(10188),
-                CLangManager.LangInstance.GetString(10189));
+            this.iKeyAssignTrainingJumpToFirstMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingJumpToFirstMeasure);
 
-            this.iKeyAssignTrainingJumpToLastMeasure = new CItemBase(CLangManager.LangInstance.GetString(10190),
-                CLangManager.LangInstance.GetString(10191));
+            this.iKeyAssignTrainingJumpToLastMeasure = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST"),
+                CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC"));
             this.list項目リスト.Add(this.iKeyAssignTrainingJumpToLastMeasure);
 
             OnListMenuの初期化();

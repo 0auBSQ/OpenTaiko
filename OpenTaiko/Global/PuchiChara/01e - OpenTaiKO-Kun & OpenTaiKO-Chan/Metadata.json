@@ -1,0 +1,16 @@
+{
+	"name" : {
+		"strings": {
+			"default": "OpenTaiKO-Kun & OpenTaiKO-Chan",
+			"ja": "OpenTai子君とOpenTai子ちゃん"
+		}
+	},
+    "rarity": "Common",
+	"description": {
+		"strings": {
+			"default": "The twin siblings of OpenTaiko-kun.\nWhen one is here the other is never far away.",
+			"ja": "OpenTaiko君の双子の姉弟。\n一方がここにいれば、もう一方が遠くにいることはない。"
+		}
+	},
+	"author": "Komi"
+}

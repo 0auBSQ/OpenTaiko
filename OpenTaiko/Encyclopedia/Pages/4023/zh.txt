@@ -1,0 +1,8 @@
+- 菜单语音：
+Menu/SongSelect（选择歌曲）
+Menu/SongDecide（选定歌曲）
+Menu/SongDecide_AI（选定AI对战歌曲）
+Menu/DiffSelect（选择难度）
+Menu/DanSelectStart（选择段位）
+Menu/DanSelectPrompt（选择段位提示）
+Menu/DanSelectConfirm（选定段位）

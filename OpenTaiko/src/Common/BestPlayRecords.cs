@@ -159,7 +159,7 @@ namespace TJAPlayer3
                 Int64 roundedDifficulty = Math.Max((int)Difficulty.Easy, Math.Min((int)Difficulty.Total - 1, record.ChartDifficulty));
                 if (roundedDifficulty <= (int)Difficulty.Edit)
                 {
-                    string[] ChartersArr = record.Charter.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    string[] ChartersArr = record.Charter.SplitByCommas();
                     Int64 roundedScoreRank = Math.Max(0, Math.Min(7, record.ScoreRank + 1));
                     Int64 roundedClearStatus = Math.Max((int)EClearStatus.NONE, Math.Min((int)EClearStatus.PERFECT, record.ClearStatus + 1));
 

@@ -1,0 +1,8 @@
+持续时间，与节拍不同，是动画等持续的
+毫秒时间。该分类最常
+用于游玩以外的菜单，但
+仍然用于少量情形，如气球爆破。
+
+例：
+Chara_Normal_AnimationDuration=500
+Chara_Result_Clear_AnimationDuration=1000

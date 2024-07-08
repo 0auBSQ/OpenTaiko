@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3
 {
@@ -520,7 +521,6 @@ namespace TJAPlayer3
                     if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.BOX)
                     {
                         TJAPlayer3.Tx.SongSelect_Song_Panel[0]?.t2D描画(0, 0);
-                        // To do: Add unlocked songs / all songs count
                     }
                     else if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE)
                     {
@@ -632,7 +632,7 @@ namespace TJAPlayer3
                     {
                         TJAPlayer3.Tx.SongSelect_Unlock_Conditions?.t2D描画(0, 0);
 
-                        if (actSongList.ttkNowUnlockConditionText != null)
+                        if (actSongList.ttkNowUnlockConditionText is not null)
                         {
                             actSongList.ResolveTitleTexture(actSongList.ttkNowUnlockConditionText)?.t2D描画(TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[0], TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[1]);
                         }
@@ -937,7 +937,7 @@ namespace TJAPlayer3
                                 }
                             }
                         #endregion
-                        #region [ Shift-F1: CONFIG画面 ]
+                        #region [ Shift-F1: Config shortcut ]
                         if ((TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
                             TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1))
                         {   // [SHIFT] + [F1] CONFIG
@@ -949,21 +949,21 @@ namespace TJAPlayer3
                             return 0;
                         }
                         #endregion
-                        #region [ F2 簡易オプション ]
+                        #region [ F2 Quick Config ]
                         if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.QuickConfig))
                         {
                             TJAPlayer3.Skin.soundChangeSFX.tPlay();
                             this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.DRUMS);
                         }
                         #endregion
-                        #region [ F3 1PオートON/OFF ]
+                        #region [ F3 1P AUTO ]
                         if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleAutoP1))
                         {
                             TJAPlayer3.Skin.soundChangeSFX.tPlay();
                             CUtility.ToggleBoolian(ref TJAPlayer3.ConfigIni.bAutoPlay[0]);
                         }
                         #endregion
-                        #region [ F4 2PオートON/OFF ]
+                        #region [ F4 2P AUTO ]
                         if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.ToggleAutoP2))
                         {
                             if (TJAPlayer3.ConfigIni.nPlayerCount > 1)
@@ -973,7 +973,7 @@ namespace TJAPlayer3
                             }
                         }
                         #endregion
-                        #region [ F5 スーパーハード ]
+                        #region [ F5 Super Hard Mode (DEPRECATED / UNUSED) ]
                         if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F5))
                         {
                             // Deprecated, to delete
@@ -991,7 +991,7 @@ namespace TJAPlayer3
                             }
                         }
                         #endregion
-                        #region [ F9  ]
+                        #region [ F9 New Heya ]
                         if (TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.NewHeya))
                         {
                             actNewHeya.Open();
@@ -1020,8 +1020,39 @@ namespace TJAPlayer3
 
                                                         if (IsSongLocked)
                                                         {
-                                                            // Handle the Coins Menu unlock condition here
-                                                            TJAPlayer3.Skin.soundError.tPlay();
+                                                            var SongToUnlock = TJAPlayer3.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
+
+                                                            if (SongToUnlock != null)
+                                                            {
+                                                                (bool, string?) response = SongToUnlock.unlockConditions.tConditionMetWrapper(TJAPlayer3.SaveFile, DBUnlockables.CUnlockConditions.EScreen.SongSelect);
+
+                                                                Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
+                                                                if (actSongList.ttkNowUnlockConditionText is not null)
+                                                                {
+                                                                    actSongList.ttkNowUnlockConditionText = new TitleTextureKey(
+                                                                    response.Item2 ?? actSongList.ttkNowUnlockConditionText.str文字,
+                                                                    actSongList.ttkNowUnlockConditionText.cPrivateFastFont,
+                                                                    responseColor, Color.Black, 1000);
+                                                                }
+
+                                                                if (response.Item1)
+                                                                {
+                                                                    TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.UnlockedSongs.Add(this.rNowSelectedSong?.tGetUniqueId() ?? "");
+                                                                    DBSaves.RegisterStringUnlockedAsset(
+                                                                        TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.SaveId, 
+                                                                        "unlocked_songs",
+                                                                        this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
+                                                                        );
+                                                                    TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+                                                                    // Play modal animation here ?
+                                                                }
+                                                                else
+                                                                    TJAPlayer3.Skin.soundError.tPlay();
+                                                            }
+                                                            else
+                                                            {
+                                                                TJAPlayer3.Skin.soundError.tPlay();
+                                                            }
                                                         }
                                                         else
                                                         {
