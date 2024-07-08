@@ -3,6 +3,7 @@
 		"strings": {
 			"default": "OpenTaiko-Kun",
 			"ja": "OpenTaiko君"
+			"zh": "OpenTaiko君"
 		}
 	},
     "rarity": "Common",
@@ -10,6 +11,7 @@
 		"strings": {
 			"default": "The most basic puchichara.\nSimple but effective.",
 			"ja": "一番シンプルなプチキャラ。\n単純ですが効果的。"
+			"zh": "最简单的迷你角色。\n简单但是有效。"
 		}
 	},
 	"author": "Komi"
