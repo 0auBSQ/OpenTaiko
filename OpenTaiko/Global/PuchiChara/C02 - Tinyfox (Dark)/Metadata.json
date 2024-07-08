@@ -1,0 +1,14 @@
+{
+	"name" : {
+		"strings": {
+			"default": "TinyFox (Dark)"
+		}
+	},
+    "rarity": "Uncommon",
+	"description": {
+		"strings": {
+			"default": "The darker variant of Project OutFox's tiny mascot."
+		}
+	},
+	"author": "Project OutFox Team"
+}
