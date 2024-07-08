@@ -1,0 +1,11 @@
+{
+	"condition": "sg",
+	"type": "me",
+	"values": [
+		1,
+		0
+	],
+	"references": [
+		"Project Outfox Serenity"
+	]
+}
