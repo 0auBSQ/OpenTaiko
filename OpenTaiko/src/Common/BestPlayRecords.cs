@@ -187,13 +187,13 @@ namespace TJAPlayer3
                 }
                 else if (roundedDifficulty == (int)Difficulty.Tower)
                 {
-                    Int64 roundedClearStatus = Math.Max((int)ETowerClearStatus.NONE, Math.Min((int)ETowerClearStatus.TOTAL, record.ClearStatus + 1));
+                    Int64 roundedClearStatus = Math.Clamp(record.ClearStatus + 1, (int)ETowerClearStatus.NONE, (int)ETowerClearStatus.TOTAL);
                     stats.ClearStatuses[roundedDifficulty][roundedClearStatus]++;
 
                 }
                 else if (roundedDifficulty == (int)Difficulty.Dan)
                 {
-                    Int64 roundedClearStatus = Math.Max((int)EDanClearStatus.NONE, Math.Min((int)EDanClearStatus.TOTAL, record.ClearStatus + 1));
+                    Int64 roundedClearStatus = Math.Clamp(record.ClearStatus + 1, (int)EDanClearStatus.NONE, (int)EDanClearStatus.TOTAL);
                     stats.ClearStatuses[roundedDifficulty][roundedClearStatus]++;
 
                 }
