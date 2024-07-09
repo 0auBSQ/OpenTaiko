@@ -191,6 +191,12 @@ namespace TJAPlayer3
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						}
 					}
+#if DEBUG
+					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F8))
+					{
+						CScoreIni_Importer.ImportScoreInisToSavesDb3();
+					}
+#endif
 
 
 					// Disable F1 keybind since menu is accessible from main menu
@@ -937,9 +943,10 @@ namespace TJAPlayer3
 				TJAPlayer3.actTextConsole.tPrint(4, (TJAPlayer3.Skin.Resolution[1] - 24), CTextConsole.EFontType.White, "TJAPlayer3 forked TJAPlayer2 forPC(kairera0467)");
 
 #endif
-				#endregion
+				//TJAPlayer3.actTextConsole.tPrint(4, 64, CTextConsole.EFontType.White, CScoreIni_Importer.Status);
+                #endregion
 
-				CStage.EPhase eフェーズid = base.ePhaseID;
+                CStage.EPhase eフェーズid = base.ePhaseID;
 				switch (eフェーズid)
 				{
 					case CStage.EPhase.Common_FADEIN:
