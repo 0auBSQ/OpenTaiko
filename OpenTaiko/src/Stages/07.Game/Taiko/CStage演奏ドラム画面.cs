@@ -271,8 +271,8 @@ namespace TJAPlayer3
 			}
 
             // Discord Presence の更新
-			string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
-				+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+			string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.ldTitle.GetString("")
+                + diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
 
             // Byte count must be used instead of String.Length.
             // The byte count is what Discord is concerned with. Some chars are greater than one byte.

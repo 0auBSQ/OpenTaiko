@@ -276,7 +276,7 @@ namespace TJAPlayer3
 					foreach (CSongListNode node in list)
 					{
 						if (node.eノード種別 != CSongListNode.ENodeType.BOX) continue;
-						string newPath = parentName + node.strタイトル + "/";
+						string newPath = parentName + node.ldTitle.GetString("") + "/";
 						CSongDict.tReinsertBackButtons(node, node.list子リスト, newPath, TJAPlayer3.Songs管理.listStrBoxDefSkinSubfolderFullName);
 
 						addBackBox(node.list子リスト, newPath);
@@ -463,7 +463,7 @@ namespace TJAPlayer3
 				var song = this.rGetSideSong(barCenterNum);
 
 				int index = (this.n現在の選択行 + barCenterNum) % TJAPlayer3.Skin.SongSelect_Bar_Count; // 新しく最下部に表示されるパネルのインデックス（0～12）。
-				this.stバー情報[index].strタイトル文字列 = song.strタイトル;
+				this.stバー情報[index].strタイトル文字列 = song.ldTitle.GetString("");
 				this.stバー情報[index].ForeColor = song.ForeColor;
 				this.stバー情報[index].BackColor = song.BackColor;
 				this.stバー情報[index].BoxColor = song.BoxColor;
@@ -480,7 +480,7 @@ namespace TJAPlayer3
 				this.stバー情報[index].BoxCharaChanged = song.isChangedBoxChara;
 
 				this.stバー情報[index].strジャンル = song.strジャンル;
-				this.stバー情報[index].strサブタイトル = song.strサブタイトル;
+				this.stバー情報[index].strサブタイトル = song.ldSubtitle.GetString("");
 				this.stバー情報[index].ar難易度 = song.nLevel;
 				this.stバー情報[index].nLevelIcon = song.nLevelIcon;
 
@@ -591,7 +591,7 @@ namespace TJAPlayer3
 				var song = this.rGetSideSong(-barCenterNum);
 
 				int index = ((this.n現在の選択行 - barCenterNum) + TJAPlayer3.Skin.SongSelect_Bar_Count) % TJAPlayer3.Skin.SongSelect_Bar_Count;   // 新しく最上部に表示されるパネルのインデックス（0～12）。
-				this.stバー情報[index].strタイトル文字列 = song.strタイトル;
+				this.stバー情報[index].strタイトル文字列 = song.ldTitle.GetString("");
 				this.stバー情報[index].ForeColor = song.ForeColor;
 				this.stバー情報[index].BackColor = song.BackColor;
 				this.stバー情報[index].BoxColor = song.BoxColor;
@@ -607,7 +607,7 @@ namespace TJAPlayer3
 				this.stバー情報[index].BoxChara = song.BoxChara;
 				this.stバー情報[index].BoxCharaChanged = song.isChangedBoxChara;
 
-				this.stバー情報[index].strサブタイトル = song.strサブタイトル;
+				this.stバー情報[index].strサブタイトル = song.ldSubtitle.GetString("");
 				this.stバー情報[index].strジャンル = song.strジャンル;
 				this.stバー情報[index].ar難易度 = song.nLevel;
                 this.stバー情報[index].nLevelIcon = song.nLevelIcon;
@@ -987,9 +987,9 @@ namespace TJAPlayer3
 
                 string[] boxText = new string[3]
                 {
-                rCurrentlySelectedSong.strBoxText[0],
-                rCurrentlySelectedSong.strBoxText[1],
-                rCurrentlySelectedSong.strBoxText[2] + _append
+                rCurrentlySelectedSong.strBoxText[0].GetString(""),
+                rCurrentlySelectedSong.strBoxText[1].GetString(""),
+                rCurrentlySelectedSong.strBoxText[2].GetString("") + _append
                 };
 
                 if (strBoxText != boxText[0] + boxText[1] + boxText[2])
@@ -1202,9 +1202,9 @@ namespace TJAPlayer3
 
 			string[] boxText = new string[3]
 			{
-                rCurrentlySelectedSong.strBoxText[0],
-                rCurrentlySelectedSong.strBoxText[1],
-                rCurrentlySelectedSong.strBoxText[2] + _append
+                rCurrentlySelectedSong.strBoxText[0].GetString(""),
+                rCurrentlySelectedSong.strBoxText[1].GetString(""),
+                rCurrentlySelectedSong.strBoxText[2].GetString("") + _append
             };
 
 			if (strBoxText != boxText[0] + boxText[1] + boxText[2])
@@ -2146,10 +2146,10 @@ namespace TJAPlayer3
 					// Fonts here
 
 					//-----------------
-					if (rCurrentlySelectedSong.strタイトル != "" && this.ttk選択している曲の曲名 == null)
-						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(rCurrentlySelectedSong.strタイトル, rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? this.pfBoxName : this.pfMusicName);
-					if (rCurrentlySelectedSong.strサブタイトル != "" && this.ttk選択している曲のサブタイトル == null)
-						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(rCurrentlySelectedSong.strサブタイトル, rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
+					if (rCurrentlySelectedSong.ldTitle.GetString("") != "" && this.ttk選択している曲の曲名 == null)
+						this.ttk選択している曲の曲名 = this.ttk曲名テクスチャを生成する(rCurrentlySelectedSong.ldTitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? this.pfBoxName : this.pfMusicName);
+					if (rCurrentlySelectedSong.ldSubtitle.GetString("") != "" && this.ttk選択している曲のサブタイトル == null)
+						this.ttk選択している曲のサブタイトル = this.ttkサブタイトルテクスチャを生成する(rCurrentlySelectedSong.ldSubtitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
 					if (rCurrentlySelectedSong.strMaker != "" && this.ttkSelectedSongMaker == null)
 						this.ttkSelectedSongMaker = this.ttkGenerateMakerTexture(rCurrentlySelectedSong.strMaker, rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
 					if (this.ttkSelectedSongBPM == null)
@@ -2905,7 +2905,7 @@ namespace TJAPlayer3
 			{
 				CSongListNode song = this.rGetSideSong(i - barCenterNum);
 				if (song == null) continue;
-				this.stバー情報[ i ].strタイトル文字列 = song.strタイトル;
+				this.stバー情報[ i ].strタイトル文字列 = song.ldTitle.GetString("");
                 this.stバー情報[ i ].strジャンル = song.strジャンル;
 				this.stバー情報[ i ].col文字色 = song.col文字色;
                 this.stバー情報[i].ForeColor = song.ForeColor;
@@ -2924,7 +2924,7 @@ namespace TJAPlayer3
 				this.stバー情報[i].BoxCharaChanged = song.isChangedBoxChara;
 
 				this.stバー情報[ i ].eバー種別 = this.e曲のバー種別を返す( song );
-                this.stバー情報[ i ].strサブタイトル = song.strサブタイトル;
+                this.stバー情報[ i ].strサブタイトル = song.ldSubtitle.GetString("");
                 this.stバー情報[ i ].ar難易度 = song.nLevel;
                 this.stバー情報[i].nLevelIcon = song.nLevelIcon;
 

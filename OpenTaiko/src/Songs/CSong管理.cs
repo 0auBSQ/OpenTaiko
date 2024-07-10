@@ -150,8 +150,8 @@ namespace TJAPlayer3
 					}
 
 					t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
-					this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.strタイトル}/");
-					downloadBox.list子リスト.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.strタイトル}/"));
+					this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.ldTitle.GetString("")}/");
+					downloadBox.list子リスト.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.ldTitle.GetString("")}/"));
 				}
 			}
 			
@@ -218,8 +218,8 @@ namespace TJAPlayer3
                                     c曲リストノード.strBreadcrumbs = ( c曲リストノード.rParentNode == null ) ?
                                     str基点フォルダ + fileinfo.Name : c曲リストノード.rParentNode.strBreadcrumbs + " > " + str基点フォルダ + fileinfo.Name;
 
-                                    c曲リストノード.strタイトル = dtx.TITLE;
-                                    c曲リストノード.strサブタイトル = dtx.SUBTITLE;
+                                    c曲リストノード.ldTitle = dtx.TITLE;
+                                    c曲リストノード.ldSubtitle = dtx.SUBTITLE;
                                     c曲リストノード.strジャンル = dtx.GENRE;
 									c曲リストノード.strMaker = dtx.MAKER;
 
@@ -408,8 +408,8 @@ namespace TJAPlayer3
 									c曲リストノード.strBreadcrumbs = ( c曲リストノード.rParentNode == null ) ?
 										str基点フォルダ + fileinfo.Name : c曲リストノード.rParentNode.strBreadcrumbs + " > " + str基点フォルダ + fileinfo.Name;
 
-									c曲リストノード.strタイトル = dtx.TITLE;
-									c曲リストノード.strサブタイトル = dtx.SUBTITLE;
+									c曲リストノード.ldTitle = dtx.TITLE;
+									c曲リストノード.ldSubtitle = dtx.SUBTITLE;
 									c曲リストノード.strMaker = dtx.MAKER;
 									c曲リストノード.strNotesDesigner = dtx.NOTESDESIGNER.Select(x => x.Equals("") ? c曲リストノード.strMaker : x).ToArray();
                                     c曲リストノード.nSide = dtx.SIDE;
@@ -615,7 +615,7 @@ namespace TJAPlayer3
 					CSongListNode c曲リストノード = new CSongListNode();
 					c曲リストノード.eノード種別 = CSongListNode.ENodeType.BOX;
 					c曲リストノード.bDTXFilesで始まるフォルダ名のBOXである = false;
-					c曲リストノード.strタイトル = boxdef.Title;
+					c曲リストノード.ldTitle = boxdef.Title;
 					c曲リストノード.strジャンル = boxdef.Genre;
                     c曲リストノード.strScenePreset = boxdef.ScenePreset;
                     c曲リストノード.strSelectBGPath = infoDir.FullName + Path.DirectorySeparatorChar + boxdef.SelectBG;
@@ -661,7 +661,7 @@ namespace TJAPlayer3
 
                     for (int i = 0; i < 3; i++)
 					{
-						if ((boxdef.strBoxText[i] != null) && (boxdef.strBoxText[i].Length > 0))
+						if ((boxdef.strBoxText[i] != null))
 						{
 							c曲リストノード.strBoxText[i] = boxdef.strBoxText[i];
 						}
@@ -709,7 +709,7 @@ namespace TJAPlayer3
                     c曲リストノード.nスコア数 = 1;
 					c曲リストノード.arスコア[ 0 ] = new Cスコア();
 					c曲リストノード.arスコア[ 0 ].ファイル情報.フォルダの絶対パス = infoDir.FullName + Path.DirectorySeparatorChar;
-					c曲リストノード.arスコア[ 0 ].譜面情報.タイトル = boxdef.Title;
+					c曲リストノード.arスコア[ 0 ].譜面情報.タイトル = boxdef.Title.GetString("");
 					c曲リストノード.arスコア[ 0 ].譜面情報.ジャンル = boxdef.Genre;
                     if (!String.IsNullOrEmpty(boxdef.DefaultPreimage))
                         c曲リストノード.arスコア[0].譜面情報.Preimage = boxdef.DefaultPreimage;
@@ -717,7 +717,7 @@ namespace TJAPlayer3
                     
 
                     c曲リストノード.strBreadcrumbs = ( c曲リストノード.rParentNode == null ) ?
-						c曲リストノード.strタイトル : c曲リストノード.rParentNode.strBreadcrumbs + " > " + c曲リストノード.strタイトル;
+						c曲リストノード.ldTitle.GetString("") : c曲リストノード.rParentNode.strBreadcrumbs + " > " + c曲リストノード.ldTitle.GetString("");
 	
 					
 					c曲リストノード.list子リスト = new List<CSongListNode>();
@@ -738,7 +738,7 @@ namespace TJAPlayer3
 							{
 								sb.Append( "(onRoot):" );
 							}
-							sb.Append( "BOX, Title=" + c曲リストノード.strタイトル );
+							sb.Append( "BOX, Title=" + c曲リストノード.ldTitle.GetString(""));
 							if( ( c曲リストノード.strジャンル != null ) && ( c曲リストノード.strジャンル.Length > 0 ) )
 							{
 								sb.Append( ", Genre=" + c曲リストノード.strジャンル );
@@ -810,7 +810,7 @@ namespace TJAPlayer3
 							{
 								try
 								{
-									c曲リストノード.arスコア[ i ].譜面情報.タイトル = cdtx.TITLE;
+									c曲リストノード.arスコア[ i ].譜面情報.タイトル = cdtx.TITLE.GetString("");
                                     
 									
                                     c曲リストノード.arスコア[ i ].譜面情報.アーティスト名 = cdtx.ARTIST;
@@ -833,7 +833,7 @@ namespace TJAPlayer3
                                     c曲リストノード.arスコア[ i ].譜面情報.SongVol = cdtx.SongVol;
                                     c曲リストノード.arスコア[ i ].譜面情報.SongLoudnessMetadata = cdtx.SongLoudnessMetadata;
 								    c曲リストノード.arスコア[ i ].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
-                                    c曲リストノード.arスコア[ i ].譜面情報.strサブタイトル = cdtx.SUBTITLE;
+                                    c曲リストノード.arスコア[ i ].譜面情報.strサブタイトル = cdtx.SUBTITLE.GetString("");
 									for (int k = 0; k < (int)Difficulty.Total; k++)
 									{
                                         c曲リストノード.arスコア[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[k];
@@ -1116,7 +1116,7 @@ namespace TJAPlayer3
 					#endregion
 
 
-					string newPath = parentName + c曲リストノード.strタイトル + "/";
+					string newPath = parentName + c曲リストノード.ldTitle.GetString("") + "/";
 
 					CSongDict.tReinsertBackButtons(c曲リストノード, c曲リストノード.list子リスト, newPath, listStrBoxDefSkinSubfolderFullName);
 
@@ -1131,16 +1131,16 @@ namespace TJAPlayer3
 
 				#region [ If no node title found, try to fetch it within the score objects ]
 				//-----------------------------
-				if ( string.IsNullOrEmpty( c曲リストノード.strタイトル ) )
+				if ( string.IsNullOrEmpty( c曲リストノード.ldTitle.GetString("")) )
 				{
 					for( int j = 0; j < (int)Difficulty.Total; j++ )
 					{
 						if( ( c曲リストノード.arスコア[ j ] != null ) && !string.IsNullOrEmpty( c曲リストノード.arスコア[ j ].譜面情報.タイトル ) )
 						{
-							c曲リストノード.strタイトル = c曲リストノード.arスコア[ j ].譜面情報.タイトル;
+							c曲リストノード.ldTitle = new CLocalizationData();
 
 							if( TJAPlayer3.ConfigIni.bLog曲検索ログ出力 )
-								Trace.TraceInformation( "タイトルを設定しました。(nID#{0:D3}, title={1})", c曲リストノード.nID, c曲リストノード.strタイトル );
+								Trace.TraceInformation( "タイトルを設定しました。(nID#{0:D3}, title={1})", c曲リストノード.nID, c曲リストノード.ldTitle.GetString(""));
 
 							break;
 						}

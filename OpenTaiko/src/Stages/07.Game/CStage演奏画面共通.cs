@@ -3365,7 +3365,7 @@ namespace TJAPlayer3
 
 		    var panelString = TJAPlayer3.IsPerformingCalibration
 		        ? "Calibrating input..."
-		        : string.IsNullOrEmpty( TJAPlayer3.DTX.PANEL ) ? TJAPlayer3.DTX.TITLE: TJAPlayer3.DTX.PANEL;
+		        : string.IsNullOrEmpty( TJAPlayer3.DTX.PANEL ) ? TJAPlayer3.DTX.TITLE.GetString(""): TJAPlayer3.DTX.PANEL;
 
 		    this.actPanel.SetPanelString( panelString, 
                 TJAPlayer3.stageSongSelect.rChoosenSong.str本当のジャンル, 

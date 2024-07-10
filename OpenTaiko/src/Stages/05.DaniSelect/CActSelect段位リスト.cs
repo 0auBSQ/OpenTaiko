@@ -373,7 +373,7 @@ namespace TJAPlayer3
                 string titleTmp = "";
 
                 if (TJAPlayer3.stageSongSelect.r確定されたスコア != null)
-                    titleTmp = TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル;
+                    titleTmp = TJAPlayer3.stageSongSelect.rChoosenSong.ldTitle.GetString("");
                 if (songNode != null)
                 {
                     STバー情報 stNode = (STバー情報)songNode;
@@ -805,7 +805,7 @@ namespace TJAPlayer3
                             }
 
                             // Two char header, will be used for grade unlocking too
-                            string tmp = song.strタイトル.Substring(0, 2);
+                            string tmp = song.ldTitle.GetString("").Substring(0, 2);
 
                             stバー情報[i].ttkタイトル[listSongs[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
@@ -844,10 +844,10 @@ namespace TJAPlayer3
                             TJAPlayer3.Tx.Dani_Bar_Folder?.tUpdateColor4(CConversion.ColorToColor4(song.BoxColor));
                             
                             stバー情報[i].ttkタイトル = new TitleTextureKey[4];
-                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(song.strタイトル, pfDanFolder, Color.White, Color.Black, TJAPlayer3.Skin.Resolution[0]);
+                            stバー情報[i].ttkタイトル[0] = new TitleTextureKey(song.ldTitle.GetString(""), pfDanFolder, Color.White, Color.Black, TJAPlayer3.Skin.Resolution[0]);
                             for (int boxdesc = 0; boxdesc < 3; boxdesc++)
                                 if (song.strBoxText[boxdesc] != null)
-                                    stバー情報[i].ttkタイトル[boxdesc + 1] = new TitleTextureKey(song.strBoxText[boxdesc], pfDanFolderDesc, song.ForeColor, song.BackColor, TJAPlayer3.Skin.Resolution[0]);
+                                    stバー情報[i].ttkタイトル[boxdesc + 1] = new TitleTextureKey(song.strBoxText[boxdesc].GetString(""), pfDanFolderDesc, song.ForeColor, song.BackColor, TJAPlayer3.Skin.Resolution[0]);
                                 else
                                     stバー情報[i].ttkタイトル[boxdesc + 1] = new TitleTextureKey("", pfDanFolderDesc, Color.White, Color.Black, TJAPlayer3.Skin.Resolution[0]);
                             stバー情報[i].cDanTickColor = song.BoxColor;

@@ -302,7 +302,7 @@ namespace TJAPlayer3
 								TJAPlayer3.SaveFile);
 							*/
 
-                            this.newGradeGranted = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tUpdateDanTitle(TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル.Substring(0, 2),
+                            this.newGradeGranted = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].tUpdateDanTitle(TJAPlayer3.stageSongSelect.rChoosenSong.ldTitle.GetString("").Substring(0, 2),
                                 clearValue % 2 == 0,
                                 (clearValue - 1) / 2);
                         }
@@ -360,8 +360,8 @@ namespace TJAPlayer3
 					return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 				}
 
-				string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.strタイトル
-				+ diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+				string details = TJAPlayer3.ConfigIni.SendDiscordPlayingInformation ? TJAPlayer3.stageSongSelect.rChoosenSong.ldTitle.GetString("")
+                + diffToString(TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) : "";
 
 				// Byte count must be used instead of String.Length.
 				// The byte count is what Discord is concerned with. Some chars are greater than one byte.

@@ -83,6 +83,7 @@ namespace TJAPlayer3
         {
             return (Entries.TryGetValue(key, out string? value)) ? value.SafeFormat(values) : InvalidKey.SafeFormat(key);
         }
+
         public string GetDifficulty(int diff)
         {
             switch (diff)

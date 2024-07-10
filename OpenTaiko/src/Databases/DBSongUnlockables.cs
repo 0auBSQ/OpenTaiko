@@ -80,8 +80,8 @@ namespace TJAPlayer3
             foreach (KeyValuePair<string, SongUnlockable> item in data)
             {
                 string _npvKey = item.Key;
-                string? _songName = CSongDict.tGetNodeFromID(_npvKey)?.strタイトル;
-                string _songSubtitle = CSongDict.tGetNodeFromID(_npvKey)?.strサブタイトル ?? "";
+                string? _songName = CSongDict.tGetNodeFromID(_npvKey)?.ldTitle.GetString("");
+                string _songSubtitle = CSongDict.tGetNodeFromID(_npvKey)?.ldSubtitle.GetString("") ?? "";
 
                 if (!_sf.Contains(_npvKey) && _songName != null)
                 {
