@@ -20,7 +20,7 @@ namespace TJAPlayer3
 
 
 		// メソッド
-
+		/*
 		public int n文字列長dot( string str )
 		{
 			return this.n文字列長dot( str, 1f );
@@ -45,6 +45,8 @@ namespace TJAPlayer3
 			}
 			return num;
 		}
+		*/
+
 		public void t文字列描画( int x, int y, string str )
 		{
 			this.t文字列描画( x, y, str, false, 1f );
@@ -88,7 +90,7 @@ namespace TJAPlayer3
 				//this.tx通常文字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Screen font dfp.png" ), false );
 				//this.tx強調文字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Screen font dfp em.png" ), false );
 
-
+			/*
 				ST文字領域[] st文字領域Array = new ST文字領域[0x5d + 2];
 				ST文字領域 st文字領域94 = new ST文字領域();
 				ST文字領域 st文字領域 = st文字領域94;
@@ -572,6 +574,7 @@ namespace TJAPlayer3
 				}
 
 				this.st文字領域 = st文字領域Array;
+			*/
 				base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource()
@@ -597,6 +600,7 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
+		/*
 		[StructLayout( LayoutKind.Sequential )]
 		private struct ST文字領域
 		{
@@ -605,6 +609,7 @@ namespace TJAPlayer3
 		}
 
 		private ST文字領域[] st文字領域;
+		*/
 		//private CTexture tx強調文字;
 		//private CTexture tx通常文字;
 		//-----------------

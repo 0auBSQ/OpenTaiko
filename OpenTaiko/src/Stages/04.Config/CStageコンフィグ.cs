@@ -185,7 +185,7 @@ namespace TJAPlayer3
 			this.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 
 
-            TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
+            //TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
 
 				//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
@@ -245,27 +245,20 @@ namespace TJAPlayer3
 
             #region [ Menu ]
             //---------------------
-            //int menuY = 162 - 22 + 13;
-            //int stepY = 39;
+			/*
             for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 			{
-				//Bitmap bmpStr = (this.n現在のメニュー番号 == i) ?
-				//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black, Color.Yellow, Color.OrangeRed ) :
-				//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black );
-				//txMenuItemLeft = CDTXMania.tテクスチャの生成( bmpStr, false );
-
 				int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
 				txMenuItemLeft[i, flag].t2D中心基準描画(TJAPlayer3.Skin.Config_Item_X[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[0], TJAPlayer3.Skin.Config_Item_Y[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[1]); //55
-				//txMenuItem.Dispose();
-				//menuY += stepY;
 			}
+			*/
 			//---------------------
 			#endregion
 			
 			#region [ Explanation Panel ]
 			//---------------------
-			if( this.tx説明文パネル != null )
-				this.tx説明文パネル.t2D描画( TJAPlayer3.Skin.Config_ExplanationPanel[0], TJAPlayer3.Skin.Config_ExplanationPanel[1]);
+			//if( this.tx説明文パネル != null )
+			//	this.tx説明文パネル.t2D描画( TJAPlayer3.Skin.Config_ExplanationPanel[0], TJAPlayer3.Skin.Config_ExplanationPanel[1]);
 			//---------------------
 			#endregion
 			

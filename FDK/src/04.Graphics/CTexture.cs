@@ -694,11 +694,11 @@ namespace FDK
             }
 
         }
-        public void t2D_DisplayImage_AnchorCenter(float x, float y)
+        public void t2D_DisplayImage_AnchorCenter(int x, int y)
         {
             this.t2D描画(x - (this.rc全画像.Width / 2 * this.vcScaleRatio.X), y - (this.rc全画像.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
         }
-        public void t2D_DisplayImage_AnchorCenter(float x, float y, RectangleF rc)
+        public void t2D_DisplayImage_AnchorCenter(int x, int y, Rectangle rc)
         {
             this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
         }

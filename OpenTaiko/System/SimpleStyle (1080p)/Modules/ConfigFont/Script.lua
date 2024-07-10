@@ -12,8 +12,8 @@ local chars = { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-'
 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 '{', '|', '}', '~' }
 
-local font_texs = -1
-local font_bold_texs = -1
+local font_texs = { }
+local font_bold_texs = { }
 
 function loadAssets()
     config = loadConfig("Config.json")
@@ -33,5 +33,7 @@ end
 
 function drawText(x, y, text, bold, scale)
     for i = 1, string.len(text) do
+        font_texs['A']:t2D_DisplayImage_AnchorCenter(x, y)
+        x = x + menu_font_size
     end
 end
