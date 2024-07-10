@@ -2,14 +2,16 @@
 	"name" : {
 		"strings": {
 			"default": "OpenTaiko-Kun (Glass edition)",
-			"ja": "OpenTaiko君 （グラス版）"
+			"ja": "OpenTaiko君 （グラス版）",
+			"zh": "OpenTaiko君（玻璃版）"
 		}
 	},
     "rarity": "Common",
 	"description": {
 		"strings": {
 			"default": "The fragine brother of OpenTaiko-Kun.\nCan see everything, even the most invisible notes.",
-			"ja": "OpenTaiko君の割れやすいな兄弟。\n何でも見えます、隠れてる音符でも。"
+			"ja": "OpenTaiko君の割れやすいな兄弟。\n何でも見えます、隠れてる音符でも。",
+			"zh": "OpenTaiko君的易碎兄弟。\n可以看到一切，即使是最隐蔽的音符。"
 		}
 	},
 	"author": "Komi"

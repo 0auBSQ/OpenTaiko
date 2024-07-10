@@ -1,13 +1,15 @@
 {
 	"name" : {
 		"strings": {
-			"default": "TinyFox"
+			"default": "TinyFox",
+			"zh": "小狐狸"
 		}
 	},
     "rarity": "Common",
 	"description": {
 		"strings": {
-			"default": "Project OutFox's tiny mascot."
+			"default": "Project OutFox's tiny mascot.",
+			"zh": "Project OutFox的小吉祥物。"
 		}
 	},
 	"author": "Project OutFox Team"

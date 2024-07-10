@@ -429,32 +429,32 @@
         "HEYA_NAMEPLATE": "名牌称号",
 
         // {0}: Asset name
-        "HEYA_DESCRIPTION_NAME": "Name: {0}",
+        "HEYA_DESCRIPTION_NAME": "姓名：{0}",
         // {0}: Asset rarity
-        "HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
-        "HEYA_DESCRIPTION_RARITY0": "Poor",
-        "HEYA_DESCRIPTION_RARITY1": "Common",
-        "HEYA_DESCRIPTION_RARITY2": "Uncommon",
-        "HEYA_DESCRIPTION_RARITY3": "Rare",
-        "HEYA_DESCRIPTION_RARITY4": "Epic",
-        "HEYA_DESCRIPTION_RARITY5": "Legendary",
-        "HEYA_DESCRIPTION_RARITY6": "Mythical",
+        "HEYA_DESCRIPTION_RARITY": "稀有度：{0}",
+        "HEYA_DESCRIPTION_RARITY0": "低下",
+        "HEYA_DESCRIPTION_RARITY1": "普通",
+        "HEYA_DESCRIPTION_RARITY2": "罕见",
+        "HEYA_DESCRIPTION_RARITY3": "稀有",
+        "HEYA_DESCRIPTION_RARITY4": "史诗",
+        "HEYA_DESCRIPTION_RARITY5": "传说",
+        "HEYA_DESCRIPTION_RARITY6": "神话",
         // {0}: Asset author
-        "HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
+        "HEYA_DESCRIPTION_AUTHOR": "作者：{0}",
         // {0}: Gauge type
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
-        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "魂条种类：{0}",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "普通",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "困难",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "魔王",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "在成功区域完成演奏过关！",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "魂条从满开始，并在每次失误大量减少！\n小心，如果魂条值到达零，演奏自动失败！",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "魂条从满开始，并在每次失误大量减少！\n一种奇怪的力量似乎减少整首歌的误差幅度……",
         // {0}: Percentage of mines
-        "HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
+        "HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "炸弹因子：{0}%的音符在扫雷模式中转换为炸弹",
         // {0}: Percentage of fuse rolls
-        "HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
+        "HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "引线因子：{0}%的气球在扫雷模式中转换为定时炸弹",
         // {0}: Coin multiplier
-        "HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
+        "HEYA_DESCRIPTION_COIN_MULTIPLIER": "金币倍数：×{0}",
 
         // Unlock requirements & messages (Any Menu)
         "UNLOCK_CONDITION_INVALID": "【错误】未达成条件",
