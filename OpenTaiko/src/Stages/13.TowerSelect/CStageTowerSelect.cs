@@ -233,54 +233,28 @@ namespace TJAPlayer3
             var mandatoryDiffs = new List<int>();
             CSongListNode song = currentSong;
 
-            song.stackランダム演奏番号.Clear();
-            song.listランダム用ノードリスト = null;
+            List<CSongListNode> songs = new List<CSongListNode>();
+            TJAPlayer3.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
+            song.listランダム用ノードリスト = songs;
 
-            if ((song.stackランダム演奏番号.Count == 0) || (song.listランダム用ノードリスト == null))
+            int selectableSongCount = song.listランダム用ノードリスト.Count;
+
+            if (selectableSongCount == 0)
             {
-                if (song.listランダム用ノードリスト == null)
-                {
-                    List<CSongListNode> songs = new List<CSongListNode>();
-                    TJAPlayer3.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
-                    song.listランダム用ノードリスト = songs;
-                }
-                int count = song.listランダム用ノードリスト.Count;
-                if (count == 0)
-                {
-                    return false;
-                }
-                int[] numArray = new int[count];
-                for (int i = 0; i < count; i++)
-                {
-                    numArray[i] = i;
-                }
-                for (int j = 0; j < (count * 1.5); j++)
-                {
-                    int index = TJAPlayer3.Random.Next(count);
-                    int num5 = TJAPlayer3.Random.Next(count);
-                    int num6 = numArray[num5];
-                    numArray[num5] = numArray[index];
-                    numArray[index] = num6;
-                }
-                for (int k = 0; k < count; k++)
-                {
-                    song.stackランダム演奏番号.Push(numArray[k]);
-                }
+                return false;
+            }
 
-                if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
-                {
-                    StringBuilder builder = new StringBuilder(0x400);
-                    builder.Append(string.Format("ランダムインデックスリストを作成しました: {0}曲: ", song.stackランダム演奏番号.Count));
-                    for (int m = 0; m < count; m++)
-                    {
-                        builder.Append(string.Format("{0} ", numArray[m]));
-                    }
-                    Trace.TraceInformation(builder.ToString());
-                }
+            int randomSongIndex = TJAPlayer3.Random.Next(selectableSongCount);
+
+            if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
+            {
+                StringBuilder builder = new StringBuilder(0x400);
+                builder.Append(string.Format("Total number of songs to randomly choose from {0}. Randomly selected index {0}.", selectableSongCount, randomSongIndex));
+                Trace.TraceInformation(builder.ToString());
             }
 
             // Third assignment
-            TJAPlayer3.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[song.stackランダム演奏番号.Pop()];
+            TJAPlayer3.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[randomSongIndex];
             TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
             CFloorManagement.reinitialize(TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
@@ -292,29 +266,6 @@ namespace TJAPlayer3
             this.eフェードアウト完了時の戻り値 = EReturnValue.SongChoosen;
             this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
             base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
-
-            #region [Log]
-
-            if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力)
-            {
-                int[] numArray2 = song.stackランダム演奏番号.ToArray();
-                StringBuilder builder2 = new StringBuilder(0x400);
-                builder2.Append("ランダムインデックスリスト残り: ");
-                if (numArray2.Length > 0)
-                {
-                    for (int n = 0; n < numArray2.Length; n++)
-                    {
-                        builder2.Append(string.Format("{0} ", numArray2[n]));
-                    }
-                }
-                else
-                {
-                    builder2.Append("(なし)");
-                }
-                Trace.TraceInformation(builder2.ToString());
-            }
-
-            #endregion
 
             CSongSelectSongManager.stopSong();
 
