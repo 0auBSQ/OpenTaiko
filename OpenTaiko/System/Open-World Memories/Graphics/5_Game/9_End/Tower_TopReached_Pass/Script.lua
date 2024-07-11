@@ -7,10 +7,11 @@
 --func:SetScale(xscale, yscale, "filename");
 --func:SetColor(r, g, b, "filename");
 
-
 local y = { 216, 480, 0, 0, 0 }
 
 local textureCount = 23
+local w = 653
+local h = 327
 
 local animeCounter = { 0, 0, 0, 0, 0 }
 local nowFrame = { 0, 0, 0, 0, 0 }
@@ -29,9 +30,7 @@ function init()
         y = { -24, 240, 504, 768, 0 }
     end
 
-    for i = 0 , textureCount do
-        func:AddGraph(tostring(i) .. ".png")
-    end
+    func:AddGraph("Assets.png")
 
 end
 
@@ -43,5 +42,6 @@ function update(player)
 end
 
 function draw(player)
-    func:DrawGraph(500, y[player + 1], tostring(nowFrame[player + 1]) .. ".png")
+    -- originally x = 500
+    func:DrawRectGraph(883.5, y[player + 1] + 4.5, w * (math.floor(nowFrame[player+1] / 8)), h * (math.floor(nowFrame[player+1] % 8)), w, h, "Assets.png")
 end
