@@ -1,13 +1,15 @@
 {
 	"name" : {
 		"strings": {
-			"default": "TinyFox (Dark)"
+			"default": "TinyFox (Dark)",
+			"zh": "小狐狸（黑暗）"
 		}
 	},
     "rarity": "Uncommon",
 	"description": {
 		"strings": {
-			"default": "The darker variant of Project OutFox's tiny mascot."
+			"default": "The darker variant of Project OutFox's tiny mascot.",
+			"zh": "Project OutFox的小吉祥物的黑暗变种。"
 		}
 	},
 	"author": "Project OutFox Team"

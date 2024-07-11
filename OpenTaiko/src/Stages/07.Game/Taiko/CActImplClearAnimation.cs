@@ -119,7 +119,7 @@ namespace TJAPlayer3
                             if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
                             //if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
                             {
-                                this.Mode[i] = EndMode.StageDondaFullCombo;
+                                this.Mode[i] = EndMode.StagePerfectCombo;
                             }
                             else
                             {
@@ -215,7 +215,7 @@ namespace TJAPlayer3
                 this.soundAILose = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
                 this.soundAIWin = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
                 this.soundAIWinFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
-                this.soundAIWinDondaFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                this.soundAIWinPerfectCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
             }
             else
             {
@@ -228,8 +228,8 @@ namespace TJAPlayer3
                 FullComboScript = new EndAnimeScript($@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
                 FullComboScript.Init();
 
-                DondaFullComboScript = new EndAnimeScript($@"{origindir}DondaFullCombo{Path.DirectorySeparatorChar}Script.lua");
-                DondaFullComboScript.Init();
+                PerfectComboScript = new EndAnimeScript($@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
+                PerfectComboScript.Init();
             }
 
 
@@ -269,7 +269,7 @@ namespace TJAPlayer3
                 FailedScript.Dispose();
                 ClearScript.Dispose();
                 FullComboScript.Dispose();
-                DondaFullComboScript.Dispose();
+                PerfectComboScript.Dispose();
             }
 
             base.DeActivate();
@@ -295,13 +295,13 @@ namespace TJAPlayer3
                 this.soundAILose = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
                 this.soundAIWin = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
                 this.soundAIWinFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
-                this.soundAIWinDondaFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                this.soundAIWinPerfectCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     this.soundClear[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
                     this.soundFailed[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
                     this.soundFullCombo[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
-                    this.soundDondaFullCombo[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
+                    this.soundPerfectCombo[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
                 }
 
             base.CreateManagedResource();
@@ -325,14 +325,14 @@ namespace TJAPlayer3
                 this.soundAILose?.tDispose();
                 this.soundAIWin?.tDispose();
                 this.soundAIWinFullCombo?.tDispose();
-                this.soundAIWinDondaFullCombo?.tDispose();
+                this.soundAIWinPerfectCombo?.tDispose();
 
                 for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
                 {
                     this.soundClear[i]?.tDispose();
                     this.soundFailed[i]?.tDispose();
                     this.soundFullCombo[i]?.tDispose();
-                    this.soundDondaFullCombo[i]?.tDispose();
+                    this.soundPerfectCombo[i]?.tDispose();
                 }
 
             base.ReleaseManagedResource();
@@ -564,10 +564,10 @@ namespace TJAPlayer3
             */
         }
 
-        private void showEndEffect_DondaFullCombo(int i)
+        private void showEndEffect_PerfectCombo(int i)
         {
-            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DondaFullComboScript.Update(i);
-            DondaFullComboScript.Draw(i);
+            if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) PerfectComboScript.Update(i);
+            PerfectComboScript.Draw(i);
 
             /*
             int[] y = new int[] { 0, 176 };
@@ -623,9 +623,9 @@ namespace TJAPlayer3
                                 this.soundFullCombo[i]?.PlayStart();
                                 TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
                                 break;
-                            case EndMode.StageDondaFullCombo:
-                                DondaFullComboScript.PlayEndAnime(i);
-                                this.soundDondaFullCombo[i]?.PlayStart();
+                            case EndMode.StagePerfectCombo:
+                                PerfectComboScript.PlayEndAnime(i);
+                                this.soundPerfectCombo[i]?.PlayStart();
                                 TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
                                 break;
 
@@ -646,7 +646,7 @@ namespace TJAPlayer3
                                 break;
                             case EndMode.AI_Win_Perfect:
                                 AIWin_PerfectScript.PlayEndAnime(i);
-                                this.soundAIWinDondaFullCombo?.PlayStart();
+                                this.soundAIWinPerfectCombo?.PlayStart();
                                 TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
                                 break;
 
@@ -731,8 +731,8 @@ namespace TJAPlayer3
                         case EndMode.StageFullCombo:
                             this.showEndEffect_FullCombo(i);
                             break;
-                        case EndMode.StageDondaFullCombo:
-                            this.showEndEffect_DondaFullCombo(i);
+                        case EndMode.StagePerfectCombo:
+                            this.showEndEffect_PerfectCombo(i);
                             break;
 
                         case EndMode.AI_Win:
@@ -820,7 +820,7 @@ namespace TJAPlayer3
         private EndAnimeScript FailedScript;
         private EndAnimeScript ClearScript;
         private EndAnimeScript FullComboScript;
-        private EndAnimeScript DondaFullComboScript;
+        private EndAnimeScript PerfectComboScript;
 
         private EndAnimeScript AILoseScript;
         private EndAnimeScript AIWinScript;
@@ -860,7 +860,7 @@ namespace TJAPlayer3
         CSound[] soundClear = new CSound[5];
         CSound[] soundFailed = new CSound[5];
         CSound[] soundFullCombo = new CSound[5];
-        CSound[] soundDondaFullCombo = new CSound[5];
+        CSound[] soundPerfectCombo = new CSound[5];
         
         CSound soundDanFailed;
         CSound soundDanRedClear;
@@ -877,7 +877,7 @@ namespace TJAPlayer3
         CSound soundAILose;
         CSound soundAIWin;
         CSound soundAIWinFullCombo;
-        CSound soundAIWinDondaFullCombo;
+        CSound soundAIWinPerfectCombo;
 
         EndMode[] Mode;
         enum EndMode
@@ -885,7 +885,7 @@ namespace TJAPlayer3
             StageFailed,
             StageCleared,
             StageFullCombo,
-            StageDondaFullCombo,
+            StagePerfectCombo,
 
             AI_Lose,
             AI_Win,

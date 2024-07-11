@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace TJAPlayer3
 {
+    [Serializable]
     internal class CLocalizationData
     {
         [JsonProperty("strings")]

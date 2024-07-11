@@ -70,7 +70,7 @@ namespace TJAPlayer3
 
             command.CommandText = $@"INSERT INTO dan_titles(DanTitleText,DanClearStatus,DanIsGold,SaveId)
 	                VALUES(
-		                '{DanTitle.Replace(@"'", @"''")}',
+		                '{DanTitle.EscapeSingleQuotes()}',
 		                {DanClearStatus},
 		                {Convert.ToInt64(DanIsGold)},
 		                {SaveId}
@@ -143,7 +143,7 @@ namespace TJAPlayer3
             if (connection == null) return;
 
             var command = connection.CreateCommand();
-            command.CommandText = @$"INSERT INTO {table}(Asset,SaveId) VALUES('{asset.Replace(@"'", @"''")}', {SaveId});";
+            command.CommandText = @$"INSERT INTO {table}(Asset,SaveId) VALUES('{asset.EscapeSingleQuotes()}', {SaveId});";
             command.ExecuteNonQuery();
         }
 
@@ -225,15 +225,15 @@ namespace TJAPlayer3
 
             var command = connection.CreateCommand();
             command.CommandText = $@" UPDATE saves SET
-                PlayerName = '{SaveData.Name.Replace(@"'", @"''")}',
-                PlayerNameplateTitle = '{SaveData.Title.Replace(@"'", @"''")}',
-                PlayerDanTitle = '{SaveData.Dan.Replace(@"'", @"''")}',
+                PlayerName = '{SaveData.Name.EscapeSingleQuotes()}',
+                PlayerNameplateTitle = '{SaveData.Title.EscapeSingleQuotes()}',
+                PlayerDanTitle = '{SaveData.Dan.EscapeSingleQuotes()}',
                 PlayerDanGold = {SaveData.DanGold},
                 PlayerDanType = {SaveData.DanType},
                 PlayerNameplateType = {SaveData.TitleType},
-                PlayerPuchichara = '{SaveData.PuchiChara.Replace(@"'", @"''")}',
+                PlayerPuchichara = '{SaveData.PuchiChara.EscapeSingleQuotes()}',
                 PlayerCharacter = {SaveData.Character},
-                PlayerCharacterName = '{SaveData.CharacterName.Replace(@"'", @"''")}'
+                PlayerCharacterName = '{SaveData.CharacterName.EscapeSingleQuotes()}'
                 WHERE SaveId = {SaveData.SaveId};
             ;";
             command.ExecuteNonQuery();
@@ -317,7 +317,7 @@ namespace TJAPlayer3
                 currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id;
                 currentPlay.ChartGenre = choosenSong.strジャンル;
                 currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty];
-                currentPlay.Artist = choosenSong.strサブタイトル; // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
+                currentPlay.Artist = choosenSong.ldSubtitle.GetString(""); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
                 currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
                 currentPlay.ChartDifficulty = choosenDifficulty;
                 currentPlay.ChartLevel = choosenSong.arスコア[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
@@ -447,10 +447,10 @@ namespace TJAPlayer3
                 cmd.CommandText = $@"
                     INSERT INTO best_plays(ChartUniqueId,ChartGenre,Charter,Artist,PlayMods,ChartDifficulty,ChartLevel,ClearStatus,ScoreRank,HighScore,SaveId,TowerBestFloor,DanExam1,DanExam2,DanExam3,DanExam4,DanExam5,DanExam6,DanExam7,PlayCount,HighScoreGoodCount,HighScoreOkCount,HighScoreBadCount,HighScoreMaxCombo,HighScoreRollCount,HighScoreADLibCount,HighScoreBoomCount)
                        VALUES(
-                            '{currentPlay.ChartUniqueId.Replace(@"'", @"''")}',
-                            '{currentPlay.ChartGenre.Replace(@"'", @"''")}',
-                            '{currentPlay.Charter.Replace(@"'", @"''")}',
-                            '{currentPlay.Artist.Replace(@"'", @"''")}',
+                            '{currentPlay.ChartUniqueId.EscapeSingleQuotes()}',
+                            '{currentPlay.ChartGenre.EscapeSingleQuotes()}',
+                            '{currentPlay.Charter.EscapeSingleQuotes()}',
+                            '{currentPlay.Artist.EscapeSingleQuotes()}',
                             {currentPlay.PlayMods},
                             {currentPlay.ChartDifficulty},
                             {currentPlay.ChartLevel},

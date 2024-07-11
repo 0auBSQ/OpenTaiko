@@ -13,7 +13,7 @@ namespace TJAPlayer3.C曲リストノードComparers
 
         public int Compare(CSongListNode n1, CSongListNode n2)
         {
-            return _order * n1.strタイトル.CompareTo( n2.strタイトル );
+            return _order * n1.ldTitle.GetString("").CompareTo( n2.ldTitle.GetString(""));
         }
     }
 }

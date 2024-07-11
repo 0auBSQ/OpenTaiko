@@ -95,7 +95,7 @@ namespace TJAPlayer3
 
 
             // とじる
-            itemBack.strタイトル = CLangManager.LangInstance.GetString("SONGSELECT_RETURN_PATH", path);
+            itemBack.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RETURN_PATH", path, path);
 
             itemBack.BackColor = ColorTranslator.FromHtml("#513009");
             itemBack.BoxColor = Color.White;
@@ -119,11 +119,11 @@ namespace TJAPlayer3
             }
 
             itemBack.strBreadcrumbs = (itemBack.rParentNode == null) ?
-                itemBack.strタイトル : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.strタイトル;
+                itemBack.ldTitle.GetString("") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("");
 
             itemBack.arスコア[0] = new Cスコア();
             itemBack.arスコア[0].ファイル情報.フォルダの絶対パス = "";
-            itemBack.arスコア[0].譜面情報.タイトル = itemBack.strタイトル;
+            itemBack.arスコア[0].譜面情報.タイトル = itemBack.ldTitle.GetString("");
             itemBack.arスコア[0].譜面情報.コメント = "";
 
             return (itemBack);
@@ -134,13 +134,13 @@ namespace TJAPlayer3
             CSongListNode itemRandom = new CSongListNode();
             itemRandom.eノード種別 = CSongListNode.ENodeType.RANDOM;
 
-            itemRandom.strタイトル = CLangManager.LangInstance.GetString("SONGSELECT_RANDOM_PATH", path);
+            itemRandom.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
 
             itemRandom.nスコア数 = (int)Difficulty.Total;
             itemRandom.rParentNode = parent;
 
             itemRandom.strBreadcrumbs = (itemRandom.rParentNode == null) ?
-                itemRandom.strタイトル : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.strタイトル;
+                itemRandom.ldTitle.GetString("") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("");
 
             itemRandom.arスコア[0] = new Cスコア();
 
@@ -208,7 +208,7 @@ namespace TJAPlayer3
 
             // Generate back buttons
             
-            string favPath = "./" + parent.strタイトル + "/";
+            string favPath = "./" + parent.ldTitle.GetString("") + "/";
 
             tReinsertBackButtons(parent, childList, favPath);
 
@@ -232,7 +232,7 @@ namespace TJAPlayer3
 
             // Generate back buttons
 
-            string favPath = "./" + parent.strタイトル + "/";
+            string favPath = "./" + parent.ldTitle.GetString("") + "/";
 
             tReinsertBackButtons(parent, childList, favPath);
 
@@ -268,7 +268,7 @@ namespace TJAPlayer3
 
             // Generate back buttons
 
-            string favPath = "./" + parent.strタイトル + "/";
+            string favPath = "./" + parent.ldTitle.GetString("") + "/";
 
             tReinsertBackButtons(parent, childList, favPath);
 

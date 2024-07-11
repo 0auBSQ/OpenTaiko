@@ -1147,8 +1147,8 @@ namespace TJAPlayer3
         public string strファイル名;
         public string strファイル名の絶対パス;
         public string strフォルダ名;
-        public string SUBTITLE;
-        public string TITLE;
+        public CLocalizationData SUBTITLE = new CLocalizationData();
+        public CLocalizationData TITLE = new CLocalizationData();
         public double dbDTXVPlaySpeed;
         public double dbScrollSpeed;
         public int nデモBGMオフセット;
@@ -1233,12 +1233,6 @@ namespace TJAPlayer3
         private string[] dlmtEnter = { "\n" };
         private string[] dlmtCOURSE = { "COURSE:" };
 
-        private readonly string langTITLE = "TITLE" + CLangManager.fetchLang().ToUpper();
-        private readonly string langSUBTITLE = "SUBTITLE" + CLangManager.fetchLang().ToUpper();
-
-        private bool titleIsLocalized = false;
-        private bool subtitleIsLocalized = false;
-
         private int nスクロール方向 = 0;
         //2015.09.18 kairera0467
         //バタフライスライドみたいなアレをやりたいがために実装。
@@ -1292,8 +1286,8 @@ namespace TJAPlayer3
         public CDTX()
         {
             this.nPlayerSide = 0;
-            this.TITLE = "";
-            this.SUBTITLE = "";
+            this.TITLE.SetString("default", "");
+            this.SUBTITLE.SetString("default", "");
             this.ARTIST = "";
             this.COMMENT = "";
             this.SIDE = ESide.eEx;
@@ -7238,7 +7232,7 @@ namespace TJAPlayer3
         private void t入力_行解析ヘッダ(string InputText)
         {
             //やべー。先頭にコメント行あったらやばいやん。
-            string[] strArray = InputText.Split(new char[] { ':' });
+            string[] strArray = InputText.Split(new char[] { ':' }, 2);
             string strCommandName = "";
             string strCommandParam = "";
 
@@ -7266,7 +7260,7 @@ namespace TJAPlayer3
                 //strArrayが2じゃない場合、ヘッダのSplitを通していない可能性がある。
                 //この処理自体は「t入力」を改造したもの。STARTでSplitしていない等、一部の処理が異なる。
 
-                #region[ヘッダ]
+                #region [Header]
                 InputText = InputText.Replace(Environment.NewLine, "\n"); //改行文字を別の文字列に差し替え。
                 InputText = InputText.Replace('\t', ' '); //何の文字か知らないけどスペースに差し替え。
                 InputText = InputText + "\n";
@@ -7291,55 +7285,26 @@ namespace TJAPlayer3
             }
 
             //パラメータを分別、そこから割り当てていきます。
-            if (strCommandName.Equals("TITLE") && !titleIsLocalized)
+            if (strCommandName.Equals("TITLE"))
             {
-                var subTitle = "";
-                for (int i = 0; i < strArray.Length; i++)
-                {
-                    subTitle += strArray[i];
-                }
-                this.TITLE = subTitle.Substring(5);
+                this.TITLE.SetString("default", strCommandParam);
             }
-            else if (strCommandName.Equals(langTITLE))
+            else if (strCommandName.StartsWith("TITLE"))
             {
-                var subTitle = "";
-                for (int i = 0; i < strArray.Length; i++)
-                {
-                    subTitle += strArray[i];
-                }
-                this.TITLE = subTitle.Substring(7);
-                titleIsLocalized = true;
+                string _lang = strCommandName.Substring(5).ToLowerInvariant();
+                this.TITLE.SetString(_lang, strCommandParam);
             }
-            else if (strCommandName.Equals("SUBTITLE") && !subtitleIsLocalized)
+            else if (strCommandName.Equals("SUBTITLE"))
             {
                 if (strCommandParam.StartsWith("--") || strCommandParam.StartsWith("++"))
-                {
-                    var subTitle = "";
-                    for (int i = 0; i < strArray.Length; i++)
-                    {
-                        subTitle += strArray[i];
-                    }
-                    this.SUBTITLE = subTitle.Substring(10);
-                }
+                    this.SUBTITLE.SetString("default", strCommandParam.Substring(2));
                 else
-                {
-                    var subTitle = "";
-                    for (int i = 0; i < strArray.Length; i++)
-                    {
-                        subTitle += strArray[i];
-                    }
-                    this.SUBTITLE = subTitle.Substring(8);
-                }
+                    this.SUBTITLE.SetString("default", strCommandParam);
             }
-            else if (strCommandName.Equals(langSUBTITLE))
+            else if (strCommandName.StartsWith("SUBTITLE"))
             {
-                var subTitle = "";
-                for (int i = 0; i < strArray.Length; i++)
-                {
-                    subTitle += strArray[i];
-                }
-                this.SUBTITLE = subTitle.Substring(10);
-                subtitleIsLocalized = true;
+                string _lang = strCommandName.Substring(8).ToLowerInvariant();
+                this.SUBTITLE.SetString(_lang, strCommandParam);
             }
             else if (strCommandName.Equals("LEVEL"))
             {

@@ -371,8 +371,8 @@ namespace TJAPlayer3
                 BarInfo bar = BarInfos[i];
                 CSongListNode song = listSongs[i];
 
-                bar.strTitle = song.strタイトル;
-                bar.strSubTitle = song.strサブタイトル;
+                bar.strTitle = song.ldTitle.GetString("");
+                bar.strSubTitle = song.ldSubtitle.GetString("");
                 bar.eノード種別 = song.eノード種別;
 
                 bar.ttkTitle = new CActSelect曲リスト.TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_Title_MaxWidth);

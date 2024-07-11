@@ -59,8 +59,8 @@ namespace TJAPlayer3
 			        if( File.Exists( cdtx.strフォルダ名 + @"set.def" ) )
 			            cdtx = new CDTX( strDTXファイルパス, true, 1.0, 0, 1 );
 
-			        this.str曲タイトル = cdtx.TITLE;
-			        this.strサブタイトル = cdtx.SUBTITLE;
+			        this.str曲タイトル = cdtx.TITLE.GetString("");
+			        this.strサブタイトル = cdtx.SUBTITLE.GetString("");
 
 			        cdtx.DeActivate();
 			    }
@@ -74,8 +74,8 @@ namespace TJAPlayer3
 			        {
 			            var cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 1);
 
-			            this.str曲タイトル = cdtx.TITLE;
-			            this.strサブタイトル = cdtx.SUBTITLE;
+			            this.str曲タイトル = cdtx.TITLE.GetString("");
+			            this.strサブタイトル = cdtx.SUBTITLE.GetString("");
 
 			            cdtx.DeActivate();
 			        }
@@ -510,7 +510,7 @@ namespace TJAPlayer3
 							}
 
 							Trace.TraceInformation( "---- Song information -----------------" );
-				    		Trace.TraceInformation( "TITLE: {0}", TJAPlayer3.DTX.TITLE );
+				    		Trace.TraceInformation( "TITLE: {0}", TJAPlayer3.DTX.TITLE.GetString("") );
 			    			Trace.TraceInformation( "FILE: {0}",  TJAPlayer3.DTX.strファイル名の絶対パス );
 		    				Trace.TraceInformation( "---------------------------" );
 

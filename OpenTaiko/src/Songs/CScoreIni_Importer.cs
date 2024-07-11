@@ -212,7 +212,7 @@ namespace TJAPlayer3
                     INSERT INTO best_plays(ChartUniqueId,ChartGenre,Charter,Artist,PlayMods,ChartDifficulty,ChartLevel,ClearStatus,ScoreRank,HighScore,SaveId,TowerBestFloor,DanExam1,DanExam2,DanExam3,DanExam4,DanExam5,DanExam6,DanExam7,PlayCount,HighScoreGoodCount,HighScoreOkCount,HighScoreBadCount,HighScoreMaxCombo,HighScoreRollCount,HighScoreADLibCount,HighScoreBoomCount)
                        VALUES(
                             '{UniqueId.data.id.Replace(@"'", @"''")}',
-                            '{boxdef.Title.Replace(@"'", @"''")}',
+                            '{boxdef.Genre}',
                             '{(!string.IsNullOrEmpty(Charters[i + 1]) ? Charters[i + 1] : Charters[0]).Replace(@"'", @"''")}',
                             '{Artist.Replace(@"'", @"''")}',
                             8925478921,
