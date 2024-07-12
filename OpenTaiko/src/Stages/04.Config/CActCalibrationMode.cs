@@ -162,12 +162,12 @@ namespace TJAPlayer3
 
             TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1], CTextConsole.EFontType.Cyan,
                 "MEDIAN OFFSET : " + GetMedianOffset() + "ms\n");
-            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + TJAPlayer3.actTextConsole.nFontHeight, CTextConsole.EFontType.White,
+            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1], CTextConsole.EFontType.White,
                 "MIN OFFSET    : " + GetLowestOffset() + "ms\n" +
                 "MAX OFFSET    : " + GetHighestOffset() + "ms\n" +
                 "LAST OFFSET   : " + LastOffset + "ms\n" +
                 "OFFSET COUNT  : " + (Offsets != null ? Offsets.Count : 0));
-            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1] + (TJAPlayer3.actTextConsole.nFontHeight * 5), CTextConsole.EFontType.White,
+            TJAPlayer3.actTextConsole.tPrint(TJAPlayer3.Skin.Config_Calibration_InfoText[0], TJAPlayer3.Skin.Config_Calibration_InfoText[1], CTextConsole.EFontType.White,
                 "CURRENT OFFSET: " + CurrentOffset() + "ms");
 
             #endregion

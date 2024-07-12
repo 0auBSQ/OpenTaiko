@@ -48,9 +48,8 @@ namespace TJAPlayer3
 
 			try
 			{
-				this.ctNowEnumeratingSongs = new CCounter();	// 0, 1000, 17, CDTXMania.Timer );
-				this.ctNowEnumeratingSongs.Start( 0, 100, 17, TJAPlayer3.Timer );
-			}
+                TJAPlayer3.Tx.lcEnumSong.Init();
+            }
 			finally
 			{
 			}
@@ -61,8 +60,8 @@ namespace TJAPlayer3
 				return;
 				
 			base.DeActivate();
-			this.ctNowEnumeratingSongs = null;
-		}
+            TJAPlayer3.Tx.lcEnumSong.Final();
+        }
 		public override void CreateManagedResource()
 		{
 			//string pathNowEnumeratingSongs = CSkin.Path( @"Graphics\ScreenTitle NowEnumeratingSongs.png" );
@@ -84,6 +83,7 @@ namespace TJAPlayer3
 			//	this.txDialogNowEnumeratingSongs = null;
 			//}
 
+			/*
 			try
 			{
 				CCachedFontRenderer ftMessage = new CCachedFontRenderer(CFontRenderer.DefaultFontName, 40, CCachedFontRenderer.FontStyle.Bold );
@@ -113,6 +113,7 @@ namespace TJAPlayer3
 				Trace.TraceError( "例外が発生しましたが処理を継続します。 (761b726d-d27c-470d-be0b-a702971601b5)" );
 				this.txMessage = null;
 			}
+			*/
 	
 			base.CreateManagedResource();
 		}
@@ -120,7 +121,7 @@ namespace TJAPlayer3
 		{
 			//CDTXMania.t安全にDisposeする( ref this.txDialogNowEnumeratingSongs );
 			//CDTXMania.t安全にDisposeする( ref this.txNowEnumeratingSongs );
-			TJAPlayer3.tDisposeSafely( ref this.txMessage );
+			//TJAPlayer3.tDisposeSafely( ref this.txMessage );
 			base.ReleaseManagedResource();
 		}
 
@@ -130,14 +131,20 @@ namespace TJAPlayer3
 			{
 				return 0;
 			}
-			this.ctNowEnumeratingSongs.TickLoop();
-			if ( TJAPlayer3.Tx.Enum_Song != null )
+			//this.ctNowEnumeratingSongs.TickLoop();
+
+
+            TJAPlayer3.Tx.lcEnumSong.Info.bFromConfigStage = bコマンドでの曲データ取得;
+            TJAPlayer3.Tx.lcEnumSong.Update();
+            TJAPlayer3.Tx.lcEnumSong.Draw();
+
+			/*
+            if ( TJAPlayer3.Tx.Enum_Song != null )
 			{
                 TJAPlayer3.Tx.Enum_Song.Opacity = (int) ( 176.0 + 80.0 * Math.Sin( (double) (2 * Math.PI * this.ctNowEnumeratingSongs.CurrentValue * 2 / 100.0 ) ) );
                 TJAPlayer3.Tx.Enum_Song.t2D描画( 18, 7 );
 			}
-
-			TJAPlayer3.Tx.lcConfigStage.Info.bEnumeratingSongs = bコマンドでの曲データ取得;
+			*/
 
 			/*
             if ( bコマンドでの曲データ取得 && TJAPlayer3.Tx.Config_Enum_Song != null )
@@ -151,9 +158,9 @@ namespace TJAPlayer3
 		}
 
 
-		private CCounter ctNowEnumeratingSongs;
+		//private CCounter ctNowEnumeratingSongs;
 		//private CTexture txNowEnumeratingSongs = null;
 		//private CTexture txDialogNowEnumeratingSongs = null;
-		private CTexture txMessage;
+		//private CTexture txMessage;
 	}
 }

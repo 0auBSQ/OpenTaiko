@@ -1,0 +1,15 @@
+{
+    "enum_song":{
+        "x":27,
+        "y":11
+    },
+    "configstage_enum_song":{
+        "x":270,
+        "y":265
+    },
+    "font_size":40,
+    "text":{
+        "x":285,
+        "y":295
+    }
+}

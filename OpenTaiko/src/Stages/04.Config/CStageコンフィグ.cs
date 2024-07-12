@@ -60,8 +60,9 @@ namespace TJAPlayer3
 			Trace.TraceInformation( "コンフィグステージを活性化します。" );
 			Trace.Indent();
 			try
-			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.tPlay();
+            {
+                TJAPlayer3.Tx.lcConfigStage.Init();
+                TJAPlayer3.Skin.bgmコンフィグ画面.tPlay();
 
 				this.n現在のメニュー番号 = 0;                                                    //
 				for( int i = 0; i < 4; i++ )													//
@@ -92,14 +93,16 @@ namespace TJAPlayer3
 				Trace.Unindent();
 			}
 			base.Activate();		// 2011.3.14 yyagi: On活性化()をtryの中から外に移動
-		}
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 		public override void DeActivate()
 		{
 			Trace.TraceInformation( "コンフィグステージを非活性化します。" );
 			Trace.Indent();
 			try
-			{
-				TJAPlayer3.Skin.bgmコンフィグ画面.tStop();
+            {
+                TJAPlayer3.Tx.lcConfigStage.Final();
+                TJAPlayer3.Skin.bgmコンフィグ画面.tStop();
 
 				TJAPlayer3.ConfigIni.t書き出し( TJAPlayer3.strEXEのあるフォルダ + "Config.ini" );	// CONFIGだけ
 				for( int i = 0; i < 4; i++ )
@@ -107,6 +110,7 @@ namespace TJAPlayer3
 					this.ctキー反復用[ i ] = null;
 				}
 					
+				/*
 				for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 				{
 					txMenuItemLeft[ i, 0 ].Dispose();
@@ -115,6 +119,7 @@ namespace TJAPlayer3
 					txMenuItemLeft[ i, 1 ] = null;
 				}
 				txMenuItemLeft = null;
+				*/
 
 				TJAPlayer3.tDisposeSafely(ref Background);
 
@@ -146,6 +151,7 @@ namespace TJAPlayer3
 					CLangManager.LangInstance.GetString("SETTINGS_EXIT")
 			};
 
+            /*
 			txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
 
 			using (var prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Config_Font_Scale))
@@ -170,7 +176,12 @@ namespace TJAPlayer3
 					}
 				}
 			}
-		}
+			*/
+            for (int i = 0; i < strMenuItem.Length; i++)
+            {
+                TJAPlayer3.Tx.lcConfigStage.GenMenuItemLeft(i, strMenuItem[i]);
+            }
+        }
 
 		public override void CreateManagedResource()											// OPTIONと画像以外共通
 		{
@@ -184,37 +195,47 @@ namespace TJAPlayer3
             //}
 			this.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 
+            string[] strMenuItem = {
+                    CLangManager.LangInstance.GetString("SETTINGS_SYSTEM"),
+                    CLangManager.LangInstance.GetString("SETTINGS_GAME"),
+                    CLangManager.LangInstance.GetString("SETTINGS_EXIT")
+                };
+            for (int i = 0; i < strMenuItem.Length; i++)
+            {
+                TJAPlayer3.Tx.lcConfigStage.GenMenuItemLeft(i, strMenuItem[i]);
+            }
 
             //TJAPlayer3.Tx.Config_Cursor = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
 
-				//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
+            //ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
-				/*
-				string[] strMenuItem = {
-					CLangManager.LangInstance.GetString(10085),
-					CLangManager.LangInstance.GetString(10086),
-					CLangManager.LangInstance.GetString(10087)
-				};
-			    
-				txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
+            /*
+            string[] strMenuItem = {
+                CLangManager.LangInstance.GetString(10085),
+                CLangManager.LangInstance.GetString(10086),
+                CLangManager.LangInstance.GetString(10087)
+            };
 
-			    using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" :  TJAPlayer3.ConfigIni.FontName), 20))
-			    {
-			        for (int i = 0; i < strMenuItem.Length; i++)
-			        {
-			            using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black))
-			            {
-			                txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-			            }
-			            using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
-			            {
-			                txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-			            }
-			        }
-			    }
-				*/
-			base.CreateManagedResource();
-		}
+            txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
+
+            using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" :  TJAPlayer3.ConfigIni.FontName), 20))
+            {
+                for (int i = 0; i < strMenuItem.Length; i++)
+                {
+                    using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black))
+                    {
+                        txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
+                    }
+                    using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
+                    {
+                        txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
+                    }
+                }
+            }
+            */
+            base.CreateManagedResource();
+
+        }
 		public override void ReleaseManagedResource()											// OPTIONと同じ(COnfig.iniの書き出しタイミングのみ異なるが、無視して良い)
 		{
 			if( this.ftフォント != null )
@@ -223,7 +244,7 @@ namespace TJAPlayer3
 				this.ftフォント = null;
 			}
 
-			TJAPlayer3.tテクスチャの解放( ref this.tx説明文パネル );
+			//TJAPlayer3.tテクスチャの解放( ref this.tx説明文パネル );
 			base.ReleaseManagedResource();
 		}
 		public override int Draw()
@@ -238,33 +259,36 @@ namespace TJAPlayer3
 				base.IsFirstDraw = false;
 			}
 
-			//ctBackgroundAnime.t進行Loop();
+            //ctBackgroundAnime.t進行Loop();
 
-			// 描画
+            // 描画
 
 
             #region [ Menu ]
             //---------------------
-			/*
+            /*
             for ( int i = 0; i < txMenuItemLeft.GetLength( 0 ); i++ )
 			{
 				int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
 				txMenuItemLeft[i, flag].t2D中心基準描画(TJAPlayer3.Skin.Config_Item_X[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[0], TJAPlayer3.Skin.Config_Item_Y[i] + TJAPlayer3.Skin.Config_Item_Font_Offset[1]); //55
 			}
 			*/
-			//---------------------
-			#endregion
-			
-			#region [ Explanation Panel ]
-			//---------------------
-			//if( this.tx説明文パネル != null )
-			//	this.tx説明文パネル.t2D描画( TJAPlayer3.Skin.Config_ExplanationPanel[0], TJAPlayer3.Skin.Config_ExplanationPanel[1]);
-			//---------------------
-			#endregion
-			
-			#region [ Item ]
-			//---------------------
-			switch( this.eItemPanelモード )
+            //---------------------
+            #endregion
+
+            #region [ Explanation Panel ]
+            //---------------------
+            //if( this.tx説明文パネル != null )
+            //	this.tx説明文パネル.t2D描画( TJAPlayer3.Skin.Config_ExplanationPanel[0], TJAPlayer3.Skin.Config_ExplanationPanel[1]);
+            //---------------------
+            #endregion
+
+            TJAPlayer3.Tx.lcConfigStage.Update();
+            TJAPlayer3.Tx.lcConfigStage.Draw();
+
+            #region [ Item ]
+            //---------------------
+            switch ( this.eItemPanelモード )
 			{
 				case EItemPanelモード.パッド一覧:
 					this.actList.t進行描画( !this.bメニューにフォーカス中 );
@@ -276,12 +300,6 @@ namespace TJAPlayer3
 			}
             //---------------------
             #endregion
-
-            TJAPlayer3.Tx.lcConfigStage.Info.nCursorIndex = n現在のメニュー番号;
-            TJAPlayer3.Tx.lcConfigStage.Info.nItembarIndex = actList.n現在の選択項目;
-
-            TJAPlayer3.Tx.lcConfigStage.Update();
-            TJAPlayer3.Tx.lcConfigStage.Draw();
             
 			//#region [ 上部パネル ]
             ////---------------------
@@ -493,7 +511,7 @@ namespace TJAPlayer3
 
 		//private CCounter ctBackgroundAnime;
 		private CActFIFOWhite actFIFO;
-		private CActConfigKeyAssign actKeyAssign;
+		public CActConfigKeyAssign actKeyAssign;
 		public CActConfigList actList;
 		private CActオプションパネル actオプションパネル;
 		private bool bメニューにフォーカス中;
@@ -502,13 +520,13 @@ namespace TJAPlayer3
 		private const int DESC_W = 220;
 		private EItemPanelモード eItemPanelモード;
 		internal CCachedFontRenderer ftフォント;
-		private int n現在のメニュー番号;
+		public int n現在のメニュー番号 { get; private set; }
 		//private CTexture txMenuカーソル;
 		//private CTexture tx下部パネル;
 		//private CTexture tx上部パネル;
-		private CTexture tx説明文パネル;
+		//private CTexture tx説明文パネル;
 		//private CTexture tx背景;
-		private CTexture[ , ] txMenuItemLeft;
+		//private CTexture[ , ] txMenuItemLeft;
 
 		private ScriptBG Background;
 
@@ -567,7 +585,7 @@ namespace TJAPlayer3
 			{
 				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 				this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 3) % 3;
-				switch ( this.n現在のメニュー番号 )
+                switch ( this.n現在のメニュー番号 )
 				{
 					case 0:
 						this.actList.t項目リストの設定_System();
@@ -582,7 +600,7 @@ namespace TJAPlayer3
 						break;
 				}
 				this.t説明文パネルに現在選択されているメニューの説明を描画する();
-			}
+            }
 		}
 		private void t説明文パネルに現在選択されているメニューの説明を描画する()
 		{
@@ -602,44 +620,48 @@ namespace TJAPlayer3
 						break;
                 }
 				SKBitmap image = ftフォント.DrawText(text, Color.White, Color.Black, null, 30);
-				if( this.tx説明文パネル != null )
-				{
-					this.tx説明文パネル.Dispose();
-				}
-				this.tx説明文パネル = new CTexture( image );
-				image.Dispose();
+                //if( this.tx説明文パネル != null )
+                //{
+                //	this.tx説明文パネル.Dispose();
+                //}
+                //this.tx説明文パネル = new CTexture( image );
+                TJAPlayer3.Tx.lcConfigStage.GenDescriptionPanel(text);
+                image.Dispose();
 			}
 			catch( CTextureCreateFailedException e)
 			{
 				Trace.TraceError( e.ToString() );
 				Trace.TraceError( "説明文テクスチャの作成に失敗しました。" );
-				this.tx説明文パネル = null;
+				//this.tx説明文パネル = null;
 			}
 		}
 		private void t説明文パネルに現在選択されている項目の説明を描画する()
 		{
 			try
 			{
-				var image = new SKBitmap( 440, 288 );		// 説明文領域サイズの縦横 2 倍。（描画時に 0.5 倍で表示する___のは中止。処理速度向上のため。）
+				//var image = new SKBitmap( 440, 288 );		// 説明文領域サイズの縦横 2 倍。（描画時に 0.5 倍で表示する___のは中止。処理速度向上のため。）
 
                 CItemBase item = this.actList.ib現在の選択項目;
 				if( ( item.str説明文 != null ) && ( item.str説明文.Length > 0 ) )
 				{
-					image.Dispose();
-					image = ftフォント.DrawText(item.str説明文, Color.White, Color.Black, null, 30);
-				}
+					//image.Dispose();
+					//image = ftフォント.DrawText(item.str説明文, Color.White, Color.Black, null, 30);
+                    TJAPlayer3.Tx.lcConfigStage.GenDescriptionPanel(item.str説明文);
+                }
+				/*
 				if( this.tx説明文パネル != null )
 				{
 					this.tx説明文パネル.Dispose();
 				}
 				this.tx説明文パネル = new CTexture( image );
-				image.Dispose();
+				*/
+				//image.Dispose();
 			}
 			catch( CTextureCreateFailedException e )
 			{
 				Trace.TraceError( e.ToString() );
 				Trace.TraceError( "説明文パネルテクスチャの作成に失敗しました。" );
-				this.tx説明文パネル = null;
+				//this.tx説明文パネル = null;
 			}
 		}
 		//-----------------

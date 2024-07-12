@@ -32,16 +32,33 @@ namespace TJAPlayer3
 		}
 
 		public string str項目名;
-		public string str説明文;
+        public string strName
+		{
+			get
+			{
+				return str項目名;
 
+            }
+		}
 
-		// コンストラクタ
+        public string str説明文;
+        public string strDescription
+        {
+            get
+            {
+                return str説明文;
 
-		public CItemBase()
+            }
+        }
+
+        // コンストラクタ
+
+        public CItemBase()
 		{
 			this.str項目名 = "";
 			this.str説明文 = "";
-		}
+
+        }
 		public CItemBase( string str項目名 )
 			: this()
 		{
@@ -108,8 +125,13 @@ namespace TJAPlayer3
 		public virtual object obj現在値()
 		{
 			return null;
-		}
-		public virtual int GetIndex()
+        }
+        public string tGetValueText()
+        {
+			object value = obj現在値();
+            return value == null ? "" : value.ToString();
+        }
+        public virtual int GetIndex()
 		{
 			return 0;
 		}

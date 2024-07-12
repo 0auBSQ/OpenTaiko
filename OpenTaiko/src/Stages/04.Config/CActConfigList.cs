@@ -307,14 +307,15 @@ namespace TJAPlayer3
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"));
 			this.list項目リスト.Add( this.iSystemGoToKeyAssign );
 
-			OnListMenuの初期化();
+            OnListMenuの初期化();
 			if (refresh)
             {
 				this.n現在の選択項目 = 0;
 				this.eメニュー種別 = Eメニュー種別.System;
-			}
-            
-		}
+            }
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+
+        }
 		#endregion
 
 
@@ -444,7 +445,8 @@ namespace TJAPlayer3
             OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.Drums;
-		}
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 
 		#endregion
 
@@ -765,7 +767,8 @@ namespace TJAPlayer3
 
                     t項目リストの設定_System(refresh : false);
 					TJAPlayer3.stageコンフィグ.ReloadMenus();
-				}
+
+                }
                 //}
 
 
@@ -853,7 +856,9 @@ namespace TJAPlayer3
 				}
 				#endregion
 			}
-		}
+
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 
 		private void tGenerateSkinSample()
 		{
@@ -934,11 +939,12 @@ namespace TJAPlayer3
 			this.iKeyAssignSystemCycleVideoDisplayMode = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY"),
 				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC"));
 			this.list項目リスト.Add( this.iKeyAssignSystemCycleVideoDisplayMode);
-
+			
             OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignSystem;
-		}
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 		public void t項目リストの設定_KeyAssignDrums()
 		{
 //			this.tConfigIniへ記録する();
@@ -1044,10 +1050,11 @@ namespace TJAPlayer3
 				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC"));
 			this.list項目リスト.Add(this.iKeyAssignRightChange);
 
-			OnListMenuの初期化();
+            OnListMenuの初期化();
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignDrums;
-		}
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 		public void t項目リストの設定_KeyAssignTraining()
         {
             this.list項目リスト.Clear();
@@ -1124,34 +1131,41 @@ namespace TJAPlayer3
             OnListMenuの初期化();
             this.n現在の選択項目 = 0;
             this.eメニュー種別 = Eメニュー種別.KeyAssignTraining;
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
         }
         #endregion
         public void t次に移動()
-		{
-			TJAPlayer3.Skin.soundカーソル移動音.tPlay();
+        {
+            TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.list項目リスト[ this.n現在の選択項目 ].t項目値を前へ移動();
 				t要素値を上下に変更中の処理();
 			}
 			else
-			{
-				this.n目標のスクロールカウンタ += 100;
-			}
-		}
+            {
+                this.n現在の選択項目 = this.t次の項目(this.n現在の選択項目);
+            }
+
+            TJAPlayer3.stageコンフィグ.t項目変更通知();
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 		public void t前に移動()
-		{
-			TJAPlayer3.Skin.soundカーソル移動音.tPlay();
+        {
+            TJAPlayer3.Skin.soundカーソル移動音.tPlay();
 			if( this.b要素値にフォーカス中 )
 			{
 				this.list項目リスト[ this.n現在の選択項目 ].t項目値を次へ移動();
 				t要素値を上下に変更中の処理();
 			}
 			else
-			{
-				this.n目標のスクロールカウンタ -= 100;
-			}
-		}
+            {
+                this.n現在の選択項目 = this.t前の項目(this.n現在の選択項目);
+            }
+
+            TJAPlayer3.stageコンフィグ.t項目変更通知();
+            TJAPlayer3.Tx.lcConfigStage.GenItembox();
+        }
 		private void t要素値を上下に変更中の処理()
 		{
 			//if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemMasterVolume )				// #33700 2014.4.26 yyagi
@@ -1199,9 +1213,6 @@ namespace TJAPlayer3
 			this.t項目リストの設定_Drums();	// 
 			this.t項目リストの設定_System();	// 順番として、最後にSystemを持ってくること。設定一覧の初期位置がSystemのため。
 			this.b要素値にフォーカス中 = false;
-			this.n目標のスクロールカウンタ = 0;
-			this.n現在のスクロールカウンタ = 0;
-			this.nスクロール用タイマ値 = -1;
 			this.ct三角矢印アニメ = new CCounter();
 
 			this.iSystemSoundType_initial			= this.iSystemSoundType.n現在選択されている項目番号;	// CONFIGに入ったときの値を保持しておく
@@ -1336,7 +1347,7 @@ namespace TJAPlayer3
 			//-----------------
 			if( base.IsFirstDraw )
 			{
-				this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
+				//this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
 				this.ct三角矢印アニメ.Start( 0, 9, 50, TJAPlayer3.Timer );
 			
 				base.IsFirstDraw = false;
@@ -1348,6 +1359,7 @@ namespace TJAPlayer3
 
 			#region [ 項目スクロールの進行 ]
 			//-----------------
+			/*
 			long n現在時刻 = TJAPlayer3.Timer.NowTime;
 			if( n現在時刻 < this.nスクロール用タイマ値 ) this.nスクロール用タイマ値 = n現在時刻;
 
@@ -1427,11 +1439,12 @@ namespace TJAPlayer3
 				this.nスクロール用タイマ値 += INTERVAL;
 			}
 			//-----------------
+			*/
 			#endregion
 			
 			#region [ ▲印アニメの進行 ]
 			//-----------------
-			if( this.b項目リスト側にフォーカスがある && ( this.n目標のスクロールカウンタ == 0 ) )
+			if( this.b項目リスト側にフォーカスがある )
 				this.ct三角矢印アニメ.TickLoop();
 			//-----------------
 			#endregion
@@ -1443,6 +1456,7 @@ namespace TJAPlayer3
 
 			#region [ 計11個の項目パネルを描画する。]
 			//-----------------
+			/*
 			int nItem = this.n現在の選択項目;
 			for( int i = 0; i < (TJAPlayer3.Skin.Config_ItemBox_Count / 2) - 1; i++ )
 				nItem = this.t前の項目( nItem );
@@ -1542,12 +1556,12 @@ namespace TJAPlayer3
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, d.ToString( "0.000" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = d.ToString( "0.000" );
 						}
-						/*else if ( this.list項目リスト[ nItem ] == this.iDrumsScrollSpeed)
-						{
-							float f = ( ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値 + 1 ) / 10f;
+						//else if ( this.list項目リスト[ nItem ] == this.iDrumsScrollSpeed)
+						//{
+						//	float f = ( ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値 + 1 ) / 10f;
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, f.ToString( "x0.0" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
-							strParam = f.ToString( "x0.0" );
-						}*/
+						//	strParam = f.ToString( "x0.0" );
+						//}
 						else
 						{
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString(), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
@@ -1621,12 +1635,13 @@ namespace TJAPlayer3
 				
 				nItem = this.t次の項目( nItem );
 			}
+			*/
 			//-----------------
 			#endregion
 			
 			#region [ 項目リストにフォーカスがあって、かつスクロールが停止しているなら、パネルの上下に▲印を描画する。]
 			//-----------------
-			if( this.b項目リスト側にフォーカスがある && ( this.n目標のスクロールカウンタ == 0 ) )
+			if( this.b項目リスト側にフォーカスがある )
 			{
 				int x_upper;
 				int x_lower;
@@ -1812,9 +1827,9 @@ namespace TJAPlayer3
 		private CItemToggle iSystemTimeStretch;				// #23664 2013.2.24 yyagi
 
 		public List<CItemBase> list項目リスト;
-		private long nスクロール用タイマ値;
-		private int n現在のスクロールカウンタ;
-		private int n目標のスクロールカウンタ;
+		//private long nスクロール用タイマ値;
+		//private int n現在のスクロールカウンタ;
+		//private int n目標のスクロールカウンタ;
 
 		/*
         private Point[] ptパネルの基本座標 = new Point[] { 

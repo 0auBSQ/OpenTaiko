@@ -2,15 +2,14 @@ import ('System.Drawing')
 
 local config = -1
 
-local menu_font_normal = -1
-local menu_font_description = -1
-local menu_item_text = { }
-local menu_item_text_selected = { }
+local font_normal = -1
+local font_description = -1
+local item_text = { }
+local item_text_selected = { }
 local description_panel_text = -1
+local itembox_texts = { }
 local background = -1
-local arrow = -1
 local cursor = -1
-local enum_song = -1
 local header = -1
 local itembox = -1
 local keyassign = -1
@@ -30,25 +29,34 @@ local itembox_count = 0
 local itembox_center = 0
 local itembox_x = { }
 local itembox_y = { }
+local itembox_infos = { }
+
+local itembox_name_offset_x = nil
+local itembox_name_offset_y = nil
+
+local itembox_value_offset_x = nil
+local itembox_value_offset_y = nil
 
 local keyassign_x = 0
 local keyassign_y = 0
 
-local enum_song_x = 0
-local enum_song_y = 0
-
 function genItembox()
     for i = 1, itembox_count do
+        itembox_infos[i] = getItemBox(i - itembox_center - 1)
+        itembox_titlekey = {}
+        itembox_titlekey.name = createTitleTextureKey(itembox_infos[i].strName, font_normal, 99999)
+        itembox_titlekey.value = createTitleTextureKey(itembox_infos[i]:tGetValueText(), font_normal, 99999)
+        itembox_texts[i] = itembox_titlekey
     end
 end
 
 function genMenuItemLeft(index, name)
-    menu_item_text[index + 1] = createTitleTextureKey(name, menu_font_normal, 99999)
-    menu_item_text_selected[index + 1] = createTitleTextureKey(name, menu_font_normal, 99999, Color.Yellow)
+    item_text[index + 1] = createTitleTextureKey(name, font_normal, 99999)
+    item_text_selected[index + 1] = createTitleTextureKey(name, font_normal, 99999, Color.Yellow)
 end
 
 function genDescriptionPanel(text)
-    description_panel_text = createTitleTextureKey(text, menu_font_description, 99999)
+    description_panel_text = createTitleTextureKey(text, font_description, 99999)
 end
 
 function background_update()
@@ -96,10 +104,10 @@ function text_draw()
         x = item_x[i - 1]
         y = item_y[i - 1]
         if configstageinfo.nCursorIndex == i - 1 then
-            tex = getTextTex(menu_item_text_selected[i], false, false)
+            tex = getTextTex(item_text_selected[i], false, false)
             tex:t2D_DisplayImage_AnchorCenter(x, y)
         else
-            tex = getTextTex(menu_item_text[i], false, false)
+            tex = getTextTex(item_text[i], false, false)
             tex:t2D_DisplayImage_AnchorCenter(x, y)
         end
     end
@@ -110,8 +118,8 @@ end
 
 function description_panel_draw()
     if not(description_panel_text == -1) then 
-        tex = getTextTex(description_panel_text, false, false)
-        tex:t2D_DisplayImage(description_panel_x, description_panel_y)
+        desc_panel_tex = getTextTex(description_panel_text, false, false)
+        desc_panel_tex:t2D_DisplayImage(description_panel_x, description_panel_y)
     end
 end
 
@@ -126,6 +134,12 @@ function itembox_draw()
         y = itembox_y[i - 1]
 
         itembox:t2D_DisplayImage(x, y)
+
+        itembox_name_tex = getTextTex(itembox_texts[i].name, false, false)
+        itembox_name_tex:t2D_DisplayImage(x + itembox_name_offset_x, y + itembox_name_offset_y)
+
+        itembox_value_tex = getTextTex(itembox_texts[i].value, false, false)
+        itembox_value_tex:t2D_DisplayImage(x + itembox_value_offset_x, y + itembox_value_offset_y)
     end
 end
 
@@ -133,25 +147,21 @@ function Keyassign_update()
 end
 
 function Keyassign_draw()
-    keyassign:t2D_DisplayImage(keyassign_x, keyassign_y)
+    if configstageinfo.bWaitingKeyInput then
+        keyassign:t2D_DisplayImage(keyassign_x, keyassign_y)
+    end
 end
 
-function enum_song_update()
-end
-
-function enum_song_draw()
-    enum_song:t2D_DisplayImage(enum_song_x, enum_song_y)
+function reloadLanguage(lang)
 end
 
 function loadAssets()
     config = loadConfig("Config.json")
     
-    menu_font_normal = loadFontRenderer(getNum(config["font_size"]["normal"]), "regular")
-    menu_font_description = loadFontRenderer(getNum(config["font_size"]["description"]), "regular")
+    font_normal = loadFontRenderer(getNum(config["font_size"]["normal"]), "regular")
+    font_description = loadFontRenderer(getNum(config["font_size"]["description"]), "regular")
     background = loadTexture("Background.png")
-    arrow = loadTexture("Arrow.png")
     cursor = loadTexture("Cursor.png")
-    enum_song = loadTexture("Enum_Song.png")
     header = loadTexture("Header.png")
     itembox = loadTexture("ItemBox.png")
     keyassign = loadTexture("KeyAssign.png")
@@ -169,11 +179,14 @@ function loadAssets()
     itembox_x = getNumArray(config["itembox"]["x"])
     itembox_y = getNumArray(config["itembox"]["y"])
 
+    itembox_name_offset_x = getNum(config["itembox_name"]["offset_x"])
+    itembox_name_offset_y = getNum(config["itembox_name"]["offset_y"])
+
+    itembox_value_offset_x = getNum(config["itembox_value"]["offset_x"])
+    itembox_value_offset_y = getNum(config["itembox_value"]["offset_y"])
+
     keyassign_x = getNum(config["keyassign"]["x"])
     keyassign_y = getNum(config["keyassign"]["y"])
-
-    enum_song_x = getNum(config["enum_song"]["x"])
-    enum_song_y = getNum(config["enum_song"]["y"])
 end
 
 function init()
@@ -196,8 +209,8 @@ function draw()
     background_draw()
     header_draw()
     cursor_draw()
-    --text_draw()
-    --description_panel_draw()
-    --itembox_draw()
-    --Keyassign_draw()
+    text_draw()
+    description_panel_draw()
+    itembox_draw()
+    Keyassign_draw()
 end

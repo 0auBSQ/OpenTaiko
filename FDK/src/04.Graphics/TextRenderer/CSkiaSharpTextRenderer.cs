@@ -321,16 +321,16 @@ namespace FDK
 
 
 
-            int height_i = -25;
+            float height_i = ((images[0].Height - 25) / 2.0f);
             for (int i = 0; i < images.Length; i++) 
             {
                 if (keepCenter)
                 {
-				    skCanvas.DrawBitmap(images[i], new SKPoint((ret_width / 2) - (images[i].Width / 2.0f), height_i));
+				    skCanvas.DrawBitmap(images[i], new SKPoint((ret_width / 2) - (images[i].Width / 2.0f), height_i - (images[i].Height / 2.0f)));
                 }
 				else 
                 {
-                    skCanvas.DrawBitmap(images[i], new SKPoint(0, height_i));
+                    skCanvas.DrawBitmap(images[i], new SKPoint(0, height_i - (images[i].Height / 2.0f)));
                 }
                 height_i += images[i].Height - 50;
                 images[i].Dispose();

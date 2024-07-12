@@ -21,7 +21,7 @@ namespace TJAPlayer3
         {
             if (!Avaibale) return;
 
-            RunLuaCode(lfDrawText, x, y, " !\"#", b強調, fScale);
+            RunLuaCode(lfDrawText, x, y, str, b強調, fScale);
         }
     }
 }

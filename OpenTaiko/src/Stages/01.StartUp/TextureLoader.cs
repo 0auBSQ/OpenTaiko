@@ -149,7 +149,6 @@ namespace TJAPlayer3
             Tile_Black = TxC(@$"Tile_Black.png");
             Menu_Title = TxC(@$"Menu_Title.png");
             Menu_Highlight = TxC(@$"Menu_Highlight.png");
-            Enum_Song = TxC(@$"Enum_Song.png");
             Loading = TxC(@$"Loading.png");
             Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
             Overlay = TxC(@$"Overlay.png");
@@ -187,6 +186,7 @@ namespace TJAPlayer3
                 NamePlate_Title_Small[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Small.png");
             }
 
+            listTexture.Add(lcEnumSong = new CLuaEnumSongsScript(CSkin.Path("Modules/EnumSongs")));
 
             #endregion
 
@@ -227,8 +227,6 @@ namespace TJAPlayer3
             #endregion
 
             #region 2_コンフィグ画面
-            //Config_Background = TxC(CONFIG + @$"Background.png");
-            //Config_Header = TxC(CONFIG + @$"Header.png");
             listTexture.Add(lcConfigStage = new CLuaConfigStageScript(CSkin.Path("Modules/ConfigStage")));
             listTexture.Add(lcConfigFont = new CLuaConfigFontScript(CSkin.Path("Modules/ConfigFont")));
             #endregion
@@ -2557,7 +2555,7 @@ namespace TJAPlayer3
         public CTexture Tile_Black,
             Menu_Title,
             Menu_Highlight,
-            Enum_Song,
+            //Enum_Song,
             Loading,
             Scanning_Loudness,
             NamePlateBase,
@@ -2565,6 +2563,7 @@ namespace TJAPlayer3
             Overlay,
             Readme,
             Network_Connection;
+        public CLuaEnumSongsScript lcEnumSong;
         public CTexture[] NamePlate;
 
         public CTexture[] NamePlate_Effect = new CTexture[5];

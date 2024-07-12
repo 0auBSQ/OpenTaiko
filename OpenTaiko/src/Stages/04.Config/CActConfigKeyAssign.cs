@@ -114,8 +114,6 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated )
 			{
-				TJAPlayer3.Tx.lcConfigStage.Info.bWaitingKeyInput = bキー入力待ち;
-
                 if ( this.bキー入力待ち )
 				{
 					if( TJAPlayer3.InputManager.Keyboard.KeyPressed( (int)SlimDXKeys.Key.Escape ) )
@@ -224,7 +222,7 @@ namespace TJAPlayer3
 			}
 		}
 
-		private bool bキー入力待ち;
+		public bool bキー入力待ち { get; private set; }
 		private STKEYLABEL[] KeyLabel = new STKEYLABEL[] { 
 			new STKEYLABEL(0x35, "[ESC]"), new STKEYLABEL(1, "[ 1 ]"), new STKEYLABEL(2, "[ 2 ]"), new STKEYLABEL(3, "[ 3 ]"), new STKEYLABEL(4, "[ 4 ]"), new STKEYLABEL(5, "[ 5 ]"), new STKEYLABEL(6, "[ 6 ]"), new STKEYLABEL(7, "[ 7 ]"), new STKEYLABEL(8, "[ 8 ]"), new STKEYLABEL(9, "[ 9 ]"), new STKEYLABEL(0, "[ 0 ]"), new STKEYLABEL(0x53, "[ - ]"), new STKEYLABEL(0x34, "[ = ]"), new STKEYLABEL(0x2a, "[BSC]"), new STKEYLABEL(0x81, "[TAB]"), new STKEYLABEL(0x1a, "[ Q ]"), 
 			new STKEYLABEL(0x20, "[ W ]"), new STKEYLABEL(14, "[ E ]"), new STKEYLABEL(0x1b, "[ R ]"), new STKEYLABEL(0x1d, "[ T ]"), new STKEYLABEL(0x22, "[ Y ]"), new STKEYLABEL(30, "[ U ]"), new STKEYLABEL(0x12, "[ I ]"), new STKEYLABEL(0x18, "[ O ]"), new STKEYLABEL(0x19, "[ P ]"), new STKEYLABEL(0x4a, "[ [ ]"), new STKEYLABEL(0x73, "[ ] ]"), new STKEYLABEL(0x75, "[Enter]"), new STKEYLABEL(0x4b, "[L-Ctrl]"), new STKEYLABEL(10, "[ A ]"), new STKEYLABEL(0x1c, "[ S ]"), new STKEYLABEL(13, "[ D ]"), 

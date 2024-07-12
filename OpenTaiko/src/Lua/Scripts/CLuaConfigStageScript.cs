@@ -40,7 +40,17 @@ namespace TJAPlayer3
 
         public CItemBase GetItembox(int index)
         {
-            return Info.listItemList[Info.nItembarIndex + index + 1];
+            int currentIndex = Info.nItembarIndex + index;
+            int size = Info.listItemList.Count;
+            while (currentIndex < 0)
+            {
+                currentIndex += size;
+            }
+            while (currentIndex >= size)
+            {
+                currentIndex -= size;
+            }
+            return Info.listItemList[currentIndex];
         }
 
         public CLuaConfigStageScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets)

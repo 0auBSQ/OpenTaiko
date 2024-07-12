@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using FDK;
+using Silk.NET.SDL;
 
 namespace TJAPlayer3
 {
@@ -26,6 +27,7 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated && !string.IsNullOrEmpty( strAlphanumericString ) )
 			{
+                /*
 				int BOL = x;
 				for( int i = 0; i < strAlphanumericString.Length; i++ )
 				{
@@ -52,7 +54,9 @@ namespace TJAPlayer3
 						}
 					}
 				}
-			}
+				*/
+                lcConsoleFont.tDrawText(x, y, font, strAlphanumericString);
+            }
 		}
 
 
@@ -64,8 +68,8 @@ namespace TJAPlayer3
 		}
 		public override void DeActivate()
 		{
-			if( this.rc文字の矩形領域 != null )
-				this.rc文字の矩形領域 = null;
+			//if( this.rc文字の矩形領域 != null )
+			//	this.rc文字の矩形領域 = null;
 
 			base.DeActivate();
 		}
@@ -73,6 +77,7 @@ namespace TJAPlayer3
 		{
 			if( !base.IsDeActivated )
 			{
+				/*
 				this.txフォント8x16[ 0 ] = TJAPlayer3.Tx.TxC(@"Console_Font.png");
 				this.txフォント8x16[ 1 ] = TJAPlayer3.Tx.TxC(@"Console_Font_Small.png");
 
@@ -91,14 +96,18 @@ namespace TJAPlayer3
 						this.rc文字の矩形領域[i, j].Height = nFontHeight;
 					}
 				}
+				*/
 
-				base.CreateManagedResource();
+				lcConsoleFont = new CLuaConsoleFontScript(CSkin.Path("Modules/ConsoleFont"));
+
+                base.CreateManagedResource();
 			}
 		}
 		public override void ReleaseManagedResource()
 		{
 			if( !base.IsDeActivated )
 			{
+				/*
 				for( int i = 0; i < 2; i++ )
 				{
 					if( this.txフォント8x16[ i ] != null )
@@ -107,20 +116,25 @@ namespace TJAPlayer3
 						this.txフォント8x16[ i ] = null;
 					}
 				}
-				base.ReleaseManagedResource();
+				*/
+
+				lcConsoleFont?.Dispose();
+
+                base.ReleaseManagedResource();
 			}
 		}
 
 
-		// その他
+        // その他
 
-		#region [ private ]
-		//-----------------
-		private Rectangle[,] rc文字の矩形領域;
-		private const string str表記可能文字 = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
-		public int nFontWidth = 8, nFontHeight = 16;
-		private CTexture[] txフォント8x16 = new CTexture[ 2 ];
-		//-----------------
-		#endregion
-	}
+        #region [ private ]
+        //-----------------
+        //private Rectangle[,] rc文字の矩形領域;
+        //private const string str表記可能文字 = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
+        //public int nFontWidth = 8, nFontHeight = 16;
+        //private CTexture[] txフォント8x16 = new CTexture[ 2 ];
+        private CLuaConsoleFontScript lcConsoleFont;
+        //-----------------
+        #endregion
+    }
 }

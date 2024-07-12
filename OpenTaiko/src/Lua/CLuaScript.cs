@@ -17,6 +17,17 @@ namespace TJAPlayer3
 {
     class CLuaScript : IDisposable
     {
+        private static List<CLuaScript> listScripts = new List<CLuaScript>();
+        public static void tReloadLanguage(string lang)
+        {
+            foreach (var item in listScripts)
+            {
+                item.ReloadLanguage(lang);
+            }
+        }
+
+
+
         public string strDir { get; private set; }
         public string strTexturesDir { get; private set; }
         public string strSounsdDir { get; private set; }
@@ -28,6 +39,7 @@ namespace TJAPlayer3
         protected Lua LuaScript { get; private set; }
 
         private LuaFunction lfLoadAssets;
+        private LuaFunction lfReloadLanguage;
 
         private CLuaInfo luaInfo;
         private CLuaFps luaFPS = new CLuaFps();
@@ -185,6 +197,7 @@ namespace TJAPlayer3
 
 
             lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
+            lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
 
             LuaScript["loadConfig"] = LoadConfig;
             LuaScript["loadTexture"] = LoadTexture;
@@ -199,6 +212,8 @@ namespace TJAPlayer3
 
 
             if (loadAssets) LoadAssets();
+
+            listScripts.Add(this);
         }
 
         public void LoadAssets(params object[] args)
@@ -209,6 +224,11 @@ namespace TJAPlayer3
 
             bLoadedAssets = true;
             bDisposed = false;
+        }
+
+        public void ReloadLanguage(params object[] args)
+        {
+            RunLuaCode(lfReloadLanguage, args);
         }
 
         public void Dispose()
@@ -225,6 +245,8 @@ namespace TJAPlayer3
 
             bDisposed = true;
             bLoadedAssets = false;
+
+            listScripts.Remove(this);
         }
 
         private void Crash(Exception exception)
