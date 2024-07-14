@@ -326,8 +326,11 @@ namespace TJAPlayer3
 
 			tResetTitleTextureKey();
 
-
-            if (rCurrentlySelectedSong.list子リスト.Count != 1)
+			// INFO: This null check is added due to `list子リスト` might be null during rapid sorting
+			//		Despite what editor tell you here it is possible to be null
+            if (rCurrentlySelectedSong != null && 
+				rCurrentlySelectedSong.list子リスト != null && 
+				rCurrentlySelectedSong.list子リスト.Count != 1)
 			{
 				if (TJAPlayer3.ConfigIni.TJAP3FolderMode)
 				{
