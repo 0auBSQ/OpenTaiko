@@ -152,24 +152,37 @@ namespace TJAPlayer3
                     }
 					*/
 
-                    TJAPlayer3.Tx.lcGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
-                    TJAPlayer3.Tx.lcAIGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
-                    TJAPlayer3.Tx.lcDanGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
-                    TJAPlayer3.Tx.lcTowerGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
 
-                    CTexture? dp = (TJAPlayer3.stage段位選択.段位リスト.stバー情報 != null)
-                        ? TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate
-                        : null;
-					TJAPlayer3.Tx.lcDanGameStartFade.SetDanPlateTexture(dp);
+					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+                    {
+                        TJAPlayer3.Tx.lcDanGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
 
-                    int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+                        CTexture? dp = (TJAPlayer3.stage段位選択.段位リスト.stバー情報 != null)
+						? TJAPlayer3.stage段位選択.段位リスト.stバー情報[TJAPlayer3.stage段位選択.段位リスト.n現在の選択行].txDanPlate
+						: null;
+						TJAPlayer3.Tx.lcDanGameStartFade.SetDanPlateTexture(dp);
+					}
+					else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+                    {
+                        TJAPlayer3.Tx.lcTowerGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
 
-                    if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
-                        currentTowerType = 0;
-                    if (currentTowerType < TJAPlayer3.Tx.TowerResult_Tower.Length)
-                        TJAPlayer3.Tx.lcTowerGameStartFade.SetTowerTexture(TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]);
-                    else
-                        TJAPlayer3.Tx.lcTowerGameStartFade.SetTowerTexture(null);
+                        int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+
+                        if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
+                            currentTowerType = 0;
+                        if (currentTowerType < TJAPlayer3.Tx.TowerResult_Tower.Length)
+                            TJAPlayer3.Tx.lcTowerGameStartFade.SetTowerTexture(TJAPlayer3.Tx.TowerResult_Tower[currentTowerType]);
+                        else
+                            TJAPlayer3.Tx.lcTowerGameStartFade.SetTowerTexture(null);
+                    }
+                    else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                    {
+                        TJAPlayer3.Tx.lcAIGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
+                    }
+					else
+					{
+                        TJAPlayer3.Tx.lcGameStartFade.GenTitle(タイトル ?? "", サブタイトル ?? "");
+                    }
                 }
 				catch ( CTextureCreateFailedException e )
 				{
