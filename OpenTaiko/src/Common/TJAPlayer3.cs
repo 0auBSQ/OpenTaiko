@@ -596,7 +596,7 @@ namespace TJAPlayer3
 					catch
 					{
 						Trace.TraceError(ToString());
-						Trace.TraceError( "例外が発生しましたが処理を継続します。" );
+						Trace.TraceError( "例外が発生しましたが処理を継続します。 (0bfe6bff-2a56-4df4-9333-2df26d9b765b)" );
 						success = false;
 					}
 				}
