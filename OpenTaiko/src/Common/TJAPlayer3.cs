@@ -985,7 +985,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ タイトル" );
+								Trace.TraceInformation( "■ Title" );
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1004,7 +1004,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 曲読み込み" );
+								Trace.TraceInformation( "■ Song Loading" );
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1042,7 +1042,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 選曲" );
+								Trace.TraceInformation( "■ Song Select" );
 								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1067,7 +1067,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 段位選択" );
+								Trace.TraceInformation( "■ Dan-i Dojo" );
 								stage段位選択.Activate();	
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1183,7 +1183,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ コンフィグ" );
+								Trace.TraceInformation( "■ Config" );
 								stageコンフィグ.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1206,7 +1206,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 終了" );
+								Trace.TraceInformation( "■ End" );
 								stage終了.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1229,7 +1229,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 選曲");
+								Trace.TraceInformation("■ Song Select");
 								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1279,7 +1279,7 @@ namespace TJAPlayer3
 										r現在のステージ.ReleaseUnmanagedResource();
 									}
 									Trace.TraceInformation( "----------------------" );
-									Trace.TraceInformation( "■ タイトル" );
+									Trace.TraceInformation( "■ Title" );
 									stageタイトル.Activate();
 									if (!ConfigIni.PreAssetsLoading) 
 									{
@@ -1312,7 +1312,7 @@ namespace TJAPlayer3
 										r現在のステージ.ReleaseUnmanagedResource();
 									}
 									Trace.TraceInformation( "----------------------" );
-									Trace.TraceInformation( "■ 選曲" );
+									Trace.TraceInformation( "■ Song Select" );
 									stageSongSelect.Activate();
 									if (!ConfigIni.PreAssetsLoading) 
 									{
@@ -1355,7 +1355,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ タイトル" );
+								Trace.TraceInformation( "■ Title" );
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1400,7 +1400,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 曲読み込み" );
+								Trace.TraceInformation( "■ Song Loading" );
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1461,7 +1461,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ コンフィグ" );
+								Trace.TraceInformation( "■ Config" );
 								stageコンフィグ.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1497,7 +1497,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ スキン切り替え" );
+								Trace.TraceInformation( "■ Skin Change" );
 								stageChangeSkin.Activate();
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageChangeSkin;
@@ -1523,7 +1523,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1563,7 +1563,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 曲読み込み");
+								Trace.TraceInformation("■ Song Loading");
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1602,7 +1602,7 @@ namespace TJAPlayer3
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1700,7 +1700,7 @@ namespace TJAPlayer3
 							#endregion
 
 							Trace.TraceInformation( "----------------------" );
-							Trace.TraceInformation( "■ 演奏（ドラム画面）" );
+							Trace.TraceInformation( "■ Gameplay (Drum Screen)" );
 #if false		// #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 for (int i = 0; i < 5; i++)
 {
@@ -1937,7 +1937,7 @@ for (int i = 0; i < 3; i++) {
 								}
 
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 選曲");
+								Trace.TraceInformation("■ Song Select");
 								stageSongSelect.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -1967,7 +1967,7 @@ for (int i = 0; i < 3; i++) {
 								#region [ 演奏クリア ]
 								//-----------------------------
 
-								// Fetch the results of the just finished play
+								// Fetch the results of the finished play
 								CScoreIni.C演奏記録 c演奏記録_Drums;
 								stage演奏ドラム画面.t演奏結果を格納する( out c演奏記録_Drums );
 
@@ -1990,7 +1990,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation( "----------------------" );
-								Trace.TraceInformation( "■ 結果" );
+								Trace.TraceInformation( "■ Results" );
 								stage結果.st演奏記録.Drums = c演奏記録_Drums;
 								stage結果.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
@@ -2103,7 +2103,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
@@ -2138,7 +2138,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 曲読み込み");
+								Trace.TraceInformation("■ Song Loading");
 								stage曲読み込み.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -2175,7 +2175,7 @@ for (int i = 0; i < 3; i++) {
 								r現在のステージ.ReleaseUnmanagedResource();
 							}
 							Trace.TraceInformation( "----------------------" );
-							Trace.TraceInformation( "■ 選曲" );
+							Trace.TraceInformation( "■ Song Select" );
 							stageSongSelect.Activate();
 							if (!ConfigIni.PreAssetsLoading) 
 							{
@@ -2216,7 +2216,7 @@ for (int i = 0; i < 3; i++) {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ タイトル");
+								Trace.TraceInformation("■ Title");
 								stageタイトル.Activate();
 								if (!ConfigIni.PreAssetsLoading) 
 								{
@@ -2375,7 +2375,7 @@ for (int i = 0; i < 3; i++) {
 				Trace.WriteLine( "" );
 				Trace.Write( e.ToString() );
 				Trace.WriteLine( "" );
-				Trace.WriteLine( "エラーだゴメン！（涙" );
+				Trace.WriteLine( "An error has occured." );
                 AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
 				throw e;
 			}
@@ -2403,12 +2403,12 @@ for (int i = 0; i < 3; i++) {
 			catch ( CTextureCreateFailedException e )
 			{
 				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "テクスチャの生成に失敗しました。({0})", fileName );
+				Trace.TraceError( "Texture generation has failed. ({0})", fileName );
 				return null;
 			}
 			catch ( FileNotFoundException )
 			{
-				Trace.TraceWarning( "テクスチャファイルが見つかりませんでした。({0})", fileName );
+				Trace.TraceWarning( "Could not find specified texture file. ({0})", fileName );
 				return null;
 			}
 		}
@@ -2432,7 +2432,7 @@ for (int i = 0; i < 3; i++) {
 			}
             if (bitmap == null)
             {
-                Trace.TraceError("テクスチャの生成に失敗しました。(bitmap==null)");
+                Trace.TraceError("Texture generation has failed. (bitmap==null)");
                 return null;
             }
             try
@@ -2442,7 +2442,7 @@ for (int i = 0; i < 3; i++) {
 			catch ( CTextureCreateFailedException e )
 			{
 				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "テクスチャの生成に失敗しました。(txData)" );
+				Trace.TraceError( "Texture generation has failed. (txData)" );
 				return null;
 			}
 		}
@@ -2464,13 +2464,13 @@ for (int i = 0; i < 3; i++) {
 			catch ( CTextureCreateFailedException e )
 			{
 				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "テクスチャの生成に失敗しました。({0})", fileName );
+				Trace.TraceError( "Texture generation has failed. ({0})", fileName );
 				return null;
 			}
 			catch ( FileNotFoundException e )
 			{
 				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "テクスチャファイルが見つかりませんでした。({0})", fileName );
+				Trace.TraceError( "Texture generation has failed. ({0})", fileName );
 				return null;
 			}
 		}
@@ -2575,6 +2575,7 @@ for (int i = 0; i < 3; i++) {
 		public List<CActivity> listトップレベルActivities;
 		private int n進行描画の戻り値;
 		private string strWindowTitle
+		// ayo komi isn't this useless code? - tfd500
 		{
 			get
 			{
@@ -2584,7 +2585,7 @@ for (int i = 0; i < 3; i++) {
 				}
 				else
 				{
-					return "TJAPlayer3 feat.DTXMania";
+					return "OpenTaiko";
 				}
 			}
 		}
@@ -2638,40 +2639,40 @@ for (int i = 0; i < 3; i++) {
 			{
 				try
 				{
-					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "TJAPlayer3.log" ), false, Encoding.GetEncoding(TJAPlayer3.sEncType) ) ) );
+					Trace.Listeners.Add( new CTraceLogListener( new StreamWriter( System.IO.Path.Combine( strEXEのあるフォルダ, "OpenTaiko.log" ), false, Encoding.GetEncoding(TJAPlayer3.sEncType) ) ) );
 				}
 				catch ( System.UnauthorizedAccessException )			// #24481 2011.2.20 yyagi
 				{
 					int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja")? 0 : 1;
 					string[] mes_writeErr = {
-						"DTXManiaLog.txtへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
-						"Failed to write DTXManiaLog.txt. Please set it writable and try again."
+						"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
+						"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
 					};
-					//MessageBox.Show( mes_writeErr[c], "DTXMania boot error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+					//MessageBox.Show( mes_writeErr[c], "OpenTaiko Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
 					Environment.Exit(1);
 				}
 			}
 			Trace.WriteLine("");
-			Trace.WriteLine( "DTXMania powered by YAMAHA Silent Session Drums" );
-			Trace.WriteLine( string.Format( "Release: {0}", VERSION ) );
+			Trace.WriteLine( "Welcome to OpenTaiko! Starting log..." );
+			Trace.WriteLine( string.Format( "Version: {0}", VERSION ) );
 			Trace.WriteLine( "" );
 			Trace.TraceInformation( "----------------------" );
-			Trace.TraceInformation( "■ アプリケーションの初期化" );
+			Trace.TraceInformation( "■ Application Info:" );
 			Trace.TraceInformation( "OS Version: " + Environment.OSVersion );
-			Trace.TraceInformation( "ProcessorCount: " + Environment.ProcessorCount.ToString() );
+			Trace.TraceInformation( "Processors: " + Environment.ProcessorCount.ToString() );
 			Trace.TraceInformation( "CLR Version: " + Environment.Version.ToString() );
 			//---------------------
 			#endregion
 			
 			#region [ DTXVmodeクラス の初期化 ]
 			//---------------------
-			//Trace.TraceInformation( "DTXVモードの初期化を行います。" );
+			//Trace.TraceInformation( "Initialize DTXV mode." );
 			//Trace.Indent();
 			try
 			{
 				DTXVmode = new CDTXVmode();
 				DTXVmode.Enabled = false;
-				//Trace.TraceInformation( "DTXVモードの初期化を完了しました。" );
+				//Trace.TraceInformation( "DTXV initialization complete." );
 			}
 			finally
 			{
@@ -2685,7 +2686,7 @@ for (int i = 0; i < 3; i++) {
 
 			#region [ Skin の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "スキンの初期化を行います。" );
+			Trace.TraceInformation( "Initializing skin..." );
 			Trace.Indent();
 #if !DEBUG
 			try
@@ -2696,12 +2697,12 @@ for (int i = 0; i < 3; i++) {
 
 				ChangeResolution(TJAPlayer3.Skin.Resolution[0], TJAPlayer3.Skin.Resolution[1]);
 
-				Trace.TraceInformation( "スキンの初期化を完了しました。" );
+				Trace.TraceInformation( "Skin successfully initialized." );
 			}
 #if !DEBUG
 			catch (Exception e)
 			{
-				Trace.TraceInformation( "スキンの初期化に失敗しました。" );
+				Trace.TraceInformation( "Skin failed to initialize." );
 				throw;
 			}
 			finally
@@ -2718,12 +2719,12 @@ for (int i = 0; i < 3; i++) {
 			//-----------
 			#region [ Timer の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "タイマの初期化を行います。" );
+			Trace.TraceInformation( "Initializing timer..." );
 			Trace.Indent();
 			try
 			{
 				Timer = new CTimer( CTimer.TimerType.MultiMedia );
-				Trace.TraceInformation( "タイマの初期化を完了しました。" );
+				Trace.TraceInformation( "Timer successfully initialized." );
 			}
 			finally
 			{
@@ -2735,12 +2736,12 @@ for (int i = 0; i < 3; i++) {
 
 			#region [ FPS カウンタの初期化 ]
 			//---------------------
-			Trace.TraceInformation( "FPSカウンタの初期化を行います。" );
+			Trace.TraceInformation( "Initializing FPS counter..." );
 			Trace.Indent();
 			try
 			{
 				FPS = new CFPS();
-				Trace.TraceInformation( "FPSカウンタを生成しました。" );
+				Trace.TraceInformation( "FPS counter initialized." );
 			}
 			finally
 			{
@@ -2750,25 +2751,25 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ act文字コンソールの初期化 ]
 			//---------------------
-			Trace.TraceInformation( "文字コンソールの初期化を行います。" );
+			Trace.TraceInformation( "Initializing console..." );
 			Trace.Indent();
 			try
 			{
 				actTextConsole = new CTextConsole();
-				Trace.TraceInformation( "文字コンソールを生成しました。" );
+				Trace.TraceInformation( "Console initialized." );
 				actTextConsole.Activate();
 				//if (!ConfigIni.PreAssetsLoading) 
 				{
 					actTextConsole.CreateManagedResource();
 					actTextConsole.CreateUnmanagedResource();
 				}
-				Trace.TraceInformation( "文字コンソールを活性化しました。" );
-				Trace.TraceInformation( "文字コンソールの初期化を完了しました。" );
+				Trace.TraceInformation( "Console has been activated." );
+				Trace.TraceInformation( "Console has finished being initialized." );
 			}
 			catch( Exception exception )
 			{
 				Trace.TraceError( exception.ToString() );
-				Trace.TraceError( "文字コンソールの初期化に失敗しました。" );
+				Trace.TraceError( "Console failed to initialize." );
 			}
 			finally
 			{
@@ -2778,7 +2779,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Input管理 の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "DirectInput, MIDI入力の初期化を行います。" );
+			Trace.TraceInformation( "Initializing DirectInput and MIDI input..." );
 			Trace.Indent();
 			try
 			{
@@ -2832,11 +2833,11 @@ for (int i = 0; i < 3; i++) {
 						continue;
 					}
 				}
-				Trace.TraceInformation( "DirectInput の初期化を完了しました。" );
+				Trace.TraceInformation( "DirectInput has been initialized." );
 			}
 			catch( Exception exception2 )
 			{
-				Trace.TraceError( "DirectInput, MIDI入力の初期化に失敗しました。" );
+				Trace.TraceError( "DirectInput and MIDI input failed to initialize." );
 				throw;
 			}
 			finally
@@ -2847,17 +2848,17 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Pad の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "パッドの初期化を行います。" );
+			Trace.TraceInformation( "Initialize pad..." );
 			Trace.Indent();
 			try
 			{
 				Pad = new CPad( ConfigIni, InputManager );
-				Trace.TraceInformation( "パッドの初期化を完了しました。" );
+				Trace.TraceInformation( "Pad has been initialized." );
 			}
 			catch( Exception exception3 )
 			{
 				Trace.TraceError( exception3.ToString() );
-				Trace.TraceError( "パッドの初期化に失敗しました。" );
+				Trace.TraceError( "Pad failed to initialize." );
 			}
 			finally
 			{
@@ -2867,7 +2868,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Sound管理 の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "サウンドデバイスの初期化を行います。" );
+			Trace.TraceInformation( "Initializing sound device..." );
 			Trace.Indent();
 			try
 			{
@@ -2938,7 +2939,7 @@ for (int i = 0; i < 3; i++) {
 			}
 			catch (Exception e)
 			{
-                throw new NullReferenceException("サウンドデバイスがひとつも有効になっていないため、サウンドデバイスの初期化ができませんでした。", e);
+                throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 			}
 			finally
 			{
@@ -2948,7 +2949,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Songs管理 の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "曲リストの初期化を行います。" );
+			Trace.TraceInformation( "Initializing song list... );
 			Trace.Indent();
 			try
 			{
@@ -2956,12 +2957,12 @@ for (int i = 0; i < 3; i++) {
 //				Songs管理_裏読 = new CSongs管理();
 				EnumSongs = new CEnumSongs();
 				actEnumSongs = new CActEnumSongs();
-				Trace.TraceInformation( "曲リストの初期化を完了しました。" );
+				Trace.TraceInformation( "Song list initialized." );
 			}
 			catch( Exception e )
 			{
 				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "曲リストの初期化に失敗しました。" );
+				Trace.TraceError( "Song list failed to initialize." );
 			}
 			finally
 			{
@@ -3019,12 +3020,12 @@ for (int i = 0; i < 3; i++) {
 			//---------------------
 			PluginHost = new CPluginHost();
 
-			Trace.TraceInformation( "プラグインの検索と生成を行います。" );
+			Trace.TraceInformation( "Initializing and generating plugins..." );
 			Trace.Indent();
 			try
 			{
 				this.tプラグイン検索と生成();
-				Trace.TraceInformation( "プラグインの検索と生成を完了しました。" );
+				Trace.TraceInformation( "Plugin generation and initialization complete." );
 			}
 			finally
 			{
@@ -3036,7 +3037,7 @@ for (int i = 0; i < 3; i++) {
 			//---------------------
 			if( this.PluginList != null && this.PluginList.Count > 0 )
 			{
-				Trace.TraceInformation( "プラグインの初期化を行います。" );
+				Trace.TraceInformation( "Initializing plugin(s)..." );
 				Trace.Indent();
 				try
 				{
@@ -3048,11 +3049,11 @@ for (int i = 0; i < 3; i++) {
 						st.plugin.OnUnmanagedリソースの作成();
 						Directory.SetCurrentDirectory( TJAPlayer3.strEXEのあるフォルダ );
 					}
-					Trace.TraceInformation( "すべてのプラグインの初期化を完了しました。" );
+					Trace.TraceInformation( "All plugins have been initialized." );
 				}
 				catch
 				{
-					Trace.TraceError( "プラグインのどれかの初期化に失敗しました。" );
+					Trace.TraceError( "Plugins could not be initialized." );
 					throw;
 				}
 				finally
@@ -3082,13 +3083,13 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 
 
-            Trace.TraceInformation( "アプリケーションの初期化を完了しました。" );
+            Trace.TraceInformation( "Application successfully started." );
 
 
 			#region [ 最初のステージの起動 ]
             //---------------------
             Trace.TraceInformation( "----------------------" );
-			Trace.TraceInformation( "■ 起動" );
+			Trace.TraceInformation( "■ Startup" );
 
 			if ( TJAPlayer3.bコンパクトモード )
 			{
@@ -3125,24 +3126,24 @@ for (int i = 0; i < 3; i++) {
 			if( !this.b終了処理完了済み )
 			{
 				Trace.TraceInformation( "----------------------" );
-				Trace.TraceInformation( "■ アプリケーションの終了" );
+				Trace.TraceInformation( "■ Shutdown" );
 				#region [ 曲検索の終了処理 ]
 				//---------------------
 				
 				if ( actEnumSongs != null )
 				{
-					Trace.TraceInformation( "曲検索actの終了処理を行います。" );
+					Trace.TraceInformation( "Ending enumeration of songs..." );
 					Trace.Indent();
 					try
 					{
 						actEnumSongs.DeActivate();
 						actEnumSongs= null;
-						Trace.TraceInformation( "曲検索actの終了処理を完了しました。" );
+						Trace.TraceInformation( "Enumeration of songs closed down successfully." );
 					}
 					catch ( Exception e )
 					{
 						Trace.TraceError( e.ToString() );
-						Trace.TraceError( "曲検索actの終了処理に失敗しました。" );
+						Trace.TraceError( "Song enumeration could not close." );
 					}
 					finally
 					{
@@ -3155,7 +3156,7 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				if( TJAPlayer3.r現在のステージ != null && TJAPlayer3.r現在のステージ.IsActivated )		// #25398 2011.06.07 MODIFY FROM
 				{
-					Trace.TraceInformation( "現在のステージを終了します。" );
+					Trace.TraceInformation( "Exiting stage..." );
 					Trace.Indent();
 					try
 					{
@@ -3165,7 +3166,7 @@ for (int i = 0; i < 3; i++) {
 							r現在のステージ.ReleaseManagedResource();
 							r現在のステージ.ReleaseUnmanagedResource();
 						}
-						Trace.TraceInformation( "現在のステージの終了処理を完了しました。" );
+						Trace.TraceInformation( "Stage exited." );
 					}
 					finally
 					{
@@ -3175,10 +3176,10 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				#endregion
 				#region [ プラグインの終了処理 ]
-				//---------------------
+				//--------------------- from this point this is where i gave up - tfd500
 				if (this.PluginList != null && this.PluginList.Count > 0)
 				{
-					Trace.TraceInformation( "すべてのプラグインを終了します。" );
+					Trace.TraceInformation( "Ending all plugins..." );
 					Trace.Indent();
 					try
 					{
@@ -3191,7 +3192,7 @@ for (int i = 0; i < 3; i++) {
 							Directory.SetCurrentDirectory( TJAPlayer3.strEXEのあるフォルダ );
 						}
 						PluginHost = null;
-						Trace.TraceInformation( "すべてのプラグインの終了処理を完了しました。" );
+						Trace.TraceInformation( "All plugins have been terminated." );
 					}
 					finally
 					{
@@ -3207,7 +3208,7 @@ for (int i = 0; i < 3; i++) {
                 //---------------------
                 if (Songs管理 != null)
 				{
-					Trace.TraceInformation( "曲リストの終了処理を行います。" );
+					Trace.TraceInformation( "Ending song list..." );
 					Trace.Indent();
 					try
 					{
@@ -3221,12 +3222,12 @@ for (int i = 0; i < 3; i++) {
 #pragma warning restore SYSLIB0011
 
 						Songs管理 = null;
-						Trace.TraceInformation( "曲リストの終了処理を完了しました。" );
+						Trace.TraceInformation( "Song list terminated." );
 					}
 					catch( Exception exception )
 					{
 						Trace.TraceError( exception.ToString() );
-						Trace.TraceError( "曲リストの終了処理に失敗しました。" );
+						Trace.TraceError( "Song list failed to terminate." );
 					}
 					finally
 					{
@@ -3242,18 +3243,18 @@ for (int i = 0; i < 3; i++) {
                 //---------------------
                 if (Skin != null)
 				{
-					Trace.TraceInformation( "スキンの終了処理を行います。" );
+					Trace.TraceInformation( "Terminating skin..." );
 					Trace.Indent();
 					try
 					{
 						Skin.Dispose();
 						Skin = null;
-						Trace.TraceInformation( "スキンの終了処理を完了しました。" );
+						Trace.TraceInformation( "Skin has been terminated." );
 					}
 					catch( Exception exception2 )
 					{
 						Trace.TraceError( exception2.ToString() );
-						Trace.TraceError( "スキンの終了処理に失敗しました。" );
+						Trace.TraceError( "Skin failed to terminate." );
 					}
 					finally
 					{
@@ -3266,18 +3267,18 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				if (SoundManager != null)
 				{
-					Trace.TraceInformation( "DirectSound の終了処理を行います。" );
+					Trace.TraceInformation( "Ending DirectSound devices..." );
 					Trace.Indent();
 					try
 					{
 						SoundManager.Dispose();
 						SoundManager = null;
-						Trace.TraceInformation( "DirectSound の終了処理を完了しました。" );
+						Trace.TraceInformation( "DirectSound devices have been terminated." );
 					}
 					catch( Exception exception3 )
 					{
 						Trace.TraceError( exception3.ToString() );
-						Trace.TraceError( "DirectSound の終了処理に失敗しました。" );
+						Trace.TraceError( "DirectSound devices failed to terminate." );
 					}
 					finally
 					{
@@ -3290,17 +3291,17 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				if (Pad != null)
 				{
-					Trace.TraceInformation( "パッドの終了処理を行います。" );
+					Trace.TraceInformation( "Ending pads..." );
 					Trace.Indent();
 					try
 					{
 						Pad = null;
-						Trace.TraceInformation( "パッドの終了処理を完了しました。" );
+						Trace.TraceInformation( "Pads have been terminated." );
 					}
 					catch( Exception exception4 )
 					{
 						Trace.TraceError( exception4.ToString() );
-						Trace.TraceError( "パッドの終了処理に失敗しました。" );
+						Trace.TraceError( "Pads failed to terminate。" );
 					}
 					finally
 					{
@@ -3313,18 +3314,18 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				if (InputManager != null)
 				{
-					Trace.TraceInformation( "DirectInput, MIDI入力の終了処理を行います。" );
+					Trace.TraceInformation( "Ending DirectInput and MIDI devices..." );
 					Trace.Indent();
 					try
 					{
 						InputManager.Dispose();
 						InputManager = null;
-						Trace.TraceInformation( "DirectInput, MIDI入力の終了処理を完了しました。" );
+						Trace.TraceInformation( "DirectInput and MIDI devices terminated." );
 					}
 					catch( Exception exception5 )
 					{
 						Trace.TraceError( exception5.ToString() );
-						Trace.TraceError( "DirectInput, MIDI入力の終了処理に失敗しました。" );
+						Trace.TraceError( "DirectInput and MIDI devices failed to terminate." );
 					}
 					finally
 					{
@@ -3337,7 +3338,7 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				if (actTextConsole != null)
 				{
-					Trace.TraceInformation( "文字コンソールの終了処理を行います。" );
+					Trace.TraceInformation( "Ending console..." );
 					Trace.Indent();
 					try
 					{
@@ -3348,12 +3349,12 @@ for (int i = 0; i < 3; i++) {
 							actTextConsole.ReleaseUnmanagedResource();
 						}
 						actTextConsole = null;
-						Trace.TraceInformation( "文字コンソールの終了処理を完了しました。" );
+						Trace.TraceInformation( "Console terminated." );
 					}
 					catch( Exception exception6 )
 					{
 						Trace.TraceError( exception6.ToString() );
-						Trace.TraceError( "文字コンソールの終了処理に失敗しました。" );
+						Trace.TraceError( "Console failed to terminate." );
 					}
 					finally
 					{
@@ -3364,7 +3365,7 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ FPSカウンタの終了処理 ]
 				//---------------------
-				Trace.TraceInformation("FPSカウンタの終了処理を行います。");
+				Trace.TraceInformation("Ending FPS counter...");
 				Trace.Indent();
 				try
 				{
@@ -3372,7 +3373,7 @@ for (int i = 0; i < 3; i++) {
 					{
 						FPS = null;
 					}
-					Trace.TraceInformation( "FPSカウンタの終了処理を完了しました。" );
+					Trace.TraceInformation( "FPS counter terminated." );
 				}
 				finally
 				{
@@ -3382,7 +3383,7 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ タイマの終了処理 ]
 				//---------------------
-				Trace.TraceInformation("タイマの終了処理を行います。");
+				Trace.TraceInformation("Ending timer...");
 				Trace.Indent();
 				try
 				{
@@ -3390,11 +3391,11 @@ for (int i = 0; i < 3; i++) {
 					{
 						Timer.Dispose();
 						Timer = null;
-						Trace.TraceInformation( "タイマの終了処理を完了しました。" );
+						Trace.TraceInformation( "Timer terminated." );
 					}
 					else
 					{
-						Trace.TraceInformation( "タイマは使用されていません。" );
+						Trace.TraceInformation( "There are no existing timers." );
 					}
 				}
 				finally
@@ -3405,7 +3406,8 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ Config.iniの出力 ]
 				//---------------------
-				Trace.TraceInformation("Config.ini を出力します。");
+				Trace.TraceInformation("Outputting Config.ini...");
+				Trace.TraceInformation("This only needs to be done once, unless you have deleted the file!");
 //				if ( ConfigIni.bIsSwappedGuitarBass )			// #24063 2011.1.16 yyagi ギターベースがスワップしているときは元に戻す
 				string str = strEXEのあるフォルダ + "Config.ini";
 				Trace.Indent();
@@ -3414,18 +3416,18 @@ for (int i = 0; i < 3; i++) {
 					if ( DTXVmode.Enabled )
 					{
 						DTXVmode.tUpdateConfigIni();
-						Trace.TraceInformation( "DTXVモードの設定情報を、Config.iniに保存しました。" );
+						Trace.TraceInformation( "Configuration information for DTXV mode has been saved in Config.ini." );
 					}
 					else
 					{
 						ConfigIni.t書き出し( str );
-						Trace.TraceInformation( "保存しました。({0})", str );
+						Trace.TraceInformation( "Saved succesfully. ({0})", str );
 					}
 				}
 				catch( Exception e )
 				{
 					Trace.TraceError( e.ToString() );
-					Trace.TraceError( "Config.ini の出力に失敗しました。({0})", str );
+					Trace.TraceError( "Config.ini failed to create. ({0})", str );
 				}
 				finally
 				{
@@ -3479,7 +3481,7 @@ for (int i = 0; i < 3; i++) {
 				}
 				//---------------------
 				#endregion
-                Trace.TraceInformation( "アプリケーションの終了処理を完了しました。" );
+                Trace.TraceInformation( "OpenTaiko has closed down successfully." );
 
 
 				this.b終了処理完了済み = true;
@@ -3502,7 +3504,7 @@ for (int i = 0; i < 3; i++) {
 			this.SearchAndGeneratePluginsInFolder( PluginFolderPath, PluginActivityName );
 
 			if( this.PluginList.Count > 0 )
-				Trace.TraceInformation( this.PluginList.Count + " 個のプラグインを読み込みました。" );
+				Trace.TraceInformation( this.PluginList.Count + "Plugins loaded." );
 		}
 
 		private void ChangeResolution(int nWidth, int nHeight)
@@ -3515,7 +3517,7 @@ for (int i = 0; i < 3; i++) {
 
 		public void RefreshSkin()
         {
-            Trace.TraceInformation("スキン変更:" + TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName(false));
+            Trace.TraceInformation("Skin Change:" + TJAPlayer3.Skin.GetCurrentSkinSubfolderFullName(false));
 
             TJAPlayer3.actTextConsole.DeActivate();
 			actTextConsole.ReleaseManagedResource();
