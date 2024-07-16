@@ -15,12 +15,14 @@ namespace TJAPlayer3
 		{
 			this.mode = EFIFOモード.フェードアウト;
 			this.counter = new CCounter(start, end, interval, TJAPlayer3.Timer );
-		}
+            TJAPlayer3.Tx.lcBlackFade.FadeOut();
+        }
 		public void tフェードイン開始(int start = 0, int end = 100, int interval = 5)
 		{
 			this.mode = EFIFOモード.フェードイン;
 			this.counter = new CCounter(start, end, interval, TJAPlayer3.Timer );
-		}
+            TJAPlayer3.Tx.lcBlackFade.FadeIn();
+        }
 
 		
 		// CActivity 実装
@@ -46,6 +48,7 @@ namespace TJAPlayer3
 			}
 			this.counter.Tick();
 			// Size clientSize = CDTXMania.app.Window.ClientSize;	// #23510 2010.10.31 yyagi: delete as of no one use this any longer.
+			/*
 			if (TJAPlayer3.Tx.Tile_Black != null)
 			{
                 TJAPlayer3.Tx.Tile_Black.Opacity = ( this.mode == EFIFOモード.フェードイン ) ? ( ( ( 100 - this.counter.CurrentValue ) * 0xff ) / 100 ) : ( ( this.counter.CurrentValue * 0xff ) / 100 );
@@ -57,10 +60,19 @@ namespace TJAPlayer3
 					}
 				}
 			}
-			if( this.counter.CurrentValue != this.counter.EndValue )
+			*/
+
+			TJAPlayer3.Tx.lcBlackFade.luaFadeInfo.eFIFOMode = mode;
+			TJAPlayer3.Tx.lcBlackFade.luaFadeInfo.dbValue = counter.CurrentValue / counter.EndValue;
+
+            TJAPlayer3.Tx.lcBlackFade.Update();
+            TJAPlayer3.Tx.lcBlackFade.Draw();
+
+            if ( this.counter.CurrentValue != this.counter.EndValue )
 			{
 				return 0;
 			}
+
 			return 1;
 		}
 

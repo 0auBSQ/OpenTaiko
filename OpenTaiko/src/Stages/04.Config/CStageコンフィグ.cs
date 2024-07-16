@@ -74,10 +74,6 @@ namespace TJAPlayer3
 				
 				ReloadMenus();
 
-				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Script.lua"));
-				Background.Init();
-				
-
 				if( this.bメニューにフォーカス中 )
 				{
 					this.t説明文パネルに現在選択されているメニューの説明を描画する();
@@ -120,8 +116,6 @@ namespace TJAPlayer3
 				}
 				txMenuItemLeft = null;
 				*/
-
-				TJAPlayer3.tDisposeSafely(ref Background);
 
 				base.DeActivate();
 			}
@@ -527,8 +521,6 @@ namespace TJAPlayer3
 		//private CTexture tx説明文パネル;
 		//private CTexture tx背景;
 		//private CTexture[ , ] txMenuItemLeft;
-
-		private ScriptBG Background;
 
 		private void tカーソルを下へ移動する()
 		{

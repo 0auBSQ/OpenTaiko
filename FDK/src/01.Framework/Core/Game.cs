@@ -42,7 +42,7 @@ namespace SampleFramework
         public static GL Gl { get; private set; }
         public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
 
-        internal static List<Action> AsyncActions = new();
+        public static List<Action> AsyncActions { get; private set; } = new();
 
         private string strIconFileName;
 

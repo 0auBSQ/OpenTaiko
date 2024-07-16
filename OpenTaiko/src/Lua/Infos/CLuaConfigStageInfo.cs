@@ -8,33 +8,9 @@ namespace TJAPlayer3
 {
     internal class CLuaConfigStageInfo
     {
-        public int nCursorIndex
-        {
-            get
-            {
-                return TJAPlayer3.stageコンフィグ.n現在のメニュー番号;
-            }
-        }
-        public int nItembarIndex
-        {
-            get
-            {
-                return TJAPlayer3.stageコンフィグ.actList.n現在の選択項目;
-            }
-        }
-        public bool bWaitingKeyInput
-        {
-            get
-            {
-                return TJAPlayer3.stageコンフィグ.actKeyAssign.bキー入力待ち;
-            }
-        }
-        public List<CItemBase> listItemList
-        {
-            get
-            {
-                return TJAPlayer3.stageコンフィグ.actList.list項目リスト;
-            }
-        }
+        public int nCursorIndex => TJAPlayer3.stageコンフィグ.n現在のメニュー番号;
+        public int nItembarIndex => TJAPlayer3.stageコンフィグ.actList.n現在の選択項目;
+        public bool bWaitingKeyInput => TJAPlayer3.stageコンフィグ.actKeyAssign.bキー入力待ち;
+        public List<CItemBase> listItemList => TJAPlayer3.stageコンフィグ.actList.list項目リスト;
     }
 }

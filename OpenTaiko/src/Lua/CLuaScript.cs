@@ -42,6 +42,7 @@ namespace TJAPlayer3
         private LuaFunction lfReloadLanguage;
 
         private CLuaInfo luaInfo;
+        private CLuaSkinInfo luaSkinInfo;
         private CLuaFps luaFPS = new CLuaFps();
 
         private List<IDisposable> listDisposables = new List<IDisposable>();
@@ -193,6 +194,7 @@ namespace TJAPlayer3
             LuaScript.DoFile($"{strDir}/Script.lua");
 
             LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
+            LuaScript["skininfo"] = luaSkinInfo = new CLuaSkinInfo();
             LuaScript["fps"] = luaFPS;
 
 

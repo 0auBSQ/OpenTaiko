@@ -30,11 +30,12 @@ namespace TJAPlayer3
 			Trace.TraceInformation( "起動ステージを活性化します。" );
 			Trace.Indent();
 			try
-			{
-				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
-				Background.Init();
+            {
+                lcStageUpStage = new CLuaStartUpStageScript(CSkin.Path("Modules/StartUpStage"));
+				lcStageUpStage.Init();
 
-				if (TJAPlayer3.ConfigIsNew)
+
+                if (TJAPlayer3.ConfigIsNew)
 				{
 					langSelectFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.StartUp_LangSelect_FontSize);
 					langSelectTitle = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
@@ -65,7 +66,8 @@ namespace TJAPlayer3
 			Trace.Indent();
 			try
 			{
-				TJAPlayer3.tDisposeSafely(ref Background);
+				lcStageUpStage.Final();
+                TJAPlayer3.tDisposeSafely(ref lcStageUpStage);
 
 				TJAPlayer3.tDisposeSafely(ref langSelectFont);
 				TJAPlayer3.tDisposeSafely(ref langSelectTitle);
@@ -126,10 +128,10 @@ namespace TJAPlayer3
 					return 0;
 				}
 
-				// CSongs管理 s管理 = CDTXMania.Songs管理;
+                // CSongs管理 s管理 = CDTXMania.Songs管理;
 
-				Background.Update();
-				Background.Draw();
+                lcStageUpStage.Update();
+                lcStageUpStage.Draw();
 
 				#region [ this.str現在進行中 の決定 ]
 				//-----------------
@@ -191,7 +193,9 @@ namespace TJAPlayer3
 								this.str現在進行中 = "Setup done.";
 								this.ePhaseID = EPhase.Startup_Complete;
 								TJAPlayer3.Skin.bgm起動画面.tStop();
-							}
+
+                                if (!TJAPlayer3.ConfigIsNew) TJAPlayer3.AsyncActions.Add(tInitAttension);
+                            }
 							if (TJAPlayer3.ConfigIni.ASyncTextureLoad)
 							{
 								Task.Run(loadTexture);
@@ -266,7 +270,8 @@ namespace TJAPlayer3
                         TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
                         CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
                         bLanguageSelected = true;
-					}
+						tInitAttension();
+                    }
                 }
                 else
                 {
@@ -277,12 +282,14 @@ namespace TJAPlayer3
 						if(TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
 						{
 							TJAPlayer3.Skin.soundDecideSFX.tPlay();
-							return 1;
+							TJAPlayer3.Tx.lcAttention.Final();
+                            return 1;
 						}
 					}
 
-					TJAPlayer3.Tx.Readme.t2D描画(0, 0);
-				}
+                    TJAPlayer3.Tx.lcAttention.Update();
+                    TJAPlayer3.Tx.lcAttention.Draw();
+                }
 
 			}
 			return 0;
@@ -293,8 +300,8 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
-		private string str現在進行中 = "";
-		private ScriptBG Background;
+		private CLuaStartUpStageScript lcStageUpStage;
+        private string str現在進行中 = "";
 		private CEnumSongs es;
 		private bool bIsLoadingTextures;
 
@@ -306,6 +313,11 @@ namespace TJAPlayer3
 		private CTexture[] langList;
 		private CTexture[] langListHighlighted;
 		private int[] langSelectOffset;
+
+		private void tInitAttension()
+        {
+            TJAPlayer3.Tx.lcAttention.Init();
+        }
 
 #if false
 		private void t曲リストの構築()

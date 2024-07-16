@@ -1,0 +1,34 @@
+{
+    "plate_ai":{
+        "x":960,
+        "y":540
+    },
+    "chara":{
+        "moving_x":375,
+        "moving_y":-120
+    },
+    "font_title":{
+        "size":47,
+        "maxsize":1065
+    },
+    "font_subtitle":{
+        "size":30,
+        "maxsize":1065
+    },
+    "title":{
+        "x":960,
+        "y":469
+    },
+    "subtitle":{
+        "x":960,
+        "y":547
+    },
+    "fade_ai_anime_ring":{
+        "x":699,
+        "y":277
+    },
+    "fade_ai_anime_loadbar":{
+        "x":735,
+        "y":573
+    }
+}

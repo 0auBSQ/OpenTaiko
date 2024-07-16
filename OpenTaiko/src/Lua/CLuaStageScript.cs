@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TJAPlayer3;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TJAPlayer3
 {

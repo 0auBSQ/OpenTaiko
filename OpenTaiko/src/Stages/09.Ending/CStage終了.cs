@@ -28,10 +28,9 @@ namespace TJAPlayer3
 			{
 				this.ct時間稼ぎ = new CCounter();
 
-				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}Script.lua"));
-				Background.Init();
+                TJAPlayer3.Tx.lcExitStage.Init();
 
-				base.Activate();
+                base.Activate();
 			}
 			finally
 			{
@@ -44,9 +43,9 @@ namespace TJAPlayer3
 			Trace.TraceInformation( "終了ステージを非活性化します。" );
 			Trace.Indent();
 			try
-			{
-				TJAPlayer3.tDisposeSafely(ref Background);
-				base.DeActivate();
+            {
+                TJAPlayer3.Tx.lcExitStage.Final();
+                base.DeActivate();
 			}
 			finally
 			{
@@ -97,8 +96,8 @@ namespace TJAPlayer3
 
 				this.ct時間稼ぎ.Tick();
 
-				Background.Update();
-				Background.Draw();
+                TJAPlayer3.Tx.lcExitStage.Update();
+				TJAPlayer3.Tx.lcExitStage.Draw();
 
 				//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
@@ -115,7 +114,6 @@ namespace TJAPlayer3
 
 		#region [ private ]
 		//-----------------
-		private ScriptBG Background;
 		private CCounter ct時間稼ぎ;
 		//private CTexture tx背景;
   //      private CTexture tx文字;

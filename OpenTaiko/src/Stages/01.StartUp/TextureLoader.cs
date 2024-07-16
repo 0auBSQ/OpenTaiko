@@ -151,9 +151,6 @@ namespace TJAPlayer3
             Menu_Highlight = TxC(@$"Menu_Highlight.png");
             Loading = TxC(@$"Loading.png");
             Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
-            Overlay = TxC(@$"Overlay.png");
-            Network_Connection = TxC(@$"Network_Connection.png");
-            Readme = TxC(@$"Readme.png");
             NamePlate = new CTexture[2];
             NamePlateBase = TxC(@$"NamePlate.png");
             NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
@@ -186,7 +183,12 @@ namespace TJAPlayer3
                 NamePlate_Title_Small[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Small.png");
             }
 
+            listTexture.Add(lcBlackFade = new CLuaFadeScript(CSkin.Path("Modules/BlackFade")));
+            listTexture.Add(lcWhiteFade = new CLuaFadeScript(CSkin.Path("Modules/WhiteFade")));
+            listTexture.Add(lcResultFade = new CLuaFadeScript(CSkin.Path("Modules/ResultFade")));
+            listTexture.Add(lcAttention = new CLuaAttentionScript(CSkin.Path("Modules/Attention")));
             listTexture.Add(lcEnumSong = new CLuaEnumSongsScript(CSkin.Path("Modules/EnumSongs")));
+            listTexture.Add(lcOverlay = new CLuaOverlayScript(CSkin.Path("Modules/Overlay")));
 
             #endregion
 
@@ -426,23 +428,9 @@ namespace TJAPlayer3
 
             #region 4_読み込み画面
 
-            SongLoading_Plate = TxC(SONGLOADING + @$"Plate.png");
-            SongLoading_Bg = TxC(SONGLOADING + @$"Bg.png");
-            SongLoading_BgWait = TxC(SONGLOADING + @$"Bg_Wait.png");
-            SongLoading_Chara = TxC(SONGLOADING + @$"Chara.png");
-            SongLoading_Fade = TxC(SONGLOADING + @$"Fade.png");
+            listTexture.Add(lcGameStartFade = new CLuaSongLoadingFadeScript(CSkin.Path("Modules/GameStartFade")));
+            listTexture.Add(lcAIGameStartFade = new CLuaSongLoadingFadeScript(CSkin.Path("Modules/AIGameStartFade")));
             SongLoading_Bg_Dan = TxC(SONGLOADING + @$"Bg_Dan.png");
-
-            SongLoading_Plate_AI = TxC(SONGLOADING + @$"Plate_AI.png");
-            SongLoading_Bg_AI = TxC(SONGLOADING + @$"Bg_AI.png");
-            SongLoading_Bg_AI_Wait = TxC(SONGLOADING + @$"Bg_AI_Wait.png");
-            SongLoading_Fade_AI = TxC(SONGLOADING + @$"Fade_AI.png");
-            SongLoading_Fade_AI_Anime_Base = TxC(SONGLOADING + @$"Fade_AI_Anime_Base.png");
-            SongLoading_Fade_AI_Anime_Ring = TxC(SONGLOADING + @$"Fade_AI_Anime_Ring.png");
-            SongLoading_Fade_AI_Anime_NowLoading = TxC(SONGLOADING + @$"Fade_AI_Anime_NowLoading.png");
-            SongLoading_Fade_AI_Anime_Start = TxC(SONGLOADING + @$"Fade_AI_Anime_Start.png");
-            SongLoading_Fade_AI_Anime_LoadBar_Base = TxC(SONGLOADING + @$"Fade_AI_Anime_LoadBar_Base.png");
-            SongLoading_Fade_AI_Anime_LoadBar = TxC(SONGLOADING + @$"Fade_AI_Anime_LoadBar.png");
 
             #endregion
 
@@ -1072,7 +1060,7 @@ namespace TJAPlayer3
             #endregion
 
             #region 7_終了画面
-            //Exit_Background = TxC(EXIT + @$"Background.png");
+            listTexture.Add(lcExitStage = new CLuaExitStageScript(CSkin.Path("Modules/ExitStage")));
             #endregion
 
             #region 7_AIResults
@@ -2559,11 +2547,13 @@ namespace TJAPlayer3
             Loading,
             Scanning_Loudness,
             NamePlateBase,
-            NamePlate_Extension,
-            Overlay,
-            Readme,
-            Network_Connection;
+            NamePlate_Extension;
+        public CLuaFadeScript lcBlackFade;
+        public CLuaFadeScript lcWhiteFade;
+        public CLuaFadeScript lcResultFade;
+        public CLuaAttentionScript lcAttention;
         public CLuaEnumSongsScript lcEnumSong;
+        public CLuaOverlayScript lcOverlay;
         public CTexture[] NamePlate;
 
         public CTexture[] NamePlate_Effect = new CTexture[5];
@@ -2712,23 +2702,10 @@ namespace TJAPlayer3
         #endregion
 
         #region 4_読み込み画面
-        public CTexture SongLoading_Plate,
-            SongLoading_Bg,
-            SongLoading_BgWait,
-            SongLoading_Chara,
-            SongLoading_Bg_Dan,
-            SongLoading_Fade,
-
-            SongLoading_Plate_AI,
-            SongLoading_Bg_AI,
-            SongLoading_Bg_AI_Wait,
-            SongLoading_Fade_AI,
-            SongLoading_Fade_AI_Anime_Base,
-            SongLoading_Fade_AI_Anime_Ring,
-            SongLoading_Fade_AI_Anime_NowLoading,
-            SongLoading_Fade_AI_Anime_Start,
-            SongLoading_Fade_AI_Anime_LoadBar_Base,
-            SongLoading_Fade_AI_Anime_LoadBar;
+        public CLuaSongLoadingFadeScript lcGameStartFade;
+        public CLuaSongLoadingFadeScript lcAIGameStartFade;
+        public CTexture
+            SongLoading_Bg_Dan;
         #endregion
 
         #region 5_演奏画面
@@ -2988,8 +2965,7 @@ Result_Mountain = new CTexture[4]*/;
         #endregion
 
         #region 7_終了画面
-        //public CTexture Exit_Background/* , */
-        /*Exit_Text; */
+        public CLuaExitStageScript lcExitStage;
         #endregion
 
         #region [7_DanResults]

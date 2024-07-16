@@ -275,6 +275,11 @@ namespace FDK
             get;
             set;
         }
+        public float fZRotation
+        {
+            get => fZ軸中心回転;
+            set { fZ軸中心回転 = value; }
+        }
         public int Opacity
         {
             get
@@ -702,6 +707,10 @@ namespace FDK
         {
             this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
         }
+        public void t2D_DisplayImage_AnchorCenter(int x, int y, RectangleF rc)
+        {
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+        }
 
         public enum RefPnt
         {
@@ -720,9 +729,13 @@ namespace FDK
         {
             this.t2D描画(x, y, 1f, this.rc全画像);
         }
-        public void t2D_DisplayImage(int x, int y, RectangleF rc画像内の描画領域)
+        public void t2D_DisplayImage(int x, int y, Rectangle rc画像内の描画領域)
         {
             this.t2D描画(x, y, 1f, rc画像内の描画領域);
+        }
+        public void t2D_DisplayImage(int x, int y, RectangleF rc)
+        {
+            this.t2D描画(x, y, 1f, rc);
         }
 
         /// <summary>

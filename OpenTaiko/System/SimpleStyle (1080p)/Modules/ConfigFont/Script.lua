@@ -1,9 +1,9 @@
 import ('System.Drawing')
 
 local font = -1
-local menu_font_offset = -1
-local menu_font_size = -1
-local menu_font_padding = -1
+local config_font_offset = -1
+local config_font_size = -1
+local config_font_padding = -1
 
 local chars = { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
@@ -31,10 +31,10 @@ end
 function loadAssets()
     config = loadConfig("Config.json")
 
-    menu_font_size = getNum(config["font"]["size"])
-    menu_font_offset = getNum(config["font"]["offset"])
-    menu_font_padding = getNum(config["font"]["padding"])
-    font = loadFontRenderer(menu_font_size, "regular")
+    config_font_size = getNum(config["font"]["size"])
+    config_font_offset = getNum(config["font"]["offset"])
+    config_font_padding = getNum(config["font"]["padding"])
+    font = loadFontRenderer(config_font_size, "regular")
 
     for i = 1, #chars do
         font_texturekey[i] = createTitleTextureKey(chars[i], font, 99999)
@@ -51,7 +51,7 @@ function drawText(x, y, text, bold, scale)
     end
 
     for i = 1, string.len(text) do
-        getTextTex(font_keys[getIndex(string.sub(text, i, i))], false, false):t2D_DisplayImage_AnchorCenter(x + (menu_font_size * menu_font_offset), y + (menu_font_size * menu_font_offset))
-        x = x + menu_font_padding
+        getTextTex(font_keys[getIndex(string.sub(text, i, i))], false, false):t2D_DisplayImage_AnchorCenter(x + (config_font_size * config_font_offset), y + (config_font_size * config_font_offset))
+        x = x + config_font_padding
     end
 end

@@ -2278,7 +2278,7 @@ for (int i = 0; i < 3; i++) {
 					Camera = Matrix4X4<float>.Identity;
 				}
 
-				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Network_Connection != null)
+				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp)
 				{
 					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.前回のシステム時刻ms) > 10000)
 					{
@@ -2290,18 +2290,18 @@ for (int i = 0; i < 3; i++) {
 							this.bネットワークに接続中 = reply.Status == IPStatus.Success;
 						});
 					}
-					TJAPlayer3.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - TJAPlayer3.Tx.Network_Connection.szTextureSize.Height, new Rectangle((TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bネットワークに接続中 ? 0 : 1), 0, TJAPlayer3.Tx.Network_Connection.szTextureSize.Width / 2, TJAPlayer3.Tx.Network_Connection.szTextureSize.Height));
 				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
 				// Display log cards
 				VisualLogManager.Display();
 
-				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Overlay != null)
-				{
-					TJAPlayer3.Tx.Overlay.t2D描画(0, 0);
-				}
-			}
+				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.lcOverlay != null)
+                {
+                    Tx.lcOverlay.Update();
+                    Tx.lcOverlay.Draw();
+                }
+            }
 
 			//foreach(var capture in ConfigIni.KeyAssign.System.Capture)
 			//{
@@ -2566,7 +2566,7 @@ for (int i = 0; i < 3; i++) {
         //-----------------
         private bool bマウスカーソル表示中 = true;
 		private bool b終了処理完了済み;
-		private bool bネットワークに接続中 = false;
+		public bool bネットワークに接続中 { get; private set; } = false;
 		private long 前回のシステム時刻ms = long.MinValue;
 		private static CDTX[] dtx = new CDTX[ 5 ];
 

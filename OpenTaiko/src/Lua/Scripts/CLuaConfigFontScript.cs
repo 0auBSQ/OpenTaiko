@@ -8,7 +8,7 @@ using TJAPlayer3;
 
 namespace TJAPlayer3
 {
-    internal class CLuaConfigFontScript : CLuaScript
+    internal class CLuaConfigFontScript : CLuaStageScript
     {
         private LuaFunction lfDrawText;
 

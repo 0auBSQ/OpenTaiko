@@ -1,9 +1,9 @@
 import ('System.Drawing')
 
 local font = -1
-local font_offset = -1
-local font_size = -1
-local font_padding = -1
+local config_font_offset = -1
+local config_font_size = -1
+local config_font_padding = -1
 
 local chars = { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
@@ -32,10 +32,10 @@ end
 function loadAssets()
     config = loadConfig("Config.json")
 
-    font_size = getNum(config["font"]["size"])
-    font_offset = getNum(config["font"]["offset"])
-    font_padding = getNum(config["font"]["padding"])
-    font = loadFontRenderer(font_size, "regular")
+    config_font_size = getNum(config["font"]["size"])
+    config_font_offset = getNum(config["font"]["offset"])
+    config_font_padding = getNum(config["font"]["padding"])
+    font = loadFontRenderer(config_font_size, "regular")
 
     for i = 1, #chars do
         font_white_texturekey[i] = createTitleTextureKey(chars[i], font, 99999, Color.White)
@@ -63,7 +63,7 @@ function drawText(x, y, type, text)
     end
 
     for i = 1, string.len(text) do
-        getTextTex(font_keys[getIndex(string.sub(text, i, i))], false, false):t2D_DisplayImage_AnchorCenter(x + (font_size * font_offset), y + (font_size * font_offset))
-        x = x + font_padding
+        getTextTex(font_keys[getIndex(string.sub(text, i, i))], false, false):t2D_DisplayImage_AnchorCenter(x + (config_font_size * config_font_offset), y + (config_font_size * config_font_offset))
+        x = x + config_font_padding
     end
 end
