@@ -430,7 +430,8 @@ namespace TJAPlayer3
 
             listTexture.Add(lcGameStartFade = new CLuaSongLoadingFadeScript(CSkin.Path("Modules/GameStartFade")));
             listTexture.Add(lcAIGameStartFade = new CLuaSongLoadingFadeScript(CSkin.Path("Modules/AIGameStartFade")));
-            SongLoading_Bg_Dan = TxC(SONGLOADING + @$"Bg_Dan.png");
+            listTexture.Add(lcDanGameStartFade = new CLuaDanGameStartFadeScript(CSkin.Path("Modules/DanGameStartFade")));
+            listTexture.Add(lcTowerGameStartFade = new CLuaTowerGameStartFadeScript(CSkin.Path("Modules/TowerGameStartFade")));
 
             #endregion
 
@@ -2704,8 +2705,8 @@ namespace TJAPlayer3
         #region 4_読み込み画面
         public CLuaSongLoadingFadeScript lcGameStartFade;
         public CLuaSongLoadingFadeScript lcAIGameStartFade;
-        public CTexture
-            SongLoading_Bg_Dan;
+        public CLuaDanGameStartFadeScript lcDanGameStartFade;
+        public CLuaTowerGameStartFadeScript lcTowerGameStartFade;
         #endregion
 
         #region 5_演奏画面

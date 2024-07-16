@@ -16,8 +16,16 @@ namespace TJAPlayer3
 
 			TJAPlayer3.Skin.soundDanSelectBGM.tStop();
 			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-				this.counter = new CCounter(0, 1255, 1, TJAPlayer3.Timer);
-			else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+			{
+                this.counter = new CCounter(0, 1255, 1, TJAPlayer3.Timer);
+                TJAPlayer3.Tx.lcDanGameStartFade.FadeOut();
+            }
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+            {
+                this.counter = new CCounter(0, 1255, 1, TJAPlayer3.Timer);
+                TJAPlayer3.Tx.lcTowerGameStartFade.FadeOut();
+            }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
 			{
 				this.counter = new CCounter(0, 5500, 1, TJAPlayer3.Timer);
                 TJAPlayer3.Tx.lcAIGameStartFade.FadeOut();
@@ -32,14 +40,20 @@ namespace TJAPlayer3
 		{
 			this.mode = EFIFOモード.フェードイン;
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			{
-				this.counter = new CCounter(0, 255, 1, TJAPlayer3.Timer);
+            if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+            {
+                this.counter = new CCounter(0, 255, 1, TJAPlayer3.Timer);
+                TJAPlayer3.Tx.lcDanGameStartFade.FadeIn();
 
-				TJAPlayer3.stage演奏ドラム画面.actDan.Start(TJAPlayer3.stage演奏ドラム画面.ListDan_Number);
-				TJAPlayer3.stage演奏ドラム画面.ListDan_Number++;
-			}
-			else if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                TJAPlayer3.stage演奏ドラム画面.actDan.Start(TJAPlayer3.stage演奏ドラム画面.ListDan_Number);
+                TJAPlayer3.stage演奏ドラム画面.ListDan_Number++;
+            }
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+            {
+                this.counter = new CCounter(0, 255, 1, TJAPlayer3.Timer);
+                TJAPlayer3.Tx.lcTowerGameStartFade.FadeIn();
+            }
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode)
 			{
 				this.counter = new CCounter(0, 3580, 1, TJAPlayer3.Timer);
                 TJAPlayer3.Tx.lcAIGameStartFade.FadeIn();
@@ -76,8 +90,17 @@ namespace TJAPlayer3
 			}
 			this.counter.Tick();
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower)
+			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+            {
+                TJAPlayer3.Tx.lcDanGameStartFade.luaFadeInfo.eFIFOMode = mode;
+                TJAPlayer3.Tx.lcDanGameStartFade.luaFadeInfo.dbValue = counter.CurrentValue / counter.EndValue;
+
+                TJAPlayer3.Tx.lcDanGameStartFade.Update();
+                TJAPlayer3.Tx.lcDanGameStartFade.Draw();
+            }
+            else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 			{
+                /*
 				if (TJAPlayer3.Tx.Tile_Black != null)
 				{
 					TJAPlayer3.Tx.Tile_Black.Opacity = this.mode == EFIFOモード.フェードアウト ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
@@ -89,7 +112,13 @@ namespace TJAPlayer3
 						}
 					}
 				}
-			}
+				*/
+                TJAPlayer3.Tx.lcTowerGameStartFade.luaFadeInfo.eFIFOMode = mode;
+                TJAPlayer3.Tx.lcTowerGameStartFade.luaFadeInfo.dbValue = counter.CurrentValue / counter.EndValue;
+
+                TJAPlayer3.Tx.lcTowerGameStartFade.Update();
+                TJAPlayer3.Tx.lcTowerGameStartFade.Draw();
+            }
 			else if (TJAPlayer3.ConfigIni.bAIBattleMode)
             {
                 TJAPlayer3.Tx.lcAIGameStartFade.luaFadeInfo.eFIFOMode = mode;

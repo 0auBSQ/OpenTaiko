@@ -8,6 +8,7 @@ namespace TJAPlayer3
 {
     internal class CLuaFadeInfo
     {
+        public double dbIdleWait;
         public double dbValue;
         public EFIFOモード eFIFOMode;
         public bool bEnded => dbValue == 1.0f;

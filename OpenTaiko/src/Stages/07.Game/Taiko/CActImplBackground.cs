@@ -388,8 +388,8 @@ namespace TJAPlayer3
                 //TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1], 
                     //new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
                     
-                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
-                DownScript.Draw();
+                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript?.Update();
+                DownScript?.Draw();
                     
                 #endregion
 

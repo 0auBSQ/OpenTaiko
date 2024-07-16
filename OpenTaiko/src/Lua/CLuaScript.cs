@@ -211,6 +211,7 @@ namespace TJAPlayer3
             LuaScript["getText"] = getText;
             LuaScript["getNumArray"] = getNumArray;
             LuaScript["getTextArray"] = getTextArray;
+            LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
 
 
             if (loadAssets) LoadAssets();
