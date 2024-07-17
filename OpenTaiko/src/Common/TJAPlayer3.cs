@@ -2949,7 +2949,7 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ Songs管理 の初期化 ]
 			//---------------------
-			Trace.TraceInformation( "Initializing song list... );
+			Trace.TraceInformation( "Initializing song list..." );
 			Trace.Indent();
 			try
 			{
