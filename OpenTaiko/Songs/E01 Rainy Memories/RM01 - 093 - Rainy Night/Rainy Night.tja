@@ -6,14 +6,14 @@ WAVE:Rainy Night.ogg
 PREIMAGE:Rainy Night.png
 OFFSET:0
 DEMOSTART:26.18
-MAKER:Taichenko_oni & Komi
+MAKER:Taichenko,Komi
 
 COURSE:Oni
 LEVEL:7
 BALLOON:29
 SCOREINIT:
 SCOREDIFF:
-NOTESDESIGNER3:Taichenko_oni
+NOTESDESIGNER3:Taichenko
 
 #START
 #SCROLL 0.5

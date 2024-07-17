@@ -6,7 +6,7 @@ WAVE:Alonebirthday.ogg
 PREIMAGE:Alonebirthday.png
 OFFSET:-0
 DEMOSTART:81.45
-MAKER:Taichenko_oni, Komi & bol
+MAKER:Taichenko,Komi,bol
 
 COURSE:Edit
 LEVEL:10.2
@@ -171,7 +171,7 @@ COURSE:Oni
 LEVEL:9
 SCOREINIT:860
 SCOREDIFF:
-NOTESDESIGNER3:Taichenko_oni & bol
+NOTESDESIGNER3:Taichenko,bol
 
 #START
 #SCROLL 0.8

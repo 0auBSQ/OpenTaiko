@@ -176,7 +176,9 @@ BoxFontName=廻想体 ネクスト UP B
 129 - Cybernetic Pressure : X3ll3n & BARY - Follow X3ll3n : • Newgrounds : https://x3ll3n.newgrounds.com/ • Soundcloud : https://soundcloud.com/x3ll3n • Youtube : https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg • Spotify : https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX • Instagram : https://www.instagram.com/x3ll3n_music/ • Twitter : https://twitter.com/Dem_X3ll3n • Other Platforms : https://linktr.ee/x3ll3n  Follow BARY : • Newgrounds : https://baryiscool.newgrounds.com/ • Soundcloud : https://soundcloud.com/bary_is_cool • Youtube : https://www.youtube.com/@bary_music • Spotify : https://open.spotify.com/artist/6kIojqA7iiEtPcbUivolci? • Twitter : https://twitter.com/cool_bary (Chart by Komi)
 130 - The Minotaur : X3ll3n & Benji-G - Follow X3ll3n : • Newgrounds : https://x3ll3n.newgrounds.com/ • Soundcloud : https://soundcloud.com/x3ll3n • Youtube : https://www.youtube.com/channel/UCP7YVa81D4B0oZ2ypDzGGeg • Spotify : https://open.spotify.com/artist/3QR2CfvMJL7sxMwN5UMRGX • Instagram : https://www.instagram.com/x3ll3n_music/ • Other Platforms : https://linktr.ee/x3ll3n  Follow Benji-G : • Newgrounds : https://benji-g.newgrounds.com/ • Soundcloud : https://soundcloud.com/user-763424064 • Youtube : https://www.youtube.com/channel/UC20XOQOSZCS90d4b6Fr0-HA • Spotify : https://open.spotify.com/artist/6YQx6KHLda3S3sd3lxWfa6?si=5gTPy-gBQgOHXm7ZSs8w5A • Twitter: https://twitter.com/Hactastic_ (Chart by Komi)
 131 - CIRCUNFERENCIA : ULKO - https://soundcloud.com/ulkokos (Chart by Colin, Dashy, Komi, DragonRatTiger)
-
+132 - NEP0: FR02ENロウカ : OPTK-HQ=CHANNEL0125 (Chart by OPTK-HQ)
+133 - 菌菇夜祭 ~ 戰奏 : Taichenko - https://space.bilibili.com/356518101 (Chart by Taichenko, Komi)
+134 - Deceiver's Revenge : H5 - https://linktr.ee/H5Music (Chart by bol)
 ```
 
 ### Visuals
