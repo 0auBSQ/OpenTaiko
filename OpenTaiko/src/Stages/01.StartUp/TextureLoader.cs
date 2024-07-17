@@ -151,6 +151,7 @@ namespace TJAPlayer3
             Menu_Highlight = TxC(@$"Menu_Highlight.png");
             Loading = TxC(@$"Loading.png");
             Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
+            /*
             NamePlate = new CTexture[2];
             NamePlateBase = TxC(@$"NamePlate.png");
             NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
@@ -161,10 +162,9 @@ namespace TJAPlayer3
             NamePlate_Effect[2] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}GoldBStar.png");
             NamePlate_Effect[3] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}PurpleBStar.png");
             NamePlate_Effect[4] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Slash.png");
+            */
 
-            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title = System.IO.Directory.GetDirectories(CSkin.Path(BASE + @$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}")).Length;
-            TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes = new int[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
-
+            /*
             NamePlate_Title = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title][];
             NamePlate_Title_Big = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
             NamePlate_Title_Small = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
@@ -182,6 +182,7 @@ namespace TJAPlayer3
                 NamePlate_Title_Big[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Big.png");
                 NamePlate_Title_Small[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Small.png");
             }
+            */
 
             listTexture.Add(lcBlackFade = new CLuaFadeScript(CSkin.Path("Modules/BlackFade")));
             listTexture.Add(lcWhiteFade = new CLuaFadeScript(CSkin.Path("Modules/WhiteFade")));
@@ -2546,22 +2547,13 @@ namespace TJAPlayer3
             Menu_Highlight,
             //Enum_Song,
             Loading,
-            Scanning_Loudness,
-            NamePlateBase,
-            NamePlate_Extension;
+            Scanning_Loudness;
         public CLuaFadeScript lcBlackFade;
         public CLuaFadeScript lcWhiteFade;
         public CLuaFadeScript lcResultFade;
         public CLuaAttentionScript lcAttention;
         public CLuaEnumSongsScript lcEnumSong;
         public CLuaOverlayScript lcOverlay;
-        public CTexture[] NamePlate;
-
-        public CTexture[] NamePlate_Effect = new CTexture[5];
-
-        public CTexture[][] NamePlate_Title;
-        public CTexture[] NamePlate_Title_Big;
-        public CTexture[] NamePlate_Title_Small;
 
         #endregion
 

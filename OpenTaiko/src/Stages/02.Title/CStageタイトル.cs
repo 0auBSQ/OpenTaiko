@@ -582,7 +582,7 @@ namespace TJAPlayer3
 
                     int _charaId = TJAPlayer3.SaveFileInstances[_actual].data.Character;
 
-					int chara_x = TJAPlayer3.Skin.Title_Entry_NamePlate[0] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+					int chara_x = TJAPlayer3.Skin.Title_Entry_NamePlate[0] + TJAPlayer3.NamePlate.lcNamePlate.GetCharaOffset();
 					int chara_y = TJAPlayer3.Skin.Title_Entry_NamePlate[1];
 
                     int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[0];
@@ -686,7 +686,7 @@ namespace TJAPlayer3
 						//int chara_y = (int)(TJAPlayer3.Skin.Characters_Title_Normal_Y[_charaId][player] - CharaY);
 
 
-                        int chara_x = (int)CharaX + TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+                        int chara_x = (int)CharaX + TJAPlayer3.Skin.SongSelect_NamePlate_X[player];// + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2
                         int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player] - (int)CharaY;
 
                         int puchi_x = chara_x + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];

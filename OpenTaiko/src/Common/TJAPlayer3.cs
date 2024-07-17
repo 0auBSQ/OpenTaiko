@@ -854,8 +854,9 @@ namespace TJAPlayer3
 			#endregion
 
 			if( r現在のステージ != null )
-			{
-				this.n進行描画の戻り値 = ( r現在のステージ != null ) ? r現在のステージ.Draw() : 0;
+                {
+                    TJAPlayer3.NamePlate.lcNamePlate.Update();
+                    this.n進行描画の戻り値 = ( r現在のステージ != null ) ? r現在のステージ.Draw() : 0;
 
 				#region [ プラグインの進行描画 ]
 				//---------------------

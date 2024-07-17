@@ -87,16 +87,17 @@ namespace TJAPlayer3
             return array;
         }
 
-        protected void RunLuaCode(LuaFunction luaFunction, params object[] args)
+        protected object[] RunLuaCode(LuaFunction luaFunction, params object[] args)
         {
             try
             {
-                luaFunction.Call(args);
+                return luaFunction.Call(args);
             }
             catch (Exception exception)
             {
                 Crash(exception);
             }
+            return new object[0];
         }
 
         private JsonNode LoadConfig(string name)
@@ -212,6 +213,7 @@ namespace TJAPlayer3
             LuaScript["getNumArray"] = getNumArray;
             LuaScript["getTextArray"] = getTextArray;
             LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
+            LuaScript["skinconfig"] = TJAPlayer3.Skin.SkinConfig;
 
 
             if (loadAssets) LoadAssets();

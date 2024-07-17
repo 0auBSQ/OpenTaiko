@@ -6,6 +6,7 @@ using System.Diagnostics;
 using FDK;
 using System.Drawing;
 using System.Linq;
+using System.Text.Json;
 
 namespace TJAPlayer3
 {
@@ -1058,6 +1059,8 @@ namespace TJAPlayer3
             LoadSkinConfigFromFile(Path(@$"SkinConfig.ini"), ref str);
             this.t文字列から読み込み(str);
 
+            using Stream stream = File.OpenRead(Path(@$"SkinConfig.json"));
+            SkinConfig = JsonSerializer.Deserialize<SkinConfigJson>(stream);
         }
 
         private void t文字列から読み込み(string strAllSettings)	// 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
@@ -1094,6 +1097,7 @@ namespace TJAPlayer3
                             }
                             switch (strCommand)
                             {
+                                /*
                                 case "Name":
                                 {
                                     this.Skin_Name = strParam;
@@ -1118,6 +1122,7 @@ namespace TJAPlayer3
                                     }
                                     break;
                                 }
+                                */
                                 //case "FontName":
                                 //{
                                 //    strParam = strParam.Replace('/', System.IO.Path.DirectorySeparatorChar);
@@ -9537,11 +9542,20 @@ namespace TJAPlayer3
         }
 
         #region 新・SkinConfig
+
+        public SkinConfigJson SkinConfig = new SkinConfigJson();
+
         #region General
-        public string Skin_Name = "Unknown";
-        public string Skin_Version = "Unknown";
-        public string Skin_Creator = "Unknown";
-        public int[] Resolution = new int[] { 1280, 720 };
+        public string Skin_Name => SkinConfig.Name;
+        public string Skin_Version => SkinConfig.Version;
+        public string Skin_Creator => SkinConfig.Creators;
+        public int[] Resolution
+        {
+            get
+            {
+                return new int[] { SkinConfig.Width, SkinConfig.Height };
+            }
+        }
         public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
         private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
         public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
@@ -9549,9 +9563,6 @@ namespace TJAPlayer3
         #endregion
 
         #region Config
-
-        public int Config_NamePlate_Ptn_Title;
-        public int[] Config_NamePlate_Ptn_Title_Boxes;
 
         public int[] Config_Arrow_X = new int[] { 552, 552 };
         public int[] Config_Arrow_Y = new int[] { 297, 363 };

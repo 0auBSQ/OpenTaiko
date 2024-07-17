@@ -822,7 +822,7 @@ namespace TJAPlayer3
 					//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 					//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
-					int chara_x = namePlate_x[pos] - (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+					int chara_x = namePlate_x[pos] - (TJAPlayer3.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + TJAPlayer3.NamePlate.lcNamePlate.GetCharaOffset();
 					int chara_y = namePlate_y[pos];
 
 					int p1chara_x = is2PSide ? TJAPlayer3.Skin.Resolution[0] / 2 : 0;

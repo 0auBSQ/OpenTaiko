@@ -257,7 +257,7 @@ namespace TJAPlayer3
 
                     //CMenuCharacter.tMenuDisplayCharacter(0, (int)(-200 + CharaX), (int)(336 - CharaY), CMenuCharacter.ECharacterAnimation.NORMAL);
 
-                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[0] + TJAPlayer3.NamePlate.lcNamePlate.GetCharaOffset();
                     int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[0];
 
                     CMenuCharacter.tMenuDisplayCharacter(

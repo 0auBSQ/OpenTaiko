@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FDK;
+using static TJAPlayer3.CDTX;
 
 namespace TJAPlayer3
 {
@@ -604,16 +605,19 @@ namespace TJAPlayer3
                             else if (index == 0)
                                 iType = 0;
 
-                            if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
-                            {
-                                TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
-                                    x,
-                                    y);
-                            } 
+                                    /*
+                                    if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
+                                    {
+                                        TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
+                                            x,
+                                            y);
+                                    } 
 
-                            tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                                    tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                                    */
+                                    TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(x, y, 255, iType, tmpTex);
 
-                        }
+                                }
                         break;
                         case ModeType.DanTitle:
                         for(int i = 1; i < TJAPlayer3.Skin.SongSelect_NewHeya_Box_Count - 1; i++)
@@ -634,12 +638,12 @@ namespace TJAPlayer3
                             if (i != 0)
                             {
                                 tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
-                                TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
+                                //TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
                             }
                             else
                             {
                                 tmpTex.color4 = CConversion.ColorToColor4(Color.White);
-                                TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
+                                //TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
                             }
 
                             TJAPlayer3.Tx.NewHeya_Box.t2D描画(x, y);
@@ -651,17 +655,20 @@ namespace TJAPlayer3
                             if (index > 0)
                             {
                                 danGrade = TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles[this.ttkDanTitles[index].str文字].clearStatus;
-                            }
+                                    }
 
-                            TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
-                                x - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
-                                y - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
-                                (8 + danGrade));
-                            TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
+                                    TJAPlayer3.NamePlate.lcNamePlate.DrawDan(x, y, 255, danGrade, tmpTex);
+                                    /*
+                                    TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
+                                        x - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
+                                        y - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
+                                        (8 + danGrade));
+                                    TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
-                            tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                                    tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                                    */
 
-                        }
+                                }
                         break;
                     }
                 }

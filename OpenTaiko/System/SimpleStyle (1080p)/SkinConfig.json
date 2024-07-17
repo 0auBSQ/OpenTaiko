@@ -1,0 +1,9 @@
+{
+    "name":"SimpleStyle",
+    "description":"Template :TemplateMoyai:",
+    "version":"0.6.0",
+    "creator":"OpenTaiko Team",
+    "width":1920,
+    "height":1080,
+    "nameplate_titletypes":["0", "1", "2", "3", "4", "5", "6", "7"]
+}

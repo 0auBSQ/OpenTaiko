@@ -671,7 +671,7 @@ namespace TJAPlayer3
                     //int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
                     //int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
 
-                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2;
+                    int chara_x = TJAPlayer3.Skin.SongSelect_NamePlate_X[player] + TJAPlayer3.NamePlate.lcNamePlate.GetCharaOffset();
                     int chara_y = TJAPlayer3.Skin.SongSelect_NamePlate_Y[player];
 
                     //int puchi_x = player == 0 ? 0 + 100 : 981 + 250;
