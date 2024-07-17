@@ -95,7 +95,7 @@ namespace TJAPlayer3
 			        !TJAPlayer3.ConfigIni.bAutoPlay[0] &&
 			        TJAPlayer3.ConfigIni.nPlayerCount == 1 &&
 			        str曲タイトル == "Input Calibration" &&
-			        strサブタイトル == "TJAPlayer3 Developers";
+			        strサブタイトル == "OpenTaiko Developers";
 
 				this.strSTAGEFILE = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}4_SongLoading{Path.DirectorySeparatorChar}Background.png");
 				
