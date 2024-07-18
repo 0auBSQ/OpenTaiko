@@ -1,6 +1,9 @@
 ﻿#TITLE:OpenTaiko Headquarters
 #GENRE:OpenTaiko Headquarters
-#BOXTYPE:6
+#BOXEXPLANATION1:Greetings, from the OPTK-HQ channel,
+#BOXEXPLANATION2:broadcasting to you now!
+#BOXEXPLANATION3:Let's see what today brings us...
+#BOXTYPE:9
 #BGTYPE:6
 #BOXCOLOR:#999999
 #BACKCOLOR:#444444
