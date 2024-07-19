@@ -1480,11 +1480,11 @@ namespace TJAPlayer3
 
                 TJAPlayer3.Tx.SongSelect_Bar_Genre_Overlay.vcScaleRatio.X = 1.0f;
 				TJAPlayer3.Tx.SongSelect_Bar_Genre_Back.vcScaleRatio.X = 1.0f;
+				TJAPlayer3.Tx.SongSelect_Bar_Genre_Random.vcScaleRatio.X = 1.0f;
 
-				
 
 
-				if (ctScrollCounter.CurrentValue != ctScrollCounter.EndValue || n見た目の行番号 != barCenterNum)
+                if (ctScrollCounter.CurrentValue != ctScrollCounter.EndValue || n見た目の行番号 != barCenterNum)
                 {
 					int songType = 0;
 					if (this.stバー情報[nパネル番号].ar難易度[(int)Difficulty.Dan] >= 0)
