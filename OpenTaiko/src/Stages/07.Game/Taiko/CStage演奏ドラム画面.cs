@@ -1837,7 +1837,7 @@ namespace TJAPlayer3
                                 break;
                         }
 
-                        if (bAutoPlay && !this.bPAUSE)
+                        if (bAutoPlay && !this.bPAUSE && !NotesManager.IsMine(pChip))
                         {
                             pChip.bHit = true;
                             if (!NotesManager.IsADLIB(pChip)) // Provisional, to avoid crash on 0x101
