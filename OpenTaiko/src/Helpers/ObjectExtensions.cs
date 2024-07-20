@@ -147,6 +147,11 @@ namespace System
             return Regex.Replace(input, TagRegex, "");
         }
 
+        public static string EscapeSingleQuotes(this string input)
+        {
+            return input.Replace(@"'", @"''");
+        }
+
         public static string SafeFormat(this string format, params object?[] args)
         {
             try

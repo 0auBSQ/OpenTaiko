@@ -103,8 +103,46 @@ namespace TJAPlayer3
             }
         }
 
+        public static CLocalizationData GetAllStringsAsLocalizationData(string key)
+        {
+            if (_cachedLocs.ContainsKey(key)) return _cachedLocs[key];
+
+            CLocalizationData loc = new CLocalizationData();
+            loc.SetString("default", "?");
+
+            foreach (string lang in Langcodes)
+            {
+                CLang _inst = CLang.GetCLang(lang);
+
+                loc.SetString(lang, _inst.GetString(key));
+            }
+
+            _cachedLocs[key] = loc;
+            return loc;
+        }
+
+        public static CLocalizationData GetAllStringsAsLocalizationDataWithArgs(string key, string keySalt, params object?[] values)
+        {
+            if (_cachedLocs.ContainsKey(key + keySalt)) return _cachedLocs[key + keySalt];
+
+            CLocalizationData loc = new CLocalizationData();
+            loc.SetString("default", "?");
+
+            foreach (string lang in Langcodes)
+            {
+                CLang _inst = CLang.GetCLang(lang);
+
+                loc.SetString(lang, _inst.GetString(key, values));
+            }
+
+            _cachedLocs[key + keySalt] = loc;
+            return loc;
+        }
+
         private static string[] _langCodes;
         private static string[] _languages;
+
+        private static Dictionary<string, CLocalizationData> _cachedLocs = new Dictionary<string, CLocalizationData>();
         //public static ILang LangInstance { get; private set; }  = new CLang_jp();
     }
 }

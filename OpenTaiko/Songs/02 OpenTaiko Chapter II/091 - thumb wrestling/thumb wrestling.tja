@@ -5,7 +5,7 @@ BPM:150
 WAVE:thumb wrestling.ogg
 OFFSET:-0.008
 DEMOSTART:57.608
-MAKER:DragonRatTiger & bol
+MAKER:DragonRatTiger,bol
 PREIMAGE:thumb wrestling.jpg
 
 COURSE:Oni
@@ -14,7 +14,6 @@ BALLOON:42,2,2,2,42,2,2,2,2,2,2,2,2,2,2,2
 SCOREINIT:
 SCOREDIFF:
 NOTESDESIGNER3:bol
-/bol
 
 #START
 2,

@@ -64,13 +64,12 @@ namespace TJAPlayer3
 		
 		public int Openindex;
 		public bool bIsOpenFolder;
-		public Stack<int> stackランダム演奏番号 = new Stack<int>();
 		public string strジャンル = "";
 		public string str本当のジャンル = "";
-		public string strタイトル = "";
+		public CLocalizationData ldTitle = new CLocalizationData();
 		public List<CDTX.DanSongs> DanSongs;
 		public Dan_C[] Dan_C;
-		public string strサブタイトル = "";
+		public CLocalizationData ldSubtitle = new CLocalizationData();
 		public string strMaker = "";
 		public string[] strNotesDesigner = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
         public CDTX.ESide nSide = CDTX.ESide.eEx;
@@ -93,7 +92,7 @@ namespace TJAPlayer3
 		public int nDanTick = 0;
 		public Color cDanTickColor = Color.White;
 		
-		public string[] strBoxText = new string[3];
+		public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
 		
 		public string strSelectBGPath;
 

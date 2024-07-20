@@ -355,7 +355,7 @@ namespace TJAPlayer3
 
                                 var diffString = CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
                                 var statusString = GetRequiredClearStatus(_aimedStatus);
-                                var _songName = CSongDict.tGetNodeFromID(_songId)?.strタイトル ?? "[Not found]";
+                                var _songName = CSongDict.tGetNodeFromID(_songId)?.ldTitle.GetString("") ?? "[Not found]";
 
                                 _rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYDIFF", statusString, _songName, diffString));
 

@@ -37,7 +37,7 @@ namespace TJAPlayer3
 
 		    var title = TJAPlayer3.IsPerformingCalibration
 		        ? $"Calibration complete. InputAdjustTime is now {TJAPlayer3.ConfigIni.nInputAdjustTimeMs}ms (Note : InputAdjust is deprecated, please transfer the value to GlobalOffset and reload the songs"
-		        : TJAPlayer3.DTX.TITLE;
+		        : TJAPlayer3.DTX.TITLE.GetString("");
 
 		    using (var bmpSongTitle = pfMusicName.DrawText(title, TJAPlayer3.Skin.Result_MusicName_ForeColor, TJAPlayer3.Skin.Result_MusicName_BackColor, null, 30))
 

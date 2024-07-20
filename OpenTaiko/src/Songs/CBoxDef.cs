@@ -14,8 +14,8 @@ namespace TJAPlayer3
 		public Color Color;
 		public string SelectBG;
 		public string Genre;
-		public string Title;
-		public string[] strBoxText = new string[3];
+		public CLocalizationData Title = new CLocalizationData();
+		public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
 		public Color ForeColor;
         public Color BackColor;
         public bool IsChangedForeColor;
@@ -33,16 +33,10 @@ namespace TJAPlayer3
 		public string DefaultPreimage;
 		public string ScenePreset;
 
-		private readonly string langTITLE = "#TITLE" + CLangManager.fetchLang().ToUpper();
-		private readonly string langBOXEXPLANATION = "#BOXEXPLANATION" + CLangManager.fetchLang().ToUpper();
-
 		// コンストラクタ
 
 		public CBoxDef()
 		{
-			for (int i = 0; i < 3; i++)
-				this.strBoxText[i] = "";
-			this.Title = "";
 			this.Genre = "";
             ForeColor = Color.White;
             BackColor = Color.Black;
@@ -90,14 +84,15 @@ namespace TJAPlayer3
 								string key = split[0];
 								string value = split[1];
 
-								if (key == langTITLE)
+								if (key == "#TITLE")
 								{
-									this.Title = value.Trim(ignoreChars);
+									this.Title.SetString("default", value.Trim(ignoreChars));
 								}
-								else if (key == "#TITLE")
+								else if (key.StartsWith("#TITLE"))
 								{
-									if (this.Title == "") this.Title = value.Trim(ignoreChars);
-								}
+                                    string _lang = key.Substring(6).ToLowerInvariant();
+                                    this.Title.SetString(_lang, value.Trim(ignoreChars));
+                                }
 								else if (key == "#GENRE")
 								{
 									this.Genre = value.Trim(ignoreChars);
@@ -157,14 +152,15 @@ namespace TJAPlayer3
 								{
 									for (int i = 0; i < 3; i++)
 									{
-										if (key == langBOXEXPLANATION + (i + 1).ToString())
+										if (key == "#BOXEXPLANATION" + (i + 1).ToString())
 										{
-											this.strBoxText[i] = value.Trim(ignoreChars);
+											this.strBoxText[i].SetString("default", value.Trim(ignoreChars));
 										}
-										else if (key == "#BOXEXPLANATION" + (i + 1).ToString())
+										else if (key.StartsWith("#BOXEXPLANATION") && key.EndsWith((i + 1).ToString()))
 										{
-											if (this.strBoxText[i] == "") this.strBoxText[i] = value.Trim(ignoreChars);
-										}
+                                            string _lang = key.Substring(15)[..^1].ToLowerInvariant();
+                                            this.strBoxText[i].SetString(_lang, value.Trim(ignoreChars));
+                                        }
 									}
 								}
 							}
