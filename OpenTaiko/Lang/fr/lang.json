@@ -246,7 +246,7 @@
         "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "Bleu gauche",
         "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Assignation de la touche \nBleu gauche pour le tambour.",
         "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "Bleu droit",
-        "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "Assignation de la touche \nBleu droit pour le tambour.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC": "Assignation de la touche \nBleu droit pour le tambour.",
         "SETTINGS_KEYASSIGN_GAME_CLAP": "Clap",
         "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Assignation de la touche \nClap pour les bongos.",
 
