@@ -246,7 +246,7 @@
         "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "LeftBlue",
         "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "左側のふちへのキーの\n割り当てを設定します。",
         "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "RightBlue",
-        "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "右側のふちへのキーの\n割り当てを設定します。",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC": "右側のふちへのキーの\n割り当てを設定します。",
         "SETTINGS_KEYASSIGN_GAME_CLAP": "Clap",
         "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "コンガの拍手へのキーの割り当てを設\n定します。",
 
