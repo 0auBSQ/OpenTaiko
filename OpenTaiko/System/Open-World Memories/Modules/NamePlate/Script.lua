@@ -46,6 +46,10 @@ local title_plate_star_big = { }
 local title_plate_star_small = { }
 local slash = nil
 
+local title_stars_folders = { "1", "2", "3" }
+local title_stars = { { } }
+local title_badges = { }
+
 local font_name_normal_size = nil
 local font_name_withtitle = nil
 local font_title = nil
@@ -188,6 +192,30 @@ function implDrawTitleEffect(x, y, titleTexIndex)
     end
 end
 
+function implDrawRarityStars(o_x, o_y, opacity, rarity)
+	local x = o_x
+	local y = o_y - 20
+	
+	star_count = 0
+	--Rare
+	if rarity == 3 then
+		star_count = 1
+	--Epic
+	elseif rarity == 4 then
+		star_count = 2
+	--Legendary / Mythical
+	elseif rarity >= 5 then
+		star_count = 3
+	end
+	
+	if star_count > 0 then
+		star_frame = 1 + math.ceil(titleplate_counter * (#title_stars[star_count] - 1))
+		tx_titlestar = title_stars[star_count][star_frame]
+		tx_titlestar.Opacity = opacity
+		tx_titlestar:t2D_DisplayImage(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+	end
+end
+
 function implDrawTitlePlate(x, y, opacity, titleTexIndex)
     if titleTexIndex >= 1 and titleTexIndex <= #title_plates then
         titleplate_frame = 1 + math.ceil(titleplate_counter * (#title_plates[titleTexIndex] - 1))
@@ -215,7 +243,7 @@ function getCharaOffset()
 end
 
 function setInfos(player, name, title, dan, data)
-    player_lua = player + 1
+    local player_lua = player + 1
     
     player_data[player_lua] = data
 
@@ -281,6 +309,7 @@ function loadAssets()
     end
 	players_blue = loadTexture("1P_Blue.png")
 
+	--Load title plates
     for i = 1, #config_titletypes do
         titledir = "Title/"..config_titletypes[i]
 		
@@ -307,6 +336,25 @@ function loadAssets()
         end
 
     end
+	
+	--Load rarity stars
+	for i = 1, #title_stars_folders do
+		stardir = "Stars/"..title_stars_folders[i]
+		
+		title_stars_config = config["stars"][title_stars_folders[i]]
+		
+		config_stars_framecount = 0
+		
+		if title_stars_config ~= nil then
+			config_stars_framecount = getNum(title_stars_config["framecount"])
+		end
+		
+		local stars = { }
+		for j = 0, config_stars_framecount do 
+            stars[j + 1] = loadTexture(stardir.."/"..j..".png")
+        end
+        title_stars[i] = stars
+	end
     
     font_name_normal_size = loadFontRenderer(config_font_name_normal_size, "regular")
     font_name_withtitle = loadFontRenderer(config_font_name_withtitle_size, "regular")
@@ -314,7 +362,11 @@ function loadAssets()
     font_dan = loadFontRenderer(config_font_dan_size, "regular")
 end
 
-function drawDan(x, y, opacity, type, titleTex)
+function drawDan(o_x, o_y, opacity, type, titleTex)
+	--Shift on side bar
+	local x = o_x - 180
+	local y = o_y + 5
+
 	--White background
     base.Opacity = opacity
     base:t2D_DisplayImage(x, y)
@@ -336,13 +388,20 @@ function drawDan(x, y, opacity, type, titleTex)
     end
 end
 
-function drawTitlePlate(x, y, opacity, titletype, titleTex)
+function drawTitlePlate(o_x, o_y, opacity, titletype, titleTex, rarityInt, nameplateId)
+	--Shift on side bar
+	local x = o_x - 180
+	local y = o_y + 5
+	
 	--White background
     base.Opacity = opacity
     base:t2D_DisplayImage(x, y)
 
 	--Upper (title) plate
     implDrawTitlePlate(x, y, opacity, titletype + 1)
+	
+	--Rarity stars
+	implDrawRarityStars(x, y, opacity, rarityInt)
 	
 	--Glow
     implDrawTitleEffect(x, y, titletype + 1)
@@ -369,8 +428,9 @@ function update()
 end
 
 function draw(x, y, opacity, player, side)
-    player_lua = player + 1
-    side_lua = side + 1
+    local player_lua = player + 1
+    local side_lua = side + 1
+	local rarityInt = player_data[player_lua].TitleRarityInt
     
     --White background
     base.Opacity = opacity
@@ -381,6 +441,9 @@ function draw(x, y, opacity, player, side)
     if not(notitle[player_lua]) then
         implDrawTitlePlate(x, y, opacity, titleplate_index)
     end
+	
+	--Rarity stars
+	implDrawRarityStars(x, y, opacity, rarityInt)
 
     --Dan plate
     if not(player_data[player_lua].Dan == nil) and not(player_data[player_lua].Dan == "") then

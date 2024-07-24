@@ -472,12 +472,16 @@ namespace TJAPlayer3
                     var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
                     int iType = -1;
+                    int _rarity = 1;
+                    int _titleid = -1;
 
                     if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null &&
                         TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Contains(this.titlesKeys[pos]))
                     {
                         var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[pos]];
                         iType = _dc.nameplateInfo.iType;
+                        _rarity = HRarity.tRarityToLangInt(_dc.rarity);
+                        _titleid = this.titlesKeys[pos];
                         //iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
                     }   
                     else if (pos == 0)
@@ -492,7 +496,7 @@ namespace TJAPlayer3
                         
                     }
                     */
-                    TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex);
+                    TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex, _rarity, _titleid);
 
                     //tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
 
@@ -720,12 +724,22 @@ namespace TJAPlayer3
                     {
                         var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[iTitleCurrent]];
                         TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = _dc.nameplateInfo.iType;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = this.titlesKeys[iTitleCurrent];
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = HRarity.tRarityToLangInt(_dc.rarity);
+                    }
+                    else if (iTitleCurrent == 0)
+                    {
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = 0;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = -1;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = 1;
+                    }
+                    else
+                    {
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = -1;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = -1;
+                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = 1;
                     }
                         
-                    else if (iTitleCurrent == 0)
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = 0;
-                    else
-                        TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = -1;
 
                     TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
 

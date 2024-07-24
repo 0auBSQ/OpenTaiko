@@ -223,6 +223,12 @@ namespace TJAPlayer3
             [JsonProperty("titleType")]
             public int TitleType = 0;
 
+            [JsonIgnore]
+            public int TitleRarityInt = 1;
+
+            [JsonIgnore]
+            public int TitleId = -1;
+
             [JsonProperty("puchiChara")]
             public string PuchiChara = "0";
 

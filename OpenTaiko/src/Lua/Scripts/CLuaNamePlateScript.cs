@@ -48,11 +48,11 @@ namespace TJAPlayer3
             RunLuaCode(lfDrawDan, x, y, opacity, danGrade, titleTex);
         }
 
-        public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex)
+        public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex, int rarity, int nameplateId)
         {
             if (!Avaibale) return;
 
-            RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex);
+            RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex, rarity, nameplateId);
         }
 
         public void Update(params object[] args)

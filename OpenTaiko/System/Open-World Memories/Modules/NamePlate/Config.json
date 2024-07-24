@@ -72,5 +72,16 @@
             "framecount":5,
             "effect":"none"
         }
-    }
+    },
+	"stars": {
+		"1":{
+            "framecount":0
+        },
+        "2":{
+            "framecount":0
+        },
+        "3":{
+            "framecount":0
+        }
+	}
 }
