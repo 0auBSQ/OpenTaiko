@@ -50,7 +50,7 @@ local title_stars_folders = { "1", "2", "3" }
 local title_stars = { { } }
 
 local title_badge_of_achievement = nil
-local nameplates_achievement = {134,78,66,71,44,14,17}
+local nameplates_achievement = {134,135,136,78,66,71,44,14,17}
 local title_badge_of_team_member = nil
 local nameplates_team_member = {}
 
