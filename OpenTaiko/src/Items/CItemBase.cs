@@ -31,13 +31,30 @@ namespace TJAPlayer3
 			切替リスト
 		}
 
-		public string str項目名;
-		public string str説明文;
+        public string str項目名;
+        public string strName
+        {
+            get
+            {
+                return str項目名;
+
+            }
+        }
+
+        public string str説明文;
+        public string strDescription
+        {
+            get
+            {
+                return str説明文;
+
+            }
+        }
 
 
-		// コンストラクタ
+        // コンストラクタ
 
-		public CItemBase()
+        public CItemBase()
 		{
 			this.str項目名 = "";
 			this.str説明文 = "";
@@ -109,7 +126,13 @@ namespace TJAPlayer3
 		{
 			return null;
 		}
-		public virtual int GetIndex()
+
+        public string tGetValueText()
+        {
+            object value = obj現在値();
+            return value == null ? "" : value.ToString();
+        }
+        public virtual int GetIndex()
 		{
 			return 0;
 		}

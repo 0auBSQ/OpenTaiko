@@ -415,13 +415,13 @@ namespace TJAPlayer3
                     {
                         tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
                         TJAPlayer3.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.DarkGray);
-                        TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
+                        //TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
                     }
                     else
                     {
                         tmpTex.color4 = CConversion.ColorToColor4(Color.White);
                         TJAPlayer3.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.White);
-                        TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
+                        //TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
                     }
 
                     int danGrade = 0;
@@ -432,6 +432,7 @@ namespace TJAPlayer3
 
                     var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
+                    /*
                     TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
                         scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
                         scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
@@ -439,7 +440,8 @@ namespace TJAPlayer3
                     TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
                     tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
-
+                    */
+                    TJAPlayer3.NamePlate.lcNamePlate.DrawDan(scroll.Item1, scroll.Item2, 255, danGrade, tmpTex);
 
                 }
             }
@@ -481,14 +483,18 @@ namespace TJAPlayer3
                     else if (pos == 0)
                         iType = 0;
 
+                    /*
                     if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
                     {
                         TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
                             scroll.Item1,
                             scroll.Item2);
-                    } 
+                        
+                    }
+                    */
+                    TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex);
 
-                    tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                    //tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
 
                 }
             }

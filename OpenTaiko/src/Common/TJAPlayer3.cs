@@ -855,7 +855,8 @@ namespace TJAPlayer3
 
 			if( r現在のステージ != null )
 			{
-				this.n進行描画の戻り値 = ( r現在のステージ != null ) ? r現在のステージ.Draw() : 0;
+                TJAPlayer3.NamePlate.lcNamePlate.Update();
+                this.n進行描画の戻り値 = ( r現在のステージ != null ) ? r現在のステージ.Draw() : 0;
 
 				#region [ プラグインの進行描画 ]
 				//---------------------
@@ -2566,8 +2567,8 @@ for (int i = 0; i < 3; i++) {
         //-----------------
         private bool bマウスカーソル表示中 = true;
 		private bool b終了処理完了済み;
-		private bool bネットワークに接続中 = false;
-		private long 前回のシステム時刻ms = long.MinValue;
+        public bool bネットワークに接続中 { get; private set; } = false;
+        private long 前回のシステム時刻ms = long.MinValue;
 		private static CDTX[] dtx = new CDTX[ 5 ];
 
         public static TextureLoader Tx = new TextureLoader();

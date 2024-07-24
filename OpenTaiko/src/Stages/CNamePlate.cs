@@ -12,8 +12,10 @@ namespace TJAPlayer3
 {
     class CNamePlate
     {
+        public CLuaNamePlateScript lcNamePlate { get; private set; }
         public void RefleshSkin()
         {
+            /*
             for (int player = 0; player < 5; player++)
             {
                 this.pfName[player]?.Dispose();
@@ -29,12 +31,18 @@ namespace TJAPlayer3
 
             this.pfTitle = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Title_Size);
             this.pfdan = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.NamePlate_Font_Dan_Size);
+            */
+            lcNamePlate?.Dispose();
+            lcNamePlate = new CLuaNamePlateScript(CSkin.Path("Modules/NamePlate"));
+
+            for (int player = 0; player < 5; player++)
+            {
+                tNamePlateRefreshTitles(player);
+            }
         }
 
         public CNamePlate()
         {
-            RefleshSkin();
-
             for (int player = 0; player < 5; player++)
             {
                 if (TJAPlayer3.SaveFileInstances[player].data.DanType < 0) TJAPlayer3.SaveFileInstances[player].data.DanType = 0;
@@ -42,13 +50,14 @@ namespace TJAPlayer3
 
                 if (TJAPlayer3.SaveFileInstances[player].data.TitleType < 0) TJAPlayer3.SaveFileInstances[player].data.TitleType = 0;
 
-                tNamePlateRefreshTitles(player);
             }
+            RefleshSkin();
 
-            ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
-            ctAnimatedNamePlateTitle = new CCounter(0, 10000, 60.0f, TJAPlayer3.Timer);
+            //ctNamePlateEffect = new CCounter(0, 120, 16.6f, TJAPlayer3.Timer);
+            //ctAnimatedNamePlateTitle = new CCounter(0, 10000, 60.0f, TJAPlayer3.Timer);
         }
 
+        /*
         public void tNamePlateDisplayNamePlateBase(int x, int y, int item)
         {
             int namePlateBaseX = TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width;
@@ -66,6 +75,7 @@ namespace TJAPlayer3
             TJAPlayer3.Tx.NamePlate_Extension?.t2D描画(x, y, new RectangleF(0, item * namePlateBaseY, namePlateBaseX, namePlateBaseY));
 
         }
+        */
 
         public void tNamePlateRefreshTitles(int player)
         {
@@ -73,21 +83,36 @@ namespace TJAPlayer3
 
             string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
-            string name = CLangManager.LangInstance.GetString("AI_NAME");
-            string title = CLangManager.LangInstance.GetString("AI_TITLE");
-            string dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
+            string name;
+            string title;
+            string dan;
 
-            if (!TJAPlayer3.ConfigIni.bAIBattleMode || actualPlayer == 0)
+            bool isAI = TJAPlayer3.ConfigIni.bAIBattleMode && player == 1;
+            if (isAI)
+            {
+                name = CLangManager.LangInstance.GetString("AI_NAME");
+                title = CLangManager.LangInstance.GetString("AI_TITLE");
+                dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
+            }
+            else
             {
                 name = TJAPlayer3.SaveFileInstances[player].data.Name;
                 title = TJAPlayer3.SaveFileInstances[player].data.Title;
-                dan = TJAPlayer3.SaveFileInstances[player].data.Dan;                
+                dan = TJAPlayer3.SaveFileInstances[player].data.Dan;
             }
+            bIsPrevAI[player] = isAI;
 
+            /*
             txTitle[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(title, pfTitle, Color.Black, Color.Empty, 1000));
             txName[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(name, pfName[player], Color.White, Color.Black, 1000));
             if (TJAPlayer3.SaveFileInstances[player].data.DanGold) txdan[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey($"<g.#FFE34A.#EA9622>{dan}</g>", pfdan, Color.White, Color.Black, 1000));
             else txdan[player] = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(new TitleTextureKey(dan, pfdan, Color.White, Color.Black, 1000));
+            */
+
+            if (TJAPlayer3.SaveFileInstances[player].data.DanGold)
+                lcNamePlate.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", TJAPlayer3.SaveFileInstances[player].data);
+            else
+                lcNamePlate.SetInfos(player, name, title, dan, TJAPlayer3.SaveFileInstances[player].data);
         }
 
 
@@ -99,15 +124,27 @@ namespace TJAPlayer3
             int basePlayer = player;
             player = TJAPlayer3.GetActualPlayer(player);
 
-            tNamePlateRefreshTitles(player);
+            //tNamePlateRefreshTitles(player);
 
+            /*
             ctNamePlateEffect.TickLoop();
             ctAnimatedNamePlateTitle.TickLoop();
 
             this.txName[player].Opacity = Opacity;
             this.txTitle[player].Opacity = Opacity;
             this.txdan[player].Opacity = Opacity;
+            */
 
+            bool isAI = TJAPlayer3.ConfigIni.bAIBattleMode && basePlayer == 1;
+            if (bIsPrevAI[basePlayer] != isAI)
+            {
+                tNamePlateRefreshTitles(player);
+            }
+            bIsPrevAI[basePlayer] = isAI;
+
+            lcNamePlate.Draw(x, y, Opacity, basePlayer, player);
+
+            /*
             TJAPlayer3.Tx.NamePlateBase.Opacity = Opacity;
 
 
@@ -203,8 +240,10 @@ namespace TJAPlayer3
             
             // Overlap frame
             tNamePlateDisplayNamePlateBase(x, y, 4);
+            */
         }
 
+        /*
         private void tNamePlateDraw(int player, int x, int y, int Opacity = 255)
         {
             if (Opacity == 0)
@@ -341,13 +380,6 @@ namespace TJAPlayer3
                 }
                 if (this.ctNamePlateEffect.CurrentValue >= 105 && this.ctNamePlateEffect.CurrentValue <= 120)
                 {
-                    /*
-                    TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].Opacity = this.ctNamePlateEffect.n現在の値 >= 112 ? (int)(255 - (this.ctNamePlateEffect.n現在の値 - 112) * 31.875f) : 255;
-                    TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].vc拡大縮小倍率.X = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
-                    TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].vc拡大縮小倍率.Y = this.ctNamePlateEffect.n現在の値 >= 112 ? 1.0f : (this.ctNamePlateEffect.n現在の値 - 105) / 8f;
-                    TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] + 1].t2D拡大率考慮中央基準描画(x + 193, y + 6);
-                    */
-
                     int tt = TJAPlayer3.SaveFileInstances[player].data.TitleType;
                     if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title && TJAPlayer3.Tx.NamePlate_Title_Big[tt] != null) {
                         TJAPlayer3.Tx.NamePlate_Title_Big[tt].Opacity = this.ctNamePlateEffect.CurrentValue >= 112 ? (int)(255 - (this.ctNamePlateEffect.CurrentValue - 112) * 31.875f) : 255;
@@ -359,14 +391,11 @@ namespace TJAPlayer3
                 }
             }
         }
+        */
 
+        /*
         private void tNamePlateStarDraw(int player, float Scale, float x, float y)
         {
-            /*
-            TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.X = Scale;
-            TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].vc拡大縮小倍率.Y = Scale;
-            TJAPlayer3.Tx.NamePlate_Effect[TJAPlayer3.NamePlateConfig.data.TitleType[player] - 1].t2D拡大率考慮中央基準描画(x, y);
-            */
             int tt = TJAPlayer3.SaveFileInstances[player].data.TitleType;
             if (tt >= 0 && tt < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title && TJAPlayer3.Tx.NamePlate_Title_Small[tt] != null)
             {
@@ -376,7 +405,9 @@ namespace TJAPlayer3
             }
 
         }
+        */
 
+        /*
         private CCachedFontRenderer[] pfName = new CCachedFontRenderer[5];
         private CCachedFontRenderer pfTitle;
         private CCachedFontRenderer pfdan;
@@ -387,5 +418,8 @@ namespace TJAPlayer3
         private CTexture[] txName = new CTexture[5];
         private CTexture[] txTitle = new CTexture[5];
         private CTexture[] txdan = new CTexture[5];
+        */
+
+        private bool[] bIsPrevAI = new bool[5];
     }
 }

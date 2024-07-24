@@ -160,9 +160,9 @@ namespace FDK
             };
             VBO = Game.Gl.GenBuffer(); //頂点バッファを作る
             Game.Gl.BindBuffer(BufferTargetARB.ArrayBuffer, VBO); //頂点バッファをバインドをする
-            unsafe 
+            unsafe
             {
-                fixed(float* data = vertices) 
+                fixed (float* data = vertices)
                 {
                     Game.Gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(vertices.Length * sizeof(float)), data, BufferUsageARB.StaticDraw); //VRAMに頂点データを送る
                 }
@@ -170,7 +170,7 @@ namespace FDK
 
             uint locationPosition = (uint)Game.Gl.GetAttribLocation(ShaderProgram, "aPosition");
             Game.Gl.EnableVertexAttribArray(locationPosition); //layout (location = 0)を使用可能に
-            unsafe 
+            unsafe
             {
                 Game.Gl.VertexAttribPointer(locationPosition, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), (void*)0); //float3個で一つのxyzの塊として頂点を作る
             }
@@ -190,9 +190,9 @@ namespace FDK
                 2, 1, 3
             };
             IndicesCount = (uint)indices.Length; //数を登録する
-            unsafe 
+            unsafe
             {
-                fixed(uint* data = indices) 
+                fixed (uint* data = indices)
                 {
                     Game.Gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(indices.Length * sizeof(uint)), data, BufferUsageARB.StaticDraw); //VRAMに送る
                 }
@@ -203,16 +203,16 @@ namespace FDK
             UVBO = Game.Gl.GenBuffer();
             Game.Gl.BindBuffer(BufferTargetARB.ArrayBuffer, UVBO);
 
-            float[] uvs = new float[] 
+            float[] uvs = new float[]
             {
                 0.0f, 0.0f,
                 1.0f, 0.0f,
                 0.0f, 1.0f,
                 1.0f, 1.0f,
             };
-            unsafe 
+            unsafe
             {
-                fixed(float* data = uvs) 
+                fixed (float* data = uvs)
                 {
                     Game.Gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(uvs.Length * sizeof(float)), data, BufferUsageARB.StaticDraw);
                 }
@@ -220,7 +220,7 @@ namespace FDK
 
             uint locationUV = (uint)Game.Gl.GetAttribLocation(ShaderProgram, "aUV");
             Game.Gl.EnableVertexAttribArray(locationUV);
-            unsafe 
+            unsafe
             {
                 Game.Gl.VertexAttribPointer(locationUV, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), (void*)0);
             }
@@ -228,7 +228,7 @@ namespace FDK
 
 
             //バインドを解除 厳密には必須ではないが何かのはずみでバインドされたままBufferSubDataでデータが更新されたらとかされたらまあ大変-----
-            Game.Gl.BindVertexArray(0); 
+            Game.Gl.BindVertexArray(0);
             Game.Gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
             Game.Gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, 0);
             //-----
@@ -274,6 +274,11 @@ namespace FDK
         {
             get;
             set;
+        }
+        public float fZRotation
+        {
+            get => fZ軸中心回転;
+            set { fZ軸中心回転 = value; }
         }
         public int Opacity
         {
@@ -357,7 +362,7 @@ namespace FDK
 
         public void UpdateTexture(IntPtr texture, int width, int height, PixelFormat rgbaType)
         {
-            unsafe 
+            unsafe
             {
                 Game.Gl.DeleteTexture(Texture_); //解放
                 void* data = texture.ToPointer();
@@ -473,27 +478,27 @@ namespace FDK
                     bitmap = new SKBitmap(10, 10);
                 }
 
-                unsafe 
+                unsafe
                 {
-                    fixed(void* data = bitmap.Pixels)
+                    fixed (void* data = bitmap.Pixels)
                     {
                         if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID)
                         {
                             Texture_ = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
                         }
-                        else 
+                        else
                         {
                             SKBitmap bm = bitmap.Copy();
-                            Action createInstance = () => 
+                            Action createInstance = () =>
                             {
-                                fixed(void* data2 = bitmap.Pixels)
+                                fixed (void* data2 = bitmap.Pixels)
                                 {
                                     Texture_ = GenTexture(data2, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
                                 }
                                 bm.Dispose();
                             };
                             Game.AsyncActions.Add(createInstance);
-                            while(Game.AsyncActions.Contains(createInstance))
+                            while (Game.AsyncActions.Contains(createInstance))
                             {
 
                             }
@@ -512,6 +517,13 @@ namespace FDK
                 throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n"));
             }
         }
+
+        public void tSetScale(float x, float y)
+        {
+            vcScaleRatio.X = x;
+            vcScaleRatio.Y = y;
+        }
+
         // メソッド
 
         // 2016.11.10 kairera0467 拡張
@@ -687,6 +699,18 @@ namespace FDK
             }
 
         }
+        public void t2D_DisplayImage_AnchorCenter(int x, int y)
+        {
+            this.t2D描画(x - (this.rc全画像.Width / 2 * this.vcScaleRatio.X), y - (this.rc全画像.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+        }
+        public void t2D_DisplayImage_AnchorCenter(int x, int y, Rectangle rc)
+        {
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+        }
+        public void t2D_DisplayImage_AnchorCenter(int x, int y, RectangleF rc)
+        {
+            this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+        }
 
         public enum RefPnt
         {
@@ -699,6 +723,19 @@ namespace FDK
             DownLeft,
             Down,
             DownRight,
+        }
+
+        public void t2D_DisplayImage(int x, int y)
+        {
+            this.t2D描画(x, y, 1f, this.rc全画像);
+        }
+        public void t2D_DisplayImage(int x, int y, Rectangle rc画像内の描画領域)
+        {
+            this.t2D描画(x, y, 1f, rc画像内の描画領域);
+        }
+        public void t2D_DisplayImage(int x, int y, RectangleF rc)
+        {
+            this.t2D描画(x, y, 1f, rc);
         }
 
         /// <summary>
@@ -744,11 +781,11 @@ namespace FDK
             {
                 blendType = BlendType.Screen;
             }
-            else 
+            else
             {
                 blendType = BlendType.Normal;
             }
-            
+
             BlendHelper.SetBlend(blendType);
 
             Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
@@ -756,21 +793,21 @@ namespace FDK
             Game.Gl.BindTexture(TextureTarget.Texture2D, Texture_); //テクスチャをバインド
 
             //MVPを設定----
-            unsafe 
+            unsafe
             {
                 Matrix4X4<float> mvp = Matrix4X4<float>.Identity;
 
                 float gameAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
-                
+
 
                 //スケーリング-----
-                mvp *= Matrix4X4.CreateScale(rc画像内の描画領域.Width / GameWindowSize.Width, rc画像内の描画領域.Height / GameWindowSize.Height, 1) * 
+                mvp *= Matrix4X4.CreateScale(rc画像内の描画領域.Width / GameWindowSize.Width, rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
                     Matrix4X4.CreateScale(flipX ? -vcScaleRatio.X : vcScaleRatio.X, flipY ? -vcScaleRatio.Y : vcScaleRatio.Y, 1.0f);
                 //-----
 
                 //回転-----
                 mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-                    Matrix4X4.CreateRotationZ(fZ軸中心回転) * 
+                    Matrix4X4.CreateRotationZ(fZ軸中心回転) *
                     Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
                 //-----
 
@@ -800,11 +837,11 @@ namespace FDK
 
             //描画-----
             Game.Gl.BindVertexArray(VAO);
-            unsafe 
+            unsafe
             {
                 Game.Gl.DrawElements(PrimitiveType.Triangles, IndicesCount, DrawElementsType.UnsignedInt, (void*)0);//描画!
             }
-            
+
             BlendHelper.SetBlend(BlendType.Normal);
         }
         public void t2D描画(int x, int y, float depth, Rectangle rc画像内の描画領域)
@@ -833,11 +870,11 @@ namespace FDK
         }
         public void t2D左右反転描画(float x, float y, float depth, Rectangle rc画像内の描画領域)
         {
-            t2D描画(x, y, depth, rc画像内の描画領域, flipX:true);
+            t2D描画(x, y, depth, rc画像内の描画領域, flipX: true);
         }
         public void t2D上下反転描画(int x, int y, float depth, Rectangle rc画像内の描画領域)
         {
-            t2D描画(x, y, depth, rc画像内の描画領域, flipY:true);
+            t2D描画(x, y, depth, rc画像内の描画領域, flipY: true);
         }
         public void t2D上下反転描画(Point pt)
         {
@@ -903,11 +940,11 @@ namespace FDK
             {
                 blendType = BlendType.Screen;
             }
-            else 
+            else
             {
                 blendType = BlendType.Normal;
             }
-            
+
             BlendHelper.SetBlend(blendType);
 
             Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
@@ -915,21 +952,21 @@ namespace FDK
             Game.Gl.BindTexture(TextureTarget.Texture2D, Texture_); //テクスチャをバインド
 
             //MVPを設定----
-            unsafe 
+            unsafe
             {
                 Matrix4X4<float> mvp = Matrix4X4<float>.Identity;
 
                 float gameAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
-                
+
 
                 //スケーリング-----
-                mvp *= Matrix4X4.CreateScale((float)rc画像内の描画領域.Width / GameWindowSize.Width, (float)rc画像内の描画領域.Height / GameWindowSize.Height, 1) * 
+                mvp *= Matrix4X4.CreateScale((float)rc画像内の描画領域.Width / GameWindowSize.Width, (float)rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
                     Matrix4X4.CreateScale(xScale, yScale, 1.0f);
                 //-----
 
                 //回転-----
                 mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-                    Matrix4X4.CreateRotationZ(fZ軸中心回転) * 
+                    Matrix4X4.CreateRotationZ(fZ軸中心回転) *
                     Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
                 //-----
 
@@ -946,7 +983,7 @@ namespace FDK
                 Game.Gl.UniformMatrix4(CameraID, 1, false, (float*)&camera);
             }
             //------
-            
+
             Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
             Game.Gl.Uniform2(ScaleID, new System.Numerics.Vector2(vcScaleRatio.X, vcScaleRatio.Y)); //変色用のカラーを設定
 
@@ -959,11 +996,11 @@ namespace FDK
 
             //描画-----
             Game.Gl.BindVertexArray(VAO);
-            unsafe 
+            unsafe
             {
                 Game.Gl.DrawElements(PrimitiveType.Triangles, IndicesCount, DrawElementsType.UnsignedInt, (void*)0);//描画!
             }
-            
+
             BlendHelper.SetBlend(BlendType.Normal);
         }
 
@@ -1025,7 +1062,7 @@ namespace FDK
         {
             this.Opacity = o;
         }
-                                                            //-----------------
+        //-----------------
         #endregion
     }
 }

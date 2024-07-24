@@ -1,0 +1,31 @@
+0 - Wood
+1 - Orange
+2 - Purple
+3 - Green
+4 - Red
+5 - Blue
+6 - Gray
+7 - Rainbow
+8 - Space
+9 - Diamond
+10 - ?
+11 - Gold
+12 - Pearl
+13 - Platinum
+14 - Kohaku (Character plate)
+15 - Dashy (Character plate)
+16 - Blue
+17 - Red
+18 - Sky Purple
+19 - AI
+20 - Cyan
+21 - OpTk Yellow (Roll)
+22 - Bol white
+23 - Saturated blue
+24 - Saturated green
+25 - OpTk Chapter I
+26 - OpTk Chapter II
+27 - OpTk Chapter III
+28 - OpTk Light
+29 - OpTk Dark
+30 - NEP0
