@@ -48,7 +48,11 @@ local slash = nil
 
 local title_stars_folders = { "1", "2", "3" }
 local title_stars = { { } }
-local title_badges = { }
+
+local title_badge_of_achievement = nil
+local nameplates_achievement = {134,78,66,71,44,14,17}
+local title_badge_of_team_member = nil
+local nameplates_team_member = {}
 
 local font_name_normal_size = nil
 local font_name_withtitle = nil
@@ -64,6 +68,15 @@ local nodan = { false, false, false, false, false }
 
 local titleplate_counter = 0
 local namePlateEffect_counter = 0
+
+function tableContains(testTable, value)
+	for i = 1,#testTable do
+		if (testTable[i] == value) then
+			return true
+		end
+	end
+	return false
+end
 
 function implDrawStar(scale, x, y, star_small)
     star_small:tSetScale(scale, scale)
@@ -196,7 +209,7 @@ function implDrawRarityStars(o_x, o_y, opacity, rarity)
 	local x = o_x
 	local y = o_y - 20
 	
-	star_count = 0
+	local star_count = 0
 	--Rare
 	if rarity == 3 then
 		star_count = 1
@@ -209,10 +222,20 @@ function implDrawRarityStars(o_x, o_y, opacity, rarity)
 	end
 	
 	if star_count > 0 then
-		star_frame = 1 + math.ceil(titleplate_counter * (#title_stars[star_count] - 1))
+		local star_frame = 1 + math.ceil(titleplate_counter * (#title_stars[star_count] - 1))
 		tx_titlestar = title_stars[star_count][star_frame]
 		tx_titlestar.Opacity = opacity
 		tx_titlestar:t2D_DisplayImage(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+	end
+end
+
+function implDrawBadges(x, y, opacity, nameplateId)
+	if tableContains(nameplates_achievement, nameplateId) then
+		title_badge_of_achievement.Opacity = opacity
+		title_badge_of_achievement:t2D_DisplayImage(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+	elseif tableContains(nameplates_team_member, nameplateId) then
+		title_badge_of_team_member.Opacity = opacity
+		title_badge_of_team_member:t2D_DisplayImage(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
 	end
 end
 
@@ -299,6 +322,9 @@ function loadAssets()
     base = loadTexture("Base.png")
     dan_base = loadTexture("Dan_Base.png")
     slash = loadTexture("Shines/Slash.png")
+	
+	title_badge_of_achievement = loadTexture("Badges/0.png")
+	title_badge_of_team_member = loadTexture("Badges/1.png")
 
     for i = 1, 3 do 
         dan_gradation[i] = loadTexture("Dan_"..dan_types[i]..".png")
@@ -403,6 +429,9 @@ function drawTitlePlate(o_x, o_y, opacity, titletype, titleTex, rarityInt, namep
 	--Rarity stars
 	implDrawRarityStars(x, y, opacity, rarityInt)
 	
+	--Badges
+	implDrawBadges(x, y, opacity, nameplateId)
+	
 	--Glow
     implDrawTitleEffect(x, y, titletype + 1)
 	
@@ -431,6 +460,7 @@ function draw(x, y, opacity, player, side)
     local player_lua = player + 1
     local side_lua = side + 1
 	local rarityInt = player_data[player_lua].TitleRarityInt
+	local nameplateId = player_data[player_lua].TitleId
     
     --White background
     base.Opacity = opacity
@@ -444,6 +474,9 @@ function draw(x, y, opacity, player, side)
 	
 	--Rarity stars
 	implDrawRarityStars(x, y, opacity, rarityInt)
+	
+	--Badges
+	implDrawBadges(x, y, opacity, nameplateId)
 
     --Dan plate
     if not(player_data[player_lua].Dan == nil) and not(player_data[player_lua].Dan == "") then
