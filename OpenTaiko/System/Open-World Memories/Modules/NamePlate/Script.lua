@@ -197,6 +197,16 @@ function implDrawTitlePlate(x, y, opacity, titleTexIndex)
     end
 end
 
+function implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
+	if (player_lua == 1 and side_lua == 2) then
+		players_blue.Opacity = opacity
+		players_blue:t2D_DisplayImage(x, y)
+	else
+		players[player_lua].Opacity = opacity
+		players[player_lua]:t2D_DisplayImage(x, y)
+	end
+end
+
 function reloadLanguage(lang)
 end
 
@@ -305,11 +315,18 @@ function loadAssets()
 end
 
 function drawDan(x, y, opacity, type, titleTex)
+	--White background
     base.Opacity = opacity
     base:t2D_DisplayImage(x, y)
 
+	--Dan base
     dan_base.Opacity = opacity
     dan_base:t2D_DisplayImage(x, y)
+    dan_gradation[type + 1].Opacity = opacity
+    dan_gradation[type + 1]:t2D_DisplayImage(x, y)
+	
+	--Player number
+	implDrawPlayerRing(x, y, opacity, 1, 1)
     
     --Dan text
     if not(nodan[player_lua]) then
@@ -320,11 +337,20 @@ function drawDan(x, y, opacity, type, titleTex)
 end
 
 function drawTitlePlate(x, y, opacity, titletype, titleTex)
+	--White background
     base.Opacity = opacity
     base:t2D_DisplayImage(x, y)
 
+	--Upper (title) plate
     implDrawTitlePlate(x, y, opacity, titletype + 1)
+	
+	--Glow
+    implDrawTitleEffect(x, y, titletype + 1)
+	
+	--Player number
+	implDrawPlayerRing(x, y, opacity, 1, 1)
 
+	--Title/Name text
     titleTex:tSetScale(math.min(config_font_title_maxsize / titleTex.szTextureSize.Width, 1.0), 1.0)
     titleTex.Opacity = opacity
     titleTex:t2D_DisplayImage_AnchorCenter(x + config_text_title_offset_x, y + config_text_title_offset_y)
@@ -351,7 +377,6 @@ function draw(x, y, opacity, player, side)
     base:t2D_DisplayImage(x, y)
 
     --Upper (title) plate
-    
     titleplate_index = player_data[player_lua].TitleType + 1
     if not(notitle[player_lua]) then
         implDrawTitlePlate(x, y, opacity, titleplate_index)
@@ -369,13 +394,7 @@ function draw(x, y, opacity, player, side)
     implDrawTitleEffect(x, y, titleplate_index)
 
     --Player number
-	if (player_lua == 1 and side_lua == 2) then
-		players_blue.Opacity = opacity
-		players_blue:t2D_DisplayImage(x, y)
-	else
-		players[player_lua].Opacity = opacity
-		players[player_lua]:t2D_DisplayImage(x, y)
-	end
+	implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
 
     --Dan text
     if not(nodan[player_lua]) then
