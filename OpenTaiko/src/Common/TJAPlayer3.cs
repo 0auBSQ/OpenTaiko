@@ -1,17 +1,26 @@
-﻿using System.Diagnostics;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using DiscordRPC;
+using System.Drawing;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
+using System.Net.NetworkInformation;
+using System.Runtime.Serialization.Formatters.Binary;
 using FDK;
 using SampleFramework;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Linq;
 using Silk.NET.Maths;
 using SkiaSharp;
+using DiscordRPC;
+
 using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
+using Color = System.Drawing.Color;
+using System.Runtime.InteropServices;
 
 namespace TJAPlayer3 {
 	internal class TJAPlayer3 : Game {
@@ -312,7 +321,7 @@ namespace TJAPlayer3 {
 			private set;
 		}
 		//		public static CStageオプション stageオプション
-		//		{
+		//		{ 
 		//			get;
 		//			private set;
 		//		}
@@ -653,8 +662,8 @@ namespace TJAPlayer3 {
 
 				//CameraTest
 				/*
-				Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
-				Matrix4X4.CreateRotationZ(MathF.PI / 4.0f) *
+				Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) * 
+				Matrix4X4.CreateRotationZ(MathF.PI / 4.0f) * 
 				Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
 				*/
 
@@ -713,32 +722,11 @@ namespace TJAPlayer3 {
 						}
 					}
 				}
-			}
-			*/
-			#endregion
-
-			if( r現在のステージ != null )
-			{
-                TJAPlayer3.NamePlate.lcNamePlate.Update();
-                this.n進行描画の戻り値 = ( r現在のステージ != null ) ? r現在のステージ.Draw() : 0;
-
-				#region [ プラグインの進行描画 ]
-				//---------------------
-				foreach( STPlugin sp in this.PluginList )
-				{
-					Directory.SetCurrentDirectory( sp.pluginDirectory );
-
-					if( TJAPlayer3.act現在入力を占有中のプラグイン == null || TJAPlayer3.act現在入力を占有中のプラグイン == sp.plugin )
-						sp.plugin.On進行描画(TJAPlayer3.Pad, TJAPlayer3.InputManager.Keyboard );
-					else
-						sp.plugin.On進行描画( null, null );
-
-					Directory.SetCurrentDirectory( TJAPlayer3.strEXEのあるフォルダ );
-				}
-				//---------------------
+				*/
 				#endregion
 
 				if (r現在のステージ != null) {
+					TJAPlayer3.NamePlate.lcNamePlate.Update();
 					this.n進行描画の戻り値 = (r現在のステージ != null) ? r現在のステージ.Draw() : 0;
 
 					#region [ プラグインの進行描画 ]
@@ -1506,7 +1494,7 @@ namespace TJAPlayer3 {
 
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Gameplay (Drum Screen)");
-#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
+#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化                                                                                   
 for (int i = 0; i < 5; i++)
 {
 	for (int j = 0; j < 2; j++)
@@ -1516,7 +1504,7 @@ for (int i = 0; i < 5; i++)
 }
 for (int i = 0; i < 3; i++) {
 	stage演奏ドラム画面.fDamageLevelFactor[i] = ConfigIni.fDamageLevelFactor[i];
-}
+}		
 #endif
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage演奏ドラム画面;
@@ -2040,7 +2028,8 @@ for (int i = 0; i < 3; i++) {
 					if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Network_Connection != null) {
 						if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.前回のシステム時刻ms) > 10000) {
 							this.前回のシステム時刻ms = SoundManager.PlayTimer.SystemTimeMs;
-							Task.Factory.StartNew(() => {
+							Task.Factory.StartNew(() =>
+							{
 								//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
 								PingReply reply = new Ping().Send("8.8.8.8", 5000);
 								this.bネットワークに接続中 = reply.Status == IPStatus.Success;
@@ -2279,9 +2268,9 @@ for (int i = 0; i < 3; i++) {
 		//-----------------
 		private bool bマウスカーソル表示中 = true;
 		private bool b終了処理完了済み;
-    public bool bネットワークに接続中 { get; private set; } = false;
-    private long 前回のシステム時刻ms = long.MinValue;
-		private static CDTX[] dtx = new CDTX[ 5 ];
+		public bool bネットワークに接続中 { get; private set; } = false;
+		private long 前回のシステム時刻ms = long.MinValue;
+		private static CDTX[] dtx = new CDTX[5];
 
 		public static TextureLoader Tx = new TextureLoader();
 
@@ -2452,7 +2441,7 @@ for (int i = 0; i < 3; i++) {
 				actTextConsole = new CTextConsole();
 				Trace.TraceInformation("Console initialized.");
 				actTextConsole.Activate();
-				//if (!ConfigIni.PreAssetsLoading)
+				//if (!ConfigIni.PreAssetsLoading) 
 				{
 					actTextConsole.CreateManagedResource();
 					actTextConsole.CreateUnmanagedResource();
@@ -2926,7 +2915,7 @@ for (int i = 0; i < 3; i++) {
 					Trace.Indent();
 					try {
 						actTextConsole.DeActivate();
-						//if (!ConfigIni.PreAssetsLoading)
+						//if (!ConfigIni.PreAssetsLoading) 
 						{
 							actTextConsole.ReleaseManagedResource();
 							actTextConsole.ReleaseUnmanagedResource();
