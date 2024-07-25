@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 
-namespace TJAPlayer3
-{
+namespace TJAPlayer3 {
 	[Serializable]
-	internal class CSongListNode
-	{
+	internal class CSongListNode {
 		// プロパティ
 
 		public ENodeType eノード種別 = ENodeType.UNKNOWN;
-		public enum ENodeType
-		{
+		public enum ENodeType {
 			SCORE,
 			SCORE_MIDI,
 			BOX,
@@ -24,20 +19,17 @@ namespace TJAPlayer3
 
 		public string[] ar難易度ラベル = new string[(int)Difficulty.Total];
 		public bool bDTXFilesで始まるフォルダ名のBOXである;
-		public bool bBoxDefで作成されたBOXである
-		{
-			get
-			{
+		public bool bBoxDefで作成されたBOXである {
+			get {
 				return !this.bDTXFilesで始まるフォルダ名のBOXである;
 			}
-			set
-			{
+			set {
 				this.bDTXFilesで始まるフォルダ名のBOXである = !value;
 			}
 		}
 		public Color col文字色 = Color.White;
-        public Color ForeColor = Color.White;
-        public Color BackColor = Color.Black;
+		public Color ForeColor = Color.White;
+		public Color BackColor = Color.Black;
 		public Color BoxColor = Color.White;
 
 		public Color BgColor = Color.White;
@@ -49,8 +41,8 @@ namespace TJAPlayer3
 		public string BoxChara;
 		public bool isChangedBoxChara;
 
-        public bool IsChangedForeColor;
-        public bool IsChangedBackColor;
+		public bool IsChangedForeColor;
+		public bool IsChangedBackColor;
 		public bool isChangedBoxColor;
 		public List<CSongListNode> listランダム用ノードリスト;
 		public List<CSongListNode> list子リスト;
@@ -61,7 +53,7 @@ namespace TJAPlayer3
 		public int nスコア数;
 
 		public CSongListNode rParentNode;
-		
+
 		public int Openindex;
 		public bool bIsOpenFolder;
 		public string strジャンル = "";
@@ -72,15 +64,15 @@ namespace TJAPlayer3
 		public CLocalizationData ldSubtitle = new CLocalizationData();
 		public string strMaker = "";
 		public string[] strNotesDesigner = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
-        public CDTX.ESide nSide = CDTX.ESide.eEx;
+		public CDTX.ESide nSide = CDTX.ESide.eEx;
 		public bool bExplicit = false;
 		public bool bMovie = false;
-		public string strBreadcrumbs = "";		// #27060 2011.2.27 yyagi; MUSIC BOXのパンくずリスト (曲リスト構造内の絶対位置捕捉のために使う)
-		public string strSkinPath = "";			// #28195 2012.5.4 yyagi; box.defでのスキン切り替え対応
-        public bool bBranch = false;
-        public int[] nLevel = new int[(int)Difficulty.Total]{ 0, 0, 0, 0, 0, 0, 0 };
-		public CDTX.ELevelIcon[] nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] {CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
-		
+		public string strBreadcrumbs = "";      // #27060 2011.2.27 yyagi; MUSIC BOXのパンくずリスト (曲リスト構造内の絶対位置捕捉のために使う)
+		public string strSkinPath = "";         // #28195 2012.5.4 yyagi; box.defでのスキン切り替え対応
+		public bool bBranch = false;
+		public int[] nLevel = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
+		public CDTX.ELevelIcon[] nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
+
 		// Tower Lives
 		public int nLife = 5;
 		public int nTotalFloor = 140;
@@ -91,53 +83,47 @@ namespace TJAPlayer3
 
 		public int nDanTick = 0;
 		public Color cDanTickColor = Color.White;
-		
+
 		public CLocalizationData[] strBoxText = new CLocalizationData[3] { new CLocalizationData(), new CLocalizationData(), new CLocalizationData() };
-		
+
 		public string strSelectBGPath;
 
 		// In-game visuals
 
 		public string strScenePreset = null;
 
-		public string tGetUniqueId()
-		{
+		public string tGetUniqueId() {
 			return uniqueId?.data.id ?? "";
 		}
 
 		// コンストラクタ
 
-		public CSongListNode()
-		{
+		public CSongListNode() {
 			this.nID = id++;
 		}
 
-		public CSongListNode Clone()
-		{
+		public CSongListNode Clone() {
 			return (CSongListNode)MemberwiseClone();
 		}
 
-		public override bool Equals(object other)
-        {
-			if (other.GetType() == typeof(CSongListNode))
-            {
+		public override bool Equals(object other) {
+			if (other.GetType() == typeof(CSongListNode)) {
 				CSongListNode obj = (CSongListNode)other;
 				return this.nID == obj.nID;
 			}
 			return this.GetHashCode() == other.GetHashCode();
-        }
+		}
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+		public override int GetHashCode() {
+			return base.GetHashCode();
+		}
 
 
-        // その他
+		// その他
 
-        #region [ private ]
-        //-----------------
-        private static int id;
+		#region [ private ]
+		//-----------------
+		private static int id;
 		//-----------------
 		#endregion
 	}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -85,7 +85,7 @@ namespace TJAPlayer3
                     this.sDanTitles[idx] = item.Key;
                     if (item.Value.isGold == true)
                         this.ttkDanTitles[idx] = new TitleTextureKey($"<g.#FFE34A.#EA9622>{item.Key}</g>", this.pfHeyaFont, Color.Gold, Color.Black, 1000);
-                    else 
+                    else
                         this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.pfHeyaFont, Color.White, Color.Black, 1000);
                     idx++;
                 }
@@ -118,7 +118,7 @@ namespace TJAPlayer3
                         this.titlesKeys[idx] = _ref;
                         idx++;
                     }
-                    
+
                 }
             }
 
@@ -163,7 +163,7 @@ namespace TJAPlayer3
             this.tResetOpts();
 
             this.PuchiChara.IdleAnimation();
-            
+
             Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.HEYA}Script.lua"));
             Background.Init();
 
@@ -173,7 +173,7 @@ namespace TJAPlayer3
         public override void DeActivate()
         {
             TJAPlayer3.tDisposeSafely(ref Background);
-            
+
             base.DeActivate();
         }
 
@@ -291,11 +291,11 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.Puchichara[pos].tx.vcScaleRatio.Y = puchiScale;
                     }
 
-                    TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0], 
-                        scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[1] + (int)(PuchiChara.sineY), 
-                        new Rectangle((PuchiChara.Counter.CurrentValue + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0], 
-                        puriRow * TJAPlayer3.Skin.Game_PuchiChara[1], 
-                        TJAPlayer3.Skin.Game_PuchiChara[0], 
+                    TJAPlayer3.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[0],
+                        scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Item_Offset[1] + (int)(PuchiChara.sineY),
+                        new Rectangle((PuchiChara.Counter.CurrentValue + 2 * puriColumn) * TJAPlayer3.Skin.Game_PuchiChara[0],
+                        puriRow * TJAPlayer3.Skin.Game_PuchiChara[1],
+                        TJAPlayer3.Skin.Game_PuchiChara[0],
                         TJAPlayer3.Skin.Game_PuchiChara[1]));
 
                     TJAPlayer3.Tx.Puchichara[pos].tx?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
@@ -434,8 +434,8 @@ namespace TJAPlayer3
 
                     /*
                     TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
-                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2, 
-                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24, 
+                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2,
+                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24,
                         (8 + danGrade));
                     TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
@@ -483,7 +483,7 @@ namespace TJAPlayer3
                         _rarity = HRarity.tRarityToLangInt(_dc.rarity);
                         _titleid = this.titlesKeys[pos];
                         //iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
-                    }   
+                    }
                     else if (pos == 0)
                         iType = 0;
 
@@ -493,7 +493,7 @@ namespace TJAPlayer3
                         TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
                             scroll.Item1,
                             scroll.Item2);
-                        
+
                     }
                     */
                     TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex, _rarity, _titleid);
@@ -540,7 +540,7 @@ namespace TJAPlayer3
             if (!ctChara_In.IsStarted)
             {
                 TJAPlayer3.Skin.soundHeyaBGM.tPlay();
-                ctChara_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);    
+                ctChara_In.Start(0, 180, 1.25f, TJAPlayer3.Timer);
             }
 
             #region [ キャラ関連 ]
@@ -581,7 +581,7 @@ namespace TJAPlayer3
 
             #endregion
 
-            
+
 
             #region [ Inputs ]
 
@@ -739,7 +739,7 @@ namespace TJAPlayer3
                         TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = -1;
                         TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = 1;
                     }
-                        
+
 
                     TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
 
@@ -762,7 +762,7 @@ namespace TJAPlayer3
             else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
                 TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel))
             {
-                
+
                 TJAPlayer3.Skin.soundCancelSFX.tPlay();
 
                 if (iCurrentMenu == -1)
@@ -778,7 +778,7 @@ namespace TJAPlayer3
                     this.ttkInfoSection = null;
                     this.tResetOpts();
                 }
-                    
+
 
                 return 0;
             }
@@ -858,7 +858,7 @@ namespace TJAPlayer3
             iPuchiCharaCurrent = PuchiChara.tGetPuchiCharaIndexByName(this.iPlayer);
         }
 
-        
+
 
         private bool tMove(int off)
         {
@@ -947,7 +947,7 @@ namespace TJAPlayer3
                 && !TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[iCharacterCurrent]))
             {
                 string _cond = "???";
-                if (HRarity.tRarityToModalInt(TJAPlayer3.Tx.Characters[iCharacterCurrent].metadata.Rarity) 
+                if (HRarity.tRarityToModalInt(TJAPlayer3.Tx.Characters[iCharacterCurrent].metadata.Rarity)
                     < HRarity.tRarityToModalInt("Epic"))
                     _cond = TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage();
                 this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);

@@ -1,25 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FDK
-{
-	public class CFPS
-	{
+﻿namespace FDK {
+	public class CFPS {
 		// プロパティ
 
-		public int NowFPS
-		{
+		public int NowFPS {
 			get;
 			private set;
 		}
-		public double DeltaTime
-		{
+		public double DeltaTime {
 			get;
 			private set;
 		}
-		public bool ChangedFPS
-		{
+		public bool ChangedFPS {
 			get;
 			private set;
 		}
@@ -27,11 +18,10 @@ namespace FDK
 
 		// コンストラクタ
 
-		public CFPS()
-		{
+		public CFPS() {
 			this.NowFPS = 0;
 			this.DeltaTime = 0;
-			this.FPSTimer = new CTimer( CTimer.TimerType.MultiMedia );
+			this.FPSTimer = new CTimer(CTimer.TimerType.MultiMedia);
 			this.BeginTime = this.FPSTimer.NowTime;
 			this.CoreFPS = 0;
 			this.ChangedFPS = false;
@@ -40,16 +30,14 @@ namespace FDK
 
 		// メソッド
 
-		public void Update()
-		{
+		public void Update() {
 			this.FPSTimer.Update();
 			this.ChangedFPS = false;
 
 			const long INTERVAL = 1000;
 			this.DeltaTime = (this.FPSTimer.NowTime - this.PrevFrameTime) / 1000.0;
 			PrevFrameTime = this.FPSTimer.NowTime;
-			while ( ( this.FPSTimer.NowTime - this.BeginTime ) >= INTERVAL )
-			{
+			while ((this.FPSTimer.NowTime - this.BeginTime) >= INTERVAL) {
 				this.NowFPS = this.CoreFPS;
 				this.CoreFPS = 0;
 				this.ChangedFPS = true;
@@ -63,10 +51,10 @@ namespace FDK
 
 		#region [ private ]
 		//-----------------
-		private CTimer	FPSTimer;
+		private CTimer FPSTimer;
 		private long BeginTime;
 		private long PrevFrameTime;
-		private int		CoreFPS;
+		private int CoreFPS;
 		//-----------------
 		#endregion
 	}

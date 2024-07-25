@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using FDK;
-using System.Drawing;
 
-namespace TJAPlayer3
-{
+namespace TJAPlayer3 {
 	[Serializable]
-	internal class Cスコア
-	{
+	internal class Cスコア {
 		// プロパティ
 
 		public STScoreIni情報 ScoreIni情報;
 		[Serializable]
-		[StructLayout( LayoutKind.Sequential )]
-		public struct STScoreIni情報
-		{
+		[StructLayout(LayoutKind.Sequential)]
+		public struct STScoreIni情報 {
 			public DateTime 最終更新日時;
 			public long ファイルサイズ;
 
-			public STScoreIni情報( DateTime 最終更新日時, long ファイルサイズ )
-			{
+			public STScoreIni情報(DateTime 最終更新日時, long ファイルサイズ) {
 				this.最終更新日時 = 最終更新日時;
 				this.ファイルサイズ = ファイルサイズ;
 			}
@@ -30,16 +22,14 @@ namespace TJAPlayer3
 
 		public STファイル情報 ファイル情報;
 		[Serializable]
-		[StructLayout( LayoutKind.Sequential )]
-		public struct STファイル情報
-		{
+		[StructLayout(LayoutKind.Sequential)]
+		public struct STファイル情報 {
 			public string ファイルの絶対パス;
 			public string フォルダの絶対パス;
 			public DateTime 最終更新日時;
 			public long ファイルサイズ;
 
-			public STファイル情報( string ファイルの絶対パス, string フォルダの絶対パス, DateTime 最終更新日時, long ファイルサイズ )
-			{
+			public STファイル情報(string ファイルの絶対パス, string フォルダの絶対パス, DateTime 最終更新日時, long ファイルサイズ) {
 				this.ファイルの絶対パス = ファイルの絶対パス;
 				this.フォルダの絶対パス = フォルダの絶対パス;
 				this.最終更新日時 = 最終更新日時;
@@ -50,9 +40,8 @@ namespace TJAPlayer3
 		public ST譜面情報 譜面情報;
 
 		[Serializable]
-		[StructLayout( LayoutKind.Sequential )]
-		public struct ST譜面情報
-		{
+		[StructLayout(LayoutKind.Sequential)]
+		public struct ST譜面情報 {
 			public string タイトル;
 			public string アーティスト名;
 			public string コメント;
@@ -73,16 +62,16 @@ namespace TJAPlayer3
 			public double MinBpm;
 			public double MaxBpm;
 			public int Duration;
-            public string strBGMファイル名;
-            public int SongVol;
-		    public LoudnessMetadata? SongLoudnessMetadata;
-            public int nデモBGMオフセット;
-            public bool[] b譜面分岐;
-            public int ハイスコア;
-            public int[] nハイスコア;
-            public string strサブタイトル;
-            public int[] nレベル;
-			public int[] nクリア;		//0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+			public string strBGMファイル名;
+			public int SongVol;
+			public LoudnessMetadata? SongLoudnessMetadata;
+			public int nデモBGMオフセット;
+			public bool[] b譜面分岐;
+			public int ハイスコア;
+			public int[] nハイスコア;
+			public string strサブタイトル;
+			public int[] nレベル;
+			public int[] nクリア;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 			public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 			public CDTX.ELevelIcon[] nLevelIcon;
 
@@ -97,22 +86,18 @@ namespace TJAPlayer3
 			public List<int[]> nExamResult;
 
 			[Serializable]
-			[StructLayout( LayoutKind.Sequential )]
-			public struct STHISTORY
-			{
+			[StructLayout(LayoutKind.Sequential)]
+			public struct STHISTORY {
 				public string 行1;
 				public string 行2;
 				public string 行3;
 				public string 行4;
 				public string 行5;
-                public string 行6;
-                public string 行7;
-                public string this[ int index ]
-				{
-					get
-					{
-						switch( index )
-						{
+				public string 行6;
+				public string 行7;
+				public string this[int index] {
+					get {
+						switch (index) {
 							case 0:
 								return this.行1;
 
@@ -127,17 +112,15 @@ namespace TJAPlayer3
 
 							case 4:
 								return this.行5;
-                            case 5:
-                                return this.行6;
-                            case 6:
-                                return this.行7;
+							case 5:
+								return this.行6;
+							case 6:
+								return this.行7;
 						}
 						throw new IndexOutOfRangeException();
 					}
-					set
-					{
-						switch( index )
-						{
+					set {
+						switch (index) {
 							case 0:
 								this.行1 = value;
 								return;
@@ -157,12 +140,12 @@ namespace TJAPlayer3
 							case 4:
 								this.行5 = value;
 								return;
-                            case 5:
-                                this.行6 = value;
-                                return;
-                            case 6:
-                                this.行7 = value;
-                                return;
+							case 5:
+								this.行6 = value;
+								return;
+							case 6:
+								this.行7 = value;
+								return;
 						}
 						throw new IndexOutOfRangeException();
 					}
@@ -170,27 +153,22 @@ namespace TJAPlayer3
 			}
 
 			[Serializable]
-			[StructLayout( LayoutKind.Sequential )]
-			public struct STRANK
-			{
+			[StructLayout(LayoutKind.Sequential)]
+			public struct STRANK {
 				public int Drums;
 				public int Guitar;
 				public int Bass;
 			}
 
 			[Serializable]
-			[StructLayout( LayoutKind.Sequential )]
-			public struct STSKILL
-			{
+			[StructLayout(LayoutKind.Sequential)]
+			public struct STSKILL {
 				public double Drums;
 				public double Guitar;
 				public double Bass;
-				public double this[ int index ]
-				{
-					get
-					{
-						switch( index )
-						{
+				public double this[int index] {
+					get {
+						switch (index) {
 							case 0:
 								return this.Drums;
 
@@ -202,14 +180,11 @@ namespace TJAPlayer3
 						}
 						throw new IndexOutOfRangeException();
 					}
-					set
-					{
-						if( ( value < 0.0 ) || ( value > 100.0 ) )
-						{
+					set {
+						if ((value < 0.0) || (value > 100.0)) {
 							throw new ArgumentOutOfRangeException();
 						}
-						switch( index )
-						{
+						switch (index) {
 							case 0:
 								this.Drums = value;
 								return;
@@ -229,22 +204,19 @@ namespace TJAPlayer3
 		}
 
 		public bool bSongDBにキャッシュがあった;
-		public bool bスコアが有効である
-		{
-			get
-			{
-				return ( ( ( this.譜面情報.レベル[ 0 ] + this.譜面情報.レベル[ 1 ] ) + this.譜面情報.レベル[ 2 ] ) != 0 );
+		public bool bスコアが有効である {
+			get {
+				return (((this.譜面情報.レベル[0] + this.譜面情報.レベル[1]) + this.譜面情報.レベル[2]) != 0);
 			}
 		}
 
 
 		// コンストラクタ
 
-		public Cスコア()
-		{
-			this.ScoreIni情報 = new STScoreIni情報( DateTime.MinValue, 0L );
+		public Cスコア() {
+			this.ScoreIni情報 = new STScoreIni情報(DateTime.MinValue, 0L);
 			this.bSongDBにキャッシュがあった = false;
-			this.ファイル情報 = new STファイル情報( "", "", DateTime.MinValue, 0L );
+			this.ファイル情報 = new STファイル情報("", "", DateTime.MinValue, 0L);
 			this.譜面情報 = new ST譜面情報();
 			this.譜面情報.タイトル = "";
 			this.譜面情報.アーティスト名 = "";
@@ -263,28 +235,28 @@ namespace TJAPlayer3
 			this.譜面情報.演奏履歴.行3 = "";
 			this.譜面情報.演奏履歴.行4 = "";
 			this.譜面情報.演奏履歴.行5 = "";
-            this.譜面情報.演奏履歴.行6 = "";
-            this.譜面情報.演奏履歴.行7 = "";
-            this.譜面情報.レベルを非表示にする = false;
+			this.譜面情報.演奏履歴.行6 = "";
+			this.譜面情報.演奏履歴.行7 = "";
+			this.譜面情報.レベルを非表示にする = false;
 			this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
 			this.譜面情報.曲種別 = CDTX.E種別.DTX;
 			this.譜面情報.Bpm = 120.0;
 			this.譜面情報.MinBpm = 120.0;
 			this.譜面情報.MaxBpm = 120.0;
 			this.譜面情報.Duration = 0;
-            this.譜面情報.strBGMファイル名 = "";
-            this.譜面情報.SongVol = CSound.DefaultSongVol;
-            this.譜面情報.SongLoudnessMetadata = null;
-            this.譜面情報.nデモBGMオフセット = 0;
-            this.譜面情報.b譜面分岐 = new bool[(int)Difficulty.Total];
-            this.譜面情報.ハイスコア = 0;
-            this.譜面情報.nハイスコア = new int[(int)Difficulty.Total];
-            this.譜面情報.strサブタイトル = "";
-            this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1};
-            this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
-            this.譜面情報.nクリア = new int[5];
+			this.譜面情報.strBGMファイル名 = "";
+			this.譜面情報.SongVol = CSound.DefaultSongVol;
+			this.譜面情報.SongLoudnessMetadata = null;
+			this.譜面情報.nデモBGMオフセット = 0;
+			this.譜面情報.b譜面分岐 = new bool[(int)Difficulty.Total];
+			this.譜面情報.ハイスコア = 0;
+			this.譜面情報.nハイスコア = new int[(int)Difficulty.Total];
+			this.譜面情報.strサブタイトル = "";
+			this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+			this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
+			this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
-	
+
 			this.譜面情報.nExamResult = new List<int[]> { };
 			//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
 			//{

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SlimDXKeys;
+﻿using SlimDXKeys;
 
 using SlimDXKey = SlimDXKeys.Key;
 
-namespace FDK
-{
-	public static class DeviceConstantConverter
-	{
+namespace FDK {
+	public static class DeviceConstantConverter {
 		// メソッド
 
-		public static Key DIKtoKey( Silk.NET.Input.Key key )
-		{
+		public static Key DIKtoKey(Silk.NET.Input.Key key) {
 			return _DIKtoKey[key];
 		}
 

@@ -1,35 +1,21 @@
-﻿using System;
-using System.IO;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FFmpeg.AutoGen;
-using System.Threading;
-
 using Size = System.Drawing.Size;
 
-namespace FDK
-{
+namespace FDK {
 	/// <summary>
 	/// ビデオのデコードをするクラス
 	/// ファイル名・nullのCTextureをもらえれば、勝手に、CTextureに映像を格納して返す。
 	/// 演奏とは別のタイマーを使用しているので、ずれる可能性がある。
 	/// </summary>
-	public unsafe class CVideoDecoder : IDisposable
-	{
-		public CVideoDecoder(string filename)
-		{
+	public unsafe class CVideoDecoder : IDisposable {
+		public CVideoDecoder(string filename) {
 			if (!File.Exists(filename))
 				throw new FileNotFoundException(filename + " not found...");
 
 			format_context = ffmpeg.avformat_alloc_context();
-			fixed (AVFormatContext** format_contexttmp = &format_context)
-			{
+			fixed (AVFormatContext** format_contexttmp = &format_context) {
 				if (ffmpeg.avformat_open_input(format_contexttmp, filename, null, null) != 0)
 					throw new FileLoadException("avformat_open_input failed\n");
 
@@ -37,10 +23,8 @@ namespace FDK
 					throw new FileLoadException("avformat_find_stream_info failed\n");
 
 				// find audio stream
-				for (int i = 0; i < (int)format_context->nb_streams; i++)
-				{
-					if (format_context->streams[i]->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_VIDEO)
-					{
+				for (int i = 0; i < (int)format_context->nb_streams; i++) {
+					if (format_context->streams[i]->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_VIDEO) {
 						video_stream = format_context->streams[i];
 						break;
 					}
@@ -76,10 +60,9 @@ namespace FDK
 			}
 		}
 
-		public void Dispose()
-		{
+		public void Dispose() {
 			bDrawing = false;
-            close = true;
+			close = true;
 			cts?.Cancel();
 			while (DS != DecodingState.Stopped) ;
 			frameconv.Dispose();
@@ -88,8 +71,7 @@ namespace FDK
 			if (ffmpeg.avcodec_close(codec_context) < 0)
 				Trace.TraceError("codec context close error.");
 			video_stream = null;
-			fixed (AVFormatContext** format_contexttmp = &format_context)
-			{
+			fixed (AVFormatContext** format_contexttmp = &format_context) {
 				ffmpeg.avformat_close_input(format_contexttmp);
 			}
 			if (lastTexture != null)
@@ -98,49 +80,39 @@ namespace FDK
 				frame.Dispose();
 		}
 
-		public void Start()
-		{
+		public void Start() {
 			CTimer.Reset();
 			CTimer.Resume();
 			this.bPlaying = true;
-            bDrawing = true;
+			bDrawing = true;
 
-        }
+		}
 
-		public void PauseControl()
-		{
-			if (this.bPlaying)
-			{
+		public void PauseControl() {
+			if (this.bPlaying) {
 				CTimer.Pause();
 				this.bPlaying = false;
-			}
-			else
-			{
+			} else {
 				CTimer.Resume();
 				this.bPlaying = true;
 			}
 		}
 
-		public void Stop()
-		{
+		public void Stop() {
 			CTimer.Pause();
 			this.bPlaying = false;
 			bDrawing = false;
-        }
+		}
 
-		public void InitRead()
-		{
-			if (!bqueueinitialized)
-			{
+		public void InitRead() {
+			if (!bqueueinitialized) {
 				this.Seek(0);
 				bqueueinitialized = true;
-			}
-			else
+			} else
 				Trace.TraceError("The class has already been initialized.\n");
 		}
 
-		public void Seek(long timestampms)
-		{
+		public void Seek(long timestampms) {
 			cts?.Cancel();
 			while (DS != DecodingState.Stopped) ;
 			if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
@@ -156,21 +128,16 @@ namespace FDK
 			lastTexture = new CTexture(FrameSize.Width, FrameSize.Height);
 		}
 
-		public void GetNowFrame(ref CTexture Texture)
-		{
-			if (this.bPlaying && decodedframes.Count != 0)
-			{
+		public void GetNowFrame(ref CTexture Texture) {
+			if (this.bPlaying && decodedframes.Count != 0) {
 				CTimer.Update();
-				if (decodedframes.TryPeek(out CDecodedFrame frame))
-				{
-					while (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed))
-					{
+				if (decodedframes.TryPeek(out CDecodedFrame frame)) {
+					while (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed)) {
 						if (decodedframes.TryDequeue(out CDecodedFrame cdecodedframe)) {
 
 							if (decodedframes.Count != 0)
 								if (decodedframes.TryPeek(out frame))
-									if (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed))
-									{
+									if (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed)) {
 										cdecodedframe.RemoveFrame();
 										continue;
 									}
@@ -197,24 +164,19 @@ namespace FDK
 
 		}
 
-		private void EnqueueFrames()
-		{
-			if (DS != DecodingState.Running && !close)
-			{
+		private void EnqueueFrames() {
+			if (DS != DecodingState.Running && !close) {
 				cts = new CancellationTokenSource();
 				Task.Factory.StartNew(() => EnqueueOneFrame());
 			}
 		}
 
-		private void EnqueueOneFrame()
-		{
+		private void EnqueueOneFrame() {
 			DS = DecodingState.Running;
 			AVFrame* frame = ffmpeg.av_frame_alloc();
 			AVPacket* packet = ffmpeg.av_packet_alloc();
-			try
-			{
-				while (true)
-				{
+			try {
+				while (true) {
 					if (cts.IsCancellationRequested || close)
 						return;
 
@@ -223,14 +185,10 @@ namespace FDK
 					{
 						int error = ffmpeg.av_read_frame(format_context, packet);
 
-						if (error >= 0)
-						{
-							if (packet->stream_index == video_stream->index)
-							{
-								if (ffmpeg.avcodec_send_packet(codec_context, packet) >= 0) 
-								{
-									if (ffmpeg.avcodec_receive_frame(codec_context, frame) == 0)
-									{
+						if (error >= 0) {
+							if (packet->stream_index == video_stream->index) {
+								if (ffmpeg.avcodec_send_packet(codec_context, packet) >= 0) {
+									if (ffmpeg.avcodec_receive_frame(codec_context, frame) == 0) {
 										AVFrame* outframe = null;
 
 										outframe = frameconv.Convert(frame);
@@ -246,26 +204,18 @@ namespace FDK
 
 							//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
 							ffmpeg.av_packet_unref(packet);
-						}
-						else if (error == ffmpeg.AVERROR_EOF)
-						{
+						} else if (error == ffmpeg.AVERROR_EOF) {
 							return;
 						}
-					}
-					else 
-					{
+					} else {
 						//ポーズ中に無限ループに入り、CPU使用率が異常に高くなってしまうため、1ms待つ。
 						//ネットを調べると、await Task.Delay()を使えというお話が出てくるが、unsafeなので、使えない
 						Thread.Sleep(1);
 					}
 				}
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
-			}
-			finally
-			{
+			} finally {
 				ffmpeg.av_packet_free(&packet);
 				ffmpeg.av_frame_unref(frame);
 				ffmpeg.av_free(frame);
@@ -273,42 +223,32 @@ namespace FDK
 			}
 		}
 
-		public CDecodedFrame PickUnusedDcodedFrame() 
-		{
+		public CDecodedFrame PickUnusedDcodedFrame() {
 			for (int i = 0; i < framelist.Length; i++) {
-				if (framelist[i].Using == false) 
-				{
+				if (framelist[i].Using == false) {
 					return framelist[i];
-				}	
+				}
 			}
 			return null;
 		}
 
-		public Size FrameSize 
-		{
+		public Size FrameSize {
 			get;
 			private set;
 		}
-		public double Duration 
-		{
+		public double Duration {
 			get;
 			private set;
 		}
 
-		public double dbPlaySpeed
-		{
-			get
-			{
+		public double dbPlaySpeed {
+			get {
 				return this._dbPlaySpeed;
 			}
-			set
-			{
-				if (value > 0)
-				{
+			set {
+				if (value > 0) {
 					this._dbPlaySpeed = value;
-				}
-				else
-				{
+				} else {
 					throw new ArgumentOutOfRangeException();
 				}
 			}
@@ -325,16 +265,15 @@ namespace FDK
 		private CancellationTokenSource cts;
 		private CDecodedFrame[] framelist = new CDecodedFrame[6];
 		private DecodingState DS = DecodingState.Stopped;
-		private enum DecodingState
-		{
+		private enum DecodingState {
 			Stopped,
 			Running
 		}
 
 		//for play
 		public bool bPlaying { get; private set; } = false;
-        public bool bDrawing { get; private set; } = false;
-        private CTimer CTimer;
+		public bool bDrawing { get; private set; } = false;
+		private CTimer CTimer;
 		private AVRational Framerate;
 		private CTexture lastTexture;
 		private bool bqueueinitialized = false;

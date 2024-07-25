@@ -2,25 +2,22 @@ using ImGuiNET;
 
 namespace LWGFW.Graphics;
 
-public class ImGUIManager : IDisposable
-{
-    private nint Context;
+public class ImGUIManager : IDisposable {
+	private nint Context;
 
-    public ImGUIManager()
-    {
-        Context = ImGui.CreateContext();
-        ImGui.SetCurrentContext(Context);
+	public ImGUIManager() {
+		Context = ImGui.CreateContext();
+		ImGui.SetCurrentContext(Context);
 
-        ImGuiIOPtr imguiIO = ImGui.GetIO();
+		ImGuiIOPtr imguiIO = ImGui.GetIO();
 
-        imguiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
-        imguiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;
+		imguiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+		imguiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;
 
-        ImGui.StyleColorsDark();
-    }
+		ImGui.StyleColorsDark();
+	}
 
-    public void Dispose()
-    {
-        ImGui.DestroyContext(Context);
-    }
+	public void Dispose() {
+		ImGui.DestroyContext(Context);
+	}
 }

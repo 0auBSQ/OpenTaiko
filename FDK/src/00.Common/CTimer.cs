@@ -1,31 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-
-namespace FDK
-{
-	public class CTimer : CTimerBase
-	{
-		public enum TimerType
-		{
+﻿namespace FDK {
+	public class CTimer : CTimerBase {
+		public enum TimerType {
 			Unknown = -1,
 			PerformanceCounter = 0,
 			MultiMedia = 1,
 			GetTickCount = 2,
 		}
-		public TimerType CurrentTimerType
-		{
+		public TimerType CurrentTimerType {
 			get;
 			protected set;
 		}
 
 
-		public override long SystemTimeMs
-		{
-			get
-			{
+		public override long SystemTimeMs {
+			get {
 				/*
 				switch( this.eタイマ種別 )
 				{
@@ -52,9 +40,8 @@ namespace FDK
 			}
 		}
 
-		public CTimer( TimerType timerType )
-			:base()
-		{
+		public CTimer(TimerType timerType)
+			: base() {
 			this.CurrentTimerType = timerType;
 
 			/*
@@ -81,23 +68,21 @@ namespace FDK
 				}
 			}
 			*/
-	
+
 			base.Reset();
 
-			ReferenceCount[ (int) this.CurrentTimerType ]++;
+			ReferenceCount[(int)this.CurrentTimerType]++;
 		}
-		
-		public override void Dispose()
-		{
-			if( this.CurrentTimerType == TimerType.Unknown )
+
+		public override void Dispose() {
+			if (this.CurrentTimerType == TimerType.Unknown)
 				return;
 
-			int type = (int) this.CurrentTimerType;
+			int type = (int)this.CurrentTimerType;
 
-			ReferenceCount[ type ] = Math.Max( ReferenceCount[ type ] - 1, 0 );
+			ReferenceCount[type] = Math.Max(ReferenceCount[type] - 1, 0);
 
-			if( ReferenceCount[ type ] == 0 )
-			{
+			if (ReferenceCount[type] == 0) {
 				/*
 				if( this.eタイマ種別 == E種別.MultiMedia )
 					timeEndPeriod( this.timeCaps.wPeriodMin );
@@ -110,11 +95,10 @@ namespace FDK
 		#region [ protected ]
 		//-----------------
 		protected long CurrentFrequency;
-		protected static int[] ReferenceCount = new int[ 3 ];
+		protected static int[] ReferenceCount = new int[3];
 		//protected TimeCaps timeCaps;
 
-		protected bool GetSetTickCount()
-		{
+		protected bool GetSetTickCount() {
 			this.CurrentTimerType = TimerType.GetTickCount;
 			return true;
 		}

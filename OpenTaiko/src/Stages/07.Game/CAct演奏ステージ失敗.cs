@@ -1,65 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
-using System.IO;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3
-{
-	internal class CAct演奏ステージ失敗 : CActivity
-	{
+namespace TJAPlayer3 {
+	internal class CAct演奏ステージ失敗 : CActivity {
 		// コンストラクタ
 
-		public CAct演奏ステージ失敗()
-		{
-            ST文字位置[] st文字位置Array = new ST文字位置[ 11 ];
+		public CAct演奏ステージ失敗() {
+			ST文字位置[] st文字位置Array = new ST文字位置[11];
 
 			ST文字位置 st文字位置 = new ST文字位置();
 			st文字位置.ch = '0';
-			st文字位置.pt = new Point( 0, 0 );
-			st文字位置Array[ 0 ] = st文字位置;
+			st文字位置.pt = new Point(0, 0);
+			st文字位置Array[0] = st文字位置;
 			ST文字位置 st文字位置2 = new ST文字位置();
 			st文字位置2.ch = '1';
-			st文字位置2.pt = new Point( 62, 0 );
-			st文字位置Array[ 1 ] = st文字位置2;
+			st文字位置2.pt = new Point(62, 0);
+			st文字位置Array[1] = st文字位置2;
 			ST文字位置 st文字位置3 = new ST文字位置();
 			st文字位置3.ch = '2';
-			st文字位置3.pt = new Point( 124, 0 );
-			st文字位置Array[ 2 ] = st文字位置3;
+			st文字位置3.pt = new Point(124, 0);
+			st文字位置Array[2] = st文字位置3;
 			ST文字位置 st文字位置4 = new ST文字位置();
 			st文字位置4.ch = '3';
-			st文字位置4.pt = new Point( 186, 0 );
-			st文字位置Array[ 3 ] = st文字位置4;
+			st文字位置4.pt = new Point(186, 0);
+			st文字位置Array[3] = st文字位置4;
 			ST文字位置 st文字位置5 = new ST文字位置();
 			st文字位置5.ch = '4';
-			st文字位置5.pt = new Point( 248, 0 );
-			st文字位置Array[ 4 ] = st文字位置5;
+			st文字位置5.pt = new Point(248, 0);
+			st文字位置Array[4] = st文字位置5;
 			ST文字位置 st文字位置6 = new ST文字位置();
 			st文字位置6.ch = '5';
-			st文字位置6.pt = new Point( 310, 0 );
-			st文字位置Array[ 5 ] = st文字位置6;
+			st文字位置6.pt = new Point(310, 0);
+			st文字位置Array[5] = st文字位置6;
 			ST文字位置 st文字位置7 = new ST文字位置();
 			st文字位置7.ch = '6';
-			st文字位置7.pt = new Point( 372, 0 );
-			st文字位置Array[ 6 ] = st文字位置7;
+			st文字位置7.pt = new Point(372, 0);
+			st文字位置Array[6] = st文字位置7;
 			ST文字位置 st文字位置8 = new ST文字位置();
 			st文字位置8.ch = '7';
-			st文字位置8.pt = new Point( 434, 0 );
-			st文字位置Array[ 7 ] = st文字位置8;
+			st文字位置8.pt = new Point(434, 0);
+			st文字位置Array[7] = st文字位置8;
 			ST文字位置 st文字位置9 = new ST文字位置();
 			st文字位置9.ch = '8';
-			st文字位置9.pt = new Point( 496, 0 );
-			st文字位置Array[ 8 ] = st文字位置9;
+			st文字位置9.pt = new Point(496, 0);
+			st文字位置Array[8] = st文字位置9;
 			ST文字位置 st文字位置10 = new ST文字位置();
 			st文字位置10.ch = '9';
-			st文字位置10.pt = new Point( 558, 0 );
-			st文字位置Array[ 9 ] = st文字位置10;
+			st文字位置10.pt = new Point(558, 0);
+			st文字位置Array[9] = st文字位置10;
 			ST文字位置 st文字位置11 = new ST文字位置();
 			st文字位置11.ch = '%';
-			st文字位置11.pt = new Point( 558 + 62, 0 );
-			st文字位置Array[ 10 ] = st文字位置11;
+			st文字位置11.pt = new Point(558 + 62, 0);
+			st文字位置Array[10] = st文字位置11;
 			this.st文字位置 = st文字位置Array;
 			base.IsDeActivated = true;
 		}
@@ -67,38 +60,32 @@ namespace TJAPlayer3
 
 		// メソッド
 
-		public void Start()
-		{
-            this.dbFailedTime = TJAPlayer3.Timer.NowTime;
-			this.ct進行 = new CCounter( 0, 300, 22, TJAPlayer3.Timer );
-			if ( TJAPlayer3.ConfigIni.eGameMode != EGame.OFF )
-            {
-			    this.ct進行 = new CCounter( 0, 4000, 2, TJAPlayer3.Timer );
-            }
+		public void Start() {
+			this.dbFailedTime = TJAPlayer3.Timer.NowTime;
+			this.ct進行 = new CCounter(0, 300, 22, TJAPlayer3.Timer);
+			if (TJAPlayer3.ConfigIni.eGameMode != EGame.OFF) {
+				this.ct進行 = new CCounter(0, 4000, 2, TJAPlayer3.Timer);
+			}
 		}
 
 
 		// CActivity 実装
 
-		public override void Activate()
-		{
+		public override void Activate() {
 			this.sd効果音 = null;
 			this.b効果音再生済み = false;
 			this.ct進行 = new CCounter();
 			base.Activate();
 		}
-		public override void DeActivate()
-		{
+		public override void DeActivate() {
 			this.ct進行 = null;
-			if( this.sd効果音 != null )
-			{
-				TJAPlayer3.SoundManager.tDisposeSound( this.sd効果音 );
+			if (this.sd効果音 != null) {
+				TJAPlayer3.SoundManager.tDisposeSound(this.sd効果音);
 				this.sd効果音 = null;
 			}
 			base.DeActivate();
 		}
-		public override void CreateManagedResource()
-		{
+		public override void CreateManagedResource() {
 			this.failedSongPlayed = false;
 			//            this.txBlack = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Tile black 64x64.png" ) );
 			//this.txStageFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_stage_failed.jpg" ) );
@@ -107,8 +94,7 @@ namespace TJAPlayer3
 			this.soundFailed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
 			base.CreateManagedResource();
 		}
-		public override void ReleaseManagedResource()
-		{
+		public override void ReleaseManagedResource() {
 			//CDTXMania.tテクスチャの解放( ref this.txStageFailed );
 			//CDTXMania.tテクスチャの解放( ref this.txGameFailed );
 			//            CDTXMania.tテクスチャの解放( ref this.txBlack );
@@ -120,30 +106,25 @@ namespace TJAPlayer3
 
 		#region [Effect]
 
-		private void showEndEffect_Failed(int i)
-		{
+		private void showEndEffect_Failed(int i) {
 			int[] y = new int[] { 0, 176 };
 
 		}
 
 		#endregion
 
-		public override int Draw()
-		{
-			if( base.IsDeActivated )
-			{
+		public override int Draw() {
+			if (base.IsDeActivated) {
 				return 0;
 			}
-			if( ( this.ct進行 == null ) || this.ct進行.IsStoped )
-			{
+			if ((this.ct進行 == null) || this.ct進行.IsStoped) {
 				return 0;
 			}
 			this.ct進行.Tick();
 
 			#region [Failed screen]
 
-			if (this.soundFailed != null && !this.failedSongPlayed)
-			{
+			if (this.soundFailed != null && !this.failedSongPlayed) {
 				this.soundFailed.PlayStart();
 				this.failedSongPlayed = true;
 			}
@@ -215,13 +196,12 @@ namespace TJAPlayer3
 
 			*/
 
-			if( !this.ct進行.IsEnded )
-			{
+			if (!this.ct進行.IsEnded) {
 				return 0;
 			}
 			return 1;
 		}
-		
+
 
 		// その他
 
@@ -239,36 +219,28 @@ namespace TJAPlayer3
 		//      private CTexture tx数字;
 		private double dbFailedTime;
 		//-----------------
-        private ST文字位置[] st文字位置;
+		private ST文字位置[] st文字位置;
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct ST文字位置
-        {
-            public char ch;
-            public Point pt;
-            public ST文字位置( char ch, Point pt )
-            {
-                this.ch = ch;
-                this.pt = pt;
-            }
-        }
+		[StructLayout(LayoutKind.Sequential)]
+		public struct ST文字位置 {
+			public char ch;
+			public Point pt;
+			public ST文字位置(char ch, Point pt) {
+				this.ch = ch;
+				this.pt = pt;
+			}
+		}
 
-        private void t文字表示( int x, int y, string str )
-		{
-			foreach( char ch in str )
-			{
-				for( int i = 0; i < this.st文字位置.Length; i++ )
-				{
-					if( this.st文字位置[ i ].ch == ch )
-					{
-						Rectangle rectangle = new Rectangle( this.st文字位置[ i ].pt.X, this.st文字位置[ i ].pt.Y, 62, 80 );
-                        if( ch == '%' )
-                        {
-                            rectangle.Width = 80;
-                        }
-						if(TJAPlayer3.Tx.Balloon_Number_Roll != null )
-						{
-                            TJAPlayer3.Tx.Balloon_Number_Roll.t2D描画( x - ( 62 * str.Length / 2 ), y, rectangle );
+		private void t文字表示(int x, int y, string str) {
+			foreach (char ch in str) {
+				for (int i = 0; i < this.st文字位置.Length; i++) {
+					if (this.st文字位置[i].ch == ch) {
+						Rectangle rectangle = new Rectangle(this.st文字位置[i].pt.X, this.st文字位置[i].pt.Y, 62, 80);
+						if (ch == '%') {
+							rectangle.Width = 80;
+						}
+						if (TJAPlayer3.Tx.Balloon_Number_Roll != null) {
+							TJAPlayer3.Tx.Balloon_Number_Roll.t2D描画(x - (62 * str.Length / 2), y, rectangle);
 						}
 						break;
 					}
