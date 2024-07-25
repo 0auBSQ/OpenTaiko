@@ -1,5 +1,10 @@
 {
-	"name" : "Template",
+	"name" : {
+		"strings": {
+			"default": "Template",
+			"ru": "Шаблон"
+		}
+	},
     "rarity": "Common",
 	"author": "OpenTaiko Team",
 }

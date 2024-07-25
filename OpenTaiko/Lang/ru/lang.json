@@ -1,0 +1,585 @@
+﻿{
+  // The folder's name is used as the ID, which is used to identify which localized data to use.
+  // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
+  // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
+  // If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+
+  // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
+  // i.e. "日本語 (Japanese)"
+  "Language": "Русский (Russian)",
+    "Entries": {
+
+        // Common
+        "MENU_RETURN": "Назад",
+        // Difficulties (Any Menu)
+        "DIFF_EASY": "Лёгк.",
+        "DIFF_NORMAL": "Норм.",
+        "DIFF_HARD": "Трудн.",
+        "DIFF_EX": "Экстрим.",
+        "DIFF_EXTRA": "Экстра.",
+        "DIFF_EXEXTRA": "Экстрим. / Экстра.",
+        "DIFF_TOWER": "Башн.",
+        "DIFF_DAN": "Дан",
+        "DIFF_ANY": "Люб.",
+        "DIFF_UNKNOWN": "Незнаком.",
+
+        // Settings
+        "SETTINGS_SYSTEM": "Настройки системы",
+        "SETTINGS_SYSTEM_DESC": "Настройки для общих системы.",
+        "SETTINGS_GAME": "Настройки геймплея",
+        "SETTINGS_GAME_DESC": "Настройки для игры на барабанах.",
+        "SETTINGS_EXIT": "Выход",
+        "SETTINGS_EXIT_DESC": "Сохранить настройки и выход из меню\nКОНФИГУРАЦИИ.",
+
+        "SETTINGS_MENU_RETURN": "<< Назад в меню",
+        "SETTINGS_MENU_RETURN_DESC": "Назад в левое меню.",
+
+        "SETTINGS_KEYASSIGN_SYSTEM": "Настройка клавиш система",
+        "SETTINGS_KEYASSIGN_SYSTEM_DESC": "Дополнительное меню для настройки клавиш\nсистема.",
+        "SETTINGS_KEYASSIGN_GAME": "Настройка клавиш геймплея",
+        "SETTINGS_KEYASSIGN_GAME_DESC": "Дополнительное меню для настройки клавиш во\nвремя геймплея.",
+        "SETTINGS_KEYASSIGN_TRAINING": "Настройка клавиш Режима Тренировки",
+        "SETTINGS_KEYASSIGN_TRAINING_DESC": "Дополнительное меню для настройки клавиш,\nиспользуемых в Режиме Тренировки.",
+
+    // Settings - System
+        "SETTINGS_SYSTEM_LANGUAGE": "Язык системы",
+        "SETTINGS_SYSTEM_LANGUAGE_DESC": "Изменить отображаемый язык в игре и в меню.",
+        "SETTINGS_SYSTEM_PLAYERCOUNT": "Количество игроков",
+        "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Выбрает, со сколькими игроками вы хотите играть.\nОдновременно могут быть активны до 5 игроков.",
+        "SETTINGS_SYSTEM_RELOADSONG": "Перезагрузка песен",
+        "SETTINGS_SYSTEM_RELOADSONG_DESC": "Перезагружает папки песен.",
+        "SETTINGS_SYSTEM_RELOADSONGCACHE": "Перезагрузка песен (Жёсткая)",
+        "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Удаляет существующую базу данных и\nперезагружает папки песен с нуля.",
+        "SETTINGS_SYSTEM_HIDEDANTOWER": "Спрятать Дан и Башни",
+        "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Скрыт партитуры Дан и Башен в меню Режима\nТайко.\nПримечание: Перезагрузите песни, чтобы\n                        настройки вступили в силу.",
+
+        // Settings - System - Graphics
+        "SETTINGS_SYSTEM_FULLSCREEN": "Полноэкранный режим",
+        "SETTINGS_SYSTEM_FULLSCREEN_DESC": "Переключение между полноэкранным и оконным\nрежимами.",
+        "SETTINGS_SYSTEM_VSYNC": "Режим VSync",
+        "SETTINGS_SYSTEM_VSYNC_DESC": "Выбрать, используется ли функция VSync.\nПри его включении частота кадров будет снижена\nдо 60, что сделает прокрутку заметок более\nплавной, но увеличит задержку ввода.\nПри его выключении частота кадров будет \nснижена, что уменьшит задержку ввода, но\nсделает прокрутку нот более нестабильной.",
+        "SETTINGS_SYSTEM_GRAPHICSAPI": "Графический интерфейс",
+        "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Метод рисования:\nВыбрать OpenGL, DirectX 11, Vulkan, или Metal.\nOpenGL работает медленно, но совместимо и\nстабильно.\nDirectX 11 быстр и стабилен, но работает только\nв Windows.\nБыстрее всего Vulkan работает в Linux.\nMetal работает только на macOS.\n\nЭто изменение вступит в силу после перезапуска\nигры.\n",
+        "SETTINGS_SYSTEM_TEXTUREASYNC": "Асинхронная загрузка текстур",
+        "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Тип загрузки текстур:\nЗависание при запуске исчезает.\nВыключайте эту настройку, если некоторые\nтекстуры станут чёрными.\nЭто изменение вступит в силу после перезапуска\nOpenTaiko.\n",
+
+        "SETTINGS_SYSTEM_BGMOVIE": "Переключение воспроизведения видео",
+        "SETTINGS_SYSTEM_BGMOVIE_DESC": "Выбрать, следует ли использовать фоновое видео.\nЕсли эта настройка включена, а видео отсутствует\nв папке, фон будет отображаться затемненным.",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Режим отображения воспроизведения видео",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Изменить способ отображения видео в фоновом\nрежиме.",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Ничто",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Полный дисплей",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Мини-дисплей",
+        "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Обо",
+        "SETTINGS_SYSTEM_LANEOPACITY": "Непрозрачность фона полоса",
+        "SETTINGS_SYSTEM_LANEOPACITY_DESC": "Это позволяет регулировать непрозрачность фона\nполоса во время воспроизведения видео.\n\n0 = полная прозрачность,\n255 = никакой прозрачности",
+
+        "SETTINGS_SYSTEM_BGA": "Нарисовать BGA",
+        "SETTINGS_SYSTEM_BGA_DESC": "Переключает, будет ли отображаться фоновая\nанимация.",
+        "SETTINGS_SYSTEM_DISPLAYCHARA": "Отобразить персонажей",
+        "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Показывает изображения персонажи.",
+        "SETTINGS_SYSTEM_DISPLAYDANCER": "Отобразить танцоров",
+        "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Показывает изображения танцора.",
+        "SETTINGS_SYSTEM_DISPLAYMOB": "Отобразить толпу",
+        "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "Показывает изображения толпы.",
+        "SETTINGS_SYSTEM_DISPLAYRUNNER": "Отобразить бегунов",
+        "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Показывает изображения бегуна.",
+        "SETTINGS_SYSTEM_DISPLAYFOOTER": "Отобразить нижний колонтитул",
+        "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Показывает изображения нижнего колонтитула.",
+        "SETTINGS_SYSTEM_DISPLAYPUCHI": "Нарисовать пти-персонажу",
+        "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Показывает изображения пти-персонажи.",
+        "SETTINGS_SYSTEM_SIMPLEMODE": "Режим просто",
+        "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Упрощает рисование, скрывая большинство\nвизуальных бликов и эффектов во время геймплея.\n",
+
+        "SETTINGS_SYSTEM_SKIN": "Текущий интерфейс",
+        "SETTINGS_SYSTEM_SKIN_DESC": "Выбрать интерфейс для использования в\nсистемной папке.",
+
+        // Settings - System - Audio
+        "SETTINGS_SYSTEM_SONGPLAYBACK": "Переключение воспроизведения песни",
+        "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Определяет, будет ли воспроизводиться музыка.",
+        "SETTINGS_SYSTEM_USESONGVOL": "Применить метаданные SONGVOL",
+        "SETTINGS_SYSTEM_USESONGVOL_DESC": "Это - частично избыточная настройка, который\nопределяет, будут ли использоваться метаданные\nSONGVOL.\nЗначения от 0 до 100 снижают громкость песни,\nно любые значения выше 100 ничего не делают.",
+        "SETTINGS_SYSTEM_SEVOL": "Громкость эффекта звука",
+        "SETTINGS_SYSTEM_SEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nударами.\nЧтобы играть без звуковых ударов, установите это\nзначение равным 0.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+        "SETTINGS_SYSTEM_VOICEVOL": "Громкость голоса",
+        "SETTINGS_SYSTEM_VOICEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nголосом персонажа.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+        "SETTINGS_SYSTEM_SONGVOL": "Громкость воспроизведения песни",
+        "SETTINGS_SYSTEM_SONGVOL_DESC": "Отрегулировает громкость воспроизведения песни.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+        "SETTINGS_SYSTEM_SONGPREVIEWVOL": "Громкость предварительного просмотра песни",
+        "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Отрегулировает громкость предварительного\nпросмотра песни.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+        "SETTINGS_SYSTEM_VOLINCREMENT": "Увеличение громкости клавиатуры",
+        "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Указает, в какой степени системные клавиши\nувеличения и уменьшения громкости изменяют\nгромкость.\nВы можете указать значение от 1 до 20.",
+
+        "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Буфер предварительного воспроизведения песни",
+        "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "Время, затраченное на воспроизведение песни\nво время геймплея.\nУменьшение этого значения может привести\nк слишком раннему воспроизведению песен.",
+        "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Буфер предварительного просмотра песни",
+        "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "Время, затраченное на воспроизведение\nпредварительного просмотра песни.\nУменьшение этого значения может привести к\nтому, что предварительный просмотр начнется\nво время прокрутки.\nВы можете указать время от 0 мс до 10000 мс.",
+
+        "SETTINGS_SYSTEM_AUDIOPLAYBACK": "Режим воспроизведения звука",
+        "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Работает только на звуковых устройствах,\n   поддерживающих воспроизведение ASIO,\n- Имеет наименьшую задержку ввода.\nWASAPI:\n- Совместим только с Windows.\n- Имеет вторую по величине задержку ввода.\nBass:\n- Поддерживается на всех платформах.\nПримечание: Выход из КОНФИГУРАЦИИ, чтобы\n                        настройки вступили в силу.",
+        "SETTINGS_SYSTEM_ASIOPLAYBACK": "Устройство воспроизведения ASIO",
+        "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Выбрать подходящее устройство для включения\nрежима воспроизведения ASIO.\nПримечание: Выход из КОНФИГУРАЦИИ, чтобы\n                        настройки вступили в силу.",
+        "SETTINGS_SYSTEM_WASAPIBUFFER": "Размер буфера WASAPI",
+        "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Изменяет звуковой буфер для режима\nвоспроизведения звука WASAPI.\nУстановить это число как можно более низким,\nчтобы не вызвать проблем со звуком, таких как\nзависание песни и неправильный выбор времени.\nУстановить его равным 0, чтобы использовать\nприблизительное правильное значение, или\nиспользовать метод проб и ошибок, чтобы найти\nправильное значение.\nПримечание: Выход из КОНФИГУРАЦИИ, чтобы\n                        настройки вступили в силу.",
+        "SETTINGS_SYSTEM_BASSBUFFER": "Размер буфера Bass",
+        "SETTINGS_SYSTEM_BASSBUFFER_DESC": "Размер буфера при использовании Bass:\nРазмер может быть в диапазоне от 0 до 99999 мс.\nЗначение, равное 0, заставит OS автоматически\nопределить размер.\nЧем меньше значение, тем меньше задержка звука,\nно это также может привести к ненормальному\nили потрескивающему звуку.\nПримечание: Выход из КОНФИГУРАЦИИ, чтобы\n                        настройки вступили в силу.",
+        "SETTINGS_SYSTEM_OSTIMER": "Режим таймера OS",
+        "SETTINGS_SYSTEM_OSTIMER_DESC": "Включение эту настройку обеспечит плавную\nпрокрутку нот, но может привести к задержке\nзвука.\nЕё выключение приведет к нестабильной\nпрокрутке нот, но обеспечит отсутствие\nзадержки звука.\n\nЕсли OFF, DTXMania использует свой оригинальный\nтаймер, и эффект будет обратным.\n",
+
+        // Settings - System - Misc.
+        "SETTINGS_SYSTEM_LOG": "Создание файл журнала",
+        "SETTINGS_SYSTEM_LOG_DESC": "Укажет, будет ли генерироваться файл\nTJAPlayer3.log при закрытии игры.\nЭто отслеживает производительность игры\nи выявляет ошибки.",
+        "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Использовать вложенные папки при случайном выборе",
+        "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Выбрать, будут ли использоваться вложенные\nпапки при случайном выборе песни.",
+        "SETTINGS_SYSTEM_DEBUGMODE": "Режим отладки",
+        "SETTINGS_SYSTEM_DEBUGMODE_DESC": "Указать, включен ли режим отладки.\nЭто приведет к появлению дополнительной\nинформации в правом нижнем углу экрана.\nЭто отобразит вашу калибровку задержки\nдля воспроизведения без звуков удары.",
+        "SETTINGS_SYSTEM_AUTOSCREENSHOT": "Автоматические снимки экрана",
+        "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Выбрает, будут ли автоматически делаться\nснимок экрана результатов.\nЭто произойдет только тогда, когда будет\nдостигнут рекорд, который может не\nсоответствовать лучшему исполнению\nэтой песни.",
+        "SETTINGS_SYSTEM_DISCORDRPC": "Богатое присутствие в Discord",
+        "SETTINGS_SYSTEM_DISCORDRPC_DESC": "Выбрать, будет ли информация о песне\nпередаваться в Discord.",
+        "SETTINGS_SYSTEM_BUFFEREDINPUT": "Режим буферизованного ввода",
+        "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Когда эта настройка включен, никакие входные\nданные не будут отброшены,\nно частота опроса входных данных снизится.\nКогда эта функция выключена, входные данные\nмогут быть пропущены, но они будут опрашиваться\nчаще.",
+
+        // Settings - Gameplay
+        "SETTINGS_GAME_GLOBALOFFSET": "Глобальный офсет",
+        "SETTINGS_GAME_GLOBALOFFSET_DESC": "Изменяет интерпретируемое значение OFFSET\nдля всех партитур.\nМожет быть установлен в диапазоне от -999 до\n999 мс.\nЧтобы уменьшить задержку ввода, установите\nзначение минус.",
+
+        "SETTINGS_GAME_CALIBRATION": "Откалибровать офсет",
+        "SETTINGS_GAME_CALIBRATION_DESC": "Откалибровает ваш офсет.\nГлобальный офсет будет перезаписан, если он\nбудет сохранен.",
+        "SETTINGS_GAME_CALIBRATION_OFFSET": "ОФСЕТ: {0}",
+
+        "SETTINGS_GAME_BADCOUNT": "Режим Канпэки",
+        "SETTINGS_GAME_BADCOUNT_DESC": "Выбрает сколько «Плохо» позволяют раньше\nпесни автоматически проиграно.\nУстановите значение 0, чтобы выключить этот\nрежим.",
+        "SETTINGS_GAME_NOTELOCK": "Режим замока ноты",
+        "SETTINGS_GAME_NOTELOCK_DESC": "Указать, считается ли ударь в интервал между\nнотами - Плохо.",
+        "SETTINGS_GAME_AILEVEL": "Уровень ИИ",
+        "SETTINGS_GAME_AILEVEL_DESC": "Определяет, насколько точен ИИ.\nЕсли 0, то ИИ выключен.\nЕсли 1 или более, то И2 будет играть за ИИ.\nВыключен, если включен режим АВТО И2.",
+        "SETTINGS_GAME_NORMALGAUGE": "Всегда использовать нормальный датчик",
+        "SETTINGS_GAME_NORMALGAUGE_DESC": "Принудительно использовает нормальный датчик\nвсегда, независимо от модификаторов персонажа.",
+
+        "SETTINGS_GAME_AUTOP1": "Автоигра игрока 1",
+        "SETTINGS_GAME_AUTOP1_DESC": "Выбрать, будет ли игрок 1 играть автоматически.",
+        "SETTINGS_GAME_AUTOP2": "Автоигра игрока 2",
+        "SETTINGS_GAME_AUTOP2_DESC": "Выбрать, будет ли игрок 2 играть автоматически.",
+        "SETTINGS_GAME_AUTOROLL": "Скорость дроби",
+        "SETTINGS_GAME_AUTOROLL_DESC": "Когда автоигра включена, дроби будут ударить\nавтоматически столько раз в секунду. Не\nоказывает никакого воздействия на баллоне.\n0 выключает автоматический дробь, и\nмаксимальное значение составляет один\nудар за кадр.",
+
+        "SETTINGS_GAME_NOINFO": "Режим отсутствия информации",
+        "SETTINGS_GAME_NOINFO_DESC": "Переключать, будет ли отображаться информация\nо песне.\nВключение эту настройки приведет к выключению\nинформации о песне.\nВыключение эту настройки будет доступна\nинформация о песне.\n",
+        "SETTINGS_GAME_COMBODISPLAY": "Минимальное комбо отображение",
+        "SETTINGS_GAME_COMBODISPLAY_DESC": "Выбрает начальный номер, под которым будет\nотображаться комбо.\nМожет быть задано в диапазоне от 1 до 99999.",
+        "SETTINGS_GAME_SCOREDISPLAY": "Переключение отображения результатов",
+        "SETTINGS_GAME_SCOREDISPLAY_DESC": "Отображает текущие оценки Хорошо/OK/Плохо\nв левом нижнем углу.\n(Только для одиночной игры)",
+        "SETTINGS_GAME_BRANCHANIME": "Набор анимаций веток",
+        "SETTINGS_GAME_BRANCHANIME_DESC": "Изменяет набор анимаций, используемых при\nветвлении партитуры.\nTYPE-A: Поколение-2\nTYPE-B: Поколение-3\n",
+
+        "SETTINGS_GAME_DEFAULTDIFF": "Трудность дефолта",
+        "SETTINGS_GAME_DEFAULTDIFF_DESC": "Выбрает трудность дефолта выбирается при\nвыборе песни.\nЕсли Экстра не выбрана, она не будет видна, пока\nне будет нажата клавиша со стрелкой вправо на\nЭкстрим этой песни.",
+        "SETTINGS_GAME_EXEXTRAANIME": "Переходы Экстрим/Экстра",
+        "SETTINGS_GAME_EXEXTRAANIME_DESC": "Воспроизводите анимацию, заданную\nинтерфейсом, переключаясь между\nЭкстрим и Экстра.",
+
+        // Settings - Gameplay - Training Mode
+        "SETTINGS_TRAINING_SKIPCOUNT": "Количество пропуска меры",
+        "SETTINGS_TRAINING_SKIPCOUNT_DESC": "Количество меры, которые необходимо пропустить\nпри нажатии клавиши пропуска мер вперёд или\nназад в Режиме Тренировки.",
+        "SETTINGS_TRAINING_JUMPINTERVAL": "Временной интервал пропуска мер",
+        "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Количество времени в миллисекундах,\nнеобходимое для многократного нажатия клавиш\nлевого или правого синего, чтобы перейти к меру,\nотмеченному в закладках, в режиме тренировки.",
+
+        // Settings - Broken/Unused/Might Deprecate/Might Update
+        // Translate these anyways, even if their future is uncertain.
+        "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Буфер предварительного просмотра изображений",
+        "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Это - избыточная настройка, перенесенная из\nDTXMania.\nЭто ничего не делает.",
+        "SETTINGS_SYSTEM_TIMESTRETCH": "Режим растягивания по времени",
+        "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Не уверен, что делает эта настройка.\nЭто потребляет больше энергии процессора и\nможет вызвать проблемы со звуком при скорости\nвоспроизведения ниже 0,9 раза.",
+        "SETTINGS_SYSTEM_FASTRENDER": "Быстрый рендеринг",
+        "SETTINGS_SYSTEM_FASTRENDER_DESC": "Переключать, будут ли отображаться изображения\nперед загрузкой песен.",
+        "SETTINGS_GAME_BRANCHGUIDE": "Руководство по ветке",
+        "SETTINGS_GAME_BRANCHGUIDE_DESC": "Включить отображение числового ориентира,\nчтобы увидеть, какая ветвь будет выбрана.\nВ автоматическом режиме он не отображается.",
+        "SETTINGS_GAME_BIGNOTEJUDGE": "Суждение о большой ноте",
+        "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Переключает, будут ли большие ноты\nвознаграждаться за попадание с помощью 2 клавиш.\nЕсли это - включен, нажатие 1 клавиши вызовет\nвизуальную задержку, прежде чем они исчезнут.\nЗа попадание по 2 клавишам начисляются двойные\nочки.\nЕсли это - выключен, то при нажатии 1 клавиши\nони будут звучать как обычная нота.\nДвойные очки по-прежнему будут начисляться.\nПопытка ударить на них двумя клавишами может\nпривести к тому, что вместо них будет удар\nследующая нота.",
+        "SETTINGS_GAME_SURVIVAL": "Режим выживания",
+        "SETTINGS_GAME_SURVIVAL_DESC": "Этот режим - сломан.\nВ нём реализована система таймера, аналогичная\nкурсам StepMania, но какой-то код отсутствует,\nпоэтому функциональность ограничена.",
+        "SETTINGS_GAME_SCOREMODE": "Режим очков",
+        "SETTINGS_GAME_SCOREMODE_DESC": "Выбирает формулу, используемую для\nопределения очков.\nTYPE-A: Поколение-1\nTYPE-B: Поколение-2\nTYPE-C: Поколение-3\n",
+        "SETTINGS_GAME_SHINUCHI": "Режим Шин-учи",
+        "SETTINGS_GAME_SHINUCHI_DESC": "За каждую заметку начисляется\nодинаковое количество очков.\nИспользовать формулу поколении-4.",
+
+        // Key Assignment - System
+        "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "Снимок экрана",
+        "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "Назначение клавиши система:\nНазначать любую кнопку для снимка экрана.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "Увеличение громкости",
+        "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "Назначение клавиши система:\nНазначать любую кнопку для увеличения\nгромкости музыка.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "Уменьшение громкости",
+        "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "Назначение клавиши система:\nНазначать любую кнопку для уменьшения\nгромкости музыка.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "Отображение значений ударов",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "Назначение клавиши система:\nНазначать любую кнопку для отображения\nзначений ударов.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "Отображение меню отладки",
+        "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "Назначение клавиши система:\nНазначать любую кнопку для отображения меню\nотладки.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Быстрая настройка",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "Назначение клавиши система:\nНазначать любую кнопку для доступа к быстрой\nнастройке.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Настройка игрока",
+        "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "Назначение клавиши система:\nНазначать любую кнопку для Настройки игрока.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Изменение сортировки песен",
+        "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "Назначение клавиши система:\nНазначать любую кнопку для сортировки песен.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Переключение авто (И1)",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "Назначение клавиши система:\nНазначать любую кнопку для переключения авто\n(И1).\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "Переключение авто (И2)",
+        "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "Назначение клавиши система:\nНазначать любую кнопку для переключения авто\n(И2).\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "Переключение Режима Тренировки",
+        "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "Назначение клавиши система:\nНазначать любую кнопку для переключения\nРежима Тренировки.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+        "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "Дисплей циклического воспроизведения видео",
+        "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "Назначение клавиши система:\nНазначать любую кнопку для режимов дисплея\nциклического воспроизведения видео.\n(Вы можете только использовать клавиатуру. Вы\nне можете использовать геймпады.)",
+
+        // Key Assignment - Gameplay
+        "SETTINGS_KEYASSIGN_GAME_DECIDE": "Выбрать",
+        "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "Клавиша для выбора.",
+        "SETTINGS_KEYASSIGN_GAME_CANCEL": "Отмена",
+        "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "Клавиша для отмены.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "Изменить на левый",
+        "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "Клавиша для переключения на левую.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "Изменить на правый",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "Клавиша для переключения на правую.",
+
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED": "Левый красный",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nкрасного.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "Правый красный",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nкрасного.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "Левый синий",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nсинего.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "Правый синий",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nсинего.",
+        "SETTINGS_KEYASSIGN_GAME_CLAP": "Хлопать",
+        "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Назначение клавиши конги:\nНазначать клавишу или кнопку для хлопании.",
+
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "Левый красный И2",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nкрасного И2.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "Правый красный И2",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nкрасного И2.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "Левый синий И2",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nсинего И2.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "Правый синий И2",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nсинего И2.",
+        "SETTINGS_KEYASSIGN_GAME_CLAP2P": "Хлопать И2",
+        "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Назначение клавиши конги:\nНазначать клавишу или кнопку для хлопании И2.",
+
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "Левый красный И3",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nкрасного И3.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "Правый красный И3",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nкрасного И3.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "Левый синий И3",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nсинего И3.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "Правый синий И3",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nсинего И3.",
+        "SETTINGS_KEYASSIGN_GAME_CLAP3P": "Хлопать И3",
+        "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Назначение клавиши конги:\nНазначать клавишу или кнопку для хлопании И3.",
+
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "Левый красный И4",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nкрасного И4.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "Правый красный И4",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nкрасного И4.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "Левый синий И4",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nсинего И4.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "Правый синий И4",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nсинего И4.",
+        "SETTINGS_KEYASSIGN_GAME_CLAP4P": "Хлопать И4",
+        "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Назначение клавиши конги:\nНазначать клавишу или кнопку для хлопании И4.",
+
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "Левый красный И5",
+        "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nкрасного И5.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "Правый красный И5",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nкрасного И5.",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "Левый синий И5",
+        "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для левого\nсинего И5.",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "Правый синий И5",
+        "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Назначение клавиши барабанов:\nНазначать клавишу или кнопку для правого\nсинего И5.",
+        "SETTINGS_KEYASSIGN_GAME_CLAP5P": "Хлопать И5",
+        "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Назначение клавиши конги:\nНазначать клавишу или кнопку для хлопании И5.",
+
+        // Key Assignment - Training
+        "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Пауза тренировки",
+        "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для паузы.",
+        "SETTINGS_KEYASSIGN_TRAINING_AUTO": "Переключение авто",
+        "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для переключения авто.",
+        "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Добавление/Удаление закладки",
+        "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для добавления или\nудаления закладки.",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Увеличение скорости прокрутки",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для увеличения скорости\nпрокрутки.",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Уменьшение скорости прокрутки",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для уменьшения скорости\nпрокрутки.",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Увеличение скорости песни",
+        "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для увеличения скорости\nпесни.",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Уменьшение скорости песни",
+        "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для уменьшения скорости\nпесни.",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Установка ветки на Нормале",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для установки ветки\nпартитуры на Нормале.",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Установка ветки на Эксперте",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для установки ветки\nпартитуры на Эксперте.",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Установка ветки на Мастере",
+        "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для установки ветки\nпартитуры на Мастере.",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Перемещение меры вперёд",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения меры\nвперёд.",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Перемещение меры назад",
+        "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения меры\nназад.",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Пропуск мер вперёд",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска мер вперёд.",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Пропуск мер назад",
+        "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска мер назад.",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Прыжок к первой мере",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к первой\nмере.",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Прыжок к последней мере",
+        "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к последней\nмере.",
+
+        // Title Screen
+        "TITLE_MODE_TAIKO": "Режим Тайко",
+        "TITLE_MODE_DAN": "Дан-и Додзё",
+        "TITLE_MODE_TOWER": "Тайко Башни",
+        "TITLE_MODE_SHOP": "Магазин",
+        "TITLE_MODE_STORY": "Тайко Приключения",
+        "TITLE_MODE_HEYA": "Моя Комната",
+        "TITLE_MODE_SETTINGS": "Настройки",
+        "TITLE_MODE_EXIT": "Выход",
+        "TITLE_MODE_ONLINE": "Онлайн-Лаунж",
+        "TITLE_MODE_DOCUMENT": "Открытая Энциклопедия",
+        "TITLE_MODE_AI": "Режим Битвы ИИ",
+        "TITLE_MODE_STATS": "Статистика Игрока",
+        "TITLE_MODE_EDITOR": "Партитура Редактор",
+        "TITLE_MODE_TOOLS": "Открытый Набор Инструментов",
+
+        "TITLE_MODE_TAIKO_DESC": "Играйте ваши любимые\nпесни в своём темпе!",
+        "TITLE_MODE_DAN_DESC": "Играйте в несколько партитурах подряд\nследующих сложных экзаменов,\nчтобы получить ранг ПРОПУСКА!",
+        "TITLE_MODE_TOWER_DESC": "Играйте в длинных партитурах с\nограниченным количеством жизней\nи доберитесь до вершины башни!",
+        "TITLE_MODE_SHOP_DESC": "Купите новые музыки,\nпти-персонажей и персонажей\nза монетам полученном из игры!",
+        "TITLE_MODE_STORY_DESC": "Преодолевайте различные препятствия и\nоткрывать новый контент и горизонты!",
+        "TITLE_MODE_HEYA_DESC": "Измените вашу информацию\nили визуальные эффекты\nвашего персонажа!",
+        "TITLE_MODE_SETTINGS_DESC": "Измените ваш стиль игры\nили общие настройки!",
+        "TITLE_MODE_EXIT_DESC": "Выход из игры.\nДо новых встреч!",
+        "TITLE_MODE_ONLINE_DESC": "Скачайте новым песням\nи контентом из Интернета!",
+        "TITLE_MODE_DOCUMENT_DESC": "Учитесь о функциях,\nсвязанных с OpenTaiko, и о том,\nкак устанавливать новый контент!",
+        "TITLE_MODE_AI_DESC": "Сражайтесь с сильным ИИ\nв нескольких секциях и\nстремиться к победе!",
+        "TITLE_MODE_STATS_DESC": "Наблюдайте и отслеживать свой\nпрогресс!",
+        "TITLE_MODE_EDITOR_DESC": "Создайте свои .tja партитуры\nпо мотивам ваших любимых песен!",
+        "TITLE_MODE_TOOLS_DESC": "Используйте различные инструменты для вставки\nнового пользовательского контента!",
+
+        // Song Select
+        // {0}: Folder path
+        "SONGSELECT_RETURN_PATH": "Назад ({0})",
+        "SONGSELECT_RANDOM": "Случайная песня",
+        // {0}: Folder path
+        "SONGSELECT_RANDOM_PATH": "Случайная песня ({0})",
+
+        "SONGSELECT_SORT": "Меню сортировки",
+        "SONGSELECT_SORT_PATH": "Расположение",
+        "SONGSELECT_SORT_TITLE": "Название",
+        "SONGSELECT_SORT_SUBTITLE": "Подзаголовок",
+        "SONGSELECT_SORT_LEVEL": "Отображаемый уровень",
+
+        // {0}: Main BPM
+        "SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+        // {0}: Main BPM
+        // {1}: Minimum BPM
+        // {2}: Maximum BPM
+        "SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+        // {0}: Charter name
+        "SONGSELECT_INFO_CHARTER": "Создано: {0}",
+
+        "SONGSELECT_QUICKCONFIG": "Быстрые настройки",
+        "SONGSELECT_QUICKCONFIG_MORE": "Более...",
+
+        // Modals
+        "MODAL_TITLE_COIN": "Монеты получены!",
+        "MODAL_TITLE_CHARA": "Новая Персонажа!",
+        "MODAL_TITLE_PUCHI": "Новая Пти-персонажа!",
+        "MODAL_TITLE_NAMEPLATE": "Новый Ранг!",
+        "MODAL_TITLE_SONG": "Новая Песня!",
+        // {0}: Newly obtained coins
+        // {1}: New total coin count
+        "MODAL_MESSAGE_COIN": "+{0} монет. (Общие: {1})",
+
+        // Online Lounge
+        "ONLINE_EXIT": "Назад в главное меню",
+        "ONLINE_DOWNLOAD": "Скачать контент",
+        "ONLINE_DOWNLOAD_CDN": "Выбор CDN",
+        "ONLINE_DOWNLOAD_SONG": "Скачать песни",
+        "ONLINE_DOWNLOAD_CHARA": "Скачать персонажей (Не доступен)",
+        "ONLINE_DOWNLOAD_PUCHI": "Скачать пти-персонажей (Не доступен)",
+        "ONLINE_MULTIPLAYER": "Сетевые многопользовательский (Не доступен)",
+
+        // Taiko Towers
+        "TOWER_FLOOR_REACHED": "Достигнутый этаж",
+        "TOWER_FLOOR_INITIAL": "",
+        "TOWER_SCORE": "Очки",
+        "TOWER_SCORE_INITIAL": "",
+
+        // Dan Dojo
+        "DAN_CONDITION_NAME_SOUL": "Датчик души",
+        "DAN_CONDITION_NAME_GOOD": "Количество Хорошо",
+        "DAN_CONDITION_NAME_OK": "Количество OK",
+        "DAN_CONDITION_NAME_BAD": "Количество Плохо",
+        "DAN_CONDITION_NAME_SCORE": "Очки",
+        "DAN_CONDITION_NAME_ROLL": "Дробь",
+        "DAN_CONDITION_NAME_HIT": "Удары",
+        "DAN_CONDITION_NAME_COMBO": "Комбо",
+        "DAN_CONDITION_NAME_ACCURACY": "Точность",
+        "DAN_CONDITION_NAME_ADLIB": "Количество ADLIB",
+        "DAN_CONDITION_NAME_BOMB": "Удары бомб",
+
+        // Heya / Quick Heya
+        "HEYA_PUCHI": "Пти-персонажа",
+        "HEYA_CHARA": "Персонажа",
+        "HEYA_DAN": "Ранг дан",
+        "HEYA_NAMEPLATE": "Ранг таблички",
+
+        // {0}: Asset name
+        "HEYA_DESCRIPTION_NAME": "Имя: {0}",
+        // {0}: Asset rarity
+        "HEYA_DESCRIPTION_RARITY": "Редкость: {0}",
+        "HEYA_DESCRIPTION_RARITY0": "Плохо",
+        "HEYA_DESCRIPTION_RARITY1": "Обычно",
+        "HEYA_DESCRIPTION_RARITY2": "Необычно",
+        "HEYA_DESCRIPTION_RARITY3": "Редко",
+        "HEYA_DESCRIPTION_RARITY4": "Эпично",
+        "HEYA_DESCRIPTION_RARITY5": "Легендарно",
+        "HEYA_DESCRIPTION_RARITY6": "Миф",
+        // {0}: Asset author
+        "HEYA_DESCRIPTION_AUTHOR": "Автор: {0}",
+        // {0}: Gauge type
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Тип датчика: {0}",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Нормально",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Трудно",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Экстремально",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Заканчивать игру в завершенной зоне, чтобы передать песню!",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nБудьте осторожны, если значение датчика достигает 0, игра - автоматически проиграна!",
+        "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nСтранная сила, кажется, уменьшает вероятность ошибки в этой песне...",
+        // {0}: Percentage of mines
+        "HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Фактор бомба: {0}% нот, превращенные в бомбы в Тральщике",
+        // {0}: Percentage of fuse rolls
+        "HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% баллонов, превращенные в дроби с взрывателем в Тральщике",
+        // {0}: Coin multiplier
+        "HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель очков: x{0}",
+
+        // Unlock requirements & messages (Any Menu)
+        "UNLOCK_CONDITION_INVALID": "[ОШИБКА] Недопустимое условие",
+        "UNLOCK_CONDITION_SHOP": "Товар доступен только в Магазине.", // cs
+        // {0}: Price of item
+        "UNLOCK_CONDITION_COST": "Цена монет: {0}", // ch, cs, cm
+        "UNLOCK_COIN_BOUGHT": "Товар куплен!",
+        "UNLOCK_COIN_MORE": "Недостаточно монет!",
+
+        "UNLOCK_CONDITION_ERROR": "Следующее условие: Для {0} требуется {1} значения.",
+        "UNLOCK_CONDITION_ERROR2": "Следующее условие: Для {0} требуется ({1} * n) значения и n ссылок.",
+
+        // {0}: Coin earn requirement
+        // {1}: Current progress
+        "UNLOCK_CONDITION_EARN": "Получайте в общей сложности {0} монет., чтобы разблокировать этот товар! ({1}/{0})", // ce
+        // {0}: Total AI plays needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_AIPLAY": "Играйте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // ap
+        // {0}: Total AI wins needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_AIWIN": "Побеждайте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // aw
+        // {0}: Total plays needed
+        // {1}: Current progress
+        "UNLOCK_CONDITION_PLAY": "Играйте {0} песн., чтобы разблокировать этот товар! ({1}/{0})", // tp
+        // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+        // {1}: # of songs needed
+        // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_PLAYDIFF": "{0} {1} песн. на {2} трудности, чтобы разблокировать этот товар! ({3}/{1})", // dp
+        // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+        // {1}: # of songs needed
+        // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} песн. с {2} звезд., чтобы разблокировать этот товар! ({3}/{1})", // lp
+        // {0}: Current progress
+        // {1}: Total # of challenges
+        "UNLOCK_CONDITION_CHALLENGE": "Получайте следующее представления, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
+        // {0}: Clear type
+        // {1}: Song name
+        // {2}: Difficulty type
+        "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} на {2} трудности.", // sp
+        // {0}: Clear type
+        // {1}: # of songs needed
+        // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+        // {3}: Current progress
+        "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} песн. в папке {2}. ({3}/{1})", // sg
+        // {0}: Clear type
+        // {1} # of songs needed
+        // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+        // {3} Current progress
+        "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} партитур. сделано {2}. ({3}/{1})", // sc
+
+        "UNLOCK_CONDITION_REQUIRE_PLAY": "Играйте",
+        "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Играйте",
+        "UNLOCK_CONDITION_REQUIRE_ASSIST": "Получайте Помогавший Завершён на",
+        "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Получайте по крайней мере Помогавший Завершён на",
+        "UNLOCK_CONDITION_REQUIRE_CLEAR": "Получайте Завершён на",
+        "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Получайте по крайней мере Завершён на",
+        "UNLOCK_CONDITION_REQUIRE_FC": "Получайте Полное Комбо на",
+        "UNLOCK_CONDITION_REQUIRE_FC_MORE": "Получайте по крайней мере Полное Комбо на",
+        "UNLOCK_CONDITION_REQUIRE_PERFECT": "Получайте Идеально на",
+        "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Получайте Идеально на", 
+
+        // Pause Menu (Taiko/Tower/Dan Mode)
+        "PAUSE_TITLE": "Пауза",
+        "PAUSE_RESUME": "Продолжить",
+        "PAUSE_RESTART": "Переиграть",
+        "PAUSE_EXIT": "Выход",
+
+        // AI Info
+        "AI_NAME": "ИИ",
+        "AI_TITLE": "Бог-Экс-Махина",
+
+        // Mods
+        "MOD_NONE": "Ничто",
+        "MOD_BLANK": "-",
+        "MOD_SWITCH_OFF": "Выкл.",
+        "MOD_SWITCH_ON": "Вкл.",
+        "MOD_SCOREMULTIPLY": "Множитель очков: {0}",
+        "MOD_COINMULTIPLY": "Множитель монетов: {0}",
+
+        "MOD_SPEED": "Скорость",
+
+        "MOD_HIDE": "Невидимость",
+        "MOD_STEALTH": "Хитрость",
+
+        "MOD_FLIP": "Зеркальные ноты",
+
+        "MOD_RANDOM": "Случайность",
+        "MOD_RANDOM_SHUFFLE": "Шарканье",
+        "MOD_RANDOM_CHAOS": "Хаос",
+
+        "MOD_TIMING": "Синхронность",
+        "MOD_TIMING1": "Свободно",
+        "MOD_TIMING2": "Мягко",
+        "MOD_TIMING3": "Нормально",
+        "MOD_TIMING4": "Строго",
+        "MOD_TIMING5": "Жёстко",
+
+        "MOD_JUSTICE": "Режим просто",
+        "MOD_SAFE": "Сложно",
+        "MOD_JUST": "Просто",
+
+        "MOD_GAMETYPE": "Тип игры",
+        "MOD_GAMETYPE_TAIKO": "Тайко",
+        "MOD_GAMETYPE_KONGA": "Конга",
+
+        "MOD_GAMEMODE": "Режим игры",
+        "MOD_GAMEMODE_TRAINING": "Тренировка",
+
+        "MOD_AUTO": "Авто",
+
+        "MOD_SONGSPEED": "Скорость песни",
+        "SETTINGS_MOD_SONGSPEED_DESC": "Изменит скорость воспроизведения песни.\nЕсли включена настройка увеличения времени\nвоспроизведения, при скорости воспроизведения\nв 0,9 раза могут возникать проблемы со звуком.\nПримечание: Это также изменяет высоту тона\nпесен.",
+
+        "MOD_HITSOUND": "Инструмент",
+
+        "MOD_FUN": "Забавный мод",
+        "MOD_FUN_AVALANCHE": "Лавина",
+        "MOD_FUN_MINESWEEPER": "Тральщик"
+    },
+  // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
+  "InvalidKey": "КЛЮЧ НЕ НАЙДЕН: {0}",
+  // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
+  // Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
+  "FontName": "Arial",
+  "BoxFontName": "font.ttf"
+}

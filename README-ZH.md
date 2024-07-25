@@ -362,6 +362,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 > * [basketballsmash/英语README翻译](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko英语翻译](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
 > * [WHMHammer/OpenTaiko中文翻译](https://github.com/whmhammer)(@WHMHammer)
+> * [Expédic Habbet/OpenTaiko中文文本协助、俄语文本](https://github.com/ExpedicHabbet)(@ExpedicHabbet)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)

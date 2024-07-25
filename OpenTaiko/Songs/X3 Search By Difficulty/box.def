@@ -1,5 +1,6 @@
 ﻿#TITLE:Search by difficulty
 #TITLEJA:むずかしさから探す
+#TITLERU:Поиск по трудности
 #TITLEZH:按难易度等级检索
 #GENRE:SearchD
 #FORECOLOR:#FFFFFF
@@ -8,6 +9,8 @@
 #BOXEXPLANATION2:fit your level !
 #BOXEXPLANATIONJA1:難易度やレベルで検索するよ
 #BOXEXPLANATIONJA2:とても便利!
+#BOXEXPLANATIONRU1:Искайте и играйте песни, которые
+#BOXEXPLANATIONRU2:соответствуют вашему уровню!
 #BOXEXPLANATIONZH1:按难易度和等级检索并游玩合适水平的歌曲！
 #BOXEXPLANATIONZH2:非常方便！
 #BGTYPE:1

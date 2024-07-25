@@ -1,5 +1,15 @@
 {
-	"name" : "AItritus",
+	"name" : {
+		"strings": {
+			"default": "AItritus",
+			"ru": "АЙтритус"
+		}
+	},
     "rarity": "Rare",
-	"author": "Dashy (OPTK)",
+	"author": {
+		"strings": {
+			"default": "Dashy (OPTK)",
+			"ru": "Дэши (OPTK)"
+		}
+	}
 }

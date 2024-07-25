@@ -1,5 +1,15 @@
 {
-	"name" : "Aoi",
+	"name" : {
+		"strings": {
+			"default": "Aoi",
+			"ru": "Аой"
+		}
+	},
     "rarity": "Uncommon",
-	"author": "Dashy (OPTK)",
+	"author": {
+		"strings": {
+			"default": "Dashy (OPTK)",
+			"ru": "Дэши (OPTK)"
+		}
+	}
 }

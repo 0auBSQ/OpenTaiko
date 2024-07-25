@@ -1,5 +1,10 @@
 {
-	"name" : "None",
+	"name" : {
+		"strings": {
+			"default": "None",
+			"ru": "Никто"
+		}
+	},
     "rarity": "Common",
 	"author": "",
 }

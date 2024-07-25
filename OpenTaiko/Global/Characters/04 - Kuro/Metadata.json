@@ -1,5 +1,15 @@
 {
-	"name" : "Kuro",
+	"name" : {
+		"strings": {
+			"default": "Kuro",
+			"ru": "Куро"
+		}
+	},
     "rarity": "Rare",
-	"author": "Dashy (OPTK)",
+	"author": {
+		"strings": {
+			"default": "Dashy (OPTK)",
+			"ru": "Дэши (OPTK)"
+		}
+	}
 }
