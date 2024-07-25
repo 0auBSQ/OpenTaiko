@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
 using Silk.NET.Input;
 
-namespace FDK
-{
-	public class CInputGamepad : IInputDevice, IDisposable
-	{
+namespace FDK {
+	public class CInputGamepad : IInputDevice, IDisposable {
 		// コンストラクタ
 
-		public CInputGamepad(IGamepad gamepad)
-		{
+		public CInputGamepad(IGamepad gamepad) {
 			this.CurrentType = InputDeviceType.Gamepad;
 			this.GUID = gamepad.Index.ToString();
 			this.ID = gamepad.Index;
@@ -21,62 +14,49 @@ namespace FDK
 			gamepad.ButtonDown += Joystick_ButtonDown;
 			gamepad.ButtonUp += Joystick_ButtonUp;
 		}
-		
-		
+
+
 		// メソッド
-		
-		public void SetID( int nID )
-		{
+
+		public void SetID(int nID) {
 			this.ID = nID;
 		}
 
 		#region [ IInputDevice 実装 ]
 		//-----------------
-		public InputDeviceType CurrentType
-		{ 
+		public InputDeviceType CurrentType {
 			get;
 			private set;
 		}
-		public string GUID
-		{
+		public string GUID {
 			get;
 			private set;
 		}
-		public int ID
-		{ 
-			get; 
-			private set;
-		}
-		public List<STInputEvent> InputEvents 
-		{
+		public int ID {
 			get;
 			private set;
 		}
-		public string strDeviceName
-		{
+		public List<STInputEvent> InputEvents {
+			get;
+			private set;
+		}
+		public string strDeviceName {
 			get;
 			set;
 		}
 
-		public void Polling(bool useBufferInput)
-		{
+		public void Polling(bool useBufferInput) {
 			InputEvents.Clear();
-			
-			for (int i = 0; i < ButtonStates.Length; i++)
-			{
-				if (ButtonStates[i].Item1)
-				{
-					if (ButtonStates[i].Item2 >= 1)
-					{
+
+			for (int i = 0; i < ButtonStates.Length; i++) {
+				if (ButtonStates[i].Item1) {
+					if (ButtonStates[i].Item2 >= 1) {
 						ButtonStates[i].Item2 = 2;
-					}
-					else
-					{
+					} else {
 						ButtonStates[i].Item2 = 1;
 
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = true,
 								Released = false,
@@ -85,20 +65,14 @@ namespace FDK
 							}
 						);
 					}
-				}
-				else
-				{
-					if (ButtonStates[i].Item2 <= -1)
-					{
+				} else {
+					if (ButtonStates[i].Item2 <= -1) {
 						ButtonStates[i].Item2 = -2;
-					}
-					else
-					{
+					} else {
 						ButtonStates[i].Item2 = -1;
 
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = false,
 								Released = true,
@@ -111,20 +85,16 @@ namespace FDK
 			}
 		}
 
-		public bool KeyPressed(int nButton)
-		{
+		public bool KeyPressed(int nButton) {
 			return ButtonStates[nButton].Item2 == 1;
 		}
-		public bool KeyPressing(int nButton)
-		{
+		public bool KeyPressing(int nButton) {
 			return ButtonStates[nButton].Item2 >= 1;
 		}
-		public bool KeyReleased(int nButton)
-		{
+		public bool KeyReleased(int nButton) {
 			return ButtonStates[nButton].Item2 == -1;
 		}
-		public bool KeyReleasing(int nButton)
-		{
+		public bool KeyReleasing(int nButton) {
 			return ButtonStates[nButton].Item2 <= -1;
 		}
 		//-----------------
@@ -132,12 +102,9 @@ namespace FDK
 
 		#region [ IDisposable 実装 ]
 		//-----------------
-		public void Dispose()
-		{
-			if(!this.IsDisposed)
-			{
-				if (this.InputEvents != null)
-				{
+		public void Dispose() {
+			if (!this.IsDisposed) {
+				if (this.InputEvents != null) {
 					this.InputEvents = null;
 				}
 				this.IsDisposed = true;
@@ -154,18 +121,14 @@ namespace FDK
 		private (bool, int)[] ButtonStates = new (bool, int)[15];
 		private bool IsDisposed;
 
-		private void Joystick_ButtonDown(IGamepad joystick, Button button)
-		{
-			if (button.Name != ButtonName.Unknown)
-			{
+		private void Joystick_ButtonDown(IGamepad joystick, Button button) {
+			if (button.Name != ButtonName.Unknown) {
 				ButtonStates[(int)button.Name].Item1 = true;
 			}
 		}
 
-		private void Joystick_ButtonUp(IGamepad joystick, Button button)
-		{
-			if (button.Name != ButtonName.Unknown)
-			{
+		private void Joystick_ButtonUp(IGamepad joystick, Button button) {
+			if (button.Name != ButtonName.Unknown) {
 				ButtonStates[(int)button.Name].Item1 = false;
 			}
 		}
