@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	internal class CActImplCombo : CAct演奏Combo共通 {
 		// CAct演奏Combo共通 実装
 

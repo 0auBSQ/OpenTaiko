@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using DiscordRPC;
 using FDK;
 using SampleFramework;
 using Silk.NET.Maths;
 using SkiaSharp;
-using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Text;
-using FDK;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class CActResultSongBar : CActivity {

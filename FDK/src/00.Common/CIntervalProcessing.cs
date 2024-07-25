@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	/// <summary>
 	/// <para>一定の間隔で処理を行うテンプレートパターンの定義。</para>
 	/// <para>たとえば、t進行() で 5ms ごとに行う処理を前回のt進行()の呼び出しから 15ms 後に呼び出した場合は、処理が 3回 実行される。</para>

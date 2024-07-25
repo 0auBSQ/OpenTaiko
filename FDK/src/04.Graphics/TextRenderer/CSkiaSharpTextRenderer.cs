@@ -1,16 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using SkiaSharp;
-using static FDK.CSkiaSharpTextRenderer;
 using Color = System.Drawing.Color;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace FDK {
 	internal class CSkiaSharpTextRenderer : ITextRenderer {

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 using FDK;
 using Silk.NET.Maths;
-using static TJAPlayer3.CSongListNode;
-using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace TJAPlayer3 {

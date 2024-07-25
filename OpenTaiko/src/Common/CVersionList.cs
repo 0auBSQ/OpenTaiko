@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class CVersionList {
 		public static string[] VersionList = {
 			"0.1.0",

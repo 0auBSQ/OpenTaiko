@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	internal class Favorites {
 		public void tFavorites() {
 			if (!File.Exists("Favorite.json"))

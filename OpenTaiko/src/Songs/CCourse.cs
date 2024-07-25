@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	public class CCourse {
 		//2016.11.07 kairera0467
 		//とりあえずメモ代わりに

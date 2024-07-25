@@ -1,10 +1,5 @@
-﻿using System;
-using System.ArrayExtensions;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Text;
 using DiscordRPC;
 using FDK;

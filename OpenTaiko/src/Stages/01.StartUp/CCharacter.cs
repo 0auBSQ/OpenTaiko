@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
-using static TJAPlayer3.DBNameplateUnlockables;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class CCharacter {
 		public DBCharacter.CharacterData metadata;
 		public DBCharacter.CharacterEffect effect;

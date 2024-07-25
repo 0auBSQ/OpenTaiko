@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ManagedBass;
+﻿using ManagedBass;
 using ManagedBass.Mix;
 
 namespace FDK.BassMixExtension {

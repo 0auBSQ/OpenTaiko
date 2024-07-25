@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using FDK;
 using Silk.NET.Maths;
 using SkiaSharp;

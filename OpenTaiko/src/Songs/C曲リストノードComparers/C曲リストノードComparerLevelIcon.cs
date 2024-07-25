@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace TJAPlayer3.C曲リストノードComparers {
+﻿namespace TJAPlayer3.C曲リストノードComparers {
 	internal sealed class C曲リストノードComparerLevelIcon : IComparer<CSongListNode> {
 		private readonly int _order;
 

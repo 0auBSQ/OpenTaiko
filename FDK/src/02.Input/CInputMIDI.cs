@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	public class CInputMIDI : IInputDevice, IDisposable {
 		// プロパティ
 

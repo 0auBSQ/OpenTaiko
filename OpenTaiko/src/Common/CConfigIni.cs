@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using FDK;
 using FDK.ExtensionMethods;
-using SampleFramework;
 
 namespace TJAPlayer3 {
 	internal class CConfigIni : INotifyPropertyChanged {

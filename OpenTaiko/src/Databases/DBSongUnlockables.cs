@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
-using static TJAPlayer3.DBNameplateUnlockables;
 using static TJAPlayer3.DBSongUnlockables;
 
 namespace TJAPlayer3 {

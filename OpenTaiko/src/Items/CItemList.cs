@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	/// <summary>
 	/// 「リスト」（複数の固定値からの１つを選択可能）を表すアイテム。
 	/// </summary>

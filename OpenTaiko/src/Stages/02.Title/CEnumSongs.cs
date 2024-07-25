@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
 
 namespace TJAPlayer3 {
 	internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲リストを取得するクラス

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using FDK;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class CAct演奏演奏情報 : CActivity {

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	[Serializable()]
 	internal class CSongUniqueID {
 		public CSongUniqueID(string path) {

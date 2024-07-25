@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class CHitSounds {
 		public CHitSounds(string path) {
 			tLoadFile(path);

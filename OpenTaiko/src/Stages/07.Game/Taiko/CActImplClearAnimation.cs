@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text;
-using FDK;
-using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
-using Rectangle = System.Drawing.Rectangle;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class CActImplClearAnimation : CActivity {

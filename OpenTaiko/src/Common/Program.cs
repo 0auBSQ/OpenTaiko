@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using FDK;
 
 namespace TJAPlayer3 {
 	internal class Program {

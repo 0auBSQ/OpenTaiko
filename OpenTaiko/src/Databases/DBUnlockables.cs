@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using static TJAPlayer3.BestPlayRecords;
 
 namespace TJAPlayer3 {

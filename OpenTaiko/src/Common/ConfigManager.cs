@@ -1,8 +1,6 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace TJAPlayer3 {
 	/// <summary>

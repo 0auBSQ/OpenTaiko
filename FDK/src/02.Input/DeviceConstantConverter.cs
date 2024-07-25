@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SlimDXKeys;
+﻿using SlimDXKeys;
 
 using SlimDXKey = SlimDXKeys.Key;
 

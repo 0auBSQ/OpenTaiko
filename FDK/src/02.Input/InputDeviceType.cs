@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	// 定数
 
 	public enum InputDeviceType {

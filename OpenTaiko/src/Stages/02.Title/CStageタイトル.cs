@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {
 	internal class CStageタイトル : CStage {

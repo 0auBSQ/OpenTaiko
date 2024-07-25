@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using FDK;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace TJAPlayer3 {
 	internal class CLang {

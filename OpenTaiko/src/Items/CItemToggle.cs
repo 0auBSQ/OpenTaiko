@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	/// <summary>
 	/// 「トグル」（ON, OFF の2状態）を表すアイテム。
 	/// </summary>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
-using NLua;
+﻿using NLua;
 
 namespace TJAPlayer3 {
 	class EndAnimeScript : ScriptBG {

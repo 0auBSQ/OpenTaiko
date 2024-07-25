@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class HSongTraverse {
 		public static List<string> SpecialFolders = new List<string> { "Favorite", "最近遊んだ曲", "SearchD" };
 

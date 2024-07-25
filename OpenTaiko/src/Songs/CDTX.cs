@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using FDK;
 using FDK.ExtensionMethods;
 using SkiaSharp;
-using TJAPlayer3;
 using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
 
 namespace TJAPlayer3 {
 	internal class CDTX : CActivity {

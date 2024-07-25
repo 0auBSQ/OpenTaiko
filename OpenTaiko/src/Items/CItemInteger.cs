@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	/// <summary>
 	/// 「整数」を表すアイテム。
 	/// </summary>

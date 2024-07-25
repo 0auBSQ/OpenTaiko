@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using FDK;
-using TJAPlayer3;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	[Serializable]
 	public class CScoreIni {
 		// プロパティ

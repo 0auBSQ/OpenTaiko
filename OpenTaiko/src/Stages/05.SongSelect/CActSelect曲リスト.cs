@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using FDK;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Silk.NET.Maths;
-using SkiaSharp;
 using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 using RectangleF = System.Drawing.RectangleF;
 

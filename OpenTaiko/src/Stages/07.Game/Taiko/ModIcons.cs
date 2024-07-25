@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class ModIcons {
 		static Dictionary<int, Action<int, int, int, int>> __methods = new Dictionary<int, Action<int, int, int, int>>()
 		{

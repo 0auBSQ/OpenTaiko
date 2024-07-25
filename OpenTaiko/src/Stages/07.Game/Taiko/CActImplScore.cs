@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text;
-using FDK;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class CActImplScore : CAct演奏スコア共通 {

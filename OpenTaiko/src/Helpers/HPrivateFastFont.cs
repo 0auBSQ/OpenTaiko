@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class HPrivateFastFont {

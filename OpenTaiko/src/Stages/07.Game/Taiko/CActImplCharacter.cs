@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Text;
-using FDK;
+﻿using FDK;
 
 
 namespace TJAPlayer3 {

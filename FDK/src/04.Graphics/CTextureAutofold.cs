@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Text;
-using Silk.NET.Maths;
-using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
-using Rectangle = System.Drawing.Rectangle;
+﻿using Rectangle = System.Drawing.Rectangle;
 
 namespace FDK {
 	/// <summary>

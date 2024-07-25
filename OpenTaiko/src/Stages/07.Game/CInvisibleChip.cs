@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using FDK;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	public class CInvisibleChip : IDisposable {

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {
 	class CStage段位選択 : CStage {

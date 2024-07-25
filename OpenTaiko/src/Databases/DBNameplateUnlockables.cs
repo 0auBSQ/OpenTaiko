@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using FFmpeg.AutoGen;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using static TJAPlayer3.DBNameplateUnlockables;
 
 namespace TJAPlayer3 {

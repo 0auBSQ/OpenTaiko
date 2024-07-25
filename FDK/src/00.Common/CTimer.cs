@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	public class CTimer : CTimerBase {
 		public enum TimerType {
 			Unknown = -1,

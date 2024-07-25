@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SlimDXKeys {
+﻿namespace SlimDXKeys {
 	public enum Key {
 		D0 = 0,
 		D1 = 1,

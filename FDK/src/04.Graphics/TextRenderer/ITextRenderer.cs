@@ -1,4 +1,3 @@
-using System;
 using SkiaSharp;
 using Color = System.Drawing.Color;
 

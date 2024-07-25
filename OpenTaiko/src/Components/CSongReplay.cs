@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SevenZip.Compression.LZMA.SevenZipHelper;
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class CSongReplay {
 		/* Game version used for the replay
          * 521 = 0.5.2.1

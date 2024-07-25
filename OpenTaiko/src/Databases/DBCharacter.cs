@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace TJAPlayer3 {
 	class DBCharacter {

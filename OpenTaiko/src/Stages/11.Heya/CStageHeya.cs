@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
+﻿using FDK;
 using static TJAPlayer3.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
-using RectangleF = System.Drawing.RectangleF;
 
 namespace TJAPlayer3 {
 	class CStageHeya : CStage {

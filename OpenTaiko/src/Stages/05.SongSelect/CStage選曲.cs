@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {

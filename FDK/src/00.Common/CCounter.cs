@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	/// <summary>
 	/// 一定間隔で単純増加する整数（カウント値）を扱う。
 	/// </summary>

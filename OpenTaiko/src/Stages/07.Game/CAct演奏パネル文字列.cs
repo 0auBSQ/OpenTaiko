@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Text;
+﻿using System.Diagnostics;
 using FDK;
 using SkiaSharp;
 using static TJAPlayer3.CActSelect曲リスト;

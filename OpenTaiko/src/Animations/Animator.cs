@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FDK;
-using TJAPlayer3;
+﻿using FDK;
 
 namespace TJAPlayer3.Animations {
 	class Animator : IAnimatable {

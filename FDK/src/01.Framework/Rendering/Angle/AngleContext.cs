@@ -1,7 +1,6 @@
 using OpenTK.Graphics.Egl; //OpenTKさん ありがとう!
 using Silk.NET.Core.Contexts;
 using Silk.NET.GLFW;
-using Silk.NET.OpenGLES;
 using Silk.NET.Windowing;
 
 namespace SampleFramework;

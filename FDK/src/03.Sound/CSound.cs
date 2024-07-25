@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using FDK.BassMixExtension;
 using FDK.ExtensionMethods;
 using ManagedBass;
-using ManagedBass.Asio;
 using ManagedBass.Fx;
 using ManagedBass.Mix;
-using ManagedBass.Wasapi;
-using Silk.NET.Windowing;
 
 
 namespace FDK {

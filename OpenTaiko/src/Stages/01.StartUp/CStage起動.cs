@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading;
-using System.Windows.Input;
+﻿using System.Diagnostics;
 using FDK;
-using SkiaSharp;
 
 namespace TJAPlayer3 {
 	internal class CStage起動 : CStage {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-// Minimalist menu class to use for custom menus
+﻿// Minimalist menu class to use for custom menus
 namespace TJAPlayer3 {
 	class CStageTemplate : CStage {
 		public CStageTemplate() {

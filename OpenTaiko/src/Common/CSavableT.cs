@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-namespace TJAPlayer3 {
+﻿namespace TJAPlayer3 {
 	class CSavableT<T> where T : new() {
 		public virtual string _fn {
 			get;

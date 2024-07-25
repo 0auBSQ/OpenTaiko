@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using FDK;
-using Silk.NET.Maths;
-using Color = System.Drawing.Color;
-using Point = System.Drawing.Point;
-using Rectangle = System.Drawing.Rectangle;
+﻿using FDK;
 
 namespace TJAPlayer3 {
 	internal class CAct演奏AVI : CActivity {

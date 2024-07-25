@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace TJAPlayer3 {
 	internal class HRarity {

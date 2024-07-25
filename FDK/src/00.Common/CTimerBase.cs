@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FDK {
+﻿namespace FDK {
 	/// <summary>
 	/// <para>タイマの抽象クラス。</para>
 	/// <para>このクラスを継承し、override したクラスを作成することで、任意のクロックを持つタイマを作成できる。</para>

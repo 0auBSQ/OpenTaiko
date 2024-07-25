@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using Silk.NET.Input;
+﻿using Silk.NET.Input;
 
 namespace FDK {
 	public class CInputKeyboard : IInputDevice, IDisposable {

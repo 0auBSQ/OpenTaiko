@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Text;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 using FDK;
-using Silk.NET.Maths;
-using Color = System.Drawing.Color;
-using RectangleF = System.Drawing.RectangleF;
 
 namespace TJAPlayer3 {
 	internal class CStage曲読み込み : CStage {

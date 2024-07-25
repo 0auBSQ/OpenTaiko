@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
+﻿using Microsoft.Data.Sqlite;
 
 namespace TJAPlayer3 {
 	public static class HDatabaseHelpers {
