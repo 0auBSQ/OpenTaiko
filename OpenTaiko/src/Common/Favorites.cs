@@ -6,57 +6,50 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace TJAPlayer3
-{
-    internal class Favorites
-    {
-        public void tFavorites() {
-            if (!File.Exists("Favorite.json"))
-                tSaveFile();
+namespace TJAPlayer3 {
+	internal class Favorites {
+		public void tFavorites() {
+			if (!File.Exists("Favorite.json"))
+				tSaveFile();
 
-            tLoadFile();
-        }
+			tLoadFile();
+		}
 
-        #region [Auxiliary methods]
+		#region [Auxiliary methods]
 
-        public void tToggleFavorite(string chartID)
-        {
-            if (tIsFavorite(chartID))
-                data.favorites[TJAPlayer3.SaveFile].Remove(chartID);
-            else
-                data.favorites[TJAPlayer3.SaveFile].Add(chartID);
+		public void tToggleFavorite(string chartID) {
+			if (tIsFavorite(chartID))
+				data.favorites[TJAPlayer3.SaveFile].Remove(chartID);
+			else
+				data.favorites[TJAPlayer3.SaveFile].Add(chartID);
 
-            tSaveFile();
-        }
+			tSaveFile();
+		}
 
-        public bool tIsFavorite(string chartID)
-        {
-            return (data.favorites[TJAPlayer3.SaveFile].Contains(chartID));
-        }
-        
+		public bool tIsFavorite(string chartID) {
+			return (data.favorites[TJAPlayer3.SaveFile].Contains(chartID));
+		}
 
-        #endregion
 
-        public class Data
-        {
-            public HashSet<string>[] favorites = new HashSet<string>[2] { new HashSet<string>(), new HashSet<string>() };
-        }
+		#endregion
 
-        public Data data = new Data();
+		public class Data {
+			public HashSet<string>[] favorites = new HashSet<string>[2] { new HashSet<string>(), new HashSet<string>() };
+		}
 
-        #region [private]
+		public Data data = new Data();
 
-        private void tSaveFile()
-        {
-            ConfigManager.SaveConfig(data, "Favorite.json");
-        }
+		#region [private]
 
-        private void tLoadFile()
-        {
-            data = ConfigManager.GetConfig<Data>(@"Favorite.json");
-        }
+		private void tSaveFile() {
+			ConfigManager.SaveConfig(data, "Favorite.json");
+		}
 
-        #endregion
-    }
+		private void tLoadFile() {
+			data = ConfigManager.GetConfig<Data>(@"Favorite.json");
+		}
+
+		#endregion
+	}
 
 }

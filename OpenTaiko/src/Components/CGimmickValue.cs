@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TJAPlayer3
-{
-    internal class CGimmickValue
-    {
-    }
+namespace TJAPlayer3 {
+	internal class CGimmickValue {
+	}
 }
