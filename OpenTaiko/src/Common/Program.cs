@@ -91,8 +91,9 @@ namespace TJAPlayer3
 							osplatform = "osx";
 						else if (OperatingSystem.IsLinux())
 							osplatform = "linux";
+						// this is gonna be redundant code i hope? :3 -tfd
 						else
-							throw new PlatformNotSupportedException("TJAPlayer3-f does not support this OS.");
+							throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
 						string platform = "";
 
@@ -111,7 +112,7 @@ namespace TJAPlayer3
 								platform = "arm64";
 								break;
 							default:
-								throw new PlatformNotSupportedException($"TJAPlayer3 does not support this Architecture. ({RuntimeInformation.ProcessArchitecture})");
+								throw new PlatformNotSupportedException($"OpenTaiko does not support this architecture. ({RuntimeInformation.ProcessArchitecture})");
 						}
 
                 		FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
@@ -127,7 +128,7 @@ namespace TJAPlayer3
 							mania.Run();
 
 						Trace.WriteLine( "" );
-						Trace.WriteLine( "遊んでくれてありがとう！" );
+						Trace.WriteLine( "Thank you for playing!" );
 					}
 #if !DEBUG
 					catch( Exception e )
@@ -135,7 +136,7 @@ namespace TJAPlayer3
 						Trace.WriteLine( "" );
 						Trace.Write( e.ToString() );
 						Trace.WriteLine( "" );
-						Trace.WriteLine( "エラーだゴメン！（涙" );
+						Trace.WriteLine( "An error has occured." );
                         AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
                         //MessageBox.Show( "エラーが発生しました。\n" +
                         //    e.ToString(), asmApp.Name + " Ver." + asmApp.Version.ToString().Substring(0, asmApp.Version.ToString().Length - 2) + " Error", MessageBoxButtons.OK, MessageBoxIcon.Error );	// #23670 2011.2.28 yyagi to show error dialog
