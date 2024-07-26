@@ -1,5 +1,6 @@
 ﻿#TITLE:Downloaded Songs
 #TITLEJA:CDNからダウンロードした曲
+#TITLERU:Скачанные песни
 #TITLEZH:下载的歌曲
 #GENRE:Download
 #BOXEXPLANATION1: Play songs downloaded
@@ -8,6 +9,9 @@
 #BOXEXPLANATIONJA1: オンラインラウンジから
 #BOXEXPLANATIONJA2: ダウンロードした曲が
 #BOXEXPLANATIONJA3: あそべるよ!
+#BOXEXPLANATIONRU1:Играйте песни, скачанные
+#BOXEXPLANATIONRU2:из Онлайн-Лаунжа!
+#BOXEXPLANATIONRU3:
 #BOXEXPLANATIONZH1:游玩
 #BOXEXPLANATIONZH2:从在线大厅下载的
 #BOXEXPLANATIONZH3:歌曲！

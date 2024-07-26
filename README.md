@@ -366,6 +366,7 @@ From version 0.5.3.1, Characters and Puchicharas are loaded from the Global fold
 > * [basketballsmash/English README Translation](https://twitter.com/basketballsmash)(@basketballsmash)
 > * [Meowgister/OpenTaiko English Translation](https://www.youtube.com/channel/UCDi5puZaJLMUA6OgIAb7rmQ)
 > * [WHMHammer/OpenTaiko Chinese Translation](https://github.com/whmhammer)(@WHMHammer)
+> * [Expédic Habbet/OpenTaiko Chinese Text Assistance, Russian Text](https://github.com/ExpedicHabbet)(@ExpedicHabbet)
 > * [Aioilight/TJAPlayer3](https://github.com/aioilight/TJAPlayer3)(@aioilight)
 > * [TwoPointZero/TJAPlayer3](https://github.com/twopointzero/TJAPlayer3)(@twopointzero)
 > * [KabanFriends/TJAPlayer3](https://github.com/KabanFriends/TJAPlayer3/tree/features)(@KabanFriends)
