@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using FDK;
 using NLua;
+using static KeraLua.LuaGC;
 using Silk.NET.OpenGLES;
 using SkiaSharp;
 using TJAPlayer3;
@@ -91,7 +92,9 @@ namespace TJAPlayer3
         {
             try
             {
-                return luaFunction.Call(args);
+                var ret = luaFunction.Call(args);
+				LuaScript.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
+				return ret;
             }
             catch (Exception exception)
             {
