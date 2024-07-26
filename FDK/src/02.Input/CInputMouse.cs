@@ -1,14 +1,9 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Numerics;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
 using Silk.NET.Input;
 
-namespace FDK
-{
-	public class CInputMouse : IInputDevice, IDisposable
-	{
+namespace FDK {
+	public class CInputMouse : IInputDevice, IDisposable {
 		// 定数
 
 		public const int MouseButtonCount = 8;
@@ -16,18 +11,14 @@ namespace FDK
 
 		// コンストラクタ
 
-		public CInputMouse(IMouse mouse)
-		{
+		public CInputMouse(IMouse mouse) {
 			this.CurrentType = InputDeviceType.Mouse;
 			this.GUID = "";
 			this.ID = 0;
-			try
-			{
+			try {
 				Trace.TraceInformation(mouse.Name + " を生成しました。");  // なぜか0x00のゴミが出るので削除
 				this.strDeviceName = mouse.Name;
-			}
-			catch
-			{
+			} catch {
 				Trace.TraceWarning("Mouse デバイスの生成に失敗しました。");
 				throw;
 			}
@@ -52,24 +43,17 @@ namespace FDK
 		public List<STInputEvent> InputEvents { get; private set; }
 		public string strDeviceName { get; set; }
 
-		public void Polling(bool useBufferInput)
-		{
+		public void Polling(bool useBufferInput) {
 			InputEvents.Clear();
-			
-			for (int i = 0; i < MouseStates.Length; i++)
-			{
-				if (MouseStates[i].Item1)
-				{
-					if (MouseStates[i].Item2 >= 1)
-					{
+
+			for (int i = 0; i < MouseStates.Length; i++) {
+				if (MouseStates[i].Item1) {
+					if (MouseStates[i].Item2 >= 1) {
 						MouseStates[i].Item2 = 2;
-					}
-					else
-					{
+					} else {
 						MouseStates[i].Item2 = 1;
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = true,
 								Released = false,
@@ -78,19 +62,13 @@ namespace FDK
 							}
 						);
 					}
-				}
-				else
-				{
-					if (MouseStates[i].Item2 <= -1)
-					{
+				} else {
+					if (MouseStates[i].Item2 <= -1) {
 						MouseStates[i].Item2 = -2;
-					}
-					else
-					{
+					} else {
 						MouseStates[i].Item2 = -1;
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = false,
 								Released = true,
@@ -102,20 +80,16 @@ namespace FDK
 				}
 			}
 		}
-		public bool KeyPressed(int nButton)
-		{
+		public bool KeyPressed(int nButton) {
 			return MouseStates[nButton].Item2 == 1;
 		}
-		public bool KeyPressing(int nButton)
-		{
+		public bool KeyPressing(int nButton) {
 			return MouseStates[nButton].Item2 >= 1;
 		}
-		public bool KeyReleased(int nButton)
-		{
+		public bool KeyReleased(int nButton) {
 			return MouseStates[nButton].Item2 == -1;
 		}
-		public bool KeyReleasing(int nButton)
-		{
+		public bool KeyReleasing(int nButton) {
 			return MouseStates[nButton].Item2 <= -1;
 		}
 		//-----------------
@@ -123,12 +97,9 @@ namespace FDK
 
 		#region [ IDisposable 実装 ]
 		//-----------------
-		public void Dispose()
-		{
-			if(!this.IsDisposed)
-			{
-				if (this.InputEvents != null)
-				{
+		public void Dispose() {
+			if (!this.IsDisposed) {
+				if (this.InputEvents != null) {
 					this.InputEvents = null;
 				}
 				this.IsDisposed = true;
@@ -145,34 +116,27 @@ namespace FDK
 		private (bool, int)[] MouseStates = new (bool, int)[12];
 		private bool IsDisposed;
 
-		private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2)
-		{
+		private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {
 
 		}
 
-		private void Mouse_DoubleClick(IMouse mouse, MouseButton mouseButton, Vector2 vector2)
-		{
+		private void Mouse_DoubleClick(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {
 
 		}
 
-		private void Mouse_MouseDown(IMouse mouse, MouseButton mouseButton)
-		{
-			if (mouseButton != MouseButton.Unknown)
-			{
+		private void Mouse_MouseDown(IMouse mouse, MouseButton mouseButton) {
+			if (mouseButton != MouseButton.Unknown) {
 				MouseStates[(int)mouseButton].Item1 = true;
 			}
 		}
 
-		private void Mouse_MouseUp(IMouse mouse, MouseButton mouseButton)
-		{
-			if (mouseButton != MouseButton.Unknown)
-			{
+		private void Mouse_MouseUp(IMouse mouse, MouseButton mouseButton) {
+			if (mouseButton != MouseButton.Unknown) {
 				MouseStates[(int)mouseButton].Item1 = false;
 			}
 		}
 
-		private void Mouse_MouseMove(IMouse mouse, Vector2 vector2)
-		{
+		private void Mouse_MouseMove(IMouse mouse, Vector2 vector2) {
 
 		}
 		//-----------------

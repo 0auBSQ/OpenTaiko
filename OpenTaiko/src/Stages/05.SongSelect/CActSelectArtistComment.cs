@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
-using System.Diagnostics;
-using Silk.NET.Maths;
-using FDK;
+﻿using FDK;
 
-using Rectangle = System.Drawing.Rectangle;
-
-namespace TJAPlayer3
-{
-	internal class CActSelectArtistComment : CActivity
-	{
+namespace TJAPlayer3 {
+	internal class CActSelectArtistComment : CActivity {
 		// メソッド
 
-		public CActSelectArtistComment()
-		{
+		public CActSelectArtistComment() {
 			base.IsDeActivated = true;
 		}
-		public void t選択曲が変更された()
-		{
+		public void t選択曲が変更された() {
 			/*
 			Cスコア cスコア = TJAPlayer3.stage選曲.r現在選択中のスコア;
 			if( cスコア != null )
@@ -127,8 +115,7 @@ namespace TJAPlayer3
 
 		// CActivity 実装
 
-		public override void Activate()
-		{
+		public override void Activate() {
 			this.txArtist = null;
 			this.txComment = null;
 			this.strArtist = "";
@@ -140,34 +127,28 @@ namespace TJAPlayer3
 			this.t選択曲が変更された();
 			base.Activate();
 		}
-		public override void DeActivate()
-		{
-			TJAPlayer3.tテクスチャの解放( ref this.txArtist );
-			TJAPlayer3.tテクスチャの解放( ref this.txComment );
+		public override void DeActivate() {
+			TJAPlayer3.tテクスチャの解放(ref this.txArtist);
+			TJAPlayer3.tテクスチャの解放(ref this.txComment);
 			this.ctComment = null;
 			base.DeActivate();
 		}
-		public override void CreateManagedResource()
-		{
-			this.ft描画用フォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, 26, CFontRenderer.FontStyle.Regular );
+		public override void CreateManagedResource() {
+			this.ft描画用フォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, 26, CFontRenderer.FontStyle.Regular);
 			base.CreateManagedResource();
 		}
-		public override void ReleaseManagedResource()
-		{
-			if( this.ft描画用フォント != null )
-			{
+		public override void ReleaseManagedResource() {
+			if (this.ft描画用フォント != null) {
 				this.ft描画用フォント.Dispose();
 				this.ft描画用フォント = null;
 			}
-			
-			TJAPlayer3.tテクスチャの解放( ref this.txArtist );
-			TJAPlayer3.tテクスチャの解放( ref this.txComment );
+
+			TJAPlayer3.tテクスチャの解放(ref this.txArtist);
+			TJAPlayer3.tテクスチャの解放(ref this.txComment);
 			base.ReleaseManagedResource();
 		}
-		public override int Draw()
-		{
-			if( !base.IsDeActivated )
-			{
+		public override int Draw() {
+			if (!base.IsDeActivated) {
 				/*
 				if( this.ctComment.b進行中 )
 				{

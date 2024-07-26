@@ -1,5 +1,6 @@
 ﻿#TITLE:Favorite songs
 #TITLEJA:おきにいり
+#TITLERU:Любимые песни
 #TITLEZH:收藏夹
 #GENRE:Favorite
 #FORECOLOR:#FFFFFF
@@ -10,6 +11,9 @@
 #BOXEXPLANATIONJA1:おきにいりに
 #BOXEXPLANATIONJA2:登録をした曲が
 #BOXEXPLANATIONJA3:遊べるよ!(とても便利!)
+#BOXEXPLANATIONRU1:Попробуйте исполнить несколько
+#BOXEXPLANATIONRU2:своих любимых песен!
+#BOXEXPLANATIONRU3:(Переключитесь с помощью нажатой левой клавиши CTRL)
 #BOXEXPLANATIONZH1:挑战自己喜欢的歌曲！
 #BOXEXPLANATIONZH2:非常方便！
 #BOXEXPLANATIONZH3:（按左Ctrl键收藏歌曲）

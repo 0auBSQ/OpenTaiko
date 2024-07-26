@@ -1,24 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
-using System.Threading;
-using System.IO;
-using FDK;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.Diagnostics;
 
 
-namespace TJAPlayer3
-{
+namespace TJAPlayer3 {
 	/// <summary>
 	/// box.defによるスキン変更時に一時的に遷移する、スキン画像の一切無いステージ。
 	/// </summary>
-	internal class CStageChangeSkin : CStage
-	{
+	internal class CStageChangeSkin : CStage {
 		// コンストラクタ
 
-		public CStageChangeSkin()
-		{
+		public CStageChangeSkin() {
 			base.eStageID = CStage.EStage.ChangeSkin;
 			base.IsDeActivated = true;
 		}
@@ -26,62 +16,47 @@ namespace TJAPlayer3
 
 		// CStage 実装
 
-		public override void Activate()
-		{
-			Trace.TraceInformation( "スキン変更ステージを活性化します。" );
+		public override void Activate() {
+			Trace.TraceInformation("スキン変更ステージを活性化します。");
 			Trace.Indent();
-			try
-			{
+			try {
 				base.Activate();
-				Trace.TraceInformation( "スキン変更ステージの活性化を完了しました。" );
-			}
-			finally
-			{
+				Trace.TraceInformation("スキン変更ステージの活性化を完了しました。");
+			} finally {
 				Trace.Unindent();
 			}
 		}
-		public override void DeActivate()
-		{
-			Trace.TraceInformation( "スキン変更ステージを非活性化します。" );
+		public override void DeActivate() {
+			Trace.TraceInformation("スキン変更ステージを非活性化します。");
 			Trace.Indent();
-			try
-			{
+			try {
 				base.DeActivate();
-				Trace.TraceInformation( "スキン変更ステージの非活性化を完了しました。" );
-			}
-			finally
-			{
+				Trace.TraceInformation("スキン変更ステージの非活性化を完了しました。");
+			} finally {
 				Trace.Unindent();
 			}
 		}
-		public override void CreateManagedResource()
-		{
-			if( !base.IsDeActivated )
-			{
+		public override void CreateManagedResource() {
+			if (!base.IsDeActivated) {
 				base.CreateManagedResource();
 			}
 		}
-		public override void ReleaseManagedResource()
-		{
-			if( !base.IsDeActivated )
-			{
+		public override void ReleaseManagedResource() {
+			if (!base.IsDeActivated) {
 				base.ReleaseManagedResource();
 			}
 		}
-		public override int Draw()
-		{
-			if( !base.IsDeActivated )
-			{
-				if ( base.IsFirstDraw )
-				{
+		public override int Draw() {
+			if (!base.IsDeActivated) {
+				if (base.IsFirstDraw) {
 					base.IsFirstDraw = false;
 					return 0;
 				}
 
-                //スキン変更処理
-                TJAPlayer3.app.RefreshSkin();
+				//スキン変更処理
+				TJAPlayer3.app.RefreshSkin();
 
-                return 1;
+				return 1;
 			}
 			return 0;
 		}
@@ -95,8 +70,8 @@ namespace TJAPlayer3
 		//	CDTXMania.Skin.ReloadSkin();
 
 
-  //          CDTXMania.Tx.DisposeTexture();
-  //          CDTXMania.Tx.LoadTexture();
+		//          CDTXMania.Tx.DisposeTexture();
+		//          CDTXMania.Tx.LoadTexture();
 
 		//	CDTXMania.act文字コンソール.On活性化();
 		//}

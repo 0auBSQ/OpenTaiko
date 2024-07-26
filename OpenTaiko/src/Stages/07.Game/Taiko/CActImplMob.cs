@@ -1,74 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using FDK;
+﻿using FDK;
 
-namespace TJAPlayer3
-{
-    internal class CActImplMob : CActivity
-    {
-        /// <summary>
-        /// 踊り子
-        /// </summary>
-        public CActImplMob()
-        {
-            base.IsDeActivated = true;
-        }
+namespace TJAPlayer3 {
+	internal class CActImplMob : CActivity {
+		/// <summary>
+		/// 踊り子
+		/// </summary>
+		public CActImplMob() {
+			base.IsDeActivated = true;
+		}
 
-        public override void Activate()
-        {
-            var mobDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.MOB}");
-            var preset = HScenePreset.GetBGPreset();
+		public override void Activate() {
+			var mobDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.MOB}");
+			var preset = HScenePreset.GetBGPreset();
 
-            if (System.IO.Directory.Exists(mobDir))
-            {
-                Random random = new Random();
+			if (System.IO.Directory.Exists(mobDir)) {
+				Random random = new Random();
 
-                var upDirs = System.IO.Directory.GetDirectories(mobDir);
-                if (upDirs.Length > 0)
-                {
-                    var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] : "";
-                    var path = (preset != null && System.IO.Directory.Exists(_presetPath)) 
-                        ?  _presetPath
-                        : upDirs[random.Next(0, upDirs.Length)];
+				var upDirs = System.IO.Directory.GetDirectories(mobDir);
+				if (upDirs.Length > 0) {
+					var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] : "";
+					var path = (preset != null && System.IO.Directory.Exists(_presetPath))
+						? _presetPath
+						: upDirs[random.Next(0, upDirs.Length)];
 
-                    MobScript = new ScriptBG($@"{path}{Path.DirectorySeparatorChar}Script.lua");
-                    MobScript.Init();
-                }
-            }
-            
-            base.Activate();
-        }
+					MobScript = new ScriptBG($@"{path}{Path.DirectorySeparatorChar}Script.lua");
+					MobScript.Init();
+				}
+			}
 
-        public override void DeActivate()
-        {
-            MobScript?.Dispose();
-            
-            base.DeActivate();
-        }
+			base.Activate();
+		}
 
-        public override void CreateManagedResource()
-        {
-            base.CreateManagedResource();
-        }
+		public override void DeActivate() {
+			MobScript?.Dispose();
 
-        public override void ReleaseManagedResource()
-        {
-            base.ReleaseManagedResource();
-        }
+			base.DeActivate();
+		}
 
-        public override int Draw()
-        {
-            if(!TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
-            {
-                if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan)
-                {
-                    if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
-                    MobScript?.Draw();
+		public override void CreateManagedResource() {
+			base.CreateManagedResource();
+		}
 
-                    /*
+		public override void ReleaseManagedResource() {
+			base.ReleaseManagedResource();
+		}
+
+		public override int Draw() {
+			if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay) {
+				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+					if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
+					MobScript?.Draw();
+
+					/*
                     if (HGaugeMethods.UNSAFE_IsRainbow(0))
                     {
 
@@ -87,14 +70,14 @@ namespace TJAPlayer3
                         
                     }
                     */
-                }
-            }
-            return base.Draw();
-        }
-        #region[ private ]
-        //-----------------
-        private ScriptBG MobScript;
-        //-----------------
-        #endregion
-    }
+				}
+			}
+			return base.Draw();
+		}
+		#region[ private ]
+		//-----------------
+		private ScriptBG MobScript;
+		//-----------------
+		#endregion
+	}
 }

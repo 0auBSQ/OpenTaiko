@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace FDK
-{
+namespace FDK {
 	// 構造体
 
-	[StructLayout( LayoutKind.Sequential )]
-	public struct STInputEvent
-	{
+	[StructLayout(LayoutKind.Sequential)]
+	public struct STInputEvent {
 		public int nKey { get; set; }
 		public bool Pressed { get; set; }
 		public bool Released { get; set; }

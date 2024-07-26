@@ -1,29 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Drawing;
-using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3
-{
-	public class CActLVLNFont : CActivity
-	{
+namespace TJAPlayer3 {
+	public class CActLVLNFont : CActivity {
 		// コンストラクタ
 
 		const int numWidth = 15;
 		const int numHeight = 19;
 
-		public CActLVLNFont()
-		{
+		public CActLVLNFont() {
 			string numChars = "0123456789?-";
 			st数字 = new ST数字[12, 4];
 
-			for (int j = 0; j < 4; j++)
-			{
-				for (int i = 0; i < 12; i++)
-				{
+			for (int j = 0; j < 4; j++) {
+				for (int i = 0; i < 12; i++) {
 					this.st数字[i, j].ch = numChars[i];
 					this.st数字[i, j].rc = new Rectangle(
 												(i % 4) * numWidth + (j % 2) * 64,
@@ -37,27 +28,22 @@ namespace TJAPlayer3
 
 
 		// メソッド
-		public void t文字列描画(int x, int y, string str)
-		{
+		public void t文字列描画(int x, int y, string str) {
 			this.t文字列描画(x, y, str, EFontColor.White, EFontAlign.Right);
 		}
-		public void t文字列描画(int x, int y, string str, EFontColor efc, EFontAlign efa)
-		{
-			if (!base.IsDeActivated && !string.IsNullOrEmpty(str))
-			{
-				if (this.tx数値 != null)
-				{
+		public void t文字列描画(int x, int y, string str, EFontColor efc, EFontAlign efa) {
+			if (!base.IsDeActivated && !string.IsNullOrEmpty(str)) {
+				if (this.tx数値 != null) {
 					bool bRightAlign = (efa == EFontAlign.Right);
 
-					if (bRightAlign)							// 右詰なら文字列反転して右から描画
+					if (bRightAlign)                            // 右詰なら文字列反転して右から描画
 					{
 						char[] chars = str.ToCharArray();
 						Array.Reverse(chars);
 						str = new string(chars);
 					}
 
-					foreach (char ch in str)
-					{
+					foreach (char ch in str) {
 						int p = (ch == '-' ? 11 : ch - '0');
 						ST数字 s = st数字[p, (int)efc];
 						int sw = s.rc.Width;
@@ -72,15 +58,12 @@ namespace TJAPlayer3
 
 		// CActivity 実装
 
-		public override void CreateManagedResource()
-		{
+		public override void CreateManagedResource() {
 			this.tx数値 = TJAPlayer3.tテクスチャの生成(CSkin.Path(@"Graphics\ScreenSelect level numbers.png"));
 			base.CreateManagedResource();
 		}
-		public override void ReleaseManagedResource()
-		{
-			if ( this.tx数値 != null )
-			{
+		public override void ReleaseManagedResource() {
+			if (this.tx数値 != null) {
 				this.tx数値.Dispose();
 				this.tx数値 = null;
 			}
@@ -93,21 +76,18 @@ namespace TJAPlayer3
 		#region [ private ]
 		//-----------------
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ST数字
-		{
+		private struct ST数字 {
 			public char ch;
 			public Rectangle rc;
 		}
 
-		public enum EFontColor
-		{
+		public enum EFontColor {
 			Red = 0,
 			Yellow = 1,
 			Orange = 2,
 			White = 3
 		}
-		public enum EFontAlign
-		{
+		public enum EFontAlign {
 			Left,
 			Right
 		}

@@ -12,7 +12,7 @@
 
 - Discord（日语）：https://discord.gg/CJ4nTkpy7t
 
-（译者注：由README-EN.md翻译。最近一次更新时间：2024年6月29日）
+（译者注：由README-EN.md翻译。最近一次更新时间：2024年7月26日）
 
 （译者注：编译指南：[https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows)](https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows))）
 
@@ -354,7 +354,7 @@ OpenTaiko是一个使用MIT许可证的开源软件。在MIT许可证下，您�
 
 ## 致谢
 
-> * [Takkkom/主要OpenTaiko功能（1080P支持, AI对战模式, 5玩家模式等）](https://github.com/Takkkom)
+> * [Takkkom/主要OpenTaiko功能（1080P支持、AI对战模式、5玩家模式等）](https://github.com/Takkkom)
 > * [AkiraChnl/OpenTaiko图标](https://github.com/AkiraChnl)(@akirach_jp)
 > * [Reichisama/OpenTaiko 0.6.0 图标](https://twitter.com/himikoreichi135)(@himikoreichi135)
 > * [cien/OpenTaiko标志/多项默认皮肤资源](https://twitter.com/CienpixeL)(@CienpixeL)

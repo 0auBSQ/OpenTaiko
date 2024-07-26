@@ -1,13 +1,11 @@
 ﻿
-namespace TJAPlayer3
-{
+namespace TJAPlayer3 {
 	/// <summary>
 	/// <para>プラグインホスト情報提供インターフェース。</para>
 	/// <para>プラグインでは、On初期化() で渡されるこのインターフェースオブジェクトを通じて、
 	/// DTXMania の持つ様々なリソースにアクセスできます。</para>
 	/// </summary>
-	public interface IPluginHost
-	{
+	public interface IPluginHost {
 		/// <summary>
 		/// DTXMania のバージョンを表します。
 		/// </summary>
@@ -40,7 +38,7 @@ namespace TJAPlayer3
 		/// </summary>
 		/// <param name="act">宣言するプラグイン（すなわち this を指定する）</param>
 		/// <returns>占有に成功すれば true を返し、既に誰かが占有中である場合には false を返します。</returns>
-		bool t入力を占有する( IPluginActivity act );
+		bool t入力を占有する(IPluginActivity act);
 
 		/// <summary>
 		/// <para>自分以外が入力データを扱って良いことを宣言します。</para>
@@ -48,12 +46,12 @@ namespace TJAPlayer3
 		/// </summary>
 		/// <param name="act">宣言するプラグイン（すなわち this を指定する）</param>
 		/// <returns>占有解除に成功すれば true、失敗すれば flase を返します。</returns>
-		bool t入力の占有を解除する( IPluginActivity act );
+		bool t入力の占有を解除する(IPluginActivity act);
 
 		/// <summary>
 		/// 指定されたシステムサウンド／BGMを再生します。
 		/// </summary>
 		/// <param name="sound">再生するシステムサウンドの識別子。</param>
-		void tシステムサウンドを再生する( Eシステムサウンド sound );
+		void tシステムサウンドを再生する(Eシステムサウンド sound);
 	}
 }

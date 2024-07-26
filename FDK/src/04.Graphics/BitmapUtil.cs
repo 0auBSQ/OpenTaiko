@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Drawing;
-using System.IO;
+﻿using System.Runtime.InteropServices;
 using SkiaSharp;
 
-namespace FDK
-{
-	public static class BitmapUtil
-	{
+namespace FDK {
+	public static class BitmapUtil {
 		// 定数
 
 		public const uint DIB_PAL_COLORS = 1;
@@ -18,9 +11,8 @@ namespace FDK
 
 		// 構造体
 
-		[StructLayout( LayoutKind.Sequential, Pack = 1 )]
-		public struct BITMAPFILEHEADER
-		{
+		[StructLayout(LayoutKind.Sequential, Pack = 1)]
+		public struct BITMAPFILEHEADER {
 			public ushort bfType;
 			public uint bfSize;
 			public ushort bfReserved1;
@@ -28,9 +20,8 @@ namespace FDK
 			public uint bfOffBits;
 		}
 
-		[StructLayout( LayoutKind.Sequential, Pack = 1 )]
-		public struct BITMAPINFOHEADER
-		{
+		[StructLayout(LayoutKind.Sequential, Pack = 1)]
+		public struct BITMAPINFOHEADER {
 			public const int BI_RGB = 0;
 			public uint biSize構造体のサイズ;
 			public int biWidthビットマップの幅dot;
@@ -48,25 +39,24 @@ namespace FDK
 
 		// メソッド
 
-		public static unsafe SKBitmap ToBitmap( IntPtr pBITMAPINFOHEADER )
-		{
+		public static unsafe SKBitmap ToBitmap(IntPtr pBITMAPINFOHEADER) {
 			BITMAPFILEHEADER bitmapfileheader;
-			BITMAPINFOHEADER* bitmapinfoheaderPtr = (BITMAPINFOHEADER*) pBITMAPINFOHEADER;
+			BITMAPINFOHEADER* bitmapinfoheaderPtr = (BITMAPINFOHEADER*)pBITMAPINFOHEADER;
 			bitmapfileheader.bfType = 0x4d42;
-			bitmapfileheader.bfOffBits = (uint) ( sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) );
+			bitmapfileheader.bfOffBits = (uint)(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
 			bitmapfileheader.bfSize = bitmapfileheader.bfOffBits + bitmapinfoheaderPtr->biSizeImage画像イメージのサイズ;
 			MemoryStream output = new MemoryStream();
-			BinaryWriter writer = new BinaryWriter( output );
-			byte[] destination = new byte[ sizeof( BITMAPFILEHEADER ) ];
-			Marshal.Copy( (IntPtr) ( &bitmapfileheader ), destination, 0, destination.Length );
-			writer.Write( destination );
-			destination = new byte[ sizeof( BITMAPINFOHEADER ) ];
-			Marshal.Copy( pBITMAPINFOHEADER, destination, 0, destination.Length );
-			writer.Write( destination );
-			destination = new byte[ bitmapinfoheaderPtr->biSizeImage画像イメージのサイズ ];
+			BinaryWriter writer = new BinaryWriter(output);
+			byte[] destination = new byte[sizeof(BITMAPFILEHEADER)];
+			Marshal.Copy((IntPtr)(&bitmapfileheader), destination, 0, destination.Length);
+			writer.Write(destination);
+			destination = new byte[sizeof(BITMAPINFOHEADER)];
+			Marshal.Copy(pBITMAPINFOHEADER, destination, 0, destination.Length);
+			writer.Write(destination);
+			destination = new byte[bitmapinfoheaderPtr->biSizeImage画像イメージのサイズ];
 			bitmapinfoheaderPtr++;
-			Marshal.Copy( (IntPtr) bitmapinfoheaderPtr, destination, 0, destination.Length );
-			writer.Write( destination );
+			Marshal.Copy((IntPtr)bitmapinfoheaderPtr, destination, 0, destination.Length);
+			writer.Write(destination);
 			writer.Flush();
 			writer.BaseStream.Position = 0L;
 			return null;
