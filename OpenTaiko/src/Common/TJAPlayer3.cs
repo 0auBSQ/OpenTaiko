@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
+using System.Globalization;
 using System.Net.NetworkInformation;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using DiscordRPC;
 using FDK;
 using SampleFramework;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Linq;
 using Silk.NET.Maths;
 using SkiaSharp;
-using DiscordRPC;
-
 using Rectangle = System.Drawing.Rectangle;
-using Point = System.Drawing.Point;
-using Color = System.Drawing.Color;
-using System.Runtime.InteropServices;
 
 namespace TJAPlayer3 {
 	internal class TJAPlayer3 : Game {
@@ -2028,8 +2019,7 @@ for (int i = 0; i < 3; i++) {
 					if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && TJAPlayer3.Tx.Network_Connection != null) {
 						if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.前回のシステム時刻ms) > 10000) {
 							this.前回のシステム時刻ms = SoundManager.PlayTimer.SystemTimeMs;
-							Task.Factory.StartNew(() =>
-							{
+							Task.Factory.StartNew(() => {
 								//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
 								PingReply reply = new Ping().Send("8.8.8.8", 5000);
 								this.bネットワークに接続中 = reply.Status == IPStatus.Success;

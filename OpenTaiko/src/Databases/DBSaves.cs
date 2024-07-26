@@ -142,25 +142,25 @@ namespace TJAPlayer3 {
 			while (reader.Read()) {
 				SaveFile sf = new SaveFile();
 
-                sf.data.SaveId = (Int64)reader["SaveId"];
-                sf.data.Name = (string)reader["PlayerName"];
-                sf.data.Title = (string)reader["PlayerNameplateTitle"];
-                sf.data.Dan = (string)reader["PlayerDanTitle"];
-                sf.data.DanGold = Convert.ToBoolean((Int64)reader["PlayerDanGold"]);
-                sf.data.DanType = (int)(Int64)reader["PlayerDanType"];
-                sf.data.TitleType = (int)(Int64)reader["PlayerNameplateType"];
-                sf.data.PuchiChara = (string)reader["PlayerPuchichara"];
-                sf.data.Character = (int)(Int64)reader["PlayerCharacter"];
-                sf.data.CharacterName = (string)reader["PlayerCharacterName"];
-                sf.data.Medals = (Int64)reader["CurrentMedals"];
-                sf.data.TotalEarnedMedals = (Int64)reader["TotalEarnedMedals"];
-                sf.data.TotalPlaycount = (int)(Int64)reader["TotalPlaycount"];
-                sf.data.AIBattleModePlaycount = (int)(Int64)reader["AIBattleModePlaycount"];
-                sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
-                sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
-                sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
-                sf.tInitSaveFile();
-                sf.tLoadUnlockables();
+				sf.data.SaveId = (Int64)reader["SaveId"];
+				sf.data.Name = (string)reader["PlayerName"];
+				sf.data.Title = (string)reader["PlayerNameplateTitle"];
+				sf.data.Dan = (string)reader["PlayerDanTitle"];
+				sf.data.DanGold = Convert.ToBoolean((Int64)reader["PlayerDanGold"]);
+				sf.data.DanType = (int)(Int64)reader["PlayerDanType"];
+				sf.data.TitleType = (int)(Int64)reader["PlayerNameplateType"];
+				sf.data.PuchiChara = (string)reader["PlayerPuchichara"];
+				sf.data.Character = (int)(Int64)reader["PlayerCharacter"];
+				sf.data.CharacterName = (string)reader["PlayerCharacterName"];
+				sf.data.Medals = (Int64)reader["CurrentMedals"];
+				sf.data.TotalEarnedMedals = (Int64)reader["TotalEarnedMedals"];
+				sf.data.TotalPlaycount = (int)(Int64)reader["TotalPlaycount"];
+				sf.data.AIBattleModePlaycount = (int)(Int64)reader["AIBattleModePlaycount"];
+				sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
+				sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
+				sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
+				sf.tInitSaveFile();
+				sf.tLoadUnlockables();
 
 				_instances[_file] = sf;
 				_file++;
