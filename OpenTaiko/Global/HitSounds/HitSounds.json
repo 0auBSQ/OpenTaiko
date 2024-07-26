@@ -2,6 +2,11 @@
 	{
 		"name": "Taiko",
 		"path": "Taiko\\",
+		"format": "WAV",
+	},
+	{
+		"name": "Old Taiko",
+		"path": "Old Taiko\\",
 		"format": "OGG",
 	},
 	{
