@@ -1,15 +1,5 @@
 {
-	"name" : {
-		"strings": {
-			"default": "Dashy (Lost)",
-			"ru": "Дэши (Потеряно)"
-		}
-	},
+	"name" : "Dashy (Lost)",
     "rarity": "Epic",
-	"author": {
-		"strings": {
-			"default": "Dashy",
-			"ru": "Дэши"
-		}
-	}
+	"author": "Dashy",
 }

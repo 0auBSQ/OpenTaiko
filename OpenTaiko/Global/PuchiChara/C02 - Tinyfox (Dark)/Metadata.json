@@ -2,7 +2,6 @@
 	"name" : {
 		"strings": {
 			"default": "TinyFox (Dark)",
-			"ru": "КрошечныйЛис (Тёмно)",
 			"zh": "小狐狸（黑暗）"
 		}
 	},
@@ -10,7 +9,6 @@
 	"description": {
 		"strings": {
 			"default": "The darker variant of Project OutFox's tiny mascot.",
-			"ru": "Более тёмный вариант крошечного талисмана из Project OutFox.",
 			"zh": "Project OutFox的小吉祥物的黑暗变种。"
 		}
 	},

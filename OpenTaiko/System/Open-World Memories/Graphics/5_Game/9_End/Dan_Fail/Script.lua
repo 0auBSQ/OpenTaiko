@@ -88,8 +88,6 @@ function init()
       speech_text = "Speech/ja/"..tostring(math.random(0, 4))..".png"
     elseif lang == "zh" then
       speech_text = "Speech/zh/"..tostring(math.random(0, 4))..".png"
-    elseif lang == "ru" then
-      speech_text = "Speech/ru/"..tostring(math.random(0, 4))..".png"
     else
       speech_text = "Speech/en/"..tostring(math.random(0, 4))..".png"
     end

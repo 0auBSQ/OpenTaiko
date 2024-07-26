@@ -2,7 +2,6 @@
 	"name" : {
 		"strings": {
 			"default": "TinyFox",
-			"ru": "КрошечныйЛис",
 			"zh": "小狐狸"
 		}
 	},
@@ -10,7 +9,6 @@
 	"description": {
 		"strings": {
 			"default": "Project OutFox's tiny mascot.",
-			"ru": "Крошечный талисман из Project OutFox.",
 			"zh": "Project OutFox的小吉祥物。"
 		}
 	},
