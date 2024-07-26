@@ -740,6 +740,11 @@ namespace TJAPlayer3 {
 			if (_dans != null && _dans.ContainsKey(_dan))
 				iDanTitleCurrent = _dans.Keys.ToList().IndexOf(_dan) + 1;
 
+			foreach (var plate in _titles.Select((value, i) => new { i, value })) {
+				if (TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId == plate.value)
+					iTitleCurrent = plate.i + 1;
+			}
+
 			iCharacterCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Characters_Ptn - 1, TJAPlayer3.SaveFileInstances[iPlayer].data.Character));
 
 			//iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
