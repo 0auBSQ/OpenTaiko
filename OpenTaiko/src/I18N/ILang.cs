@@ -35,6 +35,7 @@
 			//        CLangManager.LangInstance = new CLang_jp();
 			//        break;
 			//}
+			CLuaScript.tReloadLanguage(lang);
 		}
 
 		public static int langToInt(string lang) {

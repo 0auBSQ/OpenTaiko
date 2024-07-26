@@ -1,4 +1,4 @@
-﻿using FDK;
+using FDK;
 using static TJAPlayer3.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
@@ -365,11 +365,11 @@ namespace TJAPlayer3 {
 					if (i != 0) {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
 						TJAPlayer3.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.DarkGray);
-						TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
+						//TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
 					} else {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.White);
 						TJAPlayer3.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.White);
-						TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
+						//TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 					}
 
 					int danGrade = 0;
@@ -379,14 +379,16 @@ namespace TJAPlayer3 {
 
 					var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
-					TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
-						scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2,
-						scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24,
-						(8 + danGrade));
-					TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
+					/*
+                    TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
+                        scroll.Item1 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2,
+                        scroll.Item2 - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24,
+                        (8 + danGrade));
+                    TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
-
+                    tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                    */
+					TJAPlayer3.NamePlate.lcNamePlate.DrawDan(scroll.Item1, scroll.Item2, 255, danGrade, tmpTex);
 
 				}
 			}
@@ -412,22 +414,31 @@ namespace TJAPlayer3 {
 					var scroll = DrawSide_Menu(i + (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2));
 
 					int iType = -1;
+					int _rarity = 1;
+					int _titleid = -1;
 
 					if (TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null &&
 						TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Contains(this.titlesKeys[pos])) {
 						var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[pos]];
 						iType = _dc.nameplateInfo.iType;
+						_rarity = HRarity.tRarityToLangInt(_dc.rarity);
+						_titleid = this.titlesKeys[pos];
 						//iType = TJAPlayer3.SaveFileInstances[iPlayer].data.NamePlateTitles[this.titlesKeys[pos]].iType;
 					} else if (pos == 0)
 						iType = 0;
 
-					if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title) {
-						TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
-							scroll.Item1,
-							scroll.Item2);
-					}
+					/*
+                    if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title)
+                    {
+                        TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
+                            scroll.Item1,
+                            scroll.Item2);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
+                    }
+                    */
+					TJAPlayer3.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex, _rarity, _titleid);
+
+					//tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
 
 				}
 			}
@@ -615,10 +626,18 @@ namespace TJAPlayer3 {
 						&& TJAPlayer3.SaveFileInstances[iPlayer].data.UnlockedNameplateIds.Contains(this.titlesKeys[iTitleCurrent])) {
 						var _dc = TJAPlayer3.Databases.DBNameplateUnlockables.data[this.titlesKeys[iTitleCurrent]];
 						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = _dc.nameplateInfo.iType;
-					} else if (iTitleCurrent == 0)
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = this.titlesKeys[iTitleCurrent];
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = HRarity.tRarityToLangInt(_dc.rarity);
+					} else if (iTitleCurrent == 0) {
 						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = 0;
-					else
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = -1;
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = 1;
+					} else {
 						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleType = -1;
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleId = -1;
+						TJAPlayer3.SaveFileInstances[iPlayer].data.TitleRarityInt = 1;
+					}
+
 
 					TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
 

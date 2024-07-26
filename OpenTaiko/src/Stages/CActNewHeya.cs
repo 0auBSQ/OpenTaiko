@@ -514,9 +514,9 @@ namespace TJAPlayer3 {
 										iType = 0;
 
 									if (iType >= 0 && iType < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title) {
-										TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
-											x,
-											y);
+										//TJAPlayer3.Tx.NamePlate_Title[iType][TJAPlayer3.NamePlate.ctAnimatedNamePlateTitle.CurrentValue % TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[iType]].t2D拡大率考慮上中央基準描画(
+										//    x,
+										//    y);
 									}
 
 									tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
@@ -554,6 +554,7 @@ namespace TJAPlayer3 {
 										danGrade = TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles[this.ttkDanTitles[index].str文字].clearStatus;
 									}
 
+									/*
 									TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
 										x - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Width / 2,
 										y - TJAPlayer3.Tx.NamePlateBase.szTextureSize.Height / 24,
@@ -561,7 +562,7 @@ namespace TJAPlayer3 {
 									TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 
 									tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], y + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
-
+									*/
 								}
 								break;
 						}

@@ -312,7 +312,7 @@ namespace TJAPlayer3 {
 			private set;
 		}
 		//		public static CStageオプション stageオプション
-		//		{ 
+		//		{
 		//			get;
 		//			private set;
 		//		}
@@ -653,8 +653,8 @@ namespace TJAPlayer3 {
 
 				//CameraTest
 				/*
-				Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) * 
-				Matrix4X4.CreateRotationZ(MathF.PI / 4.0f) * 
+				Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
+				Matrix4X4.CreateRotationZ(MathF.PI / 4.0f) *
 				Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
 				*/
 
@@ -717,6 +717,7 @@ namespace TJAPlayer3 {
 				#endregion
 
 				if (r現在のステージ != null) {
+					TJAPlayer3.NamePlate.lcNamePlate.Update();
 					this.n進行描画の戻り値 = (r現在のステージ != null) ? r現在のステージ.Draw() : 0;
 
 					#region [ プラグインの進行描画 ]
@@ -1484,7 +1485,7 @@ namespace TJAPlayer3 {
 
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Gameplay (Drum Screen)");
-#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化                                                                                   
+#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
 for (int i = 0; i < 5; i++)
 {
 	for (int j = 0; j < 2; j++)
@@ -1494,7 +1495,7 @@ for (int i = 0; i < 5; i++)
 }
 for (int i = 0; i < 3; i++) {
 	stage演奏ドラム画面.fDamageLevelFactor[i] = ConfigIni.fDamageLevelFactor[i];
-}		
+}
 #endif
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage演奏ドラム画面;
@@ -2257,7 +2258,7 @@ for (int i = 0; i < 3; i++) {
 		//-----------------
 		private bool bマウスカーソル表示中 = true;
 		private bool b終了処理完了済み;
-		private bool bネットワークに接続中 = false;
+		public bool bネットワークに接続中 { get; private set; } = false;
 		private long 前回のシステム時刻ms = long.MinValue;
 		private static CDTX[] dtx = new CDTX[5];
 
@@ -2430,7 +2431,7 @@ for (int i = 0; i < 3; i++) {
 				actTextConsole = new CTextConsole();
 				Trace.TraceInformation("Console initialized.");
 				actTextConsole.Activate();
-				//if (!ConfigIni.PreAssetsLoading) 
+				//if (!ConfigIni.PreAssetsLoading)
 				{
 					actTextConsole.CreateManagedResource();
 					actTextConsole.CreateUnmanagedResource();
@@ -2904,7 +2905,7 @@ for (int i = 0; i < 3; i++) {
 					Trace.Indent();
 					try {
 						actTextConsole.DeActivate();
-						//if (!ConfigIni.PreAssetsLoading) 
+						//if (!ConfigIni.PreAssetsLoading)
 						{
 							actTextConsole.ReleaseManagedResource();
 							actTextConsole.ReleaseUnmanagedResource();

@@ -157,6 +157,8 @@ namespace TJAPlayer3 {
 				sf.data.TotalPlaycount = (int)(Int64)reader["TotalPlaycount"];
 				sf.data.AIBattleModePlaycount = (int)(Int64)reader["AIBattleModePlaycount"];
 				sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
+				sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
+				sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
 				sf.tInitSaveFile();
 				sf.tLoadUnlockables();
 
@@ -207,6 +209,8 @@ namespace TJAPlayer3 {
                 PlayerNameplateType = {SaveData.TitleType},
                 PlayerPuchichara = '{SaveData.PuchiChara.EscapeSingleQuotes()}',
                 PlayerCharacter = {SaveData.Character},
+                PlayerNameplateRarityInt = {SaveData.TitleRarityInt},
+                PlayerNameplateId = {SaveData.TitleId},
                 PlayerCharacterName = '{SaveData.CharacterName.EscapeSingleQuotes()}'
                 WHERE SaveId = {SaveData.SaveId};
             ;";
@@ -316,7 +320,7 @@ namespace TJAPlayer3 {
 				currentPlay.HighScoreBoomCount = chartScore.nMine;
 			}
 
-			// 2nd step: Overwrite the instance with best play results if exists 
+			// 2nd step: Overwrite the instance with best play results if exists
 			{
 				SqliteCommand cmd = connection.CreateCommand();
 				cmd.CommandText =

@@ -250,6 +250,10 @@ namespace FDK {
 			get;
 			set;
 		}
+		public float fZRotation {
+			get => fZ軸中心回転;
+			set { fZ軸中心回転 = value; }
+		}
 		public int Opacity {
 			get {
 				return this._opacity;
@@ -447,6 +451,12 @@ namespace FDK {
 				throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n"));
 			}
 		}
+
+		public void tSetScale(float x, float y) {
+			vcScaleRatio.X = x;
+			vcScaleRatio.Y = y;
+		}
+
 		// メソッド
 
 		// 2016.11.10 kairera0467 拡張
@@ -589,6 +599,15 @@ namespace FDK {
 			}
 
 		}
+		public void t2D_DisplayImage_AnchorCenter(int x, int y) {
+			this.t2D描画(x - (this.rc全画像.Width / 2 * this.vcScaleRatio.X), y - (this.rc全画像.Height / 2 * this.vcScaleRatio.Y), 1f, this.rc全画像);
+		}
+		public void t2D_DisplayImage_AnchorCenter(int x, int y, Rectangle rc) {
+			this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+		}
+		public void t2D_DisplayImage_AnchorCenter(int x, int y, RectangleF rc) {
+			this.t2D描画(x - (rc.Width / 2 * this.vcScaleRatio.X), y - (rc.Height / 2 * this.vcScaleRatio.Y), 1f, rc);
+		}
 
 		public enum RefPnt {
 			UpLeft,
@@ -600,6 +619,16 @@ namespace FDK {
 			DownLeft,
 			Down,
 			DownRight,
+		}
+
+		public void t2D_DisplayImage(int x, int y) {
+			this.t2D描画(x, y, 1f, this.rc全画像);
+		}
+		public void t2D_DisplayImage(int x, int y, Rectangle rc画像内の描画領域) {
+			this.t2D描画(x, y, 1f, rc画像内の描画領域);
+		}
+		public void t2D_DisplayImage(int x, int y, RectangleF rc) {
+			this.t2D描画(x, y, 1f, rc);
 		}
 
 		/// <summary>

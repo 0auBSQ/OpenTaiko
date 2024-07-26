@@ -83,7 +83,7 @@ namespace TJAPlayer3 {
 			}
 
 			// Automatically set the dan to nameplate if new
-			// Add a function within the NamePlate.cs file to update the title texture 
+			// Add a function within the NamePlate.cs file to update the title texture
 
 			if (!this.data.DanTitles.ContainsKey(title) || cs != clearStatus || iG != isGold) {
 				DBSaves.RegisterDanTitle(data.SaveId, title, clearStatus, isGold);
@@ -193,8 +193,15 @@ namespace TJAPlayer3 {
 			[JsonProperty("titleType")]
 			public int TitleType = 0;
 
+			[JsonIgnore]
+			public int TitleRarityInt = 1;
+
+			[JsonIgnore]
+			public int TitleId = -1;
+
 			[JsonProperty("puchiChara")]
 			public string PuchiChara = "0";
+
 
 			[JsonProperty("medals")]
 			public Int64 Medals = 0;
