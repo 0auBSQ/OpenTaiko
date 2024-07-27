@@ -23,10 +23,11 @@ namespace TJAPlayer3 {
 		}
 
 		// Informations of the newly added modal are initialized here
-		public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object[] args) {
+		public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
 			if (!Available) return;
 
-			object[] newParams = new object[] { player, rarity, (int)modalType }.Concat(args).ToArray();
+			object[] newParams = new object[] { player, rarity, (int)modalType };
+			if (args != null) newParams = newParams.Concat((object[])args).ToArray();
 			RunLuaCode(lfRegisterModal, newParams);
 		}
 

@@ -1173,7 +1173,6 @@ namespace TJAPlayer3 {
 		public bool bDanTowerHide;
 
 		public bool bTight;
-		public bool bストイックモード;
 		public bool bIncludeSubfoldersOnRandomSelect;
 		public bool bOutputLogs;
 		public bool bDisplayDebugInfo;
@@ -2176,10 +2175,6 @@ namespace TJAPlayer3 {
 			sw.WriteLine($"; Blank time before music source to play. (ms)");
 			sw.WriteLine("{0}={1}", nameof(MusicPreTimeMs), MusicPreTimeMs);
 			sw.WriteLine();
-			sw.WriteLine("; ストイックモード(0:OFF, 1:ON)");
-			sw.WriteLine("; Stoic mode. (0:OFF, 1:ON)");
-			sw.WriteLine("StoicMode={0}", this.bストイックモード ? 1 : 0);
-			sw.WriteLine();
 			sw.WriteLine("; バッファ入力モード(0:OFF, 1:ON)");
 			sw.WriteLine("; Using Buffered input (0:OFF, 1:ON)");
 			sw.WriteLine("BufferedInput={0}", this.bBufferedInputs ? 1 : 0);
@@ -2911,10 +2906,7 @@ namespace TJAPlayer3 {
 												this.KeyboardSoundLevelIncrement = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement);
 											} else if (str3.Equals(nameof(MusicPreTimeMs))) {
 												MusicPreTimeMs = int.Parse(str4);
-											} else if (str3.Equals("StoicMode")) {
-												this.bストイックモード = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("AutoResultCapture"))            // #25399 2011.6.9 yyagi
-											  {
+											} else if (str3.Equals("AutoResultCapture")) {
 												this.bIsAutoResultCapture = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals(nameof(SendDiscordPlayingInformation))) {
 												SendDiscordPlayingInformation = CConversion.bONorOFF(str4[0]);

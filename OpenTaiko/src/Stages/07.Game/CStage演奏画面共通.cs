@@ -2842,7 +2842,7 @@ namespace TJAPlayer3 {
 
 		protected abstract void t進行描画_AVI();
 		protected void t進行描画_AVI(int x, int y) {
-			if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && (!TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bEnableAVI)) {
+			if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && TJAPlayer3.ConfigIni.bEnableAVI) {
 				this.actAVI.t進行描画(x, y);
 			}
 		}

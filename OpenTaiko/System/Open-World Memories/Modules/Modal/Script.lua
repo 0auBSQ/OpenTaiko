@@ -73,13 +73,15 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	elseif modal_type == 3 then
 	-- Title
 	-- > modal_asset_informations: NameplateUnlockable
-	-- > modal_asset_visual_references: CLuaNamePlateScript's DrawTitlePlate callback
+	-- > modal_asset_visual_references: CLuaNamePlateScript
 	_modal_header = getLocalizedString("MODAL_TITLE_NAMEPLATE")
 	_modal_body = modal_asset_informations.Value.nameplateInfo.cld:GetString("")
 	ttk_modal_body = createTitleTextureKey(_modal_body, font_modal_plate, 99999, Color.FromArgb(0,0,0,1), Color.FromArgb(0,0,0,0))
 
 	elseif modal_type == 4 then
 	-- Song
+	-- > modal_asset_informations: CSongListNode
+	-- > modal_asset_visual_references: CTexture (Preimage)
 	_modal_header = getLocalizedString("MODAL_TITLE_SONG")
 
 	end 
@@ -159,6 +161,10 @@ function draw()
 		if modal_current_type == 3 then
 			tx_title = getTextTex(ttk_modal_body, false, false)
 			modal_current_visual:DrawTitlePlate(960, 490, 255, modal_current_info.Value.nameplateInfo.iType, tx_title, modal_current_rarity, modal_current_info.Key)
+		elseif modal_current_type == 4 then
+			if modal_current_visual ~= nil then
+				modal_current_visual:t2D_DisplayImage_AnchorCenter(960,490)
+			end
 		else 
 			tx_body = getTextTex(ttk_modal_body, false, false)
 			tx_body:t2D_DisplayImage_AnchorCenter(960,490)

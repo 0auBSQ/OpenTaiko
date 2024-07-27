@@ -1,6 +1,6 @@
 ﻿namespace TJAPlayer3 {
 	internal class Modal {
-		public Modal(EModalType mt, int ra, params object[] re) {
+		public Modal(EModalType mt, int ra, params object?[] re) {
 			modalType = mt;
 			rarity = ra;
 			reference = re;
@@ -34,7 +34,7 @@
 		#region [Public variables]
 
 		// Coin number for coin; database/unlockable asset for puchichara, character and title; no effect on text, confirm
-		public object[] reference;
+		public object?[] reference;
 
 		public int rarity;
 		public EModalType modalType;
