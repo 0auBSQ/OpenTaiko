@@ -75,6 +75,7 @@ namespace TJAPlayer3 {
 
 				case (int)EOrder.Redoing:
 					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+						TJAPlayer3.stage演奏ドラム画面.tResetGameplayFinishedStatus();
 						this.bやり直しを選択した = true;
 						CActSelectPopupMenu.b選択した = true;
 					} else {
