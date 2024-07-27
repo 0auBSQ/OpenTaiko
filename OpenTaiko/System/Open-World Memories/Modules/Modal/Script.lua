@@ -60,7 +60,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	_modal_body = getLocalizedString("MODAL_MESSAGE_COIN", tostring(modal_asset_informations), tostring(modal_asset_visual_references)) -- 0: Delta coin, 1: Total coin
 	debugLog(_modal_body)
 
-	modal_sfx_coin:tPlaySound()
+	modal_sfx_coin:PlayStart()
 
 	elseif modal_type == 1 then
 	-- Character 
@@ -93,7 +93,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	modal_asset_id = math.max(1, math.min(5, modal_current_rarity))
 
 	if modal_type ~= 0 then
-		modal_sfx[modal_asset_id]:tPlaySound()
+		modal_sfx[modal_asset_id]:PlayStart()
 	end
 
 end
