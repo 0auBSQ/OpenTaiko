@@ -20,37 +20,39 @@ namespace TJAPlayer3 {
 		}
 
 		public int GetCharaOffset() {
-			if (!Avaibale) return 0;
+			if (!Available) return 0;
 			double result = (double)RunLuaCode(lfGetCharaOffset)[0];
 			return (int)result;
 		}
 
 		public void SetInfos(int player, string name, string title, string dan, SaveFile.Data data) {
-			if (!Avaibale) return;
+			if (!Available) return;
 
 			RunLuaCode(lfSetInfos, player, name ?? "", title ?? "", dan ?? "", data);
 		}
 
+		// For My Room
 		public void DrawDan(int x, int y, int opacity, int danGrade, CTexture titleTex) {
-			if (!Avaibale) return;
+			if (!Available) return;
 
 			RunLuaCode(lfDrawDan, x, y, opacity, danGrade, titleTex);
 		}
 
+		// For My Room
 		public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex, int rarity, int nameplateId) {
-			if (!Avaibale) return;
+			if (!Available) return;
 
 			RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex, rarity, nameplateId);
 		}
 
 		public void Update(params object[] args) {
-			if (!Avaibale) return;
+			if (!Available) return;
 
 			RunLuaCode(lfUpdate, args);
 		}
 
 		public void Draw(int x, int y, int opacity, int player, int side) {
-			if (!Avaibale) return;
+			if (!Available) return;
 
 			RunLuaCode(lfDraw, x, y, opacity, player, side);
 		}

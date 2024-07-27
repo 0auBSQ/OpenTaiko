@@ -78,8 +78,9 @@ namespace TJAPlayer3 {
 						mq.tAddModal(
 							new Modal(
 								Modal.EModalType.Title,
-								HRarity.tRarityToModalInt(item.Value.rarity),
-								item.Value.nameplateInfo.cld.GetString("")          // Cannot be null on database
+								HRarity.tRarityToLangInt(item.Value.rarity),
+								item,
+								TJAPlayer3.NamePlate.lcNamePlate
 								),
 							_player);
 
