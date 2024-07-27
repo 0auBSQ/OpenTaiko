@@ -190,14 +190,14 @@ namespace TJAPlayer3 {
 							cmd.CommandText = $@"
                     INSERT INTO best_plays(ChartUniqueId,ChartGenre,Charter,Artist,PlayMods,ChartDifficulty,ChartLevel,ClearStatus,ScoreRank,HighScore,SaveId,TowerBestFloor,DanExam1,DanExam2,DanExam3,DanExam4,DanExam5,DanExam6,DanExam7,PlayCount,HighScoreGoodCount,HighScoreOkCount,HighScoreBadCount,HighScoreMaxCombo,HighScoreRollCount,HighScoreADLibCount,HighScoreBoomCount)
                        VALUES(
-                            '{UniqueId.data.id.Replace(@"'", @"''")}',
-                            '{boxdef.Genre}',
-                            '{(!string.IsNullOrEmpty(Charters[i + 1]) ? Charters[i + 1] : Charters[0]).Replace(@"'", @"''")}',
-                            '{Artist.Replace(@"'", @"''")}',
+                            '{UniqueId.data.id.EscapeSingleQuotes()}',
+                            '{boxdef.Genre.EscapeSingleQuotes()}',
+                            '{(!string.IsNullOrEmpty(Charters[i + 1]) ? Charters[i + 1] : Charters[0]).EscapeSingleQuotes()}',
+                            '{Artist.EscapeSingleQuotes()}',
                             8925478921,
                             {i},
                             {Level[i]},
-                            {Clear[i] + (i == 6 && Clear[i] > -1 ? 1 : 0)},
+                            '-1',
                             {(i != 5 ? Rank[i] : -1)},
                             {HighScore[score_index]},
                             {GetPlayerId(_score)},
@@ -235,21 +235,21 @@ namespace TJAPlayer3 {
 		private static string GetTJAFile(string path) {
 			FileInfo info = new FileInfo(path);
 
-			if (info.FullName.EndsWith("1P.score.ini")) return info.FullName.Replace("1P.score.ini", "");
-			if (info.FullName.EndsWith("2P.score.ini")) return info.FullName.Replace("2P.score.ini", "");
-			if (info.FullName.EndsWith("3P.score.ini")) return info.FullName.Replace("3P.score.ini", "");
-			if (info.FullName.EndsWith("4P.score.ini")) return info.FullName.Replace("4P.score.ini", "");
-			if (info.FullName.EndsWith("5P.score.ini")) return info.FullName.Replace("5P.score.ini", "");
+			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini", "");
+			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini", "");
+			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini", "");
+			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini", "");
+			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini", "");
 			return info.FullName.Replace(".score.ini", "");
 		}
 		private static int GetPlayerId(string path) {
 			FileInfo info = new FileInfo(path);
 
-			if (info.Name.EndsWith("1P.score.ini")) return 0;
-			if (info.Name.EndsWith("2P.score.ini")) return 1;
-			if (info.Name.EndsWith("3P.score.ini")) return 2;
-			if (info.Name.EndsWith("4P.score.ini")) return 3;
-			if (info.Name.EndsWith("5P.score.ini")) return 4;
+			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini")) return 0;
+			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini")) return 1;
+			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini")) return 2;
+			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini")) return 3;
+			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini")) return 4;
 			return 0;
 		}
 	}
