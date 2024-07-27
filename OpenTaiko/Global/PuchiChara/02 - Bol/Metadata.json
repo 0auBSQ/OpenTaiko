@@ -2,8 +2,7 @@
 	"name" : {
 		"strings": {
 			"default": "Bol",
-			"ru": "Бол",
-			"zh": "包子"
+			"ru": "Бол"
 		}
 	},
     "rarity": "Rare",
