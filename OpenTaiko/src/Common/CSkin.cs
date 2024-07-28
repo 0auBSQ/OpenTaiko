@@ -7693,9 +7693,6 @@ namespace TJAPlayer3 {
 
 		#region Config
 
-		public int Config_NamePlate_Ptn_Title;
-		public int[] Config_NamePlate_Ptn_Title_Boxes;
-
 		public int[] Config_Arrow_X = new int[] { 552, 552 };
 		public int[] Config_Arrow_Y = new int[] { 297, 363 };
 
