@@ -176,7 +176,6 @@ namespace TJAPlayer3 {
 						TJAPlayer3.actTextConsole.tPrint((int)(x * TJAPlayer3.Skin.Resolution[0] / 1280.0), (int)(y * TJAPlayer3.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
 						y += 24;
 					}
-					TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.White, this.str現在進行中);
 					//-----------------
 					#endregion
 				} else if (TJAPlayer3.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
