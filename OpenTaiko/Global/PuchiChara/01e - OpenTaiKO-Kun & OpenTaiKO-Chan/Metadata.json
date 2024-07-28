@@ -3,6 +3,7 @@
 		"strings": {
 			"default": "OpenTaiKO-Kun & OpenTaiKO-Chan",
 			"ja": "OpenTai子君とOpenTai子ちゃん",
+			"ru": "OpenTaiKO-Кун и OpenTaiKO-Тян",
 			"zh": "OpenTai子君和OpenTai子酱"
 		}
 	},
@@ -11,8 +12,14 @@
 		"strings": {
 			"default": "The twin siblings of OpenTaiko-kun.\nWhen one is here the other is never far away.",
 			"ja": "OpenTaiko君の双子の姉弟。\n一方がここにいれば、もう一方が遠くにいることはない。",
+			"ru": "Братья-близнецы OpenTaiko-Куна.\nКогда одно здесь, другое никогда не далеко.",
 			"zh": "OpenTaiko君的孪生姐弟。\n一方在此，另一方亦不会远去。"
 		}
 	},
-	"author": "Komi"
+	"author": {
+		"strings": {
+			"default": "Komi",
+			"ru": "Коми"
+		}
+	}
 }

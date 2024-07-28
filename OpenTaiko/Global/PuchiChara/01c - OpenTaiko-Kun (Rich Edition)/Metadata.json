@@ -3,6 +3,7 @@
 		"strings": {
 			"default": "OpenTaiko-Kun (Rich edition)",
 			"ja": "OpenTaiko君 （金持ち版）",
+			"ru": "OpenTaiko-Кун (Богатое издание)",
 			"zh": "OpenTaiko君（富有版）"
 		}
 	},
@@ -11,8 +12,14 @@
 		"strings": {
 			"default": "The rich brother of OpenTaiko-Kun.\nRolls over others businesses.",
 			"ja": "OpenTaiko君のお金持ちな兄弟。\nコインの大部分と引き換えに連打の支援になります。",
+			"ru": "Богатый брат OpenTaiko-Куна.\nДробь над другими предприятиями.",
 			"zh": "OpenTaiko君的富有兄弟。\n连打高于其他一切。"
 		}
 	},
-	"author": "Komi"
+	"author": {
+		"strings": {
+			"default": "Komi",
+			"ru": "Коми"
+		}
+	}
 }

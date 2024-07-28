@@ -1,5 +1,16 @@
 {
-	"name" : "Dashy (Lost)",
+	"name" : {
+		"strings": {
+			"default": "Dashy (Lost)",
+			"ru": "Дэши (Потеряно)",
+			"zh": "Dashy（失落版）"
+		}
+	},
     "rarity": "Epic",
-	"author": "Dashy",
+	"author": {
+		"strings": {
+			"default": "Dashy",
+			"ru": "Дэши"
+		}
+	}
 }
