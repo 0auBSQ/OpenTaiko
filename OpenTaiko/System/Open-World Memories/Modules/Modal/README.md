@@ -18,15 +18,15 @@ Includes the following arguments:
 
 - (object) modal_info:  Asset related information, modal_type dependent:
 > Coins -> (long) modal_info: The coin value of the play
-> Character 
-> Puchichara 
+> Character -> (CCharacter) modal_info: The unlocked character information data (never nil) 
+> Puchichara -> (CPuchichara) modal_info: The unlocked puchichara information data (never nil)
 > Title -> (NameplateUnlockable) modal_info: The unlocked nameplate information data (never nil)
 > Song -> (SongNode?) modal_info: The unlocked song information data (can be nil)
 
 - (object) modal_visual_ref:  Asset related visuals (or extra info), modal_type dependent:
 > Coins -> (long) modal_visual_ref: The total count of coins after the play
-> Character 
-> Puchichara 
+> Character -> (CTexture?) modal_visual_ref: The character render as displayed in my room (can be nil)
+> Puchichara -> nil
 > Title -> (LuaNamePlateScript) modal_visual_ref: A reference to the Nameplate Lua script (never nil except if broken skin)
 > Song -> (CTexture?) modal_visual_ref: The song preimage, with the size value set to the same value as in the song select menu (can be nil)
 ```

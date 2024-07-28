@@ -1317,7 +1317,7 @@ namespace TJAPlayer3 {
 					}
 				}
 
-				Characters[i] = new CCharacter(charaDirs[i]);
+				Characters[i] = new CCharacter(charaDirs[i], i);
 			}
 
 

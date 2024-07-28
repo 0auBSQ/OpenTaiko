@@ -36,16 +36,16 @@
 				title = CLangManager.LangInstance.GetString("AI_TITLE");
 				dan = stages[Math.Max(0, TJAPlayer3.ConfigIni.nAILevel - 1)] + "面";
 			} else {
-				name = TJAPlayer3.SaveFileInstances[player].data.Name;
-				title = TJAPlayer3.SaveFileInstances[player].data.Title;
-				dan = TJAPlayer3.SaveFileInstances[player].data.Dan;
+				name = TJAPlayer3.SaveFileInstances[actualPlayer].data.Name;
+				title = TJAPlayer3.SaveFileInstances[actualPlayer].data.Title;
+				dan = TJAPlayer3.SaveFileInstances[actualPlayer].data.Dan;
 			}
 			bIsPrevAI[player] = isAI;
 
 			if (TJAPlayer3.SaveFileInstances[player].data.DanGold)
-				lcNamePlate.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", TJAPlayer3.SaveFileInstances[player].data);
+				lcNamePlate.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", TJAPlayer3.SaveFileInstances[actualPlayer].data);
 			else
-				lcNamePlate.SetInfos(player, name, title, dan, TJAPlayer3.SaveFileInstances[player].data);
+				lcNamePlate.SetInfos(player, name, title, dan, TJAPlayer3.SaveFileInstances[actualPlayer].data);
 		}
 
 
@@ -62,7 +62,7 @@
 			}
 			bIsPrevAI[basePlayer] = isAI;
 
-			lcNamePlate.Draw(x, y, Opacity, basePlayer, player);
+			lcNamePlate.Draw(x, y, Opacity, basePlayer, TJAPlayer3.P1IsBlue() ? 1 : 0);
 		}
 
 		private bool[] bIsPrevAI = new bool[5];

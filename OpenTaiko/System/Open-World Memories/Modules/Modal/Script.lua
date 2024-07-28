@@ -63,12 +63,18 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	modal_sfx_coin:PlayStart()
 
 	elseif modal_type == 1 then
-	-- Character 
+	-- Character
+	-- > modal_asset_informations: CCharacter
+	-- > modal_asset_visual_references: CTexture?
 	_modal_header = getLocalizedString("MODAL_TITLE_CHARA")
+	_modal_body = modal_current_info.metadata:tGetName()
 
 	elseif modal_type == 2 then
-	-- Puchichara 
+	-- Puchichara
+	-- > modal_asset_informations: CPuchichara
+	-- > modal_asset_visual_references: 
 	_modal_header = getLocalizedString("MODAL_TITLE_PUCHI")
+	_modal_body = modal_current_info.metadata:tGetName()
 
 	elseif modal_type == 3 then
 	-- Title
@@ -83,6 +89,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	-- > modal_asset_informations: CSongListNode
 	-- > modal_asset_visual_references: CTexture (Preimage)
 	_modal_header = getLocalizedString("MODAL_TITLE_SONG")
+	_modal_body = modal_current_info.ldTitle:GetString("")
 
 	end 
 
@@ -157,15 +164,33 @@ function draw()
 
 		tx_header:t2D_DisplayImage_AnchorCenter(960,180)
 
-
-		if modal_current_type == 3 then
+		if modal_current_type == 1 then
+			-- Character
+			if modal_current_visual ~= nil then
+				modal_current_visual:t2D_DisplayImage(0,260)
+			end
+			tx_body = getTextTex(ttk_modal_body, false, false)
+			tx_body:t2D_DisplayImage_AnchorCenter(960,390)
+		elseif modal_current_type == 2 then
+			-- Puchichara
+			if modal_current_info.tx ~= nil then
+				modal_current_info.tx:t2D_DisplayImage_AnchorCenter(960,490)
+			end
+			tx_body = getTextTex(ttk_modal_body, false, false)
+			tx_body:t2D_DisplayImage_AnchorCenter(960,790)
+		elseif modal_current_type == 3 then
+			-- Nameplate Title
 			tx_title = getTextTex(ttk_modal_body, false, false)
 			modal_current_visual:DrawTitlePlate(960, 490, 255, modal_current_info.Value.nameplateInfo.iType, tx_title, modal_current_rarity, modal_current_info.Key)
 		elseif modal_current_type == 4 then
+			-- Song
 			if modal_current_visual ~= nil then
 				modal_current_visual:t2D_DisplayImage_AnchorCenter(960,490)
 			end
-		else 
+			tx_body = getTextTex(ttk_modal_body, false, false)
+			tx_body:t2D_DisplayImage_AnchorCenter(960,790)
+		else
+			-- Custom modals for custom unlockables in the future??
 			tx_body = getTextTex(ttk_modal_body, false, false)
 			tx_body:t2D_DisplayImage_AnchorCenter(960,490)
 		end 
