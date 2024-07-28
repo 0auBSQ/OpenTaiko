@@ -3,6 +3,7 @@ using NLua;
 
 namespace TJAPlayer3 {
 	internal class CLuaNamePlateScript : CLuaScript {
+		abc;
 		private LuaFunction lfGetCharaOffset;
 		private LuaFunction lfSetInfos;
 		private LuaFunction lfDrawDan;
