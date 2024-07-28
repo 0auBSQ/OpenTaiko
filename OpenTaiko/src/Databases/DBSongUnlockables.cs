@@ -68,10 +68,11 @@ namespace TJAPlayer3 {
 
 			foreach (KeyValuePair<string, SongUnlockable> item in data) {
 				string _npvKey = item.Key;
-				string? _songName = CSongDict.tGetNodeFromID(_npvKey)?.ldTitle.GetString("");
-				string _songSubtitle = CSongDict.tGetNodeFromID(_npvKey)?.ldSubtitle.GetString("") ?? "";
+				//string? _songName = CSongDict.tGetNodeFromID(_npvKey)?.ldTitle.GetString("");
+				//string _songSubtitle = CSongDict.tGetNodeFromID(_npvKey)?.ldSubtitle.GetString("") ?? "";
+				CSongListNode? _node = CSongDict.tGetNodeFromID(_npvKey);
 
-				if (!_sf.Contains(_npvKey) && _songName != null) {
+				if (!_sf.Contains(_npvKey)) { // && _songName != null) {
 					var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
 
 					if (_fulfilled) {
@@ -84,8 +85,8 @@ namespace TJAPlayer3 {
 							new Modal(
 								Modal.EModalType.Song,
 								HRarity.tRarityToModalInt(item.Value.rarity),
-								_songName,
-								_songSubtitle
+								_node,
+								TJAPlayer3.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage(_node?.arスコア[0] ?? null)
 								),
 							_player);
 

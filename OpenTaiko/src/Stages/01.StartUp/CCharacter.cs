@@ -4,6 +4,7 @@
 		public DBCharacter.CharacterEffect effect;
 		public DBUnlockables.CUnlockConditions unlock;
 		public string _path;
+		public int _idx;
 
 		public float GetEffectCoinMultiplier() {
 			float mult = 1f;
@@ -31,7 +32,8 @@
 						new Modal(
 							Modal.EModalType.Character,
 							HRarity.tRarityToModalInt(metadata.Rarity),
-							metadata.tGetName()
+							this,
+							TJAPlayer3.Tx.Characters_Heya_Render[_idx]
 							),
 						_player);
 
@@ -43,8 +45,9 @@
 				TJAPlayer3.SaveFileInstances[player].tApplyHeyaChanges();
 		}
 
-		public CCharacter(string path) {
+		public CCharacter(string path, int i) {
 			_path = path;
+			_idx = i;
 
 			// Character metadata
 			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))

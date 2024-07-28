@@ -23,9 +23,14 @@
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
+    <None Remove="system\open-world memories\modules\modal\Config.json" />
     <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="System\Open-World Memories\Modules\Modal\Textures\" />
+    <Folder Include="System\Open-World Memories\Modules\Modal\Sounds\" />
   </ItemGroup>
   <PropertyGroup>
     <Version>0.6.0</Version>

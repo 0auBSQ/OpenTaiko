@@ -7,6 +7,16 @@ using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {
 	internal class CStage結果 : CStage {
+		// Modals Lua management
+
+		public CLuaModalScript lcModal { get; private set; }
+
+		public void RefreshSkin() {
+			lcModal?.Dispose();
+			lcModal = new CLuaModalScript(CSkin.Path("Modules/Modal"));
+
+		}
+
 		// プロパティ
 
 		public STDGBVALUE<bool> b新記録スキル;
@@ -593,7 +603,9 @@ namespace TJAPlayer3 {
 							new Modal(
 								Modal.EModalType.Coin,
 								0,
-								this.nEarnedMedalsCount[i]),
+								(long)this.nEarnedMedalsCount[i],
+								TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Medals
+								),
 							i);
 
 					// Check unlockables
@@ -612,7 +624,7 @@ namespace TJAPlayer3 {
 
 				}
 
-				displayedModals = new Modal[] { null, null, null, null, null };
+				displayedModals = null;
 
 				#endregion
 
@@ -1357,10 +1369,9 @@ namespace TJAPlayer3 {
 
 				#region [Display modals]
 
-				// Display modal is present
-				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-					if (displayedModals[i] != null)
-						displayedModals[i].tDisplayModal();
+				if (displayedModals != null) {
+					lcModal?.Update();
+					lcModal?.Draw();
 				}
 
 				#endregion
@@ -1415,90 +1426,59 @@ namespace TJAPlayer3 {
 							|| (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
 							|| (TJAPlayer3.Pad.bPressedDGB(EPad.Decide)
 							|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
-							TJAPlayer3.Skin.soundDecideSFX.tPlay();
+
 
 							#region [ Skip animations ]
 
 							if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
 								&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 								this.actParameterPanel.tSkipResultAnimations();
 							} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
 								  && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
+								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 								ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
 							}
 
 							#endregion
 
 							  else {
-								if (!mqModals.tIsQueueEmpty(0)
-									&& (
-										TJAPlayer3.Pad.bPressedDGB(EPad.Decide)
-										|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
-										)
-									) {
-									displayedModals[0] = mqModals.tPopModal(0);
-									displayedModals[0]?.tPlayModalSfx();
-								} else if (TJAPlayer3.ConfigIni.nPlayerCount == 1 || mqModals.tAreBothQueuesEmpty()) {
-									#region [ Return to song select screen ]
+								if ((lcModal?.AnimationFinished() ?? true)) {
+									TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
-									actFI.tフェードアウト開始();
+									if (!mqModals.tAreBothQueuesEmpty()
+									&& (TJAPlayer3.Pad.bPressedDGB(EPad.Decide)
+										|| TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+										displayedModals = mqModals.tPopModalInOrder();
 
-									if (TJAPlayer3.latestSongSelect == TJAPlayer3.stageSongSelect)
-										if (TJAPlayer3.stageSongSelect.rNowSelectedSong.rParentNode != null)
-											TJAPlayer3.stageSongSelect.actSongList.tCloseBOX();
 
-									tPostprocessing();
+									} else if (TJAPlayer3.ConfigIni.nPlayerCount == 1 || mqModals.tAreBothQueuesEmpty()) {
 
-									{
-										base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-										bgmResultLoop.tStop();
-										TJAPlayer3.Skin.bgmDanResult.tStop();
-										TJAPlayer3.Skin.bgmTowerResult.tStop();
+										if (!mqModals.tAreBothQueuesEmpty())
+											LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
+
+										#region [ Return to song select screen ]
+
+										actFI.tフェードアウト開始();
+
+										if (TJAPlayer3.latestSongSelect == TJAPlayer3.stageSongSelect)
+											if (TJAPlayer3.stageSongSelect.rNowSelectedSong.rParentNode != null)
+												TJAPlayer3.stageSongSelect.actSongList.tCloseBOX();
+
+										tPostprocessing();
+
+										{
+											base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+											this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+											bgmResultLoop.tStop();
+											TJAPlayer3.Skin.bgmDanResult.tStop();
+											TJAPlayer3.Skin.bgmTowerResult.tStop();
+										}
+
+										#endregion
 									}
-
-									#endregion
 								}
-							}
-						} else if ((TJAPlayer3.ConfigIni.nPlayerCount > 1 && (
-								  TJAPlayer3.Pad.bPressedDGB(EPad.LRed2P)
-								  || TJAPlayer3.Pad.bPressedDGB(EPad.RRed2P)
-							  ))) {
-							if (!mqModals.tIsQueueEmpty(1) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue) {
-								TJAPlayer3.Skin.soundDecideSFX.tPlay();
 
-								displayedModals[1] = mqModals.tPopModal(1);
-								displayedModals[1]?.tPlayModalSfx();
-							}
-						} else if ((TJAPlayer3.ConfigIni.nPlayerCount > 2 && (
-								  TJAPlayer3.Pad.bPressedDGB(EPad.LRed3P)
-								  || TJAPlayer3.Pad.bPressedDGB(EPad.RRed3P)
-							  ))) {
-							if (!mqModals.tIsQueueEmpty(2) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue) {
-								TJAPlayer3.Skin.soundDecideSFX.tPlay();
-
-								displayedModals[2] = mqModals.tPopModal(2);
-								displayedModals[2]?.tPlayModalSfx();
-							}
-						} else if ((TJAPlayer3.ConfigIni.nPlayerCount > 3 && (
-								  TJAPlayer3.Pad.bPressedDGB(EPad.LRed4P)
-								  || TJAPlayer3.Pad.bPressedDGB(EPad.RRed4P)
-							  ))) {
-							if (!mqModals.tIsQueueEmpty(3) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue) {
-								TJAPlayer3.Skin.soundDecideSFX.tPlay();
-
-								displayedModals[3] = mqModals.tPopModal(3);
-								displayedModals[3]?.tPlayModalSfx();
-							}
-						} else if ((TJAPlayer3.ConfigIni.nPlayerCount > 4 && (
-								  TJAPlayer3.Pad.bPressedDGB(EPad.LRed5P)
-								  || TJAPlayer3.Pad.bPressedDGB(EPad.RRed5P)
-							  ))) {
-							if (!mqModals.tIsQueueEmpty(4) && this.actParameterPanel.ctMainCounter.CurrentValue >= this.actParameterPanel.MountainAppearValue) {
-								TJAPlayer3.Skin.soundDecideSFX.tPlay();
-
-								displayedModals[4] = mqModals.tPopModal(4);
-								displayedModals[4]?.tPlayModalSfx();
 							}
 						}
 
@@ -1804,7 +1784,7 @@ namespace TJAPlayer3 {
 
 		// Modal queues
 		private ModalQueue mqModals;
-		private Modal[] displayedModals;
+		private Modal? displayedModals;
 
 		// Coins information 
 		private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };

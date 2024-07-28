@@ -2391,9 +2391,6 @@ for (int i = 0; i < 3; i++) {
 			}
 #endif
 
-			// Init Modal fonts once config.ini parsing is done
-			// Moved here to reference Skin values.
-			Modal.tInitModalFonts();
 			//---------------------
 			#endregion
 			//-----------
@@ -2622,6 +2619,7 @@ for (int i = 0; i < 3; i++) {
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
 			stage結果 = new CStage結果();
+			stage結果.RefreshSkin();
 			stageChangeSkin = new CStageChangeSkin();
 			stage終了 = new CStage終了();
 			NamePlate = new CNamePlate();
@@ -3063,6 +3061,7 @@ for (int i = 0; i < 3; i++) {
 			actTextConsole.CreateManagedResource();
 			actTextConsole.CreateUnmanagedResource();
 			TJAPlayer3.NamePlate.RefleshSkin();
+			TJAPlayer3.stage結果.RefreshSkin();
 			CActSelectPopupMenu.RefleshSkin();
 			CActSelect段位リスト.RefleshSkin();
 		}
