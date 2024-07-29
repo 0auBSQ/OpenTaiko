@@ -344,6 +344,7 @@ namespace TJAPlayer3 {
 			TJAPlayer3.stage演奏ドラム画面.bPAUSE = true;
 			TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 			this.bTrainingPAUSE = true;
+			if (TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.stage演奏ドラム画面.actBalloon.KusudamaIsActive) TJAPlayer3.stage演奏ドラム画面.actBalloon.KusuMiss();
 
 			this.tMatchWithTheChartDisplayPosition(false);
 		}
@@ -368,6 +369,7 @@ namespace TJAPlayer3 {
 			TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = 0;
 			TJAPlayer3.stage演奏ドラム画面.t数値の初期化(true, true);
 			TJAPlayer3.stage演奏ドラム画面.Activate();
+			if (TJAPlayer3.ConfigIni.bTokkunMode && TJAPlayer3.stage演奏ドラム画面.actBalloon.KusudamaIsActive) TJAPlayer3.stage演奏ドラム画面.actBalloon.KusuMiss();
 
 			for (int i = 0; i < dTX.listChip.Count; i++) {
 
@@ -461,7 +463,7 @@ namespace TJAPlayer3 {
 		private long nスクロール後ms;
 		private long n最終演奏位置ms;
 
-		private bool bTrainingPAUSE;
+		public bool bTrainingPAUSE { get; private set; }
 		private bool bCurrentlyScrolling;
 
 		private CCounter ctScrollCounter;

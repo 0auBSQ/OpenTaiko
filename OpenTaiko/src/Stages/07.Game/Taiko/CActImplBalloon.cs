@@ -48,9 +48,18 @@ namespace TJAPlayer3 {
 			return base.Draw();
 		}
 
-		public void KusuIn() => KusudamaScript.KusuIn();
-		public void KusuBroke() => KusudamaScript.KusuBroke();
-		public void KusuMiss() => KusudamaScript.KusuMiss();
+		public void KusuIn() {
+			KusudamaScript.KusuIn();
+			KusudamaIsActive = true;
+		}
+		public void KusuBroke() {
+			KusudamaScript.KusuBroke();
+			KusudamaIsActive = false;
+		}
+		public void KusuMiss() {
+			KusudamaScript.KusuMiss();
+			KusudamaIsActive = false;
+		}
 
 		public enum EBalloonType {
 			BALLOON,
@@ -58,11 +67,15 @@ namespace TJAPlayer3 {
 			FUSEROLL
 		}
 
+		public bool KusudamaIsActive { get; private set; } = false;
+
 		public void tDrawKusudama() {
 			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) {
 				KusudamaScript.Update();
 			}
-			KusudamaScript.Draw();
+			if (!(TJAPlayer3.stage演奏ドラム画面.bPAUSE && TJAPlayer3.ConfigIni.bTokkunMode)) {
+				KusudamaScript.Draw();
+			}
 		}
 
 		public int On進行描画(int n連打ノルマ, int n連打数, int player, EBalloonType btype) {
@@ -141,7 +154,8 @@ namespace TJAPlayer3 {
                     if (TJAPlayer3.Tx.Kusudama != null)
                         TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                         */
-					this.tKusudamaNumber(n連打数);
+					if (!(TJAPlayer3.stage演奏ドラム画面.bPAUSE && TJAPlayer3.ConfigIni.bTokkunMode))
+						this.tKusudamaNumber(n連打数);
 				}
 
 				//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
