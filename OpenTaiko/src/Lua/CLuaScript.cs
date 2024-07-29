@@ -35,7 +35,7 @@ namespace TJAPlayer3 {
 
 		private List<IDisposable> listDisposables = new List<IDisposable>();
 
-		protected bool Avaibale {
+		protected bool Available {
 			get {
 				return bLoadedAssets && !bDisposed && !bCrashed;
 			}
@@ -148,6 +148,10 @@ namespace TJAPlayer3 {
 			return fontRenderer;
 		}
 
+		private string GetLocalizedString(string key, params object?[] args) {
+			return CLangManager.LangInstance.GetString(key, args);
+		}
+
 		private TitleTextureKey CreateTitleTextureKey(string title, CCachedFontRenderer fontRenderer, int maxSize, Color? color = null, Color? edgeColor = null) {
 			return new TitleTextureKey(title, fontRenderer, color ?? Color.White, edgeColor ?? Color.Black, maxSize);
 		}
@@ -184,6 +188,7 @@ namespace TJAPlayer3 {
 			LuaScript["getText"] = getText;
 			LuaScript["getNumArray"] = getNumArray;
 			LuaScript["getTextArray"] = getTextArray;
+			LuaScript["getLocalizedString"] = GetLocalizedString;
 			LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
 			LuaScript["debugLog"] = DebugLog;
 

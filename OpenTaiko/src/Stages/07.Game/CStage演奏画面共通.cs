@@ -2842,7 +2842,7 @@ namespace TJAPlayer3 {
 
 		protected abstract void t進行描画_AVI();
 		protected void t進行描画_AVI(int x, int y) {
-			if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && (!TJAPlayer3.ConfigIni.bストイックモード && TJAPlayer3.ConfigIni.bEnableAVI)) {
+			if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && TJAPlayer3.ConfigIni.bEnableAVI) {
 				this.actAVI.t進行描画(x, y);
 			}
 		}
@@ -4431,6 +4431,14 @@ namespace TJAPlayer3 {
 			this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.再読込_再演奏;
 			base.ePhaseID = CStage.EPhase.Game_Reload;
 			this.bPAUSE = false;
+		}
+
+		// Workaround for abnormal song completion animation after retrying during normal song completion animation
+		public void tResetGameplayFinishedStatus() {
+			for (int i = 0; i < 5; i++) {
+				ifp[i] = false;
+				isDeniedPlaying[i] = false;
+			}
 		}
 
 		public void t演奏やりなおし() {

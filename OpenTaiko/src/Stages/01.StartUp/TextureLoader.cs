@@ -136,36 +136,8 @@ namespace TJAPlayer3 {
 			Overlay = TxC(@$"Overlay.png");
 			Network_Connection = TxC(@$"Network_Connection.png");
 			Readme = TxC(@$"Readme.png");
-			NamePlate = new CTexture[2];
 			NamePlateBase = TxC(@$"NamePlate.png");
 			NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
-			NamePlate[0] = TxC(@$"1P_NamePlate.png");
-			NamePlate[1] = TxC(@$"2P_NamePlate.png");
-			NamePlate_Effect[0] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}GoldMStar.png");
-			NamePlate_Effect[1] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}PurpleMStar.png");
-			NamePlate_Effect[2] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}GoldBStar.png");
-			NamePlate_Effect[3] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}PurpleBStar.png");
-			NamePlate_Effect[4] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Slash.png");
-
-			TJAPlayer3.Skin.Config_NamePlate_Ptn_Title = System.IO.Directory.GetDirectories(CSkin.Path(BASE + @$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}")).Length;
-			TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes = new int[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
-
-			NamePlate_Title = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title][];
-			NamePlate_Title_Big = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
-			NamePlate_Title_Small = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title];
-
-			for (int i = 0; i < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title; i++) {
-				TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i] = TJAPlayer3.t連番画像の枚数を数える(CSkin.Path(BASE + @$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}"));
-				NamePlate_Title[i] = new CTexture[TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]];
-
-				for (int j = 0; j < TJAPlayer3.Skin.Config_NamePlate_Ptn_Title_Boxes[i]; j++) {
-					NamePlate_Title[i][j] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
-				}
-
-				NamePlate_Title_Big[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Big.png");
-				NamePlate_Title_Small[i] = TxC(@$"9_NamePlateEffect{Path.DirectorySeparatorChar}Title{Path.DirectorySeparatorChar}" + i.ToString() + @$"{Path.DirectorySeparatorChar}Small.png");
-			}
-
 
 			#endregion
 
@@ -1317,28 +1289,9 @@ namespace TJAPlayer3 {
 					}
 				}
 
-				Characters[i] = new CCharacter(charaDirs[i]);
+				Characters[i] = new CCharacter(charaDirs[i], i);
 			}
 
-
-			#endregion
-
-			#region [11_Modals]
-
-			Modal_Full = new CTexture[6];
-			Modal_Half = new CTexture[6];
-			Modal_Half_4P = new CTexture[6];
-			Modal_Half_5P = new CTexture[6];
-			for (int i = 0; i < 5; i++) {
-				Modal_Full[i] = TxC(MODALS + i.ToString() + @$"_full.png");
-				Modal_Half[i] = TxC(MODALS + i.ToString() + @$"_half.png");
-				Modal_Half_4P[i] = TxC(MODALS + i.ToString() + @$"_half_4P.png");
-				Modal_Half_5P[i] = TxC(MODALS + i.ToString() + @$"_half_5P.png");
-			}
-			Modal_Full[Modal_Full.Length - 1] = TxC(MODALS + @$"Coin_full.png");
-			Modal_Half[Modal_Full.Length - 1] = TxC(MODALS + @$"Coin_half.png");
-			Modal_Half_4P[Modal_Full.Length - 1] = TxC(MODALS + @$"Coin_half_4P.png");
-			Modal_Half_5P[Modal_Full.Length - 1] = TxC(MODALS + @$"Coin_half_5P.png");
 
 			#endregion
 
@@ -2399,13 +2352,6 @@ namespace TJAPlayer3 {
 			Overlay,
 			Readme,
 			Network_Connection;
-		public CTexture[] NamePlate;
-
-		public CTexture[] NamePlate_Effect = new CTexture[5];
-
-		public CTexture[][] NamePlate_Title;
-		public CTexture[] NamePlate_Title_Big;
-		public CTexture[] NamePlate_Title_Small;
 
 		#endregion
 
@@ -2928,15 +2874,6 @@ Result_Mountain = new CTexture[4]*/;
 			Characters_Result_Clear_2P,
 			Characters_Result_Failed_2P;
 		public CCharacter[] Characters;
-
-		#endregion
-
-		#region [11_Modals]
-
-		public CTexture[] Modal_Full,
-			Modal_Half,
-			Modal_Half_4P,
-			Modal_Half_5P;
 
 		#endregion
 

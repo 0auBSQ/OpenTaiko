@@ -613,7 +613,7 @@ namespace TJAPlayer3 {
 					TJAPlayer3.SaveFileInstances[iPlayer].data.DanGold = iG;
 					TJAPlayer3.SaveFileInstances[iPlayer].data.DanType = cs;
 
-					TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
+					TJAPlayer3.NamePlate.tNamePlateRefreshTitles(0);
 
 					TJAPlayer3.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
@@ -639,7 +639,7 @@ namespace TJAPlayer3 {
 					}
 
 
-					TJAPlayer3.NamePlate.tNamePlateRefreshTitles(iPlayer);
+					TJAPlayer3.NamePlate.tNamePlateRefreshTitles(0);
 
 					TJAPlayer3.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 

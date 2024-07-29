@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using FDK;
 using Silk.NET.Maths;
 using static TJAPlayer3.CActSelect曲リスト;
@@ -381,8 +382,8 @@ namespace TJAPlayer3 {
 
 		private void tDrawDanSelectedLevel(float Anime, int modifier = 0) {
 			int scroll = TJAPlayer3.Skin.Resolution[0] * modifier;
-			int currentSong = n現在の選択行 + modifier;
-			bool over4 = false;
+			int currentSong = Math.Clamp(n現在の選択行 + modifier, 0, stバー情報.Length - 1);
+            bool over4 = false;
 
 			switch (stバー情報[currentSong].eノード種別) {
 				case CSongListNode.ENodeType.SCORE: {

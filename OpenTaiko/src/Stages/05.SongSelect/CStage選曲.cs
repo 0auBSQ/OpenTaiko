@@ -209,7 +209,7 @@ namespace TJAPlayer3 {
 			this.ctOldBGScroll = new CCounter(0, (int)(txOldGenreBack.szTextureSize.Width * oldScale), 30, TJAPlayer3.Timer);
 			this.ctOldBGScroll.CurrentValue = Math.Min(scroll, (int)(txOldGenreBack.szTextureSize.Width * oldScale));
 
-			this.actPreimageパネル.t選択曲が変更された();
+			this.actPreimageパネル.tSelectedSongChanged();
 			this.actPresound.t選択曲が変更された();
 			this.act演奏履歴パネル.t選択曲が変更された();
 			this.actステータスパネル.t選択曲が変更された();
@@ -1226,7 +1226,7 @@ namespace TJAPlayer3 {
 		//private CActFIFOBlack actFOtoNowLoading;
 		public CActFIFOStart actFOtoNowLoading;
 		private CActSelectInformation actInformation;
-		private CActSelectPreimageパネル actPreimageパネル;
+		public CActSelectPreimageパネル actPreimageパネル;
 		public CActSelectPresound actPresound;
 		private CActオプションパネル actオプションパネル;
 		private CActSelectステータスパネル actステータスパネル;

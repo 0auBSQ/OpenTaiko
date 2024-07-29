@@ -12,12 +12,16 @@ namespace TJAPlayer3 {
 			SqliteConnection? connection = DBSaves.GetSavesDBConnection();
 			if (connection == null) {
 				Trace.TraceError("Could not establish a connection to Saves.db3 database. Aborting score import.");
+				Status = "";
 				return;
 			}
 
 			Status = "Searching for scores...";
-			string[] _scoreFiles = Directory.GetFiles(TJAPlayer3.ConfigIni.strSongsPath, "*.score.ini", SearchOption.AllDirectories);
-			Trace.TraceInformation($"{_scoreFiles.Length} score.ini files have been found. Beginning import.");
+			List<string> _scoreFiles = new List<string>();
+			foreach (string path in TJAPlayer3.ConfigIni.strSongsPath.Split(';', StringSplitOptions.RemoveEmptyEntries)) {
+				_scoreFiles.AddRange(Directory.GetFiles(path, "*.score.ini", SearchOption.AllDirectories));
+			}
+			Trace.TraceInformation($"{_scoreFiles.Count} score.ini files have been found. Beginning import.");
 
 			int importcount = 0;
 			Status = "Importing scores...";
@@ -228,7 +232,7 @@ namespace TJAPlayer3 {
 					Trace.TraceWarning($"Failed to import {_score} into new database. More details:\n{ex}");
 				}
 			}
-			Trace.TraceInformation($"Imported {importcount} of {_scoreFiles.Length} scores from score.ini files.");
+			Trace.TraceInformation($"Imported {importcount} of {_scoreFiles.Count} scores from score.ini files.");
 			Status = "";
 		}
 

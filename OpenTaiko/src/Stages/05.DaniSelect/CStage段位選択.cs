@@ -204,6 +204,7 @@ namespace TJAPlayer3 {
 
 					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 						TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+                        this.段位リスト.n現在の選択行 = 0;
 						return returnTitle();
 					}
 				}
