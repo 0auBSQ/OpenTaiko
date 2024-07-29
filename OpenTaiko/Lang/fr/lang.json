@@ -92,7 +92,7 @@
         "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifies drawing by hiding most visual\nflare and effects during gameplay.",
 
         "SETTINGS_SYSTEM_SKIN": "Skin actuel",
-        "SETTINGS_SYSTEM_SKIN_DESC": "Choisir le skin utiliser dans le dossier System.",
+        "SETTINGS_SYSTEM_SKIN_DESC": "Choisir le skin utilisé dans le dossier System.",
 
         // Settings - System - Audio
         "SETTINGS_SYSTEM_SONGPLAYBACK": "Activer la musique en jeu",
