@@ -173,7 +173,7 @@ namespace TJAPlayer3 {
 				int baseY = TJAPlayer3.Skin.OnlineLounge_Side_Menu[1] - _ref.Length * (TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] / 2);
 
 				for (int i = 0; i < _ref.Length; i++) {
-					CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_ref[i]);
+					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(_ref[i]);
 
 					if (_selector != i) {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -205,8 +205,8 @@ namespace TJAPlayer3 {
 				for (int i = -4; i < 4; i++) {
 					int pos = (_ref.Length * 5 + _selector + i) % _ref.Length;
 
-					CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(_ref[pos]);
-					CTexture tmpSubtitle = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
+					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(_ref[pos]);
+					CTexture tmpSubtitle = TitleTextureKey.ResolveTitleTexture(ttkCDNSongSubtitles[pos]);
 
 					var _color = CConversion.ColorToColor4(Color.DarkGray);
 
@@ -258,7 +258,7 @@ namespace TJAPlayer3 {
 						#region [Charter Name]
 
 						if (song_.charter != null && song_.charter.charter_name != null && song_.charter.charter_name != "") {
-							var charter_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+							var charter_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
 							charter_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Charter[0], TJAPlayer3.Skin.OnlineLounge_Context_Charter[1]);
 						}
@@ -268,7 +268,7 @@ namespace TJAPlayer3 {
 						#region [Song Genre]
 
 						if (song_.Genre != null && song_.Genre.genre != null && song_.Genre.genre != "") {
-							var genre_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+							var genre_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
 							genre_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Genre[0], TJAPlayer3.Skin.OnlineLounge_Context_Genre[1]);
 						}
@@ -288,7 +288,7 @@ namespace TJAPlayer3 {
 									TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
 									TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
 
-								var difnb_ = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+								var difnb_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
 								difnb_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Level[0] + column, TJAPlayer3.Skin.OnlineLounge_Context_Level[1] + row);
 							}
@@ -308,7 +308,7 @@ namespace TJAPlayer3 {
 			if (IsDownloading) {
 				TJAPlayer3.Tx.OnlineLounge_Box.t2D描画(0, 0);
 
-				var text = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+				var text = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
 				text.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Downloading[0], TJAPlayer3.Skin.OnlineLounge_Downloading[1]);
 			}

@@ -544,9 +544,6 @@ namespace TJAPlayer3 {
 			return bOption[0] || bOption[1] || bOption[2] || bOption[3] || bOption[4];
 		}
 
-		public int nStrジャンルtoNum(string strジャンル) {
-			return TJAPlayer3.stageSongSelect.actSongList.nStrジャンルtoNumBox(strジャンル);
-		}
 		//-----------------
 		#endregion
 	}

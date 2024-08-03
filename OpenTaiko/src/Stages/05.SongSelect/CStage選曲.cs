@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {
 	/*
@@ -471,9 +470,9 @@ namespace TJAPlayer3 {
 
 						if (HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED) {
 							actSongInfo.Draw();
-							if (TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan) {
+							if (this.n現在選択中の曲の難易度 == (int)Difficulty.Dan) {
 								actDanInfo.Draw();
-							} else if (TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Tower) {
+							} else if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower) {
 								actTowerInfo.Draw();
 							} else {
 							}
@@ -522,7 +521,7 @@ namespace TJAPlayer3 {
 						TJAPlayer3.Tx.SongSelect_Unlock_Conditions?.t2D描画(0, 0);
 
 						if (actSongList.ttkNowUnlockConditionText is not null) {
-							actSongList.ResolveTitleTexture(actSongList.ttkNowUnlockConditionText)?.t2D描画(TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[0], TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[1]);
+							TitleTextureKey.ResolveTitleTexture(actSongList.ttkNowUnlockConditionText)?.t2D描画(TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[0], TJAPlayer3.Skin.SongSelect_Unlock_Conditions_Text[1]);
 						}
 					}
 				}
@@ -1661,9 +1660,6 @@ namespace TJAPlayer3 {
 			}
 		}
 
-		public int nStrジャンルtoNum(string strジャンル) {
-			return this.actSongList.nStrジャンルtoNumBox(strジャンル);
-		}
 		//-----------------
 		#endregion
 	}

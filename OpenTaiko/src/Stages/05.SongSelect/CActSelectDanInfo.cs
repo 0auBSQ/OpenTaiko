@@ -17,9 +17,9 @@ namespace TJAPlayer3 {
 			ctStep = new CCounter(0, 1000, 2, TJAPlayer3.Timer);
 			ctStepFade = new CCounter(0, 255, 0.5, TJAPlayer3.Timer);
 
-			ttkExams = new CActSelect曲リスト.TitleTextureKey[(int)Exam.Type.Total];
+			ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
 			for (int i = 0; i < ttkExams.Length; i++) {
-				ttkExams[i] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetExamName(i), pfExamFont, Color.Black, Color.Transparent, 700);
+				ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), pfExamFont, Color.Black, Color.Transparent, 700);
 			}
 
 			base.Activate();
@@ -88,8 +88,8 @@ namespace TJAPlayer3 {
 					TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Scale);
 					TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
 
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTitles[i]).t2D描画(TJAPlayer3.Skin.SongSelect_DanInfo_Title_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Title_Y[pos]);
+					TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
+					TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).t2D描画(TJAPlayer3.Skin.SongSelect_DanInfo_Title_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Title_Y[pos]);
 
 
 				}
@@ -99,7 +99,7 @@ namespace TJAPlayer3 {
 					Dan_C danc0 = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 
 					if (danc0 != null) {
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_X[index], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Y[index]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_X[index], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Y[index]);
 					}
 
 					if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
@@ -137,17 +137,17 @@ namespace TJAPlayer3 {
 		public void UpdateSong() {
 			if (TJAPlayer3.stageSongSelect.rNowSelectedSong == null || TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs == null) return;
 
-			ttkTitles = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count];
+			ttkTitles = new TitleTextureKey[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count];
 			for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
 				var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
-				ttkTitles[i] = new CActSelect曲リスト.TitleTextureKey(dan.bTitleShow ? "???" : dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
+				ttkTitles[i] = new TitleTextureKey(dan.bTitleShow ? "???" : dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
 			}
 		}
 
 		#region [Private]
 
-		private CActSelect曲リスト.TitleTextureKey[] ttkTitles;
-		private CActSelect曲リスト.TitleTextureKey[] ttkExams;
+		private TitleTextureKey[] ttkTitles;
+		private TitleTextureKey[] ttkExams;
 		private CCachedFontRenderer pfTitleFont;
 		private CCachedFontRenderer pfExamFont;
 

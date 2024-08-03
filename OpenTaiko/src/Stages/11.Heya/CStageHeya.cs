@@ -181,7 +181,7 @@ namespace TJAPlayer3 {
 			#region [Main menu (Side bar)]
 
 			for (int i = 0; i < this.ttkMainMenuOpt.Length; i++) {
-				CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
+				CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
 
 				if (iCurrentMenu != -1 || iMainMenuCurrent != i) {
 					tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -267,14 +267,14 @@ namespace TJAPlayer3 {
 					#region [Database related values]
 
 					if (ttkPuchiCharaNames[pos] != null) {
-						CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
+						CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
 						tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[0],
 							scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
 					}
 
 					if (ttkPuchiCharaAuthors[pos] != null) {
-						CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
+						CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
 
 						tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
 							scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
@@ -331,14 +331,14 @@ namespace TJAPlayer3 {
 					#region [Database related values]
 
 					if (ttkCharacterNames[pos] != null) {
-						CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterNames[pos]);
+						CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterNames[pos]);
 
 						tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[0],
 							scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
 					}
 
 					if (ttkCharacterAuthors[pos] != null) {
-						CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterAuthors[pos]);
+						CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterAuthors[pos]);
 
 						tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
 							scroll.Item2 + TJAPlayer3.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
@@ -360,7 +360,7 @@ namespace TJAPlayer3 {
 				for (int i = -(TJAPlayer3.Skin.Heya_Side_Menu_Count / 2); i < (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2) + 1; i++) {
 					int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
 
-					CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[pos]);
+					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkDanTitles[pos]);
 
 					if (i != 0) {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -401,7 +401,7 @@ namespace TJAPlayer3 {
 				for (int i = -(TJAPlayer3.Skin.Heya_Side_Menu_Count / 2); i < (TJAPlayer3.Skin.Heya_Side_Menu_Count / 2) + 1; i++) {
 					int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
 
-					CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTitles[pos]);
+					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkTitles[pos]);
 
 					if (i != 0) {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -456,7 +456,7 @@ namespace TJAPlayer3 {
 					TJAPlayer3.Tx.Heya_Box?.t2D描画(0, 0);
 
 				if (this.ttkInfoSection != null)
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
+					TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
 						.t2D拡大率考慮上中央基準描画(TJAPlayer3.Skin.Heya_InfoSection[0], TJAPlayer3.Skin.Heya_InfoSection[1]);
 
 				#endregion

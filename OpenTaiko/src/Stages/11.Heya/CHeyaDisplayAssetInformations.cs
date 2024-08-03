@@ -62,7 +62,7 @@ namespace TJAPlayer3 {
 			}
 
 			TJAPlayer3.Tx.Heya_Description_Panel?.t2D描画(0, 0);
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
+			TitleTextureKey.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
 		}
 
 		public static void DisplayPuchicharaInfo(CCachedFontRenderer pf, CPuchichara puchi) {
@@ -87,7 +87,7 @@ namespace TJAPlayer3 {
 			}
 
 			TJAPlayer3.Tx.Heya_Description_Panel?.t2D描画(0, 0);
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
+			TitleTextureKey.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
 		}
 
 		public static void DisplayNameplateTitleInfo(CCachedFontRenderer pf) {

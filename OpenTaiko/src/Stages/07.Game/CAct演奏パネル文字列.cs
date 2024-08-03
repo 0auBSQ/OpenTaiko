@@ -199,7 +199,7 @@ namespace TJAPlayer3 {
 
 				if (this.txGENRE != null) {
 					this.txGENRE.t2D描画(TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Game_Genre_X + TJAPlayer3.Skin.Game_GenreText_Offset[0], TJAPlayer3.Skin.Game_Genre_Y + TJAPlayer3.Skin.Game_GenreText_Offset[1]);
+					TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Game_Genre_X + TJAPlayer3.Skin.Game_GenreText_Offset[0], TJAPlayer3.Skin.Game_Genre_Y + TJAPlayer3.Skin.Game_GenreText_Offset[1]);
 				}
 				if (this.txStage != null)
 					this.txStage.t2D描画(TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);

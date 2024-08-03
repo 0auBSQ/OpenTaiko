@@ -6,14 +6,14 @@ namespace TJAPlayer3 {
 		public bool IsOpend { get; private set; }
 		private CCachedFontRenderer MenuFont;
 
-		private CActSelect曲リスト.TitleTextureKey[] MenuTitleKeys = new CActSelect曲リスト.TitleTextureKey[5];
-		private CActSelect曲リスト.TitleTextureKey[] ttkPuchiCharaNames;
-		private CActSelect曲リスト.TitleTextureKey[] ttkPuchiCharaAuthors;
-		private CActSelect曲リスト.TitleTextureKey[] ttkCharacterNames;
-		private CActSelect曲リスト.TitleTextureKey[] ttkCharacterAuthors;
-		private CActSelect曲リスト.TitleTextureKey ttkInfoSection;
-		private CActSelect曲リスト.TitleTextureKey[] ttkDanTitles;
-		private CActSelect曲リスト.TitleTextureKey[] ttkTitles;
+		private TitleTextureKey[] MenuTitleKeys = new TitleTextureKey[5];
+		private TitleTextureKey[] ttkPuchiCharaNames;
+		private TitleTextureKey[] ttkPuchiCharaAuthors;
+		private TitleTextureKey[] ttkCharacterNames;
+		private TitleTextureKey[] ttkCharacterAuthors;
+		private TitleTextureKey ttkInfoSection;
+		private TitleTextureKey[] ttkDanTitles;
+		private TitleTextureKey[] ttkTitles;
 		private string[] titlesKeys;
 
 		public CCounter InFade;
@@ -69,18 +69,18 @@ namespace TJAPlayer3 {
 								if (TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles != null)
 									amount += TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles.Count;
 
-								this.ttkDanTitles = new CActSelect曲リスト.TitleTextureKey[amount];
+								this.ttkDanTitles = new TitleTextureKey[amount];
 
 								// Silver Shinjin (default rank) always avaliable by default
-								this.ttkDanTitles[0] = new CActSelect曲リスト.TitleTextureKey("新人", this.MenuFont, Color.White, Color.Black, 1000);
+								this.ttkDanTitles[0] = new TitleTextureKey("新人", this.MenuFont, Color.White, Color.Black, 1000);
 
 								int idx = 1;
 								if (TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles != null) {
 									foreach (var item in TJAPlayer3.SaveFileInstances[CurrentPlayer].data.DanTitles) {
 										if (item.Value.isGold == true)
-											this.ttkDanTitles[idx] = new CActSelect曲リスト.TitleTextureKey(item.Key, this.MenuFont, Color.Gold, Color.Black, 1000);
+											this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.MenuFont, Color.Gold, Color.Black, 1000);
 										else
-											this.ttkDanTitles[idx] = new CActSelect曲リスト.TitleTextureKey(item.Key, this.MenuFont, Color.White, Color.Black, 1000);
+											this.ttkDanTitles[idx] = new TitleTextureKey(item.Key, this.MenuFont, Color.White, Color.Black, 1000);
 										idx++;
 									}
 								}
@@ -93,17 +93,17 @@ namespace TJAPlayer3 {
 								if (TJAPlayer3.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null)
 									amount += TJAPlayer3.SaveFileInstances[CurrentPlayer].data.NamePlateTitles.Count;
 
-								this.ttkTitles = new CActSelect曲リスト.TitleTextureKey[amount];
+								this.ttkTitles = new TitleTextureKey[amount];
 								this.titlesKeys = new string[amount];
 
 								// Wood shojinsha (default title) always avaliable by default
-								this.ttkTitles[0] = new CActSelect曲リスト.TitleTextureKey("初心者", this.MenuFont, Color.Black, Color.Transparent, 1000);
+								this.ttkTitles[0] = new TitleTextureKey("初心者", this.MenuFont, Color.Black, Color.Transparent, 1000);
 								this.titlesKeys[0] = "初心者";
 
 								int idx = 1;
 								if (TJAPlayer3.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null) {
 									foreach (var item in TJAPlayer3.SaveFileInstances[CurrentPlayer].data.NamePlateTitles) {
-										this.ttkTitles[idx] = new CActSelect曲リスト.TitleTextureKey(item.Value.cld.GetString(item.Key), this.MenuFont, Color.Black, Color.Transparent, 1000);
+										this.ttkTitles[idx] = new TitleTextureKey(item.Value.cld.GetString(item.Key), this.MenuFont, Color.Black, Color.Transparent, 1000);
 										this.titlesKeys[idx] = item.Key;
 										idx++;
 									}
@@ -155,29 +155,29 @@ namespace TJAPlayer3 {
 			InFade = new CCounter();
 			CharaBoxAnime = new CCounter();
 
-			MenuTitleKeys[0] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), MenuFont, Color.White, Color.Black, 9999);
-			MenuTitleKeys[1] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), MenuFont, Color.White, Color.Black, 9999);
-			MenuTitleKeys[2] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), MenuFont, Color.White, Color.Black, 9999);
-			MenuTitleKeys[3] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), MenuFont, Color.White, Color.Black, 9999);
-			MenuTitleKeys[4] = new CActSelect曲リスト.TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), MenuFont, Color.White, Color.Black, 9999);
+			MenuTitleKeys[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), MenuFont, Color.White, Color.Black, 9999);
+			MenuTitleKeys[1] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), MenuFont, Color.White, Color.Black, 9999);
+			MenuTitleKeys[2] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), MenuFont, Color.White, Color.Black, 9999);
+			MenuTitleKeys[3] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), MenuFont, Color.White, Color.Black, 9999);
+			MenuTitleKeys[4] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), MenuFont, Color.White, Color.Black, 9999);
 
-			ttkPuchiCharaNames = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
-			ttkPuchiCharaAuthors = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
+			ttkPuchiCharaNames = new TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
+			ttkPuchiCharaAuthors = new TitleTextureKey[TJAPlayer3.Skin.Puchichara_Ptn];
 
 			for (int i = 0; i < TJAPlayer3.Skin.Puchichara_Ptn; i++) {
 				var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Puchichara[i].metadata.Rarity);
-				ttkPuchiCharaNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
-				ttkPuchiCharaAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
+				ttkPuchiCharaNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
+				ttkPuchiCharaAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
 			}
 
 
-			ttkCharacterAuthors = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Characters_Ptn];
-			ttkCharacterNames = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.Skin.Characters_Ptn];
+			ttkCharacterAuthors = new TitleTextureKey[TJAPlayer3.Skin.Characters_Ptn];
+			ttkCharacterNames = new TitleTextureKey[TJAPlayer3.Skin.Characters_Ptn];
 
 			for (int i = 0; i < TJAPlayer3.Skin.Characters_Ptn; i++) {
 				var textColor = HRarity.tRarityToColor(TJAPlayer3.Tx.Characters[i].metadata.Rarity);
-				ttkCharacterNames[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
-				ttkCharacterAuthors[i] = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
+				ttkCharacterNames[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetName(), this.MenuFont, textColor, Color.Black, 1000);
+				ttkCharacterAuthors[i] = new TitleTextureKey(TJAPlayer3.Tx.Characters[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
 			}
 
 
@@ -405,13 +405,13 @@ namespace TJAPlayer3 {
 									TJAPlayer3.Tx.Characters_Heya_Preview[index]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 
 									if (ttkCharacterNames[index] != null) {
-										CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterNames[index]);
+										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterNames[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
 									}
 
 									if (ttkCharacterAuthors[index] != null) {
-										CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkCharacterAuthors[index]);
+										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterAuthors[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
 									}
@@ -421,7 +421,7 @@ namespace TJAPlayer3 {
 										TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[1]);
 
 										if (this.ttkInfoSection != null)
-											TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
+											TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
 												.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
 									}
 								}
@@ -460,13 +460,13 @@ namespace TJAPlayer3 {
 
 
 									if (ttkCharacterNames[index] != null) {
-										CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaNames[index]);
+										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaNames[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
 									}
 
 									if (ttkCharacterAuthors[index] != null) {
-										CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
+										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
 									}
@@ -476,7 +476,7 @@ namespace TJAPlayer3 {
 										TJAPlayer3.Tx.NewHeya_Lock?.t2D描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_Lock_Offset[1]);
 
 										if (this.ttkInfoSection != null)
-											TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkInfoSection)
+											TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
 												.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + TJAPlayer3.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
 									}
 								}
@@ -492,7 +492,7 @@ namespace TJAPlayer3 {
 									while (index >= CurrentMaxIndex) {
 										index -= CurrentMaxIndex;
 									}
-									CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTitles[index]);
+									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkTitles[index]);
 
 									if (i != 0) {
 										tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -530,7 +530,7 @@ namespace TJAPlayer3 {
 									while (index >= CurrentMaxIndex) {
 										index -= CurrentMaxIndex;
 									}
-									CTexture tmpTex = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[index]);
+									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkDanTitles[index]);
 
 									if (i != 0) {
 										tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
@@ -576,7 +576,7 @@ namespace TJAPlayer3 {
 				TJAPlayer3.Tx.NewHeya_ModeBar.t2D描画(TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_X[i], TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Y[i]);
 				int title_x = TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_X[i] + TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[0];
 				int title_y = TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Y[i] + TJAPlayer3.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[1];
-				TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(MenuTitleKeys[i], false).t2D拡大率考慮中央基準描画(title_x, title_y);
+				TitleTextureKey.ResolveTitleTexture(MenuTitleKeys[i], false).t2D拡大率考慮中央基準描画(title_x, title_y);
 			}
 
 			return base.Draw();
@@ -606,7 +606,7 @@ namespace TJAPlayer3 {
 
 				// Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-				this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
+				this.ttkInfoSection = new TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
 
 				return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
 			}
@@ -620,7 +620,7 @@ namespace TJAPlayer3 {
 
 			if (TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock != null
 				&& !TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(TJAPlayer3.Skin.Puchicharas_Name[CurrentIndex])) {
-				this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.tConditionMessage()
+				this.ttkInfoSection = new TitleTextureKey(TJAPlayer3.Tx.Puchichara[CurrentIndex].unlock.tConditionMessage()
 					, this.MenuFont, Color.White, Color.Black, 1000);
 			} else
 				this.ttkInfoSection = null;
@@ -632,7 +632,7 @@ namespace TJAPlayer3 {
 
 			if (TJAPlayer3.Tx.Characters[CurrentIndex].unlock != null
 				&& !TJAPlayer3.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Contains(TJAPlayer3.Skin.Characters_DirName[CurrentIndex])) {
-				this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(TJAPlayer3.Tx.Characters[CurrentIndex].unlock.tConditionMessage()
+				this.ttkInfoSection = new TitleTextureKey(TJAPlayer3.Tx.Characters[CurrentIndex].unlock.tConditionMessage()
 					, this.MenuFont, Color.White, Color.Black, 1000);
 			} else
 				this.ttkInfoSection = null;
@@ -653,7 +653,7 @@ namespace TJAPlayer3 {
 
 				// Send coins here for the unlock, considering that only coin-paid puchicharas can be unlocked directly from the Heya menu
 
-				this.ttkInfoSection = new CActSelect曲リスト.TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
+				this.ttkInfoSection = new TitleTextureKey(response.Item2 ?? this.ttkInfoSection.str文字, this.MenuFont, responseColor, Color.Black, 1000);
 
 				return (response.Item1) ? ESelectStatus.SUCCESS : ESelectStatus.FAILED;
 			}

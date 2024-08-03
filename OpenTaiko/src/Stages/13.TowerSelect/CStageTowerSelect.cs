@@ -170,8 +170,8 @@ namespace TJAPlayer3 {
 			public string strTitle;
 			public string strSubTitle;
 			public CSongListNode.ENodeType eノード種別;
-			public CActSelect曲リスト.TitleTextureKey ttkTitle;
-			public CActSelect曲リスト.TitleTextureKey ttkSubTitle;
+			public TitleTextureKey ttkTitle;
+			public TitleTextureKey ttkSubTitle;
 		}
 
 		public void tSelectSong() {
@@ -247,8 +247,8 @@ namespace TJAPlayer3 {
 					break;
 			}
 
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(barInfo.ttkTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_Title_Offset[0], y + TJAPlayer3.Skin.TowerSelect_Title_Offset[1]);
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(barInfo.ttkSubTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[0], y + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[1]);
+			TitleTextureKey.ResolveTitleTexture(barInfo.ttkTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_Title_Offset[0], y + TJAPlayer3.Skin.TowerSelect_Title_Offset[1]);
+			TitleTextureKey.ResolveTitleTexture(barInfo.ttkSubTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[0], y + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[1]);
 		}
 
 		private void tUpdateBarInfos() {
@@ -278,8 +278,8 @@ namespace TJAPlayer3 {
 				bar.strSubTitle = song.ldSubtitle.GetString("");
 				bar.eノード種別 = song.eノード種別;
 
-				bar.ttkTitle = new CActSelect曲リスト.TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_Title_MaxWidth);
-				bar.ttkSubTitle = new CActSelect曲リスト.TitleTextureKey(bar.strSubTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_SubTitle_MaxWidth);
+				bar.ttkTitle = new TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_Title_MaxWidth);
+				bar.ttkSubTitle = new TitleTextureKey(bar.strSubTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_SubTitle_MaxWidth);
 			}
 		}
 

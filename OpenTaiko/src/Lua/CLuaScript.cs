@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json.Nodes;
 using FDK;
 using NLua;
-using static TJAPlayer3.CActSelect曲リスト;
 
 namespace TJAPlayer3 {
 	class CLuaScript : IDisposable {
@@ -156,8 +155,8 @@ namespace TJAPlayer3 {
 			return new TitleTextureKey(title, fontRenderer, color ?? Color.White, edgeColor ?? Color.Black, maxSize);
 		}
 
-		private CTexture GetTextTex(CActSelect曲リスト.TitleTextureKey titleTextureKey, bool vertical, bool keepCenter) {
-			return TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
+		private CTexture GetTextTex(TitleTextureKey titleTextureKey, bool vertical, bool keepCenter) {
+			return TitleTextureKey.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
 		}
 
 		public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) {

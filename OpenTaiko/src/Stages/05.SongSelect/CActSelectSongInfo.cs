@@ -49,10 +49,10 @@ namespace TJAPlayer3 {
 				}
 
 				if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show) {
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
+					TitleTextureKey.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
 				}
 				if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show) {
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
+					TitleTextureKey.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
 				}
 				if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit)
 					TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);

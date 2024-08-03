@@ -180,20 +180,20 @@ namespace TJAPlayer3 {
 		public override void Activate() {
 			this.sdDTXで指定されたフルコンボ音 = null;
 
-			ttkAISection = new CActSelect曲リスト.TitleTextureKey[TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count];
+			ttkAISection = new TitleTextureKey[TJAPlayer3.stage演奏ドラム画面.AIBattleSections.Count];
 			for (int i = 0; i < ttkAISection.Length; i++) {
-				ttkAISection[i] = new CActSelect曲リスト.TitleTextureKey($"{i + 1}区", pfAISectionText, Color.White, Color.Black, 1280);
+				ttkAISection[i] = new TitleTextureKey($"{i + 1}区", pfAISectionText, Color.White, Color.Black, 1280);
 
 			}
 
 			for (int i = 0; i < 5; i++) {
-				ttkSpeechText[i] = new CActSelect曲リスト.TitleTextureKey[6];
+				ttkSpeechText[i] = new TitleTextureKey[6];
 
 				int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character;
 
 				for (int j = 0; j < 6; j++) {
 					// { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" }
-					ttkSpeechText[i][j] = new CActSelect曲リスト.TitleTextureKey(
+					ttkSpeechText[i][j] = new TitleTextureKey(
 						TJAPlayer3.Tx.Characters[_charaId].metadata.SpeechText[j].GetString(""),
 						pfSpeechText, Color.White, Color.Black, TJAPlayer3.Skin.Result_Speech_Text_MaxWidth);
 				}
@@ -642,13 +642,13 @@ namespace TJAPlayer3 {
 						if (nowIndex == nNowAISection) {
 							TJAPlayer3.Tx.Result_AIBattle_Batch.Opacity = opacityCounter;
 							TJAPlayer3.Tx.Result_AIBattle_SectionPlate.Opacity = opacityCounter;
-							if (TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkAISection[i]) != null)
-								TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkAISection[i]).Opacity = opacityCounter;
+							if (TitleTextureKey.ResolveTitleTexture(ttkAISection[i]) != null)
+								TitleTextureKey.ResolveTitleTexture(ttkAISection[i]).Opacity = opacityCounter;
 						} else {
 							TJAPlayer3.Tx.Result_AIBattle_Batch.Opacity = 255 - opacityCounter;
 							TJAPlayer3.Tx.Result_AIBattle_SectionPlate.Opacity = 255 - opacityCounter;
-							if (TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkAISection[i]) != null)
-								TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkAISection[i]).Opacity = 255 - opacityCounter;
+							if (TitleTextureKey.ResolveTitleTexture(ttkAISection[i]) != null)
+								TitleTextureKey.ResolveTitleTexture(ttkAISection[i]).Opacity = 255 - opacityCounter;
 						}
 
 						TJAPlayer3.Tx.Result_AIBattle_Batch.t2D描画(x, y, new RectangleF(batch_width * 0, 0, batch_width, batch_height));
@@ -666,7 +666,7 @@ namespace TJAPlayer3 {
 
 						TJAPlayer3.Tx.Result_AIBattle_SectionPlate.t2D描画(x + TJAPlayer3.Skin.Result_AIBattle_SectionPlate_Offset[0], y + TJAPlayer3.Skin.Result_AIBattle_SectionPlate_Offset[1]);
 
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkAISection[i])?.t2D中心基準描画(x + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[0], y + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[1]);
+						TitleTextureKey.ResolveTitleTexture(ttkAISection[i])?.t2D中心基準描画(x + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[0], y + TJAPlayer3.Skin.Result_AIBattle_SectionText_Offset[1]);
 					}
 
 					if (ctMainCounter.CurrentValue >= MountainAppearValue) {
@@ -944,9 +944,9 @@ namespace TJAPlayer3 {
 							TJAPlayer3.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2D拡大率考慮中央基準描画(speech_bubble_x, speech_bubble_y,
 								new Rectangle(0, MoodV2 * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 
-							TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.X = scale;
-							TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.Y = scale;
-							TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2D拡大率考慮中央基準描画(
+							TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.X = scale;
+							TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.Y = scale;
+							TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2D拡大率考慮中央基準描画(
 								speech_bubble_x + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[0] * scale),
 								speech_bubble_y + (int)(TJAPlayer3.Skin.Result_Speech_Text_Offset[1] * scale));
 						}
@@ -1165,9 +1165,9 @@ namespace TJAPlayer3 {
 		private readonly ST文字位置[] st大文字位置;
 		private ST文字位置[] stScoreFont;
 
-		private CActSelect曲リスト.TitleTextureKey[] ttkAISection;
+		private TitleTextureKey[] ttkAISection;
 
-		private CActSelect曲リスト.TitleTextureKey[][] ttkSpeechText = new CActSelect曲リスト.TitleTextureKey[5][];
+		private TitleTextureKey[][] ttkSpeechText = new TitleTextureKey[5][];
 
 		private CCachedFontRenderer pfSpeechText;
 		private CCachedFontRenderer pfAISectionText;

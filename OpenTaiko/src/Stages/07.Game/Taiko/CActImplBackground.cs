@@ -224,8 +224,8 @@ namespace TJAPlayer3 {
 					#region [Tower background informations]
 
 					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_Kai[0], TJAPlayer3.Skin.Game_Tower_Font_Kai[1]);
+						TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
+						TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_Kai[0], TJAPlayer3.Skin.Game_Tower_Font_Kai[1]);
 
 						this.ct炎.TickLoop();
 						CFloorManagement.loopFrames();

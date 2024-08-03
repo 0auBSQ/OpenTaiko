@@ -1275,14 +1275,14 @@ namespace TJAPlayer3 {
 
 						#region [Text elements]
 
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkToutatsu)?.t2D描画(TJAPlayer3.Skin.TowerResult_Toutatsu[0], TJAPlayer3.Skin.TowerResult_Toutatsu[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkMaxFloors)?.t2D描画(TJAPlayer3.Skin.TowerResult_MaxFloors[0], TJAPlayer3.Skin.TowerResult_MaxFloors[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkTen)?.t2D描画(TJAPlayer3.Skin.TowerResult_Ten[0], TJAPlayer3.Skin.TowerResult_Ten[1]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkScore)?.t2D描画(TJAPlayer3.Skin.TowerResult_Score[0], TJAPlayer3.Skin.TowerResult_Score[1]);
 
-						CTexture tmpScoreCount = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkScoreCount);
-						CTexture tmpCurrentFloor = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkReachedFloor);
-						CTexture tmpRemainingLifes = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkRemaningLifes);
+						CTexture tmpScoreCount = TitleTextureKey.ResolveTitleTexture(this.ttkScoreCount);
+						CTexture tmpCurrentFloor = TitleTextureKey.ResolveTitleTexture(this.ttkReachedFloor);
+						CTexture tmpRemainingLifes = TitleTextureKey.ResolveTitleTexture(this.ttkRemaningLifes);
 
 						tmpCurrentFloor?.t2D描画(TJAPlayer3.Skin.TowerResult_CurrentFloor[0] - tmpCurrentFloor.szTextureSize.Width, TJAPlayer3.Skin.TowerResult_CurrentFloor[1]);
 						tmpScoreCount?.t2D描画(TJAPlayer3.Skin.TowerResult_ScoreCount[0] - tmpScoreCount.szTextureSize.Width, TJAPlayer3.Skin.TowerResult_ScoreCount[1]);
@@ -1628,8 +1628,8 @@ namespace TJAPlayer3 {
 				this.actParameterPanel.t小文字表示(num_x[j] + offset, num_y[j], scoresArr[j], 1.0f);
 			TJAPlayer3.Tx.Result_Number.Opacity = 255;
 
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
-			TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
+			TitleTextureKey.ResolveTitleTexture(this.ttkDanTitles[i]).Opacity = opacity;
+			TitleTextureKey.ResolveTitleTexture(this.ttkDanTitles[i]).t2D描画(TJAPlayer3.Skin.DanResult_DanTitles_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanTitles_Y[drawPos]);
 
 			CActSelect段位リスト.tDisplayDanIcon(i + 1, TJAPlayer3.Skin.DanResult_DanIcon_X[drawPos] + offset, TJAPlayer3.Skin.DanResult_DanIcon_Y[drawPos], opacity, 1.0f);
 

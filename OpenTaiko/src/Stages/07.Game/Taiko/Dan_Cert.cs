@@ -902,7 +902,7 @@ namespace TJAPlayer3 {
 						new Rectangle(0, 0, TJAPlayer3.Skin.Game_DanC_ExamType_Size[0], TJAPlayer3.Skin.Game_DanC_ExamType_Size[1]));
 
 					if ((int)dan_C[i].GetExamType() < this.ttkExams.Length)
-						TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkExams[(int)dan_C[i].GetExamType()]).t2D拡大率考慮中央基準描画(
+						TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)dan_C[i].GetExamType()]).t2D拡大率考慮中央基準描画(
 							_examX + TJAPlayer3.Skin.Game_DanC_ExamType_Size[0] / 2,
 							_examY - TJAPlayer3.Skin.Game_DanC_ExamType_Size[1] / 2);
 
@@ -941,7 +941,7 @@ namespace TJAPlayer3 {
 						TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * _scale) + 4,
 						TJAPlayer3.Skin.Game_DanC_Y[0]);
 
-					TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(this.ttkExams[(int)Exam.Type.Gauge]).t2D拡大率考慮中央基準描画(
+					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)Exam.Type.Gauge]).t2D拡大率考慮中央基準描画(
 							TJAPlayer3.Skin.Game_DanC_X[0] - ((50 - dan_C[i].GetValue(false) / 2) * _scale) + _offexX,
 							TJAPlayer3.Skin.Game_DanC_Y[0] + _offexY);
 
