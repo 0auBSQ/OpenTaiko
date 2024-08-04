@@ -73,7 +73,7 @@ namespace OpenTaiko {
 			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
 				KusudamaScript.Update();
 			}
-			if (!(TJAPlayer3.stage演奏ドラム画面.bPAUSE && TJAPlayer3.ConfigIni.bTokkunMode)) {
+			if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
 				KusudamaScript.Draw();
 			}
 		}
@@ -154,7 +154,7 @@ namespace OpenTaiko {
                     if (TJAPlayer3.Tx.Kusudama != null)
                         TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                         */
-					if (!(TJAPlayer3.stage演奏ドラム画面.bPAUSE && TJAPlayer3.ConfigIni.bTokkunMode))
+					if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
 						this.tKusudamaNumber(n連打数);
 				}
 
