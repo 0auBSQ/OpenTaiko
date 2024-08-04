@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CAct演奏スクロール速度 : CActivity {
 		// プロパティ
 
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 
 		public override void Activate() {
 			for (int i = 0; i < 5; i++) {
-				this.db現在の譜面スクロール速度[i] = (double)TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(i)];
+				this.db現在の譜面スクロール速度[i] = (double)OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.GetActualPlayer(i)];
 				this.n速度変更制御タイマ[i] = -1;
 			}
 
@@ -31,7 +31,7 @@ namespace TJAPlayer3 {
 				if (base.IsFirstDraw) {
 					//this.n速度変更制御タイマ.Drums = this.n速度変更制御タイマ.Guitar = this.n速度変更制御タイマ.Bass = (long)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
 					for (int i = 0; i < 5; i++) {
-						this.n速度変更制御タイマ[i] = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
+						this.n速度変更制御タイマ[i] = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 
 					}
 
@@ -39,7 +39,7 @@ namespace TJAPlayer3 {
 				}
 				long n現在時刻 = SoundManager.PlayTimer.NowTime;
 				for (int i = 0; i < 5; i++) {
-					double db譜面スクロールスピード = (double)TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.GetActualPlayer(i)];
+					double db譜面スクロールスピード = (double)OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.GetActualPlayer(i)];
 					if (n現在時刻 < this.n速度変更制御タイマ[i]) {
 						this.n速度変更制御タイマ[i] = n現在時刻;
 					}

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class SaveFile {
 
 		public void tSaveFile(string filename) {

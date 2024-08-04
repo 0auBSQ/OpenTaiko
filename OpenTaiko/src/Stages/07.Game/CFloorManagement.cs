@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	// Small static class which refers to the Tower mode important informations
 	static internal class CFloorManagement {
 		public static void reinitialize(int life) {
@@ -21,10 +21,10 @@ namespace TJAPlayer3 {
 				return;
 
 			if (CFloorManagement.CurrentNumberOfLives > 0) {
-				CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDurationSpeedDependent + 1000, 1, TJAPlayer3.Timer);
+				CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDurationSpeedDependent + 1000, 1, OpenTaiko.Timer);
 				CFloorManagement.CurrentNumberOfLives--;
 				//TJAPlayer3.Skin.soundTowerMiss.t再生する();
-				TJAPlayer3.Skin.voiceTowerMiss[TJAPlayer3.SaveFile]?.tPlay();
+				OpenTaiko.Skin.voiceTowerMiss[OpenTaiko.SaveFile]?.tPlay();
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace TJAPlayer3 {
 		public static int CurrentNumberOfLives = 5;
 
 		public static double InvincibilityDurationSpeedDependent {
-			get => ((double)InvincibilityDuration) / TJAPlayer3.ConfigIni.SongPlaybackSpeed;
+			get => ((double)InvincibilityDuration) / OpenTaiko.ConfigIni.SongPlaybackSpeed;
 		}
 
 		// ms

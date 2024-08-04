@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class ModalQueue {
 		public ModalQueue(Modal.EModalFormat mf) {
 			_modalQueues = new Queue<Modal>[] { new Queue<Modal>(), new Queue<Modal>(), new Queue<Modal>(), new Queue<Modal>(), new Queue<Modal>() };
@@ -10,7 +10,7 @@
 			mp.modalFormat = _modalFormat;
 			mp.player = player;
 
-			if (mp != null && player >= 0 && player < TJAPlayer3.ConfigIni.nPlayerCount)
+			if (mp != null && player >= 0 && player < OpenTaiko.ConfigIni.nPlayerCount)
 				_modalQueues[player].Enqueue(mp);
 		}
 
@@ -22,7 +22,7 @@
 
 		// 1P => 2P => 3P => 4P => 5P
 		public Modal? tPopModalInOrder() {
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (!tIsQueueEmpty(i)) {
 					Modal? _m = _modalQueues[i].Dequeue();
 					_m?.tRegisterModal(i + 1);
@@ -34,7 +34,7 @@
 		}
 
 		public bool tIsQueueEmpty(int player) {
-			if (player < 0 || player >= TJAPlayer3.ConfigIni.nPlayerCount)
+			if (player < 0 || player >= OpenTaiko.ConfigIni.nPlayerCount)
 				return true;
 
 			return _modalQueues[player].Count < 1;

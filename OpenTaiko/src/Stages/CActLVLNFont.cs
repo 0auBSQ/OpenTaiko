@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CActLVLNFont : CActivity {
 		// コンストラクタ
 
@@ -59,7 +59,7 @@ namespace TJAPlayer3 {
 		// CActivity 実装
 
 		public override void CreateManagedResource() {
-			this.tx数値 = TJAPlayer3.tテクスチャの生成(CSkin.Path(@"Graphics\ScreenSelect level numbers.png"));
+			this.tx数値 = OpenTaiko.tテクスチャの生成(CSkin.Path(@"Graphics\ScreenSelect level numbers.png"));
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {

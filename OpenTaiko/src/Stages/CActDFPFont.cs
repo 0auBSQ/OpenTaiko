@@ -3,7 +3,7 @@ using FDK;
 using Silk.NET.Maths;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActDFPFont : CActivity {
 		// コンストラクタ
 
@@ -39,7 +39,7 @@ namespace TJAPlayer3 {
 		}
 		public void t文字列描画(int x, int y, string str, bool b強調, float fScale) {
 			if (!base.IsDeActivated && !string.IsNullOrEmpty(str)) {
-				CTexture texture = b強調 ? TJAPlayer3.Tx.Config_Font_Bold : TJAPlayer3.Tx.Config_Font;
+				CTexture texture = b強調 ? OpenTaiko.Tx.Config_Font_Bold : OpenTaiko.Tx.Config_Font;
 				if (texture != null) {
 					texture.vcScaleRatio = new Vector3D<float>(fScale, fScale, 1f);
 					foreach (char ch in str) {
@@ -536,8 +536,8 @@ namespace TJAPlayer3 {
 			st文字領域Array[0x5e].ch = '`';
 			st文字領域Array[0x5e].rc = new Rectangle(69, 226, 14, 29);
 
-			float scaleX = TJAPlayer3.Tx.Config_Font.szTextureSize.Width / 256.0f;
-			float scaleY = TJAPlayer3.Tx.Config_Font.szTextureSize.Height / 256.0f;
+			float scaleX = OpenTaiko.Tx.Config_Font.szTextureSize.Width / 256.0f;
+			float scaleY = OpenTaiko.Tx.Config_Font.szTextureSize.Height / 256.0f;
 
 			for (int i = 0; i < st文字領域Array.Length; i++) {
 				st文字領域Array[i].rc = new Rectangle((int)(st文字領域Array[i].rc.X * scaleX), (int)(st文字領域Array[i].rc.Y * scaleY),

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	[Serializable]
 	internal class CLocalizationData {
 		[JsonProperty("strings")]

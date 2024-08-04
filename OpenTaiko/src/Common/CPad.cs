@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CPad {
 		// プロパティ
 

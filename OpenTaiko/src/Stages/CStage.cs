@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CStage : CActivity {
 		internal EStage eStageID;
 		public enum EStage {

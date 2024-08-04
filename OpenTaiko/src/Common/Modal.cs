@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class Modal {
 		public Modal(EModalType mt, int ra, params object?[] re) {
 			modalType = mt;
@@ -7,7 +7,7 @@
 		}
 
 		public void tRegisterModal(int player) {
-			TJAPlayer3.stage結果.lcModal.RegisterNewModal(player, rarity, modalType, reference);
+			OpenTaiko.stage結果.lcModal.RegisterNewModal(player, rarity, modalType, reference);
 		}
 
 		#region [Enum definitions]

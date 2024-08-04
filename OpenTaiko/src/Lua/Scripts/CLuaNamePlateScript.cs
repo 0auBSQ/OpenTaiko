@@ -1,7 +1,7 @@
 ﻿using FDK;
 using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CLuaNamePlateScript : CLuaScript {
 		private LuaFunction lfGetCharaOffset;
 		private LuaFunction lfSetInfos;

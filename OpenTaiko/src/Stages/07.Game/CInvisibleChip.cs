@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CInvisibleChip : IDisposable {
 		/// <summary>ミス後表示する時間(ms)</summary>
 		public int nDisplayTimeMs {
@@ -65,7 +65,7 @@ namespace TJAPlayer3 {
 		/// </summary>
 		/// <param name="eInst">楽器パート</param>
 		public void ShowChipTemporally(EInstrumentPad eInst) {
-			ccounter[(int)eInst].Start(0, nDisplayTimeMs + nFadeoutTimeMs + 1, 1, TJAPlayer3.Timer);
+			ccounter[(int)eInst].Start(0, nDisplayTimeMs + nFadeoutTimeMs + 1, 1, OpenTaiko.Timer);
 		}
 
 		/// <summary>

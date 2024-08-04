@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// KeyboardSoundGroupLevelControlHandler is called by the song selection
 	/// and song play stages when handling keyboard input. By delegating to
@@ -23,8 +23,8 @@ namespace TJAPlayer3 {
 			SoundGroupLevelController soundGroupLevelController,
 			CSkin skin,
 			bool isSongPreview) {
-			bool isAdjustmentPositive = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolIncrease);
-			bool isAdjustmentNegative = TJAPlayer3.ConfigIni.KeyAssign.KeyIsPressed(TJAPlayer3.ConfigIni.KeyAssign.System.SongVolDecrease);
+			bool isAdjustmentPositive = OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SongVolIncrease);
+			bool isAdjustmentNegative = OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SongVolDecrease);
 
 			if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 

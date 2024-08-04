@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplRunner : CActivity {
 		/// <summary>
 		/// ランナー
@@ -13,7 +13,7 @@ namespace TJAPlayer3 {
 		}
 
 		public void Start(int Player, bool IsMiss, CDTX.CChip pChip) {
-			if (Runner != null && !TJAPlayer3.ConfigIni.SimpleMode) {
+			if (Runner != null && !OpenTaiko.ConfigIni.SimpleMode) {
 				while (stRunners[Index].b使用中) {
 					Index += 1;
 					if (Index >= 128) {
@@ -30,7 +30,7 @@ namespace TJAPlayer3 {
 						} else {
 							stRunners[Index].nType = random.Next(1, Type + 1);
 						}
-						stRunners[Index].ct進行 = new CCounter(0, TJAPlayer3.Skin.Resolution[0], Timer, TJAPlayer3.Timer);
+						stRunners[Index].ct進行 = new CCounter(0, OpenTaiko.Skin.Resolution[0], Timer, OpenTaiko.Timer);
 						stRunners[Index].nOldValue = 0;
 						stRunners[Index].nNowPtn = 0;
 						stRunners[Index].fX = 0;
@@ -41,7 +41,7 @@ namespace TJAPlayer3 {
 		}
 
 		public override void Activate() {
-			if (TJAPlayer3.ConfigIni.SimpleMode) {
+			if (OpenTaiko.ConfigIni.SimpleMode) {
 				base.Activate();
 				return;
 			}
@@ -66,7 +66,7 @@ namespace TJAPlayer3 {
 						: dirs[random.Next(0, dirs.Length)];
 					LoadRunnerConifg(path);
 
-					Runner = TJAPlayer3.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}Runner.png");
+					Runner = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}Runner.png");
 				}
 			}
 
@@ -75,7 +75,7 @@ namespace TJAPlayer3 {
 		}
 
 		public override void DeActivate() {
-			if (TJAPlayer3.ConfigIni.SimpleMode) {
+			if (OpenTaiko.ConfigIni.SimpleMode) {
 				base.DeActivate();
 				return;
 			}
@@ -84,7 +84,7 @@ namespace TJAPlayer3 {
 				stRunners[i].ct進行 = null;
 			}
 
-			TJAPlayer3.tDisposeSafely(ref Runner);
+			OpenTaiko.tDisposeSafely(ref Runner);
 
 			base.DeActivate();
 		}
@@ -98,7 +98,7 @@ namespace TJAPlayer3 {
 		}
 
 		public override int Draw() {
-			if (TJAPlayer3.ConfigIni.SimpleMode) {
+			if (OpenTaiko.ConfigIni.SimpleMode) {
 				return base.Draw();
 			}
 
@@ -106,13 +106,13 @@ namespace TJAPlayer3 {
 				if (stRunners[i].b使用中) {
 					stRunners[i].nOldValue = stRunners[i].ct進行.CurrentValue;
 					stRunners[i].ct進行.Tick();
-					if (stRunners[i].ct進行.IsEnded || stRunners[i].fX > TJAPlayer3.Skin.Resolution[0]) {
+					if (stRunners[i].ct進行.IsEnded || stRunners[i].fX > OpenTaiko.Skin.Resolution[0]) {
 						stRunners[i].ct進行.Stop();
 						stRunners[i].b使用中 = false;
 					}
 					for (int n = stRunners[i].nOldValue; n < stRunners[i].ct進行.CurrentValue; n++) {
-						stRunners[i].fX += (float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[stRunners[i].nPlayer] / 18;
-						int Width = TJAPlayer3.Skin.Resolution[0] / Ptn;
+						stRunners[i].fX += (float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[stRunners[i].nPlayer] / 18;
+						int Width = OpenTaiko.Skin.Resolution[0] / Ptn;
 						stRunners[i].nNowPtn = (int)stRunners[i].fX / Width;
 					}
 					if (Runner != null) {
@@ -147,7 +147,7 @@ namespace TJAPlayer3 {
 
 		private void LoadRunnerConifg(string dancerPath) {
 			var _str = "";
-			TJAPlayer3.Skin.LoadSkinConfigFromFile(dancerPath + @"\RunnerConfig.txt", ref _str);
+			OpenTaiko.Skin.LoadSkinConfigFromFile(dancerPath + @"\RunnerConfig.txt", ref _str);
 
 			string[] delimiter = { "\n" };
 			string[] strSingleLine = _str.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);

@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// レーンフラッシュのクラス。
 	/// </summary>
@@ -13,7 +13,7 @@ namespace TJAPlayer3 {
 		}
 
 		public void Start() {
-			Counter = new CCounter(0, 100, 1, TJAPlayer3.Timer);
+			Counter = new CCounter(0, 100, 1, OpenTaiko.Timer);
 		}
 
 		public override void Activate() {
@@ -32,15 +32,15 @@ namespace TJAPlayer3 {
 				int x;
 				int y;
 
-				if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-					x = TJAPlayer3.Skin.Game_Lane_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * Player);
-					y = TJAPlayer3.Skin.Game_Lane_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * Player);
-				} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-					x = TJAPlayer3.Skin.Game_Lane_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * Player);
-					y = TJAPlayer3.Skin.Game_Lane_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * Player);
+				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+					x = OpenTaiko.Skin.Game_Lane_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * Player);
+					y = OpenTaiko.Skin.Game_Lane_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * Player);
+				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+					x = OpenTaiko.Skin.Game_Lane_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * Player);
+					y = OpenTaiko.Skin.Game_Lane_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * Player);
 				} else {
-					x = TJAPlayer3.Skin.Game_Lane_X[Player];
-					y = TJAPlayer3.Skin.Game_Lane_Y[Player];
+					x = OpenTaiko.Skin.Game_Lane_X[Player];
+					y = OpenTaiko.Skin.Game_Lane_Y[Player];
 				}
 
 				Counter.Tick();

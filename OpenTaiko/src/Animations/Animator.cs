@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3.Animations {
+namespace OpenTaiko.Animations {
 	class Animator : IAnimatable {
 		public Animator(int startValue, int endValue, int tickInterval, bool isLoop) {
 			Type = CounterType.Normal;
@@ -22,7 +22,7 @@ namespace TJAPlayer3.Animations {
 			if (Counter == null) throw new NullReferenceException();
 			switch (Type) {
 				case CounterType.Normal:
-					Counter.Start((int)StartValue, (int)EndValue, (int)TickInterval, TJAPlayer3.Timer);
+					Counter.Start((int)StartValue, (int)EndValue, (int)TickInterval, OpenTaiko.Timer);
 					break;
 				case CounterType.Double:
 					Counter.Start((double)StartValue, (double)EndValue, (double)TickInterval, SoundManager.PlayTimer);

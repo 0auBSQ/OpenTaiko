@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// The ConfigIniToSoundGroupLevelControllerBinder allows for updated sound
 	/// group level values, and keyboard sound level adjustment increment

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplJudgeText : CActivity {
 		// コンストラクタ
 
@@ -38,27 +38,27 @@ namespace TJAPlayer3 {
 						}
 						judgeC.counter.Tick();
 
-						if (TJAPlayer3.Tx.Judge != null) {
+						if (OpenTaiko.Tx.Judge != null) {
 							float moveValue = CubicEaseOut(judgeC.counter.CurrentValue / 410.0f) - 1.0f;
 
 							float x = 0;
 							float y = 0;
 
-							if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-								x = TJAPlayer3.Skin.Game_Judge_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * j);
-								y = TJAPlayer3.Skin.Game_Judge_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * j);
-							} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-								x = TJAPlayer3.Skin.Game_Judge_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * j);
-								y = TJAPlayer3.Skin.Game_Judge_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * j);
+							if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+								x = OpenTaiko.Skin.Game_Judge_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * j);
+								y = OpenTaiko.Skin.Game_Judge_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * j);
+							} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+								x = OpenTaiko.Skin.Game_Judge_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * j);
+								y = OpenTaiko.Skin.Game_Judge_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * j);
 							} else {
-								x = TJAPlayer3.Skin.Game_Judge_X[j];
-								y = TJAPlayer3.Skin.Game_Judge_Y[j];
+								x = OpenTaiko.Skin.Game_Judge_X[j];
+								y = OpenTaiko.Skin.Game_Judge_Y[j];
 							}
-							x += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[0]) + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(j);
-							y += (moveValue * TJAPlayer3.Skin.Game_Judge_Move[1]) + TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(j);
+							x += (moveValue * OpenTaiko.Skin.Game_Judge_Move[0]) + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(j);
+							y += (moveValue * OpenTaiko.Skin.Game_Judge_Move[1]) + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(j);
 
-							TJAPlayer3.Tx.Judge.Opacity = (int)(255f - (judgeC.counter.CurrentValue >= 360 ? ((judgeC.counter.CurrentValue - 360) / 50.0f) * 255f : 0f));
-							TJAPlayer3.Tx.Judge.t2D描画(x, y, judgeC.rc);
+							OpenTaiko.Tx.Judge.Opacity = (int)(255f - (judgeC.counter.CurrentValue >= 360 ? ((judgeC.counter.CurrentValue - 360) / 50.0f) * 255f : 0f));
+							OpenTaiko.Tx.Judge.t2D描画(x, y, judgeC.rc);
 						}
 					}
 				}
@@ -68,7 +68,7 @@ namespace TJAPlayer3 {
 
 		public void Start(int player, ENoteJudge judge) {
 			JudgeAnime judgeAnime = new();
-			judgeAnime.counter.Start(0, 410, 1, TJAPlayer3.Timer);
+			judgeAnime.counter.Start(0, 410, 1, OpenTaiko.Timer);
 			judgeAnime.Judge = judge;
 
 			//int njudge = judge == E判定.Perfect ? 0 : judge == E判定.Good ? 1 : judge == E判定.ADLIB ? 3 : judge == E判定.Auto ? 0 : 2;
@@ -78,12 +78,12 @@ namespace TJAPlayer3 {
 				njudge = JudgesDict[judge];
 			}
 
-			if (njudge == 0 && TJAPlayer3.ConfigIni.SimpleMode) {
+			if (njudge == 0 && OpenTaiko.ConfigIni.SimpleMode) {
 				return;
 			}
 
-			int height = TJAPlayer3.Tx.Judge.szTextureSize.Height / 5;
-			judgeAnime.rc = new Rectangle(0, (int)njudge * height, TJAPlayer3.Tx.Judge.szTextureSize.Width, height);
+			int height = OpenTaiko.Tx.Judge.szTextureSize.Height / 5;
+			judgeAnime.rc = new Rectangle(0, (int)njudge * height, OpenTaiko.Tx.Judge.szTextureSize.Width, height);
 
 			JudgeAnimes[player].Add(judgeAnime);
 		}

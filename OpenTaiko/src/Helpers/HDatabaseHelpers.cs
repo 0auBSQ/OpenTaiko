@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public static class HDatabaseHelpers {
 		public static List<string> GetAvailableLanguage(SqliteConnection connection, string prefix) {
 			List<string> _translations = new List<string>();

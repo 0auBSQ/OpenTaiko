@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// CDTXStyleExtractor determines if there is a session notation, and if there is then
 	/// it returns a sheet of music clipped according to the specified player Side.

@@ -1,6 +1,6 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class CLuaFps {
-		public double deltaTime => TJAPlayer3.FPS.DeltaTime;
-		public int fps => TJAPlayer3.FPS.NowFPS;
+		public double deltaTime => OpenTaiko.FPS.DeltaTime;
+		public int fps => OpenTaiko.FPS.NowFPS;
 	}
 }

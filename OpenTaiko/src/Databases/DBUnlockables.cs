@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using static TJAPlayer3.BestPlayRecords;
+using static OpenTaiko.BestPlayRecords;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class DBUnlockables {
 		public static Dictionary<string, int> RequiredArgs = new Dictionary<string, int>() {
 			["ch"] = 1,
@@ -127,27 +127,27 @@ namespace TJAPlayer3 {
 					case "cs":
 					case "cm":
 						if (this.Values.Length == 1)
-							return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.Medals }, screen);
+							return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.Medals }, screen);
 						else
 							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 					case "ce":
 						if (this.Values.Length == 1)
-							return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalEarnedMedals }, screen);
+							return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.TotalEarnedMedals }, screen);
 						else
 							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 					case "ap":
 						if (this.Values.Length == 1)
-							return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModePlaycount }, screen);
+							return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.AIBattleModePlaycount }, screen);
 						else
 							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 					case "aw":
 						if (this.Values.Length == 1)
-							return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.AIBattleModeWins }, screen);
+							return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.AIBattleModeWins }, screen);
 						else
 							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 					case "tp":
 						if (this.Values.Length == 1)
-							return tConditionMet(new int[] { (int)TJAPlayer3.SaveFileInstances[player].data.TotalPlaycount }, screen);
+							return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.TotalPlaycount }, screen);
 						else
 							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 					case "dp":
@@ -245,7 +245,7 @@ namespace TJAPlayer3 {
 					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount);
 
 				// Only the player loaded as 1P can check unlockables in real time
-				var SaveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data;
+				var SaveData = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data;
 				var ChartStats = SaveData.bestPlaysStats;
 
 				switch (this.Condition) {
@@ -428,8 +428,8 @@ namespace TJAPlayer3 {
 					if (this.Condition == "dp" && (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit)) return 0;
 				}
 
-				var bpDistinctCharts = TJAPlayer3.SaveFileInstances[player].data.bestPlaysDistinctCharts;
-				var chartStats = TJAPlayer3.SaveFileInstances[player].data.bestPlaysStats;
+				var bpDistinctCharts = OpenTaiko.SaveFileInstances[player].data.bestPlaysDistinctCharts;
+				var chartStats = OpenTaiko.SaveFileInstances[player].data.bestPlaysStats;
 
 				switch (this.Condition) {
 					case "dp":

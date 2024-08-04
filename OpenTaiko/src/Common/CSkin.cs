@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Text;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	// グローバル定数
 
 	public enum Eシステムサウンド {
@@ -182,7 +182,7 @@ namespace TJAPlayer3 {
 				for (int i = 0; i < 2; i++)     // 一旦Cloneを止めてASIO対応に専念
 				{
 					try {
-						this.rSound[i] = TJAPlayer3.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), _soundGroup);
+						this.rSound[i] = OpenTaiko.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), _soundGroup);
 					} catch {
 						this.rSound[i] = null;
 						throw;
@@ -226,10 +226,10 @@ namespace TJAPlayer3 {
 			}
 
 			public void tRemoveMixer() {
-				if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
+				if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
 					for (int i = 0; i < 2; i++) {
 						if (this.rSound[i] != null) {
-							TJAPlayer3.SoundManager.RemoveMixer(this.rSound[i]);
+							OpenTaiko.SoundManager.RemoveMixer(this.rSound[i]);
 						}
 					}
 				}
@@ -241,7 +241,7 @@ namespace TJAPlayer3 {
 				if (!this.bDisposed) {
 					for (int i = 0; i < 2; i++) {
 						if (this.rSound[i] != null) {
-							TJAPlayer3.SoundManager.tDisposeSound(this.rSound[i]);
+							OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
 							this.rSound[i] = null;
 						}
 					}
@@ -643,7 +643,7 @@ namespace TJAPlayer3 {
 			PrepareReloadSkin();
 		}
 		private string InitializeSkinPathRoot() {
-			strSystemSkinRoot = System.IO.Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);
+			strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);
 			return strSystemSkinRoot;
 		}
 
@@ -759,7 +759,7 @@ namespace TJAPlayer3 {
 				if (!this[i].bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 				{
 					CSystemSound cシステムサウンド = this[i];
-					if (!TJAPlayer3.bコンパクトモード || cシステムサウンド.bCompact対象) {
+					if (!OpenTaiko.bコンパクトモード || cシステムサウンド.bCompact対象) {
 						try {
 							cシステムサウンド.tLoading();
 							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
@@ -929,7 +929,7 @@ namespace TJAPlayer3 {
 
 		public void LoadSkinConfigFromFile(string path, ref string work) {
 			if (!File.Exists(Path(path))) return;
-			using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding(TJAPlayer3.sEncType))) {
+			using (var streamReader = new StreamReader(Path(path), Encoding.GetEncoding(OpenTaiko.sEncType))) {
 				while (streamReader.Peek() > -1) // 一行ずつ読み込む。
 				{
 					var nowLine = streamReader.ReadLine();

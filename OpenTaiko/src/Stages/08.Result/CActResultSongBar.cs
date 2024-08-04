@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActResultSongBar : CActivity {
 		// コンストラクタ
 
@@ -25,13 +25,13 @@ namespace TJAPlayer3 {
 			// displaying the song title as usual.
 
 
-			var title = TJAPlayer3.IsPerformingCalibration
-				? $"Calibration complete. InputAdjustTime is now {TJAPlayer3.ConfigIni.nInputAdjustTimeMs}ms (Note : InputAdjust is deprecated, please transfer the value to GlobalOffset and reload the songs"
-				: TJAPlayer3.DTX.TITLE.GetString("");
+			var title = OpenTaiko.IsPerformingCalibration
+				? $"Calibration complete. InputAdjustTime is now {OpenTaiko.ConfigIni.nInputAdjustTimeMs}ms (Note : InputAdjust is deprecated, please transfer the value to GlobalOffset and reload the songs"
+				: OpenTaiko.DTX.TITLE.GetString("");
 
-			using (var bmpSongTitle = pfMusicName.DrawText(title, TJAPlayer3.Skin.Result_MusicName_ForeColor, TJAPlayer3.Skin.Result_MusicName_BackColor, null, 30)) {
-				this.txMusicName = TJAPlayer3.tテクスチャの生成(bmpSongTitle, false);
-				txMusicName.vcScaleRatio.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName, TJAPlayer3.Skin.Result_MusicName_MaxSize);
+			using (var bmpSongTitle = pfMusicName.DrawText(title, OpenTaiko.Skin.Result_MusicName_ForeColor, OpenTaiko.Skin.Result_MusicName_BackColor, null, 30)) {
+				this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
+				txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName, OpenTaiko.Skin.Result_MusicName_MaxSize);
 			}
 
 			base.Activate();
@@ -41,15 +41,15 @@ namespace TJAPlayer3 {
 				this.ct登場用 = null;
 			}
 
-			TJAPlayer3.tテクスチャの解放(ref this.txMusicName);
+			OpenTaiko.tテクスチャの解放(ref this.txMusicName);
 			base.DeActivate();
 		}
 		public override void CreateManagedResource() {
-			this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Result_MusicName_FontSize);
+			this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Result_MusicName_FontSize);
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {
-			TJAPlayer3.tDisposeSafely(ref this.pfMusicName);
+			OpenTaiko.tDisposeSafely(ref this.pfMusicName);
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {
@@ -57,17 +57,17 @@ namespace TJAPlayer3 {
 				return 0;
 			}
 			if (base.IsFirstDraw) {
-				this.ct登場用 = new CCounter(0, 270, 4, TJAPlayer3.Timer);
+				this.ct登場用 = new CCounter(0, 270, 4, OpenTaiko.Timer);
 				base.IsFirstDraw = false;
 			}
 			this.ct登場用.Tick();
 
-			if (TJAPlayer3.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Center) {
-				this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - ((this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X) / 2), TJAPlayer3.Skin.Result_MusicName_Y);
-			} else if (TJAPlayer3.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Left) {
-				this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X, TJAPlayer3.Skin.Result_MusicName_Y);
+			if (OpenTaiko.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Center) {
+				this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X - ((this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X) / 2), OpenTaiko.Skin.Result_MusicName_Y);
+			} else if (OpenTaiko.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Left) {
+				this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X, OpenTaiko.Skin.Result_MusicName_Y);
 			} else {
-				this.txMusicName.t2D描画(TJAPlayer3.Skin.Result_MusicName_X - this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X, TJAPlayer3.Skin.Result_MusicName_Y);
+				this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X - this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X, OpenTaiko.Skin.Result_MusicName_Y);
 			}
 
 			if (!this.ct登場用.IsEnded) {

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// ゲージ増加量の種類。
 	/// </summary>

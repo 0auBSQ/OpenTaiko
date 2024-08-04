@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CVisualLogManager {
 		public enum ELogCardType {
 			LogInfo,
@@ -12,7 +12,7 @@ namespace TJAPlayer3 {
 			public LogCard(ELogCardType type, string message) {
 				lct = type;
 				msg = message;
-				timeSinceCreation = new CCounter(0, 10000, 1, TJAPlayer3.Timer);
+				timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
 			}
 
 			public void Display(int screenPosition) {
@@ -23,7 +23,7 @@ namespace TJAPlayer3 {
 				int x = 0;
 				int y = 0 + (40 * screenPosition);
 
-				TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.Cyan, msg);
+				OpenTaiko.actTextConsole.tPrint(x, y, CTextConsole.EFontType.Cyan, msg);
 			}
 
 			public bool IsExpired() {

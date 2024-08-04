@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class CVersionList {
 		public static string[] VersionList = {
 			"0.1.0",

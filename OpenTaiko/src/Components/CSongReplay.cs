@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class CSongReplay {
 		/* Game version used for the replay
          * 521 = 0.5.2.1
@@ -79,16 +79,16 @@
 		public void tDanInputSongResults(int songNo) {
 			if (songNo >= DanSongCount) return;
 			if (songNo < 0) return;
-			IndividualGoodCount[songNo] = TJAPlayer3.stage演奏ドラム画面.n良[songNo];
-			IndividualOkCount[songNo] = TJAPlayer3.stage演奏ドラム画面.n可[songNo];
-			IndividualBadCount[songNo] = TJAPlayer3.stage演奏ドラム画面.n不可[songNo];
-			IndividualRollCount[songNo] = TJAPlayer3.stage演奏ドラム画面.n連打[songNo];
-			IndividualMaxCombo[songNo] = TJAPlayer3.stage演奏ドラム画面.nHighestCombo[songNo];
-			IndividualBoomCount[songNo] = TJAPlayer3.stage演奏ドラム画面.nMine[songNo];
-			IndividualADLibCount[songNo] = TJAPlayer3.stage演奏ドラム画面.nADLIB[songNo];
+			IndividualGoodCount[songNo] = OpenTaiko.stage演奏ドラム画面.n良[songNo];
+			IndividualOkCount[songNo] = OpenTaiko.stage演奏ドラム画面.n可[songNo];
+			IndividualBadCount[songNo] = OpenTaiko.stage演奏ドラム画面.n不可[songNo];
+			IndividualRollCount[songNo] = OpenTaiko.stage演奏ドラム画面.n連打[songNo];
+			IndividualMaxCombo[songNo] = OpenTaiko.stage演奏ドラム画面.nHighestCombo[songNo];
+			IndividualBoomCount[songNo] = OpenTaiko.stage演奏ドラム画面.nMine[songNo];
+			IndividualADLibCount[songNo] = OpenTaiko.stage演奏ドラム画面.nADLIB[songNo];
 			danAccumulatedScore = 0;
 			for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore[acc];
-			IndividualScore[songNo] = (int)TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(0) - danAccumulatedScore;
+			IndividualScore[songNo] = (int)OpenTaiko.stage演奏ドラム画面.actScore.GetScore(0) - danAccumulatedScore;
 		}
 
 		#endregion
@@ -233,10 +233,10 @@
 
 		public void tResultsRegisterReplayInformations(int Coins, int Clear, int SRank) {
 			// Actual player (Used for saved informations)
-			int actualPlayer = TJAPlayer3.GetActualPlayer(storedPlayer);
+			int actualPlayer = OpenTaiko.GetActualPlayer(storedPlayer);
 
 			// Game mode
-			switch (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) {
+			switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
 				case (int)Difficulty.Dan:
 					GameMode = 1;
 					break;
@@ -252,16 +252,16 @@
 			// Chart Checksum (temporary)
 			ChartChecksum = "";
 			// Player Name
-			PlayerName = TJAPlayer3.SaveFileInstances[actualPlayer].data.Name;
+			PlayerName = OpenTaiko.SaveFileInstances[actualPlayer].data.Name;
 			// Performance informations
-			GoodCount = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nGreat;
-			OkCount = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nGood;
-			BadCount = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nMiss;
-			RollCount = TJAPlayer3.stage演奏ドラム画面.GetRoll(storedPlayer);
-			MaxCombo = TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[storedPlayer];
-			BoomCount = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nMine;
-			ADLibCount = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nADLIB;
-			Score = TJAPlayer3.stage演奏ドラム画面.CChartScore[storedPlayer].nScore;
+			GoodCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nGreat;
+			OkCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nGood;
+			BadCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nMiss;
+			RollCount = OpenTaiko.stage演奏ドラム画面.GetRoll(storedPlayer);
+			MaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[storedPlayer];
+			BoomCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nMine;
+			ADLibCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nADLIB;
+			Score = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nScore;
 			CoinValue = (short)Coins;
 			// Tower parameters
 			if (GameMode == 2) {
@@ -273,11 +273,11 @@
 			// Score rank
 			ScoreRank = (byte)SRank;
 			// Scroll speed value (as on ConfigIni, 9 is x1)
-			ScrollSpeedValue = TJAPlayer3.ConfigIni.nScrollSpeed[actualPlayer];
+			ScrollSpeedValue = OpenTaiko.ConfigIni.nScrollSpeed[actualPlayer];
 			// Song speed value (as on ConfigIni, 20 is x1)
-			SongSpeedValue = TJAPlayer3.ConfigIni.nSongSpeed;
+			SongSpeedValue = OpenTaiko.ConfigIni.nSongSpeed;
 			// Just strictess adjust mod value (as on ConfigIni, between -2 for lenient and 2 for rigorous)
-			JudgeStrictnessAdjust = TJAPlayer3.ConfigIni.nTimingZones[actualPlayer];
+			JudgeStrictnessAdjust = OpenTaiko.ConfigIni.nTimingZones[actualPlayer];
 
 			/* Mod Flags
              * Bit Offsets (Values) :
@@ -292,25 +292,25 @@
              * - 8 (256) : Safe (Bad => Ok)
              */
 			ModFlags = (int)EModFlag.None;
-			if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRROR) ModFlags |= (int)EModFlag.Mirror;
-			if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.RANDOM) ModFlags |= (int)EModFlag.Random;
-			if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
-			if (TJAPlayer3.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRRORRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
-			if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
-			if (TJAPlayer3.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
-			if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;
-			if (TJAPlayer3.ConfigIni.nFunMods[actualPlayer] == EFunMods.MINESWEEPER) ModFlags |= (int)EModFlag.Minesweeper;
-			if (TJAPlayer3.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;
-			if (TJAPlayer3.ConfigIni.bJust[actualPlayer] == 2) ModFlags |= (int)EModFlag.Safe;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRROR) ModFlags |= (int)EModFlag.Mirror;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.RANDOM) ModFlags |= (int)EModFlag.Random;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRRORRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
+			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
+			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
+			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;
+			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.MINESWEEPER) ModFlags |= (int)EModFlag.Minesweeper;
+			if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;
+			if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 2) ModFlags |= (int)EModFlag.Safe;
 			/* Gauge type
              * - 0 : Normal
              * - 1 : Hard
              * - 2 : Extreme
              */
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[actualPlayer].data.Character];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[actualPlayer].data.Character];
 			GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 			// Gauge fill value
-			GaugeFill = (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[storedPlayer];
+			GaugeFill = (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[storedPlayer];
 			// Generation timestamp (in ticks)
 			Timestamp = DateTime.Now.Ticks;
 			// Compressed inputs and size
@@ -318,9 +318,9 @@
 			CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 			CompressedInputsSize = CompressedInputs.Length;
 			// Chart metadata
-			ChartUniqueID = TJAPlayer3.stageSongSelect.rChoosenSong.uniqueId.data.id;
-			ChartDifficulty = (byte)TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[storedPlayer];
-			ChartLevel = (byte)Math.Min(255, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
+			ChartUniqueID = OpenTaiko.stageSongSelect.rChoosenSong.uniqueId.data.id;
+			ChartDifficulty = (byte)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[storedPlayer];
+			ChartLevel = (byte)Math.Min(255, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
 			// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 			OnlineScoreID = 0;
 			// Replay Checksum (Calculate at the end)

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class DBPuchichara {
 		public class PuchicharaEffect {
 			public PuchicharaEffect() {

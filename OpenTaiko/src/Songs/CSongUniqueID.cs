@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	[Serializable()]
 	internal class CSongUniqueID {
 		public CSongUniqueID(string path) {

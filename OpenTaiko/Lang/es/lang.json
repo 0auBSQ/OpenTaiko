@@ -158,10 +158,10 @@
         "SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
         "SETTINGS_GAME_NORMALGAUGE_DESC": "Force the normal gauge to be used at all times\nregardless of a character's modifiers.",
 
-        "SETTINGS_GAME_AUTOP1": "Player 1 Auto Play",
-        "SETTINGS_GAME_AUTOP1_DESC": "Toggle whether player 1 plays automatically.",
-        "SETTINGS_GAME_AUTOP2": "Player 2 Auto Play",
-        "SETTINGS_GAME_AUTOP2_DESC": "Toggle whether player 2 plays automatically.",
+        "SETTINGS_GAME_AUTOP1": "Juego automático J1",
+        "SETTINGS_GAME_AUTOP1_DESC": "Al activarlo, el carril de J1\nse jugará automáticamente.",
+        "SETTINGS_GAME_AUTOP2": "Juego automático J2",
+        "SETTINGS_GAME_AUTOP2_DESC": "Al activarlo, el carril de J2\nse jugará automáticamente.",
         "SETTINGS_GAME_AUTOROLL": "Velocidad del redoble",
         "SETTINGS_GAME_AUTOROLL_DESC": "Redobles por segundo cuando se usa el\nmodo automático.\nNo tiene efecto en los globos.\nDesactivado si está en 0,\nbloqueado a un redoble por frame.",
 
@@ -386,11 +386,11 @@
         "SONGSELECT_QUICKCONFIG_MORE": "More...",
 
         // Modals
-        "MODAL_TITLE_COIN": "Monedas conseguidas!",
-        "MODAL_TITLE_CHARA": "Personaje conseguido!",
-        "MODAL_TITLE_PUCHI": "Puchichara conseguido!",
-        "MODAL_TITLE_NAMEPLATE": "Titulo conseguido!",
-        "MODAL_TITLE_SONG": "Canción conseguido!",
+        "MODAL_TITLE_COIN": "¡Monedas conseguidas!",
+        "MODAL_TITLE_CHARA": "¡Personaje conseguido!",
+        "MODAL_TITLE_PUCHI": "¡Puchichara conseguido!",
+        "MODAL_TITLE_NAMEPLATE": "¡Titulo conseguido!",
+        "MODAL_TITLE_SONG": "¡Canción conseguida!",
         // {0}: Newly obtained coins
         // {1}: New total coin count
         "MODAL_MESSAGE_COIN": "+{0} Monedas (Total: {1})",
@@ -458,15 +458,15 @@
         "HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
 
         // Unlock requirements & messages (Any Menu)
-        "UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",
-        "UNLOCK_CONDITION_SHOP": "Item only avaliable at the Shop.", // cs
+        "UNLOCK_CONDITION_INVALID": "[ERROR] Condicion no valida",
+        "UNLOCK_CONDITION_SHOP": "Item solamente disponible en la tienda.", // cs
         // {0}: Price of item
-        "UNLOCK_CONDITION_COST": "Coin price: {0}", // ch, cs, cm
-        "UNLOCK_COIN_BOUGHT": "Item bought!",
-        "UNLOCK_COIN_MORE": "Not enough coins!",
+        "UNLOCK_CONDITION_COST": "Precio: {0}", // ch, cs, cm
+        "UNLOCK_COIN_BOUGHT": "¡Item comprado!",
+        "UNLOCK_COIN_MORE": "¡Monedas insuficientes!",
 
-        "UNLOCK_CONDITION_ERROR": "The following condition: {0} requires {1} values.",
-        "UNLOCK_CONDITION_ERROR2": "The following condition: {0} requires ({1} * n) values and n references.",
+        "UNLOCK_CONDITION_ERROR": "Esta condición: {0} requires {1} values.",
+        "UNLOCK_CONDITION_ERROR2": "Esta condición: {0} requires ({1} * n) values and n references.",
 
         // {0}: Coin earn requirement
         // {1}: Current progress

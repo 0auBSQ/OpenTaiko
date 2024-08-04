@@ -4,9 +4,8 @@ using System.Text;
 using System.Text.Json.Nodes;
 using FDK;
 using NLua;
-using static TJAPlayer3.CActSelect曲リスト;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CLuaScript : IDisposable {
 		private static List<CLuaScript> listScripts = new List<CLuaScript>();
 		public static void tReloadLanguage(string lang) {
@@ -114,7 +113,7 @@ namespace TJAPlayer3 {
 					soundGroup = ESoundGroup.Unknown;
 					break;
 			}
-			CSound sound = TJAPlayer3.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
+			CSound sound = OpenTaiko.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
 
 			listDisposables.Add(sound);
 			return sound;
@@ -156,8 +155,8 @@ namespace TJAPlayer3 {
 			return new TitleTextureKey(title, fontRenderer, color ?? Color.White, edgeColor ?? Color.Black, maxSize);
 		}
 
-		private CTexture GetTextTex(CActSelect曲リスト.TitleTextureKey titleTextureKey, bool vertical, bool keepCenter) {
-			return TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
+		private CTexture GetTextTex(TitleTextureKey titleTextureKey, bool vertical, bool keepCenter) {
+			return TitleTextureKey.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
 		}
 
 		public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) {

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class Databases {
 		public void tDatabases() {
 			DBCDN = new DBCDN();

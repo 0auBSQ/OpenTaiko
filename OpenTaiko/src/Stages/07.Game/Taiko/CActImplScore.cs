@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplScore : CAct演奏スコア共通 {
 		// CActivity 実装（共通クラスからの差分のみ）
 
@@ -34,7 +34,7 @@ namespace TJAPlayer3 {
 					if (!this.ctボーナス加算タイマ[i].IsStoped) {
 						this.ctボーナス加算タイマ[i].Tick();
 						if (this.ctボーナス加算タイマ[i].IsEnded) {
-							TJAPlayer3.stage演奏ドラム画面.actScore.BonusAdd(i);
+							OpenTaiko.stage演奏ドラム画面.actScore.BonusAdd(i);
 							this.ctボーナス加算タイマ[i].Stop();
 						}
 					}
@@ -47,35 +47,35 @@ namespace TJAPlayer3 {
 				int[] addBonus_x = new int[5];
 				int[] addBonus_y = new int[5];
 
-				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-					if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-						x[i] = TJAPlayer3.Skin.Game_Score_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
-						y[i] = TJAPlayer3.Skin.Game_Score_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
-						add_x[i] = TJAPlayer3.Skin.Game_Score_Add_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
-						add_y[i] = TJAPlayer3.Skin.Game_Score_Add_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
-						addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * i);
-						addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * i);
-					} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-						x[i] = TJAPlayer3.Skin.Game_Score_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
-						y[i] = TJAPlayer3.Skin.Game_Score_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
-						add_x[i] = TJAPlayer3.Skin.Game_Score_Add_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
-						add_y[i] = TJAPlayer3.Skin.Game_Score_Add_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
-						addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * i);
-						addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * i);
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+					if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+						x[i] = OpenTaiko.Skin.Game_Score_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
+						y[i] = OpenTaiko.Skin.Game_Score_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
+						add_x[i] = OpenTaiko.Skin.Game_Score_Add_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
+						add_y[i] = OpenTaiko.Skin.Game_Score_Add_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
+						addBonus_x[i] = OpenTaiko.Skin.Game_Score_AddBonus_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
+						addBonus_y[i] = OpenTaiko.Skin.Game_Score_AddBonus_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
+					} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+						x[i] = OpenTaiko.Skin.Game_Score_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
+						y[i] = OpenTaiko.Skin.Game_Score_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
+						add_x[i] = OpenTaiko.Skin.Game_Score_Add_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
+						add_y[i] = OpenTaiko.Skin.Game_Score_Add_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
+						addBonus_x[i] = OpenTaiko.Skin.Game_Score_AddBonus_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
+						addBonus_y[i] = OpenTaiko.Skin.Game_Score_AddBonus_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 					} else {
-						x[i] = TJAPlayer3.Skin.Game_Score_X[i];
-						y[i] = TJAPlayer3.Skin.Game_Score_Y[i];
-						add_x[i] = TJAPlayer3.Skin.Game_Score_Add_X[i];
-						add_y[i] = TJAPlayer3.Skin.Game_Score_Add_Y[i];
-						addBonus_x[i] = TJAPlayer3.Skin.Game_Score_AddBonus_X[i];
-						addBonus_y[i] = TJAPlayer3.Skin.Game_Score_AddBonus_Y[i];
+						x[i] = OpenTaiko.Skin.Game_Score_X[i];
+						y[i] = OpenTaiko.Skin.Game_Score_Y[i];
+						add_x[i] = OpenTaiko.Skin.Game_Score_Add_X[i];
+						add_y[i] = OpenTaiko.Skin.Game_Score_Add_Y[i];
+						addBonus_x[i] = OpenTaiko.Skin.Game_Score_AddBonus_X[i];
+						addBonus_y[i] = OpenTaiko.Skin.Game_Score_AddBonus_Y[i];
 					}
 				}
 
 				//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.ctボーナス加算タイマ[0].n現在の値.ToString());
 
-				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-					if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+					if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
 
 					base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.nCurrentlyDisplayedScore[i]), 0, 256, i);
 				}
@@ -89,17 +89,17 @@ namespace TJAPlayer3 {
 									this.nNowDisplayedAddScore--;
 								this.stScore[i].ctTimer.Stop();
 								this.stScore[i].b使用中 = false;
-								TJAPlayer3.stage演奏ドラム画面.actDan.Update();
+								OpenTaiko.stage演奏ドラム画面.actDan.Update();
 							}
 
 							if (!stScore[i].bAddEnd) {
 								this.nCurrentlyDisplayedScore[this.stScore[i].nPlayer] += (long)this.stScore[i].nAddScore;
 								stScore[i].bAddEnd = true;
 								if (ct点数アニメタイマ[stScore[i].nPlayer].IsUnEnded) {
-									this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, TJAPlayer3.Timer);
+									this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
 									this.ct点数アニメタイマ[stScore[i].nPlayer].CurrentValue = 1;
 								} else {
-									this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, TJAPlayer3.Timer);
+									this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
 								}
 							}
 
@@ -176,12 +176,12 @@ namespace TJAPlayer3 {
 							}
 
 							int pl = stScore[i].nPlayer;
-							if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+							if (OpenTaiko.PlayerSide == 1 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 								pl = 1;
 
-							if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == false && !TJAPlayer3.ConfigIni.SimpleMode)
-								base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[i].nPlayer == 0 && TJAPlayer3.ConfigIni.nPlayerCount <= 2 ? add_y[this.stScore[i].nPlayer] + yAdd : add_y[this.stScore[i].nPlayer] - yAdd, string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
-							if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == true && !TJAPlayer3.ConfigIni.SimpleMode)
+							if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == false && !OpenTaiko.ConfigIni.SimpleMode)
+								base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[i].nPlayer == 0 && OpenTaiko.ConfigIni.nPlayerCount <= 2 ? add_y[this.stScore[i].nPlayer] + yAdd : add_y[this.stScore[i].nPlayer] - yAdd, string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
+							if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == true && !OpenTaiko.ConfigIni.SimpleMode)
 								base.t小文字表示(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[this.stScore[i].nPlayer], string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
 							else {
 								this.nNowDisplayedAddScore--;

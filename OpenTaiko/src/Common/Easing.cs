@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class Easing {
 		public int EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
 			StartPoint = startPoint;

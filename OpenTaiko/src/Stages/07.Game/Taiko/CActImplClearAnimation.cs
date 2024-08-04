@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplClearAnimation : CActivity {
 		/// <summary>
 		/// 課題
@@ -16,7 +16,7 @@ namespace TJAPlayer3 {
 
 			bSongsPlayed = false;
 
-			this.ct進行メイン = new CCounter(0, 300, 22, TJAPlayer3.Timer);
+			this.ct進行メイン = new CCounter(0, 300, 22, OpenTaiko.Timer);
 
 			/*
             this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -27,10 +27,10 @@ namespace TJAPlayer3 {
             */
 
 			// モードの決定。クリア失敗・フルコンボも事前に作っとく。
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				if (CFloorManagement.CurrentNumberOfLives > 0) {
-					if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-						if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
+						if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
 							this.Mode[0] = EndMode.Tower_TopReached_Perfect;
 						else
 							this.Mode[0] = EndMode.Tower_TopReached_FullCombo;
@@ -38,16 +38,16 @@ namespace TJAPlayer3 {
 						this.Mode[0] = EndMode.Tower_TopReached_Pass;
 				} else
 					this.Mode[0] = EndMode.Tower_Dropout;
-			} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				// 段位認定モード。
-				if (!TJAPlayer3.stage演奏ドラム画面.actDan.GetFailedAllChallenges()) {
+				if (!OpenTaiko.stage演奏ドラム画面.actDan.GetFailedAllChallenges()) {
 					// 段位認定モード、クリア成功
 					// this.Mode[0] = EndMode.StageCleared;
 
-					bool bgold = TJAPlayer3.stage演奏ドラム画面.actDan.GetExamStatus(TJAPlayer3.stage結果.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
+					bool bgold = OpenTaiko.stage演奏ドラム画面.actDan.GetExamStatus(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
 
-					if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-						if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
+						if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
 							this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
 						else
 							this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
@@ -59,10 +59,10 @@ namespace TJAPlayer3 {
 					// 段位認定モード、クリア失敗
 					this.Mode[0] = EndMode.Dan_Fail;
 				}
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				if (TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin) {
-					if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-						if (TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				if (OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin) {
+					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
+						if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
 							this.Mode[0] = EndMode.AI_Win_Perfect;
 						else
 							this.Mode[0] = EndMode.AI_Win_FullCombo;
@@ -75,12 +75,12 @@ namespace TJAPlayer3 {
 				// 通常のモード。
 				// ここでフルコンボフラグをチェックするが現時点ではない。
 				// 今の段階では魂ゲージ80%以上でチェック。
-				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-						if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nMine == 0)
+						if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMine == 0)
 						//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 						{
-							if (TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nGood == 0)
+							if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood == 0)
 							//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
 							{
 								this.Mode[i] = EndMode.StagePerfectCombo;
@@ -104,7 +104,7 @@ namespace TJAPlayer3 {
 			var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
 
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				Tower_DropoutScript = new EndAnimeScript($@"{origindir}Tower_Dropout{Path.DirectorySeparatorChar}Script.lua");
 				Tower_DropoutScript.Init();
 
@@ -117,11 +117,11 @@ namespace TJAPlayer3 {
 				Tower_TopReached_PerfectScript = new EndAnimeScript($@"{origindir}Tower_TopReached_Perfect{Path.DirectorySeparatorChar}Script.lua");
 				Tower_TopReached_PerfectScript.Init();
 
-				this.soundTowerDropout = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
-				this.soundTowerTopPass = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
-				this.soundTowerTopFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
-				this.soundTowerTopPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
-			} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				this.soundTowerDropout = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
+				this.soundTowerTopPass = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
+				this.soundTowerTopFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
+				this.soundTowerTopPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
+			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Dan_FailScript = new EndAnimeScript($@"{origindir}Dan_Fail{Path.DirectorySeparatorChar}Script.lua");
 				Dan_FailScript.Init();
 
@@ -143,15 +143,15 @@ namespace TJAPlayer3 {
 				Dan_Gold_PerfectScript = new EndAnimeScript($@"{origindir}Dan_Gold_Perfect{Path.DirectorySeparatorChar}Script.lua");
 				Dan_Gold_PerfectScript.Init();
 
-				this.soundDanFailed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanRedClear = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanRedFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanRedPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanGoldClear = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanGoldFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
-				this.soundDanGoldPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanFailed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanRedClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanRedFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanRedPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanGoldClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanGoldFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
+				this.soundDanGoldPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
 
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				AILoseScript = new EndAnimeScript($@"{origindir}AI_Lose{Path.DirectorySeparatorChar}Script.lua");
 				AILoseScript.Init();
 
@@ -164,10 +164,10 @@ namespace TJAPlayer3 {
 				AIWin_PerfectScript = new EndAnimeScript($@"{origindir}AI_Win_Perfect{Path.DirectorySeparatorChar}Script.lua");
 				AIWin_PerfectScript.Init();
 
-				this.soundAILose = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
-				this.soundAIWin = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
-				this.soundAIWinFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
-				this.soundAIWinPerfectCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
+				this.soundAILose = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
+				this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
+				this.soundAIWinFullCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
+				this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
 			} else {
 				FailedScript = new EndAnimeScript($@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");//ClearFailed
 				FailedScript.Init();
@@ -189,12 +189,12 @@ namespace TJAPlayer3 {
 		public override void DeActivate() {
 			this.ct進行メイン = null;
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				Tower_DropoutScript.Dispose();
 				Tower_TopReached_PassScript.Dispose();
 				Tower_TopReached_FullComboScript.Dispose();
 				Tower_TopReached_PerfectScript.Dispose();
-			} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Dan_FailScript.Dispose();
 				Dan_Red_PassScript.Dispose();
 				Dan_Red_FullComboScript.Dispose();
@@ -202,7 +202,7 @@ namespace TJAPlayer3 {
 				Dan_Gold_PassScript.Dispose();
 				Dan_Gold_FullComboScript.Dispose();
 				Dan_Gold_PerfectScript.Dispose();
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				AILoseScript.Dispose();
 				AIWinScript.Dispose();
 				AIWin_FullComboScript.Dispose();
@@ -220,28 +220,28 @@ namespace TJAPlayer3 {
 		public override void CreateManagedResource() {
 			this.b再生済み = false;
 
-			this.soundTowerDropout = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
-			this.soundTowerTopPass = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
-			this.soundTowerTopFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
-			this.soundTowerTopPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
+			this.soundTowerDropout = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
+			this.soundTowerTopPass = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
+			this.soundTowerTopFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
+			this.soundTowerTopPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
 
-			this.soundDanFailed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanRedClear = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanRedFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanRedPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanGoldClear = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanGoldFC = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
-			this.soundDanGoldPerfect = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanFailed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanRedClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanRedFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanRedPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanGoldClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanGoldFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
+			this.soundDanGoldPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
 
-			this.soundAILose = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
-			this.soundAIWin = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
-			this.soundAIWinFullCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
-			this.soundAIWinPerfectCombo = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-				this.soundClear[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
-				this.soundFailed[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
-				this.soundFullCombo[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
-				this.soundPerfectCombo[i] = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
+			this.soundAILose = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
+			this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
+			this.soundAIWinFullCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
+			this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				this.soundClear[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
+				this.soundFailed[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+				this.soundFullCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
+				this.soundPerfectCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
 			}
 
 			base.CreateManagedResource();
@@ -266,7 +266,7 @@ namespace TJAPlayer3 {
 			this.soundAIWinFullCombo?.tDispose();
 			this.soundAIWinPerfectCombo?.tDispose();
 
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				this.soundClear[i]?.tDispose();
 				this.soundFailed[i]?.tDispose();
 				this.soundFullCombo[i]?.tDispose();
@@ -279,7 +279,7 @@ namespace TJAPlayer3 {
 		#region [effects]
 		// ------------------------------------
 		private void showEndEffect_Failed(int i) {
-			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) FailedScript.Update(i);
+			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) FailedScript.Update(i);
 			FailedScript.Draw(i);
 
 			int[] y = new int[] { 0, 176 };
@@ -306,7 +306,7 @@ namespace TJAPlayer3 {
             */
 		}
 		private void showEndEffect_Clear(int i) {
-			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) ClearScript.Update(i);
+			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) ClearScript.Update(i);
 			ClearScript.Draw(i);
 
 			/*
@@ -482,7 +482,7 @@ namespace TJAPlayer3 {
 		}
 
 		private void showEndEffect_FullCombo(int i) {
-			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) FullComboScript.Update(i);
+			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) FullComboScript.Update(i);
 			FullComboScript.Draw(i);
 
 			/*
@@ -500,7 +500,7 @@ namespace TJAPlayer3 {
 		}
 
 		private void showEndEffect_PerfectCombo(int i) {
-			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) PerfectComboScript.Update(i);
+			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) PerfectComboScript.Update(i);
 			PerfectComboScript.Draw(i);
 
 			/*
@@ -525,114 +525,114 @@ namespace TJAPlayer3 {
 			if (base.IsFirstDraw) {
 				base.IsFirstDraw = false;
 			}
-			if (this.ct進行メイン != null && (TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
+			if (this.ct進行メイン != null && (OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
 				this.ct進行メイン.Tick();
 
 				//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.灰, this.ct進行メイン.n現在の値.ToString() );
 				//仮置き
 
 				if (!bSongsPlayed) {
-					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-						if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+						if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
 
 						switch (this.Mode[i]) {
 							case EndMode.StageFailed:
 								FailedScript.PlayEndAnime(i);
 								this.soundFailed[i]?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.StageCleared:
 								ClearScript.PlayEndAnime(i);
 								this.soundClear[i]?.PlayStart();
-								TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.StageFullCombo:
 								FullComboScript.PlayEndAnime(i);
 								this.soundFullCombo[i]?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.StagePerfectCombo:
 								PerfectComboScript.PlayEndAnime(i);
 								this.soundPerfectCombo[i]?.PlayStart();
-								TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 
 							case EndMode.AI_Lose:
 								AILoseScript.PlayEndAnime(i);
 								this.soundAILose?.PlayStart();
-								TJAPlayer3.Skin.voiceAILose[TJAPlayer3.GetActualPlayer(1)]?.tPlay();
+								OpenTaiko.Skin.voiceAILose[OpenTaiko.GetActualPlayer(1)]?.tPlay();
 								break;
 							case EndMode.AI_Win:
 								AIWinScript.PlayEndAnime(i);
 								this.soundAIWin?.PlayStart();
-								TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.AI_Win_FullCombo:
 								AIWin_FullComboScript.PlayEndAnime(i);
 								this.soundAIWinFullCombo?.PlayStart();
-								TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.AI_Win_Perfect:
 								AIWin_PerfectScript.PlayEndAnime(i);
 								this.soundAIWinPerfectCombo?.PlayStart();
-								TJAPlayer3.Skin.voiceAIWin[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 
 							case EndMode.Tower_Dropout:
 								Tower_DropoutScript.PlayEndAnime(i);
 								this.soundTowerDropout?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Tower_TopReached_Pass:
 								Tower_TopReached_PassScript.PlayEndAnime(i);
 								this.soundTowerTopPass?.PlayStart();
-								TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Tower_TopReached_FullCombo:
 								Tower_TopReached_FullComboScript.PlayEndAnime(i);
 								this.soundTowerTopFC?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Tower_TopReached_Perfect:
 								Tower_TopReached_PerfectScript.PlayEndAnime(i);
 								this.soundTowerTopPerfect?.PlayStart();
-								TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 
 							case EndMode.Dan_Fail:
 								Dan_FailScript.PlayEndAnime(i);
 								this.soundDanFailed?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFailed[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Red_Pass:
 								Dan_Red_PassScript.PlayEndAnime(i);
 								this.soundDanRedClear?.PlayStart();
-								TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Red_FullCombo:
 								Dan_Red_FullComboScript.PlayEndAnime(i);
 								this.soundDanRedFC?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Red_Perfect:
 								Dan_Red_PerfectScript.PlayEndAnime(i);
 								this.soundDanRedPerfect?.PlayStart();
-								TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Gold_Pass:
 								Dan_Gold_PassScript.PlayEndAnime(i);
 								this.soundDanGoldClear?.PlayStart();
-								TJAPlayer3.Skin.voiceClearClear[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Gold_FullCombo:
 								Dan_Gold_FullComboScript.PlayEndAnime(i);
 								this.soundDanGoldFC?.PlayStart();
-								TJAPlayer3.Skin.voiceClearFullCombo[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 							case EndMode.Dan_Gold_Perfect:
 								Dan_Gold_PerfectScript.PlayEndAnime(i);
 								this.soundDanGoldPerfect?.PlayStart();
-								TJAPlayer3.Skin.voiceClearAllPerfect[TJAPlayer3.GetActualPlayer(i)]?.tPlay();
+								OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 								break;
 
 							default:
@@ -644,8 +644,8 @@ namespace TJAPlayer3 {
 				}
 
 
-				for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-					if (i == 1 && TJAPlayer3.ConfigIni.bAIBattleMode) break;
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+					if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
 
 					switch (this.Mode[i]) {
 						case EndMode.StageFailed:
@@ -662,65 +662,65 @@ namespace TJAPlayer3 {
 							break;
 
 						case EndMode.AI_Win:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWinScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWinScript.Update(i);
 							AIWinScript.Draw(i);
 							break;
 						case EndMode.AI_Lose:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AILoseScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AILoseScript.Update(i);
 							AILoseScript.Draw(i);
 							break;
 						case EndMode.AI_Win_FullCombo:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWin_FullComboScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWin_FullComboScript.Update(i);
 							AIWin_FullComboScript.Draw(i);
 							break;
 						case EndMode.AI_Win_Perfect:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) AIWin_PerfectScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWin_PerfectScript.Update(i);
 							AIWin_PerfectScript.Draw(i);
 							break;
 
 						case EndMode.Tower_Dropout:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_DropoutScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_DropoutScript.Update(i);
 							Tower_DropoutScript.Draw(i);
 							break;
 						case EndMode.Tower_TopReached_Pass:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PassScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PassScript.Update(i);
 							Tower_TopReached_PassScript.Draw(i);
 							break;
 						case EndMode.Tower_TopReached_FullCombo:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
 							Tower_TopReached_FullComboScript.Draw(i);
 							break;
 						case EndMode.Tower_TopReached_Perfect:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
 							Tower_TopReached_PerfectScript.Draw(i);
 							break;
 
 						case EndMode.Dan_Fail:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_FailScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_FailScript.Update(i);
 							Dan_FailScript.Draw(i);
 							break;
 						case EndMode.Dan_Red_Pass:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_PassScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_PassScript.Update(i);
 							Dan_Red_PassScript.Draw(i);
 							break;
 						case EndMode.Dan_Red_FullCombo:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_FullComboScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_FullComboScript.Update(i);
 							Dan_Red_FullComboScript.Draw(i);
 							break;
 						case EndMode.Dan_Red_Perfect:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Red_PerfectScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_PerfectScript.Update(i);
 							Dan_Red_PerfectScript.Draw(i);
 							break;
 						case EndMode.Dan_Gold_Pass:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_PassScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_PassScript.Update(i);
 							Dan_Gold_PassScript.Draw(i);
 							break;
 						case EndMode.Dan_Gold_FullCombo:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_FullComboScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_FullComboScript.Update(i);
 							Dan_Gold_FullComboScript.Draw(i);
 							break;
 						case EndMode.Dan_Gold_Perfect:
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) Dan_Gold_PerfectScript.Update(i);
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_PerfectScript.Update(i);
 							Dan_Gold_PerfectScript.Draw(i);
 							break;
 						default:

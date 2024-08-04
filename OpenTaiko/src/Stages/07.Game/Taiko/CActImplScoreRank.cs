@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CActImplScoreRank : CActivity {
 		public override void Activate() {
 			double RollTimems = 0;
@@ -17,7 +17,7 @@ namespace TJAPlayer3 {
 
 			for (int player = 0; player < 5; player++) {
 				this.ScoreRank[player] = new int[] { 500000, 600000, 700000, 800000, 900000, 950000,
-				Math.Max(1000000, (int)(TJAPlayer3.stage演奏ドラム画面.nAddScoreNiji[player] * TJAPlayer3.stage演奏ドラム画面.nNoteCount[player]) + (int)(TJAPlayer3.stage演奏ドラム画面.nBalloonCount[player] * 100) + (int)(Math.Ceiling(TJAPlayer3.stage演奏ドラム画面.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
+				Math.Max(1000000, (int)(OpenTaiko.stage演奏ドラム画面.nAddScoreNiji[player] * OpenTaiko.stage演奏ドラム画面.nNoteCount[player]) + (int)(OpenTaiko.stage演奏ドラム画面.nBalloonCount[player] * 100) + (int)(Math.Ceiling(OpenTaiko.stage演奏ドラム画面.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
 
 				for (int i = 0; i < 7; i++) {
 					this.counter[player][i] = new CCounter();
@@ -31,14 +31,14 @@ namespace TJAPlayer3 {
 		}
 
 		public override void CreateManagedResource() {
-			TowerResult_ScoreRankEffect = TJAPlayer3.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
+			TowerResult_ScoreRankEffect = OpenTaiko.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
 
 			base.CreateManagedResource();
 		}
 
 		public override void ReleaseManagedResource() {
 
-			TJAPlayer3.tDisposeSafely(ref TowerResult_ScoreRankEffect);
+			OpenTaiko.tDisposeSafely(ref TowerResult_ScoreRankEffect);
 
 			base.ReleaseManagedResource();
 		}
@@ -46,7 +46,7 @@ namespace TJAPlayer3 {
 		private void displayScoreRank(int i, int player, float x, float y, int mode = 0) {
 			CCounter cct = this.counter[player][i];
 
-			CTexture tex = TJAPlayer3.Tx.ScoreRank;
+			CTexture tex = OpenTaiko.Tx.ScoreRank;
 			if (mode == 1) // tower
 				tex = TowerResult_ScoreRankEffect;
 
@@ -54,12 +54,12 @@ namespace TJAPlayer3 {
 				return;
 
 			if (!cct.IsTicked) {
-				cct.Start(0, 3000, 1, TJAPlayer3.Timer);
+				cct.Start(0, 3000, 1, OpenTaiko.Timer);
 			}
 			if (cct.CurrentValue <= 255) {
 				tex.Opacity = cct.CurrentValue;
-				x = ((cct.CurrentValue / 255.0f) - 1.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
-				y = ((cct.CurrentValue / 255.0f) - 1.0f) * (player == 0 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
+				x = ((cct.CurrentValue / 255.0f) - 1.0f) * (player == 0 ? -OpenTaiko.Skin.Game_Judge_Move[0] : OpenTaiko.Skin.Game_Judge_Move[0]);
+				y = ((cct.CurrentValue / 255.0f) - 1.0f) * (player == 0 ? -OpenTaiko.Skin.Game_Judge_Move[1] : OpenTaiko.Skin.Game_Judge_Move[1]);
 			}
 			if (cct.CurrentValue > 255 && cct.CurrentValue <= 255 + 180) {
 				tex.Opacity = 255;
@@ -79,21 +79,21 @@ namespace TJAPlayer3 {
 			}
 			if (cct.CurrentValue >= 2745 && cct.CurrentValue <= 3000) {
 				tex.Opacity = 255 - ((cct.CurrentValue - 2745));
-				x = ((cct.CurrentValue - 2745) / 255.0f) * (player == 0 || TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? -TJAPlayer3.Skin.Game_Judge_Move[0] : TJAPlayer3.Skin.Game_Judge_Move[0]);
-				y = ((cct.CurrentValue - 2745) / 255.0f) * (player == 0 || TJAPlayer3.ConfigIni.nPlayerCount >= 2 ? -TJAPlayer3.Skin.Game_Judge_Move[1] : TJAPlayer3.Skin.Game_Judge_Move[1]);
+				x = ((cct.CurrentValue - 2745) / 255.0f) * (player == 0 || OpenTaiko.ConfigIni.nPlayerCount >= 2 ? -OpenTaiko.Skin.Game_Judge_Move[0] : OpenTaiko.Skin.Game_Judge_Move[0]);
+				y = ((cct.CurrentValue - 2745) / 255.0f) * (player == 0 || OpenTaiko.ConfigIni.nPlayerCount >= 2 ? -OpenTaiko.Skin.Game_Judge_Move[1] : OpenTaiko.Skin.Game_Judge_Move[1]);
 			}
 
 			var xpos = 0;
 			var ypos = 0;
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				xpos = TJAPlayer3.Skin.Game_ScoreRank_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-				ypos = TJAPlayer3.Skin.Game_ScoreRank_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				xpos = TJAPlayer3.Skin.Game_ScoreRank_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-				ypos = TJAPlayer3.Skin.Game_ScoreRank_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				xpos = OpenTaiko.Skin.Game_ScoreRank_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+				ypos = OpenTaiko.Skin.Game_ScoreRank_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				xpos = OpenTaiko.Skin.Game_ScoreRank_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+				ypos = OpenTaiko.Skin.Game_ScoreRank_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
 			} else {
-				xpos = TJAPlayer3.Skin.Game_ScoreRank_X[player];
-				ypos = TJAPlayer3.Skin.Game_ScoreRank_Y[player];
+				xpos = OpenTaiko.Skin.Game_ScoreRank_X[player];
+				ypos = OpenTaiko.Skin.Game_ScoreRank_Y[player];
 			}
 			xpos += (int)x;
 			ypos += (int)y;
@@ -119,18 +119,18 @@ namespace TJAPlayer3 {
 		}
 
 		public override int Draw() {
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 				float x = 0;
 				float y = 0;
 
 				for (int i = 0; i < 7; i++) {
-					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 
 						for (int player = 0; player < 5; player++) {
 							#region [Ensou score ranks]
 
 							counter[player][i].Tick();
-							if (TJAPlayer3.stage演奏ドラム画面.actScore.GetScore(player) >= ScoreRank[player][i]) {
+							if (OpenTaiko.stage演奏ドラム画面.actScore.GetScore(player) >= ScoreRank[player][i]) {
 								displayScoreRank(i, player, x, y);
 
 								#region [Legacy]
@@ -174,10 +174,10 @@ namespace TJAPlayer3 {
 							x = 0;
 						}
 						#endregion
-					} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+					} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 						#region [Tower score ranks]
 
-						double progress = CFloorManagement.LastRegisteredFloor / ((double)TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
+						double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
 
 						bool[] conditions =
 						{
@@ -186,8 +186,8 @@ namespace TJAPlayer3 {
 							progress >= 0.5,
 							progress >= 0.75,
 							progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-							TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nMine == 0,
-							TJAPlayer3.stage演奏ドラム画面.CChartScore[0].nGood == 0
+							OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0,
+							OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0
 						};
 
 						counter[0][i].Tick();

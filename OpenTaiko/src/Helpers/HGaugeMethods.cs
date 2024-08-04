@@ -2,7 +2,7 @@
 using FDK;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class HGaugeMethods {
 		public enum EGaugeType {
 			NORMAL = 0,
@@ -387,7 +387,7 @@ namespace TJAPlayer3 {
 			tDrawGaugeBase(baseTexture, x, y, scale_x, scale_y);
 			tDrawGaugeBaseClear(baseNormaTexture, x, y, diff, level, gaugeType, scale_x, scale_y);
 			tDrawGaugeFill(fillTexture, yellowTexture, (rainbowTextureArr != null && RainbowTextureIndex < rainbowTextureArr.Length) ? rainbowTextureArr[RainbowTextureIndex] : null, x, y, rainbow_x, rainbow_y, diff, level, currentPercent, gaugeType, scale_x, scale_y, Opacity, perfectHits, totalNotes);
-			if (!TJAPlayer3.ConfigIni.SimpleMode) tDrawGaugeFlash(flashTexture, x, y, Opacity, diff, level, currentPercent, gaugeType, scale_x, scale_y);
+			if (!OpenTaiko.ConfigIni.SimpleMode) tDrawGaugeFlash(flashTexture, x, y, Opacity, diff, level, currentPercent, gaugeType, scale_x, scale_y);
 			tDrawKillZone(killzoneTexture, x, y, diff, level, gaugeType, scale_x, scale_y, perfectHits, totalNotes);
 			tDrawClearIcon(clearIcon, diff, level, currentPercent, text_x, text_y, gaugeType, perfectHits, totalNotes, clearRect, clearRectHighlight);
 			tDrawSoulFire(soulFire, diff, level, currentPercent, gaugeType, scale_x, scale_y, fire_x, fire_y, SoulFireIndex);
@@ -400,42 +400,42 @@ namespace TJAPlayer3 {
 		#region [Unsafe methods]
 
 		public static bool UNSAFE_FastNormaCheck(int player) {
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
-			var _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
+			var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 			return tNormaCheck(
 				(Difficulty)_dif,
-				TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif],
+				OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif],
 				tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
-				(float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
+				(float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
 				UNSAFE_KillZonePercent(player)
 				);
 		}
 
 		public static bool UNSAFE_IsRainbow(int player) {
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 			if (tGetGaugeTypeEnum(chara.effect.tGetGaugeType()) != EGaugeType.NORMAL) return false;
-			return (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player] >= 100f;
+			return (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player] >= 100f;
 		}
 
 		public static float UNSAFE_KillZonePercent(int player) {
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 			CDTX[] dtxs =
 			{
-				TJAPlayer3.DTX,
-				TJAPlayer3.DTX_2P,
-				TJAPlayer3.DTX_3P,
-				TJAPlayer3.DTX_4P,
-				TJAPlayer3.DTX_5P
+				OpenTaiko.DTX,
+				OpenTaiko.DTX_2P,
+				OpenTaiko.DTX_3P,
+				OpenTaiko.DTX_4P,
+				OpenTaiko.DTX_5P
 			};
 
 			// Total hits and perfect hits
-			int perfectHits = TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGreat;
+			int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
 			int totalHits = dtxs[player].nノーツ数[3];
 
 			// Difficulty
-			int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
+			int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 			Difficulty difficulty = (Difficulty)_dif;
-			int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+			int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
 			return tHardGaugeGetKillscreenRatio(
 				difficulty,
@@ -446,168 +446,168 @@ namespace TJAPlayer3 {
 		}
 
 		public static void UNSAFE_DrawGaugeFast(int player, int opacity, int rainbowTextureIndex, int soulFlameIndex) {
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 			CDTX[] dtxs =
 			{
-				TJAPlayer3.DTX,
-				TJAPlayer3.DTX_2P,
-				TJAPlayer3.DTX_3P,
-				TJAPlayer3.DTX_4P,
-				TJAPlayer3.DTX_5P
+				OpenTaiko.DTX,
+				OpenTaiko.DTX_2P,
+				OpenTaiko.DTX_3P,
+				OpenTaiko.DTX_4P,
+				OpenTaiko.DTX_5P
 			};
 
 			// Set box
-			GaugeBox = new int[] { TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3] };
+			GaugeBox = new int[] { OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3] };
 
 			// Gauge pos
 			int gauge_x = 0;
 			int gauge_y = 0;
 
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				gauge_x = TJAPlayer3.Skin.Game_Gauge_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-				gauge_y = TJAPlayer3.Skin.Game_Gauge_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				gauge_x = TJAPlayer3.Skin.Game_Gauge_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-				gauge_y = TJAPlayer3.Skin.Game_Gauge_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				gauge_x = TJAPlayer3.Skin.Game_Gauge_X_AI;
-				gauge_y = TJAPlayer3.Skin.Game_Gauge_Y_AI;
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				gauge_x = OpenTaiko.Skin.Game_Gauge_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+				gauge_y = OpenTaiko.Skin.Game_Gauge_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				gauge_x = OpenTaiko.Skin.Game_Gauge_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+				gauge_y = OpenTaiko.Skin.Game_Gauge_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				gauge_x = OpenTaiko.Skin.Game_Gauge_X_AI;
+				gauge_y = OpenTaiko.Skin.Game_Gauge_Y_AI;
 			} else {
-				gauge_x = TJAPlayer3.Skin.Game_Gauge_X[player];
-				gauge_y = TJAPlayer3.Skin.Game_Gauge_Y[player];
+				gauge_x = OpenTaiko.Skin.Game_Gauge_X[player];
+				gauge_y = OpenTaiko.Skin.Game_Gauge_Y[player];
 			}
 
 			// Text pos
 			int text_x = 0;
 			int text_y = 0;
-			if (TJAPlayer3.ConfigIni.nPlayerCount <= 2) {
-				if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-					text_x = TJAPlayer3.Skin.Game_Gauge_ClearText_X_AI;
-					text_y = TJAPlayer3.Skin.Game_Gauge_ClearText_Y_AI;
+			if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
+				if (OpenTaiko.ConfigIni.bAIBattleMode) {
+					text_x = OpenTaiko.Skin.Game_Gauge_ClearText_X_AI;
+					text_y = OpenTaiko.Skin.Game_Gauge_ClearText_Y_AI;
 				} else {
-					text_x = TJAPlayer3.Skin.Game_Gauge_ClearText_X[player];
-					text_y = TJAPlayer3.Skin.Game_Gauge_ClearText_Y[player];
+					text_x = OpenTaiko.Skin.Game_Gauge_ClearText_X[player];
+					text_y = OpenTaiko.Skin.Game_Gauge_ClearText_Y[player];
 				}
 			}
 
 			// Soul pos
 			int soul_x = 0;
 			int soul_y = 0;
-			if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				soul_x = TJAPlayer3.Skin.Gauge_Soul_X_AI;
-				soul_y = TJAPlayer3.Skin.Gauge_Soul_Y_AI;
+			if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				soul_x = OpenTaiko.Skin.Gauge_Soul_X_AI;
+				soul_y = OpenTaiko.Skin.Gauge_Soul_Y_AI;
 			} else {
-				if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-					soul_x = TJAPlayer3.Skin.Gauge_Soul_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-					soul_y = TJAPlayer3.Skin.Gauge_Soul_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-				} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-					soul_x = TJAPlayer3.Skin.Gauge_Soul_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-					soul_y = TJAPlayer3.Skin.Gauge_Soul_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+					soul_x = OpenTaiko.Skin.Gauge_Soul_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+					soul_y = OpenTaiko.Skin.Gauge_Soul_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+					soul_x = OpenTaiko.Skin.Gauge_Soul_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+					soul_y = OpenTaiko.Skin.Gauge_Soul_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
 				} else {
-					soul_x = TJAPlayer3.Skin.Gauge_Soul_X[player];
-					soul_y = TJAPlayer3.Skin.Gauge_Soul_Y[player];
+					soul_x = OpenTaiko.Skin.Gauge_Soul_X[player];
+					soul_y = OpenTaiko.Skin.Gauge_Soul_Y[player];
 				}
 			}
 
 			// Fire pos
 			int fire_x = 0;
 			int fire_y = 0;
-			if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				fire_x = TJAPlayer3.Skin.Gauge_Soul_Fire_X_AI;
-				fire_y = TJAPlayer3.Skin.Gauge_Soul_Fire_Y_AI;
+			if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				fire_x = OpenTaiko.Skin.Gauge_Soul_Fire_X_AI;
+				fire_y = OpenTaiko.Skin.Gauge_Soul_Fire_Y_AI;
 			} else {
-				if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-					fire_x = TJAPlayer3.Skin.Gauge_Soul_Fire_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-					fire_y = TJAPlayer3.Skin.Gauge_Soul_Fire_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-				} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-					fire_x = TJAPlayer3.Skin.Gauge_Soul_Fire_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-					fire_y = TJAPlayer3.Skin.Gauge_Soul_Fire_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+					fire_x = OpenTaiko.Skin.Gauge_Soul_Fire_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+					fire_y = OpenTaiko.Skin.Gauge_Soul_Fire_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+					fire_x = OpenTaiko.Skin.Gauge_Soul_Fire_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+					fire_y = OpenTaiko.Skin.Gauge_Soul_Fire_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
 				} else {
-					fire_x = TJAPlayer3.Skin.Gauge_Soul_Fire_X[player];
-					fire_y = TJAPlayer3.Skin.Gauge_Soul_Fire_Y[player];
+					fire_x = OpenTaiko.Skin.Gauge_Soul_Fire_X[player];
+					fire_y = OpenTaiko.Skin.Gauge_Soul_Fire_Y[player];
 				}
 			}
 
 			// Total hits and perfect hits
-			int perfectHits = TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGreat;
+			int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
 			int totalHits = dtxs[player].nノーツ数[3];
 
 			// Scale 
 			float scale = 1.0f;
-			if (TJAPlayer3.ConfigIni.bAIBattleMode) {
+			if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				scale = 0.8f;
 			}
 
 			// Difficulty
-			int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
+			int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 			Difficulty difficulty = (Difficulty)_dif;
-			int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+			int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
 			// Current percent
-			float currentPercent = (float)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
+			float currentPercent = (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
 
 			// Gauge type
 			EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 
 			// Textures
-			int _4pGaugeIDX = (TJAPlayer3.ConfigIni.nPlayerCount >= 3) ? 1 : 0;
+			int _4pGaugeIDX = (OpenTaiko.ConfigIni.nPlayerCount >= 3) ? 1 : 0;
 			int _usedGauge = player + 3 * _4pGaugeIDX;
-			if (TJAPlayer3.P1IsBlue()) _usedGauge = 2;
-			_4pGaugeIDX = (TJAPlayer3.ConfigIni.nPlayerCount >= 3) ? 2
+			if (OpenTaiko.P1IsBlue()) _usedGauge = 2;
+			_4pGaugeIDX = (OpenTaiko.ConfigIni.nPlayerCount >= 3) ? 2
 					: (player == 1) ? 1
 					: 0;
 
-			CTexture baseTexture = TJAPlayer3.Tx.Gauge_Base[_usedGauge];
-			CTexture fillTexture = TJAPlayer3.Tx.Gauge[_usedGauge];
+			CTexture baseTexture = OpenTaiko.Tx.Gauge_Base[_usedGauge];
+			CTexture fillTexture = OpenTaiko.Tx.Gauge[_usedGauge];
 
-			CTexture[] rainbowTextureArr = (new CTexture[][] { TJAPlayer3.Tx.Gauge_Rainbow, TJAPlayer3.Tx.Gauge_Rainbow_2PGauge, TJAPlayer3.Tx.Gauge_Rainbow_Flat })[_4pGaugeIDX];
-			CTexture yellowTexture = TJAPlayer3.Tx.Gauge_Clear[_4pGaugeIDX];
-			CTexture baseNormaTexture = TJAPlayer3.Tx.Gauge_Base_Norma[_4pGaugeIDX];
-			CTexture killzoneTexture = TJAPlayer3.Tx.Gauge_Killzone[_4pGaugeIDX];
+			CTexture[] rainbowTextureArr = (new CTexture[][] { OpenTaiko.Tx.Gauge_Rainbow, OpenTaiko.Tx.Gauge_Rainbow_2PGauge, OpenTaiko.Tx.Gauge_Rainbow_Flat })[_4pGaugeIDX];
+			CTexture yellowTexture = OpenTaiko.Tx.Gauge_Clear[_4pGaugeIDX];
+			CTexture baseNormaTexture = OpenTaiko.Tx.Gauge_Base_Norma[_4pGaugeIDX];
+			CTexture killzoneTexture = OpenTaiko.Tx.Gauge_Killzone[_4pGaugeIDX];
 
 			CTexture flashTexture = yellowTexture;
 			CTexture clearIcon = (_4pGaugeIDX == 2)
 				? null
 				: (gaugeType != EGaugeType.NORMAL)
-					? TJAPlayer3.Tx.Gauge_Killzone[0]
-					: TJAPlayer3.Tx.Gauge[0];
-			CTexture soulLetter = TJAPlayer3.Tx.Gauge_Soul;
-			CTexture soulFlame = TJAPlayer3.Tx.Gauge_Soul_Fire;
+					? OpenTaiko.Tx.Gauge_Killzone[0]
+					: OpenTaiko.Tx.Gauge[0];
+			CTexture soulLetter = OpenTaiko.Tx.Gauge_Soul;
+			CTexture soulFlame = OpenTaiko.Tx.Gauge_Soul_Fire;
 
 			// Rectangles
 			Rectangle clearRectHighlight = new Rectangle(
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[0],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[1],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[2],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Rect[3]
+						OpenTaiko.Skin.Game_Gauge_ClearText_Rect[0],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Rect[1],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Rect[2],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Rect[3]
 						);
 
 			Rectangle clearRect = new Rectangle(
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[0],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[1],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[2],
-						TJAPlayer3.Skin.Game_Gauge_ClearText_Clear_Rect[3]
+						OpenTaiko.Skin.Game_Gauge_ClearText_Clear_Rect[0],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Clear_Rect[1],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Clear_Rect[2],
+						OpenTaiko.Skin.Game_Gauge_ClearText_Clear_Rect[3]
 						);
 
 			tDrawCompleteGauge(baseTexture, baseNormaTexture, flashTexture, fillTexture, yellowTexture, rainbowTextureArr, killzoneTexture, clearIcon, soulLetter, soulFlame, gauge_x, gauge_y, gauge_x, gauge_y, opacity, rainbowTextureIndex, soulFlameIndex, difficulty, level, currentPercent, gaugeType, scale, scale, text_x, text_y, perfectHits, totalHits, soul_x, soul_y, fire_x, fire_y, clearRect, clearRectHighlight);
 		}
 
 		public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 			CDTX[] dtxs =
 			{
-				TJAPlayer3.DTX,
-				TJAPlayer3.DTX_2P,
-				TJAPlayer3.DTX_3P,
-				TJAPlayer3.DTX_4P,
-				TJAPlayer3.DTX_5P
+				OpenTaiko.DTX,
+				OpenTaiko.DTX_2P,
+				OpenTaiko.DTX_3P,
+				OpenTaiko.DTX_4P,
+				OpenTaiko.DTX_5P
 			};
 
 			// Set box
-			GaugeBox = new int[] { TJAPlayer3.Skin.Result_Gauge_Rect[0], TJAPlayer3.Skin.Result_Gauge_Rect[1], TJAPlayer3.Skin.Result_Gauge_Rect[2], TJAPlayer3.Skin.Result_Gauge_Rect[3] };
+			GaugeBox = new int[] { OpenTaiko.Skin.Result_Gauge_Rect[0], OpenTaiko.Skin.Result_Gauge_Rect[1], OpenTaiko.Skin.Result_Gauge_Rect[2], OpenTaiko.Skin.Result_Gauge_Rect[3] };
 
 			// Total hits and perfect hits
-			int perfectHits = TJAPlayer3.stage演奏ドラム画面.CChartScore[player].nGreat;
+			int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
 			int totalHits = dtxs[player].nノーツ数[3];
 
 			// Gauge type
@@ -618,39 +618,39 @@ namespace TJAPlayer3 {
 
 			// Scale x
 			float scale_x = 1.0f;
-			if (TJAPlayer3.ConfigIni.nPlayerCount >= 3) {
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 3) {
 				scale_x = 0.5f;
 			}
 
 			// Difficulty
-			int _dif = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
+			int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 			Difficulty difficulty = (Difficulty)_dif;
-			int level = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+			int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
 
 			int gauge_x;
 			int gauge_y;
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				gauge_x = TJAPlayer3.Skin.Result_Gauge_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-				gauge_y = TJAPlayer3.Skin.Result_Gauge_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				gauge_x = TJAPlayer3.Skin.Result_Gauge_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
-				gauge_y = TJAPlayer3.Skin.Result_Gauge_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				gauge_x = OpenTaiko.Skin.Result_Gauge_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
+				gauge_y = OpenTaiko.Skin.Result_Gauge_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				gauge_x = OpenTaiko.Skin.Result_Gauge_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
+				gauge_y = OpenTaiko.Skin.Result_Gauge_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
 			} else {
-				gauge_x = TJAPlayer3.Skin.Result_Gauge_X[pos] + uioffset_x;
-				gauge_y = TJAPlayer3.Skin.Result_Gauge_Y[pos];
+				gauge_x = OpenTaiko.Skin.Result_Gauge_X[pos] + uioffset_x;
+				gauge_y = OpenTaiko.Skin.Result_Gauge_Y[pos];
 			}
 
 			int gauge_rainbow_x;
 			int gauge_rainbow_y;
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-				gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
-				gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
+				gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
+				gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
 			} else {
-				gauge_rainbow_x = TJAPlayer3.Skin.Result_Gauge_Rainbow_X[pos] + uioffset_x;
-				gauge_rainbow_y = TJAPlayer3.Skin.Result_Gauge_Rainbow_Y[pos];
+				gauge_rainbow_x = OpenTaiko.Skin.Result_Gauge_Rainbow_X[pos] + uioffset_x;
+				gauge_rainbow_y = OpenTaiko.Skin.Result_Gauge_Rainbow_Y[pos];
 			}
 
 			// Flame and soul
@@ -658,68 +658,68 @@ namespace TJAPlayer3 {
 			int soulText_y;
 			int soulFire_x;
 			int soulFire_y;
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				soulText_x = TJAPlayer3.Skin.Result_Soul_Text_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-				soulText_y = TJAPlayer3.Skin.Result_Soul_Text_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-				soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-				soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				soulText_x = TJAPlayer3.Skin.Result_Soul_Text_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-				soulText_y = TJAPlayer3.Skin.Result_Soul_Text_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
-				soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[0];
-				soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[1];
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				soulText_x = OpenTaiko.Skin.Result_Soul_Text_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
+				soulText_y = OpenTaiko.Skin.Result_Soul_Text_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
+				soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
+				soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				soulText_x = OpenTaiko.Skin.Result_Soul_Text_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[0];
+				soulText_y = OpenTaiko.Skin.Result_Soul_Text_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[1];
+				soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[0];
+				soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[1];
 			} else {
-				soulText_x = TJAPlayer3.Skin.Result_Soul_Text_X[pos] + uioffset_x;
-				soulText_y = TJAPlayer3.Skin.Result_Soul_Text_Y[pos];
-				soulFire_x = TJAPlayer3.Skin.Result_Soul_Fire_X[pos] + uioffset_x;
-				soulFire_y = TJAPlayer3.Skin.Result_Soul_Fire_Y[pos];
+				soulText_x = OpenTaiko.Skin.Result_Soul_Text_X[pos] + uioffset_x;
+				soulText_y = OpenTaiko.Skin.Result_Soul_Text_Y[pos];
+				soulFire_x = OpenTaiko.Skin.Result_Soul_Fire_X[pos] + uioffset_x;
+				soulFire_y = OpenTaiko.Skin.Result_Soul_Fire_Y[pos];
 			}
 
 			// Clear text
 			int clearText_x;
 			int clearText_y;
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-				clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[0] + TJAPlayer3.Skin.Result_UIMove_5P_X[pos];
-				clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_5P[1] + TJAPlayer3.Skin.Result_UIMove_5P_Y[pos];
-			} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-				clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[0] + TJAPlayer3.Skin.Result_UIMove_4P_X[pos];
-				clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_4P[1] + TJAPlayer3.Skin.Result_UIMove_4P_Y[pos];
+			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+				clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_5P[0] + OpenTaiko.Skin.Result_UIMove_5P_X[pos];
+				clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_5P[1] + OpenTaiko.Skin.Result_UIMove_5P_Y[pos];
+			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+				clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_4P[0] + OpenTaiko.Skin.Result_UIMove_4P_X[pos];
+				clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_4P[1] + OpenTaiko.Skin.Result_UIMove_4P_Y[pos];
 			} else {
-				clearText_x = TJAPlayer3.Skin.Result_Gauge_ClearText_X[pos] + uioffset_x;
-				clearText_y = TJAPlayer3.Skin.Result_Gauge_ClearText_Y[pos];
+				clearText_x = OpenTaiko.Skin.Result_Gauge_ClearText_X[pos] + uioffset_x;
+				clearText_y = OpenTaiko.Skin.Result_Gauge_ClearText_Y[pos];
 			}
 
 			// Textures
 			int _usedGauge = shiftPos;
-			CTexture baseTexture = TJAPlayer3.Tx.Result_Gauge_Base[_usedGauge];
-			CTexture fillTexture = TJAPlayer3.Tx.Result_Gauge[_usedGauge];
+			CTexture baseTexture = OpenTaiko.Tx.Result_Gauge_Base[_usedGauge];
+			CTexture fillTexture = OpenTaiko.Tx.Result_Gauge[_usedGauge];
 
-			CTexture[] rainbowTextureArr = TJAPlayer3.Tx.Result_Rainbow;
-			CTexture yellowTexture = TJAPlayer3.Tx.Result_Gauge_Clear;
-			CTexture baseNormaTexture = TJAPlayer3.Tx.Result_Gauge_Clear_Base;
-			CTexture killzoneTexture = TJAPlayer3.Tx.Result_Gauge_Killzone;
+			CTexture[] rainbowTextureArr = OpenTaiko.Tx.Result_Rainbow;
+			CTexture yellowTexture = OpenTaiko.Tx.Result_Gauge_Clear;
+			CTexture baseNormaTexture = OpenTaiko.Tx.Result_Gauge_Clear_Base;
+			CTexture killzoneTexture = OpenTaiko.Tx.Result_Gauge_Killzone;
 
 			CTexture flashTexture = null;
 			CTexture clearIcon = (gaugeType != EGaugeType.NORMAL)
-					? TJAPlayer3.Tx.Result_Gauge_Killzone
-					: TJAPlayer3.Tx.Result_Gauge[0];
+					? OpenTaiko.Tx.Result_Gauge_Killzone
+					: OpenTaiko.Tx.Result_Gauge[0];
 
-			CTexture soulLetter = TJAPlayer3.Tx.Result_Soul_Text;
-			CTexture soulFlame = TJAPlayer3.Tx.Result_Soul_Fire;
+			CTexture soulLetter = OpenTaiko.Tx.Result_Soul_Text;
+			CTexture soulFlame = OpenTaiko.Tx.Result_Soul_Fire;
 
 			// Rectangles
 			Rectangle clearRectHighlight = new Rectangle(
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[0],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[1],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[2],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Clear_Rect[3]
+						OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[0],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[1],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[2],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Clear_Rect[3]
 						);
 
 			Rectangle clearRect = new Rectangle(
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[0],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[1],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[2],
-						TJAPlayer3.Skin.Result_Gauge_ClearText_Rect[3]
+						OpenTaiko.Skin.Result_Gauge_ClearText_Rect[0],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Rect[1],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Rect[2],
+						OpenTaiko.Skin.Result_Gauge_ClearText_Rect[3]
 						);
 
 			// Positionnings 
@@ -739,7 +739,7 @@ namespace TJAPlayer3 {
 
 		#endregion
 
-		private static int[] GaugeBox = { TJAPlayer3.Skin.Game_Gauge_Rect[0], TJAPlayer3.Skin.Game_Gauge_Rect[1], TJAPlayer3.Skin.Game_Gauge_Rect[2], TJAPlayer3.Skin.Game_Gauge_Rect[3] };
+		private static int[] GaugeBox = { OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3] };
 
 	}
 }

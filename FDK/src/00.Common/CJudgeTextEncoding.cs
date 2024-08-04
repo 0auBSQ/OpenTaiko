@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CJudgeTextEncoding {
 		/// <summary>
 		/// Hnc8様のReadJEncを使用して文字コードの判別をする。

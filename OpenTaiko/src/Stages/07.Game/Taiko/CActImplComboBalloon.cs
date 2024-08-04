@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplComboBalloon : CActivity {
 		// コンストラクタ
 
@@ -22,7 +22,7 @@ namespace TJAPlayer3 {
 		// メソッド
 		public virtual void Start(int nCombo, int player) {
 			this.NowDrawBalloon = 0;
-			this.ct進行[player] = new CCounter(1, 42, 70, TJAPlayer3.Timer);
+			this.ct進行[player] = new CCounter(1, 42, 70, OpenTaiko.Timer);
 			this.nCombo_渡[player] = nCombo;
 		}
 
@@ -50,12 +50,12 @@ namespace TJAPlayer3 {
 		}
 		public override int Draw() {
 			if (!base.IsDeActivated) {
-				if (TJAPlayer3.ConfigIni.nPlayerCount > 2 || TJAPlayer3.ConfigIni.SimpleMode) return 0;
+				if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode) return 0;
 				for (int i = 0; i < 2; i++) {
-					if (TJAPlayer3.ConfigIni.bAIBattleMode) break;
+					if (OpenTaiko.ConfigIni.bAIBattleMode) break;
 
 					int j = i;
-					if (TJAPlayer3.PlayerSide == 1 && TJAPlayer3.ConfigIni.nPlayerCount == 1)
+					if (OpenTaiko.PlayerSide == 1 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 						j = 1;
 
 					if (!this.ct進行[i].IsStoped) {
@@ -65,48 +65,48 @@ namespace TJAPlayer3 {
 						}
 					}
 
-					if (TJAPlayer3.Tx.Balloon_Combo[j] != null && TJAPlayer3.Tx.Balloon_Number_Combo != null) {
+					if (OpenTaiko.Tx.Balloon_Combo[j] != null && OpenTaiko.Tx.Balloon_Number_Combo != null) {
 						//半透明4f
 						if (this.ct進行[i].CurrentValue == 1 || this.ct進行[i].CurrentValue == 42) {
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 0;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 64;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 0;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 64;
 							NowDrawBalloon = 0;
 						} else if (this.ct進行[i].CurrentValue == 2 || this.ct進行[i].CurrentValue == 41) {
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 0;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 128;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 0;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 128;
 							NowDrawBalloon = 0;
 						} else if (this.ct進行[i].CurrentValue == 3 || this.ct進行[i].CurrentValue == 40) {
 							NowDrawBalloon = 1;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 255;
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 128;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 128;
 						} else if (this.ct進行[i].CurrentValue == 4 || this.ct進行[i].CurrentValue == 39) {
 							NowDrawBalloon = 2;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 255;
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 255;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
 						} else if (this.ct進行[i].CurrentValue == 5 || this.ct進行[i].CurrentValue == 38) {
 							NowDrawBalloon = 2;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 255;
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 255;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
 						} else if (this.ct進行[i].CurrentValue >= 6 || this.ct進行[i].CurrentValue <= 37) {
 							NowDrawBalloon = 2;
-							TJAPlayer3.Tx.Balloon_Combo[j].Opacity = 255;
-							TJAPlayer3.Tx.Balloon_Number_Combo.Opacity = 255;
+							OpenTaiko.Tx.Balloon_Combo[j].Opacity = 255;
+							OpenTaiko.Tx.Balloon_Number_Combo.Opacity = 255;
 						}
 
 						if (this.ct進行[i].IsTicked) {
-							int plate_width = TJAPlayer3.Tx.Balloon_Combo[j].szTextureSize.Width / 3;
-							int plate_height = TJAPlayer3.Tx.Balloon_Combo[j].szTextureSize.Height;
-							TJAPlayer3.Tx.Balloon_Combo[j].t2D描画(TJAPlayer3.Skin.Game_Balloon_Combo_X[i], TJAPlayer3.Skin.Game_Balloon_Combo_Y[i], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height));
+							int plate_width = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Width / 3;
+							int plate_height = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Height;
+							OpenTaiko.Tx.Balloon_Combo[j].t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Y[i], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height));
 							if (this.nCombo_渡[i] < 1000) //2016.08.23 kairera0467 仮実装。
 							{
-								this.t小文字表示(TJAPlayer3.Skin.Game_Balloon_Combo_Number_X[i], TJAPlayer3.Skin.Game_Balloon_Combo_Number_Y[i], this.nCombo_渡[i], j);
-								TJAPlayer3.Tx.Balloon_Number_Combo.t2D描画(TJAPlayer3.Skin.Game_Balloon_Combo_Text_X[i] + 6 - NowDrawBalloon * 3, TJAPlayer3.Skin.Game_Balloon_Combo_Text_Y[i],
-									new Rectangle(TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[0], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[1], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[2], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[3]));
+								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_Y[i], this.nCombo_渡[i], j);
+								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Y[i],
+									new Rectangle(OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[0], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[1], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[2], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[3]));
 							} else {
-								this.t小文字表示(TJAPlayer3.Skin.Game_Balloon_Combo_Number_Ex_X[i], TJAPlayer3.Skin.Game_Balloon_Combo_Number_Ex_Y[i], this.nCombo_渡[i], j);
-								TJAPlayer3.Tx.Balloon_Number_Combo.vcScaleRatio.X = 1.0f;
-								TJAPlayer3.Tx.Balloon_Number_Combo.t2D描画(TJAPlayer3.Skin.Game_Balloon_Combo_Text_Ex_X[i] + 6 - NowDrawBalloon * 3, TJAPlayer3.Skin.Game_Balloon_Combo_Text_Ex_Y[i],
-									new Rectangle(TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[0], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[1], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[2], TJAPlayer3.Skin.Game_Balloon_Combo_Text_Rect[3]));
+								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_Ex_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_Ex_Y[i], this.nCombo_渡[i], j);
+								OpenTaiko.Tx.Balloon_Number_Combo.vcScaleRatio.X = 1.0f;
+								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_Ex_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Ex_Y[i],
+									new Rectangle(OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[0], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[1], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[2], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[3]));
 							}
 						}
 					}
@@ -141,13 +141,13 @@ namespace TJAPlayer3 {
 		private void t小文字表示(int x, int y, int num, int player) {
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++) {
-				float _x = x - (TJAPlayer3.Skin.Game_Balloon_Combo_Number_Interval[0] * (j - nums.Length));
-				float _y = y - (TJAPlayer3.Skin.Game_Balloon_Combo_Number_Interval[1] * (j - nums.Length));
+				float _x = x - (OpenTaiko.Skin.Game_Balloon_Combo_Number_Interval[0] * (j - nums.Length));
+				float _y = y - (OpenTaiko.Skin.Game_Balloon_Combo_Number_Interval[1] * (j - nums.Length));
 
-				float width = TJAPlayer3.Skin.Game_Balloon_Combo_Number_Size[0];
-				float height = TJAPlayer3.Skin.Game_Balloon_Combo_Number_Size[1];
+				float width = OpenTaiko.Skin.Game_Balloon_Combo_Number_Size[0];
+				float height = OpenTaiko.Skin.Game_Balloon_Combo_Number_Size[1];
 
-				TJAPlayer3.Tx.Balloon_Number_Combo.t2D描画(_x, _y, new RectangleF(width * nums[j], height * player, width, height));
+				OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(_x, _y, new RectangleF(width * nums[j], height * player, width, height));
 			}
 		}
 		//-----------------

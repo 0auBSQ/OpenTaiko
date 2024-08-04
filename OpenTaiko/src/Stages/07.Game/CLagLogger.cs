@@ -2,7 +2,7 @@
 using System.Text;
 using FDK.ExtensionMethods;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal static class CLagLogger {
 		private const int MaximumLag = 200;
 		private const int MinimumLag = 0 - MaximumLag;

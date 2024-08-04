@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CStage終了 : CStage {
 		// コンストラクタ
 
@@ -33,7 +33,7 @@ namespace TJAPlayer3 {
 			Trace.TraceInformation("終了ステージを非活性化します。");
 			Trace.Indent();
 			try {
-				TJAPlayer3.tDisposeSafely(ref Background);
+				OpenTaiko.tDisposeSafely(ref Background);
 				base.DeActivate();
 			} finally {
 				Trace.TraceInformation("終了ステージの非活性化を完了しました。");
@@ -70,8 +70,8 @@ namespace TJAPlayer3 {
 
 			if (!base.IsDeActivated) {
 				if (base.IsFirstDraw) {
-					TJAPlayer3.Skin.soundゲーム終了音.tPlay();
-					this.ct時間稼ぎ.Start(0, TJAPlayer3.Skin.Exit_Duration, 1, TJAPlayer3.Timer);
+					OpenTaiko.Skin.soundゲーム終了音.tPlay();
+					this.ct時間稼ぎ.Start(0, OpenTaiko.Skin.Exit_Duration, 1, OpenTaiko.Timer);
 					base.IsFirstDraw = false;
 				}
 
@@ -83,7 +83,7 @@ namespace TJAPlayer3 {
 
 				//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
-				if (this.ct時間稼ぎ.IsEnded && !TJAPlayer3.Skin.soundゲーム終了音.bIsPlaying) {
+				if (this.ct時間稼ぎ.IsEnded && !OpenTaiko.Skin.soundゲーム終了音.bIsPlaying) {
 					return 1;
 				}
 			}

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3.Animations {
+﻿namespace OpenTaiko.Animations {
 	/// <summary>
 	/// イーズインを行うクラス。
 	/// </summary>

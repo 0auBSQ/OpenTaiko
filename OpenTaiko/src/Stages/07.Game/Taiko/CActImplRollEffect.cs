@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplRollEffect : CActivity {
 		// コンストラクタ
 
@@ -12,36 +12,36 @@ namespace TJAPlayer3 {
 
 		// メソッド
 		public virtual void Start(int player) {
-			if (TJAPlayer3.ConfigIni.SimpleMode) return;
+			if (OpenTaiko.ConfigIni.SimpleMode) return;
 
 			for (int i = 0; i < 128; i++) {
 				if (!RollCharas[i].IsUsing) {
 					RollCharas[i].IsUsing = true;
-					RollCharas[i].Type = random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Ptn);
+					RollCharas[i].Type = random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Ptn);
 					RollCharas[i].OldValue = 0;
-					RollCharas[i].Counter = new CCounter(0, 5000, 1, TJAPlayer3.Timer);
-					if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay) {
+					RollCharas[i].Counter = new CCounter(0, 5000, 1, OpenTaiko.Timer);
+					if (OpenTaiko.stage演奏ドラム画面.bDoublePlay) {
 						switch (player) {
 							case 0:
-								RollCharas[i].X = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_1P_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_1P_X.Length)];
-								RollCharas[i].Y = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_1P_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_1P_Y.Length)];
-								RollCharas[i].XAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_1P_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_1P_X.Length)];
-								RollCharas[i].YAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_1P_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_1P_Y.Length)];
+								RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X.Length)];
+								RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_Y.Length)];
+								RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_X.Length)];
+								RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_1P_Y.Length)];
 								break;
 							case 1:
-								RollCharas[i].X = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_2P_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_2P_X.Length)];
-								RollCharas[i].Y = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_2P_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_2P_Y.Length)];
-								RollCharas[i].XAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_2P_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_2P_X.Length)];
-								RollCharas[i].YAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_2P_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_2P_Y.Length)];
+								RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_X.Length)];
+								RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_2P_Y.Length)];
+								RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_X.Length)];
+								RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_2P_Y.Length)];
 								break;
 							default:
 								return;
 						}
 					} else {
-						RollCharas[i].X = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_X.Length)];
-						RollCharas[i].Y = TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_StartPoint_Y.Length)];
-						RollCharas[i].XAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_X[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_X.Length)];
-						RollCharas[i].YAdd = TJAPlayer3.Skin.Game_Effect_Roll_Speed_Y[random.Next(0, TJAPlayer3.Skin.Game_Effect_Roll_Speed_Y.Length)];
+						RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_X.Length)];
+						RollCharas[i].Y = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_Y.Length)];
+						RollCharas[i].XAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_X.Length)];
+						RollCharas[i].YAdd = OpenTaiko.Skin.Game_Effect_Roll_Speed_Y[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Speed_Y.Length)];
 					}
 					break;
 				}
@@ -78,9 +78,9 @@ namespace TJAPlayer3 {
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {
-			if (!base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode) {
+			if (!base.IsDeActivated && !OpenTaiko.ConfigIni.SimpleMode) {
 
-				if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
+				if (OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 
 				for (int i = 0; i < 128; i++) {
 					if (RollCharas[i].IsUsing) {
@@ -95,16 +95,16 @@ namespace TJAPlayer3 {
 							RollCharas[i].Y += RollCharas[i].YAdd;
 						}
 
-						if (TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type] != null) {
-							TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(RollCharas[i].X, RollCharas[i].Y);
+						if (OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type] != null) {
+							OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(RollCharas[i].X, RollCharas[i].Y);
 
 							// 画面外にいたら描画をやめさせる
-							if (RollCharas[i].X < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Width || RollCharas[i].X > TJAPlayer3.Skin.Resolution[0]) {
+							if (RollCharas[i].X < 0 - OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Width || RollCharas[i].X > OpenTaiko.Skin.Resolution[0]) {
 								RollCharas[i].Counter.Stop();
 								RollCharas[i].IsUsing = false;
 							}
 
-							if (RollCharas[i].Y < 0 - TJAPlayer3.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Height || RollCharas[i].Y > TJAPlayer3.Skin.Resolution[1]) {
+							if (RollCharas[i].Y < 0 - OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Height || RollCharas[i].Y > OpenTaiko.Skin.Resolution[1]) {
 								RollCharas[i].Counter.Stop();
 								RollCharas[i].IsUsing = false;
 							}

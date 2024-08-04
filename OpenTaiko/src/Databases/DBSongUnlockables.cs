@@ -1,8 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
-using static TJAPlayer3.DBSongUnlockables;
+using static OpenTaiko.DBSongUnlockables;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>> {
 		/* DISPLAYED : Song displayed in song select, only a lock appearing on the side, audio preview plays
          * GRAYED : Box grayed, song preview does not play
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 			//_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.json";
 			//base.tDBInitSavable();
 
-			_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.db3";
+			_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.db3";
 
 
 			using (var connection = new SqliteConnection(@$"Data Source={_fn}")) {
@@ -62,8 +62,8 @@ namespace TJAPlayer3 {
 		}
 
 		public void tGetUnlockedItems(int _player, ModalQueue mq) {
-			int player = TJAPlayer3.GetActualPlayer(_player);
-			var _sf = TJAPlayer3.SaveFileInstances[player].data.UnlockedSongs;
+			int player = OpenTaiko.GetActualPlayer(_player);
+			var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedSongs;
 			bool _edited = false;
 
 			foreach (KeyValuePair<string, SongUnlockable> item in data) {
@@ -86,23 +86,23 @@ namespace TJAPlayer3 {
 								Modal.EModalType.Song,
 								HRarity.tRarityToModalInt(item.Value.rarity),
 								_node,
-								TJAPlayer3.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage(_node?.arスコア[0] ?? null)
+								OpenTaiko.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage(_node?.arスコア[0] ?? null)
 								),
 							_player);
 
-						DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[player].data.SaveId, "unlocked_songs", _npvKey);
+						DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[player].data.SaveId, "unlocked_songs", _npvKey);
 
 					}
 				}
 			}
 
 			if (_edited)
-				TJAPlayer3.SaveFileInstances[player].tApplyHeyaChanges();
+				OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
 		}
 
 		public bool tIsSongLocked(CSongListNode? song) {
 			if (song == null) return false;
-			return !TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.UnlockedSongs.Contains(song.tGetUniqueId())
+			return !OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Contains(song.tGetUniqueId())
 				&& data.ContainsKey(song.tGetUniqueId());
 		}
 

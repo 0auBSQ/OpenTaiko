@@ -1,5 +1,5 @@
 ﻿// Minimalist menu class to use for custom menus
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CStageTemplate : CStage {
 		public CStageTemplate() {
 			base.eStageID = EStage.TEMPLATE;

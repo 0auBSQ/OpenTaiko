@@ -2,7 +2,7 @@
 using FDK;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplFireworks : CActivity {
 		// コンストラクタ
 
@@ -19,12 +19,12 @@ namespace TJAPlayer3 {
 		/// <param name="nLane"></param>
 		public virtual void Start(int nLane, int nPlayer) {
 			nY座標P2 = new int[] { 548, 612, 670, 712, 730, 780, 725, 690, 640 };
-			if (TJAPlayer3.Tx.Effects_Hit_FireWorks != null && TJAPlayer3.Tx.Effects_Hit_FireWorks != null) {
+			if (OpenTaiko.Tx.Effects_Hit_FireWorks != null && OpenTaiko.Tx.Effects_Hit_FireWorks != null) {
 				for (int i = 0; i < 9; i++) {
 					for (int j = 0; j < 45; j++) {
 						if (!this.st大音符花火[j].b使用中) {
 							this.st大音符花火[j].b使用中 = true;
-							this.st大音符花火[j].ct進行 = new CCounter(0, 40, 18, TJAPlayer3.Timer); // カウンタ
+							this.st大音符花火[j].ct進行 = new CCounter(0, 40, 18, OpenTaiko.Timer); // カウンタ
 							this.st大音符花火[j].fX = this.nX座標[i]; //X座標
 							this.st大音符花火[j].fY = nPlayer == 0 ? this.nY座標[i] : this.nY座標P2[i];
 
@@ -92,7 +92,7 @@ namespace TJAPlayer3 {
 				{
 					this.st状態[j].b使用中 = true;
 					//this.st状態[ n ].ct進行 = new CCounter( 0, 9, 20, CDTXMania.Timer );
-					this.st状態[j].ct進行 = new CCounter(0, 6, 25, TJAPlayer3.Timer);
+					this.st状態[j].ct進行 = new CCounter(0, 6, 25, OpenTaiko.Timer);
 					this.st状態[j].judge = judge;
 					this.st状態[j].nPlayer = player;
 					this.st状態_大[j].nPlayer = player;
@@ -106,7 +106,7 @@ namespace TJAPlayer3 {
 						case 0x14:
 						case 0x1A:
 						case 0x1B:
-							this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, TJAPlayer3.Timer);
+							this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
 							this.st状態_大[j].judge = judge;
 							this.st状態_大[j].nIsBig = 1;
 							break;
@@ -149,10 +149,10 @@ namespace TJAPlayer3 {
 		}
 		public override int Draw() {
 			if (!base.IsDeActivated) {
-				int nWidth = (TJAPlayer3.Tx.Effects_Hit_Explosion.szTextureSize.Width / 7);
-				int nHeight = (TJAPlayer3.Tx.Effects_Hit_Explosion.szTextureSize.Height / 4);
-				int nBombWidth = (TJAPlayer3.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
-				int nBombHeight = (TJAPlayer3.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
+				int nWidth = (OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Width / 7);
+				int nHeight = (OpenTaiko.Tx.Effects_Hit_Explosion.szTextureSize.Height / 4);
+				int nBombWidth = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
+				int nBombHeight = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
 				for (int i = 0; i < 3 * 4; i++) {
 					if (this.st状態[i].b使用中) {
 						if (!this.st状態[i].ct進行.IsStoped) {
@@ -164,36 +164,36 @@ namespace TJAPlayer3 {
 
 							// (When performing calibration, reduce visual distraction
 							// and current judgment feedback near the judgment position.)
-							if (TJAPlayer3.Tx.Effects_Hit_Explosion != null && !TJAPlayer3.IsPerformingCalibration) {
+							if (OpenTaiko.Tx.Effects_Hit_Explosion != null && !OpenTaiko.IsPerformingCalibration) {
 								int n = this.st状態[i].nIsBig == 1 ? (nHeight * 2) : 0;
 
 								int nX = 0;
 								int nY = 0;
 
-								if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-									nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
-									nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
-								} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-									nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
-									nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+								if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+									nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
+									nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+								} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+									nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
+									nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
 								} else {
-									nX = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
-									nY = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+									nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
+									nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
 								}
-								nX += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
-								nY += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+								nX += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
+								nY += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
 
 								switch (st状態[i].judge) {
 									case ENoteJudge.Perfect:
 									case ENoteJudge.Great:
 									case ENoteJudge.Auto:
-										if (!TJAPlayer3.ConfigIni.SimpleMode) TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
+										if (!OpenTaiko.ConfigIni.SimpleMode) OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
 										break;
 									case ENoteJudge.Good:
-										TJAPlayer3.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
+										OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
 										break;
 									case ENoteJudge.Mine:
-										TJAPlayer3.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
+										OpenTaiko.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
 										break;
 									case ENoteJudge.Miss:
 									case ENoteJudge.Bad:
@@ -210,13 +210,13 @@ namespace TJAPlayer3 {
 						if (this.st状態_大[i].ct進行.IsEnded) {
 							this.st状態_大[i].ct進行.Stop();
 						}
-						if (TJAPlayer3.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1) {
+						if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1) {
 
 							switch (st状態_大[i].judge) {
 								case ENoteJudge.Perfect:
 								case ENoteJudge.Great:
 								case ENoteJudge.Auto:
-									if (this.st状態_大[i].nIsBig == 1 && !TJAPlayer3.ConfigIni.SimpleMode) {
+									if (this.st状態_大[i].nIsBig == 1 && !OpenTaiko.ConfigIni.SimpleMode) {
 										//float fX = 415 - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Width * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X ) / 2.0f);
 										//float fY = TJAPlayer3.Skin.nJudgePointY[ this.st状態_大[ i ].nPlayer ] - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Height * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y ) / 2.0f);
 										//float fY = 257 - ((this.txアタックエフェクトUpper_big.sz画像サイズ.Height * this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y ) / 2.0f);
@@ -243,25 +243,25 @@ namespace TJAPlayer3 {
 										float x = 0;
 										float y = 0;
 
-										if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-											x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
-											y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
-										} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-											x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
-											y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+										if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+											x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
+											y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+										} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+											x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
+											y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
 										} else {
-											x = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
-											y = TJAPlayer3.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+											x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
+											y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
 										}
-										x += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
-										y += TJAPlayer3.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+										x += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
+										y += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
 
-										x -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
-										y -= (TJAPlayer3.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
+										x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
+										y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
 
-										TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
-										TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
-										TJAPlayer3.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
 									}
 									break;
 
@@ -277,7 +277,7 @@ namespace TJAPlayer3 {
 				}
 
 				for (int i = 0; i < 45; i++) {
-					if (TJAPlayer3.Skin.nScrollFieldX[0] != 414)
+					if (OpenTaiko.Skin.nScrollFieldX[0] != 414)
 						break;
 
 					if (this.st大音符花火[i].b使用中) {

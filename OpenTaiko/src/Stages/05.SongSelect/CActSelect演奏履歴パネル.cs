@@ -7,7 +7,7 @@ using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelect演奏履歴パネル : CActivity {
 		// メソッド
 
@@ -59,8 +59,8 @@ namespace TJAPlayer3 {
 			base.IsDeActivated = true;
 		}
 		public void t選択曲が変更された() {
-			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
-			if ((cスコア != null) && !TJAPlayer3.stageSongSelect.bCurrentlyScrolling) {
+			Cスコア cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
+			if ((cスコア != null) && !OpenTaiko.stageSongSelect.bCurrentlyScrolling) {
 				try {
 					foreach (var item in tx文字列パネル) {
 						item.Dispose();
@@ -123,19 +123,19 @@ namespace TJAPlayer3 {
 		public override int Draw() {
 			if (!base.IsDeActivated) {
 				if (base.IsFirstDraw) {
-					this.ct登場アニメ用 = new CCounter(0, 3000, 1, TJAPlayer3.Timer);
+					this.ct登場アニメ用 = new CCounter(0, 3000, 1, OpenTaiko.Timer);
 					base.IsFirstDraw = false;
 				}
 				this.ct登場アニメ用.Tick();
 				int x = 980;
 				int y = 350;
-				if (TJAPlayer3.stageSongSelect.r現在選択中のスコア != null && this.ct登場アニメ用.CurrentValue >= 2000 && TJAPlayer3.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				if (OpenTaiko.stageSongSelect.r現在選択中のスコア != null && this.ct登場アニメ用.CurrentValue >= 2000 && OpenTaiko.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
 					//CDTXMania.Tx.SongSelect_ScoreWindow_Text.n透明度 = ct登場アニメ用.n現在の値 - 1745;
-					if (TJAPlayer3.Tx.SongSelect_ScoreWindow[TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度] != null) {
+					if (OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度] != null) {
 						//CDTXMania.Tx.SongSelect_ScoreWindow[CDTXMania.stage選曲.n現在選択中の曲の難易度].n透明度 = ct登場アニメ用.n現在の値 - 1745;
-						TJAPlayer3.Tx.SongSelect_ScoreWindow[TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度].t2D描画(x, y);
-						this.t小文字表示(x + 56, y + 160, string.Format("{0,7:######0}", TJAPlayer3.stageSongSelect.r現在選択中のスコア.譜面情報.nハイスコア[TJAPlayer3.stageSongSelect.n現在選択中の曲の難易度].ToString()));
-						TJAPlayer3.Tx.SongSelect_ScoreWindow_Text.t2D描画(x + 236, y + 166, new Rectangle(0, 36, 32, 30));
+						OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度].t2D描画(x, y);
+						this.t小文字表示(x + 56, y + 160, string.Format("{0,7:######0}", OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nハイスコア[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度].ToString()));
+						OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2D描画(x + 236, y + 166, new Rectangle(0, 36, 32, 30));
 					}
 				}
 			}
@@ -169,8 +169,8 @@ namespace TJAPlayer3 {
 				for (int i = 0; i < this.st小文字位置.Length; i++) {
 					if (this.st小文字位置[i].ch == ch) {
 						Rectangle rectangle = new Rectangle(this.st小文字位置[i].pt.X, this.st小文字位置[i].pt.Y, 26, 36);
-						if (TJAPlayer3.Tx.SongSelect_ScoreWindow_Text != null) {
-							TJAPlayer3.Tx.SongSelect_ScoreWindow_Text.t2D描画(x, y, rectangle);
+						if (OpenTaiko.Tx.SongSelect_ScoreWindow_Text != null) {
+							OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2D描画(x, y, rectangle);
 						}
 						break;
 					}
@@ -180,7 +180,7 @@ namespace TJAPlayer3 {
 		}
 
 		public void tSongChange() {
-			this.ct登場アニメ用 = new CCounter(0, 3000, 1, TJAPlayer3.Timer);
+			this.ct登場アニメ用 = new CCounter(0, 3000, 1, OpenTaiko.Timer);
 		}
 
 

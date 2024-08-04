@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// 「整数」を表すアイテム。
 	/// </summary>

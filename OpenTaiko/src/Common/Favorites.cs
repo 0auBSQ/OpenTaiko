@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class Favorites {
 		public void tFavorites() {
 			if (!File.Exists("Favorite.json"))
@@ -11,15 +11,15 @@
 
 		public void tToggleFavorite(string chartID) {
 			if (tIsFavorite(chartID))
-				data.favorites[TJAPlayer3.SaveFile].Remove(chartID);
+				data.favorites[OpenTaiko.SaveFile].Remove(chartID);
 			else
-				data.favorites[TJAPlayer3.SaveFile].Add(chartID);
+				data.favorites[OpenTaiko.SaveFile].Add(chartID);
 
 			tSaveFile();
 		}
 
 		public bool tIsFavorite(string chartID) {
-			return (data.favorites[TJAPlayer3.SaveFile].Contains(chartID));
+			return (data.favorites[OpenTaiko.SaveFile].Contains(chartID));
 		}
 
 

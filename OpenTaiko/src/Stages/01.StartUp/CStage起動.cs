@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CStage起動 : CStage {
 		// コンストラクタ
 
@@ -21,15 +21,15 @@ namespace TJAPlayer3 {
 				Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
 				Background.Init();
 
-				if (TJAPlayer3.ConfigIsNew) {
-					langSelectFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.StartUp_LangSelect_FontSize);
-					langSelectTitle = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
+				if (OpenTaiko.ConfigIsNew) {
+					langSelectFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.StartUp_LangSelect_FontSize);
+					langSelectTitle = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
 					langList = new CTexture[CLangManager.Languages.Length];
 					langListHighlighted = new CTexture[CLangManager.Languages.Length];
 
 					for (int i = 0; i < langList.Length; i++) {
-						langList[i] = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
-						langListHighlighted[i] = TJAPlayer3.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
+						langList[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
+						langListHighlighted[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
 					}
 					langSelectOffset = new int[2] { SampleFramework.GameWindowSize.Width / 2, (SampleFramework.GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
 				}
@@ -46,14 +46,14 @@ namespace TJAPlayer3 {
 			Trace.TraceInformation("起動ステージを非活性化します。");
 			Trace.Indent();
 			try {
-				TJAPlayer3.tDisposeSafely(ref Background);
+				OpenTaiko.tDisposeSafely(ref Background);
 
-				TJAPlayer3.tDisposeSafely(ref langSelectFont);
-				TJAPlayer3.tDisposeSafely(ref langSelectTitle);
+				OpenTaiko.tDisposeSafely(ref langSelectFont);
+				OpenTaiko.tDisposeSafely(ref langSelectTitle);
 				if (langList != null) {
 					for (int i = 0; i < langList.Length; i++) {
-						TJAPlayer3.tDisposeSafely(ref langList[i]);
-						TJAPlayer3.tDisposeSafely(ref langListHighlighted[i]);
+						OpenTaiko.tDisposeSafely(ref langList[i]);
+						OpenTaiko.tDisposeSafely(ref langListHighlighted[i]);
 					}
 				}
 
@@ -82,7 +82,7 @@ namespace TJAPlayer3 {
 				if (base.IsFirstDraw) {
 					this.list進行文字列.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums\n");
 					this.list進行文字列.Add("Product by.kairera0467\n");
-					this.list進行文字列.Add("Release: " + TJAPlayer3.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
+					this.list進行文字列.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
 
 					this.list進行文字列.Add("");
 					this.list進行文字列.Add("TJAPlayer3-Develop-ReWrite forked TJAPlayer3(@aioilight)");
@@ -134,14 +134,14 @@ namespace TJAPlayer3 {
 								this.list進行文字列.Add("LOADING TEXTURES...");
 
 								try {
-									TJAPlayer3.Tx.LoadTexture();
+									OpenTaiko.Tx.LoadTexture();
 
 									this.list進行文字列.Add("LOADING TEXTURES...OK");
 									this.str現在進行中 = "Setup done.";
 									this.ePhaseID = EPhase.Startup_Complete;
-									TJAPlayer3.Skin.bgm起動画面.tStop();
+									OpenTaiko.Skin.bgm起動画面.tStop();
 								} catch (Exception exception) {
-									TJAPlayer3.Skin.bgm起動画面.tStop();
+									OpenTaiko.Skin.bgm起動画面.tStop();
 
 									Trace.TraceError(exception.ToString());
 									this.list進行文字列.Add("LOADING TEXTURES...NG");
@@ -153,9 +153,9 @@ namespace TJAPlayer3 {
 								this.list進行文字列.Add("LOADING TEXTURES...OK");
 								this.str現在進行中 = "Setup done.";
 								this.ePhaseID = EPhase.Startup_Complete;
-								TJAPlayer3.Skin.bgm起動画面.tStop();
+								OpenTaiko.Skin.bgm起動画面.tStop();
 							}
-							if (TJAPlayer3.ConfigIni.ASyncTextureLoad) {
+							if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
 								Task.Run(loadTexture);
 							} else {
 								loadTexture();
@@ -173,18 +173,18 @@ namespace TJAPlayer3 {
 					int x = 320;
 					int y = 20;
 					for (int i = 0; i < this.list進行文字列.Count; i++) {
-						TJAPlayer3.actTextConsole.tPrint((int)(x * TJAPlayer3.Skin.Resolution[0] / 1280.0), (int)(y * TJAPlayer3.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
+						OpenTaiko.actTextConsole.tPrint((int)(x * OpenTaiko.Skin.Resolution[0] / 1280.0), (int)(y * OpenTaiko.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
 						y += 24;
 					}
 					//-----------------
 					#endregion
-				} else if (TJAPlayer3.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
+				} else if (OpenTaiko.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
 				  {
-					if (TJAPlayer3.Tx.Tile_Black != null) {
-						TJAPlayer3.Tx.Tile_Black.Opacity = 255;
-						for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += TJAPlayer3.Tx.Tile_Black.szTextureSize.Width) {
-							for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += TJAPlayer3.Tx.Tile_Black.szTextureSize.Height) {
-								TJAPlayer3.Tx.Tile_Black.t2D描画(i, j);
+					if (OpenTaiko.Tx.Tile_Black != null) {
+						OpenTaiko.Tx.Tile_Black.Opacity = 255;
+						for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
+							for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
+								OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
 							}
 						}
 					}
@@ -204,28 +204,28 @@ namespace TJAPlayer3 {
 						y += langList[i].szTextureSize.Height;
 					}
 
-					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 						langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
-					} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+					} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 						langSelectIndex = Math.Max(langSelectIndex - 1, 0);
-					} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
-						TJAPlayer3.Skin.soundDecideSFX.tPlay();
-						TJAPlayer3.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
-						CLangManager.langAttach(TJAPlayer3.ConfigIni.sLang);
+					} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
+						OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
+						CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
 						bLanguageSelected = true;
 					}
 				} else {
 					if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
 					{
-						TJAPlayer3.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
+						OpenTaiko.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
 
-						if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
-							TJAPlayer3.Skin.soundDecideSFX.tPlay();
+						if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+							OpenTaiko.Skin.soundDecideSFX.tPlay();
 							return 1;
 						}
 					}
 
-					TJAPlayer3.Tx.Readme.t2D描画(0, 0);
+					OpenTaiko.Tx.Readme.t2D描画(0, 0);
 				}
 
 			}

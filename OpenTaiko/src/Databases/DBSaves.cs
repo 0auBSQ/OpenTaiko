@@ -2,10 +2,10 @@
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class DBSaves {
 		private static string _savesDBFilename = $@"Saves.db3";
-		private static string _savesDBPath = @$"{TJAPlayer3.strEXEのあるフォルダ}{_savesDBFilename}";
+		private static string _savesDBPath = @$"{OpenTaiko.strEXEのあるフォルダ}{_savesDBFilename}";
 		private static SqliteConnection SavesDBConnection = new SqliteConnection(@$"Data Source={_savesDBPath}");
 
 		private static string _DBNotFoundError = @$"The database {_savesDBFilename} was not found or the connection failed";
@@ -21,7 +21,7 @@ namespace TJAPlayer3 {
 		}
 
 		public static Int64 GetPlayerSaveId(int player) {
-			return TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.SaveId;
+			return OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.SaveId;
 		}
 
 		#region [Unlocked Dan Titles]
@@ -276,11 +276,11 @@ namespace TJAPlayer3 {
 			SqliteConnection? connection = GetSavesDBConnection();
 			if (connection == null) return;
 
-			SaveFile.Data saveData = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data;
+			SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
 			BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
-			var choosenSong = TJAPlayer3.stageSongSelect.rChoosenSong;
-			var choosenDifficulty = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[player];
-			var chartScore = TJAPlayer3.stage演奏ドラム画面.CChartScore[player];
+			var choosenSong = OpenTaiko.stageSongSelect.rChoosenSong;
+			var choosenDifficulty = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+			var chartScore = OpenTaiko.stage演奏ドラム画面.CChartScore[player];
 			List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
 			// Do not register the play if Dan/Tower and any mod is ON
@@ -301,10 +301,10 @@ namespace TJAPlayer3 {
 				currentPlay.HighScore = chartScore.nScore;
 				if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = CFloorManagement.LastRegisteredFloor;
 				if (choosenDifficulty == (int)Difficulty.Dan) {
-					for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-						for (int j = 0; j < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
-							if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
-								int amount = TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
+					for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
+						for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
+							if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
+								int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
 								danResults[j].Add(amount);
 							}
 						}
@@ -314,7 +314,7 @@ namespace TJAPlayer3 {
 				currentPlay.HighScoreGoodCount = chartScore.nGreat;
 				currentPlay.HighScoreOkCount = chartScore.nGood;
 				currentPlay.HighScoreBadCount = chartScore.nMiss;
-				currentPlay.HighScoreMaxCombo = TJAPlayer3.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[player];
+				currentPlay.HighScoreMaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[player];
 				currentPlay.HighScoreRollCount = chartScore.nRoll;
 				currentPlay.HighScoreADLibCount = chartScore.nADLIB;
 				currentPlay.HighScoreBoomCount = chartScore.nMine;
@@ -355,18 +355,18 @@ namespace TJAPlayer3 {
 							JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam6"]) ?? new List<int> { -1 },
 							JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam7"]) ?? new List<int> { -1 }
 						};
-						for (int i = 0; i < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-							for (int j = 0; j < TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
-								if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
+						for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
+							for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
+								if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
 									int amount = danResults[j][i];
 
 									if (i < oldDanResults[j].Count) {
 										int current = oldDanResults[j][i];
 										if (current == -1) {
 											danResults[j][i] = amount;
-										} else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More) {
+										} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More) {
 											danResults[j][i] = Math.Max(amount, current);
-										} else if (TJAPlayer3.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less) {
+										} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less) {
 											danResults[j][i] = Math.Min(amount, current);
 										}
 									}

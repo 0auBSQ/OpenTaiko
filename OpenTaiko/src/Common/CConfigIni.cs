@@ -5,7 +5,7 @@ using System.Text;
 using FDK;
 using FDK.ExtensionMethods;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CConfigIni : INotifyPropertyChanged {
 		private const int MinimumKeyboardSoundLevelIncrement = 1;
 		private const int MaximumKeyboardSoundLevelIncrement = 20;
@@ -1054,7 +1054,7 @@ namespace TJAPlayer3 {
 			}
 
 			public bool KeyIsPressed(STKEYASSIGN[] pad) {
-				return TJAPlayer3.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
+				return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
 			}
 
 			[StructLayout(LayoutKind.Sequential)]
@@ -1890,7 +1890,7 @@ namespace TJAPlayer3 {
 			}
 		}
 		public void t書き出し(string iniファイル名) {
-			StreamWriter sw = new StreamWriter(iniファイル名, false, Encoding.GetEncoding(TJAPlayer3.sEncType));
+			StreamWriter sw = new StreamWriter(iniファイル名, false, Encoding.GetEncoding(OpenTaiko.sEncType));
 			sw.WriteLine(";-------------------");
 
 			#region [ System ]
@@ -1900,7 +1900,7 @@ namespace TJAPlayer3 {
 			#region [ Version ]
 			sw.WriteLine("; リリースバージョン");
 			sw.WriteLine("; Release Version.");
-			sw.WriteLine("Version={0}", TJAPlayer3.VERSION);
+			sw.WriteLine("Version={0}", OpenTaiko.VERSION);
 			sw.WriteLine();
 			#endregion
 			#region [ TJAPath ]
@@ -1913,11 +1913,11 @@ namespace TJAPlayer3 {
 			#endregion
 			#region [ スキン関連 ]
 			#region [ Skinパスの絶対パス→相対パス変換 ]
-			Uri uriRoot = new Uri(System.IO.Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar));
+			Uri uriRoot = new Uri(System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar));
 			if (strSystemSkinSubfolderFullName != null && strSystemSkinSubfolderFullName.Length == 0) {
 				// Config.iniが空の状態でDTXManiaをViewerとして起動_終了すると、strSystemSkinSubfolderFullName が空の状態でここに来る。
 				// → 初期値として Default/ を設定する。
-				strSystemSkinSubfolderFullName = System.IO.Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar + "Default" + System.IO.Path.DirectorySeparatorChar);
+				strSystemSkinSubfolderFullName = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar + "Default" + System.IO.Path.DirectorySeparatorChar);
 			}
 			Uri uriPath = new Uri(System.IO.Path.Combine(this.strSystemSkinSubfolderFullName, "." + System.IO.Path.DirectorySeparatorChar));
 			string relPath = uriRoot.MakeRelativeUri(uriPath).ToString();               // 相対パスを取得
@@ -2662,7 +2662,7 @@ namespace TJAPlayer3 {
 			if (this.bConfigIniが存在している) {
 				string str;
 				this.tキーアサインを全部クリアする();
-				using (StreamReader reader = new StreamReader(this.ConfigIniファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType))) {
+				using (StreamReader reader = new StreamReader(this.ConfigIniファイル名, Encoding.GetEncoding(OpenTaiko.sEncType))) {
 					str = reader.ReadToEnd();
 				}
 				t文字列から読み込み(str);
@@ -2751,7 +2751,7 @@ namespace TJAPlayer3 {
 											  else if (str3.Equals("SkinPath")) {
 												string absSkinPath = str4;
 												if (!System.IO.Path.IsPathRooted(str4)) {
-													absSkinPath = System.IO.Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "System");
+													absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
 													absSkinPath = System.IO.Path.Combine(absSkinPath, str4);
 													Uri u = new Uri(absSkinPath);
 													absSkinPath = u.AbsolutePath.ToString();    // str4内に相対パスがある場合に備える

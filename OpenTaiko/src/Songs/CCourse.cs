@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	public class CCourse {
 		//2016.11.07 kairera0467
 		//とりあえずメモ代わりに

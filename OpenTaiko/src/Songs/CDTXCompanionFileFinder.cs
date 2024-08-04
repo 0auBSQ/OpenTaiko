@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal static class CDTXCompanionFileFinder {
 		internal static string FindFileName(
 			string directory,
@@ -25,7 +25,7 @@ namespace TJAPlayer3 {
 			// To begin finding the right file, we first need to get the raw
 			// bytes that would comprise the file name if encoded into
 			// Shift-JIS.
-			var encodedCompanionFileNameBytes = Encoding.GetEncoding(TJAPlayer3.sEncType).GetBytes(expectedCompanionFileName);
+			var encodedCompanionFileNameBytes = Encoding.GetEncoding(OpenTaiko.sEncType).GetBytes(expectedCompanionFileName);
 
 			// Here we have a helper method that will be used to try finding
 			// the file by interpreting the byte representation encoded

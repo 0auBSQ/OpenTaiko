@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class CCharacter {
 		public DBCharacter.CharacterData metadata;
 		public DBCharacter.CharacterEffect effect;
@@ -16,8 +16,8 @@
 		}
 
 		public void tGetUnlockedItems(int _player, ModalQueue mq) {
-			int player = TJAPlayer3.GetActualPlayer(_player);
-			var _sf = TJAPlayer3.SaveFileInstances[player].data.UnlockedCharacters;
+			int player = OpenTaiko.GetActualPlayer(_player);
+			var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedCharacters;
 			bool _edited = false;
 
 			var _npvKey = Path.GetFileName(_path);
@@ -33,16 +33,16 @@
 							Modal.EModalType.Character,
 							HRarity.tRarityToModalInt(metadata.Rarity),
 							this,
-							TJAPlayer3.Tx.Characters_Heya_Render[_idx]
+							OpenTaiko.Tx.Characters_Heya_Render[_idx]
 							),
 						_player);
 
-					DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[player].data.SaveId, "unlocked_characters", _npvKey);
+					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[player].data.SaveId, "unlocked_characters", _npvKey);
 				}
 			}
 
 			if (_edited)
-				TJAPlayer3.SaveFileInstances[player].tApplyHeyaChanges();
+				OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
 		}
 
 		public CCharacter(string path, int i) {

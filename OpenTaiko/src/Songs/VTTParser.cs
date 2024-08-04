@@ -4,9 +4,9 @@ using System.Net;
 using System.Text.RegularExpressions;
 using FDK;
 using SkiaSharp;
-using static TJAPlayer3.CDTX;
+using static OpenTaiko.CDTX;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class VTTParser : IDisposable {
 		/*
         
@@ -101,8 +101,8 @@ namespace TJAPlayer3 {
 			List<LyricData> lyricData = new List<LyricData>();
 
 			LyricData data = new LyricData() {
-				ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor,
-				BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor
+				ForeColor = OpenTaiko.Skin.Game_Lyric_ForeColor,
+				BackColor = OpenTaiko.Skin.Game_Lyric_BackColor
 			};
 
 			bool readingHeader = true;
@@ -138,8 +138,8 @@ namespace TJAPlayer3 {
 						lyricData = new List<LyricData>();
 						data = new LyricData() {
 							timestamp = startTime,
-							ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor,
-							BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor
+							ForeColor = OpenTaiko.Skin.Game_Lyric_ForeColor,
+							BackColor = OpenTaiko.Skin.Game_Lyric_BackColor
 						};
 						ignoreLyrics = false;
 						isUsingLang = false;
@@ -183,8 +183,8 @@ namespace TJAPlayer3 {
 										if (tagdata == ("c")) {
 											lyricData.Add(data);
 											data.Text = String.Empty;
-											data.ForeColor = TJAPlayer3.Skin.Game_Lyric_ForeColor;
-											data.BackColor = TJAPlayer3.Skin.Game_Lyric_BackColor;
+											data.ForeColor = OpenTaiko.Skin.Game_Lyric_ForeColor;
+											data.BackColor = OpenTaiko.Skin.Game_Lyric_BackColor;
 										} else if (tagdata.StartsWith("lang")) { data.Language = String.Empty; } else if (tagdata == "ruby") {
 											lyricData.Add(data);
 											data.IsRuby = false;
@@ -215,52 +215,52 @@ namespace TJAPlayer3 {
 											foreach (string clr in colordata) {
 												switch (clr) {
 													case "white":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[0];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[0];
 														break;
 													case "lime":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[1];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[1];
 														break;
 													case "cyan":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[2];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[2];
 														break;
 													case "red":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[3];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[3];
 														break;
 													case "yellow":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[4];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[4];
 														break;
 													case "magenta":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[5];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[5];
 														break;
 													case "blue":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[6];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[6];
 														break;
 													case "black":
-														data.ForeColor = TJAPlayer3.Skin.Game_Lyric_VTTForeColor[7];
+														data.ForeColor = OpenTaiko.Skin.Game_Lyric_VTTForeColor[7];
 														break;
 													case "bg_white":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[0];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[0];
 														break;
 													case "bg_lime":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[1];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[1];
 														break;
 													case "bg_cyan":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[2];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[2];
 														break;
 													case "bg_red":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[3];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[3];
 														break;
 													case "bg_yellow":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[4];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[4];
 														break;
 													case "bg_magenta":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[5];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[5];
 														break;
 													case "bg_blue":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[6];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[6];
 														break;
 													case "bg_black":
-														data.BackColor = TJAPlayer3.Skin.Game_Lyric_VTTBackColor[7];
+														data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[7];
 														break;
 													default:
 														break;
@@ -394,20 +394,20 @@ namespace TJAPlayer3 {
 			string text = String.Empty;
 
 			foreach (LyricData data in datalist) {
-				using (CCachedFontRenderer fastdraw = HPrivateFastFont.tInstantiateFont(TJAPlayer3.Skin.Game_Lyric_FontName, TJAPlayer3.Skin.Game_Lyric_FontSize, data.Style)) {
+				using (CCachedFontRenderer fastdraw = HPrivateFastFont.tInstantiateFont(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize, data.Style)) {
 					SKBitmap textdrawing = fastdraw.DrawText(data.Text, data.ForeColor, data.BackColor, null, 30); // Draw main text
 
 					if (data.IsRuby) // ruby time
 					{
-						using (CCachedFontRenderer rubydraw = HPrivateFastFont.tInstantiateFont(TJAPlayer3.Skin.Game_Lyric_FontName, TJAPlayer3.Skin.Game_Lyric_FontSize / 2, data.Style)) {
+						using (CCachedFontRenderer rubydraw = HPrivateFastFont.tInstantiateFont(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize / 2, data.Style)) {
 							SKBitmap ruby = rubydraw.DrawText(data.RubyText, data.ForeColor, data.BackColor, null, 30);
-							Size size = new Size(textdrawing.Width > ruby.Width ? textdrawing.Width : ruby.Width, textdrawing.Height + (TJAPlayer3.Skin.Game_Lyric_VTTRubyOffset + (ruby.Height / 2)));
+							Size size = new Size(textdrawing.Width > ruby.Width ? textdrawing.Width : ruby.Width, textdrawing.Height + (OpenTaiko.Skin.Game_Lyric_VTTRubyOffset + (ruby.Height / 2)));
 							SKBitmap fullruby = new SKBitmap(size.Width, size.Height);
 
 
 							using (SKCanvas canvas = new SKCanvas(fullruby)) {
 								canvas.DrawBitmap(textdrawing, (fullruby.Width / 2) - (textdrawing.Width / 2), (fullruby.Height / 2) - (textdrawing.Height / 2));
-								canvas.DrawBitmap(ruby, (fullruby.Width - ruby.Width) / 2, (fullruby.Height / 2) - (ruby.Height / 2) - TJAPlayer3.Skin.Game_Lyric_VTTRubyOffset);
+								canvas.DrawBitmap(ruby, (fullruby.Width - ruby.Width) / 2, (fullruby.Height / 2) - (ruby.Height / 2) - OpenTaiko.Skin.Game_Lyric_VTTRubyOffset);
 							}
 							textures[data.line].Add(fullruby);
 							rubywidthoffset[data.line].Add((fullruby.Width - textdrawing.Width) / 2 > 0 ? (fullruby.Width - textdrawing.Width) / 2 : 0);
