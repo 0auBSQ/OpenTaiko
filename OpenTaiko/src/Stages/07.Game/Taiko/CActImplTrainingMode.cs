@@ -344,6 +344,7 @@ namespace OpenTaiko {
 			OpenTaiko.stage演奏ドラム画面.bPAUSE = true;
 			OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 			this.bTrainingPAUSE = true;
+			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaIsActive) OpenTaiko.stage演奏ドラム画面.actBalloon.KusuMiss();
 
 			this.tMatchWithTheChartDisplayPosition(false);
 		}
@@ -364,10 +365,11 @@ namespace OpenTaiko {
 
 
 			int n少し戻ってから演奏開始Chip = OpenTaiko.stage演奏ドラム画面.n現在のトップChip;
-
+      
 			OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = 0;
 			OpenTaiko.stage演奏ドラム画面.t数値の初期化(true, true);
 			OpenTaiko.stage演奏ドラム画面.Activate();
+			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaIsActive) OpenTaiko.stage演奏ドラム画面.actBalloon.KusuMiss();
 
 			for (int i = 0; i < dTX.listChip.Count; i++) {
 
@@ -461,7 +463,7 @@ namespace OpenTaiko {
 		private long nスクロール後ms;
 		private long n最終演奏位置ms;
 
-		private bool bTrainingPAUSE;
+		public bool bTrainingPAUSE { get; private set; }
 		private bool bCurrentlyScrolling;
 
 		private CCounter ctScrollCounter;

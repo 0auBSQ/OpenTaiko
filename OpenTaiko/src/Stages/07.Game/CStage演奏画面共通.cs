@@ -692,7 +692,7 @@ namespace OpenTaiko {
 		public CAct演奏ステージ失敗 actStageFailed;
 		protected CAct演奏スクロール速度 act譜面スクロール速度;
 		protected CActImplRoll actRoll;
-		protected CActImplBalloon actBalloon;
+		public CActImplBalloon actBalloon;
 		public CActImplCharacter actChara;
 		protected CActImplRollEffect actRollChara;
 		protected CActImplComboBalloon actComboBalloon;
