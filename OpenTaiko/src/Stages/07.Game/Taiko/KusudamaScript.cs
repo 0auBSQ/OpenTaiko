@@ -1,6 +1,6 @@
 using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class KusudamaScript : ScriptBG {
 		private LuaFunction LuaKusuIn;
 		private LuaFunction LuaKusuBroke;

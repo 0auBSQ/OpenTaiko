@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class HEasingMethods {
 		public enum EEaseType {
 			IN = 0,

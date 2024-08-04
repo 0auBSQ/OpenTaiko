@@ -2,7 +2,7 @@
 using FDK;
 
 // Minimalist menu class to use for custom menus
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CActSelectDanInfo : CStage {
 		public CActSelectDanInfo() {
 			base.IsDeActivated = true;
@@ -14,8 +14,8 @@ namespace TJAPlayer3 {
 			if (base.IsActivated)
 				return;
 
-			ctStep = new CCounter(0, 1000, 2, TJAPlayer3.Timer);
-			ctStepFade = new CCounter(0, 255, 0.5, TJAPlayer3.Timer);
+			ctStep = new CCounter(0, 1000, 2, OpenTaiko.Timer);
+			ctStepFade = new CCounter(0, 255, 0.5, OpenTaiko.Timer);
 
 			ttkExams = new TitleTextureKey[(int)Exam.Type.Total];
 			for (int i = 0; i < ttkExams.Length; i++) {
@@ -33,16 +33,16 @@ namespace TJAPlayer3 {
 
 		public override void CreateManagedResource() {
 			// Ressource allocation
-			pfTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_DanInfo_Title_Size);
-			pfExamFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Size);
+			pfTitleFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.SongSelect_DanInfo_Title_Size);
+			pfExamFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Size);
 
 			base.CreateManagedResource();
 		}
 
 		public override void ReleaseManagedResource() {
 			// Ressource freeing
-			TJAPlayer3.tDisposeSafely(ref pfTitleFont);
-			TJAPlayer3.tDisposeSafely(ref pfExamFont);
+			OpenTaiko.tDisposeSafely(ref pfTitleFont);
+			OpenTaiko.tDisposeSafely(ref pfExamFont);
 
 			base.ReleaseManagedResource();
 		}
@@ -51,16 +51,16 @@ namespace TJAPlayer3 {
 			ctStep.Tick();
 			ctStepFade.Tick();
 			if (ctStep.CurrentValue == ctStep.EndValue) {
-				ctStep = new CCounter(0, 1000, 2, TJAPlayer3.Timer);
+				ctStep = new CCounter(0, 1000, 2, OpenTaiko.Timer);
 				tNextStep();
 			}
 
-			if (TJAPlayer3.Skin.SongSelect_DanInfo_Show) {
-				for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-					var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
+			if (OpenTaiko.Skin.SongSelect_DanInfo_Show) {
+				for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
+					var dan = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i];
 					int songIndex = i / 3;
 					int opacity = 255;
-					if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
+					if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
 						if (nNowSongIndex == songIndex) {
 							opacity = ctStepFade.CurrentValue;
 						} else if (nPrevSongIndex == songIndex) {
@@ -71,48 +71,48 @@ namespace TJAPlayer3 {
 					}
 
 					int pos = i % 3;
-					CActSelect段位リスト.tDisplayDanIcon(i + 1, TJAPlayer3.Skin.SongSelect_DanInfo_Icon_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Icon_Y[pos], opacity, TJAPlayer3.Skin.SongSelect_DanInfo_Icon_Scale, false);
+					CActSelect段位リスト.tDisplayDanIcon(i + 1, OpenTaiko.Skin.SongSelect_DanInfo_Icon_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Icon_Y[pos], opacity, OpenTaiko.Skin.SongSelect_DanInfo_Icon_Scale, false);
 
-					int difficulty_cymbol_width = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
-					int difficulty_cymbol_height = TJAPlayer3.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
+					int difficulty_cymbol_width = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
+					int difficulty_cymbol_height = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
 
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Y[pos], new Rectangle(dan.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = 1;
-					TJAPlayer3.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = 1;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Y[pos], new Rectangle(dan.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = 1;
+					OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = 1;
 
-					TJAPlayer3.Tx.Dani_Level_Number.Opacity = opacity;
-					TJAPlayer3.stage段位選択.段位リスト.tLevelNumberDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, TJAPlayer3.Skin.SongSelect_DanInfo_Level_Number_Scale);
-					TJAPlayer3.Tx.Dani_Level_Number.Opacity = 255;
+					OpenTaiko.Tx.Dani_Level_Number.Opacity = opacity;
+					OpenTaiko.stage段位選択.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Scale);
+					OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
 					TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
-					TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).t2D描画(TJAPlayer3.Skin.SongSelect_DanInfo_Title_X[pos], TJAPlayer3.Skin.SongSelect_DanInfo_Title_Y[pos]);
+					TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).t2D描画(OpenTaiko.Skin.SongSelect_DanInfo_Title_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Title_Y[pos]);
 
 
 				}
 
 				for (int j = 0; j < CExamInfo.cMaxExam; j++) {
 					int index = j;
-					Dan_C danc0 = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
+					Dan_C danc0 = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 
 					if (danc0 != null) {
-						TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_X[index], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Y[index]);
+						TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
 					}
 
-					if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
-						Dan_C danc = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
+					if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
+						Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 						if (danc != null) {
-							TJAPlayer3.stage段位選択.段位リスト.tExamDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_X[0], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+							OpenTaiko.stage段位選択.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 						}
 					} else {
-						for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-							Dan_C danc = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i].Dan_C[j];
+						for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
+							Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i].Dan_C[j];
 							if (danc != null) {
 								int opacity = 255;
-								if (TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
+								if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
 									if (nNowSongIndex == i / 3) {
 										opacity = ctStepFade.CurrentValue;
 									} else if (nPrevSongIndex == i / 3) {
@@ -122,9 +122,9 @@ namespace TJAPlayer3 {
 									}
 								}
 
-								TJAPlayer3.Tx.Dani_Exam_Number.Opacity = opacity;
-								TJAPlayer3.stage段位選択.段位リスト.tExamDraw(TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), TJAPlayer3.Skin.SongSelect_DanInfo_Exam_Value_Scale);
-								TJAPlayer3.Tx.Dani_Exam_Number.Opacity = 255;
+								OpenTaiko.Tx.Dani_Exam_Number.Opacity = opacity;
+								OpenTaiko.stage段位選択.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+								OpenTaiko.Tx.Dani_Exam_Number.Opacity = 255;
 							}
 						}
 					}
@@ -135,11 +135,11 @@ namespace TJAPlayer3 {
 		}
 
 		public void UpdateSong() {
-			if (TJAPlayer3.stageSongSelect.rNowSelectedSong == null || TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs == null) return;
+			if (OpenTaiko.stageSongSelect.rNowSelectedSong == null || OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs == null) return;
 
-			ttkTitles = new TitleTextureKey[TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count];
-			for (int i = 0; i < TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-				var dan = TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs[i];
+			ttkTitles = new TitleTextureKey[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count];
+			for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
+				var dan = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i];
 				ttkTitles[i] = new TitleTextureKey(dan.bTitleShow ? "???" : dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
 			}
 		}
@@ -159,8 +159,8 @@ namespace TJAPlayer3 {
 
 		private void tNextStep() {
 			nPrevSongIndex = nNowSongIndex;
-			nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(TJAPlayer3.stageSongSelect.rNowSelectedSong.DanSongs.Count / 3.0);
-			ctStepFade = new CCounter(0, 255, 1, TJAPlayer3.Timer);
+			nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count / 3.0);
+			ctStepFade = new CCounter(0, 255, 1, OpenTaiko.Timer);
 		}
 
 		#endregion

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal static class CStrジャンルtoNum {
 		internal static int ForAC8_14(string strジャンル) {
 			switch (strジャンル) {

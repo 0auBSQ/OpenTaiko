@@ -1,6 +1,6 @@
 ﻿using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class AnimeBG : ScriptBG {
 		private LuaFunction LuaPlayAnimation;
 		public AnimeBG(string filePath) : base(filePath) {

@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CSongDict {
 		private static Dictionary<string, CSongListNode> nodes = new Dictionary<string, CSongListNode>();
 		private static HashSet<string> urls = new HashSet<string>();
@@ -171,7 +171,7 @@ namespace TJAPlayer3 {
 		public static List<CSongListNode> tFetchFavoriteFolder(CSongListNode parent) {
 			List<CSongListNode> childList = new List<CSongListNode>();
 
-			foreach (string id in TJAPlayer3.Favorites.data.favorites[TJAPlayer3.SaveFile]) {
+			foreach (string id in OpenTaiko.Favorites.data.favorites[OpenTaiko.SaveFile]) {
 				var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 				if (node != null) {
 					childList.Add(node);
@@ -192,7 +192,7 @@ namespace TJAPlayer3 {
 		public static List<CSongListNode> tFetchRecentlyPlayedSongsFolder(CSongListNode parent) {
 			List<CSongListNode> childList = new List<CSongListNode>();
 
-			foreach (string id in TJAPlayer3.RecentlyPlayedSongs.data.recentlyplayedsongs[TJAPlayer3.SaveFile].Reverse()) {
+			foreach (string id in OpenTaiko.RecentlyPlayedSongs.data.recentlyplayedsongs[OpenTaiko.SaveFile].Reverse()) {
 				var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 				if (node != null) {
 					childList.Add(node);
@@ -248,7 +248,7 @@ namespace TJAPlayer3 {
 		public static void tRefreshScoreTables() {
 			for (int pl = 0; pl < 5; pl++) {
 				CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
-				var BestPlayStats = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(pl)].data.bestPlaysStats;
+				var BestPlayStats = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(pl)].data.bestPlaysStats;
 
 				for (int s = 0; s <= (int)Difficulty.Edit + 1; s++) {
 					CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];

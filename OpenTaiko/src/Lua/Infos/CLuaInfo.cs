@@ -1,10 +1,10 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class CLuaInfo {
-		public int playerCount => TJAPlayer3.ConfigIni.nPlayerCount;
-		public string lang => TJAPlayer3.ConfigIni.sLang;
-		public bool simplemode => TJAPlayer3.ConfigIni.SimpleMode;
-		public bool p1IsBlue => TJAPlayer3.P1IsBlue();
-		public bool online => TJAPlayer3.app.bネットワークに接続中;
+		public int playerCount => OpenTaiko.ConfigIni.nPlayerCount;
+		public string lang => OpenTaiko.ConfigIni.sLang;
+		public bool simplemode => OpenTaiko.ConfigIni.SimpleMode;
+		public bool p1IsBlue => OpenTaiko.P1IsBlue();
+		public bool online => OpenTaiko.app.bネットワークに接続中;
 
 		public string dir { get; init; }
 

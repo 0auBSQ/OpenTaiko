@@ -4,7 +4,7 @@ using System.Text;
 using FDK;
 
 // Minimalist menu class to use for custom menus
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CStageTowerSelect : CStage {
 		public CStageTowerSelect() {
 			base.eStageID = EStage.TaikoTowers;
@@ -28,7 +28,7 @@ namespace TJAPlayer3 {
 			this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
 			if (listSongs == null)
-				listSongs = TJAPlayer3.Songs管理.list曲ルート_Tower;
+				listSongs = OpenTaiko.Songs管理.list曲ルート_Tower;
 
 			tUpdateBarInfos();
 
@@ -41,7 +41,7 @@ namespace TJAPlayer3 {
 		public override void DeActivate() {
 			// On de-activation
 
-			TJAPlayer3.tDisposeSafely(ref Background);
+			OpenTaiko.tDisposeSafely(ref Background);
 
 			base.DeActivate();
 		}
@@ -49,8 +49,8 @@ namespace TJAPlayer3 {
 		public override void CreateManagedResource() {
 			// Ressource allocation
 
-			pfTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerSelect_Title_Size);
-			pfSubTitleFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.TowerSelect_SubTitle_Size);
+			pfTitleFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.TowerSelect_Title_Size);
+			pfSubTitleFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.TowerSelect_SubTitle_Size);
 
 			base.CreateManagedResource();
 		}
@@ -68,13 +68,13 @@ namespace TJAPlayer3 {
 			Background.Update();
 			Background.Draw();
 
-			for (int i = 0; i < TJAPlayer3.Skin.TowerSelect_Bar_Count; i++) {
-				int currentSong = nCurrentSongIndex + i - ((TJAPlayer3.Skin.TowerSelect_Bar_Count - 1) / 2);
+			for (int i = 0; i < OpenTaiko.Skin.TowerSelect_Bar_Count; i++) {
+				int currentSong = nCurrentSongIndex + i - ((OpenTaiko.Skin.TowerSelect_Bar_Count - 1) / 2);
 				if (currentSong < 0 || currentSong >= BarInfos.Length) continue;
 				var bar = BarInfos[currentSong];
 
-				int x = TJAPlayer3.Skin.TowerSelect_Bar_X[i];
-				int y = TJAPlayer3.Skin.TowerSelect_Bar_Y[i];
+				int x = OpenTaiko.Skin.TowerSelect_Bar_X[i];
+				int y = OpenTaiko.Skin.TowerSelect_Bar_Y[i];
 				tDrawTower(x, y, bar);
 			}
 
@@ -82,41 +82,41 @@ namespace TJAPlayer3 {
 
 			if (this.eフェードアウト完了時の戻り値 == EReturnValue.Continuation) {
 				int returnTitle() {
-					TJAPlayer3.Skin.soundCancelSFX.tPlay();
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
 					this.actFOtoTitle.tフェードアウト開始();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					return 0;
 				}
 
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-					TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 					if (nCurrentSongIndex < BarInfos.Length - 1) {
 						nCurrentSongIndex++;
 					}
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 					if (nCurrentSongIndex > 0) {
 						nCurrentSongIndex--;
 					}
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
 
 					#region [Fast return (Escape)]
 
-					TJAPlayer3.Skin.soundCancelSFX.tPlay();
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					returnTitle();
 
 					#endregion
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
 					#region [Decide]
 
-					TJAPlayer3.Skin.soundDecideSFX.tPlay();
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 					switch (currentSong.eノード種別) {
 						case CSongListNode.ENodeType.SCORE:
@@ -129,7 +129,7 @@ namespace TJAPlayer3 {
 							tOpenFolder(currentSong);
 							break;
 						case CSongListNode.ENodeType.BACKBOX: {
-								if (TJAPlayer3.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.strジャンル == "太鼓タワー") {
+								if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.strジャンル == "太鼓タワー") {
 									returnTitle();
 								} else {
 									tCloseFolder(currentSong);
@@ -175,13 +175,13 @@ namespace TJAPlayer3 {
 		}
 
 		public void tSelectSong() {
-			TJAPlayer3.ConfigIni.bTokkunMode = false;
-			TJAPlayer3.stageSongSelect.rChoosenSong = listSongs[nCurrentSongIndex];
-			TJAPlayer3.stageSongSelect.r確定されたスコア = listSongs[nCurrentSongIndex].arスコア[(int)Difficulty.Tower];
-			TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
-			TJAPlayer3.stageSongSelect.str確定された曲のジャンル = listSongs[nCurrentSongIndex].strジャンル;
-			if ((TJAPlayer3.stageSongSelect.rChoosenSong != null) && (TJAPlayer3.stageSongSelect.r確定されたスコア != null)) {
-				CFloorManagement.reinitialize(TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+			OpenTaiko.ConfigIni.bTokkunMode = false;
+			OpenTaiko.stageSongSelect.rChoosenSong = listSongs[nCurrentSongIndex];
+			OpenTaiko.stageSongSelect.r確定されたスコア = listSongs[nCurrentSongIndex].arスコア[(int)Difficulty.Tower];
+			OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
+			OpenTaiko.stageSongSelect.str確定された曲のジャンル = listSongs[nCurrentSongIndex].strジャンル;
+			if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
+				CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
 				this.eフェードアウト完了時の戻り値 = EReturnValue.SongChoosen;
 				this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 				base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
@@ -195,7 +195,7 @@ namespace TJAPlayer3 {
 			CSongListNode song = currentSong;
 
 			List<CSongListNode> songs = new List<CSongListNode>();
-			TJAPlayer3.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
+			OpenTaiko.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
 			song.listランダム用ノードリスト = songs;
 
 			int selectableSongCount = song.listランダム用ノードリスト.Count;
@@ -204,21 +204,21 @@ namespace TJAPlayer3 {
 				return false;
 			}
 
-			int randomSongIndex = TJAPlayer3.Random.Next(selectableSongCount);
+			int randomSongIndex = OpenTaiko.Random.Next(selectableSongCount);
 
-			if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力) {
+			if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
 				StringBuilder builder = new StringBuilder(0x400);
 				builder.Append(string.Format("Total number of songs to randomly choose from {0}. Randomly selected index {0}.", selectableSongCount, randomSongIndex));
 				Trace.TraceInformation(builder.ToString());
 			}
 
 			// Third assignment
-			TJAPlayer3.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[randomSongIndex];
-			TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
+			OpenTaiko.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[randomSongIndex];
+			OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
-			CFloorManagement.reinitialize(TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
-			TJAPlayer3.stageSongSelect.r確定されたスコア = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(TJAPlayer3.stageSongSelect.rChoosenSong)];
-			TJAPlayer3.stageSongSelect.str確定された曲のジャンル = TJAPlayer3.stageSongSelect.rChoosenSong.strジャンル;
+			CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+			OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
+			OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.strジャンル;
 
 			//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
@@ -234,21 +234,21 @@ namespace TJAPlayer3 {
 		private void tDrawTower(int x, int y, BarInfo barInfo) {
 			switch (barInfo.eノード種別) {
 				case CSongListNode.ENodeType.SCORE:
-					TJAPlayer3.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
 					break;
 				case CSongListNode.ENodeType.RANDOM:
-					TJAPlayer3.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
 					break;
 				case CSongListNode.ENodeType.BOX:
-					TJAPlayer3.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
 					break;
 				case CSongListNode.ENodeType.BACKBOX:
-					TJAPlayer3.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
 					break;
 			}
 
-			TitleTextureKey.ResolveTitleTexture(barInfo.ttkTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_Title_Offset[0], y + TJAPlayer3.Skin.TowerSelect_Title_Offset[1]);
-			TitleTextureKey.ResolveTitleTexture(barInfo.ttkSubTitle).t2D拡大率考慮中央基準描画(x + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[0], y + TJAPlayer3.Skin.TowerSelect_SubTitle_Offset[1]);
+			TitleTextureKey.ResolveTitleTexture(barInfo.ttkTitle).t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.TowerSelect_Title_Offset[0], y + OpenTaiko.Skin.TowerSelect_Title_Offset[1]);
+			TitleTextureKey.ResolveTitleTexture(barInfo.ttkSubTitle).t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[0], y + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[1]);
 		}
 
 		private void tUpdateBarInfos() {
@@ -278,8 +278,8 @@ namespace TJAPlayer3 {
 				bar.strSubTitle = song.ldSubtitle.GetString("");
 				bar.eノード種別 = song.eノード種別;
 
-				bar.ttkTitle = new TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_Title_MaxWidth);
-				bar.ttkSubTitle = new TitleTextureKey(bar.strSubTitle, pfTitleFont, Color.Black, Color.Transparent, TJAPlayer3.Skin.TowerSelect_SubTitle_MaxWidth);
+				bar.ttkTitle = new TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, OpenTaiko.Skin.TowerSelect_Title_MaxWidth);
+				bar.ttkSubTitle = new TitleTextureKey(bar.strSubTitle, pfTitleFont, Color.Black, Color.Transparent, OpenTaiko.Skin.TowerSelect_SubTitle_MaxWidth);
 			}
 		}
 

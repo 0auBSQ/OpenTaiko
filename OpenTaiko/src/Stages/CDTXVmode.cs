@@ -2,7 +2,7 @@
 using FDK;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	public class CDTXVmode {
 		public enum ECommand {
 			Stop,
@@ -317,7 +317,7 @@ namespace TJAPlayer3 {
 		/// </summary>
 		public void tUpdateConfigIni() {
 			CConfigIni cc = new CConfigIni();
-			string path = TJAPlayer3.strEXEのあるフォルダ + "Config.ini";
+			string path = OpenTaiko.strEXEのあるフォルダ + "Config.ini";
 			if (File.Exists(path)) {
 				FileInfo fi = new FileInfo(path);
 				if (fi.Length > 0)  // Config.iniが0byteだったなら、読み込まない
@@ -334,9 +334,9 @@ namespace TJAPlayer3 {
 			}
 
 			//cc.nViewerScrollSpeed[0]  = TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile];
-			cc.bViewerShowDebugStatus = TJAPlayer3.ConfigIni.bDisplayDebugInfo;
-			cc.bViewerVSyncWait = TJAPlayer3.ConfigIni.bEnableVSync;
-			cc.bViewerTimeStretch = TJAPlayer3.ConfigIni.bTimeStretch;
+			cc.bViewerShowDebugStatus = OpenTaiko.ConfigIni.bDisplayDebugInfo;
+			cc.bViewerVSyncWait = OpenTaiko.ConfigIni.bEnableVSync;
+			cc.bViewerTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
 			cc.bViewerDrums有効 = true;
 
 			cc.t書き出し(path);

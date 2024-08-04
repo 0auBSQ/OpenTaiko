@@ -1,7 +1,7 @@
 ﻿using FDK;
 using Color = System.Drawing.Color;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 
 	public sealed class TitleTextureKey {
 
@@ -41,8 +41,8 @@ namespace TJAPlayer3 {
 
 		private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey, bool keepCenter = false) {
 			using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
-				titleTextureKey.str文字, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-				CTexture tx文字テクスチャ = TJAPlayer3.tテクスチャの生成(bmp, false);
+				titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
+				CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
 				if (tx文字テクスチャ.szTextureSize.Height > titleTextureKey.maxWidth) {
 					//tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Height);
 					tx文字テクスチャ.vcScaleRatio.X = 1.0f;
@@ -55,8 +55,8 @@ namespace TJAPlayer3 {
 
 		private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey, bool keepCenter = false) {
 			using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
-				titleTextureKey.str文字, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-				CTexture tx文字テクスチャ = TJAPlayer3.tテクスチャの生成(bmp, false);
+				titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
+				CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
 				if (tx文字テクスチャ.szTextureSize.Width > titleTextureKey.maxWidth) {
 					tx文字テクスチャ.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szTextureSize.Width);
 					tx文字テクスチャ.vcScaleRatio.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
@@ -77,7 +77,7 @@ namespace TJAPlayer3 {
 		}
 
 		// Non-static 
-		public readonly string str文字;
+		public readonly string str;
 		public readonly CCachedFontRenderer cPrivateFastFont;
 		public readonly Color forecolor;
 		public readonly Color backcolor;
@@ -85,7 +85,7 @@ namespace TJAPlayer3 {
 		public readonly Color? secondEdge;
 
 		public TitleTextureKey(string str文字, CCachedFontRenderer cPrivateFastFont, Color forecolor, Color backcolor, int maxHeight, Color? secondEdge = null) {
-			this.str文字 = str文字;
+			this.str = str文字;
 			this.cPrivateFastFont = cPrivateFastFont;
 			this.forecolor = forecolor;
 			this.backcolor = backcolor;
@@ -94,7 +94,7 @@ namespace TJAPlayer3 {
 		}
 
 		private bool Equals(TitleTextureKey other) {
-			return string.Equals(str文字, other.str文字) &&
+			return string.Equals(str, other.str) &&
 				   cPrivateFastFont.Equals(other.cPrivateFastFont) &&
 				   forecolor.Equals(other.forecolor) &&
 				   backcolor.Equals(other.backcolor) &&
@@ -110,7 +110,7 @@ namespace TJAPlayer3 {
 
 		public override int GetHashCode() {
 			unchecked {
-				var hashCode = str文字.GetHashCode();
+				var hashCode = str.GetHashCode();
 				hashCode = (hashCode * 397) ^ cPrivateFastFont.GetHashCode();
 				hashCode = (hashCode * 397) ^ forecolor.GetHashCode();
 				hashCode = (hashCode * 397) ^ backcolor.GetHashCode();

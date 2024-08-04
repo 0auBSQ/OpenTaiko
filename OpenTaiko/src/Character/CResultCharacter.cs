@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CResultCharacter {
 		private static CCounter[] ctCharacterNormal = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 		private static CCounter[] ctCharacterClear = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
@@ -33,27 +33,27 @@ namespace TJAPlayer3 {
 		}
 
 		private static bool _usesSubstituteTexture(int player, ECharacterResult eca) {
-			int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
 
-			if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn) {
+			if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 				switch (eca) {
 					case (ECharacterResult.NORMAL): {
-							if (TJAPlayer3.Tx.Characters_Result_Normal[_charaId].Length > 0)
+							if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
 								return false;
 							break;
 						}
 					case (ECharacterResult.CLEAR): {
-							if (TJAPlayer3.Tx.Characters_Result_Clear[_charaId].Length > 0)
+							if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
 								return false;
 							break;
 						}
 					case (ECharacterResult.FAILED): {
-							if (TJAPlayer3.Tx.Characters_Result_Failed[_charaId].Length > 0)
+							if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
 								return false;
 							break;
 						}
 					case (ECharacterResult.FAILED_IN): {
-							if (TJAPlayer3.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
+							if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
 								return false;
 							break;
 						}
@@ -64,36 +64,36 @@ namespace TJAPlayer3 {
 		}
 
 		public static CTexture[] _getReferenceArray(int player, ECharacterResult eca) {
-			int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
 
-			if (_charaId >= 0 && _charaId < TJAPlayer3.Skin.Characters_Ptn) {
+			if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 				switch (eca) {
 					case (ECharacterResult.NORMAL): {
-							if (TJAPlayer3.Tx.Characters_Result_Normal[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Result_Normal[_charaId];
-							if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Normal[_charaId];
+							if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Result_Normal[_charaId];
+							if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Normal[_charaId];
 							break;
 						}
 					case (ECharacterResult.CLEAR): {
-							if (TJAPlayer3.Tx.Characters_Result_Clear[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Result_Clear[_charaId];
-							if (TJAPlayer3.Tx.Characters_10Combo[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_10Combo[_charaId];
+							if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Result_Clear[_charaId];
+							if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_10Combo[_charaId];
 							break;
 						}
 					case (ECharacterResult.FAILED): {
-							if (TJAPlayer3.Tx.Characters_Result_Failed[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Result_Failed[_charaId];
-							if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Normal[_charaId];
+							if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Result_Failed[_charaId];
+							if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Normal[_charaId];
 							break;
 						}
 					case (ECharacterResult.FAILED_IN): {
-							if (TJAPlayer3.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Result_Failed_In[_charaId];
-							if (TJAPlayer3.Tx.Characters_Normal[_charaId].Length > 0)
-								return TJAPlayer3.Tx.Characters_Normal[_charaId];
+							if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Result_Failed_In[_charaId];
+							if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+								return OpenTaiko.Tx.Characters_Normal[_charaId];
 							break;
 						}
 				}
@@ -122,20 +122,20 @@ namespace TJAPlayer3 {
 		}
 
 		public static int _getReferenceAnimationDuration(int player, ECharacterResult eca) {
-			int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
 
 			switch (eca) {
 				case (ECharacterResult.NORMAL): {
-						return TJAPlayer3.Skin.Characters_Result_Normal_AnimationDuration[_charaId];
+						return OpenTaiko.Skin.Characters_Result_Normal_AnimationDuration[_charaId];
 					}
 				case (ECharacterResult.CLEAR): {
-						return TJAPlayer3.Skin.Characters_Result_Clear_AnimationDuration[_charaId];
+						return OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[_charaId];
 					}
 				case (ECharacterResult.FAILED): {
-						return TJAPlayer3.Skin.Characters_Result_Failed_AnimationDuration[_charaId];
+						return OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[_charaId];
 					}
 				case (ECharacterResult.FAILED_IN): {
-						return TJAPlayer3.Skin.Characters_Result_Failed_In_AnimationDuration[_charaId];
+						return OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[_charaId];
 					}
 			}
 			return 1000;
@@ -174,7 +174,7 @@ namespace TJAPlayer3 {
 			int _animeref = _getReferenceAnimationDuration(player, eca);
 
 			if (_ref != null && _ref.Length > 0 && _ctref != null) {
-				_ctref[player] = new CCounter(0, _ref.Length - 1, _animeref / (float)_ref.Length, TJAPlayer3.Timer);
+				_ctref[player] = new CCounter(0, _ref.Length - 1, _animeref / (float)_ref.Length, OpenTaiko.Timer);
 			}
 		}
 
@@ -185,7 +185,7 @@ namespace TJAPlayer3 {
 		}
 
 		public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterResult eca, int pos = 0, int opacity = 255) {
-			int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
 			CTexture[] _ref = _getReferenceArray(player, eca);
 			CCounter[] _ctref = _getReferenceCounter(eca);
 			bool _substitute = _usesSubstituteTexture(player, eca);
@@ -205,8 +205,8 @@ namespace TJAPlayer3 {
 
 				_tex.Opacity = opacity;
 
-				float resolutionRatioX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][0];
-				float resolutionRatioY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[_charaId][1];
+				float resolutionRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][0];
+				float resolutionRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][1];
 
 				//202
 				//float _x = (x - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
@@ -220,7 +220,7 @@ namespace TJAPlayer3 {
 				_tex.vcScaleRatio.X *= resolutionRatioX;
 				_tex.vcScaleRatio.Y *= resolutionRatioY;
 
-				if (pos % 2 == 0 || TJAPlayer3.ConfigIni.nPlayerCount > 2) {
+				if (pos % 2 == 0 || OpenTaiko.ConfigIni.nPlayerCount > 2) {
 					_tex.t2D拡大率考慮下中心基準描画(
 						_x,
 						_y

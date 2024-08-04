@@ -5,7 +5,7 @@ using FDK;
 using Silk.NET.Maths;
 using SkiaSharp;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActEnumSongs : CActivity {
 		public bool bコマンドでの曲データ取得;
 
@@ -34,7 +34,7 @@ namespace TJAPlayer3 {
 
 			try {
 				this.ctNowEnumeratingSongs = new CCounter();    // 0, 1000, 17, CDTXMania.Timer );
-				this.ctNowEnumeratingSongs.Start(0, 100, 17, TJAPlayer3.Timer);
+				this.ctNowEnumeratingSongs.Start(0, 100, 17, OpenTaiko.Timer);
 			} finally {
 			}
 		}
@@ -78,7 +78,7 @@ namespace TJAPlayer3 {
 					this.txMessage = new CTexture(image);
 					this.txMessage.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f);
 					image.Dispose();
-					TJAPlayer3.tDisposeSafely(ref ftMessage);
+					OpenTaiko.tDisposeSafely(ref ftMessage);
 				} else {
 					this.txMessage = null;
 				}
@@ -94,7 +94,7 @@ namespace TJAPlayer3 {
 		public override void ReleaseManagedResource() {
 			//CDTXMania.t安全にDisposeする( ref this.txDialogNowEnumeratingSongs );
 			//CDTXMania.t安全にDisposeする( ref this.txNowEnumeratingSongs );
-			TJAPlayer3.tDisposeSafely(ref this.txMessage);
+			OpenTaiko.tDisposeSafely(ref this.txMessage);
 			base.ReleaseManagedResource();
 		}
 
@@ -103,12 +103,12 @@ namespace TJAPlayer3 {
 				return 0;
 			}
 			this.ctNowEnumeratingSongs.TickLoop();
-			if (TJAPlayer3.Tx.Enum_Song != null) {
-				TJAPlayer3.Tx.Enum_Song.Opacity = (int)(176.0 + 80.0 * Math.Sin((double)(2 * Math.PI * this.ctNowEnumeratingSongs.CurrentValue * 2 / 100.0)));
-				TJAPlayer3.Tx.Enum_Song.t2D描画(18, 7);
+			if (OpenTaiko.Tx.Enum_Song != null) {
+				OpenTaiko.Tx.Enum_Song.Opacity = (int)(176.0 + 80.0 * Math.Sin((double)(2 * Math.PI * this.ctNowEnumeratingSongs.CurrentValue * 2 / 100.0)));
+				OpenTaiko.Tx.Enum_Song.t2D描画(18, 7);
 			}
-			if (bコマンドでの曲データ取得 && TJAPlayer3.Tx.Config_Enum_Song != null) {
-				TJAPlayer3.Tx.Config_Enum_Song.t2D描画(180, 177);
+			if (bコマンドでの曲データ取得 && OpenTaiko.Tx.Config_Enum_Song != null) {
+				OpenTaiko.Tx.Config_Enum_Song.t2D描画(180, 177);
 				this.txMessage.t2D描画(190, 197);
 			}
 

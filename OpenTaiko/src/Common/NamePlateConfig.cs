@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class NamePlateConfig {
 		public void tNamePlateConfig() {
 			// Deprecated, only converts to new format
@@ -19,7 +19,7 @@ namespace TJAPlayer3 {
 				return;
 
 			for (int i = 0; i < 5; i++) {
-				int p = TJAPlayer3.GetActualPlayer(i);
+				int p = OpenTaiko.GetActualPlayer(i);
 
 				data.Medals[p] += amounts[i];
 			}
@@ -51,20 +51,20 @@ namespace TJAPlayer3 {
 			bool iG = isGold;
 			int cs = clearStatus;
 
-			if (TJAPlayer3.NamePlateConfig.data.DanTitles[player] == null)
-				TJAPlayer3.NamePlateConfig.data.DanTitles[player] = new Dictionary<string, SaveFile.CDanTitle>();
+			if (OpenTaiko.NamePlateConfig.data.DanTitles[player] == null)
+				OpenTaiko.NamePlateConfig.data.DanTitles[player] = new Dictionary<string, SaveFile.CDanTitle>();
 
-			if (TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title)) {
-				if (TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].clearStatus > cs)
-					cs = TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].clearStatus;
-				if (TJAPlayer3.NamePlateConfig.data.DanTitles[player][title].isGold)
+			if (OpenTaiko.NamePlateConfig.data.DanTitles[player].ContainsKey(title)) {
+				if (OpenTaiko.NamePlateConfig.data.DanTitles[player][title].clearStatus > cs)
+					cs = OpenTaiko.NamePlateConfig.data.DanTitles[player][title].clearStatus;
+				if (OpenTaiko.NamePlateConfig.data.DanTitles[player][title].isGold)
 					iG = true;
 			}
 
 			// Automatically set the dan to nameplate if new
 			// Add a function within the NamePlate.cs file to update the title texture 
 
-			if (!TJAPlayer3.NamePlateConfig.data.DanTitles[player].ContainsKey(title) || cs != clearStatus || iG != isGold) {
+			if (!OpenTaiko.NamePlateConfig.data.DanTitles[player].ContainsKey(title) || cs != clearStatus || iG != isGold) {
 				changed = true;
 				/*
                 TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
@@ -76,7 +76,7 @@ namespace TJAPlayer3 {
 
 			SaveFile.CDanTitle danTitle = new SaveFile.CDanTitle(iG, cs);
 
-			TJAPlayer3.NamePlateConfig.data.DanTitles[player][title] = danTitle;
+			OpenTaiko.NamePlateConfig.data.DanTitles[player][title] = danTitle;
 
 			tSaveFile();
 

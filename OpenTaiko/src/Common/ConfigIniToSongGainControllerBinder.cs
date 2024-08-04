@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// The ConfigIniToSongGainControllerBinder allows for SONGVOL and/or other
 	/// properties related to the Gain levels applied to song preview and

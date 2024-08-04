@@ -1,6 +1,6 @@
 ﻿using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CLuaModalScript : CLuaScript {
 		private LuaFunction lfRegisterModal;
 		private LuaFunction lfAnimationFinished;

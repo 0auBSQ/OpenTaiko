@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class CSavableT<T> where T : new() {
 		public virtual string _fn {
 			get;

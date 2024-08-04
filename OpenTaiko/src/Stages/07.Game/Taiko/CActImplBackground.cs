@@ -1,9 +1,9 @@
 ﻿using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
+using static OpenTaiko.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplBackground : CActivity {
 		// 本家っぽい背景を表示させるメソッド。
 		//
@@ -44,11 +44,11 @@ namespace TJAPlayer3 {
 
 			var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
 			var preset = HScenePreset.GetBGPreset();
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				bgOrigindir += "Tower";
-			} else if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				bgOrigindir += "Dan";
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				bgOrigindir += "AI";
 			} else {
 				bgOrigindir += "Normal";
@@ -90,7 +90,7 @@ namespace TJAPlayer3 {
 				IsDownNotFound = true;
 			}
 
-			this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_Tower_Font_TowerText);
+			this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_Tower_Font_TowerText);
 
 			/*
             if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
@@ -106,54 +106,54 @@ namespace TJAPlayer3 {
 			this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText, Color.White, Color.Black, 700);
 			this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText, Color.White, Color.Black, 700);
 
-			this.ct炎 = new CCounter(0, 6, 50, TJAPlayer3.Timer);
+			this.ct炎 = new CCounter(0, 6, 50, OpenTaiko.Timer);
 
-			this.currentCharacter = Math.Max(0, Math.Min(TJAPlayer3.SaveFileInstances[0].data.Character, TJAPlayer3.Skin.Characters_Ptn - 1));
+			this.currentCharacter = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[0].data.Character, OpenTaiko.Skin.Characters_Ptn - 1));
 
-			float resolutionScaleX = TJAPlayer3.Skin.Resolution[0] / (float)TJAPlayer3.Skin.Characters_Resolution[currentCharacter][0];
-			float resolutionScaleY = TJAPlayer3.Skin.Resolution[1] / (float)TJAPlayer3.Skin.Characters_Resolution[currentCharacter][1];
+			float resolutionScaleX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][0];
+			float resolutionScaleY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[currentCharacter][1];
 
 			// Scale tower chara
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Standing[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Standing[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Climbing[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Climbing[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Running[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Running[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Clear[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Clear[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Fail[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Fail[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Standing_Tired[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Standing_Tired[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Climbing_Tired[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Climbing_Tired[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Running_Tired[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Running_Tired[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
-			foreach (CTexture texture in TJAPlayer3.Tx.Characters_Tower_Clear_Tired[currentCharacter]) {
+			foreach (CTexture texture in OpenTaiko.Tx.Characters_Tower_Clear_Tired[currentCharacter]) {
 				texture.vcScaleRatio.X = resolutionScaleX;
 				texture.vcScaleRatio.Y = resolutionScaleY;
 			}
 
 			this.ctSlideAnimation = new CCounter();
 			this.ctClimbDuration = new CCounter();
-			this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter], TJAPlayer3.Timer);
+			this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed)) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 			this.ctClimbingAnimation = new CCounter();
 			this.ctRunningAnimation = new CCounter();
 			this.ctClearAnimation = new CCounter();
@@ -172,10 +172,10 @@ namespace TJAPlayer3 {
 			if (this.IsDeActivated)
 				return;
 
-			TJAPlayer3.tDisposeSafely(ref UpScript);
-			TJAPlayer3.tDisposeSafely(ref DownScript);
+			OpenTaiko.tDisposeSafely(ref UpScript);
+			OpenTaiko.tDisposeSafely(ref DownScript);
 
-			TJAPlayer3.tDisposeSafely(ref pfTowerText);
+			OpenTaiko.tDisposeSafely(ref pfTowerText);
 
 			base.DeActivate();
 		}
@@ -207,25 +207,25 @@ namespace TJAPlayer3 {
 			#region [Upper background]
 
 			if (!IsUpNotFound) {
-				if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) UpScript?.Update();
+				if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) UpScript?.Update();
 				UpScript?.Draw();
-				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower animations variables]
 
-					this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
+					this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
 
-					int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+					int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 					int nightTime = Math.Max(140, maxFloor / 2);
 
-					currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+					currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 
 					#endregion
 
 					#region [Tower background informations]
 
-					if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-						TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], TJAPlayer3.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-						TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(TJAPlayer3.Skin.Game_Tower_Font_Kai[0], TJAPlayer3.Skin.Game_Tower_Font_Kai[1]);
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+						TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
+						TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
 
 						this.ct炎.TickLoop();
 						CFloorManagement.loopFrames();
@@ -233,38 +233,38 @@ namespace TJAPlayer3 {
 						#region [Floor number]
 
 						if (CFloorManagement.CurrentNumberOfLives > 0)
-							CFloorManagement.LastRegisteredFloor = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+							CFloorManagement.LastRegisteredFloor = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
 
 						string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
 						int len = floorStr.Length;
 
-						int digitLength = TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Width / 10;
+						int digitLength = OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Width / 10;
 
-						TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
-						TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.4f;
-						TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.4f;
+						OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
+						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.4f;
+						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.4f;
 
 						for (int idx = len - 1; idx >= 0; idx--) {
 							int currentNum = int.Parse(floorStr[idx].ToString());
 
-							TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
-								TJAPlayer3.Skin.Game_Tower_Floor_Number[1],
+							OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
+								OpenTaiko.Skin.Game_Tower_Floor_Number[1],
 								new Rectangle(digitLength * currentNum, 0,
-									digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Height));
+									digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
 						}
 
 						#endregion
 
 						#region [Life Tamashii icon]
 
-						int soulfire_width = TJAPlayer3.Tx.Gauge_Soul_Fire.szTextureSize.Width / 8;
-						int soulfire_height = TJAPlayer3.Tx.Gauge_Soul_Fire.szTextureSize.Height;
+						int soulfire_width = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Width / 8;
+						int soulfire_height = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Height;
 
-						int soul_height = TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Height / 2;
+						int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
 
-						TJAPlayer3.Tx.Gauge_Soul_Fire?.t2D描画(TJAPlayer3.Skin.Gauge_Soul_Fire_X_Tower, TJAPlayer3.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
-						TJAPlayer3.Tx.Gauge_Soul?.t2D描画(TJAPlayer3.Skin.Gauge_Soul_X_Tower, TJAPlayer3.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, TJAPlayer3.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
+						OpenTaiko.Tx.Gauge_Soul_Fire?.t2D描画(OpenTaiko.Skin.Gauge_Soul_Fire_X_Tower, OpenTaiko.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
+						OpenTaiko.Tx.Gauge_Soul?.t2D描画(OpenTaiko.Skin.Gauge_Soul_X_Tower, OpenTaiko.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
 
 						#endregion
 
@@ -286,20 +286,20 @@ namespace TJAPlayer3 {
 								: ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f, 1f)
 								: new Color4(1f, 0.2f, 0.2f, 1f));
 
-						TJAPlayer3.Tx.Taiko_Combo[0].color4 = lifeColor;
-						TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.1f;
-						TJAPlayer3.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.1f;
+						OpenTaiko.Tx.Taiko_Combo[0].color4 = lifeColor;
+						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.1f;
+						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.1f;
 
 						for (int idx = 0; idx < len; idx++) {
 							int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
 
-							TJAPlayer3.Tx.Taiko_Combo[0].t2D描画(TJAPlayer3.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
-								TJAPlayer3.Skin.Game_Tower_Life_Number[1],
+							OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
+								OpenTaiko.Skin.Game_Tower_Life_Number[1],
 								new Rectangle(digitLength * currentNum, 0,
-									digitLength, TJAPlayer3.Tx.Taiko_Combo[0].szTextureSize.Height));
+									digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
 						}
 
-						TJAPlayer3.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
+						OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
 
 						#endregion
 
@@ -314,24 +314,24 @@ namespace TJAPlayer3 {
 			#region [Lower background]
 
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 
-				TJAPlayer3.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
+				OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
 				int nightTime = Math.Max(140, maxFloor / 2);
 
-				int currentTowerType = Array.IndexOf(TJAPlayer3.Skin.Game_Tower_Names, TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+				int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
 
-				if (currentTowerType < 0 || currentTowerType >= TJAPlayer3.Skin.Game_Tower_Ptn)
+				if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
 					currentTowerType = 0;
 
 				#region [Tower lower background]
 
-				float nextPositionMax140 = Math.Min((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
+				float nextPositionMax140 = Math.Min((OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
 				if (bFloorChanged == true)
-					ctSlideAnimation.Start(0, 1000, 120f / ((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed), TJAPlayer3.Timer);
+					ctSlideAnimation.Start(0, 1000, 120f / ((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed), OpenTaiko.Timer);
 
 				float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
 
@@ -344,7 +344,7 @@ namespace TJAPlayer3 {
 				//TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1], 
 				//new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
 
-				if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript.Update();
+				if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) DownScript.Update();
 				DownScript.Draw();
 
 				#endregion
@@ -357,56 +357,56 @@ namespace TJAPlayer3 {
 				int currentTower = currentTowerType;
 
 				// Will implement the roof later, need the beforehand total floor count calculation before
-				int nextTowerBase = ((TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
-				int towerBase = (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 10) % TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower];
+				int nextTowerBase = ((OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
+				int towerBase = (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
 
-				int currentDeco = TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] % TJAPlayer3.Skin.Game_Tower_Ptn_Deco[currentTower];
-				int nextDeco = (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) % TJAPlayer3.Skin.Game_Tower_Ptn_Deco[currentTower];
+				int currentDeco = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
+				int nextDeco = (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
 
 				// Microfix for the first floor suddenly changing texture
-				if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && TJAPlayer3.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
+				if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
 					currentDeco++;
-				if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && TJAPlayer3.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
+				if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
 					towerBase++;
 
-				int widthChange = (int)(progressFactor * TJAPlayer3.Skin.Game_Tower_Floors_Move[0]);
-				int heightChange = (int)(progressFactor * TJAPlayer3.Skin.Game_Tower_Floors_Move[1]);
+				int widthChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[0]);
+				int heightChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[1]);
 
 				// Current trunk
-				if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] < maxFloor)
-					TJAPlayer3.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[0] + widthChange,
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
+				if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] < maxFloor)
+					OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(
+						OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
+						OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
 				else
-					TJAPlayer3.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[0] + widthChange,
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[1] + heightChange);
+					OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
+						OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
+						OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange);
 
 				// Current deco
-				TJAPlayer3.Tx.Tower_Deco[currentTower][currentDeco]?.t2D下中央基準描画(
-					TJAPlayer3.Skin.Game_Tower_Floors_Deco[0] + widthChange,
-					TJAPlayer3.Skin.Game_Tower_Floors_Deco[1] + heightChange);
+				OpenTaiko.Tx.Tower_Deco[currentTower][currentDeco]?.t2D下中央基準描画(
+					OpenTaiko.Skin.Game_Tower_Floors_Deco[0] + widthChange,
+					OpenTaiko.Skin.Game_Tower_Floors_Deco[1] + heightChange);
 
-				int originY = TJAPlayer3.Skin.Game_Tower_Floors_Move[1] - heightChange;
+				int originY = OpenTaiko.Skin.Game_Tower_Floors_Move[1] - heightChange;
 
 				// Next trunk
-				if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
-					TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[0] - TJAPlayer3.Skin.Game_Tower_Floors_Move[0] + widthChange,
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[1] - TJAPlayer3.Skin.Game_Tower_Floors_Move[1] + heightChange,
-						new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, TJAPlayer3.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
-				else if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
-					TJAPlayer3.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[0] - TJAPlayer3.Skin.Game_Tower_Floors_Move[0] + widthChange,
-						TJAPlayer3.Skin.Game_Tower_Floors_Body[1] - TJAPlayer3.Skin.Game_Tower_Floors_Move[1] + heightChange,
-						new Rectangle(0, originY, TJAPlayer3.Tx.Tower_Top[currentTower].szTextureSize.Width, TJAPlayer3.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
+				if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
+					OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
+						OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
+						OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
+						new Rectangle(0, originY, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
+				else if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
+					OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
+						OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
+						OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
+						new Rectangle(0, originY, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Width, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
 				}
 
 				// Next deco
-				if (TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
-					TJAPlayer3.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(
-						TJAPlayer3.Skin.Game_Tower_Floors_Deco[0] - TJAPlayer3.Skin.Game_Tower_Floors_Move[0] + widthChange,
-						TJAPlayer3.Skin.Game_Tower_Floors_Deco[1] - TJAPlayer3.Skin.Game_Tower_Floors_Move[1] + heightChange);
+				if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
+					OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(
+						OpenTaiko.Skin.Game_Tower_Floors_Deco[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
+						OpenTaiko.Skin.Game_Tower_Floors_Deco[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange);
 
 
 				#endregion
@@ -415,90 +415,90 @@ namespace TJAPlayer3 {
 
 				bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 
-				bool stageEnded = TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || TJAPlayer3.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
+				bool stageEnded = OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
 
 				if (bFloorChanged == true) {
-					float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
-					ctClimbDuration.Start(0, 1500, 120f / floorBPM, TJAPlayer3.Timer);
-					ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctRunningAnimation.Start(0, 1000, (60000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctStandTiredAnimation.Start(0, 1000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Standing_Tired[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctClimbTiredAnimation.Start(0, 1000, (120000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctRunTiredAnimation.Start(0, 1000, (60000f / floorBPM) / TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
+					float floorBPM = (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+					ctClimbDuration.Start(0, 1500, 120f / floorBPM, OpenTaiko.Timer);
+					ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctRunningAnimation.Start(0, 1000, (60000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Running_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctStandTiredAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctClimbTiredAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctRunTiredAnimation.Start(0, 1000, (60000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				}
 
 				bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
 
 				if (stageEnded && !TowerFinished && !isClimbing) {
-					float floorBPM = (float)(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
-					ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Clear[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], TJAPlayer3.Timer);
-					ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * TJAPlayer3.Skin.Characters_Beat_Tower_Fail[currentCharacter] / TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter], TJAPlayer3.Timer);
+					float floorBPM = (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+					ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
+					ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Fail[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter], OpenTaiko.Timer);
 					TowerFinished = true;
 				}
 
 				if (isClimbing) {
 					// Tired Climb
-					if (ctIsTired && (ctClimbDuration.CurrentValue <= 1000) && TJAPlayer3.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter] > 0) {
-						int animChar = ctClimbTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
-						int distDonX = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 1000f));
-						int distDonY = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 1000f));
-						TJAPlayer3.Tx.Characters_Tower_Climbing_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+					if (ctIsTired && (ctClimbDuration.CurrentValue <= 1000) && OpenTaiko.Skin.Characters_Tower_Climbing_Tired_Ptn[currentCharacter] > 0) {
+						int animChar = ctClimbTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
+						int distDonX = (int)(ctClimbDuration.CurrentValue * (OpenTaiko.Skin.Game_Tower_Don_Move[0] / 1000f));
+						int distDonY = (int)(ctClimbDuration.CurrentValue * (OpenTaiko.Skin.Game_Tower_Don_Move[1] / 1000f));
+						OpenTaiko.Tx.Characters_Tower_Climbing_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0] + distDonX, OpenTaiko.Skin.Game_Tower_Don[1] + distDonY);
 					}
 					// Tired Run
-					else if (ctIsTired && (ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter] > 0) {
-						int animChar = ctRunTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter];
-						int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 500f));
-						int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 500f));
-						TJAPlayer3.Tx.Characters_Tower_Running_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+					else if (ctIsTired && (ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && OpenTaiko.Skin.Characters_Tower_Running_Tired_Ptn[currentCharacter] > 0) {
+						int animChar = ctRunTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Running_Ptn[currentCharacter];
+						int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (OpenTaiko.Skin.Game_Tower_Don_Move[0] / 500f));
+						int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (OpenTaiko.Skin.Game_Tower_Don_Move[1] / 500f));
+						OpenTaiko.Tx.Characters_Tower_Running_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0] + distDonX, OpenTaiko.Skin.Game_Tower_Don[1] + distDonY);
 					}
 					// Climb
-					else if ((ctClimbDuration.CurrentValue <= 1000) && TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter] > 0) {
-						int animChar = ctClimbingAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
-						int distDonX = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 1000f));
-						int distDonY = (int)(ctClimbDuration.CurrentValue * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 1000f));
-						TJAPlayer3.Tx.Characters_Tower_Climbing[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+					else if ((ctClimbDuration.CurrentValue <= 1000) && OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter] > 0) {
+						int animChar = ctClimbingAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter];
+						int distDonX = (int)(ctClimbDuration.CurrentValue * (OpenTaiko.Skin.Game_Tower_Don_Move[0] / 1000f));
+						int distDonY = (int)(ctClimbDuration.CurrentValue * (OpenTaiko.Skin.Game_Tower_Don_Move[1] / 1000f));
+						OpenTaiko.Tx.Characters_Tower_Climbing[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0] + distDonX, OpenTaiko.Skin.Game_Tower_Don[1] + distDonY);
 					}
 					// Run
-					else if ((ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter] > 0) {
-						int animChar = ctRunningAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Running_Ptn[currentCharacter];
-						int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[0] / 500f));
-						int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (TJAPlayer3.Skin.Game_Tower_Don_Move[1] / 500f));
-						TJAPlayer3.Tx.Characters_Tower_Running[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0] + distDonX, TJAPlayer3.Skin.Game_Tower_Don[1] + distDonY);
+					else if ((ctClimbDuration.CurrentValue > 1000 && ctClimbDuration.CurrentValue < 1500) && OpenTaiko.Skin.Characters_Tower_Running_Ptn[currentCharacter] > 0) {
+						int animChar = ctRunningAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Running_Ptn[currentCharacter];
+						int distDonX = (int)((1500 - ctClimbDuration.CurrentValue) * (OpenTaiko.Skin.Game_Tower_Don_Move[0] / 500f));
+						int distDonY = (int)((1500 - ctClimbDuration.CurrentValue) * (OpenTaiko.Skin.Game_Tower_Don_Move[1] / 500f));
+						OpenTaiko.Tx.Characters_Tower_Running[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0] + distDonX, OpenTaiko.Skin.Game_Tower_Don[1] + distDonY);
 					}
 				} else {
 					// Fail
-					if (TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives == 0) {
-						int animChar = TJAPlayer3.Skin.Characters_Tower_Fail_IsLooping[currentCharacter] ?
-							ctFailAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter] :
-							Math.Min(ctFailAnimation.CurrentValue, TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[currentCharacter] - 1);
-						TJAPlayer3.Tx.Characters_Tower_Fail[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+					if (OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives == 0) {
+						int animChar = OpenTaiko.Skin.Characters_Tower_Fail_IsLooping[currentCharacter] ?
+							ctFailAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] :
+							Math.Min(ctFailAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] - 1);
+						OpenTaiko.Tx.Characters_Tower_Fail[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]);
 					}
 					// Tired Clear
-					else if (ctIsTired && stageEnded && TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
-						int animChar = TJAPlayer3.Skin.Characters_Tower_Clear_Tired_IsLooping[currentCharacter] ?
-							ctClearTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] :
-							Math.Min(ctClearTiredAnimation.CurrentValue, TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] - 1);
-						TJAPlayer3.Tx.Characters_Tower_Clear_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+					else if (ctIsTired && stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
+						int animChar = OpenTaiko.Skin.Characters_Tower_Clear_Tired_IsLooping[currentCharacter] ?
+							ctClearTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] :
+							Math.Min(ctClearTiredAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] - 1);
+						OpenTaiko.Tx.Characters_Tower_Clear_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]);
 					}
 					// Clear
-					else if (stageEnded && TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
-						int animChar = TJAPlayer3.Skin.Characters_Tower_Clear_IsLooping[currentCharacter] ?
-							ctClearAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter] :
-							Math.Min(ctClearAnimation.CurrentValue, TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[currentCharacter] - 1);
-						TJAPlayer3.Tx.Characters_Tower_Clear[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]);
+					else if (stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
+						int animChar = OpenTaiko.Skin.Characters_Tower_Clear_IsLooping[currentCharacter] ?
+							ctClearAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] :
+							Math.Min(ctClearAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] - 1);
+						OpenTaiko.Tx.Characters_Tower_Clear[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]);
 					}
 
 					// Tired Stand
-					else if (ctIsTired && TJAPlayer3.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter] > 0) {
-						int animChar = ctStandTiredAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter];
-						TJAPlayer3.Tx.Characters_Tower_Standing_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]); // Center X - 50
+					else if (ctIsTired && OpenTaiko.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter] > 0) {
+						int animChar = ctStandTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Standing_Tired_Ptn[currentCharacter];
+						OpenTaiko.Tx.Characters_Tower_Standing_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]); // Center X - 50
 					}
 					// Stand
-					else if (TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter] > 0) {
-						int animChar = ctStandingAnimation.CurrentValue % TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[currentCharacter];
-						TJAPlayer3.Tx.Characters_Tower_Standing[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(TJAPlayer3.Skin.Game_Tower_Don[0], TJAPlayer3.Skin.Game_Tower_Don[1]); // Center X - 50
+					else if (OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter] > 0) {
+						int animChar = ctStandingAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter];
+						OpenTaiko.Tx.Characters_Tower_Standing[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]); // Center X - 50
 					}
 				}
 
@@ -507,9 +507,9 @@ namespace TJAPlayer3 {
 				#region [Miss icon]
 
 				if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDurationSpeedDependent) {
-					if (TJAPlayer3.Tx.Tower_Miss != null)
-						TJAPlayer3.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - CFloorManagement.InvincibilityFrames.CurrentValue);
-					TJAPlayer3.Tx.Tower_Miss?.t2D下中央基準描画(TJAPlayer3.Skin.Game_Tower_Miss[0], TJAPlayer3.Skin.Game_Tower_Miss[1]);
+					if (OpenTaiko.Tx.Tower_Miss != null)
+						OpenTaiko.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - CFloorManagement.InvincibilityFrames.CurrentValue);
+					OpenTaiko.Tx.Tower_Miss?.t2D下中央基準描画(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
 				}
 
 				#endregion
@@ -527,9 +527,9 @@ namespace TJAPlayer3 {
 				ctFailAnimation?.Tick();
 
 				#endregion
-			} else if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+			} else if (!OpenTaiko.stage演奏ドラム画面.bDoublePlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 				if (!IsDownNotFound) {
-					if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) DownScript?.Update();
+					if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) DownScript?.Update();
 					DownScript?.Draw();
 				}
 			}

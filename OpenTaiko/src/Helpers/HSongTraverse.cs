@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class HSongTraverse {
 		public static List<string> SpecialFolders = new List<string> { "Favorite", "最近遊んだ曲", "SearchD" };
 

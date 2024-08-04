@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActPlayOption : CActivity {
 		public CActPlayOption() {
 			base.IsDeActivated = true;
@@ -76,7 +76,7 @@ namespace TJAPlayer3 {
 
 			txNone = OptionTypeTx(CLangManager.LangInstance.GetString("MOD_BLANK"), Color.White, Color.Black);
 
-			hsInfo = TJAPlayer3.Skin.hsHitSoundsInformations;
+			hsInfo = OpenTaiko.Skin.hsHitSoundsInformations;
 
 			txOtoiro = new CTexture[hsInfo.names.Length];
 
@@ -124,7 +124,7 @@ namespace TJAPlayer3 {
 			base.DeActivate();
 		}
 		public override void CreateManagedResource() {
-			OptionFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.SongSelect_Option_Font_Scale);
+			OptionFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.SongSelect_Option_Font_Scale);
 
 			base.CreateManagedResource();
 		}
@@ -147,10 +147,10 @@ namespace TJAPlayer3 {
 			ctOpen.Tick();
 			ctClose.Tick();
 
-			if (!ctOpen.IsTicked) ctOpen.Start(0, 50, 6, TJAPlayer3.Timer);
+			if (!ctOpen.IsTicked) ctOpen.Start(0, 50, 6, OpenTaiko.Timer);
 
-			var act難易度 = TJAPlayer3.stageSongSelect.actDifficultySelectionScreen;
-			var danAct = TJAPlayer3.stage段位選択.段位挑戦選択画面;
+			var act難易度 = OpenTaiko.stageSongSelect.actDifficultySelectionScreen;
+			var danAct = OpenTaiko.stage段位選択.段位挑戦選択画面;
 
 			#region [ Open & Close ]
 
@@ -186,24 +186,24 @@ namespace TJAPlayer3 {
 			};
 
 			var pos = player % 2;
-			var _shift = pos == 1 ? (TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
-			var _rect = new Rectangle(_shift, 0, TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Width / 2, TJAPlayer3.Tx.Difficulty_Option.szTextureSize.Height);
+			var _shift = pos == 1 ? (OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
+			var _rect = new Rectangle(_shift, 0, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Height);
 
-			TJAPlayer3.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
-			TJAPlayer3.Tx.Difficulty_Option_Select.t2D描画(_shift + TJAPlayer3.Skin.SongSelect_Option_Select_Offset[0] + NowCount * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
-				TJAPlayer3.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * TJAPlayer3.Skin.SongSelect_Option_Interval[1], _rect);
+			OpenTaiko.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
+			OpenTaiko.Tx.Difficulty_Option_Select.t2D描画(_shift + OpenTaiko.Skin.SongSelect_Option_Select_Offset[0] + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+				OpenTaiko.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[1], _rect);
 
 			for (int i = 0; i < OptionType.Length; i++) {
-				OptionType[i].t2D描画(TJAPlayer3.Skin.SongSelect_Option_OptionType_X[pos] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
-					TJAPlayer3.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
+				OptionType[i].t2D描画(OpenTaiko.Skin.SongSelect_Option_OptionType_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+					OpenTaiko.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
-			txModMults[0]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults1_X[pos], TJAPlayer3.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
-			txModMults[1]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_ModMults2_X[pos], TJAPlayer3.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
+			txModMults[0]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults1_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
+			txModMults[1]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults2_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
 
 			for (int i = 0; i < _textures.Length; i++) {
-				_textures[i]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, TJAPlayer3.Skin.SongSelect_Option_Value_X[pos] + i * TJAPlayer3.Skin.SongSelect_Option_Interval[0],
-					TJAPlayer3.Skin.SongSelect_Option_Value_Y[pos] + y + i * TJAPlayer3.Skin.SongSelect_Option_Interval[1]);
+				_textures[i]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_Value_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+					OpenTaiko.Skin.SongSelect_Option_Value_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
 			if (ctClose.CurrentValue >= 50) {
@@ -231,73 +231,73 @@ namespace TJAPlayer3 {
 
 				switch (player) {
 					case 0:
-						_rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-						_leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
-						_centerDrum = (TJAPlayer3.Pad.bPressedDGB(EPad.Decide) ||
-							(TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
-						_cancel = (TJAPlayer3.Pad.bPressedDGB(EPad.Cancel) || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+						_centerDrum = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
+							(OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+						_cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 						break;
 					case 1:
-						_rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P));
-						_leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P));
-						_centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P));
 						break;
 					case 2:
-						_rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue3P));
-						_leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue3P));
-						_centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed3P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed3P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue3P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue3P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed3P));
 						break;
 					case 3:
-						_rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue4P));
-						_leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue4P));
-						_centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed4P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed4P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue4P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue4P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed4P));
 						break;
 					case 4:
-						_rightDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue5P));
-						_leftDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue5P));
-						_centerDrum = (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed5P) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed5P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue5P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue5P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed5P));
 						break;
 				}
 
 
-				if (_leftDrum || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+				if (_leftDrum || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 					OptionSelect(true);
 					tFetchMults(player);
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 
-				if (_rightDrum || TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+				if (_rightDrum || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 					OptionSelect(false);
 					tFetchMults(player);
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 
 				if (_centerDrum && ctOpen.CurrentValue >= ctOpen.EndValue) {
-					TJAPlayer3.Skin.soundDecideSFX.tPlay();
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					if (NowCount < nOptionCount) {
 						NowCount++;
 					} else if (NowCount >= nOptionCount && !bEnd) {
 						bEnd = true;
-						ctClose.Start(0, 50, 6, TJAPlayer3.Timer);
+						ctClose.Start(0, 50, 6, OpenTaiko.Timer);
 					}
 				}
 
 				int cp1 = nOptionCount + 1;
 
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 					NowCount = (NowCount + cp1 - 1) % cp1;
 				}
 
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
-					TJAPlayer3.Skin.soundChangeSFX.tPlay();
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
 					NowCount = (NowCount + 1) % cp1;
 				}
 
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
-					TJAPlayer3.Skin.soundDecideSFX.tPlay();
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					bEnd = true;
-					ctClose.Start(0, 50, 6, TJAPlayer3.Timer);
+					ctClose.Start(0, 50, 6, OpenTaiko.Timer);
 				}
 			}
 
@@ -361,7 +361,7 @@ namespace TJAPlayer3 {
 
 		public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor) {
 			using (var bmp = OptionFont.DrawText(str文字, forecolor, backcolor, null, 30)) {
-				return TJAPlayer3.tテクスチャの生成(bmp);
+				return OpenTaiko.tテクスチャの生成(bmp);
 			}
 		}
 
@@ -420,11 +420,11 @@ namespace TJAPlayer3 {
 		}
 
 		public void Init(int player) {
-			int actual = TJAPlayer3.GetActualPlayer(player);
+			int actual = OpenTaiko.GetActualPlayer(player);
 
 			#region [ Speed ]
 
-			int speed = TJAPlayer3.ConfigIni.nScrollSpeed[actual];
+			int speed = OpenTaiko.ConfigIni.nScrollSpeed[actual];
 
 			if (speed <= 8)
 				nSpeedCount = 0;
@@ -443,13 +443,13 @@ namespace TJAPlayer3 {
 
 			#region [ Doron ]
 
-			nStealth = (int)TJAPlayer3.ConfigIni.eSTEALTH[actual];
+			nStealth = (int)OpenTaiko.ConfigIni.eSTEALTH[actual];
 
 			#endregion
 
 			#region [ Random ]
 
-			var rand_ = TJAPlayer3.ConfigIni.eRandom[actual];
+			var rand_ = OpenTaiko.ConfigIni.eRandom[actual];
 
 			if (rand_ == ERandomMode.MIRRORRANDOM) {
 				nRandom = 2;
@@ -472,31 +472,31 @@ namespace TJAPlayer3 {
 
 			#region [ Timing ]
 
-			nTiming = TJAPlayer3.ConfigIni.nTimingZones[actual];
+			nTiming = OpenTaiko.ConfigIni.nTimingZones[actual];
 
 			#endregion
 
 			#region [Just]
 
-			nJust = TJAPlayer3.ConfigIni.bJust[actual];
+			nJust = OpenTaiko.ConfigIni.bJust[actual];
 
 			#endregion
 
 			#region [GameType]
 
-			nGameType = (int)TJAPlayer3.ConfigIni.nGameType[actual];
+			nGameType = (int)OpenTaiko.ConfigIni.nGameType[actual];
 
 			#endregion
 
 			#region [Fun mods]
 
-			nFunMods = (int)TJAPlayer3.ConfigIni.nFunMods[actual];
+			nFunMods = (int)OpenTaiko.ConfigIni.nFunMods[actual];
 
 			#endregion
 
 			#region [ GameMode ]
 
-			if (TJAPlayer3.ConfigIni.bTokkunMode == true)
+			if (OpenTaiko.ConfigIni.bTokkunMode == true)
 				nGameMode = 1;
 			else
 				nGameMode = 0;
@@ -505,7 +505,7 @@ namespace TJAPlayer3 {
 
 			#region [ AutoMode ]
 
-			bool _auto = TJAPlayer3.ConfigIni.bAutoPlay[player];
+			bool _auto = OpenTaiko.ConfigIni.bAutoPlay[player];
 
 			if (_auto == true)
 				nAutoMode = 1;
@@ -516,13 +516,13 @@ namespace TJAPlayer3 {
 
 			#region [ Hitsounds ]
 
-			nOtoiro = Math.Min(txOtoiro.Length - 1, TJAPlayer3.ConfigIni.nHitSounds[actual]);
+			nOtoiro = Math.Min(txOtoiro.Length - 1, OpenTaiko.ConfigIni.nHitSounds[actual]);
 
 			#endregion
 
 			#region [ Song speed ]
 
-			nSongSpeed = Math.Max(0, Math.Min(txSongSpeed.Length - 1, (TJAPlayer3.ConfigIni.nSongSpeed / 2) - 5));
+			nSongSpeed = Math.Max(0, Math.Min(txSongSpeed.Length - 1, (OpenTaiko.ConfigIni.nSongSpeed / 2) - 5));
 
 			#endregion
 
@@ -531,80 +531,80 @@ namespace TJAPlayer3 {
 		}
 
 		public void Decision(int player) {
-			int actual = TJAPlayer3.GetActualPlayer(player);
+			int actual = OpenTaiko.GetActualPlayer(player);
 
 			#region [ Speed ]
 
 			if (nSpeedCount == 0) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 4;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = 4;
 			} else if (nSpeedCount > 0 && nSpeedCount <= 11) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = nSpeedCount + 8;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = nSpeedCount + 8;
 			} else if (nSpeedCount == 12) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 24;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = 24;
 			} else if (nSpeedCount == 13) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 29;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = 29;
 			} else if (nSpeedCount == 14) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 34;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = 34;
 			} else if (nSpeedCount == 15) {
-				TJAPlayer3.ConfigIni.nScrollSpeed[actual] = 39;
+				OpenTaiko.ConfigIni.nScrollSpeed[actual] = 39;
 			}
 
 			#endregion
 
 			#region [ Doron ]
 
-			TJAPlayer3.ConfigIni.eSTEALTH[actual] = (EStealthMode)nStealth;
+			OpenTaiko.ConfigIni.eSTEALTH[actual] = (EStealthMode)nStealth;
 
 			#endregion
 
 			#region [ Random ]
 
 			if (nRandom == 2 && nAbekobe == 1) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.MIRRORRANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.MIRRORRANDOM;
 			} else if (nRandom == 2 && nAbekobe == 0) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.SUPERRANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.SUPERRANDOM;
 			} else if (nRandom == 1 && nAbekobe == 1) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
 			} else if (nRandom == 1 && nAbekobe == 0) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
 			} else if (nRandom == 0 && nAbekobe == 1) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.MIRROR;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.MIRROR;
 			} else if (nRandom == 0 && nAbekobe == 0) {
-				TJAPlayer3.ConfigIni.eRandom[actual] = ERandomMode.OFF;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.OFF;
 			}
 
 			#endregion
 
 			#region [ Timing ]
 
-			TJAPlayer3.ConfigIni.nTimingZones[actual] = nTiming;
+			OpenTaiko.ConfigIni.nTimingZones[actual] = nTiming;
 
 			#endregion
 
 			#region [Just]
 
-			TJAPlayer3.ConfigIni.bJust[actual] = nJust;
+			OpenTaiko.ConfigIni.bJust[actual] = nJust;
 
 			#endregion
 
 			#region [GameType]
 
-			TJAPlayer3.ConfigIni.nGameType[actual] = (EGameType)nGameType;
+			OpenTaiko.ConfigIni.nGameType[actual] = (EGameType)nGameType;
 
 			#endregion
 
 			#region [Fun mods]
 
-			TJAPlayer3.ConfigIni.nFunMods[actual] = (EFunMods)nFunMods;
+			OpenTaiko.ConfigIni.nFunMods[actual] = (EFunMods)nFunMods;
 
 			#endregion
 
 			#region [ GameMode ]
 
 			if (nGameMode == 0) {
-				TJAPlayer3.ConfigIni.bTokkunMode = false;
+				OpenTaiko.ConfigIni.bTokkunMode = false;
 			} else {
-				TJAPlayer3.ConfigIni.bTokkunMode = true;
+				OpenTaiko.ConfigIni.bTokkunMode = true;
 			}
 
 			#endregion
@@ -612,23 +612,23 @@ namespace TJAPlayer3 {
 			#region [ AutoMode ]
 
 			if (nAutoMode == 1) {
-				TJAPlayer3.ConfigIni.bAutoPlay[player] = true;
+				OpenTaiko.ConfigIni.bAutoPlay[player] = true;
 			} else {
-				TJAPlayer3.ConfigIni.bAutoPlay[player] = false;
+				OpenTaiko.ConfigIni.bAutoPlay[player] = false;
 			}
 
 			#endregion
 
 			#region [ Hitsounds ]
 
-			TJAPlayer3.ConfigIni.nHitSounds[actual] = nOtoiro;
+			OpenTaiko.ConfigIni.nHitSounds[actual] = nOtoiro;
 			hsInfo.tReloadHitSounds(nOtoiro, actual);
 
 			#endregion
 
 			#region [ Song speed ]
 
-			TJAPlayer3.ConfigIni.nSongSpeed = (nSongSpeed + 5) * 2;
+			OpenTaiko.ConfigIni.nSongSpeed = (nSongSpeed + 5) * 2;
 
 			#endregion
 		}
@@ -636,7 +636,7 @@ namespace TJAPlayer3 {
 		#region [ Balancing functions ]
 
 		public float tGetScrollSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-			var _compare = (isMenu) ? nSpeedCount != 1 : TJAPlayer3.ConfigIni.nScrollSpeed[actual] != 9;
+			var _compare = (isMenu) ? nSpeedCount != 1 : OpenTaiko.ConfigIni.nScrollSpeed[actual] != 9;
 
 			if (ebt == EBalancingType.SCORE)
 				return (_compare) ? 0.9f : 1f;
@@ -644,7 +644,7 @@ namespace TJAPlayer3 {
 		}
 
 		public float tGetSongSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-			var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : TJAPlayer3.ConfigIni.nSongSpeed) / 20f;
+			var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : OpenTaiko.ConfigIni.nSongSpeed) / 20f;
 
 			if (ebt == EBalancingType.SCORE || _compare <= 1f)
 				return Math.Min(1f, (float)Math.Pow(_compare, 1.3));
@@ -652,7 +652,7 @@ namespace TJAPlayer3 {
 		}
 
 		public float tGetJustFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-			var _compare = (isMenu) ? nJust : TJAPlayer3.ConfigIni.bJust[actual];
+			var _compare = (isMenu) ? nJust : OpenTaiko.ConfigIni.bJust[actual];
 
 			if (ebt == EBalancingType.SCORE)
 				return (_compare == 2) ? 0.6f : 1f;
@@ -661,7 +661,7 @@ namespace TJAPlayer3 {
 		}
 
 		public float tGetTimingFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-			var _compare = (isMenu) ? nTiming - 2 : TJAPlayer3.ConfigIni.nTimingZones[actual] - 2;
+			var _compare = (isMenu) ? nTiming - 2 : OpenTaiko.ConfigIni.nTimingZones[actual] - 2;
 
 			if (ebt == EBalancingType.SCORE)
 				return (_compare < 0) ? (1f + 0.2f * _compare) : 1f;
@@ -670,7 +670,7 @@ namespace TJAPlayer3 {
 		}
 
 		public float tGetDoronFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-			var _compare = (isMenu) ? nStealth : (int)TJAPlayer3.ConfigIni.eSTEALTH[actual];
+			var _compare = (isMenu) ? nStealth : (int)OpenTaiko.ConfigIni.eSTEALTH[actual];
 
 			if (ebt == EBalancingType.SCORE || _compare == 0)
 				return 1f;
@@ -681,7 +681,7 @@ namespace TJAPlayer3 {
 
 		public float tGetModMultiplier(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int player = 0) {
 			float factor = 1f;
-			int actual = TJAPlayer3.GetActualPlayer(player);
+			int actual = OpenTaiko.GetActualPlayer(player);
 
 			//factor *= tGetScrollSpeedFactor(ebt, isMenu, actual);
 			factor *= tGetSongSpeedFactor(ebt, isMenu, actual);

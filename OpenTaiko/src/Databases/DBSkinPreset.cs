@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class DBSkinPreset {
 		public class SkinScene {
 			public SkinScene() {

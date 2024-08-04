@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using FDK;
 using SkiaSharp;
-using static TJAPlayer3.CActSelect曲リスト;
+using static OpenTaiko.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 
 	internal class CAct演奏パネル文字列 : CActivity {
 		public static int tToArgb(int r, int g, int b) {
@@ -55,20 +55,20 @@ namespace TJAPlayer3 {
 		/// <param name="stageText">曲数</param>
 		public void SetPanelString(string songName, string genreName, string stageText = null, CSongListNode songNode = null) {
 			if (base.IsActivated) {
-				TJAPlayer3.tテクスチャの解放(ref this.txPanel);
+				OpenTaiko.tテクスチャの解放(ref this.txPanel);
 				if ((songName != null) && (songName.Length > 0)) {
 					try {
-						using (var bmpSongTitle = pfMusicName.DrawText(songName, TJAPlayer3.Skin.Game_MusicName_ForeColor, TJAPlayer3.Skin.Game_MusicName_BackColor, null, 30)) {
-							this.txMusicName = TJAPlayer3.tテクスチャの生成(bmpSongTitle, false);
+						using (var bmpSongTitle = pfMusicName.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
+							this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
 						}
 						if (txMusicName != null) {
-							this.txMusicName.vcScaleRatio.X = TJAPlayer3.GetSongNameXScaling(ref txMusicName);
+							this.txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName);
 						}
 
 						SKBitmap bmpDiff;
 						string strDiff = "";
-						if (TJAPlayer3.Skin.eDiffDispMode == E難易度表示タイプ.n曲目に表示) {
-							switch (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0]) {
+						if (OpenTaiko.Skin.eDiffDispMode == E難易度表示タイプ.n曲目に表示) {
+							switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
 								case 0:
 									strDiff = "かんたん ";
 									break;
@@ -88,13 +88,13 @@ namespace TJAPlayer3 {
 									strDiff = "おに ";
 									break;
 							}
-							bmpDiff = pfMusicName.DrawText(strDiff + stageText, TJAPlayer3.Skin.Game_StageText_ForeColor, TJAPlayer3.Skin.Game_StageText_BackColor, null, 30);
+							bmpDiff = pfMusicName.DrawText(strDiff + stageText, OpenTaiko.Skin.Game_StageText_ForeColor, OpenTaiko.Skin.Game_StageText_BackColor, null, 30);
 						} else {
-							bmpDiff = pfMusicName.DrawText(stageText, TJAPlayer3.Skin.Game_StageText_ForeColor, TJAPlayer3.Skin.Game_StageText_BackColor, null, 30);
+							bmpDiff = pfMusicName.DrawText(stageText, OpenTaiko.Skin.Game_StageText_ForeColor, OpenTaiko.Skin.Game_StageText_BackColor, null, 30);
 						}
 
 						using (bmpDiff) {
-							txStage = TJAPlayer3.Tx.TxCGen("Songs");
+							txStage = OpenTaiko.Tx.TxCGen("Songs");
 						}
 					} catch (CTextureCreateFailedException e) {
 						Trace.TraceError(e.ToString());
@@ -103,7 +103,7 @@ namespace TJAPlayer3 {
 					}
 				}
 
-				this.txGENRE = TJAPlayer3.Tx.TxCGen("Template");
+				this.txGENRE = OpenTaiko.Tx.TxCGen("Template");
 
 				Color stageColor = Color.White;
 				if (songNode != null && songNode.isChangedBoxColor)
@@ -119,11 +119,11 @@ namespace TJAPlayer3 {
 					this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
 				}
 
-				pfGENRE = HPrivateFastFont.tInstantiateBoxFont(TJAPlayer3.Skin.Game_GenreText_FontSize);
+				pfGENRE = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Game_GenreText_FontSize);
 
 				this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
 
-				this.ct進行用 = new CCounter(0, 2000, 2, TJAPlayer3.Timer);
+				this.ct進行用 = new CCounter(0, 2000, 2, OpenTaiko.Timer);
 				this.Start();
 
 
@@ -132,23 +132,23 @@ namespace TJAPlayer3 {
 		}
 
 		public void t歌詞テクスチャを生成する(SKBitmap bmplyric) {
-			TJAPlayer3.tDisposeSafely(ref this.tx歌詞テクスチャ);
-			this.tx歌詞テクスチャ = TJAPlayer3.tテクスチャの生成(bmplyric);
+			OpenTaiko.tDisposeSafely(ref this.tx歌詞テクスチャ);
+			this.tx歌詞テクスチャ = OpenTaiko.tテクスチャの生成(bmplyric);
 		}
 		public void t歌詞テクスチャを削除する() {
-			TJAPlayer3.tテクスチャの解放(ref this.tx歌詞テクスチャ);
+			OpenTaiko.tテクスチャの解放(ref this.tx歌詞テクスチャ);
 		}
 		/// <summary>
 		/// レイヤー管理のため、On進行描画から分離。
 		/// </summary>
 		public void t歌詞テクスチャを描画する() {
 			if (this.tx歌詞テクスチャ != null) {
-				if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Left) {
-					this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X, TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
-				} else if (TJAPlayer3.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Right) {
-					this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szTextureSize.Width, TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+				if (OpenTaiko.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Left) {
+					this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X, OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+				} else if (OpenTaiko.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Right) {
+					this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szTextureSize.Width, OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
 				} else {
-					this.tx歌詞テクスチャ.t2D描画(TJAPlayer3.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szTextureSize.Width / 2), TJAPlayer3.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+					this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
 				}
 			}
 		}
@@ -164,7 +164,7 @@ namespace TJAPlayer3 {
 		// CActivity 実装
 
 		public override void Activate() {
-			this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.Game_MusicName_FontSize);
+			this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_MusicName_FontSize);
 			this.txPanel = null;
 			this.ct進行用 = new CCounter();
 			this.Start();
@@ -173,14 +173,14 @@ namespace TJAPlayer3 {
 		}
 		public override void DeActivate() {
 			this.ct進行用 = null;
-			TJAPlayer3.tDisposeSafely(ref this.txPanel);
-			TJAPlayer3.tDisposeSafely(ref this.txMusicName);
-			TJAPlayer3.tDisposeSafely(ref this.txGENRE);
-			TJAPlayer3.tDisposeSafely(ref this.pfGENRE);
-			TJAPlayer3.tDisposeSafely(ref this.txPanel);
-			TJAPlayer3.tDisposeSafely(ref this.pfMusicName);
-			TJAPlayer3.tDisposeSafely(ref this.pf歌詞フォント);
-			TJAPlayer3.tDisposeSafely(ref this.tx歌詞テクスチャ);
+			OpenTaiko.tDisposeSafely(ref this.txPanel);
+			OpenTaiko.tDisposeSafely(ref this.txMusicName);
+			OpenTaiko.tDisposeSafely(ref this.txGENRE);
+			OpenTaiko.tDisposeSafely(ref this.pfGENRE);
+			OpenTaiko.tDisposeSafely(ref this.txPanel);
+			OpenTaiko.tDisposeSafely(ref this.pfMusicName);
+			OpenTaiko.tDisposeSafely(ref this.pf歌詞フォント);
+			OpenTaiko.tDisposeSafely(ref this.tx歌詞テクスチャ);
 			base.DeActivate();
 		}
 		public override void CreateManagedResource() {
@@ -193,26 +193,26 @@ namespace TJAPlayer3 {
 			throw new InvalidOperationException("t進行描画(x,y)のほうを使用してください。");
 		}
 		public int t進行描画(int x, int y) {
-			if (TJAPlayer3.stage演奏ドラム画面.actDan.IsAnimating || TJAPlayer3.ConfigIni.nPlayerCount > 2) return 0;
+			if (OpenTaiko.stage演奏ドラム画面.actDan.IsAnimating || OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 			if (!base.IsDeActivated && !this.bMute) {
 				this.ct進行用.TickLoop();
 
 				if (this.txGENRE != null) {
-					this.txGENRE.t2D描画(TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);
-					TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Game_Genre_X + TJAPlayer3.Skin.Game_GenreText_Offset[0], TJAPlayer3.Skin.Game_Genre_Y + TJAPlayer3.Skin.Game_GenreText_Offset[1]);
+					this.txGENRE.t2D描画(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
+					TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Game_Genre_X + OpenTaiko.Skin.Game_GenreText_Offset[0], OpenTaiko.Skin.Game_Genre_Y + OpenTaiko.Skin.Game_GenreText_Offset[1]);
 				}
 				if (this.txStage != null)
-					this.txStage.t2D描画(TJAPlayer3.Skin.Game_Genre_X, TJAPlayer3.Skin.Game_Genre_Y);
+					this.txStage.t2D描画(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
 
-				if (TJAPlayer3.Skin.b現在のステージ数を表示しない) {
+				if (OpenTaiko.Skin.b現在のステージ数を表示しない) {
 					if (this.txMusicName != null) {
-						float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
-						if (this.txMusicName.szTextureSize.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
+						float fRate = (float)OpenTaiko.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
+						if (this.txMusicName.szTextureSize.Width <= OpenTaiko.Skin.Game_MusicName_MaxWidth)
 							fRate = 1.0f;
 
 						this.txMusicName.vcScaleRatio.X = fRate;
 
-						this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
+						this.txMusicName.t2D描画(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
 					}
 				} else {
 					#region[ 透明度制御 ]
@@ -237,13 +237,13 @@ namespace TJAPlayer3 {
 							IsFirstDraw = false;
 						}
 						if (this.txMusicName != null) {
-							float fRate = (float)TJAPlayer3.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
-							if (this.txMusicName.szTextureSize.Width <= TJAPlayer3.Skin.Game_MusicName_MaxWidth)
+							float fRate = (float)OpenTaiko.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
+							if (this.txMusicName.szTextureSize.Width <= OpenTaiko.Skin.Game_MusicName_MaxWidth)
 								fRate = 1.0f;
 
 							this.txMusicName.vcScaleRatio.X = fRate;
 
-							this.txMusicName.t2D描画(TJAPlayer3.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), TJAPlayer3.Skin.Game_MusicName_Y);
+							this.txMusicName.t2D描画(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
 						}
 					}
 				}

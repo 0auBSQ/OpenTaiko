@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectInformation : CActivity {
 		// コンストラクタ
 
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 			this.n画像Index下 = 0;
 
 			this.bFirst = true;
-			this.ct進行用 = new CCounter(0, 3000, 3, TJAPlayer3.Timer);
+			this.ct進行用 = new CCounter(0, 3000, 3, OpenTaiko.Timer);
 			base.Activate();
 		}
 		public override void DeActivate() {
@@ -26,15 +26,15 @@ namespace TJAPlayer3 {
 			base.DeActivate();
 		}
 		public override void CreateManagedResource() {
-			this.txInfo_Back = TJAPlayer3.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information_BG.png"));
-			this.txInfo[0] = TJAPlayer3.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information.png"));
-			this.txInfo[1] = TJAPlayer3.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information2.png"));
+			this.txInfo_Back = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information_BG.png"));
+			this.txInfo[0] = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information.png"));
+			this.txInfo[1] = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information2.png"));
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {
-			TJAPlayer3.tテクスチャの解放(ref this.txInfo_Back);
-			TJAPlayer3.tテクスチャの解放(ref this.txInfo[0]);
-			TJAPlayer3.tテクスチャの解放(ref this.txInfo[1]);
+			OpenTaiko.tテクスチャの解放(ref this.txInfo_Back);
+			OpenTaiko.tテクスチャの解放(ref this.txInfo[0]);
+			OpenTaiko.tテクスチャの解放(ref this.txInfo[1]);
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {

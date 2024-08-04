@@ -1,6 +1,6 @@
 ﻿using Color = System.Drawing.Color;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class HRarity {
 		private static Dictionary<string, Color> RarityToColor = new Dictionary<string, Color> {
 			["Poor"] = Color.Gray,

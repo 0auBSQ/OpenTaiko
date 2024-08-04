@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// 「トグル」（ON, OFF の2状態）を表すアイテム。
 	/// </summary>

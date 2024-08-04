@@ -2,7 +2,7 @@
 using FDK;
 
 // Minimalist menu class to use for custom menus
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CActSelectSongInfo : CStage {
 		public CActSelectSongInfo() {
 			base.IsDeActivated = true;
@@ -38,26 +38,26 @@ namespace TJAPlayer3 {
 		}
 
 		public override int Draw() {
-			if (TJAPlayer3.stageSongSelect.rNowSelectedSong != null && TJAPlayer3.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+			if (OpenTaiko.stageSongSelect.rNowSelectedSong != null && OpenTaiko.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
 				int[] bpms = new int[3] {
-						(int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
-						(int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
-						(int)TJAPlayer3.stageSongSelect.rNowSelectedSong.arスコア[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(TJAPlayer3.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
+						(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
+						(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
+						(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
 					};
 				for (int i = 0; i < 3; i++) {
-					tBPMNumberDraw(TJAPlayer3.Skin.SongSelect_Bpm_X[i], TJAPlayer3.Skin.SongSelect_Bpm_Y[i], bpms[i]);
+					tBPMNumberDraw(OpenTaiko.Skin.SongSelect_Bpm_X[i], OpenTaiko.Skin.SongSelect_Bpm_Y[i], bpms[i]);
 				}
 
-				if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker != null && TJAPlayer3.Skin.SongSelect_Maker_Show) {
-					TitleTextureKey.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_Maker[0], TJAPlayer3.Skin.SongSelect_Maker[1]);
+				if (OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongMaker != null && OpenTaiko.Skin.SongSelect_Maker_Show) {
+					TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_Maker[0], OpenTaiko.Skin.SongSelect_Maker[1]);
 				}
-				if (TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM != null && TJAPlayer3.Skin.SongSelect_BPM_Text_Show) {
-					TitleTextureKey.ResolveTitleTexture(TJAPlayer3.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, TJAPlayer3.Skin.SongSelect_BPM_Text[0], TJAPlayer3.Skin.SongSelect_BPM_Text[1]);
+				if (OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM != null && OpenTaiko.Skin.SongSelect_BPM_Text_Show) {
+					TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_BPM_Text[0], OpenTaiko.Skin.SongSelect_BPM_Text[1]);
 				}
-				if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bExplicit)
-					TJAPlayer3.Tx.SongSelect_Explicit?.t2D描画(TJAPlayer3.Skin.SongSelect_Explicit[0], TJAPlayer3.Skin.SongSelect_Explicit[1]);
-				if (TJAPlayer3.stageSongSelect.rNowSelectedSong.bMovie)
-					TJAPlayer3.Tx.SongSelect_Movie?.t2D描画(TJAPlayer3.Skin.SongSelect_Movie[0], TJAPlayer3.Skin.SongSelect_Movie[1]);
+				if (OpenTaiko.stageSongSelect.rNowSelectedSong.bExplicit)
+					OpenTaiko.Tx.SongSelect_Explicit?.t2D描画(OpenTaiko.Skin.SongSelect_Explicit[0], OpenTaiko.Skin.SongSelect_Explicit[1]);
+				if (OpenTaiko.stageSongSelect.rNowSelectedSong.bMovie)
+					OpenTaiko.Tx.SongSelect_Movie?.t2D描画(OpenTaiko.Skin.SongSelect_Movie[0], OpenTaiko.Skin.SongSelect_Movie[1]);
 			}
 
 
@@ -70,15 +70,15 @@ namespace TJAPlayer3 {
 			int[] nums = CConversion.SeparateDigits(num);
 
 			for (int j = 0; j < nums.Length; j++) {
-				if (TJAPlayer3.Skin.SongSelect_Bpm_Show && TJAPlayer3.Tx.SongSelect_Bpm_Number != null) {
+				if (OpenTaiko.Skin.SongSelect_Bpm_Show && OpenTaiko.Tx.SongSelect_Bpm_Number != null) {
 					float offset = j;
-					float x = originx - (TJAPlayer3.Skin.SongSelect_Bpm_Interval[0] * offset);
-					float y = originy - (TJAPlayer3.Skin.SongSelect_Bpm_Interval[1] * offset);
+					float x = originx - (OpenTaiko.Skin.SongSelect_Bpm_Interval[0] * offset);
+					float y = originy - (OpenTaiko.Skin.SongSelect_Bpm_Interval[1] * offset);
 
-					float width = TJAPlayer3.Tx.SongSelect_Bpm_Number.sz画像サイズ.Width / 10.0f;
-					float height = TJAPlayer3.Tx.SongSelect_Bpm_Number.sz画像サイズ.Height;
+					float width = OpenTaiko.Tx.SongSelect_Bpm_Number.sz画像サイズ.Width / 10.0f;
+					float height = OpenTaiko.Tx.SongSelect_Bpm_Number.sz画像サイズ.Height;
 
-					TJAPlayer3.Tx.SongSelect_Bpm_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
+					OpenTaiko.Tx.SongSelect_Bpm_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
 				}
 			}
 		}

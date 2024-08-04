@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.Text;
 using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
+using static OpenTaiko.CActSelect曲リスト;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CStageOnlineLounge : CStage {
 
 		public CStageOnlineLounge() {
@@ -49,7 +49,7 @@ namespace TJAPlayer3 {
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-			TJAPlayer3.Skin.soundOnlineLoungeBGM?.tPlay();
+			OpenTaiko.Skin.soundOnlineLoungeBGM?.tPlay();
 
 			this.currentMenu = ECurrentMenu.MAIN;
 			this.menuPointer = ECurrentMenu.CDN_SELECT;
@@ -60,7 +60,7 @@ namespace TJAPlayer3 {
 
 
 
-			dbCDN = TJAPlayer3.Databases.DBCDN;
+			dbCDN = OpenTaiko.Databases.DBCDN;
 			dbCDNData = null;
 
 			IsDownloading = false;
@@ -119,9 +119,9 @@ namespace TJAPlayer3 {
 		public override void DeActivate() {
 			// On de-activation
 
-			TJAPlayer3.tDisposeSafely(ref Background);
+			OpenTaiko.tDisposeSafely(ref Background);
 
-			TJAPlayer3.Songs管理.UpdateDownloadBox();
+			OpenTaiko.Songs管理.UpdateDownloadBox();
 
 			base.DeActivate();
 		}
@@ -129,8 +129,8 @@ namespace TJAPlayer3 {
 		public override void CreateManagedResource() {
 			// Ressource allocation
 
-			this.pfOLFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OnlineLounge_Font_OLFont);
-			this.pfOLFontLarge = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OnlineLounge_Font_OLFontLarge);
+			this.pfOLFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.OnlineLounge_Font_OLFont);
+			this.pfOLFontLarge = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.OnlineLounge_Font_OLFontLarge);
 
 			base.CreateManagedResource();
 		}
@@ -169,25 +169,25 @@ namespace TJAPlayer3 {
 			if (currentMenu == ECurrentMenu.MAIN
 				|| currentMenu == ECurrentMenu.CDN_SELECT
 				|| currentMenu == ECurrentMenu.CDN_OPTION) {
-				int baseX = TJAPlayer3.Skin.OnlineLounge_Side_Menu[0] - _ref.Length * (TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] / 2);
-				int baseY = TJAPlayer3.Skin.OnlineLounge_Side_Menu[1] - _ref.Length * (TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] / 2);
+				int baseX = OpenTaiko.Skin.OnlineLounge_Side_Menu[0] - _ref.Length * (OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] / 2);
+				int baseY = OpenTaiko.Skin.OnlineLounge_Side_Menu[1] - _ref.Length * (OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] / 2);
 
 				for (int i = 0; i < _ref.Length; i++) {
 					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(_ref[i]);
 
 					if (_selector != i) {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
-						TJAPlayer3.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
+						OpenTaiko.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 					} else {
 						tmpTex.color4 = CConversion.ColorToColor4(Color.White);
-						TJAPlayer3.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+						OpenTaiko.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 					}
 
-					TJAPlayer3.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(baseX + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] * i,
-						baseY + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] * i);
+					OpenTaiko.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(baseX + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] * i,
+						baseY + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] * i);
 					tmpTex.t2D拡大率考慮上中央基準描画(
-						baseX + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Text_Offset[0] + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[0] * i,
-						baseY + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Text_Offset[1] + TJAPlayer3.Skin.OnlineLounge_Side_Menu_Move[1] * i);
+						baseX + OpenTaiko.Skin.OnlineLounge_Side_Menu_Text_Offset[0] + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] * i,
+						baseY + OpenTaiko.Skin.OnlineLounge_Side_Menu_Text_Offset[1] + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] * i);
 				}
 			}
 
@@ -199,8 +199,8 @@ namespace TJAPlayer3 {
 				_ref = this.ttkCDNSongList;
 				_selector = cdnSongListIndex;
 
-				int baseX = TJAPlayer3.Skin.OnlineLounge_Song[0];
-				int baseY = TJAPlayer3.Skin.OnlineLounge_Song[1];
+				int baseX = OpenTaiko.Skin.OnlineLounge_Song[0];
+				int baseY = OpenTaiko.Skin.OnlineLounge_Song[1];
 
 				for (int i = -4; i < 4; i++) {
 					int pos = (_ref.Length * 5 + _selector + i) % _ref.Length;
@@ -224,23 +224,23 @@ namespace TJAPlayer3 {
 					tmpTex.color4 = _color;
 					tmpSubtitle.color4 = _color;
 
-					int x = baseX + TJAPlayer3.Skin.OnlineLounge_Song_Move[0] * i;
-					int y = baseY + TJAPlayer3.Skin.OnlineLounge_Song_Move[1] * i;
+					int x = baseX + OpenTaiko.Skin.OnlineLounge_Song_Move[0] * i;
+					int y = baseY + OpenTaiko.Skin.OnlineLounge_Song_Move[1] * i;
 
 					if (pos == 0) {
-						TJAPlayer3.Tx.OnlineLounge_Return_Box?.tUpdateColor4(_color);
-						TJAPlayer3.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(x, y);
+						OpenTaiko.Tx.OnlineLounge_Return_Box?.tUpdateColor4(_color);
+						OpenTaiko.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(x, y);
 					} else {
-						TJAPlayer3.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
-						TJAPlayer3.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(x, y);
+						OpenTaiko.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
+						OpenTaiko.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(x, y);
 					}
 
 
-					tmpTex.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.OnlineLounge_Song_Title_Offset[0], y + TJAPlayer3.Skin.OnlineLounge_Song_Title_Offset[1]);
-					tmpSubtitle.t2D拡大率考慮上中央基準描画(x + TJAPlayer3.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + TJAPlayer3.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
+					tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[1]);
+					tmpSubtitle.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
 
 					if (pos != 0 && i == 0) {
-						TJAPlayer3.Tx.OnlineLounge_Context.t2D描画(0, 0);
+						OpenTaiko.Tx.OnlineLounge_Context.t2D描画(0, 0);
 
 						var song_ = apiMethods.FetchedSongsList[pos - 1];
 
@@ -260,7 +260,7 @@ namespace TJAPlayer3 {
 						if (song_.charter != null && song_.charter.charter_name != null && song_.charter.charter_name != "") {
 							var charter_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-							charter_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Charter[0], TJAPlayer3.Skin.OnlineLounge_Context_Charter[1]);
+							charter_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Charter[0], OpenTaiko.Skin.OnlineLounge_Context_Charter[1]);
 						}
 
 						#endregion
@@ -270,7 +270,7 @@ namespace TJAPlayer3 {
 						if (song_.Genre != null && song_.Genre.genre != null && song_.Genre.genre != "") {
 							var genre_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-							genre_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Genre[0], TJAPlayer3.Skin.OnlineLounge_Context_Genre[1]);
+							genre_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Genre[0], OpenTaiko.Skin.OnlineLounge_Context_Genre[1]);
 						}
 
 						#endregion
@@ -280,17 +280,17 @@ namespace TJAPlayer3 {
 						for (int k = 0; k < (int)Difficulty.Total; k++) {
 							int diff = diffs[k];
 
-							int column = (k >= 3) ? TJAPlayer3.Skin.OnlineLounge_Context_Couse_Move[0] : 0;
-							int row = TJAPlayer3.Skin.OnlineLounge_Context_Couse_Move[1] * (k % 3);
+							int column = (k >= 3) ? OpenTaiko.Skin.OnlineLounge_Context_Couse_Move[0] : 0;
+							int row = OpenTaiko.Skin.OnlineLounge_Context_Couse_Move[1] * (k % 3);
 
 							if (diff > 0) {
-								TJAPlayer3.Tx.Couse_Symbol[k]?.t2D中心基準描画(
-									TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
-									TJAPlayer3.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
+								OpenTaiko.Tx.Couse_Symbol[k]?.t2D中心基準描画(
+									OpenTaiko.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
+									OpenTaiko.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
 
 								var difnb_ = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
-								difnb_?.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Context_Level[0] + column, TJAPlayer3.Skin.OnlineLounge_Context_Level[1] + row);
+								difnb_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Level[0] + column, OpenTaiko.Skin.OnlineLounge_Context_Level[1] + row);
 							}
 
 						}
@@ -306,11 +306,11 @@ namespace TJAPlayer3 {
 			#endregion
 
 			if (IsDownloading) {
-				TJAPlayer3.Tx.OnlineLounge_Box.t2D描画(0, 0);
+				OpenTaiko.Tx.OnlineLounge_Box.t2D描画(0, 0);
 
 				var text = TitleTextureKey.ResolveTitleTexture(
 									new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
-				text.t2D中心基準描画(TJAPlayer3.Skin.OnlineLounge_Downloading[0], TJAPlayer3.Skin.OnlineLounge_Downloading[1]);
+				text.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Downloading[0], OpenTaiko.Skin.OnlineLounge_Downloading[1]);
 			}
 
 			#endregion
@@ -321,26 +321,26 @@ namespace TJAPlayer3 {
 
 			//if (!IsDownloading)
 			{
-				if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-					TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
 					if (this.tMove(1)) {
-						TJAPlayer3.Skin.soundChangeSFX.tPlay();
+						OpenTaiko.Skin.soundChangeSFX.tPlay();
 					}
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
 					if (this.tMove(-1)) {
-						TJAPlayer3.Skin.soundChangeSFX.tPlay();
+						OpenTaiko.Skin.soundChangeSFX.tPlay();
 					}
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
 
 					#region [Fast return (Escape)]
 
-					TJAPlayer3.Skin.soundCancelSFX.tPlay();
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
 
 					if (currentMenu == ECurrentMenu.MAIN) {
 						// Return to title screen
-						TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
+						OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
 						this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
 						this.actFOtoTitle.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
@@ -358,8 +358,8 @@ namespace TJAPlayer3 {
 					return 0;
 
 					#endregion
-				} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
 
 					#region [Decide]
 
@@ -369,32 +369,32 @@ namespace TJAPlayer3 {
 							currentMenu = mainMenu[mainMenuIndex];
 							if (currentMenu == ECurrentMenu.RETURN) {
 								// Quit
-								TJAPlayer3.Skin.soundCancelSFX.tPlay();
-								TJAPlayer3.Skin.soundOnlineLoungeBGM?.tStop();
+								OpenTaiko.Skin.soundCancelSFX.tPlay();
+								OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
 								this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
 								this.actFOtoTitle.tフェードアウト開始();
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							} else {
-								TJAPlayer3.Skin.soundDecideSFX.tPlay();
+								OpenTaiko.Skin.soundDecideSFX.tPlay();
 							}
 						} else {
-							TJAPlayer3.Skin.soundError.tPlay();
+							OpenTaiko.Skin.soundError.tPlay();
 						}
 					} else if (currentMenu == ECurrentMenu.CDN_SELECT) {
 						// CDN Select Menu
 						if (CDNSelectIndex > 0) {
 							currentMenu = ECurrentMenu.CDN_OPTION;
 							dbCDNData = dbCDN.data.ElementAt(CDNSelectIndex - 1).Value;
-							TJAPlayer3.Skin.soundDecideSFX.tPlay();
+							OpenTaiko.Skin.soundDecideSFX.tPlay();
 						} else {
 							currentMenu = ECurrentMenu.MAIN;
-							TJAPlayer3.Skin.soundCancelSFX.tPlay();
+							OpenTaiko.Skin.soundCancelSFX.tPlay();
 						}
 					} else if (currentMenu == ECurrentMenu.CDN_OPTION) {
 						// CDN Option Menu
 						currentMenu = cdnOptMenu[cdnOptMenuIndex];
 						if (currentMenu == ECurrentMenu.CDN_SELECT)
-							TJAPlayer3.Skin.soundCancelSFX.tPlay();
+							OpenTaiko.Skin.soundCancelSFX.tPlay();
 						else {
 							if (currentMenu == ECurrentMenu.CDN_SONGS) {
 								apiMethods = new API(dbCDNData);
@@ -423,12 +423,12 @@ namespace TJAPlayer3 {
 
 								#endregion
 							}
-							TJAPlayer3.Skin.soundDecideSFX.tPlay();
+							OpenTaiko.Skin.soundDecideSFX.tPlay();
 						}
 
 					} else if (currentMenu == ECurrentMenu.CDN_SONGS) {
 						if (this.cdnSongListIndex == 0) {
-							TJAPlayer3.Skin.soundCancelSFX.tPlay();
+							OpenTaiko.Skin.soundCancelSFX.tPlay();
 							currentMenu = ECurrentMenu.CDN_OPTION;
 						} else {
 							if (this.cdnSongListIndex < apiMethods.FetchedSongsList.Length) {
@@ -437,9 +437,9 @@ namespace TJAPlayer3 {
 								var downloadLink = GetDownloadLink(song);
 
 								if (CSongDict.tContainsSongUrl(downloadLink) || song.DownloadNow) {
-									TJAPlayer3.Skin.soundError.tPlay();
+									OpenTaiko.Skin.soundError.tPlay();
 								} else {
-									TJAPlayer3.Skin.soundDecideSFX.tPlay();
+									OpenTaiko.Skin.soundDecideSFX.tPlay();
 									System.Threading.Thread download =
 										new System.Threading.Thread(new System.Threading.ThreadStart(DownloadSong));
 									download.Start();
@@ -505,8 +505,8 @@ namespace TJAPlayer3 {
 		}
 
 		private string GetAssignedLanguageValue(Dictionary<string, string> ens) {
-			if (ens.ContainsKey(TJAPlayer3.ConfigIni.sLang))
-				return ens[TJAPlayer3.ConfigIni.sLang];
+			if (ens.ContainsKey(OpenTaiko.ConfigIni.sLang))
+				return ens[OpenTaiko.ConfigIni.sLang];
 			return ens["default"];
 		}
 
@@ -539,9 +539,9 @@ namespace TJAPlayer3 {
 
 				// Fetch closest Download folder node
 				CSongListNode downloadBox = null;
-				for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++) {
-					if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == "Download") {
-						downloadBox = TJAPlayer3.Songs管理.list曲ルート[i];
+				for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
+					if (OpenTaiko.Songs管理.list曲ルート[i].strジャンル == "Download") {
+						downloadBox = OpenTaiko.Songs管理.list曲ルート[i];
 						if (downloadBox.rParentNode != null) downloadBox = downloadBox.rParentNode;
 						break;
 					}
@@ -558,10 +558,10 @@ namespace TJAPlayer3 {
 
 						// Search a corresponding box-def if exists
 						CSongListNode correspondingBox = null;
-						for (int i = 0; i < TJAPlayer3.Songs管理.list曲ルート.Count; i++) {
-							if (TJAPlayer3.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
-								&& TJAPlayer3.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
-								correspondingBox = TJAPlayer3.Songs管理.list曲ルート[i];
+						for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
+							if (OpenTaiko.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
+								&& OpenTaiko.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
+								correspondingBox = OpenTaiko.Songs管理.list曲ルート[i];
 						}
 
 						var newBoxDef = $@"{genredPath}{Path.DirectorySeparatorChar}box.def";
@@ -571,7 +571,7 @@ namespace TJAPlayer3 {
 
 							//File.Create(newBoxDef);
 
-							StreamWriter sw = new StreamWriter(newBoxDef, false, Encoding.GetEncoding(TJAPlayer3.sEncType));
+							StreamWriter sw = new StreamWriter(newBoxDef, false, Encoding.GetEncoding(OpenTaiko.sEncType));
 
 							sw.WriteLine($@"#TITLE:{song.Genre.genre}");
 							sw.WriteLine($@"#GENRE:{song.Genre.genre}");
@@ -618,7 +618,7 @@ namespace TJAPlayer3 {
 				//System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, $@"Songs{Path.DirectorySeparatorChar}S3 Download{Path.DirectorySeparatorChar}{song.Md5}");
 			} catch (Exception e) {
 				Trace.TraceInformation(e.ToString());
-				TJAPlayer3.Skin.soundError.tPlay();
+				OpenTaiko.Skin.soundError.tPlay();
 			}
 
 

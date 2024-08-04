@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectArtistComment : CActivity {
 		// メソッド
 
@@ -128,8 +128,8 @@ namespace TJAPlayer3 {
 			base.Activate();
 		}
 		public override void DeActivate() {
-			TJAPlayer3.tテクスチャの解放(ref this.txArtist);
-			TJAPlayer3.tテクスチャの解放(ref this.txComment);
+			OpenTaiko.tテクスチャの解放(ref this.txArtist);
+			OpenTaiko.tテクスチャの解放(ref this.txComment);
 			this.ctComment = null;
 			base.DeActivate();
 		}
@@ -143,8 +143,8 @@ namespace TJAPlayer3 {
 				this.ft描画用フォント = null;
 			}
 
-			TJAPlayer3.tテクスチャの解放(ref this.txArtist);
-			TJAPlayer3.tテクスチャの解放(ref this.txComment);
+			OpenTaiko.tテクスチャの解放(ref this.txArtist);
+			OpenTaiko.tテクスチャの解放(ref this.txComment);
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {

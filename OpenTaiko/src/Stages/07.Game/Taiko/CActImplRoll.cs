@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplRoll : CActivity {
 
 
@@ -48,7 +48,7 @@ namespace TJAPlayer3 {
 		}
 
 		public int On進行描画(int n連打数, int player) {
-			if (TJAPlayer3.ConfigIni.nPlayerCount > 2) return base.Draw();
+			if (OpenTaiko.ConfigIni.nPlayerCount > 2) return base.Draw();
 
 			this.ct連打枠カウンター[player].Tick();
 			this.ct連打アニメ[player].Tick();
@@ -57,7 +57,7 @@ namespace TJAPlayer3 {
 			//仮置き
 			int[] nRollBalloon = new int[] { -3, 514, 0, 0 };
 			int[] nRollNumber = new int[] { 48, 559, 0, 0 };
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.ct連打枠カウンター[player].n現在の値.ToString());
 				if (this.ct連打枠カウンター[player].IsUnEnded) {
 					if (ct連打枠カウンター[player].CurrentValue > 66 && !FadeOut[player].Counter.IsTicked) {
@@ -67,26 +67,26 @@ namespace TJAPlayer3 {
 
 					if (ct連打枠カウンター[player].CurrentValue == 0 || ct連打枠カウンター[player].CurrentValue == 60) {
 						bNowRollAnime = 0;
-						TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 64;
+						OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 64;
 					} else if (ct連打枠カウンター[player].CurrentValue == 1 || ct連打枠カウンター[player].CurrentValue == 59) {
 						bNowRollAnime = 1;
-						TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 128;
+						OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 128;
 					} else if (ct連打枠カウンター[player].CurrentValue == 2 || ct連打枠カウンター[player].CurrentValue == 58) {
 						bNowRollAnime = 2;
-						TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 192;
+						OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 192;
 					} else if (ct連打枠カウンター[player].CurrentValue == 3 || ct連打枠カウンター[player].CurrentValue == 57) {
 						bNowRollAnime = 3;
-						TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 255;
+						OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 					} else if (ct連打枠カウンター[player].CurrentValue >= 4 || ct連打枠カウンター[player].CurrentValue <= 56) {
 						bNowRollAnime = 4;
-						TJAPlayer3.Tx.Balloon_Number_Roll.Opacity = 255;
+						OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 					}
 
-					float width = TJAPlayer3.Tx.Balloon_Roll.szTextureSize.Width / 5.0f;
-					float height = TJAPlayer3.Tx.Balloon_Roll.szTextureSize.Height;
+					float width = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Width / 5.0f;
+					float height = OpenTaiko.Tx.Balloon_Roll.szTextureSize.Height;
 
-					TJAPlayer3.Tx.Balloon_Roll?.t2D描画(TJAPlayer3.Skin.Game_Balloon_Roll_Frame_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
-					this.t文字表示(TJAPlayer3.Skin.Game_Balloon_Roll_Number_X[player], TJAPlayer3.Skin.Game_Balloon_Roll_Number_Y[player], n連打数, player);
+					OpenTaiko.Tx.Balloon_Roll?.t2D描画(OpenTaiko.Skin.Game_Balloon_Roll_Frame_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
+					this.t文字表示(OpenTaiko.Skin.Game_Balloon_Roll_Number_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Number_Y[player], n連打数, player);
 				}
 			}
 
@@ -95,7 +95,7 @@ namespace TJAPlayer3 {
 
 		public void t枠表示時間延長(int player, bool first) {
 			if ((this.ct連打枠カウンター[player].CurrentValue >= 6 && !first) || first)
-				this.ct連打枠カウンター[player] = new CCounter(0, 60, 40, TJAPlayer3.Timer);
+				this.ct連打枠カウンター[player] = new CCounter(0, 60, 40, OpenTaiko.Timer);
 
 			if (!first)
 				this.ct連打枠カウンター[player].CurrentValue = 5;
@@ -131,19 +131,19 @@ namespace TJAPlayer3 {
 		}
 
 		private void t文字表示(int x, int y, int num, int nPlayer) {
-			TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale;
-			TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ct連打アニメ[nPlayer].CurrentValue];
+			OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale;
+			OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Roll_Number_Scale + RollScale[this.ct連打アニメ[nPlayer].CurrentValue];
 
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++) {
 				float offset = j - (nums.Length / 2.0f);
-				float _x = x - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[0] * offset);
-				float _y = y - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[1] * offset);
+				float _x = x - (OpenTaiko.Skin.Game_Balloon_Number_Interval[0] * offset);
+				float _y = y - (OpenTaiko.Skin.Game_Balloon_Number_Interval[1] * offset);
 
-				float width = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Width / 10.0f;
-				float height = TJAPlayer3.Tx.Balloon_Number_Roll.sz画像サイズ.Height;
+				float width = OpenTaiko.Tx.Balloon_Number_Roll.sz画像サイズ.Width / 10.0f;
+				float height = OpenTaiko.Tx.Balloon_Number_Roll.sz画像サイズ.Height;
 
-				TJAPlayer3.Tx.Balloon_Number_Roll.t2D拡大率考慮下基準描画(_x, _y, new RectangleF(width * nums[j], 0, width, height));
+				OpenTaiko.Tx.Balloon_Number_Roll.t2D拡大率考慮下基準描画(_x, _y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
 	}

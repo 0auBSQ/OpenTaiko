@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// すべてのアイテムの基本クラス。
 	/// </summary>

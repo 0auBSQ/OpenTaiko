@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	[Serializable]
 	public class CScoreIni {
 		// プロパティ

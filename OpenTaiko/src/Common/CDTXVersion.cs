@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// <para>DTXMania のバージョン。</para>
 	/// <para>例1："078b" → 整数部=078, 小数部=2000000 ('英字'+'yymmdd') </para>

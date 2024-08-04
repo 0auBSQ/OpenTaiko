@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3.C曲リストノードComparers {
+﻿namespace OpenTaiko.C曲リストノードComparers {
 	internal sealed class C曲リストノードComparerLevel : IComparer<CSongListNode> {
 		private readonly int _order;
 
@@ -18,7 +18,7 @@
 		}
 
 		private int _diffOf(CSongListNode n1) {
-			return n1.nLevel[TJAPlayer3.stageSongSelect.actSongList.tFetchDifficulty(n1)];
+			return n1.nLevel[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(n1)];
 		}
 	}
 }

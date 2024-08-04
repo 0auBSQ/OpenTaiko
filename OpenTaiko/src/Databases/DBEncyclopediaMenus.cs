@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class DBEncyclopediaMenus : CSavableT<DBEncyclopediaMenus.EncyclopediaMenu> {
 		public DBEncyclopediaMenus() {
-			_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}Menus.json";
+			_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}Menus.json";
 			base.tDBInitSavable();
 		}
 

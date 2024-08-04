@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// 「リスト」（複数の固定値からの１つを選択可能）を表すアイテム。
 	/// </summary>

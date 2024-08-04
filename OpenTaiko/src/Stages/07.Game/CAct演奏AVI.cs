@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CAct演奏AVI : CActivity {
 		// コンストラクタ
 
@@ -12,7 +12,7 @@ namespace TJAPlayer3 {
 		// メソッド
 
 		public void Start(int nチャンネル番号, CVideoDecoder rVD) {
-			if (nチャンネル番号 == 0x54 && TJAPlayer3.ConfigIni.bEnableAVI) {
+			if (nチャンネル番号 == 0x54 && OpenTaiko.ConfigIni.bEnableAVI) {
 				this.rVD = rVD;
 				if (this.rVD != null) {
 					this.ratio1 = Math.Min((float)SampleFramework.GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)SampleFramework.GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));
@@ -37,7 +37,7 @@ namespace TJAPlayer3 {
 				this.tx描画用.vcScaleRatio.X = this.ratio1;
 				this.tx描画用.vcScaleRatio.Y = this.ratio1;
 
-				if (TJAPlayer3.ConfigIni.eClipDispType.HasFlag(EClipDispType.背景のみ)) {
+				if (OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.背景のみ)) {
 					this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
 				}
 			}
@@ -45,7 +45,7 @@ namespace TJAPlayer3 {
 		}
 
 		public void t窓表示() {
-			if (this.rVD == null || this.tx描画用 == null || !TJAPlayer3.ConfigIni.eClipDispType.HasFlag(EClipDispType.ウィンドウのみ))
+			if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.ウィンドウのみ))
 				return;
 
 			float[] fRatio = new float[] { 640.0f - 4.0f, 360.0f - 4.0f }; //中央下表示

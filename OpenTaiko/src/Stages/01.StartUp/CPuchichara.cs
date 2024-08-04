@@ -2,7 +2,7 @@
 using Silk.NET.Maths;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CPuchichara {
 		public CTexture tx;
 		public CTexture render;
@@ -22,8 +22,8 @@ namespace TJAPlayer3 {
 		}
 
 		public void tGetUnlockedItems(int _player, ModalQueue mq) {
-			int player = TJAPlayer3.GetActualPlayer(_player);
-			var _sf = TJAPlayer3.SaveFileInstances[player].data.UnlockedPuchicharas;
+			int player = OpenTaiko.GetActualPlayer(_player);
+			var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedPuchicharas;
 			bool _edited = false;
 
 			var _npvKey = Path.GetFileName(_path);
@@ -42,25 +42,25 @@ namespace TJAPlayer3 {
 							),
 						_player);
 
-					DBSaves.RegisterStringUnlockedAsset(TJAPlayer3.SaveFileInstances[player].data.SaveId, "unlocked_puchicharas", _npvKey);
+					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[player].data.SaveId, "unlocked_puchicharas", _npvKey);
 				}
 			}
 
 			if (_edited)
-				TJAPlayer3.SaveFileInstances[player].tApplyHeyaChanges();
+				OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
 		}
 
 		public CPuchichara(string path) {
 			_path = path;
 
 			// Puchichara textures
-			tx = TJAPlayer3.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Chara.png");
+			tx = OpenTaiko.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Chara.png");
 			if (tx != null) {
-				tx.vcScaleRatio = new Vector3D<float>(TJAPlayer3.Skin.Game_PuchiChara_Scale[0]);
+				tx.vcScaleRatio = new Vector3D<float>(OpenTaiko.Skin.Game_PuchiChara_Scale[0]);
 			}
 
 			// Heya render
-			render = TJAPlayer3.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Render.png");
+			render = OpenTaiko.Tx.TxCAbsolute($@"{path}{Path.DirectorySeparatorChar}Render.png");
 
 			// Puchichara welcome sfx
 			welcome = new CSkin.CSystemSound($@"{path}{Path.DirectorySeparatorChar}Welcome.ogg", false, false, true, ESoundGroup.Voice);

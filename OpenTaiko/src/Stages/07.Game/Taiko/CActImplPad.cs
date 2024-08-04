@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplPad : CActivity {
 		// コンストラクタ
 
@@ -42,11 +42,11 @@ namespace TJAPlayer3 {
 		public override int Draw() {
 			if (!base.IsDeActivated) {
 				if (base.IsFirstDraw) {
-					this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
-					this.nY座標制御タイマ = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
+					this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+					this.nY座標制御タイマ = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 					base.IsFirstDraw = false;
 				}
-				long num = (long)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed);
+				long num = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				if (num < this.nフラッシュ制御タイマ) {
 					this.nフラッシュ制御タイマ = num;
 				}

@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using FDK;
 using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CLuaScript : IDisposable {
 		private static List<CLuaScript> listScripts = new List<CLuaScript>();
 		public static void tReloadLanguage(string lang) {
@@ -113,7 +113,7 @@ namespace TJAPlayer3 {
 					soundGroup = ESoundGroup.Unknown;
 					break;
 			}
-			CSound sound = TJAPlayer3.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
+			CSound sound = OpenTaiko.SoundManager?.tCreateSound($"{strSounsdDir}/{name}", soundGroup);
 
 			listDisposables.Add(sound);
 			return sound;

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplDancer : CActivity {
 		/// <summary>
 		/// 踊り子
@@ -13,7 +13,7 @@ namespace TJAPlayer3 {
 		public override void Activate() {
 			//this.ct踊り子モーション = new CCounter();
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				return;
 
 			var preset = HScenePreset.GetBGPreset();
@@ -47,32 +47,32 @@ namespace TJAPlayer3 {
 					nNowDancerInCounter = new float[nDancerCount];
 					nNowDancerOutCounter = new float[nDancerCount];
 
-					nDancerInPtn = TJAPlayer3.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_In{Path.DirectorySeparatorChar}");
+					nDancerInPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_In{Path.DirectorySeparatorChar}");
 					if (nDancerInPtn != 0) {
 						for (int i = 0; i < nDancerCount; i++) {
 							Dancer_In[i] = new CTexture[nDancerInPtn];
 							for (int p = 0; p < nDancerInPtn; p++) {
-								Dancer_In[i][p] = TJAPlayer3.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_In{Path.DirectorySeparatorChar}{p}.png");
+								Dancer_In[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_In{Path.DirectorySeparatorChar}{p}.png");
 							}
 						}
 					}
 
-					nDancerOutPtn = TJAPlayer3.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_Out{Path.DirectorySeparatorChar}");
+					nDancerOutPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_Out{Path.DirectorySeparatorChar}");
 					if (nDancerOutPtn != 0) {
 						for (int i = 0; i < nDancerCount; i++) {
 							Dancer_Out[i] = new CTexture[nDancerOutPtn];
 							for (int p = 0; p < nDancerOutPtn; p++) {
-								Dancer_Out[i][p] = TJAPlayer3.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_Out{Path.DirectorySeparatorChar}{p}.png");
+								Dancer_Out[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_Out{Path.DirectorySeparatorChar}{p}.png");
 							}
 						}
 					}
 
-					nDancerPtn = TJAPlayer3.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1{Path.DirectorySeparatorChar}");
+					nDancerPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1{Path.DirectorySeparatorChar}");
 					if (nDancerPtn != 0) {
 						for (int i = 0; i < nDancerCount; i++) {
 							Dancer[i] = new CTexture[nDancerPtn];
 							for (int p = 0; p < nDancerPtn; p++) {
-								Dancer[i][p] = TJAPlayer3.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}{Path.DirectorySeparatorChar}{p}.png");
+								Dancer[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}{Path.DirectorySeparatorChar}{p}.png");
 							}
 						}
 					}
@@ -85,7 +85,7 @@ namespace TJAPlayer3 {
 			arMotionArray_Out = CConversion.StringToIntArray(Game_Dancer_Out_Motion);
 			if (this.arMotionArray_Out == null) arMotionArray_Out = CConversion.StringToIntArray("0,0");
 
-			this.ar踊り子モーション番号 = CConversion.StringToIntArray(TJAPlayer3.Skin.Game_Dancer_Motion);
+			this.ar踊り子モーション番号 = CConversion.StringToIntArray(OpenTaiko.Skin.Game_Dancer_Motion);
 			if (this.ar踊り子モーション番号 == null) ar踊り子モーション番号 = CConversion.StringToIntArray("0,0");
 
 			nNowDancerCounter = 0;
@@ -95,15 +95,15 @@ namespace TJAPlayer3 {
 		}
 
 		public override void DeActivate() {
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				return;
 
 			//this.ct踊り子モーション = null;
 
 			for (int i = 0; i < nDancerCount; i++) {
-				TJAPlayer3.t安全にDisposeする(ref Dancer_In[i]);
-				TJAPlayer3.t安全にDisposeする(ref Dancer_Out[i]);
-				TJAPlayer3.t安全にDisposeする(ref Dancer[i]);
+				OpenTaiko.t安全にDisposeする(ref Dancer_In[i]);
+				OpenTaiko.t安全にDisposeする(ref Dancer_Out[i]);
+				OpenTaiko.t安全にDisposeする(ref Dancer[i]);
 			}
 
 			base.DeActivate();
@@ -122,16 +122,16 @@ namespace TJAPlayer3 {
 				this.IsFirstDraw = true;
 			}
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-				if (TJAPlayer3.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0) {
-					if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowDancerCounter += Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)TJAPlayer3.FPS.DeltaTime / nDancerBeat;
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+				if (OpenTaiko.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0) {
+					if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerCounter += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;
 					if (nNowDancerCounter >= 1) {
 						nNowDancerCounter = 0;
 					}
 					nNowDancerFrame = (int)(nNowDancerCounter * (this.ar踊り子モーション番号.Length - 1));
 
 					for (int i = 0; i < nDancerCount; i++) {
-						if ((int)TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= TJAPlayer3.Skin.Game_Dancer_Gauge[i]) {
+						if ((int)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= OpenTaiko.Skin.Game_Dancer_Gauge[i]) {
 							if (DancerStates[i] == 0) {
 								DancerStates[i] = 1;
 								nNowDancerInCounter[i] = 0;
@@ -150,7 +150,7 @@ namespace TJAPlayer3 {
 									if (nDancerInInterval == 0) {
 										DancerStates[i] = 3;
 									} else {
-										if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)TJAPlayer3.FPS.DeltaTime;
+										if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)OpenTaiko.FPS.DeltaTime;
 
 										if (nNowDancerInCounter[i] >= 1) {
 											nNowDancerInCounter[i] = 1;
@@ -159,7 +159,7 @@ namespace TJAPlayer3 {
 
 										int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In.Length - 1));
 										if (this.Dancer_In[i] != null && this.Dancer_In[i].Length > 0 && this.Dancer_In[i][this.arMotionArray_In[frame]] != null) {
-											this.Dancer_In[i][this.arMotionArray_In[frame]].t2D中心基準描画(TJAPlayer3.Skin.Game_Dancer_X[i], TJAPlayer3.Skin.Game_Dancer_Y[i]);
+											this.Dancer_In[i][this.arMotionArray_In[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 										}
 									}
 
@@ -169,7 +169,7 @@ namespace TJAPlayer3 {
 									if (nDancerOutInterval == 0) {
 										DancerStates[i] = 0;
 									} else {
-										if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)TJAPlayer3.FPS.DeltaTime;
+										if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)OpenTaiko.FPS.DeltaTime;
 
 										if (nNowDancerOutCounter[i] >= 1) {
 											nNowDancerOutCounter[i] = 1;
@@ -178,14 +178,14 @@ namespace TJAPlayer3 {
 
 										int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out.Length - 1));
 										if (this.Dancer_Out[i] != null && this.Dancer_Out[i].Length > 0 && this.Dancer_Out[i][this.arMotionArray_Out[frame]] != null) {
-											this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2D中心基準描画(TJAPlayer3.Skin.Game_Dancer_X[i], TJAPlayer3.Skin.Game_Dancer_Y[i]);
+											this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 										}
 									}
 								}
 								break;
 							case 3:
 								if (this.Dancer[i] != null && this.Dancer[i].Length > 0 && this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]] != null) {
-									this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]].t2D中心基準描画(TJAPlayer3.Skin.Game_Dancer_X[i], TJAPlayer3.Skin.Game_Dancer_Y[i]);
+									this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 								}
 								break;
 						}
@@ -222,13 +222,13 @@ namespace TJAPlayer3 {
 
 		private void LoadDancerConifg(string dancerPath) {
 			var _str = "";
-			TJAPlayer3.Skin.LoadSkinConfigFromFile(dancerPath + @$"{Path.DirectorySeparatorChar}DancerConfig.txt", ref _str);
+			OpenTaiko.Skin.LoadSkinConfigFromFile(dancerPath + @$"{Path.DirectorySeparatorChar}DancerConfig.txt", ref _str);
 
 			string[] delimiter = { "\n" };
 			string[] strSingleLine = _str.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 
-			TJAPlayer3.Skin.Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
-			TJAPlayer3.Skin.Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
+			OpenTaiko.Skin.Game_Dancer_X = new int[] { 640, 430, 856, 215, 1070 };
+			OpenTaiko.Skin.Game_Dancer_Y = new int[] { 500, 500, 500, 500, 500 };
 			nDancerCount = 5;
 			nDancerInInterval = 0;
 			nDancerOutInterval = 0;
@@ -247,20 +247,20 @@ namespace TJAPlayer3 {
 
 							if (strCommand == "Game_Dancer_Count") {
 								nDancerCount = int.Parse(strParam);
-								TJAPlayer3.Skin.Game_Dancer_X = new int[nDancerCount];
-								TJAPlayer3.Skin.Game_Dancer_Y = new int[nDancerCount];
+								OpenTaiko.Skin.Game_Dancer_X = new int[nDancerCount];
+								OpenTaiko.Skin.Game_Dancer_Y = new int[nDancerCount];
 							} else if (strCommand == "Game_Dancer_X") {
 								string[] strSplit = strParam.Split(',');
 								for (int i = 0; i < nDancerCount; i++) {
-									TJAPlayer3.Skin.Game_Dancer_X[i] = int.Parse(strSplit[i]);
+									OpenTaiko.Skin.Game_Dancer_X[i] = int.Parse(strSplit[i]);
 								}
 							} else if (strCommand == "Game_Dancer_Y") {
 								string[] strSplit = strParam.Split(',');
 								for (int i = 0; i < nDancerCount; i++) {
-									TJAPlayer3.Skin.Game_Dancer_Y[i] = int.Parse(strSplit[i]);
+									OpenTaiko.Skin.Game_Dancer_Y[i] = int.Parse(strSplit[i]);
 								}
 							} else if (strCommand == "Game_Dancer_Motion") {
-								TJAPlayer3.Skin.Game_Dancer_Motion = strParam;
+								OpenTaiko.Skin.Game_Dancer_Motion = strParam;
 							} else if (strCommand == "Game_Dancer_In_Motion") {
 								Game_Dancer_In_Motion = strParam;
 							} else if (strCommand == "Game_Dancer_Out_Motion") {
@@ -274,7 +274,7 @@ namespace TJAPlayer3 {
 							} else if (strCommand == "Game_Dancer_Gauge") {
 								string[] strSplit = strParam.Split(',');
 								for (int i = 0; i < nDancerCount; i++) {
-									TJAPlayer3.Skin.Game_Dancer_Gauge[i] = int.Parse(strSplit[i]);
+									OpenTaiko.Skin.Game_Dancer_Gauge[i] = int.Parse(strSplit[i]);
 								}
 							}
 

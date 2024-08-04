@@ -2,7 +2,7 @@
 using FDK;
 using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class ScriptBGFunc {
 		private Dictionary<string, CTexture> Textures;
 		private string DirPath;
@@ -12,15 +12,15 @@ namespace TJAPlayer3 {
 			DirPath = dirPath;
 		}
 		public void DrawText(double x, double y, string text) {
-			TJAPlayer3.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text);
+			OpenTaiko.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text);
 		}
 		public void DrawNum(double x, double y, double text) {
-			TJAPlayer3.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
+			OpenTaiko.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
 		}
 		public void AddGraph(string fileName) {
 			string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
 			trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
-			Textures.Add(fileName, TJAPlayer3.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+			Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
 		}
 		public void DrawGraph(double x, double y, string fileName) {
 			Textures[fileName]?.t2D描画((int)x, (int)y);
@@ -160,7 +160,7 @@ namespace TJAPlayer3 {
 			}
 			for (int i = 0; i < texs.Count; i++) {
 				var tex = texs[i];
-				TJAPlayer3.tテクスチャの解放(ref tex);
+				OpenTaiko.tテクスチャの解放(ref tex);
 			}
 
 			Textures.Clear();
@@ -201,30 +201,30 @@ namespace TJAPlayer3 {
 				string[] raritiesP = { "Common", "Common", "Common", "Common", "Common" };
 				string[] raritiesC = { "Common", "Common", "Common", "Common", "Common" };
 
-				if (TJAPlayer3.Tx.Puchichara != null && TJAPlayer3.Tx.Characters != null) {
-					for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
-						raritiesP[i] = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(i))].metadata.Rarity;
-						raritiesC[i] = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character].metadata.Rarity;
+				if (OpenTaiko.Tx.Puchichara != null && OpenTaiko.Tx.Characters != null) {
+					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+						raritiesP[i] = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(i))].metadata.Rarity;
+						raritiesC[i] = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character].metadata.Rarity;
 					}
 				}
 
 				// Initialisation
-				LuaSetConstValues.Call(TJAPlayer3.ConfigIni.nPlayerCount,
-					TJAPlayer3.P1IsBlue(),
-					TJAPlayer3.ConfigIni.sLang,
-					TJAPlayer3.ConfigIni.SimpleMode,
+				LuaSetConstValues.Call(OpenTaiko.ConfigIni.nPlayerCount,
+					OpenTaiko.P1IsBlue(),
+					OpenTaiko.ConfigIni.sLang,
+					OpenTaiko.ConfigIni.SimpleMode,
 					raritiesP,
 					raritiesC
 					);
 
-				LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime,
-					TJAPlayer3.FPS.NowFPS,
-					TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared,
+				LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+					OpenTaiko.FPS.NowFPS,
+					OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared,
 					0,
-					TJAPlayer3.stage演奏ドラム画面.AIBattleState,
-					TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
-					TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-					TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
+					OpenTaiko.stage演奏ドラム画面.AIBattleState,
+					OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin,
+					OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値,
+					OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM,
 					new bool[] { false, false, false, false, false },
 					-1
 					);
@@ -240,32 +240,32 @@ namespace TJAPlayer3 {
 			try {
 				float currentFloorPositionMax140 = 0;
 
-				if (TJAPlayer3.stageSongSelect.rChoosenSong != null && TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5] != null) {
-					int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+				if (OpenTaiko.stageSongSelect.rChoosenSong != null && OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5] != null) {
+					int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 					int nightTime = Math.Max(140, maxFloor / 2);
 
-					currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+					currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 				}
 				double timestamp = -1.0;
 
-				if (TJAPlayer3.DTX != null) {
-					double timeoffset = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? -2.0 : -8.2;
+				if (OpenTaiko.DTX != null) {
+					double timeoffset = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? -2.0 : -8.2;
 					// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
-					timestamp = (((double)(SoundManager.PlayTimer.NowTime * TJAPlayer3.ConfigIni.SongPlaybackSpeed)) / 1000.0) +
-							(-(TJAPlayer3.ConfigIni.MusicPreTimeMs + TJAPlayer3.DTX.nOFFSET) / 1000.0) +
+					timestamp = (((double)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0) +
+							(-(OpenTaiko.ConfigIni.MusicPreTimeMs + OpenTaiko.DTX.nOFFSET) / 1000.0) +
 							timeoffset;
 				}
 
-				LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime,
-					TJAPlayer3.FPS.NowFPS,
-					TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared,
+				LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+					OpenTaiko.FPS.NowFPS,
+					OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared,
 					(double)currentFloorPositionMax140,
-					TJAPlayer3.stage演奏ドラム画面.AIBattleState,
-					TJAPlayer3.stage演奏ドラム画面.bIsAIBattleWin,
-					TJAPlayer3.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-					TJAPlayer3.stage演奏ドラム画面.actPlayInfo.dbBPM,
-					TJAPlayer3.stage演奏ドラム画面.bIsGOGOTIME,
+					OpenTaiko.stage演奏ドラム画面.AIBattleState,
+					OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin,
+					OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値,
+					OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM,
+					OpenTaiko.stage演奏ドラム画面.bIsGOGOTIME,
 					timestamp);
 				/*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
                 LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);

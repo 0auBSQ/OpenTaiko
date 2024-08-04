@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>> {
 		public DBCDN() {
-			_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}CDN.json";
+			_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}CDN.json";
 			base.tDBInitSavable();
 		}
 
