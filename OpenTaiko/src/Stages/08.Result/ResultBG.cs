@@ -1,6 +1,6 @@
 ﻿using NLua;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class ResultBG : ScriptBG {
 		private LuaFunction LuaSkipAnimation;
 

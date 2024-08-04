@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class API {
 		public class APICharterInfo {
 			public string charter_name;
@@ -41,8 +41,8 @@ namespace TJAPlayer3 {
 			private Dictionary<string, string> PropertyMappings { get; set; }
 
 			private string GetAssignedLanguageValue(Dictionary<string, string> ens) {
-				if (ens.ContainsKey(TJAPlayer3.ConfigIni.sLang))
-					return ens[TJAPlayer3.ConfigIni.sLang];
+				if (ens.ContainsKey(OpenTaiko.ConfigIni.sLang))
+					return ens[OpenTaiko.ConfigIni.sLang];
 				return ens["default"];
 			}
 

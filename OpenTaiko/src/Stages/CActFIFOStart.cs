@@ -1,34 +1,34 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActFIFOStart : CActivity {
 		// メソッド
 
 		public void tフェードアウト開始() {
 			this.mode = EFIFOモード.フェードアウト;
 
-			TJAPlayer3.Skin.soundDanSelectBGM.tStop();
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-				this.counter = new CCounter(0, 1255, 1, TJAPlayer3.Timer);
-			else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				this.counter = new CCounter(0, 5500, 1, TJAPlayer3.Timer);
+			OpenTaiko.Skin.soundDanSelectBGM.tStop();
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+				this.counter = new CCounter(0, 1255, 1, OpenTaiko.Timer);
+			else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				this.counter = new CCounter(0, 5500, 1, OpenTaiko.Timer);
 			} else {
-				this.counter = new CCounter(0, 3580, 1, TJAPlayer3.Timer);
+				this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 			}
 		}
 		public void tフェードイン開始() {
 			this.mode = EFIFOモード.フェードイン;
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-				this.counter = new CCounter(0, 255, 1, TJAPlayer3.Timer);
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
-				TJAPlayer3.stage演奏ドラム画面.actDan.Start(TJAPlayer3.stage演奏ドラム画面.ListDan_Number);
-				TJAPlayer3.stage演奏ドラム画面.ListDan_Number++;
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
-				this.counter = new CCounter(0, 3580, 1, TJAPlayer3.Timer);
+				OpenTaiko.stage演奏ドラム画面.actDan.Start(OpenTaiko.stage演奏ドラム画面.ListDan_Number);
+				OpenTaiko.stage演奏ドラム画面.ListDan_Number++;
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+				this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 			} else {
-				this.counter = new CCounter(0, 3580, 1, TJAPlayer3.Timer);
+				this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 			}
 		}
 		public void tフェードイン完了()     // #25406 2011.6.9 yyagi
@@ -53,96 +53,96 @@ namespace TJAPlayer3 {
 			}
 			this.counter.Tick();
 
-			if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
-				if (TJAPlayer3.Tx.Tile_Black != null) {
-					TJAPlayer3.Tx.Tile_Black.Opacity = this.mode == EFIFOモード.フェードアウト ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
-					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / TJAPlayer3.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
+				if (OpenTaiko.Tx.Tile_Black != null) {
+					OpenTaiko.Tx.Tile_Black.Opacity = this.mode == EFIFOモード.フェードアウト ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
+					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 					{
-						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / TJAPlayer3.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
+						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 						{
-							TJAPlayer3.Tx.Tile_Black.t2D描画(i * TJAPlayer3.Tx.Tile_Black.szTextureSize.Width, j * TJAPlayer3.Tx.Tile_Black.szTextureSize.Height);
+							OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 						}
 					}
 				}
-			} else if (TJAPlayer3.ConfigIni.bAIBattleMode) {
+			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				if (this.mode == EFIFOモード.フェードアウト) {
 					var preTime = (this.counter.CurrentValue >= 2000 ? this.counter.CurrentValue - 2000 : 0) * 2;
 
-					TJAPlayer3.Tx.SongLoading_Fade_AI.Opacity = preTime;
-					TJAPlayer3.Tx.SongLoading_Fade_AI.t2D描画(0, 0);
+					OpenTaiko.Tx.SongLoading_Fade_AI.Opacity = preTime;
+					OpenTaiko.Tx.SongLoading_Fade_AI.t2D描画(0, 0);
 
 					if (preTime > 500) {
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Base.vcScaleRatio.X = Math.Min(((preTime - 500) / 255.0f), 1.0f);
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Base.t2D拡大率考慮中央基準描画(TJAPlayer3.Skin.Resolution[0] / 2, TJAPlayer3.Skin.Resolution[1] / 2);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Base.vcScaleRatio.X = Math.Min(((preTime - 500) / 255.0f), 1.0f);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Base.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Resolution[0] / 2, OpenTaiko.Skin.Resolution[1] / 2);
 					}
 
 					if (preTime > 1000) {
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Ring.Opacity = preTime - 1000;
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Ring.fZ軸中心回転 = preTime / 6000.0f;
-						TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Ring.t2D描画(TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_Ring[0], TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_Ring[1]);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.Opacity = preTime - 1000;
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.fZ軸中心回転 = preTime / 6000.0f;
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[1]);
 						if (preTime - 1000 < 1500) {
-							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_NowLoading.Opacity = preTime - 1000;
-							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_NowLoading.t2D描画(0, 0);
+							OpenTaiko.Tx.SongLoading_Fade_AI_Anime_NowLoading.Opacity = preTime - 1000;
+							OpenTaiko.Tx.SongLoading_Fade_AI_Anime_NowLoading.t2D描画(0, 0);
 
-							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar_Base.t2D描画(TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[1]);
+							OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar_Base.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1]);
 
 							float value = (preTime - 1000) / 1500.0f;
 							value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 							value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 							value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 
-							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.t2D描画(TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], TJAPlayer3.Skin.SongLoading_Fade_AI_Anime_LoadBar[1],
-								new RectangleF(0, 0, TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Width * value,
-								TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Height));
+							OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1],
+								new RectangleF(0, 0, OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Width * value,
+								OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Height));
 						} else {
-							TJAPlayer3.Tx.SongLoading_Fade_AI_Anime_Start.t2D描画(0, 0);
+							OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Start.t2D描画(0, 0);
 						}
 					}
 
 					var time = this.counter.CurrentValue >= 5000 ? this.counter.CurrentValue - 5000 : 0;
 
-					TJAPlayer3.Tx.SongLoading_Bg_AI.Opacity = time;
-					TJAPlayer3.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
+					OpenTaiko.Tx.SongLoading_Bg_AI.Opacity = time;
+					OpenTaiko.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
 
-					TJAPlayer3.Tx.SongLoading_Bg_AI_Wait.Opacity = time - 255;
-					TJAPlayer3.Tx.SongLoading_Bg_AI_Wait.t2D描画(0, 0);
+					OpenTaiko.Tx.SongLoading_Bg_AI_Wait.Opacity = time - 255;
+					OpenTaiko.Tx.SongLoading_Bg_AI_Wait.t2D描画(0, 0);
 
-					TJAPlayer3.Tx.SongLoading_Plate_AI.Opacity = time - 255;
-					if (TJAPlayer3.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Left) {
-						TJAPlayer3.Tx.SongLoading_Plate_AI.t2D描画(TJAPlayer3.Skin.SongLoading_Plate_X_AI, TJAPlayer3.Skin.SongLoading_Plate_Y_AI - (TJAPlayer3.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
-					} else if (TJAPlayer3.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Right) {
-						TJAPlayer3.Tx.SongLoading_Plate_AI.t2D描画(TJAPlayer3.Skin.SongLoading_Plate_X_AI - TJAPlayer3.Tx.SongLoading_Plate_AI.sz画像サイズ.Width, TJAPlayer3.Skin.SongLoading_Plate_Y_AI - (TJAPlayer3.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+					OpenTaiko.Tx.SongLoading_Plate_AI.Opacity = time - 255;
+					if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Left) {
+						OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+					} else if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Right) {
+						OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI - OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Width, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
 					} else {
-						TJAPlayer3.Tx.SongLoading_Plate_AI.t2D描画(TJAPlayer3.Skin.SongLoading_Plate_X_AI - (TJAPlayer3.Tx.SongLoading_Plate_AI.sz画像サイズ.Width / 2), TJAPlayer3.Skin.SongLoading_Plate_Y_AI - (TJAPlayer3.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+						OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Width / 2), OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
 					}
 				} else {
-					TJAPlayer3.Tx.SongLoading_Bg_AI.Opacity = 255 - counter.CurrentValue;
-					TJAPlayer3.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
+					OpenTaiko.Tx.SongLoading_Bg_AI.Opacity = 255 - counter.CurrentValue;
+					OpenTaiko.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
 				}
 			} else {
 				if (this.mode == EFIFOモード.フェードアウト) {
-					if (TJAPlayer3.Tx.SongLoading_Fade != null) {
+					if (OpenTaiko.Tx.SongLoading_Fade != null) {
 						// 曲開始幕アニメ。
 						// 地味に横の拡大率が変動しているのが一番厄介...
 						var time = this.counter.CurrentValue >= 2580 ? this.counter.CurrentValue - 2580 : 0;
 						var FadeValue = (time - 670f) / 330.0f;
 						if (FadeValue >= 1.0) FadeValue = 1.0f; else if (FadeValue <= 0.0) FadeValue = 0.0f;
 
-						DrawBack(time < 500.0 ? TJAPlayer3.Tx.SongLoading_Fade : TJAPlayer3.Tx.SongLoading_Bg, time, 0, 500.0, false);
+						DrawBack(time < 500.0 ? OpenTaiko.Tx.SongLoading_Fade : OpenTaiko.Tx.SongLoading_Bg, time, 0, 500.0, false);
 						DrawStar(FadeValue * 255f);
 						DrawPlate(FadeValue * 255f, FadeValue);
 						DrawChara(time, (time - 730f) * (255f / 270f));
 					}
 
 				} else {
-					if (TJAPlayer3.Tx.SongLoading_Fade != null) {
+					if (OpenTaiko.Tx.SongLoading_Fade != null) {
 						// 曲開始幕アニメ。
 						// 地味に横の拡大率が変動しているのが一番厄介...
 						var time = this.counter.CurrentValue;
 						var FadeValue = time / 140f;
 						if (FadeValue >= 1.0) FadeValue = 1.0f; else if (FadeValue <= 0.0) FadeValue = 0.0f;
 
-						DrawBack(time < 300.0 ? TJAPlayer3.Tx.SongLoading_Bg : TJAPlayer3.Tx.SongLoading_Fade, time, 300.0, 500.0, true);
+						DrawBack(time < 300.0 ? OpenTaiko.Tx.SongLoading_Bg : OpenTaiko.Tx.SongLoading_Fade, time, 300.0, 500.0, true);
 						DrawStar(255f - (FadeValue * 255f));
 						DrawPlate(255f - (FadeValue * 255f), 1f + (FadeValue * 0.5f), 1f - FadeValue);
 						DrawChara(time, (time <= 80.0 ? 255 : 255f - (float)((Math.Pow((time - 80f), 1.5f) / Math.Pow(220f, 1.5f)) * 255f)), 250f, (time <= 80.0 ? ((time / 80f) * 30f) : 30f - (float)((Math.Pow((time - 80f), 1.5f) / Math.Pow(220f, 1.5f)) * 320f)));
@@ -182,10 +182,10 @@ namespace TJAPlayer3 {
 		/// </summary>
 		/// <param name="opacity"></param>
 		private void DrawStar(float opacity) {
-			if (TJAPlayer3.Tx.SongLoading_BgWait is null) return;
+			if (OpenTaiko.Tx.SongLoading_BgWait is null) return;
 
-			TJAPlayer3.Tx.SongLoading_BgWait.Opacity = (int)opacity;
-			TJAPlayer3.Tx.SongLoading_BgWait.t2D描画(0, 0);
+			OpenTaiko.Tx.SongLoading_BgWait.Opacity = (int)opacity;
+			OpenTaiko.Tx.SongLoading_BgWait.t2D描画(0, 0);
 		}
 
 		/// <summary>
@@ -194,31 +194,31 @@ namespace TJAPlayer3 {
 		/// <param name="opacity"></param>
 		/// <param name="scaleX"></param>
 		private void DrawPlate(float opacity, float scaleX, float scaleY = 1f) {
-			if (TJAPlayer3.Tx.SongLoading_Plate is null) return;
-			var SizeX_Harf = TJAPlayer3.Tx.SongLoading_Plate.szTextureSize.Width / 2.0f;
-			var SizeY_Harf = TJAPlayer3.Tx.SongLoading_Plate.szTextureSize.Height / 2.0f;
+			if (OpenTaiko.Tx.SongLoading_Plate is null) return;
+			var SizeX_Harf = OpenTaiko.Tx.SongLoading_Plate.szTextureSize.Width / 2.0f;
+			var SizeY_Harf = OpenTaiko.Tx.SongLoading_Plate.szTextureSize.Height / 2.0f;
 
-			TJAPlayer3.Tx.SongLoading_Plate.Opacity = (int)opacity;
-			TJAPlayer3.Tx.SongLoading_Plate.vcScaleRatio.X = scaleX;
-			TJAPlayer3.Tx.SongLoading_Plate.vcScaleRatio.Y = scaleY;
-			TJAPlayer3.Tx.SongLoading_Plate.t2D描画(TJAPlayer3.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, TJAPlayer3.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
+			OpenTaiko.Tx.SongLoading_Plate.Opacity = (int)opacity;
+			OpenTaiko.Tx.SongLoading_Plate.vcScaleRatio.X = scaleX;
+			OpenTaiko.Tx.SongLoading_Plate.vcScaleRatio.Y = scaleY;
+			OpenTaiko.Tx.SongLoading_Plate.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, OpenTaiko.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
 		}
 
 		private void DrawChara(double time, float opacity, float X = -1, float Y = -1) {
-			if (TJAPlayer3.Tx.SongLoading_Plate is null || (X == -1 && Y == -1 ? time <= 680 : false)) return;
-			var SizeXHarf = TJAPlayer3.Tx.SongLoading_Chara.szTextureSize.Width / 2f;
-			var SizeY = TJAPlayer3.Tx.SongLoading_Chara.szTextureSize.Height;
+			if (OpenTaiko.Tx.SongLoading_Plate is null || (X == -1 && Y == -1 ? time <= 680 : false)) return;
+			var SizeXHarf = OpenTaiko.Tx.SongLoading_Chara.szTextureSize.Width / 2f;
+			var SizeY = OpenTaiko.Tx.SongLoading_Chara.szTextureSize.Height;
 
 			if (X == -1 && Y == -1) {
-				Y = (float)(Math.Sin((time - 680f) * (Math.PI / 320.0)) * TJAPlayer3.Skin.SongLoading_Chara_Move[1]);
-				X = (float)((time - 680f) / 320.0) * TJAPlayer3.Skin.SongLoading_Chara_Move[0];
+				Y = (float)(Math.Sin((time - 680f) * (Math.PI / 320.0)) * OpenTaiko.Skin.SongLoading_Chara_Move[1]);
+				X = (float)((time - 680f) / 320.0) * OpenTaiko.Skin.SongLoading_Chara_Move[0];
 			}
 
-			TJAPlayer3.Tx.SongLoading_Chara.Opacity = (int)opacity;
+			OpenTaiko.Tx.SongLoading_Chara.Opacity = (int)opacity;
 			//左キャラ
-			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(-TJAPlayer3.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
+			OpenTaiko.Tx.SongLoading_Chara.t2D描画(-OpenTaiko.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
 			//左キャラ
-			TJAPlayer3.Tx.SongLoading_Chara.t2D描画(SizeXHarf + TJAPlayer3.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
+			OpenTaiko.Tx.SongLoading_Chara.t2D描画(SizeXHarf + OpenTaiko.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 		}
 
 		// その他

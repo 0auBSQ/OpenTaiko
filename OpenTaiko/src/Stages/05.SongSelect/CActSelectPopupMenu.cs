@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using FDK;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectPopupMenu : CActivity {
 		private static List<CActSelectPopupMenu> Child = new List<CActSelectPopupMenu>();
 
@@ -56,14 +56,14 @@ namespace TJAPlayer3 {
 			stqMenuTitle.cItem = new CItemBase();
 			stqMenuTitle.cItem.str項目名 = title;
 			using (var bitmap = prvFont.DrawText(title, Color.White, Color.Black, null, 30)) {
-				stqMenuTitle.txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+				stqMenuTitle.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
 			}
 			lciMenuItems = new stQuickMenuItem[menulist.Count];
 			for (int i = 0; i < menulist.Count; i++) {
 				stQuickMenuItem stqm = new stQuickMenuItem();
 				stqm.cItem = menulist[i];
 				using (var bitmap = prvFont.DrawText(menulist[i].str項目名, Color.White, Color.Black, null, 30)) {
-					stqm.txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+					stqm.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
 				}
 				lciMenuItems[i] = stqm;
 			}
@@ -74,7 +74,7 @@ namespace TJAPlayer3 {
 
 		private void ConditionallyInitializePrvFont() {
 			if (prvFont == null) {
-				prvFont = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.PopupMenu_Font_Size);
+				prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.PopupMenu_Font_Size);
 			}
 		}
 
@@ -85,24 +85,24 @@ namespace TJAPlayer3 {
 		}
 
 		public void _RefleshSkin() {
-			TJAPlayer3.tDisposeSafely(ref prvFont);
+			OpenTaiko.tDisposeSafely(ref prvFont);
 			ConditionallyInitializePrvFont();
 
 			using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem.str項目名, Color.White, Color.Black, null, 30)) {
-				TJAPlayer3.tDisposeSafely(ref stqMenuTitle.txName);
-				stqMenuTitle.txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+				OpenTaiko.tDisposeSafely(ref stqMenuTitle.txName);
+				stqMenuTitle.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
 			}
 			for (int i = 0; i < lciMenuItems.Length; i++) {
 				using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem.str項目名, Color.White, Color.Black, null, 30)) {
-					TJAPlayer3.tDisposeSafely(ref lciMenuItems[i].txName);
-					lciMenuItems[i].txName = TJAPlayer3.tテクスチャの生成(bitmap, false);
+					OpenTaiko.tDisposeSafely(ref lciMenuItems[i].txName);
+					lciMenuItems[i].txName = OpenTaiko.tテクスチャの生成(bitmap, false);
 				}
 			}
 		}
 
 		public void tEnter押下() {
 			if (this.bキー入力待ち) {
-				TJAPlayer3.Skin.soundDecideSFX.tPlay();
+				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 				if (this.n現在の選択行 != lciMenuItems.Length - 1) {
 					if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.リスト ||
@@ -143,7 +143,7 @@ namespace TJAPlayer3 {
 
 		public void t次に移動() {
 			if (this.bキー入力待ち) {
-				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
+				OpenTaiko.Skin.soundカーソル移動音.tPlay();
 				if (bIsSelectingIntItem) {
 					lciMenuItems[n現在の選択行].cItem.t項目値を前へ移動();        // 項目移動と数値上下は方向が逆になるので注意
 				} else {
@@ -155,7 +155,7 @@ namespace TJAPlayer3 {
 		}
 		public void t前に移動() {
 			if (this.bキー入力待ち) {
-				TJAPlayer3.Skin.soundカーソル移動音.tPlay();
+				OpenTaiko.Skin.soundカーソル移動音.tPlay();
 				if (bIsSelectingIntItem) {
 					lciMenuItems[n現在の選択行].cItem.t項目値を次へ移動();        // 項目移動と数値上下は方向が逆になるので注意
 				} else {
@@ -172,7 +172,7 @@ namespace TJAPlayer3 {
 			//		this.n現在の選択行 = 0;
 			this.bキー入力待ち = true;
 			for (int i = 0; i < 4; i++) {
-				this.ctキー反復用[i] = new CCounter(0, 0, 0, TJAPlayer3.Timer);
+				this.ctキー反復用[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);
 			}
 			base.IsDeActivated = true;
 			b選択した = false;
@@ -207,7 +207,7 @@ namespace TJAPlayer3 {
 		public override void ReleaseManagedResource() {
 			//CDTXMania.tテクスチャの解放( ref this.txPopupMenuBackground );
 			//CDTXMania.tテクスチャの解放( ref this.txCursor );
-			TJAPlayer3.tDisposeSafely(ref this.prvFont);
+			OpenTaiko.tDisposeSafely(ref this.prvFont);
 			base.ReleaseManagedResource();
 		}
 
@@ -219,19 +219,19 @@ namespace TJAPlayer3 {
 			if (!base.IsDeActivated && this.bIsActivePopupMenu) {
 				if (this.bキー入力待ち) {
 					#region [ Shift-F1: CONFIG画面 ]
-					if ((TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
-						TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {  // [SHIFT] + [F1] CONFIG
-						TJAPlayer3.Skin.soundCancelSFX.tPlay();
+					if ((OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
+						OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {  // [SHIFT] + [F1] CONFIG
+						OpenTaiko.Skin.soundCancelSFX.tPlay();
 						tCancel();
 						this.bGotoDetailConfig = true;
 					}
 					#endregion
 					#region [ キー入力: キャンセル ]
-					else if ((TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
-						|| TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.FT)
-						|| TJAPlayer3.Pad.bPressedGB(EPad.Cancel))
+					else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.FT)
+						|| OpenTaiko.Pad.bPressedGB(EPad.Cancel))
 						&& this.bEsc有効) {   // キャンセル
-						TJAPlayer3.Skin.soundCancelSFX.tPlay();
+						OpenTaiko.Skin.soundCancelSFX.tPlay();
 						tCancel();
 						this.bIsActivePopupMenu = false;
 					}
@@ -241,19 +241,19 @@ namespace TJAPlayer3 {
 						#region [ キー入力: 決定 ]
 						// E楽器パート eInst = E楽器パート.UNKNOWN;
 						ESortAction eAction = ESortAction.END;
-						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.GUITAR, EPad.Decide)) {
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.GUITAR, EPad.Decide)) {
 							eInst = EInstrumentPad.GUITAR;
 							eAction = ESortAction.Decide;
-						} else if (TJAPlayer3.Pad.bPressed(EInstrumentPad.BASS, EPad.Decide)) {
+						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.BASS, EPad.Decide)) {
 							eInst = EInstrumentPad.BASS;
 							eAction = ESortAction.Decide;
 						} else if (
-							  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
-							  || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)
-							  || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
-							  || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)
-							  || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)
-							  || (TJAPlayer3.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+							  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)
+							  || (OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
 							eInst = EInstrumentPad.DRUMS;
 							eAction = ESortAction.Decide;
 						}
@@ -263,45 +263,45 @@ namespace TJAPlayer3 {
 						}
 						#endregion
 						#region [ キー入力: 前に移動 ]
-						this.ctキー反復用.Up.KeyIntervalFunc(TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
-						this.ctキー反復用.R.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
-						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.SD) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue)) {
+						this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
+						this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue)) {
 							this.t前に移動();
 						}
 						#endregion
 						#region [ キー入力: 次に移動 ]
-						this.ctキー反復用.Down.KeyIntervalFunc(TJAPlayer3.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
-						this.ctキー反復用.B.KeyIntervalFunc(TJAPlayer3.Pad.b押されているGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
-						if (TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LT) || TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue)) {
+						this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
+						this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue)) {
 							this.t次に移動();
 						}
 						#endregion
 					}
 				}
 				#region [ ポップアップメニュー 背景描画 ]
-				if (TJAPlayer3.Tx.Menu_Title != null) {
-					TJAPlayer3.Tx.Menu_Title.t2D描画(TJAPlayer3.Skin.PopupMenu_Menu_Title[0], TJAPlayer3.Skin.PopupMenu_Menu_Title[1]);
+				if (OpenTaiko.Tx.Menu_Title != null) {
+					OpenTaiko.Tx.Menu_Title.t2D描画(OpenTaiko.Skin.PopupMenu_Menu_Title[0], OpenTaiko.Skin.PopupMenu_Menu_Title[1]);
 				}
 				#endregion
 				#region [ ソートメニュータイトル描画 ]
-				stqMenuTitle.txName.t2D描画(TJAPlayer3.Skin.PopupMenu_Title[0], TJAPlayer3.Skin.PopupMenu_Title[1]);
+				stqMenuTitle.txName.t2D描画(OpenTaiko.Skin.PopupMenu_Title[0], OpenTaiko.Skin.PopupMenu_Title[1]);
 				#endregion
 				#region [ カーソル描画 ]
-				if (TJAPlayer3.Tx.Menu_Highlight != null) {
-					int curX = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[0] + (TJAPlayer3.Skin.PopupMenu_Move[0] * (this.n現在の選択行 + 1));
-					int curY = TJAPlayer3.Skin.PopupMenu_Menu_Highlight[1] + (TJAPlayer3.Skin.PopupMenu_Move[1] * (this.n現在の選択行 + 1));
+				if (OpenTaiko.Tx.Menu_Highlight != null) {
+					int curX = OpenTaiko.Skin.PopupMenu_Menu_Highlight[0] + (OpenTaiko.Skin.PopupMenu_Move[0] * (this.n現在の選択行 + 1));
+					int curY = OpenTaiko.Skin.PopupMenu_Menu_Highlight[1] + (OpenTaiko.Skin.PopupMenu_Move[1] * (this.n現在の選択行 + 1));
 
-					int width = TJAPlayer3.Tx.Menu_Highlight.szTextureSize.Width / 2;
-					int height = TJAPlayer3.Tx.Menu_Highlight.szTextureSize.Height;
+					int width = OpenTaiko.Tx.Menu_Highlight.szTextureSize.Width / 2;
+					int height = OpenTaiko.Tx.Menu_Highlight.szTextureSize.Height;
 
-					TJAPlayer3.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(0, 0, width, height));
+					OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(0, 0, width, height));
 					curX += width;
 					Rectangle rectangle = new Rectangle(width / 2, 0, width, height);
 					for (int j = 0; j < 16; j++) {
-						TJAPlayer3.Tx.Menu_Highlight.t2D描画(curX, curY, rectangle);
+						OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, rectangle);
 						curX += width;
 					}
-					TJAPlayer3.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(width, 0, width, height));
+					OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(width, 0, width, height));
 				}
 				#endregion
 				#region [ ソート候補文字列描画 ]
@@ -309,8 +309,8 @@ namespace TJAPlayer3 {
 					bool bItemBold = (i == nItemSelecting && !bShowAllItems) ? true : false;
 					//font.t文字列描画( 190, 80 + i * 32, lciMenuItems[ i ].cItem.str項目名, bItemBold, 1.0f );
 					if (lciMenuItems[i].txName != null) {
-						lciMenuItems[i].txName.t2D描画(TJAPlayer3.Skin.PopupMenu_MenuItem_Name[0] + i * TJAPlayer3.Skin.PopupMenu_Move[0],
-							TJAPlayer3.Skin.PopupMenu_MenuItem_Name[1] + i * TJAPlayer3.Skin.PopupMenu_Move[1]);
+						lciMenuItems[i].txName.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Name[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
+							OpenTaiko.Skin.PopupMenu_MenuItem_Name[1] + i * OpenTaiko.Skin.PopupMenu_Move[1]);
 					}
 
 					bool bValueBold = (bItemBold || (i == nItemSelecting && bIsSelectingIntItem)) ? true : false;
@@ -348,9 +348,9 @@ namespace TJAPlayer3 {
 						using (var bmpStr = bValueBold ?
 							prvFont.DrawText(s, Color.White, Color.Black, null, Color.Yellow, Color.OrangeRed, 30) :
 							prvFont.DrawText(s, Color.White, Color.Black, null, 30)) {
-							using (var ctStr = TJAPlayer3.tテクスチャの生成(bmpStr, false)) {
-								ctStr.t2D描画(TJAPlayer3.Skin.PopupMenu_MenuItem_Value[0] + i * TJAPlayer3.Skin.PopupMenu_Move[0],
-									TJAPlayer3.Skin.PopupMenu_MenuItem_Value[1] + i * TJAPlayer3.Skin.PopupMenu_Move[1]);
+							using (var ctStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
+								ctStr.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Value[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
+									OpenTaiko.Skin.PopupMenu_MenuItem_Value[1] + i * OpenTaiko.Skin.PopupMenu_Move[1]);
 							}
 						}
 					}

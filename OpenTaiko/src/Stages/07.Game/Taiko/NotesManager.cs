@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 
 	// Simple class containing functions to simplify readability of CChip elements
 	class NotesManager {
@@ -51,7 +51,7 @@ namespace TJAPlayer3 {
 
 		public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
 			double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-			double screen_ratio = TJAPlayer3.Skin.Resolution[0] / 1280.0;
+			double screen_ratio = OpenTaiko.Skin.Resolution[0] / 1280.0;
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
@@ -68,7 +68,7 @@ namespace TJAPlayer3 {
 
 		public static int GetNoteY(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
 			double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-			double screen_ratio = TJAPlayer3.Skin.Resolution[1] / 720.0;
+			double screen_ratio = OpenTaiko.Skin.Resolution[1] / 720.0;
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
@@ -271,31 +271,31 @@ namespace TJAPlayer3 {
 
 		// Flying notes
 		public static void DisplayNote(int player, int x, int y, int Lane) {
-			EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 			switch (Lane) {
 				case 1:
 				case 2:
 				case 3:
 				case 4:
-					TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画(x, y, new Rectangle(Lane * TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1] * 3, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+					OpenTaiko.Tx.Notes[(int)_gt]?.t2D中心基準描画(x, y, new Rectangle(Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					break;
 				case 5:
-					TJAPlayer3.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, TJAPlayer3.Skin.Game_Notes_Size[1] * 3, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+					OpenTaiko.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					break;
 			}
 		}
 
 		// Regular display
 		public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = -1) {
-			if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
 				return;
 
 			if (length == -1) {
-				length = TJAPlayer3.Skin.Game_Notes_Size[0];
+				length = OpenTaiko.Skin.Game_Notes_Size[0];
 			}
 
-			EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 			int noteType = 1;
 			if (IsSmallNote(chip, true)) noteType = 2;
@@ -304,51 +304,51 @@ namespace TJAPlayer3 {
 			else if (IsBalloon(chip)) noteType = 11;
 
 			else if (IsMine(chip)) {
-				TJAPlayer3.Tx.Note_Mine?.t2D描画(x, y);
+				OpenTaiko.Tx.Note_Mine?.t2D描画(x, y);
 				return;
 			} else if (IsPurpleNote(chip)) {
-				TJAPlayer3.Tx.Note_Swap?.t2D描画(x, y, new Rectangle(0, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Note_Swap?.t2D描画(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				return;
 			} else if (IsKusudama(chip)) {
-				TJAPlayer3.Tx.Note_Kusu?.t2D描画(x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Note_Kusu?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 				return;
 			} else if (IsADLIB(chip)) {
-				var puchichara = TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(player))];
+				var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
 				if (puchichara.effect.ShowAdlib) {
-					TJAPlayer3.Tx.Note_Adlib?.tUpdateOpacity(50);
-					TJAPlayer3.Tx.Note_Adlib?.t2D描画(x, y, new Rectangle(0, frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+					OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
+					OpenTaiko.Tx.Note_Adlib?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 				}
 				return;
 			}
 
-			TJAPlayer3.Tx.Notes[(int)_gt]?.t2D描画(x, y, new Rectangle(noteType * TJAPlayer3.Skin.Game_Notes_Size[0], frame, length, TJAPlayer3.Skin.Game_Notes_Size[1]));
+			OpenTaiko.Tx.Notes[(int)_gt]?.t2D描画(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 		}
 
 		// Roll display
 		public static void DisplayRoll(int player, int x, int y, CDTX.CChip chip, int frame,
 			Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
-			EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
-			if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
 				return;
 
 			int _offset = 0;
-			var _texarr = TJAPlayer3.Tx.Notes[(int)_gt];
-			int rollOrigin = (TJAPlayer3.Skin.Game_Notes_Size[0] * 5);
-			float _adjust = TJAPlayer3.Skin.Game_Notes_Size[0] / 2.0f;
-			float image_size = TJAPlayer3.Skin.Game_Notes_Size[0];
+			var _texarr = OpenTaiko.Tx.Notes[(int)_gt];
+			int rollOrigin = (OpenTaiko.Skin.Game_Notes_Size[0] * 5);
+			float _adjust = OpenTaiko.Skin.Game_Notes_Size[0] / 2.0f;
+			float image_size = OpenTaiko.Skin.Game_Notes_Size[0];
 
 			if (IsSmallRoll(chip) || (_gt == EGameType.TAIKO && IsYellowRoll(chip))) {
 				_offset = 0;
 			}
 			if (IsBigRoll(chip) || (_gt == EGameType.TAIKO && IsClapRoll(chip))) {
-				_offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 3;
+				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 3;
 			} else if (IsClapRoll(chip) && _gt == EGameType.KONGA) {
-				_offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 11;
+				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 11;
 			} else if (IsYellowRoll(chip) && _gt == EGameType.KONGA) {
-				_offset = TJAPlayer3.Skin.Game_Notes_Size[0] * 8;
+				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 8;
 			} else if (IsFuzeRoll(chip)) {
-				_texarr = TJAPlayer3.Tx.Note_FuseRoll;
+				_texarr = OpenTaiko.Tx.Note_FuseRoll;
 				_offset = -rollOrigin;
 			}
 
@@ -368,7 +368,7 @@ namespace TJAPlayer3 {
 			var div = dist / image_size;
 			//var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
 
-			if (TJAPlayer3.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
+			if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
 				_texarr.color4 = effectedColor;
 			else
 				_texarr.color4 = normalColor;
@@ -382,7 +382,7 @@ namespace TJAPlayer3 {
 			var _center_x = (x + x末端 + image_size) / 2;
 			var _center_y = _adjust + (y + y末端) / 2;
 			//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			//t2D拡大率考慮中央基準描画 t2D中心基準描画
 
 			// Tail
@@ -401,38 +401,38 @@ namespace TJAPlayer3 {
 				var _xc = x2 + (x2 - x1) * _d / dist;
 				var _yc = y2 + (y2 - y1) * _d / dist;
 				//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画((int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-				_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+				_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
 
 			_texarr.fZ軸中心回転 = 0;
 
-			if (TJAPlayer3.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
+			if (OpenTaiko.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
 				_texarr.color4 = effectedColor;
 			else
 				_texarr.color4 = normalColor;
 
 			// Head
-			_texarr.t2D描画(x, y, 0, new Rectangle(rollOrigin + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+			_texarr.t2D描画(x, y, 0, new Rectangle(rollOrigin + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			_texarr.color4 = normalColor;
 		}
 
 		// SENotes
 		public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip) {
-			if (TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.GetActualPlayer(player)] == EStealthMode.STEALTH)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.STEALTH)
 				return;
 
-			EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(player)];
+			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 			if (IsMine(chip)) {
-				TJAPlayer3.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1], TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			} else if (IsPurpleNote(chip) && _gt != EGameType.KONGA) {
-				TJAPlayer3.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			} else if (IsFuzeRoll(chip)) {
-				TJAPlayer3.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * 2, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			} else if (IsKusudama(chip)) {
-				TJAPlayer3.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * 3, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 3, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			} else {
-				TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(x, y, new Rectangle(0, TJAPlayer3.Skin.Game_SENote_Size[1] * chip.nSenote, TJAPlayer3.Skin.Game_SENote_Size[0], TJAPlayer3.Skin.Game_SENote_Size[1]));
+				OpenTaiko.Tx.SENotes[(int)_gt]?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * chip.nSenote, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			}
 		}
 

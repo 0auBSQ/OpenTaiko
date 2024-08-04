@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CTextConsole : CActivity {
 		// 定数
 
@@ -53,8 +53,8 @@ namespace TJAPlayer3 {
 		}
 		public override void CreateManagedResource() {
 			if (!base.IsDeActivated) {
-				this.txフォント8x16[0] = TJAPlayer3.Tx.TxC(@"Console_Font.png");
-				this.txフォント8x16[1] = TJAPlayer3.Tx.TxC(@"Console_Font_Small.png");
+				this.txフォント8x16[0] = OpenTaiko.Tx.TxC(@"Console_Font.png");
+				this.txフォント8x16[1] = OpenTaiko.Tx.TxC(@"Console_Font_Small.png");
 
 				nFontWidth = this.txフォント8x16[0].szTextureSize.Width / 32;
 				nFontHeight = this.txフォント8x16[0].szTextureSize.Height / 16;

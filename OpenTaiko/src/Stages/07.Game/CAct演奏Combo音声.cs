@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CAct演奏Combo音声 : CActivity {
 		// コンストラクタ
 
@@ -55,19 +55,19 @@ namespace TJAPlayer3 {
 
 			// フォルダ内を走査してコンボボイスをListに入れていく
 			// 1P、2P コンボボイス
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++) {
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				#region [Combo voices]
 
-				int _charaId = TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(i)].data.Character;
+				int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character;
 
-				var currentDir = ($@"{TJAPlayer3.strEXEのあるフォルダ}Global{Path.DirectorySeparatorChar}Characters{Path.DirectorySeparatorChar}{TJAPlayer3.Skin.Characters_DirName[_charaId]}{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Combo{Path.DirectorySeparatorChar}");
+				var currentDir = ($@"{OpenTaiko.strEXEのあるフォルダ}Global{Path.DirectorySeparatorChar}Characters{Path.DirectorySeparatorChar}{OpenTaiko.Skin.Characters_DirName[_charaId]}{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Combo{Path.DirectorySeparatorChar}");
 				if (Directory.Exists(currentDir)) {
 					foreach (var item in Directory.GetFiles(currentDir)) {
 						var comboVoice = new CComboVoice();
 						comboVoice.bFileFound = true;
 						comboVoice.nPlayer = i;
 						comboVoice.strFilePath = item;
-						comboVoice.soundComboVoice = TJAPlayer3.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+						comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
 						/*
                         if (TJAPlayer3.ConfigIni.nPlayerCount >= 2) //2020.05.06 Mr-Ojii 左右に出したかったから追加。
                         {
@@ -77,7 +77,7 @@ namespace TJAPlayer3 {
                                 comboVoice.soundComboVoice.n位置 = 100;
                         }
                         */
-						comboVoice.soundComboVoice.SoundPosition = TJAPlayer3.ConfigIni.nPanning[TJAPlayer3.ConfigIni.nPlayerCount - 1][i];
+						comboVoice.soundComboVoice.SoundPosition = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
 						comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
 						ListCombo[i].Add(comboVoice);
 					}
@@ -90,14 +90,14 @@ namespace TJAPlayer3 {
 
 				#region [Floor voices]
 
-				currentDir = ($@"{TJAPlayer3.strEXEのあるフォルダ}Global\Characters\{TJAPlayer3.Skin.Characters_DirName[_charaId]}\Sounds\Tower_Combo\");
+				currentDir = ($@"{OpenTaiko.strEXEのあるフォルダ}Global\Characters\{OpenTaiko.Skin.Characters_DirName[_charaId]}\Sounds\Tower_Combo\");
 				if (Directory.Exists(currentDir)) {
 					foreach (var item in Directory.GetFiles(currentDir)) {
 						var comboVoice = new CComboVoice();
 						comboVoice.bFileFound = true;
 						comboVoice.nPlayer = i;
 						comboVoice.strFilePath = item;
-						comboVoice.soundComboVoice = TJAPlayer3.SoundManager.tCreateSound(item, ESoundGroup.Voice);
+						comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
 						comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
 						ListFloor[i].Add(comboVoice);
 					}
@@ -117,12 +117,12 @@ namespace TJAPlayer3 {
 			if (!base.IsDeActivated) {
 				for (int i = 0; i < 5; i++) {
 					foreach (var item in ListCombo[i]) {
-						TJAPlayer3.SoundManager.tDisposeSound(item.soundComboVoice);
+						OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice);
 					}
 					ListCombo[i].Clear();
 
 					foreach (var item in ListFloor[i]) {
-						TJAPlayer3.SoundManager.tDisposeSound(item.soundComboVoice);
+						OpenTaiko.SoundManager.tDisposeSound(item.soundComboVoice);
 					}
 					ListFloor[i].Clear();
 				}

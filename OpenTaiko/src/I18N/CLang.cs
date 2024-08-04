@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CLang {
 		public string Id { get; private set; } = "foo";
 		public string Language { get; private set; } = "Unknown Language";
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 			get { return File.Exists(Path.Combine(Folder, _boxFontName)) ? Path.Combine(Folder, _boxFontName) : _boxFontName; }
 			private set { _boxFontName = value; }
 		}
-		public string Folder { get { return @$"{TJAPlayer3.strEXEのあるフォルダ}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"; } }
+		public string Folder { get { return @$"{OpenTaiko.strEXEのあるフォルダ}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"; } }
 
 		private string _fontName = CFontRenderer.DefaultFontName;
 		private string _boxFontName = CFontRenderer.DefaultFontName;

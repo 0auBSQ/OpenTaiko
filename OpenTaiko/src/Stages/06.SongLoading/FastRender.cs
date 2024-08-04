@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class FastRender {
 		public FastRender() {
 
@@ -15,7 +15,7 @@ namespace TJAPlayer3 {
                 }
             }*/
 
-			NullCheckAndRender(ref TJAPlayer3.Tx.Effects_GoGoSplash);
+			NullCheckAndRender(ref OpenTaiko.Tx.Effects_GoGoSplash);
 
 			//NullCheckAndRender(ref TJAPlayer3.Tx.PuchiChara);
 

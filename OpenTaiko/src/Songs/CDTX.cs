@@ -9,7 +9,7 @@ using FDK.ExtensionMethods;
 using SkiaSharp;
 using Color = System.Drawing.Color;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CDTX : CActivity {
 		// 定数
 
@@ -414,7 +414,7 @@ namespace TJAPlayer3 {
 				if (this.nチャンネル番号 == 0x01)       // WAV
 				{
 					CDTX.CWAV wc;
-					TJAPlayer3.DTX.listWAV.TryGetValue(this.n整数値_内部番号, out wc);
+					OpenTaiko.DTX.listWAV.TryGetValue(this.n整数値_内部番号, out wc);
 					if (wc == null) {
 						nDuration = 0;
 					} else {
@@ -423,7 +423,7 @@ namespace TJAPlayer3 {
 				} else if (this.nチャンネル番号 == 0x54) // AVI
 				  {
 					CVideoDecoder wc;
-					TJAPlayer3.DTX.listVD.TryGetValue(this.n整数値_内部番号, out wc);
+					OpenTaiko.DTX.listVD.TryGetValue(this.n整数値_内部番号, out wc);
 					if (wc == null) {
 						nDuration = 0;
 					} else {
@@ -431,7 +431,7 @@ namespace TJAPlayer3 {
 					}
 				}
 
-				double _db再生速度 = (TJAPlayer3.DTXVmode.Enabled) ? TJAPlayer3.DTX.dbDTXVPlaySpeed : TJAPlayer3.DTX.db再生速度;
+				double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? OpenTaiko.DTX.dbDTXVPlaySpeed : OpenTaiko.DTX.db再生速度;
 				return (int)(nDuration / _db再生速度);
 			}
 
@@ -507,14 +507,14 @@ namespace TJAPlayer3 {
 			public List<int> listこのWAVを使用するチャンネル番号の集合 = new List<int>(16);
 			public int nチップサイズ = 100;
 			public int n位置;
-			public long[] n一時停止時刻 = new long[TJAPlayer3.ConfigIni.nPoliphonicSounds];    // 4
+			public long[] n一時停止時刻 = new long[OpenTaiko.ConfigIni.nPoliphonicSounds];    // 4
 			public int SongVol = CSound.DefaultSongVol;
 			public LoudnessMetadata? SongLoudnessMetadata = null;
 			public int n現在再生中のサウンド番号;
-			public long[] n再生開始時刻 = new long[TJAPlayer3.ConfigIni.nPoliphonicSounds];    // 4
+			public long[] n再生開始時刻 = new long[OpenTaiko.ConfigIni.nPoliphonicSounds];    // 4
 			public int n内部番号;
 			public int n表記上の番号;
-			public CSound[] rSound = new CSound[TJAPlayer3.ConfigIni.nPoliphonicSounds];     // 4
+			public CSound[] rSound = new CSound[OpenTaiko.ConfigIni.nPoliphonicSounds];     // 4
 			public string strコメント文 = "";
 			public string strファイル名 = "";
 			public bool bBGMとして使わない {
@@ -556,13 +556,13 @@ namespace TJAPlayer3 {
 					return;
 
 				if (bManagedリソースの解放も行う) {
-					for (int i = 0; i < TJAPlayer3.ConfigIni.nPoliphonicSounds; i++) // 4
+					for (int i = 0; i < OpenTaiko.ConfigIni.nPoliphonicSounds; i++) // 4
 					{
 						if (this.rSound[i] != null)
-							TJAPlayer3.SoundManager.tDisposeSound(this.rSound[i]);
+							OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
 						this.rSound[i] = null;
 
-						if ((i == 0) && TJAPlayer3.ConfigIni.bLog作成解放ログ出力)
+						if ((i == 0) && OpenTaiko.ConfigIni.bLog作成解放ログ出力)
 							Trace.TraceInformation("サウンドを解放しました。({0})({1})", this.strコメント文, this.strファイル名);
 					}
 				}
@@ -1200,7 +1200,7 @@ namespace TJAPlayer3 {
 			this.BACKGROUND_GR = "";
 			this.PATH_WAV = "";
 			this.BPM = 120.0;
-			this.nOFFSET = TJAPlayer3.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
+			this.nOFFSET = OpenTaiko.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
 			this.bOFFSETの値がマイナスである = nOFFSET < 0;
 			STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 			stdgbvalue.Drums = 0;
@@ -1259,7 +1259,7 @@ namespace TJAPlayer3 {
 			this.stGDAParam = stgdaparamArray;
 			#endregion
 			this.nBGMAdjust = 0;
-			this.nPolyphonicSounds = TJAPlayer3.ConfigIni.nPoliphonicSounds;
+			this.nPolyphonicSounds = OpenTaiko.ConfigIni.nPoliphonicSounds;
 			this.dbDTXVPlaySpeed = 1.0f;
 
 			//this.nScoreModeTmp = 1;
@@ -1340,7 +1340,7 @@ namespace TJAPlayer3 {
 				if (this.listVD != null) {
 					foreach (CVideoDecoder cvd in this.listVD.Values) {
 						cvd.InitRead();
-						cvd.dbPlaySpeed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
+						cvd.dbPlaySpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 					}
 				}
 			}
@@ -1365,7 +1365,7 @@ namespace TJAPlayer3 {
 							//);
 							// wc.rSound[ i ].t再生位置を変更する( wc.rSound[ i ].t時刻から位置を返す( nAbsTimeFromStartPlaying ) );
 							// WASAPI/ASIO用↓
-							if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) {
+							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
 								if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nAbsTimeFromStartPlaying);
 								else wc.rSound[i].tSetPositonToBegin(nAbsTimeFromStartPlaying);
 							} else {
@@ -1400,7 +1400,7 @@ namespace TJAPlayer3 {
 				#region [ 同時発音数を、チャンネルによって変える ]
 
 				int nPoly = nPolyphonicSounds;
-				if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+				if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
 				{
 					// チップのライフタイム管理を行わない
 					if (cwav.bIsBassSound) nPoly = (nPolyphonicSounds >= 2) ? 2 : 1;
@@ -1415,13 +1415,13 @@ namespace TJAPlayer3 {
 
 				for (int i = 0; i < nPoly; i++) {
 					try {
-						cwav.rSound[i] = TJAPlayer3.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
+						cwav.rSound[i] = OpenTaiko.SoundManager.tCreateSound(str, ESoundGroup.SongPlayback);
 
-						if (!TJAPlayer3.ConfigIni.bDynamicBassMixerManagement) {
+						if (!OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
 							cwav.rSound[i].AddBassSoundFromMixer();
 						}
 
-						if (TJAPlayer3.ConfigIni.bLog作成解放ログ出力) {
+						if (OpenTaiko.ConfigIni.bLog作成解放ログ出力) {
 							Trace.TraceInformation("サウンドを作成しました。({3})({0})({1})({2}bytes)", cwav.strコメント文, str,
 								cwav.rSound[0].SoundBufferSize, cwav.rSound[0].IsStreamPlay ? "Stream" : "OnMemory");
 						}
@@ -1454,7 +1454,7 @@ namespace TJAPlayer3 {
 		}
 
 		public static void tManageKusudama(CDTX[] dtxarr) {
-			if (TJAPlayer3.ConfigIni.nPlayerCount == 1) return;
+			if (OpenTaiko.ConfigIni.nPlayerCount == 1) return;
 
 			// Replace non-shared kusudamas by balloons
 			#region [Sync check]
@@ -1521,8 +1521,8 @@ namespace TJAPlayer3 {
 		public void tApplyFunMods(int player = 0) {
 			Random rnd = new System.Random();
 
-			var eFun = TJAPlayer3.ConfigIni.nFunMods[TJAPlayer3.GetActualPlayer(player)];
-			var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(player)].data.Character];
+			var eFun = OpenTaiko.ConfigIni.nFunMods[OpenTaiko.GetActualPlayer(player)];
+			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 
 			var bombFactor = Math.Max(1, Math.Min(100, chara.effect.BombFactor));
 			var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
@@ -1563,7 +1563,7 @@ namespace TJAPlayer3 {
 
 			Random rnd = new System.Random();
 
-			var eRandom = TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.GetActualPlayer(player)];
+			var eRandom = OpenTaiko.ConfigIni.eRandom[OpenTaiko.GetActualPlayer(player)];
 
 			switch (eRandom) {
 				case ERandomMode.MIRROR:
@@ -1663,7 +1663,7 @@ namespace TJAPlayer3 {
 					break;
 			}
 
-			if (TJAPlayer3.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(TJAPlayer3.GetActualPlayer(nPlayerSide))].effect.AllPurple) {
+			if (OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayerSide))].effect.AllPurple) {
 				foreach (var chip in this.listChip) {
 					switch (chip.nチャンネル番号) {
 						case 0x13:
@@ -1702,7 +1702,7 @@ namespace TJAPlayer3 {
 
 		#region [ チップの再生と停止 ]
 		public void tチップの再生(CChip pChip, long n再生開始システム時刻ms) {
-			if (TJAPlayer3.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && TJAPlayer3.ConfigIni.nSongSpeed != 20)
+			if (OpenTaiko.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && OpenTaiko.ConfigIni.nSongSpeed != 20)
 				return;
 
 			if (pChip.n整数値_内部番号 >= 0) {
@@ -1714,13 +1714,13 @@ namespace TJAPlayer3 {
 					}
 					CSound sound = wc.rSound[index];
 					if (sound != null) {
-						sound.PlaySpeed = TJAPlayer3.ConfigIni.SongPlaybackSpeed;
+						sound.PlaySpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 						// 再生速度によって、WASAPI/ASIOで使う使用mixerが決まるため、付随情報の設定(音量/PAN)は、再生速度の設定後に行う
 
 						// 2018-08-27 twopointzero - DON'T attempt to load (or queue scanning) loudness metadata here.
 						//                           This code is called right after loading the .tja, and that code
 						//                           will have just made such an attempt.
-						TJAPlayer3.SongGainController.Set(wc.SongVol, wc.SongLoudnessMetadata, sound);
+						OpenTaiko.SongGainController.Set(wc.SongVol, wc.SongLoudnessMetadata, sound);
 
 						sound.SoundPosition = wc.n位置;
 						sound.PlayStart();
@@ -1812,12 +1812,12 @@ namespace TJAPlayer3 {
 						//TimeSpan span;
 						string[] files = Directory.GetFiles(this.strフォルダ名, "*.tja");
 
-						StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType));
+						StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 						string str2 = reader.ReadToEnd();
 						reader.Close();
 
 						//StreamReader reader2 = new StreamReader( this.strフォルダ名 + "test.tja", Encoding.GetEncoding( "Shift_JIS" ) );
-						StreamReader reader2 = new StreamReader(files[0], Encoding.GetEncoding(TJAPlayer3.sEncType));
+						StreamReader reader2 = new StreamReader(files[0], Encoding.GetEncoding(OpenTaiko.sEncType));
 						string str3 = reader2.ReadToEnd();
 						reader2.Close();
 
@@ -1831,7 +1831,7 @@ namespace TJAPlayer3 {
 						//DateTime timeBeginLoad = DateTime.Now;
 						//TimeSpan span;
 
-						StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType));
+						StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 						string str2 = reader.ReadToEnd();
 						reader.Close();
 
@@ -2442,7 +2442,7 @@ namespace TJAPlayer3 {
 							}
 						}
 						if (this.db再生速度 > 0.0) {
-							double _db再生速度 = (TJAPlayer3.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+							double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
 							foreach (CChip chip in this.listChip) {
 								chip.n発声時刻ms = (int)(((double)chip.n発声時刻ms) / _db再生速度);
 								chip.db発声時刻ms = (((double)chip.n発声時刻ms) / _db再生速度);
@@ -2520,7 +2520,7 @@ namespace TJAPlayer3 {
 
 						#endregion
 						#region [ bLogDTX詳細ログ出力 ]
-						if (TJAPlayer3.ConfigIni.bLogDTX詳細ログ出力) {
+						if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
 							foreach (CWAV cwav in this.listWAV.Values) {
 								Trace.TraceInformation(cwav.ToString());
 							}
@@ -2870,7 +2870,7 @@ namespace TJAPlayer3 {
 				//指定したコースの譜面の命令を消去する。
 				strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
 					strSplitした譜面[n読み込むコース],
-					TJAPlayer3.ConfigIni.nPlayerCount > 1 ? (this.nPlayerSide + 1) : 0,
+					OpenTaiko.ConfigIni.nPlayerCount > 1 ? (this.nPlayerSide + 1) : 0,
 					this.strファイル名の絶対パス);
 
 				//命令をすべて消去した譜面
@@ -5047,11 +5047,11 @@ namespace TJAPlayer3 {
 
 					if (this.bSession譜面を読み込む) {
 						if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
-							TJAPlayer3.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
+							OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
 							this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
 						}
 						if (!this.listTextures.ContainsKey(chip.strNewPath)) {
-							CTexture tx = TJAPlayer3.Tx.TxCSong(chip.strNewPath);
+							CTexture tx = OpenTaiko.Tx.TxCSong(chip.strNewPath);
 							this.listTextures.Add(chip.strNewPath, tx);
 						}
 					}
@@ -5399,10 +5399,10 @@ namespace TJAPlayer3 {
 				this.bBARLINECUE[0] = 0;
 
 				this.listChip.Add(chip);
-			} else if (command == "#LYRIC" && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
+			} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
 			  {
-				if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
-					this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor, null, 30));
+				if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
+					this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 				var chip = new CChip();
 
@@ -6093,7 +6093,7 @@ namespace TJAPlayer3 {
 		/// </summary>
 		/// <param name="InputText"></param>
 		private void t難易度別ヘッダ(string InputText) {
-			if (TJAPlayer3.actEnumSongs != null && TJAPlayer3.actEnumSongs.IsDeActivated) {
+			if (OpenTaiko.actEnumSongs != null && OpenTaiko.actEnumSongs.IsDeActivated) {
 				if (InputText.Equals("#NMSCROLL")) {
 					eScrollMode = EScrollMode.Normal;
 				} else if (InputText.Equals("#HBSCROLL")) {
@@ -6183,9 +6183,9 @@ namespace TJAPlayer3 {
 			}
 			if (this.nScoreModeTmp == 99) //2017.01.28 DD SCOREMODEを入力していない場合のみConfigで設定したモードにする
 			{
-				this.nScoreModeTmp = TJAPlayer3.ConfigIni.nScoreMode;
+				this.nScoreModeTmp = OpenTaiko.ConfigIni.nScoreMode;
 			}
-			if (TJAPlayer3.ConfigIni.nScoreMode == 3 && !this.b配点が指定されている[2, this.n参照中の難易度]) { //2017.06.04 kairera0467
+			if (OpenTaiko.ConfigIni.nScoreMode == 3 && !this.b配点が指定されている[2, this.n参照中の難易度]) { //2017.06.04 kairera0467
 				this.nScoreModeTmp = 3;
 			}
 		}
@@ -6462,7 +6462,7 @@ namespace TJAPlayer3 {
 													  //tbOFFSET.Text = strCommandParam;
 
 				// Substract global offset
-				this.nOFFSET += ((this.bOFFSETの値がマイナスである == true) ? -TJAPlayer3.ConfigIni.nGlobalOffsetMs : TJAPlayer3.ConfigIni.nGlobalOffsetMs);
+				this.nOFFSET += ((this.bOFFSETの値がマイナスである == true) ? -OpenTaiko.ConfigIni.nGlobalOffsetMs : OpenTaiko.ConfigIni.nGlobalOffsetMs);
 			} else if (strCommandName.Equals("MOVIEOFFSET")) {
 				this.nMOVIEOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
 				this.bMOVIEOFFSETの値がマイナスである = this.nMOVIEOFFSET < 0 ? true : false;
@@ -6668,7 +6668,7 @@ namespace TJAPlayer3 {
 				if (!string.IsNullOrEmpty(strCommandParam)) {
 					this.bHIDDENBRANCH = true;
 				}
-			} else if (strCommandName.Equals("LYRICS") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) {
+			} else if (strCommandName.Equals("LYRICS") && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) {
 				if (!string.IsNullOrEmpty(strCommandParam)) {
 					string[] files = SplitComma(strCommandParam);
 					string[] filePaths = new string[files.Length];
@@ -6677,7 +6677,7 @@ namespace TJAPlayer3 {
 
 						if (File.Exists(filePaths[i])) {
 							try {
-								if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
+								if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
 									if (filePaths[i].EndsWith(".vtt")) {
 										using (VTTParser parser = new VTTParser()) {
 											this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
@@ -6696,7 +6696,7 @@ namespace TJAPlayer3 {
 						}
 					}
 				}
-			} else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile && TJAPlayer3.ConfigIni.nPlayerCount < 4) {
+			} else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) {
 				if (!string.IsNullOrEmpty(strCommandParam)) {
 					string[] strFiles = SplitComma(strCommandParam);
 					string[] strFilePath = new string[strFiles.Length];
@@ -6704,7 +6704,7 @@ namespace TJAPlayer3 {
 						strFilePath[index] = this.strフォルダ名 + strFiles[index];
 						if (File.Exists(strFilePath[index])) {
 							try {
-								if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
+								if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
 									this.LyricFileParser(strFilePath[index], index);
 								this.bLyrics = true;
 								this.usingLyricsFile = true;
@@ -6718,7 +6718,7 @@ namespace TJAPlayer3 {
 			}
 			if (this.nScoreModeTmp == 99) {
 				//2017.01.28 DD 
-				this.nScoreModeTmp = TJAPlayer3.ConfigIni.nScoreMode;
+				this.nScoreModeTmp = OpenTaiko.ConfigIni.nScoreMode;
 			}
 		}
 		/// <summary>
@@ -6810,7 +6810,7 @@ namespace TJAPlayer3 {
 						for (int listindex = 0; listindex < list.Count; listindex++) {
 							STLYRIC stlrc;
 							stlrc.Text = strSplit後[i];
-							stlrc.TextTex = this.pf歌詞フォント.DrawText(strSplit後[i], TJAPlayer3.Skin.Game_Lyric_ForeColor, TJAPlayer3.Skin.Game_Lyric_BackColor, null, 30);
+							stlrc.TextTex = this.pf歌詞フォント.DrawText(strSplit後[i], OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
 							stlrc.Time = list[listindex];
 							stlrc.index = ordnumber;
 							this.listLyric2.Add(stlrc);
@@ -7096,7 +7096,7 @@ namespace TJAPlayer3 {
 		/// サウンドミキサーにサウンドを登録_削除する時刻を事前に算出する
 		/// </summary>
 		public void PlanToAddMixerChannel() {
-			if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
+			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() == "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
 			{                                                                       // チップのライフタイム管理を行わない
 				return;
 			}
@@ -7178,7 +7178,7 @@ namespace TJAPlayer3 {
 
 						int duration = 0;
 						if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CDTX.CWAV wc)) {
-							double _db再生速度 = (TJAPlayer3.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+							double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
 							duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
 						}
 						//Debug.WriteLine("duration=" + duration );
@@ -7333,7 +7333,7 @@ namespace TJAPlayer3 {
 		// CActivity 実装
 		private CCachedFontRenderer pf歌詞フォント;
 		public override void Activate() {
-			if (TJAPlayer3.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
+			if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
 				//まさかこれが原因で曲の読み込みが停止するとは思わなかった...
 				//どういうことかというとスキンを読み込むときに...いや厳密には
 				//RefleshSkinを呼び出した後一回Disposeしてnullにして解放(その後にまたインスタンスを作成する)するんだけど
@@ -7342,10 +7342,10 @@ namespace TJAPlayer3 {
 				//実は曲の読み込みはマルチスレッドで実行されているのでnullにした瞬間に参照される可能性も十分にある
 				//それならアプリが終了するんじゃないかと思ったのだけどtryを使ってい曲の読み込みを続行していた...
 				//いやーマルチスレッドって難しいね!
-				if (!string.IsNullOrEmpty(TJAPlayer3.Skin.Game_Lyric_FontName)) {
-					this.pf歌詞フォント = new CCachedFontRenderer(TJAPlayer3.Skin.Game_Lyric_FontName, TJAPlayer3.Skin.Game_Lyric_FontSize);
+				if (!string.IsNullOrEmpty(OpenTaiko.Skin.Game_Lyric_FontName)) {
+					this.pf歌詞フォント = new CCachedFontRenderer(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize);
 				} else {
-					this.pf歌詞フォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, TJAPlayer3.Skin.Game_Lyric_FontSize);
+					this.pf歌詞フォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, OpenTaiko.Skin.Game_Lyric_FontSize);
 				}
 			}
 			this.listWAV = new Dictionary<int, CWAV>();
@@ -7464,7 +7464,7 @@ namespace TJAPlayer3 {
 				foreach (KeyValuePair<string, CTexture> pair in this.listOriginalTextures) {
 					string txPath = pair.Key;
 					CTexture originalTx = pair.Value;
-					TJAPlayer3.Tx.trackedTextures.TryGetValue(txPath, out CTexture oldTx);
+					OpenTaiko.Tx.trackedTextures.TryGetValue(txPath, out CTexture oldTx);
 
 					if (oldTx != originalTx) {
 						oldTx.UpdateTexture(originalTx, originalTx.sz画像サイズ.Width, originalTx.sz画像サイズ.Height);
@@ -7496,7 +7496,7 @@ namespace TJAPlayer3 {
 					}
 					this.listVD = null;
 				}
-				TJAPlayer3.tDisposeSafely(ref this.pf歌詞フォント);
+				OpenTaiko.tDisposeSafely(ref this.pf歌詞フォント);
 				base.ReleaseManagedResource();
 			}
 		}
@@ -7798,7 +7798,7 @@ namespace TJAPlayer3 {
 					if (!int.TryParse(strパラメータ, out n数値))
 						n数値 = 1;
 
-					this.n現在の乱数 = TJAPlayer3.Random.Next(n数値) + 1;       // 1～数値 までの乱数を生成。
+					this.n現在の乱数 = OpenTaiko.Random.Next(n数値) + 1;       // 1～数値 までの乱数を生成。
 				}
 				//-----------------
 				#endregion
@@ -8327,8 +8327,8 @@ namespace TJAPlayer3 {
 		/// 音源再生前の空白を追加するメソッド。
 		/// </summary>
 		private void AddMusicPreTimeMs() {
-			this.dbNowTime += TJAPlayer3.ConfigIni.MusicPreTimeMs;
-			this.dbNowBMScollTime += TJAPlayer3.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
+			this.dbNowTime += OpenTaiko.ConfigIni.MusicPreTimeMs;
+			this.dbNowBMScollTime += OpenTaiko.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
 		}
 		//-----------------
 		#endregion

@@ -1,5 +1,15 @@
 {
-	"name" : "Dashy",
+	"name" : {
+		"strings": {
+			"default": "Dashy",
+			"ru": "Дэши"
+		}
+	},
     "rarity": "Uncommon",
-	"author": "Dashy",
+	"author": {
+		"strings": {
+			"default": "Dashy",
+			"ru": "Дэши"
+		}
+	}
 }

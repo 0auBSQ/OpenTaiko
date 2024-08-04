@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplBalloon : CActivity {
 
 
@@ -19,7 +19,7 @@ namespace TJAPlayer3 {
 				this.ct風船アニメ[i] = new CCounter();
 			}
 
-			this.ct風船ふきだしアニメ = new CCounter(0, 1, 100, TJAPlayer3.Timer);
+			this.ct風船ふきだしアニメ = new CCounter(0, 1, 100, OpenTaiko.Timer);
 
 			KusudamaScript = new(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}Script.lua"));
 			KusudamaScript.Init();
@@ -48,9 +48,18 @@ namespace TJAPlayer3 {
 			return base.Draw();
 		}
 
-		public void KusuIn() => KusudamaScript.KusuIn();
-		public void KusuBroke() => KusudamaScript.KusuBroke();
-		public void KusuMiss() => KusudamaScript.KusuMiss();
+		public void KusuIn() {
+			KusudamaScript.KusuIn();
+			KusudamaIsActive = true;
+		}
+		public void KusuBroke() {
+			KusudamaScript.KusuBroke();
+			KusudamaIsActive = false;
+		}
+		public void KusuMiss() {
+			KusudamaScript.KusuMiss();
+			KusudamaIsActive = false;
+		}
 
 		public enum EBalloonType {
 			BALLOON,
@@ -58,11 +67,15 @@ namespace TJAPlayer3 {
 			FUSEROLL
 		}
 
+		public bool KusudamaIsActive { get; private set; } = false;
+
 		public void tDrawKusudama() {
-			if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) {
+			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
 				KusudamaScript.Update();
 			}
-			KusudamaScript.Draw();
+			if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
+				KusudamaScript.Draw();
+			}
 		}
 
 		public int On進行描画(int n連打ノルマ, int n連打数, int player, EBalloonType btype) {
@@ -91,27 +104,27 @@ namespace TJAPlayer3 {
 				int frame_y;
 				int num_x;
 				int num_y;
-				if (TJAPlayer3.ConfigIni.nPlayerCount == 5) {
-					x = TJAPlayer3.Skin.Game_Balloon_Balloon_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-					y = TJAPlayer3.Skin.Game_Balloon_Balloon_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-					frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-					frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-					num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_5P[0] + (TJAPlayer3.Skin.Game_UIMove_5P[0] * player);
-					num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_5P[1] + (TJAPlayer3.Skin.Game_UIMove_5P[1] * player);
-				} else if (TJAPlayer3.ConfigIni.nPlayerCount == 4 || TJAPlayer3.ConfigIni.nPlayerCount == 3) {
-					x = TJAPlayer3.Skin.Game_Balloon_Balloon_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-					y = TJAPlayer3.Skin.Game_Balloon_Balloon_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
-					frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-					frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
-					num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[0] + (TJAPlayer3.Skin.Game_UIMove_4P[0] * player);
-					num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_4P[1] + (TJAPlayer3.Skin.Game_UIMove_4P[1] * player);
+				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+					x = OpenTaiko.Skin.Game_Balloon_Balloon_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+					y = OpenTaiko.Skin.Game_Balloon_Balloon_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+					frame_x = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+					frame_y = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+					num_x = OpenTaiko.Skin.Game_Balloon_Balloon_Number_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * player);
+					num_y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * player);
+				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+					x = OpenTaiko.Skin.Game_Balloon_Balloon_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+					y = OpenTaiko.Skin.Game_Balloon_Balloon_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
+					frame_x = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+					frame_y = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
+					num_x = OpenTaiko.Skin.Game_Balloon_Balloon_Number_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * player);
+					num_y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * player);
 				} else {
-					x = TJAPlayer3.Skin.Game_Balloon_Balloon_X[player];
-					y = TJAPlayer3.Skin.Game_Balloon_Balloon_Y[player];
-					frame_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_X[player];
-					frame_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Frame_Y[player];
-					num_x = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_X[player];
-					num_y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Y[player];
+					x = OpenTaiko.Skin.Game_Balloon_Balloon_X[player];
+					y = OpenTaiko.Skin.Game_Balloon_Balloon_Y[player];
+					frame_x = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_X[player];
+					frame_y = OpenTaiko.Skin.Game_Balloon_Balloon_Frame_Y[player];
+					num_x = OpenTaiko.Skin.Game_Balloon_Balloon_Number_X[player];
+					num_y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Y[player];
 				}
 				//1P:0 2P:245
 				//if (CDTXMania.Tx.Chara_Balloon_Breaking != null && CDTXMania.ConfigIni.ShowChara)
@@ -119,20 +132,20 @@ namespace TJAPlayer3 {
 				for (int j = 0; j < 5; j++) {
 
 					if (n残り打数[j] < n連打数 && btype == EBalloonType.BALLOON) {
-						if (TJAPlayer3.Tx.Balloon_Breaking[j] != null)
-							TJAPlayer3.Tx.Balloon_Breaking[j].t2D描画(x + (this.ct風船ふきだしアニメ.CurrentValue == 1 ? 3 : 0), y);
+						if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
+							OpenTaiko.Tx.Balloon_Breaking[j].t2D描画(x + (this.ct風船ふきだしアニメ.CurrentValue == 1 ? 3 : 0), y);
 						break;
 					}
 				}
 				//1P:31 2P:329
 
 				if (btype == EBalloonType.BALLOON) {
-					if (TJAPlayer3.Tx.Balloon_Balloon != null)
-						TJAPlayer3.Tx.Balloon_Balloon.t2D描画(frame_x, frame_y);
+					if (OpenTaiko.Tx.Balloon_Balloon != null)
+						OpenTaiko.Tx.Balloon_Balloon.t2D描画(frame_x, frame_y);
 					this.t文字表示(num_x, num_y, n連打数, player);
 				} else if (btype == EBalloonType.FUSEROLL) {
-					if (TJAPlayer3.Tx.Fuse_Balloon != null)
-						TJAPlayer3.Tx.Fuse_Balloon.t2D描画(frame_x, frame_y);
+					if (OpenTaiko.Tx.Fuse_Balloon != null)
+						OpenTaiko.Tx.Fuse_Balloon.t2D描画(frame_x, frame_y);
 					this.tFuseNumber(num_x, num_y, n連打数, player);
 				} else if (btype == EBalloonType.KUSUDAMA && player == 0) {
 					/*
@@ -141,7 +154,8 @@ namespace TJAPlayer3 {
                     if (TJAPlayer3.Tx.Kusudama != null)
                         TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                         */
-					this.tKusudamaNumber(n連打数);
+					if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
+						this.tKusudamaNumber(n連打数);
 				}
 
 				//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
@@ -155,9 +169,9 @@ namespace TJAPlayer3 {
                 }
                 */
 			} else {
-				if (n連打数 == 0 && TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player]) {
-					TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
-					TJAPlayer3.stage演奏ドラム画面.b連打中[player] = false;
+				if (n連打数 == 0 && OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player]) {
+					OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
+					OpenTaiko.stage演奏ドラム画面.b連打中[player] = false;
 				}
 			}
 
@@ -199,8 +213,8 @@ namespace TJAPlayer3 {
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++) {
 				float offset = j - (nums.Length / 2.0f);
-				float _x = x - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[0] * offset);
-				float _y = y - (TJAPlayer3.Skin.Game_Balloon_Number_Interval[1] * offset);
+				float _x = x - (OpenTaiko.Skin.Game_Balloon_Number_Interval[0] * offset);
+				float _y = y - (OpenTaiko.Skin.Game_Balloon_Number_Interval[1] * offset);
 
 				float width = tx.sz画像サイズ.Width / 10.0f;
 				float height = tx.sz画像サイズ.Height;
@@ -210,38 +224,38 @@ namespace TJAPlayer3 {
 		}
 
 		private void tKusudamaNumber(int num) {
-			if (TJAPlayer3.Tx.Kusudama_Number == null) return;
-			TJAPlayer3.Tx.Kusudama_Number.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-			TJAPlayer3.Tx.Kusudama_Number.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-			int x = TJAPlayer3.Skin.Game_Kusudama_Number_X;
-			int y = TJAPlayer3.Skin.Game_Kusudama_Number_Y;
+			if (OpenTaiko.Tx.Kusudama_Number == null) return;
+			OpenTaiko.Tx.Kusudama_Number.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale;
+			OpenTaiko.Tx.Kusudama_Number.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale;
+			int x = OpenTaiko.Skin.Game_Kusudama_Number_X;
+			int y = OpenTaiko.Skin.Game_Kusudama_Number_Y;
 
 			int[] nums = CConversion.SeparateDigits(num);
 			for (int j = 0; j < nums.Length; j++) {
 				float offset = j - ((nums.Length - 2) / 2.0f);
-				float width = TJAPlayer3.Tx.Kusudama_Number.sz画像サイズ.Width / 10.0f;
-				float height = TJAPlayer3.Tx.Kusudama_Number.sz画像サイズ.Height;
+				float width = OpenTaiko.Tx.Kusudama_Number.sz画像サイズ.Width / 10.0f;
+				float height = OpenTaiko.Tx.Kusudama_Number.sz画像サイズ.Height;
 				float _x = x - (width * offset);
 				float _y = y;
 
-				TJAPlayer3.Tx.Kusudama_Number.t2D拡大率考慮下基準描画(_x, _y, new RectangleF(width * nums[j], 0, width, height));
+				OpenTaiko.Tx.Kusudama_Number.t2D拡大率考慮下基準描画(_x, _y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
 
 		private void tFuseNumber(int x, int y, int num, int nPlayer) {
-			if (TJAPlayer3.Tx.Fuse_Number == null) return;
-			TJAPlayer3.Tx.Fuse_Number.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-			TJAPlayer3.Tx.Fuse_Number.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
+			if (OpenTaiko.Tx.Fuse_Number == null) return;
+			OpenTaiko.Tx.Fuse_Number.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale;
+			OpenTaiko.Tx.Fuse_Number.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
 
-			_nbDisplay(TJAPlayer3.Tx.Fuse_Number, num, x, y);
+			_nbDisplay(OpenTaiko.Tx.Fuse_Number, num, x, y);
 		}
 
 		private void t文字表示(int x, int y, int num, int nPlayer) {
-			if (TJAPlayer3.Tx.Balloon_Number_Roll == null) return;
-			TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.X = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale;
-			TJAPlayer3.Tx.Balloon_Number_Roll.vcScaleRatio.Y = TJAPlayer3.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
+			if (OpenTaiko.Tx.Balloon_Number_Roll == null) return;
+			OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.X = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale;
+			OpenTaiko.Tx.Balloon_Number_Roll.vcScaleRatio.Y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Scale + RollScale[this.ct風船アニメ[nPlayer].CurrentValue];
 
-			_nbDisplay(TJAPlayer3.Tx.Balloon_Number_Roll, num, x, y);
+			_nbDisplay(OpenTaiko.Tx.Balloon_Number_Roll, num, x, y);
 		}
 
 		public void tEnd() {

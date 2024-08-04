@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	[Serializable]
 	internal class Cスコア {
 		// プロパティ

@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectExExtraTransAnime : CActivity {
 		enum AnimeState {
 			NotRunning = 0,
@@ -22,8 +22,8 @@ namespace TJAPlayer3 {
 
 			CurrentState = AnimeState.NotRunning;
 
-			ExToExtraCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[0], TJAPlayer3.Timer);
-			ExtraToExCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[1], TJAPlayer3.Timer);
+			ExToExtraCounter = new CCounter(0, 1, OpenTaiko.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[0], OpenTaiko.Timer);
+			ExtraToExCounter = new CCounter(0, 1, OpenTaiko.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[1], OpenTaiko.Timer);
 
 			ExToExtraScript = new AnimeBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.SONGSELECT}Difficulty_Select{Path.DirectorySeparatorChar}ExToExtra{Path.DirectorySeparatorChar}0{Path.DirectorySeparatorChar}Script.lua"));
 			ExtraToExScript = new AnimeBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.SONGSELECT}Difficulty_Select{Path.DirectorySeparatorChar}ExtraToEx{Path.DirectorySeparatorChar}0{Path.DirectorySeparatorChar}Script.lua"));
@@ -93,19 +93,19 @@ namespace TJAPlayer3 {
 		}
 
 		public void BeginAnime(bool toExtra) {
-			if (!TJAPlayer3.ConfigIni.ShowExExtraAnime) return;
+			if (!OpenTaiko.ConfigIni.ShowExExtraAnime) return;
 			else if (toExtra && !ExToExtraScript.Exists()) return;
 			else if (!toExtra && !ExtraToExScript.Exists()) return;
 
 			CurrentState = toExtra ? AnimeState.ExToExtra : AnimeState.ExtraToEx;
 			if (toExtra) {
-				ExToExtraCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[0], TJAPlayer3.Timer);
+				ExToExtraCounter = new CCounter(0, 1, OpenTaiko.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[0], OpenTaiko.Timer);
 				ExToExtraScript.PlayAnimation();
-				TJAPlayer3.Skin.soundExToExtra[0]?.tPlay(); // Placeholder code
+				OpenTaiko.Skin.soundExToExtra[0]?.tPlay(); // Placeholder code
 			} else {
-				ExtraToExCounter = new CCounter(0, 1, TJAPlayer3.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[1], TJAPlayer3.Timer);
+				ExtraToExCounter = new CCounter(0, 1, OpenTaiko.Skin.SongSelect_Difficulty_Bar_ExExtra_AnimeDuration[1], OpenTaiko.Timer);
 				ExtraToExScript.PlayAnimation();
-				TJAPlayer3.Skin.soundExtraToEx[0]?.tPlay(); // Placeholder code
+				OpenTaiko.Skin.soundExtraToEx[0]?.tPlay(); // Placeholder code
 			}
 		}
 

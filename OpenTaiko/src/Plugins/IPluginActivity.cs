@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// <para>Activity プラグインへのインターフェース。</para>
 	/// <para>DTXMania は、IPluginActivity に対して、以下のライフサイクルを実行します。</para>
@@ -14,7 +14,7 @@
 		/// <para>DTXMania の起動処理の最後（セットアップ画面が表示される直前）に、DTXMania から一度だけ呼び出されます。</para>
 		/// <param name="PluginHost">プラグインが、ホスト（DTXMania）の情報にアクセスするためのオブジェクト。</param>
 		/// </summary>
-		void On初期化(global::TJAPlayer3.IPluginHost PluginHost);
+		void On初期化(global::OpenTaiko.IPluginHost PluginHost);
 
 		/// <summary>
 		/// <para>プラグインの終了処理を行います。</para>
@@ -50,7 +50,7 @@
 		/// <param name="pad">パッド入力。他のプラグインが入力占有中である場合は null が渡されます。</param>
 		/// <param name="keyboard">キーボード入力。他のプラグインが入力占有中である場合は null が渡されます。</param>
 		/// </summary>
-		void On進行描画(global::TJAPlayer3.CPad pad, FDK.IInputDevice keyboard);
+		void On進行描画(global::OpenTaiko.CPad pad, FDK.IInputDevice keyboard);
 
 		/// <summary>
 		/// <para>ステージが変わる度に呼び出されます。</para>
@@ -67,8 +67,8 @@
 		/// <param name="n曲番号inブロック">選択されている曲のブロック内の曲番号(0～4)。</param>
 		void On選択曲変更(string str選択曲ファイル名, int n曲番号inブロック);
 
-		void On演奏クリア(global::TJAPlayer3.CScoreIni scoreIni);
-		void On演奏失敗(global::TJAPlayer3.CScoreIni scoreIni);
-		void On演奏キャンセル(global::TJAPlayer3.CScoreIni scoreIni);
+		void On演奏クリア(global::OpenTaiko.CScoreIni scoreIni);
+		void On演奏失敗(global::OpenTaiko.CScoreIni scoreIni);
+		void On演奏キャンセル(global::OpenTaiko.CScoreIni scoreIni);
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3.Animations {
+﻿namespace OpenTaiko.Animations {
 	/// <summary>
 	/// フェードインを行うクラス。
 	/// </summary>

@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectQuickConfig : CActSelectPopupMenu {
 		// コンストラクタ
 
@@ -38,29 +38,29 @@ namespace TJAPlayer3 {
 			#region [ 共通 Target/AutoMode/AutoLane ]
 			#endregion
 			#region [ 個別 ScrollSpeed ]
-			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), 0, 1999, TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile],
+			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), 0, 1999, OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile],
 				""));
 			#endregion
 			#region [ 共通 Dark/Risky/PlaySpeed ]
-			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, TJAPlayer3.ConfigIni.nSongSpeed,
+			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, OpenTaiko.ConfigIni.nSongSpeed,
 				""));
 			#endregion
 			#region [ 個別 Sud/Hid ]
-			l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_RANDOM"), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile],
+			l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_RANDOM"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eRandom[OpenTaiko.SaveFile],
 				"",
 				new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_RANDOM"), CLangManager.LangInstance.GetString("MOD_FLIP"), "SUPER", "HYPER" }));
-			l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_HIDE"), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile],
+			l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_HIDE"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile],
 				"",
 				new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_HIDE"), CLangManager.LangInstance.GetString("MOD_STEALTH") }));
-			l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL"), CItemBase.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eGameMode,
+			l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eGameMode,
 				"",
 				new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), "TYPE-A", "TYPE-B" }));
 
-			l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI"), CItemBase.EPanelType.Normal, TJAPlayer3.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_SWITCH_ON") }));
+			l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI"), CItemBase.EPanelType.Normal, OpenTaiko.ConfigIni.ShinuchiMode ? 1 : 0, "", "", new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_SWITCH_ON") }));
 
 			#endregion
 			#region [ 共通 SET切り替え/More/Return ]
-			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT"), 1, 5, TJAPlayer3.ConfigIni.nPlayerCount, ""));
+			l.Add(new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT"), 1, 5, OpenTaiko.ConfigIni.nPlayerCount, ""));
 			l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("SONGSELECT_QUICKCONFIG_MORE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
 			l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("MENU_RETURN"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 			#endregion
@@ -85,17 +85,17 @@ namespace TJAPlayer3 {
 		public override void tEnter押下Main(int nSortOrder) {
 			switch (n現在の選択行) {
 				case (int)EOrder.ScrollSpeed:
-					TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile] = (int)GetObj現在値((int)EOrder.ScrollSpeed);
+					OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = (int)GetObj現在値((int)EOrder.ScrollSpeed);
 					break;
 
 				case (int)EOrder.PlaySpeed:
-					TJAPlayer3.ConfigIni.nSongSpeed = (int)GetObj現在値((int)EOrder.PlaySpeed);
+					OpenTaiko.ConfigIni.nSongSpeed = (int)GetObj現在値((int)EOrder.PlaySpeed);
 					break;
 				case (int)EOrder.Random:
-					TJAPlayer3.ConfigIni.eRandom[TJAPlayer3.SaveFile] = (ERandomMode)GetIndex((int)EOrder.Random);
+					OpenTaiko.ConfigIni.eRandom[OpenTaiko.SaveFile] = (ERandomMode)GetIndex((int)EOrder.Random);
 					break;
 				case (int)EOrder.Stealth:
-					TJAPlayer3.ConfigIni.eSTEALTH[TJAPlayer3.SaveFile] = (EStealthMode)GetIndex((int)EOrder.Stealth);
+					OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile] = (EStealthMode)GetIndex((int)EOrder.Stealth);
 					break;
 				case (int)EOrder.GameMode:
 					EGame game = EGame.OFF;
@@ -104,13 +104,13 @@ namespace TJAPlayer3 {
 						case 1: game = EGame.完走叩ききりまショー; break;
 						case 2: game = EGame.完走叩ききりまショー激辛; break;
 					}
-					TJAPlayer3.ConfigIni.eGameMode = game;
+					OpenTaiko.ConfigIni.eGameMode = game;
 					break;
 				case (int)EOrder.ShinuchiMode:
-					TJAPlayer3.ConfigIni.ShinuchiMode = !TJAPlayer3.ConfigIni.ShinuchiMode;
+					OpenTaiko.ConfigIni.ShinuchiMode = !OpenTaiko.ConfigIni.ShinuchiMode;
 					break;
 				case (int)EOrder.PlayerCount:
-					TJAPlayer3.ConfigIni.nPlayerCount = (int)GetObj現在値((int)EOrder.PlayerCount);
+					OpenTaiko.ConfigIni.nPlayerCount = (int)GetObj現在値((int)EOrder.PlayerCount);
 					break;
 				case (int)EOrder.More:
 					SetAutoParameters();            // 簡易CONFIGメニュー脱出に伴い、簡易CONFIG内のAUTOの設定をConfigIniクラスに反映する
@@ -166,7 +166,7 @@ namespace TJAPlayer3 {
 				this.ft表示用フォント = null;
 			}
 			//CDTXMania.tテクスチャの解放( ref this.txパネル本体 );
-			TJAPlayer3.tテクスチャの解放(ref this.tx文字列パネル);
+			OpenTaiko.tテクスチャの解放(ref this.tx文字列パネル);
 			base.ReleaseManagedResource();
 		}
 

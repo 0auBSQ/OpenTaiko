@@ -1,7 +1,7 @@
 using FDK;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class HGenreBar {
 		public static CTexture tGetGenreBar(string value, Dictionary<string, CTexture> textures) {
 			if (textures.TryGetValue($"{value}", out CTexture tex)) {

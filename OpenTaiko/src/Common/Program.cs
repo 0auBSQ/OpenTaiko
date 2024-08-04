@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class Program {
 		#region [ 二重起動チェック、DLL存在チェック ]
 		//-----------------------------
@@ -104,7 +104,7 @@ namespace TJAPlayer3 {
 							fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
 						}
 
-						using (var mania = new TJAPlayer3())
+						using (var mania = new OpenTaiko())
 							mania.Run();
 
 						Trace.WriteLine("");

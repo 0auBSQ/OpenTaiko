@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class DBCharacter {
 		public class CharacterEffect {
 			public CharacterEffect() {
@@ -12,14 +12,14 @@ namespace TJAPlayer3 {
 			public float GetCoinMultiplier() {
 				float mult = 1f;
 
-				if (Gauge == "Hard" && !TJAPlayer3.ConfigIni.bForceNormalGauge) mult *= 1.5f;
-				if (Gauge == "Extreme" && !TJAPlayer3.ConfigIni.bForceNormalGauge) mult *= 1.8f;
+				if (Gauge == "Hard" && !OpenTaiko.ConfigIni.bForceNormalGauge) mult *= 1.5f;
+				if (Gauge == "Extreme" && !OpenTaiko.ConfigIni.bForceNormalGauge) mult *= 1.8f;
 
 				return mult;
 			}
 
 			public string tGetGaugeType() {
-				return TJAPlayer3.ConfigIni.bForceNormalGauge || TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] >= 5 ? "Normal" : Gauge;
+				return OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5 ? "Normal" : Gauge;
 			}
 
 

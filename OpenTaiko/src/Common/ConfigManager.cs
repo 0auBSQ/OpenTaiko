@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// 設定ファイル入出力クラス。
 	/// </summary>

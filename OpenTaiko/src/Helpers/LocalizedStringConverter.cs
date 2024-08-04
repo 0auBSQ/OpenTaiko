@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class LocalizedStringConverter<T> : JsonConverter {
 		public override bool CanConvert(Type objectType) {
 			// CanConvert is not called when the [JsonConverter] attribute is used

@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3.C曲リストノードComparers {
+﻿namespace OpenTaiko.C曲リストノードComparers {
 	internal sealed class ComparerChain<T> : IComparer<T> where T : class {
 		private readonly IComparer<T>[] _comparers;
 

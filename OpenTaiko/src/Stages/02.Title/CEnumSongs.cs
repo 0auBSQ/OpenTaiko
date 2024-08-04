@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲リストを取得するクラス
 	{                                                   // ファイルキャッシュ(songslist.db)からの取得と、ディスクからの取得を、この一つのクラスに集約。
 
@@ -56,8 +56,8 @@ namespace TJAPlayer3 {
 				this.thDTXFileEnumerate.Priority = tp;
 			}
 		}
-		private readonly string strPathSongsDB = TJAPlayer3.strEXEのあるフォルダ + "songs.db";
-		private readonly string strPathSongList = TJAPlayer3.strEXEのあるフォルダ + "songlist.db";
+		private readonly string strPathSongsDB = OpenTaiko.strEXEのあるフォルダ + "songs.db";
+		private readonly string strPathSongList = OpenTaiko.strEXEのあるフォルダ + "songlist.db";
 
 		public Thread thDTXFileEnumerate {
 			get;
@@ -207,18 +207,18 @@ namespace TJAPlayer3 {
 			try {
 				#region [ 0) システムサウンドの構築  ]
 				//-----------------------------
-				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
+				OpenTaiko.stage起動.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
 
 				Trace.TraceInformation("0) システムサウンドを構築します。");
 				Trace.Indent();
 
 				try {
-					TJAPlayer3.Skin.bgm起動画面.tPlay();
-					for (int i = 0; i < TJAPlayer3.Skin.nシステムサウンド数; i++) {
-						if (!TJAPlayer3.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+					OpenTaiko.Skin.bgm起動画面.tPlay();
+					for (int i = 0; i < OpenTaiko.Skin.nシステムサウンド数; i++) {
+						if (!OpenTaiko.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 						{
-							CSkin.CSystemSound cシステムサウンド = TJAPlayer3.Skin[i];
-							if (!TJAPlayer3.bコンパクトモード || cシステムサウンド.bCompact対象) {
+							CSkin.CSystemSound cシステムサウンド = OpenTaiko.Skin[i];
+							if (!OpenTaiko.bコンパクトモード || cシステムサウンド.bCompact対象) {
 								try {
 									cシステムサウンド.tLoading();
 									Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
@@ -235,8 +235,8 @@ namespace TJAPlayer3 {
 							}
 						}
 					}
-					lock (TJAPlayer3.stage起動.list進行文字列) {
-						TJAPlayer3.stage起動.list進行文字列.Add("SYSTEM SOUND...OK");
+					lock (OpenTaiko.stage起動.list進行文字列) {
+						OpenTaiko.stage起動.list進行文字列.Add("SYSTEM SOUND...OK");
 					}
 				} finally {
 					Trace.Unindent();
@@ -244,12 +244,12 @@ namespace TJAPlayer3 {
 				//-----------------------------
 				#endregion
 
-				if (TJAPlayer3.bコンパクトモード) {
+				if (OpenTaiko.bコンパクトモード) {
 					Trace.TraceInformation("コンパクトモードなので残りの起動処理は省略します。");
 					return;
 				}
 			} finally {
-				TJAPlayer3.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
+				OpenTaiko.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 				TimeSpan span = (TimeSpan)(DateTime.Now - now);
 				Trace.TraceInformation("起動所要時間: {0}", span.ToString());
 				lock (this)                         // #28700 2012.6.12 yyagi; state change must be in finally{} for exiting as of compact mode.
@@ -274,8 +274,8 @@ namespace TJAPlayer3 {
 
 			try {
 				if (hard_reload) {
-					if (File.Exists($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db"))
-						File.Delete($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+					if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db"))
+						File.Delete($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
 				}
 				Deserialize();
 
@@ -287,15 +287,15 @@ namespace TJAPlayer3 {
 				Trace.Indent();
 
 				try {
-					if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.strSongsPath)) {
+					if (!string.IsNullOrEmpty(OpenTaiko.ConfigIni.strSongsPath)) {
 						CSongDict.tClearSongNodes();
-						string[] strArray = TJAPlayer3.ConfigIni.strSongsPath.Split(new char[] { ';' });
+						string[] strArray = OpenTaiko.ConfigIni.strSongsPath.Split(new char[] { ';' });
 						if (strArray.Length > 0) {
 							// 全パスについて…
 							foreach (string str in strArray) {
 								string path = str;
 								if (!Path.IsPathRooted(path)) {
-									path = TJAPlayer3.strEXEのあるフォルダ + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
+									path = OpenTaiko.strEXEのあるフォルダ + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
 								}
 
 								if (!string.IsNullOrEmpty(path)) {
@@ -411,7 +411,7 @@ namespace TJAPlayer3 {
 		/// </summary>
 		private void SerializeSongList() {
 			BinaryFormatter songlistdb_ = new BinaryFormatter();
-			using Stream songlistdb = File.OpenWrite($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+			using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
 			songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
 		}
 
@@ -422,9 +422,9 @@ namespace TJAPlayer3 {
 		/// <param name="strPathSongList"></param>
 		public void Deserialize() {
 			try {
-				if (File.Exists($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db")) {
+				if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db")) {
 					BinaryFormatter songlistdb_ = new BinaryFormatter();
-					using Stream songlistdb = File.OpenRead($"{TJAPlayer3.strEXEのあるフォルダ}songlist.db");
+					using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
 					this.Songs管理.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
 				}
 			} catch (Exception exception) {

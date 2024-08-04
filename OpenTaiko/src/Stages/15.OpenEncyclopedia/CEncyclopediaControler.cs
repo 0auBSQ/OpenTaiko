@@ -1,15 +1,15 @@
 ﻿using System.Drawing;
 using FDK;
-using static TJAPlayer3.CActSelect曲リスト;
+using static OpenTaiko.CActSelect曲リスト;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CEncyclopediaControler {
 
 		public CEncyclopediaControler() {
 			_callStack = new Stack<DBEncyclopediaMenus.EncyclopediaMenu>();
 			_idxStack = new Stack<int>();
 
-			_current = TJAPlayer3.Databases.DBEncyclopediaMenus.data;
+			_current = OpenTaiko.Databases.DBEncyclopediaMenus.data;
 
 			_lang = CLangManager.fetchLang();
 
@@ -22,7 +22,7 @@ namespace TJAPlayer3 {
 
 		private void tReloadFonts() {
 			_pfEncyclopediaMenu?.Dispose();
-			_pfEncyclopediaMenu = HPrivateFastFont.tInstantiateMainFont(TJAPlayer3.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
+			_pfEncyclopediaMenu = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.OpenEncyclopedia_Font_EncyclopediaMenu_Size);
 		}
 
 		#endregion
@@ -40,7 +40,7 @@ namespace TJAPlayer3 {
 
 		private string _GetSectionContents(int key, bool _fetchingMenus) {
 			try {
-				string _path = _GetPathTextFile(@$"{TJAPlayer3.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}" + (_fetchingMenus ? @$"Menus{Path.DirectorySeparatorChar}" : @$"Pages{Path.DirectorySeparatorChar}") + key.ToString());
+				string _path = _GetPathTextFile(@$"{OpenTaiko.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}" + (_fetchingMenus ? @$"Menus{Path.DirectorySeparatorChar}" : @$"Pages{Path.DirectorySeparatorChar}") + key.ToString());
 
 				return File.ReadAllText(_path);
 			} catch {
@@ -49,7 +49,7 @@ namespace TJAPlayer3 {
 		}
 
 		private string _GetImagePath(int key) {
-			return @$"{TJAPlayer3.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}" + key.ToString() + @".png";
+			return @$"{OpenTaiko.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}" + key.ToString() + @".png";
 		}
 
 		#endregion
@@ -73,14 +73,14 @@ namespace TJAPlayer3 {
 			Submenus = new (int, CTexture)[_count];
 
 			Submenus[0].Item1 = -1;
-			Submenus[0].Item2 = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+			Submenus[0].Item2 = TitleTextureKey.ResolveTitleTexture(
 						  new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
 
 			for (int i = 1; i < _count; i++) {
 				int _idx = i - 1; // Excluding return
 				var _menu = _current.Menus[_idx];
 				Submenus[i].Item1 = _menu.Key;
-				Submenus[i].Item2 = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+				Submenus[i].Item2 = TitleTextureKey.ResolveTitleTexture(
 						  new TitleTextureKey(_GetSectionContents(_menu.Key, true), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
 			}
 		}
@@ -99,9 +99,9 @@ namespace TJAPlayer3 {
 			for (int i = 0; i < _count; i++) {
 				var _page = _current.Pages[i];
 				Pages[i].Item1 = _page;
-				Pages[i].Item2 = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+				Pages[i].Item2 = TitleTextureKey.ResolveTitleTexture(
 						  new TitleTextureKey(_GetSectionContents(_page, false), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
-				Pages[i].Item3 = TJAPlayer3.tテクスチャの生成(_GetImagePath(_page));
+				Pages[i].Item3 = OpenTaiko.tテクスチャの生成(_GetImagePath(_page));
 			}
 		}
 
@@ -168,7 +168,7 @@ namespace TJAPlayer3 {
 		#region [private utils methods]
 
 		private void tUpdatePageIndex() {
-			PageText = TJAPlayer3.stageSongSelect.actSongList.ResolveTitleTexture(
+			PageText = TitleTextureKey.ResolveTitleTexture(
 						  new TitleTextureKey((PageIndex + 1).ToString() + "/" + Pages.Length.ToString(), _pfEncyclopediaMenu, Color.White, Color.Brown, 1000));
 		}
 

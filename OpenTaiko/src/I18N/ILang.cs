@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal interface ILang {
 		string GetString(int idx);
 	}
@@ -71,8 +71,8 @@
 		public static string[] Langcodes {
 			get {
 				if (_langCodes == null)
-					_langCodes = Directory.GetDirectories(Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)
-					.Select(result => Path.GetRelativePath(Path.Combine(TJAPlayer3.strEXEのあるフォルダ, "Lang"), result))
+					_langCodes = Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)
+					.Select(result => Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), result))
 					.ToArray();
 
 				return _langCodes;

@@ -1,5 +1,17 @@
 {
-	"name" : "Student (B)",
+	"name" : {
+		"strings": {
+			"default": "Student (B)",
+			"ru": "Студент",
+			"zh": "学生（Ｂ）"
+		}
+	},		
     "rarity": "Common",
-	"author": "Dashy (OPTK)",
+	"author": {
+		"strings": {
+			"default": "Dashy (OPTK)",
+			"ru": "Дэши (OPTK)",
+			"zh": "Dashy（OPTK）"
+		}
+	}
 }

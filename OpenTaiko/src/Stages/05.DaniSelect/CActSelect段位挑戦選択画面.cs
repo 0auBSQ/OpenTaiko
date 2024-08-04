@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class CActSelect段位挑戦選択画面 : CActivity {
 		public override void Activate() {
 			ctBarIn = new CCounter();
 			ctBarOut = new CCounter();
 			ctBarOut.CurrentValue = 255;
-			TJAPlayer3.stage段位選択.bDifficultyIn = false;
+			OpenTaiko.stage段位選択.bDifficultyIn = false;
 			bOption = false;
 
 			base.Activate();
@@ -26,60 +26,60 @@ namespace TJAPlayer3 {
 		}
 
 		public override int Draw() {
-			if (TJAPlayer3.stage段位選択.bDifficultyIn || ctBarOut.CurrentValue < ctBarOut.EndValue) {
+			if (OpenTaiko.stage段位選択.bDifficultyIn || ctBarOut.CurrentValue < ctBarOut.EndValue) {
 				ctBarIn.Tick();
 				ctBarOut.Tick();
 
-				TJAPlayer3.Tx.Challenge_Select[0].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
-				TJAPlayer3.Tx.Challenge_Select[1].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
-				TJAPlayer3.Tx.Challenge_Select[2].Opacity = TJAPlayer3.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
+				OpenTaiko.Tx.Challenge_Select[0].Opacity = OpenTaiko.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
+				OpenTaiko.Tx.Challenge_Select[1].Opacity = OpenTaiko.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
+				OpenTaiko.Tx.Challenge_Select[2].Opacity = OpenTaiko.stage段位選択.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
 
-				TJAPlayer3.Tx.Challenge_Select[0].t2D描画(0, 0);
+				OpenTaiko.Tx.Challenge_Select[0].t2D描画(0, 0);
 
 				int selectIndex = (2 - n現在の選択行);
-				int[] challenge_select_rect = TJAPlayer3.Skin.DaniSelect_Challenge_Select_Rect[selectIndex];
+				int[] challenge_select_rect = OpenTaiko.Skin.DaniSelect_Challenge_Select_Rect[selectIndex];
 
-				TJAPlayer3.Tx.Challenge_Select[2].t2D描画(TJAPlayer3.Skin.DaniSelect_Challenge_Select_X[selectIndex], TJAPlayer3.Skin.DaniSelect_Challenge_Select_Y[selectIndex],
+				OpenTaiko.Tx.Challenge_Select[2].t2D描画(OpenTaiko.Skin.DaniSelect_Challenge_Select_X[selectIndex], OpenTaiko.Skin.DaniSelect_Challenge_Select_Y[selectIndex],
 					new Rectangle(challenge_select_rect[0], challenge_select_rect[1], challenge_select_rect[2], challenge_select_rect[3]));
 
-				TJAPlayer3.Tx.Challenge_Select[1].t2D描画(0, 0);
+				OpenTaiko.Tx.Challenge_Select[1].t2D描画(0, 0);
 
 
-				if (TJAPlayer3.stage段位選択.ct待機.IsStarted)
+				if (OpenTaiko.stage段位選択.ct待機.IsStarted)
 					return base.Draw();
 
 				#region [Key bindings]
 
-				if (ctBarIn.IsEnded && !TJAPlayer3.stage段位選択.b選択した && bOption == false) {
-					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-						TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue)) {
+				if (ctBarIn.IsEnded && !OpenTaiko.stage段位選択.b選択した && bOption == false) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue)) {
 						if (n現在の選択行 - 1 >= 0) {
-							TJAPlayer3.Skin.soundChangeSFX.tPlay();
+							OpenTaiko.Skin.soundChangeSFX.tPlay();
 							n現在の選択行--;
 						}
 					}
 
-					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue)) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue)) {
 						if (n現在の選択行 + 1 <= 2) {
-							TJAPlayer3.Skin.soundChangeSFX.tPlay();
+							OpenTaiko.Skin.soundChangeSFX.tPlay();
 							n現在の選択行++;
 						}
 					}
 
-					if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-						TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed) ||
-						TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed) ||
+						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)) {
 						if (n現在の選択行 == 0) {
-							this.ctBarOut.Start(0, 255, 0.5f, TJAPlayer3.Timer);
-							TJAPlayer3.Skin.soundCancelSFX.tPlay();
-							TJAPlayer3.stage段位選択.bDifficultyIn = false;
+							this.ctBarOut.Start(0, 255, 0.5f, OpenTaiko.Timer);
+							OpenTaiko.Skin.soundCancelSFX.tPlay();
+							OpenTaiko.stage段位選択.bDifficultyIn = false;
 						} else if (n現在の選択行 == 1) {
 							//TJAPlayer3.Skin.soundDanSongSelect.t再生する();
-							TJAPlayer3.ConfigIni.bTokkunMode = false;
-							TJAPlayer3.Skin.soundDecideSFX.tPlay();
-							TJAPlayer3.Skin.voiceMenuDanSelectConfirm[TJAPlayer3.SaveFile]?.tPlay();
-							TJAPlayer3.stage段位選択.ct待機.Start(0, 3000, 1, TJAPlayer3.Timer);
+							OpenTaiko.ConfigIni.bTokkunMode = false;
+							OpenTaiko.Skin.soundDecideSFX.tPlay();
+							OpenTaiko.Skin.voiceMenuDanSelectConfirm[OpenTaiko.SaveFile]?.tPlay();
+							OpenTaiko.stage段位選択.ct待機.Start(0, 3000, 1, OpenTaiko.Timer);
 						} else if (n現在の選択行 == 2) {
 							bOption = true;
 						}

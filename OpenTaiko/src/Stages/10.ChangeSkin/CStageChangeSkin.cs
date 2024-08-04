@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// box.defによるスキン変更時に一時的に遷移する、スキン画像の一切無いステージ。
 	/// </summary>
@@ -54,7 +54,7 @@ namespace TJAPlayer3 {
 				}
 
 				//スキン変更処理
-				TJAPlayer3.app.RefreshSkin();
+				OpenTaiko.app.RefreshSkin();
 
 				return 1;
 			}

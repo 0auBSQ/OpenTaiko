@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CAct演奏ステージ失敗 : CActivity {
 		// コンストラクタ
 
@@ -61,10 +61,10 @@ namespace TJAPlayer3 {
 		// メソッド
 
 		public void Start() {
-			this.dbFailedTime = TJAPlayer3.Timer.NowTime;
-			this.ct進行 = new CCounter(0, 300, 22, TJAPlayer3.Timer);
-			if (TJAPlayer3.ConfigIni.eGameMode != EGame.OFF) {
-				this.ct進行 = new CCounter(0, 4000, 2, TJAPlayer3.Timer);
+			this.dbFailedTime = OpenTaiko.Timer.NowTime;
+			this.ct進行 = new CCounter(0, 300, 22, OpenTaiko.Timer);
+			if (OpenTaiko.ConfigIni.eGameMode != EGame.OFF) {
+				this.ct進行 = new CCounter(0, 4000, 2, OpenTaiko.Timer);
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace TJAPlayer3 {
 		public override void DeActivate() {
 			this.ct進行 = null;
 			if (this.sd効果音 != null) {
-				TJAPlayer3.SoundManager.tDisposeSound(this.sd効果音);
+				OpenTaiko.SoundManager.tDisposeSound(this.sd効果音);
 				this.sd効果音 = null;
 			}
 			base.DeActivate();
@@ -91,7 +91,7 @@ namespace TJAPlayer3 {
 			//this.txStageFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_stage_failed.jpg" ) );
 			//this.txGameFailed = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_GameFailed.png" ) );
 			//            this.tx数字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_RollNumber.png" ) );
-			this.soundFailed = TJAPlayer3.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+			this.soundFailed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {
@@ -239,8 +239,8 @@ namespace TJAPlayer3 {
 						if (ch == '%') {
 							rectangle.Width = 80;
 						}
-						if (TJAPlayer3.Tx.Balloon_Number_Roll != null) {
-							TJAPlayer3.Tx.Balloon_Number_Roll.t2D描画(x - (62 * str.Length / 2), y, rectangle);
+						if (OpenTaiko.Tx.Balloon_Number_Roll != null) {
+							OpenTaiko.Tx.Balloon_Number_Roll.t2D描画(x - (62 * str.Length / 2), y, rectangle);
 						}
 						break;
 					}

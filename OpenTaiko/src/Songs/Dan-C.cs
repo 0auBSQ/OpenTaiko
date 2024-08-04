@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// 段位認定を管理するクラス。
 	/// </summary>

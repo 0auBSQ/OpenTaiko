@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	[Serializable]
 	internal class CSongListNode {
 		// プロパティ

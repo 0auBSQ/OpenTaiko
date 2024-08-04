@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	/// <summary>
 	/// CAct演奏Drumsゲージ と CAct演奏Gutiarゲージ のbaseクラス。ダメージ計算やDanger/Failed判断もこのクラスで行う。
 	/// 
@@ -27,11 +27,11 @@ namespace TJAPlayer3 {
 					dbゲージ増加量_Branch[i, n] = new float[5];
 				}
 			}
-			this.DTX[0] = TJAPlayer3.DTX;
-			this.DTX[1] = TJAPlayer3.DTX_2P;
-			this.DTX[2] = TJAPlayer3.DTX_3P;
-			this.DTX[3] = TJAPlayer3.DTX_4P;
-			this.DTX[4] = TJAPlayer3.DTX_5P;
+			this.DTX[0] = OpenTaiko.DTX;
+			this.DTX[1] = OpenTaiko.DTX_2P;
+			this.DTX[2] = OpenTaiko.DTX_3P;
+			this.DTX[3] = OpenTaiko.DTX_4P;
+			this.DTX[4] = OpenTaiko.DTX_5P;
 			actLVLNFont = new CActLVLNFont();
 			actLVLNFont.Activate();
 			base.Activate();
@@ -94,7 +94,7 @@ namespace TJAPlayer3 {
 		{
 			//ダメージ値の計算
 			{
-				var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 				switch (chara.effect.tGetGaugeType()) {
 					default:
 					case "Normal":
@@ -114,14 +114,14 @@ namespace TJAPlayer3 {
 
 			if (nRiskyTimes_InitialVal > 0) {
 				this.bRisky = true;
-				this.nRiskyTimes = TJAPlayer3.ConfigIni.nRisky;
-				this.nRiskyTimes_Initial = TJAPlayer3.ConfigIni.nRisky;
+				this.nRiskyTimes = OpenTaiko.ConfigIni.nRisky;
+				this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
 			}
 
 			float gaugeRate = 0f;
 			float dbDamageRate = 2.0f;
 
-			int nanidou = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[nPlayer];
+			int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
 
 			switch (this.DTX[nPlayer].LEVELtaiko[nanidou]) {
 				case 0:
@@ -269,7 +269,7 @@ namespace TJAPlayer3 {
 			}
 
 			for (int i = 0; i < 3; i++) {
-				var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 				switch (chara.effect.tGetGaugeType()) {
 					default:
 					case "Normal":
@@ -284,7 +284,7 @@ namespace TJAPlayer3 {
 				}
 			}
 			for (int i = 0; i < 3; i++) {
-				var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 				switch (chara.effect.tGetGaugeType()) {
 					default:
 					case "Normal":
@@ -355,7 +355,7 @@ namespace TJAPlayer3 {
 
 		public void Damage(EInstrumentPad screenmode, EInstrumentPad part, ENoteJudge e今回の判定, int nPlayer) {
 			float fDamage;
-			int nコース = (int)TJAPlayer3.stage演奏ドラム画面.n現在のコース[nPlayer];
+			int nコース = (int)OpenTaiko.stage演奏ドラム画面.n現在のコース[nPlayer];
 
 			switch (e今回の判定) {
 				case ENoteJudge.Perfect:
@@ -384,9 +384,9 @@ namespace TJAPlayer3 {
 							fDamage = -fDamage;
 						}
 
-						var chara = TJAPlayer3.Tx.Characters[TJAPlayer3.SaveFileInstances[TJAPlayer3.GetActualPlayer(nPlayer)].data.Character];
+						var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 
-						int nanidou = TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[nPlayer];
+						int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
 						int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
 						switch (chara.effect.tGetGaugeType()) {

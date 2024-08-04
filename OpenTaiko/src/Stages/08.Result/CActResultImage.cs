@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActResultImage : CActivity {
 		// コンストラクタ
 		/// <summary>
@@ -43,7 +43,7 @@ namespace TJAPlayer3 {
 				return 0;
 			}
 			if (base.IsFirstDraw) {
-				this.ct登場用 = new CCounter(0, 100, 5, TJAPlayer3.Timer);
+				this.ct登場用 = new CCounter(0, 100, 5, OpenTaiko.Timer);
 				base.IsFirstDraw = false;
 			}
 			this.ct登場用.Tick();
@@ -64,17 +64,17 @@ namespace TJAPlayer3 {
 		private CTexture txリザルト画像;
 
 		private bool tプレビュー画像の指定があれば構築する() {
-			if (string.IsNullOrEmpty(TJAPlayer3.DTX.PREIMAGE)) {
+			if (string.IsNullOrEmpty(OpenTaiko.DTX.PREIMAGE)) {
 				return false;
 			}
-			TJAPlayer3.tDisposeSafely(ref this.txリザルト画像);
+			OpenTaiko.tDisposeSafely(ref this.txリザルト画像);
 			this.r表示するリザルト画像 = null;
-			string path = TJAPlayer3.DTX.strフォルダ名 + TJAPlayer3.DTX.PREIMAGE;
+			string path = OpenTaiko.DTX.strフォルダ名 + OpenTaiko.DTX.PREIMAGE;
 			if (!File.Exists(path)) {
 				Trace.TraceWarning("ファイルが存在しません。({0})", new object[] { path });
 				return false;
 			}
-			this.txリザルト画像 = TJAPlayer3.tテクスチャの生成(path);
+			this.txリザルト画像 = OpenTaiko.tテクスチャの生成(path);
 			this.r表示するリザルト画像 = this.txリザルト画像;
 			return (this.r表示するリザルト画像 != null);
 		}

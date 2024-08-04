@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Text;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CBoxDef {
 		// プロパティ
 
@@ -50,7 +50,7 @@ namespace TJAPlayer3 {
 		// メソッド
 
 		public void t読み込み(string boxdefファイル名) {
-			StreamReader reader = new StreamReader(boxdefファイル名, Encoding.GetEncoding(TJAPlayer3.sEncType));
+			StreamReader reader = new StreamReader(boxdefファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 			string str = null;
 			while ((str = reader.ReadLine()) != null) {
 				if (str.Length != 0) {

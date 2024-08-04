@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3.C曲リストノードComparers {
+﻿namespace OpenTaiko.C曲リストノードComparers {
 	internal sealed class C曲リストノードComparer絶対パス : IComparer<CSongListNode> {
 		private readonly int _order;
 

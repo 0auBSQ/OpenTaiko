@@ -2,7 +2,7 @@
 using FDK;
 
 // Minimalist menu class to use for custom menus
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	class COpenEncyclopedia : CStage {
 		public COpenEncyclopedia() {
 			base.eStageID = EStage.TEMPLATE;
@@ -24,7 +24,7 @@ namespace TJAPlayer3 {
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-			TJAPlayer3.Skin.soundEncyclopediaBGM?.tPlay();
+			OpenTaiko.Skin.soundEncyclopediaBGM?.tPlay();
 
 			_controler = new CEncyclopediaControler();
 
@@ -37,7 +37,7 @@ namespace TJAPlayer3 {
 		public override void DeActivate() {
 			// On de-activation
 
-			TJAPlayer3.tDisposeSafely(ref Background);
+			OpenTaiko.tDisposeSafely(ref Background);
 
 			base.DeActivate();
 		}
@@ -70,18 +70,18 @@ namespace TJAPlayer3 {
 			//OpenEncyclopedia_Background?.t2D描画(0, 0);
 
 			if (_arePagesOpened) {
-				TJAPlayer3.Tx.OpenEncyclopedia_Context?.t2D描画(0, 0);
+				OpenTaiko.Tx.OpenEncyclopedia_Context?.t2D描画(0, 0);
 
 				if (_controler.Pages.Length > 0) {
 					var _page = _controler.Pages[_controler.PageIndex];
 
-					_page.Item2?.t2D中心基準描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item2[1]);
+					_page.Item2?.t2D中心基準描画(OpenTaiko.Skin.OpenEncyclopedia_Context_Item2[0], OpenTaiko.Skin.OpenEncyclopedia_Context_Item2[1]);
 					if (_page.Item3 != null) {
-						_page.Item3.vcScaleRatio.X = TJAPlayer3.Skin.Resolution[0] / (2f * _page.Item3.szTextureSize.Width);
-						_page.Item3.vcScaleRatio.Y = TJAPlayer3.Skin.Resolution[1] / (2f * _page.Item3.szTextureSize.Height);
-						_page.Item3.t2D描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_Item3[1]);
+						_page.Item3.vcScaleRatio.X = OpenTaiko.Skin.Resolution[0] / (2f * _page.Item3.szTextureSize.Width);
+						_page.Item3.vcScaleRatio.Y = OpenTaiko.Skin.Resolution[1] / (2f * _page.Item3.szTextureSize.Height);
+						_page.Item3.t2D描画(OpenTaiko.Skin.OpenEncyclopedia_Context_Item3[0], OpenTaiko.Skin.OpenEncyclopedia_Context_Item3[1]);
 					}
-					_controler.PageText?.t2D下中央基準描画(TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[0], TJAPlayer3.Skin.OpenEncyclopedia_Context_PageText[1]);
+					_controler.PageText?.t2D下中央基準描画(OpenTaiko.Skin.OpenEncyclopedia_Context_PageText[0], OpenTaiko.Skin.OpenEncyclopedia_Context_PageText[1]);
 				}
 			}
 
@@ -90,52 +90,52 @@ namespace TJAPlayer3 {
 				var _menu = _controler.Submenus[_pos];
 
 				if (i != 0) {
-					TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
-					TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
+					OpenTaiko.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
+					OpenTaiko.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 					_menu.Item2?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 				} else {
-					TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
-					TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+					OpenTaiko.Tx.OpenEncyclopedia_Return_Box?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+					OpenTaiko.Tx.OpenEncyclopedia_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 					_menu.Item2?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 				}
 
-				int x = TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu[0] + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Move[0] * i;
-				int y = TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu[1] + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Move[1] * i;
+				int x = OpenTaiko.Skin.OpenEncyclopedia_Side_Menu[0] + OpenTaiko.Skin.OpenEncyclopedia_Side_Menu_Move[0] * i;
+				int y = OpenTaiko.Skin.OpenEncyclopedia_Side_Menu[1] + OpenTaiko.Skin.OpenEncyclopedia_Side_Menu_Move[1] * i;
 
 				if (_pos == 0)
-					TJAPlayer3.Tx.OpenEncyclopedia_Return_Box?.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.OpenEncyclopedia_Return_Box?.t2D中心基準描画(x, y);
 				else
-					TJAPlayer3.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(x, y);
+					OpenTaiko.Tx.OpenEncyclopedia_Side_Menu?.t2D中心基準描画(x, y);
 				_menu.Item2?.t2D中心基準描画(
-					x + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[0],
-					y + TJAPlayer3.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[1]);
+					x + OpenTaiko.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[0],
+					y + OpenTaiko.Skin.OpenEncyclopedia_Side_Menu_Text_Offset[1]);
 			}
 
 			#endregion
 
 			#region [Inputs]
 
-			if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-					TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
 				_controler.tHandleRight();
-				TJAPlayer3.Skin.soundChangeSFX.tPlay();
-			} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+				OpenTaiko.Skin.soundChangeSFX.tPlay();
+			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
 				_controler.tHandleLeft();
-				TJAPlayer3.Skin.soundChangeSFX.tPlay();
-			} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+				OpenTaiko.Skin.soundChangeSFX.tPlay();
+			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
 				_backToMain = _controler.tHandleBack();
-				TJAPlayer3.Skin.soundCancelSFX.tPlay();
-			} else if (TJAPlayer3.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					  TJAPlayer3.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+				OpenTaiko.Skin.soundCancelSFX.tPlay();
+			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
 				var (_b1, _b2) = _controler.tHandleEnter();
 				_backToMain = _b2;
 
 				if (_b1)
-					TJAPlayer3.Skin.soundDecideSFX.tPlay();
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
 				else
-					TJAPlayer3.Skin.soundCancelSFX.tPlay();
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
 			}
 
 			#endregion
@@ -143,7 +143,7 @@ namespace TJAPlayer3 {
 			#region [Postprocessing]
 
 			if (_backToMain) {
-				TJAPlayer3.Skin.soundEncyclopediaBGM?.tStop();
+				OpenTaiko.Skin.soundEncyclopediaBGM?.tStop();
 				this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;

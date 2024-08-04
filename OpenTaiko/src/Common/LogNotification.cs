@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class LogNotification {
 		private static Queue<CLogNotification> Notifications = new Queue<CLogNotification>();
 
@@ -20,7 +20,7 @@ namespace TJAPlayer3 {
 
 			public ENotificationType NotificationType = ENotificationType.EINFO;
 			public string Message = "";
-			public CCounter LifeTime = new CCounter(0, 1000, 1, TJAPlayer3.Timer);
+			public CCounter LifeTime = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 		}
 
 

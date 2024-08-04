@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CAct演奏スコア共通 : CActivity {
 		// プロパティ
 
@@ -184,13 +184,13 @@ namespace TJAPlayer3 {
 		/// <param name="bAutoPlay"></param>
 		/// <param name="delta"></param>
 		public void Add(long delta, int player) {
-			if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1) return;
+			if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) return;
 
 			double rev = 1.0;
 
-			delta = (long)(delta * TJAPlayer3.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
+			delta = (long)(delta * OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
 
-			this.ctTimer = new CCounter(0, 400, 1, TJAPlayer3.Timer);
+			this.ctTimer = new CCounter(0, 400, 1, OpenTaiko.Timer);
 
 			for (int sc = 0; sc < 1; sc++) {
 				for (int i = 0; i < 256; i++) {
@@ -198,7 +198,7 @@ namespace TJAPlayer3 {
 						this.stScore[i].b使用中 = true;
 						this.stScore[i].b表示中 = true;
 						this.stScore[i].nAddScore = (int)delta;
-						this.stScore[i].ctTimer = new CCounter(0, 465, 2, TJAPlayer3.Timer);
+						this.stScore[i].ctTimer = new CCounter(0, 465, 2, OpenTaiko.Timer);
 						this.stScore[i].bBonusScore = false;
 						this.stScore[i].bAddEnd = false;
 						this.stScore[i].nPlayer = player;
@@ -212,7 +212,7 @@ namespace TJAPlayer3 {
 		}
 
 		public void BonusAdd(int player) {
-			if (TJAPlayer3.ConfigIni.bAIBattleMode && player == 1) return;
+			if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) return;
 
 			for (int sc = 0; sc < 1; sc++) {
 				for (int i = 0; i < 256; i++) {
@@ -220,7 +220,7 @@ namespace TJAPlayer3 {
 						this.stScore[i].b使用中 = true;
 						this.stScore[i].b表示中 = true;
 						this.stScore[i].nAddScore = 10000;
-						this.stScore[i].ctTimer = new CCounter(0, 100, 4, TJAPlayer3.Timer);
+						this.stScore[i].ctTimer = new CCounter(0, 100, 4, OpenTaiko.Timer);
 						this.stScore[i].bBonusScore = true;
 						this.stScore[i].bAddEnd = false;
 						this.stScore[i].nPlayer = player;
@@ -277,71 +277,71 @@ namespace TJAPlayer3 {
 			foreach (char ch in str) {
 				for (int i = 0; i < this.stFont.Length; i++) {
 					if (this.stFont[i].ch == ch) {
-						Rectangle rectangle = new Rectangle(TJAPlayer3.Skin.Game_Score_Size[0] * i, 0, TJAPlayer3.Skin.Game_Score_Size[0], TJAPlayer3.Skin.Game_Score_Size[1]);
+						Rectangle rectangle = new Rectangle(OpenTaiko.Skin.Game_Score_Size[0] * i, 0, OpenTaiko.Skin.Game_Score_Size[0], OpenTaiko.Skin.Game_Score_Size[1]);
 						switch (mode) {
 							case 0:
-								if (TJAPlayer3.Tx.Taiko_Score[0] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[0] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 1.0f, 1.0f, 1.0f );
-									TJAPlayer3.Tx.Taiko_Score[0].Opacity = alpha;
-									if (TJAPlayer3.ConfigIni.SimpleMode) {
-										TJAPlayer3.Tx.Taiko_Score[0].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[0].Opacity = alpha;
+									if (OpenTaiko.ConfigIni.SimpleMode) {
+										OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = 1;
 									} else {
-										TJAPlayer3.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
+										OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
 									}
-									TJAPlayer3.Tx.Taiko_Score[0].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[0].t2D拡大率考慮下基準描画(x, y, rectangle);
 
 								}
 								break;
 							case 1:
-								if (TJAPlayer3.Tx.Taiko_Score[1] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[1] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 1.0f, 0.5f, 0.4f );
 									//this.txScore.color4 = CDTXMania.Skin.cScoreColor1P;
-									TJAPlayer3.Tx.Taiko_Score[1].Opacity = alpha;
-									TJAPlayer3.Tx.Taiko_Score[1].vcScaleRatio.Y = 1;
-									TJAPlayer3.Tx.Taiko_Score[1].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[1].Opacity = alpha;
+									OpenTaiko.Tx.Taiko_Score[1].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[1].t2D拡大率考慮下基準描画(x, y, rectangle);
 								}
 								break;
 							case 2:
-								if (TJAPlayer3.Tx.Taiko_Score[2] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[2] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 									//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-									TJAPlayer3.Tx.Taiko_Score[2].Opacity = alpha;
-									TJAPlayer3.Tx.Taiko_Score[2].vcScaleRatio.Y = 1;
-									TJAPlayer3.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[2].Opacity = alpha;
+									OpenTaiko.Tx.Taiko_Score[2].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画(x, y, rectangle);
 								}
 								break;
 							case 3:
-								if (TJAPlayer3.Tx.Taiko_Score[3] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[3] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 									//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-									TJAPlayer3.Tx.Taiko_Score[3].Opacity = alpha;
-									TJAPlayer3.Tx.Taiko_Score[3].vcScaleRatio.Y = 1;
-									TJAPlayer3.Tx.Taiko_Score[3].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[3].Opacity = alpha;
+									OpenTaiko.Tx.Taiko_Score[3].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[3].t2D拡大率考慮下基準描画(x, y, rectangle);
 								}
 								break;
 							case 4:
-								if (TJAPlayer3.Tx.Taiko_Score[4] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[4] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 									//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-									TJAPlayer3.Tx.Taiko_Score[4].Opacity = alpha;
-									TJAPlayer3.Tx.Taiko_Score[4].vcScaleRatio.Y = 1;
-									TJAPlayer3.Tx.Taiko_Score[4].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[4].Opacity = alpha;
+									OpenTaiko.Tx.Taiko_Score[4].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[4].t2D拡大率考慮下基準描画(x, y, rectangle);
 								}
 								break;
 							case 5:
-								if (TJAPlayer3.Tx.Taiko_Score[5] != null) {
+								if (OpenTaiko.Tx.Taiko_Score[5] != null) {
 									//this.txScore.color4 = new SlimDX.Color4( 0.4f, 0.5f, 1.0f );
 									//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
-									TJAPlayer3.Tx.Taiko_Score[5].Opacity = alpha;
-									TJAPlayer3.Tx.Taiko_Score[5].vcScaleRatio.Y = 1;
-									TJAPlayer3.Tx.Taiko_Score[5].t2D拡大率考慮下基準描画(x, y, rectangle);
+									OpenTaiko.Tx.Taiko_Score[5].Opacity = alpha;
+									OpenTaiko.Tx.Taiko_Score[5].vcScaleRatio.Y = 1;
+									OpenTaiko.Tx.Taiko_Score[5].t2D拡大率考慮下基準描画(x, y, rectangle);
 								}
 								break;
 						}
 						break;
 					}
 				}
-				x += TJAPlayer3.Skin.Game_Score_Padding;
+				x += OpenTaiko.Skin.Game_Score_Padding;
 			}
 		}
 	}

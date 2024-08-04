@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class RecentlyPlayedSongs {
 		public void tRecentlyPlayedSongs() {
 			if (!File.Exists("RecentlyPlayedSongs.json"))
@@ -10,11 +10,11 @@
 		#region [Auxiliary methods]
 
 		public void tAddChart(string chartID) {
-			if (!data.recentlyplayedsongs[TJAPlayer3.SaveFile].Contains(chartID))
-				data.recentlyplayedsongs[TJAPlayer3.SaveFile].Enqueue(chartID);
+			if (!data.recentlyplayedsongs[OpenTaiko.SaveFile].Contains(chartID))
+				data.recentlyplayedsongs[OpenTaiko.SaveFile].Enqueue(chartID);
 
-			while (data.recentlyplayedsongs[TJAPlayer3.SaveFile].Count > TJAPlayer3.ConfigIni.nRecentlyPlayedMax)
-				data.recentlyplayedsongs[TJAPlayer3.SaveFile].Dequeue();
+			while (data.recentlyplayedsongs[OpenTaiko.SaveFile].Count > OpenTaiko.ConfigIni.nRecentlyPlayedMax)
+				data.recentlyplayedsongs[OpenTaiko.SaveFile].Dequeue();
 
 			tSaveFile();
 		}

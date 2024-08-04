@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActScanningLoudness : CActivity {
 		public bool bIsActivelyScanning;
 
@@ -13,7 +13,7 @@ namespace TJAPlayer3 {
 
 			try {
 				this.ctNowScanningLoudness = new CCounter();
-				this.ctNowScanningLoudness.Start(0, 200, 29, TJAPlayer3.Timer);
+				this.ctNowScanningLoudness.Start(0, 200, 29, OpenTaiko.Timer);
 			} finally {
 			}
 		}
@@ -30,9 +30,9 @@ namespace TJAPlayer3 {
 				return 0;
 			}
 			this.ctNowScanningLoudness.TickLoop();
-			if (bIsActivelyScanning && TJAPlayer3.Tx.Scanning_Loudness != null) {
-				TJAPlayer3.Tx.Scanning_Loudness.Opacity = (int)(176.0 + 80.0 * Math.Sin((double)(2 * Math.PI * this.ctNowScanningLoudness.CurrentValue / 100.0)));
-				TJAPlayer3.Tx.Scanning_Loudness.t2D描画(18 + 89 + 18, 7); // 2018-09-03 twopointzero: display right of Enum_Song, using its width and margin
+			if (bIsActivelyScanning && OpenTaiko.Tx.Scanning_Loudness != null) {
+				OpenTaiko.Tx.Scanning_Loudness.Opacity = (int)(176.0 + 80.0 * Math.Sin((double)(2 * Math.PI * this.ctNowScanningLoudness.CurrentValue / 100.0)));
+				OpenTaiko.Tx.Scanning_Loudness.t2D描画(18 + 89 + 18, 7); // 2018-09-03 twopointzero: display right of Enum_Song, using its width and margin
 			}
 
 			return 0;

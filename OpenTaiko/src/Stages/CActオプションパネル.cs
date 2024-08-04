@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActオプションパネル : CActivity {
 		// CActivity 実装
 
@@ -11,16 +11,16 @@ namespace TJAPlayer3 {
 			}
 		}
 		public override void CreateManagedResource() {
-			this.txオプションパネル = TJAPlayer3.tテクスチャの生成(CSkin.Path(@"Graphics\Screen option panels.png"), false);
+			this.txオプションパネル = OpenTaiko.tテクスチャの生成(CSkin.Path(@"Graphics\Screen option panels.png"), false);
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {
-			TJAPlayer3.tテクスチャの解放(ref this.txオプションパネル);
+			OpenTaiko.tテクスチャの解放(ref this.txオプションパネル);
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {
 			if (!base.IsDeActivated) {
-				CConfigIni configIni = TJAPlayer3.ConfigIni;
+				CConfigIni configIni = OpenTaiko.ConfigIni;
 				/*
 				if( this.txオプションパネル != null )
 				{

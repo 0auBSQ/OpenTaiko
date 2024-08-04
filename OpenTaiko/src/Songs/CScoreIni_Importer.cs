@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	static class CScoreIni_Importer {
 		public static string Status { get; private set; } = "";
 		private static readonly string langSUBTITLE = "SUBTITLE" + CLangManager.LangInstance.Id.ToUpper();
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 
 			Status = "Searching for scores...";
 			List<string> _scoreFiles = new List<string>();
-			foreach (string path in TJAPlayer3.ConfigIni.strSongsPath.Split(';', StringSplitOptions.RemoveEmptyEntries)) {
+			foreach (string path in OpenTaiko.ConfigIni.strSongsPath.Split(';', StringSplitOptions.RemoveEmptyEntries)) {
 				_scoreFiles.AddRange(Directory.GetFiles(path, "*.score.ini", SearchOption.AllDirectories));
 			}
 			Trace.TraceInformation($"{_scoreFiles.Count} score.ini files have been found. Beginning import.");
@@ -239,21 +239,21 @@ namespace TJAPlayer3 {
 		private static string GetTJAFile(string path) {
 			FileInfo info = new FileInfo(path);
 
-			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini", "");
-			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini", "");
-			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini", "");
-			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini", "");
-			if (info.FullName.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini")) return info.FullName.Replace($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini", "");
+			if (info.FullName.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[0]}.score.ini")) return info.FullName.Replace($"{OpenTaiko.ConfigIni.sSaveFile[0]}.score.ini", "");
+			if (info.FullName.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[1]}.score.ini")) return info.FullName.Replace($"{OpenTaiko.ConfigIni.sSaveFile[1]}.score.ini", "");
+			if (info.FullName.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[2]}.score.ini")) return info.FullName.Replace($"{OpenTaiko.ConfigIni.sSaveFile[2]}.score.ini", "");
+			if (info.FullName.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[3]}.score.ini")) return info.FullName.Replace($"{OpenTaiko.ConfigIni.sSaveFile[3]}.score.ini", "");
+			if (info.FullName.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[4]}.score.ini")) return info.FullName.Replace($"{OpenTaiko.ConfigIni.sSaveFile[4]}.score.ini", "");
 			return info.FullName.Replace(".score.ini", "");
 		}
 		private static int GetPlayerId(string path) {
 			FileInfo info = new FileInfo(path);
 
-			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[0]}.score.ini")) return 0;
-			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[1]}.score.ini")) return 1;
-			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[2]}.score.ini")) return 2;
-			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[3]}.score.ini")) return 3;
-			if (info.Name.EndsWith($"{TJAPlayer3.ConfigIni.sSaveFile[4]}.score.ini")) return 4;
+			if (info.Name.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[0]}.score.ini")) return 0;
+			if (info.Name.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[1]}.score.ini")) return 1;
+			if (info.Name.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[2]}.score.ini")) return 2;
+			if (info.Name.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[3]}.score.ini")) return 3;
+			if (info.Name.EndsWith($"{OpenTaiko.ConfigIni.sSaveFile[4]}.score.ini")) return 4;
 			return 0;
 		}
 	}

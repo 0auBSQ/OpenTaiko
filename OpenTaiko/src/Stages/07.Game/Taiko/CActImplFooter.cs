@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplFooter : CActivity {
 		/// <summary>
 		/// フッター
@@ -23,7 +23,7 @@ namespace TJAPlayer3 {
 						? _presetPath
 						: upDirs[random.Next(0, upDirs.Length)];
 
-					Mob_Footer = TJAPlayer3.tテクスチャの生成(path);
+					Mob_Footer = OpenTaiko.tテクスチャの生成(path);
 				}
 			}
 
@@ -31,7 +31,7 @@ namespace TJAPlayer3 {
 		}
 
 		public override void DeActivate() {
-			TJAPlayer3.tDisposeSafely(ref Mob_Footer);
+			OpenTaiko.tDisposeSafely(ref Mob_Footer);
 
 			base.DeActivate();
 		}
@@ -46,7 +46,7 @@ namespace TJAPlayer3 {
 
 		public override int Draw() {
 			if (this.Mob_Footer != null) {
-				this.Mob_Footer.t2D描画(0, TJAPlayer3.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
+				this.Mob_Footer.t2D描画(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
 			}
 			return base.Draw();
 		}

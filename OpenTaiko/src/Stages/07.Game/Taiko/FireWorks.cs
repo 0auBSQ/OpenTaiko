@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class FireWorks : CActivity {
 		// コンストラクタ
 
@@ -18,7 +18,7 @@ namespace TJAPlayer3 {
 		/// </summary>
 		/// <param name="nLane"></param>
 		public virtual void Start(int nLane, int nPlayer, double x, double y) {
-			if (TJAPlayer3.ConfigIni.SimpleMode) return;
+			if (OpenTaiko.ConfigIni.SimpleMode) return;
 
 			for (int i = 0; i < 32; i++) {
 				if (!FireWork[i].IsUsing) {
@@ -27,7 +27,7 @@ namespace TJAPlayer3 {
 					FireWork[i].Player = nPlayer;
 					FireWork[i].X = x;
 					FireWork[i].Y = y;
-					FireWork[i].Counter = new CCounter(0, TJAPlayer3.Skin.Game_Effect_FireWorks[2] - 1, TJAPlayer3.Skin.Game_Effect_FireWorks_Timer, TJAPlayer3.Timer);
+					FireWork[i].Counter = new CCounter(0, OpenTaiko.Skin.Game_Effect_FireWorks[2] - 1, OpenTaiko.Skin.Game_Effect_FireWorks_Timer, OpenTaiko.Timer);
 					break;
 				}
 			}
@@ -56,11 +56,11 @@ namespace TJAPlayer3 {
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {
-			if (!base.IsDeActivated && !TJAPlayer3.ConfigIni.SimpleMode) {
+			if (!base.IsDeActivated && !OpenTaiko.ConfigIni.SimpleMode) {
 				for (int i = 0; i < 32; i++) {
 					if (FireWork[i].IsUsing) {
 						FireWork[i].Counter.Tick();
-						TJAPlayer3.Tx.Effects_Hit_FireWorks?.t2D中心基準描画((float)FireWork[i].X, (float)FireWork[i].Y, 1, new Rectangle(FireWork[i].Counter.CurrentValue * TJAPlayer3.Skin.Game_Effect_FireWorks[0], 0, TJAPlayer3.Skin.Game_Effect_FireWorks[0], TJAPlayer3.Skin.Game_Effect_FireWorks[1]));
+						OpenTaiko.Tx.Effects_Hit_FireWorks?.t2D中心基準描画((float)FireWork[i].X, (float)FireWork[i].Y, 1, new Rectangle(FireWork[i].Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
 						if (FireWork[i].Counter.IsEnded) {
 							FireWork[i].Counter.Stop();
 							FireWork[i].IsUsing = false;

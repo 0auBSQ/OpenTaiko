@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 
 	/// <summary>
 	/// 難易度。

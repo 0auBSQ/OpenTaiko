@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	internal class CActImplCombo : CAct演奏Combo共通 {
 		// CAct演奏Combo共通 実装
 

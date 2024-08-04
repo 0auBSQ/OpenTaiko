@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActSelectPresound : CActivity {
 		// メソッド
 
@@ -11,12 +11,12 @@ namespace TJAPlayer3 {
 		public void tStopSound() {
 			if (this.sound != null) {
 				this.sound.Stop();
-				TJAPlayer3.SoundManager.tDisposeSound(this.sound);
+				OpenTaiko.SoundManager.tDisposeSound(this.sound);
 				this.sound = null;
 			}
 		}
 		public void t選択曲が変更された() {
-			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
+			Cスコア cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
 
 			if ((cスコア != null) && ((!(cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名).Equals(this.str現在のファイル名) || (this.sound == null)) || !this.sound.IsPlaying)) {
 				this.tStopSound();
@@ -24,10 +24,10 @@ namespace TJAPlayer3 {
 				this.long再生位置 = -1;
 				if ((cスコア.譜面情報.strBGMファイル名 != null) && (cスコア.譜面情報.strBGMファイル名.Length > 0)) {
 					//this.ct再生待ちウェイト = new CCounter( 0, CDTXMania.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms, 1, CDTXMania.Timer );
-					if (TJAPlayer3.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") {
-						this.ct再生待ちウェイト = new CCounter(0, 1, 270, TJAPlayer3.Timer);
+					if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") {
+						this.ct再生待ちウェイト = new CCounter(0, 1, 270, OpenTaiko.Timer);
 					} else {
-						this.ct再生待ちウェイト = new CCounter(0, 1, 500, TJAPlayer3.Timer);
+						this.ct再生待ちウェイト = new CCounter(0, 1, 500, OpenTaiko.Timer);
 					}
 				}
 			}
@@ -67,14 +67,14 @@ namespace TJAPlayer3 {
 			if (!base.IsDeActivated) {
 				if ((this.ctBGMフェードイン用 != null) && this.ctBGMフェードイン用.IsTicked) {
 					this.ctBGMフェードイン用.Tick();
-					TJAPlayer3.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = this.ctBGMフェードイン用.CurrentValue;
+					OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = this.ctBGMフェードイン用.CurrentValue;
 					if (this.ctBGMフェードイン用.IsEnded) {
 						this.ctBGMフェードイン用.Stop();
 					}
 				}
 				if ((this.ctBGMフェードアウト用 != null) && this.ctBGMフェードアウト用.IsTicked) {
 					this.ctBGMフェードアウト用.Tick();
-					TJAPlayer3.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = CSound.MaximumAutomationLevel - this.ctBGMフェードアウト用.CurrentValue;
+					OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = CSound.MaximumAutomationLevel - this.ctBGMフェードアウト用.CurrentValue;
 					if (this.ctBGMフェードアウト用.IsEnded) {
 						this.ctBGMフェードアウト用.Stop();
 					}
@@ -82,7 +82,7 @@ namespace TJAPlayer3 {
 				this.t進行処理_プレビューサウンド();
 
 				if (this.sound != null) {
-					Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
+					Cスコア cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
 					if (long再生位置 == -1) {
 						this.long再生開始時のシステム時刻 = SoundManager.PlayTimer.SystemTimeMs;
 						this.long再生位置 = cスコア.譜面情報.nデモBGMオフセット;
@@ -121,29 +121,29 @@ namespace TJAPlayer3 {
 			if (this.ctBGMフェードイン用 != null) {
 				this.ctBGMフェードイン用.Stop();
 			}
-			this.ctBGMフェードアウト用 = new CCounter(0, 100, 10, TJAPlayer3.Timer);
-			this.ctBGMフェードアウト用.CurrentValue = 100 - TJAPlayer3.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
+			this.ctBGMフェードアウト用 = new CCounter(0, 100, 10, OpenTaiko.Timer);
+			this.ctBGMフェードアウト用.CurrentValue = 100 - OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
 		}
 		private void tBGMフェードイン開始() {
 			if (this.ctBGMフェードアウト用 != null) {
 				this.ctBGMフェードアウト用.Stop();
 			}
-			this.ctBGMフェードイン用 = new CCounter(0, 100, 20, TJAPlayer3.Timer);
-			this.ctBGMフェードイン用.CurrentValue = TJAPlayer3.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
+			this.ctBGMフェードイン用 = new CCounter(0, 100, 20, OpenTaiko.Timer);
+			this.ctBGMフェードイン用.CurrentValue = OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
 		}
 		private void tプレビューサウンドの作成() {
-			Cスコア cスコア = TJAPlayer3.stageSongSelect.r現在選択中のスコア;
-			var HiddenIndex = TJAPlayer3.Databases.DBSongUnlockables.tGetSongHiddenIndex(TJAPlayer3.stageSongSelect.rNowSelectedSong);
+			Cスコア cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
+			var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.rNowSelectedSong);
 			if ((cスコア != null)
 				&& !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
-				&& TJAPlayer3.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
+				&& OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
 				&& HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED
 				) {
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try {
 					strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名;
-					if (TJAPlayer3.ConfigIni.bBGM音を発声する)
-						this.sound = TJAPlayer3.SoundManager.tCreateSound(strPreviewFilename, ESoundGroup.SongPreview);
+					if (OpenTaiko.ConfigIni.bBGM音を発声する)
+						this.sound = OpenTaiko.SoundManager.tCreateSound(strPreviewFilename, ESoundGroup.SongPreview);
 					if (this.sound == null) return;
 					//this.sound.db再生速度 = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;
 
@@ -153,7 +153,7 @@ namespace TJAPlayer3 {
 					//                           If is not yet available then we wish to queue scanning.
 					var loudnessMetadata = cスコア.譜面情報.SongLoudnessMetadata
 										   ?? LoudnessMetadataScanner.LoadForAudioPath(strPreviewFilename);
-					TJAPlayer3.SongGainController.Set(cスコア.譜面情報.SongVol, loudnessMetadata, this.sound);
+					OpenTaiko.SongGainController.Set(cスコア.譜面情報.SongVol, loudnessMetadata, this.sound);
 
 					// Disable song if playing while playing the preview song
 					CSongSelectSongManager.disable();
@@ -188,7 +188,7 @@ namespace TJAPlayer3 {
 				this.ct再生待ちウェイト.Tick();
 				if (!this.ct再生待ちウェイト.IsUnEnded) {
 					this.ct再生待ちウェイト.Stop();
-					if (!TJAPlayer3.stageSongSelect.bCurrentlyScrolling) {
+					if (!OpenTaiko.stageSongSelect.bCurrentlyScrolling) {
 						this.tプレビューサウンドの作成();
 					}
 				}

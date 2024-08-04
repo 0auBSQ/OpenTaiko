@@ -1,4 +1,4 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	/// <summary>
 	/// 「スリーステート」（ON, OFF, 不定 の3状態）を表すアイテム。
 	/// </summary>

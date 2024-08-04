@@ -1,6 +1,6 @@
 ﻿using FDK;
 
-namespace TJAPlayer3 {
+namespace OpenTaiko {
 	internal class CActImplMob : CActivity {
 		/// <summary>
 		/// 踊り子
@@ -46,9 +46,9 @@ namespace TJAPlayer3 {
 		}
 
 		public override int Draw() {
-			if (!TJAPlayer3.stage演奏ドラム画面.bDoublePlay) {
-				if (TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && TJAPlayer3.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-					if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
+			if (!OpenTaiko.stage演奏ドラム画面.bDoublePlay) {
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+					if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
 					MobScript?.Draw();
 
 					/*

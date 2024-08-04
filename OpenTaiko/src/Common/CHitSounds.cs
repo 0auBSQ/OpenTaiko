@@ -1,9 +1,9 @@
-﻿namespace TJAPlayer3 {
+﻿namespace OpenTaiko {
 	class CHitSounds {
 		public CHitSounds(string path) {
 			tLoadFile(path);
 			for (int i = 0; i < 5; i++) {
-				tReloadHitSounds(TJAPlayer3.ConfigIni.nHitSounds[i], i);
+				tReloadHitSounds(OpenTaiko.ConfigIni.nHitSounds[i], i);
 			}
 		}
 
