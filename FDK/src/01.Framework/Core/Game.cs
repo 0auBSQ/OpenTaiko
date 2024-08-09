@@ -420,11 +420,8 @@ namespace SampleFramework {
 			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
 		}
 
-		public void Window_Move(Vector2D<int> size) {
-			WindowPosition = size;
-		}
+		public void Window_Move(Vector2D<int> size) { }
 
-		public void Window_FramebufferResize(Vector2D<int> size) {
-		}
+		public void Window_FramebufferResize(Vector2D<int> size) { }
 	}
 }
