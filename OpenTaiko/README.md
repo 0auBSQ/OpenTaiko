@@ -181,6 +181,7 @@ BoxFontName=廻想体 ネクスト UP B
 134 - Deceiver's Revenge : H5 - https://linktr.ee/H5Music (Chart by bol)
 135 - NEP0：MATSUR1ジケン : OPTK-HQ=CHANNEL0125 (Chart by OPTK-HQ)
 136 - Trapped Passion : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
+137 - ??? ~ T'soL Niamer-I ~ : YLN0 feat. The Second Truth (Chart by ???)
 ```
 
 ### Visuals
