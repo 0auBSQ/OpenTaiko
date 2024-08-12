@@ -68,6 +68,7 @@ namespace OpenTaiko {
 
 		protected object[] RunLuaCode(LuaFunction luaFunction, params object[] args) {
 			try {
+				if (luaFunction == null) return null;
 				var ret = luaFunction.Call(args);
 				LuaScript.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
 				return ret;
