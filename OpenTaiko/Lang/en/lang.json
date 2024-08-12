@@ -50,6 +50,8 @@
         "SETTINGS_SYSTEM_RELOADSONG_DESC": "Reload the song folder.",
         "SETTINGS_SYSTEM_RELOADSONGCACHE": "Reload Songs (Hard Reload)",
         "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Clear the existing cache and\nreload the song folder from scratch.",
+        "SETTINGS_SYSTEM_IMPORT_SCORE_INIT": "Import Score",
+        "SETTINGS_SYSTEM_IMPORT_SCORE_INIT_DESC": "Imports Score.ini files to database.",
         "SETTINGS_SYSTEM_HIDEDANTOWER": "Hide Dan/Tower",
         "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Hide Dan and Tower charts\nin the Taiko Mode menu.\nNote: Reload songs to make\n     this setting take effect.",
 
