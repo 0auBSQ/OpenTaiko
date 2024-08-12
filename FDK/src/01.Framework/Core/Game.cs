@@ -417,15 +417,11 @@ namespace SampleFramework {
 			ViewPortOffset.X = (size.X - ViewPortSize.X) / 2;
 			ViewPortOffset.Y = (size.Y - ViewPortSize.Y) / 2;
 
-			WindowSize = size;
 			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
 		}
 
-		public void Window_Move(Vector2D<int> size) {
-			WindowPosition = size;
-		}
+		public void Window_Move(Vector2D<int> size) { }
 
-		public void Window_FramebufferResize(Vector2D<int> size) {
-		}
+		public void Window_FramebufferResize(Vector2D<int> size) { }
 	}
 }
