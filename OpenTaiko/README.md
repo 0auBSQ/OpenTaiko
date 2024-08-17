@@ -182,6 +182,11 @@ BoxFontName=廻想体 ネクスト UP B
 135 - NEP0：MATSUR1ジケン : OPTK-HQ=CHANNEL0125 (Chart by OPTK-HQ)
 136 - Trapped Passion : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 137 - ??? ~ T'soL Niamer-I ~ : YLN0 feat. The Second Truth (Chart by ???)
+138 - Startup Parade! (Ryuto Setsujin + Makotora Remix) : Ryuto Setsujin + Makotora - https://kingmakotora.bandcamp.com/track/startup-parade-ryuto-setsujin-makotora-remix (Chart by DiamondN1nja)
+139 - euphoric eruption : Makotora - https://kingmakotora.bandcamp.com (Chart by Komi)
+140 - NOVAの夜 (NOVA's Night!!) : alden - https://twitter.com/aldentweeting (Chart by Komi)
+141 - AQUAMARINE : McBoiled - https://soundcloud.com/mcboiled (Chart by Komi)
+142 - floatfobia : ArLgon - https://www.youtube.com/@ArLgon.sb3 (Chart by Komi)
 ```
 
 ### Visuals
