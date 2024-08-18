@@ -3,14 +3,11 @@ using System.Drawing;
 using System.Reflection;
 using FDK;
 
-namespace OpenTaiko
-{
-	internal class CStageタイトル : CStage
-	{
+namespace OpenTaiko {
+	internal class CStageタイトル : CStage {
 		// コンストラクタ
 
-		public CStageタイトル()
-		{
+		public CStageタイトル() {
 			base.eStageID = CStage.EStage.Title;
 			base.IsDeActivated = true;
 			base.ChildActivities.Add(this.actFIfromSetup = new CActFIFOBlack());
@@ -24,12 +21,10 @@ namespace OpenTaiko
 
 		// CStage 実装
 
-		public override void Activate()
-		{
+		public override void Activate() {
 			Trace.TraceInformation("タイトルステージを活性化します。");
 			Trace.Indent();
-			try
-			{
+			try {
 				UnloadSaveFile();
 
 				this.PuchiChara.IdleAnimation();
@@ -59,8 +54,7 @@ namespace OpenTaiko
 				usedMenusCount = usedMenus.Length;
 
 				usedMenusPos = new int[usedMenusCount];
-				for (int i = 0; i < usedMenusCount; i++)
-				{
+				for (int i = 0; i < usedMenusCount; i++) {
 					usedMenusPos[i] = i + 1 - n現在の選択行モード選択;
 				}
 
@@ -77,65 +71,50 @@ namespace OpenTaiko
 				if (OpenTaiko.ConfigIni.bBGM音を発声する)
 					OpenTaiko.Skin.bgmタイトルイン.tPlay();
 				base.Activate();
-			}
-			finally
-			{
+			} finally {
 				Trace.TraceInformation("タイトルステージの活性化を完了しました。");
 				Trace.Unindent();
 			}
 		}
-		public override void DeActivate()
-		{
+		public override void DeActivate() {
 			Trace.TraceInformation("タイトルステージを非活性化します。");
 			Trace.Indent();
-			try
-			{
+			try {
 				OpenTaiko.tDisposeSafely(ref Background);
-			}
-			finally
-			{
+			} finally {
 				Trace.TraceInformation("タイトルステージの非活性化を完了しました。");
 				Trace.Unindent();
 			}
 			base.DeActivate();
 		}
 
-		public void tReloadMenus()
-		{
+		public void tReloadMenus() {
 			if (this.pfMenuTitle != null && this.pfBoxText != null)
 				CMainMenuTab.tInitMenus(this.pfMenuTitle, this.pfBoxText, OpenTaiko.Tx.ModeSelect_Bar, OpenTaiko.Tx.ModeSelect_Bar_Chara);
 		}
 
-		public override void CreateManagedResource()
-		{
+		public override void CreateManagedResource() {
 			this.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[0]);
 			this.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[1]);
 
 			base.CreateManagedResource();
 		}
-		public override void ReleaseManagedResource()
-		{
+		public override void ReleaseManagedResource() {
 
 			OpenTaiko.tDisposeSafely(ref pfMenuTitle);
 			OpenTaiko.tDisposeSafely(ref pfBoxText);
 
 			base.ReleaseManagedResource();
 		}
-		public override int Draw()
-		{
-			if (!base.IsDeActivated)
-			{
+		public override int Draw() {
+			if (!base.IsDeActivated) {
 				#region [ 初めての進行描画 ]
 				//---------------------
-				if (base.IsFirstDraw)
-				{
-					if (OpenTaiko.r直前のステージ == OpenTaiko.stage起動)
-					{
+				if (base.IsFirstDraw) {
+					if (OpenTaiko.r直前のステージ == OpenTaiko.stage起動) {
 						this.actFIfromSetup.tフェードイン開始();
 						base.ePhaseID = CStage.EPhase.Title_FadeIn;
-					}
-					else
-					{
+					} else {
 						this.actFI.tフェードイン開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEIN;
 					}
@@ -152,10 +131,8 @@ namespace OpenTaiko
 				this.ctキャライン.Tick();
 				this.ctBarMove.Tick();
 
-				if (!OpenTaiko.Skin.bgmタイトルイン.bIsPlaying)
-				{
-					if (OpenTaiko.ConfigIni.bBGM音を発声する && !b音声再生)
-					{
+				if (!OpenTaiko.Skin.bgmタイトルイン.bIsPlaying) {
+					if (OpenTaiko.ConfigIni.bBGM音を発声する && !b音声再生) {
 						OpenTaiko.Skin.bgmタイトル.tPlay();
 						b音声再生 = true;
 					}
@@ -168,18 +145,14 @@ namespace OpenTaiko
 				if (base.ePhaseID == CStage.EPhase.Common_NORMAL        // 通常状態、かつ
 					&& OpenTaiko.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
 				{
-					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel))
-					{
-						if (bモード選択)
-						{
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+						if (bモード選択) {
 							OpenTaiko.Skin.soundCancelSFX.tPlay();
 							bSaveFileLoaded = false;
 							UnloadSaveFile();
 							if (bSaveFileLoaded == false)
 								OpenTaiko.Skin.soundEntry.tPlay();
-						}
-						else
-						{
+						} else {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 							n現在の選択行モード選択 = (int)E戻り値.EXIT + 1;
 							this.actFO.tフェードアウト開始(0, 500);
@@ -208,12 +181,10 @@ namespace OpenTaiko
 					*/
 
 					// 1st step (Save file loading)
-					if (!bSaveIsLoading && !bSaveFailedToLoad)
-					{
+					if (!bSaveIsLoading && !bSaveFailedToLoad) {
 
 						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) ||
-							OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed))
-						{
+							OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)) {
 							// Hit 1P save
 							OpenTaiko.SaveFile = 0;
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -221,9 +192,7 @@ namespace OpenTaiko
 							this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
 							for (int i = 0; i < 2; i++)
 								OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
-						}
-						else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P))
-						{
+						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P)) {
 							// Hit 2P save
 							OpenTaiko.SaveFile = 1;
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -231,9 +200,8 @@ namespace OpenTaiko
 							this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
 							for (int i = 0; i < 2; i++)
 								OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
-						}
-						else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.P)) // In case "P" is already binded to another pad
-						{
+						} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.P)) // In case "P" is already binded to another pad
+						  {
 							// Hit 1P save
 							OpenTaiko.SaveFile = 0;
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -244,57 +212,45 @@ namespace OpenTaiko
 						}
 					}
 
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow))
-					{
-						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded)
-						{
-							if (n現在の選択行プレイヤーエントリー + 1 <= 2)
-							{
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded) {
+							if (n現在の選択行プレイヤーエントリー + 1 <= 2) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
 								n現在の選択行プレイヤーエントリー += 1;
 							}
 						}
 
-						if (bモード選択)
-						{
+						if (bモード選択) {
 							//if (n現在の選択行モード選択 < this.nbModes - 1)
-							if (n現在の選択行モード選択 < usedMenusCount - 1)
-							{
+							if (n現在の選択行モード選択 < usedMenusCount - 1) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
 								ctBarMove.Start(0, 250, 1.2f, OpenTaiko.Timer);
 								n現在の選択行モード選択++;
 								this.bDownPushed = true;
 
-								for (int i = 0; i < usedMenusCount; i++)
-								{
+								for (int i = 0; i < usedMenusCount; i++) {
 									usedMenusPos[i] = i + 1 - n現在の選択行モード選択;
 								}
 							}
 						}
 					}
 
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow))
-					{
-						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded)
-						{
-							if (n現在の選択行プレイヤーエントリー - 1 >= 0)
-							{
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded) {
+							if (n現在の選択行プレイヤーエントリー - 1 >= 0) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
 								n現在の選択行プレイヤーエントリー -= 1;
 							}
 						}
 
-						if (bモード選択)
-						{
-							if (n現在の選択行モード選択 > 0)
-							{
+						if (bモード選択) {
+							if (n現在の選択行モード選択 > 0) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
 								ctBarMove.Start(0, 250, 1.2f, OpenTaiko.Timer);
 								n現在の選択行モード選択--;
 								this.bDownPushed = false;
 
-								for (int i = 0; i < usedMenusCount; i++)
-								{
+								for (int i = 0; i < usedMenusCount; i++) {
 									usedMenusPos[i] = i + 1 - n現在の選択行モード選択;
 								}
 							}
@@ -303,14 +259,10 @@ namespace OpenTaiko
 
 
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)
-						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))
-					{
-						if (bプレイヤーエントリー && this.ctSaveLoaded.IsEnded)
-						{
-							if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2)
-							{
-								if (!bプレイヤーエントリー決定)
-								{
+						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+						if (bプレイヤーエントリー && this.ctSaveLoaded.IsEnded) {
+							if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2) {
+								if (!bプレイヤーエントリー決定) {
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
 									ctエントリーバー決定点滅.Start(0, 1055, 1, OpenTaiko.Timer);
 									bプレイヤーエントリー決定 = true;
@@ -319,9 +271,7 @@ namespace OpenTaiko
 										OpenTaiko.ConfigIni.nPlayerCount = 1;
 									bSaveFileLoaded = true;
 								}
-							}
-							else
-							{
+							} else {
 								OpenTaiko.Skin.soundDecideSFX.tPlay();
 								bプレイヤーエントリー = false;
 								bSaveIsLoading = false;
@@ -330,35 +280,28 @@ namespace OpenTaiko
 								ctSaveLoading = new CCounter();
 							}
 						}
-						if (bモード選択)
-						{
+						if (bモード選択) {
 							bool operationSucceded = false;
 
-							if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.DANGAMESTART || CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.TAIKOTOWERSSTART)
-							{
+							if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.DANGAMESTART || CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.TAIKOTOWERSSTART) {
 								if (OpenTaiko.Songs管理.list曲ルート_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 									operationSucceded = true;
-							}
-							else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
-								  && (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
-								  || OpenTaiko.ConfigIni.nPlayerCount == 1))
+							} else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
+									&& (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
+									|| OpenTaiko.ConfigIni.nPlayerCount == 1))
 								operationSucceded = true;
 
-							if (operationSucceded == true)
-							{
+							if (operationSucceded == true) {
 								OpenTaiko.Skin.soundDecideSFX.tPlay();
 								this.actFO.tフェードアウト開始(0, 500);
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-							}
-							else
+							} else
 								OpenTaiko.Skin.soundError.tPlay();
 						}
 					}
 
-					if (ctSaveLoading.CurrentValue >= 500)
-					{
-						if (!bSaveIsLoading)
-						{
+					if (ctSaveLoading.CurrentValue >= 500) {
+						if (!bSaveIsLoading) {
 							OpenTaiko.Skin.soundEntry.tStop();
 							ctSaveLoaded.Start(0, 3655, 1, OpenTaiko.Timer);
 							bSaveIsLoading = true;
@@ -366,10 +309,8 @@ namespace OpenTaiko
 						}
 					}
 
-					if (ctエントリーバー決定点滅.CurrentValue >= 1055)
-					{
-						if (!bモード選択)
-						{
+					if (ctエントリーバー決定点滅.CurrentValue >= 1055) {
+						if (!bモード選択) {
 							/*
 							if (!TJAPlayer3.Skin.soundsanka.bPlayed)
 								TJAPlayer3.Skin.soundsanka.t再生する();
@@ -397,12 +338,10 @@ namespace OpenTaiko
 
 				#endregion
 
-				if (bSaveFileLoaded == false)
-				{
+				if (bSaveFileLoaded == false) {
 					#region [ Save Loading ]
 
-					if (!bSaveIsLoading && !bSaveFailedToLoad)
-					{
+					if (!bSaveIsLoading && !bSaveFailedToLoad) {
 						OpenTaiko.Tx.Entry_Bar.t2D描画(0, 0);
 
 						if (this.ctコインイン待機.CurrentValue <= 255)
@@ -414,13 +353,9 @@ namespace OpenTaiko
 
 						OpenTaiko.Tx.Entry_Bar_Text.t2D描画(OpenTaiko.Skin.Title_Entry_Bar_Text_X[0], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[0], new RectangleF(0, 0, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Width, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
 						OpenTaiko.Tx.Entry_Bar_Text.t2D描画(OpenTaiko.Skin.Title_Entry_Bar_Text_X[1], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[1], new RectangleF(0, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Width, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
-					}
-					else
-					{
-						if (this.ctSaveLoaded.CurrentValue <= 1000 && this.ctSaveLoadingFailed.CurrentValue <= 1128)
-						{
-							if (bSaveIsLoading)
-							{
+					} else {
+						if (this.ctSaveLoaded.CurrentValue <= 1000 && this.ctSaveLoadingFailed.CurrentValue <= 1128) {
+							if (bSaveIsLoading) {
 								OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoaded.CurrentValue <= 2972 ? 128 : 128 - (this.ctSaveLoaded.CurrentValue - 2972);
 
 								for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
@@ -434,14 +369,12 @@ namespace OpenTaiko
 								OpenTaiko.Tx.Banapas_Load[1].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue <= 96 ? (int)((ctSaveLoaded.CurrentValue - 96) * 7.96875f) : 255;
 								OpenTaiko.Tx.Banapas_Load[1].t2D描画(0, 0);
 
-								if (OpenTaiko.Tx.Banapas_Load[2] != null)
-								{
+								if (OpenTaiko.Tx.Banapas_Load[2] != null) {
 									int step = OpenTaiko.Tx.Banapas_Load[2].szTextureSize.Width / OpenTaiko.Skin.Title_LoadingPinFrameCount;
 									int cycle = OpenTaiko.Skin.Title_LoadingPinCycle;
 									int _stamp = (ctSaveLoaded.CurrentValue - 200) % (OpenTaiko.Skin.Title_LoadingPinInstances * cycle);
 
-									for (int i = 0; i < OpenTaiko.Skin.Title_LoadingPinInstances; i++)
-									{
+									for (int i = 0; i < OpenTaiko.Skin.Title_LoadingPinInstances; i++) {
 										OpenTaiko.Tx.Banapas_Load[2].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue <= 96 ? (int)((ctSaveLoaded.CurrentValue - 96) * 7.96875f) : 255;
 
 
@@ -461,8 +394,7 @@ namespace OpenTaiko
 								}
 
 							}
-							if (bSaveFailedToLoad)
-							{
+							if (bSaveFailedToLoad) {
 								OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoadingFailed.CurrentValue <= 1000 ? 128 : 128 - (this.ctSaveLoadingFailed.CurrentValue - 1000);
 
 								for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
@@ -477,17 +409,13 @@ namespace OpenTaiko
 								OpenTaiko.Tx.Banapas_Load_Failure[0].vcScaleRatio.Y = count <= 100 ? count * 0.01f : 1.0f;
 								OpenTaiko.Tx.Banapas_Load_Failure[0].t2D描画(0, 0);
 
-								if (ctSaveLoadingFailed.CurrentValue >= 1128)
-								{
+								if (ctSaveLoadingFailed.CurrentValue >= 1128) {
 									bSaveFailedToLoad = false;
 									OpenTaiko.Skin.soundError.bPlayed = false;
 								}
 							}
-						}
-						else
-						{
-							if (bSaveIsLoading)
-							{
+						} else {
+							if (bSaveIsLoading) {
 								OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoaded.CurrentValue <= 2972 ? 128 : 128 - (this.ctSaveLoaded.CurrentValue - 2972);
 
 								for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
@@ -506,28 +434,20 @@ namespace OpenTaiko
 								float scalex = 0f;
 								float scaley = 0f;
 
-								if (count >= 300)
-								{
-									if (count <= 300 + 270)
-									{
+								if (count >= 300) {
+									if (count <= 300 + 270) {
 										anime = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 95f;
 										scalex = -(float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.15f;
 										scaley = (float)Math.Sin((float)(count - 300) / 1.5f * (Math.PI / 180)) * 0.2f;
-									}
-									else if (count <= 300 + 270 + 100)
-									{
+									} else if (count <= 300 + 270 + 100) {
 										scalex = (float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.13f;
 										scaley = -(float)Math.Sin((float)(count - (300 + 270)) * 1.8f * (Math.PI / 180)) * 0.1f;
 										anime = 0;
-									}
-									else if (count <= 300 + 540 + 100)
-									{
+									} else if (count <= 300 + 540 + 100) {
 										anime = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 95f;
 										scalex = -(float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.15f;
 										scaley = (float)Math.Sin((float)(count - (300 + 270 + 100)) / 1.5f * (Math.PI / 180)) * 0.2f;
-									}
-									else if (count <= 300 + 540 + 100 + 100)
-									{
+									} else if (count <= 300 + 540 + 100 + 100) {
 										scalex = (float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.13f;
 										scaley = -(float)Math.Sin((float)(count - (300 + 540 + 100)) * 1.8f * (Math.PI / 180)) * 0.1f;
 									}
@@ -538,8 +458,7 @@ namespace OpenTaiko
 								OpenTaiko.Tx.Banapas_Load_Clear[1].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
 								OpenTaiko.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[0], OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[1] - anime);
 
-								if (ctSaveLoaded.CurrentValue >= 2000)
-								{
+								if (ctSaveLoaded.CurrentValue >= 2000) {
 									bプレイヤーエントリー = true;
 								}
 							}
@@ -551,10 +470,8 @@ namespace OpenTaiko
 
 				#region [ プレイヤーエントリー ]
 
-				if (bプレイヤーエントリー)
-				{
-					if (!this.bキャラカウンター初期化)
-					{
+				if (bプレイヤーエントリー) {
+					if (!this.bキャラカウンター初期化) {
 						//this.ctキャラエントリーループ = new CCounter(0, Chara_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
 						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
 
@@ -664,14 +581,12 @@ namespace OpenTaiko
 
 				#region [ モード選択 ]
 
-				if (bモード選択)
-				{
+				if (bモード選択) {
 					this.ctBarAnimeIn.Tick();
 
 					#region [ キャラ描画 ]
 
-					for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++)
-					{
+					for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++) {
 						if (player >= 2) continue;
 
 						float CharaX = 0f, CharaY = 0f;
@@ -703,13 +618,11 @@ namespace OpenTaiko
 
 					#endregion
 
-					if (ctBarAnimeIn.CurrentValue >= (int)(16 * 16.6f))
-					{
+					if (ctBarAnimeIn.CurrentValue >= (int)(16 * 16.6f)) {
 						// TJAPlayer3.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, ctBarMove.n現在の値.ToString());
 
 						//for (int i = 0; i < this.nbModes; i++)
-						for (int i = 0; i < usedMenusCount; i++)
-						{
+						for (int i = 0; i < usedMenusCount; i++) {
 							// Get Menu reference
 							CMainMenuTab _menu = CMainMenuTab.__Menus[usedMenus[i]];
 							CTexture _bar = _menu.barTex;
@@ -718,17 +631,14 @@ namespace OpenTaiko
 							#region [Disable visualy 1p specific buttons if 2p]
 
 							if ((_menu._1pRestricted == true && OpenTaiko.ConfigIni.nPlayerCount > 1)
-								|| _menu.implemented == false)
-							{
+								|| _menu.implemented == false) {
 								if (_bar != null)
 									_bar.color4 = CConversion.ColorToColor4(Color.DarkGray);
 								if (_chara != null)
 									_chara.color4 = CConversion.ColorToColor4(Color.DarkGray);
 								TitleTextureKey.ResolveTitleTexture(_menu.ttkBoxText, OpenTaiko.Skin.Title_VerticalText, true).color4 = CConversion.ColorToColor4(Color.DarkGray);
 								TitleTextureKey.ResolveTitleTexture(_menu.ttkTitle, OpenTaiko.Skin.Title_VerticalText).color4 = CConversion.ColorToColor4(Color.DarkGray);
-							}
-							else
-							{
+							} else {
 								if (_bar != null)
 									_bar.color4 = CConversion.ColorToColor4(Color.White);
 								if (_chara != null)
@@ -740,8 +650,7 @@ namespace OpenTaiko
 							#endregion
 
 							// if (this.stModeBar[i].n現在存在している行 == 1 && ctBarMove.n現在の値 >= 150)
-							if (usedMenusPos[i] == 1 && ctBarMove.CurrentValue >= 150)
-							{
+							if (usedMenusPos[i] == 1 && ctBarMove.CurrentValue >= 150) {
 								float barAnimef = (ctBarMove.CurrentValue / 100.0f) - 1.5f;
 
 								float barAnime = OpenTaiko.Skin.Title_ModeSelect_Bar_Move[0] +
@@ -761,8 +670,7 @@ namespace OpenTaiko
 								//int BarAnime = ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) + 100 ? 0 : ctBarAnimeIn.n現在の値 >= (int)(26 * 16.6f) && ctBarAnimeIn.n現在の値 <= (int)(26 * 16.6f) + 100 ? 40 + (int)((ctBarAnimeIn.n現在の値 - (26 * 16.6)) / 100f * 71f) : ctBarAnimeIn.n現在の値 < (int)(26 * 16.6f) ? 40 : 111;
 								//int BarAnime1 = BarAnime == 0 ? ctBarMove.n現在の値 >= 150 ? 40 + (int)((ctBarMove.n現在の値 - 150) / 100f * 71f) : ctBarMove.n現在の値 < 150 ? 40 : 111 : 0;
 
-								if (_bar != null)
-								{
+								if (_bar != null) {
 									_bar.Opacity = 255;
 									_bar.vcScaleRatio.X = 1.0f;
 									_bar.vcScaleRatio.Y = 1.0f;
@@ -779,12 +687,9 @@ namespace OpenTaiko
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[1][2],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[1][3]));
 
-									if (OpenTaiko.Skin.Title_VerticalBar)
-									{
+									if (OpenTaiko.Skin.Title_VerticalBar) {
 										_bar.vcScaleRatio.X = (barAnimeX / OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][2]) * 2.0f;
-									}
-									else
-									{
+									} else {
 										_bar.vcScaleRatio.Y = (barAnime / OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]) * 2.0f;
 									}
 
@@ -796,8 +701,7 @@ namespace OpenTaiko
 								}
 
 
-								if (OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount] != null)
-								{
+								if (OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount] != null) {
 									CTexture _overlap = OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount];
 
 									_overlap.vcScaleRatio.X = 1.0f;
@@ -814,12 +718,9 @@ namespace OpenTaiko
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][2],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][3]));
 
-									if (OpenTaiko.Skin.Title_VerticalBar)
-									{
+									if (OpenTaiko.Skin.Title_VerticalBar) {
 										_overlap.vcScaleRatio.X = (overlayAnimeX / OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][2]);
-									}
-									else
-									{
+									} else {
 										_overlap.vcScaleRatio.Y = (overlayAnime / OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]);
 									}
 
@@ -841,8 +742,7 @@ namespace OpenTaiko
 									anime = 1.50f - (BarAnimeCount - 0.45f) * 0.61764705f;
 								anime *= OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Move;
 
-								if (_chara != null)
-								{
+								if (_chara != null) {
 									_chara.Opacity = (int)(BarAnimeCount * 255f) + (int)(barAnimef * 2.5f);
 									_chara.t2D中心基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_X[0] - anime, OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Y[0],
 										new Rectangle(0, 0, _chara.szTextureSize.Width / 2, _chara.szTextureSize.Height));
@@ -855,15 +755,12 @@ namespace OpenTaiko
 									OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title[1] - (OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title_Move * BarAnimeCount));
 
 								CTexture currentText = TitleTextureKey.ResolveTitleTexture(_menu.ttkBoxText, OpenTaiko.Skin.Title_VerticalText, true);
-								if (currentText != null)
-								{
+								if (currentText != null) {
 									currentText.Opacity = (int)(BarAnimeCount * 255f);
 									currentText?.t2D中心基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[0], OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[1]);
 								}
 
-							}
-							else
-							{
+							} else {
 								int BarAnimeY = ctBarAnimeIn.CurrentValue >= (int)(26 * 16.6f) + 100 && ctBarAnimeIn.CurrentValue <= (int)(26 * 16.6f) + 299 ? 600 - (ctBarAnimeIn.CurrentValue - (int)(26 * 16.6f + 100)) * 3 : ctBarAnimeIn.CurrentValue >= (int)(26 * 16.6f) + 100 ? 0 : 600;
 								int BarAnimeX = ctBarAnimeIn.CurrentValue >= (int)(26 * 16.6f) + 100 && ctBarAnimeIn.CurrentValue <= (int)(26 * 16.6f) + 299 ? 100 - (int)((ctBarAnimeIn.CurrentValue - (int)(26 * 16.6f + 100)) * 0.5f) : ctBarAnimeIn.CurrentValue >= (int)(26 * 16.6f) + 100 ? 0 : 100;
 
@@ -890,15 +787,13 @@ namespace OpenTaiko
 								BarMoveY = ctBarMove.CurrentValue <= 100 ? (int)(pos.Y - posSelect.Y) - (int)(ctBarMove.CurrentValue / 100f * (pos.Y - posSelect.Y)) : 0;
 
 
-								if (_bar != null)
-								{
+								if (_bar != null) {
 									_bar.vcScaleRatio.X = 1.0f;
 									_bar.vcScaleRatio.Y = 1.0f;
 									_bar.t2D描画(pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 								}
 
-								if (OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount] != null)
-								{
+								if (OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount] != null) {
 									CTexture _overlap = OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount];
 
 									_overlap.vcScaleRatio.X = 1.0f;
@@ -913,8 +808,7 @@ namespace OpenTaiko
 						}
 					}
 
-					for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++)
-					{
+					for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++) {
 						if (player >= 2) continue;
 
 						OpenTaiko.NamePlate.tNamePlateDraw(OpenTaiko.Skin.SongSelect_NamePlate_X[player], OpenTaiko.Skin.SongSelect_NamePlate_Y[player], player, false, 255);
@@ -941,18 +835,15 @@ namespace OpenTaiko
 				#endregion
 
 				CStage.EPhase eフェーズid = base.ePhaseID;
-				switch (eフェーズid)
-				{
+				switch (eフェーズid) {
 					case CStage.EPhase.Common_FADEIN:
-						if (this.actFI.Draw() != 0)
-						{
+						if (this.actFI.Draw() != 0) {
 							base.ePhaseID = CStage.EPhase.Common_NORMAL;
 						}
 						break;
 
 					case CStage.EPhase.Common_FADEOUT:
-						if (this.actFO.Draw() == 0)
-						{
+						if (this.actFO.Draw() == 0) {
 							OpenTaiko.Skin.bgmタイトル.tStop();
 							OpenTaiko.Skin.bgmタイトルイン.tStop();
 							break;
@@ -965,8 +856,7 @@ namespace OpenTaiko
 						return ((int)CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp);
 
 					case CStage.EPhase.Title_FadeIn:
-						if (this.actFIfromSetup.Draw() != 0)
-						{
+						if (this.actFIfromSetup.Draw() != 0) {
 							base.ePhaseID = CStage.EPhase.Common_NORMAL;
 						}
 						break;
@@ -974,8 +864,7 @@ namespace OpenTaiko
 			}
 			return 0;
 		}
-		public enum E戻り値
-		{
+		public enum E戻り値 {
 			継続 = 0,
 			GAMESTART,
 			DANGAMESTART,
@@ -1002,10 +891,8 @@ namespace OpenTaiko
 		private ScriptBG Background;
 
 		// Directly propose the different game options if the save file is already loaded, go back to save file select by pressing "Escape"
-		private void SkipSaveFileStep()
-		{
-			if (bSaveFileLoaded == true)
-			{
+		private void SkipSaveFileStep() {
+			if (bSaveFileLoaded == true) {
 				bモード選択 = true;
 				// bプレイヤーエントリー = true;
 				bSaveIsLoading = true;
@@ -1034,8 +921,7 @@ namespace OpenTaiko
 		}
 
 		// Restore the title screen to the "Taiko hit start" screen
-		private void UnloadSaveFile()
-		{
+		private void UnloadSaveFile() {
 			this.ctSaveLoading = new CCounter();
 			this.ctコインイン待機 = new CCounter(0, 2000, 1, OpenTaiko.Timer);
 			this.ctSaveLoaded = new CCounter();
@@ -1111,23 +997,17 @@ namespace OpenTaiko
 		private Point[] ptモード選択バー座標 =
 			{ new Point(290, 107), new Point(319, 306), new Point(356, 513) };*/
 
-		private Point getFixedPositionForBar(int CurrentPos)
-		{
+		private Point getFixedPositionForBar(int CurrentPos) {
 			int posX;
 			int posY;
 
-			if (CurrentPos >= 0 && CurrentPos < 3)
-			{
+			if (CurrentPos >= 0 && CurrentPos < 3) {
 				posX = OpenTaiko.Skin.Title_ModeSelect_Bar_X[CurrentPos];
 				posY = OpenTaiko.Skin.Title_ModeSelect_Bar_Y[CurrentPos];
-			}
-			else if (CurrentPos < 0)
-			{
+			} else if (CurrentPos < 0) {
 				posX = OpenTaiko.Skin.Title_ModeSelect_Bar_X[0] + CurrentPos * OpenTaiko.Skin.Title_ModeSelect_Bar_Offset[0];
 				posY = OpenTaiko.Skin.Title_ModeSelect_Bar_Y[0] + CurrentPos * OpenTaiko.Skin.Title_ModeSelect_Bar_Offset[1];
-			}
-			else
-			{
+			} else {
 				posX = OpenTaiko.Skin.Title_ModeSelect_Bar_X[2] + (CurrentPos - 2) * OpenTaiko.Skin.Title_ModeSelect_Bar_Offset[0];
 				posY = OpenTaiko.Skin.Title_ModeSelect_Bar_Y[2] + (CurrentPos - 2) * OpenTaiko.Skin.Title_ModeSelect_Bar_Offset[1];
 			}

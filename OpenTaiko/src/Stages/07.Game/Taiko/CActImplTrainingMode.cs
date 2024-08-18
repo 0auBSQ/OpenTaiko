@@ -365,7 +365,7 @@ namespace OpenTaiko {
 
 
 			int n少し戻ってから演奏開始Chip = OpenTaiko.stage演奏ドラム画面.n現在のトップChip;
-      
+
 			OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = 0;
 			OpenTaiko.stage演奏ドラム画面.t数値の初期化(true, true);
 			OpenTaiko.stage演奏ドラム画面.Activate();

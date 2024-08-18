@@ -2,53 +2,39 @@
 using FDK;
 using SkiaSharp;
 
-namespace OpenTaiko
-{
-	internal class CActConfigList : CActivity
-	{
+namespace OpenTaiko {
+	internal class CActConfigList : CActivity {
 		// プロパティ
 
 		public bool bIsKeyAssignSelected        // #24525 2011.3.15 yyagi
 		{
-			get
-			{
+			get {
 				Eメニュー種別 e = this.eメニュー種別;
-				if (e == Eメニュー種別.KeyAssignDrums || e == Eメニュー種別.KeyAssignSystem || e == Eメニュー種別.KeyAssignTraining)
-				{
+				if (e == Eメニュー種別.KeyAssignDrums || e == Eメニュー種別.KeyAssignSystem || e == Eメニュー種別.KeyAssignTraining) {
 					return true;
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			}
 		}
 		public bool bIsFocusingParameter        // #32059 2013.9.17 yyagi
 		{
-			get
-			{
+			get {
 				return b要素値にフォーカス中;
 			}
 		}
-		public bool b現在選択されている項目はReturnToMenuである
-		{
-			get
-			{
+		public bool b現在選択されている項目はReturnToMenuである {
+			get {
 				CItemBase currentItem = this.list項目リスト[this.n現在の選択項目];
-				if (currentItem == this.iSystemReturnToMenu || currentItem == this.iDrumsReturnToMenu)
-				{
+				if (currentItem == this.iSystemReturnToMenu || currentItem == this.iDrumsReturnToMenu) {
 					return true;
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			}
 		}
-		public CItemBase ib現在の選択項目
-		{
-			get
-			{
+		public CItemBase ib現在の選択項目 {
+			get {
 				return this.list項目リスト[this.n現在の選択項目];
 			}
 		}
@@ -58,8 +44,7 @@ namespace OpenTaiko
 		// General system options
 		#region [ t項目リストの設定_System() ]
 
-		public void t項目リストの設定_System(bool refresh = true)
-		{
+		public void t項目リストの設定_System(bool refresh = true) {
 			this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
 
@@ -307,8 +292,7 @@ namespace OpenTaiko
 			this.list項目リスト.Add(this.iSystemGoToKeyAssign);
 
 			OnListMenuの初期化();
-			if (refresh)
-			{
+			if (refresh) {
 				this.n現在の選択項目 = 0;
 				this.eメニュー種別 = Eメニュー種別.System;
 			}
@@ -320,8 +304,7 @@ namespace OpenTaiko
 		// Gameplay options 
 		#region [ t項目リストの設定_Drums() ]
 
-		public void t項目リストの設定_Drums()
-		{
+		public void t項目リストの設定_Drums() {
 			this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
 
@@ -451,15 +434,13 @@ namespace OpenTaiko
 		/// <summary>
 		/// ESC押下時の右メニュー描画
 		/// </summary>
-		public void tEsc押下()
-		{
+		public void tEsc押下() {
 			if (this.b要素値にフォーカス中)       // #32059 2013.9.17 add yyagi
 			{
 				this.b要素値にフォーカス中 = false;
 			}
 
-			switch (eメニュー種別)
-			{
+			switch (eメニュー種別) {
 				case Eメニュー種別.KeyAssignSystem:
 					t項目リストの設定_System();
 					break;
@@ -471,271 +452,159 @@ namespace OpenTaiko
 
 			// これ以外なら何もしない
 		}
-		public void tEnter押下()
-		{
+		public void tEnter押下() {
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
-			if (this.b要素値にフォーカス中)
-			{
+			if (this.b要素値にフォーカス中) {
 				this.b要素値にフォーカス中 = false;
-			}
-			else if (this.list項目リスト[this.n現在の選択項目].e種別 == CItemBase.E種別.整数)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目].e種別 == CItemBase.E種別.整数) {
 				this.b要素値にフォーカス中 = true;
-			}
-			else if (this.b現在選択されている項目はReturnToMenuである)
-			{
+			} else if (this.b現在選択されている項目はReturnToMenuである) {
 				//this.tConfigIniへ記録する();
 				//CONFIG中にスキン変化が発生すると面倒なので、一旦マスクした。
 			}
 			#region [ 個々のキーアサイン ]
-			//太鼓のキー設定。
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed)
-			{
+			  //太鼓のキー設定。
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue);
 			}
 
-			//太鼓のキー設定。2P
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed2P)
-			{
+			  //太鼓のキー設定。2P
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed2P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed2P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed2P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed2P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed2P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue2P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue2P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue2P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue2P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue2P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue2P);
 			}
 
-			//太鼓のキー設定。3P
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed3P)
-			{
+			  //太鼓のキー設定。3P
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed3P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed3P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed3P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed3P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed3P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue3P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue3P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue3P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue3P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue3P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue3P);
 			}
 
-			//太鼓のキー設定。4P
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed4P)
-			{
+			  //太鼓のキー設定。4P
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed4P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed4P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed4P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed4P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed4P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue4P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue4P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue4P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue4P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue4P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue4P);
 			}
 
-			//太鼓のキー設定。5P
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed5P)
-			{
+			  //太鼓のキー設定。5P
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed5P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LRed5P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed5P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed5P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RRed5P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue5P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue5P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LBlue5P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue5P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue5P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RBlue5P);
 			}
 
-			// Konga claps
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap)
-			{
+			  // Konga claps
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap2P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap2P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap2P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap3P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap3P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap3P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap4P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap4P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap4P);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap5P)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap5P) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Clap5P);
 			}
 
-			// Menu controls
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide)
-			{
+			  // Menu controls
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Decide);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignCancel)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignCancel) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.Cancel);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignLeftChange)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignLeftChange) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.LeftChange);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignRightChange)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignRightChange) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.RightChange);
 			}
 
-			// System controls
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemCapture)
-			{
+			  // System controls
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemCapture) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.Capture);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSongVolIncrease)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSongVolIncrease) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.SongVolumeIncrease);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSongVolDecrease)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSongVolDecrease) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.SongVolumeDecrease);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemDisplayHit)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemDisplayHit) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.DisplayHits);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemDisplayDebug)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemDisplayDebug) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.DisplayDebug);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemQuickConfig)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemQuickConfig) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.QuickConfig);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemNewHeya)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemNewHeya) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.NewHeya);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSortSongs)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSortSongs) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.SortSongs);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleAutoP1)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleAutoP1) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleAutoP1);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleAutoP2)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleAutoP2) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleAutoP2);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleTrainingMode)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleTrainingMode) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.ToggleTrainingMode);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemCycleVideoDisplayMode)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemCycleVideoDisplayMode) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.SYSTEM, EKeyConfigPad.CycleVideoDisplayMode);
 			}
 
-			// Training controls
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingPause)
-			{
+			  // Training controls
+			  else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingPause) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingPause);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingToggleAuto)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingToggleAuto) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingToggleAuto);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBookmark)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBookmark) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBookmark);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseScrollSpeed)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseScrollSpeed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingIncreaseScrollSpeed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseScrollSpeed)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseScrollSpeed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingDecreaseScrollSpeed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseSongSpeed)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseSongSpeed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingIncreaseSongSpeed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseSongSpeed)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseSongSpeed) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingDecreaseSongSpeed);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchNormal)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchNormal) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchNormal);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchExpert)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchExpert) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchExpert);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchMaster)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchMaster) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingBranchMaster);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveForwardMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveForwardMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingMoveForwardMeasure);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveBackMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveBackMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingMoveBackMeasure);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipForwardMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipForwardMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingSkipForwardMeasure);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipBackMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipBackMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingSkipBackMeasure);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToFirstMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToFirstMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingJumpToFirstMeasure);
-			}
-			else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToLastMeasure)
-			{
+			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToLastMeasure) {
 				OpenTaiko.stageコンフィグ.tパッド選択通知(EKeyConfigPart.DRUMS, EKeyConfigPad.TrainingJumpToLastMeasure);
 			}
 			#endregion
-			else
-			{
+			  else {
 				// #27029 2012.1.5 from
 				//if( ( this.iSystemBDGroup.n現在選択されている項目番号 == (int) EBDGroup.どっちもBD ) &&
 				//    ( ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemHHGroup ) || ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemHitSoundPriorityHH ) ) )
@@ -747,8 +616,7 @@ namespace OpenTaiko
 				//    // 変更許可
 				this.list項目リスト[this.n現在の選択項目].tEnter押下();
 
-				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemLanguage)
-				{
+				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemLanguage) {
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
 
@@ -770,56 +638,45 @@ namespace OpenTaiko
 
 				// Enter押下後の後処理
 
-				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemFullscreen)
-				{
+				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemFullscreen) {
 					OpenTaiko.app.b次のタイミングで全画面_ウィンドウ切り替えを行う = true;
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemVSyncWait)
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemVSyncWait) {
 					OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
 					OpenTaiko.app.b次のタイミングで垂直帰線同期切り替えを行う = true;
 				}
 				#region [ キーアサインへの遷移と脱出 ]
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemGoToKeyAssign)          // #24609 2011.4.12 yyagi
-				{
+				  else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemGoToKeyAssign)          // #24609 2011.4.12 yyagi
+				  {
 					t項目リストの設定_KeyAssignSystem();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemReturnToMenu)    // #24609 2011.4.12 yyagi
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemReturnToMenu)    // #24609 2011.4.12 yyagi
+				  {
 					tConfigIniへ記録する();
 					t項目リストの設定_System();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToKeyAssign)               // #24525 2011.3.15 yyagi
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToKeyAssign)               // #24525 2011.3.15 yyagi
+				  {
 					tConfigIniへ記録する();
 					t項目リストの設定_KeyAssignDrums();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToTrainingKeyAssign)
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToTrainingKeyAssign) {
 					tConfigIniへ記録する();
 					t項目リストの設定_KeyAssignTraining();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToCalibration)
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToCalibration) {
 					OpenTaiko.stageコンフィグ.actCalibrationMode.Start();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDrumsReturnToMenu ||
-						  this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDrumsReturnToMenu ||
+							this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
+				  {
 					t項目リストの設定_Drums();
 				}
 				#endregion
 				#region [ スキン項目でEnterを押下した場合に限り、スキンの縮小サンプルを生成する。]
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder)          // #28195 2012.5.2 yyagi
-				{
+				  else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder)          // #28195 2012.5.2 yyagi
+				  {
 					tGenerateSkinSample();
 				}
 				#endregion
 				#region [ 曲データ一覧の再読み込み ]
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemReloadDTX)              // #32081 2013.10.21 yyagi
-				{
-					if (OpenTaiko.EnumSongs.IsEnumerating)
-					{
+				  else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemReloadDTX)              // #32081 2013.10.21 yyagi
+				  {
+					if (OpenTaiko.EnumSongs.IsEnumerating) {
 						// Debug.WriteLine( "バックグラウンドでEnumeratingSongs中だったので、一旦中断します。" );
 						OpenTaiko.EnumSongs.Abort();
 						OpenTaiko.actEnumSongs.DeActivate();
@@ -832,11 +689,9 @@ namespace OpenTaiko
 					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
 
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemHardReloadDTX)              // #32081 2013.10.21 yyagi
-				{
-					if (OpenTaiko.EnumSongs.IsEnumerating)
-					{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemHardReloadDTX)              // #32081 2013.10.21 yyagi
+				  {
+					if (OpenTaiko.EnumSongs.IsEnumerating) {
 						// Debug.WriteLine( "バックグラウンドでEnumeratingSongs中だったので、一旦中断します。" );
 						OpenTaiko.EnumSongs.Abort();
 						OpenTaiko.actEnumSongs.DeActivate();
@@ -849,9 +704,7 @@ namespace OpenTaiko
 					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
 
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
-				}
-				else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore)
-				{
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
 					// Running in a separate thread so the game doesn't freeze
 					Thread thread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
 					thread.Start();
@@ -860,12 +713,10 @@ namespace OpenTaiko
 			}
 		}
 
-		private void tGenerateSkinSample()
-		{
+		private void tGenerateSkinSample() {
 
 			nSkinIndex = ((CItemList)this.list項目リスト[this.n現在の選択項目]).n現在選択されている項目番号;
-			if (nSkinSampleIndex != nSkinIndex)
-			{
+			if (nSkinSampleIndex != nSkinIndex) {
 				string path = skinSubFolders[nSkinIndex];
 				path = System.IO.Path.Combine(path, @$"Graphics{Path.DirectorySeparatorChar}1_Title{Path.DirectorySeparatorChar}Background.png");
 				SKBitmap bmSrc = SKBitmap.Decode(path);
@@ -873,8 +724,7 @@ namespace OpenTaiko
 				int _w = OpenTaiko.Skin.Resolution[0] / 4;// bmSrc.Width / 4;
 				int _h = OpenTaiko.Skin.Resolution[1] / 4;// bmSrc.Height / 4;
 
-				if (txSkinSample1 != null)
-				{
+				if (txSkinSample1 != null) {
 					OpenTaiko.tDisposeSafely(ref txSkinSample1);
 				}
 				txSkinSample1 = OpenTaiko.tテクスチャの生成(bmSrc, false);
@@ -887,13 +737,11 @@ namespace OpenTaiko
 		}
 
 		#region [ 項目リストの設定 ( Exit, KeyAssignSystem/Drums) ]
-		public void t項目リストの設定_Exit()
-		{
+		public void t項目リストの設定_Exit() {
 			this.tConfigIniへ記録する();
 			this.eメニュー種別 = Eメニュー種別.Unknown;
 		}
-		public void t項目リストの設定_KeyAssignSystem()
-		{
+		public void t項目リストの設定_KeyAssignSystem() {
 			//this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
 
@@ -944,8 +792,7 @@ namespace OpenTaiko
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignSystem;
 		}
-		public void t項目リストの設定_KeyAssignDrums()
-		{
+		public void t項目リストの設定_KeyAssignDrums() {
 			//			this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
 
@@ -1053,8 +900,7 @@ namespace OpenTaiko
 			this.n現在の選択項目 = 0;
 			this.eメニュー種別 = Eメニュー種別.KeyAssignDrums;
 		}
-		public void t項目リストの設定_KeyAssignTraining()
-		{
+		public void t項目リストの設定_KeyAssignTraining() {
 			this.list項目リスト.Clear();
 
 			this.iKeyAssignTrainingReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
@@ -1131,34 +977,25 @@ namespace OpenTaiko
 			this.eメニュー種別 = Eメニュー種別.KeyAssignTraining;
 		}
 		#endregion
-		public void t次に移動()
-		{
+		public void t次に移動() {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			if (this.b要素値にフォーカス中)
-			{
+			if (this.b要素値にフォーカス中) {
 				this.list項目リスト[this.n現在の選択項目].t項目値を前へ移動();
 				t要素値を上下に変更中の処理();
-			}
-			else
-			{
+			} else {
 				this.n目標のスクロールカウンタ += 100;
 			}
 		}
-		public void t前に移動()
-		{
+		public void t前に移動() {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			if (this.b要素値にフォーカス中)
-			{
+			if (this.b要素値にフォーカス中) {
 				this.list項目リスト[this.n現在の選択項目].t項目値を次へ移動();
 				t要素値を上下に変更中の処理();
-			}
-			else
-			{
+			} else {
 				this.n目標のスクロールカウンタ -= 100;
 			}
 		}
-		private void t要素値を上下に変更中の処理()
-		{
+		private void t要素値を上下に変更中の処理() {
 			//if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemMasterVolume )				// #33700 2014.4.26 yyagi
 			//{
 			//    CDTXMania.Sound管理.nMasterVolume = this.iSystemMasterVolume.n現在の値;
@@ -1168,8 +1005,7 @@ namespace OpenTaiko
 
 		// CActivity 実装
 
-		public override void Activate()
-		{
+		public override void Activate() {
 			if (this.IsActivated)
 				return;
 
@@ -1180,12 +1016,10 @@ namespace OpenTaiko
 			int ns = (OpenTaiko.Skin.strSystemSkinSubfolders == null) ? 0 : OpenTaiko.Skin.strSystemSkinSubfolders.Length;
 			int nb = (OpenTaiko.Skin.strBoxDefSkinSubfolders == null) ? 0 : OpenTaiko.Skin.strBoxDefSkinSubfolders.Length;
 			skinSubFolders = new string[ns + nb];
-			for (int i = 0; i < ns; i++)
-			{
+			for (int i = 0; i < ns; i++) {
 				skinSubFolders[i] = OpenTaiko.Skin.strSystemSkinSubfolders[i];
 			}
-			for (int i = 0; i < nb; i++)
-			{
+			for (int i = 0; i < nb; i++) {
 				skinSubFolders[ns + i] = OpenTaiko.Skin.strBoxDefSkinSubfolders[i];
 			}
 			skinSubFolder_org = OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true);
@@ -1217,8 +1051,7 @@ namespace OpenTaiko
 			this.iSystemSoundTimerType_initial = this.iSystemSoundTimerType.GetIndex();             //
 			base.Activate();
 		}
-		public override void DeActivate()
-		{
+		public override void DeActivate() {
 			if (this.IsDeActivated)
 				return;
 
@@ -1228,8 +1061,7 @@ namespace OpenTaiko
 
 			base.DeActivate();
 			#region [ Skin変更 ]
-			if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org)
-			{
+			if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org) {
 				OpenTaiko.app.RefreshSkin();
 			}
 			#endregion
@@ -1242,11 +1074,9 @@ namespace OpenTaiko
 				 this.iSystemWASAPIBufferSizeMs_initial != this.iSystemWASAPIBufferSizeMs.n現在の値 ||
 				// this.iSystemASIOBufferSizeMs_initial != this.iSystemASIOBufferSizeMs.n現在の値 ||
 				this.iSystemASIODevice_initial != this.iSystemASIODevice.n現在選択されている項目番号 ||
-				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex())
-			{
+				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
 				ESoundDeviceType soundDeviceType;
-				switch (this.iSystemSoundType.n現在選択されている項目番号)
-				{
+				switch (this.iSystemSoundType.n現在選択されている項目番号) {
 					case 0:
 						soundDeviceType = ESoundDeviceType.Bass;
 						break;
@@ -1278,8 +1108,7 @@ namespace OpenTaiko
 			FDK.SoundManager.bIsTimeStretch = this.iSystemTimeStretch.bON;
 			#endregion
 		}
-		public override void CreateManagedResource()
-		{
+		public override void CreateManagedResource() {
 			this.prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale);    // t項目リストの設定 の前に必要
 
 			//this.tx通常項目行パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_itembox.png" ), false );
@@ -1288,8 +1117,7 @@ namespace OpenTaiko
 			this.txSkinSample1 = null;      // スキン選択時に動的に設定するため、ここでは初期化しない
 			base.CreateManagedResource();
 		}
-		public override void ReleaseManagedResource()
-		{
+		public override void ReleaseManagedResource() {
 			prvFont.Dispose();
 
 			OpenTaiko.tテクスチャの解放(ref this.txSkinSample1);
@@ -1299,8 +1127,7 @@ namespace OpenTaiko
 
 			base.ReleaseManagedResource();
 		}
-		private void OnListMenuの初期化()
-		{
+		private void OnListMenuの初期化() {
 			OnListMenuの解放();
 			this.listMenu = new stMenuItemRight[this.list項目リスト.Count];
 		}
@@ -1308,30 +1135,23 @@ namespace OpenTaiko
 		/// <summary>
 		/// 事前にレンダリングしておいたテクスチャを解放する。
 		/// </summary>
-		private void OnListMenuの解放()
-		{
-			if (listMenu != null)
-			{
-				for (int i = 0; i < listMenu.Length; i++)
-				{
-					if (listMenu[i].txParam != null)
-					{
+		private void OnListMenuの解放() {
+			if (listMenu != null) {
+				for (int i = 0; i < listMenu.Length; i++) {
+					if (listMenu[i].txParam != null) {
 						listMenu[i].txParam.Dispose();
 					}
-					if (listMenu[i].txMenuItemRight != null)
-					{
+					if (listMenu[i].txMenuItemRight != null) {
 						listMenu[i].txMenuItemRight.Dispose();
 					}
 				}
 				this.listMenu = null;
 			}
 		}
-		public override int Draw()
-		{
+		public override int Draw() {
 			throw new InvalidOperationException("t進行描画(bool)のほうを使用してください。");
 		}
-		public int t進行描画(bool b項目リスト側にフォーカスがある)
-		{
+		public int t進行描画(bool b項目リスト側にフォーカスがある) {
 			if (this.IsDeActivated)
 				return 0;
 
@@ -1339,8 +1159,7 @@ namespace OpenTaiko
 
 			#region [ 初めての進行描画 ]
 			//-----------------
-			if (base.IsFirstDraw)
-			{
+			if (base.IsFirstDraw) {
 				this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				this.ct三角矢印アニメ.Start(0, 9, 50, OpenTaiko.Timer);
 
@@ -1357,47 +1176,34 @@ namespace OpenTaiko
 			if (n現在時刻 < this.nスクロール用タイマ値) this.nスクロール用タイマ値 = n現在時刻;
 
 			const int INTERVAL = 2; // [ms]
-			while ((n現在時刻 - this.nスクロール用タイマ値) >= INTERVAL)
-			{
+			while ((n現在時刻 - this.nスクロール用タイマ値) >= INTERVAL) {
 				int n目標項目までのスクロール量 = Math.Abs((int)(this.n目標のスクロールカウンタ - this.n現在のスクロールカウンタ));
 				int n加速度 = 0;
 
 				#region [ n加速度の決定；目標まで遠いほど加速する。]
 				//-----------------
-				if (n目標項目までのスクロール量 <= 100)
-				{
+				if (n目標項目までのスクロール量 <= 100) {
 					n加速度 = 2;
-				}
-				else if (n目標項目までのスクロール量 <= 300)
-				{
+				} else if (n目標項目までのスクロール量 <= 300) {
 					n加速度 = 3;
-				}
-				else if (n目標項目までのスクロール量 <= 500)
-				{
+				} else if (n目標項目までのスクロール量 <= 500) {
 					n加速度 = 4;
-				}
-				else
-				{
+				} else {
 					n加速度 = 8;
 				}
 				//-----------------
 				#endregion
 				#region [ this.n現在のスクロールカウンタに n加速度 を加減算。]
 				//-----------------
-				if (this.n現在のスクロールカウンタ < this.n目標のスクロールカウンタ)
-				{
+				if (this.n現在のスクロールカウンタ < this.n目標のスクロールカウンタ) {
 					this.n現在のスクロールカウンタ += n加速度;
-					if (this.n現在のスクロールカウンタ > this.n目標のスクロールカウンタ)
-					{
+					if (this.n現在のスクロールカウンタ > this.n目標のスクロールカウンタ) {
 						// 目標を超えたら目標値で停止。
 						this.n現在のスクロールカウンタ = this.n目標のスクロールカウンタ;
 					}
-				}
-				else if (this.n現在のスクロールカウンタ > this.n目標のスクロールカウンタ)
-				{
+				} else if (this.n現在のスクロールカウンタ > this.n目標のスクロールカウンタ) {
 					this.n現在のスクロールカウンタ -= n加速度;
-					if (this.n現在のスクロールカウンタ < this.n目標のスクロールカウンタ)
-					{
+					if (this.n現在のスクロールカウンタ < this.n目標のスクロールカウンタ) {
 						// 目標を超えたら目標値で停止。
 						this.n現在のスクロールカウンタ = this.n目標のスクロールカウンタ;
 					}
@@ -1406,23 +1212,18 @@ namespace OpenTaiko
 				#endregion
 				#region [ 行超え処理、ならびに目標位置に到達したらスクロールを停止して項目変更通知を発行。]
 				//-----------------
-				if (this.n現在のスクロールカウンタ >= 100)
-				{
+				if (this.n現在のスクロールカウンタ >= 100) {
 					this.n現在の選択項目 = this.t次の項目(this.n現在の選択項目);
 					this.n現在のスクロールカウンタ -= 100;
 					this.n目標のスクロールカウンタ -= 100;
-					if (this.n目標のスクロールカウンタ == 0)
-					{
+					if (this.n目標のスクロールカウンタ == 0) {
 						OpenTaiko.stageコンフィグ.t項目変更通知();
 					}
-				}
-				else if (this.n現在のスクロールカウンタ <= -100)
-				{
+				} else if (this.n現在のスクロールカウンタ <= -100) {
 					this.n現在の選択項目 = this.t前の項目(this.n現在の選択項目);
 					this.n現在のスクロールカウンタ += 100;
 					this.n目標のスクロールカウンタ += 100;
-					if (this.n目標のスクロールカウンタ == 0)
-					{
+					if (this.n目標のスクロールカウンタ == 0) {
 						OpenTaiko.stageコンフィグ.t項目変更通知();
 					}
 				}
@@ -1473,8 +1274,7 @@ namespace OpenTaiko
 
 				#region [ 現在の行の項目パネル枠を描画。]
 				//-----------------
-				switch (this.list項目リスト[nItem].eパネル種別)
-				{
+				switch (this.list項目リスト[nItem].eパネル種別) {
 					case CItemBase.EPanelType.Normal:
 					case CItemBase.EPanelType.Other:
 						if (OpenTaiko.Tx.Config_ItemBox != null)
@@ -1488,11 +1288,8 @@ namespace OpenTaiko
 				if (listMenu[nItem].txMenuItemRight != null)    // 自前のキャッシュに含まれているようなら、再レンダリングせずキャッシュを使用
 				{
 					listMenu[nItem].txMenuItemRight.t2D描画(x + OpenTaiko.Skin.Config_ItemBox_Font_Offset[0], y + OpenTaiko.Skin.Config_ItemBox_Font_Offset[1]);
-				}
-				else
-				{
-					using (var bmpItem = prvFont.DrawText(this.list項目リスト[nItem].str項目名, Color.White, Color.Black, null, 30))
-					{
+				} else {
+					using (var bmpItem = prvFont.DrawText(this.list項目リスト[nItem].str項目名, Color.White, Color.Black, null, 30)) {
 						listMenu[nItem].txMenuItemRight = OpenTaiko.tテクスチャの生成(bmpItem);
 						// ctItem.t2D描画( CDTXMania.app.Device, ( x + 0x12 ) * Scale.X, ( y + 12 ) * Scale.Y - 20 );
 						// CDTXMania.tテクスチャの解放( ref ctItem );
@@ -1505,8 +1302,7 @@ namespace OpenTaiko
 				//-----------------
 				string strParam = null;
 				bool b強調 = false;
-				switch (this.list項目リスト[nItem].e種別)
-				{
+				switch (this.list項目リスト[nItem].e種別) {
 					case CItemBase.E種別.ONorOFFトグル:
 						#region [ *** ]
 						//-----------------
@@ -1519,8 +1315,7 @@ namespace OpenTaiko
 					case CItemBase.E種別.ONorOFFor不定スリーステート:
 						#region [ *** ]
 						//-----------------
-						switch (((CItemThreeState)this.list項目リスト[nItem]).e現在の状態)
-						{
+						switch (((CItemThreeState)this.list項目リスト[nItem]).e現在の状態) {
 							case CItemThreeState.E状態.ON:
 								strParam = "ON";
 								break;
@@ -1541,8 +1336,7 @@ namespace OpenTaiko
 					case CItemBase.E種別.整数:      // #24789 2011.4.8 yyagi: add PlaySpeed supports (copied them from OPTION)
 						#region [ *** ]
 						//-----------------
-						if (this.list項目リスト[nItem] == this.iCommonPlaySpeed)
-						{
+						if (this.list項目リスト[nItem] == this.iCommonPlaySpeed) {
 							double d = ((double)((CItemInteger)this.list項目リスト[nItem]).n現在の値) / 20.0;
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, d.ToString( "0.000" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = d.ToString("0.000");
@@ -1553,8 +1347,7 @@ namespace OpenTaiko
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, f.ToString( "x0.0" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = f.ToString( "x0.0" );
 						}*/
-						else
-						{
+						else {
 							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString(), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = ((CItemInteger)this.list項目リスト[nItem]).n現在の値.ToString();
 						}
@@ -1572,11 +1365,9 @@ namespace OpenTaiko
 							strParam = list.list項目値[list.n現在選択されている項目番号];
 
 							#region [ 必要な場合に、Skinのサンプルを生成・描画する。#28195 2012.5.2 yyagi ]
-							if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder)
-							{
+							if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder) {
 								tGenerateSkinSample();      // 最初にSkinの選択肢にきたとき(Enterを押す前)に限り、サンプル生成が発生する。
-								if (txSkinSample1 != null)
-								{
+								if (txSkinSample1 != null) {
 									txSkinSample1.t2D描画(OpenTaiko.Skin.Config_SkinSample1[0], OpenTaiko.Skin.Config_SkinSample1[1]);
 								}
 							}
@@ -1586,34 +1377,27 @@ namespace OpenTaiko
 						//-----------------
 						#endregion
 				}
-				if (b強調)
-				{
+				if (b強調) {
 					using (var bmpStr = prvFont.DrawText(strParam,
 						Color.Black,
 						Color.White,
 						null,
 						OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
 						OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
-						30))
-					{
-						using (var txStr = OpenTaiko.tテクスチャの生成(bmpStr, false))
-						{
+						30)) {
+						using (var txStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
 							txStr.t2D描画(x + OpenTaiko.Skin.Config_ItemBox_ItemValue_Font_Offset[0], y + OpenTaiko.Skin.Config_ItemBox_ItemValue_Font_Offset[1]);
 						}
 					}
-				}
-				else
-				{
+				} else {
 					int nIndex = this.list項目リスト[nItem].GetIndex();
-					if (listMenu[nItem].nParam != nIndex || listMenu[nItem].txParam == null)
-					{
+					if (listMenu[nItem].nParam != nIndex || listMenu[nItem].txParam == null) {
 						stMenuItemRight stm = listMenu[nItem];
 						stm.nParam = nIndex;
 						object o = this.list項目リスト[nItem].obj現在値();
 						stm.strParam = (o == null) ? "" : o.ToString();
 
-						using (var bmpStr = prvFont.DrawText(strParam, Color.White, Color.Black, null, 30))
-						{
+						using (var bmpStr = prvFont.DrawText(strParam, Color.White, Color.Black, null, 30)) {
 							stm.txParam = OpenTaiko.tテクスチャの生成(bmpStr, false);
 						}
 
@@ -1631,8 +1415,7 @@ namespace OpenTaiko
 
 			#region [ 項目リストにフォーカスがあって、かつスクロールが停止しているなら、パネルの上下に▲印を描画する。]
 			//-----------------
-			if (this.b項目リスト側にフォーカスがある && (this.n目標のスクロールカウンタ == 0))
-			{
+			if (this.b項目リスト側にフォーカスがある && (this.n目標のスクロールカウンタ == 0)) {
 				int x_upper;
 				int x_lower;
 				int y_upper;
@@ -1640,15 +1423,12 @@ namespace OpenTaiko
 
 				// 位置決定。
 
-				if (this.b要素値にフォーカス中)
-				{
+				if (this.b要素値にフォーカス中) {
 					x_upper = OpenTaiko.Skin.Config_Arrow_Focus_X[0];  // 要素値の上下あたり。
 					x_lower = OpenTaiko.Skin.Config_Arrow_Focus_X[1];  // 要素値の上下あたり。
 					y_upper = OpenTaiko.Skin.Config_Arrow_Focus_Y[0] - this.ct三角矢印アニメ.CurrentValue;
 					y_lower = OpenTaiko.Skin.Config_Arrow_Focus_Y[1] + this.ct三角矢印アニメ.CurrentValue;
-				}
-				else
-				{
+				} else {
 					x_upper = OpenTaiko.Skin.Config_Arrow_X[0];  // 要素値の上下あたり。
 					x_lower = OpenTaiko.Skin.Config_Arrow_X[1];  // 要素値の上下あたり。
 					y_upper = OpenTaiko.Skin.Config_Arrow_Y[0] - this.ct三角矢印アニメ.CurrentValue;
@@ -1657,8 +1437,7 @@ namespace OpenTaiko
 
 				// 描画。
 
-				if (OpenTaiko.Tx.Config_Arrow != null)
-				{
+				if (OpenTaiko.Tx.Config_Arrow != null) {
 					OpenTaiko.Tx.Config_Arrow.t2D描画(x_upper, y_upper, new Rectangle(0, 0, OpenTaiko.Tx.Config_Arrow.sz画像サイズ.Width, OpenTaiko.Tx.Config_Arrow.sz画像サイズ.Height / 2));
 					OpenTaiko.Tx.Config_Arrow.t2D描画(x_lower, y_lower, new Rectangle(0, OpenTaiko.Tx.Config_Arrow.sz画像サイズ.Height / 2, OpenTaiko.Tx.Config_Arrow.sz画像サイズ.Width, OpenTaiko.Tx.Config_Arrow.sz画像サイズ.Height / 2));
 				}
@@ -1673,8 +1452,7 @@ namespace OpenTaiko
 
 		#region [ private ]
 		//-----------------
-		private enum Eメニュー種別
-		{
+		private enum Eメニュー種別 {
 			System,
 			Drums,
 			KeyAssignSystem,        // #24609 2011.4.12 yyagi: 画面キャプチャキーのアサイン
@@ -1832,8 +1610,7 @@ namespace OpenTaiko
 
 		private CCachedFontRenderer prvFont;
 		//private List<string> list項目リスト_str最終描画名;
-		private struct stMenuItemRight
-		{
+		private struct stMenuItemRight {
 			//	public string strMenuItem;
 			public CTexture txMenuItemRight;
 			public int nParam;
@@ -1904,26 +1681,20 @@ namespace OpenTaiko
 		private CItemBase isSystemImportingScore;
 		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
 
-		private int t前の項目(int nItem)
-		{
-			if (--nItem < 0)
-			{
+		private int t前の項目(int nItem) {
+			if (--nItem < 0) {
 				nItem = this.list項目リスト.Count - 1;
 			}
 			return nItem;
 		}
-		private int t次の項目(int nItem)
-		{
-			if (++nItem >= this.list項目リスト.Count)
-			{
+		private int t次の項目(int nItem) {
+			if (++nItem >= this.list項目リスト.Count) {
 				nItem = 0;
 			}
 			return nItem;
 		}
-		private void tConfigIniへ記録する()
-		{
-			switch (this.eメニュー種別)
-			{
+		private void tConfigIniへ記録する() {
+			switch (this.eメニュー種別) {
 				case Eメニュー種別.System:
 					this.tConfigIniへ記録する_System();
 					return;
@@ -1933,8 +1704,7 @@ namespace OpenTaiko
 					return;
 			}
 		}
-		private void tConfigIniへ記録する_System()
-		{
+		private void tConfigIniへ記録する_System() {
 			OpenTaiko.ConfigIni.nSongSpeed = this.iCommonPlaySpeed.n現在の値;
 
 			OpenTaiko.ConfigIni.nGraphicsDeviceType = this.iSystemGraphicsType.n現在選択されている項目番号;
@@ -2011,8 +1781,7 @@ namespace OpenTaiko
 			OpenTaiko.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
 			OpenTaiko.ConfigIni.SimpleMode = this.SimpleMode.bON;
 		}
-		private void tConfigIniへ記録する_Drums()
-		{
+		private void tConfigIniへ記録する_Drums() {
 			//TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = this.iTaikoAutoPlay.bON;
 			//TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = this.iTaikoAutoPlay2P.bON;
 			//TJAPlayer3.ConfigIni.bAuto先生の連打 = this.iTaikoAutoRoll.bON;
