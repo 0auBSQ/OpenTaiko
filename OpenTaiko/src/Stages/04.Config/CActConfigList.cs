@@ -853,7 +853,7 @@ namespace OpenTaiko
 				else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore)
 				{
 					// Running in a separate thread so the game doesn't freeze
-					Thread thread = new Thread(CScoreIni_Importer.ImportScoreInitsToSavesDb3);
+					Thread thread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
 					thread.Start();
 				}
 				#endregion

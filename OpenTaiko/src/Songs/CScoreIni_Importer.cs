@@ -5,7 +5,7 @@ namespace OpenTaiko {
 	static class CScoreIni_Importer {
 		public static string Status { get; private set; } = "";
 		private static readonly string langSUBTITLE = "SUBTITLE" + CLangManager.LangInstance.Id.ToUpper();
-		public static void ImportScoreInitsToSavesDb3() {
+		public static void ImportScoreInisToSavesDb3() {
 			Trace.TraceInformation("Importing score.ini files to Saves.db3 database!");
 
 			Status = "Establishing connection to database...";

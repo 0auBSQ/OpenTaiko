@@ -188,7 +188,7 @@ namespace OpenTaiko
 					}
 #if DEBUG
 					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F8)) {
-						CScoreIni_Importer.ImportScoreInitsToSavesDb3();
+						CScoreIni_Importer.ImportScoreInisToSavesDb3();
 					}
 #endif
 
