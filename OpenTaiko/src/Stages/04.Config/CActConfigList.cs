@@ -77,8 +77,8 @@ namespace OpenTaiko
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONGCACHE_DESC"));
 			this.list項目リスト.Add(this.iSystemHardReloadDTX);
 
-			this.isSystemImportingScore = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORT_SCORE_INIT"), CItemBase.EPanelType.Normal,
-				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORT_SCORE_INIT_DESC"));
+			this.isSystemImportingScore = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI"), CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI_DESC"));
 			this.list項目リスト.Add(this.isSystemImportingScore);
 
 			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANGUAGE"), CItemList.EPanelType.Normal, CLangManager.langToInt(OpenTaiko.ConfigIni.sLang),
