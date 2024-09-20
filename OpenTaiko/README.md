@@ -84,7 +84,7 @@ BoxFontName=廻想体 ネクスト UP B
 037 - Yukianesa ~Azure Of Ice~ : Sukima Altera - https://youtube.com/c/SukimaAltera | https://www.twitter.com/SukimaAltera (Chart by bol (Except Extreme) and 0AuBSQ)
 038 - Dear Stars : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu)
 039 - Forever Fading Away : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, colin, bol, 0AuBSQ & Ryuto Setsujin)
-040 - Every Night : DJ NEXTON - https://nexton.bandcamp.com (Chart by colin)
+040 - Every Night : RachelTypeX - https://nexton.bandcamp.com (Chart by colin)
 041 - beyond the cityscape : Makotora - https://soundcloud.com/xoxomakotora/beyond-the-cityscape (Chart by bol)
 042 - Shockwave : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by bol)
 043 - TRIPLE HELIX : Yonokid - https://youtube.com/channel/UCQmfYbGGEaz-LMcFf6bNT_Q | https://twitter.com/yonokid (Chart by colin & 0AuBSQ)
@@ -110,7 +110,7 @@ BoxFontName=廻想体 ネクスト UP B
 063 - away : rainfall - https://on.soundcloud.com/dHt1P (Chart by Megi and 0AuBSQ)
 064 - PLANETES : SiLiS - https://soundcloud.com/silis/planetes?si=2da8518a62bd4022a176a62fd2abe458&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by 0AuBSQ)
 065 - Bounded Quietude : SiLiS vs Finite Limit - https://soundcloud.com/silis/silis-vs-finite-limit-bounded?si=f7b16b47ef5e4feb992df028778af30a&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by bol and 0AuBSQ)
-066 - Heating Up : FCN - https://fcngroove.carrd.co/ (Chart by Shoxk)
+066 - Heating Up : RachelTypeX - https://fcngroove.carrd.co/ (Chart by Shoxk)
 067 - Liar Prison : SiLiS ft. Karin Natsuki - https://soundcloud.com/silis/liarprison/s-RY4KsJUxuzL?si=e1738364de3a45328b27d1f10c90fea5&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing (Chart by 0AuBSQ)
 068 - Unlucky Rain : DashyDesu - https://www.youtube.com/c/DashyDesu (Chart by DashyDesu, Shoxk and 0AuBSQ)
 069 - Vanaheimr : SiLiS - https://soundcloud.com/silis (Chart by bol and 0AuBSQ)
@@ -187,6 +187,7 @@ BoxFontName=廻想体 ネクスト UP B
 140 - NOVAの夜 (NOVA's Night!!) : alden - https://twitter.com/aldentweeting (Chart by Komi)
 141 - AQUAMARINE : McBoiled - https://soundcloud.com/mcboiled (Chart by Komi)
 142 - floatfobia : ArLgon - https://www.youtube.com/@ArLgon.sb3 (Chart by Komi)
+143 - you ruined me with your lies : Teocore - https://open.spotify.com/artist/3sYKIK8OWKNyAqWx9xmprd?si=lxpWLpvsT4OVwqwiNAEpPA // https://www.youtube.com/@t3oc0re // https://soundcloud.com/teocore (Chart by sadkay)
 ```
 
 ### Visuals
