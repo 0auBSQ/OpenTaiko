@@ -1,5 +1,16 @@
 {
-	"name" : "Template",
+	"name" : {
+		"strings": {
+			"default": "Template",
+			"ru": "Шаблон",
+			"zh": "模板"
+		}
+	},
     "rarity": "Common",
-	"author": "OpenTaiko Team",
+	"author": {
+		"strings": {
+			"default": "OpenTaiko Team",
+			"zh": "OpenTaiko团队"
+		}
+	}
 }

@@ -3,6 +3,7 @@
 		"strings": {
 			"default": "OpenTaiko-Kun",
 			"ja": "OpenTaiko君",
+			"ru": "OpenTaiko-Кун",
 			"zh": "OpenTaiko君"
 		}
 	},
@@ -11,8 +12,14 @@
 		"strings": {
 			"default": "The most basic puchichara.\nSimple but effective.",
 			"ja": "一番シンプルなプチキャラ。\n単純ですが効果的。",
+			"ru": "Самая основная пти-персонажа.\nПросто но эффективно.",
 			"zh": "最基本的迷你角色。\n简单但是有效。"
 		}
 	},
-	"author": "Komi"
+	"author": {
+		"strings": {
+			"default": "Komi",
+			"ru": "Коми"
+		}
+	}
 }

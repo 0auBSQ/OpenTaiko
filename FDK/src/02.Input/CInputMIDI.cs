@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
-
-namespace FDK
-{
-	public class CInputMIDI : IInputDevice, IDisposable
-	{
+﻿namespace FDK {
+	public class CInputMIDI : IInputDevice, IDisposable {
 		// プロパティ
 
 		public IntPtr MidiInPtr;
@@ -14,8 +7,7 @@ namespace FDK
 
 		// コンストラクタ
 
-		public CInputMIDI(uint nID)
-		{
+		public CInputMIDI(uint nID) {
 			this.MidiInPtr = IntPtr.Zero;
 			this.EventBuffers = new List<STInputEvent>(32);
 			this.InputEvents = new List<STInputEvent>(32);
@@ -28,8 +20,7 @@ namespace FDK
 
 		// メソッド
 
-		public void tメッセージからMIDI信号のみ受信(uint wMsg, IntPtr dwInstance, IntPtr dwParam1, IntPtr dwParam2, long n受信システム時刻)
-		{
+		public void tメッセージからMIDI信号のみ受信(uint wMsg, IntPtr dwInstance, IntPtr dwParam1, IntPtr dwParam2, long n受信システム時刻) {
 			/*
 			if (wMsg == CWin32.MIM_DATA)
 			{
@@ -71,8 +62,7 @@ namespace FDK
 		public List<STInputEvent> InputEvents { get; private set; }
 		public string strDeviceName { get; set; }
 
-		public void Polling(bool bWindowがアクティブ中)
-		{
+		public void Polling(bool bWindowがアクティブ中) {
 			// this.list入力イベント = new List<STInputEvent>( 32 );
 			this.InputEvents.Clear();                                // #xxxxx 2012.6.11 yyagi; To optimize, I removed new();
 
@@ -81,27 +71,21 @@ namespace FDK
 
 			this.EventBuffers.Clear();
 		}
-		public bool KeyPressed(int nKey)
-		{
-			foreach (STInputEvent event2 in this.InputEvents)
-			{
-				if ((event2.nKey == nKey) && event2.Pressed)
-				{
+		public bool KeyPressed(int nKey) {
+			foreach (STInputEvent event2 in this.InputEvents) {
+				if ((event2.nKey == nKey) && event2.Pressed) {
 					return true;
 				}
 			}
 			return false;
 		}
-		public bool KeyPressing(int nKey)
-		{
+		public bool KeyPressing(int nKey) {
 			return false;
 		}
-		public bool KeyReleased(int nKey)
-		{
+		public bool KeyReleased(int nKey) {
 			return false;
 		}
-		public bool KeyReleasing(int nKey)
-		{
+		public bool KeyReleasing(int nKey) {
 			return false;
 		}
 		//-----------------
@@ -109,14 +93,11 @@ namespace FDK
 
 		#region [ IDisposable 実装 ]
 		//-----------------
-		public void Dispose()
-		{
-			if (this.EventBuffers != null)
-			{
+		public void Dispose() {
+			if (this.EventBuffers != null) {
 				this.EventBuffers = null;
 			}
-			if (this.InputEvents != null)
-			{
+			if (this.InputEvents != null) {
 				this.InputEvents = null;
 			}
 		}

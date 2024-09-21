@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
-using Silk.NET.Input;
+﻿using Silk.NET.Input;
 
-namespace FDK
-{
-	public class CInputKeyboard : IInputDevice, IDisposable
-	{
+namespace FDK {
+	public class CInputKeyboard : IInputDevice, IDisposable {
 		// コンストラクタ
 
-		public CInputKeyboard(IReadOnlyList<IKeyboard> keyboards)
-		{
+		public CInputKeyboard(IReadOnlyList<IKeyboard> keyboards) {
 			this.CurrentType = InputDeviceType.Keyboard;
 			this.GUID = "";
 			this.ID = 0;
 
-			foreach (var keyboard in keyboards)
-			{
+			foreach (var keyboard in keyboards) {
 				keyboard.KeyDown += KeyDown;
 				keyboard.KeyUp += KeyUp;
 				keyboard.KeyChar += KeyChar;
@@ -39,24 +31,17 @@ namespace FDK
 		public List<STInputEvent> InputEvents { get; private set; }
 		public string strDeviceName { get; set; }
 
-		public void Polling(bool useBufferInput)
-		{
+		public void Polling(bool useBufferInput) {
 			InputEvents.Clear();
-			
-			for (int i = 0; i < KeyStates.Length; i++)
-			{
-				if (KeyStates[i].Item1)
-				{
-					if (KeyStates[i].Item2 >= 1)
-					{
+
+			for (int i = 0; i < KeyStates.Length; i++) {
+				if (KeyStates[i].Item1) {
+					if (KeyStates[i].Item2 >= 1) {
 						KeyStates[i].Item2 = 2;
-					}
-					else
-					{
+					} else {
 						KeyStates[i].Item2 = 1;
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = true,
 								Released = false,
@@ -65,19 +50,13 @@ namespace FDK
 							}
 						);
 					}
-				}
-				else
-				{
-					if (KeyStates[i].Item2 <= -1)
-					{
+				} else {
+					if (KeyStates[i].Item2 <= -1) {
 						KeyStates[i].Item2 = -2;
-					}
-					else
-					{
+					} else {
 						KeyStates[i].Item2 = -1;
 						InputEvents.Add(
-							new STInputEvent()
-							{
+							new STInputEvent() {
 								nKey = i,
 								Pressed = false,
 								Released = true,
@@ -92,29 +71,25 @@ namespace FDK
 		/// <param name="nKey">
 		///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 		/// </param>
-		public bool KeyPressed(int nKey)
-		{
+		public bool KeyPressed(int nKey) {
 			return KeyStates[nKey].Item2 == 1;
 		}
 		/// <param name="nKey">
 		///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 		/// </param>
-		public bool KeyPressing(int nKey)
-		{
+		public bool KeyPressing(int nKey) {
 			return KeyStates[nKey].Item2 >= 1;
 		}
 		/// <param name="nKey">
 		///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 		/// </param>
-		public bool KeyReleased(int nKey)
-		{
+		public bool KeyReleased(int nKey) {
 			return KeyStates[nKey].Item2 == -1;
 		}
 		/// <param name="nKey">
 		///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 		/// </param>
-		public bool KeyReleasing(int nKey)
-		{
+		public bool KeyReleasing(int nKey) {
 			return KeyStates[nKey].Item2 <= -1;
 		}
 		//-----------------
@@ -122,12 +97,9 @@ namespace FDK
 
 		#region [ IDisposable 実装 ]
 		//-----------------
-		public void Dispose()
-		{
-			if(!this.IsDisposed)
-			{
-				if (this.InputEvents != null)
-				{
+		public void Dispose() {
+			if (!this.IsDisposed) {
+				if (this.InputEvents != null) {
 					this.InputEvents = null;
 				}
 				this.IsDisposed = true;
@@ -147,26 +119,21 @@ namespace FDK
 		//private CTimer ct;
 
 
-		private void KeyDown(IKeyboard keyboard, Key key, int keyCode)
-		{
-			if (key != Key.Unknown)
-			{
+		private void KeyDown(IKeyboard keyboard, Key key, int keyCode) {
+			if (key != Key.Unknown) {
 				var keyNum = DeviceConstantConverter.DIKtoKey(key);
 				KeyStates[(int)keyNum].Item1 = true;
 			}
 		}
 
-		private void KeyUp(IKeyboard keyboard, Key key, int keyCode)
-		{
-			if (key != Key.Unknown)
-			{
+		private void KeyUp(IKeyboard keyboard, Key key, int keyCode) {
+			if (key != Key.Unknown) {
 				var keyNum = DeviceConstantConverter.DIKtoKey(key);
 				KeyStates[(int)keyNum].Item1 = false;
 			}
 		}
 
-		private void KeyChar(IKeyboard keyboard, char ch)
-		{
+		private void KeyChar(IKeyboard keyboard, char ch) {
 
 		}
 		//-----------------
