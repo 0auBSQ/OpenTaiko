@@ -460,16 +460,16 @@
     "UNLOCK_COIN_BOUGHT": "Item gekocht!",
     "UNLOCK_COIN_MORE": "Niet genoeg munten!",
 
-    "UNLOCK_CONDITION_ERROR": "De volgende conditie: (0) vereist (1) waardes.",
+    "UNLOCK_CONDITION_ERROR": "De volgende conditie: {0} vereist {1} waardes.",
 								
-    "UNLOCK_CONDITION_ERROR2": "De volgende conditie: (0) vereist ({1} * n) waardes en n referenties.",
+    "UNLOCK_CONDITION_ERROR2": "De volgende conditie: {0} vereist ({1} * n) waardes en n referenties.",
 
     // {0}: Coin earn requirement
     // {1}: Current progress
-    "UNLOCK_CONDITION_EARN": "Verdien in totaal (0) munten om dit itme te ontgrendelen! ({1}/{0})", // ce
+    "UNLOCK_CONDITION_EARN": "Verdien in totaal {0} munten om dit itme te ontgrendelen! ({1}/{0})", // ce
     // {0}: Total AI plays needed
     // {1}: Current progress
-    "UNLOCK_CONDITION_AIPLAY": "Speel (0) AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // ap
+    "UNLOCK_CONDITION_AIPLAY": "Speel {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // ap
     // {0}: Total AI wins needed
     // {1}: Current progress
     "UNLOCK_CONDITION_AIWIN": "Win {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // aw
