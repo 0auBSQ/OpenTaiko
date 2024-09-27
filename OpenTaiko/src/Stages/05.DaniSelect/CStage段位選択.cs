@@ -204,7 +204,7 @@ namespace OpenTaiko {
 
 					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
-                        this.段位リスト.n現在の選択行 = 0;
+						this.段位リスト.n現在の選択行 = 0;
 						return returnTitle();
 					}
 				}

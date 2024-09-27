@@ -1,4 +1,4 @@
-﻿{
+{
   // The folder's name is used as the ID, which is used to identify which localized data to use.
   // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
   // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.

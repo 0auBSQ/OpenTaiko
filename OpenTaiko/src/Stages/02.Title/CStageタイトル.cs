@@ -287,8 +287,8 @@ namespace OpenTaiko {
 								if (OpenTaiko.Songs管理.list曲ルート_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 									operationSucceded = true;
 							} else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
-								  && (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
-								  || OpenTaiko.ConfigIni.nPlayerCount == 1))
+									&& (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
+									|| OpenTaiko.ConfigIni.nPlayerCount == 1))
 								operationSucceded = true;
 
 							if (operationSucceded == true) {

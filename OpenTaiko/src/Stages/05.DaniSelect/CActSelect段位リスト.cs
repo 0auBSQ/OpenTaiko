@@ -383,7 +383,7 @@ namespace OpenTaiko {
 		private void tDrawDanSelectedLevel(float Anime, int modifier = 0) {
 			int scroll = OpenTaiko.Skin.Resolution[0] * modifier;
 			int currentSong = Math.Clamp(n現在の選択行 + modifier, 0, stバー情報.Length - 1);
-            bool over4 = false;
+			bool over4 = false;
 
 			switch (stバー情報[currentSong].eノード種別) {
 				case CSongListNode.ENodeType.SCORE: {
