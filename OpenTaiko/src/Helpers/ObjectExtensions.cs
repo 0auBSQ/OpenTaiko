@@ -174,11 +174,14 @@ namespace System {
 							// Split the input into real and imaginary parts
 							string[] parts = input.Split(new[] { '+', '-' }, StringSplitOptions.RemoveEmptyEntries);
 
+							// If starts by - (fix for -1+3i, etc)
+							double factor = input.StartsWith("-") ? -1 : 1;
+
 							if (input.Contains("+")) {
 								real = double.Parse(parts[0], CultureInfo.InvariantCulture);
 								imaginary = double.Parse(parts[1], CultureInfo.InvariantCulture);
 							} else if (input.LastIndexOf('-') > 0) // handling cases like "1-2i"
-							  {
+								{
 								real = double.Parse(parts[0], CultureInfo.InvariantCulture);
 								imaginary = -double.Parse(parts[1], CultureInfo.InvariantCulture);
 							} else if (input.StartsWith("-")) {
@@ -186,6 +189,8 @@ namespace System {
 							} else {
 								imaginary = double.Parse(parts[0], CultureInfo.InvariantCulture);
 							}
+
+							real *= factor;
 						}
 					}
 				} else {
