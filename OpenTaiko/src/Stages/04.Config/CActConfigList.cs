@@ -706,8 +706,8 @@ namespace OpenTaiko {
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 				} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
 					// Running in a separate thread so the game doesn't freeze
-					Thread thread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
-					thread.Start();
+					ScoreIniImportThread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
+					ScoreIniImportThread.Start();
 				}
 				#endregion
 			}
@@ -1680,6 +1680,16 @@ namespace OpenTaiko {
 		private CItemBase iSystemHardReloadDTX;
 		private CItemBase isSystemImportingScore;
 		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
+
+		public Thread ScoreIniImportThread { get; private set; }
+		public bool ScoreIniImportThreadIsActive
+		{
+			get
+			{
+				if (ScoreIniImportThread == null) return false;
+				return ScoreIniImportThread.IsAlive;
+			}
+		}
 
 		private int t前の項目(int nItem) {
 			if (--nItem < 0) {
