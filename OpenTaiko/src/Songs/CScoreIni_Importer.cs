@@ -8,7 +8,9 @@ namespace OpenTaiko {
 		public static void ImportScoreInisToSavesDb3() {
 			Trace.TraceInformation("Importing score.ini files to Saves.db3 database!");
 
-			Status = "Establishing connection to database...";
+			//Status = "Establishing connection to database..."; // I don't think the player needs to know this info ¯\_(ツ)_/¯
+			Status = CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1");
+
 			SqliteConnection? connection = DBSaves.GetSavesDBConnection();
 			if (connection == null) {
 				Trace.TraceError("Could not establish a connection to Saves.db3 database. Aborting score import.");
@@ -16,16 +18,23 @@ namespace OpenTaiko {
 				return;
 			}
 
-			Status = "Searching for scores...";
 			List<string> _scoreFiles = new List<string>();
 			foreach (string path in OpenTaiko.ConfigIni.strSongsPath.Split(';', StringSplitOptions.RemoveEmptyEntries)) {
 				_scoreFiles.AddRange(Directory.GetFiles(path, "*.score.ini", SearchOption.AllDirectories));
 			}
 			Trace.TraceInformation($"{_scoreFiles.Count} score.ini files have been found. Beginning import.");
 
-			int importcount = 0;
-			Status = "Importing scores...";
+			int totalcount = 0;
+			int successcount = 0;
+			int skipcount = 0;
+			int errorcount = 0;
+
 			foreach (string _score in _scoreFiles) {
+
+				Status = CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2", _scoreFiles.Count, successcount, totalcount, skipcount, errorcount, Path.GetFileName(_score));
+				//Status = $"Importing {_scoreFiles.Count} scores...\n{importcount} of {totalcount} imported ({skipcount} skipped / {errorcount} failed)\n\n{Path.GetFileName(_score)}";
+
+				//Trace.TraceInformation(Status);
 				try {
 					string directory = Path.GetDirectoryName(_score);
 					DirectoryInfo dir_parent = Directory.GetParent(directory);
@@ -187,6 +196,7 @@ namespace OpenTaiko {
 						}
 					}
 
+					bool success = false;
 					for (int i = 0; i < Level.Length; i++) {
 						int score_index = i < 5 ? i : 0;
 						if (Level[i] != -1 && HighScore[score_index] > 0) {
@@ -224,15 +234,17 @@ namespace OpenTaiko {
                         )
                        ON CONFLICT(ChartUniqueId,ChartDifficulty,PlayMods) DO NOTHING
                 ";
-							if (cmd.ExecuteNonQuery() > 0)
-								importcount++;
+							if (cmd.ExecuteNonQuery() > 0) { successcount++; success = true; }
 						}
 					}
+					if (!success) { skipcount++; }
 				} catch (Exception ex) {
 					Trace.TraceWarning($"Failed to import {_score} into new database. More details:\n{ex}");
+					errorcount++;
 				}
+				finally { totalcount++; }
 			}
-			Trace.TraceInformation($"Imported {importcount} of {_scoreFiles.Count} scores from score.ini files.");
+			Trace.TraceInformation($"Imported {successcount} of {_scoreFiles.Count} scores from score.ini files. ({errorcount} failed imports; {skipcount} skipped imports;)");
 			Status = "";
 		}
 
