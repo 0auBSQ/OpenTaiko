@@ -51,16 +51,16 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Перезагрузка песен (Жёсткая)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Удаляет существующую базу данных и\nперезагружает папки песен с нуля.",
 
-		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Импортировать Score.ini файлы",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Импортировает Score.ini файлы в базу данных.\n\n<c.#f0ad4e>ВНИМАНИЕ\nСледующее передано не будет:\n- Завершение статусы\n- Модификаторы геймплея\n- Количества ударов\n   (Хорошо, OK, Плохо, Дроби, и т.д.)\n- Результаты за экзамен Дана",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Поиск результатов...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Обработка {0} результата/ов...\n<c.#0bb000>{1} из {2} импортировано</c> (<c.#f0ad4e>{3} пропущено</c> / <c.#b00000>{4} неудачно</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Спрятать Дан и Башни",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Скрыт партитуры Дан и Башен в меню Режима\nТайко.\nПримечание: Перезагрузите песни, чтобы\n                        настройки вступили в силу.",
@@ -89,7 +89,7 @@
 		"SETTINGS_SYSTEM_BGA": "Нарисовать BGA",
 		"SETTINGS_SYSTEM_BGA_DESC": "Переключает, будет ли отображаться фоновая\nанимация.",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "Отобразить персонажей",
-		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Показывает изображения персонажи.",
+		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Показывает изображения персонажа.",
 		"SETTINGS_SYSTEM_DISPLAYDANCER": "Отобразить танцоров",
 		"SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Показывает изображения танцора.",
 		"SETTINGS_SYSTEM_DISPLAYMOB": "Отобразить толпу",
@@ -98,8 +98,8 @@
 		"SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Показывает изображения бегуна.",
 		"SETTINGS_SYSTEM_DISPLAYFOOTER": "Отобразить нижний колонтитул",
 		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Показывает изображения нижнего колонтитула.",
-		"SETTINGS_SYSTEM_DISPLAYPUCHI": "Нарисовать пти-персонажу",
-		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Показывает изображения пти-персонажи.",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI": "Нарисовать пти-персонажа",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Показывает изображения пти-персонажа.",
 		"SETTINGS_SYSTEM_SIMPLEMODE": "Режим просто",
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Упрощает рисование, скрывая большинство\nвизуальных бликов и эффектов во время геймплея.\n",
 
@@ -110,7 +110,7 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Переключение воспроизведения песни",
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Определяет, будет ли воспроизводиться музыка.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Применить метаданные SONGVOL",
-		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Это - частично избыточная настройка, который\nопределяет, будут ли использоваться метаданные\nSONGVOL.\nЗначения от 0 до 100 снижают громкость песни,\nно любые значения выше 100 ничего не делают.",
+		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Это – частично избыточная настройка, который\nопределяет, будут ли использоваться метаданные\nSONGVOL.\nЗначения от 0 до 100 снижают громкость песни,\nно любые значения выше 100 ничего не делают.",
 		"SETTINGS_SYSTEM_SEVOL": "Громкость эффекта звука",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nударами.\nЧтобы играть без звуковых ударов, установите это\nзначение равным 0.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Громкость голоса",
@@ -163,7 +163,7 @@
 		"SETTINGS_GAME_BADCOUNT": "Режим Канпэки",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Выбрает сколько «Плохо» позволяют раньше\nпесни автоматически проиграно.\nУстановите значение 0, чтобы выключить этот\nрежим.",
 		"SETTINGS_GAME_NOTELOCK": "Режим замока ноты",
-		"SETTINGS_GAME_NOTELOCK_DESC": "Указать, считается ли ударь в интервал между\nнотами - Плохо.",
+		"SETTINGS_GAME_NOTELOCK_DESC": "Указать, считается ли ударь в интервал между\nнотами – Плохо.",
 		"SETTINGS_GAME_AILEVEL": "Уровень ИИ",
 		"SETTINGS_GAME_AILEVEL_DESC": "Определяет, насколько точен ИИ.\nЕсли 0, то ИИ выключен.\nЕсли 1 или более, то И2 будет играть за ИИ.\nВыключен, если включен режим АВТО И2.",
 		"SETTINGS_GAME_NORMALGAUGE": "Всегда использовать нормальный датчик",
@@ -199,7 +199,7 @@
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Буфер предварительного просмотра изображений",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Это - избыточная настройка, перенесенная из\nDTXMania.\nЭто ничего не делает.",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Это – избыточная настройка, перенесенная из\nDTXMania.\nЭто ничего не делает.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Режим растягивания по времени",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Не уверен, что делает эта настройка.\nЭто потребляет больше энергии процессора и\nможет вызвать проблемы со звуком при скорости\nвоспроизведения ниже 0,9 раза.",
 		"SETTINGS_SYSTEM_FASTRENDER": "Быстрый рендеринг",
@@ -207,9 +207,9 @@
 		"SETTINGS_GAME_BRANCHGUIDE": "Руководство по ветке",
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Включить отображение числового ориентира,\nчтобы увидеть, какая ветвь будет выбрана.\nВ автоматическом режиме он не отображается.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Суждение о большой ноте",
-		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Переключает, будут ли большие ноты\nвознаграждаться за попадание с помощью 2 клавиш.\nЕсли это - включен, нажатие 1 клавиши вызовет\nвизуальную задержку, прежде чем они исчезнут.\nЗа попадание по 2 клавишам начисляются двойные\nочки.\nЕсли это - выключен, то при нажатии 1 клавиши\nони будут звучать как обычная нота.\nДвойные очки по-прежнему будут начисляться.\nПопытка ударить на них двумя клавишами может\nпривести к тому, что вместо них будет удар\nследующая нота.",
+		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Переключает, будут ли большие ноты\nвознаграждаться за попадание с помощью 2 клавиш.\nЕсли это – включен, нажатие 1 клавиши вызовет\nвизуальную задержку, прежде чем они исчезнут.\nЗа попадание по 2 клавишам начисляются двойные\nочки.\nЕсли это – выключен, то при нажатии 1 клавиши\nони будут звучать как обычная нота.\nДвойные очки по-прежнему будут начисляться.\nПопытка ударить на них двумя клавишами может\nпривести к тому, что вместо них будет удар\nследующая нота.",
 		"SETTINGS_GAME_SURVIVAL": "Режим выживания",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Этот режим - сломан.\nВ нём реализована система таймера, аналогичная\nкурсам StepMania, но какой-то код отсутствует,\nпоэтому функциональность ограничена.",
+		"SETTINGS_GAME_SURVIVAL_DESC": "Этот режим – сломан.\nВ нём реализована система таймера, аналогичная\nкурсам StepMania, но какой-то код отсутствует,\nпоэтому функциональность ограничена.",
 		"SETTINGS_GAME_SCOREMODE": "Режим очков",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Выбирает формулу, используемую для\nопределения очков.\nTYPE-A: Поколение-1\nTYPE-B: Поколение-2\nTYPE-C: Поколение-3\n",
 		"SETTINGS_GAME_SHINUCHI": "Режим Шин-учи",
@@ -391,15 +391,15 @@
 		// {2}: Maximum BPM
 		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Создано: {0}",
+		"SONGSELECT_INFO_CHARTER": "Сделано: {0}",
 
 		"SONGSELECT_QUICKCONFIG": "Быстрые настройки",
 		"SONGSELECT_QUICKCONFIG_MORE": "Более...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Монеты получены!",
-		"MODAL_TITLE_CHARA": "Новая Персонажа!",
-		"MODAL_TITLE_PUCHI": "Новая Пти-персонажа!",
+		"MODAL_TITLE_CHARA": "Новый Персонаж!",
+		"MODAL_TITLE_PUCHI": "Новый Пти-персонаж!",
 		"MODAL_TITLE_NAMEPLATE": "Новый Ранг!",
 		"MODAL_TITLE_SONG": "Новая Песня!",
 		// {0}: Newly obtained coins
@@ -409,7 +409,7 @@
 		// Online Lounge
 		"ONLINE_EXIT": "Назад в главное меню",
 		"ONLINE_DOWNLOAD": "Скачать контент",
-		"ONLINE_DOWNLOAD_CDN": "Выбор CDN",
+		"ONLINE_DOWNLOAD_CDN": "Выбрать CDN",
 		"ONLINE_DOWNLOAD_SONG": "Скачать песни",
 		"ONLINE_DOWNLOAD_CHARA": "Скачать персонажей (Не доступен)",
 		"ONLINE_DOWNLOAD_PUCHI": "Скачать пти-персонажей (Не доступен)",
@@ -435,8 +435,8 @@
 		"DAN_CONDITION_NAME_BOMB": "Удары бомб",
 
 		// Heya / Quick Heya
-		"HEYA_PUCHI": "Пти-персонажа",
-		"HEYA_CHARA": "Персонажа",
+		"HEYA_PUCHI": "Пти-персонаж",
+		"HEYA_CHARA": "Персонаж",
 		"HEYA_DAN": "Ранг дан",
 		"HEYA_NAMEPLATE": "Ранг таблички",
 
@@ -459,14 +459,14 @@
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Трудно",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Экстремально",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Заканчивать игру в завершенной зоне, чтобы передать песню!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nБудьте осторожны, если значение датчика достигает 0, игра - автоматически проиграна!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nБудьте осторожны, если значение датчика достигает 0, игра – автоматически проиграна!",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "Датчик начинает с полно и резко истощается при каждом промахе!\nСтранная сила, кажется, уменьшает вероятность ошибки в этой песне...",
 		// {0}: Percentage of mines
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Фактор бомба: {0}% нот, превращенные в бомбы в Тральщике",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% баллонов, превращенные в дроби с взрывателем в Тральщике",
 		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель очков: x{0}",
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монетов: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ОШИБКА] Недопустимое условие",
@@ -580,7 +580,7 @@
 		"MOD_AUTO": "Авто",
 
 		"MOD_SONGSPEED": "Скорость песни",
-		"SETTINGS_MOD_SONGSPEED_DESC": "Изменит скорость воспроизведения песни.\nЕсли включена настройка увеличения времени\nвоспроизведения, при скорости воспроизведения\nв 0,9 раза могут возникать проблемы со звуком.\nПримечание: Это также изменяет высоту тона\nпесен.",
+		"SETTINGS_MOD_SONGSPEED_DESC": "Изменит скорость воспроизведения песни.\nЕсли включена настройка увеличения времени\nвоспроизведения, при скорости воспроизведения\nв 0,9 раза могут возникать проблемы со звуком.\nПримечание: Это также изменяет высоту тона\n                        песен.",
 
 		"MOD_HITSOUND": "Инструмент",
 
