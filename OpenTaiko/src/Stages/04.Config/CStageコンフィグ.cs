@@ -295,8 +295,8 @@ namespace OpenTaiko {
 
 				int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
 				txMenuItemLeft[i, flag].t2D中心基準描画(OpenTaiko.Skin.Config_Item_X[i] + OpenTaiko.Skin.Config_Item_Font_Offset[0], OpenTaiko.Skin.Config_Item_Y[i] + OpenTaiko.Skin.Config_Item_Font_Offset[1]); //55
-																																																				 //txMenuItem.Dispose();
-																																																				 //menuY += stepY;
+																																																			 //txMenuItem.Dispose();
+																																																			 //menuY += stepY;
 			}
 			//---------------------
 			#endregion

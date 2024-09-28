@@ -62,6 +62,10 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONGCACHE_DESC"));
 			this.list項目リスト.Add(this.iSystemHardReloadDTX);
 
+			this.isSystemImportingScore = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI"), CItemBase.EPanelType.Normal,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMPORTSCOREINI_DESC"));
+			this.list項目リスト.Add(this.isSystemImportingScore);
+
 			this.iSystemLanguage = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANGUAGE"), CItemList.EPanelType.Normal, CLangManager.langToInt(OpenTaiko.ConfigIni.sLang),
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANGUAGE_DESC"),
 				CLangManager.Languages);
@@ -658,7 +662,7 @@ namespace OpenTaiko {
 				} else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToCalibration) {
 					OpenTaiko.stageコンフィグ.actCalibrationMode.Start();
 				} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDrumsReturnToMenu ||
-						  this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
+							this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
 				  {
 					t項目リストの設定_Drums();
 				}
@@ -700,6 +704,10 @@ namespace OpenTaiko {
 					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
 
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
+				} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
+					// Running in a separate thread so the game doesn't freeze
+					Thread thread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
+					thread.Start();
 				}
 				#endregion
 			}
@@ -1670,6 +1678,7 @@ namespace OpenTaiko {
 		private CItemList iSystemSkinSubfolder;             // #28195 2012.5.2 yyagi
 		private CItemBase iSystemReloadDTX;                 // #32081 2013.10.21 yyagi
 		private CItemBase iSystemHardReloadDTX;
+		private CItemBase isSystemImportingScore;
 		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
 
 		private int t前の項目(int nItem) {
@@ -1741,7 +1750,7 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.nSoundDeviceType = this.iSystemSoundType.n現在選択されている項目番号;       // #24820 2013.1.3 yyagi
 			OpenTaiko.ConfigIni.nBassBufferSizeMs = this.iSystemBassBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
 			OpenTaiko.ConfigIni.nWASAPIBufferSizeMs = this.iSystemWASAPIBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
-																											//			CDTXMania.ConfigIni.nASIOBufferSizeMs = this.iSystemASIOBufferSizeMs.n現在の値;					// #24820 2013.1.3 yyagi
+																										   //			CDTXMania.ConfigIni.nASIOBufferSizeMs = this.iSystemASIOBufferSizeMs.n現在の値;					// #24820 2013.1.3 yyagi
 			OpenTaiko.ConfigIni.nASIODevice = this.iSystemASIODevice.n現在選択されている項目番号;           // #24820 2013.1.17 yyagi
 			OpenTaiko.ConfigIni.bUseOSTimer = this.iSystemSoundTimerType.bON;                              // #33689 2014.6.17 yyagi
 
@@ -1792,7 +1801,7 @@ namespace OpenTaiko {
 
 			OpenTaiko.ConfigIni.n表示可能な最小コンボ数.Drums = this.iSystemMinComboDrums.n現在の値;
 			OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi
-																						//CDTXMania.ConfigIni.e判定表示優先度.Drums = (E判定表示優先度) this.iDrumsJudgeDispPriority.n現在選択されている項目番号;
+																					   //CDTXMania.ConfigIni.e判定表示優先度.Drums = (E判定表示優先度) this.iDrumsJudgeDispPriority.n現在選択されている項目番号;
 
 			OpenTaiko.ConfigIni.bBranchGuide = this.iTaikoBranchGuide.bON;
 			OpenTaiko.ConfigIni.nDefaultCourse = this.iTaikoDefaultCourse.n現在選択されている項目番号;
