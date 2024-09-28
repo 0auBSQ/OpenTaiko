@@ -377,6 +377,28 @@ namespace OpenTaiko {
 				actCalibrationMode.Update();
 				actCalibrationMode.Draw();
 			}
+			else if (actList.ScoreIniImportThreadIsActive) {
+				if (OpenTaiko.Tx.Tile_Black != null) {
+					OpenTaiko.Tx.Tile_Black.Opacity = 191;
+					for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
+						for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
+							OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
+						}
+					}
+					OpenTaiko.Tx.Tile_Black.Opacity = 255;
+				}
+				using (var prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale)) {
+					using (var status_text = new CTexture(prvFont.DrawText(
+						CScoreIni_Importer.Status,
+						Color.White,
+						Color.Black,
+						null,
+						30,
+						true))) {
+						status_text.t2D_DisplayImage_AnchorCenter(SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
+					}
+				}
+			}
 			// 曲データの一覧取得中は、キー入力を無効化する
 			else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 != true) {
 				if (!OpenTaiko.Skin.bgmコンフィグ画面.bIsPlaying)

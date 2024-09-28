@@ -7,572 +7,584 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
   "Language": "Nederlands (Dutch)",
-  "Entries": {
+	"Entries": {
 
-    // Common
-    "MENU_RETURN": "Terug",
-    // Difficulties (Any Menu)
-    "DIFF_EASY": "Makkelijk",
-    "DIFF_NORMAL": "Normaal",
-    "DIFF_HARD": "Moeilijk",
-    "DIFF_EX": "Extreem",
-    "DIFF_EXTRA": "Extra",
-    "DIFF_EXEXTRA": "Extreem / Extra",
-    "DIFF_TOWER": "Toren",
-    "DIFF_DAN": "Dan",
-    "DIFF_ANY": "Elk",
-    "DIFF_UNKNOWN": "Onbekend",
+		// Common
+		"MENU_RETURN": "Terug",
+		// Difficulties (Any Menu)
+		"DIFF_EASY": "Makkelijk",
+		"DIFF_NORMAL": "Normaal",
+		"DIFF_HARD": "Moeilijk",
+		"DIFF_EX": "Extreem",
+		"DIFF_EXTRA": "Extra",
+		"DIFF_EXEXTRA": "Extreem / Extra",
+		"DIFF_TOWER": "Toren",
+		"DIFF_DAN": "Dan",
+		"DIFF_ANY": "Elk",
+		"DIFF_UNKNOWN": "Onbekend",
 
-    // Settings
-    "SETTINGS_SYSTEM": "Systeemopties",
-    "SETTINGS_SYSTEM_DESC": "Instellingen voor het hele systeem.",
-    "SETTINGS_GAME": "Gameplay Opties",
-    "SETTINGS_GAME_DESC": "Instellingen voor het drummen.",
-    "SETTINGS_EXIT": "Verlaat",
-    "SETTINGS_EXIT_DESC": "Sla de instellingen op en verlaat het CONFIGURATION menu.",
+		// Settings
+		"SETTINGS_SYSTEM": "Systeemopties",
+		"SETTINGS_SYSTEM_DESC": "Instellingen voor het hele systeem.",
+		"SETTINGS_GAME": "Gameplay Opties",
+		"SETTINGS_GAME_DESC": "Instellingen voor het drummen.",
+		"SETTINGS_EXIT": "Verlaat",
+		"SETTINGS_EXIT_DESC": "Sla de instellingen op en verlaat het CONFIGURATION menu.",
 
-    "SETTINGS_MENU_RETURN": "<< Terug naar Menu",
-    "SETTINGS_MENU_RETURN_DESC": "Terug naar het linker menu.",
+		"SETTINGS_MENU_RETURN": "<< Terug naar Menu",
+		"SETTINGS_MENU_RETURN_DESC": "Terug naar het linker menu.",
 
-    "SETTINGS_KEYASSIGN_SYSTEM": "Systeemtoetsinstellingen",
-    "SETTINGS_KEYASSIGN_SYSTEM_DESC": "Een tweede menu voor het instellen van toetsen",
-    "SETTINGS_KEYASSIGN_GAME": "Gameplay toetsinstellingen",
-    "SETTINGS_KEYASSIGN_GAME_DESC": "Een tweede menu voor het instellen van toetsen voor gameplay.",
-    "SETTINGS_KEYASSIGN_TRAINING": "Training Modus Toetsinstellingen",
-    "SETTINGS_KEYASSIGN_TRAINING_DESC": "Een tweede menu voor het instellen van toetsen\ntijdens de Training Modus.",
-	
+		"SETTINGS_KEYASSIGN_SYSTEM": "Systeemtoetsinstellingen",
+		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "Een tweede menu voor het instellen van toetsen",
+		"SETTINGS_KEYASSIGN_GAME": "Gameplay toetsinstellingen",
+		"SETTINGS_KEYASSIGN_GAME_DESC": "Een tweede menu voor het instellen van toetsen voor gameplay.",
+		"SETTINGS_KEYASSIGN_TRAINING": "Training Modus Toetsinstellingen",
+		"SETTINGS_KEYASSIGN_TRAINING_DESC": "Een tweede menu voor het instellen van toetsen\ntijdens de Training Modus.",
 
-    // Settings - System
-    "SETTINGS_SYSTEM_LANGUAGE": "Systeemtaal",
-    "SETTINGS_SYSTEM_LANGUAGE_DESC": "Verander de taal\nvan het spel en de menu's.",
-    "SETTINGS_SYSTEM_PLAYERCOUNT": "Aantal Spelers",
-    "SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Kies met hoeveel spelers je wil spelen.\n Er kunnen tot 5 spelers tegelijkertijd actief zijn.",
-    "SETTINGS_SYSTEM_RELOADSONG": "Nummers Herladen",
-    "SETTINGS_SYSTEM_RELOADSONG_DESC": "Herlaad de folder voor nummers.",
-    "SETTINGS_SYSTEM_RELOADSONGCACHE": "Nummers Herladen (Hard Herladen)",
-    "SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Wist de opgeslagen cache en \nherlaadt de Nummers map vanaf nul.",
-    "SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Toren Verbergen",
-    "SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Verberg de Dan en Toren nummers\nin de Taiko Modus.\nOpmerking: Herlaad de nummers\nom dit te activeren.",
 
-    // Settings - System - Graphics
-    "SETTINGS_SYSTEM_FULLSCREEN": "Volledig scherm Modus",
-    "SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wissel tussen volledig scherm en venster modus.",
-    "SETTINGS_SYSTEM_VSYNC": "VSync Modus",
-    "SETTINGS_SYSTEM_VSYNC_DESC": "Schakelt VSync aan/uit.\nAls dit aan staat zal het op maximaal 60FPS spelen,\nzodat muziek noten soepel scrollt,\nmaar er is meer input vertraging.\nAls dit uit staat is er geen FPS limiet,\nvoor minder input vertraging,\nmaar scrollen van muziek noten kan onstabiel zijn.",
-    "SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
-    "SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode:\nSelecteer de opties OpenGL,\nDirectX11, Vulkan of Metal.\nOpenGL is langzaam, maar compatibel en stabiel.\nDirectX11 is snel en stabiel, maar\n werkt alleen op Windows.\nVulkan werkt het snelst op Linux.\nMetal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
-    "SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",
-    "SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Bevriezen bij het starten verdwijnt.\nZet deze optie uit als sommige textures zwart worden.\nDeze optie activeert na het herstarten van OpenTaiko.",
-    "SETTINGS_SYSTEM_BGMOVIE": "Video's Afspelen",
-    "SETTINGS_SYSTEM_BGMOVIE_DESC": "Schakelt achtergrond video's aan/uit.\nAls dit is ingeschakeld en het lied geen video heeft,\ndan zal de achtergrond zwart worden.",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Afspeelmodus",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Verandert hoe de video in de\nachtergrond wordt weergeven.",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Geen",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Volledig Scherm",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Mini Scherm",
-    "SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Beide",
-    "SETTINGS_SYSTEM_LANEOPACITY": "Laan Achtergrond Doorzichtigheid",
-    "SETTINGS_SYSTEM_LANEOPACITY_DESC": "Verandert de doorzichtigheid van de achtergrond\nbij het spelen van video's.\n\n0 = volledig doorzichtig,\n255 = niet doorzichtig.",
-    "SETTINGS_SYSTEM_BGA": "BGA Weergeven",
-    "SETTINGS_SYSTEM_BGA_DESC": "Schakelt animaties in de achtergrond aan/uit.",
-    "SETTINGS_SYSTEM_DISPLAYCHARA": "Karakters Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Laat Karakters zien.",
-    "SETTINGS_SYSTEM_DISPLAYDANCER": "Dansers Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Laat Dansers zien.",
-    "SETTINGS_SYSTEM_DISPLAYMOB": "Menigte Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYMOB_DESC": "Laat Menigte foto's zien.",
-    "SETTINGS_SYSTEM_DISPLAYRUNNER": "Renners Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Laat Renner foto's zien.",
-    "SETTINGS_SYSTEM_DISPLAYFOOTER": "Footer Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Laat Footer foto's zien.",
-    "SETTINGS_SYSTEM_DISPLAYPUCHI": "PuchiChara Weergeven",
-    "SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Laat PuchiChara foto's zien.",
-    "SETTINGS_SYSTEM_SIMPLEMODE": "Simpele Modus",
-    "SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Versimpelt graphics door visuele effecten en\nopmaak te verbergen tijdens gameplay.",
-    "SETTINGS_SYSTEM_SKIN": "Huidige Skin",
-    "SETTINGS_SYSTEM_SKIN_DESC": "Kies een skin uit de systeemfolder om te gebruiken.",
+		// Settings - System
+		"SETTINGS_SYSTEM_LANGUAGE": "Systeemtaal",
+		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Verander de taal\nvan het spel en de menu's.",
+		"SETTINGS_SYSTEM_PLAYERCOUNT": "Aantal Spelers",
+		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Kies met hoeveel spelers je wil spelen.\n Er kunnen tot 5 spelers tegelijkertijd actief zijn.",
+		"SETTINGS_SYSTEM_RELOADSONG": "Nummers Herladen",
+		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Herlaad de folder voor nummers.",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Nummers Herladen (Hard Herladen)",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Wist de opgeslagen cache en \nherlaadt de Nummers map vanaf nul.",
 
-    // Settings - System - Audio
-    "SETTINGS_SYSTEM_SONGPLAYBACK": "Muziek Afspelen",
-    "SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Shakelt muziek aan/uit.",
-    "SETTINGS_SYSTEM_USESONGVOL": "SONGVOL Metadata Toewijzen",
-    "SETTINGS_SYSTEM_USESONGVOL_DESC": "Dit is een deels overbodige optie\ndie kiest of SONGVOL metadata wel/niet gebruikt wordt.\nWaardes tussen 0-100 verlagen liedvolume,\nmaar waardes boven 100 doen niets.",
-    "SETTINGS_SYSTEM_SEVOL": "Geluidseffect Volume",
-    "SETTINGS_SYSTEM_SEVOL_DESC": "Past de volume aan voor geluiden zoals 'don' en 'ka'.\nOm zonder noot geluiden te spelen, zet dit op 0.\nU moet de game herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
-    "SETTINGS_SYSTEM_VOICEVOL": "Stemvolume",
-    "SETTINGS_SYSTEM_VOICEVOL_DESC": "Past de volume aan voor de stemmen van karakters.\nU moet de game herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
-    "SETTINGS_SYSTEM_SONGVOL": "Lied Volume",
-    "SETTINGS_SYSTEM_SONGVOL_DESC": "Past de volume aan voor liedjes.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
-    "SETTINGS_SYSTEM_SONGPREVIEWVOL": "Lied Voorbeeld Volume",
-    "SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Past de volume aan voor het lied voorbeeld.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
-    "SETTINGS_SYSTEM_VOLINCREMENT": "Toetsenbord Volume Wijziging",
-    "SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Geeft aan hoeveel de volume wordt aangepast voor de\nvolume omhoog/omlaag knoppen.\nU kunt een waarde instellen tussen 1 en 20.",
-    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Lied Afspeel Buffer",
-    "SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "De tijdsduur voordat een lied afspeelt in het spel.\nAls deze waarde laag staat, kunnen nummers te vroeg afspelen.",
-    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Lied Voorbeeld Buffer",
-    "SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "De tijdsduur voordat een lied voorbeeld afspeelt.\nAls deze waarde erg laag staat kunnen\nliedjes tijdens het scrollen afspelen.\nU kunt een waarde kiezen tussen 0ms en 10000ms.",
-    "SETTINGS_SYSTEM_AUDIOPLAYBACK": "Geluid Afspeelmodus",
-    "SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Werkt alleen op apparaten die ASIO audio ondersteunen\n- Heeft de laagste inputvertraging\nWasapi:\n- Alleen compatibel met Windows\n- Heeft de op een na laagste inputvertraging\nBASS:\n- Op alle platforms ondersteund\nOpmerking: verlaat de instellingen\nom dit op te slaan.",
-    "SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO Afspeelapparaat",
-    "SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Kies een apparaat om ASIO audio mee af te spelen.\nOpmerking: Verlaat de instellingen om\ndeze configuratie op te slaan.",
-    "SETTINGS_SYSTEM_WASAPIBUFFER": "Wasapi Buffer Grootte",
-    "SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Verander de buffer voor het afspelen van geluid met WASAPI.\nStel het getal zo laag mogelijk in\nzonder dat er geluidsproblemen ontstaan\nzoals onjuiste timing of bevriezing.\nZet dit op 0 om een ingeschatte waarde te gebruiken,\nof wijzig dit handmatig tot u een juiste waarde vindt.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
-    "SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Grootte",
-    "SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer grootte wanneer BASS wordt gebruikt.\nKan tussen 0~99999ms ingesteld worden.\nOp 0 stelt het OS\nautomatisch de buffer grootte in.\nHoe kleiner de waarde, hoe kleiner\nde vertraging voor geluid, maar het kan\nvoor krakende/vervormde audio zorgen.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
-    "SETTINGS_SYSTEM_OSTIMER": "OS Timer Modus",
-    "SETTINGS_SYSTEM_OSTIMER_DESC": "Met deze optie aan scrollen noten soepeler,\nmaar er kan geluidsvertraging ontstaan.\nMet deze optie uit scrollen noten onstabieler,\nzonder extra geluidsvertraging.\n\nOp UIT, gebruikt OpenTaiko de originele\ntimer en de effecten zijn vice versa.",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		// {0}: Total # of score.ini files to be processed
+		// {1}: # of score.ini files successfully imported
+		// {2}: # of score.ini files currently processed
+		// {3}: # of score.ini files skipped
+		// {4}: # of score.ini files that failed to import due to an error
+		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 
-    // Settings - System - Misc.
-    "SETTINGS_SYSTEM_LOG": "Logbestanden Creëren",
-    "SETTINGS_SYSTEM_LOG_DESC": "Schakelt het creëren van TJAPLAYER3.log bestanden\naan/uit wanneer de game wordt gesloten.\nDit volgt de prestaties van het spel\nen identificeert storingen.",
-    "SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Gebruik Subfolders bij Willekeurige Selectie",
-    "SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Kiest of subfolders wel/niet gebruikt\n worden bij willekeurige selectie van liedjes.",
-    "SETTINGS_SYSTEM_DEBUGMODE": "Debug Modus",
-    "SETTINGS_SYSTEM_DEBUGMODE_DESC": "Deze optie toont extra informatie\nrechtsonder op het scherm.\nDit geeft de latentie kalibratie weer\nvoor gameplay zonder geluidseffecten.",
-	"SETTINGS_SYSTEM_AUTOSCREENSHOT": "Automatische Screenshots",
-    "SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Kiest of resultaat screenshots automatisch worden gemaakt.\nDit gebeurt alleen wanneer een topscore is behaald,\nwat niet altijd de beste score betekent voor dat nummer.",
-    "SETTINGS_SYSTEM_DISCORDRPC": "Discord Weergave",
-    "SETTINGS_SYSTEM_DISCORDRPC_DESC": "Kiest of lied informatie wordt gedeeld met Discord.",
-    "SETTINGS_SYSTEM_BUFFEREDINPUT": "Gebufferde Input Modus",
-    "SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wanneer dit aan staat, worden geen inputs gemist\nmaar de polling frequentie vermindert.\nWanneer dit uit staat, worden inputs mogelijk gemist,\nmaar de polling frequentie is veel hoger.",
+		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Toren Verbergen",
+		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Verberg de Dan en Toren nummers\nin de Taiko Modus.\nOpmerking: Herlaad de nummers\nom dit te activeren.",
 
-    // Settings - Gameplay
-    "SETTINGS_GAME_GLOBALOFFSET": "Globale Offset",
-    "SETTINGS_GAME_GLOBALOFFSET_DESC": "Verander de geïnterpreteerde OFFSET\nwaarde voor alle liedjes.\nKan tussen -999 en 999ms ingesteld worden.\nOm input lag te verminderen, kies een negatieve waarde.",
+		// Settings - System - Graphics
+		"SETTINGS_SYSTEM_FULLSCREEN": "Volledig scherm Modus",
+		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wissel tussen volledig scherm en venster modus.",
+		"SETTINGS_SYSTEM_VSYNC": "VSync Modus",
+		"SETTINGS_SYSTEM_VSYNC_DESC": "Schakelt VSync aan/uit.\nAls dit aan staat zal het op maximaal 60FPS spelen,\nzodat muziek noten soepel scrollt,\nmaar er is meer input vertraging.\nAls dit uit staat is er geen FPS limiet,\nvoor minder input vertraging,\nmaar scrollen van muziek noten kan onstabiel zijn.",
+		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
+		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode:\nSelecteer de opties OpenGL,\nDirectX11, Vulkan of Metal.\nOpenGL is langzaam, maar compatibel en stabiel.\nDirectX11 is snel en stabiel, maar\n werkt alleen op Windows.\nVulkan werkt het snelst op Linux.\nMetal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
+		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",
+		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Bevriezen bij het starten verdwijnt.\nZet deze optie uit als sommige textures zwart worden.\nDeze optie activeert na het herstarten van OpenTaiko.",
+		"SETTINGS_SYSTEM_BGMOVIE": "Video's Afspelen",
+		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Schakelt achtergrond video's aan/uit.\nAls dit is ingeschakeld en het lied geen video heeft,\ndan zal de achtergrond zwart worden.",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Afspeelmodus",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Verandert hoe de video in de\nachtergrond wordt weergeven.",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Geen",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Volledig Scherm",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Mini Scherm",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Beide",
+		"SETTINGS_SYSTEM_LANEOPACITY": "Laan Achtergrond Doorzichtigheid",
+		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "Verandert de doorzichtigheid van de achtergrond\nbij het spelen van video's.\n\n0 = volledig doorzichtig,\n255 = niet doorzichtig.",
+		"SETTINGS_SYSTEM_BGA": "BGA Weergeven",
+		"SETTINGS_SYSTEM_BGA_DESC": "Schakelt animaties in de achtergrond aan/uit.",
+		"SETTINGS_SYSTEM_DISPLAYCHARA": "Karakters Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Laat Karakters zien.",
+		"SETTINGS_SYSTEM_DISPLAYDANCER": "Dansers Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Laat Dansers zien.",
+		"SETTINGS_SYSTEM_DISPLAYMOB": "Menigte Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYMOB_DESC": "Laat Menigte foto's zien.",
+		"SETTINGS_SYSTEM_DISPLAYRUNNER": "Renners Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Laat Renner foto's zien.",
+		"SETTINGS_SYSTEM_DISPLAYFOOTER": "Footer Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Laat Footer foto's zien.",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI": "PuchiChara Weergeven",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Laat PuchiChara foto's zien.",
+		"SETTINGS_SYSTEM_SIMPLEMODE": "Simpele Modus",
+		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Versimpelt graphics door visuele effecten en\nopmaak te verbergen tijdens gameplay.",
+		"SETTINGS_SYSTEM_SKIN": "Huidige Skin",
+		"SETTINGS_SYSTEM_SKIN_DESC": "Kies een skin uit de systeemfolder om te gebruiken.",
 
-    "SETTINGS_GAME_CALIBRATION": "Offset Kalibreren",
-    "SETTINGS_GAME_CALIBRATION_DESC": "Kalibreert de offset.\nGlobale Offset wordt overschreven waneer dit opslaat.",
-    "SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+		// Settings - System - Audio
+		"SETTINGS_SYSTEM_SONGPLAYBACK": "Muziek Afspelen",
+		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Shakelt muziek aan/uit.",
+		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL Metadata Toewijzen",
+		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Dit is een deels overbodige optie\ndie kiest of SONGVOL metadata wel/niet gebruikt wordt.\nWaardes tussen 0-100 verlagen liedvolume,\nmaar waardes boven 100 doen niets.",
+		"SETTINGS_SYSTEM_SEVOL": "Geluidseffect Volume",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "Past de volume aan voor geluiden zoals 'don' en 'ka'.\nOm zonder noot geluiden te spelen, zet dit op 0.\nU moet de game herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
+		"SETTINGS_SYSTEM_VOICEVOL": "Stemvolume",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Past de volume aan voor de stemmen van karakters.\nU moet de game herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
+		"SETTINGS_SYSTEM_SONGVOL": "Lied Volume",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "Past de volume aan voor liedjes.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "Lied Voorbeeld Volume",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Past de volume aan voor het lied voorbeeld.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
+		"SETTINGS_SYSTEM_VOLINCREMENT": "Toetsenbord Volume Wijziging",
+		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Geeft aan hoeveel de volume wordt aangepast voor de\nvolume omhoog/omlaag knoppen.\nU kunt een waarde instellen tussen 1 en 20.",
+		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Lied Afspeel Buffer",
+		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "De tijdsduur voordat een lied afspeelt in het spel.\nAls deze waarde laag staat, kunnen nummers te vroeg afspelen.",
+		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Lied Voorbeeld Buffer",
+		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "De tijdsduur voordat een lied voorbeeld afspeelt.\nAls deze waarde erg laag staat kunnen\nliedjes tijdens het scrollen afspelen.\nU kunt een waarde kiezen tussen 0ms en 10000ms.",
+		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Geluid Afspeelmodus",
+		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Werkt alleen op apparaten die ASIO audio ondersteunen\n- Heeft de laagste inputvertraging\nWasapi:\n- Alleen compatibel met Windows\n- Heeft de op een na laagste inputvertraging\nBASS:\n- Op alle platforms ondersteund\nOpmerking: verlaat de instellingen\nom dit op te slaan.",
+		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO Afspeelapparaat",
+		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Kies een apparaat om ASIO audio mee af te spelen.\nOpmerking: Verlaat de instellingen om\ndeze configuratie op te slaan.",
+		"SETTINGS_SYSTEM_WASAPIBUFFER": "Wasapi Buffer Grootte",
+		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Verander de buffer voor het afspelen van geluid met WASAPI.\nStel het getal zo laag mogelijk in\nzonder dat er geluidsproblemen ontstaan\nzoals onjuiste timing of bevriezing.\nZet dit op 0 om een ingeschatte waarde te gebruiken,\nof wijzig dit handmatig tot u een juiste waarde vindt.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
+		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Grootte",
+		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer grootte wanneer BASS wordt gebruikt.\nKan tussen 0~99999ms ingesteld worden.\nOp 0 stelt het OS\nautomatisch de buffer grootte in.\nHoe kleiner de waarde, hoe kleiner\nde vertraging voor geluid, maar het kan\nvoor krakende/vervormde audio zorgen.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
+		"SETTINGS_SYSTEM_OSTIMER": "OS Timer Modus",
+		"SETTINGS_SYSTEM_OSTIMER_DESC": "Met deze optie aan scrollen noten soepeler,\nmaar er kan geluidsvertraging ontstaan.\nMet deze optie uit scrollen noten onstabieler,\nzonder extra geluidsvertraging.\n\nOp UIT, gebruikt OpenTaiko de originele\ntimer en de effecten zijn vice versa.",
 
-    "SETTINGS_GAME_BADCOUNT": "Kanpeki Modus",
-    "SETTINGS_GAME_BADCOUNT_DESC": "Kies hoeveel 'BAD's zijn toegestaan\nvoordat een lied automatisch mislukt.\nZet de waarde op 0 om het uit te schakelen.",
-    "SETTINGS_GAME_NOTELOCK": "Notelock Modus",
-    "SETTINGS_GAME_NOTELOCK_DESC": "Kiest of het drummen tussen noten\ngeldt als BAD (mis).",
-    "SETTINGS_GAME_AILEVEL": "AI Niveau",
-    "SETTINGS_GAME_AILEVEL_DESC": "Bepaalt hoe nauwkeurig de AI is.\nOp 0 is de AI uitgeschakeld.\nOp 1 of hoger zal 2P als de AI spelen.\nUitgeschakeld als 'AUTO 2P' aan staat.",
-    "SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
-    "SETTINGS_GAME_NORMALGAUGE_DESC": "Forceer het gebruik van de normale meter\nongeacht het geselecteerde karakter en hun aanpassingen.",
+		// Settings - System - Misc.
+		"SETTINGS_SYSTEM_LOG": "Logbestanden Creëren",
+		"SETTINGS_SYSTEM_LOG_DESC": "Schakelt het creëren van TJAPLAYER3.log bestanden\naan/uit wanneer de game wordt gesloten.\nDit volgt de prestaties van het spel\nen identificeert storingen.",
+		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Gebruik Subfolders bij Willekeurige Selectie",
+		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Kiest of subfolders wel/niet gebruikt\n worden bij willekeurige selectie van liedjes.",
+		"SETTINGS_SYSTEM_DEBUGMODE": "Debug Modus",
+		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Deze optie toont extra informatie\nrechtsonder op het scherm.\nDit geeft de latentie kalibratie weer\nvoor gameplay zonder geluidseffecten.",
+		"SETTINGS_SYSTEM_AUTOSCREENSHOT": "Automatische Screenshots",
+		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Kiest of resultaat screenshots automatisch worden gemaakt.\nDit gebeurt alleen wanneer een topscore is behaald,\nwat niet altijd de beste score betekent voor dat nummer.",
+		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Weergave",
+		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Kiest of lied informatie wordt gedeeld met Discord.",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gebufferde Input Modus",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wanneer dit aan staat, worden geen inputs gemist\nmaar de polling frequentie vermindert.\nWanneer dit uit staat, worden inputs mogelijk gemist,\nmaar de polling frequentie is veel hoger.",
 
-    "SETTINGS_GAME_AUTOP1": "Speler 1 Automatisch Spelen",
-    "SETTINGS_GAME_AUTOP1_DESC": "Schakelt het automatisch spelen van liedjes op speler 1 aan/uit.",
-    "SETTINGS_GAME_AUTOP2": "Speler 1 Automatisch Spelen",
-    "SETTINGS_GAME_AUTOP2_DESC": "Schakelt het automatisch spelen van liedjes op speler 2 aan/uit.",
-    "SETTINGS_GAME_AUTOROLL": "Rolsnelheid",
-    "SETTINGS_GAME_AUTOROLL_DESC": "Wanneer Auto is ingeschakeld, zullen rollen\nautomatisch worden geraakt # keer per\nseconde. Heeft geen effect op ballonnen.\n0 schakelt automatisch rollen uit, en de maximumwaarde\nis een input per frame.",
+		// Settings - Gameplay
+		"SETTINGS_GAME_GLOBALOFFSET": "Globale Offset",
+		"SETTINGS_GAME_GLOBALOFFSET_DESC": "Verander de geïnterpreteerde OFFSET\nwaarde voor alle liedjes.\nKan tussen -999 en 999ms ingesteld worden.\nOm input lag te verminderen, kies een negatieve waarde.",
 
-    "SETTINGS_GAME_NOINFO": "Geen Informatie Modus",
-    "SETTINGS_GAME_NOINFO_DESC": "Schakelt weergave van lied informatie aan/uit.\nAls dit aan staat, wordt lied informatie verborgen.\nAls dit uit staat word lied informatie weergeven.",
-    "SETTINGS_GAME_COMBODISPLAY": "Minimum Combo Weergave",
-    "SETTINGS_GAME_COMBODISPLAY_DESC": "Kiest het minimumaantal combo dat wordt weergeven.\nKan een waarde hebben tussen 1 en 99999.",
-    "SETTINGS_GAME_SCOREDISPLAY": "Score Display Weergeven",
-    "SETTINGS_GAME_SCOREDISPLAY_DESC": "Geeft de huidige GOOD/OK/BAD beoordelingen\nweer linksonder op het scherm.\n(Alleen voor 1 speler modus)",
-    "SETTINGS_GAME_BRANCHANIME": "Tak Animaties",
-    "SETTINGS_GAME_BRANCHANIME_DESC": "Verandert de animaties wanneer een nummer vertakt.\nTYPE-A: Gen-2\nTYPE-B: Gen-3",
+		"SETTINGS_GAME_CALIBRATION": "Offset Kalibreren",
+		"SETTINGS_GAME_CALIBRATION_DESC": "Kalibreert de offset.\nGlobale Offset wordt overschreven waneer dit opslaat.",
+		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
 
-    "SETTINGS_GAME_DEFAULTDIFF": "Standaard Moeilijkheidsgraad",
-    "SETTINGS_GAME_DEFAULTDIFF_DESC": "Kiest de standaard moeilijkheidsgraad in nummer selectie.\nAls Extra niet is gekozen, zal het niet zichtbaar\nzijn tenzij de rechter pijltoets is ingedrukt\nop de Extreme moeilijkheid van dat nummer.",
-    "SETTINGS_GAME_EXEXTRAANIME": "Gebruik Extreme/Extra Animaties",
-    "SETTINGS_GAME_EXEXTRAANIME_DESC": "Speel een skin-gedefinieerde animatie\nbij het wisselen tussen\nExtreme & Extra moeilijkheid.",
+		"SETTINGS_GAME_BADCOUNT": "Kanpeki Modus",
+		"SETTINGS_GAME_BADCOUNT_DESC": "Kies hoeveel 'BAD's zijn toegestaan\nvoordat een lied automatisch mislukt.\nZet de waarde op 0 om het uit te schakelen.",
+		"SETTINGS_GAME_NOTELOCK": "Notelock Modus",
+		"SETTINGS_GAME_NOTELOCK_DESC": "Kiest of het drummen tussen noten\ngeldt als BAD (mis).",
+		"SETTINGS_GAME_AILEVEL": "AI Niveau",
+		"SETTINGS_GAME_AILEVEL_DESC": "Bepaalt hoe nauwkeurig de AI is.\nOp 0 is de AI uitgeschakeld.\nOp 1 of hoger zal 2P als de AI spelen.\nUitgeschakeld als 'AUTO 2P' aan staat.",
+		"SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
+		"SETTINGS_GAME_NORMALGAUGE_DESC": "Forceer het gebruik van de normale meter\nongeacht het geselecteerde karakter en hun aanpassingen.",
 
-    // Settings - Gameplay - Training Mode
-    "SETTINGS_TRAINING_SKIPCOUNT": "Aantal Maat Skips",
-    "SETTINGS_TRAINING_SKIPCOUNT_DESC": "De hoeveelheid maten om over te slaan\nwanneer Skip Voor/Terug wordt ingedrukt in\nTraining Modus.",
-    "SETTINGS_TRAINING_JUMPINTERVAL": "Maat Spring Tijdsinterval",
-    "SETTINGS_TRAINING_JUMPINTERVAL_DESC": "De wachttijd in milliseconden om\nmeerdere keren de linker/rechter Kat toetsen in te drukken zodat\nhet springt naar een gebookmarkde maat\nin de Training Modus.",
+		"SETTINGS_GAME_AUTOP1": "Speler 1 Automatisch Spelen",
+		"SETTINGS_GAME_AUTOP1_DESC": "Schakelt het automatisch spelen van liedjes op speler 1 aan/uit.",
+		"SETTINGS_GAME_AUTOP2": "Speler 1 Automatisch Spelen",
+		"SETTINGS_GAME_AUTOP2_DESC": "Schakelt het automatisch spelen van liedjes op speler 2 aan/uit.",
+		"SETTINGS_GAME_AUTOROLL": "Rolsnelheid",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Wanneer Auto is ingeschakeld, zullen rollen\nautomatisch worden geraakt # keer per\nseconde. Heeft geen effect op ballonnen.\n0 schakelt automatisch rollen uit, en de maximumwaarde\nis een input per frame.",
 
-    // Settings - Broken/Unused/Might Deprecate/Might Update
-    // Translate these anyways, even if their future is uncertain.
-    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Image Preview Buffer",
-    "SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Dit is een ongebruikte optie \novergezet van DTXMania.\nHet doet niets.",
-    "SETTINGS_SYSTEM_TIMESTRETCH": "Tijd Rekking Modus",
-    "SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Onzeker wat deze optie doet.\nHet gebruikt meer CPU kracht,\nen zorgt mogelijk voor problemen onder 0.9x snelheid.",
-    "SETTINGS_SYSTEM_FASTRENDER": "Snel Renderen",
-    "SETTINGS_SYSTEM_FASTRENDER_DESC": "Kiest of de weergave wordt gerenderd voordat het nummer laadt.",
-    "SETTINGS_GAME_BRANCHGUIDE": "Tak Begeleiding",
-    "SETTINGS_GAME_BRANCHGUIDE_DESC": "Kiest of er een numerieke begeleiding wordt\nweergeven om te zien welke tak wordt gekozen.\nNiet zichtbaar in automatische modus.",
-    "SETTINGS_GAME_BIGNOTEJUDGE": "Grote Noot Beoordeling",
-    "SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Kiest of grote noten met 2 toetsen een bonus geven.\nAls dit aan staat, zal 1 toets visueel vertraagd\nzijn voordat het verdwijnt.\nRaken met 2 toetsen geeft dubbele punten.\nAls dit uit staat, zal 1 toets het als een normale noot raken.\nDubbele punten worden nog steeds gegeven.\nAls je ze met 2 toetsen raakt,\nwordt de volgende mogelijk ook geraakt.",
-    "SETTINGS_GAME_SURVIVAL": "Overlevingsmodus",
-    "SETTINGS_GAME_SURVIVAL_DESC": "Deze modus werkt niet.\nHet implementeert een timer systeem net als Stepmania koersen,\nmaar er ontbreekt code. Functionaliteit is klein. ",
-    "SETTINGS_GAME_SCOREMODE": "Score Modus",
-    "SETTINGS_GAME_SCOREMODE_DESC": "Kiest de formule voor het berekenen van scores.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3\n",
-    "SETTINGS_GAME_SHINUCHI": "Shin'uchi Modus",
-    "SETTINGS_GAME_SHINUCHI_DESC": "Geeft alle noten\nin het spel dezelfde scorewaarde.\nDit gebruikt de Gen-4 formule.",
+		"SETTINGS_GAME_NOINFO": "Geen Informatie Modus",
+		"SETTINGS_GAME_NOINFO_DESC": "Schakelt weergave van lied informatie aan/uit.\nAls dit aan staat, wordt lied informatie verborgen.\nAls dit uit staat word lied informatie weergeven.",
+		"SETTINGS_GAME_COMBODISPLAY": "Minimum Combo Weergave",
+		"SETTINGS_GAME_COMBODISPLAY_DESC": "Kiest het minimumaantal combo dat wordt weergeven.\nKan een waarde hebben tussen 1 en 99999.",
+		"SETTINGS_GAME_SCOREDISPLAY": "Score Display Weergeven",
+		"SETTINGS_GAME_SCOREDISPLAY_DESC": "Geeft de huidige GOOD/OK/BAD beoordelingen\nweer linksonder op het scherm.\n(Alleen voor 1 speler modus)",
+		"SETTINGS_GAME_BRANCHANIME": "Tak Animaties",
+		"SETTINGS_GAME_BRANCHANIME_DESC": "Verandert de animaties wanneer een nummer vertakt.\nTYPE-A: Gen-2\nTYPE-B: Gen-3",
 
-    // Key Assignment - System
-    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "Vastleggen",
-    "SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "Systeemtoets:\nEen toets toewijzen om screenshots te maken.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "Volume Verhogen",
-    "SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "Systeemtoets:\nEen toets toewijzen om volume te verhogen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "Volume Verlagen",
-    "SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "Systeemtoets:\nEen toets toewijzen om volume te verlagen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "Hit Waardes Weergeven",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "Systeemtoets:\nEen toets toewijzen om hit waardes te weergeven.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "Debug Menu Weergeven",
-    "SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "Systeemtoets:\nEen toets toewijzen om het debug menu te weergeven.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Snelle Configuratie",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "Systeemtoets:\nEen toets toewijzen om de snelle configuratie te openen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Speler Aanpassing",
-    "SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "Systeemtoets:\nEen toets toewijzen voor het speler aanpassingsmenu.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Nummer Sortering",
-    "SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "Systeemtoets:\nEen toets toewijzen om nummers opnieuw te sorteren.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Auto Schakelen (P1)",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "Systeemtoets:\nEen toets toewijzen om Auto aan/uit te zetten (P1).\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "Auto Schakelen (P2)",
-    "SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "Systeemtoets:\nEen toets toewijzen om Auto aan/uit te zetten (P2).\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "Training Modus Schakelen",
-    "SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "Systeemtoets:\nEen toets toewijzen om Training aan/uit te zetten.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
-    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "Video Weergave Modus Schakelen",
-    "SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "Systeemtoets:\nEen toets toewijzen om te wisselen tussen\nvideo afspeelmodi.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_GAME_DEFAULTDIFF": "Standaard Moeilijkheidsgraad",
+		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Kiest de standaard moeilijkheidsgraad in nummer selectie.\nAls Extra niet is gekozen, zal het niet zichtbaar\nzijn tenzij de rechter pijltoets is ingedrukt\nop de Extreme moeilijkheid van dat nummer.",
+		"SETTINGS_GAME_EXEXTRAANIME": "Gebruik Extreme/Extra Animaties",
+		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Speel een skin-gedefinieerde animatie\nbij het wisselen tussen\nExtreme & Extra moeilijkheid.",
 
-    // Key Assignment - Gameplay
-    "SETTINGS_KEYASSIGN_GAME_DECIDE": "Kiezen",
-    "SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "Menu toets om te kiezen.",
-    "SETTINGS_KEYASSIGN_GAME_CANCEL": "Annuleren",
-    "SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "Menu toets om te annuleren.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "LinksWijzigen",
-    "SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "Menu toets om links te wijzigen",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "RechtsWijzigen",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "Menu toets om rechts te wijzigen",
+		// Settings - Gameplay - Training Mode
+		"SETTINGS_TRAINING_SKIPCOUNT": "Aantal Maat Skips",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "De hoeveelheid maten om over te slaan\nwanneer Skip Voor/Terug wordt ingedrukt in\nTraining Modus.",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "Maat Spring Tijdsinterval",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "De wachttijd in milliseconden om\nmeerdere keren de linker/rechter Kat toetsen in te drukken zodat\nhet springt naar een gebookmarkde maat\nin de Training Modus.",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED": "RoodLinks",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED": "RoodRechts",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "BlauwLinks",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "BlauwRechts",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_CLAP": "Klap",
-    "SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Konga toets:\nEen toets/knop aan de Klap\nknop toewijzen.",
+		// Settings - Broken/Unused/Might Deprecate/Might Update
+		// Translate these anyways, even if their future is uncertain.
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Image Preview Buffer",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Dit is een ongebruikte optie \novergezet van DTXMania.\nHet doet niets.",
+		"SETTINGS_SYSTEM_TIMESTRETCH": "Tijd Rekking Modus",
+		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Onzeker wat deze optie doet.\nHet gebruikt meer CPU kracht,\nen zorgt mogelijk voor problemen onder 0.9x snelheid.",
+		"SETTINGS_SYSTEM_FASTRENDER": "Snel Renderen",
+		"SETTINGS_SYSTEM_FASTRENDER_DESC": "Kiest of de weergave wordt gerenderd voordat het nummer laadt.",
+		"SETTINGS_GAME_BRANCHGUIDE": "Tak Begeleiding",
+		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Kiest of er een numerieke begeleiding wordt\nweergeven om te zien welke tak wordt gekozen.\nNiet zichtbaar in automatische modus.",
+		"SETTINGS_GAME_BIGNOTEJUDGE": "Grote Noot Beoordeling",
+		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Kiest of grote noten met 2 toetsen een bonus geven.\nAls dit aan staat, zal 1 toets visueel vertraagd\nzijn voordat het verdwijnt.\nRaken met 2 toetsen geeft dubbele punten.\nAls dit uit staat, zal 1 toets het als een normale noot raken.\nDubbele punten worden nog steeds gegeven.\nAls je ze met 2 toetsen raakt,\nwordt de volgende mogelijk ook geraakt.",
+		"SETTINGS_GAME_SURVIVAL": "Overlevingsmodus",
+		"SETTINGS_GAME_SURVIVAL_DESC": "Deze modus werkt niet.\nHet implementeert een timer systeem net als Stepmania koersen,\nmaar er ontbreekt code. Functionaliteit is klein. ",
+		"SETTINGS_GAME_SCOREMODE": "Score Modus",
+		"SETTINGS_GAME_SCOREMODE_DESC": "Kiest de formule voor het berekenen van scores.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3\n",
+		"SETTINGS_GAME_SHINUCHI": "Shin'uchi Modus",
+		"SETTINGS_GAME_SHINUCHI_DESC": "Geeft alle noten\nin het spel dezelfde scorewaarde.\nDit gebruikt de Gen-4 formule.",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "RoodLinks2P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks2P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "RoodRechts2P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts2P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "BlauwLinks2P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks2P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "BlauwRechts2P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts2P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_CLAP2P": "Klap2P",
-    "SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Konga toets:\nEen toets/knop aan de Klap2P\nknop toewijzen.",
+		// Key Assignment - System
+		"SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "Vastleggen",
+		"SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "Systeemtoets:\nEen toets toewijzen om screenshots te maken.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "Volume Verhogen",
+		"SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "Systeemtoets:\nEen toets toewijzen om volume te verhogen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "Volume Verlagen",
+		"SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "Systeemtoets:\nEen toets toewijzen om volume te verlagen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "Hit Waardes Weergeven",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "Systeemtoets:\nEen toets toewijzen om hit waardes te weergeven.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "Debug Menu Weergeven",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "Systeemtoets:\nEen toets toewijzen om het debug menu te weergeven.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Snelle Configuratie",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "Systeemtoets:\nEen toets toewijzen om de snelle configuratie te openen.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Speler Aanpassing",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "Systeemtoets:\nEen toets toewijzen voor het speler aanpassingsmenu.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Nummer Sortering",
+		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "Systeemtoets:\nEen toets toewijzen om nummers opnieuw te sorteren.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Auto Schakelen (P1)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "Systeemtoets:\nEen toets toewijzen om Auto aan/uit te zetten (P1).\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "Auto Schakelen (P2)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "Systeemtoets:\nEen toets toewijzen om Auto aan/uit te zetten (P2).\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "Training Modus Schakelen",
+		"SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "Systeemtoets:\nEen toets toewijzen om Training aan/uit te zetten.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "Video Weergave Modus Schakelen",
+		"SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "Systeemtoets:\nEen toets toewijzen om te wisselen tussen\nvideo afspeelmodi.\n(Je kan alleen een toetsenbord gebruiken.\nControllers/gamepads werken niet.)",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "RoodLinks3P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks3P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "RoodRechts3P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts3P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "BlauwLinks3P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks3P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "BlauwRechts3P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts3P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_CLAP3P": "Klap3P",
-    "SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Konga toets:\nEen toets/knop aan de Klap3P\nknop toewijzen.",
+		// Key Assignment - Gameplay
+		"SETTINGS_KEYASSIGN_GAME_DECIDE": "Kiezen",
+		"SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "Menu toets om te kiezen.",
+		"SETTINGS_KEYASSIGN_GAME_CANCEL": "Annuleren",
+		"SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "Menu toets om te annuleren.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "LinksWijzigen",
+		"SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "Menu toets om links te wijzigen",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "RechtsWijzigen",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "Menu toets om rechts te wijzigen",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "RoodLinks4P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks4P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "RoodRechts4P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts4P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "BlauwLinks4P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks4P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "BlauwRechts4P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts4P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_CLAP4P": "Klap4P",
-    "SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Konga toets:\nEen toets/knop aan de Klap4P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED": "RoodLinks",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED": "RoodRechts",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "BlauwLinks",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "BlauwRechts",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP": "Klap",
+		"SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Konga toets:\nEen toets/knop aan de Klap\nknop toewijzen.",
 
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "RoodLinks5P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks5P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "RoodRechts5P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts5P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "BlauwLinks5P",
-    "SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks5P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "BlauwRechts5P",
-    "SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts5P\nknop toewijzen.",
-    "SETTINGS_KEYASSIGN_GAME_CLAP5P": "Klap5P",
-    "SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Konga toets:\nEen toets/knop aan de Klap5P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "RoodLinks2P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks2P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "RoodRechts2P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts2P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "BlauwLinks2P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks2P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "BlauwRechts2P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts2P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP2P": "Klap2P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Konga toets:\nEen toets/knop aan de Klap2P\nknop toewijzen.",
 
-    // Key Assignment - Training
-    "SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Training Pauzeren",
-    "SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Drum toets:\nEen toets toewijzen om\nhet spel te pauzeren.",
-    "SETTINGS_KEYASSIGN_TRAINING_AUTO": "Auto Schakelen",
-    "SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Drum toets:\nEen toets toewijzen om Auto aan/uit te schakelen.",
-    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Bladwijzer Toevoegen/Verwijderen",
-    "SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Drum toets:\nEen toets toewijzen om bladwijzers\nte verwijderen/toe te voegen.",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Scroll Snelheid Verhogen",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Drums toets:\nEen toets toewijzen om de scrollsnelheid te verhogen.",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Scroll Snelheid Verlagen",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Drums toets:\nEen toets toewijzen om de scrollsnelheid te verlagen.",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Lied Snelheid Verhogen",
-    "SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Drum toets:\nEen toets toewijzen om het nummer te versnellen.",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Lied Snelheid Verlagen",
-    "SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Drum toets:\nEen toets toewijzen om het nummer te vertragen.",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Normale Tak Selecteren",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nNormale tak te wisselen.",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Expert Tak Selecteren",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nExpert tak te wisselen.",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Meester Tak Selecteren",
-    "SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nMeester tak te wisselen.",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Maat Vooruitgaan",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Drum toets:\nEen toets toewijzen om een maat vooruit te gaan.",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Maat Achteruitgaan",
-    "SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Drum toets:\nEen toets toewijzen om een maat achteruit te gaan.",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Maat Voorwaarts Skippen",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Drum toets:\nEen toets toewijzen om meerdere maten vooruit te springen.",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Maat Achterwaarts Skippen",
-    "SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Drum toets:\nEen toets toewijzen om meerdere maten achteruit te springen.",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Naar Eerste Maat Springen",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Drum toets:\nEen toets toewijzen om naar de eerste maat van het nummer te springen.",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Naar Laatste Maat Springen",
-    "SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drum toets:\nEen toets toewijzen om naar de laatste maat van het nummer te springen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "RoodLinks3P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks3P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "RoodRechts3P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts3P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "BlauwLinks3P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks3P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "BlauwRechts3P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts3P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP3P": "Klap3P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Konga toets:\nEen toets/knop aan de Klap3P\nknop toewijzen.",
 
-    // Title Screen
-    "TITLE_MODE_TAIKO": "Taiko Modus",
-    "TITLE_MODE_DAN": "Dan-i Dojo",
-    "TITLE_MODE_TOWER": "Taiko Torens",
-    "TITLE_MODE_SHOP": "Shop",
-    "TITLE_MODE_STORY": "Taiko Avontuur",
-    "TITLE_MODE_HEYA": "Mijn Kamer",
-    "TITLE_MODE_SETTINGS": "Instellingen",
-    "TITLE_MODE_EXIT": "Verlaat",
-    "TITLE_MODE_ONLINE": "Online Lounge",
-    "TITLE_MODE_DOCUMENT": "Open Encyclopedie",
-    "TITLE_MODE_AI": "AI Gevecht Modus",
-    "TITLE_MODE_STATS": "Player Statistieken",
-    "TITLE_MODE_EDITOR": "Nummer Bewerker",
-    "TITLE_MODE_TOOLS": "Open Toolbox",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "RoodLinks4P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks4P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "RoodRechts4P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts4P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "BlauwLinks4P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks4P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "BlauwRechts4P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts4P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP4P": "Klap4P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Konga toets:\nEen toets/knop aan de Klap4P\nknop toewijzen.",
 
-    "TITLE_MODE_TAIKO_DESC": "Speel je favoriete\nnummers op je eigen tempo!",
-    "TITLE_MODE_DAN_DESC": "Speel meerdere nummers achter elkaar\nmet uitdagende condities\nom een PASS rank te behalen!",
-    "TITLE_MODE_TOWER_DESC": "Speel lange nummers met een beperkt\naantal levens om de\ntop van te toren te bereiken!",
-    "TITLE_MODE_SHOP_DESC": "Koop nieuwe nummers, petit-chara of karakters\nmet de medailles die je in het spel hebt verdiend!",
-    "TITLE_MODE_STORY_DESC": "Overkom meerdere obstakels en\nontgrendel nieuwe content en horizons!",
-    "TITLE_MODE_HEYA_DESC": "Verander de naamplaat info\nof verander de karakters!",
-    "TITLE_MODE_SETTINGS_DESC": "Verander de stijl van het spel\nen algemene instellingen!",
-    "TITLE_MODE_EXIT_DESC": "Beëindigt het spel.\nTot de volgende keer!",
-    "TITLE_MODE_ONLINE_DESC": "Download nieuwe nummers\nen content van\nhet internet!",
-    "TITLE_MODE_DOCUMENT_DESC": "Leer over OpenTaiko\ngerelateerde eigenschappen en\nhoe je nieuwe content installeert!",
-    "TITLE_MODE_AI_DESC": "Vecht tegen een sterke AI door\nmeerdere secties en\nga voor de overwinning!",
-    "TITLE_MODE_STATS_DESC": "Bekijk en volg je\nvoortgang!",
-    "TITLE_MODE_EDITOR_DESC": "Creëer je eigen .tja nummers\nop basis van je favoriete liedjes!",
-    "TITLE_MODE_TOOLS_DESC": "Gebruik meerdere tools om\nnieuwe content toe te voegen!",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "RoodLinks5P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "Drum toets:\nEen toets/knop aan de RoodLinks5P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "RoodRechts5P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "Drum toets:\nEen toets/knop aan de RoodRechts5P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "BlauwLinks5P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Drum toets:\nEen toets/knop aan de BlauwLinks5P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "BlauwRechts5P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Drum toets:\nEen toets/knop aan de BlauwRechts5P\nknop toewijzen.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP5P": "Klap5P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Konga toets:\nEen toets/knop aan de Klap5P\nknop toewijzen.",
 
-    // Song Select
-    // {0}: Folder path
-    "SONGSELECT_RETURN_PATH": "Terug ({0})",
-    "SONGSELECT_RANDOM": "Willekeurig Nummer",
-    // {0}: Folder path
-    "SONGSELECT_RANDOM_PATH": "Willekeurig Nummer ({0})",
+		// Key Assignment - Training
+		"SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Training Pauzeren",
+		"SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Drum toets:\nEen toets toewijzen om\nhet spel te pauzeren.",
+		"SETTINGS_KEYASSIGN_TRAINING_AUTO": "Auto Schakelen",
+		"SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Drum toets:\nEen toets toewijzen om Auto aan/uit te schakelen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Bladwijzer Toevoegen/Verwijderen",
+		"SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Drum toets:\nEen toets toewijzen om bladwijzers\nte verwijderen/toe te voegen.",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Scroll Snelheid Verhogen",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Drums toets:\nEen toets toewijzen om de scrollsnelheid te verhogen.",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Scroll Snelheid Verlagen",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Drums toets:\nEen toets toewijzen om de scrollsnelheid te verlagen.",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Lied Snelheid Verhogen",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Drum toets:\nEen toets toewijzen om het nummer te versnellen.",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Lied Snelheid Verlagen",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Drum toets:\nEen toets toewijzen om het nummer te vertragen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Normale Tak Selecteren",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nNormale tak te wisselen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Expert Tak Selecteren",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nExpert tak te wisselen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Meester Tak Selecteren",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Drum toets:\nEen toets toewijzen om in het nummer naar de\nMeester tak te wisselen.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Maat Vooruitgaan",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Drum toets:\nEen toets toewijzen om een maat vooruit te gaan.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Maat Achteruitgaan",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Drum toets:\nEen toets toewijzen om een maat achteruit te gaan.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Maat Voorwaarts Skippen",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Drum toets:\nEen toets toewijzen om meerdere maten vooruit te springen.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Maat Achterwaarts Skippen",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Drum toets:\nEen toets toewijzen om meerdere maten achteruit te springen.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Naar Eerste Maat Springen",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Drum toets:\nEen toets toewijzen om naar de eerste maat van het nummer te springen.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Naar Laatste Maat Springen",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drum toets:\nEen toets toewijzen om naar de laatste maat van het nummer te springen.",
 
-    "SONGSELECT_SORT": "Sorteer Menu",
-    "SONGSELECT_SORT_PATH": "Pad",
-    "SONGSELECT_SORT_TITLE": "Titel",
-    "SONGSELECT_SORT_SUBTITLE": "Ondertiteling",
-    "SONGSELECT_SORT_LEVEL": "Weergegeven Niveau",
+		// Title Screen
+		"TITLE_MODE_TAIKO": "Taiko Modus",
+		"TITLE_MODE_DAN": "Dan-i Dojo",
+		"TITLE_MODE_TOWER": "Taiko Torens",
+		"TITLE_MODE_SHOP": "Shop",
+		"TITLE_MODE_STORY": "Taiko Avontuur",
+		"TITLE_MODE_HEYA": "Mijn Kamer",
+		"TITLE_MODE_SETTINGS": "Instellingen",
+		"TITLE_MODE_EXIT": "Verlaat",
+		"TITLE_MODE_ONLINE": "Online Lounge",
+		"TITLE_MODE_DOCUMENT": "Open Encyclopedie",
+		"TITLE_MODE_AI": "AI Gevecht Modus",
+		"TITLE_MODE_STATS": "Player Statistieken",
+		"TITLE_MODE_EDITOR": "Nummer Bewerker",
+		"TITLE_MODE_TOOLS": "Open Toolbox",
 
-    // {0}: Main BPM
-    "SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
-    // {0}: Main BPM
-    // {1}: Minimum BPM
-    // {2}: Maximum BPM
-    "SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
-    // {0}: Charter name
-    "SONGSELECT_INFO_CHARTER": "Maker: {0}",
+		"TITLE_MODE_TAIKO_DESC": "Speel je favoriete\nnummers op je eigen tempo!",
+		"TITLE_MODE_DAN_DESC": "Speel meerdere nummers achter elkaar\nmet uitdagende condities\nom een PASS rank te behalen!",
+		"TITLE_MODE_TOWER_DESC": "Speel lange nummers met een beperkt\naantal levens om de\ntop van te toren te bereiken!",
+		"TITLE_MODE_SHOP_DESC": "Koop nieuwe nummers, petit-chara of karakters\nmet de medailles die je in het spel hebt verdiend!",
+		"TITLE_MODE_STORY_DESC": "Overkom meerdere obstakels en\nontgrendel nieuwe content en horizons!",
+		"TITLE_MODE_HEYA_DESC": "Verander de naamplaat info\nof verander de karakters!",
+		"TITLE_MODE_SETTINGS_DESC": "Verander de stijl van het spel\nen algemene instellingen!",
+		"TITLE_MODE_EXIT_DESC": "Beëindigt het spel.\nTot de volgende keer!",
+		"TITLE_MODE_ONLINE_DESC": "Download nieuwe nummers\nen content van\nhet internet!",
+		"TITLE_MODE_DOCUMENT_DESC": "Leer over OpenTaiko\ngerelateerde eigenschappen en\nhoe je nieuwe content installeert!",
+		"TITLE_MODE_AI_DESC": "Vecht tegen een sterke AI door\nmeerdere secties en\nga voor de overwinning!",
+		"TITLE_MODE_STATS_DESC": "Bekijk en volg je\nvoortgang!",
+		"TITLE_MODE_EDITOR_DESC": "Creëer je eigen .tja nummers\nop basis van je favoriete liedjes!",
+		"TITLE_MODE_TOOLS_DESC": "Gebruik meerdere tools om\nnieuwe content toe te voegen!",
 
-    "SONGSELECT_QUICKCONFIG": "Snelle Coniguratie",
-    "SONGSELECT_QUICKCONFIG_MORE": "More...",
+		// Song Select
+		// {0}: Folder path
+		"SONGSELECT_RETURN_PATH": "Terug ({0})",
+		"SONGSELECT_RANDOM": "Willekeurig Nummer",
+		// {0}: Folder path
+		"SONGSELECT_RANDOM_PATH": "Willekeurig Nummer ({0})",
 
-    // Modals
-    "MODAL_TITLE_COIN": "Munten Verkregen!",
-    "MODAL_TITLE_CHARA": "Nieuw Karakter!",
-    "MODAL_TITLE_PUCHI": "Nieuwe Puchichara!",
-    "MODAL_TITLE_NAMEPLATE": "Nieuwe Titel!",
-    "MODAL_TITLE_SONG": "Nieuw Lied!",
-    // {0}: Newly obtained coins
-    // {1}: New total coin count
-    "MODAL_MESSAGE_COIN": "+{0} Munten (Totaal: {1})",
+		"SONGSELECT_SORT": "Sorteer Menu",
+		"SONGSELECT_SORT_PATH": "Pad",
+		"SONGSELECT_SORT_TITLE": "Titel",
+		"SONGSELECT_SORT_SUBTITLE": "Ondertiteling",
+		"SONGSELECT_SORT_LEVEL": "Weergegeven Niveau",
 
-    // Online Lounge
-    "ONLINE_EXIT": "Terug naar het startmenu",
-    "ONLINE_DOWNLOAD": "Content downloaden",
-    "ONLINE_DOWNLOAD_CDN": "Selecteer een CDN",
-    "ONLINE_DOWNLOAD_SONG": "Download Liedjes",
-    "ONLINE_DOWNLOAD_CHARA": "Download Karakters (Niet beschikbaar)",
-    "ONLINE_DOWNLOAD_PUCHI": "Download Puchicharas (Niet beschikbaar)",
-    "ONLINE_MULTIPLAYER": "Online Multiplayer (Niet beschikbaar)",
+		// {0}: Main BPM
+		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+		// {0}: Main BPM
+		// {1}: Minimum BPM
+		// {2}: Maximum BPM
+		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+		// {0}: Charter name
+		"SONGSELECT_INFO_CHARTER": "Maker: {0}",
 
-    // Taiko Towers
-    "TOWER_FLOOR_REACHED": "Niveau bereikt:",
-    "TOWER_FLOOR_INITIAL": "F",
-    "TOWER_SCORE": "Score",
-    "TOWER_SCORE_INITIAL": "P",
+		"SONGSELECT_QUICKCONFIG": "Snelle Coniguratie",
+		"SONGSELECT_QUICKCONFIG_MORE": "More...",
 
-    // Dan Dojo
-    "DAN_CONDITION_NAME_SOUL": "Soul gauge",
-    "DAN_CONDITION_NAME_GOOD": "Good count",
-    "DAN_CONDITION_NAME_OK": "Ok count",
-    "DAN_CONDITION_NAME_BAD": "Bad count",
-    "DAN_CONDITION_NAME_SCORE": "Score",
-    "DAN_CONDITION_NAME_ROLL": "Rolls count",
-    "DAN_CONDITION_NAME_HIT": "Hit count",
-    "DAN_CONDITION_NAME_COMBO": "Combo",
-    "DAN_CONDITION_NAME_ACCURACY": "Accuracy",
-    "DAN_CONDITION_NAME_ADLIB": "ADLIB count",
-    "DAN_CONDITION_NAME_BOMB": "Bombs hit",
+		// Modals
+		"MODAL_TITLE_COIN": "Munten Verkregen!",
+		"MODAL_TITLE_CHARA": "Nieuw Karakter!",
+		"MODAL_TITLE_PUCHI": "Nieuwe Puchichara!",
+		"MODAL_TITLE_NAMEPLATE": "Nieuwe Titel!",
+		"MODAL_TITLE_SONG": "Nieuw Lied!",
+		// {0}: Newly obtained coins
+		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN": "+{0} Munten (Totaal: {1})",
 
-    // Heya / Quick Heya
-    "HEYA_PUCHI": "Puchichara",
-    "HEYA_CHARA": "Character",
-    "HEYA_DAN": "Dan Title",
-    "HEYA_NAMEPLATE": "Nameplate Title",
+		// Online Lounge
+		"ONLINE_EXIT": "Terug naar het startmenu",
+		"ONLINE_DOWNLOAD": "Content downloaden",
+		"ONLINE_DOWNLOAD_CDN": "Selecteer een CDN",
+		"ONLINE_DOWNLOAD_SONG": "Download Liedjes",
+		"ONLINE_DOWNLOAD_CHARA": "Download Karakters (Niet beschikbaar)",
+		"ONLINE_DOWNLOAD_PUCHI": "Download Puchicharas (Niet beschikbaar)",
+		"ONLINE_MULTIPLAYER": "Online Multiplayer (Niet beschikbaar)",
 
-    // {0}: Asset name
-    "HEYA_DESCRIPTION_NAME": "Name: {0}",
-    // {0}: Asset rarity
-    "HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
-    "HEYA_DESCRIPTION_RARITY0": "Poor",
-    "HEYA_DESCRIPTION_RARITY1": "Common",
-    "HEYA_DESCRIPTION_RARITY2": "Uncommon",
-    "HEYA_DESCRIPTION_RARITY3": "Rare",
-    "HEYA_DESCRIPTION_RARITY4": "Epic",
-    "HEYA_DESCRIPTION_RARITY5": "Legendary",
-    "HEYA_DESCRIPTION_RARITY6": "Mythical",
-    // {0}: Asset author
-    "HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
-    // {0}: Gauge type
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
-    "HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
-    // {0}: Percentage of mines
-    "HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
-    // {0}: Percentage of fuse rolls
-    "HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
-    // {0}: Coin multiplier
-    "HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
+		// Taiko Towers
+		"TOWER_FLOOR_REACHED": "Niveau bereikt:",
+		"TOWER_FLOOR_INITIAL": "F",
+		"TOWER_SCORE": "Score",
+		"TOWER_SCORE_INITIAL": "P",
 
-    // Unlock requirements & messages (Any Menu)
-    "UNLOCK_CONDITION_INVALID": "[ERROR] Onjuiste conditie.",
-    "UNLOCK_CONDITION_SHOP": "Item alleen in de shop beschikbaar.", // cs
-    // {0}: Price of item
-    "UNLOCK_CONDITION_COST": "Muntprijs: {0}", // ch, cs, cm
-    "UNLOCK_COIN_BOUGHT": "Item gekocht!",
-    "UNLOCK_COIN_MORE": "Niet genoeg munten!",
+		// Dan Dojo
+		"DAN_CONDITION_NAME_SOUL": "Soul gauge",
+		"DAN_CONDITION_NAME_GOOD": "Good count",
+		"DAN_CONDITION_NAME_OK": "Ok count",
+		"DAN_CONDITION_NAME_BAD": "Bad count",
+		"DAN_CONDITION_NAME_SCORE": "Score",
+		"DAN_CONDITION_NAME_ROLL": "Rolls count",
+		"DAN_CONDITION_NAME_HIT": "Hit count",
+		"DAN_CONDITION_NAME_COMBO": "Combo",
+		"DAN_CONDITION_NAME_ACCURACY": "Accuracy",
+		"DAN_CONDITION_NAME_ADLIB": "ADLIB count",
+		"DAN_CONDITION_NAME_BOMB": "Bombs hit",
 
-    "UNLOCK_CONDITION_ERROR": "De volgende conditie: {0} vereist {1} waardes.",
-								
-    "UNLOCK_CONDITION_ERROR2": "De volgende conditie: {0} vereist ({1} * n) waardes en n referenties.",
+		// Heya / Quick Heya
+		"HEYA_PUCHI": "Puchichara",
+		"HEYA_CHARA": "Character",
+		"HEYA_DAN": "Dan Title",
+		"HEYA_NAMEPLATE": "Nameplate Title",
 
-    // {0}: Coin earn requirement
-    // {1}: Current progress
-    "UNLOCK_CONDITION_EARN": "Verdien in totaal {0} munten om dit itme te ontgrendelen! ({1}/{0})", // ce
-    // {0}: Total AI plays needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_AIPLAY": "Speel {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // ap
-    // {0}: Total AI wins needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_AIWIN": "Win {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // aw
-    // {0}: Total plays needed
-    // {1}: Current progress
-    "UNLOCK_CONDITION_PLAY": "Speel {0} liedjes om dit item te ontgrendelen! ({1}/{0})", // tp
-    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-    // {1}: # of songs needed
-    // {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_PLAYDIFF": "{0} {1} liedjes op {2} moeilijkheidsgraad om dit item te ontgrendelen! ({3}/{1})", // dp
-    // {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-    // {1}: # of songs needed
-    // {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} nummers met een ster waarde van {2} om dit item te ontgrendelen! ({3}/{1})", // lp
-    // {0}: Current progress
-    // {1}: Total # of challenges
-    "UNLOCK_CONDITION_CHALLENGE": "Behaal de volgende prestaties om dit item te ontgrendelen:  ({0}/{1})", // sp, sg, sc
-    // {0}: Clear type
-    // {1}: Song name
-    // {2}: Difficulty type
-    "UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} op {2} moeilijkheidsgraad.", // sp
-    // {0}: Clear type
-    // {1}: # of songs needed
-    // {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
-    // {3}: Current progress
-    "UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} liedjes binnen de {2} folder. ({3}/{1})", // sg
-    // {0}: Clear type
-    // {1} # of songs needed
-    // {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-    // {3} Current progress
-    "UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} nummers gemaakt door {2}. ({3}/{1})", // sc
+		// {0}: Asset name
+		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		// {0}: Asset rarity
+		"HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
+		"HEYA_DESCRIPTION_RARITY0": "Poor",
+		"HEYA_DESCRIPTION_RARITY1": "Common",
+		"HEYA_DESCRIPTION_RARITY2": "Uncommon",
+		"HEYA_DESCRIPTION_RARITY3": "Rare",
+		"HEYA_DESCRIPTION_RARITY4": "Epic",
+		"HEYA_DESCRIPTION_RARITY5": "Legendary",
+		"HEYA_DESCRIPTION_RARITY6": "Mythical",
+		// {0}: Asset author
+		"HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
+		// {0}: Gauge type
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
+		// {0}: Percentage of mines
+		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
+		// {0}: Percentage of fuse rolls
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
+		// {0}: Coin multiplier
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
 
-    "UNLOCK_CONDITION_REQUIRE_PLAY": "Speel",
-    "UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Speel",
-    "UNLOCK_CONDITION_REQUIRE_ASSIST": "Behaal een Geassisteerde Clear op",
-    "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Behaal tenminste een Geassisteerde Clear op",
-    "UNLOCK_CONDITION_REQUIRE_CLEAR": "Behaal een Clear op",
-    "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Behaal tenminste een Clear op",
-    "UNLOCK_CONDITION_REQUIRE_FC": "Behaal een Volledige Combo op",
-    "UNLOCK_CONDITION_REQUIRE_FC_MORE": "Behaal tenminste een Volledige Combo op",
-    "UNLOCK_CONDITION_REQUIRE_PERFECT": "Behaal een Perfect op",
-    "UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Behaal tenminste een Perfect op",
+		// Unlock requirements & messages (Any Menu)
+		"UNLOCK_CONDITION_INVALID": "[ERROR] Onjuiste conditie.",
+		"UNLOCK_CONDITION_SHOP": "Item alleen in de shop beschikbaar.", // cs
+		// {0}: Price of item
+		"UNLOCK_CONDITION_COST": "Muntprijs: {0}", // ch, cs, cm
+		"UNLOCK_COIN_BOUGHT": "Item gekocht!",
+		"UNLOCK_COIN_MORE": "Niet genoeg munten!",
 
-    // Pause Menu (Taiko/Tower/Dan Mode)
-    "PAUSE_TITLE": "Pauze",
-    "PAUSE_RESUME": "Hervatten",
-    "PAUSE_RESTART": "Opnieuw starten",
-    "PAUSE_EXIT": "Stoppen",
+		"UNLOCK_CONDITION_ERROR": "De volgende conditie: {0} vereist {1} waardes.",
 
-    // AI Info
-    "AI_NAME": "AI",
-    "AI_TITLE": "Deus-Ex-Machina",
+		"UNLOCK_CONDITION_ERROR2": "De volgende conditie: {0} vereist ({1} * n) waardes en n referenties.",
 
-    // Mods
-    "MOD_NONE": "Geen",
-    "MOD_BLANK": "-",
-    "MOD_SWITCH_OFF": "Uit",
-    "MOD_SWITCH_ON": "Aan",
-    "MOD_SCOREMULTIPLY": "Score Vermenigvuldiger : {0}",
-    "MOD_COINMULTIPLY": "Munten Vermenigvuldiger : {0}",
+		// {0}: Coin earn requirement
+		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN": "Verdien in totaal {0} munten om dit itme te ontgrendelen! ({1}/{0})", // ce
+		// {0}: Total AI plays needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY": "Speel {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // ap
+		// {0}: Total AI wins needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN": "Win {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // aw
+		// {0}: Total plays needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_PLAY": "Speel {0} liedjes om dit item te ontgrendelen! ({1}/{0})", // tp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: # of songs needed
+		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} liedjes op {2} moeilijkheidsgraad om dit item te ontgrendelen! ({3}/{1})", // dp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: # of songs needed
+		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} nummers met een ster waarde van {2} om dit item te ontgrendelen! ({3}/{1})", // lp
+		// {0}: Current progress
+		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE": "Behaal de volgende prestaties om dit item te ontgrendelen:  ({0}/{1})", // sp, sg, sc
+		// {0}: Clear type
+		// {1}: Song name
+		// {2}: Difficulty type
+		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} op {2} moeilijkheidsgraad.", // sp
+		// {0}: Clear type
+		// {1}: # of songs needed
+		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} liedjes binnen de {2} folder. ({3}/{1})", // sg
+		// {0}: Clear type
+		// {1} # of songs needed
+		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} nummers gemaakt door {2}. ({3}/{1})", // sc
 
-    "MOD_SPEED": "Scroll Snelheid",
+		"UNLOCK_CONDITION_REQUIRE_PLAY": "Speel",
+		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Speel",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Behaal een Geassisteerde Clear op",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Behaal tenminste een Geassisteerde Clear op",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR": "Behaal een Clear op",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Behaal tenminste een Clear op",
+		"UNLOCK_CONDITION_REQUIRE_FC": "Behaal een Volledige Combo op",
+		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Behaal tenminste een Volledige Combo op",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT": "Behaal een Perfect op",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Behaal tenminste een Perfect op",
 
-    "MOD_HIDE": "Verborgen",
-    "MOD_STEALTH": "Onzichtbaar",
+		// Pause Menu (Taiko/Tower/Dan Mode)
+		"PAUSE_TITLE": "Pauze",
+		"PAUSE_RESUME": "Hervatten",
+		"PAUSE_RESTART": "Opnieuw starten",
+		"PAUSE_EXIT": "Stoppen",
 
-    "MOD_FLIP": "Noten Omkeren",
+		// AI Info
+		"AI_NAME": "AI",
+		"AI_TITLE": "Deus-Ex-Machina",
 
-    "MOD_RANDOM": "Willekeurig",
-    "MOD_RANDOM_SHUFFLE": "Shuffle",
-    "MOD_RANDOM_CHAOS": "Chaos",
+		// Mods
+		"MOD_NONE": "Geen",
+		"MOD_BLANK": "-",
+		"MOD_SWITCH_OFF": "Uit",
+		"MOD_SWITCH_ON": "Aan",
+		"MOD_SCOREMULTIPLY": "Score Vermenigvuldiger : {0}",
+		"MOD_COINMULTIPLY": "Munten Vermenigvuldiger : {0}",
 
-    "MOD_TIMING": "Timing",
-    "MOD_TIMING1": "Los",
-    "MOD_TIMING2": "Lenig",
-    "MOD_TIMING3": "Normaal",
-    "MOD_TIMING4": "Strikt",
-    "MOD_TIMING5": "Rigoureus",
+		"MOD_SPEED": "Scroll Snelheid",
 
-    "MOD_JUSTICE": "Justice Modus",
-    "MOD_SAFE": "Veilig",
-    "MOD_JUST": "Just",
+		"MOD_HIDE": "Verborgen",
+		"MOD_STEALTH": "Onzichtbaar",
 
-    "MOD_GAMETYPE": "Game Type",
-    "MOD_GAMETYPE_TAIKO": "Taiko",
-    "MOD_GAMETYPE_KONGA": "Konga",
+		"MOD_FLIP": "Noten Omkeren",
 
-    "MOD_GAMEMODE": "Game Modus",
-    "MOD_GAMEMODE_TRAINING": "Training Mode",
+		"MOD_RANDOM": "Willekeurig",
+		"MOD_RANDOM_SHUFFLE": "Shuffle",
+		"MOD_RANDOM_CHAOS": "Chaos",
 
-    "MOD_AUTO": "Auto",
+		"MOD_TIMING": "Timing",
+		"MOD_TIMING1": "Los",
+		"MOD_TIMING2": "Lenig",
+		"MOD_TIMING3": "Normaal",
+		"MOD_TIMING4": "Strikt",
+		"MOD_TIMING5": "Rigoureus",
 
-    "MOD_SONGSPEED": "Lied Afspeelsnelheid",
-    "SETTINGS_MOD_SONGSPEED_DESC": "Verandert de snelheid van het lied.\nAls de Tijd Rekking optie is ingeschakeld,\nkunnen geluidsproblemen onststaan onder 0.9x snelheid.\nOpmerking: Het verandert ook de toon van het lied.",
+		"MOD_JUSTICE": "Justice Modus",
+		"MOD_SAFE": "Veilig",
+		"MOD_JUST": "Just",
 
-    "MOD_HITSOUND": "Instrument",
+		"MOD_GAMETYPE": "Game Type",
+		"MOD_GAMETYPE_TAIKO": "Taiko",
+		"MOD_GAMETYPE_KONGA": "Konga",
 
-    "MOD_FUN": "Leuke Mods",
-    "MOD_FUN_AVALANCHE": "Lawine",
-    "MOD_FUN_MINESWEEPER": "Minesweeper"
-  },
+		"MOD_GAMEMODE": "Game Modus",
+		"MOD_GAMEMODE_TRAINING": "Training Mode",
+
+		"MOD_AUTO": "Auto",
+
+		"MOD_SONGSPEED": "Lied Afspeelsnelheid",
+		"SETTINGS_MOD_SONGSPEED_DESC": "Verandert de snelheid van het lied.\nAls de Tijd Rekking optie is ingeschakeld,\nkunnen geluidsproblemen onststaan onder 0.9x snelheid.\nOpmerking: Het verandert ook de toon van het lied.",
+
+		"MOD_HITSOUND": "Instrument",
+
+		"MOD_FUN": "Leuke Mods",
+		"MOD_FUN_AVALANCHE": "Lawine",
+		"MOD_FUN_MINESWEEPER": "Minesweeper"
+	},
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "KEY NOT FOUND: {0}",
   // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
