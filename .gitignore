@@ -1,17 +1,31 @@
-﻿*.suo
+﻿# Visual Studio and VS Code
+*.suo
 *.snk
 /.vs
 /.vscode
+
+# JetBrains (IntelliJ, Rider, etc.)
+.idea/
+
+# Build output
 */bin
 */obj
 *.exe
+
+# Other
 *.log
 *.pdb
 *.db
 *.swp
 *.DotSettings.user
+
+# NuGet
 /packages
+
+# FDK
 /FDK/bin
+
+# OpenTaiko
 /OpenTaiko/bin
 /OpenTaiko/Cache
 /OpenTaiko/Capture_img
