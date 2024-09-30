@@ -1,0 +1,597 @@
+﻿{
+  // The folder's name is used as the ID, which is used to identify which localized data to use.
+  // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
+  // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
+  // If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+
+  // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
+  // i.e. "日本語 (Japanese)"
+  "Language": "Deutsch (German)",
+	"Entries": {
+
+		// Common
+		"MENU_RETURN": "Zurück",
+		// Difficulties (Any Menu)
+		"DIFF_EASY": "Einfach",
+		"DIFF_NORMAL": "Normal",
+		"DIFF_HARD": "Schwer",
+		"DIFF_EX": "Extrem",
+		"DIFF_EXTRA": "Extra",
+		"DIFF_EXEXTRA": "Extrem / Extra",
+		"DIFF_TOWER": "Turm",
+		"DIFF_DAN": "Dan",
+		"DIFF_ANY": "Beliebig",
+		"DIFF_UNKNOWN": "Unbekannt",
+
+		// Settings
+		"SETTINGS_SYSTEM": "Systemoptionen",
+		"SETTINGS_SYSTEM_DESC": "Einstellungen für das gesamte System",
+		"SETTINGS_GAME": "Gameplay Optionen",
+		"SETTINGS_GAME_DESC": "Einstellungen für die Schlagzeuge.",
+		"SETTINGS_EXIT": "Verlassen",
+		"SETTINGS_EXIT_DESC": "Speichere die Einstellungen und verlasse das KONFIGURATIONS-Menü.",
+
+		"SETTINGS_MENU_RETURN": "<< Zurück zum Menü",
+		"SETTINGS_MENU_RETURN_DESC": "Zurück zum linken Menü",
+
+		"SETTINGS_KEYASSIGN_SYSTEM": "Systemtasteneinstellungen",
+		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "Ein zweites Menü zum Zuweisen von Tasten",
+		"SETTINGS_KEYASSIGN_GAME": "Gameplay Tasteneinstellungen",
+		"SETTINGS_KEYASSIGN_GAME_DESC": "Ein zweites Menü zum Anpassen der während des Spiels verwendeten Tasten",
+		"SETTINGS_KEYASSIGN_TRAINING": "Trainingsmodus Tasteneinstellungen",
+		"SETTINGS_KEYASSIGN_TRAINING_DESC": "Ein zweites Menü zur Einstellung der Tasten im\nTrainingsmodus.",
+
+		// Settings - System
+		"SETTINGS_SYSTEM_LANGUAGE": "Systemsprache",
+		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Ändern der Sprache\nim Spiel und in den Menüs.",
+		"SETTINGS_SYSTEM_PLAYERCOUNT": "Spieleranzahl",
+		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Wähle mit wie vielen Spielen du spielen willst.\nEs können bis zu 5 Spieler gleichzeitig spielen.",
+		"SETTINGS_SYSTEM_RELOADSONG": "Lieder neu laden",
+		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Song Ordner neu laden.",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Songs neu laden (Hartes Neuladen)",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Leeren des vorhandenen Caches und\nSong Ordner von Grund auf neu laden.",
+
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importiere Score.ini Dateien",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importiert Score.ini Dateien in die Datenbank.\n\n<c.#f0ad4e>WARNUNG\nFolgendes wird nicht übertragen:\n- Freischalt Status\n- Gameplay-Modifikatoren\n- Anzahl der Treffer (Gut, Ok, Übel, Trommelrolle, etc.)\n- Dan-Prüfungsergebnisse",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Suche nach Ergebnissen...",
+		// {0}: Total # of score.ini files to be processed
+		// {1}: # of score.ini files successfully imported
+		// {2}: # of score.ini files currently processed
+		// {3}: # of score.ini files skipped
+		// {4}: # of score.ini files that failed to import due to an error
+		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Verarbeite {0} Ergebnisse...\n<c.#0bb000>{1} von {2} importiert</c> (<c.#f0ad4e>{3} übersprungen</c> / <c.#b00000>{4} fehlgeschlagen</c>)\n\n{5}",
+
+		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Turm ausblenden",
+		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Blendet Dan and Tower-Charts aus\nim Taiko-Modus Menü.\nHinweis: Leider neu laden, um diese\n     Einstellung wirksam zu machen.",
+
+		// Settings - System - Graphics
+		"SETTINGS_SYSTEM_FULLSCREEN": "Vollbildmodus",
+		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wechsel zwischen Vollbild- und Fenstermodus.",
+		"SETTINGS_SYSTEM_VSYNC": "VSync-Modus",
+		"SETTINGS_SYSTEM_VSYNC_DESC": "Bestimmt, ob VSync verwendet wird.\nBei Aktivierung wird die FPS auf 60 begrenzt,\nwas das Noten-Scrolling flüssiger macht,\naber die Eingabeverzögerung erhöht.\nBei Deaktivierung wird die FPS-Begrenzung aufgehoben,\nwas die Eingabeverzögerung reduziert,\naber das Noten-Scrolling instabiler machen kann.",
+		"SETTINGS_SYSTEM_GRAPHICSAPI": "Grafik-API",
+		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Zeichenmethode:\nWähle zwischen OpenGL,\nDirectX11, Vulkan oder Metal.\nOpenGL ist langsam, aber kompatibel und stabil.\nDirectX11 ist schnell und stabil, funktioniert aber nur\nunter Windows.\nVulkan ist am schnellsten unter Linux.\nMetal funktioniert nur auf MacOS.\n\nDiese Änderung wird nach einem Neustart des Spiels wirksam.",
+		"SETTINGS_SYSTEM_TEXTUREASYNC": "Asynchrones Laden der Texturen",
+		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Art des Texturladens:\nEinfrieren beim Start verschwindet\nDeaktiviere diese Option, wenn einige Texturen schwarz werden\niese Änderung wird nach einem Neustart von OpenTaiko wirksam\n",
+
+		"SETTINGS_SYSTEM_BGMOVIE": "Video-Wiedergabe umschalten",
+		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Bestimmt, ob Hintergrundvideos verwendet werden.\nWenn dies aktiviert ist und ein Video im Ordner fehlt,\nerscheint der Hintergrund schwarz.",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Anzeigemodus der Video-Wiedergabe",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Ändert, wie Videos angezeigt werden\nim Hintergrund.",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Keine",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Vollbild",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Mini-Anzeige",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Beide",
+		"SETTINGS_SYSTEM_LANEOPACITY": "Bahn-Hintergrund-Transparenz",
+		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "Steuert die Transparenz des Bahn-Hintergrunds,\nwährend Videos abgespielt werden.\n\n0 = komplett transparent,\n255 = keine Transparenz.",
+
+		"SETTINGS_SYSTEM_BGA": "Hintgrundanimationen anzeigen",
+		"SETTINGS_SYSTEM_BGA_DESC": "Bestimmt, ob Hintergrundanimationen angezeigt werden.",
+		"SETTINGS_SYSTEM_DISPLAYCHARA": "Charaktere anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "Zeigt Charakterbilder an.",
+		"SETTINGS_SYSTEM_DISPLAYDANCER": "Tänzer anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "Zeigt Tänzerbilder an.",
+		"SETTINGS_SYSTEM_DISPLAYMOB": "Mob anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYMOB_DESC": "Zeigt Mob-Bilder an.",
+		"SETTINGS_SYSTEM_DISPLAYRUNNER": "Läufer anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "Zeigt Läuferbilder an.",
+		"SETTINGS_SYSTEM_DISPLAYFOOTER": "Fußzeile anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Zeigt das Bild der Fußzeile an.",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI": "PuchiChara anzeigen",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Zeigt PuchiChara-Bilder an.",
+		"SETTINGS_SYSTEM_SIMPLEMODE": "Einfachmodus",
+		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Vereinfacht die Darstellung, indem die meisten\nvisuellen Effekte und Verzierungen im Spiel ausgeblendet werden.",
+
+		"SETTINGS_SYSTEM_SKIN": "Aktueller Skin",
+		"SETTINGS_SYSTEM_SKIN_DESC": "Wähle ein Skin aus dem Systemordner aus.",
+
+		// Settings - System - Audio
+		"SETTINGS_SYSTEM_SONGPLAYBACK": "Musikwiedergabe umschalten",
+		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Bestimmt, ob Musik abgespielt wird.",
+		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL-Metadaten anwenden",
+		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Dies ist eine teilweise redundante Einstellung,\ndie festlegt, ob SONGVOL-Metadaten verwendet werden.\nWerte zwischen 0 und 100 verringern die Lautstärke des Songs,\naber Werte über 100 bewirken nichts.",
+		"SETTINGS_SYSTEM_SEVOL": "Soundeffekt-Lautstärke",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "Passt die Lautstärke der Sounds für Don und Ka an.\nUm ohne Treffergeräusche zu spielen, setze dies auf 0.\nDu musst das Spiel nach dem Verlassen der Konfiguration neu starten,\ndamit diese Einstellung gespeichert wird.",
+		"SETTINGS_SYSTEM_VOICEVOL": "Sprachlautstärke",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Passt die Lautstärke der Sprachsounds eines Charakters an.\nDu musst das Spiel nach dem Verlassen der Konfiguration neu starten,\ndamit diese Einstellung gespeichert wird.",
+		"SETTINGS_SYSTEM_SONGVOL": "Musikwiedergabe-Lautstärke",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "Passt die Lautstärke der Musikwiedergabe an.\nDu musst das Spiel nach dem Verlassen der Konfiguration neu starten,\ndamit diese Einstellung gespeichert wird.",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "Song-Vorschau-Lautstärke",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Passt die Lautstärke der Song-Vorschau an.\nDu musst das Spiel nach dem Verlassen der Konfiguration neu starten,\ndamit diese Einstellung gespeichert wird.",
+		"SETTINGS_SYSTEM_VOLINCREMENT": "Lautstärke-Inkrement der Tastatur",
+		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Gibt an, um wie viel die Systemtasten Lautstärke erhöhen\nund Lautstärke verringern die Lautstärke ändern.\nDu kannst Werte von 1 bis 20 angeben.",
+
+		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Musikwiedergabe-Puffer",
+		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "Die Zeit, die vor der Musikwiedergabe im Spiel vergeht.\nEin verringern des Werts kann dazu führen, dass Lieder zu früh abgespielt werden.",
+		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Song-Vorschau-Puffer",
+		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "Die Zeit, die vergeht, bevor eine Song-Vorschau abgespielt wird.\nEine Verringerung dieses Werts kann dazu führen, dass\nVorschauen beginnen, während noch gescrollt wird.\nDu kannst Werte von 0 ms bis 10000 ms angeben.",
+
+		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Audio-Wiedergabemodus",
+		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Funktioniert nur mit Audiogeräten, die ASIO-Wiedergabe unterstützen\n- Hat die geringste Eingabeverzögerung\nWasapi:\n- Nur kompatibel mit Windows\n- Hat die zweitgeringste Eingabeverzögerung\nBASS:\n- Unterstützt auf allen Plattformen\nHinweis: Verlasse die KONFIGURATION, um die\n     Einstellung zu übernehmen.",
+		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO-Wiedergabegerät",
+		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Wähle ein gültiges Gerät, um den ASIO-Wiedergabemodus zu aktivieren.\nHinweis: Verlasse die KONFIGURATION, um die\n     Einstellung zu übernehmen.",
+		"SETTINGS_SYSTEM_WASAPIBUFFER": "Wasapi-Puffergröße",
+		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Ändere den Soundpuffer für den Wasapi-Wiedergabemodus.\nSetze den Wert so niedrig wie möglich,\nohne Tonprobleme wie Einfrieren oder falsches Timing zu verursachen.\nSetze ihn auf 0, um einen geschätzten korrekten Wert zu verwenden,\noder finde den korrekten Wert durch Versuch und Irrtum.\nHinweis: Verlasse die KONFIGURATION, um die\n     Einstellung zu übernehmen.",
+		"SETTINGS_SYSTEM_BASSBUFFER": "Bass-Puffergröße",
+		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Puffergröße bei Verwendung von Bass:\nDie Größe kann zwischen 0 und 99999 ms liegen.\nEin Wert von 0 überlässt die Entscheidung dem Betriebssystem.\nJe kleiner der Wert, desto weniger Audioverzögerung gibt es,\ndies kann jedoch auch zu abnormen oder knisternden Tönen führen.\n※ Hinweis: Verlasse die KONFIGURATION, um die\n　     Einstellung zu übernehmen.",
+		"SETTINGS_SYSTEM_OSTIMER": "OS-Timer-Modus",
+		"SETTINGS_SYSTEM_OSTIMER_DESC": "Das Einschalten sorgt für ein flüssigeres Noten-Scrolling,\nkann jedoch Tonverzögerungen verursachen.\nDas Ausschalten führt zu instabilem Noten-Scrolling,\nstellt jedoch sicher, dass keine Tonverzögerungen auftreten.\n\nWenn AUS, verwendet DTXMania seinen eigenen Timer,\nund der Effekt ist umgekehrt.",
+
+		// Settings - System - Misc.
+		"SETTINGS_SYSTEM_LOG": "Protokolldatei erstellen",
+		"SETTINGS_SYSTEM_LOG_DESC": "Bestimmt, ob eine TJAPlayer3.log-Datei erstellt wird,\nwenn das Spiel beendet wird.\nDies verfolgt die Leistung des Spiels\nund identifiziert Fehler.",
+		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Unterordner bei Zufallsauswahl verwenden",
+		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Bestimmt, ob Unterordner bei der zufälligen Songauswahl\nverwendet werden.",
+		"SETTINGS_SYSTEM_DEBUGMODE": "Debug-Modus",
+		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Bestimmt, ob der Debug-Modus aktiviert ist.\nZusätzliche Informationen erscheinen dann\nunten rechts.\nEs zeigt deine Latenzkalibrierung für das\nSpielen ohne Treffergeräusche an.",
+		"SETTINGS_SYSTEM_AUTOSCREENSHOT": "Automatische Screenshots",
+		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Bestimmt, ob Ergebnis-Screenshots automatisch gemacht werden.\nDies passiert nur, wenn ein Highscore erreicht wird,\nwas nicht unbedingt die beste Spielleistung widerspiegelt.",
+		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Rich Presence",
+		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Bestimmt, ob Liedinformationen mit Discord geteilt werden.",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gepufferter Eingabemodus",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wenn dies eingeschaltet ist, gehen keine Eingaben verloren,\naber die Eingabeabfragerate wird verringert.\nWenn dies ausgeschaltet ist, können Eingaben verloren gehen,\naber sie werden häufiger abgefragt.",
+
+		// Settings - Gameplay
+		"SETTINGS_GAME_GLOBALOFFSET": "Globaler Offset",
+		"SETTINGS_GAME_GLOBALOFFSET_DESC": "Ändert den interpretierten OFFSET-Wert\nfür alle Charts.\nKann zwischen -999 und 999 ms eingestellt werden.\nUm die Eingabeverzögerung zu verringern, einen negativen Wert einstellen.",
+
+		"SETTINGS_GAME_CALIBRATION": "Offset kalibrieren",
+		"SETTINGS_GAME_CALIBRATION_DESC": "Kalibriert deinen Offset.\nDer globale Offset wird überschrieben, wenn gespeichert.",
+		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+
+		"SETTINGS_GAME_BADCOUNT": "Kanpeki-Modus",
+		"SETTINGS_GAME_BADCOUNT_DESC": "Bestimmt, wie viele ÜBEL erlaubt sind,\nbevor ein Lied automatisch scheitert.\nSetze dies auf 0, um den Modus zu deaktivieren.",
+		"SETTINGS_GAME_NOTELOCK": "Notelock-Modus",
+		"SETTINGS_GAME_NOTELOCK_DESC": "Bestimmt, ob das Treffen im Raum zwischen den Noten\nals ÜBEL gewertet wird.",
+		"SETTINGS_GAME_AILEVEL": "KI-Level",
+		"SETTINGS_GAME_AILEVEL_DESC": "Bestimmt, wie präzise die KI ist.\nWenn auf 0, ist die KI deaktiviert.\nAb 1 oder mehr spielt der 2P als KI.\nDeaktiviert, wenn AUTO 2P eingeschaltet ist.",
+		"SETTINGS_GAME_NORMALGAUGE": "Immer normale Leiste verwenden",
+		"SETTINGS_GAME_NORMALGAUGE_DESC": "Erzwingt die Verwendung der normalen Leiste,\nunabhängig von den Modifikatoren des Charakters.",
+
+		"SETTINGS_GAME_AUTOP1": "Automatisches Spiel Spieler 1",
+		"SETTINGS_GAME_AUTOP1_DESC": "Bestimmt, ob Spieler 1 automatisch spielt.",
+		"SETTINGS_GAME_AUTOP2": "Automatisches Spiel Spieler 2",
+		"SETTINGS_GAME_AUTOP2_DESC": "Bestimmt, ob Spieler 2 automatisch spielt.",
+		"SETTINGS_GAME_AUTOROLL": "Roll-Geschwindigkeit",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Wenn automatisches Spielen aktiviert ist, werden Trommelrollen\nso oft pro Sekunde automatisch getroffen.\nHat keine Auswirkung auf Ballons.\n0 deaktiviert Auto-Roll, und der Maximalwert\nist ein Treffer pro Frame.",
+
+		"SETTINGS_GAME_NOINFO": "Kein Informationsmodus",
+		"SETTINGS_GAME_NOINFO_DESC": "Bestimmt, ob Liedinformationen angezeigt werden.\nEinschalten deaktiviert die Liedinformationen,\nausschalten aktiviert sie.",
+		"SETTINGS_GAME_COMBODISPLAY": "Minimale Combo-Anzeige",
+		"SETTINGS_GAME_COMBODISPLAY_DESC": "Wähle die Mindestanzahl, bei der die Combo angezeigt wird.\nKann zwischen 1 und 99999 eingestellt werden.",
+		"SETTINGS_GAME_SCOREDISPLAY": "Punkteanzeige umschalten",
+		"SETTINGS_GAME_SCOREDISPLAY_DESC": "Zeigt die aktuellen Gut/Ok/Übel-Bewertungen\nunten links an.\n(Nur Einzelspieler)",
+		"SETTINGS_GAME_BRANCHANIME": "Zweiganimationssatz",
+		"SETTINGS_GAME_BRANCHANIME_DESC": "Ändert den Animationssatz, der verwendet wird, wenn eine Liedvariante ausgewählt wird.\nTYP-A: 2. Generation\nTYP-B: 3. Generation",
+
+		"SETTINGS_GAME_DEFAULTDIFF": "Standard-Schwierigkeitsgrad",
+		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Wähle den standardmäßig ausgewählten Schwierigkeitsgrad\naus, der bei der Liedauswahl angezeigt wird.\nWenn Extra nicht ausgewählt ist, wird es nur sichtbar,\nwenn auf der höchsten Schwierigkeit des Liedes\nder rechte Pfeil gedrückt wird.",
+		"SETTINGS_GAME_EXEXTRAANIME": "Extreme/Extra-Übergänge verwenden",
+		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Spielt eine skin-definierte Animation\nbeim Wechsel zwischen\nExtreme & Extra.",
+
+		// Settings - Gameplay - Training Mode
+		"SETTINGS_TRAINING_SKIPCOUNT": "Takt-Überspringanzahl",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Die Anzahl der Takte, die beim Drücken von\nVorwärts-/Rückwärts-Takt übersprungen werden\nim Trainingsmodus.",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "Zeitintervall für Takt-Sprung",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Die Zeit in Millisekunden, die erforderlich ist,\num wiederholt die linken/rechten blauen Tasten zu drücken,\num zu einem markierten Takt im Trainingsmodus zu springen.",
+
+		// Settings - Broken/Unused/Might Deprecate/Might Update
+		// Translate these anyways, even if their future is uncertain.
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Bildvorschau-Puffer",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Dies ist eine redundante Einstellung,\ndie aus DTXMania portiert wurde.\nSie hat keine Funktion.",
+		"SETTINGS_SYSTEM_TIMESTRETCH": "Time-Stretch-Modus",
+		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Unklar, was diese Option bewirkt.\nSie benötigt mehr CPU-Leistung\nund könnte Tonprobleme verursachen\nbei Wiedergabegeschwindigkeit unter 0,9x.",
+		"SETTINGS_SYSTEM_FASTRENDER": "Schnelles Rendern",
+		"SETTINGS_SYSTEM_FASTRENDER_DESC": "Bestimmt, ob Bilder vor dem Laden von Liedern gerendert werden.",
+		"SETTINGS_GAME_BRANCHGUIDE": "Zweigführer",
+		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Bestimmt, ob ein numerischer Leitfaden angezeigt wird,\num zu sehen, welcher Zweig gewählt wird.\nIm Auto-Modus wird er nicht angezeigt.",
+		"SETTINGS_GAME_BIGNOTEJUDGE": "Große Noten-Bewertung",
+		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Bestimmt, ob große Noten durch das Treffen mit 2 Tasten belohnt werden.\nWenn dies aktiviert ist, führt das Treffen mit 1 Taste\nzu einer visuellen Verzögerung, bevor sie verschwinden.\nTreffer mit 2 Tasten bringen doppelte Punkte.\nWenn dies deaktiviert ist, werden sie mit 1 Taste\nwie normale Noten getroffen.\nDoppelte Punkte werden trotzdem vergeben.\nVersuche, sie mit 2 Tasten zu treffen,\nkönnen dazu führen, dass die nächste Note getroffen wird.",
+		"SETTINGS_GAME_SURVIVAL": "Überlebensmodus",
+		"SETTINGS_GAME_SURVIVAL_DESC": "Dieser Modus ist defekt.\nEr implementiert ein Timersystem ähnlich wie Stepmania-Kurse,\naber einige Codes fehlen, sodass die Funktionalität begrenzt ist.",
+		"SETTINGS_GAME_SCOREMODE": "Punkte-Modus",
+		"SETTINGS_GAME_SCOREMODE_DESC": "Wählt die Formel, die zur Berechnung der Punkte verwendet wird.\nTYP-A: 1. Generation\nTYP-B: 2. Generation\nTYP-C: 3. Generation",
+		"SETTINGS_GAME_SHINUCHI": "Shin'uchi-Modus",
+		"SETTINGS_GAME_SHINUCHI_DESC": "Macht jede Note gleich viel Punkte wert.\nVerwendet die Formel der 4. Generation.",
+
+		// Key Assignment - System
+		"SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "Bildschirmaufnahme",
+		"SETTINGS_KEYASSIGN_SYSTEM_CAPTURE_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste für die Bildschirmaufnahme zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL": "Lautstärke erhöhen",
+		"SETTINGS_KEYASSIGN_SYSTEM_INCREASEVOL_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Erhöhen der Musiklautstärke zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL": "Lautstärke verringern",
+		"SETTINGS_KEYASSIGN_SYSTEM_DECREASEVOL_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Verringern der Musiklautstärke zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS": "Trefferwerte anzeigen",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYHITS_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Anzeigen der Trefferwerte zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG": "Debug-Menü anzeigen",
+		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Anzeigen des Debug-Menüs zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Schnellkonfiguration",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste für den Zugriff auf die Schnellkonfiguration zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Spieleranpassung",
+		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste für die Spieleranpassung zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Lieder sortieren",
+		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Neusortieren der Lieder zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Automatik umschalten (P1)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Umschalten der Automatik für P1 zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO2P": "Automatik umschalten (P2)",
+		"SETTINGS_KEYASSIGN_SYSTEM_AUTO2P_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Umschalten der Automatik für P2 zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_TRAINING": "Trainingsmodus umschalten",
+		"SETTINGS_KEYASSIGN_SYSTEM_TRAINING_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Umschalten des Trainingsmodus zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+		"SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY": "Videoanzeigemodus wechseln",
+		"SETTINGS_KEYASSIGN_SYSTEM_BGMOVIEDISPLAY_DESC": "System-Tastenzuweisung:\nWeise eine beliebige Taste zum Wechseln der Videoanzeigemodi zu.\n(Nur die Tastatur kann verwendet werden. Gamepads\nkönnen nicht verwendet werden.)",
+
+		// Key Assignment - Gameplay
+		"SETTINGS_KEYASSIGN_GAME_DECIDE": "Bestätigen",
+		"SETTINGS_KEYASSIGN_GAME_DECIDE_DESC": "Menü-Bestätigungstaste.",
+		"SETTINGS_KEYASSIGN_GAME_CANCEL": "Abbrechen",
+		"SETTINGS_KEYASSIGN_GAME_CANCEL_DESC": "Menü-Abbruchtaste.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTCHANGE": "Links ändern",
+		"SETTINGS_KEYASSIGN_GAME_LEFTCHANGE_DESC": "Menü-Linkstaste.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE": "Rechts ändern",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTCHANGE_DESC": "Menü-Rechtstaste.",
+
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED": "LinksRot",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksRot-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED": "RechtsRot",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsRot-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE": "LinksBlau",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksBlau-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "RechtsBlau",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsBlau-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP": "Klatschen",
+		"SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Konga-Tastenzuweisung:\nWeise eine Taste/Pads für den Klatschen-Knopf zu.",
+
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED2P": "LinksRot2P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED2P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksRot2P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED2P": "RechtsRot2P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED2P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsRot2P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P": "LinksBlau2P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksBlau2P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "RechtsBlau2P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsBlau2P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP2P": "Klatschen2P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Konga-Tastenzuweisung:\nWeise eine Taste/Pads für den Klatschen2P-Knopf zu.",
+
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED3P": "LinksRot3P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED3P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksRot3P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED3P": "RechtsRot3P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED3P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsRot3P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P": "LinksBlau3P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksBlau3P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "RechtsBlau3P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsBlau3P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP3P": "Klatschen3P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Konga-Tastenzuweisung:\nWeise eine Taste/Pads für den Klatschen3P-Knopf zu.",
+
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED4P": "LinksRot4P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED4P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksRot4P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED4P": "RechtsRot4P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED4P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsRot4P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P": "LinksBlau4P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksBlau4P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "RechtsBlau4P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsBlau4P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP4P": "Klatschen4P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Konga-Tastenzuweisung:\nWeise eine Taste/Pads für den Klatschen4P-Knopf zu.",
+
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED5P": "LinksRot5P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTRED5P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksRot5P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED5P": "RechtsRot5P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTRED5P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsRot5P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P": "LinksBlau5P",
+		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den LinksBlau5P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "RechtsBlau5P",
+		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Trommel-Tastenzuweisung:\nWeise eine Taste/Pads für den RechtsBlau5P-Knopf zu.",
+		"SETTINGS_KEYASSIGN_GAME_CLAP5P": "Klatschen5P",
+		"SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Konga-Tastenzuweisung:\nWeise eine Taste/Pads für den Klatschen5P-Knopf zu.",
+
+		// Key Assignment - Training
+		"SETTINGS_KEYASSIGN_TRAINING_PAUSE": "Training pausieren",
+		"SETTINGS_KEYASSIGN_TRAINING_PAUSE_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Pausieren zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_AUTO": "Automatik umschalten",
+		"SETTINGS_KEYASSIGN_TRAINING_AUTO_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Umschalten der Automatik zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_BOOKMARK": "Lesezeichen hinzufügen/entfernen",
+		"SETTINGS_KEYASSIGN_TRAINING_BOOKMARK_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Hinzufügen/Entfernen von Lesezeichen zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL": "Scrollgeschwindigkeit erhöhen",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESCROLL_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Erhöhen der Scrollgeschwindigkeit zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL": "Scrollgeschwindigkeit verringern",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESCROLL_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Verringern der Scrollgeschwindigkeit zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED": "Liedgeschwindigkeit erhöhen",
+		"SETTINGS_KEYASSIGN_TRAINING_INCREASESPEED_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Erhöhen der Liedgeschwindigkeit zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED": "Liedgeschwindigkeit verringern",
+		"SETTINGS_KEYASSIGN_TRAINING_DECREASESPEED_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Verringern der Liedgeschwindigkeit zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL": "Zweig auf Normal setzen",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHNORMAL_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zu, um den Zweig eines Liedes\nauf Normal zu setzen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT": "Zweig auf Experte setzen",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zu, um den Zweig eines Liedes\nauf Experte zu setzen.",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Zweig auf Meister setzen",
+		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zu, um den Zweig eines Liedes\nauf Meister zu setzen.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Takt vorwärts bewegen",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zu, um den Takt vorwärts zu bewegen.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Takt zurück bewegen",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zu, um den Takt rückwärts zu bewegen.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Takte vorwärts überspringen",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Überspringen von Takten vorwärts zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Takte rückwärts überspringen",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Überspringen von Takten rückwärts zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Zum ersten Takt springen",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Springen zum ersten Takt zu.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Zum letzten Takt springen",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Trommel-Tastenzuweisung:\nWeise eine beliebige Taste zum Springen zum letzten Takt zu.",
+
+		// Title Screen
+		"TITLE_MODE_TAIKO": "Taiko-Modus",
+		"TITLE_MODE_DAN": "Dan-i Dojo",
+		"TITLE_MODE_TOWER": "Taiko-Türme",
+		"TITLE_MODE_SHOP": "Shop",
+		"TITLE_MODE_STORY": "Taiko-Abenteuer",
+		"TITLE_MODE_HEYA": "Mein Zimmer",
+		"TITLE_MODE_SETTINGS": "Einstellungen",
+		"TITLE_MODE_EXIT": "Beenden",
+		"TITLE_MODE_ONLINE": "Online-Lounge",
+		"TITLE_MODE_DOCUMENT": "Enzyklopädie öffnen",
+		"TITLE_MODE_AI": "KI-Kampfmodus",
+		"TITLE_MODE_STATS": "Spielerstatistiken",
+		"TITLE_MODE_EDITOR": "Chart-Editor",
+		"TITLE_MODE_TOOLS": "Werkzeugkasten öffnen",
+
+		"TITLE_MODE_TAIKO_DESC": "Spiele deine Lieblingslieder\nin deinem eigenen Tempo!",
+		"TITLE_MODE_DAN_DESC": "Spiele mehrere Charts hintereinander\nin herausfordernden Prüfungen,\num einen PASS-Rang zu erhalten!",
+		"TITLE_MODE_TOWER_DESC": "Spiele lange Charts mit einer begrenzten\nAnzahl von Leben und erreiche\ndie Spitze des Turms!",
+		"TITLE_MODE_SHOP_DESC": "Kaufe neue Lieder, Petit-Chara oder Charaktere\nmit den Medaillen, die du im Spiel verdient hast!",
+		"TITLE_MODE_STORY_DESC": "Überwinde verschiedene Hindernisse und\nschalte neue Inhalte und Horizonte frei!",
+		"TITLE_MODE_HEYA_DESC": "Ändere deine Namensschild-Infos\noder das Aussehen deines Charakters!",
+		"TITLE_MODE_SETTINGS_DESC": "Ändere deinen Spielstil\noder die allgemeinen Einstellungen!",
+		"TITLE_MODE_EXIT_DESC": "Beende das Spiel.\nBis zum nächsten Mal!",
+		"TITLE_MODE_ONLINE_DESC": "Lade neue Charts\nund Inhalte aus\ndem Internet herunter!",
+		"TITLE_MODE_DOCUMENT_DESC": "Erfahre mehr über die Funktionen von OpenTaiko\nund wie du neue Inhalte installierst!",
+		"TITLE_MODE_AI_DESC": "Kämpfe gegen eine starke KI\ndurch mehrere Abschnitte\nund strebe den Sieg an!",
+		"TITLE_MODE_STATS_DESC": "Verfolge deinen Fortschritt\nund deine Statistiken!",
+		"TITLE_MODE_EDITOR_DESC": "Erstelle deine eigenen .tja-Charts\nbasierend auf deinen Lieblingsliedern!",
+		"TITLE_MODE_TOOLS_DESC": "Nutze verschiedene Werkzeuge, um\nneue benutzerdefinierte Inhalte hinzuzufügen!",
+
+		// Song Select
+		// {0}: Folder path
+		"SONGSELECT_RETURN_PATH": "Zurück ({0})",
+		"SONGSELECT_RANDOM": "Zufälliges Lied",
+		// {0}: Folder path
+		"SONGSELECT_RANDOM_PATH": "Zufälliges Lied ({0})",
+
+		"SONGSELECT_SORT": "Sortiermenü",
+		"SONGSELECT_SORT_PATH": "Pfad",
+		"SONGSELECT_SORT_TITLE": "Titel",
+		"SONGSELECT_SORT_SUBTITLE": "Untertitel",
+		"SONGSELECT_SORT_LEVEL": "Angezeigte Stufe",
+
+		// {0}: Main BPM
+		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+		// {0}: Main BPM
+		// {1}: Minimum BPM
+		// {2}: Maximum BPM
+		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+		// {0}: Charter name
+		"SONGSELECT_INFO_CHARTER": "Ersteller: {0}",
+
+		"SONGSELECT_QUICKCONFIG": "Schnellkonfiguration",
+		"SONGSELECT_QUICKCONFIG_MORE": "Mehr...",
+
+		// Modals
+		"MODAL_TITLE_COIN": "Münzen erhalten!",
+		"MODAL_TITLE_CHARA": "Neuer Charakter!",
+		"MODAL_TITLE_PUCHI": "Neuer Puchichara!",
+		"MODAL_TITLE_NAMEPLATE": "Neuer Titel!",
+		"MODAL_TITLE_SONG": "Neues Lied!",
+		// {0}: Newly obtained coins
+		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN": "+{0} Münzen (Gesamt: {1})",
+
+		// Online Lounge
+		"ONLINE_EXIT": "Zum Hauptmenü zurückkehren",
+		"ONLINE_DOWNLOAD": "Inhalte herunterladen",
+		"ONLINE_DOWNLOAD_CDN": "CDN auswählen",
+		"ONLINE_DOWNLOAD_SONG": "Lieder herunterladen",
+		"ONLINE_DOWNLOAD_CHARA": "Charaktere herunterladen (Nicht verfügbar)",
+		"ONLINE_DOWNLOAD_PUCHI": "Puchicharas herunterladen (Nicht verfügbar)",
+		"ONLINE_MULTIPLAYER": "Online Multiplayer (Nicht verfügbar)",
+
+		// Taiko Towers
+		"TOWER_FLOOR_REACHED": "Erreichte Etage",
+		"TOWER_FLOOR_INITIAL": "E",
+		"TOWER_SCORE": "Punkte",
+		"TOWER_SCORE_INITIAL": "P",
+
+		// Dan Dojo
+		"DAN_CONDITION_NAME_SOUL": "Seelenleiste",
+		"DAN_CONDITION_NAME_GOOD": "Gut-Anzahl",
+		"DAN_CONDITION_NAME_OK": "Ok-Anzahl",
+		"DAN_CONDITION_NAME_BAD": "Übel-Anzahl",
+		"DAN_CONDITION_NAME_SCORE": "Punkte",
+		"DAN_CONDITION_NAME_ROLL": "Rollen-Anzahl",
+		"DAN_CONDITION_NAME_HIT": "Treffer-Anzahl",
+		"DAN_CONDITION_NAME_COMBO": "Combo",
+		"DAN_CONDITION_NAME_ACCURACY": "Genauigkeit",
+		"DAN_CONDITION_NAME_ADLIB": "ADLIB-Anzahl",
+		"DAN_CONDITION_NAME_BOMB": "Bomben getroffen",
+
+		// Heya / Quick Heya
+		"HEYA_PUCHI": "Puchichara",
+		"HEYA_CHARA": "Charakter",
+		"HEYA_DAN": "Dan-Titel",
+		"HEYA_NAMEPLATE": "Namensschild-Titel",
+
+		// {0}: Asset name
+		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		// {0}: Asset rarity
+		"HEYA_DESCRIPTION_RARITY": "Seltenheit: {0}",
+		"HEYA_DESCRIPTION_RARITY0": "Schlecht",
+		"HEYA_DESCRIPTION_RARITY1": "Gewöhnlich",
+		"HEYA_DESCRIPTION_RARITY2": "Ungewöhnlich",
+		"HEYA_DESCRIPTION_RARITY3": "Selten",
+		"HEYA_DESCRIPTION_RARITY4": "Episch",
+		"HEYA_DESCRIPTION_RARITY5": "Legendär",
+		"HEYA_DESCRIPTION_RARITY6": "Mythisch",
+		// {0}: Asset author
+		"HEYA_DESCRIPTION_AUTHOR": "Autor: {0}",
+		// {0}: Gauge type
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Leistentyp: {0}",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Schwierig",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extrem",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Beende das Spiel innerhalb der Clear-Zone, um das Lied zu bestehen!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "Die Leiste beginnt voll und verringert sich stark bei jedem Fehler!\nSei vorsichtig, wenn der Wert der Leiste 0 erreicht, scheitert das Spiel automatisch!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "Die Leiste beginnt voll und verringert sich stark bei jedem Fehler!\nEine seltsame Kraft scheint den Fehlerspielraum während des Liedes zu verringern...",
+		// {0}: Percentage of mines
+		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bombenfaktor: {0}% der Noten werden in Minen umgewandelt im Minensucher-Modus",
+		// {0}: Percentage of fuse rolls
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Zündschnurfaktor: {0}% der Ballons werden in Zündschnur-Rollen umgewandelt im Minensucher-Modus",
+		// {0}: Coin multiplier
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Münz-Multiplikator: x{0}",
+
+		// Unlock requirements & messages (Any Menu)
+		"UNLOCK_CONDITION_INVALID": "[FEHLER] Ungültige Bedingung",
+		"UNLOCK_CONDITION_SHOP": "Artikel nur im Shop verfügbar.", // cs
+		// {0}: Price of item
+		"UNLOCK_CONDITION_COST": "Münzpreis: {0}", // ch, cs, cm
+		"UNLOCK_COIN_BOUGHT": "Artikel gekauft!",
+		"UNLOCK_COIN_MORE": "Nicht genug Münzen!",
+
+		"UNLOCK_CONDITION_ERROR": "Die folgende Bedingung: {0} erfordert {1} Werte.",
+		"UNLOCK_CONDITION_ERROR2": "Die folgende Bedingung: {0} erfordert ({1} * n) Werte und n Referenzen.",
+
+		// {0}: Coin earn requirement
+		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN": "Verdiene insgesamt {0} Münzen, um diesen Artikel freizuschalten! ({1}/{0})", // ce
+		// {0}: Total AI plays needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY": "Spiele {0} KI-Kämpfe, um diesen Artikel freizuschalten! ({1}/{0})", // ap
+		// {0}: Total AI wins needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN": "Gewinne {0} KI-Kämpfe, um diesen Artikel freizuschalten! ({1}/{0})", // aw
+		// {0}: Total plays needed
+		// {1}: Current progress
+		"UNLOCK_CONDITION_PLAY": "Spiele {0} Lieder, um diesen Artikel freizuschalten! ({1}/{0})", // tp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: # of songs needed
+		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} Lieder auf {2} Schwierigkeitsgrad, um diesen Artikel freizuschalten! ({3}/{1})", // dp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: # of songs needed
+		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} Lieder mit einem Sterne-Rating von {2}, um diesen Artikel freizuschalten! ({3}/{1})", // lp
+		// {0}: Current progress
+		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE": "Erreiche die folgenden Leistungen, um diesen Artikel freizuschalten: ({0}/{1})", // sp, sg, sc
+		// {0}: Clear type
+		// {1}: Song name
+		// {2}: Difficulty type
+		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} auf {2} Schwierigkeitsgrad.", // sp
+		// {0}: Clear type
+		// {1}: # of songs needed
+		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} Lieder im {2}-Ordner. ({3}/{1})", // sg
+		// {0}: Clear type
+		// {1} # of songs needed
+		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} Charts erstellt von {2}. ({3}/{1})", // sc
+
+		"UNLOCK_CONDITION_REQUIRE_PLAY": "Spiele",
+		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Spiele",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Erhalte eine assistierte Freischaltung bei",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Erhalte mindestens eine assistierte Freischaltung bei",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR": "Erreiche eine Freischaltung bei",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Erreiche mindestens eine Freischaltung bei",
+		"UNLOCK_CONDITION_REQUIRE_FC": "Erreiche eine volle Combo bei",
+		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Erreiche mindestens eine volle Combo bei",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT": "Erreiche ein Perfekt bei",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Erreiche ein Perfekt bei",
+
+		// Pause Menu (Taiko/Tower/Dan Mode)
+		"PAUSE_TITLE": "Pause",
+		"PAUSE_RESUME": "Fortsetzen",
+		"PAUSE_RESTART": "Neustart",
+		"PAUSE_EXIT": "Beenden",
+
+		// AI Info
+		"AI_NAME": "KI",
+		"AI_TITLE": "Deus-Ex-Machina",
+
+		// Mods
+		"MOD_NONE": "Keine",
+		"MOD_BLANK": "-",
+		"MOD_SWITCH_OFF": "Aus",
+		"MOD_SWITCH_ON": "An",
+		"MOD_SCOREMULTIPLY": "Punkte-Multiplikator: {0}",
+		"MOD_COINMULTIPLY": "Münz-Multiplikator: {0}",
+
+		"MOD_SPEED": "Scroll-Geschwindigkeit",
+
+		"MOD_HIDE": "Unsichtbar",
+		"MOD_STEALTH": "Tarnung",
+
+		"MOD_FLIP": "Noten umkehren",
+
+		"MOD_RANDOM": "Zufällig",
+		"MOD_RANDOM_SHUFFLE": "Mischen",
+		"MOD_RANDOM_CHAOS": "Chaos",
+
+		"MOD_TIMING": "Timing",
+		"MOD_TIMING1": "Locker",
+		"MOD_TIMING2": "Nachsichtig",
+		"MOD_TIMING3": "Normal",
+		"MOD_TIMING4": "Streng",
+		"MOD_TIMING5": "Genau",
+
+		"MOD_JUSTICE": "Justice-Modus",
+		"MOD_SAFE": "Sicher",
+		"MOD_JUST": "Präzise",
+
+		"MOD_GAMETYPE": "Spieltyp",
+		"MOD_GAMETYPE_TAIKO": "Taiko",
+		"MOD_GAMETYPE_KONGA": "Konga",
+
+		"MOD_GAMEMODE": "Spielmodus",
+		"MOD_GAMEMODE_TRAINING": "Trainingsmodus",
+
+		"MOD_AUTO": "Automatisch",
+
+		"MOD_SONGSPEED": "Song-Wiedergabegeschwindigkeit",
+		"SETTINGS_MOD_SONGSPEED_DESC": "Ändere die Song-Wiedergabegeschwindigkeit.\nWenn die Time-Stretch-Option aktiviert ist,\nkönnen bei einer Wiedergabegeschwindigkeit unter 0,9x Tonprobleme auftreten.\nHinweis: Dies ändert auch die Tonhöhe der Lieder.",
+
+		"MOD_HITSOUND": "Instrument",
+
+		"MOD_FUN": "Spaß-Modifikatoren",
+		"MOD_FUN_AVALANCHE": "Lawine",
+		"MOD_FUN_MINESWEEPER": "Minesweeper"
+	},
+  // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
+  "InvalidKey": "TASTE NICHT GEFUNDEN: {0}",
+  // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
+  // Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
+  "FontName": "Arial",
+  "BoxFontName": "font.ttf"
+}

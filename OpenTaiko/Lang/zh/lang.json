@@ -51,16 +51,16 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "重新载入曲目（硬重新加载）",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "删除既有数据库并从空白重新扫描曲目文件夹并载入曲目。",
 
-		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "导入 Score.ini 文件",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "导入 Score.ini 文件到数据库中。\n\n<c.#f0ad4e>警告\n下列内容将不会转移：\n— 过关状态\n— 游玩修改器\n— 击打数（良、可、不可、连打等）\n— 段位测验成绩",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "正在搜索成绩……",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "正在处理 {0} 份成绩……\n<c.#0bb000>{1} ／ {2} 已处理</c>（<c.#f0ad4e>{3} 跳过</c> ／ <c.#b00000>{4} 失败</c>）\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新载入曲目以使此选项生效。",
@@ -458,7 +458,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "普通",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "困难",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "魔王",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "在成功区域完成演奏过关！",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "在过关区域完成演奏！",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "魂条从满开始，并在每次失误大量减少！\n小心，如果魂条值到达零，演奏自动失败！",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "魂条从满开始，并在每次失误大量减少！\n一种奇怪的力量似乎减少整首歌的误差幅度……",
 		// {0}: Percentage of mines
@@ -521,10 +521,10 @@
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "游玩",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "游玩",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST": "协助成功游玩",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "至少协助成功游玩",
-		"UNLOCK_CONDITION_REQUIRE_CLEAR": "成功游玩",
-		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "至少成功游玩",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST": "协助过关",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "至少协助过关",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR": "过关",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "至少过关",
 		"UNLOCK_CONDITION_REQUIRE_FC": "全连",
 		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "至少全连",
 		"UNLOCK_CONDITION_REQUIRE_PERFECT": "全良",

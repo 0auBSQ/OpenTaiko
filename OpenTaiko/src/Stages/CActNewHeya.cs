@@ -459,13 +459,13 @@ namespace OpenTaiko {
 									OpenTaiko.Tx.Puchichara[index].tx?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 
 
-									if (ttkCharacterNames[index] != null) {
+									if (ttkPuchiCharaNames[index] != null) {
 										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaNames[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
 									}
 
-									if (ttkCharacterAuthors[index] != null) {
+									if (ttkPuchiCharaAuthors[index] != null) {
 										CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
 
 										tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
