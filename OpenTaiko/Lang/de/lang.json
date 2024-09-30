@@ -52,7 +52,7 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Leeren des vorhandenen Caches und\nSong Ordner von Grund auf neu laden.",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importiere Score.ini Dateien",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importiert Score.ini Dateien in die Datenbank.\n\n<c.#f0ad4e>WARNUNG\nFolgendes wird nicht übertragen:\n- Freischalt Status\n- Gameplay-Modifikatoren\n- Anzahl der Treffer (Gut, Ok, Schlecht, Trommelrolle, etc.)\n- Dan-Prüfungsergebnisse",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importiert Score.ini Dateien in die Datenbank.\n\n<c.#f0ad4e>WARNUNG\nFolgendes wird nicht übertragen:\n- Freischalt Status\n- Gameplay-Modifikatoren\n- Anzahl der Treffer (Gut, Ok, Übel, Trommelrolle, etc.)\n- Dan-Prüfungsergebnisse",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Suche nach Ergebnissen...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
@@ -161,9 +161,9 @@
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
 
 		"SETTINGS_GAME_BADCOUNT": "Kanpeki-Modus",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Bestimmt, wie viele SCHLECHT erlaubt sind,\nbevor ein Lied automatisch scheitert.\nSetze dies auf 0, um den Modus zu deaktivieren.",
+		"SETTINGS_GAME_BADCOUNT_DESC": "Bestimmt, wie viele ÜBEL erlaubt sind,\nbevor ein Lied automatisch scheitert.\nSetze dies auf 0, um den Modus zu deaktivieren.",
 		"SETTINGS_GAME_NOTELOCK": "Notelock-Modus",
-		"SETTINGS_GAME_NOTELOCK_DESC": "Bestimmt, ob das Treffen im Raum zwischen den Noten\nals SCHLECHT gewertet wird.",
+		"SETTINGS_GAME_NOTELOCK_DESC": "Bestimmt, ob das Treffen im Raum zwischen den Noten\nals ÜBEL gewertet wird.",
 		"SETTINGS_GAME_AILEVEL": "KI-Level",
 		"SETTINGS_GAME_AILEVEL_DESC": "Bestimmt, wie präzise die KI ist.\nWenn auf 0, ist die KI deaktiviert.\nAb 1 oder mehr spielt der 2P als KI.\nDeaktiviert, wenn AUTO 2P eingeschaltet ist.",
 		"SETTINGS_GAME_NORMALGAUGE": "Immer normale Leiste verwenden",
@@ -181,7 +181,7 @@
 		"SETTINGS_GAME_COMBODISPLAY": "Minimale Combo-Anzeige",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "Wähle die Mindestanzahl, bei der die Combo angezeigt wird.\nKann zwischen 1 und 99999 eingestellt werden.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Punkteanzeige umschalten",
-		"SETTINGS_GAME_SCOREDISPLAY_DESC": "Zeigt die aktuellen Gut/Ok/Schlecht-Bewertungen\nunten links an.\n(Nur Einzelspieler)",
+		"SETTINGS_GAME_SCOREDISPLAY_DESC": "Zeigt die aktuellen Gut/Ok/Übel-Bewertungen\nunten links an.\n(Nur Einzelspieler)",
 		"SETTINGS_GAME_BRANCHANIME": "Zweiganimationssatz",
 		"SETTINGS_GAME_BRANCHANIME_DESC": "Ändert den Animationssatz, der verwendet wird, wenn eine Liedvariante ausgewählt wird.\nTYP-A: 2. Generation\nTYP-B: 3. Generation",
 
@@ -425,7 +425,7 @@
 		"DAN_CONDITION_NAME_SOUL": "Seelenleiste",
 		"DAN_CONDITION_NAME_GOOD": "Gut-Anzahl",
 		"DAN_CONDITION_NAME_OK": "Ok-Anzahl",
-		"DAN_CONDITION_NAME_BAD": "Schlecht-Anzahl",
+		"DAN_CONDITION_NAME_BAD": "Übel-Anzahl",
 		"DAN_CONDITION_NAME_SCORE": "Punkte",
 		"DAN_CONDITION_NAME_ROLL": "Rollen-Anzahl",
 		"DAN_CONDITION_NAME_HIT": "Treffer-Anzahl",
