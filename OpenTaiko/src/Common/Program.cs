@@ -74,8 +74,9 @@ namespace OpenTaiko {
 							osplatform = "osx";
 						else if (OperatingSystem.IsLinux())
 							osplatform = "linux";
+						// this is gonna be redundant code i hope? :3 -tfd
 						else
-							throw new PlatformNotSupportedException("TJAPlayer3-f does not support this OS.");
+							throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
 						string platform = "";
 
@@ -93,7 +94,7 @@ namespace OpenTaiko {
 								platform = "arm64";
 								break;
 							default:
-								throw new PlatformNotSupportedException($"TJAPlayer3 does not support this Architecture. ({RuntimeInformation.ProcessArchitecture})");
+								throw new PlatformNotSupportedException($"OpenTaiko does not support this architecture. ({RuntimeInformation.ProcessArchitecture})");
 						}
 
 						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
@@ -107,8 +108,8 @@ namespace OpenTaiko {
 						using (var mania = new OpenTaiko())
 							mania.Run();
 
-						Trace.WriteLine("");
-						Trace.WriteLine("遊んでくれてありがとう！");
+						Trace.WriteLine( "" );
+						Trace.WriteLine( "Thank you for playing!" );
 					}
 #if !DEBUG
 					catch( Exception e )
@@ -117,6 +118,9 @@ namespace OpenTaiko {
 						Trace.WriteLine( "OpenTaiko ran into an unexpected error, and can't continue from here! Σ(っ °Д °;)っ" );
 						Trace.WriteLine( "More details: " );
 						Trace.Write( e.ToString() );
+						Trace.WriteLine( "" );
+						Trace.WriteLine( "An error has occured." );
+                        AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
 					}
 #endif
 					// END #24606 2011.03.08 from
