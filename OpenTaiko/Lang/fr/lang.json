@@ -465,6 +465,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
 
@@ -539,6 +544,8 @@
 		// AI Info
 		"AI_NAME": "IA",
 		"AI_TITLE": "Deus-Ex-Machina",
+		// {0}: Section No.
+		"AI_SECTION": "Section {0}",
 
 		// Mods
 		"MOD_NONE": "Aucun",

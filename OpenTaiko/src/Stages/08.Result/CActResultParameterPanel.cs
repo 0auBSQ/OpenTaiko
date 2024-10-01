@@ -182,7 +182,7 @@ namespace OpenTaiko {
 
 			ttkAISection = new TitleTextureKey[OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count];
 			for (int i = 0; i < ttkAISection.Length; i++) {
-				ttkAISection[i] = new TitleTextureKey($"{i + 1}区", pfAISectionText, Color.White, Color.Black, 1280);
+				ttkAISection[i] = new TitleTextureKey(CLangManager.LangInstance.GetString("AI_SECTION", i + 1), pfAISectionText, Color.White, Color.Black, 1280);
 
 			}
 

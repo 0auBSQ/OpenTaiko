@@ -465,6 +465,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "爆弾ファクター：掃海で音符の{0}%は爆弾になる",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "時爆弾ファクター：掃海でふうせんの{0}%は時爆弾になる",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "コイン乗数：x{0}",
 
@@ -539,6 +544,8 @@
 		// AI Info
 		"AI_NAME": "AI",
 		"AI_TITLE": "デウス・エクス・マキナ",
+		// {0}: Section No.
+		"AI_SECTION": "{0}区",
 
 		// Mods
 		"MOD_NONE": "なし",

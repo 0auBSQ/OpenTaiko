@@ -74,7 +74,6 @@ namespace OpenTaiko {
 							osplatform = "osx";
 						else if (OperatingSystem.IsLinux())
 							osplatform = "linux";
-						// this is gonna be redundant code i hope? :3 -tfd
 						else
 							throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
@@ -118,9 +117,6 @@ namespace OpenTaiko {
 						Trace.WriteLine( "OpenTaiko ran into an unexpected error, and can't continue from here! Σ(っ °Д °;)っ" );
 						Trace.WriteLine( "More details: " );
 						Trace.Write( e.ToString() );
-						Trace.WriteLine( "" );
-						Trace.WriteLine( "An error has occured." );
-                        AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
 					}
 #endif
 					// END #24606 2011.03.08 from
