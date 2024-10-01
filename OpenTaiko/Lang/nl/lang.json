@@ -52,16 +52,16 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Nummers Herladen (Hard Herladen)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Wist de opgeslagen cache en \nherlaadt de Nummers map vanaf nul.",
 
-		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importeer Score.ini",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importeert Score.ini-bestanden naar de database.\n\n<c.#f0ad4e>WAARSCHUWING\nHet volgende wordt niet overgedragen:\n- Clear-statussen\n- Gameplay-modificatoren\n- Aantal treffers (Good, Ok, Bad, Drumroll, etc.)\n- Dan-examenscores",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Zoeken naar scores...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Verwerken van {0} scores...\n<c.#0bb000>{1} van {2} geïmporteerd</c> (<c.#f0ad4e>{3} overgeslagen</c> / <c.#b00000>{4} mislukt</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Toren Verbergen",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Verberg de Dan en Toren nummers\nin de Taiko Modus.\nOpmerking: Herlaad de nummers\nom dit te activeren.",
