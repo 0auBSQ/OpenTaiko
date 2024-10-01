@@ -910,15 +910,16 @@ namespace OpenTaiko {
 			}
 			#endregion
 			#region [ "曲データを検索しています"画像 ]
-			try {
-				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText("Now enumerating songs.\nPlease wait...", Color.White));
-				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f); // 半分のサイズで表示する。
+			try
+			{
+				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText("Now loading songs.\nPlease wait...", Color.White));
+				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>( 0.5f, 0.5f, 1f );	// 半分のサイズで表示する。
 
 				/*
 				using ( Bitmap image = new Bitmap( 640, 96 ) )
 				using ( Graphics graphics = Graphics.FromImage( image ) )
 				{
-					string[] s1 = { "曲データを検索しています。", "Now enumerating songs." };
+					string[] s1 = { "曲データを検索しています。", "Now loading songs." };
 					string[] s2 = { "そのまましばらくお待ち下さい。", "Please wait..." };
 					graphics.DrawString( s1[c], this.ft曲リスト用フォント, Brushes.DarkGray, (float) 2f, (float) 2f );
 					graphics.DrawString( s1[c], this.ft曲リスト用フォント, Brushes.White, (float) 0f, (float) 0f );
