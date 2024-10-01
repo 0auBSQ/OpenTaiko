@@ -6,8 +6,8 @@ namespace OpenTaiko {
 			["Poor"] = Color.Gray,
 			["Common"] = Color.White,
 			["Uncommon"] = Color.Lime,
-			["Rare"] = Color.Blue,
-			["Epic"] = Color.Purple,
+			["Rare"] = Color.FromArgb(0xFF, 0x00, 0x88, 0xFF),
+			["Epic"] = Color.FromArgb(0xFF, 0xC8, 0x00, 0xFF),
 			["Legendary"] = Color.Orange,
 			["Mythical"] = Color.Pink,
 		};
