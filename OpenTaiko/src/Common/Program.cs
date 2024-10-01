@@ -74,7 +74,6 @@ namespace OpenTaiko {
 							osplatform = "osx";
 						else if (OperatingSystem.IsLinux())
 							osplatform = "linux";
-						// this is gonna be redundant code i hope? :3 -tfd
 						else
 							throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
