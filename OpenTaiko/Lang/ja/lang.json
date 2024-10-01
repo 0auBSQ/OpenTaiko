@@ -539,6 +539,8 @@
 		// AI Info
 		"AI_NAME": "AI",
 		"AI_TITLE": "デウス・エクス・マキナ",
+		// {0}: Section No.
+		"AI_SECTION": "{0}区",
 
 		// Mods
 		"MOD_NONE": "なし",

@@ -536,6 +536,8 @@
 		// AI Info
 		"AI_NAME": "AI",
 		"AI_TITLE": "Deus-Ex-Machina",
+		// {0}: Section No.
+		"AI_SECTION": "Sectie {0}",
 
 		// Mods
 		"MOD_NONE": "Geen",

@@ -539,6 +539,8 @@
 		// AI Info
 		"AI_NAME": "ИИ",
 		"AI_TITLE": "Бог-Экс-Махина",
+		// {0}: Section No.
+		"AI_SECTION": "Секция {0}",
 
 		// Mods
 		"MOD_NONE": "Ничто",
