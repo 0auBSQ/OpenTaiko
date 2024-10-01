@@ -465,6 +465,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Фактор бомба: {0}% нот, превращенные в бомбы в Тральщике",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% баллонов, превращенные в дроби с взрывателем в Тральщике",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монетов: x{0}",
 
