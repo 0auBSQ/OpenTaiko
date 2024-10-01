@@ -1,4 +1,5 @@
 using System.Drawing;
+using DiscordRPC;
 using FDK;
 
 namespace OpenTaiko {
@@ -90,8 +91,8 @@ namespace OpenTaiko {
 							break;
 						case ModeType.SubTitle: {
 								int amount = 1;
-								if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null)
-									amount += OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles.Count;
+								if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds != null)
+									amount += OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds.Count;
 
 								this.ttkTitles = new TitleTextureKey[amount];
 								this.titlesKeys = new string[amount];
@@ -101,10 +102,11 @@ namespace OpenTaiko {
 								this.titlesKeys[0] = "初心者";
 
 								int idx = 1;
-								if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null) {
-									foreach (var item in OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles) {
-										this.ttkTitles[idx] = new TitleTextureKey(item.Value.cld.GetString(item.Key), this.MenuFont, Color.Black, Color.Transparent, 1000);
-										this.titlesKeys[idx] = item.Key;
+								if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds != null) {
+									foreach (var item in OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds) {
+										var name = OpenTaiko.Databases.DBNameplateUnlockables.data[item];
+										this.ttkTitles[idx] = new TitleTextureKey(name.nameplateInfo.cld.GetString(""), this.MenuFont, Color.Black, Color.Transparent, 1000);
+										this.titlesKeys[idx] = name.nameplateInfo.cld.GetString("");
 										idx++;
 									}
 								}
@@ -312,15 +314,29 @@ namespace OpenTaiko {
 									}
 									break;
 								case ModeType.SubTitle: {
-										OpenTaiko.SaveFileInstances[CurrentPlayer].data.Title = this.ttkTitles[CurrentIndex].str;
 
-										if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null
-											&& OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[CurrentIndex]))
-											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleType = OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles[this.titlesKeys[CurrentIndex]].iType;
-										else if (CurrentIndex == 0)
+										if (CurrentIndex == 0) {
 											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleType = 0;
-										else
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleId = -1;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleRarityInt = 1;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.Title = "初心者";
+										}
+										else if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds != null &&
+										OpenTaiko.Databases.DBNameplateUnlockables.data.ContainsKey(OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds[CurrentIndex - 1])) {
+											var id = OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds[CurrentIndex - 1];
+											var nameplate = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
+
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleId = id;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.Title = nameplate.nameplateInfo.cld.GetString("");
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleRarityInt = HRarity.tRarityToLangInt(nameplate.rarity);
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleType = nameplate.nameplateInfo.iType;
+										}
+										else {
 											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleType = -1;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleId = -1;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.TitleRarityInt = 1;
+											OpenTaiko.SaveFileInstances[CurrentPlayer].data.Title = "";
+										}
 
 										OpenTaiko.NamePlate.tNamePlateRefreshTitles(CurrentPlayer);
 
@@ -506,16 +522,25 @@ namespace OpenTaiko {
 									y += OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1];
 
 									int iType = -1;
+									int rarity = 1;
+									int id = -1;
 
-									if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles != null &&
-										OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles.ContainsKey(this.titlesKeys[index]))
-										iType = OpenTaiko.SaveFileInstances[CurrentPlayer].data.NamePlateTitles[this.titlesKeys[index]].iType;
-									else if (index == 0)
+									if (index == 0) {
 										iType = 0;
+									}
+									else if (OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds != null &&
+										OpenTaiko.Databases.DBNameplateUnlockables.data.ContainsKey(OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds[index - 1])) {
+										id = OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedNameplateIds[index - 1];
+										var nameplate = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
+										iType = nameplate.nameplateInfo.iType;
+										rarity = HRarity.tRarityToLangInt(nameplate.rarity);
+									}
 
 
 
 									tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[0], y + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[1]);
+									
+									OpenTaiko.NamePlate.lcNamePlate.DrawTitlePlate(x, y, 255, iType, tmpTex, rarity, id);
 
 								}
 								break;
@@ -549,6 +574,8 @@ namespace OpenTaiko {
 									if (index > 0) {
 										danGrade = OpenTaiko.SaveFileInstances[CurrentPlayer].data.DanTitles[this.ttkDanTitles[index].str].clearStatus;
 									}
+
+									OpenTaiko.NamePlate.lcNamePlate.DrawDan(x, y, 255, danGrade, tmpTex);
 
 									/*
 									TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(
