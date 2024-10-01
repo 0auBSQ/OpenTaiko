@@ -77,11 +77,11 @@ namespace FDK {
 
 		private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
 
-		private string Purify(string input) {
+		public string Purify(string input) {
 			return Regex.Replace(input, TagRegex, "");
 		}
 
-		private List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor) {
+		public List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor) {
 			List<SStringToken> tokens = new List<SStringToken>();
 			Stack<string> tags = new Stack<string>();
 			Stack<SStringToken> tokenStack = new Stack<SStringToken>();

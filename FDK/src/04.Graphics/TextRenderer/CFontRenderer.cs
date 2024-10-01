@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using SkiaSharp;
-
+using static FDK.CSkiaSharpTextRenderer;
 using Color = System.Drawing.Color;
 
 namespace FDK {
@@ -144,6 +144,42 @@ namespace FDK {
 
 			//グラデ(全体)にも対応したいですね？
 
+			List<CSkiaSharpTextRenderer.SStringToken> tokens = new List<CSkiaSharpTextRenderer.SStringToken>();
+			tokens = this.textRenderer.Tokenize(drawstr, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor);
+
+			string purified = this.textRenderer.Purify(drawstr);
+			string[] strList = new string[purified.Length];
+			for (int i = 0; i < purified.Length; i++)
+				strList[i] = purified.Substring(i, 1);
+			SKBitmap[] strImageList = new SKBitmap[purified.Length];
+
+			int nWidth = 0;
+			int nHeight = 0;
+			int _idx = 0;
+			foreach (SStringToken tok in tokens) {
+				string[] splitted = new string[tok.s.Length];
+				for (int i = 0; i < tok.s.Length; i++)
+					splitted[i] = tok.s.Substring(i, 1);
+
+				for (int i = 0; i < splitted.Length; i++) {
+					strImageList[_idx] = this.textRenderer.DrawText(splitted[i], drawmode, tok.TextColor, tok.OutlineColor, secondEdgeColor, tok.GradiantTop, tok.GradiantBottom, edge_Ratio, false);
+
+					//回転する文字
+					if (Rotate_Chara_List_Vertical.Contains(splitted[i])) {
+						using (var surface = new SKCanvas(strImageList[_idx])) {
+							surface.RotateDegrees(90, strImageList[_idx].Width / 2, strImageList[_idx].Height / 2);
+							surface.DrawBitmap(strImageList[_idx], 0, 0);
+						}
+					}
+
+					nWidth = Math.Max(nWidth, strImageList[_idx].Width);
+					nHeight += strImageList[_idx].Height - 25;
+					_idx++;
+				}
+			}
+
+
+			/*
 			string[] strList = new string[drawstr.Length];
 			for (int i = 0; i < drawstr.Length; i++)
 				strList[i] = drawstr.Substring(i, 1);
@@ -166,6 +202,7 @@ namespace FDK {
 				nWidth = Math.Max(nWidth, strImageList[i].Width);
 				nHeight += strImageList[i].Height - 25;
 			}
+			*/
 
 			SKImageInfo skImageInfo = new SKImageInfo(nWidth, nHeight);
 

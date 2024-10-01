@@ -1,8 +1,6 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using FDK;
 using Silk.NET.Maths;
-using static OpenTaiko.CActSelect曲リスト;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace OpenTaiko {
@@ -336,7 +334,7 @@ namespace OpenTaiko {
 					titleTmp = stNode.ttkタイトル[stNode.ttkタイトル.Length - 1].str;
 				}
 
-				TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.Substring(0, 2), pfDanPlateTitle, Color.White, Color.Black, 1000);
+				TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.TrimStringWithTags(2), pfDanPlateTitle, Color.White, Color.Black, 1000);
 				TitleTextureKey.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(x + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[1]);
 			}
 		}
@@ -718,7 +716,7 @@ namespace OpenTaiko {
 							}
 
 							// Two char header, will be used for grade unlocking too
-							string tmp = song.ldTitle.GetString("").Substring(0, 2);
+							string tmp = song.ldTitle.GetString("").TrimStringWithTags(2);
 
 							stバー情報[i].ttkタイトル[listSongs[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
