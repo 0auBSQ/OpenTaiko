@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using FDK;
-using static OpenTaiko.CActSelect曲リスト;
 
 namespace OpenTaiko {
 	class CMainMenuTab {
@@ -153,7 +152,7 @@ namespace OpenTaiko {
 					true,
 					true,
 					true,
-					true,
+					false,
 					true,
 					false,
 					false,
