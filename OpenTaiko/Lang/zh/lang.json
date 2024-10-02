@@ -465,11 +465,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "炸弹因子：{0}%的音符在扫雷模式中转换为炸弹",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "引线因子：{0}%的气球在扫雷模式中转换为定时炸弹",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "所有大音符变成<c.#c800ff>交换</c>音符",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>音符变为可视",
 		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "自动以 {0} 打／秒<c.#ffff00>连打</c>",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>分开</c><c.#0088ff>跑道</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "金币倍数：×{0}",
 

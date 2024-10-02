@@ -115,6 +115,73 @@ namespace System {
 
 		private const string TagRegex = @"<(/?)([gc](?:\.#[0-9a-fA-F]{6})*?)>";
 
+		public static string TrimStringWithTags(this string input, int maxLength) {
+			// This will store the result
+			string result = string.Empty;
+			// This will store the length of characters outside tags
+			int count = 0;
+
+			// Stack to keep track of open tags
+			Stack<string> openTags = new Stack<string>();
+
+			// Use regex to match tags and content
+			var regex = new Regex(TagRegex);
+			var matches = regex.Matches(input);
+			int lastIndex = 0;
+
+			foreach (Match match in matches) {
+				// Add the characters before the current match (which are non-tag characters)
+				if (match.Index > lastIndex) {
+					// Get the substring before the tag
+					string contentBeforeTag = input.Substring(lastIndex, match.Index - lastIndex);
+
+					// Calculate how many characters we can take from this content
+					int charsToTake = Math.Min(maxLength - count, contentBeforeTag.Length);
+
+					// Append the allowed part to the result
+					result += contentBeforeTag.Substring(0, charsToTake);
+
+					// Update the count of characters outside tags
+					count += charsToTake;
+
+					// If we have reached the max length, break
+					if (count >= maxLength) {
+						break;
+					}
+				}
+
+				// Process the tag
+				result += match.Value;
+
+				// If it's an opening tag, push it to the stack
+				if (!match.Value.StartsWith("</")) {
+					openTags.Push(match.Value);
+				} else if (openTags.Count > 0) {
+					// If it's a closing tag, pop the corresponding opening tag from the stack
+					openTags.Pop();
+				}
+
+				// Update the last index after the tag
+				lastIndex = match.Index + match.Length;
+			}
+
+			// If there is remaining text after the last tag, handle it
+			if (lastIndex < input.Length && count < maxLength) {
+				string remainingContent = input.Substring(lastIndex);
+				result += remainingContent.Substring(0, Math.Min(maxLength - count, remainingContent.Length));
+			}
+
+			// Close all remaining open tags
+			while (openTags.Count > 0) {
+				string openTag = openTags.Pop();
+				// Convert the opening tag to its closing counterpart
+				string tagName = new Regex(@"<([gc](?:\.#[0-9a-fA-F]{6})*?)>").Match(openTag).Groups[1].Value;
+				result += $"</{tagName[0]}>";
+			}
+
+			return result;
+		}
+
 		public static string RemoveTags(this string input) {
 			return Regex.Replace(input, TagRegex, "");
 		}
