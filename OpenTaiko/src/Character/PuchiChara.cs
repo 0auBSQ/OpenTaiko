@@ -58,29 +58,15 @@ namespace OpenTaiko {
 
 			int p = OpenTaiko.GetActualPlayer(player);
 
-			/*
-            TJAPlayer3.act文字コンソール.tPrint(700, 500, C文字コンソール.Eフォント種別.白, Counter.n現在の値.ToString());
-            TJAPlayer3.act文字コンソール.tPrint(700, 520, C文字コンソール.Eフォント種別.白, SineCounter.n現在の値.ToString());
-            TJAPlayer3.act文字コンソール.tPrint(700, 540, C文字コンソール.Eフォント種別.白, SineCounterIdle.n現在の値.ToString());
-            */
-
 			if (inGame)
 				sineY = (double)SineCounter.CurrentValue;
 			else
 				sineY = (double)SineCounterIdle.CurrentValue;
 
-			// TJAPlayer3.act文字コンソール.tPrint(700, 560, C文字コンソール.Eフォント種別.白, sineY.ToString());
-
 			sineY = Math.Sin(sineY * (Math.PI / 180)) * (OpenTaiko.Skin.Game_PuchiChara_Sine * (isBalloon ? OpenTaiko.Skin.Game_PuchiChara_Scale[1] : OpenTaiko.Skin.Game_PuchiChara_Scale[0]));
 
-			// TJAPlayer3.act文字コンソール.tPrint(700, 580, C文字コンソール.Eフォント種別.白, sineY.ToString());
-
-			//int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
-
 			int puriChar = PuchiChara.tGetPuchiCharaIndexByName(p);
-
 			var chara = OpenTaiko.Tx.Puchichara[puriChar].tx;
-			//TJAPlayer3.Tx.PuchiChara[puriChar];
 
 			if (chara != null) {
 				float puchiScale = OpenTaiko.Skin.Resolution[1] / 720.0f;
@@ -90,9 +76,7 @@ namespace OpenTaiko {
 				chara.vcScaleRatio.Y *= scale;
 				chara.Opacity = alpha;
 
-				// (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height
-
-				/* To do :
+				/* Todo :
                 **
                 ** - Yellow light color filter when isGrowing is true
                 */

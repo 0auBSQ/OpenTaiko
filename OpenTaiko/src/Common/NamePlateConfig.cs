@@ -4,11 +4,6 @@ namespace OpenTaiko {
 	class NamePlateConfig {
 		public void tNamePlateConfig() {
 			// Deprecated, only converts to new format
-			/*
-            if (!File.Exists("NamePlate.json"))
-                tSaveFile();
-            */
-
 			tLoadFile();
 		}
 
@@ -62,15 +57,10 @@ namespace OpenTaiko {
 			}
 
 			// Automatically set the dan to nameplate if new
-			// Add a function within the NamePlate.cs file to update the title texture 
+			// Add a function within the NamePlate.cs file to update the title texture
 
 			if (!OpenTaiko.NamePlateConfig.data.DanTitles[player].ContainsKey(title) || cs != clearStatus || iG != isGold) {
 				changed = true;
-				/*
-                TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
-                TJAPlayer3.NamePlateConfig.data.DanGold[player] = iG;
-                TJAPlayer3.NamePlateConfig.data.DanType[player] = cs;
-                */
 			}
 
 
@@ -189,8 +179,6 @@ namespace OpenTaiko {
 		}
 
 		private void tLoadFile() {
-			//data = ConfigManager.GetConfig<Data>(@"NamePlate.json");
-
 			if (!File.Exists("NamePlate.json"))
 				return;
 

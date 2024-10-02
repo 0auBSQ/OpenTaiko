@@ -127,20 +127,6 @@ namespace OpenTaiko {
 				}
 			}
 			reader.Close();
-
-			/*
-			if (!IsChangedBoxType)
-            {
-				this.BoxType = this.nStrジャンルtoNum(this.Genre);
-            }
-			if (!IsChangedBgType)
-            {
-				this.BgType = this.nStrジャンルtoNum(this.Genre);
-			}
-			*/
 		}
-
-
-
 	}
 }

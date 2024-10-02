@@ -416,6 +416,4 @@ namespace OpenTaiko {
 		OFF = 0
 	}
 	#endregion
-
-
 }
