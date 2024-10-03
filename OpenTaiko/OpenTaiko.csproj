@@ -23,6 +23,7 @@
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include=".init/**" CopyToOutputDirectory="PreserveNewest" />
     <None Remove="system\open-world memories\modules\modal\Config.json" />
     <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
