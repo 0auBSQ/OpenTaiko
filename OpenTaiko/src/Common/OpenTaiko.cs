@@ -2304,7 +2304,7 @@ for (int i = 0; i < 3; i++) {
 			VisualLogManager = new CVisualLogManager();
 
 			if (!File.Exists("Saves.db3")) {
-				File.Copy(@$".init{Environment.NewLine}Saves.db3", "Saves.db3");
+				File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
 			}
 			// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
 			SaveFileInstances = DBSaves.FetchSaveInstances();
