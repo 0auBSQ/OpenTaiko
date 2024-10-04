@@ -7,7 +7,6 @@
 
 		public bool bON;
 
-
 		// コンストラクタ
 
 		public CItemToggle() {

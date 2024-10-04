@@ -15,15 +15,9 @@ namespace OpenTaiko {
 		}
 
 		public DBSongUnlockables() {
-			//_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.json";
-			//base.tDBInitSavable();
-
 			_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.db3";
-
-
 			using (var connection = new SqliteConnection(@$"Data Source={_fn}")) {
 				connection.Open();
-
 
 				// Get songs info
 				var command = connection.CreateCommand();
@@ -68,15 +62,12 @@ namespace OpenTaiko {
 
 			foreach (KeyValuePair<string, SongUnlockable> item in data) {
 				string _npvKey = item.Key;
-				//string? _songName = CSongDict.tGetNodeFromID(_npvKey)?.ldTitle.GetString("");
-				//string _songSubtitle = CSongDict.tGetNodeFromID(_npvKey)?.ldSubtitle.GetString("") ?? "";
 				CSongListNode? _node = CSongDict.tGetNodeFromID(_npvKey);
 
-				if (!_sf.Contains(_npvKey)) { // && _songName != null) {
+				if (!_sf.Contains(_npvKey)) {
 					var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
 
 					if (_fulfilled) {
-						//_sf.Add(_npvKey, item.Value.nameplateInfo);
 						_sf.Add(_npvKey);
 						_edited = true;
 

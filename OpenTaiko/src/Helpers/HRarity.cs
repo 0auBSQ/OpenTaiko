@@ -79,7 +79,5 @@ namespace OpenTaiko {
 
 			return coinMult;
 		}
-
-
 	}
 }

@@ -8,16 +8,6 @@ namespace OpenTaiko {
 	internal class CSongs管理 {
 		// プロパティ
 
-		/*public int nSongsDBから取得できたスコア数
-		{
-			get; 
-			set; 
-		}
-		public int nSongsDBへ出力できたスコア数
-		{
-			get;
-			set;
-		}*/
 		public int nスコアキャッシュから反映できたスコア数 {
 			get;
 			set;
@@ -51,17 +41,6 @@ namespace OpenTaiko {
 		}
 		[NonSerialized]
 		public AutoResetEvent AutoReset;
-		/*public AutoResetEvent AutoReset
-		{
-			get
-			{
-				return autoReset;
-			}
-			private set
-			{
-				autoReset = value;
-			}
-		}*/
 
 		private int searchCount;                            // #PREMOVIE中は検索n回実行したら少しスリープする
 
@@ -110,18 +89,6 @@ namespace OpenTaiko {
 
 				if (flatten.Count > 0) {
 					int index = list曲ルート.IndexOf(flatten[0]);
-
-					/*
-					if (!list曲ルート.Contains(downloadBox))
-					{
-						for (int i = 0; i < flatten.Count; i++)
-						{
-							this.list曲ルート.Remove(flatten[i]);
-						}
-						list曲ルート.Insert(index, downloadBox);
-					}
-					*/
-
 					if (!list曲ルート.Contains(downloadBox)) {
 						this.list曲ルート = this.list曲ルート.Except(flatten).ToList();
 						list曲ルート.Insert(index, downloadBox);
@@ -221,25 +188,7 @@ namespace OpenTaiko {
 
 									}
 									c曲リストノード.nTotalFloor++;
-
-									/*
-									switch (c曲リストノード.strジャンル) 
-									{
-										case "J-POP":
-											c曲リストノード.strジャンル = "ポップス";
-											break;
-										case "ゲームミュージック":
-											c曲リストノード.strジャンル = "ゲームバラエティ";
-											break;
-										case "どうよう":
-											c曲リストノード.strジャンル = "キッズ";
-											break;
-									}
-									*/
-
 									c曲リストノード.str本当のジャンル = c曲リストノード.strジャンル;
-
-
 									c曲リストノード.arスコア[n] = new Cスコア();
 									c曲リストノード.arスコア[n].ファイル情報.ファイルの絶対パス = str基点フォルダ + fileinfo.Name;
 									c曲リストノード.arスコア[n].ファイル情報.フォルダの絶対パス = str基点フォルダ;
@@ -277,15 +226,6 @@ namespace OpenTaiko {
 
 					if ((strExt.Equals(".tja") || strExt.Equals(".dtx"))) {
 						// 2017.06.02 kairera0467 廃止。
-						//if( strExt.Equals( ".tja" ) )
-						//{
-						//    //tja、dtxが両方存在していた場合、tjaを読み込まずにdtxだけ使う。
-						//    string[] dtxscoreini = Directory.GetFiles( str基点フォルダ, "*.dtx");
-						//    if(dtxscoreini.Length != 0 )
-						//    {
-						//        continue;
-						//    }
-						//}
 
 						#region[ 新処理 ]
 
@@ -488,31 +428,6 @@ namespace OpenTaiko {
 										if (!listSongsDB.ContainsKey(filePath + hash)) listSongsDB.Add(filePath + hash, c曲リストノード);
 										this.n検索された曲ノード数++;
 										b = true;
-									}
-
-									if (OpenTaiko.ConfigIni.bLog曲検索ログ出力) {
-										//    Trace.Indent();
-										//    try
-										//    {
-										//        StringBuilder sb = new StringBuilder( 0x100 );
-										//        sb.Append( string.Format( "nID#{0:D3}", c曲リストノード.nID ) );
-										//        if( c曲リストノード.r親ノード != null )
-										//        {
-										//            sb.Append( string.Format( "(in#{0:D3}):", c曲リストノード.r親ノード.nID ) );
-										//        }
-										//        else
-										//        {
-										//            sb.Append( "(onRoot):" );
-										//        }
-										//        sb.Append( " SONG, File=" + c曲リストノード.arスコア[ 0 ].ファイル情報.ファイルの絶対パス );
-										//        sb.Append( ", Size=" + c曲リストノード.arスコア[ 0 ].ファイル情報.ファイルサイズ );
-										//        sb.Append( ", LastUpdate=" + c曲リストノード.arスコア[ 0 ].ファイル情報.最終更新日時 );
-										//        Trace.TraceInformation( sb.ToString() );
-										//    }
-										//    finally
-										//    {
-										//        Trace.Unindent();
-										//    }
 									}
 								}
 							}
@@ -750,7 +665,6 @@ namespace OpenTaiko {
 
 						this.nファイルから反映できたスコア数++;
 						cdtx.DeActivate();
-						//Debug.WriteLine( "★" + this.nファイルから反映できたスコア数 + " " + c曲リストノード.arスコア[ i ].譜面情報.タイトル );
 						#region [ 曲検索ログ出力 ]
 						//-----------------
 						if (OpenTaiko.ConfigIni.bLog曲検索ログ出力) {
@@ -801,44 +715,6 @@ namespace OpenTaiko {
 				}
 			}
 
-			// Removed the pre-made recently played songs folder, so players will have total control on it's shape and visuals
-
-			/*
-			#region [ "最近遊んだ曲"BOXを生成する ]
-
-			if(list曲ルート.Count > 0)
-			{
-				C曲リストノード crecentryplaysong = new C曲リストノード();
-				crecentryplaysong.eノード種別 = C曲リストノード.Eノード種別.BOX;
-
-				// 最近あそんだ曲
-				crecentryplaysong.strタイトル = CLangManager.LangInstance.GetString(201);
-
-				crecentryplaysong.strBoxText[0] = "";
-				crecentryplaysong.strBoxText[1] = CLangManager.LangInstance.GetString(202);
-				crecentryplaysong.strBoxText[2] = "";
-
-				crecentryplaysong.strジャンル = "最近遊んだ曲";
-				crecentryplaysong.nスコア数 = 1;
-				crecentryplaysong.list子リスト = new List<C曲リストノード>();
-				crecentryplaysong.BackColor = ColorTranslator.FromHtml("#164748");
-				crecentryplaysong.BoxColor = Color.White;
-				crecentryplaysong.BgColor = Color.White;
-
-				crecentryplaysong.arスコア[0] = new Cスコア();
-				crecentryplaysong.arスコア[0].ファイル情報.フォルダの絶対パス = "";
-				crecentryplaysong.arスコア[0].譜面情報.タイトル = crecentryplaysong.strタイトル;
-				crecentryplaysong.arスコア[0].譜面情報.コメント =
-					(CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ja") ?
-					"最近遊んだ曲" :
-					"Recentry play songs";
-
-				list曲ルート.Add(crecentryplaysong);
-			}
-
-			#endregion
-			*/
-
 			this.t曲リストへ後処理を適用する(this.list曲ルート);
 
 			for (int p = 0; p < list曲ルート.Count; p++) {
@@ -852,16 +728,6 @@ namespace OpenTaiko {
 
 						// Add to dojo
 						list曲ルート_Dan = c曲リストノード.list子リスト;
-						/*
-						for (int i = 0; i < c曲リストノード.list子リスト.Count; i++)
-						{
-							if(c曲リストノード.list子リスト[i].eノード種別 == C曲リストノード.Eノード種別.SCORE)
-							{
-								list曲ルート_Dan.Add(c曲リストノード.list子リスト[i]);
-								continue;
-							}
-						}
-						*/
 					} else if (c曲リストノード.strジャンル == "太鼓タワー") {
 						if (OpenTaiko.ConfigIni.bDanTowerHide) {
 							list曲ルート.Remove(c曲リストノード);
@@ -884,22 +750,10 @@ namespace OpenTaiko {
 
 								if (OpenTaiko.ConfigIni.bDanTowerHide)
 									c曲リストノード.list子リスト.Remove(c曲リストノード.list子リスト[i]);
-
 								continue;
 							}
 						}
 					}
-				} else {
-					// ???????
-
-					/*
-					if (c曲リストノード.arスコア[5] != null)
-					{
-						c曲リストノード.list子リスト.Remove(c曲リストノード);
-						list曲ルート_Dan.Add(c曲リストノード);
-						continue;
-					}
-					*/
 				}
 			}
 
@@ -927,7 +781,6 @@ namespace OpenTaiko {
 				ノードリスト.Add(randomNode);
 
 			}
-
 
 			// Don't sort songs if the folder isn't global
 			// Call back reinsert back folders if sort called ?
@@ -1003,142 +856,6 @@ namespace OpenTaiko {
 		}
 		//-----------------
 		#endregion
-
-		// Songs DB here
-
-		/*#region [ スコアキャッシュをSongsDBに出力する ]
-		//-----------------
-		public void tスコアキャッシュをSongsDBに出力する( string SongsDBファイル名 )
-		{
-			this.nSongsDBへ出力できたスコア数 = 0;
-			try
-			{
-				BinaryWriter bw = new BinaryWriter( new FileStream( SongsDBファイル名, FileMode.Create, FileAccess.Write ) );
-				bw.Write( SONGSDB_VERSION );
-				this.tSongsDBにリストを１つ出力する( bw, this.list曲ルート );
-				bw.Close();
-			}
-			catch (Exception e)
-			{
-				Trace.TraceError( "songs.dbの出力に失敗しました。" );
-				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "例外が発生しましたが処理を継続します。 (ca70d133-f092-4351-8ebd-0906d8f1cffa)" );
-			}
-		}
-		private void tSongsDBにノードを１つ出力する( BinaryWriter bw, C曲リストノード node )
-		{
-			for( int i = 0; i < (int)Difficulty.Total; i++ )
-			{
-				// ここではsuspendに応じないようにしておく(深い意味はない。ファイルの書き込みオープン状態を長時間維持したくないだけ)
-				//if ( this.bIsSuspending )		// #27060 中断要求があったら、解除要求が来るまで待機
-				//{
-				//	autoReset.WaitOne();
-				//}
-
-				if( node.arスコア[ i ] != null )
-				{
-					bw.Write( node.arスコア[ i ].ファイル情報.ファイルの絶対パス );
-					bw.Write( node.arスコア[ i ].ファイル情報.フォルダの絶対パス );
-					bw.Write( node.arスコア[ i ].ファイル情報.最終更新日時.Ticks );
-					bw.Write( node.arスコア[ i ].ファイル情報.ファイルサイズ );
-					bw.Write( node.arスコア[ i ].ScoreIni情報.最終更新日時.Ticks );
-					bw.Write( node.arスコア[ i ].ScoreIni情報.ファイルサイズ );
-					bw.Write( node.arスコア[ i ].譜面情報.タイトル );
-					bw.Write( node.arスコア[ i ].譜面情報.アーティスト名 );
-					bw.Write( node.arスコア[ i ].譜面情報.コメント );
-					bw.Write( node.arスコア[ i ].譜面情報.ジャンル );
-					bw.Write( node.arスコア[ i ].譜面情報.Preimage );
-					bw.Write( node.arスコア[ i ].譜面情報.Premovie );
-					bw.Write( node.arスコア[ i ].譜面情報.Presound );
-					bw.Write( node.arスコア[ i ].譜面情報.Backgound );
-					bw.Write( node.arスコア[ i ].譜面情報.レベル.Drums );
-					bw.Write( node.arスコア[ i ].譜面情報.レベル.Guitar );
-					bw.Write( node.arスコア[ i ].譜面情報.レベル.Bass );
-					bw.Write( node.arスコア[ i ].譜面情報.最大ランク.Drums );
-					bw.Write( node.arスコア[ i ].譜面情報.最大ランク.Guitar );
-					bw.Write( node.arスコア[ i ].譜面情報.最大ランク.Bass );
-					bw.Write( node.arスコア[ i ].譜面情報.最大スキル.Drums );
-					bw.Write( node.arスコア[ i ].譜面情報.最大スキル.Guitar );
-					bw.Write( node.arスコア[ i ].譜面情報.最大スキル.Bass );
-					bw.Write( node.arスコア[ i ].譜面情報.フルコンボ.Drums );
-					bw.Write( node.arスコア[ i ].譜面情報.フルコンボ.Guitar );
-					bw.Write( node.arスコア[ i ].譜面情報.フルコンボ.Bass );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏回数.Drums );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏回数.Guitar );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏回数.Bass );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏履歴.行1 );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏履歴.行2 );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏履歴.行3 );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏履歴.行4 );
-					bw.Write( node.arスコア[ i ].譜面情報.演奏履歴.行5 );
-                    bw.Write(node.arスコア[i].譜面情報.演奏履歴.行6);
-                    bw.Write(node.arスコア[i].譜面情報.演奏履歴.行7);
-                    bw.Write( node.arスコア[ i ].譜面情報.レベルを非表示にする );
-					bw.Write( (int) node.arスコア[ i ].譜面情報.曲種別 );
-					bw.Write( node.arスコア[ i ].譜面情報.Bpm );
-					bw.Write( node.arスコア[ i ].譜面情報.Duration );
-                    bw.Write( node.arスコア[ i ].譜面情報.strBGMファイル名 );
-                    bw.Write( node.arスコア[ i ].譜面情報.SongVol );
-				    var songLoudnessMetadata = node.arスコア[ i ].譜面情報.SongLoudnessMetadata;
-				    bw.Write( songLoudnessMetadata.HasValue );
-                    bw.Write( songLoudnessMetadata?.Integrated.ToDouble() ?? 0.0 );
-                    bw.Write( songLoudnessMetadata?.TruePeak.HasValue ?? false );
-                    bw.Write( songLoudnessMetadata?.TruePeak?.ToDouble() ?? 0.0 );
-				    bw.Write( node.arスコア[ i ].譜面情報.nデモBGMオフセット );
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[0] );
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[1] );
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[2] );
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[3] );
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[4] );
-                    bw.Write(node.arスコア[i].譜面情報.b譜面分岐[5]);
-                    bw.Write( node.arスコア[ i ].譜面情報.b譜面分岐[6] );
-                    bw.Write( node.arスコア[ i ].譜面情報.ハイスコア );
-                    bw.Write( node.arスコア[ i ].譜面情報.nハイスコア[0] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nハイスコア[1] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nハイスコア[2] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nハイスコア[3] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nハイスコア[4] );
-                    bw.Write(node.arスコア[i].譜面情報.nハイスコア[5]);
-                    bw.Write(node.arスコア[i].譜面情報.nハイスコア[6]);
-                    bw.Write( node.arスコア[ i ].譜面情報.strサブタイトル );
-                    bw.Write( node.arスコア[ i ].譜面情報.nレベル[0] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nレベル[1] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nレベル[2] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nレベル[3] );
-                    bw.Write( node.arスコア[ i ].譜面情報.nレベル[4] );
-                    bw.Write(node.arスコア[i].譜面情報.nレベル[5]);
-                    bw.Write(node.arスコア[i].譜面情報.nレベル[6]);
-					bw.Write(node.arスコア[i].譜面情報.nクリア[0]);
-					bw.Write(node.arスコア[i].譜面情報.nクリア[1]);
-					bw.Write(node.arスコア[i].譜面情報.nクリア[2]);
-					bw.Write(node.arスコア[i].譜面情報.nクリア[3]);
-					bw.Write(node.arスコア[i].譜面情報.nクリア[4]);
-					bw.Write(node.arスコア[i].譜面情報.nスコアランク[0]);
-					bw.Write(node.arスコア[i].譜面情報.nスコアランク[1]);
-					bw.Write(node.arスコア[i].譜面情報.nスコアランク[2]);
-					bw.Write(node.arスコア[i].譜面情報.nスコアランク[3]);
-					bw.Write(node.arスコア[i].譜面情報.nスコアランク[4]);
-                    this.nSongsDBへ出力できたスコア数++;
-				}
-			}
-		}
-		private void tSongsDBにリストを１つ出力する( BinaryWriter bw, List<C曲リストノード> list )
-		{
-			foreach( C曲リストノード c曲リストノード in list )
-			{
-				if(    ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE )
-					|| ( c曲リストノード.eノード種別 == C曲リストノード.Eノード種別.SCORE_MIDI ) )
-				{
-					this.tSongsDBにノードを１つ出力する( bw, c曲リストノード );
-				}
-				if( c曲リストノード.list子リスト != null )
-				{
-					this.tSongsDBにリストを１つ出力する( bw, c曲リストノード.list子リスト );
-				}
-			}
-		}
-		//-----------------
-		#endregion*/
 
 		#region [ 曲リストソート ]
 		//-----------------
@@ -1274,7 +991,6 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 		#region [ private ]
 		//-----------------
-		//private const string SONGSDB_VERSION = "SongsDB5";
 		public List<string> listStrBoxDefSkinSubfolderFullName {
 			get;
 			private set;

@@ -42,9 +42,6 @@ namespace OpenTaiko {
 
 		// CActivity 実装
 
-		public override void Activate() {
-			base.Activate();
-		}
 		public override void DeActivate() {
 			if (this.rc文字の矩形領域 != null)
 				this.rc文字の矩形領域 = null;

@@ -370,7 +370,7 @@ namespace OpenTaiko {
 				case CStage.EPhase.Common_FADEIN:
 					//if( this.actFI.On進行描画() != 0 )			    // #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
 					// 必ず一度「CStaeg.Eフェーズ.共通_フェードイン」フェーズを経由させること。
-					// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。 
+					// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。
 					base.ePhaseID = CStage.EPhase.SongLoading_LoadDTXFile;
 					return (int)E曲読込画面の戻り値.継続;
 
@@ -480,7 +480,6 @@ namespace OpenTaiko {
 								_dtx[i]?.tApplyFunMods(i);
 								OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
 							}
-							CDTX.tManageKusudama(_dtx);
 
 							OpenTaiko.stage演奏ドラム画面.Activate();
 

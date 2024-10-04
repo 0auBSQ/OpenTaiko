@@ -246,9 +246,6 @@ namespace OpenTaiko {
 				float resolutionRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][0];
 				float resolutionRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][1];
 
-				//float _x = (x + (150.0f * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
-				//float _y = (y + (((_substitute == true) ? 290 : _ref[_ctref[player].n現在の値].szテクスチャサイズ.Height)) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f)) * resolutionRatioY;
-
 				_tex.vcScaleRatio.X *= resolutionRatioX;
 				_tex.vcScaleRatio.Y *= resolutionRatioY;
 
@@ -256,20 +253,11 @@ namespace OpenTaiko {
 				float _y = y;
 
 				if (player % 2 == 0) {
-					//_ref[_ctref[player].n現在の値].t2D描画(x, y);
-					//_ref[_ctref[player].n現在の値].t2D中心基準描画(x + 150, y + 156);
-
 					_tex.t2D拡大率考慮下中心基準描画(
 						_x,
 						_y // 312
 						);
-
-
-
 				} else {
-					//_ref[_ctref[player].n現在の値].t2D左右反転描画(x, y);
-					//_ref[_ctref[player].n現在の値].t2D中心基準描画Mirrored(x + 150, y + 156);
-
 					_tex.t2D拡大率考慮下中心基準描画Mirrored(
 						_x,
 						_y // 312
@@ -278,11 +266,8 @@ namespace OpenTaiko {
 
 				_tex.vcScaleRatio.X = 1f;
 				_tex.vcScaleRatio.Y = 1f;
-
 				_tex.Opacity = 255;
-
 			}
-
 		}
 	}
 }

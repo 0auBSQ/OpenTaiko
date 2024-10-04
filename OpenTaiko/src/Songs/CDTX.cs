@@ -347,11 +347,11 @@ namespace OpenTaiko {
 
                     //太鼓予備
 					"??", "??", "??", "??", "??", "??", "??", "??",
-					"??", "??", "??", "??", "??", "??", "??", "??", 
+					"??", "??", "??", "??", "??", "??", "??", "??",
 
                     //システム
 					"小節線", "拍線", "??", "??", "AVI", "??", "??", "??",
-					"??", "??", "??", "??", "??", "??", "??", "??", 
+					"??", "??", "??", "??", "??", "??", "??", "??",
 
                     //システム(移動予定)
 					"SCROLL", "DELAY", "ゴーゴータイム開始", "ゴーゴータイム終了", "カメラ移動開始(縦)", "カメラ移動終了(縦)", "カメラ移動開始(横)", "カメラ移動終了(横)",
@@ -361,7 +361,7 @@ namespace OpenTaiko {
 					"??", "??", "??", "??", "??", "??", "??", "??",
 
 					"??", "??", "??", "??", "??", "??", "??", "??",
-					"??", "??", "??", "??", "??", "??", "??", "??", 
+					"??", "??", "??", "??", "??", "??", "??", "??",
 
                     //太鼓1P、システム(現行)
 					"??", "??", "??", "太鼓_赤", "太鼓_青", "太鼓_赤(大)", "太鼓_青(大)", "太鼓_黄",
@@ -374,11 +374,11 @@ namespace OpenTaiko {
 					"??", "??", "??", "??", "??", "??", "??", "??",
 
 					"??", "??", "??", "??", "0xC4", "0xC5", "0xC6", "??",
-					"??", "??", "0xCA", "??", "??", "??", "??", "0xCF", 
+					"??", "??", "0xCA", "??", "??", "??", "??", "0xCF",
 
                     //システム(現行)
 					"0xD0", "??", "??", "??", "??", "??", "??", "??",
-					"??", "??", "ミキサー追加", "ミキサー削除", "DELAY", "譜面分岐リセット", "譜面分岐アニメ", "譜面分岐内部処理", 
+					"??", "??", "ミキサー追加", "ミキサー削除", "DELAY", "譜面分岐リセット", "譜面分岐アニメ", "譜面分岐内部処理",
 
                     //システム(現行)
 					"小節線ON/OFF", "分岐固定", "判定枠移動", "", "", "", "", "",
@@ -1293,39 +1293,11 @@ namespace OpenTaiko {
 			DanSongs.Number = 0;
 
 		}
-		/*
-        public CDTX(string str全入力文字列, int difficulty)
-            : this()
-        {
-            this.On活性化();
-            this.t入力_全入力文字列から(str全入力文字列, difficulty);
-        }
-        public CDTX(string strファイル名, bool bヘッダのみ, int difficulty)
-            : this()
-        {
-            this.On活性化();
-            this.t入力(strファイル名, bヘッダのみ, difficulty);
-        }
-        public CDTX(string str全入力文字列, double db再生速度, int nBGMAdjust, int difficulty)
-            : this()
-        {
-            this.On活性化();
-            this.t入力_全入力文字列から(str全入力文字列, str全入力文字列, db再生速度, nBGMAdjust, difficulty);
-        }
-        */
 		public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int difficulty)
 			: this() {
 			this.Activate();
 			this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, 0, 0, false, difficulty);
 		}
-		/*
-        public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersion, int difficulty)
-            : this()
-        {
-            this.On活性化();
-            this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, nReadVersion, 0, false, difficulty);
-        }
-        */
 		public CDTX(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
 			: this() {
 			this.Activate();
@@ -1358,12 +1330,6 @@ namespace OpenTaiko {
 						long nCurrentTime = SoundManager.PlayTimer.SystemTimeMs;
 						if (nCurrentTime > wc.n再生開始時刻[i]) {
 							long nAbsTimeFromStartPlaying = nCurrentTime - wc.n再生開始時刻[i];
-							//Trace.TraceInformation( "再生位置自動補正: {0}, seek先={1}ms, 全音長={2}ms",
-							//    Path.GetFileName( wc.rSound[ 0 ].strファイル名 ),
-							//    nAbsTimeFromStartPlaying,
-							//    wc.rSound[ 0 ].n総演奏時間ms
-							//);
-							// wc.rSound[ i ].t再生位置を変更する( wc.rSound[ i ].t時刻から位置を返す( nAbsTimeFromStartPlaying ) );
 							// WASAPI/ASIO用↓
 							if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
 								if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nAbsTimeFromStartPlaying);
@@ -1453,71 +1419,6 @@ namespace OpenTaiko {
 			return new string(new char[] { str[n / 36], str[n % 36] });
 		}
 
-		public static void tManageKusudama(CDTX[] dtxarr) {
-			if (OpenTaiko.ConfigIni.nPlayerCount == 1) return;
-
-			// Replace non-shared kusudamas by balloons
-			#region [Sync check]
-			/*
-			for (int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-            {
-                CDTX dtx = dtxarr[i];
-                if (dtx == null) continue;
-                foreach (KeyValuePair<double, CChip> kvp in dtx.kusudaMAP)
-                {
-                    for (int j = 0; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
-                    {
-                        if (j == i) continue;
-
-                        CDTX dtxp = dtxarr[j];
-                        if (dtxp == null) continue;
-                        if (!dtxp.kusudaMAP.ContainsKey(kvp.Key))
-                        {
-                            kvp.Value.nチャンネル番号 = 0x17;
-                            break;
-                        }
-                    }
-                }
-            }
-            */
-			#endregion
-
-			// Stack balloon values to all remining (= existing) kusudamas to player 1
-			#region [Accumulation]
-			/*
-            CDTX dtx1 = dtxarr[0];
-            if (dtx1 == null) return;
-            foreach (KeyValuePair<double, CChip> kvp in dtx1.kusudaMAP)
-            {
-                if (!NotesManager.IsKusudama(kvp.Value)) continue;
-                for (int j = 1; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
-                {
-                    CDTX dtxp = dtxarr[j];
-                    if (dtxp == null) continue;
-                    if (dtxp.kusudaMAP.ContainsKey(kvp.Key)
-                        && NotesManager.IsKusudama(dtxp.kusudaMAP[kvp.Key]))
-                    {
-                        kvp.Value.nBalloon += dtxp.kusudaMAP[kvp.Key].nBalloon;
-                    }
-                }
-                // For score normalization
-                
-                for (int j = 1; j < TJAPlayer3.ConfigIni.nPlayerCount; j++)
-                {
-                    CDTX dtxp = dtxarr[j];
-                    if (dtxp == null) continue;
-                    if (dtxp.kusudaMAP.ContainsKey(kvp.Key)
-                        && NotesManager.IsKusudama(dtxp.kusudaMAP[kvp.Key]))
-                    {
-                        dtxp.kusudaMAP[kvp.Key].nBalloon = kvp.Value.nBalloon;
-                    }
-                }
-                
-            }
-            */
-			#endregion
-		}
-
 		public void tApplyFunMods(int player = 0) {
 			Random rnd = new System.Random();
 
@@ -1560,7 +1461,6 @@ namespace OpenTaiko {
 
 		public void tRandomizeTaikoChips(int player = 0) {
 			//2016.02.11 kairera0467
-
 			Random rnd = new System.Random();
 
 			var eRandom = OpenTaiko.ConfigIni.eRandom[OpenTaiko.GetActualPlayer(player)];
@@ -1694,10 +1594,7 @@ namespace OpenTaiko {
 				#endregion
 
 				this.tSenotes_Core_V2(list音符のみのリスト);
-
 			}
-
-
 		}
 
 		#region [ チップの再生と停止 ]
@@ -1768,8 +1665,6 @@ namespace OpenTaiko {
 			foreach (CWAV cwav in this.listWAV.Values) {
 				for (int i = 0; i < nPolyphonicSounds; i++) {
 					if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused) {
-						//long num1 = cwav.n一時停止時刻[ i ];
-						//long num2 = cwav.n再生開始時刻[ i ];
 						cwav.rSound[i].Resume(cwav.n一時停止時刻[i] - cwav.n再生開始時刻[i]);
 						cwav.n再生開始時刻[i] += SoundManager.PlayTimer.SystemTimeMs - cwav.n一時停止時刻[i];
 					}
@@ -1797,43 +1692,25 @@ namespace OpenTaiko {
 			// Unique ID parsing/generation
 			this.uniqueID = new CSongUniqueID(this.strフォルダ名 + @$"{Path.DirectorySeparatorChar}uniqueID.json");
 
-			//if ( this.e種別 != E種別.SMF )
-			{
-				try {
-					this.nPlayerSide = nPlayerSide;
-					this.bSession譜面を読み込む = bSession;
-					//次郎方式
-
-					//DateTime timeBeginLoad = DateTime.Now;
-					//TimeSpan span;
-
-					StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
-					string str2 = reader.ReadToEnd();
-					reader.Close();
-
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "DTXfileload時間:          {0}", span.ToString() );
-
-					this.t入力_全入力文字列から(str2, str2, db再生速度, nBGMAdjust, difficulty);
-				} catch (Exception ex) {
-					//MessageBox.Show( "おや?エラーが出たようです。お兄様。" );
-					Trace.TraceError("おや?エラーが出たようです。お兄様。");
-					Trace.TraceError(ex.ToString());
-					Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
-				}
+			try {
+				this.nPlayerSide = nPlayerSide;
+				this.bSession譜面を読み込む = bSession;
+				//次郎方式
+				StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
+				string str2 = reader.ReadToEnd();
+				reader.Close();
+				this.t入力_全入力文字列から(str2, str2, db再生速度, nBGMAdjust, difficulty);
+			} catch (Exception ex) {
+				Trace.TraceError("おや?エラーが出たようです。お兄様。");
+				Trace.TraceError(ex.ToString());
+				Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 			}
 		}
 		public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度, int nBGMAdjust, int Difficulty) {
-			//DateTime timeBeginLoad = DateTime.Now;
-			//TimeSpan span;
-
 			if (!string.IsNullOrEmpty(str全入力文字列)) {
 				#region [ 改行カット ]
 				this.db再生速度 = db再生速度;
 				#endregion
-				//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-				//Trace.TraceInformation( "改行カット時間:           {0}", span.ToString() );
-				//timeBeginLoad = DateTime.Now;
 				#region [ 初期化 ]
 				for (int j = 0; j < 36 * 36; j++) {
 					this.n無限管理WAV[j] = -j;
@@ -1863,14 +1740,10 @@ namespace OpenTaiko {
 				this.t入力_V4(str全入力文字列, Difficulty);
 
 				#endregion
-				//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-				//Trace.TraceInformation( "抜き出し時間:             {0}", span.ToString() );
-				//timeBeginLoad = DateTime.Now;
 				this.n無限管理WAV = null;
 				this.n無限管理BPM = null;
 				this.n無限管理PAN = null;
 				this.n無限管理SIZE = null;
-				//this.t入力_行解析ヘッダ( str1Unused );
 				if (!this.bヘッダのみ) {
 					#region [ BPM/BMP初期化 ]
 					int ch;
@@ -1902,9 +1775,6 @@ namespace OpenTaiko {
 						this.listChip.Insert(0, chip);
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "前準備完了時間:           {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region [ CWAV初期化 ]
 					foreach (CWAV cwav in this.listWAV.Values) {
 						if (cwav.nチップサイズ < 0) {
@@ -1915,63 +1785,14 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "CWAV前準備時間:           {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region [ チップ倍率設定 ]						// #28145 2012.4.22 yyagi 二重ループを1重ループに変更して高速化)
-					//foreach ( CWAV cwav in this.listWAV.Values )
-					//{
-					//    foreach( CChip chip in this.listChip )
-					//    {
-					//        if( chip.n整数値_内部番号 == cwav.n内部番号 )
-					//        {
-					//            chip.dbチップサイズ倍率 = ( (double) cwav.nチップサイズ ) / 100.0;
-					//            if (chip.nチャンネル番号 == 0x01 )	// BGMだったら
-					//            {
-					//                cwav.bIsOnBGMLane = true;
-					//            }
-					//        }
-					//    }
-					//}
 					foreach (CChip chip in this.listChip) {
 						if (this.listWAV.TryGetValue(chip.n整数値_内部番号, out CWAV cwav))
-						//foreach ( CWAV cwav in this.listWAV.Values )
 						{
-							//	if ( chip.n整数値_内部番号 == cwav.n内部番号 )
-							//	{
 							chip.dbチップサイズ倍率 = ((double)cwav.nチップサイズ) / 100.0;
-							//if ( chip.nチャンネル番号 == 0x01 )	// BGMだったら
-							//{
-							//	cwav.bIsOnBGMLane = true;
-							//}
-							//	}
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "CWAV全準備時間:           {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
-					#region [ 必要に応じて空打ち音を0小節に定義する ]
-					//for ( int m = 0xb1; m <= 0xbc; m++ )			// #28146 2012.4.21 yyagi; bb -> bc
-					//{
-					//    foreach ( CChip chip in this.listChip )
-					//    {
-					//        if ( chip.nチャンネル番号 == m )
-					//        {
-					//            CChip c = new CChip();
-					//            c.n発声位置 = 0;
-					//            c.nチャンネル番号 = chip.nチャンネル番号;
-					//            c.n整数値 = chip.n整数値;
-					//            c.n整数値_内部番号 = chip.n整数値_内部番号;
-					//            this.listChip.Insert( 0, c );
-					//            break;
-					//        }
-					//    }
-					//}
-					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "空打確認時間:             {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region [ 拍子_拍線の挿入 ]
 					if (this.listChip.Count > 0) {
 						this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
@@ -1979,28 +1800,8 @@ namespace OpenTaiko {
 													// なお、093時点では、このソートを削除しても動作するようにはしてある。
 													// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 													// これにより、数ms程度ながらここでのソートも高速化されている。
-
-						//double barlength = 1.0;
-						//int nEndOfSong = ( this.listChip[ this.listChip.Count - 1 ].n発声位置 + 384 ) - ( this.listChip[ this.listChip.Count - 1 ].n発声位置 % 384 );
-						//for ( int tick384 = 0; tick384 <= nEndOfSong; tick384 += 384 )	// 小節線の挿入　(後に出てくる拍子線とループをまとめようとするなら、forループの終了条件の微妙な違いに注意が必要)
-						//{
-						//    CChip chip = new CChip();
-						//    chip.n発声位置 = tick384;
-						//    chip.nチャンネル番号 = 0x50;	// 小節線
-						//    chip.n整数値 = 36 * 36 - 1;
-						//    chip.dbSCROLL = 1.0;
-						//    this.listChip.Add( chip );
-						//}
-						////this.listChip.Sort();				// ここでのソートは不要。ただし最後にソートすること
-						//int nChipNo_BarLength = 0;
-						//int nChipNo_C1 = 0;
-
-						//this.listChip.Sort();
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "拍子_拍線挿入時間:       {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region [ C2 [拍線_小節線表示指定] の処理 ]		// #28145 2012.4.21 yyagi; 2重ループをほぼ1重にして高速化
 					bool bShowBeatBarLine = true;
 					for (int i = 0; i < this.listChip.Count; i++) {
@@ -2032,14 +1833,10 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "C2 [拍線_小節線表示指定]:  {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					this.n内部番号BRANCH1to = 0;
 					this.n内部番号JSCROLL1to = 0;
 					#region [ 発声時刻の計算 ]
 					double bpm = 120.0;
-					//double dbBarLength = 1.0;
 					int n発声位置 = 0;
 					int ms = 0;
 					int nBar = 0;
@@ -2053,7 +1850,6 @@ namespace OpenTaiko {
 
 					foreach (CChip chip in this.listChip) {
 						if (chip.nチャンネル番号 == 0x02) { }
-						//else if( chip.nチャンネル番号 == 0x03 ){}
 						else if (chip.nチャンネル番号 == 0x01) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 <= 0x1F) { } else if (chip.nチャンネル番号 == 0x50) { } else if (chip.nチャンネル番号 == 0x51) { } else if (chip.nチャンネル番号 == 0x54) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 == 0xF1) { } else if (chip.nチャンネル番号 == 0xF2) { } else if (chip.nチャンネル番号 == 0xFF) { } else if (chip.nチャンネル番号 == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 < 0x93)
 							chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
 						else if ((chip.nチャンネル番号 > 0x9F && chip.nチャンネル番号 < 0xA0) || (chip.nチャンネル番号 >= 0xF0 && chip.nチャンネル番号 < 0xFE))
@@ -2146,10 +1942,6 @@ namespace OpenTaiko {
 							case 0x50: {
 									if (this.bOFFSETの値がマイナスである)
 										chip.n発声時刻ms += this.nOFFSET;
-									//chip.n発声時刻ms += this.nDELAY;
-									//chip.dbBPM = this.dbNowBPM;
-									//chip.dbSCROLL = this.dbNowSCROLL;
-
 									if (this.n内部番号BRANCH1to + 1 > this.listBRANCH.Count)
 										continue;
 
@@ -2158,29 +1950,6 @@ namespace OpenTaiko {
 										this.n内部番号BRANCH1to++;
 									}
 
-									//switch (this.n現在のコース)
-									//{
-									//    case 0:
-									//        chip.dbSCROLL = this.dbNowSCROLL_Normal;
-									//        break;
-									//    case 1:
-									//        chip.dbSCROLL = this.dbNowSCROLL_Expert;
-									//        break;
-									//    case 2:
-									//        chip.dbSCROLL = this.dbNowSCROLL_Master;
-									//        break;
-									//}
-
-									//if( this.bBarLine == true )
-									//    chip.b可視 = true;
-									//else
-									//    chip.b可視 = false;
-
-									//if( this.b次の小節が分岐である )
-									//{
-									//    chip.bBranch = true;
-									//    this.b次の小節が分岐である = false;
-									//}
 									continue;
 								}
 
@@ -2224,31 +1993,7 @@ namespace OpenTaiko {
 										chip.n発声時刻ms += this.nOFFSET;
 										chip.nノーツ終了時刻ms += this.nOFFSET;
 									}
-
-									//chip.dbBPM = this.dbNowBPM;
-									//chip.dbSCROLL = this.dbNowSCROLL;
 									this.nNowRoll = this.nNowRollCount - 1;
-
-									//chip.nノーツ終了時刻ms = ms + ( (int) ( ( ( 0x271 * ( chip.nノーツ終了位置 - n発声位置 ) ) * dbBarLength ) / bpm ) );
-
-									#region[チップ番号を記録]
-									//switch(chip.nコース)
-									//{
-									//    case 0:
-									//        this.n連打チップ_temp[0] = this.nNowRoll;
-									//        this.dbSCROLL_temp[0] = this.dbNowSCROLL;
-									//        break;
-									//    case 1:
-									//        this.n連打チップ_temp[1] = this.nNowRoll;
-									//        this.dbSCROLL_temp[1] = this.dbNowSCROLL;
-									//        break;
-									//    case 2:
-									//        this.n連打チップ_temp[2] = this.nNowRoll;
-									//        this.dbSCROLL_temp[2] = this.dbNowSCROLL;
-									//        break;
-									//}
-
-									#endregion
 
 									continue;
 								}
@@ -2257,71 +2002,14 @@ namespace OpenTaiko {
 									if (this.bOFFSETの値がマイナスである) {
 										chip.n発声時刻ms += this.nOFFSET;
 									}
-									//chip.n発声時刻ms += this.nDELAY;
-									//chip.dbBPM = this.dbNowBPM;
-									//chip.dbSCROLL = this.dbNowSCROLL;
-
-									#region[チップ番号を記録]
-									//風船は現時点では未実装のため処理しない。
-
-
-									//switch (chip.nコース)
-									//{
-									//    case 0:
-									//        if (this.listChip[this.n連打チップ_temp[0]].nチャンネル番号 == 0x99) break;
-									//        this.listChip[this.n連打チップ_temp[0]].nノーツ終了時刻ms = chip.n発声時刻ms;
-									//        this.listChip[this.n連打チップ_temp[0]].dbSCROLL = this.dbSCROLL_temp[0];
-									//        break;
-									//    case 1:
-									//        if (this.listChip[this.n連打チップ_temp[1]].nチャンネル番号 == 0x99) break;
-									//        this.listChip[this.n連打チップ_temp[1]].nノーツ終了時刻ms = chip.n発声時刻ms;
-									//        this.listChip[this.n連打チップ_temp[1]].dbSCROLL = this.dbSCROLL_temp[1];
-									//        break;
-									//    case 2:
-									//        if (this.listChip[this.n連打チップ_temp[2]].nチャンネル番号 == 0x99) break;
-									//        this.listChip[this.n連打チップ_temp[2]].nノーツ終了時刻ms = chip.n発声時刻ms;
-									//        this.listChip[this.n連打チップ_temp[2]].dbSCROLL = this.dbSCROLL_temp[2];
-									//        break;
-									//}
-
-									#endregion
-
-									//this.listChip[this.nNowRoll].nノーツ終了時刻ms = chip.n発声時刻ms;
-									//this.listChip[this.nNowRoll].dbSCROLL = this.dbNowSCROLL;
-									//this.listChip[this.nNowRoll].dbBPM = this.dbNowBPM;
 									continue;
 								}
 							case 0x9D: {
-									//if ( this.listSCROLL.ContainsKey( chip.n整数値_内部番号 ) )
-									//{
-									//this.dbNowSCROLL = ( ( this.listSCROLL[ chip.n整数値_内部番号 ].n表記上の番号 == 0 ) ? 0.0 : 1.0 ) + this.listSCROLL[ chip.n整数値_内部番号 ].dbSCROLL値;
-									//}
-
-									//switch (chip.nコース)
-									//{
-									//    case 0:
-									//        this.dbNowSCROLL_Normal = this.dbNowSCROLL;
-									//        this.n現在のコース = 0;
-									//        break;
-									//    case 1:
-									//        this.dbNowSCROLL_Expert = this.dbNowSCROLL;
-									//        this.n現在のコース = 1;
-									//        break;
-									//    case 2:
-									//        this.dbNowSCROLL_Master = this.dbNowSCROLL;
-									//        this.n現在のコース = 2;
-									//        break;
-									//}
-
 									continue;
 								}
 							case 0xDC: {
 									if (this.bOFFSETの値がマイナスである)
 										chip.n発声時刻ms += this.nOFFSET;
-									//if ( this.listDELAY.ContainsKey( chip.n整数値_内部番号 ) )
-									//{
-									//    this.nDELAY = ( ( this.listDELAY[ chip.n整数値_内部番号 ].n表記上の番号 == 0 ) ? 0 : 0 ) + this.listDELAY[ chip.n整数値_内部番号 ].nDELAY値;
-									//}
 									continue;
 								}
 							case 0xDE: {
@@ -2343,31 +2031,15 @@ namespace OpenTaiko {
 							case 0xDF: {
 									if (this.bOFFSETの値がマイナスである)
 										chip.n発声時刻ms += this.nOFFSET;
-									//if ( this.listBRANCH.ContainsKey( chip.n整数値_内部番号 ) )
-									//{
-									//this.listBRANCH[chip.n整数値_内部番号].db分岐時間ms = chip.n発声時刻ms + ( this.bOFFSETの値がマイナスである ? this.nOFFSET : 0 );
-									//}
-
 									continue;
 								}
 							case 0xE0: {
-									//if (this.bOFFSETの値がマイナスである)
-									//    chip.n発声時刻ms += this.nOFFSET;
-
-									//chip.dbBPM = this.dbNowBPM;
-									//chip.dbSCROLL = this.dbNowSCROLL;
-									//if( chip.n整数値_内部番号 == 1 )
-									//    this.bBarLine = false;
-									//else
-									//    this.bBarLine = true;
 									continue;
 								}
 							default: {
 									if (this.bOFFSETの値がマイナスである)
 										chip.n発声時刻ms += this.nOFFSET;
-									//chip.n発声時刻ms += this.nDELAY;
 									chip.dbBPM = this.dbNowBPM;
-									//chip.dbSCROLL = this.dbNowSCROLL;
 									continue;
 								}
 						}
@@ -2381,9 +2053,6 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "発声時刻計算:             {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 
 					#region[listlyricを時間順に並び替え。]
 					this.listLyric2 = tmplistlyric;
@@ -2392,9 +2061,6 @@ namespace OpenTaiko {
 
 					this.nBGMAdjust = 0;
 					this.t各自動再生音チップの再生時刻を変更する(nBGMAdjust);
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "再生時刻変更:             {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 
 					#region [ 可視チップ数カウント ]
 					for (int n = 0; n < 14; n++) {
@@ -2410,9 +2076,6 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "可視チップ数カウント      {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region [ チップの種類を分類し、対応するフラグを立てる ]
 					foreach (CChip chip in this.listChip) {
 						if ((chip.nチャンネル番号 == 0x01 && this.listWAV.TryGetValue(chip.n整数値_内部番号, out CWAV cwav)) && !cwav.listこのWAVを使用するチャンネル番号の集合.Contains(chip.nチャンネル番号)) {
@@ -2440,9 +2103,6 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-					//span = (TimeSpan) ( DateTime.Now - timeBeginLoad );
-					//Trace.TraceInformation( "ch番号集合確認:           {0}", span.ToString() );
-					//timeBeginLoad = DateTime.Now;
 					#region[ seNotes計算 ]
 					if (this.listBRANCH.Count != 0)
 						this.tSetSenotes_branch();
@@ -2463,20 +2123,6 @@ namespace OpenTaiko {
 						}
 					}
 					#endregion
-
-					//ソートっぽい
-					//this.listChip.Sort(delegate(CChip pchipA, CChip pchipB) { return pchipA.n発声時刻ms - pchipB.n発声時刻ms; } );
-					//Random ran1 = new Random();
-					//for (int n = 0; n < this.listChip.Count; n++ )
-					//{
-
-					//    if (CDTXMania.ConfigIni.bHispeedRandom)
-					//    {
-
-					//        int nRan = ran1.Next(5, 40);
-					//        this.listChip[n].dbSCROLL = nRan / 10.0;
-					//    }
-					//}
 					int n整数値管理 = 0;
 					foreach (CChip chip in this.listChip) {
 						if (chip.nチャンネル番号 != 0x54)
@@ -2517,7 +2163,7 @@ namespace OpenTaiko {
 					if (!string.IsNullOrEmpty(input[n]) &&
 						(input[n].Substring(0, 1) == "#"
 						|| input[n].StartsWith("EXAM")
-						|| NotesManager.FastFlankedParsing(input[n])))//this.CharConvertNote(input[n].Substring(0, 1)) != -1))
+						|| NotesManager.FastFlankedParsing(input[n])))
 					{
 						if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
 							//A～Fで始まる命令が削除されない不具合の対策
@@ -2526,7 +2172,7 @@ namespace OpenTaiko {
 						}
 					}
 				} else if (nMode == 2) {
-					if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+					if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))
 					{
 						if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
 							//A～Fで始まる命令が削除されない不具合の対策
@@ -2575,7 +2221,7 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="InputText"></param>
 		/// <returns>1小節内の文字数</returns>
@@ -2584,7 +2230,7 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="InputText"></param>
 		/// <returns>1小節内の文字数</returns>
@@ -2608,16 +2254,12 @@ namespace OpenTaiko {
 				return;
 			}
 
-
 			var line = new CLine();
 			line.nコース = this.nLineCountCourseTemp;
 			line.n文字数 = InputText.Length - 1;
 			line.n小節番号 = this.n現在の小節数;
-
 			this.listLine.Add(line);
-
 			this.n現在の小節数++;
-
 		}
 
 		/// <summary>
@@ -2630,8 +2272,6 @@ namespace OpenTaiko {
 		private object str改行文字を削除する(string strInput, int nMode) {
 			string str = "";
 			str = strInput;
-			// str = strInput.Replace(Environment.NewLine, "\n");
-			// str = str.Replace('\t', ' ');
 
 			unsafe {
 				fixed (char* s = str) {
@@ -2682,11 +2322,7 @@ namespace OpenTaiko {
 					if (this.strConvertCourse(nNC) != -1) {
 						nCourse = this.strConvertCourse(nNC);
 						strCourseTJA[nCourse] = strTemp[n];
-					} else {
-
 					}
-					//strCourseTJA[ ];
-
 				}
 			} else {
 				strCourseTJA[3] = strTJA;
@@ -2701,8 +2337,6 @@ namespace OpenTaiko {
 			 @"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MAKER|SELECTBG|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
 			RegexOptions.Multiline | RegexOptions.Compiled);
 
-		// private static readonly HashSet<string> valableTokens = new HashSet<string>(@"TIT|LEV|BPM|WAV|OFF|BAL|EXA|DAN|REN|BAL|SON|SEV|SCO|COU|STY|TOW|GAM|LIF|DEM|SID|SUB|GEN|MOV|BGI|BGM|HID|GAU|LYR|#HB|#BM".Split('|'));
-
 		private int nDifficulty;
 
 		/// <summary>
@@ -2710,7 +2344,7 @@ namespace OpenTaiko {
 		/// ○未実装
 		/// _「COURSE」定義が無い譜面は未対応
 		/// 　→ver2015082200で対応完了。
-		/// 
+		///
 		/// </summary>
 		/// <param name="strInput">譜面のデータ</param>
 		private void t入力_V4(string strInput, int difficulty) {
@@ -2728,19 +2362,12 @@ namespace OpenTaiko {
 				}
 				string strInputHeader = strInput.Remove(startIndex);
 				strInput = strInput.Remove(0, startIndex);
-
-				// Regex called here
-				// strInputHeader = regexForStrippingHeadingLines.Replace(strInputHeader, "");
-
-
 				strInput = strInputHeader + "\n" + strInput;
 
 				//どうせ使わないので先にSplitしてコメントを削除。
 				var strSplitした譜面 = (string[])this.str改行文字を削除する(strInput, 1);
 
 				for (int i = 0; strSplitした譜面.Length > i; i++) {
-					// strSplitした譜面[i] = this.tコメントを削除する(strSplitした譜面[i]);
-
 					int idx = strSplitした譜面[i].IndexOf("//");
 					if (idx >= 0)
 						strSplitした譜面[i] = strSplitした譜面[i].Substring(0, idx);
@@ -2765,8 +2392,6 @@ namespace OpenTaiko {
 
 				int n読み込むコース = 3;
 				int n譜面数 = 0; //2017.07.22 kairera0467 tjaに含まれる譜面の数
-
-
 				bool b新処理 = false;
 
 				//まずはコースごとに譜面を分割。
@@ -2851,31 +2476,16 @@ namespace OpenTaiko {
 				//0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
 				var strSplitした後の譜面 = strSplit読み込むコース; //strSplitした譜面[ n読み込むコース ].Split( this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries );
 				strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplitした後の譜面, 1);
-				//string str命令消去譜面temp = this.StringArrayToString( this.str命令消去譜面 );
-				//string[] strDelimiter = { "," };
-				//this.str命令消去譜面 = str命令消去譜面temp.Split( strDelimiter, StringSplitOptions.RemoveEmptyEntries );
-
 				this.n現在の小節数 = 1;
 				try {
 					#region[ 最初の処理 ]
 					//1小節の時間を挿入して開始時間を調節。
 					this.dbNowTime += ((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0);
-					//this.dbNowBMScollTime += (( this.dbBarLength ) * 16.0 );
 					#endregion
-					//string strWrite = "";
 					for (int i = 0; strSplitした後の譜面.Length > i; i++) {
 						nNowReadLine++;
 						str = strSplitした後の譜面[i];
-						//strWrite += str;
-						//if( !str.StartsWith( "#" ) && !string.IsNullOrEmpty( this.strTemp ) )
-						//{
-						//    str = this.strTemp + str;
-						//}
-
-						// Check line
-
 						this.t入力_行解析譜面_V4(str);
-
 					}
 
 					// Retrieve all the global exams (non individual) at the end
@@ -2891,11 +2501,6 @@ namespace OpenTaiko {
 					Trace.TraceError(ex.ToString());
 					Trace.TraceError("例外が発生しましたが処理を継続します。 (2da1e880-6b63-4e82-b018-bf18c3568335)");
 				}
-				//if( stream != null )
-				//{
-				//    stream.Flush();
-				//    stream.Close();
-				//}
 				#endregion
 			}
 		}
@@ -2975,12 +2580,6 @@ namespace OpenTaiko {
 			return result.ToArray();
 		}
 
-
-
-
-
-
-
 		/// <summary>
 		/// 譜面読み込みメソッドV4で使用。
 		/// </summary>
@@ -3053,8 +2652,6 @@ namespace OpenTaiko {
 
 				var chip1 = new CChip();
 				chip1.nチャンネル番号 = 0x54;
-				//chip1.n発声位置 = 384;
-				//chip1.n発声時刻ms = (int)this.dbNowTime;
 				if (this.nMOVIEOFFSET == 0)
 					chip1.n発声時刻ms = (int)this.dbNowTime;
 				else
@@ -3075,7 +2672,6 @@ namespace OpenTaiko {
 
 				chip.nチャンネル番号 = 0xFF;
 				chip.n発声位置 = ((this.n現在の小節数 + 2) * 384);
-				//chip.n発声時刻ms = (int)( this.dbNowTime + ((15000.0 / this.dbNowBPM * ( 4.0 / 4.0 )) * 16.0) * 2  );
 				chip.n発声時刻ms = (int)(this.dbNowTime + 1000); //2016.07.16 kairera0467 終了時から1秒後に設置するよう変更。
 				chip.fNow_Measure_m = this.fNow_Measure_m;
 				chip.fNow_Measure_s = this.fNow_Measure_s;
@@ -3085,7 +2681,6 @@ namespace OpenTaiko {
 
 				if (n参照中の難易度 == (int)Difficulty.Dan) {
 					for (int i = listChip.Count - 1; i >= 0; i--) {
-						//if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
 						if (NotesManager.IsHittableNote(listChip[i])) {
 							if (DanSongs.Number != 0) {
 								Array.Resize(ref this.pDan_LastChip, this.pDan_LastChip.Length + 1);
@@ -3241,10 +2836,6 @@ namespace OpenTaiko {
 
 					this.listChip.Add(chip);
 				}
-
-
-
-
 				this.n内部番号SCROLL1to++;
 			} else if (command == "#MEASURE") {
 				strArray = argument.Split(new char[] { '/' });
@@ -3276,8 +2867,6 @@ namespace OpenTaiko {
 				// チップを配置。
 
 				this.listChip.Add(chip);
-
-				//lbMaster.Items.Add( ";拍子変更 " + strArray[0] + "/" + strArray[1] );
 			} else if (command == "#DELAY") {
 				double nDELAY = 0;
 				if (!double.TryParse(argument, out nDELAY)) {
@@ -3286,10 +2875,7 @@ namespace OpenTaiko {
 				}
 				nDELAY *= 1000;
 
-
 				this.listDELAY.Add(this.n内部番号DELAY1to, new CDELAY() { n内部番号 = this.n内部番号DELAY1to, n表記上の番号 = 0, nDELAY値 = (int)nDELAY, delay_bmscroll_time = this.dbLastBMScrollTime, delay_bpm = this.dbNowBPM, delay_course = this.n現在のコース, delay_time = this.dbLastTime });
-
-
 				//チップ追加して割り込んでみる。
 				var chip = new CChip();
 
@@ -3417,8 +3003,6 @@ namespace OpenTaiko {
 								break;
 							case "LINEAR":
 								eType = Easing.CalcType.Linear;
-								break;
-							default:
 								break;
 						}
 
@@ -3593,8 +3177,6 @@ namespace OpenTaiko {
 								break;
 							case "LINEAR":
 								eType = Easing.CalcType.Linear;
-								break;
-							default:
 								break;
 						}
 
@@ -4524,8 +4106,6 @@ namespace OpenTaiko {
 							case "LINEAR":
 								eType = Easing.CalcType.Linear;
 								break;
-							default:
-								break;
 						}
 
 						chip.objCalcType = eType;
@@ -4709,8 +4289,6 @@ namespace OpenTaiko {
 								break;
 							case "LINEAR":
 								eType = Easing.CalcType.Linear;
-								break;
-							default:
 								break;
 						}
 
@@ -5177,7 +4755,7 @@ namespace OpenTaiko {
 				// チップを配置。
 				this.listChip.Add(chip);
 			} else if (command == "#BRANCHSTART") {
-				#region [ 譜面分岐のパース方法を作り直し ]   
+				#region [ 譜面分岐のパース方法を作り直し ]
 				this.bチップがある.Branch = true;
 				this.b最初の分岐である = false;
 				this.b分岐を一回でも開始した = true;
@@ -5503,7 +5081,6 @@ namespace OpenTaiko {
 
 				nextSongnextSongChip.nチャンネル番号 = 0x01;
 				nextSongnextSongChip.n発声位置 = 384;
-				//nextSongnextSongChip.n発声時刻ms = (int)this.dbNowTime - (bOFFSETの値がマイナスである ? -nOFFSET : nOFFSET);
 				nextSongnextSongChip.n発声時刻ms = (int)this.dbNowTime;
 				nextSongnextSongChip.fNow_Measure_m = this.fNow_Measure_m;
 				nextSongnextSongChip.fNow_Measure_s = this.fNow_Measure_s;
@@ -5568,7 +5145,7 @@ namespace OpenTaiko {
 			}
 		}
 		void t現在のチップ情報を記録する(bool bInPut) {
-			//2020.04.21 こうなってしまったのは仕方がないな。。 
+			//2020.04.21 こうなってしまったのは仕方がないな。。
 			if (bInPut) {
 				#region [ 記録する ]
 				cBranchStart.dbTime = this.dbNowTime;
@@ -5692,7 +5269,7 @@ namespace OpenTaiko {
 
 							chip.b可視 = true;
 							chip.bHideBarLine = this.bBARLINECUE[0] == 1;
-							#region [ 作り直し ]  
+							#region [ 作り直し ]
 							if (IsEndedBranching) {
 								if (this.IsBranchBarDraw[i])
 									chip.bBranch = true;
@@ -5704,7 +5281,7 @@ namespace OpenTaiko {
 
 							this.listChip.Add(chip);
 
-							#region [ 作り直し ]  
+							#region [ 作り直し ]
 							if (IsEndedBranching)
 								this.IsBranchBarDraw[i] = false;
 							else this.IsBranchBarDraw[(int)n現在のコース] = false;
@@ -5724,7 +5301,6 @@ namespace OpenTaiko {
 							hakusen.n発声位置 = ((this.n現在の小節数) * 384);
 							hakusen.n発声時刻ms = (int)(this.dbNowTime + (((db1拍 * 4.0)) * measure) * 1000.0);
 							hakusen.nチャンネル番号 = 0x51;
-							//hakusen.n発声時刻ms = (int)this.dbNowTime;
 							hakusen.fBMSCROLLTime = this.dbNowBMScollTime;
 							hakusen.n整数値_内部番号 = this.n現在の小節数;
 							hakusen.n整数値 = 0;
@@ -5735,11 +5311,7 @@ namespace OpenTaiko {
 							hakusen.dbSCROLL_Y = this.dbNowScrollY;
 							hakusen.nコース = n現在のコース;
 							hakusen.eScrollMode = eScrollMode;
-
 							this.listChip.Add(hakusen);
-							//--全ての拍線の時間を出力する--
-							//Trace.WriteLine( string.Format( "|| {0,3:##0} Time:{1} Beat:{2}", this.n現在の小節数, hakusen.n発声時刻ms, measure ) );
-							//--------------------------------
 						}
 
 						#endregion
@@ -5892,11 +5464,8 @@ namespace OpenTaiko {
 										listChip_Branch[i][nNowRollCountBranch[i]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
 									}
 
-									//listChip[ nNowRollCount ].dbBPM = this.dbNowBPM;
-									//listChip[ nNowRollCount ].dbSCROLL = this.dbNowSCROLL;
 									if (!IsEndedBranching || i == 2)
 										nNowRoll = 0;
-									//continue;
 								}
 
 								if (IsEnabledFixSENote) {
@@ -5992,8 +5561,6 @@ namespace OpenTaiko {
 
 								Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
 								Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
-								// Array.Resize(ref nDan_BallonCount, nDan_BallonCount.Length + 1);
-
 								if (IsEndedBranching) {
 									this.listChip_Branch[i].Add(chip);
 									if (i == 0)
@@ -6078,19 +5645,7 @@ namespace OpenTaiko {
 					this.nScoreDiff[this.n参照中の難易度] = value;
 					this.b配点が指定されている[1, this.n参照中の難易度] = true;
 				});
-			}
-
-			  //if( this.nScoreModeTmp == 99 ) //2017.01.28 DD SCOREMODEを入力していない場合のみConfigで設定したモードにする
-			  //{
-			  //    this.nScoreModeTmp = CDTXMania.ConfigIni.nScoreMode;
-			  //}
-			  //if( CDTXMania.ConfigIni.nScoreMode == 3 && !this.b配点が指定されている[ 2, this.n参照中の難易度 ] ){ //2017.06.04 kairera0467
-			  //    this.nScoreModeTmp = 3;
-			  //}
-
-
-
-			  else if (strCommandName.Equals("SCOREMODE")) {
+			} else if (strCommandName.Equals("SCOREMODE")) {
 				if (!string.IsNullOrEmpty(strCommandParam)) {
 					this.nScoreModeTmp = Convert.ToInt16(strCommandParam);
 				}
@@ -6647,7 +6202,7 @@ namespace OpenTaiko {
 				}
 			}
 			if (this.nScoreModeTmp == 99) {
-				//2017.01.28 DD 
+				//2017.01.28 DD
 				this.nScoreModeTmp = OpenTaiko.ConfigIni.nScoreMode;
 			}
 		}
@@ -6755,34 +6310,9 @@ namespace OpenTaiko {
 		/// 複素数のパースもどき
 		/// </summary>
 		private void tParsedComplexNumber(string strScroll, ref double[] dbScroll) {
-			/*
-            bool bFirst = true; //最初の数値か
-            bool bUse = false; //数値扱い中
-            string[] arScroll = new string[2];
-            char[] c = strScroll.ToCharArray();
-            //1.0-1.0i
-            for (int i = 0; i < strScroll.Length; i++)
-            {
-                if (bFirst)
-                    arScroll[0] += c[i];
-                else
-                    arScroll[1] += c[i];
-
-                //次の文字が'i'なら脱出。
-                if (c[i + 1] == 'i')
-                    break;
-                else if (c[i + 1] == '-' || c[i + 1] == '+')
-                    bFirst = false;
-
-            }
-            dbScroll[0] = Convert.ToDouble(arScroll[0]);
-            dbScroll[1] = Convert.ToDouble(arScroll[1]);
-            */
-
 			var cpx = strScroll.ParseComplex();
 			dbScroll[0] = cpx[0];
 			dbScroll[1] = cpx[1];
-			return;
 		}
 
 		private void tSetSenotes() {
@@ -6804,7 +6334,6 @@ namespace OpenTaiko {
 			//逆にしてしまうと計算がとてつもないことになるので注意。
 
 			try {
-				//this.tSenotes_Core( list音符のみのリスト );
 				this.tSenotes_Core_V2(list音符のみのリスト, true);
 			} catch (Exception ex) {
 				Trace.TraceError(ex.ToString());
@@ -6863,7 +6392,6 @@ namespace OpenTaiko {
 						break;
 				}
 
-				//this.tSenotes_Core( list音符のみのリスト );
 				this.tSenotes_Core_V2(list音符のみのリスト, true);
 			}
 
@@ -7073,25 +6601,9 @@ namespace OpenTaiko {
 							}
 						}
 						#endregion
-						#region [ BGMチップならば即ミキサーに追加 ]
-						//if ( pChip.nチャンネル番号 == 0x01 )	// BGMチップは即ミキサーに追加
-						//{
-						//    if ( listWAV.ContainsKey( pChip.n整数値_内部番号 ) )
-						//    {
-						//        CDTX.CWAV wc = CDTXMania.DTX.listWAV[ pChip.n整数値_内部番号 ];
-						//        if ( wc.rSound[ 0 ] != null )
-						//        {
-						//            CDTXMania.Sound管理.AddMixer( wc.rSound[ 0 ] );	// BGMは多重再生しない仕様としているので、1個目だけミキサーに登録すればよい
-						//        }
-						//    }
-						//}
-						#endregion
 						#region [ 発音1秒前のタイミングを算出 ]
 						int nAddMixer時刻ms, nAddMixer位置 = 0;
-						//Debug.WriteLine("==================================================================");
-						//Debug.WriteLine( "Start: ch=" + pChip.nチャンネル番号.ToString("x2") + ", nWAV番号=" + pChip.n整数値 + ", time=" + pChip.n発声時刻ms + ", lasttime=" + listChip[ listChip.Count - 1 ].n発声時刻ms );
 						t発声時刻msと発声位置を取得する(pChip.n発声時刻ms - n発音前余裕ms, out nAddMixer時刻ms, out nAddMixer位置);
-						//Debug.WriteLine( "nAddMixer時刻ms=" + nAddMixer時刻ms + ",nAddMixer位置=" + nAddMixer位置 );
 
 						CChip c_AddMixer = new CChip() {
 							nチャンネル番号 = 0xDA,
@@ -7102,8 +6614,6 @@ namespace OpenTaiko {
 							b演奏終了後も再生が続くチップである = false
 						};
 						listAddMixerChannel.Add(c_AddMixer);
-						//Debug.WriteLine("listAddMixerChannel:" );
-						//DebugOut_CChipList( listAddMixerChannel );
 						#endregion
 
 						int duration = 0;
@@ -7111,40 +6621,26 @@ namespace OpenTaiko {
 							double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
 							duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
 						}
-						//Debug.WriteLine("duration=" + duration );
 						int n新RemoveMixer時刻ms, n新RemoveMixer位置;
 						t発声時刻msと発声位置を取得する(pChip.n発声時刻ms + duration + n発音後余裕ms, out n新RemoveMixer時刻ms, out n新RemoveMixer位置);
-						//Debug.WriteLine( "n新RemoveMixer時刻ms=" + n新RemoveMixer時刻ms + ",n新RemoveMixer位置=" + n新RemoveMixer位置 );
 						if (n新RemoveMixer時刻ms < pChip.n発声時刻ms + duration)   // 曲の最後でサウンドが切れるような場合は
 						{
 							CChip c_AddMixer_noremove = c_AddMixer;
 							c_AddMixer_noremove.b演奏終了後も再生が続くチップである = true;
 							listAddMixerChannel[listAddMixerChannel.Count - 1] = c_AddMixer_noremove;
-							//continue;												// 発声位置の計算ができないので、Mixer削除をあきらめる___のではなく
-							// #32248 2013.10.15 yyagi 演奏終了後も再生を続けるチップであるというフラグをpChip内に立てる
 							break;
 						}
-						#region [ 未使用コード ]
-						//if ( n新RemoveMixer時刻ms < pChip.n発声時刻ms + duration )	// 曲の最後でサウンドが切れるような場合
-						//{
-						//    n新RemoveMixer時刻ms = pChip.n発声時刻ms + duration;
-						//    // 「位置」は比例計算で求めてお茶を濁す...このやり方だと誤動作したため対応中止
-						//    n新RemoveMixer位置 = listChip[ listChip.Count - 1 ].n発声位置 * n新RemoveMixer時刻ms / listChip[ listChip.Count - 1 ].n発声時刻ms;
-						//}
-						#endregion
 
 						#region [ 発音終了2秒後にmixerから削除するが、その前に再発音することになるのかを確認(再発音ならmixer削除タイミングを延期) ]
 						int n整数値 = pChip.n整数値;
 						int index = listRemoveTiming.FindIndex(
 							delegate (CChip cchip) { return cchip.n整数値 == n整数値; }
 						);
-						//Debug.WriteLine( "index=" + index );
 						if (index >= 0)                                                 // 過去に同じチップで発音中のものが見つかった場合
 						{                                                                   // 過去の発音のmixer削除を確定させるか、延期するかの2択。
 							int n旧RemoveMixer時刻ms = listRemoveTiming[index].n発声時刻ms;
 							int n旧RemoveMixer位置 = listRemoveTiming[index].n発声位置;
 
-							//Debug.WriteLine( "n旧RemoveMixer時刻ms=" + n旧RemoveMixer時刻ms + ",n旧RemoveMixer位置=" + n旧RemoveMixer位置 );
 							if (pChip.n発声時刻ms - n発音前余裕ms <= n旧RemoveMixer時刻ms)  // mixer削除前に、同じ音の再発音がある場合は、
 							{                                                                   // mixer削除時刻を遅延させる(if-else後に行う)
 																								//Debug.WriteLine( "remove TAIL of listAddMixerChannel. TAIL INDEX=" + listAddMixerChannel.Count );
@@ -7154,7 +6650,6 @@ namespace OpenTaiko {
 																								//DebugOut_CChipList( listAddMixerChannel );
 							} else                                                            // 逆に、時間軸上、mixer削除後に再発音するような流れの場合は
 							  {
-								//Debug.WriteLine( "Publish the value(listRemoveTiming[index] to listRemoveMixerChannel." );
 								listRemoveMixerChannel.Add(listRemoveTiming[index]);    // mixer削除を確定させる
 																						//Debug.WriteLine( "listRemoveMixerChannel:" );
 																						//DebugOut_CChipList( listRemoveMixerChannel );
@@ -7169,10 +6664,6 @@ namespace OpenTaiko {
 								n発声位置 = n新RemoveMixer位置
 							};
 							listRemoveTiming[index] = c;
-							//listRemoveTiming[ index ].n発声時刻ms = n新RemoveMixer時刻ms;	// mixer削除時刻を更新(遅延)する
-							//listRemoveTiming[ index ].n発声位置 = n新RemoveMixer位置;
-							//Debug.WriteLine( "listRemoveTiming: modified" );
-							//DebugOut_CChipList( listRemoveTiming );
 						} else                                                                // 過去に同じチップを発音していないor
 						  {                                                                   // 発音していたが既にmixer削除確定していたなら
 							CChip c = new CChip()                                           // 新しくmixer削除候補として追加する
@@ -7183,25 +6674,12 @@ namespace OpenTaiko {
 								n発声時刻ms = n新RemoveMixer時刻ms,
 								n発声位置 = n新RemoveMixer位置
 							};
-							//Debug.WriteLine( "Add new chip to listRemoveMixerTiming: " );
-							//Debug.WriteLine( "ch=" + c.nチャンネル番号.ToString( "x2" ) + ", nWAV番号=" + c.n整数値 + ", time=" + c.n発声時刻ms + ", lasttime=" + listChip[ listChip.Count - 1 ].n発声時刻ms );
 							listRemoveTiming.Add(c);
-							//Debug.WriteLine( "listRemoveTiming:" );
-							//DebugOut_CChipList( listRemoveTiming );
 						}
 						#endregion
 						break;
 				}
 			}
-			//Debug.WriteLine("==================================================================");
-			//Debug.WriteLine( "Result:" );
-			//Debug.WriteLine( "listAddMixerChannel:" );
-			//DebugOut_CChipList( listAddMixerChannel );
-			//Debug.WriteLine( "listRemoveMixerChannel:" );
-			//DebugOut_CChipList( listRemoveMixerChannel );
-			//Debug.WriteLine( "listRemoveTiming:" );
-			//DebugOut_CChipList( listRemoveTiming );
-			//Debug.WriteLine( "==================================================================" );
 
 			listChip.AddRange(listAddMixerChannel);
 			listChip.AddRange(listRemoveMixerChannel);
@@ -7209,7 +6687,6 @@ namespace OpenTaiko {
 			listChip.Sort();
 		}
 		private void DebugOut_CChipList(List<CChip> c) {
-			//Debug.WriteLine( "Count=" + c.Count );
 			for (int i = 0; i < c.Count; i++) {
 				Debug.WriteLine(i + ": ch=" + c[i].nチャンネル番号.ToString("x2") + ", WAV番号=" + c[i].n整数値 + ", time=" + c[i].n発声時刻ms);
 			}
@@ -7221,11 +6698,6 @@ namespace OpenTaiko {
 			if (n希望発声時刻ms < 0) {
 				n希望発声時刻ms = 0;
 			}
-			//else if ( n希望発声時刻ms > listChip[ listChip.Count - 1 ].n発声時刻ms )		// BGMの最後の余韻を殺してしまうので、この条件は外す
-			//{
-			//    n希望発声時刻ms = listChip[ listChip.Count - 1 ].n発声時刻ms;
-			//}
-
 			int index_min = -1, index_max = -1;
 			for (int i = 0; i < listChip.Count; i++)        // 希望発声位置前後の「前」の方のチップを検索
 			{
@@ -7239,8 +6711,6 @@ namespace OpenTaiko {
 				// listの最終項目の時刻をそのまま使用する
 				//___のではダメ。BGMが尻切れになる。
 				// そこで、listの最終項目の発声時刻msと発生位置から、希望発声時刻に相当する希望発声位置を比例計算して求める。
-				//n新発声時刻ms = n希望発声時刻ms;
-				//n新発声位置 = listChip[ listChip.Count - 1 ].n発声位置 * n希望発声時刻ms / listChip[ listChip.Count - 1 ].n発声時刻ms;
 				n新発声時刻ms = listChip[listChip.Count - 1].n発声時刻ms;
 				n新発声位置 = listChip[listChip.Count - 1].n発声位置;
 				return false;
