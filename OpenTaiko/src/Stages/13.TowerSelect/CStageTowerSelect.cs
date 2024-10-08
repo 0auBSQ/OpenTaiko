@@ -206,7 +206,7 @@ namespace OpenTaiko {
 
 			int randomSongIndex = OpenTaiko.Random.Next(selectableSongCount);
 
-			if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
+			if (OpenTaiko.ConfigIni.bDetailedLogOutputDTX) {
 				StringBuilder builder = new StringBuilder(0x400);
 				builder.Append(string.Format("Total number of songs to randomly choose from {0}. Randomly selected index {0}.", selectableSongCount, randomSongIndex));
 				Trace.TraceInformation(builder.ToString());

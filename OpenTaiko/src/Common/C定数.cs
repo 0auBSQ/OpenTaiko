@@ -275,7 +275,7 @@ namespace OpenTaiko {
 		ADLIB = 7,
 		Mine = 8,
 	}
-	internal enum E判定文字表示位置 {
+	internal enum EJudgeTextDisplayPosition {
 		表示OFF,
 		レーン上,
 		判定ライン上,

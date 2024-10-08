@@ -562,7 +562,7 @@ namespace OpenTaiko {
 							OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
 						this.rSound[i] = null;
 
-						if ((i == 0) && OpenTaiko.ConfigIni.bLog作成解放ログ出力)
+						if ((i == 0) && OpenTaiko.ConfigIni.bCreationReleaseLogOutput)
 							Trace.TraceInformation("サウンドを解放しました。({0})({1})", this.strコメント文, this.strファイル名);
 					}
 				}
@@ -1387,7 +1387,7 @@ namespace OpenTaiko {
 							cwav.rSound[i].AddBassSoundFromMixer();
 						}
 
-						if (OpenTaiko.ConfigIni.bLog作成解放ログ出力) {
+						if (OpenTaiko.ConfigIni.bCreationReleaseLogOutput) {
 							Trace.TraceInformation("サウンドを作成しました。({3})({0})({1})({2}bytes)", cwav.strコメント文, str,
 								cwav.rSound[0].SoundBufferSize, cwav.rSound[0].IsStreamPlay ? "Stream" : "OnMemory");
 						}
@@ -1599,7 +1599,7 @@ namespace OpenTaiko {
 
 		#region [ チップの再生と停止 ]
 		public void tチップの再生(CChip pChip, long n再生開始システム時刻ms) {
-			if (OpenTaiko.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && OpenTaiko.ConfigIni.nSongSpeed != 20)
+			if (OpenTaiko.ConfigIni.bNoAudioPlayUnlessPlaybackSpeedIsNormal && OpenTaiko.ConfigIni.nSongSpeed != 20)
 				return;
 
 			if (pChip.n整数値_内部番号 >= 0) {
@@ -2111,7 +2111,7 @@ namespace OpenTaiko {
 
 					#endregion
 					#region [ bLogDTX詳細ログ出力 ]
-					if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
+					if (OpenTaiko.ConfigIni.bDetailedLogOutputDTX) {
 						foreach (CWAV cwav in this.listWAV.Values) {
 							Trace.TraceInformation(cwav.ToString());
 						}

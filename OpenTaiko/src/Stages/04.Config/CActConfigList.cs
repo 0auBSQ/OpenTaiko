@@ -123,11 +123,11 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGA_DESC"));
 			this.list項目リスト.Add(this.iSystemBGA);
 
-			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms,
+			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewSoundAfterSongSelection,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC"));
 			this.list項目リスト.Add(this.iSystemPreviewSoundWait);
 
-			this.iSystemPreviewImageWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms,
+			this.iSystemPreviewImageWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC"));
 			this.list項目リスト.Add(this.iSystemPreviewImageWait);
 
@@ -307,7 +307,7 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_NOTELOCK_DESC"));
 			this.list項目リスト.Add(this.iDrumsTight);
 
-			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.n表示可能な最小コンボ数.Drums,
+			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums,
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY_DESC"));
 			this.list項目リスト.Add(this.iSystemMinComboDrums);
 
@@ -1602,8 +1602,8 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 			OpenTaiko.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 			OpenTaiko.ConfigIni.bEnableBGA = this.iSystemBGA.bON;
-			OpenTaiko.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms = this.iSystemPreviewSoundWait.n現在の値;
-			OpenTaiko.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms = this.iSystemPreviewImageWait.n現在の値;
+			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewSoundAfterSongSelection = this.iSystemPreviewSoundWait.n現在の値;
+			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = this.iSystemPreviewImageWait.n現在の値;
 			OpenTaiko.ConfigIni.bDisplayDebugInfo = this.iSystemDebugInfo.bON;
 			OpenTaiko.ConfigIni.n背景の透過度 = this.iSystemBGAlpha.n現在の値;
 			OpenTaiko.ConfigIni.bBGM音を発声する = this.iSystemBGMSound.bON;
@@ -1661,7 +1661,7 @@ namespace OpenTaiko {
 
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 
-			OpenTaiko.ConfigIni.n表示可能な最小コンボ数.Drums = this.iSystemMinComboDrums.n現在の値;
+			OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums = this.iSystemMinComboDrums.n現在の値;
 			OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi
 			OpenTaiko.ConfigIni.bBranchGuide = this.iTaikoBranchGuide.bON;
 			OpenTaiko.ConfigIni.nDefaultCourse = this.iTaikoDefaultCourse.n現在選択されている項目番号;

@@ -4705,7 +4705,7 @@ namespace OpenTaiko {
 			#endregion
 			#region [ PAUSEしていたサウンドを一斉に再生再開する(ただしタイマを止めているので、ここではまだ再生開始しない) ]
 
-			if (!(OpenTaiko.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && OpenTaiko.ConfigIni.nSongSpeed != 20))
+			if (!(OpenTaiko.ConfigIni.bNoAudioPlayUnlessPlaybackSpeedIsNormal && OpenTaiko.ConfigIni.nSongSpeed != 20))
 				foreach (CSound cs in pausedCSound) {
 					cs.tPlaySound();
 				}
@@ -4789,7 +4789,7 @@ namespace OpenTaiko {
 		}
 
 		protected void t進行描画_判定文字列1_通常位置指定の場合() {
-			if (((E判定文字表示位置)OpenTaiko.ConfigIni.判定文字表示位置.Drums) != E判定文字表示位置.コンボ下)    // 判定ライン上または横
+			if (((EJudgeTextDisplayPosition)OpenTaiko.ConfigIni.JudgeTextDisplayPosition.Drums) != EJudgeTextDisplayPosition.コンボ下)    // 判定ライン上または横
 			{
 				this.actJudgeString.Draw();
 			}
