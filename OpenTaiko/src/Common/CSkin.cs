@@ -37,7 +37,7 @@ namespace OpenTaiko {
 	}
 
 	internal class CSkin : IDisposable {
-		// クラス
+		// Class
 
 		public class CSystemSound : IDisposable {
 			// static フィールド

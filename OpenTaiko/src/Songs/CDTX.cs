@@ -17,7 +17,7 @@ namespace OpenTaiko {
 
 		public List<string> listErrors = new List<string>();
 		private int nNowReadLine;
-		// クラス
+		// Class
 
 		public class CBPM {
 			public double dbBPM値;

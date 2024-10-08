@@ -11,7 +11,7 @@ namespace OpenTaiko {
 		private const int MaximumKeyboardSoundLevelIncrement = 20;
 		private const int DefaultKeyboardSoundLevelIncrement = 5;
 
-		// クラス
+		// Class
 
 		#region [ CKeyAssign ]
 		public class CKeyAssign {
