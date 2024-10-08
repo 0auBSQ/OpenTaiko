@@ -1,28 +1,28 @@
 ﻿namespace OpenTaiko.Animations {
 	/// <summary>
-	/// アニメーション インターフェイス。
+	/// Animation interface.
 	/// </summary>
 	interface IAnimatable {
 		/// <summary>
-		/// アニメーションを開始します。
+		/// Starts the animation.
 		/// </summary>
 		void Start();
 		/// <summary>
-		/// アニメーションを停止します。
+		/// Stops the animation.
 		/// </summary>
 		void Stop();
 		/// <summary>
-		/// アニメーションをリセットします。
+		/// Resets the animation.
 		/// </summary>
 		void Reset();
 		/// <summary>
-		/// アニメーションの進行を行います。
+		/// Advances the animation.
 		/// </summary>
 		void Tick();
 		/// <summary>
-		/// アニメーションのパラメータを返します。
+		/// Returns the animation parameters.
 		/// </summary>
-		/// <returns>アニメーションのパラメータを返します。</returns>
+		/// <returns>Animation parameters.</returns>
 		object GetAnimation();
 	}
 }

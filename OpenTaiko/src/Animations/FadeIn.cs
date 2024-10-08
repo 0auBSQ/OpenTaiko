@@ -1,20 +1,20 @@
 ﻿namespace OpenTaiko.Animations {
 	/// <summary>
-	/// フェードインを行うクラス。
+	/// A class that performs fade-in animation.
 	/// </summary>
 	internal class FadeIn : Animator {
 		/// <summary>
-		/// フェードインを初期化します。
+		/// Initialize fade-in.
 		/// </summary>
-		/// <param name="timems">フェードインに掛ける秒数(ミリ秒)</param>
+		/// <param name="timems">Time taken for fading, in milliseconds.</param>
 		public FadeIn(int timems) : base(0, timems - 1, 1, false) {
 			TimeMs = timems;
 		}
 
 		/// <summary>
-		/// フェードインの不透明度を255段階で返します。
+		/// Returns the opacity of the fade-in animation in 255 levels.
 		/// </summary>
-		/// <returns>不透明度。</returns>
+		/// <returns>Opacity of the fade-in animation.</returns>
 		public override object GetAnimation() {
 			var opacity = base.Counter.CurrentValue * 255 / TimeMs;
 			return opacity;

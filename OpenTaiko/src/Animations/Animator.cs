@@ -62,7 +62,7 @@ namespace OpenTaiko.Animations {
 
 
 
-		// プロパティ
+		// Properties
 		public CCounter Counter {
 			get;
 			private set;
