@@ -240,7 +240,7 @@ namespace OpenTaiko {
 		}
 
 
-		// プロパティ
+		// Properties
 
 		// Hitsounds
 

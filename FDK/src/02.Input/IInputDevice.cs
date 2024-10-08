@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public interface IInputDevice : IDisposable {
-		// プロパティ
+		// Properties
 
 		InputDeviceType CurrentType {
 			get;

@@ -949,7 +949,7 @@ namespace OpenTaiko {
 			public int nタイプ;
 		}
 
-		// プロパティ
+		// Properties
 
 
 		public class CBranchStartInfo {

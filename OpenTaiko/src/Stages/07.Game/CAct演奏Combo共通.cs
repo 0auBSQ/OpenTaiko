@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CAct演奏Combo共通 : CActivity {
-		// プロパティ
+		// Properties
 
 		public STCOMBO n現在のコンボ数;
 		public struct STCOMBO {

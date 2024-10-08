@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CActConfigKeyAssign : CActivity {
-		// プロパティ
+		// Properties
 
 		public bool bキー入力待ちの最中である {
 			get {

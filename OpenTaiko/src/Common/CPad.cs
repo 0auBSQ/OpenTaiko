@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	public class CPad {
-		// プロパティ
+		// Properties
 
 		internal STHIT st検知したデバイス;
 		[StructLayout(LayoutKind.Sequential)]

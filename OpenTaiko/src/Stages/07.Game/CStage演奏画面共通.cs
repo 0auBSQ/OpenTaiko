@@ -8,7 +8,7 @@ namespace OpenTaiko {
 	/// 演奏画面の共通クラス (ドラム演奏画面, ギター演奏画面の継承元)
 	/// </summary>
 	internal abstract class CStage演奏画面共通 : CStage {
-		// プロパティ
+		// Properties
 
 		// メソッド
 
@@ -2637,7 +2637,7 @@ namespace OpenTaiko {
 		protected abstract void ドラムスクロール速度アップ();
 		protected abstract void ドラムスクロール速度ダウン();
 		protected void tキー入力() {
-			// Inputs 
+			// Inputs
 
 			IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 
@@ -4229,7 +4229,7 @@ namespace OpenTaiko {
 		}
 
 		public void tBranchJudge(CDTX.CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer) {
-			// Branch check score here 
+			// Branch check score here
 
 			if (this.b強制的に分岐させた[nPlayer]) return;
 

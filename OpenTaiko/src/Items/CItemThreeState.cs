@@ -3,7 +3,7 @@
 	/// 「スリーステート」（ON, OFF, 不定 の3状態）を表すアイテム。
 	/// </summary>
 	internal class CItemThreeState : CItemBase {
-		// プロパティ
+		// Properties
 
 		public E状態 e現在の状態;
 		public enum E状態 {

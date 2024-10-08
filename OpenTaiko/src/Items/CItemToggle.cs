@@ -3,7 +3,7 @@
 	/// 「トグル」（ON, OFF の2状態）を表すアイテム。
 	/// </summary>
 	internal class CItemToggle : CItemBase {
-		// プロパティ
+		// Properties
 
 		public bool bON;
 

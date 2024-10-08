@@ -9,7 +9,7 @@ namespace FDK {
 		public static int DefaultVolume = 110;
 
 
-		// プロパティ
+		// Properties
 
 		public List<IInputDevice> InputDevices {
 			get;

@@ -6,7 +6,7 @@ using OpenTaiko.C曲リストノードComparers;
 namespace OpenTaiko {
 	[Serializable]
 	internal class CSongs管理 {
-		// プロパティ
+		// Properties
 
 		public int nスコアキャッシュから反映できたスコア数 {
 			get;

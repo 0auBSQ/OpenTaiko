@@ -11,7 +11,7 @@ namespace OpenTaiko {
 			Child.Add(this);
 		}
 
-		// プロパティ
+		// Properties
 
 
 		public int GetIndex(int pos) {

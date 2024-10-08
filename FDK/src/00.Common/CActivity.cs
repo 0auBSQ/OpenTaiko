@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CActivity {
-		// プロパティ
+		// Properties
 
 		public bool IsActivated { get; private set; }
 		public bool IsDeActivated {

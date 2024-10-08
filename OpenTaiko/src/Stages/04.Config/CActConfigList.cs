@@ -4,7 +4,7 @@ using SkiaSharp;
 
 namespace OpenTaiko {
 	internal class CActConfigList : CActivity {
-		// プロパティ
+		// Properties
 
 		public bool bIsKeyAssignSelected        // #24525 2011.3.15 yyagi
 		{

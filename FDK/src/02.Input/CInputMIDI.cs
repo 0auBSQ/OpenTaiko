@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CInputMIDI : IInputDevice, IDisposable {
-		// プロパティ
+		// Properties
 
 		public IntPtr MidiInPtr;
 		public List<STInputEvent> EventBuffers;

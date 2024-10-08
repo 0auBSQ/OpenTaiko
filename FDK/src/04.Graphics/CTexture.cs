@@ -229,7 +229,7 @@ namespace FDK {
 			Game.Gl.DeleteProgram(ShaderProgram);
 		}
 
-		// プロパティ
+		// Properties
 		public bool b加算合成 {
 			get;
 			set;

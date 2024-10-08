@@ -5,7 +5,7 @@ using FDK;
 namespace OpenTaiko {
 	[Serializable]
 	internal class Cスコア {
-		// プロパティ
+		// Properties
 
 		public STScoreIni情報 ScoreIni情報;
 		[Serializable]

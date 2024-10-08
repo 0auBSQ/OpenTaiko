@@ -73,7 +73,7 @@ namespace OpenTaiko {
 	#endregion
 
 	internal class CStage選曲 : CStage {
-		// プロパティ
+		// Properties
 		public int nスクロールバー相対y座標 {
 			get {
 				if (actSongList != null) {
@@ -886,7 +886,7 @@ namespace OpenTaiko {
 														} else {
 															if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
 																if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
-																	// Init tower variables 
+																	// Init tower variables
 																	if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
 																		CFloorManagement.reinitialize(this.rNowSelectedSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
 
@@ -1429,7 +1429,7 @@ namespace OpenTaiko {
 				//Debug.Write( "CMD解析: 成功!(" + _ePad.Length + ") " );
 				//for ( int i = 0; i < _ePad.Length; i++ ) Debug.Write( _ePad[ i ] + ", " );
 				//Debug.WriteLine( "" );
-				//stct.RemoveRange( 0, targetCount );			// #24396 2011.2.13 yyagi 
+				//stct.RemoveRange( 0, targetCount );			// #24396 2011.2.13 yyagi
 				stct.Clear();                                   // #24396 2011.2.13 yyagi Clear all command input history in case you succeeded inputting some command
 
 				return true;

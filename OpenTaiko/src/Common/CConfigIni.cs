@@ -1130,7 +1130,7 @@ namespace OpenTaiko {
 			WASAPI_Shared,
 			Unknown = 99
 		}
-		// プロパティ
+		// Properties
 
 		public class CAIPerformances {
 			public int nGoodOdds;

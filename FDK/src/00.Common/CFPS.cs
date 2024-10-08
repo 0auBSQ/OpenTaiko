@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CFPS {
-		// プロパティ
+		// Properties
 
 		public int NowFPS {
 			get;

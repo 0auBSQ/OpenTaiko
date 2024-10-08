@@ -6,7 +6,7 @@ namespace FDK {
 	/// </summary>
 
 	public class CIniFile {
-		// プロパティ
+		// Properties
 
 		public string FileName {
 			get;

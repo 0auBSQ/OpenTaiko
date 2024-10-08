@@ -15,7 +15,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace OpenTaiko {
 	internal class OpenTaiko : Game {
-		// プロパティ
+		// Properties
 		#region [ properties ]
 		public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		public static readonly string AppDisplayThreePartVersion = GetAppDisplayThreePartVersion();

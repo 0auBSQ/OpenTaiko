@@ -5,7 +5,7 @@ using ManagedBass.Wasapi;
 
 namespace FDK {
 	internal class CSoundDeviceWASAPI : ISoundDevice {
-		// プロパティ
+		// Properties
 
 		public ESoundDeviceType SoundDeviceType {
 			get;
@@ -75,7 +75,7 @@ namespace FDK {
 					Errors be = Bass.LastError;
 					Trace.TraceInformation("WASAPI Master Volume Set Error: " + be.ToString());
 				} else {
-					// int n = this.nMasterVolume;	
+					// int n = this.nMasterVolume;
 					// Trace.TraceInformation( "WASAPI Master Volume Set Success: " + value );
 
 				}

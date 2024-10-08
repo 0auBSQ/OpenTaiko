@@ -6,7 +6,7 @@ using SkiaSharp;
 
 namespace OpenTaiko {
 	internal class CStageコンフィグ : CStage {
-		// プロパティ
+		// Properties
 
 		public CActDFPFont actFont { get; private set; }
 		public CActCalibrationMode actCalibrationMode;
