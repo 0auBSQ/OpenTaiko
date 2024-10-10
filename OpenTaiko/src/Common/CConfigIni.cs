@@ -1194,7 +1194,7 @@ namespace OpenTaiko {
 			get => ((double)nSongSpeed) / 20.0;
 		}
 
-		public bool bNoAudioPlayUnlessPlaybackSpeedIsNormal; // FIXME: Negation should be removed and booleans flipped
+		public bool bNoAudioIfNot1xSpeed; // FIXME: Negation should be removed and booleans flipped
 		public int nMsWaitPreviewSoundFromSongSelected;
 		public int nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection;
 
@@ -1741,7 +1741,7 @@ namespace OpenTaiko {
 			}
 
 			this.nSongSpeed = 20;
-			this.bNoAudioPlayUnlessPlaybackSpeedIsNormal = false;
+			this.bNoAudioIfNot1xSpeed = false;
 			#region [ AutoPlay ]
 
 			for (int i = 0; i < 5; i++) {
@@ -2328,7 +2328,7 @@ namespace OpenTaiko {
 			sw.WriteLine();
 
 			sw.WriteLine("; 演奏速度が一倍速であるときのみBGMを再生する(0:OFF, 1:ON)");
-			sw.WriteLine("PlaySpeedNotEqualOneNoSound={0}", this.bNoAudioPlayUnlessPlaybackSpeedIsNormal ? 1 : 0);
+			sw.WriteLine("PlaySpeedNotEqualOneNoSound={0}", this.bNoAudioIfNot1xSpeed ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine("; デフォルトで選択される難易度");
 			sw.WriteLine("DefaultCourse={0}", this.nDefaultCourse);
@@ -3193,7 +3193,7 @@ namespace OpenTaiko {
 											  else if (str3.Equals("PlaySpeed")) {
 												this.nSongSpeed = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 5, 400, this.nSongSpeed);
 											} else if (str3.Equals("PlaySpeedNotEqualOneNoSound")) {
-												this.bNoAudioPlayUnlessPlaybackSpeedIsNormal = CConversion.bONorOFF(str4[0]);
+												this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("Risky"))                    // #23559 2011.6.23  yyagi
 											  {
 												this.nRisky = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 10, this.nRisky);

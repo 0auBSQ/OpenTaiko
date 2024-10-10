@@ -1599,7 +1599,7 @@ namespace OpenTaiko {
 
 		#region [ チップの再生と停止 ]
 		public void tチップの再生(CChip pChip, long n再生開始システム時刻ms) {
-			if (OpenTaiko.ConfigIni.bNoAudioPlayUnlessPlaybackSpeedIsNormal && OpenTaiko.ConfigIni.nSongSpeed != 20)
+			if (OpenTaiko.ConfigIni.bNoAudioIfNot1xSpeed && OpenTaiko.ConfigIni.nSongSpeed != 20)
 				return;
 
 			if (pChip.n整数値_内部番号 >= 0) {
