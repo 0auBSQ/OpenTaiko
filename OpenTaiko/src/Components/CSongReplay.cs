@@ -292,14 +292,14 @@
              * - 8 (256) : Safe (Bad => Ok)
              */
 			ModFlags = (int)EModFlag.None;
-			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRROR) ModFlags |= (int)EModFlag.Mirror;
-			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.RANDOM) ModFlags |= (int)EModFlag.Random;
-			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.SUPERRANDOM) ModFlags |= (int)EModFlag.SuperRandom;
-			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MIRRORRANDOM) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
-			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.DORON) ModFlags |= (int)EModFlag.Invisible;
-			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.STEALTH) ModFlags |= (int)EModFlag.PerfectMemory;
-			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.AVALANCHE) ModFlags |= (int)EModFlag.Avalanche;
-			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.MINESWEEPER) ModFlags |= (int)EModFlag.Minesweeper;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.Mirror) ModFlags |= (int)EModFlag.Mirror;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.Random) ModFlags |= (int)EModFlag.Random;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.SuperRandom) ModFlags |= (int)EModFlag.SuperRandom;
+			if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MirrorRandom) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
+			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Doron) ModFlags |= (int)EModFlag.Invisible;
+			if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Stealth) ModFlags |= (int)EModFlag.PerfectMemory;
+			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Avalanche) ModFlags |= (int)EModFlag.Avalanche;
+			if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Minesweeper) ModFlags |= (int)EModFlag.Minesweeper;
 			if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;
 			if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 2) ModFlags |= (int)EModFlag.Safe;
 			/* Gauge type

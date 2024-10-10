@@ -6,7 +6,7 @@ namespace OpenTaiko {
 	/// box.defによるスキン変更時に一時的に遷移する、スキン画像の一切無いステージ。
 	/// </summary>
 	internal class CStageChangeSkin : CStage {
-		// コンストラクタ
+		// Constructor
 
 		public CStageChangeSkin() {
 			base.eStageID = CStage.EStage.ChangeSkin;

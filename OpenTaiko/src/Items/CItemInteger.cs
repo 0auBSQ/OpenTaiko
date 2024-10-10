@@ -3,13 +3,13 @@
 	/// 「整数」を表すアイテム。
 	/// </summary>
 	internal class CItemInteger : CItemBase {
-		// プロパティ
+		// Properties
 
 		public int n現在の値;
 		public bool b値がフォーカスされている;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemInteger() {
 			base.e種別 = CItemBase.E種別.整数;

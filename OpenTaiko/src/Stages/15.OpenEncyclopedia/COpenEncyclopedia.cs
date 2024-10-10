@@ -116,19 +116,19 @@ namespace OpenTaiko {
 			#region [Inputs]
 
 			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				_controler.tHandleRight();
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				_controler.tHandleLeft();
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 				_backToMain = _controler.tHandleBack();
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 				var (_b1, _b2) = _controler.tHandleEnter();
 				_backToMain = _b2;
 

@@ -11,7 +11,7 @@ namespace OpenTaiko {
 			Child.Add(this);
 		}
 
-		// プロパティ
+		// Properties
 
 
 		public int GetIndex(int pos) {
@@ -228,7 +228,7 @@ namespace OpenTaiko {
 					#endregion
 					#region [ キー入力: キャンセル ]
 					else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
-						|| OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.FT)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)
 						|| OpenTaiko.Pad.bPressedGB(EPad.Cancel))
 						&& this.bEsc有効) {   // キャンセル
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
@@ -241,20 +241,20 @@ namespace OpenTaiko {
 						#region [ キー入力: 決定 ]
 						// E楽器パート eInst = E楽器パート.UNKNOWN;
 						ESortAction eAction = ESortAction.END;
-						if (OpenTaiko.Pad.bPressed(EInstrumentPad.GUITAR, EPad.Decide)) {
-							eInst = EInstrumentPad.GUITAR;
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Guitar, EPad.Decide)) {
+							eInst = EInstrumentPad.Guitar;
 							eAction = ESortAction.Decide;
-						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.BASS, EPad.Decide)) {
-							eInst = EInstrumentPad.BASS;
+						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Bass, EPad.Decide)) {
+							eInst = EInstrumentPad.Bass;
 							eAction = ESortAction.Decide;
 						} else if (
-							  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
-							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)
-							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
-							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)
-							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)
-							  || (OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
-							eInst = EInstrumentPad.DRUMS;
+							  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) // #24756 2011.4.1 yyagi: Add condition "Drum-Decide" to enable CY in Sort Menu.
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+							  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+							  || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+							eInst = EInstrumentPad.Drums;
 							eAction = ESortAction.Decide;
 						}
 						if (eAction == ESortAction.Decide)  // 決定
@@ -265,14 +265,14 @@ namespace OpenTaiko {
 						#region [ キー入力: 前に移動 ]
 						this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
 						this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
-						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue)) {
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
 							this.t前に移動();
 						}
 						#endregion
 						#region [ キー入力: 次に移動 ]
 						this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
 						this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
-						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue)) {
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
 							this.t次に移動();
 						}
 						#endregion
@@ -370,7 +370,7 @@ namespace OpenTaiko {
 		protected bool bEsc有効;
 
 		internal int n現在の選択行;
-		internal EInstrumentPad eInst = EInstrumentPad.UNKNOWN;
+		internal EInstrumentPad eInst = EInstrumentPad.Unknown;
 
 		//private CTexture txPopupMenuBackground;
 		//private CTexture txCursor;

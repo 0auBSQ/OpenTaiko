@@ -6,7 +6,7 @@ namespace OpenTaiko {
 		public static string BASE = @$"Graphics{Path.DirectorySeparatorChar}";
 		public static string GLOBAL = @$"Global{Path.DirectorySeparatorChar}";
 
-		// Global assets 
+		// Global assets
 		public static string PUCHICHARA = @$"PuchiChara{Path.DirectorySeparatorChar}";
 		public static string CHARACTERS = @$"Characters{Path.DirectorySeparatorChar}";
 
@@ -68,7 +68,7 @@ namespace OpenTaiko {
 		public Dictionary<string, CTexture> trackedTextures = new Dictionary<string, CTexture>();
 
 		public TextureLoader() {
-			// コンストラクタ
+			// Constructor
 		}
 
 		internal CTexture TxC(string FileName, bool localize = true) {
@@ -2325,7 +2325,7 @@ namespace OpenTaiko {
 			}
 			listTexture.Clear();
 
-			//if (TJAPlayer3.ConfigIni.PreAssetsLoading) 
+			//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 			{
 				foreach (var act in OpenTaiko.app.listトップレベルActivities) {
 					act.ReleaseManagedResource();

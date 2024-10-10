@@ -2,7 +2,7 @@
 
 namespace FDK {
 	public class CInputJoystick : IInputDevice, IDisposable {
-		// コンストラクタ
+		// Constructor
 
 		private IJoystick Joystick { get; set; }
 

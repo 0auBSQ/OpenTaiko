@@ -3,7 +3,7 @@
 namespace OpenTaiko {
 	[Serializable]
 	internal class CSongListNode {
-		// プロパティ
+		// Properties
 
 		public ENodeType eノード種別 = ENodeType.UNKNOWN;
 		public enum ENodeType {
@@ -96,7 +96,7 @@ namespace OpenTaiko {
 			return uniqueId?.data.id ?? "";
 		}
 
-		// コンストラクタ
+		// Constructor
 
 		public CSongListNode() {
 			this.nID = id++;

@@ -60,7 +60,7 @@
 			get { return !this.IsEnded; }
 		}
 
-		// コンストラクタ
+		// Constructor
 
 		public CCounter() {
 			this.NormalTimer = null;

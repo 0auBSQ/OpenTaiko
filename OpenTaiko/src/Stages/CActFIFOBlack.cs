@@ -5,11 +5,11 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void tフェードアウト開始(int start = 0, int end = 100, int interval = 5) {
-			this.mode = EFIFOモード.フェードアウト;
+			this.mode = EFIFOMode.FadeOut;
 			this.counter = new CCounter(start, end, interval, OpenTaiko.Timer);
 		}
 		public void tフェードイン開始(int start = 0, int end = 100, int interval = 5) {
-			this.mode = EFIFOモード.フェードイン;
+			this.mode = EFIFOMode.FadeIn;
 			this.counter = new CCounter(start, end, interval, OpenTaiko.Timer);
 		}
 
@@ -33,7 +33,7 @@ namespace OpenTaiko {
 			this.counter.Tick();
 			// Size clientSize = CDTXMania.app.Window.ClientSize;	// #23510 2010.10.31 yyagi: delete as of no one use this any longer.
 			if (OpenTaiko.Tx.Tile_Black != null) {
-				OpenTaiko.Tx.Tile_Black.Opacity = (this.mode == EFIFOモード.フェードイン) ? (((100 - this.counter.CurrentValue) * 0xff) / 100) : ((this.counter.CurrentValue * 0xff) / 100);
+				OpenTaiko.Tx.Tile_Black.Opacity = (this.mode == EFIFOMode.FadeIn) ? (((100 - this.counter.CurrentValue) * 0xff) / 100) : ((this.counter.CurrentValue * 0xff) / 100);
 				for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)        // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 				{
 					for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++)  // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
@@ -54,7 +54,7 @@ namespace OpenTaiko {
 		#region [ private ]
 		//-----------------
 		private CCounter counter;
-		private EFIFOモード mode;
+		private EFIFOMode mode;
 		//private CTexture tx黒タイル64x64;
 		//-----------------
 		#endregion

@@ -2,7 +2,7 @@ using Silk.NET.Input;
 
 namespace FDK {
 	public class CInputGamepad : IInputDevice, IDisposable {
-		// コンストラクタ
+		// Constructor
 
 		public CInputGamepad(IGamepad gamepad) {
 			this.CurrentType = InputDeviceType.Gamepad;

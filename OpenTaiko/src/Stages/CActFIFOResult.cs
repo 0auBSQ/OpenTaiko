@@ -5,11 +5,11 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void tフェードアウト開始() {
-			this.mode = EFIFOモード.フェードアウト;
+			this.mode = EFIFOMode.FadeOut;
 			this.counter = new CCounter(0, 100, 30, OpenTaiko.Timer);
 		}
 		public void tフェードイン開始() {
-			this.mode = EFIFOモード.フェードイン;
+			this.mode = EFIFOMode.FadeIn;
 			this.counter = new CCounter(0, 300, 2, OpenTaiko.Timer);
 		}
 		public void tフェードイン完了() {
@@ -36,7 +36,7 @@ namespace OpenTaiko {
 			this.counter.Tick();
 			// Size clientSize = CDTXMania.app.Window.ClientSize;	// #23510 2010.10.31 yyagi: delete as of no one use this any longer.
 			if (OpenTaiko.Tx.Tile_Black != null) {
-				if (this.mode == EFIFOモード.フェードイン) {
+				if (this.mode == EFIFOMode.FadeIn) {
 					if (counter.CurrentValue >= 200) {
 						OpenTaiko.Tx.Tile_Black.Opacity = (((100 - (this.counter.CurrentValue - 200)) * 0xff) / 100);
 					} else {
@@ -54,7 +54,7 @@ namespace OpenTaiko {
 					}
 				}
 			}
-			if (this.mode == EFIFOモード.フェードアウト) {
+			if (this.mode == EFIFOMode.FadeOut) {
 				if (this.counter.CurrentValue != 100) {
 					return 0;
 				}
@@ -72,7 +72,7 @@ namespace OpenTaiko {
 		#region [ private ]
 		//-----------------
 		private CCounter counter;
-		private EFIFOモード mode;
+		private EFIFOMode mode;
 		//private CTexture tx黒タイル64x64;
 		//-----------------
 		#endregion

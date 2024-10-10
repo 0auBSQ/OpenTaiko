@@ -63,7 +63,7 @@ namespace OpenTaiko {
 		public void Start() {
 			this.dbFailedTime = OpenTaiko.Timer.NowTime;
 			this.ct進行 = new CCounter(0, 300, 22, OpenTaiko.Timer);
-			if (OpenTaiko.ConfigIni.eGameMode != EGame.OFF) {
+			if (OpenTaiko.ConfigIni.eGameMode != EGame.Off) {
 				this.ct進行 = new CCounter(0, 4000, 2, OpenTaiko.Timer);
 			}
 		}

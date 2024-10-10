@@ -5,7 +5,7 @@ using FDK;
 namespace OpenTaiko {
 	[Serializable]
 	internal class Cスコア {
-		// プロパティ
+		// Properties
 
 		public STScoreIni情報 ScoreIni情報;
 		[Serializable]
@@ -211,7 +211,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public Cスコア() {
 			this.ScoreIni情報 = new STScoreIni情報(DateTime.MinValue, 0L);

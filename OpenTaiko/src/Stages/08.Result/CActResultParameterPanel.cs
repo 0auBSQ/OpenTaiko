@@ -4,7 +4,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CActResultParameterPanel : CActivity {
-		// コンストラクタ
+		// Constructor
 
 		public CActResultParameterPanel() {
 			ST文字位置[] st文字位置Array = new ST文字位置[11];
@@ -1151,7 +1151,7 @@ namespace OpenTaiko {
 		public int ApparitionFade = 100;
 		public int ApparitionDuration = 300;
 
-		// Plate shine variables 
+		// Plate shine variables
 		public int[] ShinePXPos = { 114 - 25, 114 - 16, -37 - 23, -37 - 9, -75 + 20, 78 - 13 };
 		public int[] ShinePYPos = { -36 + 52, -36 + 2, 3 - 7, 3 + 30, -73 - 23, -81 - 31 };
 		public int ShinePFade = 100;

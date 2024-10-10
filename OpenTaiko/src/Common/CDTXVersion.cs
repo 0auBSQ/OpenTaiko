@@ -7,7 +7,7 @@ namespace OpenTaiko {
 	/// <para>例2："078a(100124)" → 整数部=078, 小数部=1100124 ('英字'+'yymmdd')</para>
 	/// </summary>
 	public class CDTXVersion {
-		// プロパティ
+		// Properties
 
 		/// <summary>
 		/// <para>バージョンが未知のときに true になる。</para>
@@ -33,7 +33,7 @@ namespace OpenTaiko {
 		public int n小数部;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CDTXVersion() {
 			this.n整数部 = 0;

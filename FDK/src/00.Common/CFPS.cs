@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CFPS {
-		// プロパティ
+		// Properties
 
 		public int NowFPS {
 			get;
@@ -16,7 +16,7 @@
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CFPS() {
 			this.NowFPS = 0;

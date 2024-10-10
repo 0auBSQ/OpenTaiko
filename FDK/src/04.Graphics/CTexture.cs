@@ -229,7 +229,7 @@ namespace FDK {
 			Game.Gl.DeleteProgram(ShaderProgram);
 		}
 
-		// プロパティ
+		// Properties
 		public bool b加算合成 {
 			get;
 			set;
@@ -291,7 +291,7 @@ namespace FDK {
 
 		internal uint Texture_;
 
-		// コンストラクタ
+		// Constructor
 
 		public CTexture() {
 			this.sz画像サイズ = new Size(0, 0);

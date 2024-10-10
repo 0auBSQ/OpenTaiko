@@ -6,13 +6,13 @@ using SkiaSharp;
 
 namespace OpenTaiko {
 	internal class CStageコンフィグ : CStage {
-		// プロパティ
+		// Properties
 
 		public CActDFPFont actFont { get; private set; }
 		public CActCalibrationMode actCalibrationMode;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CStageコンフィグ() {
 			CActDFPFont font;
@@ -403,7 +403,7 @@ namespace OpenTaiko {
 				if (!OpenTaiko.Skin.bgmコンフィグ画面.bIsPlaying)
 					OpenTaiko.Skin.bgmコンフィグ画面.tPlay();
 
-				if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.FT)) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {
+				if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					if (!this.bメニューにフォーカス中) {
 						if (this.eItemPanelモード == EItemPanelモード.キーコード一覧) {
@@ -420,7 +420,7 @@ namespace OpenTaiko {
 						this.actFIFO.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
-				} else if ((OpenTaiko.Pad.bPressedDGB(EPad.CY) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)) || (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC) || (OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+				} else if ((OpenTaiko.Pad.bPressedDGB(EPad.CY) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD)) || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC) || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 					if (this.n現在のメニュー番号 == 2) {
 						// Exit
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -455,12 +455,12 @@ namespace OpenTaiko {
 				}
 				this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 				this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.HH), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
-				if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.SD)) {
+				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD)) {
 					this.tカーソルを上へ移動する();
 				}
 				this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 				this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.BD), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
-				if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LT)) {
+				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT)) {
 					this.tカーソルを下へ移動する();
 				}
 			}

@@ -3,7 +3,7 @@
 	/// 「スリーステート」（ON, OFF, 不定 の3状態）を表すアイテム。
 	/// </summary>
 	internal class CItemThreeState : CItemBase {
-		// プロパティ
+		// Properties
 
 		public E状態 e現在の状態;
 		public enum E状態 {
@@ -13,7 +13,7 @@
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemThreeState() {
 			base.e種別 = CItemBase.E種別.ONorOFFor不定スリーステート;

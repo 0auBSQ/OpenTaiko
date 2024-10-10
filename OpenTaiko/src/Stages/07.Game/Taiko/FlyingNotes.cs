@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class FlyingNotes : CActivity {
-		// コンストラクタ
+		// Constructor
 
 		public FlyingNotes() {
 			base.IsDeActivated = true;
@@ -155,7 +155,7 @@ namespace OpenTaiko {
 						/*
                         if (Flying[i].Player == 0)
                         {
-                            
+
                         }
                         else if (Flying[i].Player == 1)
                         {

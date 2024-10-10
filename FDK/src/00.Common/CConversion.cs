@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CConversion {
-		// プロパティ
+		// Properties
 
 		public static readonly string str16進数文字 = "0123456789ABCDEFabcdef";
 		public static readonly string str36進数文字 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

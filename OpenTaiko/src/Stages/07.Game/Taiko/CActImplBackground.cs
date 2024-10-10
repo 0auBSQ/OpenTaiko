@@ -15,7 +15,7 @@ namespace OpenTaiko {
 
 		public void tFadeIn(int player) {
 			//this.ct上背景クリアインタイマー[player] = new CCounter(0, 100, 2, TJAPlayer3.Timer);
-			this.eFadeMode = EFIFOモード.フェードイン;
+			this.eFadeMode = EFIFOMode.FadeIn;
 		}
 
 		//public void tFadeOut(int player)
@@ -600,7 +600,7 @@ namespace OpenTaiko {
 		private bool IsUpNotFound;
 		private bool IsDownNotFound;
 
-		private EFIFOモード eFadeMode;
+		private EFIFOMode eFadeMode;
 		//-----------------
 		#endregion
 	}

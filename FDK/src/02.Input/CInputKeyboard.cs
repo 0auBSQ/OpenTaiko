@@ -2,7 +2,7 @@
 
 namespace FDK {
 	public class CInputKeyboard : IInputDevice, IDisposable {
-		// コンストラクタ
+		// Constructor
 
 		public CInputKeyboard(IReadOnlyList<IKeyboard> keyboards) {
 			this.CurrentType = InputDeviceType.Keyboard;

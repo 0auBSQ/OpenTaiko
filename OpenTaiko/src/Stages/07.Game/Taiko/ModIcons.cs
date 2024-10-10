@@ -70,9 +70,9 @@
 		static private void tDisplayDoronIcon(int x, int y, int player) {
 			var conf_ = OpenTaiko.ConfigIni.eSTEALTH[player];
 
-			if (conf_ == EStealthMode.DORON)
+			if (conf_ == EStealthMode.Doron)
 				OpenTaiko.Tx.Mod_Doron?.t2D描画(x, y);
-			else if (conf_ == EStealthMode.STEALTH)
+			else if (conf_ == EStealthMode.Stealth)
 				OpenTaiko.Tx.Mod_Stealth?.t2D描画(x, y);
 			else
 				OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
@@ -92,13 +92,13 @@
 		static private void tDisplayRandomIcon(int x, int y, int player) {
 			var rand_ = OpenTaiko.ConfigIni.eRandom[player];
 
-			if (rand_ == ERandomMode.MIRROR)
+			if (rand_ == ERandomMode.Mirror)
 				OpenTaiko.Tx.Mod_Mirror?.t2D描画(x, y);
-			else if (rand_ == ERandomMode.RANDOM)
+			else if (rand_ == ERandomMode.Random)
 				OpenTaiko.Tx.Mod_Random?.t2D描画(x, y);
-			else if (rand_ == ERandomMode.SUPERRANDOM)
+			else if (rand_ == ERandomMode.SuperRandom)
 				OpenTaiko.Tx.Mod_Super?.t2D描画(x, y);
-			else if (rand_ == ERandomMode.MIRRORRANDOM)
+			else if (rand_ == ERandomMode.MirrorRandom)
 				OpenTaiko.Tx.Mod_Hyper?.t2D描画(x, y);
 			else
 				OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
@@ -142,12 +142,12 @@
 		static public bool tPlayIsStock(int player) {
 			int actual = OpenTaiko.GetActualPlayer(player);
 
-			if (OpenTaiko.ConfigIni.nFunMods[actual] != EFunMods.NONE) return false;
+			if (OpenTaiko.ConfigIni.nFunMods[actual] != EFunMods.None) return false;
 			if (OpenTaiko.ConfigIni.bJust[actual] != 0) return false;
 			if (OpenTaiko.ConfigIni.nTimingZones[actual] != 2) return false;
 			if (OpenTaiko.ConfigIni.nSongSpeed != 20) return false;
-			if (OpenTaiko.ConfigIni.eRandom[actual] != ERandomMode.OFF) return false;
-			if (OpenTaiko.ConfigIni.eSTEALTH[actual] != EStealthMode.OFF) return false;
+			if (OpenTaiko.ConfigIni.eRandom[actual] != ERandomMode.Off) return false;
+			if (OpenTaiko.ConfigIni.eSTEALTH[actual] != EStealthMode.Off) return false;
 			if (OpenTaiko.ConfigIni.nScrollSpeed[actual] != 9) return false;
 
 			return true;

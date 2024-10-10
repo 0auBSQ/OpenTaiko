@@ -231,31 +231,31 @@ namespace OpenTaiko {
 
 				switch (player) {
 					case 0:
-						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
 						_centerDrum = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-							(OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+							(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
 						_cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 						break;
 					case 1:
-						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P));
-						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P));
-						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
 						break;
 					case 2:
-						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue3P));
-						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue3P));
-						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed3P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
 						break;
 					case 3:
-						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue4P));
-						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue4P));
-						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed4P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
 						break;
 					case 4:
-						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue5P));
-						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue5P));
-						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed5P));
+						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
+						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
+						_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
 						break;
 				}
 
@@ -451,19 +451,19 @@ namespace OpenTaiko {
 
 			var rand_ = OpenTaiko.ConfigIni.eRandom[actual];
 
-			if (rand_ == ERandomMode.MIRRORRANDOM) {
+			if (rand_ == ERandomMode.MirrorRandom) {
 				nRandom = 2;
 				nAbekobe = 1;
-			} else if (rand_ == ERandomMode.SUPERRANDOM) {
+			} else if (rand_ == ERandomMode.SuperRandom) {
 				nRandom = 2;
 				nAbekobe = 0;
-			} else if (rand_ == ERandomMode.RANDOM) {
+			} else if (rand_ == ERandomMode.Random) {
 				nRandom = 1;
 				nAbekobe = 0;
-			} else if (rand_ == ERandomMode.MIRROR) {
+			} else if (rand_ == ERandomMode.Mirror) {
 				nRandom = 0;
 				nAbekobe = 1;
-			} else if (rand_ == ERandomMode.OFF) {
+			} else if (rand_ == ERandomMode.Off) {
 				nRandom = 0;
 				nAbekobe = 0;
 			}
@@ -560,17 +560,17 @@ namespace OpenTaiko {
 			#region [ Random ]
 
 			if (nRandom == 2 && nAbekobe == 1) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.MIRRORRANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.MirrorRandom;
 			} else if (nRandom == 2 && nAbekobe == 0) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.SUPERRANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.SuperRandom;
 			} else if (nRandom == 1 && nAbekobe == 1) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.Random;
 			} else if (nRandom == 1 && nAbekobe == 0) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.RANDOM;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.Random;
 			} else if (nRandom == 0 && nAbekobe == 1) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.MIRROR;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.Mirror;
 			} else if (nRandom == 0 && nAbekobe == 0) {
-				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.OFF;
+				OpenTaiko.ConfigIni.eRandom[actual] = ERandomMode.Off;
 			}
 
 			#endregion

@@ -43,11 +43,11 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>
-		/// ぷちキャラを描画する。(オーバーライドじゃないよ)
+		/// Draws Puchi Chara (small character) on the screen. Note: this is not an override.
 		/// </summary>
-		/// <param name="x">X座標(中央)</param>
-		/// <param name="y">Y座標(中央)</param>
-		/// <param name="alpha">不透明度</param>
+		/// <param name="x">X coordinate (center)</param>
+		/// <param name="y">Y coordinate (center)</param>
+		/// <param name="alpha">Opacity (0-255)</param>
 		/// <returns></returns>
 		public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
 			if (!OpenTaiko.ConfigIni.ShowPuchiChara) return base.Draw();

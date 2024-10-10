@@ -8,7 +8,7 @@ using RectangleF = System.Drawing.RectangleF;
 
 namespace OpenTaiko {
 	internal class CActSelect曲リスト : CActivity {
-		// プロパティ
+		// Properties
 
 		public bool bIsEnumeratingSongs {
 			get;
@@ -77,7 +77,7 @@ namespace OpenTaiko {
 		// (前と同じ曲なら選択曲変更に掛かる再計算を省略して高速化するため)
 		private CSongListNode song_last = null;
 
-		// コンストラクタ
+		// Constructor
 
 		public CActSelect曲リスト() {
 
@@ -238,7 +238,7 @@ namespace OpenTaiko {
 
 					this.rCurrentlySelectedSong.bIsOpenFolder = true;
 
-					// Previous index 
+					// Previous index
 					int n回数 = this.rCurrentlySelectedSong.Openindex;
 					if (this.rCurrentlySelectedSong.Openindex >= this.rCurrentlySelectedSong.list子リスト.Count())
 						n回数 = 0;
@@ -1305,8 +1305,8 @@ namespace OpenTaiko {
 
 					// Very disgusting, to improve and unbloat asap
 					this.tジャンル別選択されていない曲バーの描画(
-						xAnime - (int)Box_X,//Box, 
-						y - ((int)Box_Y),//Box * 3), 
+						xAnime - (int)Box_X,//Box,
+						y - ((int)Box_Y),//Box * 3),
 						this.stバー情報[nパネル番号].strジャンル,
 						stバー情報[nパネル番号].eバー種別,
 						stバー情報[nパネル番号].nクリア,
@@ -1318,10 +1318,10 @@ namespace OpenTaiko {
 				}
 
 				/*
-				 
+
 				else if (n見た目の行番号 != 4)
 					this.tジャンル別選択されていない曲バーの描画(xAnime - (int)Box, y - ((int)Box * 3), this.stバー情報[nパネル番号].strジャンル, stバー情報[nパネル番号].eバー種別, stバー情報[nパネル番号].nクリア, stバー情報[nパネル番号].nスコアランク, boxType);
-				
+
 				*/
 
 				//-----------------
@@ -1349,7 +1349,7 @@ namespace OpenTaiko {
 				}
 
 
-				//-----------------					
+				//-----------------
 			}
 			#endregion
 
@@ -1844,7 +1844,7 @@ namespace OpenTaiko {
 						break;
 				}
 
-				/*if (TJAPlayer3.Tx.SongSelect_Branch_Text != null 
+				/*if (TJAPlayer3.Tx.SongSelect_Branch_Text != null
 					&& TJAPlayer3.stage選曲.r現在選択中のスコア.譜面情報.b譜面分岐[TJAPlayer3.stage選曲.n現在選択中の曲の難易度])
 					TJAPlayer3.Tx.SongSelect_Branch_Text.t2D描画(483, TJAPlayer3.Skin.SongSelect_Overall_Y + 21);
 				*/
@@ -2048,7 +2048,7 @@ namespace OpenTaiko {
 			#region [Decide]
 
 			if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide)) ||
-			((OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+			((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 
@@ -2093,7 +2093,7 @@ namespace OpenTaiko {
 
 			#region [Left]
 
-			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)
+			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)
 				|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -2115,7 +2115,7 @@ namespace OpenTaiko {
 
 			#region [Right]
 
-			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)
+			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)
 				|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
