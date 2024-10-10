@@ -4,7 +4,7 @@
 	/// </summary>
 	class Linear : Animator {
 		/// <summary>
-		/// Initialize linear.
+		/// Initialize linear movement.
 		/// </summary>
 		/// <param name="startPoint">Starting point.</param>
 		/// <param name="endPoint">End point.</param>
