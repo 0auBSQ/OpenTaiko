@@ -18,17 +18,17 @@ namespace OpenTaiko {
 
 	public enum EScrollMode {
 		Normal,
-		BMSCROLL,
-		HBSCROLL
+		BmScroll,
+		HbScroll
 	}
 
 	public enum EGame {
-		OFF = 0,
+		Off = 0,
 		FullCompletionChallenge = 1,
 		FullCompletionChallengeExtreme = 2
 	}
 	public enum EDifficultyDisplayType {
-		OFF = 0,
+		Off = 0,
 		DisplayOnNthSong = 1,
 		DisplayAsImageOnMTaiko = 2,
 	}
