@@ -123,7 +123,7 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGA_DESC"));
 			this.list項目リスト.Add(this.iSystemBGA);
 
-			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewSoundAfterSongSelection,
+			this.iSystemPreviewSoundWait = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER"), 0, 0x2710, OpenTaiko.ConfigIni.nMsWaitPreviewSoundFromSongSelected,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC"));
 			this.list項目リスト.Add(this.iSystemPreviewSoundWait);
 
@@ -1602,7 +1602,7 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 			OpenTaiko.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 			OpenTaiko.ConfigIni.bEnableBGA = this.iSystemBGA.bON;
-			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewSoundAfterSongSelection = this.iSystemPreviewSoundWait.n現在の値;
+			OpenTaiko.ConfigIni.nMsWaitPreviewSoundFromSongSelected = this.iSystemPreviewSoundWait.n現在の値;
 			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = this.iSystemPreviewImageWait.n現在の値;
 			OpenTaiko.ConfigIni.bDisplayDebugInfo = this.iSystemDebugInfo.bON;
 			OpenTaiko.ConfigIni.nBackgroundTransparency = this.iSystemBGAlpha.n現在の値;

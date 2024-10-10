@@ -1195,7 +1195,7 @@ namespace OpenTaiko {
 		}
 
 		public bool bNoAudioPlayUnlessPlaybackSpeedIsNormal; // FIXME: Negation should be removed and booleans flipped
-		public int nWaitTimeMsBeforePreviewSoundAfterSongSelection;
+		public int nMsWaitPreviewSoundFromSongSelected;
 		public int nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection;
 
 		private bool _applyLoudnessMetadata;
@@ -1671,7 +1671,7 @@ namespace OpenTaiko {
 			this.bEnableAVI = false;
 			this.eClipDispType = EClipDispType.BackgroundOnly;
 			this.bEnableBGA = true;
-			this.nWaitTimeMsBeforePreviewSoundAfterSongSelection = 1000;
+			this.nMsWaitPreviewSoundFromSongSelected = 1000;
 			this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = 100;
 			this.bBGMPlayVoiceSound = true;
 
@@ -2111,7 +2111,7 @@ namespace OpenTaiko {
 			#endregion
 			#region [ プレビュー音 ]
 			sw.WriteLine("; 曲選択からプレビュー音の再生までのウェイト[ms]");
-			sw.WriteLine("PreviewSoundWait={0}", this.nWaitTimeMsBeforePreviewSoundAfterSongSelection);
+			sw.WriteLine("PreviewSoundWait={0}", this.nMsWaitPreviewSoundFromSongSelected);
 			sw.WriteLine();
 			sw.WriteLine("; 曲選択からプレビュー画像表示までのウェイト[ms]");
 			sw.WriteLine("PreviewImageWait={0}", this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection);
@@ -2849,7 +2849,7 @@ namespace OpenTaiko {
 											#endregion
 											#region [ プレビュー音 ]
 											  else if (str3.Equals("PreviewSoundWait")) {
-												this.nWaitTimeMsBeforePreviewSoundAfterSongSelection = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nWaitTimeMsBeforePreviewSoundAfterSongSelection);
+												this.nMsWaitPreviewSoundFromSongSelected = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
 											} else if (str3.Equals("PreviewImageWait")) {
 												this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection);
 											}
