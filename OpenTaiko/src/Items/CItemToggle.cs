@@ -7,7 +7,7 @@
 
 		public bool bON;
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemToggle() {
 			base.e種別 = CItemBase.E種別.ONorOFFトグル;

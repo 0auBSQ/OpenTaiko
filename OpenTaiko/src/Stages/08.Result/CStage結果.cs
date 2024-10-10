@@ -43,7 +43,7 @@ namespace OpenTaiko {
 		public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CStage結果() {
 			this.st演奏記録.Drums = new CScoreIni.C演奏記録();

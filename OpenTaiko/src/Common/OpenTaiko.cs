@@ -195,7 +195,7 @@ namespace OpenTaiko {
 						return c曲リストノード.nPerfect範囲ms;
 					}
 				}
-				return ConfigIni.nヒット範囲ms.Perfect;
+				return ConfigIni.nHitRangeMs.Perfect;
 			}
 		}
 		public static int nGreat範囲ms {
@@ -206,7 +206,7 @@ namespace OpenTaiko {
 						return c曲リストノード.nGreat範囲ms;
 					}
 				}
-				return ConfigIni.nヒット範囲ms.Great;
+				return ConfigIni.nHitRangeMs.Great;
 			}
 		}
 		public static int nGood範囲ms {
@@ -217,7 +217,7 @@ namespace OpenTaiko {
 						return c曲リストノード.nGood範囲ms;
 					}
 				}
-				return ConfigIni.nヒット範囲ms.Good;
+				return ConfigIni.nHitRangeMs.Good;
 			}
 		}
 		public static int nPoor範囲ms {
@@ -228,7 +228,7 @@ namespace OpenTaiko {
 						return c曲リストノード.nPoor範囲ms;
 					}
 				}
-				return ConfigIni.nヒット範囲ms.Poor;
+				return ConfigIni.nHitRangeMs.Poor;
 			}
 		}
 		#endregion
@@ -428,7 +428,7 @@ namespace OpenTaiko {
 
 		#endregion
 
-		// コンストラクタ
+		// Constructor
 
 		public OpenTaiko() : base("OpenTaiko.ico") {
 			OpenTaiko.app = this;
@@ -547,7 +547,7 @@ namespace OpenTaiko {
 		}
 
 		protected override void LoadContent() {
-			if (ConfigIni.bウィンドウモード) {
+			if (ConfigIni.bWindowMode) {
 				if (!this.bマウスカーソル表示中) {
 					this.bマウスカーソル表示中 = true;
 				}

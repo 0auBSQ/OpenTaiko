@@ -604,7 +604,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 		public CSkin(string _strSkinSubfolderFullName, bool _bUseBoxDefSkin) {
 			lockBoxDefSkin = new object();
 			strSystemSkinSubfolderFullName = _strSkinSubfolderFullName;

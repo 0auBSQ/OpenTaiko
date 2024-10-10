@@ -45,7 +45,7 @@ namespace FDK {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 		public CInputManager(IWindow window, bool bUseMidiIn = true) {
 			Initialize(window, bUseMidiIn);
 		}

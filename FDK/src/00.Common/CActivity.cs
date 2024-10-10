@@ -21,7 +21,7 @@
 		protected bool IsFirstDraw = true;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CActivity() {
 			this.IsDeActivated = true;

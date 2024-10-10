@@ -44,7 +44,7 @@ namespace OpenTaiko {
 
 		private int searchCount;                            // #PREMOVIE中は検索n回実行したら少しスリープする
 
-		// コンストラクタ
+		// Constructor
 
 		public CSongs管理() {
 			this.listSongsDB = new();

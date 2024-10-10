@@ -28,7 +28,7 @@ namespace OpenTaiko {
 		public string DefaultPreimage;
 		public string ScenePreset;
 
-		// コンストラクタ
+		// Constructor
 
 		public CBoxDef() {
 			this.Genre = "";

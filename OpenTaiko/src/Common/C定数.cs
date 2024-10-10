@@ -276,10 +276,10 @@ namespace OpenTaiko {
 		Mine = 8,
 	}
 	internal enum EJudgeTextDisplayPosition {
-		表示OFF,
-		レーン上,
-		判定ライン上,
-		コンボ下
+		OFF,
+		AboveLane,
+		OnJudgeLine,
+		BelowCombo
 	}
 
 	internal enum EFIFOモード {
@@ -399,13 +399,13 @@ namespace OpenTaiko {
 	}
 
 	#region[Ver.K追加]
-	public enum Eレーンタイプ {
+	public enum ELaneType {
 		TypeA,
 		TypeB,
 		TypeC,
 		TypeD
 	}
-	public enum Eミラー {
+	public enum EMirror {
 		TypeA,
 		TypeB
 	}

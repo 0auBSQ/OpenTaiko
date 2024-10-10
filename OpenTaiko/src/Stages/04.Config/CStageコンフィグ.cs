@@ -12,7 +12,7 @@ namespace OpenTaiko {
 		public CActCalibrationMode actCalibrationMode;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CStageコンフィグ() {
 			CActDFPFont font;
@@ -420,7 +420,7 @@ namespace OpenTaiko {
 						this.actFIFO.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
-				} else if ((OpenTaiko.Pad.bPressedDGB(EPad.CY) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)) || (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC) || (OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+				} else if ((OpenTaiko.Pad.bPressedDGB(EPad.CY) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD)) || (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC) || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 					if (this.n現在のメニュー番号 == 2) {
 						// Exit
 						OpenTaiko.Skin.soundDecideSFX.tPlay();

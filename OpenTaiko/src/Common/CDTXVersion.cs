@@ -33,7 +33,7 @@ namespace OpenTaiko {
 		public int n小数部;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CDTXVersion() {
 			this.n整数部 = 0;

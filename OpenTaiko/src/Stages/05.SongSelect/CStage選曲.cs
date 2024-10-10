@@ -39,7 +39,7 @@ namespace OpenTaiko {
 			if (CSongSelectSongManager.isSongDisabled)
 				return;
 
-			if (OpenTaiko.ConfigIni.bBGM音を発声する && !bgmIn.bIsPlaying && !bgmLoop.bIsPlaying) {
+			if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound && !bgmIn.bIsPlaying && !bgmLoop.bIsPlaying) {
 				if (inSongPlayed == false) {
 					bgmIn.tPlay();
 					CSongSelectSongManager.inSongPlayed = true;
@@ -848,7 +848,7 @@ namespace OpenTaiko {
 								if (!this.bCurrentlyScrolling) {
 									#region [ Decide ]
 									if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-									((OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
+									((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 										if (this.actSongList.rCurrentlySelectedSong != null) {
 											switch (this.actSongList.rCurrentlySelectedSong.eノード種別) {

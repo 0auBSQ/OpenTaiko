@@ -77,7 +77,7 @@ namespace OpenTaiko {
 		// (前と同じ曲なら選択曲変更に掛かる再計算を省略して高速化するため)
 		private CSongListNode song_last = null;
 
-		// コンストラクタ
+		// Constructor
 
 		public CActSelect曲リスト() {
 
@@ -2048,7 +2048,7 @@ namespace OpenTaiko {
 			#region [Decide]
 
 			if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide)) ||
-			((OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+			((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 

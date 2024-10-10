@@ -13,7 +13,7 @@
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemThreeState() {
 			base.e種別 = CItemBase.E種別.ONorOFFor不定スリーステート;

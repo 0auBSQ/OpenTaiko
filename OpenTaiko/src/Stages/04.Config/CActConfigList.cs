@@ -135,11 +135,11 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DEBUGMODE_DESC"));
 			this.list項目リスト.Add(this.iSystemDebugInfo);
 
-			this.iSystemBGAlpha = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANEOPACITY"), 0, 0xff, OpenTaiko.ConfigIni.n背景の透過度,
+			this.iSystemBGAlpha = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANEOPACITY"), 0, 0xff, OpenTaiko.ConfigIni.nBackgroundTransparency,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LANEOPACITY_DESC"));
 			this.list項目リスト.Add(this.iSystemBGAlpha);
 
-			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACK"), OpenTaiko.ConfigIni.bBGM音を発声する,
+			this.iSystemBGMSound = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACK"), OpenTaiko.ConfigIni.bBGMPlayVoiceSound,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACK_DESC"));
 			this.list項目リスト.Add(this.iSystemBGMSound);
 
@@ -1605,8 +1605,8 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewSoundAfterSongSelection = this.iSystemPreviewSoundWait.n現在の値;
 			OpenTaiko.ConfigIni.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = this.iSystemPreviewImageWait.n現在の値;
 			OpenTaiko.ConfigIni.bDisplayDebugInfo = this.iSystemDebugInfo.bON;
-			OpenTaiko.ConfigIni.n背景の透過度 = this.iSystemBGAlpha.n現在の値;
-			OpenTaiko.ConfigIni.bBGM音を発声する = this.iSystemBGMSound.bON;
+			OpenTaiko.ConfigIni.nBackgroundTransparency = this.iSystemBGAlpha.n現在の値;
+			OpenTaiko.ConfigIni.bBGMPlayVoiceSound = this.iSystemBGMSound.bON;
 			OpenTaiko.ConfigIni.bDanTowerHide = this.iDanTowerHide.bON;
 
 			OpenTaiko.ConfigIni.ApplySongVol = this.iSystemApplySongVol.bON;

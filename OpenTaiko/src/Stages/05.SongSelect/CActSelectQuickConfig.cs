@@ -2,7 +2,7 @@
 
 namespace OpenTaiko {
 	internal class CActSelectQuickConfig : CActSelectPopupMenu {
-		// コンストラクタ
+		// Constructor
 
 		public CActSelectQuickConfig() {
 			CActSelectQuickConfigMain();
@@ -10,16 +10,16 @@ namespace OpenTaiko {
 
 		private void CActSelectQuickConfigMain() {
 			/*
-			•Target: Drums/Guitar/Bass 
-			•Auto Mode: All ON/All OFF/CUSTOM 
-			•Auto Lane: 
-			•Scroll Speed: 
-			•Play Speed: 
-			•Risky: 
-			•Hidden/Sudden: None/Hidden/Sudden/Both 
-			•Conf SET: SET-1/SET-2/SET-3 
-			•More... 
-			•EXIT 
+			•Target: Drums/Guitar/Bass
+			•Auto Mode: All ON/All OFF/CUSTOM
+			•Auto Lane:
+			•Scroll Speed:
+			•Play Speed:
+			•Risky:
+			•Hidden/Sudden: None/Hidden/Sudden/Both
+			•Conf SET: SET-1/SET-2/SET-3
+			•More...
+			•EXIT
 			*/
 			lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
 			for (int nConfSet = 0; nConfSet < 3; nConfSet++) {

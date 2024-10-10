@@ -203,7 +203,7 @@ namespace OpenTaiko {
 		}
 
 		public override int Draw() {
-			if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide)) || ((OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+			if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide)) || ((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 				switch (CurrentState) {
 					case SelectableInfo.PlayerSelect: {
 							switch (CurrentIndex) {

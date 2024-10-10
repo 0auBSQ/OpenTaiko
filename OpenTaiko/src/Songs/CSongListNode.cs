@@ -96,7 +96,7 @@ namespace OpenTaiko {
 			return uniqueId?.data.id ?? "";
 		}
 
-		// コンストラクタ
+		// Constructor
 
 		public CSongListNode() {
 			this.nID = id++;

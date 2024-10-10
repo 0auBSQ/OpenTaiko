@@ -3036,7 +3036,7 @@ namespace OpenTaiko {
 					case 0x01:  // BGM
 						if (!pChip.bHit && time < 0) {
 							pChip.bHit = true;
-							if (configIni.bBGM音を発声する) {
+							if (configIni.bBGMPlayVoiceSound) {
 								dTX.tチップの再生(pChip, SoundManager.PlayTimer.PrevResetTime + (long)(pChip.n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed));
 							}
 						}
@@ -4672,7 +4672,7 @@ namespace OpenTaiko {
 						bool b = dTX.listWAV.TryGetValue(pChip.n整数値_内部番号, out wc);
 						if (!b) continue;
 
-						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGM音を発声する) || (!wc.bIsBGMSound)) {
+						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
 							OpenTaiko.DTX.tチップの再生(pChip, (long)(SoundManager.PlayTimer.PrevResetTime) + (long)(pChip.n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed));
 							#region [ PAUSEする ]
 							int j = wc.n現在再生中のサウンド番号;
@@ -4778,7 +4778,7 @@ namespace OpenTaiko {
 
 		protected abstract void t進行描画_演奏情報();
 		protected void t進行描画_演奏情報(int x, int y) {
-			if (!OpenTaiko.ConfigIni.b演奏情報を表示しない) {
+			if (!OpenTaiko.ConfigIni.bDoNotDisplayPerformanceInfos) {
 				this.actPlayInfo.t進行描画(x, y);
 			}
 		}
@@ -4789,7 +4789,7 @@ namespace OpenTaiko {
 		}
 
 		protected void t進行描画_判定文字列1_通常位置指定の場合() {
-			if (((EJudgeTextDisplayPosition)OpenTaiko.ConfigIni.JudgeTextDisplayPosition.Drums) != EJudgeTextDisplayPosition.コンボ下)    // 判定ライン上または横
+			if (((EJudgeTextDisplayPosition)OpenTaiko.ConfigIni.JudgeTextDisplayPosition.Drums) != EJudgeTextDisplayPosition.BelowCombo)    // 判定ライン上または横
 			{
 				this.actJudgeString.Draw();
 			}

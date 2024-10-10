@@ -16,7 +16,7 @@
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CFPS() {
 			this.NowFPS = 0;

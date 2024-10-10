@@ -234,7 +234,7 @@ namespace OpenTaiko {
 						_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
 						_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
 						_centerDrum = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-							(OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+							(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
 						_cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 						break;
 					case 1:

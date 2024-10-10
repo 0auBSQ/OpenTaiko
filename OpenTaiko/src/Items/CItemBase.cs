@@ -40,7 +40,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemBase() {
 			this.str項目名 = "";

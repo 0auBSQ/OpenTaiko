@@ -14,7 +14,7 @@ namespace OpenTaiko {
 
 		public bool bIsDifficltSelect;
 
-		// コンストラクタ
+		// Constructor
 
 		public CActSelect難易度選択画面() {
 			for (int i = 0; i < 10; i++) {
@@ -169,7 +169,7 @@ namespace OpenTaiko {
 								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
 								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
 								decide = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-									(OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+									(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
 								cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 								break;
 							case 1:

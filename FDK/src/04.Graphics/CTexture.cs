@@ -291,7 +291,7 @@ namespace FDK {
 
 		internal uint Texture_;
 
-		// コンストラクタ
+		// Constructor
 
 		public CTexture() {
 			this.sz画像サイズ = new Size(0, 0);

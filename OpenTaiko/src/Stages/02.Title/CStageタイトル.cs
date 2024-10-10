@@ -5,7 +5,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CStageタイトル : CStage {
-		// コンストラクタ
+		// Constructor
 
 		public CStageタイトル() {
 			base.eStageID = CStage.EStage.Title;
@@ -68,7 +68,7 @@ namespace OpenTaiko {
 				b音声再生 = false;
 				if (bSaveFileLoaded == false)
 					OpenTaiko.Skin.soundEntry.tPlay();
-				if (OpenTaiko.ConfigIni.bBGM音を発声する)
+				if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound)
 					OpenTaiko.Skin.bgmタイトルイン.tPlay();
 				base.Activate();
 			} finally {
@@ -132,7 +132,7 @@ namespace OpenTaiko {
 				this.ctBarMove.Tick();
 
 				if (!OpenTaiko.Skin.bgmタイトルイン.bIsPlaying) {
-					if (OpenTaiko.ConfigIni.bBGM音を発声する && !b音声再生) {
+					if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound && !b音声再生) {
 						OpenTaiko.Skin.bgmタイトル.tPlay();
 						b音声再生 = true;
 					}
@@ -171,7 +171,7 @@ namespace OpenTaiko {
 					if ((TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.RightShift) || TJAPlayer3.Input管理.Keyboard.bキーが押されている((int)SlimDXKeys.Key.LeftShift)) && TJAPlayer3.Input管理.Keyboard.bキーが押された((int)SlimDXKeys.Key.F1))
 					{
 						TJAPlayer3.Skin.soundEntry.t停止する();
-						
+
 						n現在の選択行モード選択 = (int)E戻り値.CONFIG - 1;
 
 						this.actFO.tフェードアウト開始();

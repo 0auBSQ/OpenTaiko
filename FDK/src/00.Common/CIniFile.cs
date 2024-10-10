@@ -22,7 +22,7 @@ namespace FDK {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CIniFile() {
 			this.FileName = "";

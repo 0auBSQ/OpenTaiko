@@ -211,7 +211,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public Cスコア() {
 			this.ScoreIni情報 = new STScoreIni情報(DateTime.MinValue, 0L);

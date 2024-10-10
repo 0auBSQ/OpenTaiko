@@ -1178,7 +1178,7 @@ namespace OpenTaiko {
 //		public bool bGUITAR演奏で直前のGUITARを消音する;
 //		public bool bBASS演奏で直前のBASSを消音する;
 #endif
-		// コンストラクタ
+		// Constructor
 
 		public CDTX() {
 			this.nPlayerSide = 0;

@@ -1054,18 +1054,18 @@ namespace OpenTaiko {
 			}
 
 			public bool KeyIsPressed(STKEYASSIGN[] pad) {
-				return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.コード));
+				return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.Code));
 			}
 
 			[StructLayout(LayoutKind.Sequential)]
 			public struct STKEYASSIGN {
-				public EInputDevice 入力デバイス;
+				public EInputDevice InputDevice;
 				public int ID;
-				public int コード;
+				public int Code;
 				public STKEYASSIGN(EInputDevice DeviceType, int nID, int nCode) {
-					this.入力デバイス = DeviceType;
+					this.InputDevice = DeviceType;
 					this.ID = nID;
-					this.コード = nCode;
+					this.Code = nCode;
 				}
 			}
 
@@ -1164,7 +1164,7 @@ namespace OpenTaiko {
 		public int nBGAlpha;
 		public bool bEnableAVI;
 		public bool bEnableBGA;
-		public bool bBGM音を発声する;
+		public bool bBGMPlayVoiceSound;
 		public bool bDetailedLogOutputDTX;
 		public bool bSongSearchLogOutput;
 		public bool bCreationReleaseLogOutput;
@@ -1381,12 +1381,12 @@ namespace OpenTaiko {
 			this.nAILevel = this.nDefaultAILevel;
 		}
 
-		public bool bEnterがキー割り当てのどこにも使用されていない {
+		public bool bEnterIsNotUsedInKeyAssignments {
 			get {
 				for (int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++) {
 					for (int j = 0; j < (int)EKeyConfigPad.MAX; j++) {
 						for (int k = 0; k < 0x10; k++) {
-							if ((this.KeyAssign[i][j][k].入力デバイス == EInputDevice.Keyboard) && (this.KeyAssign[i][j][k].コード == (int)SlimDXKeys.Key.Return)) {
+							if ((this.KeyAssign[i][j][k].InputDevice == EInputDevice.Keyboard) && (this.KeyAssign[i][j][k].Code == (int)SlimDXKeys.Key.Return)) {
 								return false;
 							}
 						}
@@ -1395,7 +1395,7 @@ namespace OpenTaiko {
 				return true;
 			}
 		}
-		public bool bウィンドウモード {
+		public bool bWindowMode {
 			get {
 				return !this.bFullScreen;
 			}
@@ -1403,7 +1403,7 @@ namespace OpenTaiko {
 				this.bFullScreen = !value;
 			}
 		}
-		public bool b演奏情報を表示しない {
+		public bool bDoNotDisplayPerformanceInfos { // FIXME: should be flipped
 			get {
 				return !this.bDisplayDebugInfo;
 			}
@@ -1411,7 +1411,7 @@ namespace OpenTaiko {
 				this.bDisplayDebugInfo = !value;
 			}
 		}
-		public int n背景の透過度 {
+		public int nBackgroundTransparency {
 			get {
 				return this.nBGAlpha;
 			}
@@ -1462,7 +1462,7 @@ namespace OpenTaiko {
 		public bool SendDiscordPlayingInformation;
 
 		#region [ STRANGE ]
-		public STRANGE nヒット範囲ms;
+		public STRANGE nHitRangeMs;
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STRANGE {
 			public int Perfect;
@@ -1641,8 +1641,8 @@ namespace OpenTaiko {
 		#endregion
 
 		#region[Position]
-		public Eレーンタイプ eLaneType;
-		public Eミラー eMirror;
+		public ELaneType eLaneType;
+		public EMirror eMirror;
 
 		#endregion
 		#region[System]
@@ -1653,7 +1653,7 @@ namespace OpenTaiko {
 		#endregion
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CConfigIni() {
 			this.strSongsPath = "Songs" + Path.DirectorySeparatorChar;
@@ -1673,7 +1673,7 @@ namespace OpenTaiko {
 			this.bEnableBGA = true;
 			this.nWaitTimeMsBeforePreviewSoundAfterSongSelection = 1000;
 			this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = 100;
-			this.bBGM音を発声する = true;
+			this.bBGMPlayVoiceSound = true;
 
 			this.bDanTowerHide = false;
 
@@ -1729,7 +1729,7 @@ namespace OpenTaiko {
 			this.nGlobalOffsetMs = 0;
 			for (int i = 0; i < 3; i++) {
 				this.bReverse[i] = false;
-				this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.レーン上;
+				this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.AboveLane;
 				this.eInvisible[i] = EInvisible.OFF;
 			}
 
@@ -1749,11 +1749,11 @@ namespace OpenTaiko {
 			}
 			this.bAuto先生の連打 = true;
 			#endregion
-			this.nヒット範囲ms = new STRANGE();
-			this.nヒット範囲ms.Perfect = 25;
-			this.nヒット範囲ms.Great = -1; //使用しません。
-			this.nヒット範囲ms.Good = 75;
-			this.nヒット範囲ms.Poor = 108;
+			this.nHitRangeMs = new STRANGE();
+			this.nHitRangeMs.Perfect = 25;
+			this.nHitRangeMs.Great = -1; //使用しません。
+			this.nHitRangeMs.Good = 75;
+			this.nHitRangeMs.Poor = 108;
 			this.ConfigIniファイル名 = "";
 			this.dicJoystick = new Dictionary<int, string>(10);
 			this.dicGamepad = new Dictionary<int, string>(10);
@@ -1849,7 +1849,7 @@ namespace OpenTaiko {
 			MusicPreTimeMs = 1000; // 一秒
 			SendDiscordPlayingInformation = true;
 			#region[ Ver.K追加 ]
-			this.eLaneType = Eレーンタイプ.TypeA;
+			this.eLaneType = ELaneType.TypeA;
 			this.bDirectShowMode = false;
 			#endregion
 		}
@@ -1873,13 +1873,13 @@ namespace OpenTaiko {
 						(j == (int)EKeyConfigPad.LeftChange || j == (int)EKeyConfigPad.RightChange ||
 						j == (int)EKeyConfigPad.Decide)) continue;
 					for (int k = 0; k < 0x10; k++) {
-						if (((this.KeyAssign[i][j][k].入力デバイス == DeviceType) && (this.KeyAssign[i][j][k].ID == nID)) && (this.KeyAssign[i][j][k].コード == nCode)) {
+						if (((this.KeyAssign[i][j][k].InputDevice == DeviceType) && (this.KeyAssign[i][j][k].ID == nID)) && (this.KeyAssign[i][j][k].Code == nCode)) {
 							for (int m = k; m < 15; m++) {
 								this.KeyAssign[i][j][m] = this.KeyAssign[i][j][m + 1];
 							}
-							this.KeyAssign[i][j][15].入力デバイス = EInputDevice.Unknown;
+							this.KeyAssign[i][j][15].InputDevice = EInputDevice.Unknown;
 							this.KeyAssign[i][j][15].ID = 0;
-							this.KeyAssign[i][j][15].コード = 0;
+							this.KeyAssign[i][j][15].Code = 0;
 							k--;
 						}
 					}
@@ -2121,7 +2121,7 @@ namespace OpenTaiko {
 			//sw.WriteLine( "AdjustWaves={0}", this.bWave再生位置自動調整機能有効 ? 1 : 0 );
 			#region [ BGM/ドラムヒット音の再生 ]
 			sw.WriteLine("; BGM の再生(0:OFF, 1:ON)");
-			sw.WriteLine("BGMSound={0}", this.bBGM音を発声する ? 1 : 0);
+			sw.WriteLine("BGMSound={0}", this.bBGMPlayVoiceSound ? 1 : 0);
 			sw.WriteLine();
 			#endregion
 			sw.WriteLine("; Hide Dan and Tower charts from the ensou song select screen (0:OFF, 1:ON)");
@@ -2836,7 +2836,7 @@ namespace OpenTaiko {
 											  {
 												this.nSleepMsPerFrame = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, -1, 50, this.nSleepMsPerFrame);
 											} else if (str3.Equals("BGAlpha")) {
-												this.n背景の透過度 = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0xff, this.n背景の透過度);
+												this.nBackgroundTransparency = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0xff, this.nBackgroundTransparency);
 											}
 											#region [ AVI/BGA ]
 											  else if (str3.Equals("AVI")) {
@@ -2856,7 +2856,7 @@ namespace OpenTaiko {
 											#endregion
 											#region [ BGM/ドラムのヒット音 ]
 											  else if (str3.Equals("BGMSound")) {
-												this.bBGM音を発声する = CConversion.bONorOFF(str4[0]);
+												this.bBGMPlayVoiceSound = CConversion.bONorOFF(str4[0]);
 											}
 											#endregion
 											  else if (str3.Equals("DanTowerHide")) {
@@ -2993,13 +2993,13 @@ namespace OpenTaiko {
 									//-----------------------------
 									case Eセクション種別.HitRange:
 										if (str3.Equals("Perfect")) {
-											this.nヒット範囲ms.Perfect = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Perfect);
+											this.nHitRangeMs.Perfect = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
 										} else if (str3.Equals("Great")) {
-											this.nヒット範囲ms.Great = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Great);
+											this.nHitRangeMs.Great = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Great);
 										} else if (str3.Equals("Good")) {
-											this.nヒット範囲ms.Good = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Good);
+											this.nHitRangeMs.Good = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Good);
 										} else if (str3.Equals("Poor")) {
-											this.nヒット範囲ms.Poor = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nヒット範囲ms.Poor);
+											this.nHitRangeMs.Poor = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
 										}
 										continue;
 
@@ -3573,14 +3573,14 @@ namespace OpenTaiko {
 		private void tキーの書き出し(StreamWriter sw, CKeyAssign.STKEYASSIGN[] assign) {
 			bool flag = true;
 			for (int i = 0; i < 0x10; i++) {
-				if (assign[i].入力デバイス == EInputDevice.Unknown) {
+				if (assign[i].InputDevice == EInputDevice.Unknown) {
 					continue;
 				}
 				if (!flag) {
 					sw.Write(',');
 				}
 				flag = false;
-				switch (assign[i].入力デバイス) {
+				switch (assign[i].InputDevice) {
 					case EInputDevice.Keyboard:
 						sw.Write('K');
 						break;
@@ -3601,7 +3601,7 @@ namespace OpenTaiko {
 						sw.Write('N');
 						break;
 				}
-				sw.Write("{0}{1}", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(assign[i].ID, 1), assign[i].コード);   // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
+				sw.Write("{0}{1}", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(assign[i].ID, 1), assign[i].Code);   // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
 			}
 		}
 		private void tキーの読み出しと設定(string strキー記述, CKeyAssign.STKEYASSIGN[] assign) {
@@ -3643,9 +3643,9 @@ namespace OpenTaiko {
 				id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".IndexOf(str[1]);    // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
 				if (((id >= 0) && int.TryParse(str.Substring(2), out code)) && ((code >= 0) && (code <= 0xff))) {
 					//this.t指定した入力が既にアサイン済みである場合はそれを全削除する( e入力デバイス, id, code );
-					assign[i].入力デバイス = e入力デバイス;
+					assign[i].InputDevice = e入力デバイス;
 					assign[i].ID = id;
-					assign[i].コード = code;
+					assign[i].Code = code;
 				}
 			}
 		}

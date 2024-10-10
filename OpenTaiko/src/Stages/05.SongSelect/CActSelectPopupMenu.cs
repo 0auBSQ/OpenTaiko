@@ -253,7 +253,7 @@ namespace OpenTaiko {
 							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
 							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)
 							  || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed)
-							  || (OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+							  || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
 							eInst = EInstrumentPad.DRUMS;
 							eAction = ESortAction.Decide;
 						}

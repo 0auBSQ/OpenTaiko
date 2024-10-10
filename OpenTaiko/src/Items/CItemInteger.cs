@@ -9,7 +9,7 @@
 		public bool b値がフォーカスされている;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemInteger() {
 			base.e種別 = CItemBase.E種別.整数;

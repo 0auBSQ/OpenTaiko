@@ -1,7 +1,7 @@
 ﻿namespace OpenTaiko {
 	internal class CActSortSongs : CActSelectPopupMenu {
 
-		// コンストラクタ
+		// Constructor
 
 		public CActSortSongs() {
 			List<CItemBase> lci = new List<CItemBase>();
