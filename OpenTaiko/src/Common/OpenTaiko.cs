@@ -1469,7 +1469,7 @@ for (int i = 0; i < 3; i++) {
 							#endregion
 
 							switch (this.n進行描画の戻り値) {
-								case (int)EPerformanceScreenReturnValue.ReloadAndReplay:
+								case (int)EGameplayScreenReturnValue.ReloadAndReplay:
 									#region [ DTXファイルを再読み込みして、再演奏 ]
 									DTX.t全チップの再生停止();
 									DTX.DeActivate();
@@ -1496,10 +1496,10 @@ for (int i = 0; i < 3; i++) {
 								#endregion
 								//	break;
 
-								case (int)EPerformanceScreenReturnValue.Continue:
+								case (int)EGameplayScreenReturnValue.Continue:
 									break;
 
-								case (int)EPerformanceScreenReturnValue.PerformanceInterrupted:
+								case (int)EGameplayScreenReturnValue.PerformanceInterrupted:
 									#region [ 演奏キャンセル ]
 									//-----------------------------
 
@@ -1572,7 +1572,7 @@ for (int i = 0; i < 3; i++) {
 								//-----------------------------
 								#endregion
 
-								case (int)EPerformanceScreenReturnValue.StageFailed:
+								case (int)EGameplayScreenReturnValue.StageFailed:
 									#region [ 演奏失敗(StageFailed) ]
 									//-----------------------------
 
@@ -1621,7 +1621,7 @@ for (int i = 0; i < 3; i++) {
 								//-----------------------------
 								#endregion
 
-								case (int)EPerformanceScreenReturnValue.StageCleared:
+								case (int)EGameplayScreenReturnValue.StageCleared:
 									#region [ 演奏クリア ]
 									//-----------------------------
 

@@ -607,7 +607,7 @@ namespace OpenTaiko {
 						}
 					}
 				} else if (bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_EndStage) {
-					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageCleared;
+					this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
 					base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 					this.actFOClear.tフェードアウト開始();
 				}

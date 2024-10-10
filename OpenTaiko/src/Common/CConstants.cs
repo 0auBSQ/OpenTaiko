@@ -284,7 +284,7 @@ namespace OpenTaiko {
 		FadeOut
 	}
 
-	internal enum EPerformanceScreenReturnValue {
+	internal enum EGameplayScreenReturnValue {
 		Continue,
 		PerformanceInterrupted,
 		StageFailed,

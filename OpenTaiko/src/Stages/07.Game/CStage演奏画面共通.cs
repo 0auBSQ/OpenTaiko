@@ -282,7 +282,7 @@ namespace OpenTaiko {
 
 			listWAV = OpenTaiko.DTX.listWAV;
 
-			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.Continue;
+			this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.Continue;
 			this.n現在のトップChip = (listChip[0].Count > 0) ? 0 : -1;
 			this.L最後に再生したHHの実WAV番号 = new List<int>(16);
 			this.n最後に再生したHHのチャンネル番号 = 0;
@@ -717,7 +717,7 @@ namespace OpenTaiko {
 		public CCounter[] ctChipAnimeLag;
 		private int bgmlength = 1;
 
-		protected EPerformanceScreenReturnValue eフェードアウト完了時の戻り値;
+		protected EGameplayScreenReturnValue eフェードアウト完了時の戻り値;
 		protected readonly int[] nチャンネル0Atoパッド08 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 8, 0, 9, 9 };
 		protected readonly int[] nチャンネル0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 9, 0, 8, 8 };
 		//                         RD LC  LP  RD
@@ -2853,9 +2853,9 @@ namespace OpenTaiko {
 				&& ((this.actStageFailed.Draw() != 0)
 				&& (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut))) {
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageCleared;
+					this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
 				} else {
-					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageFailed;
+					this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
 
 				}
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
@@ -4428,7 +4428,7 @@ namespace OpenTaiko {
 
 		public void t再読込() {
 			OpenTaiko.DTX.t全チップの再生停止とミキサーからの削除();
-			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.ReloadAndReplay;
+			this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.ReloadAndReplay;
 			base.ePhaseID = CStage.EPhase.Game_Reload;
 			this.bPAUSE = false;
 		}
@@ -4726,7 +4726,7 @@ namespace OpenTaiko {
 		public void t演奏中止() {
 			this.actFO.tフェードアウト開始();
 			base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.PerformanceInterrupted;
+			this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
 		}
 
 		/// <summary>
