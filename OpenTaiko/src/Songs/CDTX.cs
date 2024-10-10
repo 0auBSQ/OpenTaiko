@@ -5123,7 +5123,7 @@ namespace OpenTaiko {
 				chip.nコース = this.n現在のコース;
 
 				// チップを配置。
-				eScrollMode = EScrollMode.BmScroll;
+				eScrollMode = EScrollMode.BMScroll;
 
 				this.listChip.Add(chip);
 			} else if (command == "#HBSCROLL") {
@@ -5139,7 +5139,7 @@ namespace OpenTaiko {
 				chip.nコース = this.n現在のコース;
 
 				// チップを配置。
-				eScrollMode = EScrollMode.HbScroll;
+				eScrollMode = EScrollMode.HBScroll;
 
 				this.listChip.Add(chip);
 			}
@@ -5594,10 +5594,10 @@ namespace OpenTaiko {
 				if (InputText.Equals("#NMSCROLL")) {
 					eScrollMode = EScrollMode.Normal;
 				} else if (InputText.Equals("#HBSCROLL")) {
-					eScrollMode = EScrollMode.HbScroll;
+					eScrollMode = EScrollMode.HBScroll;
 				}
 				if (InputText.Equals("#BMSCROLL")) {
-					eScrollMode = EScrollMode.BmScroll;
+					eScrollMode = EScrollMode.BMScroll;
 				}
 			}
 

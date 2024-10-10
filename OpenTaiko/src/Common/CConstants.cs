@@ -15,8 +15,8 @@ namespace OpenTaiko {
 
 	public enum EScrollMode {
 		Normal,
-		BmScroll,
-		HbScroll
+		BMScroll,
+		HBScroll
 	}
 
 	public enum EGame {

@@ -1503,7 +1503,7 @@ namespace OpenTaiko {
 										else
 											this.nHand[nPlayer] = 0;
 
-										if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HbScroll))
+										if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HBScroll))
 											pChip.fBMSCROLLTime -= OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] * -0.05;
 
 										OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Red);
@@ -2977,7 +2977,7 @@ namespace OpenTaiko {
 				}
 
 
-				if (pChip.eScrollMode == EScrollMode.BmScroll || pChip.eScrollMode == EScrollMode.HbScroll) {
+				if (pChip.eScrollMode == EScrollMode.BMScroll || pChip.eScrollMode == EScrollMode.HBScroll) {
 
 					/*
                     pChip.nバーからの距離dot.Taiko = (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * dbSCROLL * (db現在の譜面スクロール速度[nPlayer] + 1) / 2 / 5.0);

@@ -1783,7 +1783,7 @@ namespace OpenTaiko {
 					long time = pChip.n発声時刻ms - __dbt;
 
 					if (pChip.dbSCROLL_Y != 0.0) {
-						var dbSCROLL = pChip.eScrollMode == EScrollMode.BmScroll ? 1.0 : pChip.dbSCROLL;
+						var dbSCROLL = pChip.eScrollMode == EScrollMode.BMScroll ? 1.0 : pChip.dbSCROLL;
 
 						y = NoteOriginY[nPlayer];
 
