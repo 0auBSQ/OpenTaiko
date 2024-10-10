@@ -1327,7 +1327,7 @@ namespace OpenTaiko {
 									r現在のステージ.ReleaseUnmanagedResource();
 								}
 								#region [ ESC押下時は、曲の読み込みを中止して選曲画面に戻る ]
-								if (this.n進行描画の戻り値 == (int)E曲読込画面の戻り値.読込中止) {
+								if (this.n進行描画の戻り値 == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
 									//DTX.t全チップの再生停止();
 									if (DTX != null) {
 										DTX.DeActivate();
@@ -1469,7 +1469,7 @@ for (int i = 0; i < 3; i++) {
 							#endregion
 
 							switch (this.n進行描画の戻り値) {
-								case (int)E演奏画面の戻り値.再読込_再演奏:
+								case (int)EPerformanceScreenReturnValue.ReloadAndReplay:
 									#region [ DTXファイルを再読み込みして、再演奏 ]
 									DTX.t全チップの再生停止();
 									DTX.DeActivate();
@@ -1496,10 +1496,10 @@ for (int i = 0; i < 3; i++) {
 								#endregion
 								//	break;
 
-								case (int)E演奏画面の戻り値.継続:
+								case (int)EPerformanceScreenReturnValue.Continue:
 									break;
 
-								case (int)E演奏画面の戻り値.演奏中断:
+								case (int)EPerformanceScreenReturnValue.PerformanceInterrupted:
 									#region [ 演奏キャンセル ]
 									//-----------------------------
 
@@ -1572,7 +1572,7 @@ for (int i = 0; i < 3; i++) {
 								//-----------------------------
 								#endregion
 
-								case (int)E演奏画面の戻り値.ステージ失敗:
+								case (int)EPerformanceScreenReturnValue.StageFailed:
 									#region [ 演奏失敗(StageFailed) ]
 									//-----------------------------
 
@@ -1621,7 +1621,7 @@ for (int i = 0; i < 3; i++) {
 								//-----------------------------
 								#endregion
 
-								case (int)E演奏画面の戻り値.ステージクリア:
+								case (int)EPerformanceScreenReturnValue.StageCleared:
 									#region [ 演奏クリア ]
 									//-----------------------------
 

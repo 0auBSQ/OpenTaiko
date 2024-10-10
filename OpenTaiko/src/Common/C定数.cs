@@ -3,7 +3,7 @@
 namespace OpenTaiko {
 
 	/// <summary>
-	/// 難易度。
+	/// Difficulty degree.
 	/// </summary>
 	public enum Difficulty {
 		Easy,
@@ -24,13 +24,13 @@ namespace OpenTaiko {
 
 	public enum EGame {
 		OFF = 0,
-		完走叩ききりまショー = 1,
-		完走叩ききりまショー激辛 = 2
+		FullCompletionChallenge = 1,
+		FullCompletionChallengeExtreme = 2
 	}
-	public enum E難易度表示タイプ {
+	public enum EDifficultyDisplayType {
 		OFF = 0,
-		n曲目に表示 = 1,
-		mtaikoに画像で表示 = 2,
+		DisplayOnNthSong = 1,
+		DisplayAsImageOnMTaiko = 2,
 	}
 
 	public enum EPad            // 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
@@ -282,23 +282,23 @@ namespace OpenTaiko {
 		BelowCombo
 	}
 
-	internal enum EFIFOモード {
-		フェードイン,
-		フェードアウト
+	internal enum EFIFOMode {
+		FadeIn,
+		FadeOut
 	}
 
-	internal enum E演奏画面の戻り値 {
-		継続,
-		演奏中断,
-		ステージ失敗,
-		ステージクリア,
-		再読込_再演奏,
-		再演奏
+	internal enum EPerformanceScreenReturnValue {
+		Continue,
+		PerformanceInterrupted,
+		StageFailed,
+		StageCleared,
+		ReloadAndReplay,
+		Replay
 	}
-	internal enum E曲読込画面の戻り値 {
-		継続 = 0,
-		読込完了,
-		読込中止
+	internal enum ESongLoadingScreenReturnValue {
+		Continue = 0,
+		LoadComplete,
+		LoadCanceled
 	}
 
 	public enum ENoteState {
@@ -309,7 +309,7 @@ namespace OpenTaiko {
 		bad
 	}
 
-	public enum E連打State {
+	public enum EDrumrollState {
 		none,
 		roll,
 		rollB,
@@ -410,9 +410,9 @@ namespace OpenTaiko {
 		TypeB
 	}
 	public enum EClipDispType {
-		背景のみ = 1,
-		ウィンドウのみ = 2,
-		両方 = 3,
+		BackgroundOnly = 1,
+		WindowOnly = 2,
+		Both = 3,
 		OFF = 0
 	}
 	#endregion

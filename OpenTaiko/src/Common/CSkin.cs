@@ -901,7 +901,7 @@ namespace OpenTaiko {
 		/// 変数の初期化
 		/// </summary>
 		public void tSkinConfigInit() {
-			this.eDiffDispMode = E難易度表示タイプ.mtaikoに画像で表示;
+			this.eDiffDispMode = EDifficultyDisplayType.DisplayAsImageOnMTaiko;
 			this.b現在のステージ数を表示しない = false;
 		}
 
@@ -1015,7 +1015,7 @@ namespace OpenTaiko {
 									}
 
 								case "DiffDispMode": {
-										this.eDiffDispMode = (E難易度表示タイプ)CConversion.n値を文字列から取得して範囲内に丸めて返す(strParam, 0, 2, (int)this.eDiffDispMode);
+										this.eDiffDispMode = (EDifficultyDisplayType)CConversion.n値を文字列から取得して範囲内に丸めて返す(strParam, 0, 2, (int)this.eDiffDispMode);
 										break;
 									}
 								case "NowStageDisp": {
@@ -7578,7 +7578,7 @@ namespace OpenTaiko {
 		public float fComboNumberSpacing = 0;
 		public float fComboNumberSpacing_l = 0;
 
-		public E難易度表示タイプ eDiffDispMode;
+		public EDifficultyDisplayType eDiffDispMode;
 		public bool b現在のステージ数を表示しない;
 
 		//リザルト画面

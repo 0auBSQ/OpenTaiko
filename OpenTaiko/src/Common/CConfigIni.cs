@@ -1665,11 +1665,11 @@ namespace OpenTaiko {
 			this.nWindowHeight = SampleFramework.GameWindowSize.Height;         //
 			this.nSleepMsPerFrame = -1;         // #xxxxx 2011.11.27 yyagi add
 			this.nSleepMsWhenNotInFocus = 1;            // #23568 2010.11.04 ikanick add
-			this._bGuitar有効 = true;
-			this._bDrums有効 = true;
+			this._bGuitarValidity = true;
+			this._bDrumsValidity = true;
 			this.nBGAlpha = 100;
 			this.bEnableAVI = false;
-			this.eClipDispType = EClipDispType.背景のみ;
+			this.eClipDispType = EClipDispType.BackgroundOnly;
 			this.bEnableBGA = true;
 			this.nWaitTimeMsBeforePreviewSoundAfterSongSelection = 1000;
 			this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = 100;
@@ -3530,8 +3530,8 @@ namespace OpenTaiko {
 			Temp,
 		}
 
-		private bool _bDrums有効;
-		private bool _bGuitar有効;
+		private bool _bDrumsValidity;
+		private bool _bGuitarValidity;
 		private bool bConfigIniが存在している;
 		private string ConfigIniファイル名;
 

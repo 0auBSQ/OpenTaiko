@@ -495,9 +495,9 @@ namespace OpenTaiko {
 
 				if (OpenTaiko.ConfigIni.bTokkunMode)
 					OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
-				if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー)
+				if (OpenTaiko.ConfigIni.eGameMode == EGame.FullCompletionChallenge)
 					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
-				if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛)
+				if (OpenTaiko.ConfigIni.eGameMode == EGame.FullCompletionChallengeExtreme)
 					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
 				if (OpenTaiko.ConfigIni.bSuperHard)
 					OpenTaiko.actTextConsole.tPrint(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");

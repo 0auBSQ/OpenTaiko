@@ -282,7 +282,7 @@ namespace OpenTaiko {
 
 			listWAV = OpenTaiko.DTX.listWAV;
 
-			this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.継続;
+			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.Continue;
 			this.n現在のトップChip = (listChip[0].Count > 0) ? 0 : -1;
 			this.L最後に再生したHHの実WAV番号 = new List<int>(16);
 			this.n最後に再生したHHのチャンネル番号 = 0;
@@ -717,7 +717,7 @@ namespace OpenTaiko {
 		public CCounter[] ctChipAnimeLag;
 		private int bgmlength = 1;
 
-		protected E演奏画面の戻り値 eフェードアウト完了時の戻り値;
+		protected EPerformanceScreenReturnValue eフェードアウト完了時の戻り値;
 		protected readonly int[] nチャンネル0Atoパッド08 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 8, 0, 9, 9 };
 		protected readonly int[] nチャンネル0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 9, 0, 8, 8 };
 		//                         RD LC  LP  RD
@@ -787,7 +787,7 @@ namespace OpenTaiko {
 		protected int[] n風船残り = new int[5];
 		protected int[] n現在の連打数 = new int[5];
 		public int[] Chara_MissCount;
-		protected E連打State eRollState;
+		protected EDrumrollState eRollState;
 		protected bool[] ifp = { false, false, false, false, false };
 		protected bool[] isDeniedPlaying = { false, false, false, false, false };
 
@@ -1186,9 +1186,9 @@ namespace OpenTaiko {
 				}
 
 				if (pChip.nチャンネル番号 == 0x15)
-					this.eRollState = E連打State.roll;
+					this.eRollState = EDrumrollState.roll;
 				else
-					this.eRollState = E連打State.rollB;
+					this.eRollState = EDrumrollState.rollB;
 
 				pChip.nRollCount++;
 
@@ -1323,7 +1323,7 @@ namespace OpenTaiko {
 					}
 				}
 
-				this.eRollState = E連打State.balloon;
+				this.eRollState = EDrumrollState.balloon;
 
 
 
@@ -1412,7 +1412,7 @@ namespace OpenTaiko {
 							if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, OpenTaiko.Timer);
 						}
 					}
-					this.eRollState = E連打State.none; // Unused variable ?
+					this.eRollState = EDrumrollState.none; // Unused variable ?
 				}
 			} else {
 				if (IsKusudama) {
@@ -1520,7 +1520,7 @@ namespace OpenTaiko {
 								}
 							}
 							if (!bAutoPlay && !rollEffectHit) {
-								this.eRollState = E連打State.roll;
+								this.eRollState = EDrumrollState.roll;
 								this.tRollProcess(pChip, (SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), 1, nNowInput, 0, nPlayer);
 							}
 
@@ -2779,15 +2779,15 @@ namespace OpenTaiko {
 				if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.CycleVideoDisplayMode)) {
 					switch (OpenTaiko.ConfigIni.eClipDispType) {
 						case EClipDispType.OFF:
-							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.背景のみ;
+							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.BackgroundOnly;
 							break;
-						case EClipDispType.背景のみ:
-							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.ウィンドウのみ;
+						case EClipDispType.BackgroundOnly:
+							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.WindowOnly;
 							break;
-						case EClipDispType.ウィンドウのみ:
-							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.両方;
+						case EClipDispType.WindowOnly:
+							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.Both;
 							break;
-						case EClipDispType.両方:
+						case EClipDispType.Both:
 							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.OFF;
 							break;
 					}
@@ -2853,9 +2853,9 @@ namespace OpenTaiko {
 				&& ((this.actStageFailed.Draw() != 0)
 				&& (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut))) {
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージクリア;
+					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageCleared;
 				} else {
-					this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージ失敗;
+					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageFailed;
 
 				}
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
@@ -3187,7 +3187,7 @@ namespace OpenTaiko {
 									chip現在処理中の連打チップ[nPlayer] = null;
 
 								}
-								this.eRollState = E連打State.none;
+								this.eRollState = EDrumrollState.none;
 							}
 							if (pChip.n描画優先度 <= 0)
 								this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
@@ -4428,7 +4428,7 @@ namespace OpenTaiko {
 
 		public void t再読込() {
 			OpenTaiko.DTX.t全チップの再生停止とミキサーからの削除();
-			this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.再読込_再演奏;
+			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.ReloadAndReplay;
 			base.ePhaseID = CStage.EPhase.Game_Reload;
 			this.bPAUSE = false;
 		}
@@ -4726,7 +4726,7 @@ namespace OpenTaiko {
 		public void t演奏中止() {
 			this.actFO.tフェードアウト開始();
 			base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-			this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.演奏中断;
+			this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.PerformanceInterrupted;
 		}
 
 		/// <summary>

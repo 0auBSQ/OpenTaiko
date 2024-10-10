@@ -470,7 +470,7 @@ namespace OpenTaiko {
 				//this.t進行描画_レーン();
 				//this.t進行描画_レーンフラッシュD();
 
-				if ((OpenTaiko.ConfigIni.eClipDispType == EClipDispType.ウィンドウのみ || OpenTaiko.ConfigIni.eClipDispType == EClipDispType.両方) && OpenTaiko.ConfigIni.nPlayerCount == 1)
+				if ((OpenTaiko.ConfigIni.eClipDispType == EClipDispType.WindowOnly || OpenTaiko.ConfigIni.eClipDispType == EClipDispType.Both) && OpenTaiko.ConfigIni.nPlayerCount == 1)
 					this.actAVI.t窓表示();
 
 				if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
@@ -607,7 +607,7 @@ namespace OpenTaiko {
 						}
 					}
 				} else if (bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_EndStage) {
-					this.eフェードアウト完了時の戻り値 = E演奏画面の戻り値.ステージクリア;
+					this.eフェードアウト完了時の戻り値 = EPerformanceScreenReturnValue.StageCleared;
 					base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 					this.actFOClear.tフェードアウト開始();
 				}
