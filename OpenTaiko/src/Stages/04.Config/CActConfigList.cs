@@ -307,7 +307,7 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_NOTELOCK_DESC"));
 			this.list項目リスト.Add(this.iDrumsTight);
 
-			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums,
+			this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums,
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY_DESC"));
 			this.list項目リスト.Add(this.iSystemMinComboDrums);
 
@@ -1661,7 +1661,7 @@ namespace OpenTaiko {
 
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 
-			OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums = this.iSystemMinComboDrums.n現在の値;
+			OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;
 			OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi
 			OpenTaiko.ConfigIni.bBranchGuide = this.iTaikoBranchGuide.bON;
 			OpenTaiko.ConfigIni.nDefaultCourse = this.iTaikoDefaultCourse.n現在選択されている項目番号;

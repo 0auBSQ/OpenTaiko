@@ -563,7 +563,7 @@ namespace OpenTaiko {
 					e今回の状態遷移イベント = EEvent.同一数値;
 				} else if (this.status[i].n現在表示中のCOMBO値 > this.status[i].nCOMBO値) {
 					e今回の状態遷移イベント = EEvent.ミス通知;
-				} else if ((this.status[i].n現在表示中のCOMBO値 < OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums) && (this.status[i].nCOMBO値 < OpenTaiko.ConfigIni.nMinimumDisplayableComboCount.Drums)) {
+				} else if ((this.status[i].n現在表示中のCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums) && (this.status[i].nCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums)) {
 					e今回の状態遷移イベント = EEvent.非表示;
 				} else {
 					e今回の状態遷移イベント = EEvent.数値更新;

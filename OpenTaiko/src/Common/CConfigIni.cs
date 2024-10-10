@@ -1257,7 +1257,7 @@ namespace OpenTaiko {
 				nameof(KeyboardSoundLevelIncrement));
 		}
 
-		public STDGBVALUE<int> nMinimumDisplayableComboCount;
+		public STDGBVALUE<int> nMinDisplayedCombo;
 		public int[] nScrollSpeed;
 		public int[] nTimingZones;
 		public EGameType[] nGameType;
@@ -1678,11 +1678,11 @@ namespace OpenTaiko {
 			this.bDanTowerHide = false;
 
 			this.bIncludeSubfoldersOnRandomSelect = true;
-			this.nMinimumDisplayableComboCount = new STDGBVALUE<int>();
-			this.nMinimumDisplayableComboCount.Drums = 10;
-			this.nMinimumDisplayableComboCount.Guitar = 10;
-			this.nMinimumDisplayableComboCount.Bass = 10;
-			this.nMinimumDisplayableComboCount.Taiko = 10;
+			this.nMinDisplayedCombo = new STDGBVALUE<int>();
+			this.nMinDisplayedCombo.Drums = 10;
+			this.nMinDisplayedCombo.Guitar = 10;
+			this.nMinDisplayedCombo.Bass = 10;
+			this.nMinDisplayedCombo.Taiko = 10;
 			this.nRollsPerSec = 15;
 			this.nAILevel = 1;
 			this.bAIBattleMode = false;
@@ -2128,7 +2128,7 @@ namespace OpenTaiko {
 			sw.WriteLine("DanTowerHide={0}", this.bDanTowerHide ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine("; 最小表示コンボ数");
-			sw.WriteLine("MinComboDrums={0}", this.nMinimumDisplayableComboCount.Drums);
+			sw.WriteLine("MinComboDrums={0}", this.nMinDisplayedCombo.Drums);
 			sw.WriteLine();
 			sw.WriteLine("; RANDOM SELECT で子BOXを検索対象に含める (0:OFF, 1:ON)");
 			sw.WriteLine("RandomFromSubBox={0}", this.bIncludeSubfoldersOnRandomSelect ? 1 : 0);
@@ -2866,7 +2866,7 @@ namespace OpenTaiko {
 											}
 											#region [ コンボ数 ]
 											  else if (str3.Equals("MinComboDrums")) {
-												this.nMinimumDisplayableComboCount.Drums = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 0x1869f, this.nMinimumDisplayableComboCount.Drums);
+												this.nMinDisplayedCombo.Drums = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
 											}
 											#endregion
 											  else if (str3.Equals("ShowDebugStatus")) {
