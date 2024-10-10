@@ -302,19 +302,19 @@ namespace OpenTaiko {
 	}
 
 	public enum ENoteState {
-		none,
-		wait,
-		perfect,
-		grade,
-		bad
+		None,
+		Wait,
+		Perfect,
+		Grade,
+		Bad
 	}
 
 	public enum EDrumrollState {
-		none,
-		roll,
-		rollB,
-		balloon,
-		potato
+		None,
+		Roll,
+		RollB,
+		Balloon,
+		Potato
 	}
 
 	public enum EStealthMode {

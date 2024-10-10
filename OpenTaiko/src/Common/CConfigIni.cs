@@ -1836,7 +1836,7 @@ namespace OpenTaiko {
 			this.bHispeedRandom = false;
 			this.nDefaultSongSort = 2;
 			this.nRecentlyPlayedMax = 5;
-			this.eGameMode = EGame.OFF;
+			this.eGameMode = EGame.Off;
 			this.TokkunMashInterval = 750;
 			this.bEndingAnime = false;
 			this.nPlayerCount = 1; //2017.08.18 kairera0467 マルチプレイ対応

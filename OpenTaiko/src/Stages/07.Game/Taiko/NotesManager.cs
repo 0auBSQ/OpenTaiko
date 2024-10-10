@@ -55,10 +55,10 @@ namespace OpenTaiko {
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-				case EScrollMode.BMSCROLL: {
+				case EScrollMode.BmScroll: {
 						return (int)((hbtime / 16.0) * interval * screen_ratio);
 					}
-				case EScrollMode.HBSCROLL: {
+				case EScrollMode.HbScroll: {
 						return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
 					}
 				default:
@@ -72,10 +72,10 @@ namespace OpenTaiko {
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-				case EScrollMode.BMSCROLL: {
+				case EScrollMode.BmScroll: {
 						return 0;
 					}
-				case EScrollMode.HBSCROLL: {
+				case EScrollMode.HbScroll: {
 						return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
 					}
 				default:

@@ -456,7 +456,7 @@ namespace OpenTaiko {
 				if (!BGA_Hidden && OpenTaiko.ConfigIni.ShowMob && !OpenTaiko.ConfigIni.bTokkunMode)
 					this.actMob.Draw();
 
-				if (OpenTaiko.ConfigIni.eGameMode != EGame.OFF)
+				if (OpenTaiko.ConfigIni.eGameMode != EGame.Off)
 					this.actGame.Draw();
 
 				this.t進行描画_譜面スクロール速度();
@@ -1271,14 +1271,14 @@ namespace OpenTaiko {
 
 									bool _timeB110 = time <= 110;
 
-									if (chipNoHit.eNoteState == ENoteState.none) {
+									if (chipNoHit.eNoteState == ENoteState.None) {
 										if (_timeB110) {
 											chipNoHit.nProcessTime = (int)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed);
-											chipNoHit.eNoteState = ENoteState.wait;
+											chipNoHit.eNoteState = ENoteState.Wait;
 											//this.nWaitButton = waitInstr;
 											this.nStoredHit[nUsePlayer] = (int)_pad;
 										}
-									} else if (chipNoHit.eNoteState == ENoteState.wait) {
+									} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 
 										bool _isExpected = NotesManager.IsExpectedPad(this.nStoredHit[nUsePlayer], (int)_pad, chipNoHit, _gt);
 
@@ -1768,7 +1768,7 @@ namespace OpenTaiko {
 					#endregion
 
 					#region[ 両手待ち時 ]
-					if (pChip.eNoteState == ENoteState.wait) {
+					if (pChip.eNoteState == ENoteState.Wait) {
 						x = (NoteOriginX[nPlayer]);
 					}
 					#endregion
@@ -1783,7 +1783,7 @@ namespace OpenTaiko {
 					long time = pChip.n発声時刻ms - __dbt;
 
 					if (pChip.dbSCROLL_Y != 0.0) {
-						var dbSCROLL = pChip.eScrollMode == EScrollMode.BMSCROLL ? 1.0 : pChip.dbSCROLL;
+						var dbSCROLL = pChip.eScrollMode == EScrollMode.BmScroll ? 1.0 : pChip.dbSCROLL;
 
 						y = NoteOriginY[nPlayer];
 
@@ -2287,7 +2287,7 @@ namespace OpenTaiko {
 				if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko)) {
 					float timeC = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 					int nWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-					if (chipNoHit.eNoteState == ENoteState.wait && timeC <= 110
+					if (chipNoHit.eNoteState == ENoteState.Wait && timeC <= 110
 						&& chipNoHit.nProcessTime + nWaitTime <= (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
 						if (!_isSwapNote) {
 							this.tドラムヒット処理(chipNoHit.nProcessTime, EPad.RRed, chipNoHit, false, i);
@@ -2298,7 +2298,7 @@ namespace OpenTaiko {
 						}
 
 
-						chipNoHit.eNoteState = ENoteState.none;
+						chipNoHit.eNoteState = ENoteState.None;
 					}
 				}
 			}

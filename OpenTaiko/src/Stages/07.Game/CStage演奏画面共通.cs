@@ -1186,9 +1186,9 @@ namespace OpenTaiko {
 				}
 
 				if (pChip.nチャンネル番号 == 0x15)
-					this.eRollState = EDrumrollState.roll;
+					this.eRollState = EDrumrollState.Roll;
 				else
-					this.eRollState = EDrumrollState.rollB;
+					this.eRollState = EDrumrollState.RollB;
 
 				pChip.nRollCount++;
 
@@ -1323,7 +1323,7 @@ namespace OpenTaiko {
 					}
 				}
 
-				this.eRollState = EDrumrollState.balloon;
+				this.eRollState = EDrumrollState.Balloon;
 
 
 
@@ -1412,7 +1412,7 @@ namespace OpenTaiko {
 							if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, OpenTaiko.Timer);
 						}
 					}
-					this.eRollState = EDrumrollState.none; // Unused variable ?
+					this.eRollState = EDrumrollState.None; // Unused variable ?
 				}
 			} else {
 				if (IsKusudama) {
@@ -1503,7 +1503,7 @@ namespace OpenTaiko {
 										else
 											this.nHand[nPlayer] = 0;
 
-										if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HBSCROLL))
+										if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HbScroll))
 											pChip.fBMSCROLLTime -= OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[nPlayer] * -0.05;
 
 										OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Red);
@@ -1520,7 +1520,7 @@ namespace OpenTaiko {
 								}
 							}
 							if (!bAutoPlay && !rollEffectHit) {
-								this.eRollState = EDrumrollState.roll;
+								this.eRollState = EDrumrollState.Roll;
 								this.tRollProcess(pChip, (SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), 1, nNowInput, 0, nPlayer);
 							}
 
@@ -2977,7 +2977,7 @@ namespace OpenTaiko {
 				}
 
 
-				if (pChip.eScrollMode == EScrollMode.BMSCROLL || pChip.eScrollMode == EScrollMode.HBSCROLL) {
+				if (pChip.eScrollMode == EScrollMode.BmScroll || pChip.eScrollMode == EScrollMode.HbScroll) {
 
 					/*
                     pChip.nバーからの距離dot.Taiko = (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * dbSCROLL * (db現在の譜面スクロール速度[nPlayer] + 1) / 2 / 5.0);
@@ -2995,7 +2995,7 @@ namespace OpenTaiko {
 						if (time <= 0) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
-								pChip.eNoteState = ENoteState.bad;
+								pChip.eNoteState = ENoteState.Bad;
 								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.TAIKO, false, 0, nPlayer);
 							}
 						}
@@ -3187,7 +3187,7 @@ namespace OpenTaiko {
 									chip現在処理中の連打チップ[nPlayer] = null;
 
 								}
-								this.eRollState = EDrumrollState.none;
+								this.eRollState = EDrumrollState.None;
 							}
 							if (pChip.n描画優先度 <= 0)
 								this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
@@ -4363,7 +4363,7 @@ namespace OpenTaiko {
 								dTX.listChip[A].b可視 = false;
 						}
 						//共通なため分岐させない.
-						dTX.listChip[A].eNoteState = ENoteState.none;
+						dTX.listChip[A].eNoteState = ENoteState.None;
 
 						if (dTX.listChip[A].IsEndedBranching && (dTX.listChip[A].nコース == CDTX.ECourse.eNormal)) {
 							if (bRollOnlyFlag)//共通譜面時かつ、連打譜面だったら可視化
@@ -4610,7 +4610,7 @@ namespace OpenTaiko {
 				dTX.listChip[i].b可視 = true;
 				dTX.listChip[i].IsHitted = false;
 				dTX.listChip[i].IsMissed = false;
-				dTX.listChip[i].eNoteState = ENoteState.none;
+				dTX.listChip[i].eNoteState = ENoteState.None;
 				dTX.listChip[i].nProcessTime = 0;
 				dTX.listChip[i].nRollCount = 0;
 				dTX.listChip[i].nRollCount = 0;

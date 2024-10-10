@@ -98,9 +98,9 @@ namespace OpenTaiko {
 					OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile] = (EStealthMode)GetIndex((int)EOrder.Stealth);
 					break;
 				case (int)EOrder.GameMode:
-					EGame game = EGame.OFF;
+					EGame game = EGame.Off;
 					switch ((int)GetIndex((int)EOrder.GameMode)) {
-						case 0: game = EGame.OFF; break;
+						case 0: game = EGame.Off; break;
 						case 1: game = EGame.FullCompletionChallenge; break;
 						case 2: game = EGame.FullCompletionChallengeExtreme; break;
 					}
