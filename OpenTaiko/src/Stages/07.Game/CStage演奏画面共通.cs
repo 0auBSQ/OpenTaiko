@@ -1135,11 +1135,11 @@ namespace OpenTaiko {
 
 			if (index == 0x11 || index == 0x13 || index == 0x1A || index == 0x101) {
 				this.soundRed[pChip.nPlayerSide]?.PlayStart();
-				if ((index == 0x13 && _gt == EGameType.KONGA) || index == 0x101) {
+				if ((index == 0x13 && _gt == EGameType.Konga) || index == 0x101) {
 					this.soundBlue[pChip.nPlayerSide]?.PlayStart();
 				}
 			} else if (index == 0x12 || index == 0x14 || index == 0x1B) {
-				if (index == 0x14 && _gt == EGameType.KONGA) {
+				if (index == 0x14 && _gt == EGameType.Konga) {
 					this.soundClap[pChip.nPlayerSide]?.PlayStart();
 				} else {
 					this.soundBlue[pChip.nPlayerSide]?.PlayStart();
@@ -1242,7 +1242,7 @@ namespace OpenTaiko {
 				if (sort == 0 || sort == 2) {
 					this.soundRed[pChip.nPlayerSide]?.PlayStart();
 
-					if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA || (_gt == EGameType.TAIKO && pChip.nチャンネル番号 == 0x21)) {
+					if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.Konga || (_gt == EGameType.Taiko && pChip.nチャンネル番号 == 0x21)) {
 						//CDTXMania.Skin.soundRed.t再生する();
 						//CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 1, nPlayer );
 						OpenTaiko.stage演奏ドラム画面.FlyingNotes.Start(1, nPlayer, true);
@@ -1254,7 +1254,7 @@ namespace OpenTaiko {
 				} else if (sort == 1 || sort == 3) {
 					this.soundBlue[pChip.nPlayerSide]?.PlayStart();
 
-					if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.KONGA || (_gt == EGameType.TAIKO && pChip.nチャンネル番号 == 0x21)) {
+					if (pChip.nチャンネル番号 == 0x15 || _gt == EGameType.Konga || (_gt == EGameType.Taiko && pChip.nチャンネル番号 == 0x21)) {
 						//CDTXMania.Skin.soundBlue.t再生する();
 						//CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( 2, nPlayer );
 						OpenTaiko.stage演奏ドラム画面.FlyingNotes.Start(2, nPlayer, true);
@@ -1464,11 +1464,11 @@ namespace OpenTaiko {
 
 			ENoteJudge eJudgeResult = ENoteJudge.Auto;
 			switch (pChip.e楽器パート) {
-				case EInstrumentPad.DRUMS:
-				case EInstrumentPad.GUITAR:
-				case EInstrumentPad.BASS:
+				case EInstrumentPad.Drums:
+				case EInstrumentPad.Guitar:
+				case EInstrumentPad.Bass:
 					break;
-				case EInstrumentPad.TAIKO: {
+				case EInstrumentPad.Taiko: {
 						//連打が短すぎると発声されない
 						eJudgeResult = (bCorrectLane) ? this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer) : ENoteJudge.Miss;
 
@@ -1512,8 +1512,8 @@ namespace OpenTaiko {
 										OpenTaiko.stage演奏ドラム画面.actMtaiko.tMtaikoEvent(pChip.nチャンネル番号, this.nHand[nPlayer], nPlayer);
 
 
-										if (pChip.nチャンネル番号 == 0x20 && _gt == EGameType.KONGA) nLane = 4;
-										else if (pChip.nチャンネル番号 == 0x21 && _gt == EGameType.KONGA) nLane = 1;
+										if (pChip.nチャンネル番号 == 0x20 && _gt == EGameType.Konga) nLane = 4;
+										else if (pChip.nチャンネル番号 == 0x21 && _gt == EGameType.Konga) nLane = 1;
 
 										this.tRollProcess(pChip, (SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), 1, nLane, 0, nPlayer);
 									}
@@ -1662,7 +1662,7 @@ namespace OpenTaiko {
 					break;
 			}
 
-			if ((pChip.e楽器パート != EInstrumentPad.UNKNOWN)) {
+			if ((pChip.e楽器パート != EInstrumentPad.Unknown)) {
 				if (NotesManager.IsMissableNote(pChip)) {
 					actGauge.Damage(screenmode, pChip.e楽器パート, eJudgeResult, nPlayer);
 				}
@@ -1769,11 +1769,11 @@ namespace OpenTaiko {
 
 
 			switch (pChip.e楽器パート) {
-				case EInstrumentPad.DRUMS:
-				case EInstrumentPad.GUITAR:
-				case EInstrumentPad.BASS:
+				case EInstrumentPad.Drums:
+				case EInstrumentPad.Guitar:
+				case EInstrumentPad.Bass:
 					break;
-				case EInstrumentPad.TAIKO:
+				case EInstrumentPad.Taiko:
 					if (!bAutoPlay) {
 						if (NotesManager.IsGenericRoll(pChip))
 							break;
@@ -2052,7 +2052,7 @@ namespace OpenTaiko {
 				default:
 					break;
 			}
-			if (((pChip.e楽器パート != EInstrumentPad.UNKNOWN)) && (eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
+			if (((pChip.e楽器パート != EInstrumentPad.Unknown)) && (eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
 				int nCombos = this.actCombo.n現在のコンボ数[nPlayer];
 				long nInit = OpenTaiko.DTX.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer]];
 				long nDiff = OpenTaiko.DTX.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer]];
@@ -2198,12 +2198,12 @@ namespace OpenTaiko {
 			//ChipのCourseをベースにゲージの伸びを調節
 			actGauge.Damage(screenmode, part, ENoteJudge.Miss, 0);
 			switch (part) {
-				case EInstrumentPad.DRUMS:
-				case EInstrumentPad.GUITAR:
-				case EInstrumentPad.BASS:
+				case EInstrumentPad.Drums:
+				case EInstrumentPad.Guitar:
+				case EInstrumentPad.Bass:
 					break;
 
-				case EInstrumentPad.TAIKO:
+				case EInstrumentPad.Taiko:
 					this.actCombo.n現在のコンボ数.P1 = 0;
 					this.actCombo.n現在のコンボ数.P2 = 0;
 					this.actCombo.n現在のコンボ数.P3 = 0;
@@ -2778,7 +2778,7 @@ namespace OpenTaiko {
 
 				if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.CycleVideoDisplayMode)) {
 					switch (OpenTaiko.ConfigIni.eClipDispType) {
-						case EClipDispType.OFF:
+						case EClipDispType.Off:
 							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.BackgroundOnly;
 							break;
 						case EClipDispType.BackgroundOnly:
@@ -2788,7 +2788,7 @@ namespace OpenTaiko {
 							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.Both;
 							break;
 						case EClipDispType.Both:
-							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.OFF;
+							OpenTaiko.ConfigIni.eClipDispType = EClipDispType.Off;
 							break;
 					}
 				}
@@ -2996,7 +2996,7 @@ namespace OpenTaiko {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
 								pChip.eNoteState = ENoteState.Bad;
-								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.TAIKO, false, 0, nPlayer);
+								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
 							}
 						}
 					}
@@ -3021,7 +3021,7 @@ namespace OpenTaiko {
 						//( ( pChip.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && pChip.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
 						{
 							if (bAutoPlay)
-								this.tチップのヒット処理(n現在時刻ms, cChipCurrentlyInProcess, EInstrumentPad.TAIKO, false, 0, nPlayer);
+								this.tチップのヒット処理(n現在時刻ms, cChipCurrentlyInProcess, EInstrumentPad.Taiko, false, 0, nPlayer);
 						}
 					}
 				}
@@ -4171,11 +4171,11 @@ namespace OpenTaiko {
 
 				if (!pChip.bHit) {
 					bool bRollChip = NotesManager.IsGenericRoll(pChip);// pChip.nチャンネル番号 >= 0x15 && pChip.nチャンネル番号 <= 0x19;
-					if (bRollChip && ((pChip.e楽器パート != EInstrumentPad.UNKNOWN))) {
+					if (bRollChip && ((pChip.e楽器パート != EInstrumentPad.Unknown))) {
 						int instIndex = (int)pChip.e楽器パート;
 						if (pChip.nバーからの距離dot[instIndex] < -40) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
-								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.TAIKO, false, 0, nPlayer);
+								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
 							}
 						}
 					}

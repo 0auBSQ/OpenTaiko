@@ -521,17 +521,17 @@ namespace OpenTaiko {
 			#region [ Inputs ]
 
 			if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-				OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+				OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				if (this.tMove(1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				if (this.tMove(-1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 
 				#region [Decide]
 
@@ -655,7 +655,7 @@ namespace OpenTaiko {
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
 

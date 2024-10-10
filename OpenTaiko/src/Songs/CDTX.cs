@@ -159,7 +159,7 @@ namespace OpenTaiko {
 			public int nスクロール方向;
 			public int n描画優先度; //(特殊)現状連打との判断目的で使用
 			public ENoteState eNoteState;
-			public EInstrumentPad e楽器パート = EInstrumentPad.UNKNOWN;
+			public EInstrumentPad e楽器パート = EInstrumentPad.Unknown;
 			public int nチャンネル番号;
 			public int VideoStartTimeMs;
 			public STDGBVALUE<int> nバーからの距離dot;
@@ -308,7 +308,7 @@ namespace OpenTaiko {
 				this.bHit = false;
 				this.IsMissed = false;
 				this.b可視 = true;
-				this.e楽器パート = EInstrumentPad.UNKNOWN;
+				this.e楽器パート = EInstrumentPad.Unknown;
 				this.n透明度 = 0xff;
 				this.nバーからの距離dot.Drums = 0;
 				this.nバーからの距離dot.Guitar = 0;
@@ -1429,7 +1429,7 @@ namespace OpenTaiko {
 			var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
 
 			switch (eFun) {
-				case EFunMods.MINESWEEPER:
+				case EFunMods.Minesweeper:
 					foreach (var chip in this.listChip) {
 						if (NotesManager.IsMissableNote(chip)) {
 							int n = rnd.Next(100);
@@ -1445,7 +1445,7 @@ namespace OpenTaiko {
 
 					}
 					break;
-				case EFunMods.AVALANCHE:
+				case EFunMods.Avalanche:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1453,7 +1453,7 @@ namespace OpenTaiko {
 						chip.dbSCROLL *= (n + 50) / (double)100;
 					}
 					break;
-				case EFunMods.NONE:
+				case EFunMods.None:
 				default:
 					break;
 			}
@@ -1466,7 +1466,7 @@ namespace OpenTaiko {
 			var eRandom = OpenTaiko.ConfigIni.eRandom[OpenTaiko.GetActualPlayer(player)];
 
 			switch (eRandom) {
-				case ERandomMode.MIRROR:
+				case ERandomMode.Mirror:
 					foreach (var chip in this.listChip) {
 						switch (chip.nチャンネル番号) {
 							case 0x11:
@@ -1486,7 +1486,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.RANDOM:
+				case ERandomMode.Random:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1510,7 +1510,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.SUPERRANDOM:
+				case ERandomMode.SuperRandom:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1534,7 +1534,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.MIRRORRANDOM:
+				case ERandomMode.MirrorRandom:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1558,7 +1558,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.OFF:
+				case ERandomMode.Off:
 				default:
 					break;
 			}
@@ -1578,7 +1578,7 @@ namespace OpenTaiko {
 				}
 			}
 
-			if (eRandom != ERandomMode.OFF) {
+			if (eRandom != ERandomMode.Off) {
 				#region[ list作成 ]
 				//ひとまずチップだけのリストを作成しておく。
 				List<CDTX.CChip> list音符のみのリスト;
@@ -4689,11 +4689,11 @@ namespace OpenTaiko {
 				chip.n整数値_内部番号 = 1;
 				switch (argument) {
 					case "Taiko":
-						chip.eGameType = EGameType.TAIKO;
+						chip.eGameType = EGameType.Taiko;
 						break;
 					case "Bongo":
 					case "Konga":
-						chip.eGameType = EGameType.KONGA;
+						chip.eGameType = EGameType.Konga;
 						break;
 				}
 
@@ -5379,7 +5379,7 @@ namespace OpenTaiko {
 									chip.nコース = n現在のコース;
 
 								chip.n分岐回数 = this.n内部番号BRANCH1to;
-								chip.e楽器パート = EInstrumentPad.TAIKO;
+								chip.e楽器パート = EInstrumentPad.Taiko;
 								chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 								chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
 								chip.nPlayerSide = this.nPlayerSide;

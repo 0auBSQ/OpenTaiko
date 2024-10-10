@@ -90,21 +90,21 @@ namespace OpenTaiko {
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 					if (nCurrentSongIndex < BarInfos.Length - 1) {
 						nCurrentSongIndex++;
 					}
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 					if (nCurrentSongIndex > 0) {
 						nCurrentSongIndex--;
 					}
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+				  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 					#region [Fast return (Escape)]
 
@@ -113,7 +113,7 @@ namespace OpenTaiko {
 
 					#endregion
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 					#region [Decide]
 
 					OpenTaiko.Skin.soundDecideSFX.tPlay();

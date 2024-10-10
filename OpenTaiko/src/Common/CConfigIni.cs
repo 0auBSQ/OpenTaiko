@@ -1077,42 +1077,42 @@ namespace OpenTaiko {
 			public CKeyAssignPad this[int index] {
 				get {
 					switch (index) {
-						case (int)EKeyConfigPart.DRUMS:
+						case (int)EKeyConfigPart.Drums:
 							return this.Drums;
 
-						case (int)EKeyConfigPart.GUITAR:
+						case (int)EKeyConfigPart.Guitar:
 							return this.Guitar;
 
-						case (int)EKeyConfigPart.BASS:
+						case (int)EKeyConfigPart.Bass:
 							return this.Bass;
 
-						case (int)EKeyConfigPart.TAIKO:
+						case (int)EKeyConfigPart.Taiko:
 							return this.Taiko;
 
-						case (int)EKeyConfigPart.SYSTEM:
+						case (int)EKeyConfigPart.System:
 							return this.System;
 					}
 					throw new IndexOutOfRangeException();
 				}
 				set {
 					switch (index) {
-						case (int)EKeyConfigPart.DRUMS:
+						case (int)EKeyConfigPart.Drums:
 							this.Drums = value;
 							return;
 
-						case (int)EKeyConfigPart.GUITAR:
+						case (int)EKeyConfigPart.Guitar:
 							this.Guitar = value;
 							return;
 
-						case (int)EKeyConfigPart.BASS:
+						case (int)EKeyConfigPart.Bass:
 							this.Bass = value;
 							return;
 
-						case (int)EKeyConfigPart.TAIKO:
+						case (int)EKeyConfigPart.Taiko:
 							this.Taiko = value;
 							return;
 
-						case (int)EKeyConfigPart.SYSTEM:
+						case (int)EKeyConfigPart.System:
 							this.System = value;
 							return;
 					}
@@ -1383,8 +1383,8 @@ namespace OpenTaiko {
 
 		public bool bEnterIsNotUsedInKeyAssignments {
 			get {
-				for (int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++) {
-					for (int j = 0; j < (int)EKeyConfigPad.MAX; j++) {
+				for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
+					for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
 						for (int k = 0; k < 0x10; k++) {
 							if ((this.KeyAssign[i][j][k].InputDevice == EInputDevice.Keyboard) && (this.KeyAssign[i][j][k].Code == (int)SlimDXKeys.Key.Return)) {
 								return false;
@@ -1723,19 +1723,19 @@ namespace OpenTaiko {
 			this.JudgeTextDisplayPosition = new STDGBVALUE<EJudgeTextDisplayPosition>();
 			this.nScrollSpeed = new int[5] { 9, 9, 9, 9, 9 };
 			this.nTimingZones = new int[5] { 2, 2, 2, 2, 2 };
-			this.nGameType = new EGameType[5] { EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO, EGameType.TAIKO };
-			this.nFunMods = new EFunMods[5] { EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE, EFunMods.NONE };
+			this.nGameType = new EGameType[5] { EGameType.Taiko, EGameType.Taiko, EGameType.Taiko, EGameType.Taiko, EGameType.Taiko };
+			this.nFunMods = new EFunMods[5] { EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None };
 			this.nInputAdjustTimeMs = 0;
 			this.nGlobalOffsetMs = 0;
 			for (int i = 0; i < 3; i++) {
 				this.bReverse[i] = false;
 				this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.AboveLane;
-				this.eInvisible[i] = EInvisible.OFF;
+				this.eInvisible[i] = EInvisible.Off;
 			}
 
 
 			for (int i = 0; i < 5; i++) {
-				this.eRandom[i] = ERandomMode.OFF;
+				this.eRandom[i] = ERandomMode.Off;
 				this.nScrollSpeed[i] = 9;
 				this.nTimingZones[i] = 2;
 			}
@@ -1827,7 +1827,7 @@ namespace OpenTaiko {
 			this.eSTEALTH = new EStealthMode[5];
 
 			for (int i = 0; i < 5; i++)
-				this.eSTEALTH[i] = EStealthMode.OFF;
+				this.eSTEALTH[i] = EStealthMode.Off;
 
 			this.bNoInfo = false;
 
@@ -1863,7 +1863,7 @@ namespace OpenTaiko {
 
 		public void t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
 			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
-			for (int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++) {
+			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0; j < (int)EKeyConfigPad.Capture; j++) // Do not restrict duplicate keybinds for System controls
 				{
 					if (isMenu ?
@@ -3140,15 +3140,15 @@ namespace OpenTaiko {
 											#region [Fun mods]
 
 											  else if (str3.Equals("FunMods1P")) {
-												this.nFunMods[0] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[0]);
+												this.nFunMods[0] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
 											} else if (str3.Equals("FunMods2P")) {
-												this.nFunMods[1] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[1]);
+												this.nFunMods[1] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
 											} else if (str3.Equals("FunMods3P")) {
-												this.nFunMods[2] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[2]);
+												this.nFunMods[2] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
 											} else if (str3.Equals("FunMods4P")) {
-												this.nFunMods[3] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[3]);
+												this.nFunMods[3] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
 											} else if (str3.Equals("FunMods5P")) {
-												this.nFunMods[4] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.TOTAL - 1, (int)this.nFunMods[4]);
+												this.nFunMods[4] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
 											}
 
 											#endregion
@@ -3561,8 +3561,8 @@ namespace OpenTaiko {
 		}
 		private void tキーアサインを全部クリアする() {
 			this.KeyAssign = new CKeyAssign();
-			for (int i = 0; i <= (int)EKeyConfigPart.SYSTEM; i++) {
-				for (int j = 0; j < (int)EKeyConfigPad.MAX; j++) {
+			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
+				for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
 					this.KeyAssign[i][j] = new CKeyAssign.STKEYASSIGN[16];
 					for (int k = 0; k < 16; k++) {
 						this.KeyAssign[i][j][k] = new CKeyAssign.STKEYASSIGN(EInputDevice.Unknown, 0, 0);

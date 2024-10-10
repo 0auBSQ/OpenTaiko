@@ -790,9 +790,9 @@ namespace OpenTaiko {
 				if (OpenTaiko.ConfigIni.nDefaultSongSort == 0) {
 					t曲リストのソート1_絶対パス順(ノードリスト);
 				} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 1) {
-					t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.TAIKO, 1, 0);
+					t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.Taiko, 1, 0);
 				} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 2) {
-					t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.TAIKO, 2, 0);
+					t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.Taiko, 2, 0);
 				}
 				//-----------------------------
 				#endregion
@@ -811,9 +811,9 @@ namespace OpenTaiko {
 					if (OpenTaiko.ConfigIni.nDefaultSongSort == 0) {
 						t曲リストのソート1_絶対パス順(c曲リストノード.list子リスト);
 					} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 1) {
-						t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.TAIKO, 1, 0);
+						t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.Taiko, 1, 0);
 					} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 2) {
-						t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.TAIKO, 2, 0);
+						t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.Taiko, 2, 0);
 					}
 					//-----------------------------
 					#endregion
@@ -861,7 +861,7 @@ namespace OpenTaiko {
 		//-----------------
 
 		public static void t曲リストのソート1_絶対パス順(List<CSongListNode> ノードリスト) {
-			t曲リストのソート1_絶対パス順(ノードリスト, EInstrumentPad.TAIKO, 1, 0);
+			t曲リストのソート1_絶対パス順(ノードリスト, EInstrumentPad.Taiko, 1, 0);
 
 			foreach (CSongListNode c曲リストノード in ノードリスト) {
 				if ((c曲リストノード.list子リスト != null) && (c曲リストノード.list子リスト.Count > 1)) {

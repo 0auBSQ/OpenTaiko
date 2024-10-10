@@ -164,17 +164,17 @@ namespace OpenTaiko {
 					}
 
 					if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 						this.段位リスト.t右に移動();
 					}
 
 					if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-					OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 						this.段位リスト.t左に移動();
 					}
 
 					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)) {
+						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 						switch (段位リスト.currentBar.eノード種別) {
 							case CSongListNode.ENodeType.SCORE:
 							case CSongListNode.ENodeType.RANDOM: {
@@ -203,7 +203,7 @@ namespace OpenTaiko {
 					}
 
 					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-						OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 						this.段位リスト.n現在の選択行 = 0;
 						return returnTitle();
 					}

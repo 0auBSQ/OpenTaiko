@@ -145,7 +145,7 @@ namespace OpenTaiko {
 				if (base.ePhaseID == CStage.EPhase.Common_NORMAL        // 通常状態、かつ
 					&& OpenTaiko.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
 				{
-					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Cancel)) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 						if (bモード選択) {
 							OpenTaiko.Skin.soundCancelSFX.tPlay();
 							bSaveFileLoaded = false;
@@ -183,8 +183,8 @@ namespace OpenTaiko {
 					// 1st step (Save file loading)
 					if (!bSaveIsLoading && !bSaveFailedToLoad) {
 
-						if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide) ||
-							OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed)) {
+						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
+							OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
 							// Hit 1P save
 							OpenTaiko.SaveFile = 0;
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -192,7 +192,7 @@ namespace OpenTaiko {
 							this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
 							for (int i = 0; i < 2; i++)
 								OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
-						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P)) {
+						} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P)) {
 							// Hit 2P save
 							OpenTaiko.SaveFile = 1;
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -212,7 +212,7 @@ namespace OpenTaiko {
 						}
 					}
 
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded) {
 							if (n現在の選択行プレイヤーエントリー + 1 <= 2) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -235,7 +235,7 @@ namespace OpenTaiko {
 						}
 					}
 
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 						if (bプレイヤーエントリー && !bプレイヤーエントリー決定 && this.ctSaveLoaded.IsEnded) {
 							if (n現在の選択行プレイヤーエントリー - 1 >= 0) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -258,7 +258,7 @@ namespace OpenTaiko {
 					}
 
 
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.Decide)
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
 						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
 						if (bプレイヤーエントリー && this.ctSaveLoaded.IsEnded) {
 							if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2) {

@@ -86,7 +86,7 @@ namespace OpenTaiko {
 			return list;
 		}
 		public bool bPressed(EInstrumentPad part, EPad pad) {
-			if (part != EInstrumentPad.UNKNOWN) {
+			if (part != EInstrumentPad.Unknown) {
 
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 				for (int i = 0; i < stkeyassignArray.Length; i++) {
@@ -140,19 +140,19 @@ namespace OpenTaiko {
 			return false;
 		}
 		public bool bPressedDGB(EPad pad) {
-			if (!this.bPressed(EInstrumentPad.DRUMS, pad) && !this.bPressed(EInstrumentPad.GUITAR, pad)) {
-				return this.bPressed(EInstrumentPad.BASS, pad);
+			if (!this.bPressed(EInstrumentPad.Drums, pad) && !this.bPressed(EInstrumentPad.Guitar, pad)) {
+				return this.bPressed(EInstrumentPad.Bass, pad);
 			}
 			return true;
 		}
 		public bool bPressedGB(EPad pad) {
-			if (!this.bPressed(EInstrumentPad.GUITAR, pad)) {
-				return this.bPressed(EInstrumentPad.BASS, pad);
+			if (!this.bPressed(EInstrumentPad.Guitar, pad)) {
+				return this.bPressed(EInstrumentPad.Bass, pad);
 			}
 			return true;
 		}
 		public bool b押されている(EInstrumentPad part, EPad pad) {
-			if (part != EInstrumentPad.UNKNOWN) {
+			if (part != EInstrumentPad.Unknown) {
 				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 				for (int i = 0; i < stkeyassignArray.Length; i++) {
 					switch (stkeyassignArray[i].InputDevice) {
@@ -198,8 +198,8 @@ namespace OpenTaiko {
 			return false;
 		}
 		public bool b押されているGB(EPad pad) {
-			if (!this.b押されている(EInstrumentPad.GUITAR, pad)) {
-				return this.b押されている(EInstrumentPad.BASS, pad);
+			if (!this.b押されている(EInstrumentPad.Guitar, pad)) {
+				return this.b押されている(EInstrumentPad.Bass, pad);
 			}
 			return true;
 		}

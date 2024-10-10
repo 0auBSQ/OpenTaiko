@@ -1417,8 +1417,8 @@ namespace OpenTaiko {
 							#endregion
 						}
 						if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
-							|| OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD))
-							|| (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
+							|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
+							|| (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
 							|| (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
 							|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
@@ -1479,9 +1479,9 @@ namespace OpenTaiko {
 
 
 						if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) ||
+								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
 							OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 								#region [ Phase 2 (Swap freely between Exams and Songs) ]
 

@@ -353,11 +353,11 @@ namespace OpenTaiko {
 			} else if ((OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))) {
 				Close();
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
-			} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)
+			} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)
 				  || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 				ChangeIndex(-1);
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
-			} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)
+			} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)
 				  || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 				ChangeIndex(1);
 				OpenTaiko.Skin.soundChangeSFX.tPlay();

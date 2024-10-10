@@ -2093,7 +2093,7 @@ namespace OpenTaiko {
 
 			#region [Left]
 
-			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)
+			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)
 				|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -2115,7 +2115,7 @@ namespace OpenTaiko {
 
 			#region [Right]
 
-			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)
+			else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)
 				|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 				if (emc == eMenuContext.SearchByDifficulty) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();

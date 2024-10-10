@@ -15,7 +15,7 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void t開始(EKeyConfigPart part, EKeyConfigPad pad, string strパッド名) {
-			if (part != EKeyConfigPart.UNKNOWN) {
+			if (part != EKeyConfigPart.Unknown) {
 				this.part = part;
 				this.pad = pad;
 				this.strパッド名 = strパッド名;
@@ -63,8 +63,8 @@ namespace OpenTaiko {
 		// CActivity 実装
 
 		public override void Activate() {
-			this.part = EKeyConfigPart.UNKNOWN;
-			this.pad = EKeyConfigPad.UNKNOWN;
+			this.part = EKeyConfigPart.Unknown;
+			this.pad = EKeyConfigPad.Unknown;
 			this.strパッド名 = "";
 			this.n現在の選択行 = 0;
 			this.bキー入力待ち = false;

@@ -804,7 +804,7 @@ namespace OpenTaiko {
 						#region [ F2 Quick Config ]
 						if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.QuickConfig)) {
 							OpenTaiko.Skin.soundChangeSFX.tPlay();
-							this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.DRUMS);
+							this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.Drums);
 						}
 						#endregion
 						#region [ F3 1P AUTO ]
@@ -1008,11 +1008,11 @@ namespace OpenTaiko {
 								if (!this.bCurrentlyScrolling) {
 									this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 									//this.ctキー反復用.Up.tキー反復( CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.UpArrow ) || CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.LeftArrow ), new CCounter.DGキー処理( this.tカーソルを上へ移動する ) );
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 										this.tカーソルを上へ移動する();
 									}
 								} else {
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 										//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -1027,11 +1027,11 @@ namespace OpenTaiko {
 									this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 									//this.ctキー反復用.Down.tキー反復( CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.DownArrow ) || CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.RightArrow ), new CCounter.DGキー処理( this.tカーソルを下へ移動する ) );
 
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 										this.tカーソルを下へ移動する();
 									}
 								} else {
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 										//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -1058,14 +1058,14 @@ namespace OpenTaiko {
 							#region [ BDx2: 簡易CONFIG ]
 							if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SortSongs)) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
-								this.actSortSongs.tActivatePopupMenu(EInstrumentPad.DRUMS, ref this.actSongList);
+								this.actSortSongs.tActivatePopupMenu(EInstrumentPad.Drums, ref this.actSongList);
 							}
 							#endregion
 							#region [ HHx2: 難易度変更 ]
-							if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HH) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HHO)) {   // [HH]x2 難易度変更
-								CommandHistory.Add(EInstrumentPad.DRUMS, EPadFlag.HH);
+							if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.HH) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.HHO)) {   // [HH]x2 難易度変更
+								CommandHistory.Add(EInstrumentPad.Drums, EPadFlag.HH);
 								EPadFlag[] comChangeDifficulty = new EPadFlag[] { EPadFlag.HH, EPadFlag.HH };
-								if (CommandHistory.CheckCommand(comChangeDifficulty, EInstrumentPad.DRUMS)) {
+								if (CommandHistory.CheckCommand(comChangeDifficulty, EInstrumentPad.Drums)) {
 									Debug.WriteLine("ドラムス難易度変更");
 									this.actSongList.t難易度レベルをひとつ進める();
 									OpenTaiko.Skin.soundChangeSFX.tPlay();

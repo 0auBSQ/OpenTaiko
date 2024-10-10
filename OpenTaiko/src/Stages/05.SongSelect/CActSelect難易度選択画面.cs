@@ -166,33 +166,33 @@ namespace OpenTaiko {
 
 						switch (i) {
 							case 0:
-								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
 								decide = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
 									(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
 								cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 								break;
 							case 1:
 								if (!OpenTaiko.ConfigIni.bAIBattleMode) {
-									right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue2P));
-									left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue2P));
-									decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed2P));
+									right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
+									left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
+									decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
 								}
 								break;
 							case 2:
-								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue3P));
-								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue3P));
-								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed3P));
+								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
+								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
+								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
 								break;
 							case 3:
-								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue4P));
-								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue4P));
-								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed4P));
+								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
+								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
+								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
 								break;
 							case 4:
-								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RBlue5P));
-								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LBlue5P));
-								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RRed5P));
+								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
+								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
+								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
 								break;
 						}
 
