@@ -2,9 +2,6 @@
 
 namespace OpenTaiko {
 
-	/// <summary>
-	/// Difficulty degree.
-	/// </summary>
 	public enum Difficulty {
 		Easy,
 		Normal,
