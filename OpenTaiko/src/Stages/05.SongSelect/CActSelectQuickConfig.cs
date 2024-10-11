@@ -101,8 +101,8 @@ namespace OpenTaiko {
 					EGame game = EGame.Off;
 					switch ((int)GetIndex((int)EOrder.GameMode)) {
 						case 0: game = EGame.Off; break;
-						case 1: game = EGame.FullCompletionChallenge; break;
-						case 2: game = EGame.FullCompletionChallengeExtreme; break;
+						case 1: game = EGame.Survival; break;
+						case 2: game = EGame.SurvivalHard; break;
 					}
 					OpenTaiko.ConfigIni.eGameMode = game;
 					break;

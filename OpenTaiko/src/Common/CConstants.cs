@@ -21,8 +21,8 @@ namespace OpenTaiko {
 
 	public enum EGame {
 		Off = 0,
-		FullCompletionChallenge = 1,
-		FullCompletionChallengeExtreme = 2
+		Survival = 1,
+		SurvivalHard = 2
 	}
 
 	public enum EDifficultyDisplayType {
