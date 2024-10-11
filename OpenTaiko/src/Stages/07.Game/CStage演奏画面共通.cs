@@ -787,7 +787,7 @@ namespace OpenTaiko {
 		protected int[] n風船残り = new int[5];
 		protected int[] n現在の連打数 = new int[5];
 		public int[] Chara_MissCount;
-		protected EDrumrollState eRollState;
+		protected ERollState eRollState;
 		protected bool[] ifp = { false, false, false, false, false };
 		protected bool[] isDeniedPlaying = { false, false, false, false, false };
 
@@ -1186,9 +1186,9 @@ namespace OpenTaiko {
 				}
 
 				if (pChip.nチャンネル番号 == 0x15)
-					this.eRollState = EDrumrollState.Roll;
+					this.eRollState = ERollState.Roll;
 				else
-					this.eRollState = EDrumrollState.RollB;
+					this.eRollState = ERollState.RollB;
 
 				pChip.nRollCount++;
 
@@ -1323,7 +1323,7 @@ namespace OpenTaiko {
 					}
 				}
 
-				this.eRollState = EDrumrollState.Balloon;
+				this.eRollState = ERollState.Balloon;
 
 
 
@@ -1412,7 +1412,7 @@ namespace OpenTaiko {
 							if (actChara.CharaAction_Balloon_Delay[player] != null) actChara.CharaAction_Balloon_Delay[player] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[player]] - 1, 1, OpenTaiko.Timer);
 						}
 					}
-					this.eRollState = EDrumrollState.None; // Unused variable ?
+					this.eRollState = ERollState.None; // Unused variable ?
 				}
 			} else {
 				if (IsKusudama) {
@@ -1520,7 +1520,7 @@ namespace OpenTaiko {
 								}
 							}
 							if (!bAutoPlay && !rollEffectHit) {
-								this.eRollState = EDrumrollState.Roll;
+								this.eRollState = ERollState.Roll;
 								this.tRollProcess(pChip, (SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), 1, nNowInput, 0, nPlayer);
 							}
 
@@ -3187,7 +3187,7 @@ namespace OpenTaiko {
 									chip現在処理中の連打チップ[nPlayer] = null;
 
 								}
-								this.eRollState = EDrumrollState.None;
+								this.eRollState = ERollState.None;
 							}
 							if (pChip.n描画優先度 <= 0)
 								this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);

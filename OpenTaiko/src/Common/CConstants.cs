@@ -307,7 +307,7 @@ namespace OpenTaiko {
 		Bad
 	}
 
-	public enum EDrumrollState {
+	public enum ERollState {
 		None,
 		Roll,
 		RollB,
