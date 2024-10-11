@@ -9,10 +9,6 @@
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_TITLE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_SUBTITLE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_LEVEL"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "13,12,11,...", "1,2,3,..." }));
-			// FIXME: Implement these
-			// lci.Add( new CItemList("Best Rank", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "E,D,C,...",		"SS,S,A,..." } ) );
-			// lci.Add( new CItemList("PlayCount", CItemBase.EPanelType.Normal, 0, "", "", new string[] { "10,9,8,...",		"1,2,3,..." } ) );
-			// lci.Add( new CItemList("SkillPoint",	CItemBase.EPanelType.Normal, 0, "", "", new string[] { "100,99,98,...",	"1,2,3,..." } ) );
 #if TEST_SORTBGM
 			lci.Add( new CItemList( "BPM",			CItemBase.EPanelType.Normal, 0, "", "", new string[] { "300,200,...",	"70,80,90,..." } ) );
 #endif
