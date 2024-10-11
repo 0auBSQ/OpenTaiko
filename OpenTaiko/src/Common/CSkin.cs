@@ -901,7 +901,7 @@ namespace OpenTaiko {
 		/// 変数の初期化
 		/// </summary>
 		public void tSkinConfigInit() {
-			this.eDiffDispMode = EDifficultyDisplayType.DisplayAsImageOnMTaiko;
+			this.eDiffDispMode = EDifficultyDisplayType.ImageOnMTaiko;
 			this.b現在のステージ数を表示しない = false;
 		}
 

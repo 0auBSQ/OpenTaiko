@@ -24,10 +24,11 @@ namespace OpenTaiko {
 		FullCompletionChallenge = 1,
 		FullCompletionChallengeExtreme = 2
 	}
+
 	public enum EDifficultyDisplayType {
 		Off = 0,
-		DisplayOnNthSong = 1,
-		DisplayAsImageOnMTaiko = 2,
+		TextOnNthSong = 1,
+		ImageOnMTaiko = 2,
 	}
 
 	public enum EPad            // 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。

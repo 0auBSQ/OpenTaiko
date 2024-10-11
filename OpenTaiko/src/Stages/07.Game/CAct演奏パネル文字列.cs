@@ -67,7 +67,7 @@ namespace OpenTaiko {
 
 						SKBitmap bmpDiff;
 						string strDiff = "";
-						if (OpenTaiko.Skin.eDiffDispMode == EDifficultyDisplayType.DisplayOnNthSong) {
+						if (OpenTaiko.Skin.eDiffDispMode == EDifficultyDisplayType.TextOnNthSong) {
 							switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
 								case 0:
 									strDiff = "かんたん ";
