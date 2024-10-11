@@ -562,7 +562,7 @@ namespace OpenTaiko {
 							OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
 						this.rSound[i] = null;
 
-						if ((i == 0) && OpenTaiko.ConfigIni.bCreationReleaseLogOutput)
+						if ((i == 0) && OpenTaiko.ConfigIni.bOutputCreationReleaseLog)
 							Trace.TraceInformation("サウンドを解放しました。({0})({1})", this.strコメント文, this.strファイル名);
 					}
 				}
@@ -1387,7 +1387,7 @@ namespace OpenTaiko {
 							cwav.rSound[i].AddBassSoundFromMixer();
 						}
 
-						if (OpenTaiko.ConfigIni.bCreationReleaseLogOutput) {
+						if (OpenTaiko.ConfigIni.bOutputCreationReleaseLog) {
 							Trace.TraceInformation("サウンドを作成しました。({3})({0})({1})({2}bytes)", cwav.strコメント文, str,
 								cwav.rSound[0].SoundBufferSize, cwav.rSound[0].IsStreamPlay ? "Stream" : "OnMemory");
 						}
@@ -2111,7 +2111,7 @@ namespace OpenTaiko {
 
 					#endregion
 					#region [ bLogDTX詳細ログ出力 ]
-					if (OpenTaiko.ConfigIni.bDetailedLogOutputDTX) {
+					if (OpenTaiko.ConfigIni.bOutputDetailedDTXLog) {
 						foreach (CWAV cwav in this.listWAV.Values) {
 							Trace.TraceInformation(cwav.ToString());
 						}

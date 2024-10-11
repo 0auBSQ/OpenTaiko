@@ -1165,9 +1165,9 @@ namespace OpenTaiko {
 		public bool bEnableAVI;
 		public bool bEnableBGA;
 		public bool bBGMPlayVoiceSound;
-		public bool bDetailedLogOutputDTX;
-		public bool bSongSearchLogOutput;
-		public bool bCreationReleaseLogOutput;
+		public bool bOutputDetailedDTXLog;
+		public bool bOutputSongSearchLog;
+		public bool bOutputCreationReleaseLog;
 		public STDGBVALUE<bool> bReverse;
 
 		public bool bDanTowerHide;
@@ -2245,13 +2245,13 @@ namespace OpenTaiko {
 			sw.WriteLine("OutputLog={0}", this.bOutputLogs ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine("; 曲データ検索に関するLog出力(0:OFF, 1:ON)");
-			sw.WriteLine("TraceSongSearch={0}", this.bSongSearchLogOutput ? 1 : 0);
+			sw.WriteLine("TraceSongSearch={0}", this.bOutputSongSearchLog ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine("; 画像やサウンドの作成_解放に関するLog出力(0:OFF, 1:ON)");
-			sw.WriteLine("TraceCreatedDisposed={0}", this.bCreationReleaseLogOutput ? 1 : 0);
+			sw.WriteLine("TraceCreatedDisposed={0}", this.bOutputCreationReleaseLog ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine("; DTX読み込み詳細に関するLog出力(0:OFF, 1:ON)");
-			sw.WriteLine("TraceDTXDetails={0}", this.bDetailedLogOutputDTX ? 1 : 0);
+			sw.WriteLine("TraceDTXDetails={0}", this.bOutputDetailedDTXLog ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine(";-------------------");
 			#endregion
@@ -3012,11 +3012,11 @@ namespace OpenTaiko {
 											if (str3.Equals("OutputLog")) {
 												this.bOutputLogs = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("TraceCreatedDisposed")) {
-												this.bCreationReleaseLogOutput = CConversion.bONorOFF(str4[0]);
+												this.bOutputCreationReleaseLog = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("TraceDTXDetails")) {
-												this.bDetailedLogOutputDTX = CConversion.bONorOFF(str4[0]);
+												this.bOutputDetailedDTXLog = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("TraceSongSearch")) {
-												this.bSongSearchLogOutput = CConversion.bONorOFF(str4[0]);
+												this.bOutputSongSearchLog = CConversion.bONorOFF(str4[0]);
 											}
 											continue;
 										}

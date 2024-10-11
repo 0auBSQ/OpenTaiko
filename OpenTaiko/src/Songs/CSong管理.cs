@@ -110,7 +110,7 @@ namespace OpenTaiko {
 
 			DirectoryInfo info = new DirectoryInfo(str基点フォルダ);
 
-			if (OpenTaiko.ConfigIni.bSongSearchLogOutput)
+			if (OpenTaiko.ConfigIni.bOutputSongSearchLog)
 				Trace.TraceInformation("基点フォルダ: " + str基点フォルダ);
 
 			#region [ a.フォルダ内に set.def が存在する場合 → 1フォルダ内のtjaファイル無制限]
@@ -118,7 +118,7 @@ namespace OpenTaiko {
 			string path = str基点フォルダ + "set.def";
 			if (File.Exists(path)) {
 				new FileInfo(path);
-				if (OpenTaiko.ConfigIni.bSongSearchLogOutput) {
+				if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 					Trace.TraceInformation("set.def検出 : {0}", path);
 					Trace.Indent();
 				}
@@ -209,7 +209,7 @@ namespace OpenTaiko {
 						#endregion
 					}
 				} finally {
-					if (OpenTaiko.ConfigIni.bSongSearchLogOutput) {
+					if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 						Trace.Unindent();
 					}
 				}
@@ -547,7 +547,7 @@ namespace OpenTaiko {
 
 					c曲リストノード.list子リスト = new List<CSongListNode>();
 					listノードリスト.Add(c曲リストノード);
-					if (OpenTaiko.ConfigIni.bSongSearchLogOutput) {
+					if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 						Trace.TraceInformation("box.def検出 : {0}", infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def");
 						Trace.Indent();
 						try {
@@ -667,7 +667,7 @@ namespace OpenTaiko {
 						cdtx.DeActivate();
 						#region [ 曲検索ログ出力 ]
 						//-----------------
-						if (OpenTaiko.ConfigIni.bSongSearchLogOutput) {
+						if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 							StringBuilder sb = new StringBuilder(0x400);
 							sb.Append(string.Format("曲データファイルから譜面情報を転記しました。({0})", path));
 							sb.Append("(title=" + c曲リストノード.arスコア[i].譜面情報.タイトル);
@@ -839,7 +839,7 @@ namespace OpenTaiko {
 						if ((c曲リストノード.arスコア[j] != null) && !string.IsNullOrEmpty(c曲リストノード.arスコア[j].譜面情報.タイトル)) {
 							c曲リストノード.ldTitle = new CLocalizationData();
 
-							if (OpenTaiko.ConfigIni.bSongSearchLogOutput)
+							if (OpenTaiko.ConfigIni.bOutputSongSearchLog)
 								Trace.TraceInformation("タイトルを設定しました。(nID#{0:D3}, title={1})", c曲リストノード.nID, c曲リストノード.ldTitle.GetString(""));
 
 							break;
