@@ -1186,8 +1186,8 @@ namespace OpenTaiko {
 		public Dictionary<int, string> dicGamepad;
 		public ERandomMode[] eRandom;
 		public CKeyAssign KeyAssign;
-		public int nSleepMsWhenNotInFocus;       // #23568 2010.11.04 ikanick add
-		public int nSleepMsPerFrame;            // #xxxxx 2011.11.27 yyagi add
+		public int nMsSleepUnfocused;       // #23568 2010.11.04 ikanick add
+		public int nMsSleepPerFrame;            // #xxxxx 2011.11.27 yyagi add
 		public int nSongSpeed;
 
 		public double SongPlaybackSpeed {
@@ -1196,7 +1196,7 @@ namespace OpenTaiko {
 
 		public bool bNoAudioIfNot1xSpeed; // FIXME: Negation should be removed and booleans flipped
 		public int nMsWaitPreviewSoundFromSongSelected;
-		public int nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection;
+		public int nMsWaitPreviewImageFromSongSelected;
 
 		private bool _applyLoudnessMetadata;
 
@@ -1663,8 +1663,8 @@ namespace OpenTaiko {
 			this.nWindowBaseYPosition = 100;
 			this.nWindowWidth = SampleFramework.GameWindowSize.Width;           // #23510 2010.10.31 yyagi add
 			this.nWindowHeight = SampleFramework.GameWindowSize.Height;         //
-			this.nSleepMsPerFrame = -1;         // #xxxxx 2011.11.27 yyagi add
-			this.nSleepMsWhenNotInFocus = 1;            // #23568 2010.11.04 ikanick add
+			this.nMsSleepPerFrame = -1;         // #xxxxx 2011.11.27 yyagi add
+			this.nMsSleepUnfocused = 1;            // #23568 2010.11.04 ikanick add
 			this._bGuitarEnabled = true;
 			this._bDrumsEnabled = true;
 			this.nBGAlpha = 100;
@@ -1672,7 +1672,7 @@ namespace OpenTaiko {
 			this.eClipDispType = EClipDispType.BackgroundOnly;
 			this.bEnableBGA = true;
 			this.nMsWaitPreviewSoundFromSongSelected = 1000;
-			this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = 100;
+			this.nMsWaitPreviewImageFromSongSelected = 100;
 			this.bBGMPlayVoiceSound = true;
 
 			this.bDanTowerHide = false;
@@ -2009,7 +2009,7 @@ namespace OpenTaiko {
 			sw.WriteLine();                                                                             //
 			sw.WriteLine("; 非フォーカス時のsleep値[ms]");                       // #23568 2011.11.04 ikanick add
 			sw.WriteLine("; A sleep time[ms] while the window is inactive.");   //
-			sw.WriteLine("BackSleep={0}", this.nSleepMsWhenNotInFocus);     // そのまま引用（苦笑）
+			sw.WriteLine("BackSleep={0}", this.nMsSleepUnfocused);     // そのまま引用（苦笑）
 			sw.WriteLine();                                                             //
 			#endregion
 			#region [ フォント ]
@@ -2028,7 +2028,7 @@ namespace OpenTaiko {
 			sw.WriteLine();
 			sw.WriteLine("; フレーム毎のsleep値[ms] (-1でスリープ無し, 0以上で毎フレームスリープ。動画キャプチャ等で活用下さい)");   // #xxxxx 2011.11.27 yyagi add
 			sw.WriteLine("; A sleep time[ms] per frame.");                          //
-			sw.WriteLine("SleepTimePerFrame={0}", this.nSleepMsPerFrame);       //
+			sw.WriteLine("SleepTimePerFrame={0}", this.nMsSleepPerFrame);       //
 			sw.WriteLine();                                                             //
 			#endregion
 
@@ -2114,7 +2114,7 @@ namespace OpenTaiko {
 			sw.WriteLine("PreviewSoundWait={0}", this.nMsWaitPreviewSoundFromSongSelected);
 			sw.WriteLine();
 			sw.WriteLine("; 曲選択からプレビュー画像表示までのウェイト[ms]");
-			sw.WriteLine("PreviewImageWait={0}", this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection);
+			sw.WriteLine("PreviewImageWait={0}", this.nMsWaitPreviewImageFromSongSelected);
 			sw.WriteLine();
 			#endregion
 			//sw.WriteLine( "; Waveの再生位置自動補正(0:OFF, 1:ON)" );
@@ -2789,7 +2789,7 @@ namespace OpenTaiko {
 												this.bIsEnabledSystemMenu = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BackSleep"))                // #23568 2010.11.04 ikanick add
 											  {
-												this.nSleepMsWhenNotInFocus = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, 0, 50, this.nSleepMsWhenNotInFocus);
+												this.nMsSleepUnfocused = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, 0, 50, this.nMsSleepUnfocused);
 											}
 											#endregion
 
@@ -2834,7 +2834,7 @@ namespace OpenTaiko {
 												this.bEnableVSync = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("SleepTimePerFrame"))        // #23568 2011.11.27 yyagi
 											  {
-												this.nSleepMsPerFrame = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, -1, 50, this.nSleepMsPerFrame);
+												this.nMsSleepPerFrame = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, -1, 50, this.nMsSleepPerFrame);
 											} else if (str3.Equals("BGAlpha")) {
 												this.nBackgroundTransparency = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0xff, this.nBackgroundTransparency);
 											}
@@ -2851,7 +2851,7 @@ namespace OpenTaiko {
 											  else if (str3.Equals("PreviewSoundWait")) {
 												this.nMsWaitPreviewSoundFromSongSelected = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
 											} else if (str3.Equals("PreviewImageWait")) {
-												this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nWaitTimeMsBeforePreviewImageDisplaysAfterSongSelection);
+												this.nMsWaitPreviewImageFromSongSelected = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
 											}
 											#endregion
 											#region [ BGM/ドラムのヒット音 ]
