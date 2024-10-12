@@ -17,7 +17,7 @@ namespace OpenTaiko {
 	internal class OpenTaiko : Game {
 		// プロパティ
 		#region [ properties ]
-		public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();//.Substring(0, Assembly.GetExecutingAssembly().GetName().Version.ToString().Length - 2);
+		public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		public static readonly string AppDisplayThreePartVersion = GetAppDisplayThreePartVersion();
 		public static readonly string AppNumericThreePartVersion = GetAppNumericThreePartVersion();
 
@@ -41,8 +41,6 @@ namespace OpenTaiko {
 			?? $"{GetAppDisplayThreePartVersion()} (unknown informational version)";
 		public static readonly string SLIMDXDLL = "c_net20x86_Jun2010";
 		public static readonly string D3DXDLL = "d3dx9_43.dll";     // June 2010
-																	//public static readonly string D3DXDLL = "d3dx9_42.dll";	// February 2010
-																	//public static readonly string D3DXDLL = "d3dx9_41.dll";	// March 2009
 
 		public static CStage latestSongSelect {
 			get;
@@ -311,11 +309,6 @@ namespace OpenTaiko {
 			get;
 			private set;
 		}
-		//		public static CStageオプション stageオプション
-		//		{
-		//			get;
-		//			private set;
-		//		}
 		public static CStageコンフィグ stageコンフィグ {
 			get;
 			private set;
@@ -518,7 +511,6 @@ namespace OpenTaiko {
 					// Load config info
 					ConfigIni.tファイルから読み込み(path);
 				} catch (Exception e) {
-					//ConfigIni = new CConfigIni();	// 存在してなければ新規生成
 					Trace.TraceError(e.ToString());
 					Trace.TraceError("例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)");
 				}
@@ -530,20 +522,6 @@ namespace OpenTaiko {
 				case 0:
 					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
 					break;
-				/*
-				case 1:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D9;
-				break;
-				case 2:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
-				break;
-				case 3:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
-				break;
-				case 4:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
-				break;
-				*/
 				case 1:
 					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
 					break;
@@ -565,33 +543,15 @@ namespace OpenTaiko {
 		}
 
 		protected override void Initialize() {
-
 			this.t起動処理();
-
-			/*
-			if ( this.listトップレベルActivities != null )
-			{
-				foreach( CActivity activity in this.listトップレベルActivities )
-					activity.OnManagedリソースの作成();
-			}
-
-			foreach( STPlugin st in this.listプラグイン )
-			{
-				Directory.SetCurrentDirectory( st.strプラグインフォルダ );
-				st.plugin.OnManagedリソースの作成();
-				Directory.SetCurrentDirectory( TJAPlayer3.strEXEのあるフォルダ );
-			}
-			*/
 		}
 
 		protected override void LoadContent() {
 			if (ConfigIni.bウィンドウモード) {
 				if (!this.bマウスカーソル表示中) {
-					//Cursor.Show();
 					this.bマウスカーソル表示中 = true;
 				}
 			} else if (this.bマウスカーソル表示中) {
-				//Cursor.Hide();
 				this.bマウスカーソル表示中 = false;
 			}
 
@@ -638,7 +598,6 @@ namespace OpenTaiko {
 			try
 #endif
 			{
-				// Sound管理?.t再生中の処理をする();
 				Timer?.Update();
 				SoundManager.PlayTimer?.Update();
 				FPS?.Update();
@@ -651,70 +610,7 @@ namespace OpenTaiko {
 					if (BeatScaling.CurrentValue == BeatScaling.EndValue) BeatScaling = null;
 				}
 
-				//CameraTest
-				/*
-				Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
-				Matrix4X4.CreateRotationZ(MathF.PI / 4.0f) *
-				Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
-				*/
-
 				// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
-
-				#region [ DTXCreatorからの指示 ]
-				/*
-				if ( this.Window.IsReceivedMessage )	// ウインドウメッセージで、
-				{
-					string strMes = this.Window.strMessage;
-					this.Window.IsReceivedMessage = false;
-
-					if ( strMes != null )
-					{
-						DTXVmode.ParseArguments( strMes );
-
-						if ( DTXVmode.Enabled )
-						{
-							bコンパクトモード = true;
-							strコンパクトモードファイル = DTXVmode.filename;
-							if ( DTXVmode.Command == CDTXVmode.ECommand.Preview )
-							{
-								// preview soundの再生
-								string strPreviewFilename = DTXVmode.previewFilename;
-	//Trace.TraceInformation( "Preview Filename=" + DTXVmode.previewFilename );
-								try
-								{
-									if ( this.previewSound != null )
-									{
-										this.previewSound.tサウンドを停止する();
-										this.previewSound.Dispose();
-										this.previewSound = null;
-									}
-									this.previewSound = TJAPlayer3.Sound管理.tサウンドを生成する( strPreviewFilename, ESoundGroup.SongPreview );
-
-									// 2018-08-23 twopointzero: DTXVmode previewVolume will always set
-									// Gain since in this mode it should override the application of
-									// SONGVOL or any other Gain source regardless of configuration.
-									this.previewSound.SetGain(DTXVmode.previewVolume);
-
-									this.previewSound.n位置 = DTXVmode.previewPan;
-									this.previewSound.t再生を開始する();
-									Trace.TraceInformation( "DTXCからの指示で、サウンドを生成しました。({0})", strPreviewFilename );
-								}
-								catch
-								{
-									Trace.TraceError(ToString());
-									Trace.TraceError( "DTXCからの指示での、サウンドの生成に失敗しました。({0})", strPreviewFilename );
-									if ( this.previewSound != null )
-									{
-										this.previewSound.Dispose();
-									}
-									this.previewSound = null;
-								}
-							}
-						}
-					}
-				}
-				*/
-				#endregion
 
 				if (r現在のステージ != null) {
 					OpenTaiko.NamePlate.lcNamePlate.Update();
@@ -1078,7 +974,6 @@ namespace OpenTaiko {
 								Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
 							}
 
-							//this.tガベージコレクションを実行する();		// #31980 2013.9.3 yyagi タイトル画面でだけ、毎フレームGCを実行して重くなっていた問題の修正
 							//-----------------------------
 							#endregion
 							break;
@@ -1991,12 +1886,6 @@ for (int i = 0; i < 3; i++) {
 					if (!ConfigIni.bTokkunMode) {
 						float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
 						float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
-						/*
-						var mat = Matrix.LookAtLH(new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, (float)(-SampleFramework.GameWindowSize.Height / (fCamZoomFactor * 2) * Math.Sqrt(3.0))), new Vector3(-fCamXOffset * screen_ratiox, fCamYOffset * screen_ratioy, 0f), new Vector3(0f, 1f, 0f));
-						mat *= Matrix.RotationYawPitchRoll(0, 0, C変換.DegreeToRadian(fCamRotation));
-						mat *= Matrix.Scaling(fCamXScale, fCamYScale, 1f);
-						this.Device.SetTransform(TransformState.View, mat);
-						*/
 
 						Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
 
@@ -2037,9 +1926,6 @@ for (int i = 0; i < 3; i++) {
 					}
 				}
 
-				//foreach(var capture in ConfigIni.KeyAssign.System.Capture)
-				//{
-				//if (TJAPlayer3.Input管理.Keyboard.KeyPressed(capture.コード) && capture.コード != 0)
 				if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
 #if DEBUG
 					if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
@@ -2070,15 +1956,6 @@ for (int i = 0; i < 3; i++) {
 					SaveResultScreen(strFullPath);
 #endif
 				}
-
-				//}
-
-				/*
-				if ( Sound管理?.GetCurrentSoundDeviceType() != "DirectSound" )
-				{
-					Sound管理?.t再生中の処理をする();	// サウンドバッファの更新; 画面描画と同期させることで、スクロールをスムーズにする
-				}
-				*/
 
 				#region [ 全画面_ウインドウ切り替え ]
 				if (this.b次のタイミングで全画面_ウィンドウ切り替えを行う) {
@@ -2308,14 +2185,6 @@ for (int i = 0; i < 3; i++) {
 			}
 			// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
 			SaveFileInstances = DBSaves.FetchSaveInstances();
-			/*
-            for (int i = 0; i < 5; i++)
-            {
-                SaveFileInstances[i] = new SaveFile();
-                SaveFileInstances[i].tSaveFile(TJAPlayer3.ConfigIni.sSaveFile[i]);
-            }
-			*/
-
 
 			//---------------------
 			#endregion
@@ -2333,7 +2202,6 @@ for (int i = 0; i < 3; i++) {
 						"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
 						"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
 					};
-					//MessageBox.Show( mes_writeErr[c], "OpenTaiko Startup Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
 					Environment.Exit(1);
 				}
 			}
@@ -2351,15 +2219,8 @@ for (int i = 0; i < 3; i++) {
 
 			#region [ DTXVmodeクラス の初期化 ]
 			//---------------------
-			//Trace.TraceInformation( "Initialize DTXV mode." );
-			//Trace.Indent();
-			try {
-				DTXVmode = new CDTXVmode();
-				DTXVmode.Enabled = false;
-				//Trace.TraceInformation( "DTXV initialization complete." );
-			} finally {
-				//Trace.Unindent();
-			}
+			DTXVmode = new CDTXVmode();
+			DTXVmode.Enabled = false;
 			//---------------------
 			#endregion
 
@@ -2430,11 +2291,8 @@ for (int i = 0; i < 3; i++) {
 				actTextConsole = new CTextConsole();
 				Trace.TraceInformation("Console initialized.");
 				actTextConsole.Activate();
-				//if (!ConfigIni.PreAssetsLoading)
-				{
-					actTextConsole.CreateManagedResource();
-					actTextConsole.CreateUnmanagedResource();
-				}
+				actTextConsole.CreateManagedResource();
+				actTextConsole.CreateUnmanagedResource();
 				Trace.TraceInformation("Console has been activated.");
 				Trace.TraceInformation("Console has finished being initialized.");
 			} catch (Exception exception) {
@@ -2572,7 +2430,6 @@ for (int i = 0; i < 3; i++) {
 				ShowWindowTitleWithSoundType();
 				FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
 				SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
-				//FDK.CSound管理.bIsMP3DecodeByWindowsCodec = CDTXMania.ConfigIni.bNoMP3Streaming;
 				Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
 			} catch (Exception e) {
 				throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
@@ -2610,7 +2467,6 @@ for (int i = 0; i < 3; i++) {
 			r直前のステージ = null;
 			stage起動 = new CStage起動();
 			stageタイトル = new CStageタイトル();
-			//			stageオプション = new CStageオプション();
 			stageコンフィグ = new CStageコンフィグ();
 			stageSongSelect = new CStage選曲();
 			stage段位選択 = new CStage段位選択();
@@ -2631,7 +2487,6 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add(actTextConsole);
 			this.listトップレベルActivities.Add(stage起動);
 			this.listトップレベルActivities.Add(stageタイトル);
-			//			this.listトップレベルActivities.Add( stageオプション );
 			this.listトップレベルActivities.Add(stageコンフィグ);
 			this.listトップレベルActivities.Add(stageSongSelect);
 			this.listトップレベルActivities.Add(stage段位選択);
@@ -2905,11 +2760,8 @@ for (int i = 0; i < 3; i++) {
 					Trace.Indent();
 					try {
 						actTextConsole.DeActivate();
-						//if (!ConfigIni.PreAssetsLoading)
-						{
-							actTextConsole.ReleaseManagedResource();
-							actTextConsole.ReleaseUnmanagedResource();
-						}
+						actTextConsole.ReleaseManagedResource();
+						actTextConsole.ReleaseUnmanagedResource();
 						actTextConsole = null;
 						Trace.TraceInformation("Console terminated.");
 					} catch (Exception exception6) {
@@ -2956,7 +2808,6 @@ for (int i = 0; i < 3; i++) {
 				//---------------------
 				Trace.TraceInformation("Outputting Config.ini...");
 				Trace.TraceInformation("This only needs to be done once, unless you have deleted the file!");
-				//				if ( ConfigIni.bIsSwappedGuitarBass )			// #24063 2011.1.16 yyagi ギターベースがスワップしているときは元に戻す
 				string str = strEXEのあるフォルダ + "Config.ini";
 				Trace.Indent();
 				try {
@@ -2997,23 +2848,12 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 				#region [ DTXVmodeの終了処理 ]
 				//---------------------
-				//Trace.TraceInformation( "DTXVモードの終了処理を行います。" );
-				//Trace.Indent();
-				try {
-					if (DTXVmode != null) {
-						DTXVmode = null;
-						//Trace.TraceInformation( "DTXVモードの終了処理を完了しました。" );
-					} else {
-						//Trace.TraceInformation( "DTXVモードは使用されていません。" );
-					}
-				} finally {
-					//Trace.Unindent();
+				if (DTXVmode != null) {
+					DTXVmode = null;
 				}
 				//---------------------
 				#endregion
 				Trace.TraceInformation("OpenTaiko has closed down successfully.");
-
-
 				this.b終了処理完了済み = true;
 			}
 		}
@@ -3111,19 +2951,6 @@ for (int i = 0; i < 3; i++) {
 				this.SearchAndGeneratePluginsInFolder(dir + Path.DirectorySeparatorChar, PluginTypeName);
 		}
 		//-----------------
-		/*
-		private void Window_ResizeEnd(object sender, EventArgs e)				// #23510 2010.11.20 yyagi: to get resized window size
-		{
-			if ( ConfigIni.bウィンドウモード )
-			{
-				ConfigIni.n初期ウィンドウ開始位置X = base.Window.Location.X;	// #30675 2013.02.04 ikanick add
-				ConfigIni.n初期ウィンドウ開始位置Y = base.Window.Location.Y;	//
-			}
-
-			ConfigIni.nウインドウwidth = (ConfigIni.bウィンドウモード) ? base.Window.ClientSize.Width : currentClientSize.Width;	// #23510 2010.10.31 yyagi add
-			ConfigIni.nウインドウheight = (ConfigIni.bウィンドウモード) ? base.Window.ClientSize.Height : currentClientSize.Height;
-		}
-		*/
 		#endregion
 		#endregion
 

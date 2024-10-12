@@ -71,10 +71,6 @@ namespace OpenTaiko {
 				CLangManager.Languages);
 			this.list項目リスト.Add(this.iSystemLanguage);
 
-			//this.iLayoutType = new CItemInteger(CLangManager.LangInstance.GetString(16), 0, (int)eLayoutType.TOTAL - 1, TJAPlayer3.ConfigIni.nLayoutType,
-			//	CLangManager.LangInstance.GetString(17));
-			//this.list項目リスト.Add(this.iLayoutType);
-
 			this.iTaikoPlayerCount = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT"), 1, 5, OpenTaiko.ConfigIni.nPlayerCount,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_PLAYERCOUNT_DESC"));
 			this.list項目リスト.Add(this.iTaikoPlayerCount);
@@ -82,12 +78,6 @@ namespace OpenTaiko {
 			this.iDanTowerHide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_HIDEDANTOWER"), OpenTaiko.ConfigIni.bDanTowerHide,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_HIDEDANTOWER_DESC"));
 			this.list項目リスト.Add(this.iDanTowerHide);
-
-			/*
-			this.iSystemRisky = new CItemInteger(CLangManager.LangInstance.GetString(8), 0, 10, TJAPlayer3.ConfigIni.nRisky,
-				CLangManager.LangInstance.GetString(9));
-			this.list項目リスト.Add( this.iSystemRisky );
-			*/
 
 			this.iCommonPlaySpeed = new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, OpenTaiko.ConfigIni.nSongSpeed,
 				CLangManager.LangInstance.GetString("SETTINGS_MOD_SONGSPEED_DESC"));
@@ -119,14 +109,6 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE_DESC"));
 			this.list項目リスト.Add(this.iSystemAVI);
 
-			//if (CLangManager.fetchLang() == "ja")
-			//{
-			//	this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString(10150), CItemList.EPanelType.Normal, (int)TJAPlayer3.ConfigIni.eClipDispType,
-			//		CLangManager.LangInstance.GetString(10151),
-			//		new string[] {"OFF","背景","ウィンドウ","両方"});
-			//	this.list項目リスト.Add( this.iSystemAVIDisplayMode );
-			//}
-			//else
 			this.iSystemAVIDisplayMode = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY"), CItemList.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eClipDispType,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC"),
 				new string[] {
@@ -189,11 +171,6 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC"));
 			this.list項目リスト.Add(this.MusicPreTimeMs);
 
-			//this.iSystemStoicMode = new CItemToggle( "StoicMode", CDTXMania.ConfigIni.bストイックモード,
-			//    "ストイック（禁欲）モード：\n以下をまとめて表示ON/OFFします。\n_プレビュー画像/動画\n_リザルト画像/動画\n_NowLoading画像\n_演奏画面の背景画像\n_BGA 画像 / AVI 動画\n_グラフ画像\n",
-			//    "Turn ON to disable drawing\n * preview image / movie\n * result image / movie\n * nowloading image\n * wallpaper (in playing screen)\n * BGA / AVI (in playing screen)" );
-			//this.list項目リスト.Add( this.iSystemStoicMode );
-
 			this.iSystemAutoResultCapture = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUTOSCREENSHOT"), OpenTaiko.ConfigIni.bIsAutoResultCapture,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC"));
 			this.list項目リスト.Add(this.iSystemAutoResultCapture);
@@ -211,7 +188,6 @@ namespace OpenTaiko {
 			this.list項目リスト.Add(this.iLogOutputLog);
 
 			// #24820 2013.1.3 yyagi
-
 
 			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nSoundDeviceType,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC"),
@@ -238,7 +214,6 @@ namespace OpenTaiko {
 			this.iSystemSoundTimerType = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_OSTIMER"), OpenTaiko.ConfigIni.bUseOSTimer,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_OSTIMER_DESC"));
 			this.list項目リスト.Add(this.iSystemSoundTimerType);
-
 
 			ShowChara = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYCHARA"), OpenTaiko.ConfigIni.ShowChara,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISPLAYCHARA_DESC"));
@@ -276,16 +251,10 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TEXTUREASYNC_DESC"));
 			this.list項目リスト.Add(ASyncTextureLoad);
 
-
-
 			this.iSystemSkinSubfolder = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SKIN"), CItemBase.EPanelType.Normal, nSkinIndex,
 				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SKIN_DESC"),
-				//"CONFIGURATIONを抜けると、設定した\n" +
-				//"スキンに変更されます。",
 				skinNames);
 			this.list項目リスト.Add(this.iSystemSkinSubfolder);
-
-
 
 			this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"));
@@ -301,7 +270,7 @@ namespace OpenTaiko {
 		#endregion
 
 
-		// Gameplay options 
+		// Gameplay options
 		#region [ t項目リストの設定_Drums() ]
 
 		public void t項目リストの設定_Drums() {
@@ -342,19 +311,9 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY_DESC"));
 			this.list項目リスト.Add(this.iSystemMinComboDrums);
 
-
-			// #23580 2011.1.3 yyagi
-
-			/*
-			this.iInputAdjustTimeMs = new CItemInteger(CLangManager.LangInstance.GetString(78), -9999, 9999, TJAPlayer3.ConfigIni.nInputAdjustTimeMs,
-				CLangManager.LangInstance.GetString(79));
-			this.list項目リスト.Add( this.iInputAdjustTimeMs );
-			*/
-
 			this.iGlobalOffsetMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_GLOBALOFFSET"), -9999, 9999, OpenTaiko.ConfigIni.nGlobalOffsetMs,
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_GLOBALOFFSET_DESC"));
 			this.list項目リスト.Add(this.iGlobalOffsetMs);
-
 
 			this.iTaikoDefaultCourse = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_DEFAULTDIFF"), CItemBase.EPanelType.Normal, OpenTaiko.ConfigIni.nDefaultCourse,
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_DEFAULTDIFF_DESC"),
@@ -376,7 +335,7 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI_DESC"));
 			this.list項目リスト.Add(this.ShinuchiMode);
 
-			// This does nothing vvv
+			// FIXME: This does nothing vvv
 			this.iTaikoBranchGuide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE"), OpenTaiko.ConfigIni.bBranchGuide,
 				CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE_DESC"));
 			this.list項目リスト.Add(this.iTaikoBranchGuide);
@@ -458,9 +417,6 @@ namespace OpenTaiko {
 				this.b要素値にフォーカス中 = false;
 			} else if (this.list項目リスト[this.n現在の選択項目].e種別 == CItemBase.E種別.整数) {
 				this.b要素値にフォーカス中 = true;
-			} else if (this.b現在選択されている項目はReturnToMenuである) {
-				//this.tConfigIniへ記録する();
-				//CONFIG中にスキン変化が発生すると面倒なので、一旦マスクした。
 			}
 			#region [ 個々のキーアサイン ]
 			  //太鼓のキー設定。
@@ -606,14 +562,6 @@ namespace OpenTaiko {
 			#endregion
 			  else {
 				// #27029 2012.1.5 from
-				//if( ( this.iSystemBDGroup.n現在選択されている項目番号 == (int) EBDGroup.どっちもBD ) &&
-				//    ( ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemHHGroup ) || ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemHitSoundPriorityHH ) ) )
-				//{
-				//    // 変更禁止（何もしない）
-				//}
-				//else
-				//{
-				//    // 変更許可
 				this.list項目リスト[this.n現在の選択項目].tEnter押下();
 
 				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemLanguage) {
@@ -633,9 +581,6 @@ namespace OpenTaiko {
 					t項目リストの設定_System(refresh: false);
 					OpenTaiko.stageコンフィグ.ReloadMenus();
 				}
-				//}
-
-
 				// Enter押下後の後処理
 
 				if (this.list項目リスト[this.n現在の選択項目] == this.iSystemFullscreen) {
@@ -686,13 +631,10 @@ namespace OpenTaiko {
 					OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 					OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 					OpenTaiko.actEnumSongs.Activate();
-					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
-
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 				} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemHardReloadDTX)              // #32081 2013.10.21 yyagi
 				  {
 					if (OpenTaiko.EnumSongs.IsEnumerating) {
-						// Debug.WriteLine( "バックグラウンドでEnumeratingSongs中だったので、一旦中断します。" );
 						OpenTaiko.EnumSongs.Abort();
 						OpenTaiko.actEnumSongs.DeActivate();
 					}
@@ -701,8 +643,6 @@ namespace OpenTaiko {
 					OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 					OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 					OpenTaiko.actEnumSongs.Activate();
-					// TJAPlayer3.stage選曲.Refresh(TJAPlayer3.EnumSongs.Songs管理, true);
-
 					OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 				} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
 					// Running in a separate thread so the game doesn't freeze
@@ -721,8 +661,8 @@ namespace OpenTaiko {
 				path = System.IO.Path.Combine(path, @$"Graphics{Path.DirectorySeparatorChar}1_Title{Path.DirectorySeparatorChar}Background.png");
 				SKBitmap bmSrc = SKBitmap.Decode(path);
 
-				int _w = OpenTaiko.Skin.Resolution[0] / 4;// bmSrc.Width / 4;
-				int _h = OpenTaiko.Skin.Resolution[1] / 4;// bmSrc.Height / 4;
+				int _w = OpenTaiko.Skin.Resolution[0] / 4;
+				int _h = OpenTaiko.Skin.Resolution[1] / 4;
 
 				if (txSkinSample1 != null) {
 					OpenTaiko.tDisposeSafely(ref txSkinSample1);
@@ -742,9 +682,7 @@ namespace OpenTaiko {
 			this.eメニュー種別 = Eメニュー種別.Unknown;
 		}
 		public void t項目リストの設定_KeyAssignSystem() {
-			//this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
-
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
 			this.iKeyAssignSystemReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
@@ -793,9 +731,7 @@ namespace OpenTaiko {
 			this.eメニュー種別 = Eメニュー種別.KeyAssignSystem;
 		}
 		public void t項目リストの設定_KeyAssignDrums() {
-			//			this.tConfigIniへ記録する();
 			this.list項目リスト.Clear();
-
 			// #27029 2012.1.5 from: 説明文は最大9行→13行に変更。
 
 			this.iKeyAssignDrumsReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
@@ -981,7 +917,6 @@ namespace OpenTaiko {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
 			if (this.b要素値にフォーカス中) {
 				this.list項目リスト[this.n現在の選択項目].t項目値を前へ移動();
-				t要素値を上下に変更中の処理();
 			} else {
 				this.n目標のスクロールカウンタ += 100;
 			}
@@ -990,18 +925,10 @@ namespace OpenTaiko {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
 			if (this.b要素値にフォーカス中) {
 				this.list項目リスト[this.n現在の選択項目].t項目値を次へ移動();
-				t要素値を上下に変更中の処理();
 			} else {
 				this.n目標のスクロールカウンタ -= 100;
 			}
 		}
-		private void t要素値を上下に変更中の処理() {
-			//if ( this.list項目リスト[ this.n現在の選択項目 ] == this.iSystemMasterVolume )				// #33700 2014.4.26 yyagi
-			//{
-			//    CDTXMania.Sound管理.nMasterVolume = this.iSystemMasterVolume.n現在の値;
-			//}
-		}
-
 
 		// CActivity 実装
 
@@ -1033,9 +960,7 @@ namespace OpenTaiko {
 			nSkinSampleIndex = -1;
 			#endregion
 
-			//			this.listMenu = new List<stMenuItemRight>();
-
-			this.t項目リストの設定_Drums(); // 
+			this.t項目リストの設定_Drums();
 			this.t項目リストの設定_System();    // 順番として、最後にSystemを持ってくること。設定一覧の初期位置がSystemのため。
 			this.b要素値にフォーカス中 = false;
 			this.n目標のスクロールカウンタ = 0;
@@ -1046,9 +971,8 @@ namespace OpenTaiko {
 			this.iSystemSoundType_initial = this.iSystemSoundType.n現在選択されている項目番号;   // CONFIGに入ったときの値を保持しておく
 			this.iSystemBassBufferSizeMs_initial = this.iSystemBassBufferSizeMs.n現在の値;              // CONFIG脱出時にこの値から変更されているようなら
 			this.iSystemWASAPIBufferSizeMs_initial = this.iSystemWASAPIBufferSizeMs.n現在の値;              // CONFIG脱出時にこの値から変更されているようなら
-																										// this.iSystemASIOBufferSizeMs_initial	= this.iSystemASIOBufferSizeMs.n現在の値;				// サウンドデバイスを再構築する
-			this.iSystemASIODevice_initial = this.iSystemASIODevice.n現在選択されている項目番号; //
-			this.iSystemSoundTimerType_initial = this.iSystemSoundTimerType.GetIndex();             //
+			this.iSystemASIODevice_initial = this.iSystemASIODevice.n現在選択されている項目番号;
+			this.iSystemSoundTimerType_initial = this.iSystemSoundTimerType.GetIndex();
 			base.Activate();
 		}
 		public override void DeActivate() {
@@ -1072,7 +996,6 @@ namespace OpenTaiko {
 			if (this.iSystemSoundType_initial != this.iSystemSoundType.n現在選択されている項目番号 ||
 				 this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
 				 this.iSystemWASAPIBufferSizeMs_initial != this.iSystemWASAPIBufferSizeMs.n現在の値 ||
-				// this.iSystemASIOBufferSizeMs_initial != this.iSystemASIOBufferSizeMs.n現在の値 ||
 				this.iSystemASIODevice_initial != this.iSystemASIODevice.n現在選択されている項目番号 ||
 				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
 				ESoundDeviceType soundDeviceType;
@@ -1097,7 +1020,6 @@ namespace OpenTaiko {
 										this.iSystemBassBufferSizeMs.n現在の値,
 										this.iSystemWASAPIBufferSizeMs.n現在の値,
 										0,
-										// this.iSystemASIOBufferSizeMs.n現在の値,
 										this.iSystemASIODevice.n現在選択されている項目番号,
 										this.iSystemSoundTimerType.bON);
 				OpenTaiko.app.ShowWindowTitleWithSoundType();
@@ -1110,21 +1032,12 @@ namespace OpenTaiko {
 		}
 		public override void CreateManagedResource() {
 			this.prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale);    // t項目リストの設定 の前に必要
-
-			//this.tx通常項目行パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_itembox.png" ), false );
-			//this.txその他項目行パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_itembox other.png" ), false );
-			//this.tx三角矢印 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\4_triangle arrow.png" ), false );
 			this.txSkinSample1 = null;      // スキン選択時に動的に設定するため、ここでは初期化しない
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {
 			prvFont.Dispose();
-
 			OpenTaiko.tテクスチャの解放(ref this.txSkinSample1);
-			//CDTXMania.tテクスチャの解放( ref this.tx通常項目行パネル );
-			//CDTXMania.tテクスチャの解放( ref this.txその他項目行パネル );
-			//CDTXMania.tテクスチャの解放( ref this.tx三角矢印 );
-
 			base.ReleaseManagedResource();
 		}
 		private void OnListMenuの初期化() {
@@ -1162,7 +1075,6 @@ namespace OpenTaiko {
 			if (base.IsFirstDraw) {
 				this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				this.ct三角矢印アニメ.Start(0, 9, 50, OpenTaiko.Timer);
-
 				base.IsFirstDraw = false;
 			}
 			//-----------------
@@ -1241,11 +1153,7 @@ namespace OpenTaiko {
 				this.ct三角矢印アニメ.TickLoop();
 			//-----------------
 			#endregion
-
-
 			// 描画
-
-			//this.ptパネルの基本座標[ 4 ].X = this.b項目リスト側にフォーカスがある ? 0x228 : 0x25a;		// メニューにフォーカスがあるなら、項目リストの中央は頭を出さない。
 
 			#region [ 計11個の項目パネルを描画する。]
 			//-----------------
@@ -1291,11 +1199,8 @@ namespace OpenTaiko {
 				} else {
 					using (var bmpItem = prvFont.DrawText(this.list項目リスト[nItem].str項目名, Color.White, Color.Black, null, 30)) {
 						listMenu[nItem].txMenuItemRight = OpenTaiko.tテクスチャの生成(bmpItem);
-						// ctItem.t2D描画( CDTXMania.app.Device, ( x + 0x12 ) * Scale.X, ( y + 12 ) * Scale.Y - 20 );
-						// CDTXMania.tテクスチャの解放( ref ctItem );
 					}
 				}
-				//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 0x12, y + 12, this.list項目リスト[ nItem ].str項目名 );
 				//-----------------
 				#endregion
 				#region [ 現在の行の項目の要素を描画。]
@@ -1306,7 +1211,6 @@ namespace OpenTaiko {
 					case CItemBase.E種別.ONorOFFトグル:
 						#region [ *** ]
 						//-----------------
-						//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemToggle) this.list項目リスト[ nItem ] ).bON ? "ON" : "OFF" );
 						strParam = ((CItemToggle)this.list項目リスト[nItem]).bON ? "ON" : "OFF";
 						break;
 					//-----------------
@@ -1328,7 +1232,6 @@ namespace OpenTaiko {
 								strParam = "OFF";
 								break;
 						}
-						//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, "ON" );
 						break;
 					//-----------------
 					#endregion
@@ -1338,17 +1241,9 @@ namespace OpenTaiko {
 						//-----------------
 						if (this.list項目リスト[nItem] == this.iCommonPlaySpeed) {
 							double d = ((double)((CItemInteger)this.list項目リスト[nItem]).n現在の値) / 20.0;
-							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, d.ToString( "0.000" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = d.ToString("0.000");
 						}
-						/*else if ( this.list項目リスト[ nItem ] == this.iDrumsScrollSpeed)
-						{
-							float f = ( ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値 + 1 ) / 10f;
-							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, f.ToString( "x0.0" ), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
-							strParam = f.ToString( "x0.0" );
-						}*/
 						else {
-							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, ( (CItemInteger) this.list項目リスト[ nItem ] ).n現在の値.ToString(), ( n行番号 == 0 ) && this.b要素値にフォーカス中 );
 							strParam = ((CItemInteger)this.list項目リスト[nItem]).n現在の値.ToString();
 						}
 						b強調 = centerFlag && this.b要素値にフォーカス中;
@@ -1361,7 +1256,6 @@ namespace OpenTaiko {
 						//-----------------
 						{
 							CItemList list = (CItemList)this.list項目リスト[nItem];
-							//CDTXMania.stageコンフィグ.actFont.t文字列描画( x + 210, y + 12, list.list項目値[ list.n現在選択されている項目番号 ] );
 							strParam = list.list項目値[list.n現在選択されている項目番号];
 
 							#region [ 必要な場合に、Skinのサンプルを生成・描画する。#28195 2012.5.2 yyagi ]
@@ -1579,13 +1473,11 @@ namespace OpenTaiko {
 
 		private CItemInteger iSystemBassBufferSizeMs;       // #24820 2013.1.15 yyagi
 		private CItemInteger iSystemWASAPIBufferSizeMs;     // #24820 2013.1.15 yyagi
-															//		private CItemInteger iSystemASIOBufferSizeMs;		// #24820 2013.1.3 yyagi
 		private CItemList iSystemASIODevice;                // #24820 2013.1.17 yyagi
 
 		private int iSystemSoundType_initial;
 		private int iSystemBassBufferSizeMs_initial;
 		private int iSystemWASAPIBufferSizeMs_initial;
-		//		private int iSystemASIOBufferSizeMs_initial;
 		private int iSystemASIODevice_initial;
 		private CItemToggle iSystemSoundTimerType;          // #33689 2014.6.17 yyagi
 		private int iSystemSoundTimerType_initial;          // #33689 2014.6.17 yyagi
@@ -1597,21 +1489,8 @@ namespace OpenTaiko {
 		private int n現在のスクロールカウンタ;
 		private int n目標のスクロールカウンタ;
 
-		/*
-        private Point[] ptパネルの基本座標 = new Point[] { 
-			new Point(0x25a, 4), new Point(0x25a, 0x4f), new Point(0x25a, 0x9a), new Point(0x25a, 0xe5), 
-			new Point(0x228, 0x130), 
-			new Point(0x25a, 0x17b), new Point(0x25a, 0x1c6), new Point(0x25a, 0x211), new Point(0x25a, 0x25c), new Point(0x25a, 0x2a7) };
-		*/
-
-		//private CTexture txその他項目行パネル;
-		//private CTexture tx三角矢印;
-		//private CTexture tx通常項目行パネル;
-
 		private CCachedFontRenderer prvFont;
-		//private List<string> list項目リスト_str最終描画名;
 		private struct stMenuItemRight {
-			//	public string strMenuItem;
 			public CTexture txMenuItemRight;
 			public int nParam;
 			public string strParam;
@@ -1620,11 +1499,11 @@ namespace OpenTaiko {
 		private stMenuItemRight[] listMenu;
 
 		private CTexture txSkinSample1;             // #28195 2012.5.2 yyagi
-		private string[] skinSubFolders;            //
-		private string[] skinNames;                 //
-		private string skinSubFolder_org;           //
-		private int nSkinSampleIndex;               //
-		private int nSkinIndex;                     //
+		private string[] skinSubFolders;
+		private string[] skinNames;
+		private string skinSubFolder_org;
+		private int nSkinSampleIndex;
+		private int nSkinIndex;
 
 		private CItemBase iDrumsGoToCalibration;
 		private CItemBase iDrumsGoToKeyAssign;
@@ -1679,13 +1558,10 @@ namespace OpenTaiko {
 		private CItemBase iSystemReloadDTX;                 // #32081 2013.10.21 yyagi
 		private CItemBase iSystemHardReloadDTX;
 		private CItemBase isSystemImportingScore;
-		//private CItemInteger iSystemMasterVolume;			// #33700 2014.4.26 yyagi
 
 		public Thread ScoreIniImportThread { get; private set; }
-		public bool ScoreIniImportThreadIsActive
-		{
-			get
-			{
+		public bool ScoreIniImportThreadIsActive {
+			get {
 				if (ScoreIniImportThread == null) return false;
 				return ScoreIniImportThread.IsAlive;
 			}
@@ -1721,7 +1597,6 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
 			OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
-			//CDTXMania.ConfigIni.bWave再生位置自動調整機能有効 = this.iSystemAdjustWaves.bON;
 			OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
 			OpenTaiko.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
 			OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
@@ -1732,11 +1607,8 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bDisplayDebugInfo = this.iSystemDebugInfo.bON;
 			OpenTaiko.ConfigIni.n背景の透過度 = this.iSystemBGAlpha.n現在の値;
 			OpenTaiko.ConfigIni.bBGM音を発声する = this.iSystemBGMSound.bON;
-
 			OpenTaiko.ConfigIni.bDanTowerHide = this.iDanTowerHide.bON;
 
-			// TJAPlayer3.ConfigIni.ApplyLoudnessMetadata = this.iSystemApplyLoudnessMetadata.bON;
-			// TJAPlayer3.ConfigIni.TargetLoudness = this.iSystemTargetLoudness.n現在の値 / 10.0;
 			OpenTaiko.ConfigIni.ApplySongVol = this.iSystemApplySongVol.bON;
 			OpenTaiko.ConfigIni.SoundEffectLevel = this.iSystemSoundEffectLevel.n現在の値;
 			OpenTaiko.ConfigIni.VoiceLevel = this.iSystemVoiceLevel.n現在の値;
@@ -1746,9 +1618,6 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.MusicPreTimeMs = this.MusicPreTimeMs.n現在の値;
 
 			OpenTaiko.ConfigIni.bOutputLogs = this.iLogOutputLog.bON;
-			//CDTXMania.ConfigIni.bストイックモード = this.iSystemStoicMode.bON;
-
-			//CDTXMania.ConfigIni.nShowLagType = this.iSystemShowLag.n現在選択されている項目番号;				// #25370 2011.6.3 yyagi
 			OpenTaiko.ConfigIni.bIsAutoResultCapture = this.iSystemAutoResultCapture.bON;                  // #25399 2011.6.9 yyagi
 			OpenTaiko.ConfigIni.SendDiscordPlayingInformation = this.SendDiscordPlayingInformation.bON;
 
@@ -1769,14 +1638,6 @@ namespace OpenTaiko {
 
 			OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(this.iSystemLanguage.n現在選択されている項目番号);
 			CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
-
-
-			//Trace.TraceInformation( "saved" );
-			//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(true) );
-			//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
-			//Trace.TraceInformation( "Skin現在BoxDef  : " + CSkin.strBoxDefSkinSubfolderFullName );
-			//CDTXMania.ConfigIni.nMasterVolume = this.iSystemMasterVolume.n現在の値;							// #33700 2014.4.26 yyagi
-			//CDTXMania.ConfigIni.e判定表示優先度 = (E判定表示優先度) this.iSystemJudgeDispPriority.n現在選択されている項目番号;
 			OpenTaiko.ConfigIni.ShowChara = this.ShowChara.bON;
 			OpenTaiko.ConfigIni.ShowDancer = this.ShowDancer.bON;
 			OpenTaiko.ConfigIni.ShowRunner = this.ShowRunner.bON;
@@ -1785,47 +1646,31 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.ShowPuchiChara = this.ShowPuchiChara.bON;
 
 			OpenTaiko.ConfigIni.nPlayerCount = this.iTaikoPlayerCount.n現在の値;
-
-			//TJAPlayer3.ConfigIni.nLayoutType = this.iLayoutType.n現在の値;
 			OpenTaiko.ConfigIni.FastRender = this.FastRender.bON;
 			OpenTaiko.ConfigIni.ASyncTextureLoad = this.ASyncTextureLoad.bON;
 			OpenTaiko.ConfigIni.SimpleMode = this.SimpleMode.bON;
 		}
 		private void tConfigIniへ記録する_Drums() {
-			//TJAPlayer3.ConfigIni.b太鼓パートAutoPlay = this.iTaikoAutoPlay.bON;
-			//TJAPlayer3.ConfigIni.b太鼓パートAutoPlay2P = this.iTaikoAutoPlay2P.bON;
-			//TJAPlayer3.ConfigIni.bAuto先生の連打 = this.iTaikoAutoRoll.bON;
 			OpenTaiko.ConfigIni.nRollsPerSec = this.iRollsPerSec.n現在の値;
 
 			OpenTaiko.ConfigIni.nDefaultAILevel = this.iAILevel.n現在の値;
 			for (int i = 0; i < 2; i++)
 				OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
 
-			//TJAPlayer3.ConfigIni.nScrollSpeed[TJAPlayer3.SaveFile] = this.iDrumsScrollSpeed.n現在の値;
-
 			OpenTaiko.ConfigIni.bTight = this.iDrumsTight.bON;
-
-			//TJAPlayer3.ConfigIni.nInputAdjustTimeMs = this.iInputAdjustTimeMs.n現在の値;
 
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 
 			OpenTaiko.ConfigIni.n表示可能な最小コンボ数.Drums = this.iSystemMinComboDrums.n現在の値;
 			OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi
-																					   //CDTXMania.ConfigIni.e判定表示優先度.Drums = (E判定表示優先度) this.iDrumsJudgeDispPriority.n現在選択されている項目番号;
-
 			OpenTaiko.ConfigIni.bBranchGuide = this.iTaikoBranchGuide.bON;
 			OpenTaiko.ConfigIni.nDefaultCourse = this.iTaikoDefaultCourse.n現在選択されている項目番号;
 			OpenTaiko.ConfigIni.nScoreMode = this.iTaikoScoreMode.n現在選択されている項目番号;
 			OpenTaiko.ConfigIni.ShinuchiMode = this.ShinuchiMode.bON;
 			OpenTaiko.ConfigIni.nBranchAnime = this.iTaikoBranchAnime.n現在選択されている項目番号;
-			//CDTXMania.ConfigIni.bHispeedRandom = this.iTaikoHispeedRandom.bON;
 			OpenTaiko.ConfigIni.bNoInfo = this.iTaikoNoInfo.bON;
 
-			//TJAPlayer3.ConfigIni.eRandom.Taiko = (Eランダムモード)this.iTaikoRandom.n現在選択されている項目番号;
-			//TJAPlayer3.ConfigIni.eSTEALTH = (Eステルスモード)this.iTaikoStealth.n現在選択されている項目番号;
-
 			OpenTaiko.ConfigIni.eGameMode = (EGame)this.iTaikoGameMode.n現在選択されている項目番号;
-			//TJAPlayer3.ConfigIni.bJust = this.iTaikoJust.bON;
 			OpenTaiko.ConfigIni.bJudgeCountDisplay = this.iTaikoJudgeCountDisp.bON;
 			OpenTaiko.ConfigIni.ShowExExtraAnime = this.iShowExExtraAnime.bON;
 			OpenTaiko.ConfigIni.bJudgeBigNotes = this.iTaikoBigNotesJudge.bON;

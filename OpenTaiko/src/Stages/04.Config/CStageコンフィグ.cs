@@ -376,8 +376,7 @@ namespace OpenTaiko {
 
 				actCalibrationMode.Update();
 				actCalibrationMode.Draw();
-			}
-			else if (actList.ScoreIniImportThreadIsActive) {
+			} else if (actList.ScoreIniImportThreadIsActive) {
 				if (OpenTaiko.Tx.Tile_Black != null) {
 					OpenTaiko.Tx.Tile_Black.Opacity = 191;
 					for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
@@ -399,8 +398,8 @@ namespace OpenTaiko {
 					}
 				}
 			}
-			// 曲データの一覧取得中は、キー入力を無効化する
-			else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 != true) {
+			  // 曲データの一覧取得中は、キー入力を無効化する
+			  else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 != true) {
 				if (!OpenTaiko.Skin.bgmコンフィグ画面.bIsPlaying)
 					OpenTaiko.Skin.bgmコンフィグ画面.tPlay();
 

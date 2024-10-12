@@ -7,7 +7,6 @@ namespace OpenTaiko {
 		private static CCounter[] ctCharacterFailed = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 		private static CCounter[] ctCharacterFailedIn = new CCounter[5] { new CCounter(), new CCounter(), new CCounter(), new CCounter(), new CCounter() };
 
-
 		public enum ECharacterResult {
 			// Song select
 			NORMAL,
@@ -208,12 +207,6 @@ namespace OpenTaiko {
 				float resolutionRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][0];
 				float resolutionRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][1];
 
-				//202
-				//float _x = (x - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][0] / 1280.0f))) * resolutionRatioX;
-
-				//532
-				//float _y = (y - (((_substitute == true) ? 20 : 40) * (TJAPlayer3.Skin.Characters_Resolution[_charaId][1] / 720.0f))) * resolutionRatioY;
-
 				float _x = x;
 				float _y = y;
 
@@ -234,12 +227,8 @@ namespace OpenTaiko {
 
 				_tex.vcScaleRatio.X = 1f;
 				_tex.vcScaleRatio.Y = 1f;
-
-
 				_tex.Opacity = 255;
-
 			}
-
 		}
 	}
 }

@@ -5,11 +5,7 @@ using static OpenTaiko.DBNameplateUnlockables;
 namespace OpenTaiko {
 	internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnlockable>> {
 		public DBNameplateUnlockables() {
-			//_fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.json";
-			//base.tDBInitSavable();
-
 			_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.db3";
-
 
 			using (var connection = new SqliteConnection(@$"Data Source={_fn}")) {
 				connection.Open();
@@ -61,7 +57,6 @@ namespace OpenTaiko {
 
 		public void tGetUnlockedItems(int _player, ModalQueue mq) {
 			int player = OpenTaiko.GetActualPlayer(_player);
-			//var _sf = TJAPlayer3.SaveFileInstances[player].data.NamePlateTitles;
 			var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedNameplateIds;
 			bool _edited = false;
 
@@ -72,7 +67,6 @@ namespace OpenTaiko {
 					var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
 
 					if (_fulfilled) {
-						//_sf.Add(_npvKey, item.Value.nameplateInfo);
 						_sf.Add(_npvKey);
 						_edited = true;
 						mq.tAddModal(

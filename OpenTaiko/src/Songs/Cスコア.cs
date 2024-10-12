@@ -256,13 +256,7 @@ namespace OpenTaiko {
 			this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
 			this.譜面情報.nクリア = new int[5];
 			this.譜面情報.nスコアランク = new int[5];
-
 			this.譜面情報.nExamResult = new List<int[]> { };
-			//for (int i = 0; i < TJAPlayer3.stage選曲.r確定された曲.DanSongs.Count; i++)
-			//{
-			//	譜面情報.nExamResult.Add(new int[CExamInfo.cMaxExam]);
-			//}
-
 			this.譜面情報.nLife = 5;
 			this.譜面情報.nTotalFloor = 140;
 		}

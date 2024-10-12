@@ -241,8 +241,7 @@ namespace OpenTaiko {
 				} catch (Exception ex) {
 					Trace.TraceWarning($"Failed to import {_score} into new database. More details:\n{ex}");
 					errorcount++;
-				}
-				finally { totalcount++; }
+				} finally { totalcount++; }
 			}
 			Trace.TraceInformation($"Imported {successcount} of {_scoreFiles.Count} scores from score.ini files. ({errorcount} failed imports; {skipcount} skipped imports;)");
 			Status = "";

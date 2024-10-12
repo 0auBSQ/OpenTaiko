@@ -1446,7 +1446,6 @@ namespace OpenTaiko {
 		public bool bViewerShowDebugStatus;
 		public bool bViewerTimeStretch;
 		public bool bViewerDrums有効, bViewerGuitar有効;
-		//public bool bNoMP3Streaming;				// 2014.4.14 yyagi; mp3のシーク位置がおかしくなる場合は、これをtrueにすることで、wavにデコードしてからオンメモリ再生する
 		public int nMasterVolume;
 		public bool ShinuchiMode; // 真打モード
 		public bool FastRender; // 事前画像描画モード
@@ -1665,7 +1664,7 @@ namespace OpenTaiko {
 			this.nWindowBaseXPosition = 100; // #30675 2013.02.04 ikanick add
 			this.nWindowBaseYPosition = 100;
 			this.nWindowWidth = SampleFramework.GameWindowSize.Width;           // #23510 2010.10.31 yyagi add
-			this.nWindowHeight = SampleFramework.GameWindowSize.Height;         // 
+			this.nWindowHeight = SampleFramework.GameWindowSize.Height;         //
 			this.nフレーム毎スリープms = -1;         // #xxxxx 2011.11.27 yyagi add
 			this.n非フォーカス時スリープms = 1;            // #23568 2010.11.04 ikanick add
 			this._bGuitar有効 = true;
@@ -2237,23 +2236,9 @@ namespace OpenTaiko {
 			sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
 			sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 			sw.WriteLine("DefaultAILevel={0}", this.nDefaultAILevel);
-			//sw.WriteLine("AIBattleMode={0}", bAIBattleMode ? 1 : 0);
 			sw.WriteLine();
 			sw.WriteLine(";-------------------");
 			#endregion
-
-			/*
-            #region [ HitRange ]
-            sw.WriteLine("[HitRange]");
-            sw.WriteLine();
-            sw.WriteLine("; Perfect～Poor とみなされる範囲[ms]");
-            sw.WriteLine("Perfect={0}", this.nヒット範囲ms.Perfect);
-            sw.WriteLine("Good={0}", this.nヒット範囲ms.Good);
-            sw.WriteLine("Poor={0}", this.nヒット範囲ms.Poor);
-            sw.WriteLine();
-            sw.WriteLine(";-------------------");
-            #endregion
-			*/
 
 			#region [ Log ]
 			sw.WriteLine("[Log]");

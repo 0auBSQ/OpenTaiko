@@ -41,7 +41,6 @@ namespace OpenTaiko {
 			// Earn Coins is also called once per play, so we just add 1 here to the total playcount
 			data.TotalPlaycount += 1;
 			DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, amount, 1);
-			//tSaveFile();
 		}
 
 		// Return false if the current amount of coins is to low
@@ -51,8 +50,6 @@ namespace OpenTaiko {
 
 			data.Medals -= amount;
 			DBSaves.AlterCoinsAndTotalPlayCount(data.SaveId, -amount, 0);
-			//tSaveFile();
-
 			return true;
 		}
 
@@ -88,20 +85,9 @@ namespace OpenTaiko {
 			if (!this.data.DanTitles.ContainsKey(title) || cs != clearStatus || iG != isGold) {
 				DBSaves.RegisterDanTitle(data.SaveId, title, clearStatus, isGold);
 				changed = true;
-				/*
-                TJAPlayer3.NamePlateConfig.data.Dan[player] = title;
-                TJAPlayer3.NamePlateConfig.data.DanGold[player] = iG;
-                TJAPlayer3.NamePlateConfig.data.DanType[player] = cs;
-                */
 			}
-
-
 			CDanTitle danTitle = new CDanTitle(iG, cs);
-
 			this.data.DanTitles[title] = danTitle;
-
-			//tSaveFile();
-
 			return changed;
 		}
 
@@ -166,7 +152,6 @@ namespace OpenTaiko {
 
 		public void tApplyHeyaChanges() {
 			DBSaves.ApplyChangesFromMyRoom(this);
-			//this.tSaveFile();
 		}
 
 		#endregion

@@ -95,7 +95,6 @@ namespace OpenTaiko {
 						return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_CLEAR" : "UNLOCK_CONDITION_REQUIRE_CLEAR_MORE");
 					case (int)EClearStatus.ASSISTED_CLEAR:
 						return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_ASSIST" : "UNLOCK_CONDITION_REQUIRE_ASSIST_MORE");
-					case (int)EClearStatus.NONE:
 					default:
 						return CLangManager.LangInstance.GetString(exact ? "UNLOCK_CONDITION_REQUIRE_PLAY" : "UNLOCK_CONDITION_REQUIRE_PLAY_MORE");
 				}
@@ -116,7 +115,7 @@ namespace OpenTaiko {
              * ap : "AI battle plays", 1 value : [AI battle playcount]
              * aw : "AI battle wins", 1 value : [AI battle wins count]
              * ig : "Impossible to Get", (not recommanded) used to be able to have content in database that is impossible to unlock, no values
-             * 
+             *
             */
 			public (bool, string?) tConditionMetWrapper(int player, EScreen screen = EScreen.MyRoom) {
 				if (RequiredArgCount < 0 && RequiredArgs.ContainsKey(Condition))
@@ -510,11 +509,6 @@ namespace OpenTaiko {
 			}
 
 			#endregion
-
 		}
-
 	}
-
-
-
 }

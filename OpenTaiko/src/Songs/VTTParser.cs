@@ -8,12 +8,7 @@ using static OpenTaiko.CDTX;
 
 namespace OpenTaiko {
 	public class VTTParser : IDisposable {
-		/*
-        
-        TO-DO :
-        - timestamp tag support
-
-        */
+		// TODO : timestamp tag support
 		[Flags]
 		private enum ParseMode {
 			None = 0,
@@ -23,7 +18,7 @@ namespace OpenTaiko {
 		}
 
 		internal struct LyricData {
-			public long timestamp; // WIP, only first timestamp is accounted for
+			public long timestamp; // TODO: WIP, only first timestamp is accounted for
 			public string Text;
 
 			public CCachedFontRenderer.FontStyle Style;
