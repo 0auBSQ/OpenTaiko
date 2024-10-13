@@ -50,18 +50,18 @@ jobs:
           7z u ../../../../../../OpenTaiko_win_64bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
           cd ..\..\..\..\..\..\
 
-      - name: Build for Windows x86
-        shell: cmd
-        run: |
-          build-win-x86.bat
+#      - name: Build for Windows x86
+#        shell: cmd
+#        run: |
+#          build-win-x86.bat
           
-      - name: Create Archive (Win x86)
-        shell: cmd
-        run: |
-          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
-          7z a ../../../../../../OpenTaiko_win_32bit.zip * -xr!Songs/ 
-          7z u ../../../../../../OpenTaiko_win_32bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
-          cd ..\..\..\..\..\..\
+#      - name: Create Archive (Win x86)
+#        shell: cmd
+#        run: |
+#          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
+#          7z a ../../../../../../OpenTaiko_win_32bit.zip * -xr!Songs/ 
+#          7z u ../../../../../../OpenTaiko_win_32bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
+#          cd ..\..\..\..\..\..\
 
       - name: Build for Mac x64
         shell: cmd
@@ -107,7 +107,8 @@ jobs:
       - name: Upload All Builds
         uses: xresloader/upload-to-github-release@v1.4.2
         with:
-          file: "OpenTaiko_win_64bit.zip;OpenTaiko_win_32bit.zip;OpenTaiko_osx_64bit.zip;OpenTaiko_linux_64bit.zip;Songs.zip"
+#          file: "OpenTaiko_win_64bit.zip;OpenTaiko_win_32bit.zip;OpenTaiko_osx_64bit.zip;OpenTaiko_linux_64bit.zip;Songs.zip"
+          file: "OpenTaiko_win_64bit.zip;OpenTaiko_osx_64bit.zip;OpenTaiko_linux_64bit.zip;Songs.zip"
           overwrite: true
           tag_name: "autobuild"
           draft: false
