@@ -40,7 +40,8 @@ namespace OpenTaiko {
 		}
 
 		public override int Draw() {
-			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.nTotalFloor);
+			// nTotalFloor needs to be fixed, it always returns 140.
+			//tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.nTotalFloor);
 
 			return 0;
 		}
