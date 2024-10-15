@@ -2238,7 +2238,7 @@ for (int i = 0; i < 3; i++) {
 				Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
 				OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName = OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true);  // 旧指定のSkinフォルダが消滅していた場合に備える
 
-				// ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
+				ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
 
 				Trace.TraceInformation("Skin successfully initialized.");
 			}
@@ -2879,7 +2879,7 @@ for (int i = 0; i < 3; i++) {
 			GameWindowSize.Width = nWidth;
 			GameWindowSize.Height = nHeight;
 
-			WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
+			//WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
 		}
 
 		public void RefreshSkin() {
@@ -2895,7 +2895,7 @@ for (int i = 0; i < 3; i++) {
 
 			OpenTaiko.Tx.DisposeTexture();
 
-			// ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
+			ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
 
 			OpenTaiko.Tx.LoadTexture();
 
