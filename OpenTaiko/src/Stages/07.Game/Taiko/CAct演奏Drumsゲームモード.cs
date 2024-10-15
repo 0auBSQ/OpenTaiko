@@ -119,7 +119,7 @@ namespace OpenTaiko {
 
 		public void t叩ききりまショー_判定項目と難易度を決める() {
 			//まず通常、激辛時でわける。
-			if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー) {
+			if (OpenTaiko.ConfigIni.eGameMode == EGame.Survival) {
 				#region[ 通常 ]
 				//通常の査定
 				// 精度 > 最小ズレ > コンボ > 最大ズレ > ミス
@@ -182,7 +182,7 @@ namespace OpenTaiko {
 					new STボーナス( 70.0, -0.5 )
 				};
 				#endregion
-			} else if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛) {
+			} else if (OpenTaiko.ConfigIni.eGameMode == EGame.SurvivalHard) {
 				#region[ 激辛 ]
 				//激ムズの査定
 				// 最大ズレ > 精度 > コンボ > 最小ズレ > ミス
@@ -373,7 +373,7 @@ namespace OpenTaiko {
 		}
 
 		public override int Draw() {
-			if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー || OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛) {
+			if (OpenTaiko.ConfigIni.eGameMode == EGame.Survival || OpenTaiko.ConfigIni.eGameMode == EGame.SurvivalHard) {
 				//if( this.st叩ききりまショー.b最初のチップが叩かれた == true )//&&
 				//CDTXMania.stage演奏ドラム画面.r検索範囲内にチップがあるか調べる( CSound管理.rc演奏用タイマ.n現在時刻ms, 0, 3000 ) )
 				//this.st叩ききりまショー.ct残り時間.t進行();

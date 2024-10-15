@@ -142,7 +142,7 @@ namespace OpenTaiko {
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try {
 					strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名;
-					if (OpenTaiko.ConfigIni.bBGM音を発声する)
+					if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound)
 						this.sound = OpenTaiko.SoundManager.tCreateSound(strPreviewFilename, ESoundGroup.SongPreview);
 					if (this.sound == null) return;
 					//this.sound.db再生速度 = ((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0;

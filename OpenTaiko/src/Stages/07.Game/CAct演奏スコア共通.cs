@@ -4,7 +4,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CAct演奏スコア共通 : CActivity {
-		// プロパティ
+		// Properties
 
 		protected long[] nScoreIncrease;
 		protected double[] nCurrentRealScore;

@@ -37,7 +37,7 @@ namespace OpenTaiko {
 				this.tx描画用.vcScaleRatio.X = this.ratio1;
 				this.tx描画用.vcScaleRatio.Y = this.ratio1;
 
-				if (OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.背景のみ)) {
+				if (OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.BackgroundOnly)) {
 					this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
 				}
 			}
@@ -45,10 +45,10 @@ namespace OpenTaiko {
 		}
 
 		public void t窓表示() {
-			if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.ウィンドウのみ))
+			if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.WindowOnly))
 				return;
 
-			float[] fRatio = new float[] { 640.0f - 4.0f, 360.0f - 4.0f }; //中央下表示
+			float[] fRatio = new float[] { (SampleFramework.GameWindowSize.Width / 2) - 4.0f, (SampleFramework.GameWindowSize.Height / 2) - 4.0f }; //中央下表示
 
 			float ratio = Math.Min((float)(fRatio[0] / this.rVD.FrameSize.Width), (float)(fRatio[1] / this.rVD.FrameSize.Height));
 			this.tx描画用.vcScaleRatio.X = ratio;

@@ -8,7 +8,7 @@ namespace OpenTaiko {
 			base.IsDeActivated = true;
 		}
 		public void tSelectedSongChanged() {
-			this.ctDelayedDisplay = new CCounter(-OpenTaiko.ConfigIni.n曲が選択されてからプレビュー画像が表示開始されるまでのウェイトms, 100, 1, OpenTaiko.Timer);
+			this.ctDelayedDisplay = new CCounter(-OpenTaiko.ConfigIni.nMsWaitPreviewImageFromSongSelected, 100, 1, OpenTaiko.Timer);
 			this.bNewPreimageLoaded = false;
 		}
 

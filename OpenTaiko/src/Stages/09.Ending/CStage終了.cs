@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CStage終了 : CStage {
-		// コンストラクタ
+		// Constructor
 
 		public CStage終了() {
 			base.eStageID = CStage.EStage.End;

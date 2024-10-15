@@ -1,6 +1,6 @@
 ﻿namespace FDK {
 	public class CActivity {
-		// プロパティ
+		// Properties
 
 		public bool IsActivated { get; private set; }
 		public bool IsDeActivated {
@@ -21,7 +21,7 @@
 		protected bool IsFirstDraw = true;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CActivity() {
 			this.IsDeActivated = true;

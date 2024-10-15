@@ -37,7 +37,7 @@ namespace OpenTaiko {
 	}
 
 	internal class CSkin : IDisposable {
-		// クラス
+		// Class
 
 		public class CSystemSound : IDisposable {
 			// static フィールド
@@ -240,7 +240,7 @@ namespace OpenTaiko {
 		}
 
 
-		// プロパティ
+		// Properties
 
 		// Hitsounds
 
@@ -604,7 +604,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 		public CSkin(string _strSkinSubfolderFullName, bool _bUseBoxDefSkin) {
 			lockBoxDefSkin = new object();
 			strSystemSkinSubfolderFullName = _strSkinSubfolderFullName;
@@ -901,7 +901,7 @@ namespace OpenTaiko {
 		/// 変数の初期化
 		/// </summary>
 		public void tSkinConfigInit() {
-			this.eDiffDispMode = E難易度表示タイプ.mtaikoに画像で表示;
+			this.eDiffDispMode = EDifficultyDisplayType.ImageOnMTaiko;
 			this.b現在のステージ数を表示しない = false;
 		}
 
@@ -1015,7 +1015,7 @@ namespace OpenTaiko {
 									}
 
 								case "DiffDispMode": {
-										this.eDiffDispMode = (E難易度表示タイプ)CConversion.n値を文字列から取得して範囲内に丸めて返す(strParam, 0, 2, (int)this.eDiffDispMode);
+										this.eDiffDispMode = (EDifficultyDisplayType)CConversion.n値を文字列から取得して範囲内に丸めて返す(strParam, 0, 2, (int)this.eDiffDispMode);
 										break;
 									}
 								case "NowStageDisp": {
@@ -2455,15 +2455,25 @@ namespace OpenTaiko {
 									}
 								case "SongSelect_Difficulty_Number_X": {
 										string[] strSplit = strParam.Split(',');
-										for (int i = 0; i < 5; i++) {
+										int max = Math.Min(strSplit.Length, 7);
+										for (int i = 0; i < max; i++) {
 											SongSelect_Difficulty_Number_X[i] = int.Parse(strSplit[i]);
+											if (i == 4) {
+												SongSelect_Difficulty_Number_X[5] = SongSelect_Difficulty_Number_X[i];
+												SongSelect_Difficulty_Number_X[6] = SongSelect_Difficulty_Number_X[i];
+											}
 										}
 										break;
 									}
 								case "SongSelect_Difficulty_Number_Y": {
 										string[] strSplit = strParam.Split(',');
-										for (int i = 0; i < 5; i++) {
+										int max = Math.Min(strSplit.Length, 7);
+										for (int i = 0; i < max; i++) {
 											SongSelect_Difficulty_Number_Y[i] = int.Parse(strSplit[i]);
+											if (i == 4) {
+												SongSelect_Difficulty_Number_Y[5] = SongSelect_Difficulty_Number_Y[i];
+												SongSelect_Difficulty_Number_Y[6] = SongSelect_Difficulty_Number_Y[i];
+											}
 										}
 										break;
 									}
@@ -7578,7 +7588,7 @@ namespace OpenTaiko {
 		public float fComboNumberSpacing = 0;
 		public float fComboNumberSpacing_l = 0;
 
-		public E難易度表示タイプ eDiffDispMode;
+		public EDifficultyDisplayType eDiffDispMode;
 		public bool b現在のステージ数を表示しない;
 
 		//リザルト画面
@@ -8098,8 +8108,8 @@ namespace OpenTaiko {
 		public int[] SongSelect_Difficulty_Star_Y = new int[] { 459, 459, 459, 459, 459 };
 		public int[] SongSelect_Difficulty_Star_Interval = new int[] { 10, 0 };
 
-		public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927 };
-		public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435 };
+		public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927, 927, 927 };
+		public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435, 435, 435 };
 		public int[] SongSelect_Difficulty_Number_Interval = new int[] { 11, 0 };
 
 		public int[][] SongSelect_Difficulty_Crown_X = new int[][] {

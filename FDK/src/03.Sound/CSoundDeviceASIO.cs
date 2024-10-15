@@ -26,7 +26,7 @@ namespace FDK {
 	}
 
 	internal class CSoundDeviceASIO : ISoundDevice {
-		// プロパティ
+		// Properties
 
 		public ESoundDeviceType SoundDeviceType {
 			get;
@@ -81,7 +81,7 @@ namespace FDK {
 					Errors be = Bass.LastError;
 					Trace.TraceInformation("ASIO Master Volume Set Error: " + be.ToString());
 				} else {
-					// int n = this.nMasterVolume;	
+					// int n = this.nMasterVolume;
 					// Trace.TraceInformation( "ASIO Master Volume Set Success: " + value );
 				}
 			}

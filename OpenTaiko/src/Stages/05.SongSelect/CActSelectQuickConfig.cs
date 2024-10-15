@@ -2,7 +2,7 @@
 
 namespace OpenTaiko {
 	internal class CActSelectQuickConfig : CActSelectPopupMenu {
-		// コンストラクタ
+		// Constructor
 
 		public CActSelectQuickConfig() {
 			CActSelectQuickConfigMain();
@@ -10,16 +10,16 @@ namespace OpenTaiko {
 
 		private void CActSelectQuickConfigMain() {
 			/*
-			•Target: Drums/Guitar/Bass 
-			•Auto Mode: All ON/All OFF/CUSTOM 
-			•Auto Lane: 
-			•Scroll Speed: 
-			•Play Speed: 
-			•Risky: 
-			•Hidden/Sudden: None/Hidden/Sudden/Both 
-			•Conf SET: SET-1/SET-2/SET-3 
-			•More... 
-			•EXIT 
+			•Target: Drums/Guitar/Bass
+			•Auto Mode: All ON/All OFF/CUSTOM
+			•Auto Lane:
+			•Scroll Speed:
+			•Play Speed:
+			•Risky:
+			•Hidden/Sudden: None/Hidden/Sudden/Both
+			•Conf SET: SET-1/SET-2/SET-3
+			•More...
+			•EXIT
 			*/
 			lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
 			for (int nConfSet = 0; nConfSet < 3; nConfSet++) {
@@ -98,11 +98,11 @@ namespace OpenTaiko {
 					OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile] = (EStealthMode)GetIndex((int)EOrder.Stealth);
 					break;
 				case (int)EOrder.GameMode:
-					EGame game = EGame.OFF;
+					EGame game = EGame.Off;
 					switch ((int)GetIndex((int)EOrder.GameMode)) {
-						case 0: game = EGame.OFF; break;
-						case 1: game = EGame.完走叩ききりまショー; break;
-						case 2: game = EGame.完走叩ききりまショー激辛; break;
+						case 0: game = EGame.Off; break;
+						case 1: game = EGame.Survival; break;
+						case 2: game = EGame.SurvivalHard; break;
 					}
 					OpenTaiko.ConfigIni.eGameMode = game;
 					break;

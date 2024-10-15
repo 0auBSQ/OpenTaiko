@@ -1,14 +1,14 @@
 ﻿namespace OpenTaiko.Animations {
 	/// <summary>
-	/// イーズインを行うクラス。
+	/// A class that performs ease-in animation.
 	/// </summary>
 	class EaseIn : Animator {
 		/// <summary>
-		/// イーズインを初期化します。
+		/// Initialize Ease-in.
 		/// </summary>
-		/// <param name="startPoint">始点。</param>
-		/// <param name="endPoint">終点。</param>
-		/// <param name="timeMs">イージングにかける時間。</param>
+		/// <param name="startPoint">Starting point</param>
+		/// <param name="endPoint">End point</param>
+		/// <param name="timeMs">Time taken for easing, in milliseconds</param>
 		public EaseIn(int startPoint, int endPoint, int timeMs) : base(0, timeMs, 1, false) {
 			StartPoint = startPoint;
 			EndPoint = endPoint;
@@ -17,8 +17,8 @@
 		}
 
 		public override object GetAnimation() {
-			var persent = Counter.CurrentValue / (double)TimeMs;
-			return ((double)Sa * persent * persent * persent) + StartPoint;
+			var percent = Counter.CurrentValue / (double)TimeMs;
+			return ((double)Sa * percent * percent * percent) + StartPoint;
 		}
 
 		private readonly int StartPoint;

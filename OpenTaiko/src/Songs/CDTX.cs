@@ -17,7 +17,7 @@ namespace OpenTaiko {
 
 		public List<string> listErrors = new List<string>();
 		private int nNowReadLine;
-		// クラス
+		// Class
 
 		public class CBPM {
 			public double dbBPM値;
@@ -159,7 +159,7 @@ namespace OpenTaiko {
 			public int nスクロール方向;
 			public int n描画優先度; //(特殊)現状連打との判断目的で使用
 			public ENoteState eNoteState;
-			public EInstrumentPad e楽器パート = EInstrumentPad.UNKNOWN;
+			public EInstrumentPad e楽器パート = EInstrumentPad.Unknown;
 			public int nチャンネル番号;
 			public int VideoStartTimeMs;
 			public STDGBVALUE<int> nバーからの距離dot;
@@ -308,7 +308,7 @@ namespace OpenTaiko {
 				this.bHit = false;
 				this.IsMissed = false;
 				this.b可視 = true;
-				this.e楽器パート = EInstrumentPad.UNKNOWN;
+				this.e楽器パート = EInstrumentPad.Unknown;
 				this.n透明度 = 0xff;
 				this.nバーからの距離dot.Drums = 0;
 				this.nバーからの距離dot.Guitar = 0;
@@ -562,7 +562,7 @@ namespace OpenTaiko {
 							OpenTaiko.SoundManager.tDisposeSound(this.rSound[i]);
 						this.rSound[i] = null;
 
-						if ((i == 0) && OpenTaiko.ConfigIni.bLog作成解放ログ出力)
+						if ((i == 0) && OpenTaiko.ConfigIni.bOutputCreationReleaseLog)
 							Trace.TraceInformation("サウンドを解放しました。({0})({1})", this.strコメント文, this.strファイル名);
 					}
 				}
@@ -949,7 +949,7 @@ namespace OpenTaiko {
 			public int nタイプ;
 		}
 
-		// プロパティ
+		// Properties
 
 
 		public class CBranchStartInfo {
@@ -1178,7 +1178,7 @@ namespace OpenTaiko {
 //		public bool bGUITAR演奏で直前のGUITARを消音する;
 //		public bool bBASS演奏で直前のBASSを消音する;
 #endif
-		// コンストラクタ
+		// Constructor
 
 		public CDTX() {
 			this.nPlayerSide = 0;
@@ -1387,7 +1387,7 @@ namespace OpenTaiko {
 							cwav.rSound[i].AddBassSoundFromMixer();
 						}
 
-						if (OpenTaiko.ConfigIni.bLog作成解放ログ出力) {
+						if (OpenTaiko.ConfigIni.bOutputCreationReleaseLog) {
 							Trace.TraceInformation("サウンドを作成しました。({3})({0})({1})({2}bytes)", cwav.strコメント文, str,
 								cwav.rSound[0].SoundBufferSize, cwav.rSound[0].IsStreamPlay ? "Stream" : "OnMemory");
 						}
@@ -1429,7 +1429,7 @@ namespace OpenTaiko {
 			var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
 
 			switch (eFun) {
-				case EFunMods.MINESWEEPER:
+				case EFunMods.Minesweeper:
 					foreach (var chip in this.listChip) {
 						if (NotesManager.IsMissableNote(chip)) {
 							int n = rnd.Next(100);
@@ -1445,7 +1445,7 @@ namespace OpenTaiko {
 
 					}
 					break;
-				case EFunMods.AVALANCHE:
+				case EFunMods.Avalanche:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1453,7 +1453,7 @@ namespace OpenTaiko {
 						chip.dbSCROLL *= (n + 50) / (double)100;
 					}
 					break;
-				case EFunMods.NONE:
+				case EFunMods.None:
 				default:
 					break;
 			}
@@ -1466,7 +1466,7 @@ namespace OpenTaiko {
 			var eRandom = OpenTaiko.ConfigIni.eRandom[OpenTaiko.GetActualPlayer(player)];
 
 			switch (eRandom) {
-				case ERandomMode.MIRROR:
+				case ERandomMode.Mirror:
 					foreach (var chip in this.listChip) {
 						switch (chip.nチャンネル番号) {
 							case 0x11:
@@ -1486,7 +1486,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.RANDOM:
+				case ERandomMode.Random:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1510,7 +1510,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.SUPERRANDOM:
+				case ERandomMode.SuperRandom:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1534,7 +1534,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.MIRRORRANDOM:
+				case ERandomMode.MirrorRandom:
 					foreach (var chip in this.listChip) {
 						int n = rnd.Next(100);
 
@@ -1558,7 +1558,7 @@ namespace OpenTaiko {
 						}
 					}
 					break;
-				case ERandomMode.OFF:
+				case ERandomMode.Off:
 				default:
 					break;
 			}
@@ -1578,7 +1578,7 @@ namespace OpenTaiko {
 				}
 			}
 
-			if (eRandom != ERandomMode.OFF) {
+			if (eRandom != ERandomMode.Off) {
 				#region[ list作成 ]
 				//ひとまずチップだけのリストを作成しておく。
 				List<CDTX.CChip> list音符のみのリスト;
@@ -1599,7 +1599,7 @@ namespace OpenTaiko {
 
 		#region [ チップの再生と停止 ]
 		public void tチップの再生(CChip pChip, long n再生開始システム時刻ms) {
-			if (OpenTaiko.ConfigIni.b演奏速度が一倍速であるとき以外音声を再生しない && OpenTaiko.ConfigIni.nSongSpeed != 20)
+			if (OpenTaiko.ConfigIni.bNoAudioIfNot1xSpeed && OpenTaiko.ConfigIni.nSongSpeed != 20)
 				return;
 
 			if (pChip.n整数値_内部番号 >= 0) {
@@ -2111,7 +2111,7 @@ namespace OpenTaiko {
 
 					#endregion
 					#region [ bLogDTX詳細ログ出力 ]
-					if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
+					if (OpenTaiko.ConfigIni.bOutputDetailedDTXLog) {
 						foreach (CWAV cwav in this.listWAV.Values) {
 							Trace.TraceInformation(cwav.ToString());
 						}
@@ -4689,11 +4689,11 @@ namespace OpenTaiko {
 				chip.n整数値_内部番号 = 1;
 				switch (argument) {
 					case "Taiko":
-						chip.eGameType = EGameType.TAIKO;
+						chip.eGameType = EGameType.Taiko;
 						break;
 					case "Bongo":
 					case "Konga":
-						chip.eGameType = EGameType.KONGA;
+						chip.eGameType = EGameType.Konga;
 						break;
 				}
 
@@ -5123,7 +5123,7 @@ namespace OpenTaiko {
 				chip.nコース = this.n現在のコース;
 
 				// チップを配置。
-				eScrollMode = EScrollMode.BMSCROLL;
+				eScrollMode = EScrollMode.BMScroll;
 
 				this.listChip.Add(chip);
 			} else if (command == "#HBSCROLL") {
@@ -5139,7 +5139,7 @@ namespace OpenTaiko {
 				chip.nコース = this.n現在のコース;
 
 				// チップを配置。
-				eScrollMode = EScrollMode.HBSCROLL;
+				eScrollMode = EScrollMode.HBScroll;
 
 				this.listChip.Add(chip);
 			}
@@ -5379,7 +5379,7 @@ namespace OpenTaiko {
 									chip.nコース = n現在のコース;
 
 								chip.n分岐回数 = this.n内部番号BRANCH1to;
-								chip.e楽器パート = EInstrumentPad.TAIKO;
+								chip.e楽器パート = EInstrumentPad.Taiko;
 								chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 								chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
 								chip.nPlayerSide = this.nPlayerSide;
@@ -5594,10 +5594,10 @@ namespace OpenTaiko {
 				if (InputText.Equals("#NMSCROLL")) {
 					eScrollMode = EScrollMode.Normal;
 				} else if (InputText.Equals("#HBSCROLL")) {
-					eScrollMode = EScrollMode.HBSCROLL;
+					eScrollMode = EScrollMode.HBScroll;
 				}
 				if (InputText.Equals("#BMSCROLL")) {
-					eScrollMode = EScrollMode.BMSCROLL;
+					eScrollMode = EScrollMode.BMScroll;
 				}
 			}
 

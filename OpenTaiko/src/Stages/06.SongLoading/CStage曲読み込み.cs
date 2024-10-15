@@ -202,7 +202,7 @@ namespace OpenTaiko {
 					this.sd読み込み音.tStopSound();
 					this.sd読み込み音.tDispose();
 				}
-				return (int)E曲読込画面の戻り値.読込中止;
+				return (int)ESongLoadingScreenReturnValue.LoadCanceled;
 			}
 			#endregion
 
@@ -372,7 +372,7 @@ namespace OpenTaiko {
 					// 必ず一度「CStaeg.Eフェーズ.共通_フェードイン」フェーズを経由させること。
 					// さもないと、曲読み込みが完了するまで、曲読み込み画面が描画されない。
 					base.ePhaseID = CStage.EPhase.SongLoading_LoadDTXFile;
-					return (int)E曲読込画面の戻り値.継続;
+					return (int)ESongLoadingScreenReturnValue.Continue;
 
 				case CStage.EPhase.SongLoading_LoadDTXFile: {
 						timeBeginLoad = DateTime.Now;
@@ -445,14 +445,14 @@ namespace OpenTaiko {
 
 						base.ePhaseID = CStage.EPhase.SongLoading_WaitToLoadWAVFile;
 						timeBeginLoadWAV = DateTime.Now;
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 					}
 
 				case CStage.EPhase.SongLoading_WaitToLoadWAVFile: {
 						if (this.ct待機.CurrentValue > 260) {
 							base.ePhaseID = CStage.EPhase.SongLoading_LoadWAVFile;
 						}
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 					}
 
 				case CStage.EPhase.SongLoading_LoadWAVFile: {
@@ -487,7 +487,7 @@ namespace OpenTaiko {
 
 							base.ePhaseID = CStage.EPhase.SongLoading_LoadBMPFile;
 						}
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 					}
 
 				case CStage.EPhase.SongLoading_LoadBMPFile: {
@@ -511,7 +511,7 @@ namespace OpenTaiko {
 						OpenTaiko.Timer.Update();
 						//CSound管理.rc演奏用タイマ.t更新();
 						base.ePhaseID = CStage.EPhase.SongLoading_WaitForSoundSystemBGM;
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 					}
 
 				case CStage.EPhase.SongLoading_WaitForSoundSystemBGM: {
@@ -524,19 +524,19 @@ namespace OpenTaiko {
 						{
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						}
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 					}
 
 				case CStage.EPhase.Common_FADEOUT:
 					if (this.ct待機.IsUnEnded)        // DTXVモード時は、フェードアウト省略
-						return (int)E曲読込画面の戻り値.継続;
+						return (int)ESongLoadingScreenReturnValue.Continue;
 
 					if (this.sd読み込み音 != null) {
 						this.sd読み込み音.tDispose();
 					}
-					return (int)E曲読込画面の戻り値.読込完了;
+					return (int)ESongLoadingScreenReturnValue.LoadComplete;
 			}
-			return (int)E曲読込画面の戻り値.継続;
+			return (int)ESongLoadingScreenReturnValue.Continue;
 		}
 
 		/// <summary>

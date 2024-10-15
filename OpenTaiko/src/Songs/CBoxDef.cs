@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenTaiko {
 	internal class CBoxDef {
-		// プロパティ
+		// Properties
 
 		public Color Color;
 		public string SelectBG;
@@ -28,7 +28,7 @@ namespace OpenTaiko {
 		public string DefaultPreimage;
 		public string ScenePreset;
 
-		// コンストラクタ
+		// Constructor
 
 		public CBoxDef() {
 			this.Genre = "";
