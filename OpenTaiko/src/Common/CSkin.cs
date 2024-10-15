@@ -2455,15 +2455,25 @@ namespace OpenTaiko {
 									}
 								case "SongSelect_Difficulty_Number_X": {
 										string[] strSplit = strParam.Split(',');
-										for (int i = 0; i < 5; i++) {
+										int max = Math.Min(strSplit.Length, 7);
+										for (int i = 0; i < max; i++) {
 											SongSelect_Difficulty_Number_X[i] = int.Parse(strSplit[i]);
+											if (i == 4) {
+												SongSelect_Difficulty_Number_X[5] = SongSelect_Difficulty_Number_X[i];
+												SongSelect_Difficulty_Number_X[6] = SongSelect_Difficulty_Number_X[i];
+											}
 										}
 										break;
 									}
 								case "SongSelect_Difficulty_Number_Y": {
 										string[] strSplit = strParam.Split(',');
-										for (int i = 0; i < 5; i++) {
+										int max = Math.Min(strSplit.Length, 7);
+										for (int i = 0; i < max; i++) {
 											SongSelect_Difficulty_Number_Y[i] = int.Parse(strSplit[i]);
+											if (i == 4) {
+												SongSelect_Difficulty_Number_Y[5] = SongSelect_Difficulty_Number_Y[i];
+												SongSelect_Difficulty_Number_Y[6] = SongSelect_Difficulty_Number_Y[i];
+											}
 										}
 										break;
 									}
@@ -8098,8 +8108,8 @@ namespace OpenTaiko {
 		public int[] SongSelect_Difficulty_Star_Y = new int[] { 459, 459, 459, 459, 459 };
 		public int[] SongSelect_Difficulty_Star_Interval = new int[] { 10, 0 };
 
-		public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927 };
-		public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435 };
+		public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927, 927, 927 };
+		public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435, 435, 435 };
 		public int[] SongSelect_Difficulty_Number_Interval = new int[] { 11, 0 };
 
 		public int[][] SongSelect_Difficulty_Crown_X = new int[][] {
