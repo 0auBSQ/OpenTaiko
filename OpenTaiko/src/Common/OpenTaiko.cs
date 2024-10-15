@@ -2879,7 +2879,7 @@ for (int i = 0; i < 3; i++) {
 			GameWindowSize.Width = nWidth;
 			GameWindowSize.Height = nHeight;
 
-			WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
+			//WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
 		}
 
 		public void RefreshSkin() {

@@ -48,7 +48,7 @@ namespace OpenTaiko {
 			if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.ウィンドウのみ))
 				return;
 
-			float[] fRatio = new float[] { 640.0f - 4.0f, 360.0f - 4.0f }; //中央下表示
+			float[] fRatio = new float[] { (SampleFramework.GameWindowSize.Width / 2) - 4.0f, (SampleFramework.GameWindowSize.Height / 2) - 4.0f }; //中央下表示
 
 			float ratio = Math.Min((float)(fRatio[0] / this.rVD.FrameSize.Width), (float)(fRatio[1] / this.rVD.FrameSize.Height));
 			this.tx描画用.vcScaleRatio.X = ratio;

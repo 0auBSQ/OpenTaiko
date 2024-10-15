@@ -40,7 +40,8 @@ namespace OpenTaiko {
 		}
 
 		public override int Draw() {
-			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.nTotalFloor);
+			if (OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5] != null)
+			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5].譜面情報.nTotalFloor);
 
 			return 0;
 		}
