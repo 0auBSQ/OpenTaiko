@@ -194,7 +194,7 @@
 		"SETTINGS_TRAINING_SKIPCOUNT": "跳转小节数",
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "训练模式中按下前进/后退多个小节跳转的小节数。",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "跳转小节时间间隔",
-		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "训练模式中跳转至带书签的小节交替按下左/右蓝按键所需毫秒数。",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "训练模式中跳转至带书签的小节交替按下左/右蓝按键所需\n毫秒数。",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
