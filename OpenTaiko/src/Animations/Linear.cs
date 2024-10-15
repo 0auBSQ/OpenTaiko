@@ -1,14 +1,14 @@
 ﻿namespace OpenTaiko.Animations {
 	/// <summary>
-	/// リニア移動を行うクラス。
+	/// A class that performs linear animation.
 	/// </summary>
 	class Linear : Animator {
 		/// <summary>
-		/// リニア移動を初期化します。
+		/// Initialize linear movement.
 		/// </summary>
-		/// <param name="startPoint">始点。</param>
-		/// <param name="endPoint">終点。</param>
-		/// <param name="timeMs">移動にかける時間。</param>
+		/// <param name="startPoint">Starting point.</param>
+		/// <param name="endPoint">End point.</param>
+		/// <param name="timeMs">Time taken for linear, in milliseconds.</param>
 		public Linear(int startPoint, int endPoint, int timeMs) : base(0, timeMs, 1, false) {
 			StartPoint = startPoint;
 			EndPoint = endPoint;
@@ -17,8 +17,8 @@
 		}
 
 		public override object GetAnimation() {
-			var persent = Counter.CurrentValue / (double)TimeMs;
-			return (Sa * persent) + StartPoint;
+			var percent = Counter.CurrentValue / (double)TimeMs;
+			return (Sa * percent) + StartPoint;
 		}
 
 		private readonly int StartPoint;

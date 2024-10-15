@@ -2,7 +2,7 @@
 
 namespace OpenTaiko {
 	internal class CAct演奏スクロール速度 : CActivity {
-		// プロパティ
+		// Properties
 
 		public double[] db現在の譜面スクロール速度 = new double[5];
 

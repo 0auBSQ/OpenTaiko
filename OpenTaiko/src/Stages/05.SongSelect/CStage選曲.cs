@@ -39,7 +39,7 @@ namespace OpenTaiko {
 			if (CSongSelectSongManager.isSongDisabled)
 				return;
 
-			if (OpenTaiko.ConfigIni.bBGM音を発声する && !bgmIn.bIsPlaying && !bgmLoop.bIsPlaying) {
+			if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound && !bgmIn.bIsPlaying && !bgmLoop.bIsPlaying) {
 				if (inSongPlayed == false) {
 					bgmIn.tPlay();
 					CSongSelectSongManager.inSongPlayed = true;
@@ -73,7 +73,7 @@ namespace OpenTaiko {
 	#endregion
 
 	internal class CStage選曲 : CStage {
-		// プロパティ
+		// Properties
 		public int nスクロールバー相対y座標 {
 			get {
 				if (actSongList != null) {
@@ -495,9 +495,9 @@ namespace OpenTaiko {
 
 				if (OpenTaiko.ConfigIni.bTokkunMode)
 					OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
-				if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー)
+				if (OpenTaiko.ConfigIni.eGameMode == EGame.Survival)
 					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
-				if (OpenTaiko.ConfigIni.eGameMode == EGame.完走叩ききりまショー激辛)
+				if (OpenTaiko.ConfigIni.eGameMode == EGame.SurvivalHard)
 					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
 				if (OpenTaiko.ConfigIni.bSuperHard)
 					OpenTaiko.actTextConsole.tPrint(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
@@ -804,7 +804,7 @@ namespace OpenTaiko {
 						#region [ F2 Quick Config ]
 						if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.QuickConfig)) {
 							OpenTaiko.Skin.soundChangeSFX.tPlay();
-							this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.DRUMS);
+							this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.Drums);
 						}
 						#endregion
 						#region [ F3 1P AUTO ]
@@ -848,7 +848,7 @@ namespace OpenTaiko {
 								if (!this.bCurrentlyScrolling) {
 									#region [ Decide ]
 									if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-									((OpenTaiko.ConfigIni.bEnterがキー割り当てのどこにも使用されていない && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
+									((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 										if (this.actSongList.rCurrentlySelectedSong != null) {
 											switch (this.actSongList.rCurrentlySelectedSong.eノード種別) {
@@ -886,7 +886,7 @@ namespace OpenTaiko {
 														} else {
 															if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
 																if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
-																	// Init tower variables 
+																	// Init tower variables
 																	if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
 																		CFloorManagement.reinitialize(this.rNowSelectedSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
 
@@ -1008,11 +1008,11 @@ namespace OpenTaiko {
 								if (!this.bCurrentlyScrolling) {
 									this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 									//this.ctキー反復用.Up.tキー反復( CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.UpArrow ) || CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.LeftArrow ), new CCounter.DGキー処理( this.tカーソルを上へ移動する ) );
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 										this.tカーソルを上へ移動する();
 									}
 								} else {
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 										//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -1027,11 +1027,11 @@ namespace OpenTaiko {
 									this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 									//this.ctキー反復用.Down.tキー反復( CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.DownArrow ) || CDTXMania.Input管理.Keyboard.bキーが押されている( (int) SlimDXKeys.Key.RightArrow ), new CCounter.DGキー処理( this.tカーソルを下へ移動する ) );
 
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 										this.tカーソルを下へ移動する();
 									}
 								} else {
-									if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+									if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 										//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 										CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
@@ -1058,14 +1058,14 @@ namespace OpenTaiko {
 							#region [ BDx2: 簡易CONFIG ]
 							if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SortSongs)) {
 								OpenTaiko.Skin.soundChangeSFX.tPlay();
-								this.actSortSongs.tActivatePopupMenu(EInstrumentPad.DRUMS, ref this.actSongList);
+								this.actSortSongs.tActivatePopupMenu(EInstrumentPad.Drums, ref this.actSongList);
 							}
 							#endregion
 							#region [ HHx2: 難易度変更 ]
-							if (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HH) || OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.HHO)) {   // [HH]x2 難易度変更
-								CommandHistory.Add(EInstrumentPad.DRUMS, EPadFlag.HH);
+							if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.HH) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.HHO)) {   // [HH]x2 難易度変更
+								CommandHistory.Add(EInstrumentPad.Drums, EPadFlag.HH);
 								EPadFlag[] comChangeDifficulty = new EPadFlag[] { EPadFlag.HH, EPadFlag.HH };
-								if (CommandHistory.CheckCommand(comChangeDifficulty, EInstrumentPad.DRUMS)) {
+								if (CommandHistory.CheckCommand(comChangeDifficulty, EInstrumentPad.Drums)) {
 									Debug.WriteLine("ドラムス難易度変更");
 									this.actSongList.t難易度レベルをひとつ進める();
 									OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -1429,7 +1429,7 @@ namespace OpenTaiko {
 				//Debug.Write( "CMD解析: 成功!(" + _ePad.Length + ") " );
 				//for ( int i = 0; i < _ePad.Length; i++ ) Debug.Write( _ePad[ i ] + ", " );
 				//Debug.WriteLine( "" );
-				//stct.RemoveRange( 0, targetCount );			// #24396 2011.2.13 yyagi 
+				//stct.RemoveRange( 0, targetCount );			// #24396 2011.2.13 yyagi
 				stct.Clear();                                   // #24396 2011.2.13 yyagi Clear all command input history in case you succeeded inputting some command
 
 				return true;
@@ -1540,7 +1540,7 @@ namespace OpenTaiko {
 
 			int randomSongIndex = OpenTaiko.Random.Next(selectableSongCount);
 
-			if (OpenTaiko.ConfigIni.bLogDTX詳細ログ出力) {
+			if (OpenTaiko.ConfigIni.bOutputDetailedDTXLog) {
 				StringBuilder builder = new StringBuilder(0x400);
 				builder.Append(string.Format("Total number of songs to randomly choose from {0}. Randomly selected index {0}.", selectableSongCount, randomSongIndex));
 				Trace.TraceInformation(builder.ToString());

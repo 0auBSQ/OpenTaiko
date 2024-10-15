@@ -3,13 +3,13 @@
 	/// 「リスト」（複数の固定値からの１つを選択可能）を表すアイテム。
 	/// </summary>
 	internal class CItemList : CItemBase {
-		// プロパティ
+		// Properties
 
 		public List<string> list項目値;
 		public int n現在選択されている項目番号;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemList() {
 			base.e種別 = CItemBase.E種別.リスト;
@@ -90,7 +90,7 @@
 	/// e種別が違うのと、tEnter押下()で何もしない以外は、「リスト」そのまま。
 	/// </summary>
 	internal class CSwitchItemList : CItemList {
-		// コンストラクタ
+		// Constructor
 
 		public CSwitchItemList() {
 			base.e種別 = CItemBase.E種別.切替リスト;

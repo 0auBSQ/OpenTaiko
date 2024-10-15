@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CStage起動 : CStage {
-		// コンストラクタ
+		// Constructor
 
 		public CStage起動() {
 			base.eStageID = CStage.EStage.StartUp;

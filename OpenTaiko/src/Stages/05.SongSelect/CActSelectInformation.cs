@@ -4,7 +4,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CActSelectInformation : CActivity {
-		// コンストラクタ
+		// Constructor
 
 		public CActSelectInformation() {
 			base.IsDeActivated = true;

@@ -203,7 +203,7 @@ namespace OpenTaiko {
 				OpenTaiko.Tx.Taiko_Base[(int)_gt]?.t2D描画(taiko_x, taiko_y);
 
 				// Taiko hits
-				if (_gt == EGameType.TAIKO) {
+				if (_gt == EGameType.Taiko) {
 					if (OpenTaiko.Tx.Taiko_Don_Left != null && OpenTaiko.Tx.Taiko_Don_Right != null && OpenTaiko.Tx.Taiko_Ka_Left != null && OpenTaiko.Tx.Taiko_Ka_Right != null) {
 						OpenTaiko.Tx.Taiko_Ka_Left.Opacity = getMTaikoOpacity(this.stパッド状態[playerShift].n明るさ);
 						OpenTaiko.Tx.Taiko_Ka_Right.Opacity = getMTaikoOpacity(this.stパッド状態[1 + playerShift].n明るさ);
@@ -215,7 +215,7 @@ namespace OpenTaiko {
 						OpenTaiko.Tx.Taiko_Don_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Height));
 						OpenTaiko.Tx.Taiko_Don_Right.t2D描画(taiko_x + OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, taiko_y, new Rectangle(OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, 0, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Height));
 					}
-				} else if (_gt == EGameType.KONGA) {
+				} else if (_gt == EGameType.Konga) {
 					if (OpenTaiko.Tx.Taiko_Konga_Clap != null && OpenTaiko.Tx.Taiko_Konga_Don != null && OpenTaiko.Tx.Taiko_Konga_Ka != null) {
 						OpenTaiko.Tx.Taiko_Konga_Clap.Opacity = getMTaikoOpacity(this.stパッド状態[4 + playerShift].n明るさ);
 						OpenTaiko.Tx.Taiko_Konga_Don.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[2 + playerShift].n明るさ, this.stパッド状態[3 + playerShift].n明るさ));
@@ -403,7 +403,7 @@ namespace OpenTaiko {
 						}
 						break;
 					case 0x14: {
-							if (_gt == EGameType.KONGA) {
+							if (_gt == EGameType.Konga) {
 								this.stパッド状態[4 + playerShift].n明るさ = 8;
 							} else {
 								this.stパッド状態[nHand + playerShift].n明るさ = 8;
@@ -425,7 +425,7 @@ namespace OpenTaiko {
 
 					case 0x13:
 					case 0x1A: {
-							if (_gt == EGameType.KONGA) {
+							if (_gt == EGameType.Konga) {
 								this.stパッド状態[0 + playerShift].n明るさ = 8;
 								this.stパッド状態[2 + playerShift].n明るさ = 8;
 							} else {
@@ -442,7 +442,7 @@ namespace OpenTaiko {
 
 					case 0x14:
 					case 0x1B: {
-							if (_gt == EGameType.KONGA) {
+							if (_gt == EGameType.Konga) {
 								this.stパッド状態[4 + playerShift].n明るさ = 8;
 							} else {
 								this.stパッド状態[0 + playerShift].n明るさ = 8;

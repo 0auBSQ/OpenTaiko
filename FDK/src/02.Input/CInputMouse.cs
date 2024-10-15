@@ -9,7 +9,7 @@ namespace FDK {
 		public const int MouseButtonCount = 8;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CInputMouse(IMouse mouse) {
 			this.CurrentType = InputDeviceType.Mouse;

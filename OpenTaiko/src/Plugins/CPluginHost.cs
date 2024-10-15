@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko {
 	internal class CPluginHost : IPluginHost {
-		// コンストラクタ
+		// Constructor
 
 		public CPluginHost() {
 			this._DTXManiaVersion = new CDTXVersion(OpenTaiko.VERSION);

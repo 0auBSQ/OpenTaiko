@@ -6,7 +6,7 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void tフェードアウト開始() {
-			this.mode = EFIFOモード.フェードアウト;
+			this.mode = EFIFOMode.FadeOut;
 
 			OpenTaiko.Skin.soundDanSelectBGM.tStop();
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
@@ -18,7 +18,7 @@ namespace OpenTaiko {
 			}
 		}
 		public void tフェードイン開始() {
-			this.mode = EFIFOモード.フェードイン;
+			this.mode = EFIFOMode.FadeIn;
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
@@ -55,7 +55,7 @@ namespace OpenTaiko {
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
 				if (OpenTaiko.Tx.Tile_Black != null) {
-					OpenTaiko.Tx.Tile_Black.Opacity = this.mode == EFIFOモード.フェードアウト ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
+					OpenTaiko.Tx.Tile_Black.Opacity = this.mode == EFIFOMode.FadeOut ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
 					for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 					{
 						for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
@@ -65,7 +65,7 @@ namespace OpenTaiko {
 					}
 				}
 			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				if (this.mode == EFIFOモード.フェードアウト) {
+				if (this.mode == EFIFOMode.FadeOut) {
 					var preTime = (this.counter.CurrentValue >= 2000 ? this.counter.CurrentValue - 2000 : 0) * 2;
 
 					OpenTaiko.Tx.SongLoading_Fade_AI.Opacity = preTime;
@@ -120,7 +120,7 @@ namespace OpenTaiko {
 					OpenTaiko.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
 				}
 			} else {
-				if (this.mode == EFIFOモード.フェードアウト) {
+				if (this.mode == EFIFOMode.FadeOut) {
 					if (OpenTaiko.Tx.SongLoading_Fade != null) {
 						// 曲開始幕アニメ。
 						// 地味に横の拡大率が変動しているのが一番厄介...
@@ -150,11 +150,11 @@ namespace OpenTaiko {
 				}
 			}
 
-			if (this.mode == EFIFOモード.フェードアウト) {
+			if (this.mode == EFIFOMode.FadeOut) {
 				if (this.counter.CurrentValue != this.counter.EndValue) {
 					return 0;
 				}
-			} else if (this.mode == EFIFOモード.フェードイン) {
+			} else if (this.mode == EFIFOMode.FadeIn) {
 				if (this.counter.CurrentValue != this.counter.EndValue) {
 					return 0;
 				}
@@ -227,7 +227,7 @@ namespace OpenTaiko {
 		//-----------------
 		private CCounter counter;
 		private CCounter ct待機;
-		private EFIFOモード mode;
+		private EFIFOMode mode;
 		//private CTexture tx幕;
 		//private CTexture tx幕2;
 		//-----------------

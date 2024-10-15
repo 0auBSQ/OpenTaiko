@@ -1,7 +1,7 @@
 ﻿namespace OpenTaiko {
 	internal class CActSortSongs : CActSelectPopupMenu {
 
-		// コンストラクタ
+		// Constructor
 
 		public CActSortSongs() {
 			List<CItemBase> lci = new List<CItemBase>();
@@ -9,16 +9,10 @@
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_TITLE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_SUBTITLE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_LEVEL"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "13,12,11,...", "1,2,3,..." }));
-			//lci.Add( new CItemList( "Best Rank",	CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "E,D,C,...",		"SS,S,A,..." } ) );
-			//lci.Add( new CItemList( "PlayCount",	CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "10,9,8,...",		"1,2,3,..." } ) );
-
-			//lci.Add( new CItemList( "SkillPoint",	CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "100,99,98,...",	"1,2,3,..." } ) );
 #if TEST_SORTBGM
-			lci.Add( new CItemList( "BPM",			CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "300,200,...",	"70,80,90,..." } ) );
+			lci.Add( new CItemList( "BPM",			CItemBase.EPanelType.Normal, 0, "", "", new string[] { "300,200,...",	"70,80,90,..." } ) );
 #endif
-			//lci.Add( new CItemList( "ジャンル",			CItemBase.Eパネル種別.通常, 0, "", "", new string[] { "AC15",	"AC8-14" } ) );
 			lci.Add(new CItemList(CLangManager.LangInstance.GetString("MENU_RETURN"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
-
 			base.Initialize(lci, false, CLangManager.LangInstance.GetString("SONGSELECT_SORT"));
 		}
 
@@ -28,11 +22,6 @@
 			this.act曲リスト = ca;
 			base.tActivatePopupMenu(einst);
 		}
-		//public void tDeativatePopupMenu()
-		//{
-		//	base.tDeativatePopupMenu();
-		//}
-
 
 		public override void tEnter押下Main(int nSortOrder) {
 			nSortOrder *= 2;    // 0,1  => -1, 1
@@ -81,20 +70,10 @@
 
 		// CActivity 実装
 
-		public override void Activate() {
-			//this.e現在のソート = EOrder.Title;
-			base.Activate();
-		}
 		public override void DeActivate() {
 			if (!base.IsDeActivated) {
 				base.DeActivate();
 			}
-		}
-		public override void CreateManagedResource() {
-			base.CreateManagedResource();
-		}
-		public override void ReleaseManagedResource() {
-			base.ReleaseManagedResource();
 		}
 
 		#region [ private ]
@@ -113,6 +92,4 @@
 		//-----------------
 		#endregion
 	}
-
-
 }

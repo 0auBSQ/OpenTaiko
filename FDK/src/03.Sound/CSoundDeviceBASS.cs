@@ -4,7 +4,7 @@ using ManagedBass.Mix;
 
 namespace FDK {
 	public class CSoundDeviceBASS : ISoundDevice {
-		// プロパティ
+		// Properties
 
 		public ESoundDeviceType SoundDeviceType {
 			get;

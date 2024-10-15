@@ -17,7 +17,7 @@ namespace OpenTaiko {
 
 		}
 
-		// プロパティ
+		// Properties
 
 		public STDGBVALUE<bool> b新記録スキル;
 		public STDGBVALUE<bool> b新記録スコア;
@@ -43,7 +43,7 @@ namespace OpenTaiko {
 		public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CStage結果() {
 			this.st演奏記録.Drums = new CScoreIni.C演奏記録();
@@ -84,11 +84,6 @@ namespace OpenTaiko {
 				progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
 				OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0,
 				OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0
-				/*
-				progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-				this.st演奏記録.Drums.nMiss数 == 0,
-				this.st演奏記録.Drums.nGreat数 == 0
-				*/
 			};
 
 			for (int i = 0; i < conditions.Length; i++) {
@@ -111,7 +106,7 @@ namespace OpenTaiko {
 			try {
 				/*
 				 * Notes about the difference between Replay - Save statuses and the "Assisted clear" clear status
-				 * 
+				 *
 				 * - The values for replay files are 0 if no status, while for save files they start by -1
 				 * - The "Assisted clear" status is used on the save files, but NOT on the replay files
 				 * - The "Assisted clear" status is also not used in the coins evaluations
@@ -1053,7 +1048,7 @@ namespace OpenTaiko {
 						int songCount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count;
 
 						/*
-						**	1600 => Dan plate 
+						**	1600 => Dan plate
 						**  3200 + 300 * count => Songs display
 						**  5500 + 300 * count => Exams plate display
 						**	8200 + 300 * count => Goukaku/Fugoukaku display => Step 2 (Prompt the user to tap enter and let them swaping between informations hitting kas)
@@ -1422,8 +1417,8 @@ namespace OpenTaiko {
 							#endregion
 						}
 						if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
-							|| OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RD))
-							|| (OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LC)
+							|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
+							|| (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
 							|| (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
 							|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
@@ -1484,9 +1479,9 @@ namespace OpenTaiko {
 
 
 						if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.LeftChange) ||
+								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
 							OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.DRUMS, EPad.RightChange)) {
+								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 								#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
@@ -1786,7 +1781,7 @@ namespace OpenTaiko {
 		private ModalQueue mqModals;
 		private Modal? displayedModals;
 
-		// Coins information 
+		// Coins information
 		private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };
 
 

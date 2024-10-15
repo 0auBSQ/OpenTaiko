@@ -2,7 +2,7 @@
 
 namespace OpenTaiko {
 	internal class CAct演奏演奏情報 : CActivity {
-		// プロパティ
+		// Properties
 
 		public double[] dbBPM = new double[5];
 		public readonly int[] NowMeasure = new int[5];

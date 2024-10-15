@@ -55,10 +55,10 @@ namespace OpenTaiko {
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-				case EScrollMode.BMSCROLL: {
+				case EScrollMode.BMScroll: {
 						return (int)((hbtime / 16.0) * interval * screen_ratio);
 					}
-				case EScrollMode.HBSCROLL: {
+				case EScrollMode.HBScroll: {
 						return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
 					}
 				default:
@@ -72,10 +72,10 @@ namespace OpenTaiko {
 			switch (eScrollMode) {
 				case EScrollMode.Normal:
 					return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-				case EScrollMode.BMSCROLL: {
+				case EScrollMode.BMScroll: {
 						return 0;
 					}
-				case EScrollMode.HBSCROLL: {
+				case EScrollMode.HBScroll: {
 						return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
 					}
 				default:
@@ -156,17 +156,17 @@ namespace OpenTaiko {
 
 		public static bool IsBigKaTaiko(CDTX.CChip chip, EGameType gt) {
 			if (chip == null) return false;
-			return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.TAIKO;
+			return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.Taiko;
 		}
 
 		public static bool IsBigDonTaiko(CDTX.CChip chip, EGameType gt) {
 			if (chip == null) return false;
-			return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A) && gt == EGameType.TAIKO;
+			return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A) && gt == EGameType.Taiko;
 		}
 
 		public static bool IsClapKonga(CDTX.CChip chip, EGameType gt) {
 			if (chip == null) return false;
-			return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.KONGA;
+			return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.Konga;
 		}
 
 		public static bool IsSwapNote(CDTX.CChip chip, EGameType gt) {
@@ -180,7 +180,7 @@ namespace OpenTaiko {
 		public static bool IsKongaPink(CDTX.CChip chip, EGameType gt) {
 			if (chip == null) return false;
 			// Purple notes are treated as Pink in Konga
-			return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A || IsPurpleNote(chip)) && gt == EGameType.KONGA;
+			return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A || IsPurpleNote(chip)) && gt == EGameType.Konga;
 		}
 		public static bool IsPurpleNote(CDTX.CChip chip) {
 			if (chip == null) return false;
@@ -288,7 +288,7 @@ namespace OpenTaiko {
 
 		// Regular display
 		public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = -1) {
-			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 				return;
 
 			if (length == -1) {
@@ -329,7 +329,7 @@ namespace OpenTaiko {
 			Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
 			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
-			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.OFF || !chip.bShow)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 				return;
 
 			int _offset = 0;
@@ -338,14 +338,14 @@ namespace OpenTaiko {
 			float _adjust = OpenTaiko.Skin.Game_Notes_Size[0] / 2.0f;
 			float image_size = OpenTaiko.Skin.Game_Notes_Size[0];
 
-			if (IsSmallRoll(chip) || (_gt == EGameType.TAIKO && IsYellowRoll(chip))) {
+			if (IsSmallRoll(chip) || (_gt == EGameType.Taiko && IsYellowRoll(chip))) {
 				_offset = 0;
 			}
-			if (IsBigRoll(chip) || (_gt == EGameType.TAIKO && IsClapRoll(chip))) {
+			if (IsBigRoll(chip) || (_gt == EGameType.Taiko && IsClapRoll(chip))) {
 				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 3;
-			} else if (IsClapRoll(chip) && _gt == EGameType.KONGA) {
+			} else if (IsClapRoll(chip) && _gt == EGameType.Konga) {
 				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 11;
-			} else if (IsYellowRoll(chip) && _gt == EGameType.KONGA) {
+			} else if (IsYellowRoll(chip) && _gt == EGameType.Konga) {
 				_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 8;
 			} else if (IsFuzeRoll(chip)) {
 				_texarr = OpenTaiko.Tx.Note_FuseRoll;
@@ -418,14 +418,14 @@ namespace OpenTaiko {
 
 		// SENotes
 		public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip) {
-			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.STEALTH)
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
 				return;
 
 			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 			if (IsMine(chip)) {
 				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
-			} else if (IsPurpleNote(chip) && _gt != EGameType.KONGA) {
+			} else if (IsPurpleNote(chip) && _gt != EGameType.Konga) {
 				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 			} else if (IsFuzeRoll(chip)) {
 				OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));

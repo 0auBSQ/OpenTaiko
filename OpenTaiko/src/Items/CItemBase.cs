@@ -5,7 +5,7 @@ namespace OpenTaiko {
 	/// すべてのアイテムの基本クラス。
 	/// </summary>
 	internal class CItemBase {
-		// プロパティ
+		// Properties
 
 		public EPanelType eパネル種別;
 		public enum EPanelType {
@@ -40,7 +40,7 @@ namespace OpenTaiko {
 		}
 
 
-		// コンストラクタ
+		// Constructor
 
 		public CItemBase() {
 			this.str項目名 = "";

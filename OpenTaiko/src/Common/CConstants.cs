@@ -2,9 +2,6 @@
 
 namespace OpenTaiko {
 
-	/// <summary>
-	/// 難易度。
-	/// </summary>
 	public enum Difficulty {
 		Easy,
 		Normal,
@@ -18,19 +15,20 @@ namespace OpenTaiko {
 
 	public enum EScrollMode {
 		Normal,
-		BMSCROLL,
-		HBSCROLL
+		BMScroll,
+		HBScroll
 	}
 
 	public enum EGame {
-		OFF = 0,
-		完走叩ききりまショー = 1,
-		完走叩ききりまショー激辛 = 2
+		Off = 0,
+		Survival = 1,
+		SurvivalHard = 2
 	}
-	public enum E難易度表示タイプ {
-		OFF = 0,
-		n曲目に表示 = 1,
-		mtaikoに画像で表示 = 2,
+
+	public enum EDifficultyDisplayType {
+		Off = 0,
+		TextOnNthSong = 1,
+		ImageOnMTaiko = 2,
 	}
 
 	public enum EPad            // 演奏用のenum。ここを修正するときは、次に出てくる EKeyConfigPad と EパッドFlag もセットで修正すること。
@@ -80,16 +78,16 @@ namespace OpenTaiko {
 		LBlue5P = 30,
 		RBlue5P = 31,
 
-		CLAP = 32,
-		CLAP2P = 33,
-		CLAP3P = 34,
-		CLAP4P = 35,
-		CLAP5P = 36,
+		Clap = 32,
+		Clap2P = 33,
+		Clap3P = 34,
+		Clap4P = 35,
+		Clap5P = 36,
 		LeftChange = 37,
 		RightChange = 38,
 
-		MAX,            // 門番用として定義
-		UNKNOWN = 99
+		Max,            // 門番用として定義
+		Unknown = 99
 	}
 	public enum EKeyConfigPad       // #24609 キーコンフィグで使うenum。capture要素あり。
 	{
@@ -138,11 +136,11 @@ namespace OpenTaiko {
 		LBlue5P = EPad.LBlue5P,
 		RBlue5P = EPad.RBlue5P,
 
-		Clap = EPad.CLAP,
-		Clap2P = EPad.CLAP2P,
-		Clap3P = EPad.CLAP3P,
-		Clap4P = EPad.CLAP4P,
-		Clap5P = EPad.CLAP5P,
+		Clap = EPad.Clap,
+		Clap2P = EPad.Clap2P,
+		Clap3P = EPad.Clap3P,
+		Clap4P = EPad.Clap4P,
+		Clap5P = EPad.Clap5P,
 		LeftChange = EPad.LeftChange,
 		RightChange = EPad.RightChange,
 		#endregion
@@ -182,8 +180,8 @@ namespace OpenTaiko {
 		TrainingJumpToFirstMeasure,
 		TrainingJumpToLastMeasure,
 		#endregion
-		MAX,
-		UNKNOWN = EPad.UNKNOWN
+		Max,
+		Unknown = EPad.Unknown
 	}
 	[Flags]
 	public enum EPadFlag        // #24063 2011.1.16 yyagi コマンド入力用 パッド入力のフラグ化
@@ -216,44 +214,44 @@ namespace OpenTaiko {
 		RRed2P = 16,
 		LBlue2P = 32,
 		RBlue2P = 64,
-		UNKNOWN = 4096
+		Unknown = 4096
 	}
 	public enum ERandomMode {
-		OFF,
-		RANDOM,
-		MIRROR,
-		SUPERRANDOM,
-		MIRRORRANDOM
+		Off,
+		Random,
+		Mirror,
+		SuperRandom,
+		MirrorRandom
 	}
 
 	public enum EFunMods {
-		NONE,
-		AVALANCHE,
-		MINESWEEPER,
-		TOTAL,
+		None,
+		Avalanche,
+		Minesweeper,
+		Total,
 	}
 
 	public enum EGameType {
-		TAIKO = 0,
-		KONGA = 1,
+		Taiko = 0,
+		Konga = 1,
 	}
 
 	public enum EInstrumentPad      // ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
 	{
-		DRUMS = 0,
-		GUITAR = 1,
-		BASS = 2,
-		TAIKO = 3,
-		UNKNOWN = 99
+		Drums = 0,
+		Guitar = 1,
+		Bass = 2,
+		Taiko = 3,
+		Unknown = 99
 	}
 	public enum EKeyConfigPart  // : E楽器パート
 	{
-		DRUMS = EInstrumentPad.DRUMS,
-		GUITAR = EInstrumentPad.GUITAR,
-		BASS = EInstrumentPad.BASS,
-		TAIKO = EInstrumentPad.TAIKO,
-		SYSTEM,
-		UNKNOWN = EInstrumentPad.UNKNOWN
+		Drums = EInstrumentPad.Drums,
+		Guitar = EInstrumentPad.Guitar,
+		Bass = EInstrumentPad.Bass,
+		Taiko = EInstrumentPad.Taiko,
+		System,
+		Unknown = EInstrumentPad.Unknown
 	}
 
 	internal enum EInputDevice {
@@ -275,61 +273,61 @@ namespace OpenTaiko {
 		ADLIB = 7,
 		Mine = 8,
 	}
-	internal enum E判定文字表示位置 {
-		表示OFF,
-		レーン上,
-		判定ライン上,
-		コンボ下
+	internal enum EJudgeTextDisplayPosition {
+		OFF,
+		AboveLane,
+		OnJudgeLine,
+		BelowCombo
 	}
 
-	internal enum EFIFOモード {
-		フェードイン,
-		フェードアウト
+	internal enum EFIFOMode {
+		FadeIn,
+		FadeOut
 	}
 
-	internal enum E演奏画面の戻り値 {
-		継続,
-		演奏中断,
-		ステージ失敗,
-		ステージクリア,
-		再読込_再演奏,
-		再演奏
+	internal enum EGameplayScreenReturnValue {
+		Continue,
+		PerformanceInterrupted,
+		StageFailed,
+		StageCleared,
+		ReloadAndReplay,
+		Replay
 	}
-	internal enum E曲読込画面の戻り値 {
-		継続 = 0,
-		読込完了,
-		読込中止
+	internal enum ESongLoadingScreenReturnValue {
+		Continue = 0,
+		LoadComplete,
+		LoadCanceled
 	}
 
 	public enum ENoteState {
-		none,
-		wait,
-		perfect,
-		grade,
-		bad
+		None,
+		Wait,
+		Perfect,
+		Grade,
+		Bad
 	}
 
-	public enum E連打State {
-		none,
-		roll,
-		rollB,
-		balloon,
-		potato
+	public enum ERollState {
+		None,
+		Roll,
+		RollB,
+		Balloon,
+		Potato
 	}
 
 	public enum EStealthMode {
-		OFF = 0,
-		DORON = 1,
-		STEALTH = 2
+		Off = 0,
+		Doron = 1,
+		Stealth = 2
 	}
 
 	/// <summary>
 	/// 透明チップの種類
 	/// </summary>
 	public enum EInvisible {
-		OFF,        // チップを透明化しない
-		SEMI,       // Poor/Miss時だけ、一時的に透明解除する
-		FULL        // チップを常に透明化する
+		Off,        // チップを透明化しない
+		Semi,       // Poor/Miss時だけ、一時的に透明解除する
+		Full        // チップを常に透明化する
 	}
 
 	/// <summary>
@@ -348,42 +346,42 @@ namespace OpenTaiko {
 		public T this[int index] {
 			get {
 				switch (index) {
-					case (int)EInstrumentPad.DRUMS:
+					case (int)EInstrumentPad.Drums:
 						return this.Drums;
 
-					case (int)EInstrumentPad.GUITAR:
+					case (int)EInstrumentPad.Guitar:
 						return this.Guitar;
 
-					case (int)EInstrumentPad.BASS:
+					case (int)EInstrumentPad.Bass:
 						return this.Bass;
 
-					case (int)EInstrumentPad.TAIKO:
+					case (int)EInstrumentPad.Taiko:
 						return this.Taiko;
 
-					case (int)EInstrumentPad.UNKNOWN:
+					case (int)EInstrumentPad.Unknown:
 						return this.Unknown;
 				}
 				throw new IndexOutOfRangeException();
 			}
 			set {
 				switch (index) {
-					case (int)EInstrumentPad.DRUMS:
+					case (int)EInstrumentPad.Drums:
 						this.Drums = value;
 						return;
 
-					case (int)EInstrumentPad.GUITAR:
+					case (int)EInstrumentPad.Guitar:
 						this.Guitar = value;
 						return;
 
-					case (int)EInstrumentPad.BASS:
+					case (int)EInstrumentPad.Bass:
 						this.Bass = value;
 						return;
 
-					case (int)EInstrumentPad.TAIKO:
+					case (int)EInstrumentPad.Taiko:
 						this.Taiko = value;
 						return;
 
-					case (int)EInstrumentPad.UNKNOWN:
+					case (int)EInstrumentPad.Unknown:
 						this.Unknown = value;
 						return;
 				}
@@ -399,21 +397,21 @@ namespace OpenTaiko {
 	}
 
 	#region[Ver.K追加]
-	public enum Eレーンタイプ {
+	public enum ELaneType {
 		TypeA,
 		TypeB,
 		TypeC,
 		TypeD
 	}
-	public enum Eミラー {
+	public enum EMirror {
 		TypeA,
 		TypeB
 	}
 	public enum EClipDispType {
-		背景のみ = 1,
-		ウィンドウのみ = 2,
-		両方 = 3,
-		OFF = 0
+		BackgroundOnly = 1,
+		WindowOnly = 2,
+		Both = 3,
+		Off = 0
 	}
 	#endregion
 }
