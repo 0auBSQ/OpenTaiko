@@ -177,7 +177,7 @@
 		"SETTINGS_GAME_AUTOROLL_DESC": "When auto is enabled, rolls will be \nautomatically hit this many times per \nsecond. Has no effect on balloons. \n0 disables auto roll, and the \nmaximum value is one hit per frame.",
 
 		"SETTINGS_GAME_NOINFO": "No Information Mode",
-		"SETTINGS_GAME_NOINFO_DESC": "Toggle whether song information is shown.\nTurning this on will disable song informaton.\nTurning this off will enable song information.\n",
+		"SETTINGS_GAME_NOINFO_DESC": "Toggle whether song information is shown.\nTurning this on will disable song information.\nTurning this off will enable song information.\n",
 		"SETTINGS_GAME_COMBODISPLAY": "Minimum Combo Display",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "Choose the initial number that combo is displayed at.\nCan be specified between 1 and 99999.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Toggle Score Display",
@@ -459,7 +459,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reaches 0, the play is automatically failed!",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
 		// {0}: Percentage of mines
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
@@ -475,7 +475,7 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",
-		"UNLOCK_CONDITION_SHOP": "Item only avaliable at the Shop.", // cs
+		"UNLOCK_CONDITION_SHOP": "Item only available at the Shop.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "Coin price: {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "Item bought!",

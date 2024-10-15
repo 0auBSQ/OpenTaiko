@@ -1,8 +1,12 @@
 ﻿// PeepoDrumKit 2023/10/28
 TITLE:Rhythm Challenge Tower
 TITLEJA:挑戦! リズム感覚テスト!
+TITLERU:Башня Вызова Ритму
+TITLEZH:节奏挑战塔
 SUBTITLE:OPTK Sound Team "Dashy"
 SUBTITLEJA:OPTK Sound Team 「Dashy」
+SUBTITLERU:OPTK Sound Team «Дэши»
+SUBTITLEZH:OPTK Sound Team “Dashy”
 BPM:120
 WAVE:rhythmtest.ogg
 OFFSET:0
