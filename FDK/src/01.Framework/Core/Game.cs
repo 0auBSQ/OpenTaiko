@@ -176,7 +176,10 @@ namespace SampleFramework {
 
 					using SKBitmap sKBitmap = new(ViewportWidth, ViewportHeight - 1);
 					sKBitmap.SetPixels((IntPtr)pixels2);
-					action(sKBitmap);
+
+					using SKBitmap scaledBitmap = new(GameWindowSize.Width, GameWindowSize.Height);
+					if (sKBitmap.ScalePixels(scaledBitmap, SKFilterQuality.High)) action(scaledBitmap);
+					else action(sKBitmap);
 				}
 			});
 		}
