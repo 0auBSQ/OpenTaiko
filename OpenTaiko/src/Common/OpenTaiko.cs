@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using DiscordRPC;
 using FDK;
+using ImGuiNET;
 using SampleFramework;
 using Silk.NET.Maths;
 using SkiaSharp;
@@ -1970,6 +1971,10 @@ for (int i = 0; i < 3; i++) {
 					this.b次のタイミングで垂直帰線同期切り替えを行う = false;
 				}
 				#endregion
+
+#if DEBUG
+				ImGuiDebugWindow.Draw();
+#endif
 			}
 #if !DEBUG
 			catch( Exception e )

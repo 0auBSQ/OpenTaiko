@@ -83,6 +83,8 @@ namespace FDK {
 					Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + ")");
 				} catch { }
 			}
+
+			SampleFramework.Game.InitImGuiController(window, Context);
 		}
 
 
@@ -184,7 +186,7 @@ namespace FDK {
 
 		#region [ private ]
 		//-----------------
-		private IInputContext Context;
+		public IInputContext Context { get; private set; }
 		private IInputDevice _Keyboard;
 		private IInputDevice _Mouse;
 		private bool bDisposed済み;
