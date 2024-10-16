@@ -196,6 +196,10 @@
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
 
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "ロックされた曲のプレイ許可",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "SongUnlockables.db3を無視してすべての曲を利用可能にする。\nSaves.db3にアンロックデータを追加されていません。\nアンロック通知は普通に結果画面に表示されます。\n\n<c.#f0ad4e>警告\nONにするとスピードランが無効になります。</c>",
+
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "PreImageWait",

@@ -1178,6 +1178,7 @@ namespace OpenTaiko {
 		public bool bDisplayDebugInfo;
 		public bool bEnableVSync;
 		public bool bFullScreen;
+		public bool bIgnoreSongUnlockables;
 		public int nWindowBaseXPosition; // #30675 2013.02.04 ikanick add
 		public int nWindowBaseYPosition;
 		public int nWindowWidth;             // #23510 2010.10.31 yyagi add
@@ -1658,6 +1659,7 @@ namespace OpenTaiko {
 		public CConfigIni() {
 			this.strSongsPath = "Songs" + Path.DirectorySeparatorChar;
 			this.bFullScreen = false;
+			this.bIgnoreSongUnlockables = false;
 			this.bEnableVSync = true;
 			this.nWindowBaseXPosition = 100; // #30675 2013.02.04 ikanick add
 			this.nWindowBaseYPosition = 100;
@@ -1969,6 +1971,9 @@ namespace OpenTaiko {
 
 			sw.WriteLine("; File paths on the Saves folder.");
 			sw.WriteLine("SaveFileName={0}", String.Join(",", this.sSaveFile));
+			sw.WriteLine();
+			sw.WriteLine("; Ignore song unlockables (0: No, 1: Yes)");
+			sw.WriteLine("IgnoreSongUnlockables={0}", this.bIgnoreSongUnlockables ? 1 : 0);
 			sw.WriteLine();
 
 			#endregion
@@ -2728,6 +2733,8 @@ namespace OpenTaiko {
 														this.sSaveFile[i] = _s[i];
 													}
 												}
+											} else if (str3.Equals("IgnoreSongUnlockables")) {
+												this.bIgnoreSongUnlockables = CConversion.bONorOFF(str4[0]);
 											}
 
 											#region [ skin関係 ]

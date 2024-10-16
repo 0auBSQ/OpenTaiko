@@ -89,7 +89,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	-- > modal_asset_informations: CSongListNode
 	-- > modal_asset_visual_references: CTexture (Preimage)
 	_modal_header = getLocalizedString("MODAL_TITLE_SONG")
-	_modal_body = modal_current_info.ldTitle:GetString("")
+	_modal_body = (modal_current_info ~= nil) and modal_current_info.ldTitle:GetString("") or "??? (Not found)"
 
 	end 
 
@@ -99,7 +99,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	end
 
 	-- Tmp
-	modal_asset_id = math.max(1, math.min(5, modal_current_rarity))
+	modal_asset_id = math.max(1, math.min(5, modal_current_rarity + 1))
 
 	if modal_type ~= 0 then
 		modal_sfx[modal_asset_id]:PlayStart()
