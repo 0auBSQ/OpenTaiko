@@ -32,7 +32,7 @@ namespace OpenTaiko {
 			var dancerOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.DANCER}");
 			if (System.IO.Directory.Exists($@"{dancerOrigindir}")) {
 				var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
-				if (dirs.Length > 0) {
+				if (dirs.Length > 0 && preset.DancerSet.Length > 0) {
 					var _presetPath = (preset != null && preset.DancerSet != null) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
 					var path = (preset != null && System.IO.Directory.Exists(_presetPath))
 						? _presetPath

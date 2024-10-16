@@ -20,7 +20,6 @@
 * THE SOFTWARE.
 */
 using FDK;
-using ImGuiNET;
 using Silk.NET.Core;
 using Silk.NET.GLFW;
 using Silk.NET.Input;
@@ -437,6 +436,7 @@ namespace SampleFramework {
 
 			ViewPortOffset.X = (size.X - ViewPortSize.X) / 2;
 			ViewPortOffset.Y = (size.Y - ViewPortSize.Y) / 2;
+
 
 			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
 		}

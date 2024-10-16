@@ -5,48 +5,56 @@
             "DOWN": [ "0","1","2" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
-            "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "MOB": [ ],
+            "RUNNER": [ ]
         },
         "Dango": {
             "UP": [ "0" ],
             "DOWN": [ "0" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
-            "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "MOB": [ ],
+            "RUNNER": [ ]
         },
         "Clouds": {
             "UP": [ "1" ],
             "DOWN": [ "1" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
-            "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "MOB": [ ],
+            "RUNNER": [ ]
         },
-		    "Forest": {
+		"Forest": {
             "UP": [ "1" ],
             "DOWN": [ "2" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
-            "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "MOB": [ ],
+            "RUNNER": [ ]
         },
         "Dashy": {
             "UP": [ "8" ],
             "DOWN": [ "8" ],
             "DANCER": [ "Dashy" ],
             "FOOTER": [ "8" ],
-            "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "MOB": [ ],
+            "RUNNER": [ ]
         },
         "Outfox": {
             "UP": [ "Outfox" ],
             "DOWN": [ "Outfox" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "Outfox" ],
+            "MOB": [ ],
+            "RUNNER": [ ]
+        },
+		"Headquarters1": {
+            "UP": [ "0","1" ],
+            "DOWN": [ "0","1","2" ],
+            "DANCER": [ "0" ],
+            "FOOTER": [ "0" ],
             "MOB": [ "0" ],
-            "RUNNER": [ "0" ]
+            "RUNNER": [ ]
         }
     },
     "Dan": {
