@@ -6,12 +6,14 @@ namespace OpenTaiko {
 	internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>> {
 		/* DISPLAYED : Song displayed in song select, only a lock appearing on the side, audio preview plays
          * GRAYED : Box grayed, song preview does not play
+         * BLURED : Like grayed, but with a glitch effect on the song title and preimage making it unreadable
          * HIDDEN : Song not appears on the song select list until being unlocked
          */
 		public enum EHiddenIndex {
 			DISPLAYED = 0,
 			GRAYED = 1,
-			HIDDEN = 2
+			BLURED = 2,
+			HIDDEN = 3
 		}
 
 		public DBSongUnlockables() {
@@ -92,7 +94,7 @@ namespace OpenTaiko {
 		}
 
 		public bool tIsSongLocked(CSongListNode? song) {
-			if (song == null) return false;
+			if (song == null || OpenTaiko.ConfigIni.bIgnoreSongUnlockables) return false;
 			return !OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Contains(song.tGetUniqueId())
 				&& data.ContainsKey(song.tGetUniqueId());
 		}

@@ -196,6 +196,11 @@
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
 
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignorer SongUnlockables.db3",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Rend tout les sons accessibles.\nNe modifie pas directement Saves.db3.\nLes sons sont toujours débloqués normalement.\n\n<c.#f0ad4e>ATTENTION\nActiver cette option rend les speedruns invalides.</c>",
+
+
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Délai avant l'image",

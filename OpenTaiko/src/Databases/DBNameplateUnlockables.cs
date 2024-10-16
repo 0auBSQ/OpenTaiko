@@ -72,7 +72,7 @@ namespace OpenTaiko {
 						mq.tAddModal(
 							new Modal(
 								Modal.EModalType.Title,
-								HRarity.tRarityToLangInt(item.Value.rarity),
+								HRarity.tRarityToModalInt(item.Value.rarity),
 								item,
 								OpenTaiko.NamePlate.lcNamePlate
 								),

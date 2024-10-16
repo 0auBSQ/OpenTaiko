@@ -83,6 +83,8 @@ namespace FDK {
 					Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + ")");
 				} catch { }
 			}
+
+			SampleFramework.Game.InitImGuiController(window, Context);
 		}
 
 

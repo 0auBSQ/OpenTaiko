@@ -374,6 +374,10 @@ namespace OpenTaiko {
 				CLangManager.LangInstance.GetString("SETTINGS_TRAINING_JUMPINTERVAL_DESC"));
 			this.list項目リスト.Add(TokkunMashInterval);
 
+			this.iTaikoIgnoreSongUnlockables = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_IGNORESONGUNLOCKABLES"), OpenTaiko.ConfigIni.bIgnoreSongUnlockables,
+				CLangManager.LangInstance.GetString("SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC"));
+			this.list項目リスト.Add(this.iTaikoIgnoreSongUnlockables);
+
 			this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
 				CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DESC"));
 			this.list項目リスト.Add(this.iDrumsGoToKeyAssign);
@@ -1242,8 +1246,7 @@ namespace OpenTaiko {
 						if (this.list項目リスト[nItem] == this.iCommonPlaySpeed) {
 							double d = ((double)((CItemInteger)this.list項目リスト[nItem]).n現在の値) / 20.0;
 							strParam = d.ToString("0.000");
-						}
-						else {
+						} else {
 							strParam = ((CItemInteger)this.list項目リスト[nItem]).n現在の値.ToString();
 						}
 						b強調 = centerFlag && this.b要素値にフォーカス中;
@@ -1519,6 +1522,7 @@ namespace OpenTaiko {
 		private CItemToggle iTaikoAutoPlay;
 		private CItemToggle iTaikoAutoPlay2P;
 		private CItemToggle iTaikoAutoRoll;
+		private CItemToggle iTaikoIgnoreSongUnlockables;
 
 		private CItemInteger iRollsPerSec;
 		private CItemInteger iAILevel;
@@ -1660,6 +1664,7 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bTight = this.iDrumsTight.bON;
 
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
+			OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
 			OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;
 			OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi

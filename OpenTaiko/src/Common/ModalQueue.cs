@@ -14,12 +14,6 @@
 				_modalQueues[player].Enqueue(mp);
 		}
 
-		public Modal tPopModal(int player) {
-			if (!tIsQueueEmpty(player))
-				return _modalQueues[player].Dequeue();
-			return null;
-		}
-
 		// 1P => 2P => 3P => 4P => 5P
 		public Modal? tPopModalInOrder() {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
