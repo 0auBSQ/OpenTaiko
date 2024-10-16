@@ -186,7 +186,7 @@ namespace FDK {
 
 		#region [ private ]
 		//-----------------
-		public IInputContext Context { get; private set; }
+		private IInputContext Context;
 		private IInputDevice _Keyboard;
 		private IInputDevice _Mouse;
 		private bool bDisposed済み;
