@@ -432,7 +432,7 @@ namespace OpenTaiko {
 						var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 						var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
-						if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 							OpenTaiko.Tx.SongSelect_Song_Panel[4]?.t2D描画(0, 0);
 						} else {
 							if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
@@ -468,7 +468,7 @@ namespace OpenTaiko {
 						var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 						var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
-						if (HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED) {
+						if (HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
 							actSongInfo.Draw();
 							if (this.n現在選択中の曲の難易度 == (int)Difficulty.Dan) {
 								actDanInfo.Draw();
@@ -514,7 +514,7 @@ namespace OpenTaiko {
 					if (this.actDifficultySelectionScreen.bIsDifficltSelect == false || this.actSongList.ctDifficultyIn.CurrentValue < 1000)
 						this.actPreimageパネル.Draw();
 
-					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED)
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED)
 						OpenTaiko.Tx.SongSelect_Song_Panel[5]?.t2D描画(0, 0);
 
 					if (IsSongLocked) {

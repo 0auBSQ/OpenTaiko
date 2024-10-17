@@ -152,7 +152,14 @@ namespace OpenTaiko {
 					this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = num4 * xRatio;
 					this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = num4 * xRatio;
 
-					this.rCurrentlyDisplayedPreimage.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
+					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong);
+
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
+						this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = true;
+						this.rCurrentlyDisplayedPreimage.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
+						this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = false;
+					} else
+						this.rCurrentlyDisplayedPreimage.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
 				}
 			}
 		}

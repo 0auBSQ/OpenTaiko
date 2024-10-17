@@ -910,10 +910,9 @@ namespace OpenTaiko {
 			}
 			#endregion
 			#region [ "曲データを検索しています"画像 ]
-			try
-			{
+			try {
 				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText("Now loading songs.\nPlease wait...", Color.White));
-				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>( 0.5f, 0.5f, 1f );	// 半分のサイズで表示する。
+				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f); // 半分のサイズで表示する。
 
 				/*
 				using ( Bitmap image = new Bitmap( 640, 96 ) )
@@ -1344,7 +1343,7 @@ namespace OpenTaiko {
 				var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(stバー情報[nパネル番号].reference);
 				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(stバー情報[nパネル番号].reference);
 
-				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 					OpenTaiko.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画(xAnime - (int)Box_X, y - ((int)Box_Y));
 				}
 
@@ -1413,7 +1412,7 @@ namespace OpenTaiko {
 
 					#region [ Bar ]
 
-					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 						DrawBarCenter(OpenTaiko.Tx.SongSelect_Bar_Genre_Locked, OpenTaiko.Skin.SongSelect_Bar_X[barCenterNum], OpenTaiko.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
 					} else {
 						var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, OpenTaiko.Tx.SongSelect_Bar_Genre);
@@ -1558,7 +1557,7 @@ namespace OpenTaiko {
 
 							#region [Difficulty bars]
 
-							if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED) {
+							if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
 								// 難易度がTower、Danではない
 								if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan) {
 									#region [Display difficulty boxes]
@@ -1965,7 +1964,7 @@ namespace OpenTaiko {
 					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
 					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
 
-					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 						DrawBarCenter(OpenTaiko.Tx.SongSelect_Bar_Genre_Locked_Top, OpenTaiko.Skin.SongSelect_Bar_X[barCenterNum], OpenTaiko.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
 						//TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画();
 					}
@@ -2709,7 +2708,7 @@ namespace OpenTaiko {
 			if (eバー種別 == Eバー種別.Random) {
 				OpenTaiko.Tx.SongSelect_Bar_Genre_Random?.t2D描画(x, y);
 			} else if (eバー種別 != Eバー種別.BackBox) {
-				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 					OpenTaiko.Tx.SongSelect_Bar_Genre_Locked?.t2D描画(x, y);
 					return;
 				} else {
