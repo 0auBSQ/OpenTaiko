@@ -30,7 +30,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
 
       - name: Observe the Directory
         shell: cmd
@@ -45,7 +45,7 @@ jobs:
       - name: Create Archive (Win x64)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net7.0\win-x64\publish\
+          cd OpenTaiko\bin\Release\net8.0\win-x64\publish\
           7z a ../../../../../../OpenTaiko_win_64bit.zip * -xr!Songs/ 
           7z u ../../../../../../OpenTaiko_win_64bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
           cd ..\..\..\..\..\..\
@@ -58,7 +58,7 @@ jobs:
 #      - name: Create Archive (Win x86)
 #        shell: cmd
 #        run: |
-#          cd OpenTaiko\bin\Release\net7.0\win-x86\publish\
+#          cd OpenTaiko\bin\Release\net8.0\win-x86\publish\
 #          7z a ../../../../../../OpenTaiko_win_32bit.zip * -xr!Songs/ 
 #          7z u ../../../../../../OpenTaiko_win_32bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
 #          cd ..\..\..\..\..\..\
@@ -71,7 +71,7 @@ jobs:
       - name: Create Archive (Mac x64)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net7.0\osx-x64\publish\
+          cd OpenTaiko\bin\Release\net8.0\osx-x64\publish\
           7z a ../../../../../../OpenTaiko_osx_64bit.zip * -xr!Songs/ 
           7z u ../../../../../../OpenTaiko_osx_64bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
           cd ..\..\..\..\..\..\
@@ -84,7 +84,7 @@ jobs:
       - name: Create Archive (Linux x64)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\
+          cd OpenTaiko\bin\Release\net8.0\linux-x64\publish\
           7z a ../../../../../../OpenTaiko_linux_64bit.zip * -xr!Songs/ 
           7z u ../../../../../../OpenTaiko_linux_64bit.zip "Songs/L2 Custom Charts/*" "Songs/L3 Downloaded Songs/*" "Songs/S1 Dan-i Dojo/box.def" "Songs/S2 Taiko Towers/box.def" "Songs/X1 Favorite/*" "Songs/X2 Recent/*" "Songs/X3 Search By Difficulty/*"
           cd ..\..\..\..\..\..\
@@ -92,7 +92,7 @@ jobs:
       - name: Create Archive (Songs)
         shell: cmd
         run: |
-          cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\Songs\
+          cd OpenTaiko\bin\Release\net8.0\linux-x64\publish\Songs\
           7z a ../../../../../../../Songs.zip *
           7z d ../../../../../../../Songs.zip "L2 Custom Charts/" "L3 Downloaded Songs/" "X1 Favorite/" "X2 Recent/" "X3 Search By Difficulty/"
           cd ..\..\..\..\..\..\..\
@@ -100,7 +100,7 @@ jobs:
       #- name: Create Archive (System)
       #  shell: cmd
       #  run: |
-      #    cd OpenTaiko\bin\Release\net7.0\linux-x64\publish\System\
+      #    cd OpenTaiko\bin\Release\net8.0\linux-x64\publish\System\
       #    7z a ../../../../../../../System.zip *
       #    cd ..\..\..\..\..\..\..\
       
