@@ -17,7 +17,7 @@ namespace OpenTaiko {
 				Random random = new Random();
 
 				var upDirs = System.IO.Directory.GetFiles(footerDir);
-				if (upDirs.Length > 0) {
+				if (upDirs.Length > 0 && preset.FooterSet.Length > 0) {
 					var _presetPath = (preset != null && preset.FooterSet != null) ? $@"{footerDir}" + preset.FooterSet[random.Next(0, preset.FooterSet.Length)] + ".png" : "";
 					var path = (preset != null && System.IO.File.Exists(_presetPath))
 						? _presetPath

@@ -17,7 +17,7 @@ namespace OpenTaiko {
 				Random random = new Random();
 
 				var upDirs = System.IO.Directory.GetDirectories(mobDir);
-				if (upDirs.Length > 0) {
+				if (upDirs.Length > 0 && preset.MobSet.Length > 0) {
 					var _presetPath = (preset != null && preset.MobSet != null) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] : "";
 					var path = (preset != null && System.IO.Directory.Exists(_presetPath))
 						? _presetPath
