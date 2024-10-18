@@ -72,9 +72,9 @@ namespace OpenTaiko {
 					UpScript = new ScriptBG($@"{upPath}{Path.DirectorySeparatorChar}Script.lua");
 					UpScript.Init();
 				}
-				else { IsUpNotFound = true; }
 
-				IsUpNotFound = !UpScript.Exists();
+				if (UpScript == null) IsUpNotFound = true;
+				else IsUpNotFound = !UpScript.Exists();
 			} else {
 				IsUpNotFound = true;
 			}
