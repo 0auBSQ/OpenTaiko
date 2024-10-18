@@ -10,6 +10,7 @@ namespace OpenTaiko {
 			= new Dictionary<TitleTextureKey, CTexture>();
 
 		public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey) {
+			if (titleTextureKey == null) return null;
 			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 				texture = GenerateTitleTexture(titleTextureKey);
 				_titledictionary.Add(titleTextureKey, texture);
@@ -19,6 +20,7 @@ namespace OpenTaiko {
 		}
 
 		public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey, bool bVertical, bool keepCenter = false) {
+			if (titleTextureKey == null) return null;
 			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 				if (bVertical)
 					texture = GenerateTitleTextureTate(titleTextureKey, keepCenter);
@@ -31,6 +33,7 @@ namespace OpenTaiko {
 		}
 
 		public static CTexture ResolveTitleTextureTate(TitleTextureKey titleTextureKey) {
+			if (titleTextureKey == null) return null;
 			if (!_titledictionary.TryGetValue(titleTextureKey, out var texture)) {
 				texture = GenerateTitleTextureTate(titleTextureKey);
 				_titledictionary.Add(titleTextureKey, texture);
@@ -40,6 +43,7 @@ namespace OpenTaiko {
 		}
 
 		private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey, bool keepCenter = false) {
+			if (titleTextureKey == null) return null;
 			using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
 				titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 				CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
@@ -54,6 +58,7 @@ namespace OpenTaiko {
 		}
 
 		private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey, bool keepCenter = false) {
+			if (titleTextureKey == null) return null;
 			using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
 				titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 				CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);

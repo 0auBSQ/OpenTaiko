@@ -19,7 +19,10 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+using System.Reflection;
+using System.Runtime.InteropServices;
 using FDK;
+using ImGuiNET;
 using Silk.NET.Core;
 using Silk.NET.GLFW;
 using Silk.NET.Input;
@@ -38,12 +41,48 @@ namespace SampleFramework {
 		public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
 
 		public static ImGuiController ImGuiController { get; private set; }
+		public static ImGuiIOPtr ImGuiIO { get; private set; }
+		private static CTexture ImGuiFontAtlas;
 
 		static string _test = "";
 		public static void InitImGuiController(IView window, IInputContext context) {
 			if (ImGuiController != null) return;
 
 			ImGuiController = new ImGuiController(Gl, window, context);
+			ImGuiIO = ImGui.GetIO();
+			ImGui.StyleColorsDark();
+#if DEBUG
+			try {
+				ImGuiIO.Fonts.Clear();
+				unsafe {
+					Stream data = Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf");
+					byte[] stream_data = new byte[data.Length];
+					data.Read(stream_data);
+					fixed (byte* stream = stream_data) {
+						ImFontConfigPtr config = new ImFontConfigPtr(ImGuiNative.ImFontConfig_ImFontConfig());
+						ImGuiIO.Fonts.AddFontFromMemoryTTF((IntPtr)stream, 64, 16.0f, config, ImGuiIO.Fonts.GetGlyphRangesDefault());
+						config.MergeMode = true;
+						ImGuiIO.Fonts.AddFontFromMemoryTTF((IntPtr)stream, 64, 16.0f, config, ImGuiIO.Fonts.GetGlyphRangesJapanese());
+
+						ImGuiIO.Fonts.GetTexDataAsRGBA32(out byte* out_pixels, out int width, out int height);
+
+						using (SKImage image = SKImage.FromPixels(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Opaque), (IntPtr)out_pixels)) {
+							using (SKBitmap bitmap = SKBitmap.FromImage(image)) {
+								ImGuiFontAtlas?.Dispose();
+								ImGuiFontAtlas = new CTexture(bitmap);
+							}
+						}
+						Marshal.FreeHGlobal((IntPtr)out_pixels);
+
+						ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Texture_);
+					}
+				}
+			}
+			catch (Exception ex) {
+				ImGuiIO.Fonts.Clear();
+				ImGuiIO.Fonts.AddFontDefault();
+			}
+#endif
 		}
 
 		public static List<Action> AsyncActions { get; private set; } = new();

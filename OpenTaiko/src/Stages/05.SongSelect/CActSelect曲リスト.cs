@@ -193,8 +193,8 @@ namespace OpenTaiko {
 		}
 
 		public void tResetTitleKey() {
-			this.ttk選択している曲の曲名 = null;
-			this.ttk選択している曲のサブタイトル = null;
+			this.ttkSelectedSongTitle = null;
+			this.ttkSelectedSongSubtitle = null;
 			this.ttkSelectedSongMaker = null;
 			this.ttkSelectedSongBPM = null;
 		}
@@ -553,8 +553,8 @@ namespace OpenTaiko {
 
 				this.t選択曲が変更された(false);             // スクロールバー用に今何番目を選択しているかを更新
 
-				this.ttk選択している曲の曲名 = null;
-				this.ttk選択している曲のサブタイトル = null;
+				this.ttkSelectedSongTitle = null;
+				this.ttkSelectedSongSubtitle = null;
 
 				OpenTaiko.stageSongSelect.tNotifySelectedSongChange();      // スクロール完了＝選択曲変更！
 				ctBarOpen.Start(0, 260, 2, OpenTaiko.Timer);
@@ -910,10 +910,9 @@ namespace OpenTaiko {
 			}
 			#endregion
 			#region [ "曲データを検索しています"画像 ]
-			try
-			{
+			try {
 				this.txEnumeratingSongs = new CTexture(ft曲リスト用フォント.DrawText("Now loading songs.\nPlease wait...", Color.White));
-				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>( 0.5f, 0.5f, 1f );	// 半分のサイズで表示する。
+				this.txEnumeratingSongs.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f); // 半分のサイズで表示する。
 
 				/*
 				using ( Bitmap image = new Bitmap( 640, 96 ) )
@@ -1327,24 +1326,33 @@ namespace OpenTaiko {
 				//-----------------
 				#endregion
 
-				#region [ タイトル名テクスチャを描画。]
-				if (ctDifficultyIn.CurrentValue >= 1000 && OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
-					TitleTextureKey.ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, OpenTaiko.Skin.SongSelect_VerticalText).Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
-				else
-					TitleTextureKey.ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, OpenTaiko.Skin.SongSelect_VerticalText).Opacity = 255;
-
-				if (ctScrollCounter.CurrentValue != ctScrollCounter.EndValue)
-					TitleTextureKey.ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, OpenTaiko.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(
-						xAnime - Box_X + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別), y - Box_Y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別));
-				else if (n見た目の行番号 != barCenterNum)
-					TitleTextureKey.ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, OpenTaiko.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(
-						xAnime - Box_X + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別), y - Box_Y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別));
-				#endregion
-
 				var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(stバー情報[nパネル番号].reference);
 				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(stバー情報[nパネル番号].reference);
 
-				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+				var _title = TitleTextureKey.ResolveTitleTexture(this.stバー情報[nパネル番号].ttkタイトル, OpenTaiko.Skin.SongSelect_VerticalText);
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
+					_title.bUseNoiseEffect = true;
+				}
+
+				#region [ タイトル名テクスチャを描画。]
+				if (ctDifficultyIn.CurrentValue >= 1000 && OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
+					_title.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+				else
+					_title.Opacity = 255;
+
+				if (ctScrollCounter.CurrentValue != ctScrollCounter.EndValue)
+					_title.t2D拡大率考慮中央基準描画(
+						xAnime - Box_X + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別), y - Box_Y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別));
+				else if (n見た目の行番号 != barCenterNum)
+					_title.t2D拡大率考慮中央基準描画(
+						xAnime - Box_X + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別), y - Box_Y + GetTitleOffsetY(this.stバー情報[nパネル番号].eバー種別));
+				#endregion
+
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
+					_title.bUseNoiseEffect = false;
+				}
+
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 					OpenTaiko.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画(xAnime - (int)Box_X, y - ((int)Box_Y));
 				}
 
@@ -1413,7 +1421,7 @@ namespace OpenTaiko {
 
 					#region [ Bar ]
 
-					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 						DrawBarCenter(OpenTaiko.Tx.SongSelect_Bar_Genre_Locked, OpenTaiko.Skin.SongSelect_Bar_X[barCenterNum], OpenTaiko.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
 					} else {
 						var bar_genre = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxType, OpenTaiko.Tx.SongSelect_Bar_Genre);
@@ -1558,7 +1566,7 @@ namespace OpenTaiko {
 
 							#region [Difficulty bars]
 
-							if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED) {
+							if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
 								// 難易度がTower、Danではない
 								if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan) {
 									#region [Display difficulty boxes]
@@ -1890,59 +1898,76 @@ namespace OpenTaiko {
 					fNowScrollAnime));
 
 				if ((i == barCenterNum) && ctScrollCounter.CurrentValue == ctScrollCounter.EndValue) {
-					CTexture tx選択している曲のサブタイトル = null;
+					CTexture txSelectedSongSubtitle = null;
 
 					// (A) スクロールが停止しているときの選択曲バーの描画。
+
+					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
 
 					#region [ Nastiest Song Title display method I ever saw]
 
 					// Fonts here
 
 					//-----------------
-					if (rCurrentlySelectedSong.ldTitle.GetString("") != "" && this.ttk選択している曲の曲名 == null)
-						this.ttk選択している曲の曲名 = this.ttkGenerateSongNameTexture(rCurrentlySelectedSong.ldTitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? this.pfBoxName : this.pfMusicName);
-					if (rCurrentlySelectedSong.ldSubtitle.GetString("") != "" && this.ttk選択している曲のサブタイトル == null)
-						this.ttk選択している曲のサブタイトル = this.ttkGenerateSubtitleTexture(rCurrentlySelectedSong.ldSubtitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
+					if (rCurrentlySelectedSong.ldTitle.GetString("") != "" && this.ttkSelectedSongTitle == null)
+						this.ttkSelectedSongTitle = this.ttkGenerateSongNameTexture(rCurrentlySelectedSong.ldTitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor, rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? this.pfBoxName : this.pfMusicName);
+					if (rCurrentlySelectedSong.ldSubtitle.GetString("") != "" && this.ttkSelectedSongSubtitle == null)
+						this.ttkSelectedSongSubtitle = this.ttkGenerateSubtitleTexture(rCurrentlySelectedSong.ldSubtitle.GetString(""), rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
 					if (rCurrentlySelectedSong.strMaker != "" && this.ttkSelectedSongMaker == null)
 						this.ttkSelectedSongMaker = this.ttkGenerateMakerTexture(rCurrentlySelectedSong.strMaker, rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor);
 					if (this.ttkSelectedSongBPM == null)
 						this.ttkSelectedSongBPM = this.ttkGenerateBPMTexture(rCurrentlySelectedSong, rCurrentlySelectedSong.ForeColor, rCurrentlySelectedSong.BackColor); ;
 
 
-					if (this.ttk選択している曲のサブタイトル != null)
-						tx選択している曲のサブタイトル = TitleTextureKey.ResolveTitleTexture(ttk選択している曲のサブタイトル, OpenTaiko.Skin.SongSelect_VerticalText);
+					if (this.ttkSelectedSongSubtitle != null)
+						txSelectedSongSubtitle = TitleTextureKey.ResolveTitleTexture(ttkSelectedSongSubtitle, OpenTaiko.Skin.SongSelect_VerticalText);
+
+					var _title = TitleTextureKey.ResolveTitleTexture(this.ttkSelectedSongTitle, OpenTaiko.Skin.SongSelect_VerticalText);
+
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED && _title != null) {
+						_title.bUseNoiseEffect = true;
+					}
 
 					//サブタイトルがあったら700
 
-					if (ttk選択している曲の曲名 != null) {
+					if (ttkSelectedSongTitle != null) {
 						if (!ctBoxOpen.IsEnded)
-							TitleTextureKey.ResolveTitleTexture(this.ttk選択している曲の曲名, OpenTaiko.Skin.SongSelect_VerticalText).Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
+							_title.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
 							ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
 						else {
 							if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
-								TitleTextureKey.ResolveTitleTexture(this.ttk選択している曲の曲名, OpenTaiko.Skin.SongSelect_VerticalText).Opacity = 255;
+								_title.Opacity = 255;
 							else if (ctDifficultyIn.CurrentValue >= 1000)
-								TitleTextureKey.ResolveTitleTexture(this.ttk選択している曲の曲名, OpenTaiko.Skin.SongSelect_VerticalText).Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+								_title.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
 						}
 					}
 
-					if (this.ttk選択している曲のサブタイトル != null) {
+					if (this.ttkSelectedSongSubtitle != null) {
+						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
+							txSelectedSongSubtitle.bUseNoiseEffect = true;
+						}
+
 						if (!ctBoxOpen.IsEnded)
-							tx選択している曲のサブタイトル.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
+							txSelectedSongSubtitle.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
 							ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
 						else {
 							if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
-								tx選択している曲のサブタイトル.Opacity = (int)(BarAnimeCount * 255.0f);
+								txSelectedSongSubtitle.Opacity = (int)(BarAnimeCount * 255.0f);
 							else if (ctDifficultyIn.CurrentValue >= 1000)
-								tx選択している曲のサブタイトル.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+								txSelectedSongSubtitle.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
 						}
 
-						tx選択している曲のサブタイトル.t2D拡大率考慮中央基準描画(
+						txSelectedSongSubtitle.t2D拡大率考慮中央基準描画(
 							xAnime + OpenTaiko.Skin.SongSelect_Bar_SubTitle_Offset[0] + (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMoveX : centerMoveX / 1.1f),
 							y + OpenTaiko.Skin.SongSelect_Bar_SubTitle_Offset[1] - (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMove : centerMove / 1.1f));
 
-						if (this.ttk選択している曲の曲名 != null) {
-							TitleTextureKey.ResolveTitleTexture(this.ttk選択している曲の曲名, OpenTaiko.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(
+						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
+							txSelectedSongSubtitle.bUseNoiseEffect = false;
+						}
+
+						if (this.ttkSelectedSongTitle != null) {
+							_title.t2D拡大率考慮中央基準描画(
 								xAnime + GetTitleOffsetX(rCurrentlySelectedSong.eノード種別) +
 								(rCurrentlySelectedSong.eノード種別 != CSongListNode.ENodeType.BACKBOX ? (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMoveX : centerMoveX / 1.1f) : 0),
 
@@ -1950,8 +1975,8 @@ namespace OpenTaiko {
 								(rCurrentlySelectedSong.eノード種別 != CSongListNode.ENodeType.BACKBOX ? (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMove : centerMove / 1.1f) : 0));
 						}
 					} else {
-						if (this.ttk選択している曲の曲名 != null) {
-							TitleTextureKey.ResolveTitleTexture(this.ttk選択している曲の曲名, OpenTaiko.Skin.SongSelect_VerticalText).t2D拡大率考慮中央基準描画(
+						if (this.ttkSelectedSongTitle != null) {
+							_title.t2D拡大率考慮中央基準描画(
 								xAnime + GetTitleOffsetX(this.stバー情報[nパネル番号].eバー種別) +
 								(rCurrentlySelectedSong.eノード種別 != CSongListNode.ENodeType.BACKBOX ? (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMoveX : centerMoveX / 1.1f) : 0),
 
@@ -1959,13 +1984,16 @@ namespace OpenTaiko {
 								(rCurrentlySelectedSong.eノード種別 != CSongListNode.ENodeType.BACKBOX ? (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMove : centerMove / 1.1f) : 0));
 						}
 					}
+
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED && _title != null) {
+						_title.bUseNoiseEffect = false;
+					}
 					//-----------------
 					#endregion
 
-					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
-					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
 
-					if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 						DrawBarCenter(OpenTaiko.Tx.SongSelect_Bar_Genre_Locked_Top, OpenTaiko.Skin.SongSelect_Bar_X[barCenterNum], OpenTaiko.Skin.SongSelect_Bar_Y[barCenterNum], centerMoveX, centerMove, false, false, false);
 						//TJAPlayer3.Tx.SongSelect_Bar_Genre_Locked_Top?.t2D描画();
 					}
@@ -2298,8 +2326,8 @@ namespace OpenTaiko {
 		private STバー情報[] stバー情報 = new STバー情報[OpenTaiko.Skin.SongSelect_Bar_Count];
 		private CTexture txSongNotFound, txEnumeratingSongs;
 
-		private TitleTextureKey ttk選択している曲の曲名;
-		private TitleTextureKey ttk選択している曲のサブタイトル;
+		private TitleTextureKey ttkSelectedSongTitle;
+		private TitleTextureKey ttkSelectedSongSubtitle;
 		public TitleTextureKey ttkSelectedSongBPM;
 		public TitleTextureKey ttkSelectedSongMaker;
 
@@ -2709,7 +2737,7 @@ namespace OpenTaiko {
 			if (eバー種別 == Eバー種別.Random) {
 				OpenTaiko.Tx.SongSelect_Bar_Genre_Random?.t2D描画(x, y);
 			} else if (eバー種別 != Eバー種別.BackBox) {
-				if (HiddenIndex == DBSongUnlockables.EHiddenIndex.GRAYED) {
+				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 					OpenTaiko.Tx.SongSelect_Bar_Genre_Locked?.t2D描画(x, y);
 					return;
 				} else {
@@ -2911,12 +2939,12 @@ namespace OpenTaiko {
 
 
 		private void tResetTitleTextureKey() {
-			if (this.ttk選択している曲の曲名 != null) {
-				this.ttk選択している曲の曲名 = null;
+			if (this.ttkSelectedSongTitle != null) {
+				this.ttkSelectedSongTitle = null;
 				this.b選択曲が変更された = false;
 			}
-			if (this.ttk選択している曲のサブタイトル != null) {
-				this.ttk選択している曲のサブタイトル = null;
+			if (this.ttkSelectedSongSubtitle != null) {
+				this.ttkSelectedSongSubtitle = null;
 				this.b選択曲が変更された = false;
 			}
 			if (this.ttkSelectedSongMaker != null) {

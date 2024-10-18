@@ -137,7 +137,7 @@ namespace OpenTaiko {
 			if ((cスコア != null)
 				&& !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
 				&& OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
-				&& HiddenIndex != DBSongUnlockables.EHiddenIndex.GRAYED
+				&& HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED
 				) {
 				string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 				try {

@@ -229,6 +229,8 @@ namespace OpenTaiko {
 							this.Type = "me";
 							bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
 							return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
+						default:
+							return (false, null);
 					}
 				}
 

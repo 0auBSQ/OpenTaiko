@@ -37,7 +37,7 @@ namespace OpenTaiko {
 			bExamChangeCheck = false;
 
 			if (number == 0) {
-				for (int i = 1; i < CExamInfo.cMaxExam; i++)
+				for (int i = 0; i < CExamInfo.cMaxExam; i++)
 					ExamChange[i] = false;
 
 				for (int j = 0; j < CExamInfo.cMaxExam; j++) {

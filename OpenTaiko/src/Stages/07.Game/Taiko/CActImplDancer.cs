@@ -18,6 +18,8 @@ namespace OpenTaiko {
 
 			var preset = HScenePreset.GetBGPreset();
 
+			if (preset == null) return;
+
 			Random random = new Random();
 
 			Dancer_In = new CTexture[5][];
@@ -30,13 +32,13 @@ namespace OpenTaiko {
 
 
 			var dancerOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.DANCER}");
-			if (System.IO.Directory.Exists($@"{dancerOrigindir}")) {
-				var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
-				if (dirs.Length > 0 && preset.DancerSet.Length > 0) {
-					var _presetPath = (preset != null && preset.DancerSet != null) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
-					var path = (preset != null && System.IO.Directory.Exists(_presetPath))
+			if (Directory.Exists($@"{dancerOrigindir}")) {
+				var dirs = Directory.GetDirectories($@"{dancerOrigindir}");
+				if (preset.DancerSet != null) {
+					var _presetPath = (preset.DancerSet.Length > 0) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
+					var path = (Directory.Exists(_presetPath))
 						? _presetPath
-						: dirs[random.Next(0, dirs.Length)];
+						: (dirs.Length > 0 ? dirs[random.Next(0, dirs.Length)] : "");
 
 					LoadDancerConifg(path);
 

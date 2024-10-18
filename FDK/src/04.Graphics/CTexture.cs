@@ -63,6 +63,9 @@ namespace FDK {
 
 		private static int NoteModeID;
 
+		private static int NoiseEffectID;
+		private static int TimeID;
+
 		/// <summary>
 		/// 描画に使用する共通のバッファを作成
 		/// </summary>
@@ -97,23 +100,40 @@ namespace FDK {
                 uniform sampler2D texture1;
                 uniform vec4 textureRect;
                 uniform vec2 scale;
-                uniform bool noteMode;
+                uniform int noteMode;
+				uniform int useNoiseEffect;
+				uniform float time;
 
                 varying vec2 texcoord;
+
+				float randomGrayscale(vec2 uv) {
+					return fract(sin(dot(uv.xy * 10.0, vec2(12.9898, 78.233))) * (43758.5453 * (time + 1.0) * 0.02));
+				}
+
 
                 void main()
                 {
                     vec2 rect;
-                    if (noteMode)
+                    if (noteMode == 1)
                     {
                         rect = textureRect.xy + (texcoord * textureRect.zw * scale);
+
                         rect = rect - (floor((rect - textureRect.xy) / textureRect.zw) * textureRect.zw);
                     }
                     else
                     {
                         rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
                     }
-                    gl_FragColor = texture2D(texture1, rect) * color;
+
+					vec4 texColor = texture2D(texture1, rect) * color;
+
+					if (useNoiseEffect == 1) {
+						float n = randomGrayscale(rect);
+						texColor.rgb = vec3(n);
+						texColor.a = 1.0;
+					}
+
+                    gl_FragColor = texColor;
                 }"
 			);
 			//------
@@ -125,7 +145,8 @@ namespace FDK {
 			TextureRectID = Game.Gl.GetUniformLocation(ShaderProgram, "textureRect"); //テクスチャの切り抜きの座標と大きさ
 			CameraID = Game.Gl.GetUniformLocation(ShaderProgram, "camera"); //テクスチャの切り抜きの座標と大きさ
 			NoteModeID = Game.Gl.GetUniformLocation(ShaderProgram, "noteMode"); //テクスチャの切り抜きの座標と大きさ
-
+			NoiseEffectID = Game.Gl.GetUniformLocation(ShaderProgram, "useNoiseEffect");
+			TimeID = Game.Gl.GetUniformLocation(ShaderProgram, "time");
 
 			//------
 
@@ -230,6 +251,12 @@ namespace FDK {
 		}
 
 		// Properties
+
+		public bool bUseNoiseEffect {
+			get;
+			set;
+		}
+
 		public bool b加算合成 {
 			get;
 			set;
@@ -289,7 +316,7 @@ namespace FDK {
 		/// </summary>
 		public static float f画面比率 = 1.0f;
 
-		internal uint Texture_;
+		public uint Texture_ { get; internal set; }
 
 		// Constructor
 
@@ -713,6 +740,11 @@ namespace FDK {
 
 			Game.Gl.Uniform1(NoteModeID, rollMode ? 1 : 0);
 
+			float _time = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 100;
+			Game.Gl.Uniform1(TimeID, _time);
+			Game.Gl.Uniform1(NoiseEffectID, bUseNoiseEffect ? 1 : 0);
+
+
 			//描画-----
 			Game.Gl.BindVertexArray(VAO);
 			unsafe {
@@ -843,6 +875,10 @@ namespace FDK {
 				rc画像内の描画領域.Width / rc全画像.Width, rc画像内の描画領域.Height / rc全画像.Height)); //大きさ、終わりではない
 
 			Game.Gl.Uniform1(NoteModeID, 0);
+
+			float _time = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) % 100;
+			Game.Gl.Uniform1(TimeID, _time);
+			Game.Gl.Uniform1(NoiseEffectID, bUseNoiseEffect ? 1 : 0);
 
 			//描画-----
 			Game.Gl.BindVertexArray(VAO);
