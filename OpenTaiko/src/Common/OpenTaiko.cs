@@ -8,7 +8,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using ImGuiNET;
 using SampleFramework;
 using Silk.NET.Maths;
 using SkiaSharp;
@@ -1973,7 +1972,10 @@ for (int i = 0; i < 3; i++) {
 				#endregion
 
 #if DEBUG
-				ImGuiDebugWindow.Draw();
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F11))
+					OpenTaiko.ConfigIni.DEBUG_bShowImgui = !OpenTaiko.ConfigIni.DEBUG_bShowImgui;
+				if (OpenTaiko.ConfigIni.DEBUG_bShowImgui)
+					ImGuiDebugWindow.Draw();
 #endif
 			}
 #if !DEBUG

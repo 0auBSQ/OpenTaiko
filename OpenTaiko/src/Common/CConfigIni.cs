@@ -1650,6 +1650,10 @@ namespace OpenTaiko {
 		public bool bDirectShowMode;
 		#endregion
 
+		#region[DEBUG]
+		public bool DEBUG_bShowImgui;
+		#endregion
+
 		//--------------------------
 		#endregion
 
@@ -1853,6 +1857,9 @@ namespace OpenTaiko {
 			#region[ Ver.K追加 ]
 			this.eLaneType = ELaneType.TypeA;
 			this.bDirectShowMode = false;
+			#endregion
+			#region[DEBUG]
+			DEBUG_bShowImgui = true;
 			#endregion
 		}
 		public CConfigIni(string iniファイル名)
@@ -2641,6 +2648,13 @@ namespace OpenTaiko {
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
+			#region [DEBUG]
+			sw.WriteLine("[DEBUG]");
+			sw.WriteLine();
+			sw.WriteLine("ImGui={0}", this.DEBUG_bShowImgui ? 1 : 0);
+			sw.WriteLine();
+			sw.WriteLine();
+			#endregion
 
 			sw.Close();
 		}
@@ -2697,6 +2711,8 @@ namespace OpenTaiko {
 								unknown = Eセクション種別.SystemKeyAssign;
 							} else if (str2.Equals("TrainingKeyAssign")) {
 								unknown = Eセクション種別.TrainingKeyAssign;
+							} else if (str2.Equals("DEBUG")) {
+								unknown = Eセクション種別.DEBUG;
 							} else if (str2.Equals("Temp")) {
 								unknown = Eセクション種別.Temp;
 							} else {
@@ -3503,8 +3519,17 @@ namespace OpenTaiko {
 											}
 											continue;
 										}
-										//-----------------------------
-										#endregion
+									//-----------------------------
+									#endregion
+									case Eセクション種別.DEBUG: {
+											switch(str3) {
+												case "ImGui": {
+														this.DEBUG_bShowImgui = CConversion.bONorOFF(str4[0]);
+														break;
+													}
+											}
+											continue;
+										}
 								}
 							}
 						}
@@ -3534,6 +3559,7 @@ namespace OpenTaiko {
 			DrumsKeyAssign,
 			SystemKeyAssign,
 			TrainingKeyAssign,
+			DEBUG,
 			Temp,
 		}
 
