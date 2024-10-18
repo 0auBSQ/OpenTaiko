@@ -107,7 +107,7 @@ namespace FDK {
                 varying vec2 texcoord;
 
 				float randomGrayscale(vec2 uv) {
-					return fract(sin(dot(uv.xy * 10.0, vec2(12.9898, 78.233))) * (43758.5453 * time * 0.02));
+					return fract(sin(dot(uv.xy * 10.0, vec2(12.9898, 78.233))) * (43758.5453 * (time + 1.0) * 0.02));
 				}
 
 
@@ -130,6 +130,7 @@ namespace FDK {
 					if (useNoiseEffect == 1) {
 						float n = randomGrayscale(rect);
 						texColor.rgb = vec3(n);
+						texColor.a = 1.0;
 					}
 
                     gl_FragColor = texColor;
