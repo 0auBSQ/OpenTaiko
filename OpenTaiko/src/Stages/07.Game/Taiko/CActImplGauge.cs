@@ -180,12 +180,17 @@ namespace OpenTaiko {
 								new Rectangle(OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 						}
 
+
 						if (OpenTaiko.Tx.Gauge_Dan[2] != null) {
 							for (int i = 0; i < OpenTaiko.DTX.Dan_C.Length; i++) {
 								if (OpenTaiko.DTX.Dan_C[i] != null) {
-									if (OpenTaiko.DTX.Dan_C[i].GetExamType() == Exam.Type.Gauge) {
-										OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), gauge_y[0],
-											new Rectangle((OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
+									Dan_C dan_c = OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
+										OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
+										OpenTaiko.DTX.Dan_C[i];
+
+									if (dan_c.GetExamType() == Exam.Type.Gauge) {
+										OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (dan_c.GetValue(false) / 2 * nWidth), gauge_y[0],
+											new Rectangle((dan_c.GetValue(false) / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (dan_c.GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 									}
 								}
 							}
@@ -214,16 +219,20 @@ namespace OpenTaiko {
 								OpenTaiko.Tx.Gauge_Dan[1]?.t2D描画(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 							for (int i = 0; i < OpenTaiko.DTX.Dan_C.Length; i++) {
-								if (OpenTaiko.DTX.Dan_C[i] != null && OpenTaiko.DTX.Dan_C[i].GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= OpenTaiko.DTX.Dan_C[i].GetValue(false)) {
+								Dan_C dan_c = OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
+										OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
+										OpenTaiko.DTX.Dan_C[i];
+
+								if (dan_c != null && dan_c.GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= dan_c.GetValue(false)) {
 									OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;
-									OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x + (OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), y, new Rectangle(OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth, 0, nRectX[0] - (OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
+									OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x + (dan_c.GetValue(false) / 2 * nWidth), y, new Rectangle(dan_c.GetValue(false) / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 									int Opacity = 0;
 									if (this.ctGaugeFlash.CurrentValue <= 365) Opacity = 0;
 									else if (this.ctGaugeFlash.CurrentValue <= 448) Opacity = (int)((this.ctGaugeFlash.CurrentValue - 365) / 83f * 255f);
 									else if (this.ctGaugeFlash.CurrentValue <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.CurrentValue - 448) / 83f * 255f);
 									OpenTaiko.Tx.Gauge_Dan[3].Opacity = Opacity;
-									OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.DTX.Dan_C[i].GetValue(false) / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
+									OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x, y, new Rectangle(0, 0, dan_c.GetValue(false) / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 									break;
 								}

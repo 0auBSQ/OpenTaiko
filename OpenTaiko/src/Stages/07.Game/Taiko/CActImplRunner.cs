@@ -54,16 +54,18 @@ namespace OpenTaiko {
 
 			var preset = HScenePreset.GetBGPreset();
 
+			if (preset == null) return;
+
 			Random random = new Random();
 
 			var dancerOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.RUNNER}");
-			if (System.IO.Directory.Exists($@"{dancerOrigindir}")) {
-				var dirs = System.IO.Directory.GetDirectories($@"{dancerOrigindir}");
-				if (dirs.Length > 0 && preset.RunnerSet.Length > 0) {
-					var _presetPath = (preset != null && preset.RunnerSet != null) ? $@"{dancerOrigindir}" + preset.RunnerSet[random.Next(0, preset.RunnerSet.Length)] : "";
-					var path = (preset != null && System.IO.Directory.Exists(_presetPath))
+			if (Directory.Exists($@"{dancerOrigindir}")) {
+				var dirs = Directory.GetDirectories($@"{dancerOrigindir}");
+				if (preset.RunnerSet != null) {
+					var _presetPath = (preset.RunnerSet.Length > 0) ? $@"{dancerOrigindir}" + preset.RunnerSet[random.Next(0, preset.RunnerSet.Length)] : "";
+					var path = (Directory.Exists(_presetPath))
 						? _presetPath
-						: dirs[random.Next(0, dirs.Length)];
+						: (dirs.Length > 0 ? dirs[random.Next(0, dirs.Length)] : "");
 					LoadRunnerConifg(path);
 
 					Runner = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}Runner.png");

@@ -13,15 +13,17 @@ namespace OpenTaiko {
 			var footerDir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.FOOTER}");
 			var preset = HScenePreset.GetBGPreset();
 
-			if (System.IO.Directory.Exists(footerDir)) {
+			if (preset == null) return;
+
+			if (Directory.Exists(footerDir)) {
 				Random random = new Random();
 
-				var upDirs = System.IO.Directory.GetFiles(footerDir);
-				if (upDirs.Length > 0 && preset.FooterSet.Length > 0) {
-					var _presetPath = (preset != null && preset.FooterSet != null) ? $@"{footerDir}" + preset.FooterSet[random.Next(0, preset.FooterSet.Length)] + ".png" : "";
-					var path = (preset != null && System.IO.File.Exists(_presetPath))
+				var upDirs = Directory.GetFiles(footerDir);
+				if (preset.FooterSet != null) {
+					var _presetPath = (preset.FooterSet.Length > 0) ? $@"{footerDir}" + preset.FooterSet[random.Next(0, preset.FooterSet.Length)] + ".png" : "";
+					var path = File.Exists(_presetPath)
 						? _presetPath
-						: upDirs[random.Next(0, upDirs.Length)];
+						: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : "");
 
 					Mob_Footer = OpenTaiko.tテクスチャの生成(path);
 				}
@@ -45,9 +47,7 @@ namespace OpenTaiko {
 		}
 
 		public override int Draw() {
-			if (this.Mob_Footer != null) {
-				this.Mob_Footer.t2D描画(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
-			}
+			this.Mob_Footer?.t2D描画(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
 			return base.Draw();
 		}
 

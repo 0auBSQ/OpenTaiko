@@ -315,7 +315,7 @@ namespace FDK {
 		/// </summary>
 		public static float f画面比率 = 1.0f;
 
-		internal uint Texture_;
+		public uint Texture_ { get; internal set; }
 
 		// Constructor
 
