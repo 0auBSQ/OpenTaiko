@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "Русский (Russian)",
+	"Language": "Русский (Russian)",
+	"Version":  "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -195,6 +196,10 @@
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Количество меры, которые необходимо пропустить\nпри нажатии клавиши пропуска мер вперёд или\nназад в Режиме Тренировки.",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Временной интервал пропуска мер",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Количество времени в миллисекундах,\nнеобходимое для многократного нажатия клавиш\nлевого или правого синего, чтобы перейти к меру,\nотмеченному в закладках, в режиме тренировки.",
+
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Игнорирование условий разблокировки песен",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Сделает доступными все песни, игнорируя файл\nSongUnlockables.db3.\nЭто не добавляет записи о разблокировке в файл\nSaves.db3.\nУведомления о разблокировке по-прежнему будут\nотображаться на экране результатов.\n\n<c.#f0ad4e>ВНИМАНИЕ\nПри ON (включенной) этой опции любой спидран\nстановится недействительным.</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
