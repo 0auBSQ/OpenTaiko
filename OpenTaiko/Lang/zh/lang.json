@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "中文 (Chinese)",
+	"Language": "中文 (Chinese)",
+	"Version":  "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -195,6 +196,10 @@
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "训练模式中按下前进/后退多个小节跳转的小节数。",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "跳转小节时间间隔",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "训练模式中跳转至带书签的小节交替按下左/右蓝按键所需\n毫秒数。",
+
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "忽略歌曲解锁条件",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "使所有歌曲在忽略SongUnlockables.db3中可用。\n这将不添加解锁记录到Saves.db3中。\n解锁通知仍将出现在结算界面中。\n\n<c.#f0ad4e>警告\n开启此选项将使任何速通作废。</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
