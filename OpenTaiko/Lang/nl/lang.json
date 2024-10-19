@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "Nederlands (Dutch)",
+    "Language": "Nederlands (Dutch)",
+	"Version":  "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -191,6 +192,10 @@
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "De hoeveelheid maten om over te slaan\nwanneer Skip Voor/Terug wordt ingedrukt in\nTraining Modus.",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Maat Spring Tijdsinterval",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "De wachttijd in milliseconden om\nmeerdere keren de linker/rechter Kat toetsen in te drukken zodat\nhet springt naar een gebookmarkde maat\nin de Training Modus.",
+
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignore Song Unlockables",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Make all songs available ignoring SongUnlockables.db3.\nThis does not add unlock entries to Saves.db3.\nUnlock notifications will still appear on results.\n\n<c.#f0ad4e>WARNING\nHaving this option ON invalidates any speedrun.</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
