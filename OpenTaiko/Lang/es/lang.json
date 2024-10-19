@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "Español (Spanish)",
+    "Language": "Español (Spanish)",
+	"Version":  "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -196,6 +197,10 @@
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "The number of measures to skip while\npressing Skip Forward/Back Measure in\nTraining Mode.",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to\nrepeatedly hit the Left/Right Blue keys in\norder to jump to a bookmarked measure in\nTraining Mode.",
+
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignore Song Unlockables",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Make all songs available ignoring SongUnlockables.db3.\nThis does not add unlock entries to Saves.db3.\nUnlock notifications will still appear on results.\n\n<c.#f0ad4e>WARNING\nHaving this option ON invalidates any speedrun.</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
