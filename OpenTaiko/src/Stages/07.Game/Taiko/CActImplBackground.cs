@@ -44,9 +44,6 @@ namespace OpenTaiko {
 
 			var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
 			var preset = HScenePreset.GetBGPreset();
-
-			if (preset == null) return;
-
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				bgOrigindir += "Tower";
 			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
@@ -63,18 +60,15 @@ namespace OpenTaiko {
 				var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
 
 				// If there is a preset upper background and this preset exists on the skin use it, else random upper background
-				if (preset.UpperBackground != null) {
-					var _presetPath = (preset.UpperBackground.Length > 0) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
-					var upPath = (Directory.Exists(_presetPath))
-						? _presetPath
-						: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : "");
+				var _presetPath = (preset != null && preset.UpperBackground != null) ? $@"{bgOrigindir}{Path.DirectorySeparatorChar}Up{Path.DirectorySeparatorChar}" + preset.UpperBackground[random.Next(0, preset.UpperBackground.Length)] : "";
+				var upPath = (preset != null && System.IO.Directory.Exists(_presetPath))
+					? _presetPath
+					: upDirs[random.Next(0, upDirs.Length)];
 
-					UpScript = new ScriptBG($@"{upPath}{Path.DirectorySeparatorChar}Script.lua");
-					UpScript.Init();
-				}
+				UpScript = new ScriptBG($@"{upPath}{Path.DirectorySeparatorChar}Script.lua");
+				UpScript.Init();
 
-				if (UpScript == null) IsUpNotFound = true;
-				else IsUpNotFound = !UpScript.Exists();
+				IsUpNotFound = false;
 			} else {
 				IsUpNotFound = true;
 			}
