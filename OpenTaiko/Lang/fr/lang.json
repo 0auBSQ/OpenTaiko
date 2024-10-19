@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "Français (French)",
+    "Language": "Français (French)",
+	"Version":  "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -199,7 +200,6 @@
 		// Settings - Gameplay - Unlockables
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignorer SongUnlockables.db3",
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Rend tout les sons accessibles.\nNe modifie pas directement Saves.db3.\nLes sons sont toujours débloqués normalement.\n\n<c.#f0ad4e>ATTENTION\nActiver cette option rend les speedruns invalides.</c>",
-
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
