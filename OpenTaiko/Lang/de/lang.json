@@ -6,7 +6,8 @@
 
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
-  "Language": "Deutsch (German)",
+    "Language": "Deutsch (German)",
+	"Version": "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -195,6 +196,10 @@
 		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Die Anzahl der Takte, die beim Drücken von\nVorwärts-/Rückwärts-Takt übersprungen werden\nim Trainingsmodus.",
 		"SETTINGS_TRAINING_JUMPINTERVAL": "Zeitintervall für Takt-Sprung",
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Die Zeit in Millisekunden, die erforderlich ist,\num wiederholt die linken/rechten blauen Tasten zu drücken,\num zu einem markierten Takt im Trainingsmodus zu springen.",
+
+		// Settings - Gameplay - Unlockables
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Freischaltung der Lieder ignorieren",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Macht alle Lieder verfügbar, unabhängig von SongUnlockables.db3.\nDies fügt keine Freischaltungen zu Saves.db3 hinzu.\nFreischalt-Benachrichtigungen erscheinen weiterhin in den Ergebnissen.\n\n<c.#f0ad4e>WARNUNG\nDas Aktivieren dieser Option macht jeden Speedrun ungültig.</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
@@ -465,11 +470,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bombenfaktor: {0}% der Noten werden in Minen umgewandelt im Minensucher-Modus",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Zündschnurfaktor: {0}% der Ballons werden in Zündschnur-Rollen umgewandelt im Minensucher-Modus",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Alle großen Noten werden zu <c.#c800ff>Swap</c>-Noten",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> Noten werden sichtbar",
 		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatische <c.#ffff00>Rolls</c> mit {0} Schlägen",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Geteilte</c> <c.#0088ff>Spuren</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Münz-Multiplikator: x{0}",
 
