@@ -2781,26 +2781,26 @@ namespace OpenTaiko {
 											#endregion
 											#region [ Window関係 ]
 											  else if (str3.Equals("GraphicsDeviceType")) {
-												this.nGraphicsDeviceType = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nGraphicsDeviceType);
+												this.nGraphicsDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nGraphicsDeviceType);
 											} else if (str3.Equals("FullScreen")) {
 												this.bFullScreen = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("WindowX"))      // #30675 2013.02.04 ikanick add
 											  {
-												this.nWindowBaseXPosition = CConversion.n値を文字列から取得して範囲内に丸めて返す(
+												this.nWindowBaseXPosition = CConversion.ParseIntInRange(
 													str4, 0, 9999, this.nWindowBaseXPosition);
 											} else if (str3.Equals("WindowY"))      // #30675 2013.02.04 ikanick add
 											  {
-												this.nWindowBaseYPosition = CConversion.n値を文字列から取得して範囲内に丸めて返す(
+												this.nWindowBaseYPosition = CConversion.ParseIntInRange(
 													str4, 0, 9999, this.nWindowBaseYPosition);
 											} else if (str3.Equals("WindowWidth"))      // #23510 2010.10.31 yyagi add
 											  {
-												this.nWindowWidth = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 65535, this.nWindowWidth);
+												this.nWindowWidth = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowWidth);
 												if (this.nWindowWidth <= 0) {
 													this.nWindowWidth = SampleFramework.GameWindowSize.Width;
 												}
 											} else if (str3.Equals("WindowHeight"))     // #23510 2010.10.31 yyagi add
 											  {
-												this.nWindowHeight = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 65535, this.nWindowHeight);
+												this.nWindowHeight = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowHeight);
 												if (this.nWindowHeight <= 0) {
 													this.nWindowHeight = SampleFramework.GameWindowSize.Height;
 												}
@@ -2812,20 +2812,20 @@ namespace OpenTaiko {
 												this.bIsEnabledSystemMenu = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BackSleep"))                // #23568 2010.11.04 ikanick add
 											  {
-												this.nMsSleepUnfocused = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, 0, 50, this.nMsSleepUnfocused);
+												this.nMsSleepUnfocused = CConversion.ParseIntInRangeAndClamp(str4, 0, 50, this.nMsSleepUnfocused);
 											}
 											#endregion
 
 											#region [ WASAPI/ASIO関係 ]
 											  else if (str3.Equals("SoundDeviceType")) {
-												this.nSoundDeviceType = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nSoundDeviceType);
+												this.nSoundDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nSoundDeviceType);
 											} else if (str3.Equals("BassBufferSizeMs")) {
-												this.nBassBufferSizeMs = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.nBassBufferSizeMs);
+												this.nBassBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nBassBufferSizeMs);
 											} else if (str3.Equals("WASAPIBufferSizeMs")) {
-												this.nWASAPIBufferSizeMs = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.nWASAPIBufferSizeMs);
+												this.nWASAPIBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nWASAPIBufferSizeMs);
 											} else if (str3.Equals("ASIODevice")) {
 												string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
-												this.nASIODevice = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, asiodev.Length - 1, this.nASIODevice);
+												this.nASIODevice = CConversion.ParseIntInRange(str4, 0, asiodev.Length - 1, this.nASIODevice);
 											}
 											  //else if ( str3.Equals( "ASIOBufferSizeMs" ) )
 											  //{
@@ -2857,9 +2857,9 @@ namespace OpenTaiko {
 												this.bEnableVSync = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("SleepTimePerFrame"))        // #23568 2011.11.27 yyagi
 											  {
-												this.nMsSleepPerFrame = CConversion.n値を文字列から取得して範囲内にちゃんと丸めて返す(str4, -1, 50, this.nMsSleepPerFrame);
+												this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(str4, -1, 50, this.nMsSleepPerFrame);
 											} else if (str3.Equals("BGAlpha")) {
-												this.nBackgroundTransparency = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0xff, this.nBackgroundTransparency);
+												this.nBackgroundTransparency = CConversion.ParseIntInRange(str4, 0, 0xff, this.nBackgroundTransparency);
 											}
 											#region [ AVI/BGA ]
 											  else if (str3.Equals("AVI")) {
@@ -2867,14 +2867,14 @@ namespace OpenTaiko {
 											} else if (str3.Equals("BGA")) {
 												this.bEnableBGA = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("ClipDispType")) {
-												this.eClipDispType = (EClipDispType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eClipDispType);
+												this.eClipDispType = (EClipDispType)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eClipDispType);
 											}
 											#endregion
 											#region [ プレビュー音 ]
 											  else if (str3.Equals("PreviewSoundWait")) {
-												this.nMsWaitPreviewSoundFromSongSelected = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
+												this.nMsWaitPreviewSoundFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
 											} else if (str3.Equals("PreviewImageWait")) {
-												this.nMsWaitPreviewImageFromSongSelected = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
+												this.nMsWaitPreviewImageFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
 											}
 											#endregion
 											#region [ BGM/ドラムのヒット音 ]
@@ -2889,7 +2889,7 @@ namespace OpenTaiko {
 											}
 											#region [ コンボ数 ]
 											  else if (str3.Equals("MinComboDrums")) {
-												this.nMinDisplayedCombo.Drums = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
+												this.nMinDisplayedCombo.Drums = CConversion.ParseIntInRange(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
 											}
 											#endregion
 											  else if (str3.Equals("ShowDebugStatus")) {
@@ -2897,19 +2897,19 @@ namespace OpenTaiko {
 											} else if (str3.Equals(nameof(ApplyLoudnessMetadata))) {
 												this.ApplyLoudnessMetadata = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals(nameof(TargetLoudness))) {
-												this.TargetLoudness = CConversion.db値を文字列から取得して範囲内に丸めて返す(str4, CSound.MinimumLufs.ToDouble(), CSound.MaximumLufs.ToDouble(), this.TargetLoudness);
+												this.TargetLoudness = CConversion.ParseDoubleInRange(str4, CSound.MinimumLufs.ToDouble(), CSound.MaximumLufs.ToDouble(), this.TargetLoudness);
 											} else if (str3.Equals(nameof(ApplySongVol))) {
 												this.ApplySongVol = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals(nameof(SoundEffectLevel))) {
-												this.SoundEffectLevel = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SoundEffectLevel);
+												this.SoundEffectLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SoundEffectLevel);
 											} else if (str3.Equals(nameof(VoiceLevel))) {
-												this.VoiceLevel = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.VoiceLevel);
+												this.VoiceLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.VoiceLevel);
 											} else if (str3.Equals(nameof(SongPreviewLevel))) {
-												this.SongPreviewLevel = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel);
+												this.SongPreviewLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel);
 											} else if (str3.Equals(nameof(SongPlaybackLevel))) {
-												this.SongPlaybackLevel = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel);
+												this.SongPlaybackLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel);
 											} else if (str3.Equals(nameof(KeyboardSoundLevelIncrement))) {
-												this.KeyboardSoundLevelIncrement = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement);
+												this.KeyboardSoundLevelIncrement = CConversion.ParseIntInRange(str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement);
 											} else if (str3.Equals(nameof(MusicPreTimeMs))) {
 												MusicPreTimeMs = int.Parse(str4);
 											} else if (str3.Equals("AutoResultCapture")) {
@@ -2922,42 +2922,42 @@ namespace OpenTaiko {
 											}
 											#region [ AdjustTime ]
 											  else if (str3.Equals("GlobalOffset")) {
-												this.nGlobalOffsetMs = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, -9999, 9999, this.nGlobalOffsetMs);
+												this.nGlobalOffsetMs = CConversion.ParseIntInRange(str4, -9999, 9999, this.nGlobalOffsetMs);
 											}
 											#endregion
 											  else if (str3.Equals("BufferedInput")) {
 												this.bBufferedInputs = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("PolyphonicSounds"))     // #28228 2012.5.1 yyagi
 											  {
-												this.nPoliphonicSounds = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 8, this.nPoliphonicSounds);
+												this.nPoliphonicSounds = CConversion.ParseIntInRange(str4, 1, 8, this.nPoliphonicSounds);
 											}
 											#region [ VelocityMin ]
 											  else if (str3.Equals("LCVelocityMin"))            // #23857 2010.12.12 yyagi
 											  {
-												this.nVelocityMin.LC = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.LC);
+												this.nVelocityMin.LC = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LC);
 											} else if (str3.Equals("HHVelocityMin")) {
-												this.nVelocityMin.HH = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.HH);
+												this.nVelocityMin.HH = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HH);
 											} else if (str3.Equals("SDVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.SD = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.SD);
+												this.nVelocityMin.SD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.SD);
 											} else if (str3.Equals("BDVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.BD = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.BD);
+												this.nVelocityMin.BD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.BD);
 											} else if (str3.Equals("HTVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.HT = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.HT);
+												this.nVelocityMin.HT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HT);
 											} else if (str3.Equals("LTVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.LT = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.LT);
+												this.nVelocityMin.LT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LT);
 											} else if (str3.Equals("FTVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.FT = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.FT);
+												this.nVelocityMin.FT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.FT);
 											} else if (str3.Equals("CYVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.CY = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.CY);
+												this.nVelocityMin.CY = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.CY);
 											} else if (str3.Equals("RDVelocityMin"))            // #23857 2011.1.31 yyagi
 											  {
-												this.nVelocityMin.RD = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 127, this.nVelocityMin.RD);
+												this.nVelocityMin.RD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.RD);
 											}
 											#endregion
 											  //else if ( str3.Equals( "NoMP3Streaming" ) )
@@ -3016,13 +3016,13 @@ namespace OpenTaiko {
 									//-----------------------------
 									case Eセクション種別.HitRange:
 										if (str3.Equals("Perfect")) {
-											this.nHitRangeMs.Perfect = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
+											this.nHitRangeMs.Perfect = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
 										} else if (str3.Equals("Great")) {
-											this.nHitRangeMs.Great = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Great);
+											this.nHitRangeMs.Great = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Great);
 										} else if (str3.Equals("Good")) {
-											this.nHitRangeMs.Good = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Good);
+											this.nHitRangeMs.Good = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Good);
 										} else if (str3.Equals("Poor")) {
-											this.nHitRangeMs.Poor = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
+											this.nHitRangeMs.Poor = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
 										}
 										continue;
 
@@ -3067,14 +3067,14 @@ namespace OpenTaiko {
 
 											#region [ Invisible ]
 											  else if (str3.Equals("DrumsInvisible")) {
-												this.eInvisible.Drums = (EInvisible)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.eInvisible.Drums);
+												this.eInvisible.Drums = (EInvisible)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eInvisible.Drums);
 											}
 
 											#endregion
 											  else if (str3.Equals("DrumsReverse")) {
 												this.bReverse.Drums = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("DrumsPosition")) {
-												this.JudgeTextDisplayPosition.Drums = (EJudgeTextDisplayPosition)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.JudgeTextDisplayPosition.Drums);
+												this.JudgeTextDisplayPosition.Drums = (EJudgeTextDisplayPosition)CConversion.ParseIntInRange(str4, 0, 2, (int)this.JudgeTextDisplayPosition.Drums);
 											}
 
 											#region [Mods]
@@ -3082,15 +3082,15 @@ namespace OpenTaiko {
 											#region [Scroll Speed]
 
 											  else if (str3.Equals("DrumsScrollSpeed") || str3.Equals("DrumsScrollSpeed1P")) {
-												this.nScrollSpeed[0] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[0]);
+												this.nScrollSpeed[0] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[0]);
 											} else if (str3.Equals("DrumsScrollSpeed2P")) {
-												this.nScrollSpeed[1] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[1]);
+												this.nScrollSpeed[1] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[1]);
 											} else if (str3.Equals("DrumsScrollSpeed3P")) {
-												this.nScrollSpeed[2] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[2]);
+												this.nScrollSpeed[2] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[2]);
 											} else if (str3.Equals("DrumsScrollSpeed4P")) {
-												this.nScrollSpeed[3] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[3]);
+												this.nScrollSpeed[3] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[3]);
 											} else if (str3.Equals("DrumsScrollSpeed5P")) {
-												this.nScrollSpeed[4] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 0x7cf, this.nScrollSpeed[4]);
+												this.nScrollSpeed[4] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[4]);
 											}
 
 											#endregion
@@ -3098,15 +3098,15 @@ namespace OpenTaiko {
 											#region [Timing Zones]
 
 											  else if (str3.Equals("TimingZones1P")) {
-												this.nTimingZones[0] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[0]);
+												this.nTimingZones[0] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[0]);
 											} else if (str3.Equals("TimingZones2P")) {
-												this.nTimingZones[1] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[1]);
+												this.nTimingZones[1] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[1]);
 											} else if (str3.Equals("TimingZones3P")) {
-												this.nTimingZones[2] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[2]);
+												this.nTimingZones[2] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[2]);
 											} else if (str3.Equals("TimingZones4P")) {
-												this.nTimingZones[3] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[3]);
+												this.nTimingZones[3] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[3]);
 											} else if (str3.Equals("TimingZones5P")) {
-												this.nTimingZones[4] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, this.nTimingZones[4]);
+												this.nTimingZones[4] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[4]);
 											}
 
 
@@ -3115,15 +3115,15 @@ namespace OpenTaiko {
 											#region [Just]
 
 											  else if (str3.Equals("Just") || str3.Equals("Just1P")) {
-												this.bJust[0] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[0]);
+												this.bJust[0] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[0]);
 											} else if (str3.Equals("Just2P")) {
-												this.bJust[1] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[1]);
+												this.bJust[1] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[1]);
 											} else if (str3.Equals("Just3P")) {
-												this.bJust[2] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[2]);
+												this.bJust[2] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[2]);
 											} else if (str3.Equals("Just4P")) {
-												this.bJust[3] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[3]);
+												this.bJust[3] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[3]);
 											} else if (str3.Equals("Just5P")) {
-												this.bJust[4] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.bJust[4]);
+												this.bJust[4] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[4]);
 											}
 
 											#endregion
@@ -3131,15 +3131,15 @@ namespace OpenTaiko {
 											#region [Hitsounds]
 
 											  else if (str3.Equals("HitSounds1P")) {
-												this.nHitSounds[0] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[0]);
+												this.nHitSounds[0] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[0]);
 											} else if (str3.Equals("HitSounds2P")) {
-												this.nHitSounds[1] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[1]);
+												this.nHitSounds[1] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[1]);
 											} else if (str3.Equals("HitSounds3P")) {
-												this.nHitSounds[2] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[2]);
+												this.nHitSounds[2] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[2]);
 											} else if (str3.Equals("HitSounds4P")) {
-												this.nHitSounds[3] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[3]);
+												this.nHitSounds[3] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[3]);
 											} else if (str3.Equals("HitSounds5P")) {
-												this.nHitSounds[4] = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999999, this.nHitSounds[4]);
+												this.nHitSounds[4] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[4]);
 											}
 
 											#endregion
@@ -3147,15 +3147,15 @@ namespace OpenTaiko {
 											#region [Gametype]
 
 											  else if (str3.Equals("Gametype1P")) {
-												this.nGameType[0] = (EGameType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[0]);
+												this.nGameType[0] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[0]);
 											} else if (str3.Equals("Gametype2P")) {
-												this.nGameType[1] = (EGameType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[1]);
+												this.nGameType[1] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[1]);
 											} else if (str3.Equals("Gametype3P")) {
-												this.nGameType[2] = (EGameType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[2]);
+												this.nGameType[2] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[2]);
 											} else if (str3.Equals("Gametype4P")) {
-												this.nGameType[3] = (EGameType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[3]);
+												this.nGameType[3] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[3]);
 											} else if (str3.Equals("Gametype5P")) {
-												this.nGameType[4] = (EGameType)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, (int)this.nGameType[4]);
+												this.nGameType[4] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[4]);
 											}
 
 											#endregion
@@ -3163,15 +3163,15 @@ namespace OpenTaiko {
 											#region [Fun mods]
 
 											  else if (str3.Equals("FunMods1P")) {
-												this.nFunMods[0] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
+												this.nFunMods[0] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
 											} else if (str3.Equals("FunMods2P")) {
-												this.nFunMods[1] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
+												this.nFunMods[1] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
 											} else if (str3.Equals("FunMods3P")) {
-												this.nFunMods[2] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
+												this.nFunMods[2] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
 											} else if (str3.Equals("FunMods4P")) {
-												this.nFunMods[3] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
+												this.nFunMods[3] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
 											} else if (str3.Equals("FunMods5P")) {
-												this.nFunMods[4] = (EFunMods)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
+												this.nFunMods[4] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
 											}
 
 											#endregion
@@ -3179,15 +3179,15 @@ namespace OpenTaiko {
 											#region [Stealh]
 
 											  else if (str3.Equals("TaikoStealth1P") || str3.Equals("TaikoStealth")) {
-												this.eSTEALTH[0] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[0]);
+												this.eSTEALTH[0] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[0]);
 											} else if (str3.Equals("TaikoStealth2P")) {
-												this.eSTEALTH[1] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[1]);
+												this.eSTEALTH[1] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[1]);
 											} else if (str3.Equals("TaikoStealth3P")) {
-												this.eSTEALTH[2] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[2]);
+												this.eSTEALTH[2] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[2]);
 											} else if (str3.Equals("TaikoStealth4P")) {
-												this.eSTEALTH[3] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[3]);
+												this.eSTEALTH[3] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[3]);
 											} else if (str3.Equals("TaikoStealth5P")) {
-												this.eSTEALTH[4] = (EStealthMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, (int)this.eSTEALTH[4]);
+												this.eSTEALTH[4] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[4]);
 											}
 
 											#endregion
@@ -3195,15 +3195,15 @@ namespace OpenTaiko {
 											#region [Random/Mirror]
 
 											  else if (str3.Equals("TaikoRandom1P") || str3.Equals("TaikoRandom")) {
-												this.eRandom[0] = (ERandomMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[0]);
+												this.eRandom[0] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[0]);
 											} else if (str3.Equals("TaikoRandom2P")) {
-												this.eRandom[1] = (ERandomMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[1]);
+												this.eRandom[1] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[1]);
 											} else if (str3.Equals("TaikoRandom3P")) {
-												this.eRandom[2] = (ERandomMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[2]);
+												this.eRandom[2] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[2]);
 											} else if (str3.Equals("TaikoRandom4P")) {
-												this.eRandom[3] = (ERandomMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[3]);
+												this.eRandom[3] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[3]);
 											} else if (str3.Equals("TaikoRandom5P")) {
-												this.eRandom[4] = (ERandomMode)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 4, (int)this.eRandom[4]);
+												this.eRandom[4] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[4]);
 											}
 
 											#endregion
@@ -3214,49 +3214,49 @@ namespace OpenTaiko {
 
 
 											  else if (str3.Equals("PlaySpeed")) {
-												this.nSongSpeed = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 5, 400, this.nSongSpeed);
+												this.nSongSpeed = CConversion.ParseIntInRange(str4, 5, 400, this.nSongSpeed);
 											} else if (str3.Equals("PlaySpeedNotEqualOneNoSound")) {
 												this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("Risky"))                    // #23559 2011.6.23  yyagi
 											  {
-												this.nRisky = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 10, this.nRisky);
+												this.nRisky = CConversion.ParseIntInRange(str4, 0, 10, this.nRisky);
 											} else if (str3.Equals("DrumsTight")) {
 												this.bTight = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BranchGuide")) {
 												this.bBranchGuide = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("DefaultCourse")) //2017.01.30 DD
 											  {
-												this.nDefaultCourse = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 5, this.nDefaultCourse);
+												this.nDefaultCourse = CConversion.ParseIntInRange(str4, 0, 5, this.nDefaultCourse);
 											} else if (str3.Equals("ScoreMode")) {
-												this.nScoreMode = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 3, this.nScoreMode);
+												this.nScoreMode = CConversion.ParseIntInRange(str4, 0, 3, this.nScoreMode);
 											} else if (str3.Equals("HispeedRandom")) {
 												this.bHispeedRandom = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BigNotesWaitTime")) {
-												this.nBigNoteWaitTimems = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 100, this.nBigNoteWaitTimems);
+												this.nBigNoteWaitTimems = CConversion.ParseIntInRange(str4, 1, 100, this.nBigNoteWaitTimems);
 											} else if (str3.Equals("BigNotesJudge")) {
 												this.bJudgeBigNotes = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("ForceNormalGauge")) {
 												this.bForceNormalGauge = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BranchAnime")) {
-												this.nBranchAnime = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 1, this.nBranchAnime);
+												this.nBranchAnime = CConversion.ParseIntInRange(str4, 0, 1, this.nBranchAnime);
 											} else if (str3.Equals("NoInfo")) {
 												this.bNoInfo = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("DefaultSongSort")) {
-												this.nDefaultSongSort = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, this.nDefaultSongSort);
+												this.nDefaultSongSort = CConversion.ParseIntInRange(str4, 0, 2, this.nDefaultSongSort);
 											} else if (str3.Equals("RecentlyPlayedMax")) {
-												this.nRecentlyPlayedMax = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.nRecentlyPlayedMax);
+												this.nRecentlyPlayedMax = CConversion.ParseIntInRange(str4, 0, 9999, this.nRecentlyPlayedMax);
 											} else if (str3.Equals("GameMode")) {
-												this.eGameMode = (EGame)CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 2, (int)this.eGameMode);
+												this.eGameMode = (EGame)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eGameMode);
 											} else if (str3.Equals("TokkunSkipMeasures")) {
-												this.TokkunSkipMeasures = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.TokkunSkipMeasures);
+												this.TokkunSkipMeasures = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunSkipMeasures);
 											} else if (str3.Equals(nameof(TokkunMashInterval))) {
-												this.TokkunMashInterval = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 0, 9999, this.TokkunMashInterval);
+												this.TokkunMashInterval = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunMashInterval);
 											} else if (str3.Equals("JudgeCountDisplay")) {
 												this.bJudgeCountDisplay = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("ShowExExtraAnime")) {
 												this.ShowExExtraAnime = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("PlayerCount")) {
-												this.nPlayerCount = CConversion.n値を文字列から取得して範囲内に丸めて返す(str4, 1, 5, this.nPlayerCount);
+												this.nPlayerCount = CConversion.ParseIntInRange(str4, 1, 5, this.nPlayerCount);
 											} else if (str3.Equals(nameof(ShinuchiMode))) {
 												ShinuchiMode = CConversion.bONorOFF(str4[0]);
 											}
