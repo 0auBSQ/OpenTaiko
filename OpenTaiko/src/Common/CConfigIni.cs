@@ -2679,893 +2679,895 @@ namespace OpenTaiko {
 			string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string s in strSingleLine) {
 				string str = s.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
-				if ((str.Length != 0) && (str[0] != ';')) {
-					try {
-						string str3;
-						string str4;
-						if (str[0] == '[') {
-							#region [ Section Change ]
-							//-----------------------------
-							StringBuilder builder = new StringBuilder(0x20);
-							int num = 1;
-							while ((num < str.Length) && (str[num] != ']')) {
-								builder.Append(str[num++]);
-							}
-							string str2 = builder.ToString();
-							unknown = str2 switch {
-								"System" => ESectionType.System,
-								"AutoPlay" => ESectionType.AutoPlay,
-								"HitRange" => ESectionType.HitRange,
-								"Log" => ESectionType.Log,
-								"PlayOption" => ESectionType.PlayOption,
-								"ViewerOption" => ESectionType.ViewerOption,
-								"GUID" => ESectionType.GUID,
-								"DrumsKeyAssign" => ESectionType.DrumsKeyAssign,
-								"SystemKeyAssign" => ESectionType.SystemKeyAssign,
-								"TrainingKeyAssign" => ESectionType.TrainingKeyAssign,
-								"DEBUG" => ESectionType.DEBUG,
-								"Temp" => ESectionType.Temp,
-								_ => ESectionType.Unknown
-							};
-							//-----------------------------
-							#endregion
-						} else {
-							string[] strArray = str.Split(new char[] { '=' });
-							if (strArray.Length == 2) {
-								str3 = strArray[0].Trim();
-								str4 = strArray[1].Trim();
-								switch (unknown) {
-									#region [ [System] ]
-									//-----------------------------
-									case ESectionType.System: {
-										switch (str3)
-										{
-											case "TJAPath":
-												this.strSongsPath = str4;
-												break;
-											case "Lang":
-												this.sLang = str4;
-												CLangManager.langAttach(str4);
-												break;
-											case "LayoutType":
-												this.nLayoutType = int.Parse(str4);
-												break;
-											case "SaveFileName":
-											{
-												var _s = str4.Split(new char[] { ',' });
+				if ((str.Length == 0) || (str[0] == ';')) {
+					continue;
+				}
 
-												// Ignore custom save file names if duplicates
-												if (!_s.GroupBy(x => x).Any(g => g.Count() > 1)) {
-													for (int i = 0; i < Math.Min(5, _s.Length); i++) {
-														this.sSaveFile[i] = _s[i];
-													}
+				try {
+					string str3;
+					string str4;
+					if (str[0] == '[') {
+						#region [ Section Change ]
+						//-----------------------------
+						StringBuilder builder = new StringBuilder(0x20);
+						int num = 1;
+						while ((num < str.Length) && (str[num] != ']')) {
+							builder.Append(str[num++]);
+						}
+						string str2 = builder.ToString();
+						unknown = str2 switch {
+							"System" => ESectionType.System,
+							"AutoPlay" => ESectionType.AutoPlay,
+							"HitRange" => ESectionType.HitRange,
+							"Log" => ESectionType.Log,
+							"PlayOption" => ESectionType.PlayOption,
+							"ViewerOption" => ESectionType.ViewerOption,
+							"GUID" => ESectionType.GUID,
+							"DrumsKeyAssign" => ESectionType.DrumsKeyAssign,
+							"SystemKeyAssign" => ESectionType.SystemKeyAssign,
+							"TrainingKeyAssign" => ESectionType.TrainingKeyAssign,
+							"DEBUG" => ESectionType.DEBUG,
+							"Temp" => ESectionType.Temp,
+							_ => ESectionType.Unknown
+						};
+						//-----------------------------
+						#endregion
+					} else {
+						string[] strArray = str.Split(new char[] { '=' });
+						if (strArray.Length == 2) {
+							str3 = strArray[0].Trim();
+							str4 = strArray[1].Trim();
+							switch (unknown) {
+								#region [ [System] ]
+								//-----------------------------
+								case ESectionType.System: {
+									switch (str3)
+									{
+										case "TJAPath":
+											this.strSongsPath = str4;
+											break;
+										case "Lang":
+											this.sLang = str4;
+											CLangManager.langAttach(str4);
+											break;
+										case "LayoutType":
+											this.nLayoutType = int.Parse(str4);
+											break;
+										case "SaveFileName":
+										{
+											var _s = str4.Split(new char[] { ',' });
+
+											// Ignore custom save file names if duplicates
+											if (!_s.GroupBy(x => x).Any(g => g.Count() > 1)) {
+												for (int i = 0; i < Math.Min(5, _s.Length); i++) {
+													this.sSaveFile[i] = _s[i];
 												}
-
-												break;
 											}
-											case "IgnoreSongUnlockables":
-												this.bIgnoreSongUnlockables = CConversion.bONorOFF(str4[0]);
-												break;
-											case "SkinPath":
+
+											break;
+										}
+										case "IgnoreSongUnlockables":
+											this.bIgnoreSongUnlockables = CConversion.bONorOFF(str4[0]);
+											break;
+										case "SkinPath":
+										{
+											string absSkinPath = str4;
+											if (!System.IO.Path.IsPathRooted(str4)) {
+												absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
+												absSkinPath = System.IO.Path.Combine(absSkinPath, str4);
+												Uri u = new Uri(absSkinPath);
+												absSkinPath = u.AbsolutePath.ToString();    // str4内に相対パスがある場合に備える
+												absSkinPath = System.Web.HttpUtility.UrlDecode(absSkinPath);                        // デコードする
+												absSkinPath = absSkinPath.Replace('/', System.IO.Path.DirectorySeparatorChar);  // 区切り文字が\ではなく/なので置換する
+											}
+											if (absSkinPath[absSkinPath.Length - 1] != System.IO.Path.DirectorySeparatorChar)   // フォルダ名末尾に\を必ずつけて、CSkin側と表記を統一する
 											{
-												string absSkinPath = str4;
-												if (!System.IO.Path.IsPathRooted(str4)) {
-													absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
-													absSkinPath = System.IO.Path.Combine(absSkinPath, str4);
-													Uri u = new Uri(absSkinPath);
-													absSkinPath = u.AbsolutePath.ToString();    // str4内に相対パスがある場合に備える
-													absSkinPath = System.Web.HttpUtility.UrlDecode(absSkinPath);                        // デコードする
-													absSkinPath = absSkinPath.Replace('/', System.IO.Path.DirectorySeparatorChar);  // 区切り文字が\ではなく/なので置換する
-												}
-												if (absSkinPath[absSkinPath.Length - 1] != System.IO.Path.DirectorySeparatorChar)   // フォルダ名末尾に\を必ずつけて、CSkin側と表記を統一する
-												{
-													absSkinPath += System.IO.Path.DirectorySeparatorChar;
-												}
-												this.strSystemSkinSubfolderFullName = absSkinPath;
-												break;
+												absSkinPath += System.IO.Path.DirectorySeparatorChar;
 											}
-											case nameof(this.PreAssetsLoading):
-												this.PreAssetsLoading = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.FastRender):
-												this.FastRender = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.ASyncTextureLoad):
-												this.ASyncTextureLoad = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.SimpleMode):
-												this.SimpleMode = CConversion.bONorOFF(str4[0]);
-												break;
-											case "GraphicsDeviceType":
-												this.nGraphicsDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nGraphicsDeviceType);
-												break;
-											case "FullScreen":
-												this.bFullScreen = CConversion.bONorOFF(str4[0]);
-												break;
-											case "WindowX":
-												this.nWindowBaseXPosition = CConversion.ParseIntInRange(
-													str4, 0, 9999, this.nWindowBaseXPosition);
-												break;
-											case "WindowY":
-												this.nWindowBaseYPosition = CConversion.ParseIntInRange(
-													str4, 0, 9999, this.nWindowBaseYPosition);
-												break;
-											case "WindowWidth":
-											{
-												this.nWindowWidth = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowWidth);
-												if (this.nWindowWidth <= 0) {
-													this.nWindowWidth = SampleFramework.GameWindowSize.Width;
-												}
-
-												break;
+											this.strSystemSkinSubfolderFullName = absSkinPath;
+											break;
+										}
+										case nameof(this.PreAssetsLoading):
+											this.PreAssetsLoading = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.FastRender):
+											this.FastRender = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.ASyncTextureLoad):
+											this.ASyncTextureLoad = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.SimpleMode):
+											this.SimpleMode = CConversion.bONorOFF(str4[0]);
+											break;
+										case "GraphicsDeviceType":
+											this.nGraphicsDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nGraphicsDeviceType);
+											break;
+										case "FullScreen":
+											this.bFullScreen = CConversion.bONorOFF(str4[0]);
+											break;
+										case "WindowX":
+											this.nWindowBaseXPosition = CConversion.ParseIntInRange(
+												str4, 0, 9999, this.nWindowBaseXPosition);
+											break;
+										case "WindowY":
+											this.nWindowBaseYPosition = CConversion.ParseIntInRange(
+												str4, 0, 9999, this.nWindowBaseYPosition);
+											break;
+										case "WindowWidth":
+										{
+											this.nWindowWidth = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowWidth);
+											if (this.nWindowWidth <= 0) {
+												this.nWindowWidth = SampleFramework.GameWindowSize.Width;
 											}
-											case "WindowHeight":
-											{
-												this.nWindowHeight = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowHeight);
-												if (this.nWindowHeight <= 0) {
-													this.nWindowHeight = SampleFramework.GameWindowSize.Height;
-												}
 
-												break;
+											break;
+										}
+										case "WindowHeight":
+										{
+											this.nWindowHeight = CConversion.ParseIntInRange(str4, 1, 65535, this.nWindowHeight);
+											if (this.nWindowHeight <= 0) {
+												this.nWindowHeight = SampleFramework.GameWindowSize.Height;
 											}
-											case "DoubleClickFullScreen":
-												this.bIsAllowedDoubleClickFullscreen = CConversion.bONorOFF(str4[0]);
-												break;
-											case "EnableSystemMenu":
-												this.bIsEnabledSystemMenu = CConversion.bONorOFF(str4[0]);
-												break;
-											case "BackSleep":
-												this.nMsSleepUnfocused = CConversion.ParseIntInRangeAndClamp(str4, 0, 50, this.nMsSleepUnfocused);
-												break;
-											case "SoundDeviceType":
-												this.nSoundDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nSoundDeviceType);
-												break;
-											case "BassBufferSizeMs":
-												this.nBassBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nBassBufferSizeMs);
-												break;
-											case "WASAPIBufferSizeMs":
-												this.nWASAPIBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nWASAPIBufferSizeMs);
-												break;
-											case "ASIODevice":
-											{
-												string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
-												this.nASIODevice = CConversion.ParseIntInRange(str4, 0, asiodev.Length - 1, this.nASIODevice);
-												break;
-											}
-											case "SoundTimerType":
-												this.bUseOSTimer = CConversion.bONorOFF(str4[0]);
-												break;
-											case "FontName":
-												this.FontName = str4;
-												break;
-											case "BoxFontName":
-												this.BoxFontName = str4;
-												break;
-											case "VSyncWait":
-												this.bEnableVSync = CConversion.bONorOFF(str4[0]);
-												break;
-											case "SleepTimePerFrame":
-												this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(str4, -1, 50, this.nMsSleepPerFrame);
-												break;
-											case "BGAlpha":
-												this.nBackgroundTransparency = CConversion.ParseIntInRange(str4, 0, 0xff, this.nBackgroundTransparency);
-												break;
-											case "AVI":
-												this.bEnableAVI = CConversion.bONorOFF(str4[0]);
-												break;
-											case "BGA":
-												this.bEnableBGA = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ClipDispType":
-												this.eClipDispType = (EClipDispType)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eClipDispType);
-												break;
-											case "PreviewSoundWait":
-												this.nMsWaitPreviewSoundFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
-												break;
-											case "PreviewImageWait":
-												this.nMsWaitPreviewImageFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
-												break;
-											case "BGMSound":
-												this.bBGMPlayVoiceSound = CConversion.bONorOFF(str4[0]);
-												break;
-											case "DanTowerHide":
-												this.bDanTowerHide = CConversion.bONorOFF(str4[0]);
-												break;
-											case "RandomFromSubBox":
-												this.bIncludeSubfoldersOnRandomSelect = CConversion.bONorOFF(str4[0]);
-												break;
-											case "MinComboDrums":
-												this.nMinDisplayedCombo.Drums = CConversion.ParseIntInRange(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
-												break;
-											case "ShowDebugStatus":
-												this.bDisplayDebugInfo = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.ApplyLoudnessMetadata):
-												this.ApplyLoudnessMetadata = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.TargetLoudness):
-												this.TargetLoudness = CConversion.ParseDoubleInRange(str4, CSound.MinimumLufs.ToDouble(), CSound.MaximumLufs.ToDouble(), this.TargetLoudness);
-												break;
-											case nameof(this.ApplySongVol):
-												this.ApplySongVol = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.SoundEffectLevel):
-												this.SoundEffectLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SoundEffectLevel);
-												break;
-											case nameof(this.VoiceLevel):
-												this.VoiceLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.VoiceLevel);
-												break;
-											case nameof(this.SongPreviewLevel):
-												this.SongPreviewLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel);
-												break;
-											case nameof(this.SongPlaybackLevel):
-												this.SongPlaybackLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel);
-												break;
-											case nameof(this.KeyboardSoundLevelIncrement):
-												this.KeyboardSoundLevelIncrement = CConversion.ParseIntInRange(str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement);
-												break;
-											case nameof(this.MusicPreTimeMs):
-												this.MusicPreTimeMs = int.Parse(str4);
-												break;
-											case "AutoResultCapture":
-												this.bIsAutoResultCapture = CConversion.bONorOFF(str4[0]);
-												break;
-											case nameof(this.SendDiscordPlayingInformation):
-												this.SendDiscordPlayingInformation = CConversion.bONorOFF(str4[0]);
-												break;
-											case "TimeStretch":
-												this.bTimeStretch = CConversion.bONorOFF(str4[0]);
-												break;
-											case "GlobalOffset":
-												this.nGlobalOffsetMs = CConversion.ParseIntInRange(str4, -9999, 9999, this.nGlobalOffsetMs);
-												break;
-											case "BufferedInput":
-												this.bBufferedInputs = CConversion.bONorOFF(str4[0]);
-												break;
-											case "PolyphonicSounds":
-												this.nPoliphonicSounds = CConversion.ParseIntInRange(str4, 1, 8, this.nPoliphonicSounds);
-												break;
-											case "LCVelocityMin":
-												this.nVelocityMin.LC = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LC);
-												break;
-											case "HHVelocityMin":
-												this.nVelocityMin.HH = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HH);
-												break;
-											case "SDVelocityMin":
-												this.nVelocityMin.SD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.SD);
-												break;
-											case "BDVelocityMin":
-												this.nVelocityMin.BD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.BD);
-												break;
-											case "HTVelocityMin":
-												this.nVelocityMin.HT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HT);
-												break;
-											case "LTVelocityMin":
-												this.nVelocityMin.LT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LT);
-												break;
-											case "FTVelocityMin":
-												this.nVelocityMin.FT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.FT);
-												break;
-											case "CYVelocityMin":
-												this.nVelocityMin.CY = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.CY);
-												break;
-											case "RDVelocityMin":
-												this.nVelocityMin.RD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.RD);
-												break;
-											case "DirectShowMode":
-												this.bDirectShowMode = CConversion.bONorOFF(str4[0]); ;
-												break;
-											case nameof(this.TJAP3FolderMode):
-												this.TJAP3FolderMode = CConversion.bONorOFF(str4[0]);
-												break;
-											case "EndingAnime":
-												this.bEndingAnime = CConversion.bONorOFF(str4[0]);
-												break;
-										}
 
-										continue;
+											break;
+										}
+										case "DoubleClickFullScreen":
+											this.bIsAllowedDoubleClickFullscreen = CConversion.bONorOFF(str4[0]);
+											break;
+										case "EnableSystemMenu":
+											this.bIsEnabledSystemMenu = CConversion.bONorOFF(str4[0]);
+											break;
+										case "BackSleep":
+											this.nMsSleepUnfocused = CConversion.ParseIntInRangeAndClamp(str4, 0, 50, this.nMsSleepUnfocused);
+											break;
+										case "SoundDeviceType":
+											this.nSoundDeviceType = CConversion.ParseIntInRange(str4, 0, 4, this.nSoundDeviceType);
+											break;
+										case "BassBufferSizeMs":
+											this.nBassBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nBassBufferSizeMs);
+											break;
+										case "WASAPIBufferSizeMs":
+											this.nWASAPIBufferSizeMs = CConversion.ParseIntInRange(str4, 0, 9999, this.nWASAPIBufferSizeMs);
+											break;
+										case "ASIODevice":
+										{
+											string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
+											this.nASIODevice = CConversion.ParseIntInRange(str4, 0, asiodev.Length - 1, this.nASIODevice);
+											break;
+										}
+										case "SoundTimerType":
+											this.bUseOSTimer = CConversion.bONorOFF(str4[0]);
+											break;
+										case "FontName":
+											this.FontName = str4;
+											break;
+										case "BoxFontName":
+											this.BoxFontName = str4;
+											break;
+										case "VSyncWait":
+											this.bEnableVSync = CConversion.bONorOFF(str4[0]);
+											break;
+										case "SleepTimePerFrame":
+											this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(str4, -1, 50, this.nMsSleepPerFrame);
+											break;
+										case "BGAlpha":
+											this.nBackgroundTransparency = CConversion.ParseIntInRange(str4, 0, 0xff, this.nBackgroundTransparency);
+											break;
+										case "AVI":
+											this.bEnableAVI = CConversion.bONorOFF(str4[0]);
+											break;
+										case "BGA":
+											this.bEnableBGA = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ClipDispType":
+											this.eClipDispType = (EClipDispType)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eClipDispType);
+											break;
+										case "PreviewSoundWait":
+											this.nMsWaitPreviewSoundFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
+											break;
+										case "PreviewImageWait":
+											this.nMsWaitPreviewImageFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
+											break;
+										case "BGMSound":
+											this.bBGMPlayVoiceSound = CConversion.bONorOFF(str4[0]);
+											break;
+										case "DanTowerHide":
+											this.bDanTowerHide = CConversion.bONorOFF(str4[0]);
+											break;
+										case "RandomFromSubBox":
+											this.bIncludeSubfoldersOnRandomSelect = CConversion.bONorOFF(str4[0]);
+											break;
+										case "MinComboDrums":
+											this.nMinDisplayedCombo.Drums = CConversion.ParseIntInRange(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
+											break;
+										case "ShowDebugStatus":
+											this.bDisplayDebugInfo = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.ApplyLoudnessMetadata):
+											this.ApplyLoudnessMetadata = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.TargetLoudness):
+											this.TargetLoudness = CConversion.ParseDoubleInRange(str4, CSound.MinimumLufs.ToDouble(), CSound.MaximumLufs.ToDouble(), this.TargetLoudness);
+											break;
+										case nameof(this.ApplySongVol):
+											this.ApplySongVol = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.SoundEffectLevel):
+											this.SoundEffectLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SoundEffectLevel);
+											break;
+										case nameof(this.VoiceLevel):
+											this.VoiceLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.VoiceLevel);
+											break;
+										case nameof(this.SongPreviewLevel):
+											this.SongPreviewLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPreviewLevel);
+											break;
+										case nameof(this.SongPlaybackLevel):
+											this.SongPlaybackLevel = CConversion.ParseIntInRange(str4, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, this.SongPlaybackLevel);
+											break;
+										case nameof(this.KeyboardSoundLevelIncrement):
+											this.KeyboardSoundLevelIncrement = CConversion.ParseIntInRange(str4, MinimumKeyboardSoundLevelIncrement, MaximumKeyboardSoundLevelIncrement, this.KeyboardSoundLevelIncrement);
+											break;
+										case nameof(this.MusicPreTimeMs):
+											this.MusicPreTimeMs = int.Parse(str4);
+											break;
+										case "AutoResultCapture":
+											this.bIsAutoResultCapture = CConversion.bONorOFF(str4[0]);
+											break;
+										case nameof(this.SendDiscordPlayingInformation):
+											this.SendDiscordPlayingInformation = CConversion.bONorOFF(str4[0]);
+											break;
+										case "TimeStretch":
+											this.bTimeStretch = CConversion.bONorOFF(str4[0]);
+											break;
+										case "GlobalOffset":
+											this.nGlobalOffsetMs = CConversion.ParseIntInRange(str4, -9999, 9999, this.nGlobalOffsetMs);
+											break;
+										case "BufferedInput":
+											this.bBufferedInputs = CConversion.bONorOFF(str4[0]);
+											break;
+										case "PolyphonicSounds":
+											this.nPoliphonicSounds = CConversion.ParseIntInRange(str4, 1, 8, this.nPoliphonicSounds);
+											break;
+										case "LCVelocityMin":
+											this.nVelocityMin.LC = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LC);
+											break;
+										case "HHVelocityMin":
+											this.nVelocityMin.HH = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HH);
+											break;
+										case "SDVelocityMin":
+											this.nVelocityMin.SD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.SD);
+											break;
+										case "BDVelocityMin":
+											this.nVelocityMin.BD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.BD);
+											break;
+										case "HTVelocityMin":
+											this.nVelocityMin.HT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HT);
+											break;
+										case "LTVelocityMin":
+											this.nVelocityMin.LT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LT);
+											break;
+										case "FTVelocityMin":
+											this.nVelocityMin.FT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.FT);
+											break;
+										case "CYVelocityMin":
+											this.nVelocityMin.CY = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.CY);
+											break;
+										case "RDVelocityMin":
+											this.nVelocityMin.RD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.RD);
+											break;
+										case "DirectShowMode":
+											this.bDirectShowMode = CConversion.bONorOFF(str4[0]); ;
+											break;
+										case nameof(this.TJAP3FolderMode):
+											this.TJAP3FolderMode = CConversion.bONorOFF(str4[0]);
+											break;
+										case "EndingAnime":
+											this.bEndingAnime = CConversion.bONorOFF(str4[0]);
+											break;
 									}
-									//-----------------------------
-									#endregion
 
-									#region [ [AutoPlay] ]
-									//-----------------------------
-									case ESectionType.AutoPlay:
-										switch (str3)
-										{
-											case "Taiko":
-												this.bAutoPlay[0] = CConversion.bONorOFF(str4[0]);
-												break;
-											case "Taiko2P":
-												this.bAutoPlay[1] = CConversion.bONorOFF(str4[0]);
-												break;
-											case "Taiko3P":
-												this.bAutoPlay[2] = CConversion.bONorOFF(str4[0]);
-												break;
-											case "Taiko4P":
-												this.bAutoPlay[3] = CConversion.bONorOFF(str4[0]);
-												break;
-											case "Taiko5P":
-												this.bAutoPlay[4] = CConversion.bONorOFF(str4[0]);
-												break;
-											case "TaikoAutoRoll":
-												this.bAuto先生の連打 = CConversion.bONorOFF(str4[0]);
-												break;
-											case "RollsPerSec":
-												this.nRollsPerSec = int.Parse(str4);
-												break;
-											case "DefaultAILevel":
-												this.nDefaultAILevel = int.Parse(str4);
-												this.nAILevel = this.nDefaultAILevel;
-												break;
-										}
-										continue;
-									//-----------------------------
-									#endregion
+									continue;
+								}
+								//-----------------------------
+								#endregion
 
-									#region [ [HitRange] ]
-									//-----------------------------
-									case ESectionType.HitRange:
-										switch (str3)
-										{
-											case "Perfect":
-												this.nHitRangeMs.Perfect = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
-												break;
-											case "Great":
-												this.nHitRangeMs.Great = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Great);
-												break;
-											case "Good":
-												this.nHitRangeMs.Good = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Good);
-												break;
-											case "Poor":
-												this.nHitRangeMs.Poor = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
-												break;
-										}
-										continue;
-
-									//-----------------------------
-									#endregion
-
-									#region [ [Log] ]
-									//-----------------------------
-									case ESectionType.Log: {
-										switch (str3)
-										{
-											case "OutputLog":
-												this.bOutputLogs = CConversion.bONorOFF(str4[0]);
-												break;
-											case "TraceCreatedDisposed":
-												this.bOutputCreationReleaseLog = CConversion.bONorOFF(str4[0]);
-												break;
-											case "TraceDTXDetails":
-												this.bOutputDetailedDTXLog = CConversion.bONorOFF(str4[0]);
-												break;
-											case "TraceSongSearch":
-												this.bOutputSongSearchLog = CConversion.bONorOFF(str4[0]);
-												break;
-										}
-
-										continue;
+								#region [ [AutoPlay] ]
+								//-----------------------------
+								case ESectionType.AutoPlay:
+									switch (str3)
+									{
+										case "Taiko":
+											this.bAutoPlay[0] = CConversion.bONorOFF(str4[0]);
+											break;
+										case "Taiko2P":
+											this.bAutoPlay[1] = CConversion.bONorOFF(str4[0]);
+											break;
+										case "Taiko3P":
+											this.bAutoPlay[2] = CConversion.bONorOFF(str4[0]);
+											break;
+										case "Taiko4P":
+											this.bAutoPlay[3] = CConversion.bONorOFF(str4[0]);
+											break;
+										case "Taiko5P":
+											this.bAutoPlay[4] = CConversion.bONorOFF(str4[0]);
+											break;
+										case "TaikoAutoRoll":
+											this.bAuto先生の連打 = CConversion.bONorOFF(str4[0]);
+											break;
+										case "RollsPerSec":
+											this.nRollsPerSec = int.Parse(str4);
+											break;
+										case "DefaultAILevel":
+											this.nDefaultAILevel = int.Parse(str4);
+											this.nAILevel = this.nDefaultAILevel;
+											break;
 									}
-									//-----------------------------
-									#endregion
+									continue;
+								//-----------------------------
+								#endregion
 
-									#region [ [PlayOption] ]
-									//-----------------------------
-									case ESectionType.PlayOption: {
-										switch (str3)
-										{
-											case "ShowChara":
-												this.ShowChara = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowDancer":
-												this.ShowDancer = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowRunner":
-												this.ShowRunner = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowMob":
-												this.ShowMob = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowFooter":
-												this.ShowFooter = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowPuchiChara":
-												this.ShowPuchiChara = CConversion.bONorOFF(str4[0]);
-												break;
-											case "EnableCountDownTimer":
-												this.bEnableCountdownTimer = CConversion.bONorOFF(str4[0]);
-												break;
-											case "DrumsInvisible":
-												this.eInvisible.Drums = (EInvisible)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eInvisible.Drums);
-												break;
-											case "DrumsReverse":
-												this.bReverse.Drums = CConversion.bONorOFF(str4[0]);
-												break;
-											case "DrumsPosition":
-												this.JudgeTextDisplayPosition.Drums = (EJudgeTextDisplayPosition)CConversion.ParseIntInRange(str4, 0, 2, (int)this.JudgeTextDisplayPosition.Drums);
-												break;
-											case "DrumsScrollSpeed":
-											case "DrumsScrollSpeed1P":
-												this.nScrollSpeed[0] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[0]);
-												break;
-											case "DrumsScrollSpeed2P":
-												this.nScrollSpeed[1] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[1]);
-												break;
-											case "DrumsScrollSpeed3P":
-												this.nScrollSpeed[2] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[2]);
-												break;
-											case "DrumsScrollSpeed4P":
-												this.nScrollSpeed[3] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[3]);
-												break;
-											case "DrumsScrollSpeed5P":
-												this.nScrollSpeed[4] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[4]);
-												break;
-											case "TimingZones1P":
-												this.nTimingZones[0] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[0]);
-												break;
-											case "TimingZones2P":
-												this.nTimingZones[1] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[1]);
-												break;
-											case "TimingZones3P":
-												this.nTimingZones[2] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[2]);
-												break;
-											case "TimingZones4P":
-												this.nTimingZones[3] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[3]);
-												break;
-											case "TimingZones5P":
-												this.nTimingZones[4] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[4]);
-												break;
-											case "Just":
-											case "Just1P":
-												this.bJust[0] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[0]);
-												break;
-											case "Just2P":
-												this.bJust[1] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[1]);
-												break;
-											case "Just3P":
-												this.bJust[2] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[2]);
-												break;
-											case "Just4P":
-												this.bJust[3] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[3]);
-												break;
-											case "Just5P":
-												this.bJust[4] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[4]);
-												break;
-											case "HitSounds1P":
-												this.nHitSounds[0] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[0]);
-												break;
-											case "HitSounds2P":
-												this.nHitSounds[1] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[1]);
-												break;
-											case "HitSounds3P":
-												this.nHitSounds[2] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[2]);
-												break;
-											case "HitSounds4P":
-												this.nHitSounds[3] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[3]);
-												break;
-											case "HitSounds5P":
-												this.nHitSounds[4] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[4]);
-												break;
-											case "Gametype1P":
-												this.nGameType[0] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[0]);
-												break;
-											case "Gametype2P":
-												this.nGameType[1] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[1]);
-												break;
-											case "Gametype3P":
-												this.nGameType[2] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[2]);
-												break;
-											case "Gametype4P":
-												this.nGameType[3] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[3]);
-												break;
-											case "Gametype5P":
-												this.nGameType[4] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[4]);
-												break;
-											case "FunMods1P":
-												this.nFunMods[0] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
-												break;
-											case "FunMods2P":
-												this.nFunMods[1] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
-												break;
-											case "FunMods3P":
-												this.nFunMods[2] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
-												break;
-											case "FunMods4P":
-												this.nFunMods[3] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
-												break;
-											case "FunMods5P":
-												this.nFunMods[4] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
-												break;
-											case "TaikoStealth1P":
-											case "TaikoStealth":
-												this.eSTEALTH[0] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[0]);
-												break;
-											case "TaikoStealth2P":
-												this.eSTEALTH[1] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[1]);
-												break;
-											case "TaikoStealth3P":
-												this.eSTEALTH[2] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[2]);
-												break;
-											case "TaikoStealth4P":
-												this.eSTEALTH[3] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[3]);
-												break;
-											case "TaikoStealth5P":
-												this.eSTEALTH[4] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[4]);
-												break;
-											case "TaikoRandom1P":
-											case "TaikoRandom":
-												this.eRandom[0] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[0]);
-												break;
-											case "TaikoRandom2P":
-												this.eRandom[1] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[1]);
-												break;
-											case "TaikoRandom3P":
-												this.eRandom[2] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[2]);
-												break;
-											case "TaikoRandom4P":
-												this.eRandom[3] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[3]);
-												break;
-											case "TaikoRandom5P":
-												this.eRandom[4] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[4]);
-												break;
-											case "PlaySpeed":
-												this.nSongSpeed = CConversion.ParseIntInRange(str4, 5, 400, this.nSongSpeed);
-												break;
-											case "PlaySpeedNotEqualOneNoSound":
-												this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
-												break;
-											case "Risky":
-												this.nRisky = CConversion.ParseIntInRange(str4, 0, 10, this.nRisky);
-												break;
-											case "DrumsTight":
-												this.bTight = CConversion.bONorOFF(str4[0]);
-												break;
-											case "BranchGuide":
-												this.bBranchGuide = CConversion.bONorOFF(str4[0]);
-												break;
-											case "DefaultCourse":
-												this.nDefaultCourse = CConversion.ParseIntInRange(str4, 0, 5, this.nDefaultCourse);
-												break;
-											case "ScoreMode":
-												this.nScoreMode = CConversion.ParseIntInRange(str4, 0, 3, this.nScoreMode);
-												break;
-											case "HispeedRandom":
-												this.bHispeedRandom = CConversion.bONorOFF(str4[0]);
-												break;
-											case "BigNotesWaitTime":
-												this.nBigNoteWaitTimems = CConversion.ParseIntInRange(str4, 1, 100, this.nBigNoteWaitTimems);
-												break;
-											case "BigNotesJudge":
-												this.bJudgeBigNotes = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ForceNormalGauge":
-												this.bForceNormalGauge = CConversion.bONorOFF(str4[0]);
-												break;
-											case "BranchAnime":
-												this.nBranchAnime = CConversion.ParseIntInRange(str4, 0, 1, this.nBranchAnime);
-												break;
-											case "NoInfo":
-												this.bNoInfo = CConversion.bONorOFF(str4[0]);
-												break;
-											case "DefaultSongSort":
-												this.nDefaultSongSort = CConversion.ParseIntInRange(str4, 0, 2, this.nDefaultSongSort);
-												break;
-											case "RecentlyPlayedMax":
-												this.nRecentlyPlayedMax = CConversion.ParseIntInRange(str4, 0, 9999, this.nRecentlyPlayedMax);
-												break;
-											case "GameMode":
-												this.eGameMode = (EGame)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eGameMode);
-												break;
-											case "TokkunSkipMeasures":
-												this.TokkunSkipMeasures = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunSkipMeasures);
-												break;
-											case nameof(this.TokkunMashInterval):
-												this.TokkunMashInterval = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunMashInterval);
-												break;
-											case "JudgeCountDisplay":
-												this.bJudgeCountDisplay = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ShowExExtraAnime":
-												this.ShowExExtraAnime = CConversion.bONorOFF(str4[0]);
-												break;
-											case "PlayerCount":
-												this.nPlayerCount = CConversion.ParseIntInRange(str4, 1, 5, this.nPlayerCount);
-												break;
-											case nameof(this.ShinuchiMode):
-												this.ShinuchiMode = CConversion.bONorOFF(str4[0]);
-												break;
-										}
-
-										continue;
+								#region [ [HitRange] ]
+								//-----------------------------
+								case ESectionType.HitRange:
+									switch (str3)
+									{
+										case "Perfect":
+											this.nHitRangeMs.Perfect = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
+											break;
+										case "Great":
+											this.nHitRangeMs.Great = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Great);
+											break;
+										case "Good":
+											this.nHitRangeMs.Good = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Good);
+											break;
+										case "Poor":
+											this.nHitRangeMs.Poor = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
+											break;
 									}
-									//-----------------------------
-									#endregion
+									continue;
 
-									#region [ [ViewerOption] ]
-									//-----------------------------
-									case ESectionType.ViewerOption: {
-										switch (str3)
-										{
-											case "ViewerVSyncWait":
-												this.bViewerVSyncWait = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ViewerShowDebugStatus":
-												this.bViewerShowDebugStatus = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ViewerTimeStretch":
-												this.bViewerTimeStretch = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ViewerGuitar":
-												this.bViewerGuitar有効 = CConversion.bONorOFF(str4[0]);
-												break;
-											case "ViewerDrums":
-												this.bViewerDrums有効 = CConversion.bONorOFF(str4[0]);
-												break;
-										}
+								//-----------------------------
+								#endregion
 
-										continue;
+								#region [ [Log] ]
+								//-----------------------------
+								case ESectionType.Log: {
+									switch (str3)
+									{
+										case "OutputLog":
+											this.bOutputLogs = CConversion.bONorOFF(str4[0]);
+											break;
+										case "TraceCreatedDisposed":
+											this.bOutputCreationReleaseLog = CConversion.bONorOFF(str4[0]);
+											break;
+										case "TraceDTXDetails":
+											this.bOutputDetailedDTXLog = CConversion.bONorOFF(str4[0]);
+											break;
+										case "TraceSongSearch":
+											this.bOutputSongSearchLog = CConversion.bONorOFF(str4[0]);
+											break;
 									}
-									//-----------------------------
-									#endregion
 
-									#region [ [GUID] ]
-									//-----------------------------
-									case ESectionType.GUID:
-										switch (str3)
-										{
-											case "JoystickID":
-												this.tJoystickIDの取得(str4);
-												break;
-											case "GamepadID":
-												this.tGamepadIDの取得(str4);
-												break;
-										}
-										continue;
-									//-----------------------------
-									#endregion
+									continue;
+								}
+								//-----------------------------
+								#endregion
 
-									#region [ [DrumsKeyAssign] ]
-									//-----------------------------
-									case ESectionType.DrumsKeyAssign: {
-										switch (str3)
-										{
-											case "LeftRed":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed);
-												break;
-											case "RightRed":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed);
-												break;
-											case "LeftBlue":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue);
-												break;
-											case "RightBlue":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue);
-												break;
-											case "LeftRed2P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed2P);
-												break;
-											case "RightRed2P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed2P);
-												break;
-											case "LeftBlue2P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue2P);
-												break;
-											case "RightBlue2P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue2P);
-												break;
-											case "LeftRed3P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed3P);
-												break;
-											case "RightRed3P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed3P);
-												break;
-											case "LeftBlue3P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue3P);
-												break;
-											case "RightBlue3P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue3P);
-												break;
-											case "LeftRed4P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed4P);
-												break;
-											case "RightRed4P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed4P);
-												break;
-											case "LeftBlue4P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue4P);
-												break;
-											case "RightBlue4P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue4P);
-												break;
-											case "LeftRed5P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed5P);
-												break;
-											case "RightRed5P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed5P);
-												break;
-											case "LeftBlue5P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue5P);
-												break;
-											case "RightBlue5P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue5P);
-												break;
-											case "Clap":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap);
-												break;
-											case "Clap2P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap2P);
-												break;
-											case "Clap3P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap3P);
-												break;
-											case "Clap4P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap4P);
-												break;
-											case "Clap5P":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap5P);
-												break;
-											case "Decide":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Decide);
-												break;
-											case "Cancel":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Cancel);
-												break;
-											case "LeftChange":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftChange);
-												break;
-											case "RightChange":
-												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightChange);
-												break;
-										}
-
-										continue;
+								#region [ [PlayOption] ]
+								//-----------------------------
+								case ESectionType.PlayOption: {
+									switch (str3)
+									{
+										case "ShowChara":
+											this.ShowChara = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowDancer":
+											this.ShowDancer = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowRunner":
+											this.ShowRunner = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowMob":
+											this.ShowMob = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowFooter":
+											this.ShowFooter = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowPuchiChara":
+											this.ShowPuchiChara = CConversion.bONorOFF(str4[0]);
+											break;
+										case "EnableCountDownTimer":
+											this.bEnableCountdownTimer = CConversion.bONorOFF(str4[0]);
+											break;
+										case "DrumsInvisible":
+											this.eInvisible.Drums = (EInvisible)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eInvisible.Drums);
+											break;
+										case "DrumsReverse":
+											this.bReverse.Drums = CConversion.bONorOFF(str4[0]);
+											break;
+										case "DrumsPosition":
+											this.JudgeTextDisplayPosition.Drums = (EJudgeTextDisplayPosition)CConversion.ParseIntInRange(str4, 0, 2, (int)this.JudgeTextDisplayPosition.Drums);
+											break;
+										case "DrumsScrollSpeed":
+										case "DrumsScrollSpeed1P":
+											this.nScrollSpeed[0] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[0]);
+											break;
+										case "DrumsScrollSpeed2P":
+											this.nScrollSpeed[1] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[1]);
+											break;
+										case "DrumsScrollSpeed3P":
+											this.nScrollSpeed[2] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[2]);
+											break;
+										case "DrumsScrollSpeed4P":
+											this.nScrollSpeed[3] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[3]);
+											break;
+										case "DrumsScrollSpeed5P":
+											this.nScrollSpeed[4] = CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[4]);
+											break;
+										case "TimingZones1P":
+											this.nTimingZones[0] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[0]);
+											break;
+										case "TimingZones2P":
+											this.nTimingZones[1] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[1]);
+											break;
+										case "TimingZones3P":
+											this.nTimingZones[2] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[2]);
+											break;
+										case "TimingZones4P":
+											this.nTimingZones[3] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[3]);
+											break;
+										case "TimingZones5P":
+											this.nTimingZones[4] = CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[4]);
+											break;
+										case "Just":
+										case "Just1P":
+											this.bJust[0] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[0]);
+											break;
+										case "Just2P":
+											this.bJust[1] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[1]);
+											break;
+										case "Just3P":
+											this.bJust[2] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[2]);
+											break;
+										case "Just4P":
+											this.bJust[3] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[3]);
+											break;
+										case "Just5P":
+											this.bJust[4] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[4]);
+											break;
+										case "HitSounds1P":
+											this.nHitSounds[0] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[0]);
+											break;
+										case "HitSounds2P":
+											this.nHitSounds[1] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[1]);
+											break;
+										case "HitSounds3P":
+											this.nHitSounds[2] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[2]);
+											break;
+										case "HitSounds4P":
+											this.nHitSounds[3] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[3]);
+											break;
+										case "HitSounds5P":
+											this.nHitSounds[4] = CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[4]);
+											break;
+										case "Gametype1P":
+											this.nGameType[0] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[0]);
+											break;
+										case "Gametype2P":
+											this.nGameType[1] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[1]);
+											break;
+										case "Gametype3P":
+											this.nGameType[2] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[2]);
+											break;
+										case "Gametype4P":
+											this.nGameType[3] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[3]);
+											break;
+										case "Gametype5P":
+											this.nGameType[4] = (EGameType)CConversion.ParseIntInRange(str4, 0, 1, (int)this.nGameType[4]);
+											break;
+										case "FunMods1P":
+											this.nFunMods[0] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
+											break;
+										case "FunMods2P":
+											this.nFunMods[1] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
+											break;
+										case "FunMods3P":
+											this.nFunMods[2] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
+											break;
+										case "FunMods4P":
+											this.nFunMods[3] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
+											break;
+										case "FunMods5P":
+											this.nFunMods[4] = (EFunMods)CConversion.ParseIntInRange(str4, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
+											break;
+										case "TaikoStealth1P":
+										case "TaikoStealth":
+											this.eSTEALTH[0] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[0]);
+											break;
+										case "TaikoStealth2P":
+											this.eSTEALTH[1] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[1]);
+											break;
+										case "TaikoStealth3P":
+											this.eSTEALTH[2] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[2]);
+											break;
+										case "TaikoStealth4P":
+											this.eSTEALTH[3] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[3]);
+											break;
+										case "TaikoStealth5P":
+											this.eSTEALTH[4] = (EStealthMode)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eSTEALTH[4]);
+											break;
+										case "TaikoRandom1P":
+										case "TaikoRandom":
+											this.eRandom[0] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[0]);
+											break;
+										case "TaikoRandom2P":
+											this.eRandom[1] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[1]);
+											break;
+										case "TaikoRandom3P":
+											this.eRandom[2] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[2]);
+											break;
+										case "TaikoRandom4P":
+											this.eRandom[3] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[3]);
+											break;
+										case "TaikoRandom5P":
+											this.eRandom[4] = (ERandomMode)CConversion.ParseIntInRange(str4, 0, 4, (int)this.eRandom[4]);
+											break;
+										case "PlaySpeed":
+											this.nSongSpeed = CConversion.ParseIntInRange(str4, 5, 400, this.nSongSpeed);
+											break;
+										case "PlaySpeedNotEqualOneNoSound":
+											this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
+											break;
+										case "Risky":
+											this.nRisky = CConversion.ParseIntInRange(str4, 0, 10, this.nRisky);
+											break;
+										case "DrumsTight":
+											this.bTight = CConversion.bONorOFF(str4[0]);
+											break;
+										case "BranchGuide":
+											this.bBranchGuide = CConversion.bONorOFF(str4[0]);
+											break;
+										case "DefaultCourse":
+											this.nDefaultCourse = CConversion.ParseIntInRange(str4, 0, 5, this.nDefaultCourse);
+											break;
+										case "ScoreMode":
+											this.nScoreMode = CConversion.ParseIntInRange(str4, 0, 3, this.nScoreMode);
+											break;
+										case "HispeedRandom":
+											this.bHispeedRandom = CConversion.bONorOFF(str4[0]);
+											break;
+										case "BigNotesWaitTime":
+											this.nBigNoteWaitTimems = CConversion.ParseIntInRange(str4, 1, 100, this.nBigNoteWaitTimems);
+											break;
+										case "BigNotesJudge":
+											this.bJudgeBigNotes = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ForceNormalGauge":
+											this.bForceNormalGauge = CConversion.bONorOFF(str4[0]);
+											break;
+										case "BranchAnime":
+											this.nBranchAnime = CConversion.ParseIntInRange(str4, 0, 1, this.nBranchAnime);
+											break;
+										case "NoInfo":
+											this.bNoInfo = CConversion.bONorOFF(str4[0]);
+											break;
+										case "DefaultSongSort":
+											this.nDefaultSongSort = CConversion.ParseIntInRange(str4, 0, 2, this.nDefaultSongSort);
+											break;
+										case "RecentlyPlayedMax":
+											this.nRecentlyPlayedMax = CConversion.ParseIntInRange(str4, 0, 9999, this.nRecentlyPlayedMax);
+											break;
+										case "GameMode":
+											this.eGameMode = (EGame)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eGameMode);
+											break;
+										case "TokkunSkipMeasures":
+											this.TokkunSkipMeasures = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunSkipMeasures);
+											break;
+										case nameof(this.TokkunMashInterval):
+											this.TokkunMashInterval = CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunMashInterval);
+											break;
+										case "JudgeCountDisplay":
+											this.bJudgeCountDisplay = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ShowExExtraAnime":
+											this.ShowExExtraAnime = CConversion.bONorOFF(str4[0]);
+											break;
+										case "PlayerCount":
+											this.nPlayerCount = CConversion.ParseIntInRange(str4, 1, 5, this.nPlayerCount);
+											break;
+										case nameof(this.ShinuchiMode):
+											this.ShinuchiMode = CConversion.bONorOFF(str4[0]);
+											break;
 									}
-									//-----------------------------
-									#endregion
 
-									#region [ [SystemKeyAssign] ]
-									//-----------------------------
-									case ESectionType.SystemKeyAssign: {
-											switch (str3) {
-												case "Capture": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.Capture);
-														break;
-													}
-												case "SongVolumeIncrease": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolIncrease);
-														break;
-													}
-												case "SongVolumeDecrease": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolDecrease);
-														break;
-													}
-												case "DisplayHits": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayHits);
-														break;
-													}
-												case "DisplayDebug": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayDebug);
-														break;
-													}
-												case "QuickConfig": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.QuickConfig);
-														break;
-													}
-												case "NewHeya": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.NewHeya);
-														break;
-													}
-												case "SortSongs": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.SortSongs);
-														break;
-													}
-												case "ToggleAutoP1": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP1);
-														break;
-													}
-												case "ToggleAutoP2": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP2);
-														break;
-													}
-												case "ToggleTrainingMode": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleTrainingMode);
-														break;
-													}
-												case "CycleVideoDisplayMode": {
-														this.ReadAndSetKey(str4, this.KeyAssign.System.CycleVideoDisplayMode);
-														break;
-													}
-											}
-											continue;
-										}
-									#endregion
-									#region [ [TrainingKeyAssign] ]
-									case ESectionType.TrainingKeyAssign: {
-											switch (str3) {
-												case "TrainingIncreaseScrollSpeed": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
-														break;
-													}
-												case "TrainingDecreaseScrollSpeed": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
-														break;
-													}
-												case "TrainingIncreaseSongSpeed": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
-														break;
-													}
-												case "TrainingDecreaseSongSpeed": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
-														break;
-													}
-												case "TrainingToggleAuto": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingToggleAuto);
-														break;
-													}
-												case "TrainingBranchNormal": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchNormal);
-														break;
-													}
-												case "TrainingBranchExpert": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchExpert);
-														break;
-													}
-												case "TrainingBranchMaster": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchMaster);
-														break;
-													}
-												case "TrainingPause": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingPause);
-														break;
-													}
-												case "TrainingBookmark": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBookmark);
-														break;
-													}
-												case "TrainingMoveForwardMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
-														break;
-													}
-												case "TrainingMoveBackMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
-														break;
-													}
-												case "TrainingSkipForwardMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
-														break;
-													}
-												case "TrainingSkipBackMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
-														break;
-													}
-												case "TrainingJumpToFirstMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
-														break;
-													}
-												case "TrainingJumpToLastMeasure": {
-														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
-														break;
-													}
-											}
-											continue;
-										}
-									//-----------------------------
-									#endregion
-									case ESectionType.DEBUG: {
-										this.DEBUG_bShowImgui = str3 switch {
-											"ImGui" => CConversion.bONorOFF(str4[0]),
-											_ => this.DEBUG_bShowImgui
-										};
-										continue;
+									continue;
+								}
+								//-----------------------------
+								#endregion
+
+								#region [ [ViewerOption] ]
+								//-----------------------------
+								case ESectionType.ViewerOption: {
+									switch (str3)
+									{
+										case "ViewerVSyncWait":
+											this.bViewerVSyncWait = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ViewerShowDebugStatus":
+											this.bViewerShowDebugStatus = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ViewerTimeStretch":
+											this.bViewerTimeStretch = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ViewerGuitar":
+											this.bViewerGuitar有効 = CConversion.bONorOFF(str4[0]);
+											break;
+										case "ViewerDrums":
+											this.bViewerDrums有効 = CConversion.bONorOFF(str4[0]);
+											break;
 									}
+
+									continue;
+								}
+								//-----------------------------
+								#endregion
+
+								#region [ [GUID] ]
+								//-----------------------------
+								case ESectionType.GUID:
+									switch (str3)
+									{
+										case "JoystickID":
+											this.tJoystickIDの取得(str4);
+											break;
+										case "GamepadID":
+											this.tGamepadIDの取得(str4);
+											break;
+									}
+									continue;
+								//-----------------------------
+								#endregion
+
+								#region [ [DrumsKeyAssign] ]
+								//-----------------------------
+								case ESectionType.DrumsKeyAssign: {
+									switch (str3)
+									{
+										case "LeftRed":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed);
+											break;
+										case "RightRed":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed);
+											break;
+										case "LeftBlue":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue);
+											break;
+										case "RightBlue":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue);
+											break;
+										case "LeftRed2P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed2P);
+											break;
+										case "RightRed2P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed2P);
+											break;
+										case "LeftBlue2P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue2P);
+											break;
+										case "RightBlue2P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue2P);
+											break;
+										case "LeftRed3P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed3P);
+											break;
+										case "RightRed3P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed3P);
+											break;
+										case "LeftBlue3P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue3P);
+											break;
+										case "RightBlue3P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue3P);
+											break;
+										case "LeftRed4P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed4P);
+											break;
+										case "RightRed4P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed4P);
+											break;
+										case "LeftBlue4P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue4P);
+											break;
+										case "RightBlue4P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue4P);
+											break;
+										case "LeftRed5P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed5P);
+											break;
+										case "RightRed5P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed5P);
+											break;
+										case "LeftBlue5P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue5P);
+											break;
+										case "RightBlue5P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue5P);
+											break;
+										case "Clap":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap);
+											break;
+										case "Clap2P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap2P);
+											break;
+										case "Clap3P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap3P);
+											break;
+										case "Clap4P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap4P);
+											break;
+										case "Clap5P":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap5P);
+											break;
+										case "Decide":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Decide);
+											break;
+										case "Cancel":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Cancel);
+											break;
+										case "LeftChange":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftChange);
+											break;
+										case "RightChange":
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightChange);
+											break;
+									}
+
+									continue;
+								}
+								//-----------------------------
+								#endregion
+
+								#region [ [SystemKeyAssign] ]
+								//-----------------------------
+								case ESectionType.SystemKeyAssign: {
+									switch (str3) {
+										case "Capture": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.Capture);
+											break;
+										}
+										case "SongVolumeIncrease": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolIncrease);
+											break;
+										}
+										case "SongVolumeDecrease": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolDecrease);
+											break;
+										}
+										case "DisplayHits": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayHits);
+											break;
+										}
+										case "DisplayDebug": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayDebug);
+											break;
+										}
+										case "QuickConfig": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.QuickConfig);
+											break;
+										}
+										case "NewHeya": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.NewHeya);
+											break;
+										}
+										case "SortSongs": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.SortSongs);
+											break;
+										}
+										case "ToggleAutoP1": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP1);
+											break;
+										}
+										case "ToggleAutoP2": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP2);
+											break;
+										}
+										case "ToggleTrainingMode": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleTrainingMode);
+											break;
+										}
+										case "CycleVideoDisplayMode": {
+											this.ReadAndSetKey(str4, this.KeyAssign.System.CycleVideoDisplayMode);
+											break;
+										}
+									}
+									continue;
+								}
+								#endregion
+								#region [ [TrainingKeyAssign] ]
+								case ESectionType.TrainingKeyAssign: {
+									switch (str3) {
+										case "TrainingIncreaseScrollSpeed": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+											break;
+										}
+										case "TrainingDecreaseScrollSpeed": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+											break;
+										}
+										case "TrainingIncreaseSongSpeed": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+											break;
+										}
+										case "TrainingDecreaseSongSpeed": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+											break;
+										}
+										case "TrainingToggleAuto": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingToggleAuto);
+											break;
+										}
+										case "TrainingBranchNormal": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchNormal);
+											break;
+										}
+										case "TrainingBranchExpert": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchExpert);
+											break;
+										}
+										case "TrainingBranchMaster": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchMaster);
+											break;
+										}
+										case "TrainingPause": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingPause);
+											break;
+										}
+										case "TrainingBookmark": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBookmark);
+											break;
+										}
+										case "TrainingMoveForwardMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+											break;
+										}
+										case "TrainingMoveBackMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+											break;
+										}
+										case "TrainingSkipForwardMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+											break;
+										}
+										case "TrainingSkipBackMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+											break;
+										}
+										case "TrainingJumpToFirstMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+											break;
+										}
+										case "TrainingJumpToLastMeasure": {
+											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+											break;
+										}
+									}
+									continue;
+								}
+								//-----------------------------
+								#endregion
+								case ESectionType.DEBUG: {
+									this.DEBUG_bShowImgui = str3 switch {
+										"ImGui" => CConversion.bONorOFF(str4[0]),
+										_ => this.DEBUG_bShowImgui
+									};
+									continue;
 								}
 							}
 						}
-					} catch (Exception exception) {
-						Trace.TraceError(exception.ToString());
-						Trace.TraceError("例外が発生しましたが処理を継続します。 (93c4c5cd-4996-4e8c-a82f-a179ff590b44)");
 					}
+				} catch (Exception exception) {
+					Trace.TraceError(exception.ToString());
+					Trace.TraceError("例外が発生しましたが処理を継続します。 (93c4c5cd-4996-4e8c-a82f-a179ff590b44)");
 				}
 			}
 		}
