@@ -323,7 +323,7 @@ namespace OpenTaiko {
 				if (fi.Length > 0)  // Config.iniが0byteだったなら、読み込まない
 				{
 					try {
-						cc.tファイルから読み込み(path);
+						cc.LoadFromFile(path);
 					} catch (Exception e) {
 						//ConfigIni = new CConfigIni();	// 存在してなければ新規生成
 						Trace.TraceError(e.ToString());
