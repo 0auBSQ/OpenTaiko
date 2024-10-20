@@ -1870,7 +1870,7 @@ namespace OpenTaiko {
 
 		// メソッド
 
-		public void t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
+		public void RemoveDuplicateKeyAssignments(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
 			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange || pad == EKeyConfigPad.LeftChange;
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0; j < (int)EKeyConfigPad.Capture; j++) // Do not restrict duplicate keybinds for System controls
@@ -3260,63 +3260,63 @@ namespace OpenTaiko {
 									//-----------------------------
 									case ESectionType.DrumsKeyAssign: {
 											if (str3.Equals("LeftRed")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed);
 											} else if (str3.Equals("RightRed")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed);
 											} else if (str3.Equals("LeftBlue")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue);
 											} else if (str3.Equals("RightBlue")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue);
 											} else if (str3.Equals("LeftRed2P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed2P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed2P);
 											} else if (str3.Equals("RightRed2P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed2P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed2P);
 											} else if (str3.Equals("LeftBlue2P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue2P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue2P);
 											} else if (str3.Equals("RightBlue2P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue2P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue2P);
 											} else if (str3.Equals("LeftRed3P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed3P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed3P);
 											} else if (str3.Equals("RightRed3P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed3P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed3P);
 											} else if (str3.Equals("LeftBlue3P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue3P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue3P);
 											} else if (str3.Equals("RightBlue3P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue3P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue3P);
 											} else if (str3.Equals("LeftRed4P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed4P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed4P);
 											} else if (str3.Equals("RightRed4P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed4P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed4P);
 											} else if (str3.Equals("LeftBlue4P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue4P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue4P);
 											} else if (str3.Equals("RightBlue4P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue4P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue4P);
 											} else if (str3.Equals("LeftRed5P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed5P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed5P);
 											} else if (str3.Equals("RightRed5P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed5P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed5P);
 											} else if (str3.Equals("LeftBlue5P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue5P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue5P);
 											} else if (str3.Equals("RightBlue5P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue5P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue5P);
 											} else if (str3.Equals("Clap")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap);
 											} else if (str3.Equals("Clap2P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap2P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap2P);
 											} else if (str3.Equals("Clap3P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap3P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap3P);
 											} else if (str3.Equals("Clap4P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap4P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap4P);
 											} else if (str3.Equals("Clap5P")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap5P);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap5P);
 											} else if (str3.Equals("Decide")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Decide);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Decide);
 											} else if (str3.Equals("Cancel")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Cancel);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.Cancel);
 											} else if (str3.Equals("LeftChange")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftChange);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftChange);
 											} else if (str3.Equals("RightChange")) {
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightChange);
+												this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightChange);
 											}
 
 											continue;
@@ -3329,51 +3329,51 @@ namespace OpenTaiko {
 									case ESectionType.SystemKeyAssign: {
 											switch (str3) {
 												case "Capture": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.Capture);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.Capture);
 														break;
 													}
 												case "SongVolumeIncrease": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.SongVolIncrease);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolIncrease);
 														break;
 													}
 												case "SongVolumeDecrease": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.SongVolDecrease);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolDecrease);
 														break;
 													}
 												case "DisplayHits": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.DisplayHits);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayHits);
 														break;
 													}
 												case "DisplayDebug": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.DisplayDebug);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayDebug);
 														break;
 													}
 												case "QuickConfig": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.QuickConfig);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.QuickConfig);
 														break;
 													}
 												case "NewHeya": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.NewHeya);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.NewHeya);
 														break;
 													}
 												case "SortSongs": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.SortSongs);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.SortSongs);
 														break;
 													}
 												case "ToggleAutoP1": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleAutoP1);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP1);
 														break;
 													}
 												case "ToggleAutoP2": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleAutoP2);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP2);
 														break;
 													}
 												case "ToggleTrainingMode": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.ToggleTrainingMode);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleTrainingMode);
 														break;
 													}
 												case "CycleVideoDisplayMode": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.System.CycleVideoDisplayMode);
+														this.ReadAndSetKey(str4, this.KeyAssign.System.CycleVideoDisplayMode);
 														break;
 													}
 											}
@@ -3384,67 +3384,67 @@ namespace OpenTaiko {
 									case ESectionType.TrainingKeyAssign: {
 											switch (str3) {
 												case "TrainingIncreaseScrollSpeed": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
 														break;
 													}
 												case "TrainingDecreaseScrollSpeed": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
 														break;
 													}
 												case "TrainingIncreaseSongSpeed": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
 														break;
 													}
 												case "TrainingDecreaseSongSpeed": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
 														break;
 													}
 												case "TrainingToggleAuto": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingToggleAuto);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingToggleAuto);
 														break;
 													}
 												case "TrainingBranchNormal": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchNormal);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchNormal);
 														break;
 													}
 												case "TrainingBranchExpert": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchExpert);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchExpert);
 														break;
 													}
 												case "TrainingBranchMaster": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBranchMaster);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchMaster);
 														break;
 													}
 												case "TrainingPause": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingPause);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingPause);
 														break;
 													}
 												case "TrainingBookmark": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingBookmark);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBookmark);
 														break;
 													}
 												case "TrainingMoveForwardMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
 														break;
 													}
 												case "TrainingMoveBackMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
 														break;
 													}
 												case "TrainingSkipForwardMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
 														break;
 													}
 												case "TrainingSkipBackMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
 														break;
 													}
 												case "TrainingJumpToFirstMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
 														break;
 													}
 												case "TrainingJumpToLastMeasure": {
-														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+														this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
 														break;
 													}
 											}
@@ -3571,51 +3571,51 @@ namespace OpenTaiko {
 			}
 		}
 
-		private void tキーの読み出しと設定(string strキー記述, CKeyAssign.STKEYASSIGN[] assign) {
-			string[] strArray = strキー記述.Split(new char[] { ',' });
+		private void ReadAndSetKey(string keyDescription, CKeyAssign.STKEYASSIGN[] assign) {
+			string[] strArray = keyDescription.Split(new char[] { ',' });
 			for (int i = 0; (i < strArray.Length) && (i < 0x10); i++) {
-				EInputDevice e入力デバイス;
+				EInputDevice eInputDevice;
 				int id;
 				int code;
 				string str = strArray[i].Trim().ToUpper();
 				if (str.Length >= 3) {
-					e入力デバイス = EInputDevice.Unknown;
+					eInputDevice = EInputDevice.Unknown;
 					switch (str[0]) {
 						case 'J':
-							e入力デバイス = EInputDevice.Joypad;
+							eInputDevice = EInputDevice.Joypad;
 							break;
 
 						case 'G':
-							e入力デバイス = EInputDevice.Gamepad;
+							eInputDevice = EInputDevice.Gamepad;
 							break;
 
 						case 'K':
-							e入力デバイス = EInputDevice.Keyboard;
+							eInputDevice = EInputDevice.Keyboard;
 							break;
 
 						case 'L':
 							continue;
 
 						case 'M':
-							e入力デバイス = EInputDevice.MIDIInput;
+							eInputDevice = EInputDevice.MIDIInput;
 							break;
 
 						case 'N':
-							e入力デバイス = EInputDevice.Mouse;
+							eInputDevice = EInputDevice.Mouse;
 							break;
 					}
 				} else {
 					continue;
 				}
-				id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".IndexOf(str[1]);    // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
+				id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".IndexOf(str[1]);
 				if (((id >= 0) && int.TryParse(str.Substring(2), out code)) && ((code >= 0) && (code <= 0xff))) {
-					//this.t指定した入力が既にアサイン済みである場合はそれを全削除する( e入力デバイス, id, code );
-					assign[i].InputDevice = e入力デバイス;
+					assign[i].InputDevice = eInputDevice;
 					assign[i].ID = id;
 					assign[i].Code = code;
 				}
 			}
 		}
+
 		private void SetDefaultKeyAssignments() {
 			this.ClearAllKeyAssignments();
 
