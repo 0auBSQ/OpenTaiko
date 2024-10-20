@@ -2671,59 +2671,14 @@ namespace OpenTaiko {
 									this.ProcessAutoPlaySection(str3, str4);
 									continue;
 
-								#region [ [HitRange] ]
-
-								//-----------------------------
 								case ESectionType.HitRange:
-									switch (str3) {
-										case "Perfect":
-											this.nHitRangeMs.Perfect =
-												CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
-											break;
-										case "Great":
-											this.nHitRangeMs.Great =
-												CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Great);
-											break;
-										case "Good":
-											this.nHitRangeMs.Good =
-												CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Good);
-											break;
-										case "Poor":
-											this.nHitRangeMs.Poor =
-												CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Poor);
-											break;
-									}
-
+									this.ProcessHitRangeSection(str3, str4);
 									continue;
 
-								//-----------------------------
-
-								#endregion
-
-								#region [ [Log] ]
-
-								//-----------------------------
 								case ESectionType.Log: {
-									switch (str3) {
-										case "OutputLog":
-											this.bOutputLogs = CConversion.bONorOFF(str4[0]);
-											break;
-										case "TraceCreatedDisposed":
-											this.bOutputCreationReleaseLog = CConversion.bONorOFF(str4[0]);
-											break;
-										case "TraceDTXDetails":
-											this.bOutputDetailedDTXLog = CConversion.bONorOFF(str4[0]);
-											break;
-										case "TraceSongSearch":
-											this.bOutputSongSearchLog = CConversion.bONorOFF(str4[0]);
-											break;
-									}
-
+									this.ProcessLogSection(str3, str4);
 									continue;
 								}
-								//-----------------------------
-
-								#endregion
 
 								#region [ [PlayOption] ]
 
@@ -3610,11 +3565,41 @@ namespace OpenTaiko {
 		}
 
 		private void ProcessHitRangeSection(string key, string value) {
-
+			switch (key) {
+				case "Perfect":
+					this.nHitRangeMs.Perfect =
+						CConversion.ParseIntInRange(value, 0, 0x3e7, this.nHitRangeMs.Perfect);
+					break;
+				case "Great":
+					this.nHitRangeMs.Great =
+						CConversion.ParseIntInRange(value, 0, 0x3e7, this.nHitRangeMs.Great);
+					break;
+				case "Good":
+					this.nHitRangeMs.Good =
+						CConversion.ParseIntInRange(value, 0, 0x3e7, this.nHitRangeMs.Good);
+					break;
+				case "Poor":
+					this.nHitRangeMs.Poor =
+						CConversion.ParseIntInRange(value, 0, 0x3e7, this.nHitRangeMs.Poor);
+					break;
+			}
 		}
 
 		private void ProcessLogSection(string key, string value) {
-
+			switch (key) {
+				case "OutputLog":
+					this.bOutputLogs = CConversion.bONorOFF(value[0]);
+					break;
+				case "TraceCreatedDisposed":
+					this.bOutputCreationReleaseLog = CConversion.bONorOFF(value[0]);
+					break;
+				case "TraceDTXDetails":
+					this.bOutputDetailedDTXLog = CConversion.bONorOFF(value[0]);
+					break;
+				case "TraceSongSearch":
+					this.bOutputSongSearchLog = CConversion.bONorOFF(value[0]);
+					break;
+			}
 		}
 
 		private void ProcessViewerOptionSection(string key, string value) {
