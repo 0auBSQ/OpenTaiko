@@ -2680,302 +2680,10 @@ namespace OpenTaiko {
 									continue;
 								}
 
-								#region [ [PlayOption] ]
-
-								//-----------------------------
 								case ESectionType.PlayOption: {
-									switch (str3) {
-										case "ShowChara":
-											this.ShowChara = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowDancer":
-											this.ShowDancer = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowRunner":
-											this.ShowRunner = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowMob":
-											this.ShowMob = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowFooter":
-											this.ShowFooter = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowPuchiChara":
-											this.ShowPuchiChara = CConversion.bONorOFF(str4[0]);
-											break;
-										case "EnableCountDownTimer":
-											this.bEnableCountdownTimer = CConversion.bONorOFF(str4[0]);
-											break;
-										case "DrumsInvisible":
-											this.eInvisible.Drums =
-												(EInvisible)CConversion.ParseIntInRange(str4, 0, 2,
-													(int)this.eInvisible.Drums);
-											break;
-										case "DrumsReverse":
-											this.bReverse.Drums = CConversion.bONorOFF(str4[0]);
-											break;
-										case "DrumsPosition":
-											this.JudgeTextDisplayPosition.Drums =
-												(EJudgeTextDisplayPosition)CConversion.ParseIntInRange(str4, 0, 2,
-													(int)this.JudgeTextDisplayPosition.Drums);
-											break;
-										case "DrumsScrollSpeed":
-										case "DrumsScrollSpeed1P":
-											this.nScrollSpeed[0] =
-												CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[0]);
-											break;
-										case "DrumsScrollSpeed2P":
-											this.nScrollSpeed[1] =
-												CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[1]);
-											break;
-										case "DrumsScrollSpeed3P":
-											this.nScrollSpeed[2] =
-												CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[2]);
-											break;
-										case "DrumsScrollSpeed4P":
-											this.nScrollSpeed[3] =
-												CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[3]);
-											break;
-										case "DrumsScrollSpeed5P":
-											this.nScrollSpeed[4] =
-												CConversion.ParseIntInRange(str4, 0, 0x7cf, this.nScrollSpeed[4]);
-											break;
-										case "TimingZones1P":
-											this.nTimingZones[0] =
-												CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[0]);
-											break;
-										case "TimingZones2P":
-											this.nTimingZones[1] =
-												CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[1]);
-											break;
-										case "TimingZones3P":
-											this.nTimingZones[2] =
-												CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[2]);
-											break;
-										case "TimingZones4P":
-											this.nTimingZones[3] =
-												CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[3]);
-											break;
-										case "TimingZones5P":
-											this.nTimingZones[4] =
-												CConversion.ParseIntInRange(str4, 0, 4, this.nTimingZones[4]);
-											break;
-										case "Just":
-										case "Just1P":
-											this.bJust[0] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[0]);
-											break;
-										case "Just2P":
-											this.bJust[1] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[1]);
-											break;
-										case "Just3P":
-											this.bJust[2] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[2]);
-											break;
-										case "Just4P":
-											this.bJust[3] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[3]);
-											break;
-										case "Just5P":
-											this.bJust[4] = CConversion.ParseIntInRange(str4, 0, 2, this.bJust[4]);
-											break;
-										case "HitSounds1P":
-											this.nHitSounds[0] =
-												CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[0]);
-											break;
-										case "HitSounds2P":
-											this.nHitSounds[1] =
-												CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[1]);
-											break;
-										case "HitSounds3P":
-											this.nHitSounds[2] =
-												CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[2]);
-											break;
-										case "HitSounds4P":
-											this.nHitSounds[3] =
-												CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[3]);
-											break;
-										case "HitSounds5P":
-											this.nHitSounds[4] =
-												CConversion.ParseIntInRange(str4, 0, 9999999, this.nHitSounds[4]);
-											break;
-										case "Gametype1P":
-											this.nGameType[0] =
-												(EGameType)CConversion.ParseIntInRange(str4, 0, 1,
-													(int)this.nGameType[0]);
-											break;
-										case "Gametype2P":
-											this.nGameType[1] =
-												(EGameType)CConversion.ParseIntInRange(str4, 0, 1,
-													(int)this.nGameType[1]);
-											break;
-										case "Gametype3P":
-											this.nGameType[2] =
-												(EGameType)CConversion.ParseIntInRange(str4, 0, 1,
-													(int)this.nGameType[2]);
-											break;
-										case "Gametype4P":
-											this.nGameType[3] =
-												(EGameType)CConversion.ParseIntInRange(str4, 0, 1,
-													(int)this.nGameType[3]);
-											break;
-										case "Gametype5P":
-											this.nGameType[4] =
-												(EGameType)CConversion.ParseIntInRange(str4, 0, 1,
-													(int)this.nGameType[4]);
-											break;
-										case "FunMods1P":
-											this.nFunMods[0] = (EFunMods)CConversion.ParseIntInRange(str4, 0,
-												(int)EFunMods.Total - 1, (int)this.nFunMods[0]);
-											break;
-										case "FunMods2P":
-											this.nFunMods[1] = (EFunMods)CConversion.ParseIntInRange(str4, 0,
-												(int)EFunMods.Total - 1, (int)this.nFunMods[1]);
-											break;
-										case "FunMods3P":
-											this.nFunMods[2] = (EFunMods)CConversion.ParseIntInRange(str4, 0,
-												(int)EFunMods.Total - 1, (int)this.nFunMods[2]);
-											break;
-										case "FunMods4P":
-											this.nFunMods[3] = (EFunMods)CConversion.ParseIntInRange(str4, 0,
-												(int)EFunMods.Total - 1, (int)this.nFunMods[3]);
-											break;
-										case "FunMods5P":
-											this.nFunMods[4] = (EFunMods)CConversion.ParseIntInRange(str4, 0,
-												(int)EFunMods.Total - 1, (int)this.nFunMods[4]);
-											break;
-										case "TaikoStealth1P":
-										case "TaikoStealth":
-											this.eSTEALTH[0] =
-												(EStealthMode)CConversion.ParseIntInRange(str4, 0, 3,
-													(int)this.eSTEALTH[0]);
-											break;
-										case "TaikoStealth2P":
-											this.eSTEALTH[1] =
-												(EStealthMode)CConversion.ParseIntInRange(str4, 0, 3,
-													(int)this.eSTEALTH[1]);
-											break;
-										case "TaikoStealth3P":
-											this.eSTEALTH[2] =
-												(EStealthMode)CConversion.ParseIntInRange(str4, 0, 3,
-													(int)this.eSTEALTH[2]);
-											break;
-										case "TaikoStealth4P":
-											this.eSTEALTH[3] =
-												(EStealthMode)CConversion.ParseIntInRange(str4, 0, 3,
-													(int)this.eSTEALTH[3]);
-											break;
-										case "TaikoStealth5P":
-											this.eSTEALTH[4] =
-												(EStealthMode)CConversion.ParseIntInRange(str4, 0, 3,
-													(int)this.eSTEALTH[4]);
-											break;
-										case "TaikoRandom1P":
-										case "TaikoRandom":
-											this.eRandom[0] =
-												(ERandomMode)CConversion.ParseIntInRange(str4, 0, 4,
-													(int)this.eRandom[0]);
-											break;
-										case "TaikoRandom2P":
-											this.eRandom[1] =
-												(ERandomMode)CConversion.ParseIntInRange(str4, 0, 4,
-													(int)this.eRandom[1]);
-											break;
-										case "TaikoRandom3P":
-											this.eRandom[2] =
-												(ERandomMode)CConversion.ParseIntInRange(str4, 0, 4,
-													(int)this.eRandom[2]);
-											break;
-										case "TaikoRandom4P":
-											this.eRandom[3] =
-												(ERandomMode)CConversion.ParseIntInRange(str4, 0, 4,
-													(int)this.eRandom[3]);
-											break;
-										case "TaikoRandom5P":
-											this.eRandom[4] =
-												(ERandomMode)CConversion.ParseIntInRange(str4, 0, 4,
-													(int)this.eRandom[4]);
-											break;
-										case "PlaySpeed":
-											this.nSongSpeed =
-												CConversion.ParseIntInRange(str4, 5, 400, this.nSongSpeed);
-											break;
-										case "PlaySpeedNotEqualOneNoSound":
-											this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
-											break;
-										case "Risky":
-											this.nRisky = CConversion.ParseIntInRange(str4, 0, 10, this.nRisky);
-											break;
-										case "DrumsTight":
-											this.bTight = CConversion.bONorOFF(str4[0]);
-											break;
-										case "BranchGuide":
-											this.bBranchGuide = CConversion.bONorOFF(str4[0]);
-											break;
-										case "DefaultCourse":
-											this.nDefaultCourse =
-												CConversion.ParseIntInRange(str4, 0, 5, this.nDefaultCourse);
-											break;
-										case "ScoreMode":
-											this.nScoreMode = CConversion.ParseIntInRange(str4, 0, 3, this.nScoreMode);
-											break;
-										case "HispeedRandom":
-											this.bHispeedRandom = CConversion.bONorOFF(str4[0]);
-											break;
-										case "BigNotesWaitTime":
-											this.nBigNoteWaitTimems =
-												CConversion.ParseIntInRange(str4, 1, 100, this.nBigNoteWaitTimems);
-											break;
-										case "BigNotesJudge":
-											this.bJudgeBigNotes = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ForceNormalGauge":
-											this.bForceNormalGauge = CConversion.bONorOFF(str4[0]);
-											break;
-										case "BranchAnime":
-											this.nBranchAnime =
-												CConversion.ParseIntInRange(str4, 0, 1, this.nBranchAnime);
-											break;
-										case "NoInfo":
-											this.bNoInfo = CConversion.bONorOFF(str4[0]);
-											break;
-										case "DefaultSongSort":
-											this.nDefaultSongSort =
-												CConversion.ParseIntInRange(str4, 0, 2, this.nDefaultSongSort);
-											break;
-										case "RecentlyPlayedMax":
-											this.nRecentlyPlayedMax =
-												CConversion.ParseIntInRange(str4, 0, 9999, this.nRecentlyPlayedMax);
-											break;
-										case "GameMode":
-											this.eGameMode =
-												(EGame)CConversion.ParseIntInRange(str4, 0, 2, (int)this.eGameMode);
-											break;
-										case "TokkunSkipMeasures":
-											this.TokkunSkipMeasures =
-												CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunSkipMeasures);
-											break;
-										case nameof(this.TokkunMashInterval):
-											this.TokkunMashInterval =
-												CConversion.ParseIntInRange(str4, 0, 9999, this.TokkunMashInterval);
-											break;
-										case "JudgeCountDisplay":
-											this.bJudgeCountDisplay = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ShowExExtraAnime":
-											this.ShowExExtraAnime = CConversion.bONorOFF(str4[0]);
-											break;
-										case "PlayerCount":
-											this.nPlayerCount =
-												CConversion.ParseIntInRange(str4, 1, 5, this.nPlayerCount);
-											break;
-										case nameof(this.ShinuchiMode):
-											this.ShinuchiMode = CConversion.bONorOFF(str4[0]);
-											break;
-									}
-
+									this.ProcessPlayOptionSection(str3, str4);
 									continue;
 								}
-								//-----------------------------
-
-								#endregion
 
 								#region [ [ViewerOption] ]
 
@@ -3602,24 +3310,292 @@ namespace OpenTaiko {
 			}
 		}
 
-		private void ProcessViewerOptionSection(string key, string value) {
+		private void ProcessPlayOptionSection(string key, string value) {
+			switch (key) {
+				case "ShowChara":
+					this.ShowChara = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowDancer":
+					this.ShowDancer = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowRunner":
+					this.ShowRunner = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowMob":
+					this.ShowMob = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowFooter":
+					this.ShowFooter = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowPuchiChara":
+					this.ShowPuchiChara = CConversion.bONorOFF(value[0]);
+					break;
+				case "EnableCountDownTimer":
+					this.bEnableCountdownTimer = CConversion.bONorOFF(value[0]);
+					break;
+				case "DrumsInvisible":
+					this.eInvisible.Drums =
+						(EInvisible)CConversion.ParseIntInRange(value, 0, 2, (int)this.eInvisible.Drums);
+					break;
+				case "DrumsReverse":
+					this.bReverse.Drums = CConversion.bONorOFF(value[0]);
+					break;
+				case "DrumsPosition":
+					this.JudgeTextDisplayPosition.Drums =
+						(EJudgeTextDisplayPosition)CConversion.ParseIntInRange(value, 0, 2,
+							(int)this.JudgeTextDisplayPosition.Drums);
+					break;
+				case "DrumsScrollSpeed":
+				case "DrumsScrollSpeed1P":
+					this.nScrollSpeed[0] =
+						CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[0]);
+					break;
+				case "DrumsScrollSpeed2P":
+					this.nScrollSpeed[1] =
+						CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[1]);
+					break;
+				case "DrumsScrollSpeed3P":
+					this.nScrollSpeed[2] =
+						CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[2]);
+					break;
+				case "DrumsScrollSpeed4P":
+					this.nScrollSpeed[3] =
+						CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[3]);
+					break;
+				case "DrumsScrollSpeed5P":
+					this.nScrollSpeed[4] =
+						CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[4]);
+					break;
+				case "TimingZones1P":
+					this.nTimingZones[0] =
+						CConversion.ParseIntInRange(value, 0, 4, this.nTimingZones[0]);
+					break;
+				case "TimingZones2P":
+					this.nTimingZones[1] =
+						CConversion.ParseIntInRange(value, 0, 4, this.nTimingZones[1]);
+					break;
+				case "TimingZones3P":
+					this.nTimingZones[2] =
+						CConversion.ParseIntInRange(value, 0, 4, this.nTimingZones[2]);
+					break;
+				case "TimingZones4P":
+					this.nTimingZones[3] =
+						CConversion.ParseIntInRange(value, 0, 4, this.nTimingZones[3]);
+					break;
+				case "TimingZones5P":
+					this.nTimingZones[4] =
+						CConversion.ParseIntInRange(value, 0, 4, this.nTimingZones[4]);
+					break;
+				case "Just":
+				case "Just1P":
+					this.bJust[0] = CConversion.ParseIntInRange(value, 0, 2, this.bJust[0]);
+					break;
+				case "Just2P":
+					this.bJust[1] = CConversion.ParseIntInRange(value, 0, 2, this.bJust[1]);
+					break;
+				case "Just3P":
+					this.bJust[2] = CConversion.ParseIntInRange(value, 0, 2, this.bJust[2]);
+					break;
+				case "Just4P":
+					this.bJust[3] = CConversion.ParseIntInRange(value, 0, 2, this.bJust[3]);
+					break;
+				case "Just5P":
+					this.bJust[4] = CConversion.ParseIntInRange(value, 0, 2, this.bJust[4]);
+					break;
+				case "HitSounds1P":
+					this.nHitSounds[0] =
+						CConversion.ParseIntInRange(value, 0, 9999999, this.nHitSounds[0]);
+					break;
+				case "HitSounds2P":
+					this.nHitSounds[1] =
+						CConversion.ParseIntInRange(value, 0, 9999999, this.nHitSounds[1]);
+					break;
+				case "HitSounds3P":
+					this.nHitSounds[2] =
+						CConversion.ParseIntInRange(value, 0, 9999999, this.nHitSounds[2]);
+					break;
+				case "HitSounds4P":
+					this.nHitSounds[3] =
+						CConversion.ParseIntInRange(value, 0, 9999999, this.nHitSounds[3]);
+					break;
+				case "HitSounds5P":
+					this.nHitSounds[4] =
+						CConversion.ParseIntInRange(value, 0, 9999999, this.nHitSounds[4]);
+					break;
+				case "Gametype1P":
+					this.nGameType[0] =
+						(EGameType)CConversion.ParseIntInRange(value, 0, 1, (int)this.nGameType[0]);
+					break;
+				case "Gametype2P":
+					this.nGameType[1] =
+						(EGameType)CConversion.ParseIntInRange(value, 0, 1, (int)this.nGameType[1]);
+					break;
+				case "Gametype3P":
+					this.nGameType[2] =
+						(EGameType)CConversion.ParseIntInRange(value, 0, 1, (int)this.nGameType[2]);
+					break;
+				case "Gametype4P":
+					this.nGameType[3] =
+						(EGameType)CConversion.ParseIntInRange(value, 0, 1, (int)this.nGameType[3]);
+					break;
+				case "Gametype5P":
+					this.nGameType[4] =
+						(EGameType)CConversion.ParseIntInRange(value, 0, 1, (int)this.nGameType[4]);
+					break;
+				case "FunMods1P":
+					this.nFunMods[0] =
+						(EFunMods)CConversion.ParseIntInRange(value, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[0]);
+					break;
+				case "FunMods2P":
+					this.nFunMods[1] =
+						(EFunMods)CConversion.ParseIntInRange(value, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[1]);
+					break;
+				case "FunMods3P":
+					this.nFunMods[2] =
+						(EFunMods)CConversion.ParseIntInRange(value, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[2]);
+					break;
+				case "FunMods4P":
+					this.nFunMods[3] =
+						(EFunMods)CConversion.ParseIntInRange(value, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[3]);
+					break;
+				case "FunMods5P":
+					this.nFunMods[4] =
+						(EFunMods)CConversion.ParseIntInRange(value, 0, (int)EFunMods.Total - 1, (int)this.nFunMods[4]);
+					break;
+				case "TaikoStealth1P":
+				case "TaikoStealth":
+					this.eSTEALTH[0] =
+						(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[0]);
+					break;
+				case "TaikoStealth2P":
+					this.eSTEALTH[1] =
+						(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[1]);
+					break;
+				case "TaikoStealth3P":
+					this.eSTEALTH[2] =
+						(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[2]);
+					break;
+				case "TaikoStealth4P":
+					this.eSTEALTH[3] =
+						(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[3]);
+					break;
+				case "TaikoStealth5P":
+					this.eSTEALTH[4] =
+						(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[4]);
+					break;
+				case "TaikoRandom1P":
+				case "TaikoRandom":
+					this.eRandom[0] =
+						(ERandomMode)CConversion.ParseIntInRange(value, 0, 4, (int)this.eRandom[0]);
+					break;
+				case "TaikoRandom2P":
+					this.eRandom[1] =
+						(ERandomMode)CConversion.ParseIntInRange(value, 0, 4, (int)this.eRandom[1]);
+					break;
+				case "TaikoRandom3P":
+					this.eRandom[2] =
+						(ERandomMode)CConversion.ParseIntInRange(value, 0, 4, (int)this.eRandom[2]);
+					break;
+				case "TaikoRandom4P":
+					this.eRandom[3] =
+						(ERandomMode)CConversion.ParseIntInRange(value, 0, 4, (int)this.eRandom[3]);
+					break;
+				case "TaikoRandom5P":
+					this.eRandom[4] =
+						(ERandomMode)CConversion.ParseIntInRange(value, 0, 4, (int)this.eRandom[4]);
+					break;
+				case "PlaySpeed":
+					this.nSongSpeed =
+						CConversion.ParseIntInRange(value, 5, 400, this.nSongSpeed);
+					break;
+				case "PlaySpeedNotEqualOneNoSound":
+					this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(value[0]);
+					break;
+				case "Risky":
+					this.nRisky = CConversion.ParseIntInRange(value, 0, 10, this.nRisky);
+					break;
+				case "DrumsTight":
+					this.bTight = CConversion.bONorOFF(value[0]);
+					break;
+				case "BranchGuide":
+					this.bBranchGuide = CConversion.bONorOFF(value[0]);
+					break;
+				case "DefaultCourse":
+					this.nDefaultCourse =
+						CConversion.ParseIntInRange(value, 0, 5, this.nDefaultCourse);
+					break;
+				case "ScoreMode":
+					this.nScoreMode = CConversion.ParseIntInRange(value, 0, 3, this.nScoreMode);
+					break;
+				case "HispeedRandom":
+					this.bHispeedRandom = CConversion.bONorOFF(value[0]);
+					break;
+				case "BigNotesWaitTime":
+					this.nBigNoteWaitTimems =
+						CConversion.ParseIntInRange(value, 1, 100, this.nBigNoteWaitTimems);
+					break;
+				case "BigNotesJudge":
+					this.bJudgeBigNotes = CConversion.bONorOFF(value[0]);
+					break;
+				case "ForceNormalGauge":
+					this.bForceNormalGauge = CConversion.bONorOFF(value[0]);
+					break;
+				case "BranchAnime":
+					this.nBranchAnime =
+						CConversion.ParseIntInRange(value, 0, 1, this.nBranchAnime);
+					break;
+				case "NoInfo":
+					this.bNoInfo = CConversion.bONorOFF(value[0]);
+					break;
+				case "DefaultSongSort":
+					this.nDefaultSongSort =
+						CConversion.ParseIntInRange(value, 0, 2, this.nDefaultSongSort);
+					break;
+				case "RecentlyPlayedMax":
+					this.nRecentlyPlayedMax =
+						CConversion.ParseIntInRange(value, 0, 9999, this.nRecentlyPlayedMax);
+					break;
+				case "GameMode":
+					this.eGameMode =
+						(EGame)CConversion.ParseIntInRange(value, 0, 2, (int)this.eGameMode);
+					break;
+				case "TokkunSkipMeasures":
+					this.TokkunSkipMeasures =
+						CConversion.ParseIntInRange(value, 0, 9999, this.TokkunSkipMeasures);
+					break;
+				case nameof(this.TokkunMashInterval):
+					this.TokkunMashInterval =
+						CConversion.ParseIntInRange(value, 0, 9999, this.TokkunMashInterval);
+					break;
+				case "JudgeCountDisplay":
+					this.bJudgeCountDisplay = CConversion.bONorOFF(value[0]);
+					break;
+				case "ShowExExtraAnime":
+					this.ShowExExtraAnime = CConversion.bONorOFF(value[0]);
+					break;
+				case "PlayerCount":
+					this.nPlayerCount =
+						CConversion.ParseIntInRange(value, 1, 5, this.nPlayerCount);
+					break;
+				case nameof(this.ShinuchiMode):
+					this.ShinuchiMode = CConversion.bONorOFF(value[0]);
+					break;
+			}
+		}
 
+		private void ProcessViewerOptionSection(string key, string value) {
 		}
 
 		private void ProcessDrumKeyAssignmentSection(string key, string value) {
-
 		}
 
 		private void ProcessTrainingKeyAssignmentSection(string key, string value) {
-
 		}
 
 		private void ProcessDebugSection(string key, string value) {
-
 		}
 
 		private void ProcessGuidSection(string key, string value) {
-
 		}
 
 		#region [ private ]
