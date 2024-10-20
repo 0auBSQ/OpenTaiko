@@ -2684,7 +2684,7 @@ namespace OpenTaiko {
 						string str3;
 						string str4;
 						if (str[0] == '[') {
-							#region [ セクションの変更 ]
+							#region [ Section Change ]
 							//-----------------------------
 							StringBuilder builder = new StringBuilder(0x20);
 							int num = 1;
@@ -2827,26 +2827,12 @@ namespace OpenTaiko {
 											} else if (str3.Equals("ASIODevice")) {
 												string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
 												this.nASIODevice = CConversion.ParseIntInRange(str4, 0, asiodev.Length - 1, this.nASIODevice);
-											}
-											  //else if ( str3.Equals( "ASIOBufferSizeMs" ) )
-											  //{
-											  //    this.nASIOBufferSizeMs = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 9999, this.nASIOBufferSizeMs );
-											  //}
-											  //else if ( str3.Equals( "DynamicBassMixerManagement" ) )
-											  //{
-											  //    this.bDynamicBassMixerManagement = C変換.bONorOFF( str4[ 0 ] );
-											  //}
-											  else if (str3.Equals("SoundTimerType"))           // #33689 2014.6.6 yyagi
-											  {
+											} else if (str3.Equals("SoundTimerType")) {
 												this.bUseOSTimer = CConversion.bONorOFF(str4[0]);
 											}
-											  //else if ( str3.Equals( "MasterVolume" ) )
-											  //{
-											  //    this.nMasterVolume = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 100, this.nMasterVolume );
-											  //}
 											#endregion
 
-											#region [ フォント ]
+											#region [ Font ]
 											  else if (str3.Equals("FontName")) {
 												this.FontName = str4;
 											} else if (str3.Equals("BoxFontName")) {
@@ -2856,8 +2842,7 @@ namespace OpenTaiko {
 
 											  else if (str3.Equals("VSyncWait")) {
 												this.bEnableVSync = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("SleepTimePerFrame"))        // #23568 2011.11.27 yyagi
-											  {
+											} else if (str3.Equals("SleepTimePerFrame")) {
 												this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(str4, -1, 50, this.nMsSleepPerFrame);
 											} else if (str3.Equals("BGAlpha")) {
 												this.nBackgroundTransparency = CConversion.ParseIntInRange(str4, 0, 0xff, this.nBackgroundTransparency);
@@ -2871,14 +2856,14 @@ namespace OpenTaiko {
 												this.eClipDispType = (EClipDispType)CConversion.ParseIntInRange(str4, 0, 3, (int)this.eClipDispType);
 											}
 											#endregion
-											#region [ プレビュー音 ]
+											#region [ Preview Sound ]
 											  else if (str3.Equals("PreviewSoundWait")) {
 												this.nMsWaitPreviewSoundFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewSoundFromSongSelected);
 											} else if (str3.Equals("PreviewImageWait")) {
 												this.nMsWaitPreviewImageFromSongSelected = CConversion.ParseIntInRange(str4, 0, 0x5f5e0ff, this.nMsWaitPreviewImageFromSongSelected);
 											}
 											#endregion
-											#region [ BGM/ドラムのヒット音 ]
+											#region [ BGM/Drum Hit Sound ]
 											  else if (str3.Equals("BGMSound")) {
 												this.bBGMPlayVoiceSound = CConversion.bONorOFF(str4[0]);
 											}
@@ -2888,7 +2873,7 @@ namespace OpenTaiko {
 											} else if (str3.Equals("RandomFromSubBox")) {
 												this.bIncludeSubfoldersOnRandomSelect = CConversion.bONorOFF(str4[0]);
 											}
-											#region [ コンボ数 ]
+											#region [ Combo ]
 											  else if (str3.Equals("MinComboDrums")) {
 												this.nMinDisplayedCombo.Drums = CConversion.ParseIntInRange(str4, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
 											}
@@ -2917,8 +2902,7 @@ namespace OpenTaiko {
 												this.bIsAutoResultCapture = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals(nameof(SendDiscordPlayingInformation))) {
 												SendDiscordPlayingInformation = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("TimeStretch"))              // #23664 2013.2.24 yyagi
-											  {
+											} else if (str3.Equals("TimeStretch")) {
 												this.bTimeStretch = CConversion.bONorOFF(str4[0]);
 											}
 											#region [ AdjustTime ]
@@ -2928,46 +2912,32 @@ namespace OpenTaiko {
 											#endregion
 											  else if (str3.Equals("BufferedInput")) {
 												this.bBufferedInputs = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("PolyphonicSounds"))     // #28228 2012.5.1 yyagi
-											  {
+											} else if (str3.Equals("PolyphonicSounds")) {
 												this.nPoliphonicSounds = CConversion.ParseIntInRange(str4, 1, 8, this.nPoliphonicSounds);
 											}
 											#region [ VelocityMin ]
-											  else if (str3.Equals("LCVelocityMin"))            // #23857 2010.12.12 yyagi
-											  {
+											  else if (str3.Equals("LCVelocityMin")) {
 												this.nVelocityMin.LC = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LC);
 											} else if (str3.Equals("HHVelocityMin")) {
 												this.nVelocityMin.HH = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HH);
-											} else if (str3.Equals("SDVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("SDVelocityMin")) {
 												this.nVelocityMin.SD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.SD);
-											} else if (str3.Equals("BDVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("BDVelocityMin")) {
 												this.nVelocityMin.BD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.BD);
-											} else if (str3.Equals("HTVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("HTVelocityMin")) {
 												this.nVelocityMin.HT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.HT);
-											} else if (str3.Equals("LTVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("LTVelocityMin")) {
 												this.nVelocityMin.LT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.LT);
-											} else if (str3.Equals("FTVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("FTVelocityMin")) {
 												this.nVelocityMin.FT = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.FT);
-											} else if (str3.Equals("CYVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("CYVelocityMin")) {
 												this.nVelocityMin.CY = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.CY);
-											} else if (str3.Equals("RDVelocityMin"))            // #23857 2011.1.31 yyagi
-											  {
+											} else if (str3.Equals("RDVelocityMin")) {
 												this.nVelocityMin.RD = CConversion.ParseIntInRange(str4, 0, 127, this.nVelocityMin.RD);
 											}
 											#endregion
-											  //else if ( str3.Equals( "NoMP3Streaming" ) )
-											  //{
-											  //    this.bNoMP3Streaming = C変換.bONorOFF( str4[ 0 ] );
-											  //}
-											#region[ Ver.K追加 ]
-											  else if (str3.Equals("DirectShowMode"))       // #28228 2012.5.1 yyagi
-											  {
+											#region[ Ver.K Addition ]
+											  else if (str3.Equals("DirectShowMode")) {
 												this.bDirectShowMode = CConversion.bONorOFF(str4[0]); ;
 											}
 											#endregion
@@ -3003,12 +2973,6 @@ namespace OpenTaiko {
 											this.nDefaultAILevel = int.Parse(str4);
 											this.nAILevel = this.nDefaultAILevel;
 										}
-										/*
-										if (str3.Equals("AIBattleMode"))
-										{
-											bAIBattleMode = C変換.bONorOFF(str4[0]);
-										}
-										*/
 										continue;
 									//-----------------------------
 									#endregion
@@ -3209,24 +3173,19 @@ namespace OpenTaiko {
 
 											#endregion
 
-
 											#endregion
-
-
 
 											  else if (str3.Equals("PlaySpeed")) {
 												this.nSongSpeed = CConversion.ParseIntInRange(str4, 5, 400, this.nSongSpeed);
 											} else if (str3.Equals("PlaySpeedNotEqualOneNoSound")) {
 												this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("Risky"))                    // #23559 2011.6.23  yyagi
-											  {
+											} else if (str3.Equals("Risky")) {
 												this.nRisky = CConversion.ParseIntInRange(str4, 0, 10, this.nRisky);
 											} else if (str3.Equals("DrumsTight")) {
 												this.bTight = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("BranchGuide")) {
 												this.bBranchGuide = CConversion.bONorOFF(str4[0]);
-											} else if (str3.Equals("DefaultCourse")) //2017.01.30 DD
-											  {
+											} else if (str3.Equals("DefaultCourse")) {
 												this.nDefaultCourse = CConversion.ParseIntInRange(str4, 0, 5, this.nDefaultCourse);
 											} else if (str3.Equals("ScoreMode")) {
 												this.nScoreMode = CConversion.ParseIntInRange(str4, 0, 3, this.nScoreMode);
@@ -3269,20 +3228,6 @@ namespace OpenTaiko {
 									#region [ [ViewerOption] ]
 									//-----------------------------
 									case ESectionType.ViewerOption: {
-											/*
-											if ( str3.Equals( "ViewerDrumsScrollSpeed" ) )
-											{
-												this.nViewerScrollSpeed.Drums = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 1999, this.nViewerScrollSpeed.Drums );
-											}
-											else if ( str3.Equals( "ViewerGuitarScrollSpeed" ) )
-											{
-												this.nViewerScrollSpeed.Guitar = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 1999, this.nViewerScrollSpeed.Guitar );
-											}
-											else if ( str3.Equals( "ViewerBassScrollSpeed" ) )
-											{
-												this.nViewerScrollSpeed.Bass = C変換.n値を文字列から取得して範囲内に丸めて返す( str4, 0, 1999, this.nViewerScrollSpeed.Bass );
-											}
-											*/
 											if (str3.Equals("ViewerVSyncWait")) {
 												this.bViewerVSyncWait = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("ViewerShowDebugStatus")) {
@@ -3318,57 +3263,42 @@ namespace OpenTaiko {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed);
 											} else if (str3.Equals("RightRed")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed);
-											} else if (str3.Equals("LeftBlue"))                                     // #27029 2012.1.4 from
-											  {                                                                 //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue);  //
-											}                                                                   //
-											  else if (str3.Equals("RightBlue"))                                        // #27029 2012.1.4 from
-											  {                                                                 //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue); //
+											} else if (str3.Equals("LeftBlue")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue);
+											} else if (str3.Equals("RightBlue")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue);
 											} else if (str3.Equals("LeftRed2P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed2P);
 											} else if (str3.Equals("RightRed2P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed2P);
-											} else if (str3.Equals("LeftBlue2P"))                                       // #27029 2012.1.4 from
-											  {                                                                 //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue2P);    //
-											}                                                                   //
-											  else if (str3.Equals("RightBlue2P"))                                      // #27029 2012.1.4 from
-											  {                                                                 //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue2P); //
+											} else if (str3.Equals("LeftBlue2P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue2P);
+											} else if (str3.Equals("RightBlue2P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue2P);
 											} else if (str3.Equals("LeftRed3P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed3P);
 											} else if (str3.Equals("RightRed3P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed3P);
-											} else if (str3.Equals("LeftBlue3P"))                                     // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue3P);    //
-											}                                                                   //
-											  else if (str3.Equals("RightBlue3P"))                                        // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue3P); //
+											} else if (str3.Equals("LeftBlue3P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue3P);
+											} else if (str3.Equals("RightBlue3P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue3P);
 											} else if (str3.Equals("LeftRed4P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed4P);
 											} else if (str3.Equals("RightRed4P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed4P);
-											} else if (str3.Equals("LeftBlue4P"))                                     // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue4P);    //
-											}                                                                   //
-											  else if (str3.Equals("RightBlue4P"))                                        // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue4P); //
+											} else if (str3.Equals("LeftBlue4P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue4P);
+											} else if (str3.Equals("RightBlue4P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue4P);
 											} else if (str3.Equals("LeftRed5P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed5P);
 											} else if (str3.Equals("RightRed5P")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightRed5P);
-											} else if (str3.Equals("LeftBlue5P"))                                     // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue5P);    //
-											}                                                                   //
-											  else if (str3.Equals("RightBlue5P"))                                        // #27029 2012.1.4 from
-											  {                                                                   //
-												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue5P); //
+											} else if (str3.Equals("LeftBlue5P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftBlue5P);
+											} else if (str3.Equals("RightBlue5P")) {
+												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.RightBlue5P);
 											} else if (str3.Equals("Clap")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.Clap);
 											} else if (str3.Equals("Clap2P")) {
@@ -3640,6 +3570,7 @@ namespace OpenTaiko {
 				sw.Write("{0}{1}", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(assign[i].ID, 1), assign[i].Code);   // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
 			}
 		}
+
 		private void tキーの読み出しと設定(string strキー記述, CKeyAssign.STKEYASSIGN[] assign) {
 			string[] strArray = strキー記述.Split(new char[] { ',' });
 			for (int i = 0; (i < strArray.Length) && (i < 0x10); i++) {
