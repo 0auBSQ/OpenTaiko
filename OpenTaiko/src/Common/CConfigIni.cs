@@ -2667,43 +2667,9 @@ namespace OpenTaiko {
 									this.ProcessSystemSection(str3, str4);
 									continue;
 								}
-
-								#region [ [AutoPlay] ]
-
-								//-----------------------------
 								case ESectionType.AutoPlay:
-									switch (str3) {
-										case "Taiko":
-											this.bAutoPlay[0] = CConversion.bONorOFF(str4[0]);
-											break;
-										case "Taiko2P":
-											this.bAutoPlay[1] = CConversion.bONorOFF(str4[0]);
-											break;
-										case "Taiko3P":
-											this.bAutoPlay[2] = CConversion.bONorOFF(str4[0]);
-											break;
-										case "Taiko4P":
-											this.bAutoPlay[3] = CConversion.bONorOFF(str4[0]);
-											break;
-										case "Taiko5P":
-											this.bAutoPlay[4] = CConversion.bONorOFF(str4[0]);
-											break;
-										case "TaikoAutoRoll":
-											this.bAuto先生の連打 = CConversion.bONorOFF(str4[0]);
-											break;
-										case "RollsPerSec":
-											this.nRollsPerSec = int.Parse(str4);
-											break;
-										case "DefaultAILevel":
-											this.nDefaultAILevel = int.Parse(str4);
-											this.nAILevel = this.nDefaultAILevel;
-											break;
-									}
-
+									this.ProcessAutoPlaySection(str3, str4);
 									continue;
-								//-----------------------------
-
-								#endregion
 
 								#region [ [HitRange] ]
 
@@ -3611,6 +3577,64 @@ namespace OpenTaiko {
 					this.bEndingAnime = CConversion.bONorOFF(value[0]);
 					break;
 			}
+		}
+
+		private void ProcessAutoPlaySection(string key, string value) {
+			switch (key) {
+				case "Taiko":
+					this.bAutoPlay[0] = CConversion.bONorOFF(value[0]);
+					break;
+				case "Taiko2P":
+					this.bAutoPlay[1] = CConversion.bONorOFF(value[0]);
+					break;
+				case "Taiko3P":
+					this.bAutoPlay[2] = CConversion.bONorOFF(value[0]);
+					break;
+				case "Taiko4P":
+					this.bAutoPlay[3] = CConversion.bONorOFF(value[0]);
+					break;
+				case "Taiko5P":
+					this.bAutoPlay[4] = CConversion.bONorOFF(value[0]);
+					break;
+				case "TaikoAutoRoll":
+					this.bAuto先生の連打 = CConversion.bONorOFF(value[0]);
+					break;
+				case "RollsPerSec":
+					this.nRollsPerSec = int.Parse(value);
+					break;
+				case "DefaultAILevel":
+					this.nDefaultAILevel = int.Parse(value);
+					this.nAILevel = this.nDefaultAILevel;
+					break;
+			}
+		}
+
+		private void ProcessHitRangeSection(string key, string value) {
+
+		}
+
+		private void ProcessLogSection(string key, string value) {
+
+		}
+
+		private void ProcessViewerOptionSection(string key, string value) {
+
+		}
+
+		private void ProcessDrumKeyAssignmentSection(string key, string value) {
+
+		}
+
+		private void ProcessTrainingKeyAssignmentSection(string key, string value) {
+
+		}
+
+		private void ProcessDebugSection(string key, string value) {
+
+		}
+
+		private void ProcessGuidSection(string key, string value) {
+
 		}
 
 		#region [ private ]
