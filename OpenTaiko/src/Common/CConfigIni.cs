@@ -1760,10 +1760,10 @@ namespace OpenTaiko {
 			this.nHitRangeMs.Great = -1; //使用しません。
 			this.nHitRangeMs.Good = 75;
 			this.nHitRangeMs.Poor = 108;
-			this.ConfigIniファイル名 = "";
+			this.ConfigIniFileName = "";
 			this.dicJoystick = new Dictionary<int, string>(10);
 			this.dicGamepad = new Dictionary<int, string>(10);
-			this.tデフォルトのキーアサインに設定する();
+			this.SetDefaultKeyAssignments();
 			#region [ velocityMin ]
 			this.nVelocityMin.LC = 0;                   // #23857 2011.1.31 yyagi VelocityMin
 			this.nVelocityMin.HH = 20;
@@ -1864,7 +1864,7 @@ namespace OpenTaiko {
 		}
 		public CConfigIni(string iniファイル名)
 			: this() {
-			this.tファイルから読み込み(iniファイル名);
+			this.LoadFromFile(iniファイル名);
 		}
 
 
@@ -2458,97 +2458,97 @@ namespace OpenTaiko {
 			sw.WriteLine();
 
 			sw.Write("LeftRed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed);
 			sw.WriteLine();
 			sw.Write("RightRed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed);
 			sw.WriteLine();
 			sw.Write("LeftBlue=");                                      // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue);   //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue);   //
 			sw.WriteLine();                                         //
 			sw.Write("RightBlue=");                                     // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue);  //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue);  //
 			sw.WriteLine();
 
 			sw.Write("LeftRed2P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed2P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed2P);
 			sw.WriteLine();
 			sw.Write("RightRed2P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed2P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed2P);
 			sw.WriteLine();
 			sw.Write("LeftBlue2P=");                                        // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue2P); //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue2P); //
 			sw.WriteLine();                                                 //
 			sw.Write("RightBlue2P=");                                       // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue2P);  //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue2P);  //
 			sw.WriteLine();
 
 			sw.Write("LeftRed3P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed3P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed3P);
 			sw.WriteLine();
 			sw.Write("RightRed3P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed3P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed3P);
 			sw.WriteLine();
 			sw.Write("LeftBlue3P=");                                        // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue3P); //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue3P); //
 			sw.WriteLine();                                                 //
 			sw.Write("RightBlue3P=");                                       // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue3P);  //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue3P);  //
 			sw.WriteLine();
 
 			sw.Write("LeftRed4P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed4P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed4P);
 			sw.WriteLine();
 			sw.Write("RightRed4P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed4P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed4P);
 			sw.WriteLine();
 			sw.Write("LeftBlue4P=");                                        // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue4P); //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue4P); //
 			sw.WriteLine();                                                 //
 			sw.Write("RightBlue4P=");                                       // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue4P);  //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue4P);  //
 			sw.WriteLine();
 
 			sw.Write("LeftRed5P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftRed5P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed5P);
 			sw.WriteLine();
 			sw.Write("RightRed5P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightRed5P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed5P);
 			sw.WriteLine();
 			sw.Write("LeftBlue5P=");                                        // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftBlue5P); //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue5P); //
 			sw.WriteLine();                                                 //
 			sw.Write("RightBlue5P=");                                       // #27029 2012.1.4 from
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightBlue5P);  //
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue5P);  //
 			sw.WriteLine();
 
 			sw.Write("Clap=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap);
 			sw.WriteLine();
 			sw.Write("Clap2P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap2P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap2P);
 			sw.WriteLine();
 			sw.Write("Clap3P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap3P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap3P);
 			sw.WriteLine();
 			sw.Write("Clap4P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap4P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap4P);
 			sw.WriteLine();
 			sw.Write("Clap5P=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Clap5P);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap5P);
 			sw.WriteLine();
 
 			sw.Write("Decide=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Decide);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Decide);
 			sw.WriteLine();
 			sw.Write("Cancel=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.Cancel);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Cancel);
 			sw.WriteLine();
 			sw.Write("LeftChange=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.LeftChange);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftChange);
 			sw.WriteLine();
 			sw.Write("RightChange=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.RightChange);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightChange);
 			sw.WriteLine();
 
 			sw.WriteLine();
@@ -2557,40 +2557,40 @@ namespace OpenTaiko {
 			sw.WriteLine("[SystemKeyAssign]");
 			sw.WriteLine();
 			sw.Write("Capture=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.Capture);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.Capture);
 			sw.WriteLine();
 			sw.Write("SongVolumeIncrease=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.SongVolIncrease);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.SongVolIncrease);
 			sw.WriteLine();
 			sw.Write("SongVolumeDecrease=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.SongVolDecrease);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.SongVolDecrease);
 			sw.WriteLine();
 			sw.Write("DisplayHits=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.DisplayHits);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.DisplayHits);
 			sw.WriteLine();
 			sw.Write("DisplayDebug=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.DisplayDebug);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.DisplayDebug);
 			sw.WriteLine();
 			sw.Write("QuickConfig=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.QuickConfig);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.QuickConfig);
 			sw.WriteLine();
 			sw.Write("NewHeya=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.NewHeya);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.NewHeya);
 			sw.WriteLine();
 			sw.Write("SortSongs=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.SortSongs);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.SortSongs);
 			sw.WriteLine();
 			sw.Write("ToggleAutoP1=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.ToggleAutoP1);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.ToggleAutoP1);
 			sw.WriteLine();
 			sw.Write("ToggleAutoP2=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.ToggleAutoP2);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.ToggleAutoP2);
 			sw.WriteLine();
 			sw.Write("ToggleTrainingMode=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.ToggleTrainingMode);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.ToggleTrainingMode);
 			sw.WriteLine();
 			sw.Write("CycleVideoDisplayMode=");
-			this.tキーの書き出し(sw, this.KeyAssign.System.CycleVideoDisplayMode);
+			this.WriteKeyAssignment(sw, this.KeyAssign.System.CycleVideoDisplayMode);
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -2599,52 +2599,52 @@ namespace OpenTaiko {
 			sw.WriteLine("[TrainingKeyAssign]");
 			sw.WriteLine();
 			sw.Write("TrainingIncreaseScrollSpeed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
 			sw.WriteLine();
 			sw.Write("TrainingDecreaseScrollSpeed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
 			sw.WriteLine();
 			sw.Write("TrainingIncreaseSongSpeed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
 			sw.WriteLine();
 			sw.Write("TrainingDecreaseSongSpeed=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
 			sw.WriteLine();
 			sw.Write("TrainingToggleAuto=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingToggleAuto);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingToggleAuto);
 			sw.WriteLine();
 			sw.Write("TrainingBranchNormal=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchNormal);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchNormal);
 			sw.WriteLine();
 			sw.Write("TrainingBranchExpert=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchExpert);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchExpert);
 			sw.WriteLine();
 			sw.Write("TrainingBranchMaster=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBranchMaster);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchMaster);
 			sw.WriteLine();
 			sw.Write("TrainingPause=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingPause);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingPause);
 			sw.WriteLine();
 			sw.Write("TrainingBookmark=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingBookmark);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBookmark);
 			sw.WriteLine();
 			sw.Write("TrainingMoveForwardMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
 			sw.WriteLine();
 			sw.Write("TrainingMoveBackMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveBackMeasure);
 			sw.WriteLine();
 			sw.Write("TrainingSkipForwardMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
 			sw.WriteLine();
 			sw.Write("TrainingSkipBackMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
 			sw.WriteLine();
 			sw.Write("TrainingJumpToFirstMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
 			sw.WriteLine();
 			sw.Write("TrainingJumpToLastMeasure=");
-			this.tキーの書き出し(sw, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+			this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
 			sw.WriteLine();
 			sw.WriteLine();
 			#endregion
@@ -2658,22 +2658,23 @@ namespace OpenTaiko {
 
 			sw.Close();
 		}
-		public void tファイルから読み込み(string iniファイル名) {
-			this.ConfigIniファイル名 = iniファイル名;
-			this.bConfigIniが存在している = File.Exists(this.ConfigIniファイル名);
-			if (this.bConfigIniが存在している) {
+
+		public void LoadFromFile(string iniFileName) {
+			this.ConfigIniFileName = iniFileName;
+			this.bConfigIniFileExists = File.Exists(this.ConfigIniFileName);
+			if (this.bConfigIniFileExists) {
 				string str;
-				this.tキーアサインを全部クリアする();
-				using (StreamReader reader = new StreamReader(this.ConfigIniファイル名, Encoding.GetEncoding(OpenTaiko.sEncType))) {
+				this.ClearAllKeyAssignments();
+				using (StreamReader reader = new StreamReader(this.ConfigIniFileName, Encoding.GetEncoding(OpenTaiko.sEncType))) {
 					str = reader.ReadToEnd();
 				}
-				t文字列から読み込み(str);
+				LoadFromString(str);
 			}
 		}
 
-		private void t文字列から読み込み(string strAllSettings)  // 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
+		private void LoadFromString(string strAllSettings)
 		{
-			Eセクション種別 unknown = Eセクション種別.Unknown;
+			ESectionType unknown = ESectionType.Unknown;
 			string[] delimiter = { "\n" };
 			string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string s in strSingleLine) {
@@ -2692,31 +2693,31 @@ namespace OpenTaiko {
 							}
 							string str2 = builder.ToString();
 							if (str2.Equals("System")) {
-								unknown = Eセクション種別.System;
+								unknown = ESectionType.System;
 							} else if (str2.Equals("AutoPlay")) {
-								unknown = Eセクション種別.AutoPlay;
+								unknown = ESectionType.AutoPlay;
 							} else if (str2.Equals("HitRange")) {
-								unknown = Eセクション種別.HitRange;
+								unknown = ESectionType.HitRange;
 							} else if (str2.Equals("Log")) {
-								unknown = Eセクション種別.Log;
+								unknown = ESectionType.Log;
 							} else if (str2.Equals("PlayOption")) {
-								unknown = Eセクション種別.PlayOption;
+								unknown = ESectionType.PlayOption;
 							} else if (str2.Equals("ViewerOption")) {
-								unknown = Eセクション種別.ViewerOption;
+								unknown = ESectionType.ViewerOption;
 							} else if (str2.Equals("GUID")) {
-								unknown = Eセクション種別.GUID;
+								unknown = ESectionType.GUID;
 							} else if (str2.Equals("DrumsKeyAssign")) {
-								unknown = Eセクション種別.DrumsKeyAssign;
+								unknown = ESectionType.DrumsKeyAssign;
 							} else if (str2.Equals("SystemKeyAssign")) {
-								unknown = Eセクション種別.SystemKeyAssign;
+								unknown = ESectionType.SystemKeyAssign;
 							} else if (str2.Equals("TrainingKeyAssign")) {
-								unknown = Eセクション種別.TrainingKeyAssign;
+								unknown = ESectionType.TrainingKeyAssign;
 							} else if (str2.Equals("DEBUG")) {
-								unknown = Eセクション種別.DEBUG;
+								unknown = ESectionType.DEBUG;
 							} else if (str2.Equals("Temp")) {
-								unknown = Eセクション種別.Temp;
+								unknown = ESectionType.Temp;
 							} else {
-								unknown = Eセクション種別.Unknown;
+								unknown = ESectionType.Unknown;
 							}
 							//-----------------------------
 							#endregion
@@ -2728,7 +2729,7 @@ namespace OpenTaiko {
 								switch (unknown) {
 									#region [ [System] ]
 									//-----------------------------
-									case Eセクション種別.System: {
+									case ESectionType.System: {
 											#region [ TJAPath ]
 											if (str3.Equals("TJAPath")) {
 												this.strSongsPath = str4;
@@ -2983,7 +2984,7 @@ namespace OpenTaiko {
 
 									#region [ [AutoPlay] ]
 									//-----------------------------
-									case Eセクション種別.AutoPlay:
+									case ESectionType.AutoPlay:
 										if (str3.Equals("Taiko")) {
 											this.bAutoPlay[0] = CConversion.bONorOFF(str4[0]);
 										} else if (str3.Equals("Taiko2P")) {
@@ -3014,7 +3015,7 @@ namespace OpenTaiko {
 
 									#region [ [HitRange] ]
 									//-----------------------------
-									case Eセクション種別.HitRange:
+									case ESectionType.HitRange:
 										if (str3.Equals("Perfect")) {
 											this.nHitRangeMs.Perfect = CConversion.ParseIntInRange(str4, 0, 0x3e7, this.nHitRangeMs.Perfect);
 										} else if (str3.Equals("Great")) {
@@ -3031,7 +3032,7 @@ namespace OpenTaiko {
 
 									#region [ [Log] ]
 									//-----------------------------
-									case Eセクション種別.Log: {
+									case ESectionType.Log: {
 											if (str3.Equals("OutputLog")) {
 												this.bOutputLogs = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("TraceCreatedDisposed")) {
@@ -3048,7 +3049,7 @@ namespace OpenTaiko {
 
 									#region [ [PlayOption] ]
 									//-----------------------------
-									case Eセクション種別.PlayOption: {
+									case ESectionType.PlayOption: {
 											if (str3.Equals("ShowChara")) {
 												ShowChara = CConversion.bONorOFF(str4[0]);
 											} else if (str3.Equals("ShowDancer")) {
@@ -3267,7 +3268,7 @@ namespace OpenTaiko {
 
 									#region [ [ViewerOption] ]
 									//-----------------------------
-									case Eセクション種別.ViewerOption: {
+									case ESectionType.ViewerOption: {
 											/*
 											if ( str3.Equals( "ViewerDrumsScrollSpeed" ) )
 											{
@@ -3300,7 +3301,7 @@ namespace OpenTaiko {
 
 									#region [ [GUID] ]
 									//-----------------------------
-									case Eセクション種別.GUID:
+									case ESectionType.GUID:
 										if (str3.Equals("JoystickID")) {
 											this.tJoystickIDの取得(str4);
 										} else if (str3.Equals("GamepadID")) {
@@ -3312,7 +3313,7 @@ namespace OpenTaiko {
 
 									#region [ [DrumsKeyAssign] ]
 									//-----------------------------
-									case Eセクション種別.DrumsKeyAssign: {
+									case ESectionType.DrumsKeyAssign: {
 											if (str3.Equals("LeftRed")) {
 												this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.LeftRed);
 											} else if (str3.Equals("RightRed")) {
@@ -3395,7 +3396,7 @@ namespace OpenTaiko {
 
 									#region [ [SystemKeyAssign] ]
 									//-----------------------------
-									case Eセクション種別.SystemKeyAssign: {
+									case ESectionType.SystemKeyAssign: {
 											switch (str3) {
 												case "Capture": {
 														this.tキーの読み出しと設定(str4, this.KeyAssign.System.Capture);
@@ -3450,7 +3451,7 @@ namespace OpenTaiko {
 										}
 									#endregion
 									#region [ [TrainingKeyAssign] ]
-									case Eセクション種別.TrainingKeyAssign: {
+									case ESectionType.TrainingKeyAssign: {
 											switch (str3) {
 												case "TrainingIncreaseScrollSpeed": {
 														this.tキーの読み出しと設定(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
@@ -3521,7 +3522,7 @@ namespace OpenTaiko {
 										}
 									//-----------------------------
 									#endregion
-									case Eセクション種別.DEBUG: {
+									case ESectionType.DEBUG: {
 											switch(str3) {
 												case "ImGui": {
 														this.DEBUG_bShowImgui = CConversion.bONorOFF(str4[0]);
@@ -3547,7 +3548,7 @@ namespace OpenTaiko {
 
 		#region [ private ]
 		//-----------------
-		private enum Eセクション種別 {
+		private enum ESectionType {
 			Unknown,
 			System,
 			Log,
@@ -3565,8 +3566,8 @@ namespace OpenTaiko {
 
 		private bool _bDrumsEnabled;
 		private bool _bGuitarEnabled;
-		private bool bConfigIniが存在している;
-		private string ConfigIniファイル名;
+		private bool bConfigIniFileExists;
+		private string ConfigIniFileName;
 
 		private void tJoystickIDの取得(string strキー記述) {
 			string[] strArray = strキー記述.Split(new char[] { ',' });
@@ -3592,7 +3593,8 @@ namespace OpenTaiko {
 				}
 			}
 		}
-		private void tキーアサインを全部クリアする() {
+
+		private void ClearAllKeyAssignments() {
 			this.KeyAssign = new CKeyAssign();
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
@@ -3603,7 +3605,8 @@ namespace OpenTaiko {
 				}
 			}
 		}
-		private void tキーの書き出し(StreamWriter sw, CKeyAssign.STKEYASSIGN[] assign) {
+
+		private void WriteKeyAssignment(StreamWriter sw, CKeyAssign.STKEYASSIGN[] assign) {
 			bool flag = true;
 			for (int i = 0; i < 0x10; i++) {
 				if (assign[i].InputDevice == EInputDevice.Unknown) {
@@ -3682,8 +3685,8 @@ namespace OpenTaiko {
 				}
 			}
 		}
-		private void tデフォルトのキーアサインに設定する() {
-			this.tキーアサインを全部クリアする();
+		private void SetDefaultKeyAssignments() {
+			this.ClearAllKeyAssignments();
 
 			string strDefaultKeyAssign = @"
 [DrumsKeyAssign]
@@ -3749,7 +3752,7 @@ TrainingSkipBackMeasure=K0108
 TrainingJumpToFirstMeasure=K070
 TrainingJumpToLastMeasure=K051
 ";
-			t文字列から読み込み(strDefaultKeyAssign);
+			LoadFromString(strDefaultKeyAssign);
 		}
 		//-----------------
 		#endregion

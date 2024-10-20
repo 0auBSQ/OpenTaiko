@@ -509,7 +509,7 @@ namespace OpenTaiko {
 			if (File.Exists(path)) {
 				try {
 					// Load config info
-					ConfigIni.tファイルから読み込み(path);
+					ConfigIni.LoadFromFile(path);
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
 					Trace.TraceError("例外が発生しましたが処理を継続します。 (b8d93255-bbe4-4ca3-8264-7ee5175b19f3)");
