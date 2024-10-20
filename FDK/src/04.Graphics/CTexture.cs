@@ -130,7 +130,7 @@ namespace FDK {
 					if (useNoiseEffect == 1) {
 						float n = randomGrayscale(rect);
 						texColor.rgb = vec3(n);
-						texColor.a = 1.0;
+						// texColor.a = 1.0;
 					}
 
                     gl_FragColor = texColor;

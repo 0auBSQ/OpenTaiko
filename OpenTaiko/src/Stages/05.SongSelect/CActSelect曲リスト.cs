@@ -1925,7 +1925,7 @@ namespace OpenTaiko {
 
 					var _title = TitleTextureKey.ResolveTitleTexture(this.ttkSelectedSongTitle, OpenTaiko.Skin.SongSelect_VerticalText);
 
-					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED && _title != null) {
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED && _title != null) {
 						_title.bUseNoiseEffect = true;
 					}
 
@@ -1944,7 +1944,7 @@ namespace OpenTaiko {
 					}
 
 					if (this.ttkSelectedSongSubtitle != null) {
-						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
+						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
 							txSelectedSongSubtitle.bUseNoiseEffect = true;
 						}
 
@@ -1962,7 +1962,7 @@ namespace OpenTaiko {
 							xAnime + OpenTaiko.Skin.SongSelect_Bar_SubTitle_Offset[0] + (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMoveX : centerMoveX / 1.1f),
 							y + OpenTaiko.Skin.SongSelect_Bar_SubTitle_Offset[1] - (rCurrentlySelectedSong.eノード種別 == CSongListNode.ENodeType.BOX ? centerMove : centerMove / 1.1f));
 
-						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
+						if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
 							txSelectedSongSubtitle.bUseNoiseEffect = false;
 						}
 
@@ -1985,7 +1985,7 @@ namespace OpenTaiko {
 						}
 					}
 
-					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED && _title != null) {
+					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED && _title != null) {
 						_title.bUseNoiseEffect = false;
 					}
 					//-----------------
