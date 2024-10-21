@@ -97,12 +97,26 @@ namespace OpenTaiko {
 							int plate_width = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Width / 3;
 							int plate_height = OpenTaiko.Tx.Balloon_Combo[j].szTextureSize.Height;
 							OpenTaiko.Tx.Balloon_Combo[j].t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Y[i], new RectangleF(NowDrawBalloon * plate_width, 0, plate_width, plate_height));
-							if (this.nCombo_渡[i] < 1000) //2016.08.23 kairera0467 仮実装。
+							if (this.nCombo_渡[i] < 10) //1-digit
 							{
-								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_Y[i], this.nCombo_渡[i], j);
+								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_1digit_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_1digit_Y[i], this.nCombo_渡[i], j);
 								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Y[i],
 									new Rectangle(OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[0], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[1], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[2], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[3]));
-							} else {
+							}
+							else if (this.nCombo_渡[i] < 100) //2-digit
+							{
+								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_2digit_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_2digit_Y[i], this.nCombo_渡[i], j);
+								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Y[i],
+									new Rectangle(OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[0], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[1], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[2], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[3]));
+							}
+							else if (this.nCombo_渡[i] < 1000) //3-digit
+							{
+								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_3digit_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_3digit_Y[i], this.nCombo_渡[i], j);
+								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Y[i],
+									new Rectangle(OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[0], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[1], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[2], OpenTaiko.Skin.Game_Balloon_Combo_Text_Rect[3]));
+							}
+							else //more
+							{
 								this.t小文字表示(OpenTaiko.Skin.Game_Balloon_Combo_Number_Ex_X[i], OpenTaiko.Skin.Game_Balloon_Combo_Number_Ex_Y[i], this.nCombo_渡[i], j);
 								OpenTaiko.Tx.Balloon_Number_Combo.vcScaleRatio.X = 1.0f;
 								OpenTaiko.Tx.Balloon_Number_Combo.t2D描画(OpenTaiko.Skin.Game_Balloon_Combo_Text_Ex_X[i] + 6 - NowDrawBalloon * 3, OpenTaiko.Skin.Game_Balloon_Combo_Text_Ex_Y[i],
