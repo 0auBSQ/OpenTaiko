@@ -2617,16 +2617,18 @@ namespace OpenTaiko {
 		public void LoadFromFile(string iniFileName) {
 			this.ConfigIniFileName = iniFileName;
 			this.bConfigIniFileExists = File.Exists(this.ConfigIniFileName);
-			if (this.bConfigIniFileExists) {
-				string str;
-				this.ClearAllKeyAssignments();
-				using (StreamReader reader =
-				       new StreamReader(this.ConfigIniFileName, Encoding.GetEncoding(OpenTaiko.sEncType))) {
-					str = reader.ReadToEnd();
-				}
-
-				this.LoadFromString(str);
+			if (!this.bConfigIniFileExists) {
+				return;
 			}
+
+			string str;
+			this.ClearAllKeyAssignments();
+			using (StreamReader reader =
+			       new StreamReader(this.ConfigIniFileName, Encoding.GetEncoding(OpenTaiko.sEncType))) {
+				str = reader.ReadToEnd();
+			}
+
+			this.LoadFromString(str);
 		}
 
 		private void LoadFromString(string strAllSettings) {
