@@ -1757,8 +1757,7 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void RemoveDuplicateKeyAssignments(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
-			var isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange ||
-			             pad == EKeyConfigPad.LeftChange;
+			bool isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange or EKeyConfigPad.LeftChange;
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0;
 				     j < (int)EKeyConfigPad.Capture;
