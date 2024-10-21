@@ -8425,10 +8425,6 @@ namespace OpenTaiko {
 		public int Game_Tower_Ptn_Result;
 
 		public int Game_Tower_Ptn_Don;
-		public int[] Game_Tower_Ptn_Don_Standing,
-			Game_Tower_Ptn_Don_Jump,
-			Game_Tower_Ptn_Don_Climbing,
-			Game_Tower_Ptn_Don_Running;
 
 		#endregion
 
