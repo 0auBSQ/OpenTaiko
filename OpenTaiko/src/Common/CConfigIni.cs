@@ -1661,6 +1661,20 @@ namespace OpenTaiko {
 			this.nDisplayTimesMs = 3000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップ再表示期間
 			this.nFadeoutTimeMs = 2000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップフェードアウト時間
 
+			this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>(){
+				{ ESectionType.System, this.ProcessSystemSection},
+				{ ESectionType.AutoPlay, this.ProcessAutoPlaySection},
+				{ ESectionType.HitRange, this.ProcessHitRangeSection},
+				{ ESectionType.Log, this.ProcessLogSection},
+				{ ESectionType.PlayOption, this.ProcessPlayOptionSection},
+				{ ESectionType.ViewerOption, this.ProcessViewerOptionSection},
+				{ ESectionType.GUID, this.ProcessGuidSection},
+				{ ESectionType.DrumsKeyAssign, this.ProcessDrumKeyAssignmentSection},
+				{ ESectionType.SystemKeyAssign, this.ProcessSystemKeyAssignmentSection},
+				{ ESectionType.TrainingKeyAssign, this.ProcessTrainingKeyAssignmentSection},
+				{ ESectionType.DEBUG, this.ProcessDebugSection},
+			};
+
 			bViewerVSyncWait = true;
 			bViewerShowDebugStatus = true;
 			bViewerTimeStretch = false;
@@ -2629,9 +2643,6 @@ namespace OpenTaiko {
 					string str3;
 					string str4;
 					if (str[0] == '[') {
-						#region [ Section Change ]
-
-						//-----------------------------
 						StringBuilder builder = new StringBuilder(0x20);
 						int num = 1;
 						while ((num < str.Length) && (str[num] != ']')) {
@@ -2654,57 +2665,13 @@ namespace OpenTaiko {
 							"Temp" => ESectionType.Temp,
 							_ => ESectionType.Unknown
 						};
-						//-----------------------------
-
-						#endregion
 					} else {
 						string[] strArray = str.Split(new char[] { '=' });
 						if (strArray.Length == 2) {
 							str3 = strArray[0].Trim();
 							str4 = strArray[1].Trim();
-							switch (unknown) {
-								case ESectionType.System: {
-									this.ProcessSystemSection(str3, str4);
-									continue;
-								}
-								case ESectionType.AutoPlay:
-									this.ProcessAutoPlaySection(str3, str4);
-									continue;
-								case ESectionType.HitRange:
-									this.ProcessHitRangeSection(str3, str4);
-									continue;
-								case ESectionType.Log: {
-									this.ProcessLogSection(str3, str4);
-									continue;
-								}
-								case ESectionType.PlayOption: {
-									this.ProcessPlayOptionSection(str3, str4);
-									continue;
-								}
-								case ESectionType.ViewerOption: {
-									this.ProcessViewerOptionSection(str3, str4);
-									continue;
-								}
-								case ESectionType.GUID:
-									this.ProcessGuidSection(str3, str4);
-									continue;
-								case ESectionType.DrumsKeyAssign: {
-									this.ProcessDrumKeyAssignmentSection(str3, str4);
-									continue;
-								}
-								case ESectionType.SystemKeyAssign: {
-									this.ProcessSystemKeyAssignmentSection(str3, str4);
-									continue;
-								}
-								case ESectionType.TrainingKeyAssign: {
-									this.ProcessTrainingKeyAssignmentSection(str3, str4);
-									continue;
-								}
-
-								case ESectionType.DEBUG: {
-									this.ProcessDebugSection(str3, str4);
-									continue;
-								}
+							if (this.sectionProcess.TryGetValue(unknown, out var processSection)) {
+								processSection(str3, str4);
 							}
 						}
 					}
@@ -3584,6 +3551,8 @@ namespace OpenTaiko {
 			DEBUG,
 			Temp,
 		}
+
+		private Dictionary<ESectionType, Action<string, string>> sectionProcess;
 
 		private bool _bDrumsEnabled;
 		private bool _bGuitarEnabled;
