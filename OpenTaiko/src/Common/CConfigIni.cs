@@ -2642,7 +2642,8 @@ namespace OpenTaiko {
 			string[] delimiter = { "\n" };
 			string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string s in strSingleLine) {
-				string line = s.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
+				string line = s.Replace('\t', ' ')
+					.TrimStart(new char[] { '\t', ' ' });
 				if ((line.Length == 0) || (line[0] == ';')) {
 					continue;
 				}
