@@ -2611,7 +2611,7 @@ namespace OpenTaiko {
 					str = reader.ReadToEnd();
 				}
 
-				LoadFromString(str);
+				this.LoadFromString(str);
 			}
 		}
 
@@ -2670,308 +2670,39 @@ namespace OpenTaiko {
 								case ESectionType.AutoPlay:
 									this.ProcessAutoPlaySection(str3, str4);
 									continue;
-
 								case ESectionType.HitRange:
 									this.ProcessHitRangeSection(str3, str4);
 									continue;
-
 								case ESectionType.Log: {
 									this.ProcessLogSection(str3, str4);
 									continue;
 								}
-
 								case ESectionType.PlayOption: {
 									this.ProcessPlayOptionSection(str3, str4);
 									continue;
 								}
-
-								#region [ [ViewerOption] ]
-
-								//-----------------------------
 								case ESectionType.ViewerOption: {
-									switch (str3) {
-										case "ViewerVSyncWait":
-											this.bViewerVSyncWait = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ViewerShowDebugStatus":
-											this.bViewerShowDebugStatus = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ViewerTimeStretch":
-											this.bViewerTimeStretch = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ViewerGuitar":
-											this.bViewerGuitar有効 = CConversion.bONorOFF(str4[0]);
-											break;
-										case "ViewerDrums":
-											this.bViewerDrums有効 = CConversion.bONorOFF(str4[0]);
-											break;
-									}
-
+									this.ProcessViewerOptionSection(str3, str4);
 									continue;
 								}
-								//-----------------------------
-
-								#endregion
-
-								#region [ [GUID] ]
-
-								//-----------------------------
 								case ESectionType.GUID:
-									switch (str3) {
-										case "JoystickID":
-											this.tJoystickIDの取得(str4);
-											break;
-										case "GamepadID":
-											this.tGamepadIDの取得(str4);
-											break;
-									}
-
+									this.ProcessGuidSection(str3, str4);
 									continue;
-								//-----------------------------
-
-								#endregion
-
-								#region [ [DrumsKeyAssign] ]
-
-								//-----------------------------
 								case ESectionType.DrumsKeyAssign: {
-									switch (str3) {
-										case "LeftRed":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed);
-											break;
-										case "RightRed":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed);
-											break;
-										case "LeftBlue":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue);
-											break;
-										case "RightBlue":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue);
-											break;
-										case "LeftRed2P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed2P);
-											break;
-										case "RightRed2P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed2P);
-											break;
-										case "LeftBlue2P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue2P);
-											break;
-										case "RightBlue2P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue2P);
-											break;
-										case "LeftRed3P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed3P);
-											break;
-										case "RightRed3P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed3P);
-											break;
-										case "LeftBlue3P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue3P);
-											break;
-										case "RightBlue3P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue3P);
-											break;
-										case "LeftRed4P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed4P);
-											break;
-										case "RightRed4P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed4P);
-											break;
-										case "LeftBlue4P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue4P);
-											break;
-										case "RightBlue4P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue4P);
-											break;
-										case "LeftRed5P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftRed5P);
-											break;
-										case "RightRed5P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightRed5P);
-											break;
-										case "LeftBlue5P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftBlue5P);
-											break;
-										case "RightBlue5P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightBlue5P);
-											break;
-										case "Clap":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap);
-											break;
-										case "Clap2P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap2P);
-											break;
-										case "Clap3P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap3P);
-											break;
-										case "Clap4P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap4P);
-											break;
-										case "Clap5P":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Clap5P);
-											break;
-										case "Decide":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Decide);
-											break;
-										case "Cancel":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.Cancel);
-											break;
-										case "LeftChange":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.LeftChange);
-											break;
-										case "RightChange":
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.RightChange);
-											break;
-									}
-
+									this.ProcessDrumKeyAssignmentSection(str3, str4);
 									continue;
 								}
-								//-----------------------------
-
-								#endregion
-
-								#region [ [SystemKeyAssign] ]
-
-								//-----------------------------
 								case ESectionType.SystemKeyAssign: {
-									switch (str3) {
-										case "Capture": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.Capture);
-											break;
-										}
-										case "SongVolumeIncrease": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolIncrease);
-											break;
-										}
-										case "SongVolumeDecrease": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.SongVolDecrease);
-											break;
-										}
-										case "DisplayHits": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayHits);
-											break;
-										}
-										case "DisplayDebug": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.DisplayDebug);
-											break;
-										}
-										case "QuickConfig": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.QuickConfig);
-											break;
-										}
-										case "NewHeya": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.NewHeya);
-											break;
-										}
-										case "SortSongs": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.SortSongs);
-											break;
-										}
-										case "ToggleAutoP1": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP1);
-											break;
-										}
-										case "ToggleAutoP2": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleAutoP2);
-											break;
-										}
-										case "ToggleTrainingMode": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.ToggleTrainingMode);
-											break;
-										}
-										case "CycleVideoDisplayMode": {
-											this.ReadAndSetKey(str4, this.KeyAssign.System.CycleVideoDisplayMode);
-											break;
-										}
-									}
-
+									this.ProcessSystemKeyAssignmentSection(str3, str4);
 									continue;
 								}
-
-								#endregion
-
-								#region [ [TrainingKeyAssign] ]
-
 								case ESectionType.TrainingKeyAssign: {
-									switch (str3) {
-										case "TrainingIncreaseScrollSpeed": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
-											break;
-										}
-										case "TrainingDecreaseScrollSpeed": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
-											break;
-										}
-										case "TrainingIncreaseSongSpeed": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
-											break;
-										}
-										case "TrainingDecreaseSongSpeed": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
-											break;
-										}
-										case "TrainingToggleAuto": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingToggleAuto);
-											break;
-										}
-										case "TrainingBranchNormal": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchNormal);
-											break;
-										}
-										case "TrainingBranchExpert": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchExpert);
-											break;
-										}
-										case "TrainingBranchMaster": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBranchMaster);
-											break;
-										}
-										case "TrainingPause": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingPause);
-											break;
-										}
-										case "TrainingBookmark": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingBookmark);
-											break;
-										}
-										case "TrainingMoveForwardMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
-											break;
-										}
-										case "TrainingMoveBackMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingMoveBackMeasure);
-											break;
-										}
-										case "TrainingSkipForwardMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
-											break;
-										}
-										case "TrainingSkipBackMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingSkipBackMeasure);
-											break;
-										}
-										case "TrainingJumpToFirstMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
-											break;
-										}
-										case "TrainingJumpToLastMeasure": {
-											this.ReadAndSetKey(str4, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
-											break;
-										}
-									}
-
+									this.ProcessTrainingKeyAssignmentSection(str3, str4);
 									continue;
 								}
-								//-----------------------------
-
-								#endregion
 
 								case ESectionType.DEBUG: {
-									this.DEBUG_bShowImgui = str3 switch {
-										"ImGui" => CConversion.bONorOFF(str4[0]),
-										_ => this.DEBUG_bShowImgui
-									};
+									this.ProcessDebugSection(str3, str4);
 									continue;
 								}
 							}
@@ -3584,18 +3315,255 @@ namespace OpenTaiko {
 		}
 
 		private void ProcessViewerOptionSection(string key, string value) {
-		}
-
-		private void ProcessDrumKeyAssignmentSection(string key, string value) {
-		}
-
-		private void ProcessTrainingKeyAssignmentSection(string key, string value) {
-		}
-
-		private void ProcessDebugSection(string key, string value) {
+			switch (key) {
+				case "ViewerVSyncWait":
+					this.bViewerVSyncWait = CConversion.bONorOFF(value[0]);
+					break;
+				case "ViewerShowDebugStatus":
+					this.bViewerShowDebugStatus = CConversion.bONorOFF(value[0]);
+					break;
+				case "ViewerTimeStretch":
+					this.bViewerTimeStretch = CConversion.bONorOFF(value[0]);
+					break;
+				case "ViewerGuitar":
+					this.bViewerGuitar有効 = CConversion.bONorOFF(value[0]);
+					break;
+				case "ViewerDrums":
+					this.bViewerDrums有効 = CConversion.bONorOFF(value[0]);
+					break;
+			}
 		}
 
 		private void ProcessGuidSection(string key, string value) {
+			switch (key) {
+				case "JoystickID":
+					this.tJoystickIDの取得(value);
+					break;
+				case "GamepadID":
+					this.tGamepadIDの取得(value);
+					break;
+			}
+		}
+
+		private void ProcessDrumKeyAssignmentSection(string key, string value) {
+			switch (key) {
+				case "LeftRed":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed);
+					break;
+				case "RightRed":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed);
+					break;
+				case "LeftBlue":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue);
+					break;
+				case "RightBlue":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue);
+					break;
+				case "LeftRed2P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed2P);
+					break;
+				case "RightRed2P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed2P);
+					break;
+				case "LeftBlue2P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue2P);
+					break;
+				case "RightBlue2P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue2P);
+					break;
+				case "LeftRed3P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed3P);
+					break;
+				case "RightRed3P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed3P);
+					break;
+				case "LeftBlue3P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue3P);
+					break;
+				case "RightBlue3P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue3P);
+					break;
+				case "LeftRed4P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed4P);
+					break;
+				case "RightRed4P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed4P);
+					break;
+				case "LeftBlue4P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue4P);
+					break;
+				case "RightBlue4P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue4P);
+					break;
+				case "LeftRed5P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed5P);
+					break;
+				case "RightRed5P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed5P);
+					break;
+				case "LeftBlue5P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue5P);
+					break;
+				case "RightBlue5P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue5P);
+					break;
+				case "Clap":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap);
+					break;
+				case "Clap2P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap2P);
+					break;
+				case "Clap3P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap3P);
+					break;
+				case "Clap4P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap4P);
+					break;
+				case "Clap5P":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap5P);
+					break;
+				case "Decide":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Decide);
+					break;
+				case "Cancel":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.Cancel);
+					break;
+				case "LeftChange":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftChange);
+					break;
+				case "RightChange":
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.RightChange);
+					break;
+			}
+		}
+
+		private void ProcessSystemKeyAssignmentSection(string key, string value) {
+			switch (key) {
+				case "Capture": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.Capture);
+					break;
+				}
+				case "SongVolumeIncrease": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.SongVolIncrease);
+					break;
+				}
+				case "SongVolumeDecrease": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.SongVolDecrease);
+					break;
+				}
+				case "DisplayHits": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.DisplayHits);
+					break;
+				}
+				case "DisplayDebug": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.DisplayDebug);
+					break;
+				}
+				case "QuickConfig": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.QuickConfig);
+					break;
+				}
+				case "NewHeya": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.NewHeya);
+					break;
+				}
+				case "SortSongs": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.SortSongs);
+					break;
+				}
+				case "ToggleAutoP1": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP1);
+					break;
+				}
+				case "ToggleAutoP2": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP2);
+					break;
+				}
+				case "ToggleTrainingMode": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleTrainingMode);
+					break;
+				}
+				case "CycleVideoDisplayMode": {
+					this.ReadAndSetKey(value, this.KeyAssign.System.CycleVideoDisplayMode);
+					break;
+				}
+			}
+		}
+
+		private void ProcessTrainingKeyAssignmentSection(string key, string value) {
+			switch (key) {
+				case "TrainingIncreaseScrollSpeed": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+					break;
+				}
+				case "TrainingDecreaseScrollSpeed": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+					break;
+				}
+				case "TrainingIncreaseSongSpeed": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+					break;
+				}
+				case "TrainingDecreaseSongSpeed": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+					break;
+				}
+				case "TrainingToggleAuto": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingToggleAuto);
+					break;
+				}
+				case "TrainingBranchNormal": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchNormal);
+					break;
+				}
+				case "TrainingBranchExpert": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchExpert);
+					break;
+				}
+				case "TrainingBranchMaster": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchMaster);
+					break;
+				}
+				case "TrainingPause": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingPause);
+					break;
+				}
+				case "TrainingBookmark": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBookmark);
+					break;
+				}
+				case "TrainingMoveForwardMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+					break;
+				}
+				case "TrainingMoveBackMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+					break;
+				}
+				case "TrainingSkipForwardMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+					break;
+				}
+				case "TrainingSkipBackMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+					break;
+				}
+				case "TrainingJumpToFirstMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+					break;
+				}
+				case "TrainingJumpToLastMeasure": {
+					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+					break;
+				}
+			}
+		}
+
+		private void ProcessDebugSection(string key, string value) {
+			this.DEBUG_bShowImgui = key switch {
+				"ImGui" => CConversion.bONorOFF(value[0]),
+				_ => this.DEBUG_bShowImgui
+			};
 		}
 
 		#region [ private ]
