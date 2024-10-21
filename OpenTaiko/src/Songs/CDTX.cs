@@ -431,7 +431,7 @@ namespace OpenTaiko {
 					}
 				}
 
-				double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? OpenTaiko.DTX.dbDTXVPlaySpeed : OpenTaiko.DTX.db再生速度;
+				double _db再生速度 = OpenTaiko.DTX.db再生速度;
 				return (int)(nDuration / _db再生速度);
 			}
 
@@ -2043,7 +2043,7 @@ namespace OpenTaiko {
 						}
 					}
 					if (this.db再生速度 > 0.0) {
-						double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+						double _db再生速度 = this.db再生速度;
 						foreach (CChip chip in this.listChip) {
 							chip.n発声時刻ms = (int)(((double)chip.n発声時刻ms) / _db再生速度);
 							chip.db発声時刻ms = (((double)chip.n発声時刻ms) / _db再生速度);
@@ -6614,7 +6614,7 @@ namespace OpenTaiko {
 
 						int duration = 0;
 						if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CDTX.CWAV wc)) {
-							double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+							double _db再生速度 = this.db再生速度;
 							duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
 						}
 						int n新RemoveMixer時刻ms, n新RemoveMixer位置;

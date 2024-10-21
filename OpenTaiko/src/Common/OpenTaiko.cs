@@ -395,11 +395,6 @@ namespace OpenTaiko {
 			get;
 			set;
 		}
-		public static CDTXVmode DTXVmode            // #28821 2014.1.23 yyagi
-		{
-			get;
-			set;
-		}
 		public static DiscordRpcClient DiscordClient;
 
 		// 0 : 1P, 1 : 2P
@@ -1297,7 +1292,6 @@ namespace OpenTaiko {
 						case CStage.EStage.SongLoading:
 							#region [ *** ]
 							//-----------------------------
-							DTXVmode.Refreshed = false;     // 曲のリロード中に発生した再リロードは、無視する。
 							if (this.n進行描画の戻り値 != 0) {
 								OpenTaiko.Pad.st検知したデバイス.Clear();  // 入力デバイスフラグクリア(2010.9.11)
 								r現在のステージ.DeActivate();
@@ -1387,65 +1381,6 @@ for (int i = 0; i < 3; i++) {
 
 						case CStage.EStage.Game:
 							#region [ *** ]
-
-							#region [ DTXVモード中にDTXCreatorから指示を受けた場合の処理 ]
-							if (DTXVmode.Enabled && DTXVmode.Refreshed) {
-								DTXVmode.Refreshed = false;
-
-								if (DTXVmode.Command == CDTXVmode.ECommand.Stop) {
-									OpenTaiko.stage演奏ドラム画面.t停止();
-									if (previewSound != null) {
-										this.previewSound.tStopSound();
-										this.previewSound.Dispose();
-										this.previewSound = null;
-									}
-									//{
-									//    int lastd = 0;
-									//    int f = 0;
-									//    for ( int i = 0; i < swlist1.Count; i++ )
-									//    {
-									//        int d1 = swlist1[ i ];
-									//        int d2 = swlist2[ i ];
-									//        int d3 = swlist3[ i ];
-									//        int d4 = swlist4[ i ];
-									//        int d5 = swlist5[ i ];
-
-									//        int dif = d1 - lastd;
-									//        string s = "";
-									//        if ( 16 <= dif && dif <= 17 )
-									//        {
-									//        }
-									//        else
-									//        {
-									//            s = "★";
-									//        }
-									//        Trace.TraceInformation( "frame {0:D4}: {1:D3} ( {2:D3}, {3:D3} - {7:D3}, {4:D3} ) {5}, n現在時刻={6}", f, dif, d1, d2, d3, s, d4, d5 );
-									//        lastd = d1;
-									//        f++;
-									//    }
-									//    swlist1.Clear();
-									//    swlist2.Clear();
-									//    swlist3.Clear();
-									//    swlist4.Clear();
-									//    swlist5.Clear();
-
-									//}
-								} else if (DTXVmode.Command == CDTXVmode.ECommand.Play) {
-									if (DTXVmode.NeedReload) {
-										OpenTaiko.stage演奏ドラム画面.t再読込();
-
-										OpenTaiko.ConfigIni.bTimeStretch = DTXVmode.TimeStretch;
-										SoundManager.bIsTimeStretch = DTXVmode.TimeStretch;
-										if (OpenTaiko.ConfigIni.bEnableVSync != DTXVmode.VSyncWait) {
-											OpenTaiko.ConfigIni.bEnableVSync = DTXVmode.VSyncWait;
-											OpenTaiko.app.b次のタイミングで垂直帰線同期切り替えを行う = true;
-										}
-									} else {
-										OpenTaiko.stage演奏ドラム画面.t演奏位置の変更(OpenTaiko.DTXVmode.nStartBar, 0);
-									}
-								}
-							}
-							#endregion
 
 							switch (this.n進行描画の戻り値) {
 								case (int)EGameplayScreenReturnValue.ReloadAndReplay:
@@ -2133,11 +2068,7 @@ for (int i = 0; i < 3; i++) {
 		// ayo komi isn't this useless code? - tfd500
 		{
 			get {
-				if (DTXVmode.Enabled) {
-					return "DTXViewer release " + VERSION;
-				} else {
-					return "OpenTaiko";
-				}
+				return "OpenTaiko";
 			}
 		}
 		private CSound previewSound;
@@ -2202,14 +2133,6 @@ for (int i = 0; i < 3; i++) {
 			Trace.TraceInformation("CLR Version: " + Environment.Version.ToString());
 			//---------------------
 			#endregion
-
-			#region [ DTXVmodeクラス の初期化 ]
-			//---------------------
-			DTXVmode = new CDTXVmode();
-			DTXVmode.Enabled = false;
-			//---------------------
-			#endregion
-
 
 			DTX = null;
 
@@ -2294,7 +2217,7 @@ for (int i = 0; i < 3; i++) {
 			Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 			Trace.Indent();
 			try {
-				bool bUseMIDIIn = !DTXVmode.Enabled;
+				bool bUseMIDIIn = true;
 				InputManager = new CInputManager(Window_);
 				foreach (IInputDevice device in InputManager.InputDevices) {
 					if ((device.CurrentType == InputDeviceType.Joystick) && !ConfigIni.dicJoystick.ContainsValue(device.GUID)) {
@@ -2793,13 +2716,8 @@ for (int i = 0; i < 3; i++) {
 				string str = strEXEのあるフォルダ + "Config.ini";
 				Trace.Indent();
 				try {
-					if (DTXVmode.Enabled) {
-						DTXVmode.tUpdateConfigIni();
-						Trace.TraceInformation("Configuration information for DTXV mode has been saved in Config.ini.");
-					} else {
-						ConfigIni.t書き出し(str);
-						Trace.TraceInformation("Saved succesfully. ({0})", str);
-					}
+					ConfigIni.t書き出し(str);
+					Trace.TraceInformation("Saved succesfully. ({0})", str);
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
 					Trace.TraceError("Config.ini failed to create. ({0})", str);
@@ -2826,13 +2744,6 @@ for (int i = 0; i < 3; i++) {
 
 				ConfigIni = null;
 
-				//---------------------
-				#endregion
-				#region [ DTXVmodeの終了処理 ]
-				//---------------------
-				if (DTXVmode != null) {
-					DTXVmode = null;
-				}
 				//---------------------
 				#endregion
 				Trace.TraceInformation("OpenTaiko has closed down successfully.");

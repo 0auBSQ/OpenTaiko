@@ -378,13 +378,8 @@ namespace OpenTaiko {
 			bIsDirectSound = (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() == "DirectSound");
 			bUseOSTimer = OpenTaiko.ConfigIni.bUseOSTimer;
 			this.bPAUSE = false;
-			if (OpenTaiko.DTXVmode.Enabled) {
-				db再生速度 = OpenTaiko.DTX.dbDTXVPlaySpeed;
-				OpenTaiko.ConfigIni.nSongSpeed = (int)(OpenTaiko.DTX.dbDTXVPlaySpeed * 20 + 0.5);
-			} else {
-				db再生速度 = OpenTaiko.ConfigIni.SongPlaybackSpeed;
-			}
-			bValidScore = (OpenTaiko.DTXVmode.Enabled) ? false : true;
+			db再生速度 = OpenTaiko.ConfigIni.SongPlaybackSpeed;
+			bValidScore = true;
 
 			#region [ 演奏開始前にmixer登録しておくべきサウンド(開幕してすぐに鳴らすことになるチップ音)を登録しておく ]
 			foreach (CDTX.CChip pChip in listChip[0]) {
