@@ -2640,8 +2640,6 @@ namespace OpenTaiko {
 				}
 
 				try {
-					string key;
-					string value;
 					if (line[0] == '[') {
 						StringBuilder builder = new StringBuilder(0x20);
 						int num = 1;
@@ -2668,8 +2666,8 @@ namespace OpenTaiko {
 					} else {
 						string[] keyValuePair = line.Split(new char[] { '=' });
 						if (keyValuePair.Length == 2) {
-							key = keyValuePair[0].Trim();
-							value = keyValuePair[1].Trim();
+							string key = keyValuePair[0].Trim();
+							string value = keyValuePair[1].Trim();
 							if (this.sectionProcess.TryGetValue(currentSectionType, out var processSection)) {
 								processSection(key, value);
 							}
