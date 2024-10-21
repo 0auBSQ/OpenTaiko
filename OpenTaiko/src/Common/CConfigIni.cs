@@ -1117,11 +1117,16 @@ namespace OpenTaiko {
 		public bool bAIBattleMode = false;
 
 		public CAIPerformances[] apAIPerformances = {
-			new CAIPerformances(500, 400, 100, 7, 200), new CAIPerformances(650, 310, 40, 8, 150),
-			new CAIPerformances(750, 225, 25, 9, 100), new CAIPerformances(800, 180, 20, 10, 70),
-			new CAIPerformances(850, 135, 15, 12, 50), new CAIPerformances(900, 90, 10, 14, 30),
-			new CAIPerformances(920, 75, 5, 16, 20), new CAIPerformances(950, 49, 1, 22, 10),
-			new CAIPerformances(975, 25, 0, 26, 5), new CAIPerformances(1000, 0, 0, 30, 0)
+			new CAIPerformances(500, 400, 100, 7, 200),
+			new CAIPerformances(650, 310, 40, 8, 150),
+			new CAIPerformances(750, 225, 25, 9, 100),
+			new CAIPerformances(800, 180, 20, 10, 70),
+			new CAIPerformances(850, 135, 15, 12, 50),
+			new CAIPerformances(900, 90, 10, 14, 30),
+			new CAIPerformances(920, 75, 5, 16, 20),
+			new CAIPerformances(950, 49, 1, 22, 10),
+			new CAIPerformances(975, 25, 0, 26, 5),
+			new CAIPerformances(1000, 0, 0, 30, 0)
 		};
 
 		public CTimingZones[] tzLevels = {
@@ -1129,8 +1134,7 @@ namespace OpenTaiko {
 			new CTimingZones(58, 108, 125), // Lv1 (Easy-Normal + "Lenient" mod)
 			new CTimingZones(42, 108, 125), // Lv2 (Easy-Normal / Tower Ama-kuchi or Hard-Extreme + "Loose" mod)
 			new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
-			new CTimingZones(25, 75,
-				108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
+			new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
 			new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
 			new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
 		};
@@ -1176,7 +1180,10 @@ namespace OpenTaiko {
 		public int[] nHitSounds = new int[5] { 0, 0, 0, 0, 0 };
 
 		public int[][] nPanning = new int[5][] {
-			new int[1] { 0 }, new int[2] { -100, 100 }, new int[3] { -100, 0, 100 }, new int[4] { -100, -33, 33, 100 },
+			new int[1] { 0 },
+			new int[2] { -100, 100 },
+			new int[3] { -100, 0, 100 },
+			new int[4] { -100, -33, 33, 100 },
 			new int[5] { -100, -50, 0, 50, 100 },
 		};
 
@@ -1643,10 +1650,10 @@ namespace OpenTaiko {
 
 			#region [ WASAPI/ASIO ]
 
+			// #24820 2012.12.23 yyagi 初期値はACM | #31927 2013.8.25 yyagi OSにより初期値変更
 			this.nSoundDeviceType = OperatingSystem.IsWindows()
 				? (int)ESoundDeviceTypeForConfig.WASAPI_Shared
-				: (int)ESoundDeviceTypeForConfig
-					.Bass; // #24820 2012.12.23 yyagi 初期値はACM | #31927 2013.8.25 yyagi OSにより初期値変更
+				: (int)ESoundDeviceTypeForConfig.Bass;
 			nBassBufferSizeMs = 1;
 			this.nWASAPIBufferSizeMs = 50; // #24820 2013.1.15 yyagi 初期値は50(0で自動設定)
 			this.nASIODevice = 0; // #24820 2013.1.17 yyagi
@@ -1654,8 +1661,8 @@ namespace OpenTaiko {
 
 			#endregion
 
-			this.bUseOSTimer =
-				true; // #33689 2014.6.6 yyagi 初期値はfalse (FDKのタイマー。ＦＲＯＭ氏考案の独自タイマー) // 2024.4.27 DRT Gonna keep this on by default. Seems to cause more issues when off.
+			// #33689 2014.6.6 yyagi 初期値はfalse (FDKのタイマー。ＦＲＯＭ氏考案の独自タイマー) // 2024.4.27 DRT Gonna keep this on by default. Seems to cause more issues when off.
+			this.bUseOSTimer = true;
 			this.bDynamicBassMixerManagement = true; //
 			this.bTimeStretch = false; // #23664 2013.2.24 yyagi 初期値はfalse (再生速度変更を、ピッチ変更にて行う)
 			this.nDisplayTimesMs = 3000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップ再表示期間
@@ -1750,7 +1757,7 @@ namespace OpenTaiko {
 		// メソッド
 
 		public void RemoveDuplicateKeyAssignments(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
-			var isMenu = pad == EKeyConfigPad.Decide || pad == EKeyConfigPad.RightChange ||
+			var isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange ||
 			             pad == EKeyConfigPad.LeftChange;
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0;
