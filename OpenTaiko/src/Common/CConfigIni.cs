@@ -3537,10 +3537,11 @@ namespace OpenTaiko {
 		}
 
 		private void ProcessDebugSection(string key, string value) {
-			this.DEBUG_bShowImgui = key switch {
-				"ImGui" => CConversion.bONorOFF(value[0]),
-				_ => this.DEBUG_bShowImgui
-			};
+			switch (key) {
+				case "ImGui":
+					this.DEBUG_bShowImgui = CConversion.bONorOFF(value[0]);
+					break;
+			}
 		}
 
 		#region [ private ]
