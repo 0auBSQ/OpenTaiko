@@ -331,10 +331,6 @@ namespace OpenTaiko {
 			private set;
 		}
 
-		public static COpenEncyclopedia stageOpenEncyclopedia {
-			get;
-			private set;
-		}
 		public static CStage曲読み込み stage曲読み込み {
 			get;
 			private set;
@@ -358,10 +354,6 @@ namespace OpenTaiko {
 		public static CStage r現在のステージ = null;
 		public static CStage r直前のステージ = null;
 		public static string strEXEのあるフォルダ {
-			get;
-			private set;
-		}
-		public static string strコンパクトモードファイル {
 			get;
 			private set;
 		}
@@ -795,27 +787,6 @@ namespace OpenTaiko {
 									}
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stageOnlineLounge;
-									//-----------------------------
-									#endregion
-									break;
-
-								case (int)CStageタイトル.E戻り値.ENCYCLOPEDIA:
-									#region [Online Lounge]
-									//-----------------------------
-									r現在のステージ.DeActivate();
-									if (!ConfigIni.PreAssetsLoading) {
-										r現在のステージ.ReleaseManagedResource();
-										r現在のステージ.ReleaseUnmanagedResource();
-									}
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Open Encyclopedia");
-									stageOpenEncyclopedia.Activate();
-									if (!ConfigIni.PreAssetsLoading) {
-										stageOpenEncyclopedia.CreateManagedResource();
-										stageOpenEncyclopedia.CreateUnmanagedResource();
-									}
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stageOpenEncyclopedia;
 									//-----------------------------
 									#endregion
 									break;
@@ -2156,7 +2127,6 @@ for (int i = 0; i < 3; i++) {
 			stageHeya = new CStageHeya();
 			stageOnlineLounge = new CStageOnlineLounge();
 			stageTowerSelect = new CStageTowerSelect();
-			stageOpenEncyclopedia = new COpenEncyclopedia();
 			stage曲読み込み = new CStage曲読み込み();
 			stage演奏ドラム画面 = new CStage演奏ドラム画面();
 			stage結果 = new CStage結果();
@@ -2176,7 +2146,6 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add(stageHeya);
 			this.listトップレベルActivities.Add(stageOnlineLounge);
 			this.listトップレベルActivities.Add(stageTowerSelect);
-			this.listトップレベルActivities.Add(stageOpenEncyclopedia);
 			this.listトップレベルActivities.Add(stage曲読み込み);
 			this.listトップレベルActivities.Add(stage演奏ドラム画面);
 			this.listトップレベルActivities.Add(stage結果);

@@ -27,7 +27,6 @@ namespace OpenTaiko {
 		public static string MODALS = @$"11_Modals{Path.DirectorySeparatorChar}";
 		public static string ONLINELOUNGE = @$"12_OnlineLounge{Path.DirectorySeparatorChar}";
 		public static string TOWERSELECT = @$"13_TowerSelect{Path.DirectorySeparatorChar}";
-		public static string OPENENCYCLOPEDIA = @$"15_OpenEncyclopedia{Path.DirectorySeparatorChar}";
 
 		// InGame
 		public static string DANCER = @$"2_Dancer{Path.DirectorySeparatorChar}";
@@ -1311,15 +1310,6 @@ namespace OpenTaiko {
 			#region [13_TowerSelect]
 
 			TowerSelect_Tower = TxC(TOWERSELECT + @"Tower.png");
-
-			#endregion
-
-			#region [15_OpenEncyclopedia]
-
-			//OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
-			OpenEncyclopedia_Context = TxC(OPENENCYCLOPEDIA + @"Context.png");
-			OpenEncyclopedia_Side_Menu = TxC(OPENENCYCLOPEDIA + @"Side_Menu.png");
-			OpenEncyclopedia_Return_Box = TxC(OPENENCYCLOPEDIA + @"Return_Box.png");
 
 			#endregion
 
@@ -2895,16 +2885,6 @@ Result_Mountain = new CTexture[4]*/;
 
 		public CTexture
 			TowerSelect_Tower;
-
-		#endregion
-
-		#region [15_OpenEncyclopedia]
-
-		public CTexture
-			//OpenEncyclopedia_Background,
-			OpenEncyclopedia_Context,
-			OpenEncyclopedia_Return_Box,
-			OpenEncyclopedia_Side_Menu;
 
 		#endregion
 
