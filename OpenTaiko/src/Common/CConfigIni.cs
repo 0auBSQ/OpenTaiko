@@ -1756,30 +1756,33 @@ namespace OpenTaiko {
 
 		// メソッド
 
-		public void RemoveDuplicateKeyAssignments(EInputDevice DeviceType, int nID, int nCode, EKeyConfigPad pad) {
+		public void RemoveDuplicateKeyAssignments(EInputDevice deviceType, int nID, int nCode, EKeyConfigPad pad) {
 			bool isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange or EKeyConfigPad.LeftChange;
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
-				for (int j = 0;
-				     j < (int)EKeyConfigPad.Capture;
-				     j++) // Do not restrict duplicate keybinds for System controls
+				// Do not restrict duplicate keybinds for System controls
+				for (int j = 0; j < (int)EKeyConfigPad.Capture; j++)
 				{
-					if (isMenu
-						    ? (j != (int)EKeyConfigPad.LeftChange && j != (int)EKeyConfigPad.RightChange &&
-						       j != (int)EKeyConfigPad.Decide)
-						    : (j == (int)EKeyConfigPad.LeftChange || j == (int)EKeyConfigPad.RightChange ||
-						       j == (int)EKeyConfigPad.Decide)) continue;
+					bool isJMenu = j is (int)EKeyConfigPad.LeftChange
+						or (int)EKeyConfigPad.RightChange
+						or (int)EKeyConfigPad.Decide;
+					if (isMenu != isJMenu) {
+						continue;
+					}
 					for (int k = 0; k < 0x10; k++) {
-						if (((this.KeyAssign[i][j][k].InputDevice == DeviceType) &&
-						     (this.KeyAssign[i][j][k].ID == nID)) && (this.KeyAssign[i][j][k].Code == nCode)) {
-							for (int m = k; m < 15; m++) {
-								this.KeyAssign[i][j][m] = this.KeyAssign[i][j][m + 1];
-							}
-
-							this.KeyAssign[i][j][15].InputDevice = EInputDevice.Unknown;
-							this.KeyAssign[i][j][15].ID = 0;
-							this.KeyAssign[i][j][15].Code = 0;
-							k--;
+						if (this.KeyAssign[i][j][k].InputDevice != deviceType ||
+						    this.KeyAssign[i][j][k].ID != nID ||
+						    this.KeyAssign[i][j][k].Code != nCode) {
+							continue;
 						}
+
+						for (int m = k; m < 15; m++) {
+							this.KeyAssign[i][j][m] = this.KeyAssign[i][j][m + 1];
+						}
+
+						this.KeyAssign[i][j][15].InputDevice = EInputDevice.Unknown;
+						this.KeyAssign[i][j][15].ID = 0;
+						this.KeyAssign[i][j][15].Code = 0;
+						k--;
 					}
 				}
 			}
