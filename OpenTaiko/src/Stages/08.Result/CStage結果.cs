@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using static OpenTaiko.CActSelect曲リスト;
 
 namespace OpenTaiko {
 	internal class CStage結果 : CStage {
@@ -1395,110 +1394,108 @@ namespace OpenTaiko {
 
 				// キー入力
 
-				if (OpenTaiko.act現在入力を占有中のプラグイン == null) {
-					if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
-						if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
-							#region [ Return to song select screen (Faster method) ]
+				if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+						#region [ Return to song select screen (Faster method) ]
 
-							bgmResultLoop.tStop();
-							OpenTaiko.Skin.bgmDanResult.tStop();
-							OpenTaiko.Skin.bgmTowerResult.tStop();
+						bgmResultLoop.tStop();
+						OpenTaiko.Skin.bgmDanResult.tStop();
+						OpenTaiko.Skin.bgmTowerResult.tStop();
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
+						actFI.tフェードアウト開始();
+
+						if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
+							if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
+								OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
+
+						tPostprocessing();
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+						this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+
+						#endregion
+					}
+					if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
+						|| (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
+						|| (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
+						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
+
+
+						#region [ Skip animations ]
+
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
+							&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							actFI.tフェードアウト開始();
-
-							if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-								if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-									OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
-
-							tPostprocessing();
-							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-
-							#endregion
+							this.actParameterPanel.tSkipResultAnimations();
+						} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
+							  && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
+							OpenTaiko.Skin.soundDecideSFX.tPlay();
+							ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
 						}
-						if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
-							|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
-							|| (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
-							|| (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-							|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
+						#endregion
 
-							#region [ Skip animations ]
-
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
-								&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
+						  else {
+							if ((lcModal?.AnimationFinished() ?? true)) {
 								OpenTaiko.Skin.soundDecideSFX.tPlay();
-								this.actParameterPanel.tSkipResultAnimations();
-							} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
-								  && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
-								OpenTaiko.Skin.soundDecideSFX.tPlay();
-								ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
-							}
 
-							#endregion
-
-							  else {
-								if ((lcModal?.AnimationFinished() ?? true)) {
-									OpenTaiko.Skin.soundDecideSFX.tPlay();
-
-									if (!mqModals.tAreBothQueuesEmpty()
-									&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-										|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
-										displayedModals = mqModals.tPopModalInOrder();
+								if (!mqModals.tAreBothQueuesEmpty()
+								&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
+									|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+									displayedModals = mqModals.tPopModalInOrder();
 
 
-									} else if (OpenTaiko.ConfigIni.nPlayerCount == 1 || mqModals.tAreBothQueuesEmpty()) {
+								} else if (OpenTaiko.ConfigIni.nPlayerCount == 1 || mqModals.tAreBothQueuesEmpty()) {
 
-										if (!mqModals.tAreBothQueuesEmpty())
-											LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
+									if (!mqModals.tAreBothQueuesEmpty())
+										LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
 
-										#region [ Return to song select screen ]
+									#region [ Return to song select screen ]
 
-										actFI.tフェードアウト開始();
+									actFI.tフェードアウト開始();
 
-										if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
-											if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-												OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
+									if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
+										if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
+											OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
 
-										tPostprocessing();
+									tPostprocessing();
 
-										{
-											base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-											this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-											bgmResultLoop.tStop();
-											OpenTaiko.Skin.bgmDanResult.tStop();
-											OpenTaiko.Skin.bgmTowerResult.tStop();
-										}
-
-										#endregion
+									{
+										base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+										this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+										bgmResultLoop.tStop();
+										OpenTaiko.Skin.bgmDanResult.tStop();
+										OpenTaiko.Skin.bgmTowerResult.tStop();
 									}
-								}
 
+									#endregion
+								}
 							}
+
 						}
+					}
 
 
-						if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
-							OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-								OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								#region [ Phase 2 (Swap freely between Exams and Songs) ]
+					if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
+							OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
+						OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
+							OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+							#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
-								if (ctPhase1 != null && ctPhase1.IsEnded && (ctPhase2 == null || ctPhase2.IsEnded)) {
-									ctPhase2 = new CCounter(0, 1280, 0.5f, OpenTaiko.Timer);
-									ctPhase2.CurrentValue = 0;
+							if (ctPhase1 != null && ctPhase1.IsEnded && (ctPhase2 == null || ctPhase2.IsEnded)) {
+								ctPhase2 = new CCounter(0, 1280, 0.5f, OpenTaiko.Timer);
+								ctPhase2.CurrentValue = 0;
 
-									if (examsShift == 0)
-										examsShift = 1;
-									else
-										examsShift = -examsShift;
+								if (examsShift == 0)
+									examsShift = 1;
+								else
+									examsShift = -examsShift;
 
-									OpenTaiko.Skin.soundChangeSFX.tPlay();
-								}
-
-								#endregion
+								OpenTaiko.Skin.soundChangeSFX.tPlay();
 							}
+
+							#endregion
 						}
 					}
 				}

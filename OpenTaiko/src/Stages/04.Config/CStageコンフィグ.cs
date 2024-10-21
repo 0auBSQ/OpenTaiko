@@ -366,8 +366,7 @@ namespace OpenTaiko {
 			// キー入力
 
 			if ((base.ePhaseID != CStage.EPhase.Common_NORMAL)
-				|| this.actKeyAssign.bキー入力待ちの最中である
-				|| OpenTaiko.act現在入力を占有中のプラグイン != null)
+				|| this.actKeyAssign.bキー入力待ちの最中である)
 				return 0;
 
 			if (actCalibrationMode.IsStarted) {

@@ -33,35 +33,21 @@ namespace OpenTaiko {
 					OpenTaiko.ConfigIni.bTokkunMode = false;
 				}
 
-				if (OpenTaiko.bコンパクトモード) {
-					string strDTXファイルパス = OpenTaiko.strコンパクトモードファイル;
+				string strDTXファイルパス = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
 
-					CDTX cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 0);
+				var strフォルダ名 = Path.GetDirectoryName(strDTXファイルパス) + Path.DirectorySeparatorChar;
 
-					if (File.Exists(cdtx.strフォルダ名 + @"set.def"))
-						cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 1);
+				if (File.Exists(strフォルダ名 + @"set.def")) {
+					var cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 1);
 
 					this.str曲タイトル = cdtx.TITLE.GetString("");
 					this.strサブタイトル = cdtx.SUBTITLE.GetString("");
 
 					cdtx.DeActivate();
 				} else {
-					string strDTXファイルパス = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
-
-					var strフォルダ名 = Path.GetDirectoryName(strDTXファイルパス) + Path.DirectorySeparatorChar;
-
-					if (File.Exists(strフォルダ名 + @"set.def")) {
-						var cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 1);
-
-						this.str曲タイトル = cdtx.TITLE.GetString("");
-						this.strサブタイトル = cdtx.SUBTITLE.GetString("");
-
-						cdtx.DeActivate();
-					} else {
-						var 譜面情報 = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報;
-						this.str曲タイトル = 譜面情報.タイトル;
-						this.strサブタイトル = 譜面情報.strサブタイトル;
-					}
+					var 譜面情報 = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報;
+					this.str曲タイトル = 譜面情報.タイトル;
+					this.strサブタイトル = 譜面情報.strサブタイトル;
 				}
 
 				// For the moment, detect that we are performing
@@ -377,11 +363,7 @@ namespace OpenTaiko {
 				case CStage.EPhase.SongLoading_LoadDTXFile: {
 						timeBeginLoad = DateTime.Now;
 						TimeSpan span;
-						str = null;
-						if (!OpenTaiko.bコンパクトモード)
-							str = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
-						else
-							str = OpenTaiko.strコンパクトモードファイル;
+						str = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
 
 						if ((OpenTaiko.DTX != null) && OpenTaiko.DTX.IsActivated)
 							OpenTaiko.DTX.DeActivate();

@@ -74,7 +74,7 @@ namespace SampleFramework {
 						}
 						Marshal.FreeHGlobal((IntPtr)out_pixels);
 
-						ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Texture_);
+						ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Pointer);
 					}
 				}
 			}

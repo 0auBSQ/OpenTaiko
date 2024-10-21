@@ -290,7 +290,7 @@ namespace OpenTaiko {
 					{
 						if (device.KeyPressed(i)) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							OpenTaiko.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice.Gamepad, device.ID, i, this.pad);
+							OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.Gamepad, device.ID, i, this.pad);
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = EInputDevice.Gamepad;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
@@ -308,7 +308,7 @@ namespace OpenTaiko {
 					{
 						if (device.KeyPressed(i)) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							OpenTaiko.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice.Joypad, device.ID, i, this.pad);
+							OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.Joypad, device.ID, i, this.pad);
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = EInputDevice.Joypad;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
@@ -334,7 +334,7 @@ namespace OpenTaiko {
 					 OpenTaiko.InputManager.Keyboard.KeyPressed(i)) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					if (pad < EKeyConfigPad.Capture)
-						OpenTaiko.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice.Keyboard, 0, i, this.pad);
+						OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.Keyboard, 0, i, this.pad);
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = EInputDevice.Keyboard;
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
@@ -356,7 +356,7 @@ namespace OpenTaiko {
 					for (int i = 0; i < 0x100; i++) {
 						if (device.KeyPressed(i)) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							OpenTaiko.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice.MIDIInput, device.ID, i, this.pad);
+							OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.MIDIInput, device.ID, i, this.pad);
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = EInputDevice.MIDIInput;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
 							OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
@@ -370,7 +370,7 @@ namespace OpenTaiko {
 		private bool tキーチェックとアサイン_Mouse() {
 			for (int i = 0; i < 8; i++) {
 				if (OpenTaiko.InputManager.Mouse.KeyPressed(i)) {
-					OpenTaiko.ConfigIni.t指定した入力が既にアサイン済みである場合はそれを全削除する(EInputDevice.Mouse, 0, i, this.pad);
+					OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.Mouse, 0, i, this.pad);
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = EInputDevice.Mouse;
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
 					OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;

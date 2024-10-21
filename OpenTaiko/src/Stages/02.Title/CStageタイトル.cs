@@ -142,8 +142,7 @@ namespace OpenTaiko {
 
 				#region [ キー関係 ]
 
-				if (base.ePhaseID == CStage.EPhase.Common_NORMAL        // 通常状態、かつ
-					&& OpenTaiko.act現在入力を占有中のプラグイン == null)    // プラグインの入力占有がない
+				if (base.ePhaseID == CStage.EPhase.Common_NORMAL)    // プラグインの入力占有がない
 				{
 					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 						if (bモード選択) {

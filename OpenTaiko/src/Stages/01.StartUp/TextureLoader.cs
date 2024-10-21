@@ -27,7 +27,6 @@ namespace OpenTaiko {
 		public static string MODALS = @$"11_Modals{Path.DirectorySeparatorChar}";
 		public static string ONLINELOUNGE = @$"12_OnlineLounge{Path.DirectorySeparatorChar}";
 		public static string TOWERSELECT = @$"13_TowerSelect{Path.DirectorySeparatorChar}";
-		public static string OPENENCYCLOPEDIA = @$"15_OpenEncyclopedia{Path.DirectorySeparatorChar}";
 
 		// InGame
 		public static string DANCER = @$"2_Dancer{Path.DirectorySeparatorChar}";
@@ -783,8 +782,6 @@ namespace OpenTaiko {
 
 			#region [20_Tower]
 
-			Tower_Sky_Gradient = TxC(GAME + TOWER + @$"Sky_Gradient.png");
-
 			Tower_Miss = TxC(GAME + TOWER + @$"Miss.png");
 
 			// Tower elements
@@ -818,45 +815,7 @@ namespace OpenTaiko {
 				}
 			}
 
-			// Tower climbing Don
-			OpenTaiko.Skin.Game_Tower_Ptn_Don = System.IO.Directory.GetDirectories(CSkin.Path(BASE + GAME + TOWER + TOWERDON)).Length;
-			Tower_Don_Climbing = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don][];
-			Tower_Don_Jump = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don][];
-			Tower_Don_Running = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don][];
-			Tower_Don_Standing = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don][];
 
-			OpenTaiko.Skin.Game_Tower_Ptn_Don_Climbing = new int[OpenTaiko.Skin.Game_Tower_Ptn_Don];
-			OpenTaiko.Skin.Game_Tower_Ptn_Don_Jump = new int[OpenTaiko.Skin.Game_Tower_Ptn_Don];
-			OpenTaiko.Skin.Game_Tower_Ptn_Don_Running = new int[OpenTaiko.Skin.Game_Tower_Ptn_Don];
-			OpenTaiko.Skin.Game_Tower_Ptn_Don_Standing = new int[OpenTaiko.Skin.Game_Tower_Ptn_Don];
-
-			for (int i = 0; i < OpenTaiko.Skin.Game_Tower_Ptn_Don; i++) {
-				OpenTaiko.Skin.Game_Tower_Ptn_Don_Climbing[i] = OpenTaiko.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Climbing{Path.DirectorySeparatorChar}"), "Climbing");
-				OpenTaiko.Skin.Game_Tower_Ptn_Don_Running[i] = OpenTaiko.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Running{Path.DirectorySeparatorChar}"), "Running");
-				OpenTaiko.Skin.Game_Tower_Ptn_Don_Standing[i] = OpenTaiko.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Standing{Path.DirectorySeparatorChar}"), "Standing");
-				OpenTaiko.Skin.Game_Tower_Ptn_Don_Jump[i] = OpenTaiko.t連番画像の枚数を数える(CSkin.Path(BASE + GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Jump{Path.DirectorySeparatorChar}"), "Jump");
-
-				Tower_Don_Climbing[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don_Climbing[i]];
-				Tower_Don_Running[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don_Running[i]];
-				Tower_Don_Standing[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don_Standing[i]];
-				Tower_Don_Jump[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Don_Jump[i]];
-
-				for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Don_Climbing[i]; j++) {
-					Tower_Don_Climbing[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Climbing{Path.DirectorySeparatorChar}Climbing" + j.ToString() + ".png");
-				}
-
-				for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Don_Running[i]; j++) {
-					Tower_Don_Running[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Running{Path.DirectorySeparatorChar}Running" + j.ToString() + ".png");
-				}
-
-				for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Don_Standing[i]; j++) {
-					Tower_Don_Standing[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Standing{Path.DirectorySeparatorChar}Standing" + j.ToString() + ".png");
-				}
-
-				for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Don_Jump[i]; j++) {
-					Tower_Don_Jump[i][j] = TxC(GAME + TOWER + TOWERDON + i.ToString() + @$"{Path.DirectorySeparatorChar}Jump{Path.DirectorySeparatorChar}Jump" + j.ToString() + ".png");
-				}
-			}
 
 			#endregion
 
@@ -1311,15 +1270,6 @@ namespace OpenTaiko {
 			#region [13_TowerSelect]
 
 			TowerSelect_Tower = TxC(TOWERSELECT + @"Tower.png");
-
-			#endregion
-
-			#region [15_OpenEncyclopedia]
-
-			//OpenEncyclopedia_Background = TxC(OPENENCYCLOPEDIA + @"Background.png");
-			OpenEncyclopedia_Context = TxC(OPENENCYCLOPEDIA + @"Context.png");
-			OpenEncyclopedia_Side_Menu = TxC(OPENENCYCLOPEDIA + @"Side_Menu.png");
-			OpenEncyclopedia_Return_Box = TxC(OPENENCYCLOPEDIA + @"Return_Box.png");
 
 			#endregion
 
@@ -2675,17 +2625,12 @@ namespace OpenTaiko {
 
 		#region [20_Tower]
 
-		public CTexture Tower_Sky_Gradient,
-			Tower_Miss;
+		public CTexture Tower_Miss;
 
 		public CTexture[] Tower_Top;
 
 		public CTexture[][] Tower_Base,
-			Tower_Deco,
-			Tower_Don_Running,
-			Tower_Don_Standing,
-			Tower_Don_Climbing,
-			Tower_Don_Jump;
+			Tower_Deco;
 
 
 		#endregion
@@ -2895,16 +2840,6 @@ Result_Mountain = new CTexture[4]*/;
 
 		public CTexture
 			TowerSelect_Tower;
-
-		#endregion
-
-		#region [15_OpenEncyclopedia]
-
-		public CTexture
-			//OpenEncyclopedia_Background,
-			OpenEncyclopedia_Context,
-			OpenEncyclopedia_Return_Box,
-			OpenEncyclopedia_Side_Menu;
 
 		#endregion
 

@@ -395,14 +395,6 @@ namespace OpenTaiko {
 
 					this.actFI.tフェードイン開始();
 
-					if (OpenTaiko.DTXVmode.Enabled)            // DTXVモードなら
-					{
-						#region [ DTXV用の再生設定にする(全AUTOなど) ]
-						tDTXV用の設定();
-						#endregion
-						t演奏位置の変更(OpenTaiko.DTXVmode.nStartBar, 0);
-					}
-
 					// TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
 					base.IsFirstDraw = false;
 				}
@@ -621,8 +613,7 @@ namespace OpenTaiko {
 
 				// キー入力
 
-				if (OpenTaiko.act現在入力を占有中のプラグイン == null)
-					this.tキー入力();
+				this.tキー入力();
 
 
 			}

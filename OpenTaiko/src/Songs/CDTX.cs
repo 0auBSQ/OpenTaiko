@@ -431,7 +431,7 @@ namespace OpenTaiko {
 					}
 				}
 
-				double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? OpenTaiko.DTX.dbDTXVPlaySpeed : OpenTaiko.DTX.db再生速度;
+				double _db再生速度 = OpenTaiko.DTX.db再生速度;
 				return (int)(nDuration / _db再生速度);
 			}
 
@@ -1787,8 +1787,7 @@ namespace OpenTaiko {
 					#endregion
 					#region [ チップ倍率設定 ]						// #28145 2012.4.22 yyagi 二重ループを1重ループに変更して高速化)
 					foreach (CChip chip in this.listChip) {
-						if (this.listWAV.TryGetValue(chip.n整数値_内部番号, out CWAV cwav))
-						{
+						if (this.listWAV.TryGetValue(chip.n整数値_内部番号, out CWAV cwav)) {
 							chip.dbチップサイズ倍率 = ((double)cwav.nチップサイズ) / 100.0;
 						}
 					}
@@ -1849,8 +1848,7 @@ namespace OpenTaiko {
 					int BGM番号 = 0;
 
 					foreach (CChip chip in this.listChip) {
-						if (chip.nチャンネル番号 == 0x02) { }
-						else if (chip.nチャンネル番号 == 0x01) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 <= 0x1F) { } else if (chip.nチャンネル番号 == 0x50) { } else if (chip.nチャンネル番号 == 0x51) { } else if (chip.nチャンネル番号 == 0x54) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 == 0xF1) { } else if (chip.nチャンネル番号 == 0xF2) { } else if (chip.nチャンネル番号 == 0xFF) { } else if (chip.nチャンネル番号 == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 < 0x93)
+						if (chip.nチャンネル番号 == 0x02) { } else if (chip.nチャンネル番号 == 0x01) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 <= 0x1F) { } else if (chip.nチャンネル番号 == 0x50) { } else if (chip.nチャンネル番号 == 0x51) { } else if (chip.nチャンネル番号 == 0x54) { } else if (chip.nチャンネル番号 == 0x08) { } else if (chip.nチャンネル番号 == 0xF1) { } else if (chip.nチャンネル番号 == 0xF2) { } else if (chip.nチャンネル番号 == 0xFF) { } else if (chip.nチャンネル番号 == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nチャンネル番号 < 0x93)
 							chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
 						else if ((chip.nチャンネル番号 > 0x9F && chip.nチャンネル番号 < 0xA0) || (chip.nチャンネル番号 >= 0xF0 && chip.nチャンネル番号 < 0xFE))
 							chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
@@ -2045,7 +2043,7 @@ namespace OpenTaiko {
 						}
 					}
 					if (this.db再生速度 > 0.0) {
-						double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+						double _db再生速度 = this.db再生速度;
 						foreach (CChip chip in this.listChip) {
 							chip.n発声時刻ms = (int)(((double)chip.n発声時刻ms) / _db再生速度);
 							chip.db発声時刻ms = (((double)chip.n発声時刻ms) / _db再生速度);
@@ -2163,8 +2161,7 @@ namespace OpenTaiko {
 					if (!string.IsNullOrEmpty(input[n]) &&
 						(input[n].Substring(0, 1) == "#"
 						|| input[n].StartsWith("EXAM")
-						|| NotesManager.FastFlankedParsing(input[n])))
-					{
+						|| NotesManager.FastFlankedParsing(input[n]))) {
 						if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
 							//A～Fで始まる命令が削除されない不具合の対策
 						} else {
@@ -2172,8 +2169,7 @@ namespace OpenTaiko {
 						}
 					}
 				} else if (nMode == 2) {
-					if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))
-					{
+					if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n])) {
 						if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
 							//A～Fで始まる命令が削除されない不具合の対策
 						} else {
@@ -6618,7 +6614,7 @@ namespace OpenTaiko {
 
 						int duration = 0;
 						if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CDTX.CWAV wc)) {
-							double _db再生速度 = (OpenTaiko.DTXVmode.Enabled) ? this.dbDTXVPlaySpeed : this.db再生速度;
+							double _db再生速度 = this.db再生速度;
 							duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
 						}
 						int n新RemoveMixer時刻ms, n新RemoveMixer位置;
