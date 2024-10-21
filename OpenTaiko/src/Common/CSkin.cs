@@ -737,7 +737,7 @@ namespace OpenTaiko {
 				if (!this[i].bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 				{
 					CSystemSound cシステムサウンド = this[i];
-					if (!OpenTaiko.bコンパクトモード || cシステムサウンド.bCompact対象) {
+					if (cシステムサウンド.bCompact対象) {
 						try {
 							cシステムサウンド.tLoading();
 							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);

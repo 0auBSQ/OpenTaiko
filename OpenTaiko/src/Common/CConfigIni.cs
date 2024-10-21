@@ -1210,7 +1210,7 @@ namespace OpenTaiko {
 					for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
 						for (int k = 0; k < 0x10; k++) {
 							if ((this.KeyAssign[i][j][k].InputDevice == EInputDevice.Keyboard) &&
-							    (this.KeyAssign[i][j][k].Code == (int)SlimDXKeys.Key.Return)) {
+								(this.KeyAssign[i][j][k].Code == (int)SlimDXKeys.Key.Return)) {
 								return false;
 							}
 						}
@@ -1641,8 +1641,8 @@ namespace OpenTaiko {
 			this.bBufferedInputs = true;
 			this.bIsAllowedDoubleClickFullscreen = false; // #26752 2011.11.26 ダブルクリックでのフルスクリーンモード移行を許可
 			this.nPoliphonicSounds = 4; // #28228 2012.5.1 yyagi レーン毎の最大同時発音数
-			// #24820 2013.1.15 yyagi 初期値を4から2に変更。BASS.net使用時の負荷軽減のため。
-			// #24820 2013.1.17 yyagi 初期値を4に戻した。動的なミキサー制御がうまく動作しているため。
+										// #24820 2013.1.15 yyagi 初期値を4から2に変更。BASS.net使用時の負荷軽減のため。
+										// #24820 2013.1.17 yyagi 初期値を4に戻した。動的なミキサー制御がうまく動作しているため。
 			this.bIsEnabledSystemMenu = true; // #28200 2012.5.1 yyagi System Menuの利用可否切替(使用可)
 			this.strSystemSkinSubfolderFullName = ""; // #28195 2012.5.2 yyagi 使用中のSkinサブフォルダ名
 			this.bTight = false; // #29500 2012.9.11 kairera0467 TIGHTモード
@@ -1657,7 +1657,7 @@ namespace OpenTaiko {
 			nBassBufferSizeMs = 1;
 			this.nWASAPIBufferSizeMs = 50; // #24820 2013.1.15 yyagi 初期値は50(0で自動設定)
 			this.nASIODevice = 0; // #24820 2013.1.17 yyagi
-			//			this.nASIOBufferSizeMs = 0;					// #24820 2012.12.25 yyagi 初期値は0(自動設定)
+								  //			this.nASIOBufferSizeMs = 0;					// #24820 2012.12.25 yyagi 初期値は0(自動設定)
 
 			#endregion
 
@@ -1760,8 +1760,7 @@ namespace OpenTaiko {
 			bool isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange or EKeyConfigPad.LeftChange;
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				// Do not restrict duplicate keybinds for System controls
-				for (int j = 0; j < (int)EKeyConfigPad.Capture; j++)
-				{
+				for (int j = 0; j < (int)EKeyConfigPad.Capture; j++) {
 					bool isJMenu = j is (int)EKeyConfigPad.LeftChange
 						or (int)EKeyConfigPad.RightChange
 						or (int)EKeyConfigPad.Decide;
@@ -1770,8 +1769,8 @@ namespace OpenTaiko {
 					}
 					for (int k = 0; k < 0x10; k++) {
 						if (this.KeyAssign[i][j][k].InputDevice != deviceType ||
-						    this.KeyAssign[i][j][k].ID != nID ||
-						    this.KeyAssign[i][j][k].Code != nCode) {
+							this.KeyAssign[i][j][k].ID != nID ||
+							this.KeyAssign[i][j][k].Code != nCode) {
 							continue;
 						}
 
@@ -2633,7 +2632,7 @@ namespace OpenTaiko {
 			string str;
 			this.ClearAllKeyAssignments();
 			using (StreamReader reader =
-			       new StreamReader(this.ConfigIniFileName, Encoding.GetEncoding(OpenTaiko.sEncType))) {
+				   new StreamReader(this.ConfigIniFileName, Encoding.GetEncoding(OpenTaiko.sEncType))) {
 				str = reader.ReadToEnd();
 			}
 
@@ -2705,41 +2704,41 @@ namespace OpenTaiko {
 					this.nLayoutType = int.Parse(value);
 					break;
 				case "SaveFileName": {
-					var _s = value.Split(new char[] { ',' });
+						var _s = value.Split(new char[] { ',' });
 
-					// Ignore custom save file names if duplicates
-					if (!_s.GroupBy(x => x).Any(g => g.Count() > 1)) {
-						for (int i = 0; i < Math.Min(5, _s.Length); i++) {
-							this.sSaveFile[i] = _s[i];
+						// Ignore custom save file names if duplicates
+						if (!_s.GroupBy(x => x).Any(g => g.Count() > 1)) {
+							for (int i = 0; i < Math.Min(5, _s.Length); i++) {
+								this.sSaveFile[i] = _s[i];
+							}
 						}
-					}
 
-					break;
-				}
+						break;
+					}
 				case "IgnoreSongUnlockables":
 					this.bIgnoreSongUnlockables = CConversion.bONorOFF(value[0]);
 					break;
 				case "SkinPath": {
-					string absSkinPath = value;
-					if (!System.IO.Path.IsPathRooted(value)) {
-						absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
-						absSkinPath = System.IO.Path.Combine(absSkinPath, value);
-						Uri u = new Uri(absSkinPath);
-						absSkinPath = u.AbsolutePath.ToString(); // str4内に相対パスがある場合に備える
-						absSkinPath = System.Web.HttpUtility.UrlDecode(absSkinPath); // デコードする
-						absSkinPath =
-							absSkinPath.Replace('/', System.IO.Path.DirectorySeparatorChar); // 区切り文字が\ではなく/なので置換する
-					}
+						string absSkinPath = value;
+						if (!System.IO.Path.IsPathRooted(value)) {
+							absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
+							absSkinPath = System.IO.Path.Combine(absSkinPath, value);
+							Uri u = new Uri(absSkinPath);
+							absSkinPath = u.AbsolutePath.ToString(); // str4内に相対パスがある場合に備える
+							absSkinPath = System.Web.HttpUtility.UrlDecode(absSkinPath); // デコードする
+							absSkinPath =
+								absSkinPath.Replace('/', System.IO.Path.DirectorySeparatorChar); // 区切り文字が\ではなく/なので置換する
+						}
 
-					if (absSkinPath[absSkinPath.Length - 1] !=
-					    System.IO.Path.DirectorySeparatorChar) // フォルダ名末尾に\を必ずつけて、CSkin側と表記を統一する
-					{
-						absSkinPath += System.IO.Path.DirectorySeparatorChar;
-					}
+						if (absSkinPath[absSkinPath.Length - 1] !=
+							System.IO.Path.DirectorySeparatorChar) // フォルダ名末尾に\を必ずつけて、CSkin側と表記を統一する
+						{
+							absSkinPath += System.IO.Path.DirectorySeparatorChar;
+						}
 
-					this.strSystemSkinSubfolderFullName = absSkinPath;
-					break;
-				}
+						this.strSystemSkinSubfolderFullName = absSkinPath;
+						break;
+					}
 				case nameof(this.PreAssetsLoading):
 					this.PreAssetsLoading = CConversion.bONorOFF(value[0]);
 					break;
@@ -2767,21 +2766,21 @@ namespace OpenTaiko {
 						value, 0, 9999, this.nWindowBaseYPosition);
 					break;
 				case "WindowWidth": {
-					this.nWindowWidth = CConversion.ParseIntInRange(value, 1, 65535, this.nWindowWidth);
-					if (this.nWindowWidth <= 0) {
-						this.nWindowWidth = SampleFramework.GameWindowSize.Width;
-					}
+						this.nWindowWidth = CConversion.ParseIntInRange(value, 1, 65535, this.nWindowWidth);
+						if (this.nWindowWidth <= 0) {
+							this.nWindowWidth = SampleFramework.GameWindowSize.Width;
+						}
 
-					break;
-				}
+						break;
+					}
 				case "WindowHeight": {
-					this.nWindowHeight = CConversion.ParseIntInRange(value, 1, 65535, this.nWindowHeight);
-					if (this.nWindowHeight <= 0) {
-						this.nWindowHeight = SampleFramework.GameWindowSize.Height;
-					}
+						this.nWindowHeight = CConversion.ParseIntInRange(value, 1, 65535, this.nWindowHeight);
+						if (this.nWindowHeight <= 0) {
+							this.nWindowHeight = SampleFramework.GameWindowSize.Height;
+						}
 
-					break;
-				}
+						break;
+					}
 				case "DoubleClickFullScreen":
 					this.bIsAllowedDoubleClickFullscreen = CConversion.bONorOFF(value[0]);
 					break;
@@ -2801,10 +2800,10 @@ namespace OpenTaiko {
 					this.nWASAPIBufferSizeMs = CConversion.ParseIntInRange(value, 0, 9999, this.nWASAPIBufferSizeMs);
 					break;
 				case "ASIODevice": {
-					string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
-					this.nASIODevice = CConversion.ParseIntInRange(value, 0, asiodev.Length - 1, this.nASIODevice);
-					break;
-				}
+						string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
+						this.nASIODevice = CConversion.ParseIntInRange(value, 0, asiodev.Length - 1, this.nASIODevice);
+						break;
+					}
 				case "SoundTimerType":
 					this.bUseOSTimer = CConversion.bONorOFF(value[0]);
 					break;
@@ -3417,122 +3416,122 @@ namespace OpenTaiko {
 		private void ProcessSystemKeyAssignmentSection(string key, string value) {
 			switch (key) {
 				case "Capture": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.Capture);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.Capture);
+						break;
+					}
 				case "SongVolumeIncrease": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.SongVolIncrease);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.SongVolIncrease);
+						break;
+					}
 				case "SongVolumeDecrease": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.SongVolDecrease);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.SongVolDecrease);
+						break;
+					}
 				case "DisplayHits": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.DisplayHits);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.DisplayHits);
+						break;
+					}
 				case "DisplayDebug": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.DisplayDebug);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.DisplayDebug);
+						break;
+					}
 				case "QuickConfig": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.QuickConfig);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.QuickConfig);
+						break;
+					}
 				case "NewHeya": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.NewHeya);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.NewHeya);
+						break;
+					}
 				case "SortSongs": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.SortSongs);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.SortSongs);
+						break;
+					}
 				case "ToggleAutoP1": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP1);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP1);
+						break;
+					}
 				case "ToggleAutoP2": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP2);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.ToggleAutoP2);
+						break;
+					}
 				case "ToggleTrainingMode": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.ToggleTrainingMode);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.ToggleTrainingMode);
+						break;
+					}
 				case "CycleVideoDisplayMode": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.CycleVideoDisplayMode);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.System.CycleVideoDisplayMode);
+						break;
+					}
 			}
 		}
 
 		private void ProcessTrainingKeyAssignmentSection(string key, string value) {
 			switch (key) {
 				case "TrainingIncreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+						break;
+					}
 				case "TrainingDecreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+						break;
+					}
 				case "TrainingIncreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+						break;
+					}
 				case "TrainingDecreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+						break;
+					}
 				case "TrainingToggleAuto": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingToggleAuto);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingToggleAuto);
+						break;
+					}
 				case "TrainingBranchNormal": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchNormal);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchNormal);
+						break;
+					}
 				case "TrainingBranchExpert": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchExpert);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchExpert);
+						break;
+					}
 				case "TrainingBranchMaster": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchMaster);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchMaster);
+						break;
+					}
 				case "TrainingPause": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingPause);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingPause);
+						break;
+					}
 				case "TrainingBookmark": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBookmark);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBookmark);
+						break;
+					}
 				case "TrainingMoveForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+						break;
+					}
 				case "TrainingMoveBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveBackMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+						break;
+					}
 				case "TrainingSkipForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+						break;
+					}
 				case "TrainingSkipBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipBackMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+						break;
+					}
 				case "TrainingJumpToFirstMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+						break;
+					}
 				case "TrainingJumpToLastMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
-					break;
-				}
+						this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+						break;
+					}
 			}
 		}
 
@@ -3563,7 +3562,7 @@ namespace OpenTaiko {
 			Temp,
 		}
 
-		private Dictionary<ESectionType, Action<string, string>> sectionProcess;
+		private Dictionary<ESectionType, Action<string, string>> sectionProcess = new Dictionary<ESectionType, Action<string, string>>();
 
 		private bool _bDrumsEnabled;
 		private bool _bGuitarEnabled;

@@ -218,7 +218,7 @@ namespace OpenTaiko {
 						if (!OpenTaiko.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 						{
 							CSkin.CSystemSound cシステムサウンド = OpenTaiko.Skin[i];
-							if (!OpenTaiko.bコンパクトモード || cシステムサウンド.bCompact対象) {
+							if (cシステムサウンド.bCompact対象) {
 								try {
 									cシステムサウンド.tLoading();
 									Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
@@ -244,10 +244,6 @@ namespace OpenTaiko {
 				//-----------------------------
 				#endregion
 
-				if (OpenTaiko.bコンパクトモード) {
-					Trace.TraceInformation("コンパクトモードなので残りの起動処理は省略します。");
-					return;
-				}
 			} finally {
 				OpenTaiko.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 				TimeSpan span = (TimeSpan)(DateTime.Now - now);

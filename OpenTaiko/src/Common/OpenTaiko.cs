@@ -55,10 +55,6 @@ namespace OpenTaiko {
 			get;
 			private set;
 		}
-		public static bool bコンパクトモード {
-			get;
-			private set;
-		}
 		public static CConfigIni ConfigIni {
 			get;
 			private set;
@@ -634,10 +630,10 @@ namespace OpenTaiko {
 
 					CScoreIni scoreIni = null;
 
-					#region [ 曲検索スレッドの起動/終了 ]					// ここに"Enumerating Songs..."表示を集約
-					if (!OpenTaiko.bコンパクトモード) {
-						actEnumSongs.Draw();                            // "Enumerating Songs..."アイコンの描画
-					}
+					#region [ 曲検索スレッドの起動/終了 ]
+					// ここに"Enumerating Songs..."表示を集約
+					actEnumSongs.Draw();                            // "Enumerating Songs..."アイコンの描画
+
 					switch (r現在のステージ.eStageID) {
 						case CStage.EStage.Title:
 						case CStage.EStage.Config:
@@ -721,37 +717,20 @@ namespace OpenTaiko {
 							#region [ *** ]
 							//-----------------------------
 							if (this.n進行描画の戻り値 != 0) {
-								if (!bコンパクトモード) {
-									r現在のステージ.DeActivate();
-									if (!ConfigIni.PreAssetsLoading) {
-										r現在のステージ.ReleaseManagedResource();
-										r現在のステージ.ReleaseUnmanagedResource();
-									}
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Title");
-									stageタイトル.Activate();
-									if (!ConfigIni.PreAssetsLoading) {
-										stageタイトル.CreateManagedResource();
-										stageタイトル.CreateUnmanagedResource();
-									}
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stageタイトル;
-								} else {
-									r現在のステージ.DeActivate();
-									if (!ConfigIni.PreAssetsLoading) {
-										r現在のステージ.ReleaseManagedResource();
-										r現在のステージ.ReleaseUnmanagedResource();
-									}
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Song Loading");
-									stage曲読み込み.Activate();
-									if (!ConfigIni.PreAssetsLoading) {
-										stage曲読み込み.CreateManagedResource();
-										stage曲読み込み.CreateUnmanagedResource();
-									}
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stage曲読み込み;
+								r現在のステージ.DeActivate();
+								if (!ConfigIni.PreAssetsLoading) {
+									r現在のステージ.ReleaseManagedResource();
+									r現在のステージ.ReleaseUnmanagedResource();
 								}
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Title");
+								stageタイトル.Activate();
+								if (!ConfigIni.PreAssetsLoading) {
+									stageタイトル.CreateManagedResource();
+									stageタイトル.CreateUnmanagedResource();
+								}
+								r直前のステージ = r現在のステージ;
+								r現在のステージ = stageタイトル;
 								foreach (STPlugin pg in this.PluginList) {
 									Directory.SetCurrentDirectory(pg.pluginDirectory);
 									pg.plugin.Onステージ変更();
@@ -2571,11 +2550,7 @@ for (int i = 0; i < 3; i++) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Startup");
 
-			if (OpenTaiko.bコンパクトモード) {
-				r現在のステージ = stage曲読み込み;
-			} else {
-				r現在のステージ = stage起動;
-			}
+			r現在のステージ = stage起動;
 			r現在のステージ.Activate();
 			if (!ConfigIni.PreAssetsLoading) {
 				r現在のステージ.CreateManagedResource();
