@@ -613,8 +613,7 @@ namespace OpenTaiko {
 
 				// キー入力
 
-				if (OpenTaiko.act現在入力を占有中のプラグイン == null)
-					this.tキー入力();
+				this.tキー入力();
 
 
 			}

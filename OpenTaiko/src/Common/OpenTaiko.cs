@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -370,28 +369,11 @@ namespace OpenTaiko {
 			get;
 			private set;
 		}
-		internal static IPluginActivity act現在入力を占有中のプラグイン = null;
 		public bool b次のタイミングで垂直帰線同期切り替えを行う {
 			get;
 			set;
 		}
 		public bool b次のタイミングで全画面_ウィンドウ切り替えを行う {
-			get;
-			set;
-		}
-		public CPluginHost PluginHost {
-			get;
-			private set;
-		}
-		public List<STPlugin> PluginList = new List<STPlugin>();
-		public struct STPlugin {
-			public IPluginActivity plugin;
-			public string pluginDirectory;
-			public string assemblyName;
-			public Version Version;
-		}
-		private static Size currentClientSize       // #23510 2010.10.27 add yyagi to keep current window size
-		{
 			get;
 			set;
 		}
@@ -550,23 +532,11 @@ namespace OpenTaiko {
 				foreach (CActivity activity in this.listトップレベルActivities)
 					activity.CreateUnmanagedResource();
 			}
-
-			foreach (STPlugin st in this.PluginList) {
-				Directory.SetCurrentDirectory(st.pluginDirectory);
-				st.plugin.OnUnmanagedリソースの作成();
-				Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-			}
 		}
 		protected override void UnloadContent() {
 			if (this.listトップレベルActivities != null) {
 				foreach (CActivity activity in this.listトップレベルActivities)
 					activity.ReleaseUnmanagedResource();
-			}
-
-			foreach (STPlugin st in this.PluginList) {
-				Directory.SetCurrentDirectory(st.pluginDirectory);
-				st.plugin.OnUnmanagedリソースの解放();
-				Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
 			}
 		}
 		protected override void OnExiting() {
@@ -606,22 +576,6 @@ namespace OpenTaiko {
 				if (r現在のステージ != null) {
 					OpenTaiko.NamePlate.lcNamePlate.Update();
 					this.n進行描画の戻り値 = (r現在のステージ != null) ? r現在のステージ.Draw() : 0;
-
-					#region [ プラグインの進行描画 ]
-					//---------------------
-					foreach (STPlugin sp in this.PluginList) {
-						Directory.SetCurrentDirectory(sp.pluginDirectory);
-
-						if (OpenTaiko.act現在入力を占有中のプラグイン == null || OpenTaiko.act現在入力を占有中のプラグイン == sp.plugin)
-							sp.plugin.On進行描画(OpenTaiko.Pad, OpenTaiko.InputManager.Keyboard);
-						else
-							sp.plugin.On進行描画(null, null);
-
-						Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-					}
-					//---------------------
-					#endregion
-
 
 					CScoreIni scoreIni = null;
 
@@ -726,11 +680,6 @@ namespace OpenTaiko {
 								}
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageタイトル;
-								foreach (STPlugin pg in this.PluginList) {
-									Directory.SetCurrentDirectory(pg.pluginDirectory);
-									pg.plugin.Onステージ変更();
-									Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-								}
 
 								this.tガベージコレクションを実行する();
 							}
@@ -942,12 +891,6 @@ namespace OpenTaiko {
 
 							}
 
-							foreach (STPlugin pg in this.PluginList) {
-								Directory.SetCurrentDirectory(pg.pluginDirectory);
-								pg.plugin.Onステージ変更();
-								Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-							}
-
 							//-----------------------------
 							#endregion
 							break;
@@ -976,12 +919,6 @@ namespace OpenTaiko {
 										r直前のステージ = r現在のステージ;
 										r現在のステージ = stageタイトル;
 
-										foreach (STPlugin pg in this.PluginList) {
-											Directory.SetCurrentDirectory(pg.pluginDirectory);
-											pg.plugin.Onステージ変更();
-											Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-										}
-
 										this.tガベージコレクションを実行する();
 										break;
 									//-----------------------------
@@ -1004,12 +941,6 @@ namespace OpenTaiko {
 										}
 										r直前のステージ = r現在のステージ;
 										r現在のステージ = stageSongSelect;
-
-										foreach (STPlugin pg in this.PluginList) {
-											Directory.SetCurrentDirectory(pg.pluginDirectory);
-											pg.plugin.Onステージ変更();
-											Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-										}
 
 										this.tガベージコレクションを実行する();
 										break;
@@ -1051,16 +982,6 @@ namespace OpenTaiko {
 										ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
 										ConfigIni.bAIBattleMode = false;
 									}
-									/*
-									Skin.bgm選曲画面イン.t停止する();
-									Skin.bgm選曲画面.t停止する();
-									*/
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1091,12 +1012,6 @@ namespace OpenTaiko {
 									*/
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1145,12 +1060,6 @@ namespace OpenTaiko {
 
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1207,12 +1116,6 @@ namespace OpenTaiko {
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
 
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-
 									this.tガベージコレクションを実行する();
 									break;
 								//-----------------------------
@@ -1236,12 +1139,6 @@ namespace OpenTaiko {
 									}
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stage曲読み込み;
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1274,12 +1171,6 @@ namespace OpenTaiko {
 
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1341,12 +1232,6 @@ namespace OpenTaiko {
 									// Seek latest registered song select screen
 									r現在のステージ = OpenTaiko.latestSongSelect;
 
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-
 									break;
 								}
 								#endregion
@@ -1367,11 +1252,6 @@ for (int i = 0; i < 3; i++) {
 #endif
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stage演奏ドラム画面;
-								foreach (STPlugin pg in this.PluginList) {
-									Directory.SetCurrentDirectory(pg.pluginDirectory);
-									pg.plugin.Onステージ変更();
-									Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-								}
 
 								this.tガベージコレクションを実行する();
 							}
@@ -1417,16 +1297,6 @@ for (int i = 0; i < 3; i++) {
 									#region [ 演奏キャンセル ]
 									//-----------------------------
 
-									#region [ プラグイン On演奏キャンセル() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.On演奏キャンセル(scoreIni);
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
-
 									DTX.t全チップの再生停止();
 									DTX.DeActivate();
 									DTX.ReleaseManagedResource();
@@ -1436,27 +1306,6 @@ for (int i = 0; i < 3; i++) {
 										r現在のステージ.ReleaseManagedResource();
 										r現在のステージ.ReleaseUnmanagedResource();
 									}
-
-									// Play cancelled return screen
-
-									/*
-									if(stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-									{
-										Trace.TraceInformation("----------------------");
-										Trace.TraceInformation("■ 段位選択");
-										stage段位選択.On活性化();
-										r直前のステージ = r現在のステージ;
-										r現在のステージ = stage段位選択;
-									}
-                                    else
-									{
-										Trace.TraceInformation("----------------------");
-										Trace.TraceInformation("■ 選曲");
-										stage選曲.On活性化();
-										r直前のステージ = r現在のステージ;
-										r現在のステージ = stage選曲;
-									}
-									*/
 
 									Trace.TraceInformation("----------------------");
 									Trace.TraceInformation("■ Return to song select menu");
@@ -1470,16 +1319,6 @@ for (int i = 0; i < 3; i++) {
 									// Seek latest registered song select screen
 									r現在のステージ = OpenTaiko.latestSongSelect;
 
-									#region [ プラグイン Onステージ変更() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
-
 									this.tガベージコレクションを実行する();
 									this.tガベージコレクションを実行する();
 									break;
@@ -1489,16 +1328,6 @@ for (int i = 0; i < 3; i++) {
 								case (int)EGameplayScreenReturnValue.StageFailed:
 									#region [ 演奏失敗(StageFailed) ]
 									//-----------------------------
-
-									#region [ プラグイン On演奏失敗() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.On演奏失敗(scoreIni);
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
 
 									DTX.t全チップの再生停止();
 									DTX.DeActivate();
@@ -1520,16 +1349,6 @@ for (int i = 0; i < 3; i++) {
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stageSongSelect;
 
-									#region [ プラグイン Onステージ変更() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
-
 									this.tガベージコレクションを実行する();
 									break;
 								//-----------------------------
@@ -1542,17 +1361,6 @@ for (int i = 0; i < 3; i++) {
 									// Fetch the results of the finished play
 									CScoreIni.C演奏記録 c演奏記録_Drums;
 									stage演奏ドラム画面.t演奏結果を格納する(out c演奏記録_Drums);
-
-
-									#region [ プラグイン On演奏クリア() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.On演奏クリア(scoreIni);
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
 
 									r現在のステージ.DeActivate();
 									if (!ConfigIni.PreAssetsLoading) {
@@ -1569,16 +1377,6 @@ for (int i = 0; i < 3; i++) {
 									}
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stage結果;
-
-									#region [ プラグイン Onステージ変更() の呼び出し ]
-									//---------------------
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-									//---------------------
-									#endregion
 
 									break;
 									//-----------------------------
@@ -1640,12 +1438,6 @@ for (int i = 0; i < 3; i++) {
 
 								stageSongSelect.NowSong++;
 
-								foreach (STPlugin pg in this.PluginList) {
-									Directory.SetCurrentDirectory(pg.pluginDirectory);
-									pg.plugin.Onステージ変更();
-									Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-								}
-
 								this.tガベージコレクションを実行する();
 							}
 							//-----------------------------
@@ -1677,12 +1469,6 @@ for (int i = 0; i < 3; i++) {
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
 
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
-
 									this.tガベージコレクションを実行する();
 									break;
 								//-----------------------------
@@ -1706,12 +1492,6 @@ for (int i = 0; i < 3; i++) {
 									}
 									r直前のステージ = r現在のステージ;
 									r現在のステージ = stage曲読み込み;
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -1779,12 +1559,6 @@ for (int i = 0; i < 3; i++) {
 
 									CSongSelectSongManager.stopSong();
 									CSongSelectSongManager.enable();
-
-									foreach (STPlugin pg in this.PluginList) {
-										Directory.SetCurrentDirectory(pg.pluginDirectory);
-										pg.plugin.Onステージ変更();
-										Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-									}
 
 									this.tガベージコレクションを実行する();
 									break;
@@ -2410,44 +2184,6 @@ for (int i = 0; i < 3; i++) {
 			this.listトップレベルActivities.Add(stage終了);
 			//---------------------
 			#endregion
-			#region [ プラグインの検索と生成 ]
-			//---------------------
-			PluginHost = new CPluginHost();
-
-			Trace.TraceInformation("Initializing and generating plugins...");
-			Trace.Indent();
-			try {
-				this.tプラグイン検索と生成();
-				Trace.TraceInformation("Plugin generation and initialization complete.");
-			} finally {
-				Trace.Unindent();
-			}
-			//---------------------
-			#endregion
-			#region [ プラグインの初期化 ]
-			//---------------------
-			if (this.PluginList != null && this.PluginList.Count > 0) {
-				Trace.TraceInformation("Initializing plugin(s)...");
-				Trace.Indent();
-				try {
-					foreach (STPlugin st in this.PluginList) {
-						Directory.SetCurrentDirectory(st.pluginDirectory);
-						st.plugin.On初期化(this.PluginHost);
-						st.plugin.OnManagedリソースの作成();
-						st.plugin.OnUnmanagedリソースの作成();
-						Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-					}
-					Trace.TraceInformation("All plugins have been initialized.");
-				} catch {
-					Trace.TraceError("Plugins could not be initialized.");
-					throw;
-				} finally {
-					Trace.Unindent();
-				}
-			}
-
-			//---------------------
-			#endregion
 
 			#region Discordの処理
 			DiscordClient = new DiscordRpcClient("939341030141096007");
@@ -2535,27 +2271,7 @@ for (int i = 0; i < 3; i++) {
 				}
 				//---------------------
 				#endregion
-				#region [ プラグインの終了処理 ]
-				//--------------------- from this point this is where i gave up - tfd500
-				if (this.PluginList != null && this.PluginList.Count > 0) {
-					Trace.TraceInformation("Ending all plugins...");
-					Trace.Indent();
-					try {
-						foreach (STPlugin st in this.PluginList) {
-							Directory.SetCurrentDirectory(st.pluginDirectory);
-							st.plugin.OnUnmanagedリソースの解放();
-							st.plugin.OnManagedリソースの解放();
-							st.plugin.On終了();
-							Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-						}
-						PluginHost = null;
-						Trace.TraceInformation("All plugins have been terminated.");
-					} finally {
-						Trace.Unindent();
-					}
-				}
-				//---------------------
-				#endregion
+
 				#region Discordの処理
 				DiscordClient?.Dispose();
 				#endregion
@@ -2756,17 +2472,6 @@ for (int i = 0; i < 3; i++) {
 			GC.WaitForPendingFinalizers();
 			GC.Collect(GC.MaxGeneration);
 		}
-		private void tプラグイン検索と生成() {
-			this.PluginList = new List<STPlugin>();
-
-			string PluginActivityName = typeof(IPluginActivity).FullName;
-			string PluginFolderPath = strEXEのあるフォルダ + "Plugins" + Path.DirectorySeparatorChar;
-
-			this.SearchAndGeneratePluginsInFolder(PluginFolderPath, PluginActivityName);
-
-			if (this.PluginList.Count > 0)
-				Trace.TraceInformation(this.PluginList.Count + "Plugins loaded.");
-		}
 
 		private void ChangeResolution(int nWidth, int nHeight) {
 			GameWindowSize.Width = nWidth;
@@ -2800,51 +2505,6 @@ for (int i = 0; i < 3; i++) {
 			CActSelectPopupMenu.RefleshSkin();
 			CActSelect段位リスト.RefleshSkin();
 		}
-		#region [ Windowイベント処理 ]
-		private void SearchAndGeneratePluginsInFolder(string PluginFolderPath, string PluginTypeName) {
-			// 指定されたパスが存在しないとエラー
-			if (!Directory.Exists(PluginFolderPath)) {
-				Trace.TraceWarning("The plugin folder does not exist. (" + PluginFolderPath + ")");
-				return;
-			}
-
-			// (1) すべての *.dll について…
-			string[] strDLLs = System.IO.Directory.GetFiles(PluginFolderPath, "*.dll");
-			foreach (string dllName in strDLLs) {
-				try {
-					// (1-1) dll をアセンブリとして読み込む。
-					System.Reflection.Assembly asm = System.Reflection.Assembly.LoadFrom(dllName);
-
-					// (1-2) アセンブリ内のすべての型について、プラグインとして有効か調べる
-					foreach (Type t in asm.GetTypes()) {
-						//  (1-3) ↓クラスであり↓Publicであり↓抽象クラスでなく↓IPlugin型のインスタンスが作れる　型を持っていれば有効
-						if (t.IsClass && t.IsPublic && !t.IsAbstract && t.GetInterface(PluginTypeName) != null) {
-							// (1-4) クラス名からインスタンスを作成する
-							var st = new STPlugin() {
-								plugin = (IPluginActivity)asm.CreateInstance(t.FullName),
-								pluginDirectory = Path.GetDirectoryName(dllName),
-								assemblyName = asm.GetName().Name,
-								Version = asm.GetName().Version,
-							};
-
-							// (1-5) プラグインリストへ登録
-							this.PluginList.Add(st);
-							Trace.TraceInformation("Plugin {0} ({1}, {2}, {3}) has been loaded.", t.FullName, Path.GetFileName(dllName), st.assemblyName, st.Version.ToString());
-						}
-					}
-				} catch (Exception e) {
-					Trace.TraceError(e.ToString());
-					Trace.TraceInformation(dllName + "could not be used to generate a plugin. Skipping plugin.");
-				}
-			}
-
-			// (2) サブフォルダがあれば再帰する
-			string[] strDirs = Directory.GetDirectories(PluginFolderPath, "*");
-			foreach (string dir in strDirs)
-				this.SearchAndGeneratePluginsInFolder(dir + Path.DirectorySeparatorChar, PluginTypeName);
-		}
-		//-----------------
-		#endregion
 		#endregion
 
 		#region [ EXTENDED VARIABLES ]

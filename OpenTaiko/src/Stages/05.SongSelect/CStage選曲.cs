@@ -224,12 +224,6 @@ namespace OpenTaiko {
 				if (c曲リストノード != null && cスコア != null && c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE) {
 					string str選択曲ファイル名 = cスコア.ファイル情報.ファイルの絶対パス;
 					int n曲番号inブロック = OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
-
-					foreach (OpenTaiko.STPlugin stPlugin in OpenTaiko.app.PluginList) {
-						Directory.SetCurrentDirectory(stPlugin.pluginDirectory);
-						stPlugin.plugin.On選択曲変更(str選択曲ファイル名, n曲番号inブロック);
-						Directory.SetCurrentDirectory(OpenTaiko.strEXEのあるフォルダ);
-					}
 				}
 			}
 			//---------------------
@@ -707,8 +701,7 @@ namespace OpenTaiko {
 				#region [ Inputs ]
 
 				// キー入力
-				if (base.ePhaseID == CStage.EPhase.Common_NORMAL
-					&& OpenTaiko.act現在入力を占有中のプラグイン == null) {
+				if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
 					#region [ 簡易CONFIGでMore、またはShift+F1: 詳細CONFIG呼び出し ]
 					if (actQuickConfig.bGotoDetailConfig) {   // 詳細CONFIG呼び出し
 						actQuickConfig.tDeativatePopupMenu();
