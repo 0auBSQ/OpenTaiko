@@ -316,7 +316,7 @@ namespace FDK {
 		/// </summary>
 		public static float f画面比率 = 1.0f;
 
-		public uint Texture_ { get; internal set; }
+		public uint Pointer { get; internal set; }
 
 		// Constructor
 
@@ -337,12 +337,12 @@ namespace FDK {
 			this.b加算合成 = tx.b加算合成;
 			this.fZ軸中心回転 = tx.fZ軸中心回転;
 			this.vcScaleRatio = tx.vcScaleRatio;
-			Texture_ = tx.Texture_;
+			Pointer = tx.Pointer;
 			//			this._txData = null;
 		}
 
 		public void UpdateTexture(CTexture texture, int n幅, int n高さ) {
-			Texture_ = texture.Texture_;
+			Pointer = texture.Pointer;
 			this.sz画像サイズ = new Size(n幅, n高さ);
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
 			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
@@ -350,9 +350,9 @@ namespace FDK {
 
 		public void UpdateTexture(IntPtr texture, int width, int height, PixelFormat rgbaType) {
 			unsafe {
-				Game.Gl.DeleteTexture(Texture_); //解放
+				Game.Gl.DeleteTexture(Pointer); //解放
 				void* data = texture.ToPointer();
-				Texture_ = GenTexture(data, (uint)width, (uint)height, rgbaType);
+				Pointer = GenTexture(data, (uint)width, (uint)height, rgbaType);
 			}
 			this.sz画像サイズ = new Size(width, height);
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
@@ -452,12 +452,12 @@ namespace FDK {
 				unsafe {
 					fixed (void* data = bitmap.Pixels) {
 						if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
-							Texture_ = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
+							Pointer = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
 						} else {
 							SKBitmap bm = bitmap.Copy();
 							Action createInstance = () => {
 								fixed (void* data2 = bitmap.Pixels) {
-									Texture_ = GenTexture(data2, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
+									Pointer = GenTexture(data2, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
 								}
 								bm.Dispose();
 							};
@@ -696,7 +696,7 @@ namespace FDK {
 
 			Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
-			Game.Gl.BindTexture(TextureTarget.Texture2D, Texture_); //テクスチャをバインド
+			Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
 
 			//MVPを設定----
 			unsafe {
@@ -832,7 +832,7 @@ namespace FDK {
 
 			Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
-			Game.Gl.BindTexture(TextureTarget.Texture2D, Texture_); //テクスチャをバインド
+			Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
 
 			//MVPを設定----
 			unsafe {
@@ -894,7 +894,7 @@ namespace FDK {
 		//-----------------
 		public void Dispose() {
 			if (!this.bDispose完了済み) {
-				Game.Gl.DeleteTexture(Texture_); //解放
+				Game.Gl.DeleteTexture(Pointer); //解放
 
 				this.bDispose完了済み = true;
 			}

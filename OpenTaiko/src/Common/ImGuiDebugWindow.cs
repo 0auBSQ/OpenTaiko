@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using FDK;
 using ImGuiNET;
+using SampleFramework;
 
 namespace OpenTaiko {
 	/*
@@ -14,6 +17,11 @@ namespace OpenTaiko {
 
 		private static long memoryReadTimer = 0;
 		private static long pagedmemory = 0;
+		private static int textureMemoryUsage = 0;
+
+		private static int sortType = -1;
+		private static readonly string[] sortNames = ["Memory Usage (Highest->Lowest)", "Memory Usage (Lowest->Highest)", "Pointer ID"];
+		private static string reloadTexPath = "";
 		public static void Draw() {
 			if (SampleFramework.Game.ImGuiController == null) return;
 
@@ -47,8 +55,10 @@ namespace OpenTaiko {
 
 				#region Tabs
 				System();
+				Inputs();
 				Profile();
 				Stage();
+				Textures();
 				#endregion
 
 				ImGui.EndTabBar();
@@ -56,6 +66,7 @@ namespace OpenTaiko {
 				ImGui.End();
 			}
 		}
+		#region Tabs
 		private static void System() {
 			if (ImGui.BeginTabItem("System")) {
 				ImGui.TextWrapped($"Path: {(Environment.ProcessPath != null ? Environment.ProcessPath : "???")}");
@@ -63,7 +74,81 @@ namespace OpenTaiko {
 				ImGui.Text($"OS Version: {Environment.OSVersion} ({RuntimeInformation.RuntimeIdentifier})");
 				ImGui.Text($"OS Architecture: {RuntimeInformation.OSArchitecture}");
 				ImGui.Text($"Framework Version: {RuntimeInformation.FrameworkDescription}");
-				ImGui.Text($"Is Privileged: {Environment.IsPrivilegedProcess}");
+				ImGui.NewLine();
+				ImGui.Text("Graphics API: " + Game.GraphicsDeviceType_);
+				ImGui.Text("Audio Device: " + OpenTaiko.SoundManager.GetCurrentSoundDeviceType());
+
+				ImGui.EndTabItem();
+			}
+		}
+		private static void Inputs() {
+			if (ImGui.BeginTabItem("Inputs")) {
+
+				ImGui.Text("Total Inputs Found: " + OpenTaiko.InputManager.InputDevices.Count());
+
+				ImGui.NewLine();
+
+				ImGui.Text("Input Count:");
+				ImGui.Indent();
+				ImGui.Text("Keyboard: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Keyboard));
+				ImGui.Text("Mouse: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Mouse));
+				ImGui.Text("Gamepad: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Gamepad));
+				ImGui.Text("Joystick: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Joystick));
+				ImGui.Text("MIDI: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.MidiIn));
+				ImGui.Text("Unknown: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Unknown));
+
+				foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
+					if (ImGui.TreeNodeEx(device.CurrentType.ToString() + " (ID " + device.ID + ")")) {
+						switch (device.CurrentType) {
+							case InputDeviceType.Keyboard:
+								var keyboard = (CInputKeyboard)device;
+								for (int i = 0; i < keyboard.KeyStates.Length; i++) {
+									if (keyboard.KeyPressed(i)) { ImGui.Text((SlimDXKeys.Key)i + " Pressed!"); }
+									if (keyboard.KeyPressing(i)) { ImGui.Text((SlimDXKeys.Key)i + " Pressing!"); }
+									if (keyboard.KeyReleased(i)) { ImGui.Text((SlimDXKeys.Key)i + " Released!"); }
+								}
+								break;
+							case InputDeviceType.Mouse:
+								var mouse = (CInputMouse)device;
+								for (int i = 0; i < mouse.MouseStates.Length; i++) {
+									if (mouse.KeyPressed(i)) { ImGui.Text((Silk.NET.Input.MouseButton)i + " Pressed!"); }
+									if (mouse.KeyPressing(i)) { ImGui.Text((Silk.NET.Input.MouseButton)i + " Pressing!"); }
+									if (mouse.KeyReleased(i)) { ImGui.Text((Silk.NET.Input.MouseButton)i + " Released!"); }
+								}
+								break;
+							case InputDeviceType.Gamepad:
+								var gamepad = (CInputGamepad)device;
+								for (int i = 0; i < gamepad.ButtonStates.Length; i++) {
+									if (gamepad.KeyPressed(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressed!"); }
+									if (gamepad.KeyPressing(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressing!"); }
+									if (gamepad.KeyReleased(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Released!"); }
+								}
+								break;
+							case InputDeviceType.Joystick:
+								var joystick = (CInputJoystick)device;
+								for (int i = 0; i < joystick.ButtonStates.Length; i++) {
+									if (joystick.KeyPressed(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressed!"); }
+									if (joystick.KeyPressing(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressing!"); }
+									if (joystick.KeyReleased(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Released!"); }
+								}
+								break;
+							case InputDeviceType.MidiIn:
+								var midiin = (CInputMIDI)device;
+								//for (int i = 0; i < midiin.InputEvents.Count; i++) {
+								//	if (midiin.InputEvents[i].Pressed) { ImGui.Text(midiin.InputEvents[i].nKey + " Pressed!"); }
+								//	if (midiin.KeyPressing(i)) { ImGui.Text("Pressing!"); }
+								//	if (midiin.InputEvents[i].Released) { ImGui.Text(midiin.InputEvents[i].nKey + " Released!"); }
+								//}
+								ImGui.TextColored(new Vector4(1, 0, 0, 1), "MIDI input polling is currently disabled.");
+								break;
+							case InputDeviceType.Unknown:
+								ImGui.TextDisabled("Unknown input device type.");
+								ImGui.TextDisabled("GUID: " + device.GUID);
+								break;
+						}
+						ImGui.TreePop();
+					}
+				}
 
 				ImGui.EndTabItem();
 			}
@@ -197,48 +282,177 @@ namespace OpenTaiko {
 						}
 						break;
 					case CStage.EStage.Game:
-						switch (OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0])) {
-							case Difficulty.Dan:
-								ImGui.SeparatorText("Dan Dojo Mode");
-								break;
-							case Difficulty.Tower:
-								ImGui.SeparatorText("Tower Mode");
-								break;
-							default:
-								ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[0] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
-								break;
-
-						}
-						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
-							ImGui.Text($"Auto Play ({i + 1}P): " + OpenTaiko.ConfigIni.bAutoPlay[i]);
-
-						ImGui.NewLine();
-
-						ImGui.Text("Title: " + OpenTaiko.DTX.TITLE.GetString("???"));
-						ImGui.Text("Subtitle: " + OpenTaiko.DTX.SUBTITLE.GetString("???"));
-						if (!string.IsNullOrEmpty(OpenTaiko.DTX.MAKER)) {
-							ImGui.Text("Charter: " + OpenTaiko.DTX.MAKER);
-						} else {
-							ImGui.TextDisabled("Charter: (None)");
-						}
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-							var dtx = OpenTaiko.GetDTX(i);
+							if (ImGui.TreeNodeEx($"Player {i+1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
-							ImGui.Text("BPM: " + dtx.BASEBPM + (dtx.listBPM.Count > 1 ? (" (Min: " + dtx.MinBPM + " / Max: " + dtx.MaxBPM + ")") : ""));
-							if (dtx.listBPM.Count > 1) {
-								if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
-									foreach (CDTX.CBPM bpm in dtx.listBPM.Values) {
-										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPM値}");
-									}
-									ImGui.TreePop();
+								Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
+								var dtx = OpenTaiko.GetDTX(i);
+
+								switch (game_difficulty) {
+									case Difficulty.Dan:
+										ImGui.SeparatorText("Dan Dojo Mode");
+										break;
+									case Difficulty.Tower:
+										ImGui.SeparatorText("Tower Mode");
+										ImGui.Text("Side: " + dtx.SIDE);
+										ImGui.Text("Life: " + dtx.LIFE);
+										ImGui.Text("Floor Count: " + OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5].譜面情報.nTotalFloor);
+										break;
+									default:
+										ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
+										break;
+
 								}
+								ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]), $"Difficulty: {game_difficulty}");
+								ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
+
+								ImGui.NewLine();
+
+								ImGui.Text("ID: " + dtx.uniqueID.data.id);
+								ImGui.Text("Title: " + dtx.TITLE.GetString(""));
+								ImGui.Text("Subtitle: " + dtx.SUBTITLE.GetString(""));
+								ImGui.Text("Charter: " + dtx.MAKER);
+
+								// BPM
+								ImGui.Text("BPM: " + dtx.BASEBPM + (dtx.listBPM.Count > 1 ? (" (Min: " + dtx.MinBPM + " / Max: " + dtx.MaxBPM + ")") : ""));
+								if (dtx.listBPM.Count > 1) {
+									if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
+										foreach (CDTX.CBPM bpm in dtx.listBPM.Values) {
+											ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPM値}");
+										}
+										ImGui.TreePop();
+									}
+								}
+
+								ImGui.NewLine();
+
+								ImGui.Text("Note Count: ");
+								ImGui.Indent();
+								ImGui.Text("Normal: " + dtx.nノーツ数_Branch[0] +
+									" / Expert: " + dtx.nノーツ数_Branch[1] +
+									" / Master: " + dtx.nノーツ数_Branch[2]);
+								ImGui.Unindent();
+
+								ImGui.TreePop();
 							}
+
 						}
+						
 						break;
 				}
 
 				ImGui.EndTabItem();
 			}
 		}
+		private static void Textures() {
+			if (ImGui.BeginTabItem("Textures")) {
+				ImGui.Text("Total Texture Count: " + OpenTaiko.Tx.listTexture.Count);
+				ImGui.Text("Total Memory Usage: " + textureMemoryUsage + "bytes (" + GetMemAllocationInMegabytes(textureMemoryUsage) + "MB)");
+				if (ImGui.Button("Refresh") || textureMemoryUsage == 0) {
+					textureMemoryUsage = OpenTaiko.Tx.listTexture.Where(tex => tex != null).Sum(tex => tex.szTextureSize.Width * tex.szTextureSize.Height * 4);
+				}
+				if (ImGui.BeginCombo("Change Sort", sortType != -1 ? sortNames[sortType] : "(Default)")) {
+					if (ImGui.Selectable(sortNames[0], sortType == 0)) {
+						OpenTaiko.Tx.listTexture.Sort((tex1, tex2) => (tex2 != null ? tex2.szTextureSize.Width * tex2.szTextureSize.Height : -1).CompareTo(tex1 != null ? tex1.szTextureSize.Width * tex1.szTextureSize.Height : -1));
+						sortType = 0;
+					}
+					if (ImGui.Selectable(sortNames[1], sortType == 1)) {
+						OpenTaiko.Tx.listTexture.Sort((tex1, tex2) => (tex1 != null ? tex1.szTextureSize.Width * tex1.szTextureSize.Height : -1).CompareTo(tex2 != null ? tex2.szTextureSize.Width * tex2.szTextureSize.Height : -1));
+						sortType = 1;
+					}
+					if (ImGui.Selectable(sortNames[2], sortType == 2)) {
+						OpenTaiko.Tx.listTexture.Sort((tex1, tex2) => (tex1 != null ? (int)tex1.Pointer : -1).CompareTo(tex2 != null ? (int)tex2.Pointer : -1));
+						sortType = 2;
+					}
+					ImGui.EndCombo();
+				}
+
+				if (ImGui.TreeNodeEx("Show All Textures###TEXTURE_SHOWALL")) {
+					int index = 0;
+					if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.StartUp)
+						ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
+					else
+						foreach (CTexture tex in OpenTaiko.Tx.listTexture) {
+							CTexturePopup(tex, $"#{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###TEXTURE_SHOW_POPUP_{index++}");
+						}
+					ImGui.TreePop();
+				}
+				ImGui.EndTabItem();
+			}
+		}
+		#endregion
+
+		#region ImGui Items
+		private static void CTexturePopup(CTexture texture, string label) {
+			if (ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.Framed)) {
+
+				ImGui.BeginDisabled();
+				ImGui.InputText("Path", ref reloadTexPath, 2048);
+				if (ImGui.Button("Reload via. Path (To-do)")) {
+					// To-do
+				}
+				ImGui.EndDisabled();
+
+				ImGui.TreePop();
+			}
+			if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNone)) {
+				if (ImGui.BeginItemTooltip()) {
+					if (DrawCTextureForImGui(texture, 800, 800)) {
+						ImGui.Text("Pointer: " + texture.Pointer);
+						ImGui.Text("Size: x" + texture.szTextureSize.Width + ",y" + texture.szTextureSize.Height);
+						ImGui.Text("Memory allocated: " + String.Format("{0:0.###}",GetTextureMemAllocationInMegabytes(texture)) + "MB");
+					}
+					else {
+						ImGui.TextDisabled("Texture is not loaded.");
+					}
+					ImGui.EndTooltip();
+				}
+			}
+		}
+		private static bool DrawCTextureForImGui(CTexture texture) {
+			if (texture == null) return false;
+			return DrawCTextureForImGui(texture,
+				new Vector2(texture.szTextureSize.Width, texture.szTextureSize.Height),
+				new Vector2(0,0), new Vector2(1,1));
+		}
+		private static bool DrawCTextureForImGui(CTexture texture, int max_width, int max_height) {
+			if (texture == null) return false;
+			return DrawCTextureForImGui(texture, 0, 0,
+				Math.Min(texture.szTextureSize.Width, max_width), Math.Min(texture.szTextureSize.Height, max_height));
+		}
+		private static bool DrawCTextureForImGui(CTexture texture, int x, int y, int width, int height) {
+			return DrawCTextureForImGui(texture, new Rectangle(x, y, width, height));
+		}
+		private static bool DrawCTextureForImGui(CTexture texture, Rectangle rect) {
+			if (texture == null) return false;
+			return DrawCTextureForImGui(texture,
+				new Vector2(rect.Width, rect.Height),
+				new Vector2((float)rect.X / texture.szTextureSize.Width, (float)rect.Y / texture.szTextureSize.Height),
+				new Vector2((float)rect.Right / texture.szTextureSize.Width, (float)rect.Bottom / texture.szTextureSize.Height));
+		}
+		/// <param name="image_size">Must be in pixels</param>
+		/// <param name="pos">Value is typically between 0.0f and 1.0f</param>
+		/// <param name="size">Value is typically between 0.0f and 1.0f</param>
+		private static bool DrawCTextureForImGui(CTexture texture, Vector2 image_size, Vector2 pos, Vector2 size) {
+			if (texture == null) return false;
+			ImGui.Image((nint)texture.Pointer, image_size, pos, size);
+			return true;
+		}
+		#endregion
+
+		#region Helpers
+		private static float GetMemAllocationInMegabytes(int bytes) { return (float)bytes / (1024 * 1024); }
+		private static float GetTextureMemAllocationInMegabytes(CTexture texture) {
+			return (float)GetTextureMemAllocation(texture) / (1024 * 1024);
+		}
+		private static int GetTextureMemAllocation(CTexture texture) {
+			if (texture == null) return 0;
+			return texture.szTextureSize.Width * texture.szTextureSize.Height * 4;
+		}
+		private static Vector4 ColorToVector4(Color color) {
+			return new Vector4((float)color.R / 255, (float)color.G / 255, (float)color.B / 255, (float)color.A / 255);
+		}
+		#endregion
+
 	}
 }

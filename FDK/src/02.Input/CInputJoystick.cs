@@ -131,7 +131,7 @@ namespace FDK {
 
 		#region [ private ]
 		//-----------------
-		private (bool, int)[] ButtonStates = new (bool, int)[18];
+		public (bool, int)[] ButtonStates { get; private set; } = new (bool, int)[18];
 		private bool IsDisposed;
 
 		private void Joystick_ButtonDown(IJoystick joystick, Button button) {
