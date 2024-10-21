@@ -1661,18 +1661,18 @@ namespace OpenTaiko {
 			this.nDisplayTimesMs = 3000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップ再表示期間
 			this.nFadeoutTimeMs = 2000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップフェードアウト時間
 
-			this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>(){
-				{ ESectionType.System, this.ProcessSystemSection},
-				{ ESectionType.AutoPlay, this.ProcessAutoPlaySection},
-				{ ESectionType.HitRange, this.ProcessHitRangeSection},
-				{ ESectionType.Log, this.ProcessLogSection},
-				{ ESectionType.PlayOption, this.ProcessPlayOptionSection},
-				{ ESectionType.ViewerOption, this.ProcessViewerOptionSection},
-				{ ESectionType.GUID, this.ProcessGuidSection},
-				{ ESectionType.DrumsKeyAssign, this.ProcessDrumKeyAssignmentSection},
-				{ ESectionType.SystemKeyAssign, this.ProcessSystemKeyAssignmentSection},
-				{ ESectionType.TrainingKeyAssign, this.ProcessTrainingKeyAssignmentSection},
-				{ ESectionType.DEBUG, this.ProcessDebugSection},
+			this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>() {
+				{ ESectionType.System, this.ProcessSystemSection },
+				{ ESectionType.AutoPlay, this.ProcessAutoPlaySection },
+				{ ESectionType.HitRange, this.ProcessHitRangeSection },
+				{ ESectionType.Log, this.ProcessLogSection },
+				{ ESectionType.PlayOption, this.ProcessPlayOptionSection },
+				{ ESectionType.ViewerOption, this.ProcessViewerOptionSection },
+				{ ESectionType.GUID, this.ProcessGuidSection },
+				{ ESectionType.DrumsKeyAssign, this.ProcessDrumKeyAssignmentSection },
+				{ ESectionType.SystemKeyAssign, this.ProcessSystemKeyAssignmentSection },
+				{ ESectionType.TrainingKeyAssign, this.ProcessTrainingKeyAssignmentSection },
+				{ ESectionType.DEBUG, this.ProcessDebugSection },
 			};
 
 			bViewerVSyncWait = true;
@@ -2630,27 +2630,27 @@ namespace OpenTaiko {
 		}
 
 		private void LoadFromString(string strAllSettings) {
-			ESectionType unknown = ESectionType.Unknown;
+			ESectionType currentSectionType = ESectionType.Unknown;
 			string[] delimiter = { "\n" };
 			string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string s in strSingleLine) {
-				string str = s.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
-				if ((str.Length == 0) || (str[0] == ';')) {
+				string line = s.Replace('\t', ' ').TrimStart(new char[] { '\t', ' ' });
+				if ((line.Length == 0) || (line[0] == ';')) {
 					continue;
 				}
 
 				try {
-					string str3;
-					string str4;
-					if (str[0] == '[') {
+					string key;
+					string value;
+					if (line[0] == '[') {
 						StringBuilder builder = new StringBuilder(0x20);
 						int num = 1;
-						while ((num < str.Length) && (str[num] != ']')) {
-							builder.Append(str[num++]);
+						while ((num < line.Length) && (line[num] != ']')) {
+							builder.Append(line[num++]);
 						}
 
-						string str2 = builder.ToString();
-						unknown = str2 switch {
+						string sectionName = builder.ToString();
+						currentSectionType = sectionName switch {
 							"System" => ESectionType.System,
 							"AutoPlay" => ESectionType.AutoPlay,
 							"HitRange" => ESectionType.HitRange,
@@ -2666,12 +2666,12 @@ namespace OpenTaiko {
 							_ => ESectionType.Unknown
 						};
 					} else {
-						string[] strArray = str.Split(new char[] { '=' });
-						if (strArray.Length == 2) {
-							str3 = strArray[0].Trim();
-							str4 = strArray[1].Trim();
-							if (this.sectionProcess.TryGetValue(unknown, out var processSection)) {
-								processSection(str3, str4);
+						string[] keyValuePair = line.Split(new char[] { '=' });
+						if (keyValuePair.Length == 2) {
+							key = keyValuePair[0].Trim();
+							value = keyValuePair[1].Trim();
+							if (this.sectionProcess.TryGetValue(currentSectionType, out var processSection)) {
+								processSection(key, value);
 							}
 						}
 					}
