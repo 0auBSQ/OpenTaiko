@@ -113,7 +113,7 @@ namespace FDK {
 
 		#region [ private ]
 		//-----------------
-		private (bool, int)[] KeyStates = new (bool, int)[144];
+		public (bool, int)[] KeyStates { get; private set; } = new (bool, int)[144];
 		private bool IsDisposed;
 		//private CTimer timer;
 		//private CTimer ct;

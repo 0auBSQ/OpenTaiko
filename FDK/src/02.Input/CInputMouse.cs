@@ -113,7 +113,7 @@ namespace FDK {
 
 		#region [ private ]
 		//-----------------
-		private (bool, int)[] MouseStates = new (bool, int)[12];
+		public (bool, int)[] MouseStates { get; private set; } = new (bool, int)[12];
 		private bool IsDisposed;
 
 		private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {

@@ -573,8 +573,8 @@ namespace OpenTaiko {
 		//private CTexture tx下背景クリアメイン;
 		//private CTexture tx下背景クリアサブ1;
 
-		private ScriptBG UpScript;
-		private ScriptBG DownScript;
+		public ScriptBG UpScript;
+		public ScriptBG DownScript;
 
 		private TitleTextureKey ttkTouTatsuKaiSuu;
 		private TitleTextureKey ttkKai;

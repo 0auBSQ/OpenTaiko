@@ -6880,7 +6880,7 @@ namespace OpenTaiko {
 		}
 		public override void CreateManagedResource() {
 			if (!base.IsDeActivated) {
-				this.tAVIの読み込み();
+				//this.tAVIの読み込み();
 				base.CreateManagedResource();
 			}
 		}
