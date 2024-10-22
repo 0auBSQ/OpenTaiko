@@ -3571,30 +3571,22 @@ namespace OpenTaiko {
 
 		private void GetJoystickID(string keyDescription) {
 			string[] strArray = keyDescription.Split(new char[] { ',' });
-			if (strArray.Length >= 2) {
-				int result = 0;
-				if ((int.TryParse(strArray[0], out result) && (result >= 0)) && (result <= 9)) {
-					if (this.dicJoystick.ContainsKey(result)) {
-						this.dicJoystick.Remove(result);
-					}
-
-					this.dicJoystick.Add(result, strArray[1]);
-				}
+			if (strArray.Length < 2 || !int.TryParse(strArray[0], out int result) || result < 0 || result > 9) {
+				return;
 			}
+
+			this.dicJoystick.Remove(result);
+			this.dicJoystick.Add(result, strArray[1]);
 		}
 
 		private void GetGamepadID(string keyDescription) {
 			string[] strArray = keyDescription.Split(new char[] { ',' });
-			if (strArray.Length >= 2) {
-				int result = 0;
-				if ((int.TryParse(strArray[0], out result) && (result >= 0)) && (result <= 9)) {
-					if (this.dicGamepad.ContainsKey(result)) {
-						this.dicGamepad.Remove(result);
-					}
-
-					this.dicGamepad.Add(result, strArray[1]);
-				}
+			if (strArray.Length < 2 || !int.TryParse(strArray[0], out int result) || result < 0 || result > 9) {
+				return;
 			}
+
+			this.dicGamepad.Remove(result);
+			this.dicGamepad.Add(result, strArray[1]);
 		}
 
 		private void ClearAllKeyAssignments() {

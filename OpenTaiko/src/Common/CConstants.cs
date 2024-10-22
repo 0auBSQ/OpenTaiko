@@ -345,23 +345,14 @@ namespace OpenTaiko {
 		public T Unknown;
 		public T this[int index] {
 			get {
-				switch (index) {
-					case (int)EInstrumentPad.Drums:
-						return this.Drums;
-
-					case (int)EInstrumentPad.Guitar:
-						return this.Guitar;
-
-					case (int)EInstrumentPad.Bass:
-						return this.Bass;
-
-					case (int)EInstrumentPad.Taiko:
-						return this.Taiko;
-
-					case (int)EInstrumentPad.Unknown:
-						return this.Unknown;
-				}
-				throw new IndexOutOfRangeException();
+				return index switch {
+					(int)EInstrumentPad.Drums => this.Drums,
+					(int)EInstrumentPad.Guitar => this.Guitar,
+					(int)EInstrumentPad.Bass => this.Bass,
+					(int)EInstrumentPad.Taiko => this.Taiko,
+					(int)EInstrumentPad.Unknown => this.Unknown,
+					_ => throw new IndexOutOfRangeException()
+				};
 			}
 			set {
 				switch (index) {
