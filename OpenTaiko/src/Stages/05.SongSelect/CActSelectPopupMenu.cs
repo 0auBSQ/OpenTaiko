@@ -264,14 +264,14 @@ namespace OpenTaiko {
 						#endregion
 						#region [ キー入力: 前に移動 ]
 						this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
-						this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
+						this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
 						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
 							this.t前に移動();
 						}
 						#endregion
 						#region [ キー入力: 次に移動 ]
 						this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
-						this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
+						this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
 						if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
 							this.t次に移動();
 						}
