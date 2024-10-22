@@ -39,102 +39,105 @@ namespace OpenTaiko {
 
 			// すべての入力デバイスについて…
 			foreach (IInputDevice device in this.rInput管理.InputDevices) {
-				if ((device.InputEvents != null) && (device.InputEvents.Count != 0)) {
-					foreach (STInputEvent event2 in device.InputEvents) {
-						for (int i = 0; i < stkeyassignArray.Length; i++) {
-							switch (stkeyassignArray[i].InputDevice) {
-								case EInputDevice.Keyboard:
-									if ((device.CurrentType == InputDeviceType.Keyboard) && (event2.nKey == stkeyassignArray[i].Code)) {
-										list.Add(event2);
-										this.st検知したデバイス.Keyboard = true;
-									}
-									break;
-
-								case EInputDevice.MIDIInput:
-									if (((device.CurrentType == InputDeviceType.MidiIn) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-										list.Add(event2);
-										this.st検知したデバイス.MIDIIN = true;
-									}
-									break;
-
-								case EInputDevice.Joypad:
-									if (((device.CurrentType == InputDeviceType.Joystick) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-										list.Add(event2);
-										this.st検知したデバイス.Joypad = true;
-									}
-									break;
-
-								case EInputDevice.Gamepad:
-									if (((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-										list.Add(event2);
-										this.st検知したデバイス.Gamepad = true;
-									}
-									break;
-
-								case EInputDevice.Mouse:
-									if ((device.CurrentType == InputDeviceType.Mouse) && (event2.nKey == stkeyassignArray[i].Code)) {
-										list.Add(event2);
-										this.st検知したデバイス.Mouse = true;
-									}
-									break;
-							}
-						}
-					}
+				if (device.InputEvents == null || device.InputEvents.Count == 0) {
 					continue;
 				}
+
+				foreach (STInputEvent event2 in device.InputEvents) {
+					for (int i = 0; i < stkeyassignArray.Length; i++) {
+						switch (stkeyassignArray[i].InputDevice) {
+							case EInputDevice.Keyboard:
+								if ((device.CurrentType == InputDeviceType.Keyboard) && (event2.nKey == stkeyassignArray[i].Code)) {
+									list.Add(event2);
+									this.st検知したデバイス.Keyboard = true;
+								}
+								break;
+
+							case EInputDevice.MIDIInput:
+								if (((device.CurrentType == InputDeviceType.MidiIn) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
+									list.Add(event2);
+									this.st検知したデバイス.MIDIIN = true;
+								}
+								break;
+
+							case EInputDevice.Joypad:
+								if (((device.CurrentType == InputDeviceType.Joystick) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
+									list.Add(event2);
+									this.st検知したデバイス.Joypad = true;
+								}
+								break;
+
+							case EInputDevice.Gamepad:
+								if (((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
+									list.Add(event2);
+									this.st検知したデバイス.Gamepad = true;
+								}
+								break;
+
+							case EInputDevice.Mouse:
+								if ((device.CurrentType == InputDeviceType.Mouse) && (event2.nKey == stkeyassignArray[i].Code)) {
+									list.Add(event2);
+									this.st検知したデバイス.Mouse = true;
+								}
+								break;
+						}
+					}
+				}
+				continue;
 			}
 			return list;
 		}
 		public bool bPressed(EInstrumentPad part, EPad pad) {
-			if (part != EInstrumentPad.Unknown) {
+			if (part == EInstrumentPad.Unknown) {
+				return false;
+			}
 
-				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
-				for (int i = 0; i < stkeyassignArray.Length; i++) {
-					switch (stkeyassignArray[i].InputDevice) {
-						case EInputDevice.Keyboard:
-							if (!this.rInput管理.Keyboard.KeyPressed(stkeyassignArray[i].Code))
-								break;
+			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+			for (int i = 0; i < stkeyassignArray.Length; i++) {
+				switch (stkeyassignArray[i].InputDevice) {
+					case EInputDevice.Keyboard:
+						if (!this.rInput管理.Keyboard.KeyPressed(stkeyassignArray[i].Code))
+							break;
 
-							this.st検知したデバイス.Keyboard = true;
-							return true;
+						this.st検知したデバイス.Keyboard = true;
+						return true;
 
-						case EInputDevice.MIDIInput: {
-								IInputDevice device2 = this.rInput管理.MidiIn(stkeyassignArray[i].ID);
-								if ((device2 == null) || !device2.KeyPressed(stkeyassignArray[i].Code))
-									break;
+					case EInputDevice.MIDIInput: {
+						IInputDevice device2 = this.rInput管理.MidiIn(stkeyassignArray[i].ID);
+						if (device2 == null || !device2.KeyPressed(stkeyassignArray[i].Code))
+							break;
 
-								this.st検知したデバイス.MIDIIN = true;
-								return true;
-							}
-						case EInputDevice.Joypad: {
-								if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
-									break;
-
-								IInputDevice device = this.rInput管理.Joystick(stkeyassignArray[i].ID);
-								if ((device == null) || !device.KeyPressed(stkeyassignArray[i].Code))
-									break;
-
-								this.st検知したデバイス.Joypad = true;
-								return true;
-							}
-						case EInputDevice.Gamepad: {
-								if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
-									break;
-
-								IInputDevice device = this.rInput管理.Gamepad(stkeyassignArray[i].ID);
-								if ((device == null) || !device.KeyPressed(stkeyassignArray[i].Code))
-									break;
-
-								this.st検知したデバイス.Gamepad = true;
-								return true;
-							}
-						case EInputDevice.Mouse:
-							if (!this.rInput管理.Mouse.KeyPressed(stkeyassignArray[i].Code))
-								break;
-
-							this.st検知したデバイス.Mouse = true;
-							return true;
+						this.st検知したデバイス.MIDIIN = true;
+						return true;
 					}
+					case EInputDevice.Joypad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.rInput管理.Joystick(stkeyassignArray[i].ID);
+						if (device == null || !device.KeyPressed(stkeyassignArray[i].Code))
+							break;
+
+						this.st検知したデバイス.Joypad = true;
+						return true;
+					}
+					case EInputDevice.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.rInput管理.Gamepad(stkeyassignArray[i].ID);
+						if (device == null || !device.KeyPressed(stkeyassignArray[i].Code))
+							break;
+
+						this.st検知したデバイス.Gamepad = true;
+						return true;
+					}
+					case EInputDevice.Mouse:
+						if (!this.rInput管理.Mouse.KeyPressed(stkeyassignArray[i].Code))
+							break;
+
+						this.st検知したデバイス.Mouse = true;
+						return true;
 				}
 			}
 			return false;
@@ -146,62 +149,58 @@ namespace OpenTaiko {
 			return true;
 		}
 		public bool bPressedGB(EPad pad) {
-			if (!this.bPressed(EInstrumentPad.Guitar, pad)) {
-				return this.bPressed(EInstrumentPad.Bass, pad);
-			}
-			return true;
+			return this.bPressed(EInstrumentPad.Guitar, pad) || this.bPressed(EInstrumentPad.Bass, pad);
 		}
 		public bool b押されている(EInstrumentPad part, EPad pad) {
-			if (part != EInstrumentPad.Unknown) {
-				CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
-				for (int i = 0; i < stkeyassignArray.Length; i++) {
-					switch (stkeyassignArray[i].InputDevice) {
-						case EInputDevice.Keyboard:
-							if (!this.rInput管理.Keyboard.KeyPressing(stkeyassignArray[i].Code)) {
-								break;
-							}
-							this.st検知したデバイス.Keyboard = true;
-							return true;
+			if (part == EInstrumentPad.Unknown) {
+				return false;
+			}
 
-						case EInputDevice.Joypad: {
-								if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
-									break;
-								}
-								IInputDevice device = this.rInput管理.Joystick(stkeyassignArray[i].ID);
-								if ((device == null) || !device.KeyPressing(stkeyassignArray[i].Code)) {
-									break;
-								}
-								this.st検知したデバイス.Joypad = true;
-								return true;
-							}
+			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+			for (int i = 0; i < stkeyassignArray.Length; i++) {
+				switch (stkeyassignArray[i].InputDevice) {
+					case EInputDevice.Keyboard:
+						if (!this.rInput管理.Keyboard.KeyPressing(stkeyassignArray[i].Code)) {
+							break;
+						}
+						this.st検知したデバイス.Keyboard = true;
+						return true;
 
-						case EInputDevice.Gamepad: {
-								if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
-									break;
-								}
-								IInputDevice device = this.rInput管理.Gamepad(stkeyassignArray[i].ID);
-								if ((device == null) || !device.KeyPressing(stkeyassignArray[i].Code)) {
-									break;
-								}
-								this.st検知したデバイス.Gamepad = true;
-								return true;
-							}
-						case EInputDevice.Mouse:
-							if (!this.rInput管理.Mouse.KeyPressing(stkeyassignArray[i].Code)) {
-								break;
-							}
-							this.st検知したデバイス.Mouse = true;
-							return true;
+					case EInputDevice.Joypad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
+							break;
+						}
+						IInputDevice device = this.rInput管理.Joystick(stkeyassignArray[i].ID);
+						if ((device == null) || !device.KeyPressing(stkeyassignArray[i].Code)) {
+							break;
+						}
+						this.st検知したデバイス.Joypad = true;
+						return true;
 					}
+
+					case EInputDevice.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
+							break;
+						}
+						IInputDevice device = this.rInput管理.Gamepad(stkeyassignArray[i].ID);
+						if ((device == null) || !device.KeyPressing(stkeyassignArray[i].Code)) {
+							break;
+						}
+						this.st検知したデバイス.Gamepad = true;
+						return true;
+					}
+					case EInputDevice.Mouse:
+						if (!this.rInput管理.Mouse.KeyPressing(stkeyassignArray[i].Code)) {
+							break;
+						}
+						this.st検知したデバイス.Mouse = true;
+						return true;
 				}
 			}
 			return false;
 		}
 		public bool b押されているGB(EPad pad) {
-			if (!this.b押されている(EInstrumentPad.Guitar, pad)) {
-				return this.b押されている(EInstrumentPad.Bass, pad);
-			}
-			return true;
+			return this.b押されている(EInstrumentPad.Guitar, pad) || this.b押されている(EInstrumentPad.Bass, pad);
 		}
 
 
