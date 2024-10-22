@@ -12,10 +12,10 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 		public void DrawText(double x, double y, string text) {
-			OpenTaiko.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text);
+			OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
 		}
 		public void DrawNum(double x, double y, double text) {
-			OpenTaiko.actTextConsole.tPrint((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
+			OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
 		}
 		public void AddGraph(string fileName) {
 			string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);

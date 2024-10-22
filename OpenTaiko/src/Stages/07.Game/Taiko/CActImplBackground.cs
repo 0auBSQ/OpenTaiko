@@ -317,7 +317,7 @@ namespace OpenTaiko {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
 
-				OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
+				OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
 				int nightTime = Math.Max(140, maxFloor / 2);
 

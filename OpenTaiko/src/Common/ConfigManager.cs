@@ -4,29 +4,27 @@ using Newtonsoft.Json.Converters;
 
 namespace OpenTaiko {
 	/// <summary>
-	/// 設定ファイル入出力クラス。
+	/// Class for reading and writing configuration files.
 	/// </summary>
 	public static class ConfigManager {
 		private static readonly JsonSerializerSettings Settings =
 			new JsonSerializerSettings() {
 				ObjectCreationHandling = ObjectCreationHandling.Auto,
 				DefaultValueHandling = DefaultValueHandling.Include,
-				// ContractResolver = new CamelCasePropertyNamesContractResolver(),
 				NullValueHandling = NullValueHandling.Ignore,
 				MissingMemberHandling = MissingMemberHandling.Ignore,
 				Converters = new StringEnumConverter[] { new StringEnumConverter() }
 			};
 
 		/// <summary>
-		/// 設定ファイルの読み込みを行います。ファイルが存在しなかった場合、そのクラスの新規インスタンスを返します。
+		/// Reads the configuration file. If the file does not exist, it will be created.
 		/// </summary>
-		/// <typeparam name="T">シリアライズしたクラス。</typeparam>
-		/// <param name="filePath">ファイル名。</param>
-		/// <returns>デシリアライズ結果。</returns>
+		/// <typeparam name="T">Type of the object to deserialize.</typeparam>
+		/// <param name="filePath">File name.</param>
+		/// <returns>Deserialized object.</returns>
 		public static T GetConfig<T>(string filePath) where T : new() {
 			var json = "";
 			if (!System.IO.File.Exists(filePath)) {
-				// ファイルが存在しないので
 				SaveConfig(new T(), filePath);
 			}
 			using (var stream = new System.IO.StreamReader(filePath, Encoding.UTF8)) {
@@ -36,10 +34,10 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>
-		/// 設定ファイルの書き込みを行います。
+		/// Writes the object to a file.
 		/// </summary>
-		/// <param name="obj">シリアライズするインスタンス。</param>
-		/// <param name="filePath">ファイル名。</param>
+		/// <param name="obj">Object to serialize.</param>
+		/// <param name="filePath">File name.</param>
 		public static void SaveConfig(object obj, string filePath) {
 			(new FileInfo(filePath)).Directory.Create();
 			using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8)) {
