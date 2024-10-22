@@ -88,7 +88,7 @@ namespace OpenTaiko {
 					base.IsFirstDraw = false;
 				}
 
-				OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
+				OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
 				if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause)) {
 					if (this.bTrainingPAUSE) {
