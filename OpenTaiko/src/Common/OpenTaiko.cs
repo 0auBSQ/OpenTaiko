@@ -38,8 +38,6 @@ namespace OpenTaiko {
 				.FirstOrDefault()
 				?.InformationalVersion
 			?? $"{GetAppDisplayThreePartVersion()} (unknown informational version)";
-		public static readonly string SLIMDXDLL = "c_net20x86_Jun2010";
-		public static readonly string D3DXDLL = "d3dx9_43.dll";     // June 2010
 
 		public static CStage latestSongSelect {
 			get;

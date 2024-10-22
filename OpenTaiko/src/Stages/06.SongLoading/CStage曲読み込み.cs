@@ -37,18 +37,9 @@ namespace OpenTaiko {
 
 				var strフォルダ名 = Path.GetDirectoryName(strDTXファイルパス) + Path.DirectorySeparatorChar;
 
-				if (File.Exists(strフォルダ名 + @"set.def")) {
-					var cdtx = new CDTX(strDTXファイルパス, true, 1.0, 0, 1);
-
-					this.str曲タイトル = cdtx.TITLE.GetString("");
-					this.strサブタイトル = cdtx.SUBTITLE.GetString("");
-
-					cdtx.DeActivate();
-				} else {
-					var 譜面情報 = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報;
-					this.str曲タイトル = 譜面情報.タイトル;
-					this.strサブタイトル = 譜面情報.strサブタイトル;
-				}
+				var 譜面情報 = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報;
+				this.str曲タイトル = 譜面情報.タイトル;
+				this.strサブタイトル = 譜面情報.strサブタイトル;
 
 				this.strSTAGEFILE = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}4_SongLoading{Path.DirectorySeparatorChar}Background.png");
 
