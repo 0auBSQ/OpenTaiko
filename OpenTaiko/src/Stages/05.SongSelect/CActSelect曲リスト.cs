@@ -783,8 +783,6 @@ namespace OpenTaiko {
 
 			}
 
-			OpenTaiko.IsPerformingCalibration = false;
-
 			OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect = false;
 
 			this.pfBoxName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.SongSelect_BoxName_Scale);

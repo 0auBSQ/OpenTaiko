@@ -20,14 +20,7 @@ namespace OpenTaiko {
 
 		public override void Activate() {
 
-			// After performing calibration, inform the player that
-			// calibration has been completed, rather than
-			// displaying the song title as usual.
-
-
-			var title = OpenTaiko.IsPerformingCalibration
-				? $"Calibration complete. InputAdjustTime is now {OpenTaiko.ConfigIni.nInputAdjustTimeMs}ms (Note : InputAdjust is deprecated, please transfer the value to GlobalOffset and reload the songs"
-				: OpenTaiko.DTX.TITLE.GetString("");
+			var title = OpenTaiko.DTX.TITLE.GetString("");
 
 			using (var bmpSongTitle = pfMusicName.DrawText(title, OpenTaiko.Skin.Result_MusicName_ForeColor, OpenTaiko.Skin.Result_MusicName_BackColor, null, 30)) {
 				this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);

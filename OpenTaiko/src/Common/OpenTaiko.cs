@@ -171,8 +171,6 @@ namespace OpenTaiko {
 
 		public static CSongReplay[] ReplayInstances = new CSongReplay[5];
 
-		public static bool IsPerformingCalibration;
-
 		public static CFPS FPS {
 			get;
 			private set;

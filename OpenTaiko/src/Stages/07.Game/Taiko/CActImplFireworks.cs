@@ -164,7 +164,7 @@ namespace OpenTaiko {
 
 							// (When performing calibration, reduce visual distraction
 							// and current judgment feedback near the judgment position.)
-							if (OpenTaiko.Tx.Effects_Hit_Explosion != null && !OpenTaiko.IsPerformingCalibration) {
+							if (OpenTaiko.Tx.Effects_Hit_Explosion != null) {
 								int n = this.st状態[i].nIsBig == 1 ? (nHeight * 2) : 0;
 
 								int nX = 0;

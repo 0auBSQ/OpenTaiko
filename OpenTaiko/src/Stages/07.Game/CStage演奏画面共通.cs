@@ -505,12 +505,6 @@ namespace OpenTaiko {
 
 			var meanLag = CLagLogger.LogAndReturnMeanLag();
 
-			if (OpenTaiko.IsPerformingCalibration && meanLag != null) {
-				var oldInputAdjustTimeMs = OpenTaiko.ConfigIni.nInputAdjustTimeMs;
-				var newInputAdjustTimeMs = oldInputAdjustTimeMs - (int)Math.Round(meanLag.Value);
-				Trace.TraceInformation($"Calibration complete. Updating InputAdjustTime from {oldInputAdjustTimeMs}ms to {newInputAdjustTimeMs}ms.");
-				OpenTaiko.ConfigIni.nInputAdjustTimeMs = newInputAdjustTimeMs;
-			}
 			this.actDan.IsAnimating = false;// IsAnimating=trueのときにそのまま選曲画面に戻ると、文字列が描画されない問題修正用。
 			OpenTaiko.tテクスチャの解放(ref this.tx背景);
 
@@ -941,23 +935,7 @@ namespace OpenTaiko {
 
 		internal ENoteJudge e指定時刻からChipのJUDGEを返す(long nTime, CDTX.CChip pChip, int player = 0) {
 			var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player);
-
-			// When performing calibration, reduce audio distraction from user input.
-			// For users who play primarily by watching notes cross the judgment position,
-			// you might think that we want them to see visual judgment feedback during
-			// calibration, but we do not. Humans are remarkably good at adjusting
-			// the timing of their own physical movement, even without realizing it.
-			// We are calibrating their input timing for the purposes of judgment.
-			// We do not want them subconsciously playing early so as to line up
-			// their hits with the perfect, good, etc. judgment results based on their
-			// current (and soon to be replaced) input adjust time values.
-			// Instead, we want them focused on the sounds of their keyboard, tatacon,
-			// other controller, etc. and the visuals of notes crossing the judgment position.
-			if (OpenTaiko.IsPerformingCalibration) {
-				return e判定 < ENoteJudge.Good ? ENoteJudge.Good : e判定;
-			} else {
-				return e判定;
-			}
+			return e判定;
 		}
 
 		private bool tEasyTimeZones(int nPlayer) {
@@ -2865,13 +2843,7 @@ namespace OpenTaiko {
 			}
 		}
 		protected void tパネル文字列の設定() {
-			// When performing calibration, inform the player that
-			// calibration is taking place, rather than
-			// displaying the panel title or song title as usual.
-
-			var panelString = OpenTaiko.IsPerformingCalibration
-				? "Calibrating input..."
-				: string.IsNullOrEmpty(OpenTaiko.DTX.PANEL) ? OpenTaiko.DTX.TITLE.GetString("") : OpenTaiko.DTX.PANEL;
+			var panelString = string.IsNullOrEmpty(OpenTaiko.DTX.PANEL) ? OpenTaiko.DTX.TITLE.GetString("") : OpenTaiko.DTX.PANEL;
 
 			this.actPanel.SetPanelString(panelString,
 				OpenTaiko.stageSongSelect.rChoosenSong.str本当のジャンル,

@@ -288,49 +288,21 @@ namespace OpenTaiko {
 			// their drum sound effects with the sounds of the input calibration file.
 			// Instead, we want them focused on the sounds of their keyboard, tatacon,
 			// other controller, etc. and the sounds of the input calibration audio file.
-			if (!OpenTaiko.IsPerformingCalibration) {
-				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					int actual = OpenTaiko.GetActualPlayer(i);
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				int actual = OpenTaiko.GetActualPlayer(i);
 
-					var hs = OpenTaiko.Skin.hsHitSoundsInformations;
+				var hs = OpenTaiko.Skin.hsHitSoundsInformations;
 
-					//this.soundRed[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.don[actual]), ESoundGroup.SoundEffect);
-					//this.soundBlue[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.ka[actual]), ESoundGroup.SoundEffect);
-					//this.soundAdlib[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.adlib[actual]), ESoundGroup.SoundEffect);
-					//this.soundClap[i] = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(hs.clap[actual]), ESoundGroup.SoundEffect);
+				this.soundRed[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.don[actual]), ESoundGroup.SoundEffect);
+				this.soundBlue[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.ka[actual]), ESoundGroup.SoundEffect);
+				this.soundAdlib[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.adlib[actual]), ESoundGroup.SoundEffect);
+				this.soundClap[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.clap[actual]), ESoundGroup.SoundEffect);
 
-					this.soundRed[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.don[actual]), ESoundGroup.SoundEffect);
-					this.soundBlue[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.ka[actual]), ESoundGroup.SoundEffect);
-					this.soundAdlib[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.adlib[actual]), ESoundGroup.SoundEffect);
-					this.soundClap[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.clap[actual]), ESoundGroup.SoundEffect);
-
-					int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
-					if (this.soundRed[i] != null) this.soundRed[i].SoundPosition = _panning;
-					if (this.soundBlue[i] != null) this.soundBlue[i].SoundPosition = _panning;
-					if (this.soundAdlib[i] != null) this.soundAdlib[i].SoundPosition = _panning;
-					if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
-				}
-				/*
-                this.soundRed = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\dong.ogg" ), ESoundGroup.SoundEffect );
-			    this.soundBlue = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path( @"Sounds\Taiko\ka.ogg" ), ESoundGroup.SoundEffect );
-			    this.soundAdlib = TJAPlayer3.Sound管理.tサウンドを生成する( CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect );
-
-                this.soundRed2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\dong.ogg"), ESoundGroup.SoundEffect);
-                this.soundBlue2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\ka.ogg"), ESoundGroup.SoundEffect);
-                this.soundAdlib2 = TJAPlayer3.Sound管理.tサウンドを生成する(CSkin.Path(@"Sounds\Taiko\Adlib.ogg"), ESoundGroup.SoundEffect);
-                */
-
-				/*
-                if (TJAPlayer3.ConfigIni.nPlayerCount == 2)//2020.05.06 Mr-Ojii左右に出したかったから、追加。
-                {
-                    this.soundRed[0].n位置 = -100;
-                    this.soundBlue[0].n位置 = -100;
-                    this.soundAdlib[0].n位置 = -100;
-                    this.soundRed[1].n位置 = 100;
-                    this.soundBlue[1].n位置 = 100;
-                    this.soundAdlib[1].n位置 = 100;
-                }
-                */
+				int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
+				if (this.soundRed[i] != null) this.soundRed[i].SoundPosition = _panning;
+				if (this.soundBlue[i] != null) this.soundBlue[i].SoundPosition = _panning;
+				if (this.soundAdlib[i] != null) this.soundAdlib[i].SoundPosition = _panning;
+				if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
 			}
 		}
 		public override void DeActivate() {
@@ -352,20 +324,6 @@ namespace OpenTaiko {
 			LoudnessMetadataScanner.StartBackgroundScanning();
 		}
 		public override void CreateManagedResource() {
-			//this.t背景テクスチャの生成();
-			//this.tx太鼓ノーツ = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_taiko_notes.png" ) );
-			//this.txHand = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_taiko_notes_arm.png" ) );
-			//this.txSenotes = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_senotes.png" ) );
-			//this.tx小節線 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_bar_line.png" ) );
-			//this.tx小節線_branch = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_bar_line_branch.png" ) );
-			//            this.tx判定数小文字 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\8_Result_number_s.png" ) );
-			//            this.txNamePlate = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_NamePlate.png" ) );
-			//            if (CDTXMania.stage演奏ドラム画面.bDoublePlay)
-			//                this.txNamePlate2P = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_NamePlate2P.png" ) );
-			//            this.txPlayerNumber = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_PlayerNumber.png"));
-
-			//            this.tx判定数表示パネル = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\7_Paramater Panel.png" ) );
-
 			base.CreateManagedResource();
 		}
 		public override void ReleaseManagedResource() {

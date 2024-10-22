@@ -50,16 +50,6 @@ namespace OpenTaiko {
 					this.strサブタイトル = 譜面情報.strサブタイトル;
 				}
 
-				// For the moment, detect that we are performing
-				// calibration via there being an actual single
-				// player and the special song title and subtitle
-				// of the .tja used to perform input calibration
-				OpenTaiko.IsPerformingCalibration =
-					!OpenTaiko.ConfigIni.bAutoPlay[0] &&
-					OpenTaiko.ConfigIni.nPlayerCount == 1 &&
-					str曲タイトル == "Input Calibration" &&
-					strサブタイトル == "TJAPlayer3 Developers";
-
 				this.strSTAGEFILE = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}4_SongLoading{Path.DirectorySeparatorChar}Background.png");
 
 
@@ -76,13 +66,9 @@ namespace OpenTaiko {
 					// calibration is about to begin, rather than
 					// displaying the song title and subtitle as usual.
 
-					var タイトル = OpenTaiko.IsPerformingCalibration
-						? "Input calibration is about to begin."
-						: this.str曲タイトル;
+					var タイトル = this.str曲タイトル;
 
-					var サブタイトル = OpenTaiko.IsPerformingCalibration
-						? "Please play as accurately as possible."
-						: this.strサブタイトル;
+					var サブタイトル = this.strサブタイトル;
 
 					if (!string.IsNullOrEmpty(タイトル)) {
 						//this.txタイトル = new CTexture( CDTXMania.app.Device, image, CDTXMania.TextureFormat );
@@ -108,7 +94,6 @@ namespace OpenTaiko {
 					Trace.TraceError("テクスチャの生成に失敗しました。({0})", new object[] { this.strSTAGEFILE });
 					this.txタイトル = null;
 					this.txサブタイトル = null;
-					this.tx背景 = null;
 				}
 
 				base.Activate();
@@ -136,7 +121,6 @@ namespace OpenTaiko {
 			pfDanTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_DanC_Title_Size);
 			pfDanSubTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_DanC_SubTitle_Size);
 
-			this.tx背景 = OpenTaiko.tテクスチャの生成(this.strSTAGEFILE, false);
 			//this.txSongnamePlate = CDTXMania.tテクスチャの生成( CSkin.Path( @$"Graphics{Path.DirectorySeparatorChar}6_SongnamePlate.png" ) );
 			base.CreateManagedResource();
 		}
@@ -147,7 +131,6 @@ namespace OpenTaiko {
 			pfDanTitle?.Dispose();
 			pfDanSubTitle?.Dispose();
 
-			OpenTaiko.tテクスチャの解放(ref this.tx背景);
 			base.ReleaseManagedResource();
 		}
 		public override int Draw() {
@@ -548,7 +531,6 @@ namespace OpenTaiko {
 		private string strサブタイトル;
 		private CTexture txタイトル;
 		private CTexture txサブタイトル;
-		private CTexture tx背景;
 		//private CTexture txSongnamePlate;
 		private DateTime timeBeginLoad;
 		private DateTime timeBeginLoadWAV;
