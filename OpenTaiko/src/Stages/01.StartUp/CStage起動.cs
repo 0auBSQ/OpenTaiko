@@ -173,7 +173,7 @@ namespace OpenTaiko {
 					int x = 320;
 					int y = 20;
 					for (int i = 0; i < this.list進行文字列.Count; i++) {
-						OpenTaiko.actTextConsole.tPrint((int)(x * OpenTaiko.Skin.Resolution[0] / 1280.0), (int)(y * OpenTaiko.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
+						OpenTaiko.actTextConsole.Print((int)(x * OpenTaiko.Skin.Resolution[0] / 1280.0), (int)(y * OpenTaiko.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
 						y += 24;
 					}
 					//-----------------
