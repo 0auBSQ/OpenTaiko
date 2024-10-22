@@ -2820,16 +2820,16 @@ namespace OpenTaiko {
 		}
 
 		protected void t入力メソッド記憶(EInstrumentPad part) {
-			if (OpenTaiko.Pad.st検知したデバイス.Keyboard) {
+			if (OpenTaiko.Pad.detectedDevice.Keyboard) {
 				this.b演奏にキーボードを使った = true;
 			}
-			if (OpenTaiko.Pad.st検知したデバイス.Joypad) {
+			if (OpenTaiko.Pad.detectedDevice.Joypad) {
 				this.b演奏にジョイパッドを使った = true;
 			}
-			if (OpenTaiko.Pad.st検知したデバイス.MIDIIN) {
+			if (OpenTaiko.Pad.detectedDevice.MIDIIN) {
 				this.b演奏にMIDI入力を使った = true;
 			}
-			if (OpenTaiko.Pad.st検知したデバイス.Mouse) {
+			if (OpenTaiko.Pad.detectedDevice.Mouse) {
 				this.b演奏にマウスを使った = true;
 			}
 		}

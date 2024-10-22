@@ -488,13 +488,13 @@ namespace OpenTaiko {
 				}
 
 				if (OpenTaiko.ConfigIni.bTokkunMode)
-					OpenTaiko.actTextConsole.tPrint(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
+					OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
 				if (OpenTaiko.ConfigIni.eGameMode == EGame.Survival)
-					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
+					OpenTaiko.actTextConsole.Print(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
 				if (OpenTaiko.ConfigIni.eGameMode == EGame.SurvivalHard)
-					OpenTaiko.actTextConsole.tPrint(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
+					OpenTaiko.actTextConsole.Print(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
 				if (OpenTaiko.ConfigIni.bSuperHard)
-					OpenTaiko.actTextConsole.tPrint(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
+					OpenTaiko.actTextConsole.Print(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
 
 				#endregion
 

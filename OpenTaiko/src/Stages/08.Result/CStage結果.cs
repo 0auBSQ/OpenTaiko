@@ -1248,7 +1248,7 @@ namespace OpenTaiko {
 
 						int sc = GetTowerScoreRank() - 1;
 
-						OpenTaiko.actTextConsole.tPrint(0, 40, CTextConsole.EFontType.White, sc.ToString());
+						OpenTaiko.actTextConsole.Print(0, 40, CTextConsole.EFontType.White, sc.ToString());
 
 						if (sc >= 0 && OpenTaiko.Tx.TowerResult_ScoreRankEffect != null) {
 							int scoreRankEffect_width = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;

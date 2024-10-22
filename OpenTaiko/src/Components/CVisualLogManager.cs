@@ -23,7 +23,7 @@ namespace OpenTaiko {
 				int x = 0;
 				int y = 0 + (40 * screenPosition);
 
-				OpenTaiko.actTextConsole.tPrint(x, y, CTextConsole.EFontType.Cyan, msg);
+				OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.Cyan, msg);
 			}
 
 			public bool IsExpired() {

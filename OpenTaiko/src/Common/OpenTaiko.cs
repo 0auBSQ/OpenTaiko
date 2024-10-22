@@ -1155,7 +1155,7 @@ namespace OpenTaiko {
 							#region [ *** ]
 							//-----------------------------
 							if (this.n進行描画の戻り値 != 0) {
-								OpenTaiko.Pad.st検知したデバイス.Clear();  // 入力デバイスフラグクリア(2010.9.11)
+								OpenTaiko.Pad.detectedDevice.Clear();  // 入力デバイスフラグクリア(2010.9.11)
 								r現在のステージ.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									r現在のステージ.ReleaseManagedResource();

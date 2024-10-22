@@ -453,12 +453,12 @@ namespace OpenTaiko {
 					}
 				}
 				this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
-				this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.HH), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
+				this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.HH), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD)) {
 					this.tカーソルを上へ移動する();
 				}
 				this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
-				this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.b押されているGB(EPad.BD), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
+				this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.BD), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT)) {
 					this.tカーソルを下へ移動する();
 				}
