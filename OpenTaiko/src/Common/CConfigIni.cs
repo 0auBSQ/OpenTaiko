@@ -3313,10 +3313,10 @@ namespace OpenTaiko {
 		private void ProcessGuidSection(string key, string value) {
 			switch (key) {
 				case "JoystickID":
-					this.tJoystickIDの取得(value);
+					this.GetJoystickID(value);
 					break;
 				case "GamepadID":
-					this.tGamepadIDの取得(value);
+					this.GetGamepadID(value);
 					break;
 			}
 		}
@@ -3569,8 +3569,8 @@ namespace OpenTaiko {
 		private bool bConfigIniFileExists;
 		private string ConfigIniFileName;
 
-		private void tJoystickIDの取得(string strキー記述) {
-			string[] strArray = strキー記述.Split(new char[] { ',' });
+		private void GetJoystickID(string keyDescription) {
+			string[] strArray = keyDescription.Split(new char[] { ',' });
 			if (strArray.Length >= 2) {
 				int result = 0;
 				if ((int.TryParse(strArray[0], out result) && (result >= 0)) && (result <= 9)) {
@@ -3583,8 +3583,8 @@ namespace OpenTaiko {
 			}
 		}
 
-		private void tGamepadIDの取得(string strキー記述) {
-			string[] strArray = strキー記述.Split(new char[] { ',' });
+		private void GetGamepadID(string keyDescription) {
+			string[] strArray = keyDescription.Split(new char[] { ',' });
 			if (strArray.Length >= 2) {
 				int result = 0;
 				if ((int.TryParse(strArray[0], out result) && (result >= 0)) && (result <= 9)) {
