@@ -5,10 +5,14 @@ namespace FDK;
 public class CInputGamepad : IInputDevice, IDisposable {
 	// Constructor
 
+	private IGamepad Gamepad { get; set; }
+
 	public CInputGamepad(IGamepad gamepad) {
+		this.Gamepad = gamepad;
 		this.CurrentType = InputDeviceType.Gamepad;
 		this.GUID = gamepad.Index.ToString();
 		this.ID = gamepad.Index;
+		this.Name = gamepad.Name;
 
 		this.InputEvents = new List<STInputEvent>(32);
 
@@ -34,6 +38,10 @@ public class CInputGamepad : IInputDevice, IDisposable {
 		private set;
 	}
 	public int ID {
+		get;
+		private set;
+	}
+	public string Name {
 		get;
 		private set;
 	}

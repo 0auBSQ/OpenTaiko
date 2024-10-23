@@ -79,7 +79,7 @@ internal class CActImplMob : CActivity {
 	}
 	#region[ private ]
 	//-----------------
-	private ScriptBG MobScript;
+	public ScriptBG MobScript { get; private set; }
 	//-----------------
 	#endregion
 }

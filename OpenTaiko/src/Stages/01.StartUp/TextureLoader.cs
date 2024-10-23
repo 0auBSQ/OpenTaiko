@@ -603,7 +603,6 @@ class TextureLoader {
 		Gauge_Dan[5] = TxC(GAME + GAUGE + @$"1P_Dan_Right.png");
 
 		Gauge_Soul = TxC(GAME + GAUGE + @$"Soul.png");
-		Gauge_Flash = TxC(GAME + GAUGE + @$"Flash.png");
 		Gauge_Soul_Fire = TxC(GAME + GAUGE + @$"Fire.png");
 		Gauge_Soul_Explosion = new CTexture[2];
 		Gauge_Soul_Explosion[0] = TxC(GAME + GAUGE + @$"1P_Explosion.png");
@@ -876,7 +875,6 @@ class TextureLoader {
 		#endregion
 
 		#region 6_結果発表
-		Result_FadeIn = TxC(RESULT + @$"FadeIn.png");
 
 		Result_Gauge[0] = TxC(RESULT + @$"Gauge.png");
 		Result_Gauge_Base[0] = TxC(RESULT + @$"Gauge_Base.png");
@@ -2530,7 +2528,6 @@ class TextureLoader {
 		Gauge_Killzone,
 		Gauge_Soul_Explosion;
 	public CTexture Gauge_Soul,
-		Gauge_Flash,
 		Gauge_Soul_Fire;
 	public CTexture[] Gauge_Dan;
 	public CTexture[] Gauge_Dan_Rainbow;
@@ -2673,8 +2670,7 @@ class TextureLoader {
 	#endregion
 
 	#region 6_結果発表
-	public CTexture Result_FadeIn,
-		Result_Header,
+	public CTexture Result_Header,
 		Result_Number,
 		Result_Panel,
 		Result_Panel_2P,

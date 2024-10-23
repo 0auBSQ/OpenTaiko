@@ -12,6 +12,9 @@ public interface IInputDevice : IDisposable {
 	int ID {
 		get;
 	}
+	string Name {
+		get;
+	}
 	List<STInputEvent> InputEvents {
 		get;
 	}

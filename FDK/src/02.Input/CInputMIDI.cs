@@ -15,6 +15,7 @@ public class CInputMIDI : IInputDevice, IDisposable {
 		this.CurrentType = InputDeviceType.MidiIn;
 		this.GUID = "";
 		this.ID = (int)nID;
+		this.Name = "";
 		this.strDeviceName = "";    // CInput管理で初期化する
 	}
 
@@ -60,6 +61,7 @@ public class CInputMIDI : IInputDevice, IDisposable {
 	public InputDeviceType CurrentType { get; private set; }
 	public string GUID { get; private set; }
 	public int ID { get; private set; }
+	public string Name { get; private set; }
 	public List<STInputEvent> InputEvents { get; private set; }
 	public string strDeviceName { get; set; }
 

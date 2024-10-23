@@ -8,7 +8,7 @@ using NLua;
 namespace OpenTaiko;
 
 class CLuaScript : IDisposable {
-	private static List<CLuaScript> listScripts = new List<CLuaScript>();
+	public static List<CLuaScript> listScripts { get; private set; } = new List<CLuaScript>();
 	public static void tReloadLanguage(string lang) {
 		foreach (var item in listScripts) {
 			item.ReloadLanguage(lang);
@@ -33,7 +33,7 @@ class CLuaScript : IDisposable {
 	private CLuaInfo luaInfo;
 	private CLuaFps luaFPS = new CLuaFps();
 
-	private List<IDisposable> listDisposables = new List<IDisposable>();
+	public List<IDisposable> listDisposables { get; private set; } = new List<IDisposable>();
 
 	protected bool Available {
 		get {

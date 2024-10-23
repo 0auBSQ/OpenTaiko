@@ -9,6 +9,7 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 		this.CurrentType = InputDeviceType.Keyboard;
 		this.GUID = "";
 		this.ID = 0;
+		this.Name = keyboards.Count > 0 ? keyboards[0].Name : "";
 
 		foreach (var keyboard in keyboards) {
 			keyboard.KeyDown += KeyDown;
@@ -29,6 +30,7 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 	public InputDeviceType CurrentType { get; private set; }
 	public string GUID { get; private set; }
 	public int ID { get; private set; }
+	public string Name { get; private set; }
 	public List<STInputEvent> InputEvents { get; private set; }
 	public string strDeviceName { get; set; }
 

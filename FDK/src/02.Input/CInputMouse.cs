@@ -16,13 +16,7 @@ public class CInputMouse : IInputDevice, IDisposable {
 		this.CurrentType = InputDeviceType.Mouse;
 		this.GUID = "";
 		this.ID = 0;
-		try {
-			Trace.TraceInformation(mouse.Name + " を生成しました。");  // なぜか0x00のゴミが出るので削除
-			this.strDeviceName = mouse.Name;
-		} catch {
-			Trace.TraceWarning("Mouse デバイスの生成に失敗しました。");
-			throw;
-		}
+		this.Name = mouse.Name;
 
 		mouse.Click += Mouse_Click;
 		mouse.DoubleClick += Mouse_DoubleClick;
@@ -41,8 +35,8 @@ public class CInputMouse : IInputDevice, IDisposable {
 	public InputDeviceType CurrentType { get; private set; }
 	public string GUID { get; private set; }
 	public int ID { get; private set; }
+	public string Name { get; private set; }
 	public List<STInputEvent> InputEvents { get; private set; }
-	public string strDeviceName { get; set; }
 
 	public void Polling(bool useBufferInput) {
 		InputEvents.Clear();
