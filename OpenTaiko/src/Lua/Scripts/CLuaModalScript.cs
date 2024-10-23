@@ -1,47 +1,47 @@
 ﻿using NLua;
 
-namespace OpenTaiko {
-	internal class CLuaModalScript : CLuaScript {
-		private LuaFunction lfRegisterModal;
-		private LuaFunction lfAnimationFinished;
-		private LuaFunction lfUpdate;
-		private LuaFunction lfDraw;
+namespace OpenTaiko;
 
-		public CLuaModalScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
+internal class CLuaModalScript : CLuaScript {
+	private LuaFunction lfRegisterModal;
+	private LuaFunction lfAnimationFinished;
+	private LuaFunction lfUpdate;
+	private LuaFunction lfDraw;
 
-			lfRegisterModal = (LuaFunction)LuaScript["registerNewModal"];
-			lfAnimationFinished = (LuaFunction)LuaScript["isAnimationFinished"];
-			lfUpdate = (LuaFunction)LuaScript["update"];
-			lfDraw = (LuaFunction)LuaScript["draw"];
-		}
+	public CLuaModalScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
 
-		// Function to retrieve if the currently playing modal animation (etc) finished playing, allowing to send the next modal
-		public bool AnimationFinished() {
-			if (!Available) return false;
-			bool result = (bool)RunLuaCode(lfAnimationFinished)[0];
-			return result;
-		}
+		lfRegisterModal = (LuaFunction)LuaScript["registerNewModal"];
+		lfAnimationFinished = (LuaFunction)LuaScript["isAnimationFinished"];
+		lfUpdate = (LuaFunction)LuaScript["update"];
+		lfDraw = (LuaFunction)LuaScript["draw"];
+	}
 
-		// Informations of the newly added modal are initialized here
-		public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
-			if (!Available) return;
+	// Function to retrieve if the currently playing modal animation (etc) finished playing, allowing to send the next modal
+	public bool AnimationFinished() {
+		if (!Available) return false;
+		bool result = (bool)RunLuaCode(lfAnimationFinished)[0];
+		return result;
+	}
 
-			object[] newParams = new object[] { player, rarity, (int)modalType };
-			if (args != null) newParams = newParams.Concat((object[])args).ToArray();
-			RunLuaCode(lfRegisterModal, newParams);
-		}
+	// Informations of the newly added modal are initialized here
+	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
+		if (!Available) return;
 
-		// Handle inputs here (if necessary, like to add a shortcut to accelerate the animation etc
-		public void Update(params object[] args) {
-			if (!Available) return;
+		object[] newParams = new object[] { player, rarity, (int)modalType };
+		if (args != null) newParams = newParams.Concat((object[])args).ToArray();
+		RunLuaCode(lfRegisterModal, newParams);
+	}
 
-			RunLuaCode(lfUpdate, args);
-		}
+	// Handle inputs here (if necessary, like to add a shortcut to accelerate the animation etc
+	public void Update(params object[] args) {
+		if (!Available) return;
 
-		public void Draw(params object[] args) {
-			if (!Available) return;
+		RunLuaCode(lfUpdate, args);
+	}
 
-			RunLuaCode(lfDraw, args);
-		}
+	public void Draw(params object[] args) {
+		if (!Available) return;
+
+		RunLuaCode(lfDraw, args);
 	}
 }
