@@ -1,60 +1,60 @@
 ﻿using FDK;
 using NLua;
 
-namespace OpenTaiko {
-	internal class CLuaNamePlateScript : CLuaScript {
-		private LuaFunction lfGetCharaOffset;
-		private LuaFunction lfSetInfos;
-		private LuaFunction lfDrawDan;
-		private LuaFunction lfDrawTitlePlate;
-		private LuaFunction lfUpdate;
-		private LuaFunction lfDraw;
+namespace OpenTaiko;
 
-		public CLuaNamePlateScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
-			lfGetCharaOffset = (LuaFunction)LuaScript["getCharaOffset"];
-			lfSetInfos = (LuaFunction)LuaScript["setInfos"];
-			lfDrawDan = (LuaFunction)LuaScript["drawDan"];
-			lfDrawTitlePlate = (LuaFunction)LuaScript["drawTitlePlate"];
-			lfUpdate = (LuaFunction)LuaScript["update"];
-			lfDraw = (LuaFunction)LuaScript["draw"];
-		}
+internal class CLuaNamePlateScript : CLuaScript {
+	private LuaFunction lfGetCharaOffset;
+	private LuaFunction lfSetInfos;
+	private LuaFunction lfDrawDan;
+	private LuaFunction lfDrawTitlePlate;
+	private LuaFunction lfUpdate;
+	private LuaFunction lfDraw;
 
-		public int GetCharaOffset() {
-			if (!Available) return 0;
-			double result = (double)RunLuaCode(lfGetCharaOffset)[0];
-			return (int)result;
-		}
+	public CLuaNamePlateScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
+		lfGetCharaOffset = (LuaFunction)LuaScript["getCharaOffset"];
+		lfSetInfos = (LuaFunction)LuaScript["setInfos"];
+		lfDrawDan = (LuaFunction)LuaScript["drawDan"];
+		lfDrawTitlePlate = (LuaFunction)LuaScript["drawTitlePlate"];
+		lfUpdate = (LuaFunction)LuaScript["update"];
+		lfDraw = (LuaFunction)LuaScript["draw"];
+	}
 
-		public void SetInfos(int player, string name, string title, string dan, SaveFile.Data data) {
-			if (!Available) return;
+	public int GetCharaOffset() {
+		if (!Available) return 0;
+		double result = (double)RunLuaCode(lfGetCharaOffset)[0];
+		return (int)result;
+	}
 
-			RunLuaCode(lfSetInfos, player, name ?? "", title ?? "", dan ?? "", data);
-		}
+	public void SetInfos(int player, string name, string title, string dan, SaveFile.Data data) {
+		if (!Available) return;
 
-		// For My Room
-		public void DrawDan(int x, int y, int opacity, int danGrade, CTexture titleTex) {
-			if (!Available) return;
+		RunLuaCode(lfSetInfos, player, name ?? "", title ?? "", dan ?? "", data);
+	}
 
-			RunLuaCode(lfDrawDan, x, y, opacity, danGrade, titleTex);
-		}
+	// For My Room
+	public void DrawDan(int x, int y, int opacity, int danGrade, CTexture titleTex) {
+		if (!Available) return;
 
-		// For My Room
-		public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex, int rarity, int nameplateId) {
-			if (!Available) return;
+		RunLuaCode(lfDrawDan, x, y, opacity, danGrade, titleTex);
+	}
 
-			RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex, rarity, nameplateId);
-		}
+	// For My Room
+	public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex, int rarity, int nameplateId) {
+		if (!Available) return;
 
-		public void Update(params object[] args) {
-			if (!Available) return;
+		RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex, rarity, nameplateId);
+	}
 
-			RunLuaCode(lfUpdate, args);
-		}
+	public void Update(params object[] args) {
+		if (!Available) return;
 
-		public void Draw(int x, int y, int opacity, int player, int side) {
-			if (!Available) return;
+		RunLuaCode(lfUpdate, args);
+	}
 
-			RunLuaCode(lfDraw, x, y, opacity, player, side);
-		}
+	public void Draw(int x, int y, int opacity, int player, int side) {
+		if (!Available) return;
+
+		RunLuaCode(lfDraw, x, y, opacity, player, side);
 	}
 }

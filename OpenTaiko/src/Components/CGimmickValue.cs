@@ -1,4 +1,4 @@
-﻿namespace OpenTaiko {
-	internal class CGimmickValue {
-	}
+﻿namespace OpenTaiko;
+
+internal class CGimmickValue {
 }

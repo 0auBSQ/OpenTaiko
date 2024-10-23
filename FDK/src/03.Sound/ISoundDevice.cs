@@ -1,14 +1,14 @@
-﻿namespace FDK {
-	internal interface ISoundDevice : IDisposable {
-		ESoundDeviceType SoundDeviceType { get; }
-		int nMasterVolume { get; set; }
-		long OutputDelay { get; }
-		long BufferSize { get; }
-		long ElapsedTimeMs { get; }
-		long UpdateSystemTimeMs { get; }
-		CTimer SystemTimer { get; }
+﻿namespace FDK;
 
-		CSound tCreateSound(string strファイル名, ESoundGroup soundGroup);
-		void tCreateSound(string strファイル名, CSound sound);
-	}
+internal interface ISoundDevice : IDisposable {
+	ESoundDeviceType SoundDeviceType { get; }
+	int nMasterVolume { get; set; }
+	long OutputDelay { get; }
+	long BufferSize { get; }
+	long ElapsedTimeMs { get; }
+	long UpdateSystemTimeMs { get; }
+	CTimer SystemTimer { get; }
+
+	CSound tCreateSound(string strファイル名, ESoundGroup soundGroup);
+	void tCreateSound(string strファイル名, CSound sound);
 }

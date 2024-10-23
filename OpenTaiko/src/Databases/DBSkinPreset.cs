@@ -1,56 +1,56 @@
 ﻿using Newtonsoft.Json;
 
-namespace OpenTaiko {
-	internal class DBSkinPreset {
-		public class SkinScene {
-			public SkinScene() {
-				UpperBackground = null;
-				LowerBackground = null;
-				DancerSet = null;
-				FooterSet = null;
-				MobSet = null;
-				RunnerSet = null;
-			}
+namespace OpenTaiko;
 
-			[JsonProperty("UP")]
-			public string[] UpperBackground;
-
-			[JsonProperty("DOWN")]
-			public string[] LowerBackground;
-
-			[JsonProperty("DANCER")]
-			public string[] DancerSet;
-
-			[JsonProperty("FOOTER")]
-			public string[] FooterSet;
-
-			[JsonProperty("MOB")]
-			public string[] MobSet;
-
-			[JsonProperty("RUNNER")]
-			public string[] RunnerSet;
+internal class DBSkinPreset {
+	public class SkinScene {
+		public SkinScene() {
+			UpperBackground = null;
+			LowerBackground = null;
+			DancerSet = null;
+			FooterSet = null;
+			MobSet = null;
+			RunnerSet = null;
 		}
-		public class SkinPreset {
-			public SkinPreset() {
-				Regular = new Dictionary<string, SkinScene>();
-				Dan = new Dictionary<string, SkinScene>();
-				Tower = new Dictionary<string, SkinScene>();
-				AI = new Dictionary<string, SkinScene>();
-			}
 
+		[JsonProperty("UP")]
+		public string[] UpperBackground;
 
-			[JsonProperty("Regular")]
-			public Dictionary<string, SkinScene> Regular;
+		[JsonProperty("DOWN")]
+		public string[] LowerBackground;
 
-			[JsonProperty("Dan")]
-			public Dictionary<string, SkinScene> Dan;
+		[JsonProperty("DANCER")]
+		public string[] DancerSet;
 
-			[JsonProperty("Tower")]
-			public Dictionary<string, SkinScene> Tower;
+		[JsonProperty("FOOTER")]
+		public string[] FooterSet;
 
-			[JsonProperty("AI")]
-			public Dictionary<string, SkinScene> AI;
+		[JsonProperty("MOB")]
+		public string[] MobSet;
 
+		[JsonProperty("RUNNER")]
+		public string[] RunnerSet;
+	}
+	public class SkinPreset {
+		public SkinPreset() {
+			Regular = new Dictionary<string, SkinScene>();
+			Dan = new Dictionary<string, SkinScene>();
+			Tower = new Dictionary<string, SkinScene>();
+			AI = new Dictionary<string, SkinScene>();
 		}
+
+
+		[JsonProperty("Regular")]
+		public Dictionary<string, SkinScene> Regular;
+
+		[JsonProperty("Dan")]
+		public Dictionary<string, SkinScene> Dan;
+
+		[JsonProperty("Tower")]
+		public Dictionary<string, SkinScene> Tower;
+
+		[JsonProperty("AI")]
+		public Dictionary<string, SkinScene> AI;
+
 	}
 }
