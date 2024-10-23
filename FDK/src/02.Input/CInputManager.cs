@@ -80,7 +80,7 @@ namespace FDK {
 			Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
 			for (int i = 0; i < InputDevices.Count; i++) {
 				try {
-					Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + ")");
+					Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + " - " + InputDevices[i].Name + ")");
 				} catch { }
 			}
 

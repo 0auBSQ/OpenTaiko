@@ -4,13 +4,14 @@ namespace FDK {
 	public class CInputJoystick : IInputDevice, IDisposable {
 		// Constructor
 
-		private IJoystick Joystick { get; set; }
+		public IJoystick Joystick { get; private set; }
 
 		public CInputJoystick(IJoystick joystick) {
-			Joystick = joystick;
+			this.Joystick = joystick;
 			this.CurrentType = InputDeviceType.Joystick;
 			this.GUID = joystick.Index.ToString();
 			this.ID = joystick.Index;
+			this.Name = joystick.Name;
 
 			this.InputEvents = new List<STInputEvent>(32);
 
@@ -38,6 +39,10 @@ namespace FDK {
 			private set;
 		}
 		public int ID {
+			get;
+			private set;
+		}
+		public string Name {
 			get;
 			private set;
 		}
