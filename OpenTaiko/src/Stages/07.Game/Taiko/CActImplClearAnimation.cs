@@ -742,29 +742,29 @@ namespace OpenTaiko {
 		#region[ private ]
 		//-----------------
 
-		private EndAnimeScript FailedScript;
-		private EndAnimeScript ClearScript;
-		private EndAnimeScript FullComboScript;
-		private EndAnimeScript PerfectComboScript;
+		public EndAnimeScript FailedScript { get; private set; }
+		public EndAnimeScript ClearScript { get; private set; }
+		public EndAnimeScript FullComboScript { get; private set; }
+		public EndAnimeScript PerfectComboScript { get; private set; }
 
-		private EndAnimeScript AILoseScript;
-		private EndAnimeScript AIWinScript;
-		private EndAnimeScript AIWin_FullComboScript;
-		private EndAnimeScript AIWin_PerfectScript;
+		public EndAnimeScript AILoseScript { get; private set; }
+		public EndAnimeScript AIWinScript { get; private set; }
+		public EndAnimeScript AIWin_FullComboScript { get; private set; }
+		public EndAnimeScript AIWin_PerfectScript { get; private set; }
 
-		private EndAnimeScript Tower_DropoutScript;
-		private EndAnimeScript Tower_TopReached_PassScript;
-		private EndAnimeScript Tower_TopReached_FullComboScript;
-		private EndAnimeScript Tower_TopReached_PerfectScript;
+		public EndAnimeScript Tower_DropoutScript { get; private set; }
+		public EndAnimeScript Tower_TopReached_PassScript { get; private set; }
+		public EndAnimeScript Tower_TopReached_FullComboScript { get; private set; }
+		public EndAnimeScript Tower_TopReached_PerfectScript { get; private set; }
 
-		private EndAnimeScript Dan_FailScript;
-		private EndAnimeScript Dan_Red_PassScript;
-		private EndAnimeScript Dan_Red_FullComboScript;
-		private EndAnimeScript Dan_Red_PerfectScript;
+		public EndAnimeScript Dan_FailScript { get; private set; }
+		public EndAnimeScript Dan_Red_PassScript { get; private set; }
+		public EndAnimeScript Dan_Red_FullComboScript { get; private set; }
+		public EndAnimeScript Dan_Red_PerfectScript { get; private set; }
 
-		private EndAnimeScript Dan_Gold_PassScript;
-		private EndAnimeScript Dan_Gold_FullComboScript;
-		private EndAnimeScript Dan_Gold_PerfectScript;
+		public EndAnimeScript Dan_Gold_PassScript { get; private set; }
+		public EndAnimeScript Dan_Gold_FullComboScript { get; private set; }
+		public EndAnimeScript Dan_Gold_PerfectScript { get; private set; }
 
 
 
@@ -804,8 +804,8 @@ namespace OpenTaiko {
 		CSound soundAIWinFullCombo;
 		CSound soundAIWinPerfectCombo;
 
-		EndMode[] Mode;
-		enum EndMode {
+		public EndMode[] Mode { get; private set; }
+		public enum EndMode {
 			StageFailed,
 			StageCleared,
 			StageFullCombo,
