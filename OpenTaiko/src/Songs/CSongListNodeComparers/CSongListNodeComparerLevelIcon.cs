@@ -1,9 +1,9 @@
-﻿namespace OpenTaiko.C曲リストノードComparers;
+﻿namespace OpenTaiko.CSongListNodeComparers;
 
-internal sealed class C曲リストノードComparerLevel : IComparer<CSongListNode> {
+internal sealed class CSongListNodeComparerLevelIcon : IComparer<CSongListNode> {
 	private readonly int _order;
 
-	public C曲リストノードComparerLevel(int order) {
+	public CSongListNodeComparerLevelIcon(int order) {
 		this._order = order;
 	}
 
@@ -19,6 +19,6 @@ internal sealed class C曲リストノードComparerLevel : IComparer<CSongListN
 	}
 
 	private int _diffOf(CSongListNode n1) {
-		return n1.nLevel[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(n1)];
+		return (int)n1.nLevelIcon[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(n1)];
 	}
 }

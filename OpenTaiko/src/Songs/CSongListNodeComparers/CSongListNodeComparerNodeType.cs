@@ -1,12 +1,12 @@
-﻿namespace OpenTaiko.C曲リストノードComparers;
+﻿namespace OpenTaiko.CSongListNodeComparers;
 
-internal sealed class C曲リストノードComparerノード種別 : IComparer<CSongListNode> {
+internal sealed class CSongListNodeComparerNodeType : IComparer<CSongListNode> {
 	public int Compare(CSongListNode x, CSongListNode y) {
 		return ToComparable(x.eノード種別).CompareTo(ToComparable(y.eノード種別));
 	}
 
-	private static int ToComparable(CSongListNode.ENodeType eノード種別) {
-		switch (eノード種別) {
+	private static int ToComparable(CSongListNode.ENodeType nodeType) {
+		switch (nodeType) {
 			case CSongListNode.ENodeType.BOX:
 				return 0;
 			case CSongListNode.ENodeType.SCORE:

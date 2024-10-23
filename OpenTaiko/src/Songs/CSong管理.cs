@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using OpenTaiko.C曲リストノードComparers;
+using OpenTaiko.CSongListNodeComparers;
 
 namespace OpenTaiko;
 
@@ -96,7 +96,7 @@ internal class CSongs管理 {
 				}
 
 				t曲を検索してリストを作成する(path, true, downloadBox.list子リスト, downloadBox);
-				this.t曲リストへ後処理を適用する(downloadBox.list子リスト, $"/{downloadBox.ldTitle.GetString("")}/");
+				this.tSongListPostprocessing(downloadBox.list子リスト, $"/{downloadBox.ldTitle.GetString("")}/");
 				downloadBox.list子リスト.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.ldTitle.GetString("")}/"));
 			}
 		}
@@ -708,7 +708,7 @@ internal class CSongs管理 {
 
 	#region [ 曲リストへ後処理を適用する ]
 	//-----------------
-	public void t曲リストへ後処理を適用する() {
+	public void tSongListPostprocessing() {
 		listStrBoxDefSkinSubfolderFullName = new List<string>();
 		if (OpenTaiko.Skin.strBoxDefSkinSubfolders != null) {
 			foreach (string b in OpenTaiko.Skin.strBoxDefSkinSubfolders) {
@@ -716,7 +716,7 @@ internal class CSongs管理 {
 			}
 		}
 
-		this.t曲リストへ後処理を適用する(this.list曲ルート);
+		this.tSongListPostprocessing(this.list曲ルート);
 
 		for (int p = 0; p < list曲ルート.Count; p++) {
 			var c曲リストノード = list曲ルート[p];
@@ -775,57 +775,36 @@ internal class CSongs管理 {
 	}
 
 
-	private void t曲リストへ後処理を適用する(List<CSongListNode> ノードリスト, string parentName = "/", bool isGlobal = true) {
+	private void tSongListPostprocessing(List<CSongListNode> nodeList, string parentName = "/", bool isGlobal = true) {
 
-		if (isGlobal && ノードリスト.Count > 0) {
-			var randomNode = CSongDict.tGenerateRandomButton(ノードリスト[0].rParentNode, parentName);
-			ノードリスト.Add(randomNode);
+		if (isGlobal && nodeList.Count > 0) {
+			var randomNode = CSongDict.tGenerateRandomButton(nodeList[0].rParentNode, parentName);
+			nodeList.Add(randomNode);
 
 		}
 
 		// Don't sort songs if the folder isn't global
 		// Call back reinsert back folders if sort called ?
 		if (isGlobal) {
-			#region [ Sort nodes ]
-			//-----------------------------
-			if (OpenTaiko.ConfigIni.nDefaultSongSort == 0) {
-				t曲リストのソート1_絶対パス順(ノードリスト);
-			} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 1) {
-				t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.Taiko, 1, 0);
-			} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 2) {
-				t曲リストのソート9_ジャンル順(ノードリスト, EInstrumentPad.Taiko, 2, 0);
-			}
-			//-----------------------------
-			#endregion
+			tSongListSortByPath(nodeList);
 		}
 
 		// すべてのノードについて…
-		foreach (CSongListNode c曲リストノード in ノードリスト) {
+		foreach (CSongListNode songNode in nodeList) {
 			SlowOrSuspendSearchTask();      // #27060 中断要求があったら、解除要求が来るまで待機, #PREMOVIE再生中は検索負荷を落とす
 
 			#region [ Append "Back" buttons to the included folders ]
 			//-----------------------------
-			if (c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX) {
+			if (songNode.eノード種別 == CSongListNode.ENodeType.BOX) {
 
-				#region [ Sort child nodes ]
-				//-----------------------------
-				if (OpenTaiko.ConfigIni.nDefaultSongSort == 0) {
-					t曲リストのソート1_絶対パス順(c曲リストノード.list子リスト);
-				} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 1) {
-					t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.Taiko, 1, 0);
-				} else if (OpenTaiko.ConfigIni.nDefaultSongSort == 2) {
-					t曲リストのソート9_ジャンル順(c曲リストノード.list子リスト, EInstrumentPad.Taiko, 2, 0);
-				}
-				//-----------------------------
-				#endregion
+				tSongListSortByPath(songNode.list子リスト);
 
+				string newPath = parentName + songNode.ldTitle.GetString("") + "/";
 
-				string newPath = parentName + c曲リストノード.ldTitle.GetString("") + "/";
-
-				CSongDict.tReinsertBackButtons(c曲リストノード, c曲リストノード.list子リスト, newPath, listStrBoxDefSkinSubfolderFullName);
+				CSongDict.tReinsertBackButtons(songNode, songNode.list子リスト, newPath, listStrBoxDefSkinSubfolderFullName);
 
 				// Process subfolders recussively
-				t曲リストへ後処理を適用する(c曲リストノード.list子リスト, newPath, false);
+				tSongListPostprocessing(songNode.list子リスト, newPath, false);
 
 				continue;
 			}
@@ -835,13 +814,13 @@ internal class CSongs管理 {
 
 			#region [ If no node title found, try to fetch it within the score objects ]
 			//-----------------------------
-			if (string.IsNullOrEmpty(c曲リストノード.ldTitle.GetString(""))) {
+			if (string.IsNullOrEmpty(songNode.ldTitle.GetString(""))) {
 				for (int j = 0; j < (int)Difficulty.Total; j++) {
-					if ((c曲リストノード.arスコア[j] != null) && !string.IsNullOrEmpty(c曲リストノード.arスコア[j].譜面情報.タイトル)) {
-						c曲リストノード.ldTitle = new CLocalizationData();
+					if ((songNode.arスコア[j] != null) && !string.IsNullOrEmpty(songNode.arスコア[j].譜面情報.タイトル)) {
+						songNode.ldTitle = new CLocalizationData();
 
 						if (OpenTaiko.ConfigIni.bOutputSongSearchLog)
-							Trace.TraceInformation("タイトルを設定しました。(nID#{0:D3}, title={1})", c曲リストノード.nID, c曲リストノード.ldTitle.GetString(""));
+							Trace.TraceInformation("タイトルを設定しました。(nID#{0:D3}, title={1})", songNode.nID, songNode.ldTitle.GetString(""));
 
 						break;
 					}
@@ -858,79 +837,65 @@ internal class CSongs管理 {
 	//-----------------
 	#endregion
 
-	#region [ 曲リストソート ]
+	#region [ Sort Song List ]
 	//-----------------
 
-	public static void t曲リストのソート1_絶対パス順(List<CSongListNode> ノードリスト) {
-		t曲リストのソート1_絶対パス順(ノードリスト, EInstrumentPad.Taiko, 1, 0);
+	public static void tSongListSortByPath(List<CSongListNode> nodeList) {
+		tSongListSortByPath(nodeList, 1, 0);
 
-		foreach (CSongListNode c曲リストノード in ノードリスト) {
-			if ((c曲リストノード.list子リスト != null) && (c曲リストノード.list子リスト.Count > 1)) {
-				t曲リストのソート1_絶対パス順(c曲リストノード.list子リスト);
+		foreach (CSongListNode songNode in nodeList) {
+			if ((songNode.list子リスト != null) && (songNode.list子リスト.Count > 1)) {
+				tSongListSortByPath(songNode.list子リスト);
 			}
 		}
 	}
 
-	public static void t曲リストのソート1_絶対パス順(List<CSongListNode> ノードリスト, EInstrumentPad part, int order, params object[] p) {
+	public static void tSongListSortByPath(List<CSongListNode> nodeList, int order, params object[] p) {
 		var comparer = new ComparerChain<CSongListNode>(
-			new C曲リストノードComparerノード種別(),
-			new C曲リストノードComparer絶対パス(order),
-			new C曲リストノードComparerタイトル(order),
-			new C曲リストノードComparerSubtitle(order));
+			new CSongListNodeComparerNodeType(),
+			new CSongListNodeComparerUnlockStatus(),
+			new CSongListNodeComparerPath(order),
+			new CSongListNodeComparerTitle(order),
+			new CSongListNodeComparerSubtitle(order));
 
-		ノードリスト.Sort(comparer);
+		nodeList.Sort(comparer);
 	}
 
-	public static void t曲リストのソート2_タイトル順(List<CSongListNode> ノードリスト, EInstrumentPad part, int order, params object[] p) {
+	public static void tSongListSortByTitle(List<CSongListNode> nodeList, int order, params object[] p) {
 		var comparer = new ComparerChain<CSongListNode>(
-			new C曲リストノードComparerノード種別(),
-			new C曲リストノードComparerタイトル(order),
-			new C曲リストノードComparerSubtitle(order),
-			new C曲リストノードComparer絶対パス(order));
+			new CSongListNodeComparerNodeType(),
+			new CSongListNodeComparerUnlockStatus(),
+			new CSongListNodeComparerTitle(order),
+			new CSongListNodeComparerSubtitle(order),
+			new CSongListNodeComparerPath(order));
 
-		ノードリスト.Sort(comparer);
+		nodeList.Sort(comparer);
 	}
 
-	public static void tSongListSortBySubtitle(List<CSongListNode> ノードリスト, EInstrumentPad part, int order, params object[] p) {
+	public static void tSongListSortBySubtitle(List<CSongListNode> nodeList, int order, params object[] p) {
 		var comparer = new ComparerChain<CSongListNode>(
-			new C曲リストノードComparerノード種別(),
-			new C曲リストノードComparerSubtitle(order),
-			new C曲リストノードComparerタイトル(order),
-			new C曲リストノードComparer絶対パス(order));
+			new CSongListNodeComparerNodeType(),
+			new CSongListNodeComparerUnlockStatus(),
+			new CSongListNodeComparerSubtitle(order),
+			new CSongListNodeComparerTitle(order),
+			new CSongListNodeComparerPath(order));
 
-		ノードリスト.Sort(comparer);
+		nodeList.Sort(comparer);
 	}
 
-	public static void tSongListSortByLevel(List<CSongListNode> ノードリスト, EInstrumentPad part, int order, params object[] p) {
+	public static void tSongListSortByLevel(List<CSongListNode> nodeList, int order, params object[] p) {
 		var comparer = new ComparerChain<CSongListNode>(
-			new C曲リストノードComparerノード種別(),
-			new C曲リストノードComparerLevel(order),
-			new C曲リストノードComparerLevelIcon(order),
-			new C曲リストノードComparerタイトル(order),
-			new C曲リストノードComparerSubtitle(order),
-			new C曲リストノードComparer絶対パス(order));
+			new CSongListNodeComparerNodeType(),
+			new CSongListNodeComparerUnlockStatus(),
+			new CSongListNodeComparerLevel(order),
+			new CSongListNodeComparerLevelIcon(order),
+			new CSongListNodeComparerTitle(order),
+			new CSongListNodeComparerSubtitle(order),
+			new CSongListNodeComparerPath(order));
 
-		ノードリスト.Sort(comparer);
+		nodeList.Sort(comparer);
 	}
 
-	public static void t曲リストのソート9_ジャンル順(List<CSongListNode> ノードリスト, EInstrumentPad part, int order, params object[] p) {
-		try {
-			var acGenreComparer = order == 1
-				? (IComparer<CSongListNode>)new C曲リストノードComparerAC8_14()
-				: new C曲リストノードComparerAC15();
-
-			var comparer = new ComparerChain<CSongListNode>(
-				new C曲リストノードComparerノード種別(),
-				acGenreComparer,
-				new C曲リストノードComparer絶対パス(1),
-				new C曲リストノードComparerタイトル(1));
-
-			ノードリスト.Sort(comparer);
-		} catch (Exception ex) {
-			Trace.TraceError(ex.ToString());
-			Trace.TraceError("例外が発生しましたが処理を継続します。 (bca6dda7-76ad-42fc-a415-250f52c0b17d)");
-		}
-	}
 
 #if TEST_SORTBGM
 		public static void t曲リストのソート9_BPM順( List<C曲リストノード> ノードリスト, E楽器パート part, int order, params object[] p )

@@ -160,20 +160,20 @@ internal class CActSelect曲リスト : CActivity {
 	}
 
 
-	public delegate void DGSortFunc(List<CSongListNode> songList, EInstrumentPad eInst, int order, params object[] p);
+	public delegate void DGSortFunc(List<CSongListNode> songList, int order, params object[] p);
 	/// <summary>
 	/// 主にCSong管理.cs内にあるソート機能を、delegateで呼び出す。
 	/// </summary>
 	/// <param name="sf">ソート用に呼び出すメソッド</param>
 	/// <param name="eInst">ソート基準とする楽器</param>
 	/// <param name="order">-1=降順, 1=昇順</param>
-	public void t曲リストのソート(DGSortFunc sf, EInstrumentPad eInst, int order, params object[] p) {
+	public void t曲リストのソート(DGSortFunc sf, int order, params object[] p) {
 		List<CSongListNode> songList = GetSongListWithinMe(this.rCurrentlySelectedSong);
 		if (songList == null) {
 			// 何もしない;
 		} else {
 			//				CDTXMania.Songs管理.t曲リストのソート3_演奏回数の多い順( songList, eInst, order );
-			sf(songList, eInst, order, p);
+			sf(songList, order, p);
 			//				this.r現在選択中の曲 = CDTXMania
 			void addBackBox(List<CSongListNode> list, string parentName = "/") {
 				foreach (CSongListNode node in list) {

@@ -363,7 +363,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			Trace.Indent();
 
 			try {
-				this.Songs管理.t曲リストへ後処理を適用する();
+				this.Songs管理.tSongListPostprocessing();
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
 				Trace.TraceError("例外が発生しましたが処理を継続します。 (6480ffa0-1cc1-40d4-9cc9-aceeecd0264b)");

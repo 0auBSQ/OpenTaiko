@@ -1,4 +1,4 @@
-﻿namespace OpenTaiko.C曲リストノードComparers;
+﻿namespace OpenTaiko.CSongListNodeComparers;
 
 internal sealed class ComparerChain<T> : IComparer<T> where T : class {
 	private readonly IComparer<T>[] _comparers;

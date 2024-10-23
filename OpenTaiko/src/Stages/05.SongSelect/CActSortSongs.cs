@@ -30,25 +30,25 @@ internal class CActSortSongs : CActSelectPopupMenu {
 		switch ((EOrder)n現在の選択行) {
 			case EOrder.Path:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.t曲リストのソート1_絶対パス順, eInst, nSortOrder
+					CSongs管理.tSongListSortByPath, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Title:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.t曲リストのソート2_タイトル順, eInst, nSortOrder
+					CSongs管理.tSongListSortByTitle, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Subtitle:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortBySubtitle, eInst, nSortOrder
+					CSongs管理.tSongListSortBySubtitle, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Level:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortByLevel, eInst, nSortOrder
+					CSongs管理.tSongListSortByLevel, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;

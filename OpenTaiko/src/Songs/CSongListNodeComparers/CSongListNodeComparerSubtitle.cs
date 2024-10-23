@@ -1,9 +1,9 @@
-﻿namespace OpenTaiko.C曲リストノードComparers;
+﻿namespace OpenTaiko.CSongListNodeComparers;
 
-internal sealed class C曲リストノードComparerSubtitle : IComparer<CSongListNode> {
+internal sealed class CSongListNodeComparerSubtitle : IComparer<CSongListNode> {
 	private readonly int _order;
 
-	public C曲リストノードComparerSubtitle(int order) {
+	public CSongListNodeComparerSubtitle(int order) {
 		this._order = order;
 	}
 
