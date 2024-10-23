@@ -380,7 +380,6 @@ namespace OpenTaiko {
 				switch (OpenTaiko.r現在のステージ.eStageID) {
 					#region Game
 					case CStage.EStage.Game:
-						if (ImGui.TreeNodeEx("Loaded Script.lua Textures###TEXTURE_LUA")) {
 
 							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actBackground.UpScript,
 								"Up Background", "TEXTURE_LUA_UPBG");
@@ -443,47 +442,7 @@ namespace OpenTaiko {
 									break;
 							}
 							#endregion
-							ImGui.TreePop();
-						}
-						else {
-							// Summarize mem usage from scripts even when the tab is closed
-							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBackground.UpScript);
-							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBackground.DownScript);
-							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actMob.MobScript);
-							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaScript);
 
-							switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
-								case Difficulty.Tower:
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_DropoutScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_PassScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_FullComboScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_PerfectScript);
-									break;
-								case Difficulty.Dan:
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_FailScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PassScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_FullComboScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PerfectScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PassScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_FullComboScript);
-									currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PerfectScript);
-									break;
-								default:
-									if (OpenTaiko.ConfigIni.bAIBattleMode) {
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.AILoseScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.AIWinScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.AIWin_FullComboScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.AIWin_PerfectScript);
-									}
-									else {
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.FailedScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.ClearScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.FullComboScript);
-										currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actEnd.PerfectComboScript);
-									}
-									break;
-							}
-						}
 						#endregion
 
 						break;
