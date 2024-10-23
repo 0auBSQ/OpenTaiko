@@ -324,7 +324,9 @@ namespace OpenTaiko {
 									}
 								}
 
-								ImGui.Text("Lyrics: " + (dtx.bLyrics ? (dtx.usingLyricsFile ? dtx.listLyric2.Count : dtx.listLyric.Count) : "None"));
+								ImGui.Text("Lyrics: " + (!dtx.bLyrics ? "None"
+								     : dtx.usingLyricsFile ? dtx.listLyric2.Count
+								     : dtx.listLyric.Count));
 
 								ImGui.NewLine();
 
