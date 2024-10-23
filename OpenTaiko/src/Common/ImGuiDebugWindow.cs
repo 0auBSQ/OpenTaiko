@@ -372,6 +372,11 @@ namespace OpenTaiko {
 				currentStageMemoryUsage = 0;
 
 				#region Script.lua Memory Usage
+				int index = 0;
+				foreach (CLuaScript luascript in CLuaScript.listScripts)
+					currentStageMemoryUsage += CTextureListPopup(luascript.listDisposables.OfType<CTexture>(),
+					$"Module #{index}", $"MODULE{index++}_TEXTURES");
+
 				switch (OpenTaiko.r現在のステージ.eStageID) {
 					#region Game
 					case CStage.EStage.Game:
