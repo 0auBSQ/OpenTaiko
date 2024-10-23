@@ -17,8 +17,6 @@ namespace FDK {
 
 			joystick.ButtonDown += Joystick_ButtonDown;
 			joystick.ButtonUp += Joystick_ButtonUp;
-			joystick.AxisMoved += Joystick_AxisMoved;
-			joystick.HatMoved += Joystick_HatMoved;
 		}
 
 
@@ -149,14 +147,6 @@ namespace FDK {
 			if (button.Name != ButtonName.Unknown) {
 				ButtonStates[(int)button.Name].Item1 = false;
 			}
-		}
-
-		private void Joystick_AxisMoved(IJoystick joystick, Axis axis) {
-
-		}
-
-		private void Joystick_HatMoved(IJoystick joystick, Hat hat) {
-
 		}
 		//-----------------
 		#endregion

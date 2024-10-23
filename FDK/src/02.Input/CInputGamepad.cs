@@ -17,8 +17,6 @@ namespace FDK {
 
 			gamepad.ButtonDown += Joystick_ButtonDown;
 			gamepad.ButtonUp += Joystick_ButtonUp;
-			gamepad.ThumbstickMoved += this.Gamepad_ThumbstickMoved;
-			gamepad.TriggerMoved += this.Gamepad_TriggerMoved;
 		}
 
 
@@ -141,12 +139,6 @@ namespace FDK {
 			if (button.Name != ButtonName.Unknown) {
 				ButtonStates[(int)button.Name].Item1 = false;
 			}
-		}
-
-		private void Gamepad_ThumbstickMoved(IGamepad joystick, Thumbstick thumbstick) {
-		}
-
-		private void Gamepad_TriggerMoved(IGamepad joystick, Trigger trigger) {
 		}
 		//-----------------
 		#endregion
