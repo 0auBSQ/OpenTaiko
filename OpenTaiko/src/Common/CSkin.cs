@@ -4571,17 +4571,45 @@ namespace OpenTaiko {
 										}
 										break;
 									}
-								case "Game_Balloon_Combo_Number_X": {
+								case "Game_Balloon_Combo_Number_1digit_X": {
 										string[] strSplit = strParam.Split(',');
 										for (int i = 0; i < 2; i++) {
-											Game_Balloon_Combo_Number_X[i] = int.Parse(strSplit[i]);
+											Game_Balloon_Combo_Number_1digit_X[i] = int.Parse(strSplit[i]);
 										}
 										break;
 									}
-								case "Game_Balloon_Combo_Number_Y": {
+								case "Game_Balloon_Combo_Number_1digit_Y": {
 										string[] strSplit = strParam.Split(',');
 										for (int i = 0; i < 2; i++) {
-											Game_Balloon_Combo_Number_Y[i] = int.Parse(strSplit[i]);
+											Game_Balloon_Combo_Number_1digit_Y[i] = int.Parse(strSplit[i]);
+										}
+										break;
+									}
+								case "Game_Balloon_Combo_Number_2digit_X": {
+										string[] strSplit = strParam.Split(',');
+										for (int i = 0; i < 2; i++) {
+											Game_Balloon_Combo_Number_2digit_X[i] = int.Parse(strSplit[i]);
+										}
+										break;
+									}
+								case "Game_Balloon_Combo_Number_2digit_Y": {
+										string[] strSplit = strParam.Split(',');
+										for (int i = 0; i < 2; i++) {
+											Game_Balloon_Combo_Number_1digit_Y[i] = int.Parse(strSplit[i]);
+										}
+										break;
+									}
+								case "Game_Balloon_Combo_Number_3digit_X": {
+										string[] strSplit = strParam.Split(',');
+										for (int i = 0; i < 2; i++) {
+											Game_Balloon_Combo_Number_3digit_X[i] = int.Parse(strSplit[i]);
+										}
+										break;
+									}
+								case "Game_Balloon_Combo_Number_3digit_Y": {
+										string[] strSplit = strParam.Split(',');
+										for (int i = 0; i < 2; i++) {
+											Game_Balloon_Combo_Number_3digit_Y[i] = int.Parse(strSplit[i]);
 										}
 										break;
 									}
@@ -8599,8 +8627,12 @@ namespace OpenTaiko {
 		#region Balloon
 		public int[] Game_Balloon_Combo_X = new int[] { 253, 253 };
 		public int[] Game_Balloon_Combo_Y = new int[] { -11, 538 };
-		public int[] Game_Balloon_Combo_Number_X = new int[] { 257, 257 };
-		public int[] Game_Balloon_Combo_Number_Y = new int[] { 54, 603 };
+		public int[] Game_Balloon_Combo_Number_1digit_X = new int[] { 257, 257 };
+		public int[] Game_Balloon_Combo_Number_1digit_Y = new int[] { 54, 603 };
+		public int[] Game_Balloon_Combo_Number_2digit_X = new int[] { 257, 257 };
+		public int[] Game_Balloon_Combo_Number_2digit_Y = new int[] { 54, 603 };
+		public int[] Game_Balloon_Combo_Number_3digit_X = new int[] { 257, 257 };
+		public int[] Game_Balloon_Combo_Number_3digit_Y = new int[] { 54, 603 };
 		public int[] Game_Balloon_Combo_Number_Ex_X = new int[] { 257, 257 };
 		public int[] Game_Balloon_Combo_Number_Ex_Y = new int[] { 54, 603 };
 		public int[] Game_Balloon_Combo_Number_Size = new int[] { 53, 62 };
