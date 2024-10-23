@@ -358,7 +358,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 				int p = OpenTaiko.GetActualPlayer(j);
 
-				Cスコア.ST譜面情報 idx = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報;
+				CScore.ST譜面情報 idx = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報;
 
 				//var GPInfo = TJAPlayer3.stageSongSelect.r現在選択中のスコア.GPInfo[p];
 

@@ -8,8 +8,8 @@ internal sealed class CSongListNodeComparerPath : IComparer<CSongListNode> {
 	}
 
 	public int Compare(CSongListNode n1, CSongListNode n2) {
-		if ((n1.eノード種別 == CSongListNode.ENodeType.BOX) && (n2.eノード種別 == CSongListNode.ENodeType.BOX)) {
-			return _order * n1.arスコア[0].ファイル情報.フォルダの絶対パス.CompareTo(n2.arスコア[0].ファイル情報.フォルダの絶対パス);
+		if ((n1.nodeType == CSongListNode.ENodeType.BOX) && (n2.nodeType == CSongListNode.ENodeType.BOX)) {
+			return _order * n1.score[0].ファイル情報.フォルダの絶対パス.CompareTo(n2.score[0].ファイル情報.フォルダの絶対パス);
 		}
 
 		var str = filePath(n1);
@@ -20,8 +20,8 @@ internal sealed class CSongListNodeComparerPath : IComparer<CSongListNode> {
 
 	private static string filePath(CSongListNode songNode) {
 		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			if (songNode.arスコア[i] != null) {
-				return songNode.arスコア[i].ファイル情報.ファイルの絶対パス ?? "";
+			if (songNode.score[i] != null) {
+				return songNode.score[i].ファイル情報.ファイルの絶対パス ?? "";
 			}
 		}
 

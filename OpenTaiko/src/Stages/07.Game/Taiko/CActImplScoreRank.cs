@@ -178,7 +178,7 @@ class CActImplScoreRank : CActivity {
 				} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
+					double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 					bool[] conditions =
 					{

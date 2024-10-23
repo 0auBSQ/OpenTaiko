@@ -5,7 +5,10 @@ using FDK;
 namespace OpenTaiko;
 
 [Serializable]
-internal class Cスコア {
+internal class CScore {
+	// Old DTX class, to deprecate ASAP and handle everything on CSongListNode
+
+
 	// Properties
 
 	public STScoreIni情報 ScoreIni情報;
@@ -214,7 +217,7 @@ internal class Cスコア {
 
 	// Constructor
 
-	public Cスコア() {
+	public CScore() {
 		this.ScoreIni情報 = new STScoreIni情報(DateTime.MinValue, 0L);
 		this.bSongDBにキャッシュがあった = false;
 		this.ファイル情報 = new STファイル情報("", "", DateTime.MinValue, 0L);

@@ -291,12 +291,12 @@ internal class DBSaves {
 
 		{
 			currentPlay.ChartUniqueId = choosenSong.uniqueId.data.id;
-			currentPlay.ChartGenre = choosenSong.strジャンル;
+			currentPlay.ChartGenre = choosenSong.songGenre;
 			currentPlay.Charter = choosenSong.strNotesDesigner[choosenDifficulty];
 			currentPlay.Artist = choosenSong.ldSubtitle.GetString(""); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
 			currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
 			currentPlay.ChartDifficulty = choosenDifficulty;
-			currentPlay.ChartLevel = choosenSong.arスコア[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
+			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;

@@ -405,7 +405,7 @@ class HGaugeMethods {
 		var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		return tNormaCheck(
 			(Difficulty)_dif,
-			OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif],
+			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif],
 			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
 			(float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
@@ -436,7 +436,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif];
 
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
@@ -542,7 +542,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif];
 
 		// Current percent
 		float currentPercent = (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
@@ -626,7 +626,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[_dif].譜面情報.nレベル[_dif];
+		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif];
 
 		int gauge_x;
 		int gauge_y;

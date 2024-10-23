@@ -104,7 +104,7 @@ internal class CStage選曲 : CStage {
 		get;
 		set;
 	}
-	public Cスコア r確定されたスコア {
+	public CScore r確定されたスコア {
 		get;
 		set;
 	}
@@ -117,7 +117,7 @@ internal class CStage選曲 : CStage {
 			return this.actSongList.n現在選択中の曲の現在の難易度レベル;
 		}
 	}
-	public Cスコア r現在選択中のスコア {
+	public CScore r現在選択中のスコア {
 		get {
 			return this.actSongList.r現在選択中のスコア;
 		}
@@ -223,7 +223,7 @@ internal class CStage選曲 : CStage {
 			var c曲リストノード = OpenTaiko.stageSongSelect.rNowSelectedSong;
 			var cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
 
-			if (c曲リストノード != null && cスコア != null && c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE) {
+			if (c曲リストノード != null && cスコア != null && c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) {
 				string str選択曲ファイル名 = cスコア.ファイル情報.ファイルの絶対パス;
 				int n曲番号inブロック = OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
 			}
@@ -305,7 +305,7 @@ internal class CStage選曲 : CStage {
 
 
 			if (rNowSelectedSong != null)
-				NowGenre = rNowSelectedSong.strジャンル;
+				NowGenre = rNowSelectedSong.songGenre;
 
 			AI_Background = new ScriptBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.SONGSELECT}{Path.DirectorySeparatorChar}AIBattle{Path.DirectorySeparatorChar}Script.lua"));
 			AI_Background.Init();
@@ -422,9 +422,9 @@ internal class CStage選曲 : CStage {
 
 				#region [Song Panel]
 
-				if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.BOX) {
+				if (this.rNowSelectedSong.nodeType == CSongListNode.ENodeType.BOX) {
 					OpenTaiko.Tx.SongSelect_Song_Panel[0]?.t2D描画(0, 0);
-				} else if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				} else if (this.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
@@ -459,8 +459,8 @@ internal class CStage選曲 : CStage {
 			#region [Song Info]
 
 			if (this.rNowSelectedSong != null) {
-				if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.BOX) {
-				} else if (this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				if (this.rNowSelectedSong.nodeType == CSongListNode.ENodeType.BOX) {
+				} else if (this.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
@@ -503,7 +503,7 @@ internal class CStage選曲 : CStage {
 			#region [Preimage, upper lock layer and unlock conditions]
 
 			if (this.rNowSelectedSong != null
-				&& this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				&& this.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 				var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
@@ -658,9 +658,9 @@ internal class CStage選曲 : CStage {
 
 				var song = this.rNowSelectedSong;
 
-				if (song != null && song.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				if (song != null && song.nodeType == CSongListNode.ENodeType.SCORE) {
 					var closest = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
-					var score = song.arスコア[closest];
+					var score = song.score[closest];
 
 					if (score != null) {
 						int displayedScore = 0;
@@ -723,7 +723,7 @@ internal class CStage選曲 : CStage {
 						if (this.actSongList.latestContext == eMenuContext.SearchByDifficulty) {
 							#region [Trigger context box]
 
-							this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchSongsByDifficulty(
+							this.actSongList.rCurrentlySelectedSong.childrenList = CSongDict.tFetchSongsByDifficulty(
 								this.actSongList.rCurrentlySelectedSong,
 								this.actSongList.tMenuContextGetVar(0),
 								this.actSongList.tMenuContextGetVar(1));
@@ -846,7 +846,7 @@ internal class CStage選曲 : CStage {
 									 ((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 									if (this.actSongList.rCurrentlySelectedSong != null) {
-										switch (this.actSongList.rCurrentlySelectedSong.eノード種別) {
+										switch (this.actSongList.rCurrentlySelectedSong.nodeType) {
 											case CSongListNode.ENodeType.SCORE: {
 													var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 
@@ -883,7 +883,7 @@ internal class CStage選曲 : CStage {
 															if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
 																// Init tower variables
 																if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
-																	CFloorManagement.reinitialize(this.rNowSelectedSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+																	CFloorManagement.reinitialize(this.rNowSelectedSong.score[(int)Difficulty.Tower].譜面情報.nLife);
 
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
 																OpenTaiko.Skin.voiceMenuSongDecide[OpenTaiko.SaveFile]?.tPlay();
@@ -909,11 +909,11 @@ internal class CStage選曲 : CStage {
 
 													#region [Pre-generated folders]
 
-													if (this.actSongList.rCurrentlySelectedSong.strジャンル == "Favorite") {
-														this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchFavoriteFolder(this.actSongList.rCurrentlySelectedSong);
-													} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "最近遊んだ曲") {
-														this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchRecentlyPlayedSongsFolder(this.actSongList.rCurrentlySelectedSong);
-													} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "SearchD") {
+													if (this.actSongList.rCurrentlySelectedSong.songGenre == "Favorite") {
+														this.actSongList.rCurrentlySelectedSong.childrenList = CSongDict.tFetchFavoriteFolder(this.actSongList.rCurrentlySelectedSong);
+													} else if (this.actSongList.rCurrentlySelectedSong.songGenre == "最近遊んだ曲") {
+														this.actSongList.rCurrentlySelectedSong.childrenList = CSongDict.tFetchRecentlyPlayedSongsFolder(this.actSongList.rCurrentlySelectedSong);
+													} else if (this.actSongList.rCurrentlySelectedSong.songGenre == "SearchD") {
 														this.actSongList.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
 														OpenTaiko.Skin.soundDecideSFX.tPlay();
 														goto Decided;
@@ -1433,7 +1433,7 @@ internal class CStage選曲 : CStage {
 	private CCommandHistory CommandHistory;
 
 	private void tカーソルを下へ移動する() {
-		if ((this.actSongList.rGetSideSong(1).eノード種別 == CSongListNode.ENodeType.SCORE) || this.actSongList.rGetSideSong(1).eノード種別 == CSongListNode.ENodeType.BACKBOX) {
+		if ((this.actSongList.rGetSideSong(1).nodeType == CSongListNode.ENodeType.SCORE) || this.actSongList.rGetSideSong(1).nodeType == CSongListNode.ENodeType.BACKBOX) {
 			OpenTaiko.stageSongSelect.bBGMIn再生した = false;
 
 			CSongSelectSongManager.disable();
@@ -1443,7 +1443,7 @@ internal class CStage選曲 : CStage {
 		}
 		this.ctBackgroundFade.Start(0, 600, 1, OpenTaiko.Timer);
 		if (this.actSongList.ctBarOpen.CurrentValue >= 200 || this.ctBackgroundFade.CurrentValue >= 600 - 255) {
-			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.strジャンル;
+			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.songGenre;
 			OpenTaiko.stageSongSelect.OldUseGenre = !this.rNowSelectedSong.isChangedBgType;
 			OpenTaiko.stageSongSelect.OldBg = this.rNowSelectedSong.BgType;
 			OpenTaiko.stageSongSelect.OldBgColor = this.rNowSelectedSong.BgColor;
@@ -1453,7 +1453,7 @@ internal class CStage選曲 : CStage {
 		OpenTaiko.Skin.soundカーソル移動音.tPlay();
 	}
 	private void tカーソルを上へ移動する() {
-		if ((this.actSongList.rGetSideSong(-1).eノード種別 == CSongListNode.ENodeType.SCORE) || this.actSongList.rGetSideSong(-1).eノード種別 == CSongListNode.ENodeType.BACKBOX) {
+		if ((this.actSongList.rGetSideSong(-1).nodeType == CSongListNode.ENodeType.SCORE) || this.actSongList.rGetSideSong(-1).nodeType == CSongListNode.ENodeType.BACKBOX) {
 			OpenTaiko.stageSongSelect.bBGMIn再生した = false;
 
 			CSongSelectSongManager.disable();
@@ -1464,7 +1464,7 @@ internal class CStage選曲 : CStage {
 
 		this.ctBackgroundFade.Start(0, 600, 1, OpenTaiko.Timer);
 		if (this.actSongList.ctBarOpen.CurrentValue >= 200 || this.ctBackgroundFade.CurrentValue >= 600 - 255) {
-			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.strジャンル;
+			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.songGenre;
 			OpenTaiko.stageSongSelect.OldUseGenre = !this.rNowSelectedSong.isChangedBgType;
 			OpenTaiko.stageSongSelect.OldBg = this.rNowSelectedSong.BgType;
 			OpenTaiko.stageSongSelect.OldBgColor = this.rNowSelectedSong.BgColor;
@@ -1476,7 +1476,7 @@ internal class CStage選曲 : CStage {
 	private void tカーソルスキップ(bool Up) {
 		this.ctBackgroundFade.Start(0, 600, 1, OpenTaiko.Timer);
 		if (this.actSongList.ctBarOpen.CurrentValue >= 200 || this.ctBackgroundFade.CurrentValue >= 600 - 255) {
-			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.strジャンル;
+			OpenTaiko.stageSongSelect.OldGenre = this.rNowSelectedSong.songGenre;
 			OpenTaiko.stageSongSelect.OldUseGenre = !this.rNowSelectedSong.isChangedBgType;
 			OpenTaiko.stageSongSelect.OldBg = this.rNowSelectedSong.BgType;
 			OpenTaiko.stageSongSelect.OldBgColor = this.rNowSelectedSong.BgColor;
@@ -1497,7 +1497,7 @@ internal class CStage選曲 : CStage {
 			if (contextDiff < (int)Difficulty.Oni)
 				return contextDiff;
 			else if (contextDiff == (int)Difficulty.Oni) {
-				var score = song.arスコア[baseDiff];
+				var score = song.score[baseDiff];
 				if (score.譜面情報.nレベル[(int)Difficulty.Oni] >= 0 && score.譜面情報.nレベル[(int)Difficulty.Edit] >= 0)
 					return (new Random().Next(0, 2) == 0 ? (int)Difficulty.Oni : (int)Difficulty.Edit);
 				return (int)Difficulty.Oni;
@@ -1526,8 +1526,8 @@ internal class CStage選曲 : CStage {
 
 		CSongListNode song = this.actSongList.rCurrentlySelectedSong;
 
-		song.listランダム用ノードリスト = this.t指定された曲が存在する場所の曲を列挙する_子リスト含む(song, ref mandatoryDiffs);
-		int selectableSongCount = song.listランダム用ノードリスト.Count;
+		song.randomList = this.t指定された曲が存在する場所の曲を列挙する_子リスト含む(song, ref mandatoryDiffs);
+		int selectableSongCount = song.randomList.Count;
 
 		if (selectableSongCount == 0) {
 			return;
@@ -1542,7 +1542,7 @@ internal class CStage選曲 : CStage {
 		}
 
 		// Third assignment
-		this.rNowSelectedSong = song.listランダム用ノードリスト[randomSongIndex];
+		this.rNowSelectedSong = song.randomList[randomSongIndex];
 
 		actSongList.t現在選択中の曲を元に曲バーを再構成する();
 		actSongList.t選択曲が変更された(false);
@@ -1557,7 +1557,7 @@ internal class CStage選曲 : CStage {
 		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
 
 		this.nChoosenSongDifficulty[0] = this.actSongList.n現在選択中の曲の現在の難易度レベル;
-		this.str確定された曲のジャンル = this.rChoosenSong.strジャンル;
+		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
 
 		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
 			this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
@@ -1573,7 +1573,7 @@ internal class CStage選曲 : CStage {
 		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
 
 		this.nChoosenSongDifficulty[player] = nCurrentLevel;
-		this.str確定された曲のジャンル = this.rChoosenSong.strジャンル;
+		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
 
 		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
 			this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
@@ -1591,12 +1591,12 @@ internal class CStage選曲 : CStage {
 		song = song.rParentNode;
 		if ((song == null) && (OpenTaiko.Songs管理.list曲ルート.Count > 0)) {
 			foreach (CSongListNode c曲リストノード in OpenTaiko.Songs管理.list曲ルート) {
-				if ((c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE) || (c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE_MIDI)) {
+				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
 					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
 					if (diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present
-						var score = c曲リストノード.arスコア[diff];
+						var score = c曲リストノード.score[diff];
 						bool requiredDiffsExist = true;
 						foreach (int df in mandatory) {
 							if (score.譜面情報.nレベル[df] < 0) {
@@ -1613,7 +1613,7 @@ internal class CStage選曲 : CStage {
 					}
 
 				}
-				if ((c曲リストノード.list子リスト != null) && OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect) {
+				if ((c曲リストノード.childrenList != null) && OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect) {
 					this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory);
 				}
 			}
@@ -1624,15 +1624,15 @@ internal class CStage選曲 : CStage {
 	}
 
 	public void t指定された曲の子リストの曲を列挙する_孫リスト含む(CSongListNode r親, ref List<CSongListNode> list, ref List<int> mandatory, bool dan = false, Difficulty difficulty = Difficulty.Dan) {
-		if ((r親 != null) && (r親.list子リスト != null)) {
-			foreach (CSongListNode c曲リストノード in r親.list子リスト) {
-				if ((c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE) || (c曲リストノード.eノード種別 == CSongListNode.ENodeType.SCORE_MIDI)) {
+		if ((r親 != null) && (r親.childrenList != null)) {
+			foreach (CSongListNode c曲リストノード in r親.childrenList) {
+				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
 					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
 
 					if (dan ? diff == (int)difficulty : diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present
-						var score = c曲リストノード.arスコア[diff];
+						var score = c曲リストノード.score[diff];
 						bool requiredDiffsExist = true;
 						foreach (int df in mandatory) {
 							if (score.譜面情報.nレベル[df] < 0) {
@@ -1648,7 +1648,7 @@ internal class CStage選曲 : CStage {
 
 					}
 				}
-				if ((c曲リストノード.list子リスト != null) && OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect) {
+				if ((c曲リストノード.childrenList != null) && OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect) {
 					this.t指定された曲の子リストの曲を列挙する_孫リスト含む(c曲リストノード, ref list, ref mandatory, dan, difficulty);
 				}
 			}

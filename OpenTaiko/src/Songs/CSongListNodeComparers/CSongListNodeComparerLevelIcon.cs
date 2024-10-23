@@ -8,8 +8,8 @@ internal sealed class CSongListNodeComparerLevelIcon : IComparer<CSongListNode> 
 	}
 
 	public int Compare(CSongListNode n1, CSongListNode n2) {
-		int _n1s = (n1.eノード種別 != CSongListNode.ENodeType.SCORE) ? 0 : 1;
-		int _n2s = (n2.eノード種別 != CSongListNode.ENodeType.SCORE) ? 0 : 1;
+		int _n1s = (n1.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
+		int _n2s = (n2.nodeType != CSongListNode.ENodeType.SCORE) ? 0 : 1;
 
 
 		if (_n1s == 0 || _n2s == 0) {

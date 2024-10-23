@@ -241,8 +241,8 @@ class ScriptBG : IDisposable {
 		try {
 			float currentFloorPositionMax140 = 0;
 
-			if (OpenTaiko.stageSongSelect.rChoosenSong != null && OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5] != null) {
-				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+			if (OpenTaiko.stageSongSelect.rChoosenSong != null && OpenTaiko.stageSongSelect.rChoosenSong.score[5] != null) {
+				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);

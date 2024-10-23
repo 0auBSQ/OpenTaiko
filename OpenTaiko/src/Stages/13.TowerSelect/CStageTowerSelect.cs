@@ -119,7 +119,7 @@ class CStageTowerSelect : CStage {
 
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
-				switch (currentSong.eノード種別) {
+				switch (currentSong.nodeType) {
 					case CSongListNode.ENodeType.SCORE:
 						tSelectSong();
 						break;
@@ -130,7 +130,7 @@ class CStageTowerSelect : CStage {
 						tOpenFolder(currentSong);
 						break;
 					case CSongListNode.ENodeType.BACKBOX: {
-							if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.strジャンル == "太鼓タワー") {
+							if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.songGenre == "太鼓タワー") {
 								returnTitle();
 							} else {
 								tCloseFolder(currentSong);
@@ -178,11 +178,11 @@ class CStageTowerSelect : CStage {
 	public void tSelectSong() {
 		OpenTaiko.ConfigIni.bTokkunMode = false;
 		OpenTaiko.stageSongSelect.rChoosenSong = listSongs[nCurrentSongIndex];
-		OpenTaiko.stageSongSelect.r確定されたスコア = listSongs[nCurrentSongIndex].arスコア[(int)Difficulty.Tower];
+		OpenTaiko.stageSongSelect.r確定されたスコア = listSongs[nCurrentSongIndex].score[(int)Difficulty.Tower];
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = listSongs[nCurrentSongIndex].strジャンル;
+		OpenTaiko.stageSongSelect.str確定された曲のジャンル = listSongs[nCurrentSongIndex].songGenre;
 		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
-			CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+			CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nLife);
 			this.eフェードアウト完了時の戻り値 = EReturnValue.SongChoosen;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
@@ -197,9 +197,9 @@ class CStageTowerSelect : CStage {
 
 		List<CSongListNode> songs = new List<CSongListNode>();
 		OpenTaiko.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
-		song.listランダム用ノードリスト = songs;
+		song.randomList = songs;
 
-		int selectableSongCount = song.listランダム用ノードリスト.Count;
+		int selectableSongCount = song.randomList.Count;
 
 		if (selectableSongCount == 0) {
 			return false;
@@ -214,12 +214,12 @@ class CStageTowerSelect : CStage {
 		}
 
 		// Third assignment
-		OpenTaiko.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[randomSongIndex];
+		OpenTaiko.stageSongSelect.rChoosenSong = song.randomList[randomSongIndex];
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
-		CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
-		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.strジャンル;
+		CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nLife);
+		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
+		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.songGenre;
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
@@ -259,13 +259,13 @@ class CStageTowerSelect : CStage {
 
 	private void tOpenFolder(CSongListNode song) {
 		nCurrentSongIndex = 0;
-		listSongs = song.list子リスト;
+		listSongs = song.childrenList;
 		tUpdateBarInfos();
 	}
 
 	private void tCloseFolder(CSongListNode song) {
 		nCurrentSongIndex = 0;
-		listSongs = song.rParentNode.rParentNode.list子リスト;
+		listSongs = song.rParentNode.rParentNode.childrenList;
 		tUpdateBarInfos();
 	}
 
@@ -277,7 +277,7 @@ class CStageTowerSelect : CStage {
 
 			bar.strTitle = song.ldTitle.GetString("");
 			bar.strSubTitle = song.ldSubtitle.GetString("");
-			bar.eノード種別 = song.eノード種別;
+			bar.eノード種別 = song.nodeType;
 
 			bar.ttkTitle = new TitleTextureKey(bar.strTitle, pfTitleFont, Color.Black, Color.Transparent, OpenTaiko.Skin.TowerSelect_Title_MaxWidth);
 			bar.ttkSubTitle = new TitleTextureKey(bar.strSubTitle, pfTitleFont, Color.Black, Color.Transparent, OpenTaiko.Skin.TowerSelect_SubTitle_MaxWidth);

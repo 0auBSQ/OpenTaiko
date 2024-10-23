@@ -298,7 +298,7 @@ public static class ImGuiDebugWindow {
 									ImGui.SeparatorText("Tower Mode");
 									ImGui.Text("Side: " + dtx.SIDE);
 									ImGui.Text("Life: " + dtx.LIFE);
-									ImGui.Text("Floor Count: " + OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5].譜面情報.nTotalFloor);
+									ImGui.Text("Floor Count: " + OpenTaiko.stageSongSelect.rNowSelectedSong.score[5].譜面情報.nTotalFloor);
 									break;
 								default:
 									ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");

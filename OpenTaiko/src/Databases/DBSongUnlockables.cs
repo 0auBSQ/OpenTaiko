@@ -80,7 +80,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 							Modal.EModalType.Song,
 							HRarity.tRarityToModalInt(item.Value.rarity),
 							_node,
-							OpenTaiko.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage(_node?.arスコア[0] ?? null)
+							OpenTaiko.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage(_node?.score[0] ?? null)
 						),
 						_player);
 

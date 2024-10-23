@@ -2,7 +2,7 @@
 
 internal sealed class CSongListNodeComparerNodeType : IComparer<CSongListNode> {
 	public int Compare(CSongListNode x, CSongListNode y) {
-		return ToComparable(x.eノード種別).CompareTo(ToComparable(y.eノード種別));
+		return ToComparable(x.nodeType).CompareTo(ToComparable(y.nodeType));
 	}
 
 	private static int ToComparable(CSongListNode.ENodeType nodeType) {

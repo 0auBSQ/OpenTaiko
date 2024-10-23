@@ -541,7 +541,7 @@ class CStageOnlineLounge : CStage {
 			// Fetch closest Download folder node
 			CSongListNode downloadBox = null;
 			for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
-				if (OpenTaiko.Songs管理.list曲ルート[i].strジャンル == "Download") {
+				if (OpenTaiko.Songs管理.list曲ルート[i].songGenre == "Download") {
 					downloadBox = OpenTaiko.Songs管理.list曲ルート[i];
 					if (downloadBox.rParentNode != null) downloadBox = downloadBox.rParentNode;
 					break;
@@ -550,7 +550,7 @@ class CStageOnlineLounge : CStage {
 
 			// If there is at least one download folder, transfer the zip contents in it
 			if (downloadBox != null) {
-				var path = downloadBox.arスコア[0].ファイル情報.フォルダの絶対パス;
+				var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
 				var genredPath = $@"{path}{Path.DirectorySeparatorChar}{song.Genre.genre}{Path.DirectorySeparatorChar}";
 
 				if (!Directory.Exists(genredPath)) {
@@ -560,8 +560,8 @@ class CStageOnlineLounge : CStage {
 					// Search a corresponding box-def if exists
 					CSongListNode correspondingBox = null;
 					for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
-						if (OpenTaiko.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
-							&& OpenTaiko.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
+						if (OpenTaiko.Songs管理.list曲ルート[i].songGenre == song.Genre.genre
+							&& OpenTaiko.Songs管理.list曲ルート[i].nodeType == CSongListNode.ENodeType.BOX)
 							correspondingBox = OpenTaiko.Songs管理.list曲ルート[i];
 					}
 
@@ -587,7 +587,7 @@ class CStageOnlineLounge : CStage {
 						sw.Close();
 					} else {
 						// Copy the existing box.def if available
-						var corPath = correspondingBox.arスコア[0].ファイル情報.フォルダの絶対パス;
+						var corPath = correspondingBox.score[0].ファイル情報.フォルダの絶対パス;
 
 						File.Copy($@"{corPath}{Path.DirectorySeparatorChar}box.def", newBoxDef);
 					}

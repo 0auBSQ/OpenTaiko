@@ -39,11 +39,11 @@ class CActSelectSongInfo : CStage {
 	}
 
 	public override int Draw() {
-		if (OpenTaiko.stageSongSelect.rNowSelectedSong != null && OpenTaiko.stageSongSelect.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+		if (OpenTaiko.stageSongSelect.rNowSelectedSong != null && OpenTaiko.stageSongSelect.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 			int[] bpms = new int[3] {
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
+				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
+				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
+				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
 			};
 			for (int i = 0; i < 3; i++) {
 				tBPMNumberDraw(OpenTaiko.Skin.SongSelect_Bpm_X[i], OpenTaiko.Skin.SongSelect_Bpm_Y[i], bpms[i]);

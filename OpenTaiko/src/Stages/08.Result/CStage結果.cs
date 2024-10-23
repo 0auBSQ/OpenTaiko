@@ -72,7 +72,7 @@ internal class CStage結果 : CStage {
 
 	public int GetTowerScoreRank() {
 		int tmpClear = 0;
-		double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor);
+		double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 		// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
 		bool[] conditions =
@@ -394,12 +394,12 @@ internal class CStage結果 : CStage {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				diffModifier = 3;
 
-				int stars = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower];
+				int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower];
 
 				starRate = Math.Min(10, stars) / 2;
 				redStarRate = Math.Max(0, stars - 10) * 4;
 
-				int maxFloors = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[(int)Difficulty.Tower].譜面情報.nTotalFloor;
+				int maxFloors = OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nTotalFloor;
 
 				double floorRate = Math.Pow(CFloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
 				double lengthBonus = Math.Max(1, maxFloors / 140.0);
@@ -472,7 +472,7 @@ internal class CStage結果 : CStage {
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					int diff = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
-					int stars = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[diff].譜面情報.nレベル[diff];
+					int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[diff].譜面情報.nレベル[diff];
 
 					diffModifier = Math.Max(1, Math.Min(3, diff));
 
@@ -651,7 +651,7 @@ internal class CStage結果 : CStage {
 			this.EndAnime = false;
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
+				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
 				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48, Color.White, Color.Black, 700);
 				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
@@ -1227,7 +1227,7 @@ internal class CStage結果 : CStage {
 						int xFactor = 0;
 						float yFactor = 1f;
 
-						int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+						int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTowerType);
 
 						if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn_Result)
 							currentTowerType = 0;

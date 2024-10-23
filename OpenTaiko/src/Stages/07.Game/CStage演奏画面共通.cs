@@ -2847,7 +2847,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		var panelString = string.IsNullOrEmpty(OpenTaiko.DTX.PANEL) ? OpenTaiko.DTX.TITLE.GetString("") : OpenTaiko.DTX.PANEL;
 
 		this.actPanel.SetPanelString(panelString,
-			OpenTaiko.stageSongSelect.rChoosenSong.str本当のジャンル,
+			OpenTaiko.stageSongSelect.rChoosenSong.songGenrePanel,
 			OpenTaiko.Skin.Game_StageText,
 			songNode: OpenTaiko.stageSongSelect.rChoosenSong);
 	}

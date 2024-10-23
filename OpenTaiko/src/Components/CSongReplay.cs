@@ -321,7 +321,7 @@ class CSongReplay {
 		// Chart metadata
 		ChartUniqueID = OpenTaiko.stageSongSelect.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[storedPlayer];
-		ChartLevel = (byte)Math.Min(255, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
+		ChartLevel = (byte)Math.Min(255, OpenTaiko.stageSongSelect.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
 		// Replay Checksum (Calculate at the end)

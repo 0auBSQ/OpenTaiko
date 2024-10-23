@@ -176,7 +176,7 @@ class CStage段位選択 : CStage {
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
-					switch (段位リスト.currentBar.eノード種別) {
+					switch (段位リスト.currentBar.nodeType) {
 						case CSongListNode.ENodeType.SCORE:
 						case CSongListNode.ENodeType.RANDOM: {
 								//this.t段位を選択する();
@@ -192,7 +192,7 @@ class CStage段位選択 : CStage {
 							}
 							break;
 						case CSongListNode.ENodeType.BACKBOX: {
-								if (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentBar.rParentNode) && 段位リスト.currentBar.rParentNode.strジャンル == "段位道場") {
+								if (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentBar.rParentNode) && 段位リスト.currentBar.rParentNode.songGenre == "段位道場") {
 									return returnTitle();
 								} else {
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -253,7 +253,7 @@ class CStage段位選択 : CStage {
 		if (段位挑戦選択画面.bOption) actPlayOption.On進行描画(0);
 
 		if (ct待機.CurrentValue >= 3000) {
-			if (段位リスト.currentBar.eノード種別 == CSongListNode.ENodeType.RANDOM) {
+			if (段位リスト.currentBar.nodeType == CSongListNode.ENodeType.RANDOM) {
 				if (!tSelectSongRandomly()) {
 					bDifficultyIn = false;
 					b選択した = false;
@@ -293,9 +293,9 @@ class CStage段位選択 : CStage {
 	public void t段位を選択する() {
 		this.b選択した = true;
 		OpenTaiko.stageSongSelect.rChoosenSong = 段位リスト.listSongs[段位リスト.n現在の選択行];
-		OpenTaiko.stageSongSelect.r確定されたスコア = 段位リスト.listSongs[段位リスト.n現在の選択行].arスコア[(int)Difficulty.Dan];
+		OpenTaiko.stageSongSelect.r確定されたスコア = 段位リスト.listSongs[段位リスト.n現在の選択行].score[(int)Difficulty.Dan];
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = 段位リスト.listSongs[段位リスト.n現在の選択行].strジャンル;
+		OpenTaiko.stageSongSelect.str確定された曲のジャンル = 段位リスト.listSongs[段位リスト.n現在の選択行].songGenre;
 		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
 			this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
@@ -312,9 +312,9 @@ class CStage段位選択 : CStage {
 
 		List<CSongListNode> songs = new List<CSongListNode>();
 		OpenTaiko.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true);
-		song.listランダム用ノードリスト = songs;
+		song.randomList = songs;
 
-		int selectableSongCount = song.listランダム用ノードリスト.Count;
+		int selectableSongCount = song.randomList.Count;
 
 		if (selectableSongCount == 0) {
 			return false;
@@ -329,11 +329,11 @@ class CStage段位選択 : CStage {
 		}
 
 		// Third assignment
-		OpenTaiko.stageSongSelect.rChoosenSong = song.listランダム用ノードリスト[randomSongIndex];
+		OpenTaiko.stageSongSelect.rChoosenSong = song.randomList[randomSongIndex];
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
 
-		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.strジャンル;
+		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
+		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.songGenre;
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 

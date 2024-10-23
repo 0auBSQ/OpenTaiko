@@ -134,7 +134,7 @@ internal class CStage曲読み込み : CStage {
 		#region [ 初めての進行描画 ]
 		//-----------------------------
 		if (base.IsFirstDraw) {
-			Cスコア cスコア1 = OpenTaiko.stageSongSelect.r確定されたスコア;
+			CScore cスコア1 = OpenTaiko.stageSongSelect.r確定されたスコア;
 			if (this.sd読み込み音 != null) {
 				if (OpenTaiko.Skin.sound曲読込開始音.bExclusive && (CSkin.CSystemSound.r最後に再生した排他システムサウンド != null)) {
 					CSkin.CSystemSound.r最後に再生した排他システムサウンド.tStop();
@@ -259,7 +259,7 @@ internal class CStage曲読み込み : CStage {
 					int xFactor = 0;
 					float yFactor = 1f;
 
-					int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+					int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTowerType);
 
 					if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
 						currentTowerType = 0;

@@ -683,13 +683,13 @@ class CActSelect段位リスト : CStage {
 	}
 
 	public void tOpenFolder(CSongListNode song) {
-		listSongs = song.list子リスト;
+		listSongs = song.childrenList;
 		n現在の選択行 = 0;
 		tUpdateSongs();
 	}
 
 	public void tCloseFolder(CSongListNode song) {
-		listSongs = song.rParentNode.rParentNode.list子リスト;
+		listSongs = song.rParentNode.rParentNode.childrenList;
 		n現在の選択行 = 0;
 		tUpdateSongs();
 	}
@@ -703,8 +703,8 @@ class CActSelect段位リスト : CStage {
 		for (int i = 0; i < stバー情報.Length; i++) {
 			var song = listSongs[i];
 
-			stバー情報[i].eノード種別 = song.eノード種別;
-			switch (song.eノード種別) {
+			stバー情報[i].eノード種別 = song.nodeType;
+			switch (song.nodeType) {
 				case CSongListNode.ENodeType.SCORE: {
 						stバー情報[i].ttkタイトル = new TitleTextureKey[listSongs[i].DanSongs.Count + 1];
 						stバー情報[i].n曲難易度 = new int[listSongs[i].DanSongs.Count];
@@ -721,14 +721,14 @@ class CActSelect段位リスト : CStage {
 
 						stバー情報[i].ttkタイトル[listSongs[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
-						stバー情報[i].nDanTick = song.arスコア[6].譜面情報.nDanTick;
-						stバー情報[i].cDanTickColor = song.arスコア[6].譜面情報.cDanTickColor;
+						stバー情報[i].nDanTick = song.score[6].譜面情報.nDanTick;
+						stバー情報[i].cDanTickColor = song.score[6].譜面情報.cDanTickColor;
 
 						//stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
 						var TableEntry = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.tGetSongSelectTableEntry(song.tGetUniqueId());
 						stバー情報[i].clearGrade = TableEntry.ClearStatuses[(int)Difficulty.Dan];
 
-						string barCenter = Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";
+						string barCenter = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";
 						if (BarTexCache.TryGetValue(barCenter, out CTexture texture1)) {
 							stバー情報[i].txBarCenter = texture1;
 						} else {
@@ -736,7 +736,7 @@ class CActSelect段位リスト : CStage {
 							BarTexCache.Add(barCenter, stバー情報[i].txBarCenter);
 						}
 
-						string danPlate = Path.GetDirectoryName(song.arスコア[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Dan_Plate.png";
+						string danPlate = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Dan_Plate.png";
 						if (BarTexCache.TryGetValue(danPlate, out CTexture texture2)) {
 							stバー情報[i].txDanPlate = texture2;
 						} else {

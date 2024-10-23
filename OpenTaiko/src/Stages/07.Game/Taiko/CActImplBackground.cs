@@ -215,7 +215,7 @@ internal class CActImplBackground : CActivity {
 
 				this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
 
-				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -316,13 +316,13 @@ internal class CActImplBackground : CActivity {
 
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
+			int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
 			int nightTime = Math.Max(140, maxFloor / 2);
 
-			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTowerType);
+			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTowerType);
 
 			if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
 				currentTowerType = 0;

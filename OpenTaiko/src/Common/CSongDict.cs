@@ -20,7 +20,7 @@ internal class CSongDict {
 	}
 
 	public static string[] tGetNodesByGenreName(string genreName) {
-		return nodes.Where(_nd => _nd.Value.strジャンル == genreName).Select(_nd => _nd.Key).ToArray();
+		return nodes.Where(_nd => _nd.Value.songGenre == genreName).Select(_nd => _nd.Key).ToArray();
 	}
 
 	#region [General song dict methods]
@@ -74,7 +74,7 @@ internal class CSongDict {
 	// Generate a back button
 	public static CSongListNode tGenerateBackButton(CSongListNode parent, string path = "/", List<string> listStrBoxDef = null) {
 		CSongListNode itemBack = new CSongListNode();
-		itemBack.eノード種別 = CSongListNode.ENodeType.BACKBOX;
+		itemBack.nodeType = CSongListNode.ENodeType.BACKBOX;
 
 
 		// とじる
@@ -88,9 +88,9 @@ internal class CSongDict {
 		itemBack.BgType = parent.BgType;
 		itemBack.isChangedBgType = parent.isChangedBgType;
 
-		itemBack.strジャンル = parent.strジャンル;
+		itemBack.songGenre = parent.songGenre;
 		itemBack.strSelectBGPath = parent.strSelectBGPath;
-		itemBack.nスコア数 = 1;
+		itemBack.difficultiesCount = 1;
 		itemBack.rParentNode = parent;
 		itemBack.strSkinPath = (parent.rParentNode == null) ?
 			"" : parent.rParentNode.strSkinPath;
@@ -103,27 +103,27 @@ internal class CSongDict {
 		itemBack.strBreadcrumbs = (itemBack.rParentNode == null) ?
 			itemBack.ldTitle.GetString("") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("");
 
-		itemBack.arスコア[0] = new Cスコア();
-		itemBack.arスコア[0].ファイル情報.フォルダの絶対パス = "";
-		itemBack.arスコア[0].譜面情報.タイトル = itemBack.ldTitle.GetString("");
-		itemBack.arスコア[0].譜面情報.コメント = "";
+		itemBack.score[0] = new CScore();
+		itemBack.score[0].ファイル情報.フォルダの絶対パス = "";
+		itemBack.score[0].譜面情報.タイトル = itemBack.ldTitle.GetString("");
+		itemBack.score[0].譜面情報.コメント = "";
 
 		return (itemBack);
 	}
 
 	public static CSongListNode tGenerateRandomButton(CSongListNode parent, string path = "/") {
 		CSongListNode itemRandom = new CSongListNode();
-		itemRandom.eノード種別 = CSongListNode.ENodeType.RANDOM;
+		itemRandom.nodeType = CSongListNode.ENodeType.RANDOM;
 
 		itemRandom.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
 
-		itemRandom.nスコア数 = (int)Difficulty.Total;
+		itemRandom.difficultiesCount = (int)Difficulty.Total;
 		itemRandom.rParentNode = parent;
 
 		itemRandom.strBreadcrumbs = (itemRandom.rParentNode == null) ?
 			itemRandom.ldTitle.GetString("") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("");
 
-		itemRandom.arスコア[0] = new Cスコア();
+		itemRandom.score[0] = new CScore();
 
 		return itemRandom;
 	}
@@ -131,7 +131,7 @@ internal class CSongDict {
 	// Reset the position of all back buttons, also adds a random button at the end
 	public static List<CSongListNode> tReinsertBackButtons(CSongListNode parent, List<CSongListNode> songList, string path = "/", List<string> listStrBoxDef = null) {
 		// Remove all the existing back boxes currently existing
-		songList.RemoveAll(e => e.eノード種別 == CSongListNode.ENodeType.BACKBOX || e.eノード種別 == CSongListNode.ENodeType.RANDOM);
+		songList.RemoveAll(e => e.nodeType == CSongListNode.ENodeType.BACKBOX || e.nodeType == CSongListNode.ENodeType.RANDOM);
 
 		int songCount = songList.Count;
 

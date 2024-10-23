@@ -178,52 +178,6 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	#region [ 入力範囲ms ]
-	public static int nPerfect範囲ms {
-		get {
-			if (stageSongSelect.rChoosenSong != null) {
-				CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
-				if (((c曲リストノード != null) && (c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX)) && (c曲リストノード.nPerfect範囲ms >= 0)) {
-					return c曲リストノード.nPerfect範囲ms;
-				}
-			}
-			return ConfigIni.nHitRangeMs.Perfect;
-		}
-	}
-	public static int nGreat範囲ms {
-		get {
-			if (stageSongSelect.rChoosenSong != null) {
-				CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
-				if (((c曲リストノード != null) && (c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX)) && (c曲リストノード.nGreat範囲ms >= 0)) {
-					return c曲リストノード.nGreat範囲ms;
-				}
-			}
-			return ConfigIni.nHitRangeMs.Great;
-		}
-	}
-	public static int nGood範囲ms {
-		get {
-			if (stageSongSelect.rChoosenSong != null) {
-				CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
-				if (((c曲リストノード != null) && (c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX)) && (c曲リストノード.nGood範囲ms >= 0)) {
-					return c曲リストノード.nGood範囲ms;
-				}
-			}
-			return ConfigIni.nHitRangeMs.Good;
-		}
-	}
-	public static int nPoor範囲ms {
-		get {
-			if (stageSongSelect.rChoosenSong != null) {
-				CSongListNode c曲リストノード = stageSongSelect.rChoosenSong.rParentNode;
-				if (((c曲リストノード != null) && (c曲リストノード.eノード種別 == CSongListNode.ENodeType.BOX)) && (c曲リストノード.nPoor範囲ms >= 0)) {
-					return c曲リストノード.nPoor範囲ms;
-				}
-			}
-			return ConfigIni.nHitRangeMs.Poor;
-		}
-	}
-	#endregion
 	public static CPad Pad {
 		get;
 		private set;

@@ -61,7 +61,7 @@ internal class CActSelectPreimageパネル : CActivity {
 		return 0;
 	}
 
-	public CTexture? tGenerateAndGetPreimage(Cスコア? cScoreInst) {
+	public CTexture? tGenerateAndGetPreimage(CScore? cScoreInst) {
 		this.tUpdatePreimage(cScoreInst);
 		return tGetPreimageTextureResized();
 	}
@@ -105,7 +105,7 @@ internal class CActSelectPreimageパネル : CActivity {
 		}
 	}
 
-	private void tUpdatePreimage(Cスコア? cScoreInst) {
+	private void tUpdatePreimage(CScore? cScoreInst) {
 		if (cScoreInst != null && this.tBuildPreimageAssets(cScoreInst)) {
 			return;
 		}
@@ -114,7 +114,7 @@ internal class CActSelectPreimageパネル : CActivity {
 		this.rCurrentlyDisplayedPreimage = this.txDefaultPreimage;
 		this.strCurrentFilename = "";
 	}
-	private bool tBuildPreimageAssets(Cスコア cScoreInst) {
+	private bool tBuildPreimageAssets(CScore cScoreInst) {
 		if ((cScoreInst == null) || string.IsNullOrEmpty(cScoreInst.譜面情報.Preimage)) return false;
 
 		string str = ((!Path.IsPathRooted(cScoreInst.譜面情報.Preimage)) ? cScoreInst.ファイル情報.フォルダの絶対パス : "") + cScoreInst.譜面情報.Preimage;
