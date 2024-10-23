@@ -240,42 +240,41 @@ namespace OpenTaiko {
 
 						}
 
+						#region [Rainbow]
+
+						if (this.db現在のゲージ値[0] >= 100.0) {
+							this.ct虹アニメ.TickLoop();
+							this.ct虹透明度.TickLoop();
+							if (OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue] != null) {
+								OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.X = scale;
+								OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.Y = scale;
+
+								OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.X = scale;
+								OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.Y = scale;
+
+								bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
+
+
+								OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].Opacity = 255;
+								OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+									new RectangleF(0,
+									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
+									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height));
+
+
+								OpenTaiko.Tx.Gauge_Rainbow[虹ベース].Opacity = (ct虹透明度.CurrentValue * 255 / (int)ct虹透明度.EndValue) / 1;
+								OpenTaiko.Tx.Gauge_Rainbow[虹ベース].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+									new RectangleF(0,
+									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
+									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height));
+							}
+						}
+
+						#endregion
 
 						if (OpenTaiko.Tx.Gauge_Line[0] != null) {
-							#region [Rainbow]
-
-							if (this.db現在のゲージ値[0] >= 100.0) {
-								this.ct虹アニメ.TickLoop();
-								this.ct虹透明度.TickLoop();
-								if (OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue] != null) {
-									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.X = scale;
-									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.Y = scale;
-
-									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.X = scale;
-									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.Y = scale;
-
-									bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
-
-
-									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].Opacity = 255;
-									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
-										new RectangleF(0,
-										smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-										OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Width,
-										smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height));
-
-
-									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].Opacity = (ct虹透明度.CurrentValue * 255 / (int)ct虹透明度.EndValue) / 1;
-									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
-										new RectangleF(0,
-										smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-										OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Width,
-										smart ? OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height));
-								}
-							}
-
-							#endregion
-
 
 							OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.X = scale;
 							OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.Y = scale;

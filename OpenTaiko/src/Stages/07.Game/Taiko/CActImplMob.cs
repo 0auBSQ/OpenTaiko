@@ -78,7 +78,7 @@ namespace OpenTaiko {
 		}
 		#region[ private ]
 		//-----------------
-		private ScriptBG MobScript;
+		public ScriptBG MobScript { get; private set; }
 		//-----------------
 		#endregion
 	}
