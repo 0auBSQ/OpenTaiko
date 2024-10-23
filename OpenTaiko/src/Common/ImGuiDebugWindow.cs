@@ -388,6 +388,8 @@ namespace OpenTaiko {
 								"Down Background", "TEXTURE_LUA_DOWNBG");
 							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actMob.MobScript,
 								"Mob", "TEXTURE_LUA_MOB");
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaScript,
+								"Kusudama", "TEXTURE_LUA_KUSUDAMA");
 
 							#region Endings
 							switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
@@ -448,6 +450,7 @@ namespace OpenTaiko {
 							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBackground.UpScript);
 							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBackground.DownScript);
 							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actMob.MobScript);
+							currentStageMemoryUsage += GetTotalMemoryUsageFromCTextureList(OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaScript);
 
 							switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
 								case Difficulty.Tower:

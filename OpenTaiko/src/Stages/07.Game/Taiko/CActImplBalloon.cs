@@ -182,7 +182,7 @@ namespace OpenTaiko {
 			return base.Draw();
 		}
 
-		private KusudamaScript KusudamaScript;
+		public KusudamaScript KusudamaScript { get; private set; }
 
 
 		private CCounter ct風船終了;
