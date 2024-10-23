@@ -119,8 +119,8 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 		int nデバイス = 0;      // 0:"no device" … BASS からはデバイスへアクセスさせない。アクセスは BASSWASAPI アドオンから行う。
 		int n周波数 = 44100;   // 仮決め。lデバイス（≠ドライバ）がネイティブに対応している周波数であれば何でもいい？ようだ。BASSWASAPIでデバイスの周波数は変えられる。いずれにしろBASSMXで自動的にリサンプリングされる。
-		//if( !Bass.Init( nデバイス, n周波数, DeviceInitFlags.Default, IntPtr.Zero ) )
-		//	throw new Exception( string.Format( "BASS (WASAPI) の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString() ) );
+							//if( !Bass.Init( nデバイス, n周波数, DeviceInitFlags.Default, IntPtr.Zero ) )
+							//	throw new Exception( string.Format( "BASS (WASAPI) の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString() ) );
 
 		Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
 

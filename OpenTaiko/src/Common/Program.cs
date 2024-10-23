@@ -102,8 +102,8 @@ internal class Program {
 					using (var mania = new OpenTaiko())
 						mania.Run();
 
-					Trace.WriteLine( "" );
-					Trace.WriteLine( "Thank you for playing!" );
+					Trace.WriteLine("");
+					Trace.WriteLine("Thank you for playing!");
 				}
 #if !DEBUG
 					catch( Exception e )

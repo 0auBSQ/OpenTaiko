@@ -150,41 +150,41 @@ internal class CActImplDancer : CActivity {
 						case 0:
 							break;
 						case 1: {
-							if (nDancerInInterval == 0) {
-								DancerStates[i] = 3;
-							} else {
-								if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)OpenTaiko.FPS.DeltaTime;
-
-								if (nNowDancerInCounter[i] >= 1) {
-									nNowDancerInCounter[i] = 1;
+								if (nDancerInInterval == 0) {
 									DancerStates[i] = 3;
+								} else {
+									if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)OpenTaiko.FPS.DeltaTime;
+
+									if (nNowDancerInCounter[i] >= 1) {
+										nNowDancerInCounter[i] = 1;
+										DancerStates[i] = 3;
+									}
+
+									int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In.Length - 1));
+									if (this.Dancer_In[i] != null && this.Dancer_In[i].Length > 0 && this.Dancer_In[i][this.arMotionArray_In[frame]] != null) {
+										this.Dancer_In[i][this.arMotionArray_In[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+									}
 								}
 
-								int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In.Length - 1));
-								if (this.Dancer_In[i] != null && this.Dancer_In[i].Length > 0 && this.Dancer_In[i][this.arMotionArray_In[frame]] != null) {
-									this.Dancer_In[i][this.arMotionArray_In[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
-								}
 							}
-
-						}
 							break;
 						case 2: {
-							if (nDancerOutInterval == 0) {
-								DancerStates[i] = 0;
-							} else {
-								if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)OpenTaiko.FPS.DeltaTime;
-
-								if (nNowDancerOutCounter[i] >= 1) {
-									nNowDancerOutCounter[i] = 1;
+								if (nDancerOutInterval == 0) {
 									DancerStates[i] = 0;
-								}
+								} else {
+									if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)OpenTaiko.FPS.DeltaTime;
 
-								int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out.Length - 1));
-								if (this.Dancer_Out[i] != null && this.Dancer_Out[i].Length > 0 && this.Dancer_Out[i][this.arMotionArray_Out[frame]] != null) {
-									this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+									if (nNowDancerOutCounter[i] >= 1) {
+										nNowDancerOutCounter[i] = 1;
+										DancerStates[i] = 0;
+									}
+
+									int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out.Length - 1));
+									if (this.Dancer_Out[i] != null && this.Dancer_Out[i].Length > 0 && this.Dancer_Out[i][this.arMotionArray_Out[frame]] != null) {
+										this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+									}
 								}
 							}
-						}
 							break;
 						case 3:
 							if (this.Dancer[i] != null && this.Dancer[i].Length > 0 && this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]] != null) {

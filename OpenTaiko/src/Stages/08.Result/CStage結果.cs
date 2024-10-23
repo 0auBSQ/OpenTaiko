@@ -28,7 +28,7 @@ internal class CStage結果 : CStage {
 	public STDGBVALUE<float> fPoor率;
 	public STDGBVALUE<float> fMiss率;
 	public STDGBVALUE<bool> bオート;        // #23596 10.11.16 add ikanick
-	//        10.11.17 change (int to bool) ikanick
+										 //        10.11.17 change (int to bool) ikanick
 
 	public STDGBVALUE<int> nランク値;
 	public STDGBVALUE<int> n演奏回数;
@@ -66,7 +66,7 @@ internal class CStage結果 : CStage {
 
 	public bool isAutoDisabled(int player) {
 		return ((player != 1 && !OpenTaiko.ConfigIni.bAutoPlay[player])
-		        || (player == 1 && !OpenTaiko.ConfigIni.bAutoPlay[player] && !OpenTaiko.ConfigIni.bAIBattleMode));
+				|| (player == 1 && !OpenTaiko.ConfigIni.bAutoPlay[player] && !OpenTaiko.ConfigIni.bAIBattleMode));
 	}
 
 
@@ -544,7 +544,7 @@ internal class CStage結果 : CStage {
 					_sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
 				if (!OpenTaiko.ConfigIni.bAutoPlay[i]
-				    && !(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)) {
+					&& !(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)) {
 					int _cs = -1;
 					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 						_cs = 0;
@@ -1382,7 +1382,7 @@ internal class CStage結果 : CStage {
 
 			#region [ #24609 2011.3.14 yyagi ランク更新or演奏型スキル更新時、リザルト画像をpngで保存する ]
 			if (this.bアニメが完了 == true && this.bIsCheckedWhetherResultScreenShouldSaveOrNot == false  // #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
-			                         && OpenTaiko.ConfigIni.bIsAutoResultCapture)                                               // #25399 2011.6.9 yyagi
+									 && OpenTaiko.ConfigIni.bIsAutoResultCapture)                                               // #25399 2011.6.9 yyagi
 			{
 				string strFullPath =
 					Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
@@ -1416,20 +1416,20 @@ internal class CStage結果 : CStage {
 					#endregion
 				}
 				if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
-				      || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
-				     || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
-				         || (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-				             || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
+					  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
+					 || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
+						 || (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
+							 || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 
 					#region [ Skip animations ]
 
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
-					    && this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
+						&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						this.actParameterPanel.tSkipResultAnimations();
 					} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
-					           && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
+							   && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
 					}
@@ -1441,8 +1441,8 @@ internal class CStage結果 : CStage {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 							if (!mqModals.tAreBothQueuesEmpty()
-							    && (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-							        || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+								&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
+									|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
 								displayedModals = mqModals.tPopModalInOrder();
 
 
@@ -1478,9 +1478,9 @@ internal class CStage結果 : CStage {
 
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
-				    OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
+					OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 						#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
@@ -1516,8 +1516,8 @@ internal class CStage結果 : CStage {
 		#region [ Global scores ]
 
 		int totalHit = OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
-		               + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
-		               + OpenTaiko.stage演奏ドラム画面.GetRoll(0);
+					   + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
+					   + OpenTaiko.stage演奏ドラム画面.GetRoll(0);
 
 		// Small digits
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Perfect[0] + offset, OpenTaiko.Skin.DanResult_Perfect[1],

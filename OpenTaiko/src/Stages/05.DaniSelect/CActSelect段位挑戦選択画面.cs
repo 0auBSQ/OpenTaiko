@@ -53,7 +53,7 @@ class CActSelect段位挑戦選択画面 : CActivity {
 
 			if (ctBarIn.IsEnded && !OpenTaiko.stage段位選択.b選択した && bOption == false) {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
 					if (n現在の選択行 - 1 >= 0) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
 						n現在の選択行--;
@@ -61,7 +61,7 @@ class CActSelect段位挑戦選択画面 : CActivity {
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
 					if (n現在の選択行 + 1 <= 2) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
 						n現在の選択行++;
@@ -69,8 +69,8 @@ class CActSelect段位挑戦選択画面 : CActivity {
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)) {
 					if (n現在の選択行 == 0) {
 						this.ctBarOut.Start(0, 255, 0.5f, OpenTaiko.Timer);
 						OpenTaiko.Skin.soundCancelSFX.tPlay();

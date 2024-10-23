@@ -89,7 +89,7 @@ internal class CActImplFireworks : CActivity {
 	public virtual void Start(int nLane, ENoteJudge judge, int player) {
 		for (int j = 0; j < 3 * 4; j++) {
 			if (!this.st状態[j].b使用中)
-				//for( int n = 0; n < 1; n++ )
+			//for( int n = 0; n < 1; n++ )
 			{
 				this.st状態[j].b使用中 = true;
 				//this.st状態[ n ].ct進行 = new CCounter( 0, 9, 20, CDTXMania.Timer );

@@ -270,7 +270,7 @@ internal class CStage曲読み込み : CStage {
 					}
 
 					float pos = (OpenTaiko.Tx.TowerResult_Background.szTextureSize.Height - OpenTaiko.Skin.Resolution[1]) -
-					            ((ct待機.CurrentValue <= 1200 ? ct待機.CurrentValue / 10f : 120) / 120f * (OpenTaiko.Tx.TowerResult_Background.szTextureSize.Height - OpenTaiko.Skin.Resolution[1]));
+								((ct待機.CurrentValue <= 1200 ? ct待機.CurrentValue / 10f : 120) / 120f * (OpenTaiko.Tx.TowerResult_Background.szTextureSize.Height - OpenTaiko.Skin.Resolution[1]));
 
 					OpenTaiko.Tx.TowerResult_Background?.t2D描画(0, -1 * pos);
 
@@ -336,153 +336,153 @@ internal class CStage曲読み込み : CStage {
 				return (int)ESongLoadingScreenReturnValue.Continue;
 
 			case CStage.EPhase.SongLoading_LoadDTXFile: {
-				timeBeginLoad = DateTime.Now;
-				TimeSpan span;
-				str = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
+					timeBeginLoad = DateTime.Now;
+					TimeSpan span;
+					str = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
 
-				if ((OpenTaiko.DTX != null) && OpenTaiko.DTX.IsActivated)
-					OpenTaiko.DTX.DeActivate();
+					if ((OpenTaiko.DTX != null) && OpenTaiko.DTX.IsActivated)
+						OpenTaiko.DTX.DeActivate();
 
-				//if( CDTXMania.DTX == null )
-				{
-					OpenTaiko.DTX = new CDTX(str, false, 1.0, 0, 0, 0, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
-					if (OpenTaiko.ConfigIni.nPlayerCount >= 2)
-						OpenTaiko.DTX_2P = new CDTX(str, false, 1.0, 0, 0, 1, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[1]);
-					if (OpenTaiko.ConfigIni.nPlayerCount >= 3)
-						OpenTaiko.DTX_3P = new CDTX(str, false, 1.0, 0, 0, 2, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[2]);
-					if (OpenTaiko.ConfigIni.nPlayerCount >= 4)
-						OpenTaiko.DTX_4P = new CDTX(str, false, 1.0, 0, 0, 3, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[3]);
-					if (OpenTaiko.ConfigIni.nPlayerCount >= 5)
-						OpenTaiko.DTX_5P = new CDTX(str, false, 1.0, 0, 0, 4, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[4]);
+					//if( CDTXMania.DTX == null )
+					{
+						OpenTaiko.DTX = new CDTX(str, false, 1.0, 0, 0, 0, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
+						if (OpenTaiko.ConfigIni.nPlayerCount >= 2)
+							OpenTaiko.DTX_2P = new CDTX(str, false, 1.0, 0, 0, 1, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[1]);
+						if (OpenTaiko.ConfigIni.nPlayerCount >= 3)
+							OpenTaiko.DTX_3P = new CDTX(str, false, 1.0, 0, 0, 2, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[2]);
+						if (OpenTaiko.ConfigIni.nPlayerCount >= 4)
+							OpenTaiko.DTX_4P = new CDTX(str, false, 1.0, 0, 0, 3, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[3]);
+						if (OpenTaiko.ConfigIni.nPlayerCount >= 5)
+							OpenTaiko.DTX_5P = new CDTX(str, false, 1.0, 0, 0, 4, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[4]);
 
-					if (OpenTaiko.DTX.listErrors.Count != 0) {
-						string message = "";
-						foreach (var text in OpenTaiko.DTX.listErrors) {
-							OpenTaiko.VisualLogManager.PushCard(CVisualLogManager.ELogCardType.LogError, text);
-							//System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
+						if (OpenTaiko.DTX.listErrors.Count != 0) {
+							string message = "";
+							foreach (var text in OpenTaiko.DTX.listErrors) {
+								OpenTaiko.VisualLogManager.PushCard(CVisualLogManager.ELogCardType.LogError, text);
+								//System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
+							}
 						}
+
+						Trace.TraceInformation("---- Song information -----------------");
+						Trace.TraceInformation("TITLE: {0}", OpenTaiko.DTX.TITLE.GetString(""));
+						Trace.TraceInformation("FILE: {0}", OpenTaiko.DTX.strファイル名の絶対パス);
+						Trace.TraceInformation("---------------------------");
+
+						span = (TimeSpan)(DateTime.Now - timeBeginLoad);
+						Trace.TraceInformation("Chart loading time:           {0}", span.ToString());
+
+						// 段位認定モード用。
+						#region [dan setup]
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan && OpenTaiko.DTX.List_DanSongs != null) {
+
+							var titleForeColor = OpenTaiko.Skin.Game_DanC_Title_ForeColor;
+							var titleBackColor = OpenTaiko.Skin.Game_DanC_Title_BackColor;
+							var subtitleForeColor = OpenTaiko.Skin.Game_DanC_SubTitle_ForeColor;
+							var subtitleBackColor = OpenTaiko.Skin.Game_DanC_SubTitle_BackColor;
+
+							for (int i = 0; i < OpenTaiko.DTX.List_DanSongs.Count; i++) {
+								if (!string.IsNullOrEmpty(OpenTaiko.DTX.List_DanSongs[i].Title)) {
+									using (var bmpSongTitle = pfDanTitle.DrawText(OpenTaiko.DTX.List_DanSongs[i].Title, titleForeColor, titleBackColor, null, 30)) {
+										OpenTaiko.DTX.List_DanSongs[i].TitleTex = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
+										OpenTaiko.DTX.List_DanSongs[i].TitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.DTX.List_DanSongs[i].TitleTex, OpenTaiko.Skin.Game_DanC_Title_MaxWidth);
+									}
+								}
+
+								if (!string.IsNullOrEmpty(OpenTaiko.DTX.List_DanSongs[i].SubTitle)) {
+									using (var bmpSongSubTitle = pfDanSubTitle.DrawText(OpenTaiko.DTX.List_DanSongs[i].SubTitle, subtitleForeColor, subtitleBackColor, null, 30)) {
+										OpenTaiko.DTX.List_DanSongs[i].SubTitleTex = OpenTaiko.tテクスチャの生成(bmpSongSubTitle, false);
+										OpenTaiko.DTX.List_DanSongs[i].SubTitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.DTX.List_DanSongs[i].SubTitleTex, OpenTaiko.Skin.Game_DanC_SubTitle_MaxWidth);
+									}
+								}
+
+							}
+						}
+						#endregion
 					}
 
-					Trace.TraceInformation("---- Song information -----------------");
-					Trace.TraceInformation("TITLE: {0}", OpenTaiko.DTX.TITLE.GetString(""));
-					Trace.TraceInformation("FILE: {0}", OpenTaiko.DTX.strファイル名の絶対パス);
-					Trace.TraceInformation("---------------------------");
-
-					span = (TimeSpan)(DateTime.Now - timeBeginLoad);
-					Trace.TraceInformation("Chart loading time:           {0}", span.ToString());
-
-					// 段位認定モード用。
-					#region [dan setup]
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan && OpenTaiko.DTX.List_DanSongs != null) {
-
-						var titleForeColor = OpenTaiko.Skin.Game_DanC_Title_ForeColor;
-						var titleBackColor = OpenTaiko.Skin.Game_DanC_Title_BackColor;
-						var subtitleForeColor = OpenTaiko.Skin.Game_DanC_SubTitle_ForeColor;
-						var subtitleBackColor = OpenTaiko.Skin.Game_DanC_SubTitle_BackColor;
-
-						for (int i = 0; i < OpenTaiko.DTX.List_DanSongs.Count; i++) {
-							if (!string.IsNullOrEmpty(OpenTaiko.DTX.List_DanSongs[i].Title)) {
-								using (var bmpSongTitle = pfDanTitle.DrawText(OpenTaiko.DTX.List_DanSongs[i].Title, titleForeColor, titleBackColor, null, 30)) {
-									OpenTaiko.DTX.List_DanSongs[i].TitleTex = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
-									OpenTaiko.DTX.List_DanSongs[i].TitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.DTX.List_DanSongs[i].TitleTex, OpenTaiko.Skin.Game_DanC_Title_MaxWidth);
-								}
-							}
-
-							if (!string.IsNullOrEmpty(OpenTaiko.DTX.List_DanSongs[i].SubTitle)) {
-								using (var bmpSongSubTitle = pfDanSubTitle.DrawText(OpenTaiko.DTX.List_DanSongs[i].SubTitle, subtitleForeColor, subtitleBackColor, null, 30)) {
-									OpenTaiko.DTX.List_DanSongs[i].SubTitleTex = OpenTaiko.tテクスチャの生成(bmpSongSubTitle, false);
-									OpenTaiko.DTX.List_DanSongs[i].SubTitleTex.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref OpenTaiko.DTX.List_DanSongs[i].SubTitleTex, OpenTaiko.Skin.Game_DanC_SubTitle_MaxWidth);
-								}
-							}
-
-						}
-					}
-					#endregion
+					base.ePhaseID = CStage.EPhase.SongLoading_WaitToLoadWAVFile;
+					timeBeginLoadWAV = DateTime.Now;
+					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
-
-				base.ePhaseID = CStage.EPhase.SongLoading_WaitToLoadWAVFile;
-				timeBeginLoadWAV = DateTime.Now;
-				return (int)ESongLoadingScreenReturnValue.Continue;
-			}
 
 			case CStage.EPhase.SongLoading_WaitToLoadWAVFile: {
-				if (this.ct待機.CurrentValue > 260) {
-					base.ePhaseID = CStage.EPhase.SongLoading_LoadWAVFile;
+					if (this.ct待機.CurrentValue > 260) {
+						base.ePhaseID = CStage.EPhase.SongLoading_LoadWAVFile;
+					}
+					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
-				return (int)ESongLoadingScreenReturnValue.Continue;
-			}
 
 			case CStage.EPhase.SongLoading_LoadWAVFile: {
-				int looptime = (OpenTaiko.ConfigIni.bEnableVSync) ? 3 : 1; // VSyncWait=ON時は1frame(1/60s)あたり3つ読むようにする
-				for (int i = 0; i < looptime && nWAVcount <= OpenTaiko.DTX.listWAV.Count; i++) {
-					if (OpenTaiko.DTX.listWAV[nWAVcount].listこのWAVを使用するチャンネル番号の集合.Count > 0)   // #28674 2012.5.8 yyagi
-					{
-						OpenTaiko.DTX.tWAVの読み込み(OpenTaiko.DTX.listWAV[nWAVcount]);
+					int looptime = (OpenTaiko.ConfigIni.bEnableVSync) ? 3 : 1; // VSyncWait=ON時は1frame(1/60s)あたり3つ読むようにする
+					for (int i = 0; i < looptime && nWAVcount <= OpenTaiko.DTX.listWAV.Count; i++) {
+						if (OpenTaiko.DTX.listWAV[nWAVcount].listこのWAVを使用するチャンネル番号の集合.Count > 0)   // #28674 2012.5.8 yyagi
+						{
+							OpenTaiko.DTX.tWAVの読み込み(OpenTaiko.DTX.listWAV[nWAVcount]);
+						}
+						nWAVcount++;
 					}
-					nWAVcount++;
+					if (nWAVcount > OpenTaiko.DTX.listWAV.Count) {
+						TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
+						Trace.TraceInformation("Song loading time({0,4}):     {1}", OpenTaiko.DTX.listWAV.Count, span.ToString());
+						timeBeginLoadWAV = DateTime.Now;
+
+						if (OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
+							OpenTaiko.DTX.PlanToAddMixerChannel();
+						}
+
+						var _dtx = new CDTX[5] { OpenTaiko.DTX, OpenTaiko.DTX_2P, OpenTaiko.DTX_3P, OpenTaiko.DTX_4P, OpenTaiko.DTX_5P };
+
+						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+							_dtx[i]?.tRandomizeTaikoChips(i);
+							_dtx[i]?.tApplyFunMods(i);
+							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
+						}
+
+						OpenTaiko.stage演奏ドラム画面.Activate();
+
+						span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
+
+						base.ePhaseID = CStage.EPhase.SongLoading_LoadBMPFile;
+					}
+					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
-				if (nWAVcount > OpenTaiko.DTX.listWAV.Count) {
-					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
-					Trace.TraceInformation("Song loading time({0,4}):     {1}", OpenTaiko.DTX.listWAV.Count, span.ToString());
-					timeBeginLoadWAV = DateTime.Now;
-
-					if (OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
-						OpenTaiko.DTX.PlanToAddMixerChannel();
-					}
-
-					var _dtx = new CDTX[5] { OpenTaiko.DTX, OpenTaiko.DTX_2P, OpenTaiko.DTX_3P, OpenTaiko.DTX_4P, OpenTaiko.DTX_5P };
-
-					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						_dtx[i]?.tRandomizeTaikoChips(i);
-						_dtx[i]?.tApplyFunMods(i);
-						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
-					}
-
-					OpenTaiko.stage演奏ドラム画面.Activate();
-
-					span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
-
-					base.ePhaseID = CStage.EPhase.SongLoading_LoadBMPFile;
-				}
-				return (int)ESongLoadingScreenReturnValue.Continue;
-			}
 
 			case CStage.EPhase.SongLoading_LoadBMPFile: {
-				TimeSpan span;
-				DateTime timeBeginLoadBMPAVI = DateTime.Now;
+					TimeSpan span;
+					DateTime timeBeginLoadBMPAVI = DateTime.Now;
 
-				if (OpenTaiko.ConfigIni.bEnableAVI)
-					OpenTaiko.DTX.tAVIの読み込み();
-				span = (TimeSpan)(DateTime.Now - timeBeginLoadBMPAVI);
+					if (OpenTaiko.ConfigIni.bEnableAVI)
+						OpenTaiko.DTX.tAVIの読み込み();
+					span = (TimeSpan)(DateTime.Now - timeBeginLoadBMPAVI);
 
-				span = (TimeSpan)(DateTime.Now - timeBeginLoad);
-				Trace.TraceInformation("総読込時間:                {0}", span.ToString());
+					span = (TimeSpan)(DateTime.Now - timeBeginLoad);
+					Trace.TraceInformation("総読込時間:                {0}", span.ToString());
 
-				if (OpenTaiko.ConfigIni.FastRender) {
-					var fastRender = new FastRender();
-					fastRender.Render();
-					fastRender = null;
+					if (OpenTaiko.ConfigIni.FastRender) {
+						var fastRender = new FastRender();
+						fastRender.Render();
+						fastRender = null;
+					}
+
+
+					OpenTaiko.Timer.Update();
+					//CSound管理.rc演奏用タイマ.t更新();
+					base.ePhaseID = CStage.EPhase.SongLoading_WaitForSoundSystemBGM;
+					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
-
-
-				OpenTaiko.Timer.Update();
-				//CSound管理.rc演奏用タイマ.t更新();
-				base.ePhaseID = CStage.EPhase.SongLoading_WaitForSoundSystemBGM;
-				return (int)ESongLoadingScreenReturnValue.Continue;
-			}
 
 			case CStage.EPhase.SongLoading_WaitForSoundSystemBGM: {
-				long nCurrentTime = OpenTaiko.Timer.NowTime;
-				if (nCurrentTime < this.nBGM再生開始時刻)
-					this.nBGM再生開始時刻 = nCurrentTime;
+					long nCurrentTime = OpenTaiko.Timer.NowTime;
+					if (nCurrentTime < this.nBGM再生開始時刻)
+						this.nBGM再生開始時刻 = nCurrentTime;
 
-				//						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) > ( this.nBGMの総再生時間ms - 1000 ) )
-				if ((nCurrentTime - this.nBGM再生開始時刻) >= (this.nBGMの総再生時間ms))    // #27787 2012.3.10 yyagi 1000ms == フェードイン分の時間
-				{
-					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					//						if ( ( nCurrentTime - this.nBGM再生開始時刻 ) > ( this.nBGMの総再生時間ms - 1000 ) )
+					if ((nCurrentTime - this.nBGM再生開始時刻) >= (this.nBGMの総再生時間ms))    // #27787 2012.3.10 yyagi 1000ms == フェードイン分の時間
+					{
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					}
+					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
-				return (int)ESongLoadingScreenReturnValue.Continue;
-			}
 
 			case CStage.EPhase.Common_FADEOUT:
 				if (this.ct待機.IsUnEnded)        // DTXVモード時は、フェードアウト省略

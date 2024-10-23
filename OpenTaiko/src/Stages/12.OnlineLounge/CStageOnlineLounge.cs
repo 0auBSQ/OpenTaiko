@@ -168,8 +168,8 @@ class CStageOnlineLounge : CStage {
 
 
 		if (currentMenu == ECurrentMenu.MAIN
-		    || currentMenu == ECurrentMenu.CDN_SELECT
-		    || currentMenu == ECurrentMenu.CDN_OPTION) {
+			|| currentMenu == ECurrentMenu.CDN_SELECT
+			|| currentMenu == ECurrentMenu.CDN_OPTION) {
 			int baseX = OpenTaiko.Skin.OnlineLounge_Side_Menu[0] - _ref.Length * (OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] / 2);
 			int baseY = OpenTaiko.Skin.OnlineLounge_Side_Menu[1] - _ref.Length * (OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] / 2);
 
@@ -323,17 +323,17 @@ class CStageOnlineLounge : CStage {
 		//if (!IsDownloading)
 		{
 			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-			    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+				OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				if (this.tMove(1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				if (this.tMove(-1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 				#region [Fast return (Escape)]
 
@@ -360,7 +360,7 @@ class CStageOnlineLounge : CStage {
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 
 				#region [Decide]
 
@@ -561,7 +561,7 @@ class CStageOnlineLounge : CStage {
 					CSongListNode correspondingBox = null;
 					for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
 						if (OpenTaiko.Songs管理.list曲ルート[i].strジャンル == song.Genre.genre
-						    && OpenTaiko.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
+							&& OpenTaiko.Songs管理.list曲ルート[i].eノード種別 == CSongListNode.ENodeType.BOX)
 							correspondingBox = OpenTaiko.Songs管理.list曲ルート[i];
 					}
 

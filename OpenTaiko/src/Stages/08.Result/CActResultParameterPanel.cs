@@ -421,7 +421,7 @@ internal class CActResultParameterPanel : CActivity {
 						if (ctゲージアニメ[i].CurrentValue != 50) {
 							// Gauge didn't reach rainbow
 							if (OpenTaiko.ConfigIni.nPlayerCount < 2
-							    || ctゲージアニメ[(i == 0) ? 1 : 0].IsEnded)
+								|| ctゲージアニメ[(i == 0) ? 1 : 0].IsEnded)
 								OpenTaiko.Skin.soundGauge.tStop();
 						} else {
 							// Gauge reached rainbow
@@ -713,7 +713,7 @@ internal class CActResultParameterPanel : CActivity {
 						if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED_IN))
 							CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.FAILED_IN);
 						else if (CResultCharacter.tIsCounterEnded(p, CResultCharacter.ECharacterResult.FAILED_IN)
-						         && !CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
+								 && !CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
 							CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.FAILED);
 					}
 

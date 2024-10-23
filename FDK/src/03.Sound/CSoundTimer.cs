@@ -6,9 +6,9 @@ public class CSoundTimer : CTimerBase {
 	public override long SystemTimeMs {
 		get {
 			if (this.Device.SoundDeviceType == ESoundDeviceType.Bass ||
-			    this.Device.SoundDeviceType == ESoundDeviceType.ExclusiveWASAPI ||
-			    this.Device.SoundDeviceType == ESoundDeviceType.SharedWASAPI ||
-			    this.Device.SoundDeviceType == ESoundDeviceType.ASIO) {
+				this.Device.SoundDeviceType == ESoundDeviceType.ExclusiveWASAPI ||
+				this.Device.SoundDeviceType == ESoundDeviceType.SharedWASAPI ||
+				this.Device.SoundDeviceType == ESoundDeviceType.ASIO) {
 				// BASS 系の ISoundDevice.n経過時間ms はオーディオバッファの更新間隔ずつでしか更新されないため、単にこれを返すだけではとびとびの値になる。
 				// そこで、更新間隔の最中に呼ばれた場合は、システムタイマを使って補間する。
 				// この場合の経過時間との誤差は更新間隔以内に収まるので問題ないと判断する。
@@ -32,12 +32,12 @@ public class CSoundTimer : CTimerBase {
 					return this.Device.ElapsedTimeMs;
 				} else {
 					if (FDK.SoundManager.bUseOSTimer)
-						//if ( true )
+					//if ( true )
 					{
 						return ctDInputTimer.SystemTimeMs;              // 仮にCSoundTimerをCTimer相当の動作にしてみた
 					} else {
 						return this.Device.ElapsedTimeMs
-						       + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs);
+							   + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs);
 					}
 				}
 			}
@@ -60,10 +60,10 @@ public class CSoundTimer : CTimerBase {
 			this.nSoundTimerCounter = this.SystemTimeMs;
 			//Debug.WriteLine( "BaseCounter: " + nDInputTimerCounter + ", " + nSoundTimerCounter );
 		} catch (Exception e)
-			// サウンド設定変更時に、timer.Dispose()した後、timerが実際に停止する前にここに来てしまう場合があり
-			// その際にNullReferenceExceptionが発生する
-			// timerが実際に停止したことを検出してから次の設定をすべきだが、実装が難しいため、
-			// ここで単に例外破棄することで代替する
+		// サウンド設定変更時に、timer.Dispose()した後、timerが実際に停止する前にここに来てしまう場合があり
+		// その際にNullReferenceExceptionが発生する
+		// timerが実際に停止したことを検出してから次の設定をすべきだが、実装が難しいため、
+		// ここで単に例外破棄することで代替する
 		{
 			Trace.TraceInformation(e.ToString());
 			Trace.TraceInformation("FDK: CSoundTimer.SnapTimers(): 例外発生しましたが、継続します。");
@@ -92,8 +92,8 @@ public class CSoundTimer : CTimerBase {
 	}
 
 	internal ISoundDevice Device = null;    // debugのため、一時的にprotectedをpublicにする。後で元に戻しておくこと。
-	//protected Thread thSendInput = null;
-	//protected Thread thSnapTimers = null;
+											//protected Thread thSendInput = null;
+											//protected Thread thSnapTimers = null;
 	private CTimer ctDInputTimer = null;
 	private long nDInputTimerCounter = 0;
 	private long nSoundTimerCounter = 0;

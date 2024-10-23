@@ -45,7 +45,7 @@ public sealed class TitleTextureKey {
 	private static CTexture GenerateTitleTextureTate(TitleTextureKey titleTextureKey, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
-			       titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
+				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 			CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
 			if (tx文字テクスチャ.szTextureSize.Height > titleTextureKey.maxWidth) {
 				//tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Height);
@@ -60,7 +60,7 @@ public sealed class TitleTextureKey {
 	private static CTexture GenerateTitleTexture(TitleTextureKey titleTextureKey, bool keepCenter = false) {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
-			       titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
+				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 			CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
 			if (tx文字テクスチャ.szTextureSize.Width > titleTextureKey.maxWidth) {
 				tx文字テクスチャ.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szTextureSize.Width);
@@ -100,11 +100,11 @@ public sealed class TitleTextureKey {
 
 	private bool Equals(TitleTextureKey other) {
 		return string.Equals(str, other.str) &&
-		       cPrivateFastFont.Equals(other.cPrivateFastFont) &&
-		       forecolor.Equals(other.forecolor) &&
-		       backcolor.Equals(other.backcolor) &&
-		       secondEdge.Equals(other.secondEdge) &&
-		       maxWidth == other.maxWidth;
+			   cPrivateFastFont.Equals(other.cPrivateFastFont) &&
+			   forecolor.Equals(other.forecolor) &&
+			   backcolor.Equals(other.backcolor) &&
+			   secondEdge.Equals(other.secondEdge) &&
+			   maxWidth == other.maxWidth;
 	}
 
 	public override bool Equals(object obj) {

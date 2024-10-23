@@ -41,9 +41,9 @@ internal class CActCalibrationMode : CActivity {
 		CalibrateTick.Tick();
 
 		bool decide = OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
-		              OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) ||
-		              OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
-		              OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return);
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) ||
+					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
+					  OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return);
 
 		if (CalibrateTick.IsEnded) {
 			OpenTaiko.Skin.calibrationTick.tPlay();
@@ -51,13 +51,13 @@ internal class CActCalibrationMode : CActivity {
 		}
 
 		if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
-		    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue) ||
-		    OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+			OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue) ||
+			OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 			buttonIndex = Math.Max(buttonIndex - 1, 0);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
 		} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) ||
-		           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue) ||
-		           OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue) ||
+				   OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 			buttonIndex = Math.Min(buttonIndex + 1, 2);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
 		} else if (buttonIndex == 0 && decide) // Cancel
@@ -78,7 +78,7 @@ internal class CActCalibrationMode : CActivity {
 
 			return 0;
 		} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Cancel) ||
-		           OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+				   OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 			Stop();
 

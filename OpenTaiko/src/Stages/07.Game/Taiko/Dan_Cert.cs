@@ -45,7 +45,7 @@ internal class Dan_Cert : CActivity {
 				if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[0].Dan_C[j] != null) {
 					Challenge[j] = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
 					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null
-					    && OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
+						&& OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
 					{
 						if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].GetExamRange() == Exam.Range.Less) {
 							OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Value[0];
@@ -206,9 +206,9 @@ internal class Dan_Cert : CActivity {
 				Challenge[i].SetReached(!Challenge[i].IsCleared[0]);
 			} else {
 				songsnotesremain[NowShowingNumber] = OpenTaiko.DTX.nDan_NotesCount[NowShowingNumber]
-				                                     - (OpenTaiko.stage演奏ドラム画面.n良[NowShowingNumber]
-				                                        + OpenTaiko.stage演奏ドラム画面.n可[NowShowingNumber]
-				                                        + OpenTaiko.stage演奏ドラム画面.n不可[NowShowingNumber]);
+													 - (OpenTaiko.stage演奏ドラム画面.n良[NowShowingNumber]
+														+ OpenTaiko.stage演奏ドラム画面.n可[NowShowingNumber]
+														+ OpenTaiko.stage演奏ドラム画面.n不可[NowShowingNumber]);
 
 				/*
                 notesremain = TJAPlayer3.DTX.nノーツ数[3]
@@ -221,9 +221,9 @@ internal class Dan_Cert : CActivity {
                 */
 
 				notesremain = OpenTaiko.DTX.nノーツ数[3]
-				              - (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
-				                 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
-				                 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss);
+							  - (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
+								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
+								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss);
 
 				// 残り音符数が0になったときに判断されるやつ
 
@@ -249,12 +249,12 @@ internal class Dan_Cert : CActivity {
 					case Exam.Type.JudgeGood:
 					case Exam.Type.JudgeBad:
 						if (ExamChange[i]
-							    ? songsnotesremain[NowShowingNumber] < (Challenge[i].Value[0] - Challenge[i].Amount)
-							    : notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
+								? songsnotesremain[NowShowingNumber] < (Challenge[i].Value[0] - Challenge[i].Amount)
+								: notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
 						break;
 					case Exam.Type.Combo:
 						if (notesremain + OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.P1 < ((Challenge[i].Value[0]))
-						    && OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
+							&& OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
 						break;
 					default:
 						break;
@@ -267,8 +267,8 @@ internal class Dan_Cert : CActivity {
 
 				if (OpenTaiko.DTX.listChip.Count > 0) {
 					if (ExamChange[i]
-						    ? OpenTaiko.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= SoundManager.PlayTimer.NowTime//TJAPlayer3.Timer.n現在時刻
-						    : OpenTaiko.DTX.listChip[OpenTaiko.DTX.listChip.Count - 1].n発声時刻ms <= SoundManager.PlayTimer.NowTime)//TJAPlayer3.Timer.n現在時刻)
+							? OpenTaiko.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= SoundManager.PlayTimer.NowTime//TJAPlayer3.Timer.n現在時刻
+							: OpenTaiko.DTX.listChip[OpenTaiko.DTX.listChip.Count - 1].n発声時刻ms <= SoundManager.PlayTimer.NowTime)//TJAPlayer3.Timer.n現在時刻)
 					{
 						switch (Challenge[i].GetExamType()) {
 							case Exam.Type.Score:
@@ -502,7 +502,7 @@ internal class Dan_Cert : CActivity {
 				continue;
 
 			if (dan_C[i].GetExamType() != Exam.Type.Gauge
-			    || isResult) {
+				|| isResult) {
 				if (dan_C[i].GetExamType() != Exam.Type.Gauge)
 					currentPosition++;
 
@@ -562,7 +562,7 @@ internal class Dan_Cert : CActivity {
 						#region [Success type variables]
 
 						bool rainbowBetterSuccess = GetExamStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success
-						                            && GetExamConfirmStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]);
+													&& GetExamConfirmStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]);
 
 						int amountToPercent;
 						int drawGaugeTypetwo = 0;
@@ -1087,20 +1087,20 @@ internal class Dan_Cert : CActivity {
 	public bool GetExamConfirmStatus(Dan_C dan_C) {
 		switch (dan_C.GetExamRange()) {
 			case Exam.Range.Less: {
-				if (GetExamStatus(dan_C) == Exam.Status.Better_Success && notesremain == 0)
-					return true;
-				else
-					return false;
-			}
+					if (GetExamStatus(dan_C) == Exam.Status.Better_Success && notesremain == 0)
+						return true;
+					else
+						return false;
+				}
 
 			case Exam.Range.More: {
-				if (dan_C.GetExamType() == Exam.Type.Accuracy && notesremain != 0)
-					return false;
-				else if (GetExamStatus(dan_C) == Exam.Status.Better_Success)
-					return true;
-				else
-					return false;
-			}
+					if (dan_C.GetExamType() == Exam.Type.Accuracy && notesremain != 0)
+						return false;
+					else if (GetExamStatus(dan_C) == Exam.Status.Better_Success)
+						return true;
+					else
+						return false;
+				}
 		}
 		return false;
 	}

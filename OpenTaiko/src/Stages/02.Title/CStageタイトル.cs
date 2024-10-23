@@ -184,7 +184,7 @@ internal class CStageタイトル : CStage {
 				if (!bSaveIsLoading && !bSaveFailedToLoad) {
 
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
-					    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
+						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
 						// Hit 1P save
 						OpenTaiko.SaveFile = 0;
 						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
@@ -259,7 +259,7 @@ internal class CStageタイトル : CStage {
 
 
 				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
-				    || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
 					if (bプレイヤーエントリー && this.ctSaveLoaded.IsEnded) {
 						if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2) {
 							if (!bプレイヤーエントリー決定) {
@@ -287,8 +287,8 @@ internal class CStageタイトル : CStage {
 							if (OpenTaiko.Songs管理.list曲ルート_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 								operationSucceded = true;
 						} else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
-						           && (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
-						               || OpenTaiko.ConfigIni.nPlayerCount == 1))
+								   && (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
+									   || OpenTaiko.ConfigIni.nPlayerCount == 1))
 							operationSucceded = true;
 
 						if (operationSucceded == true) {
@@ -359,8 +359,8 @@ internal class CStageタイトル : CStage {
 							OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoaded.CurrentValue <= 2972 ? 128 : 128 - (this.ctSaveLoaded.CurrentValue - 2972);
 
 							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
-							for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-								OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
+									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 
 							OpenTaiko.Tx.Banapas_Load[0].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue * 2;
 							OpenTaiko.Tx.Banapas_Load[0].vcScaleRatio.Y = ctSaveLoaded.CurrentValue <= 100 ? ctSaveLoaded.CurrentValue * 0.01f : 1.0f;
@@ -382,11 +382,11 @@ internal class CStageタイトル : CStage {
 										OpenTaiko.Skin.Title_LoadingPinBase[0] + OpenTaiko.Skin.Title_LoadingPinDiff[0] * i,
 										OpenTaiko.Skin.Title_LoadingPinBase[1] + OpenTaiko.Skin.Title_LoadingPinDiff[1] * i,
 										new Rectangle(step
-										              * (_stamp >= i * cycle
-											              ? _stamp <= (i + 1) * cycle
-												              ? (_stamp + i * cycle) / (cycle / OpenTaiko.Skin.Title_LoadingPinFrameCount)
-												              : 0
-											              : 0),
+													  * (_stamp >= i * cycle
+														  ? _stamp <= (i + 1) * cycle
+															  ? (_stamp + i * cycle) / (cycle / OpenTaiko.Skin.Title_LoadingPinFrameCount)
+															  : 0
+														  : 0),
 											0,
 											step,
 											OpenTaiko.Tx.Banapas_Load[2].szTextureSize.Height));
@@ -398,8 +398,8 @@ internal class CStageタイトル : CStage {
 							OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoadingFailed.CurrentValue <= 1000 ? 128 : 128 - (this.ctSaveLoadingFailed.CurrentValue - 1000);
 
 							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
-							for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-								OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
+									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 
 							if (!OpenTaiko.Skin.soundError.bPlayed)
 								OpenTaiko.Skin.soundError.tPlay();
@@ -419,8 +419,8 @@ internal class CStageタイトル : CStage {
 							OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoaded.CurrentValue <= 2972 ? 128 : 128 - (this.ctSaveLoaded.CurrentValue - 2972);
 
 							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
-							for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-								OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
+									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 
 							if (!OpenTaiko.Skin.SoundBanapas.bPlayed)
 								OpenTaiko.Skin.SoundBanapas.tPlay();
@@ -631,7 +631,7 @@ internal class CStageタイトル : CStage {
 						#region [Disable visualy 1p specific buttons if 2p]
 
 						if ((_menu._1pRestricted == true && OpenTaiko.ConfigIni.nPlayerCount > 1)
-						    || _menu.implemented == false) {
+							|| _menu.implemented == false) {
 							if (_bar != null)
 								_bar.color4 = CConversion.ColorToColor4(Color.DarkGray);
 							if (_chara != null)
@@ -654,16 +654,16 @@ internal class CStageタイトル : CStage {
 							float barAnimef = (ctBarMove.CurrentValue / 100.0f) - 1.5f;
 
 							float barAnime = OpenTaiko.Skin.Title_ModeSelect_Bar_Move[0] +
-							                 (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Bar_Move[1] - OpenTaiko.Skin.Title_ModeSelect_Bar_Move[0]));
+											 (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Bar_Move[1] - OpenTaiko.Skin.Title_ModeSelect_Bar_Move[0]));
 
 							float barAnimeX = OpenTaiko.Skin.Title_ModeSelect_Bar_Move_X[0] +
-							                  (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Bar_Move_X[1] - OpenTaiko.Skin.Title_ModeSelect_Bar_Move_X[0]));
+											  (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Bar_Move_X[1] - OpenTaiko.Skin.Title_ModeSelect_Bar_Move_X[0]));
 
 							float overlayAnime = OpenTaiko.Skin.Title_ModeSelect_Overlay_Move[0] +
-							                     (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Overlay_Move[1] - OpenTaiko.Skin.Title_ModeSelect_Overlay_Move[0]));
+												 (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Overlay_Move[1] - OpenTaiko.Skin.Title_ModeSelect_Overlay_Move[0]));
 
 							float overlayAnimeX = OpenTaiko.Skin.Title_ModeSelect_Overlay_Move_X[0] +
-							                      (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Overlay_Move_X[1] - OpenTaiko.Skin.Title_ModeSelect_Overlay_Move_X[0]));
+												  (barAnimef * (OpenTaiko.Skin.Title_ModeSelect_Overlay_Move_X[1] - OpenTaiko.Skin.Title_ModeSelect_Overlay_Move_X[0]));
 
 
 

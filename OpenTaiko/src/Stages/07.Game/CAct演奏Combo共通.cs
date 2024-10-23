@@ -317,7 +317,7 @@ internal class CAct演奏Combo共通 : CActivity {
 
 		if (nCombo値 == 0)
 			return;     // コンボゼロは表示しない。
-		//-----------------
+						//-----------------
 		#endregion
 
 		int[] n位の数 = new int[10];   // 表示は10桁もあれば足りるだろう
@@ -586,10 +586,10 @@ internal class CAct演奏Combo共通 : CActivity {
 					this.status[i].n前回の時刻_ジャンプ用 += INTERVAL;
 				}
 			}
-			//-----------------
-			#endregion
+		//-----------------
+		#endregion
 
-			Retry:  // モードが変化した場合はここからリトライする。
+		Retry:  // モードが変化した場合はここからリトライする。
 
 			switch (this.status[i].e現在のモード) {
 				case EMode.非表示中:
@@ -667,8 +667,8 @@ internal class CAct演奏Combo共通 : CActivity {
 					}
 					this.status[i].n現在表示中のCOMBO値 = this.status[i].nCOMBO値;
 					break;
-				//-----------------
-				#endregion
+					//-----------------
+					#endregion
 			}
 		}
 

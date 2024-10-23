@@ -136,9 +136,9 @@ internal class CActSelectPresound : CActivity {
 		Cスコア cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
 		var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.rNowSelectedSong);
 		if ((cスコア != null)
-		    && !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
-		    && OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
-		    && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED
+			&& !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
+			&& OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
+			&& HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED
 		   ) {
 			string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
 			try {
@@ -153,7 +153,7 @@ internal class CActSelectPresound : CActivity {
 				//                           caused background scanning and the metadata may now be available.
 				//                           If is not yet available then we wish to queue scanning.
 				var loudnessMetadata = cスコア.譜面情報.SongLoudnessMetadata
-				                       ?? LoudnessMetadataScanner.LoadForAudioPath(strPreviewFilename);
+									   ?? LoudnessMetadataScanner.LoadForAudioPath(strPreviewFilename);
 				OpenTaiko.SongGainController.Set(cスコア.譜面情報.SongVol, loudnessMetadata, this.sound);
 
 				// Disable song if playing while playing the preview song

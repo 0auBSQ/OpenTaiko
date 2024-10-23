@@ -170,7 +170,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 							right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
 							left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
 							decide = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-							          (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+									  (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
 							cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 							break;
 						case 1:
@@ -462,9 +462,9 @@ internal class CActSelect難易度選択画面 : CActivity {
 			}
 
 			moveX += (((float)Math.Sin((float)ctBarAnime[i].CurrentValue * (Math.PI / 180)) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_Anime[0]) -
-			          (((float)Math.Cos((float)ctBarAnimeIn.CurrentValue * (Math.PI / 170)) + 1.0f) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_AnimeIn[0]));
+					  (((float)Math.Cos((float)ctBarAnimeIn.CurrentValue * (Math.PI / 170)) + 1.0f) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_AnimeIn[0]));
 			moveY += (((float)Math.Sin((float)ctBarAnime[i].CurrentValue * (Math.PI / 180)) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]) -
-			          (((float)Math.Cos((float)ctBarAnimeIn.CurrentValue * (Math.PI / 170)) + 1.0f) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]));
+					  (((float)Math.Cos((float)ctBarAnimeIn.CurrentValue * (Math.PI / 170)) + 1.0f) * OpenTaiko.Skin.SongSelect_Difficulty_Select_Bar_Anime[1]));
 
 
 

@@ -35,22 +35,22 @@ class HScenePreset {
 		bool sectionIsValid = _ps != null ? ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).Count > 0 : false;
 
 		var preset = (sectionIsValid
-		              && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
-		              && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset))
+					  && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
+					  && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset))
 			? ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset]
 			: null;
 
 		if (sectionIsValid
-		    && OpenTaiko.DTX.scenePreset != null
-		    && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
+			&& OpenTaiko.DTX.scenePreset != null
+			&& ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
 		{
 			preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[OpenTaiko.DTX.scenePreset];
 		} else if (sectionIsValid
-		           && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
-		           && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset)) {
+				   && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
+				   && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset)) {
 			preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset];
 		} else if (sectionIsValid
-		           && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey("")) {
+				   && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey("")) {
 			preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[""];
 		} else if (sectionIsValid) {
 			var cstps = (Dictionary<string, DBSkinPreset.SkinScene>)_ps;

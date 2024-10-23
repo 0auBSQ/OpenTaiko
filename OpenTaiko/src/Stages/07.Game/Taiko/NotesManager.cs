@@ -36,7 +36,7 @@ class NotesManager {
 
 		for (int i = 0; i < s.Length; i++) {
 			if (GetNoteValueFromChar(s.Substring(i, 1)) == -1
-			    && s.Substring(i, 1) != ",")
+				&& s.Substring(i, 1) != ",")
 				return false;
 		}
 
@@ -56,11 +56,11 @@ class NotesManager {
 			case EScrollMode.Normal:
 				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
 			case EScrollMode.BMScroll: {
-				return (int)((hbtime / 16.0) * interval * screen_ratio);
-			}
+					return (int)((hbtime / 16.0) * interval * screen_ratio);
+				}
 			case EScrollMode.HBScroll: {
-				return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-			}
+					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
+				}
 			default:
 				return 0;
 		}
@@ -73,11 +73,11 @@ class NotesManager {
 			case EScrollMode.Normal:
 				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
 			case EScrollMode.BMScroll: {
-				return 0;
-			}
+					return 0;
+				}
 			case EScrollMode.HBScroll: {
-				return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-			}
+					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
+				}
 			default:
 				return 0;
 		}
@@ -95,12 +95,12 @@ class NotesManager {
 
 		if (IsBigKaTaiko(chip, gt)) {
 			return (inPad == EPad.LBlue && onPad == EPad.RBlue)
-			       || (inPad == EPad.RBlue && onPad == EPad.LBlue);
+				   || (inPad == EPad.RBlue && onPad == EPad.LBlue);
 		}
 
 		if (IsBigDonTaiko(chip, gt)) {
 			return (inPad == EPad.LRed && onPad == EPad.RRed)
-			       || (inPad == EPad.RRed && onPad == EPad.LRed);
+				   || (inPad == EPad.RRed && onPad == EPad.LRed);
 		}
 
 		if (IsSwapNote(chip, gt)) {
@@ -110,7 +110,7 @@ class NotesManager {
 			bool storedRed = onPad == EPad.LRed || onPad == EPad.RRed;
 
 			return (storedRed && hitBlue)
-			       || (storedBlue && hitRed);
+				   || (storedBlue && hitRed);
 		}
 
 		return false;
@@ -245,24 +245,24 @@ class NotesManager {
 	public static bool IsGenericRoll(CDTX.CChip chip) {
 		if (chip == null) return false;
 		return (0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19) ||
-		       (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21)
-		       || chip.nチャンネル番号 == 0x1D;
+			   (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21)
+			   || chip.nチャンネル番号 == 0x1D;
 	}
 
 	public static bool IsMissableNote(CDTX.CChip chip) {
 		if (chip == null) return false;
 		return (0x11 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x14)
-		       || chip.nチャンネル番号 == 0x1A
-		       || chip.nチャンネル番号 == 0x1B
-		       || chip.nチャンネル番号 == 0x101;
+			   || chip.nチャンネル番号 == 0x1A
+			   || chip.nチャンネル番号 == 0x1B
+			   || chip.nチャンネル番号 == 0x101;
 	}
 
 	public static bool IsHittableNote(CDTX.CChip chip) {
 		if (chip == null) return false;
 		return IsMissableNote(chip)
-		       || IsGenericRoll(chip)
-		       || IsADLIB(chip)
-		       || IsMine(chip);
+			   || IsGenericRoll(chip)
+			   || IsADLIB(chip)
+			   || IsMine(chip);
 	}
 
 	#endregion

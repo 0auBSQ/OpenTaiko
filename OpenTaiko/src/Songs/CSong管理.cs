@@ -763,8 +763,8 @@ internal class CSongs管理 {
 		List<string> l = new List<string>(listStrBoxDefSkinSubfolderFullName);
 		foreach (string boxdefSkinSubfolderFullName in l) {
 			if (Array.BinarySearch(systemSkinNames,
-				    CSkin.GetSkinName(boxdefSkinSubfolderFullName),
-				    StringComparer.InvariantCultureIgnoreCase) >= 0) {
+					CSkin.GetSkinName(boxdefSkinSubfolderFullName),
+					StringComparer.InvariantCultureIgnoreCase) >= 0) {
 				listStrBoxDefSkinSubfolderFullName.Remove(boxdefSkinSubfolderFullName);
 			}
 		}

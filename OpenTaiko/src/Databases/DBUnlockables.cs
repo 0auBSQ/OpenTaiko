@@ -160,7 +160,7 @@ class DBUnlockables {
 				case "sg":
 				case "sc":
 					if (this.Values.Length % this.RequiredArgCount == 0
-					    && this.Reference.Length == this.Values.Length / this.RequiredArgCount)
+						&& this.Reference.Length == this.Values.Length / this.RequiredArgCount)
 						return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
 					else
 						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR2", this.Condition, this.RequiredArgCount.ToString()));
@@ -252,20 +252,20 @@ class DBUnlockables {
 
 			switch (this.Condition) {
 				case "ch": {
-					if (screen == EScreen.MyRoom)
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
-					return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
-				}
+						if (screen == EScreen.MyRoom)
+							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+						return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+					}
 				case "cs": {
-					if (screen == EScreen.Shop)
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
-					return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_SHOP"));
-				}
+						if (screen == EScreen.Shop)
+							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+						return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_SHOP"));
+					}
 				case "cm": {
-					if (screen == EScreen.SongSelect)
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
-					return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
-				}
+						if (screen == EScreen.SongSelect)
+							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
+						return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+					}
 				case "ce":
 					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN", this.Values[0], SaveData.TotalEarnedMedals);
 				case "ap":
@@ -275,133 +275,133 @@ class DBUnlockables {
 				case "tp":
 					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY", this.Values[0], SaveData.TotalPlaycount);
 				case "dp": {
-					var _aimedDifficulty = this.Values[0];
-					var _aimedStatus = this.Values[1];
+						var _aimedDifficulty = this.Values[0];
+						var _aimedStatus = this.Values[1];
 
-					if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
-					if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+						if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+						if (_aimedDifficulty < (int)Difficulty.Easy || _aimedDifficulty > (int)Difficulty.Edit) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
 
-					var _table = ChartStats.ClearStatuses[_aimedDifficulty];
-					var _ura = ChartStats.ClearStatuses[(int)Difficulty.Edit];
-					int _count = 0;
-					for (int i = _aimedStatus; i < (int)EClearStatus.TOTAL; i++) {
-						_count += _table[i];
-						if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
-					}
+						var _table = ChartStats.ClearStatuses[_aimedDifficulty];
+						var _ura = ChartStats.ClearStatuses[(int)Difficulty.Edit];
+						int _count = 0;
+						for (int i = _aimedStatus; i < (int)EClearStatus.TOTAL; i++) {
+							_count += _table[i];
+							if (_aimedDifficulty == (int)Difficulty.Oni) _count += _ura[i];
+						}
 
-					var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString("DIFF_EXEXTRA") : CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
-					var statusString = GetRequiredClearStatus(_aimedStatus);
-					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF", statusString, this.Values[2], diffString, _count);
-				}
-				case "lp": {
-					var _aimedDifficulty = this.Values[0];
-					var _aimedStatus = this.Values[1];
-
-					if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
-
-					int _count = 0;
-					if (_aimedStatus == (int)EClearStatus.NONE) _count = ChartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
-					else if (_aimedStatus <= (int)EClearStatus.CLEAR) _count = ChartStats.LevelClears.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
-					else if (_aimedStatus == (int)EClearStatus.FC) _count = ChartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
-					else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
-
-					var statusString = GetRequiredClearStatus(_aimedStatus);
-					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL", statusString, this.Values[2], _aimedDifficulty, _count);
-				}
-				case "sp": {
-					List<string> _rows = new List<string>();
-					var _challengeCount = this.Values.Length / this.RequiredArgCount;
-
-					var _count = 0;
-					for (int i = 0; i < _challengeCount; i++) {
-						int _base = i * this.RequiredArgCount;
-						string _songId = this.Reference[i];
-						var _aimedDifficulty = this.Values[_base];
-						var _aimedStatus = this.Values[_base + 1];
-
-						var diffString = CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
+						var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString("DIFF_EXEXTRA") : CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
 						var statusString = GetRequiredClearStatus(_aimedStatus);
-						var _songName = CSongDict.tGetNodeFromID(_songId)?.ldTitle.GetString("") ?? "[Not found]";
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF", statusString, this.Values[2], diffString, _count);
+					}
+				case "lp": {
+						var _aimedDifficulty = this.Values[0];
+						var _aimedStatus = this.Values[1];
 
-						_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYDIFF", statusString, _songName, diffString));
+						if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+
+						int _count = 0;
+						if (_aimedStatus == (int)EClearStatus.NONE) _count = ChartStats.LevelPlays.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+						else if (_aimedStatus <= (int)EClearStatus.CLEAR) _count = ChartStats.LevelClears.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+						else if (_aimedStatus == (int)EClearStatus.FC) _count = ChartStats.LevelFCs.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+						else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
+
+						var statusString = GetRequiredClearStatus(_aimedStatus);
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL", statusString, this.Values[2], _aimedDifficulty, _count);
+					}
+				case "sp": {
+						List<string> _rows = new List<string>();
+						var _challengeCount = this.Values.Length / this.RequiredArgCount;
+
+						var _count = 0;
+						for (int i = 0; i < _challengeCount; i++) {
+							int _base = i * this.RequiredArgCount;
+							string _songId = this.Reference[i];
+							var _aimedDifficulty = this.Values[_base];
+							var _aimedStatus = this.Values[_base + 1];
+
+							var diffString = CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
+							var statusString = GetRequiredClearStatus(_aimedStatus);
+							var _songName = CSongDict.tGetNodeFromID(_songId)?.ldTitle.GetString("") ?? "[Not found]";
+
+							_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYDIFF", statusString, _songName, diffString));
 
 
-						// Safisfied count
-						if (_aimedDifficulty >= (int)Difficulty.Easy && _aimedDifficulty <= (int)Difficulty.Edit) {
-							string key = _songId + _aimedDifficulty.ToString();
-							var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
-							if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
-
-						} else if (_aimedDifficulty < (int)Difficulty.Easy) {
-							for (int diff = (int)Difficulty.Easy; diff <= (int)Difficulty.Edit; diff++) {
-								string key = _songId + diff.ToString();
+							// Safisfied count
+							if (_aimedDifficulty >= (int)Difficulty.Easy && _aimedDifficulty <= (int)Difficulty.Edit) {
+								string key = _songId + _aimedDifficulty.ToString();
 								var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
-								if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) {
-									_count++;
-									break;
+								if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) _count++;
+
+							} else if (_aimedDifficulty < (int)Difficulty.Easy) {
+								for (int diff = (int)Difficulty.Easy; diff <= (int)Difficulty.Edit; diff++) {
+									string key = _songId + diff.ToString();
+									var _cht = SaveData.bestPlaysDistinctCharts.TryGetValue(key, out var value) ? value : null;
+									if (_cht != null && _cht.ClearStatus + 1 >= _aimedStatus) {
+										_count++;
+										break;
+									}
 								}
 							}
 						}
-					}
 
-					// Push front
-					_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
-					return String.Join("\n", _rows);
-				}
+						// Push front
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						return String.Join("\n", _rows);
+					}
 				case "sg": {
-					List<string> _rows = new List<string>();
-					var _challengeCount = this.Values.Length / this.RequiredArgCount;
+						List<string> _rows = new List<string>();
+						var _challengeCount = this.Values.Length / this.RequiredArgCount;
 
-					var _count = 0;
-					for (int i = 0; i < _challengeCount; i++) {
-						int _base = i * this.RequiredArgCount;
-						string _genreName = this.Reference[i];
-						int _songCount = this.Values[_base];
-						var _aimedStatus = this.Values[_base + 1];
+						var _count = 0;
+						for (int i = 0; i < _challengeCount; i++) {
+							int _base = i * this.RequiredArgCount;
+							string _genreName = this.Reference[i];
+							int _songCount = this.Values[_base];
+							var _aimedStatus = this.Values[_base + 1];
 
-						int _satifsiedCount = 0;
-						if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.SongGenrePlays.TryGetValue(_genreName, out var value) ? value : 0;
-						else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.SongGenreClears.TryGetValue(_genreName, out var value) ? value : 0;
-						else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.SongGenreFCs.TryGetValue(_genreName, out var value) ? value : 0;
-						else _satifsiedCount = ChartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
+							int _satifsiedCount = 0;
+							if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.SongGenrePlays.TryGetValue(_genreName, out var value) ? value : 0;
+							else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.SongGenreClears.TryGetValue(_genreName, out var value) ? value : 0;
+							else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.SongGenreFCs.TryGetValue(_genreName, out var value) ? value : 0;
+							else _satifsiedCount = ChartStats.SongGenrePerfects.TryGetValue(_genreName, out var value) ? value : 0;
 
-						if (_satifsiedCount >= _songCount) _count++;
+							if (_satifsiedCount >= _songCount) _count++;
 
 
-						var statusString = GetRequiredClearStatus(_aimedStatus);
-						_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE", statusString, _songCount, _genreName, _satifsiedCount));
+							var statusString = GetRequiredClearStatus(_aimedStatus);
+							_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE", statusString, _songCount, _genreName, _satifsiedCount));
+						}
+
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						return String.Join("\n", _rows);
 					}
-
-					_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
-					return String.Join("\n", _rows);
-				}
 				case "sc": {
-					List<string> _rows = new List<string>();
-					var _challengeCount = this.Values.Length / this.RequiredArgCount;
+						List<string> _rows = new List<string>();
+						var _challengeCount = this.Values.Length / this.RequiredArgCount;
 
-					var _count = 0;
-					for (int i = 0; i < _challengeCount; i++) {
-						int _base = i * this.RequiredArgCount;
-						string _charterName = this.Reference[i];
-						int _songCount = this.Values[_base];
-						var _aimedStatus = this.Values[_base + 1];
+						var _count = 0;
+						for (int i = 0; i < _challengeCount; i++) {
+							int _base = i * this.RequiredArgCount;
+							string _charterName = this.Reference[i];
+							int _songCount = this.Values[_base];
+							var _aimedStatus = this.Values[_base + 1];
 
-						int _satifsiedCount = 0;
-						if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.CharterPlays.TryGetValue(_charterName, out var value) ? value : 0;
-						else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.CharterClears.TryGetValue(_charterName, out var value) ? value : 0;
-						else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.CharterFCs.TryGetValue(_charterName, out var value) ? value : 0;
-						else _satifsiedCount = ChartStats.CharterPerfects.TryGetValue(_charterName, out var value) ? value : 0;
+							int _satifsiedCount = 0;
+							if (_aimedStatus == (int)EClearStatus.NONE) _satifsiedCount = ChartStats.CharterPlays.TryGetValue(_charterName, out var value) ? value : 0;
+							else if (_aimedStatus <= (int)EClearStatus.CLEAR) _satifsiedCount = ChartStats.CharterClears.TryGetValue(_charterName, out var value) ? value : 0;
+							else if (_aimedStatus == (int)EClearStatus.FC) _satifsiedCount = ChartStats.CharterFCs.TryGetValue(_charterName, out var value) ? value : 0;
+							else _satifsiedCount = ChartStats.CharterPerfects.TryGetValue(_charterName, out var value) ? value : 0;
 
-						if (_satifsiedCount >= _songCount) _count++;
+							if (_satifsiedCount >= _songCount) _count++;
 
 
-						var statusString = GetRequiredClearStatus(_aimedStatus);
-						_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER", statusString, _songCount, _charterName, _satifsiedCount));
+							var statusString = GetRequiredClearStatus(_aimedStatus);
+							_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER", statusString, _songCount, _charterName, _satifsiedCount));
+						}
+
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						return String.Join("\n", _rows);
 					}
-
-					_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
-					return String.Join("\n", _rows);
-				}
 
 			}
 			// Includes cm or ig which are not supposed to be displayed in My Room

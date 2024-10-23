@@ -91,21 +91,21 @@ class CStageTowerSelect : CStage {
 			}
 
 			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-			    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+				OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				if (nCurrentSongIndex < BarInfos.Length - 1) {
 					nCurrentSongIndex++;
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				if (nCurrentSongIndex > 0) {
 					nCurrentSongIndex--;
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 				#region [Fast return (Escape)]
 
@@ -114,7 +114,7 @@ class CStageTowerSelect : CStage {
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-			           OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 				#region [Decide]
 
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -130,12 +130,12 @@ class CStageTowerSelect : CStage {
 						tOpenFolder(currentSong);
 						break;
 					case CSongListNode.ENodeType.BACKBOX: {
-						if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.strジャンル == "太鼓タワー") {
-							returnTitle();
-						} else {
-							tCloseFolder(currentSong);
+							if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.strジャンル == "太鼓タワー") {
+								returnTitle();
+							} else {
+								tCloseFolder(currentSong);
+							}
 						}
-					}
 						break;
 				}
 

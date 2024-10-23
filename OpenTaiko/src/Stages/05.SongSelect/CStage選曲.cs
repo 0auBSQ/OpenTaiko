@@ -291,7 +291,7 @@ internal class CStage選曲 : CStage {
 			base.Activate();
 
 			this.actステータスパネル.t選択曲が変更された();  // 最大ランクを更新
-			// Discord Presenceの更新
+											// Discord Presenceの更新
 			OpenTaiko.DiscordClient?.SetPresence(new RichPresence() {
 				Details = "",
 				State = "SongSelect",
@@ -503,7 +503,7 @@ internal class CStage選曲 : CStage {
 			#region [Preimage, upper lock layer and unlock conditions]
 
 			if (this.rNowSelectedSong != null
-			    && this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
+				&& this.rNowSelectedSong.eノード種別 == CSongListNode.ENodeType.SCORE) {
 				var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(this.rNowSelectedSong);
 
@@ -787,7 +787,7 @@ internal class CStage選曲 : CStage {
 					#endregion
 					#region [ Shift-F1: Config shortcut ]
 					if ((OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
-					    OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {   // [SHIFT] + [F1] CONFIG
+						OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {   // [SHIFT] + [F1] CONFIG
 						this.actPresound.tStopSound();
 						this.eフェードアウト完了時の戻り値 = E戻り値.コンフィグ呼び出し;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
 						this.actFIFO.tフェードアウト開始();
@@ -843,134 +843,134 @@ internal class CStage選曲 : CStage {
 							if (!this.bCurrentlyScrolling) {
 								#region [ Decide ]
 								if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-								     ((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
+									 ((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 									if (this.actSongList.rCurrentlySelectedSong != null) {
 										switch (this.actSongList.rCurrentlySelectedSong.eノード種別) {
 											case CSongListNode.ENodeType.SCORE: {
-												var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
+													var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(this.rNowSelectedSong);
 
-												if (IsSongLocked) {
-													var SongToUnlock = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
+													if (IsSongLocked) {
+														var SongToUnlock = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
 
-													if (SongToUnlock != null) {
-														(bool, string?) response = SongToUnlock.unlockConditions.tConditionMetWrapper(OpenTaiko.SaveFile, DBUnlockables.CUnlockConditions.EScreen.SongSelect);
+														if (SongToUnlock != null) {
+															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMetWrapper(OpenTaiko.SaveFile, DBUnlockables.CUnlockConditions.EScreen.SongSelect);
 
-														Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
-														if (actSongList.ttkNowUnlockConditionText is not null) {
-															actSongList.ttkNowUnlockConditionText = new TitleTextureKey(
-																response.Item2 ?? actSongList.ttkNowUnlockConditionText.str,
-																actSongList.ttkNowUnlockConditionText.cPrivateFastFont,
-																responseColor, Color.Black, 1000);
-														}
+															Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
+															if (actSongList.ttkNowUnlockConditionText is not null) {
+																actSongList.ttkNowUnlockConditionText = new TitleTextureKey(
+																	response.Item2 ?? actSongList.ttkNowUnlockConditionText.str,
+																	actSongList.ttkNowUnlockConditionText.cPrivateFastFont,
+																	responseColor, Color.Black, 1000);
+															}
 
-														if (response.Item1) {
-															OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Add(this.rNowSelectedSong?.tGetUniqueId() ?? "");
-															DBSaves.RegisterStringUnlockedAsset(
-																OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.SaveId,
-																"unlocked_songs",
-																this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
-															);
-															OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
-															// Play modal animation here ?
-														} else
-															OpenTaiko.Skin.soundError.tPlay();
-													} else {
-														OpenTaiko.Skin.soundError.tPlay();
-													}
-												} else {
-													if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
-														if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
-															// Init tower variables
-															if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
-																CFloorManagement.reinitialize(this.rNowSelectedSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
-
-															OpenTaiko.Skin.soundDecideSFX.tPlay();
-															OpenTaiko.Skin.voiceMenuSongDecide[OpenTaiko.SaveFile]?.tPlay();
-
-															this.t曲を選択する();
+															if (response.Item1) {
+																OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Add(this.rNowSelectedSong?.tGetUniqueId() ?? "");
+																DBSaves.RegisterStringUnlockedAsset(
+																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.SaveId,
+																	"unlocked_songs",
+																	this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
+																);
+																OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																// Play modal animation here ?
+															} else
+																OpenTaiko.Skin.soundError.tPlay();
 														} else {
 															OpenTaiko.Skin.soundError.tPlay();
 														}
 													} else {
-														// Called here
-														OpenTaiko.Skin.soundDecideSFX.tPlay();
-														this.actDifficultySelectionScreen.bIsDifficltSelect = true;
-														this.actDifficultySelectionScreen.t選択画面初期化();
-														this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-														this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-														//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-														CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+														if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
+															if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
+																// Init tower variables
+																if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+																	CFloorManagement.reinitialize(this.rNowSelectedSong.arスコア[(int)Difficulty.Tower].譜面情報.nLife);
+
+																OpenTaiko.Skin.soundDecideSFX.tPlay();
+																OpenTaiko.Skin.voiceMenuSongDecide[OpenTaiko.SaveFile]?.tPlay();
+
+																this.t曲を選択する();
+															} else {
+																OpenTaiko.Skin.soundError.tPlay();
+															}
+														} else {
+															// Called here
+															OpenTaiko.Skin.soundDecideSFX.tPlay();
+															this.actDifficultySelectionScreen.bIsDifficltSelect = true;
+															this.actDifficultySelectionScreen.t選択画面初期化();
+															this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+															this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+															//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+															CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+														}
 													}
 												}
-											}
 												break;
 											case CSongListNode.ENodeType.BOX: {
 
-												#region [Pre-generated folders]
+													#region [Pre-generated folders]
 
-												if (this.actSongList.rCurrentlySelectedSong.strジャンル == "Favorite") {
-													this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchFavoriteFolder(this.actSongList.rCurrentlySelectedSong);
-												} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "最近遊んだ曲") {
-													this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchRecentlyPlayedSongsFolder(this.actSongList.rCurrentlySelectedSong);
-												} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "SearchD") {
-													this.actSongList.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
+													if (this.actSongList.rCurrentlySelectedSong.strジャンル == "Favorite") {
+														this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchFavoriteFolder(this.actSongList.rCurrentlySelectedSong);
+													} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "最近遊んだ曲") {
+														this.actSongList.rCurrentlySelectedSong.list子リスト = CSongDict.tFetchRecentlyPlayedSongsFolder(this.actSongList.rCurrentlySelectedSong);
+													} else if (this.actSongList.rCurrentlySelectedSong.strジャンル == "SearchD") {
+														this.actSongList.tMenuContextTrigger(eMenuContext.SearchByDifficulty);
+														OpenTaiko.Skin.soundDecideSFX.tPlay();
+														goto Decided;
+														//this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
+													}
+
+													#endregion
+
+													CSongSelectSongManager.disable();
+
 													OpenTaiko.Skin.soundDecideSFX.tPlay();
-													goto Decided;
-													//this.act曲リスト.r現在選択中の曲.list子リスト = CSongDict.tFetchSongsByDifficulty(this.act曲リスト.r現在選択中の曲, (int)Difficulty.Oni, 8);
+													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+													this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
+													this.actSongList.bBoxOpen = true;
+													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 												}
-
-												#endregion
-
-												CSongSelectSongManager.disable();
-
-												OpenTaiko.Skin.soundDecideSFX.tPlay();
-												this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-												this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
-												this.actSongList.bBoxOpen = true;
-												//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-												CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
-											}
 												break;
 											case CSongListNode.ENodeType.BACKBOX: {
-												// TOJIRU
-												CSongSelectSongManager.enable();
+													// TOJIRU
+													CSongSelectSongManager.enable();
 
-												OpenTaiko.Skin.soundCancelSFX.tPlay();
-												this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-												this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
-												this.actSongList.bBoxClose = true;
-												//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-												CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
-											}
+													OpenTaiko.Skin.soundCancelSFX.tPlay();
+													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+													this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
+													this.actSongList.bBoxClose = true;
+													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+												}
 												break;
 											case CSongListNode.ENodeType.RANDOM: {
-												this.tSetSongRandomly();
+													this.tSetSongRandomly();
 
-												// Called here
-												OpenTaiko.Skin.soundDecideSFX.tPlay();
-												this.actDifficultySelectionScreen.bIsDifficltSelect = true;
-												this.actDifficultySelectionScreen.t選択画面初期化();
-												this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-												this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+													// Called here
+													OpenTaiko.Skin.soundDecideSFX.tPlay();
+													this.actDifficultySelectionScreen.bIsDifficltSelect = true;
+													this.actDifficultySelectionScreen.t選択画面初期化();
+													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
+													this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 
-												//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-												CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
-												/*
-                                                TJAPlayer3.Skin.sound決定音.t再生する();
+													/*
+													TJAPlayer3.Skin.sound決定音.t再生する();
 
-                                                this.act曲リスト.tMenuContextTrigger(eMenuContext.Random);
-                                                goto Decided;
-                                                */
+													this.act曲リスト.tMenuContextTrigger(eMenuContext.Random);
+													goto Decided;
+													*/
 
-												/*
-                                                this.t曲をランダム選択する();
+													/*
+													this.t曲をランダム選択する();
 
-                                                //this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-                                                CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
-                                                */
-											}
+													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+													*/
+												}
 												break;
 										}
 
@@ -1034,9 +1034,9 @@ internal class CStage選曲 : CStage {
 									for (int i = 0; i < 7; i++) tカーソルスキップ(false);
 								}
 							}
-							#endregion
+						#endregion
 
-							Decided:;
+						Decided:;
 
 						}
 						#region [ Upstairs ]

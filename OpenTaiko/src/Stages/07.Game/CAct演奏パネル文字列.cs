@@ -110,8 +110,8 @@ internal class CAct演奏パネル文字列 : CActivity {
 				stageColor = songNode.BoxColor;
 
 			if (!(songNode != null && songNode.isChangedBoxColor)
-			    && tTagDict != null
-			    && tTagDict.ContainsKey(genreName)) {
+				&& tTagDict != null
+				&& tTagDict.ContainsKey(genreName)) {
 				this.txGENRE.color4 = tTagDict[genreName];
 			} else if (genreName == CLangManager.LangInstance.GetString("TITLE_MODE_DAN")) {
 				this.txGENRE.color4 = tTagDict["段位道場"];

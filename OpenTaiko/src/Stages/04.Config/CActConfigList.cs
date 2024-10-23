@@ -617,7 +617,7 @@ internal class CActConfigList : CActivity {
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iDrumsGoToCalibration) {
 				OpenTaiko.stageコンフィグ.actCalibrationMode.Start();
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDrumsReturnToMenu ||
-			           this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
+					   this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingReturnToMenu)     // #24525 2011.3.15 yyagi
 			{
 				t項目リストの設定_Drums();
 			}
@@ -1004,10 +1004,10 @@ internal class CActConfigList : CActivity {
 		// #33689 2014.6.17 yyagi CONFIGでSoundTimerTypeの設定を変更した場合も、サウンドデバイスを再構築する。
 		#region [ サウンドデバイス変更 ]
 		if (this.iSystemSoundType_initial != this.iSystemSoundType.n現在選択されている項目番号 ||
-		    this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
-		    this.iSystemWASAPIBufferSizeMs_initial != this.iSystemWASAPIBufferSizeMs.n現在の値 ||
-		    this.iSystemASIODevice_initial != this.iSystemASIODevice.n現在選択されている項目番号 ||
-		    this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
+			this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
+			this.iSystemWASAPIBufferSizeMs_initial != this.iSystemWASAPIBufferSizeMs.n現在の値 ||
+			this.iSystemASIODevice_initial != this.iSystemASIODevice.n現在選択されている項目番号 ||
+			this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
 			ESoundDeviceType soundDeviceType;
 			switch (this.iSystemSoundType.n現在選択されている項目番号) {
 				case 0:
@@ -1178,7 +1178,7 @@ internal class CActConfigList : CActivity {
 			#region [ 今まさに画面外に飛びだそうとしている項目パネルは描画しない。]
 			//-----------------
 			if (((i == 0) && (this.n現在のスクロールカウンタ > 0)) ||       // 上に飛び出そうとしている
-			    ((i == OpenTaiko.Skin.Config_ItemBox_Count - 1) && (this.n現在のスクロールカウンタ < 0)))      // 下に飛び出そうとしている
+				((i == OpenTaiko.Skin.Config_ItemBox_Count - 1) && (this.n現在のスクロールカウンタ < 0)))      // 下に飛び出そうとしている
 			{
 				nItem = this.t次の項目(nItem);
 				continue;
@@ -1262,32 +1262,32 @@ internal class CActConfigList : CActivity {
 
 				case CItemBase.E種別.リスト: // #28195 2012.5.2 yyagi: add Skin supports
 					#region [ *** ]
-					//-----------------
-				{
-					CItemList list = (CItemList)this.list項目リスト[nItem];
-					strParam = list.list項目値[list.n現在選択されている項目番号];
-
-					#region [ 必要な場合に、Skinのサンプルを生成・描画する。#28195 2012.5.2 yyagi ]
-					if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder) {
-						tGenerateSkinSample();      // 最初にSkinの選択肢にきたとき(Enterを押す前)に限り、サンプル生成が発生する。
-						if (txSkinSample1 != null) {
-							txSkinSample1.t2D描画(OpenTaiko.Skin.Config_SkinSample1[0], OpenTaiko.Skin.Config_SkinSample1[1]);
-						}
-					}
-					#endregion
-					break;
-				}
 				//-----------------
-				#endregion
+				{
+						CItemList list = (CItemList)this.list項目リスト[nItem];
+						strParam = list.list項目値[list.n現在選択されている項目番号];
+
+						#region [ 必要な場合に、Skinのサンプルを生成・描画する。#28195 2012.5.2 yyagi ]
+						if (this.list項目リスト[this.n現在の選択項目] == this.iSystemSkinSubfolder) {
+							tGenerateSkinSample();      // 最初にSkinの選択肢にきたとき(Enterを押す前)に限り、サンプル生成が発生する。
+							if (txSkinSample1 != null) {
+								txSkinSample1.t2D描画(OpenTaiko.Skin.Config_SkinSample1[0], OpenTaiko.Skin.Config_SkinSample1[1]);
+							}
+						}
+						#endregion
+						break;
+					}
+					//-----------------
+					#endregion
 			}
 			if (b強調) {
 				using (var bmpStr = prvFont.DrawText(strParam,
-					       Color.Black,
-					       Color.White,
-					       null,
-					       OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
-					       OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
-					       30)) {
+						   Color.Black,
+						   Color.White,
+						   null,
+						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
+						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
+						   30)) {
 					using (var txStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
 						txStr.t2D描画(x + OpenTaiko.Skin.Config_ItemBox_ItemValue_Font_Offset[0], y + OpenTaiko.Skin.Config_ItemBox_ItemValue_Font_Offset[1]);
 					}
@@ -1643,7 +1643,7 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.nSoundDeviceType = this.iSystemSoundType.n現在選択されている項目番号;       // #24820 2013.1.3 yyagi
 		OpenTaiko.ConfigIni.nBassBufferSizeMs = this.iSystemBassBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
 		OpenTaiko.ConfigIni.nWASAPIBufferSizeMs = this.iSystemWASAPIBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
-		//			CDTXMania.ConfigIni.nASIOBufferSizeMs = this.iSystemASIOBufferSizeMs.n現在の値;					// #24820 2013.1.3 yyagi
+																									   //			CDTXMania.ConfigIni.nASIOBufferSizeMs = this.iSystemASIOBufferSizeMs.n現在の値;					// #24820 2013.1.3 yyagi
 		OpenTaiko.ConfigIni.nASIODevice = this.iSystemASIODevice.n現在選択されている項目番号;           // #24820 2013.1.17 yyagi
 		OpenTaiko.ConfigIni.bUseOSTimer = this.iSystemSoundTimerType.bON;                              // #33689 2014.6.17 yyagi
 

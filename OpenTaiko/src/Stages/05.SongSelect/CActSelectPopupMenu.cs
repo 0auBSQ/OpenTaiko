@@ -107,8 +107,8 @@ internal class CActSelectPopupMenu : CActivity {
 
 			if (this.n現在の選択行 != lciMenuItems.Length - 1) {
 				if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.リスト ||
-				    lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFトグル ||
-				    lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFor不定スリーステート) {
+					lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFトグル ||
+					lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFor不定スリーステート) {
 					lciMenuItems[n現在の選択行].cItem.t項目値を次へ移動();
 				} else if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.整数) {
 					bIsSelectingIntItem = !bIsSelectingIntItem;     // 選択状態/選択解除状態を反転する
@@ -221,7 +221,7 @@ internal class CActSelectPopupMenu : CActivity {
 			if (this.bキー入力待ち) {
 				#region [ Shift-F1: CONFIG画面 ]
 				if ((OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
-				    OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {  // [SHIFT] + [F1] CONFIG
+					OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {  // [SHIFT] + [F1] CONFIG
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					tCancel();
 					this.bGotoDetailConfig = true;
@@ -229,9 +229,9 @@ internal class CActSelectPopupMenu : CActivity {
 				#endregion
 				#region [ キー入力: キャンセル ]
 				else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
-				          || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)
-				          || OpenTaiko.Pad.bPressedGB(EPad.Cancel))
-				         && this.bEsc有効) {   // キャンセル
+						  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)
+						  || OpenTaiko.Pad.bPressedGB(EPad.Cancel))
+						 && this.bEsc有効) {   // キャンセル
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					tCancel();
 					this.bIsActivePopupMenu = false;
@@ -347,8 +347,8 @@ internal class CActSelectPopupMenu : CActivity {
 					//               }
 					//font.t文字列描画( (int)(340 * Scale.X), (int)(80 + i * 32), s, bValueBold, 1.0f * Scale.Y);
 					using (var bmpStr = bValueBold ?
-						       prvFont.DrawText(s, Color.White, Color.Black, null, Color.Yellow, Color.OrangeRed, 30) :
-						       prvFont.DrawText(s, Color.White, Color.Black, null, 30)) {
+							   prvFont.DrawText(s, Color.White, Color.Black, null, Color.Yellow, Color.OrangeRed, 30) :
+							   prvFont.DrawText(s, Color.White, Color.Black, null, 30)) {
 						using (var ctStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
 							ctStr.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Value[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
 								OpenTaiko.Skin.PopupMenu_MenuItem_Value[1] + i * OpenTaiko.Skin.PopupMenu_Move[1]);
@@ -439,6 +439,6 @@ internal class CActSelectPopupMenu : CActivity {
 		Cancel, Decide, Previous, Next, END
 	}
 	private int nItemSelecting;     // 「n現在の選択行」とは別に設ける。sortでメニュー表示直後にアイテムの中身を表示しないようにするため
-	//-----------------
+									//-----------------
 	#endregion
 }

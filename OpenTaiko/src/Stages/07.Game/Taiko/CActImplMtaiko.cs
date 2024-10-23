@@ -88,31 +88,31 @@ internal class CActImplMtaiko : CActivity {
 
 			switch (i) {
 				case 0: {
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-						tex = OpenTaiko.Tx.Taiko_Background[2];
-					} else if (OpenTaiko.ConfigIni.bTokkunMode) {
-						if (OpenTaiko.P1IsBlue())
-							tex = OpenTaiko.Tx.Taiko_Background[6];
-						else
-							tex = OpenTaiko.Tx.Taiko_Background[5];
-					} else {
-						if (OpenTaiko.P1IsBlue())
-							tex = OpenTaiko.Tx.Taiko_Background[4];
-						else
-							tex = OpenTaiko.Tx.Taiko_Background[0];
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+							tex = OpenTaiko.Tx.Taiko_Background[2];
+						} else if (OpenTaiko.ConfigIni.bTokkunMode) {
+							if (OpenTaiko.P1IsBlue())
+								tex = OpenTaiko.Tx.Taiko_Background[6];
+							else
+								tex = OpenTaiko.Tx.Taiko_Background[5];
+						} else {
+							if (OpenTaiko.P1IsBlue())
+								tex = OpenTaiko.Tx.Taiko_Background[4];
+							else
+								tex = OpenTaiko.Tx.Taiko_Background[0];
+						}
 					}
-				}
 					break;
 				case 1: {
-					if (OpenTaiko.ConfigIni.bAIBattleMode) {
-						tex = OpenTaiko.Tx.Taiko_Background[9];
-					} else {
-						if (OpenTaiko.ConfigIni.nPlayerCount == 2)
-							tex = OpenTaiko.Tx.Taiko_Background[1];
-						else
-							tex = OpenTaiko.Tx.Taiko_Background[4];
+						if (OpenTaiko.ConfigIni.bAIBattleMode) {
+							tex = OpenTaiko.Tx.Taiko_Background[9];
+						} else {
+							if (OpenTaiko.ConfigIni.nPlayerCount == 2)
+								tex = OpenTaiko.Tx.Taiko_Background[1];
+							else
+								tex = OpenTaiko.Tx.Taiko_Background[4];
+						}
 					}
-				}
 					break;
 				case 2:
 					tex = OpenTaiko.Tx.Taiko_Background[7];
@@ -396,20 +396,20 @@ internal class CActImplMtaiko : CActivity {
 				case 0x15:
 				case 0x16:
 				case 0x17: {
-					this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
-				}
+						this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
+					}
 					break;
 				case 0x12: {
-					this.stパッド状態[nHand + playerShift].n明るさ = 8;
-				}
-					break;
-				case 0x14: {
-					if (_gt == EGameType.Konga) {
-						this.stパッド状態[4 + playerShift].n明るさ = 8;
-					} else {
 						this.stパッド状態[nHand + playerShift].n明るさ = 8;
 					}
-				}
+					break;
+				case 0x14: {
+						if (_gt == EGameType.Konga) {
+							this.stパッド状態[4 + playerShift].n明るさ = 8;
+						} else {
+							this.stパッド状態[nHand + playerShift].n明るさ = 8;
+						}
+					}
 					break;
 
 			}
@@ -420,44 +420,44 @@ internal class CActImplMtaiko : CActivity {
 				case 0x16:
 				case 0x17:
 				case 0x1F: {
-					this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
-				}
+						this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
+					}
 					break;
 
 				case 0x13:
 				case 0x1A: {
-					if (_gt == EGameType.Konga) {
-						this.stパッド状態[0 + playerShift].n明るさ = 8;
-						this.stパッド状態[2 + playerShift].n明るさ = 8;
-					} else {
-						this.stパッド状態[2 + playerShift].n明るさ = 8;
-						this.stパッド状態[3 + playerShift].n明るさ = 8;
+						if (_gt == EGameType.Konga) {
+							this.stパッド状態[0 + playerShift].n明るさ = 8;
+							this.stパッド状態[2 + playerShift].n明るさ = 8;
+						} else {
+							this.stパッド状態[2 + playerShift].n明るさ = 8;
+							this.stパッド状態[3 + playerShift].n明るさ = 8;
+						}
 					}
-				}
 					break;
 
 				case 0x12: {
-					this.stパッド状態[nHand + playerShift].n明るさ = 8;
-				}
+						this.stパッド状態[nHand + playerShift].n明るさ = 8;
+					}
 					break;
 
 				case 0x14:
 				case 0x1B: {
-					if (_gt == EGameType.Konga) {
-						this.stパッド状態[4 + playerShift].n明るさ = 8;
-					} else {
-						this.stパッド状態[0 + playerShift].n明るさ = 8;
-						this.stパッド状態[1 + playerShift].n明るさ = 8;
-					}
+						if (_gt == EGameType.Konga) {
+							this.stパッド状態[4 + playerShift].n明るさ = 8;
+						} else {
+							this.stパッド状態[0 + playerShift].n明るさ = 8;
+							this.stパッド状態[1 + playerShift].n明るさ = 8;
+						}
 
-				}
+					}
 					break;
 
 				case 0x101: {
-					this.stパッド状態[nHand + playerShift].n明るさ = 8;
-					this.stパッド状態[2 + (nHand == 0 ? 1 : 0) + playerShift].n明るさ = 8;
-					break;
-				}
+						this.stパッド状態[nHand + playerShift].n明るさ = 8;
+						this.stパッド状態[2 + (nHand == 0 ? 1 : 0) + playerShift].n明るさ = 8;
+						break;
+					}
 			}
 		}
 

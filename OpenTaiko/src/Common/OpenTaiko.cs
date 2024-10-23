@@ -580,9 +580,9 @@ internal class OpenTaiko : Game {
 						if (EnumSongs != null) {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
 							if (r現在のステージ.eStageID == CStage.EStage.Title &&
-							    r直前のステージ.eStageID == CStage.EStage.StartUp &&
-							    this.n進行描画の戻り値 == (int)CStageタイトル.E戻り値.継続 &&
-							    !EnumSongs.IsSongListEnumStarted) {
+								r直前のステージ.eStageID == CStage.EStage.StartUp &&
+								this.n進行描画の戻り値 == (int)CStageタイトル.E戻り値.継続 &&
+								!EnumSongs.IsSongListEnumStarted) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
 									actEnumSongs.CreateManagedResource();
@@ -621,7 +621,7 @@ internal class OpenTaiko : Game {
 
 							#region [ 曲探索中断待ち待機 ]
 							if (r現在のステージ.eStageID == CStage.EStage.SongLoading && !EnumSongs.IsSongListEnumCompletelyDone &&
-							    EnumSongs.thDTXFileEnumerate != null)                           // #28700 2012.6.12 yyagi; at Compact mode, enumerating thread does not exist.
+								EnumSongs.thDTXFileEnumerate != null)                           // #28700 2012.6.12 yyagi; at Compact mode, enumerating thread does not exist.
 							{
 								EnumSongs.WaitUntilSuspended();                                 // 念のため、曲検索が一時中断されるまで待機
 							}
@@ -912,8 +912,8 @@ internal class OpenTaiko : Game {
 
 									this.tガベージコレクションを実行する();
 									break;
-								//-----------------------------
-								#endregion
+									//-----------------------------
+									#endregion
 							}
 							return;
 						}
@@ -1049,8 +1049,8 @@ internal class OpenTaiko : Game {
 								r直前のステージ = r現在のステージ;
 								r現在のステージ = stageChangeSkin;
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						//-----------------------------
 						#endregion
@@ -1110,8 +1110,8 @@ internal class OpenTaiko : Game {
 
 								this.tガベージコレクションを実行する();
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						#endregion
 						break;
@@ -1142,8 +1142,8 @@ internal class OpenTaiko : Game {
 
 								this.tガベージコレクションを実行する();
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						#endregion
 						break;
@@ -1347,8 +1347,8 @@ for (int i = 0; i < 3; i++) {
 								r現在のステージ = stage結果;
 
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						//-----------------------------
 						#endregion
@@ -1463,8 +1463,8 @@ for (int i = 0; i < 3; i++) {
 
 								this.tガベージコレクションを実行する();
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						#endregion
 						break;
@@ -1530,8 +1530,8 @@ for (int i = 0; i < 3; i++) {
 
 								this.tガベージコレクションを実行する();
 								break;
-							//-----------------------------
-							#endregion
+								//-----------------------------
+								#endregion
 						}
 						#endregion
 						break;
@@ -1546,8 +1546,8 @@ for (int i = 0; i < 3; i++) {
 					Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
 
 					Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
-					          Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
-					          Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
+							  Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
+							  Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
 
 					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
 
@@ -1807,7 +1807,7 @@ for (int i = 0; i < 3; i++) {
 	public List<CActivity> listトップレベルActivities;
 	private int n進行描画の戻り値;
 	private string strWindowTitle
-		// ayo komi isn't this useless code? - tfd500
+	// ayo komi isn't this useless code? - tfd500
 	{
 		get {
 			return "OpenTaiko";

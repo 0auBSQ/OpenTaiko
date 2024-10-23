@@ -97,7 +97,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 	public bool tIsSongLocked(CSongListNode? song) {
 		if (song == null || OpenTaiko.ConfigIni.bIgnoreSongUnlockables) return false;
 		return !OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Contains(song.tGetUniqueId())
-		       && data.ContainsKey(song.tGetUniqueId());
+			   && data.ContainsKey(song.tGetUniqueId());
 	}
 
 	public EHiddenIndex tGetSongHiddenIndex(CSongListNode? song) {

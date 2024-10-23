@@ -28,35 +28,35 @@ class CMenuCharacter {
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
 				case (ECharacterAnimation.NORMAL): {
-					if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterAnimation.START): {
-					if (OpenTaiko.Tx.Characters_Menu_Start[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Start[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterAnimation.SELECT): {
-					if (OpenTaiko.Tx.Characters_Menu_Select[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Select[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterAnimation.WAIT): {
-					if (OpenTaiko.Tx.Characters_Menu_Wait[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Wait[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterAnimation.ENTRY): {
-					if (OpenTaiko.Tx.Characters_Title_Entry[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Title_Entry[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterAnimation.ENTRY_NORMAL): {
-					if (OpenTaiko.Tx.Characters_Title_Normal[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Title_Normal[_charaId].Length > 0)
+							return false;
+						break;
+					}
 			}
 		}
 
@@ -69,49 +69,49 @@ class CMenuCharacter {
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
 				case (ECharacterAnimation.NORMAL): {
-					if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Menu_Loop[_charaId];
-					if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Normal[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Menu_Loop[_charaId];
+						if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Normal[_charaId];
+						break;
+					}
 				case (ECharacterAnimation.START): {
-					if (OpenTaiko.Tx.Characters_Menu_Start[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Menu_Start[_charaId];
-					if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_10Combo[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Start[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Menu_Start[_charaId];
+						if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_10Combo[_charaId];
+						break;
+					}
 				case (ECharacterAnimation.SELECT): {
-					if (OpenTaiko.Tx.Characters_Menu_Select[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Menu_Select[_charaId];
-					if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_10Combo[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Select[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Menu_Select[_charaId];
+						if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_10Combo[_charaId];
+						break;
+					}
 				case (ECharacterAnimation.WAIT): {
-					if (OpenTaiko.Tx.Characters_Menu_Wait[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Menu_Wait[_charaId];
-					if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Menu_Loop[_charaId];
-					if (OpenTaiko.Tx.Characters_GoGoTime[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_GoGoTime[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Menu_Wait[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Menu_Wait[_charaId];
+						if (OpenTaiko.Tx.Characters_Menu_Loop[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Menu_Loop[_charaId];
+						if (OpenTaiko.Tx.Characters_GoGoTime[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_GoGoTime[_charaId];
+						break;
+					}
 				case (ECharacterAnimation.ENTRY): {
-					if (OpenTaiko.Tx.Characters_Title_Entry[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Title_Entry[_charaId];
-					if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_10Combo[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Title_Entry[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Title_Entry[_charaId];
+						if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_10Combo[_charaId];
+						break;
+					}
 				case (ECharacterAnimation.ENTRY_NORMAL): {
-					if (OpenTaiko.Tx.Characters_Title_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Title_Normal[_charaId];
-					if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Normal[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Title_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Title_Normal[_charaId];
+						if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Normal[_charaId];
+						break;
+					}
 			}
 		}
 
@@ -122,23 +122,23 @@ class CMenuCharacter {
 	public static CCounter[] _getReferenceCounter(ECharacterAnimation eca) {
 		switch (eca) {
 			case (ECharacterAnimation.NORMAL): {
-				return ctCharacterNormal;
-			}
+					return ctCharacterNormal;
+				}
 			case (ECharacterAnimation.START): {
-				return ctCharacterStart;
-			}
+					return ctCharacterStart;
+				}
 			case (ECharacterAnimation.SELECT): {
-				return ctCharacterSelect;
-			}
+					return ctCharacterSelect;
+				}
 			case (ECharacterAnimation.WAIT): {
-				return ctCharacterWait;
-			}
+					return ctCharacterWait;
+				}
 			case (ECharacterAnimation.ENTRY): {
-				return ctCharacterEntry;
-			}
+					return ctCharacterEntry;
+				}
 			case (ECharacterAnimation.ENTRY_NORMAL): {
-				return ctCharacterEntryNormal;
-			}
+					return ctCharacterEntryNormal;
+				}
 		}
 		return null;
 	}
@@ -148,23 +148,23 @@ class CMenuCharacter {
 
 		switch (eca) {
 			case (ECharacterAnimation.NORMAL): {
-				return OpenTaiko.Skin.Characters_Menu_Loop_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Menu_Loop_AnimationDuration[_charaId];
+				}
 			case (ECharacterAnimation.START): {
-				return OpenTaiko.Skin.Characters_Menu_Start_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Menu_Start_AnimationDuration[_charaId];
+				}
 			case (ECharacterAnimation.SELECT): {
-				return OpenTaiko.Skin.Characters_Menu_Select_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Menu_Select_AnimationDuration[_charaId];
+				}
 			case (ECharacterAnimation.WAIT): {
-				return OpenTaiko.Skin.Characters_Menu_Wait_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Menu_Wait_AnimationDuration[_charaId];
+				}
 			case (ECharacterAnimation.ENTRY): {
-				return OpenTaiko.Skin.Characters_Title_Entry_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Title_Entry_AnimationDuration[_charaId];
+				}
 			case (ECharacterAnimation.ENTRY_NORMAL): {
-				return OpenTaiko.Skin.Characters_Title_Normal_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Title_Normal_AnimationDuration[_charaId];
+				}
 		}
 		return 1000;
 	}
@@ -172,35 +172,35 @@ class CMenuCharacter {
 	public static void tDisableCounter(ECharacterAnimation eca) {
 		switch (eca) {
 			case (ECharacterAnimation.NORMAL): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterNormal[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterNormal[i] = new CCounter();
+					break;
+				}
 			case (ECharacterAnimation.START): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterStart[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterStart[i] = new CCounter();
+					break;
+				}
 			case (ECharacterAnimation.SELECT): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterSelect[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterSelect[i] = new CCounter();
+					break;
+				}
 			case (ECharacterAnimation.WAIT): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterWait[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterWait[i] = new CCounter();
+					break;
+				}
 			case (ECharacterAnimation.ENTRY): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterEntry[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterEntry[i] = new CCounter();
+					break;
+				}
 			case (ECharacterAnimation.ENTRY_NORMAL): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterEntryNormal[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterEntryNormal[i] = new CCounter();
+					break;
+				}
 		}
 
 	}
@@ -230,9 +230,9 @@ class CMenuCharacter {
 
 		if (_ctref[player] != null && _ref != null && _ctref[player].CurrentValue < _ref.Length) {
 			if (eca == ECharacterAnimation.NORMAL
-			    || eca == ECharacterAnimation.WAIT
-			    || eca == ECharacterAnimation.ENTRY
-			    || eca == ECharacterAnimation.ENTRY_NORMAL)
+				|| eca == ECharacterAnimation.WAIT
+				|| eca == ECharacterAnimation.ENTRY
+				|| eca == ECharacterAnimation.ENTRY_NORMAL)
 				_ctref[player].TickLoop();
 			else
 				_ctref[player].Tick();

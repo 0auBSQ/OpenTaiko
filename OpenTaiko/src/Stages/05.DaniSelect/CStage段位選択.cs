@@ -165,46 +165,46 @@ class CStage段位選択 : CStage {
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 					this.段位リスト.t右に移動();
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 					this.段位リスト.t左に移動();
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 					switch (段位リスト.currentBar.eノード種別) {
 						case CSongListNode.ENodeType.SCORE:
 						case CSongListNode.ENodeType.RANDOM: {
-							//this.t段位を選択する();
-							//TJAPlayer3.Skin.soundDanSongSelectCheck.t再生する();
-							OpenTaiko.Skin.voiceMenuDanSelectPrompt[OpenTaiko.SaveFile]?.tPlay();
-							this.bDifficultyIn = true;
-							this.段位挑戦選択画面.ctBarIn.Start(0, 255, 1, OpenTaiko.Timer);
-						}
+								//this.t段位を選択する();
+								//TJAPlayer3.Skin.soundDanSongSelectCheck.t再生する();
+								OpenTaiko.Skin.voiceMenuDanSelectPrompt[OpenTaiko.SaveFile]?.tPlay();
+								this.bDifficultyIn = true;
+								this.段位挑戦選択画面.ctBarIn.Start(0, 255, 1, OpenTaiko.Timer);
+							}
 							break;
 						case CSongListNode.ENodeType.BOX: {
-							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							段位リスト.tOpenFolder(段位リスト.currentBar);
-						}
+								OpenTaiko.Skin.soundDecideSFX.tPlay();
+								段位リスト.tOpenFolder(段位リスト.currentBar);
+							}
 							break;
 						case CSongListNode.ENodeType.BACKBOX: {
-							if (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentBar.rParentNode) && 段位リスト.currentBar.rParentNode.strジャンル == "段位道場") {
-								return returnTitle();
-							} else {
-								OpenTaiko.Skin.soundDecideSFX.tPlay();
-								段位リスト.tCloseFolder(段位リスト.currentBar);
+								if (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentBar.rParentNode) && 段位リスト.currentBar.rParentNode.strジャンル == "段位道場") {
+									return returnTitle();
+								} else {
+									OpenTaiko.Skin.soundDecideSFX.tPlay();
+									段位リスト.tCloseFolder(段位リスト.currentBar);
+								}
 							}
-						}
 							break;
 					}
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				    OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
+					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 					this.段位リスト.n現在の選択行 = 0;
 					return returnTitle();
 				}

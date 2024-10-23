@@ -79,10 +79,10 @@ internal class CActImplClearAnimation : CActivity {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 					if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMine == 0)
-						//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
+					//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 					{
 						if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood == 0)
-							//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
+						//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
 						{
 							this.Mode[i] = EndMode.StagePerfectCombo;
 						} else {

@@ -38,25 +38,25 @@ class CResultCharacter {
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
 				case (ECharacterResult.NORMAL): {
-					if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterResult.CLEAR): {
-					if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterResult.FAILED): {
-					if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
+							return false;
+						break;
+					}
 				case (ECharacterResult.FAILED_IN): {
-					if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
-						return false;
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
+							return false;
+						break;
+					}
 			}
 		}
 
@@ -69,33 +69,33 @@ class CResultCharacter {
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
 				case (ECharacterResult.NORMAL): {
-					if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Result_Normal[_charaId];
-					if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Normal[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Result_Normal[_charaId];
+						if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Normal[_charaId];
+						break;
+					}
 				case (ECharacterResult.CLEAR): {
-					if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Result_Clear[_charaId];
-					if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_10Combo[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Clear[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Result_Clear[_charaId];
+						if (OpenTaiko.Tx.Characters_10Combo[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_10Combo[_charaId];
+						break;
+					}
 				case (ECharacterResult.FAILED): {
-					if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Result_Failed[_charaId];
-					if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Normal[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Failed[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Result_Failed[_charaId];
+						if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Normal[_charaId];
+						break;
+					}
 				case (ECharacterResult.FAILED_IN): {
-					if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Result_Failed_In[_charaId];
-					if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
-						return OpenTaiko.Tx.Characters_Normal[_charaId];
-					break;
-				}
+						if (OpenTaiko.Tx.Characters_Result_Failed_In[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Result_Failed_In[_charaId];
+						if (OpenTaiko.Tx.Characters_Normal[_charaId].Length > 0)
+							return OpenTaiko.Tx.Characters_Normal[_charaId];
+						break;
+					}
 			}
 		}
 
@@ -106,17 +106,17 @@ class CResultCharacter {
 	public static CCounter[] _getReferenceCounter(ECharacterResult eca) {
 		switch (eca) {
 			case (ECharacterResult.NORMAL): {
-				return ctCharacterNormal;
-			}
+					return ctCharacterNormal;
+				}
 			case (ECharacterResult.CLEAR): {
-				return ctCharacterClear;
-			}
+					return ctCharacterClear;
+				}
 			case (ECharacterResult.FAILED): {
-				return ctCharacterFailed;
-			}
+					return ctCharacterFailed;
+				}
 			case (ECharacterResult.FAILED_IN): {
-				return ctCharacterFailedIn;
-			}
+					return ctCharacterFailedIn;
+				}
 		}
 		return null;
 	}
@@ -126,17 +126,17 @@ class CResultCharacter {
 
 		switch (eca) {
 			case (ECharacterResult.NORMAL): {
-				return OpenTaiko.Skin.Characters_Result_Normal_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Result_Normal_AnimationDuration[_charaId];
+				}
 			case (ECharacterResult.CLEAR): {
-				return OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[_charaId];
+				}
 			case (ECharacterResult.FAILED): {
-				return OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[_charaId];
+				}
 			case (ECharacterResult.FAILED_IN): {
-				return OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[_charaId];
-			}
+					return OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[_charaId];
+				}
 		}
 		return 1000;
 	}
@@ -144,25 +144,25 @@ class CResultCharacter {
 	public static void tDisableCounter(ECharacterResult eca) {
 		switch (eca) {
 			case (ECharacterResult.NORMAL): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterNormal[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterNormal[i] = new CCounter();
+					break;
+				}
 			case (ECharacterResult.CLEAR): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterClear[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterClear[i] = new CCounter();
+					break;
+				}
 			case (ECharacterResult.FAILED): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterFailed[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterFailed[i] = new CCounter();
+					break;
+				}
 			case (ECharacterResult.FAILED_IN): {
-				for (int i = 0; i < 5; i++)
-					ctCharacterFailedIn[i] = new CCounter();
-				break;
-			}
+					for (int i = 0; i < 5; i++)
+						ctCharacterFailedIn[i] = new CCounter();
+					break;
+				}
 		}
 
 	}
@@ -192,8 +192,8 @@ class CResultCharacter {
 
 		if (_ctref[player] != null && _ref != null && _ctref[player].CurrentValue < _ref.Length) {
 			if (eca == ECharacterResult.NORMAL
-			    || eca == ECharacterResult.CLEAR
-			    || eca == ECharacterResult.FAILED)
+				|| eca == ECharacterResult.CLEAR
+				|| eca == ECharacterResult.FAILED)
 				_ctref[player].TickLoop();
 			else
 				_ctref[player].Tick();

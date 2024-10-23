@@ -78,8 +78,7 @@ public abstract class Game : IDisposable {
 					ImGuiIO.Fonts.SetTexID((nint)ImGuiFontAtlas.Pointer);
 				}
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			ImGuiIO.Fonts.Clear();
 			ImGuiIO.Fonts.AddFontDefault();
 		}

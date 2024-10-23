@@ -1302,11 +1302,11 @@ class TextureLoader {
 			return;
 
 		if (old >= 0 &&
-		    (OpenTaiko.SaveFileInstances[0].data.Character != old || player == 0) &&
-		    (OpenTaiko.SaveFileInstances[1].data.Character != old || player == 1) &&
-		    (OpenTaiko.SaveFileInstances[2].data.Character != old || player == 2) &&
-		    (OpenTaiko.SaveFileInstances[3].data.Character != old || player == 3) &&
-		    (OpenTaiko.SaveFileInstances[4].data.Character != old || player == 4)) {
+			(OpenTaiko.SaveFileInstances[0].data.Character != old || player == 0) &&
+			(OpenTaiko.SaveFileInstances[1].data.Character != old || player == 1) &&
+			(OpenTaiko.SaveFileInstances[2].data.Character != old || player == 2) &&
+			(OpenTaiko.SaveFileInstances[3].data.Character != old || player == 3) &&
+			(OpenTaiko.SaveFileInstances[4].data.Character != old || player == 4)) {
 			int i = old;
 
 			#region [Dispose the previous character]
@@ -1454,11 +1454,11 @@ class TextureLoader {
 		string charaPath = OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC];
 
 		if ((newC >= 0 &&
-		     OpenTaiko.SaveFileInstances[0].data.Character != newC &&
-		     OpenTaiko.SaveFileInstances[1].data.Character != newC &&
-		     OpenTaiko.SaveFileInstances[2].data.Character != newC &&
-		     OpenTaiko.SaveFileInstances[3].data.Character != newC &&
-		     OpenTaiko.SaveFileInstances[4].data.Character != newC) || primary) {
+			 OpenTaiko.SaveFileInstances[0].data.Character != newC &&
+			 OpenTaiko.SaveFileInstances[1].data.Character != newC &&
+			 OpenTaiko.SaveFileInstances[2].data.Character != newC &&
+			 OpenTaiko.SaveFileInstances[3].data.Character != newC &&
+			 OpenTaiko.SaveFileInstances[4].data.Character != newC) || primary) {
 			int i = newC;
 
 			#region [Allocate the new character]
@@ -1811,188 +1811,188 @@ class TextureLoader {
 
 							switch (strCommand) {
 								case "Game_Chara_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_X[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_X[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Y[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_4P[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_4P[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_5P[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_5P[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_X_AI": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_X_AI[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Y_AI": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Y_AI[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Balloon_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Balloon_X[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Balloon_X[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Balloon_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Balloon_Y[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Balloon_4P": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Balloon_4P[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Balloon_4P[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Balloon_5P": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 2; k++) {
-										OpenTaiko.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Balloon_5P[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Kusudama_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 5; k++) {
-										OpenTaiko.Skin.Characters_Kusudama_X[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 5; k++) {
+											OpenTaiko.Skin.Characters_Kusudama_X[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Kusudama_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int k = 0; k < 5; k++) {
-										OpenTaiko.Skin.Characters_Kusudama_Y[i][k] = int.Parse(strSplit[k]);
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 5; k++) {
+											OpenTaiko.Skin.Characters_Kusudama_Y[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
 									}
-									break;
-								}
 								case "Game_Chara_Balloon_Timer": {
-									if (int.Parse(strParam) > 0)
-										OpenTaiko.Skin.Characters_Balloon_Timer[i] = int.Parse(strParam);
-									break;
-								}
+										if (int.Parse(strParam) > 0)
+											OpenTaiko.Skin.Characters_Balloon_Timer[i] = int.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Balloon_Delay": {
-									if (int.Parse(strParam) > 0)
-										OpenTaiko.Skin.Characters_Balloon_Delay[i] = int.Parse(strParam);
-									break;
-								}
+										if (int.Parse(strParam) > 0)
+											OpenTaiko.Skin.Characters_Balloon_Delay[i] = int.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Balloon_FadeOut": {
-									if (int.Parse(strParam) > 0)
-										OpenTaiko.Skin.Characters_Balloon_FadeOut[i] = int.Parse(strParam);
-									break;
-								}
+										if (int.Parse(strParam) > 0)
+											OpenTaiko.Skin.Characters_Balloon_FadeOut[i] = int.Parse(strParam);
+										break;
+									}
 								// パターン数の設定はTextureLoader.csで反映されます。
 								case "Game_Chara_Motion_Normal": {
-									OpenTaiko.Skin.Characters_Motion_Normal[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_Normal[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_10Combo": {
-									OpenTaiko.Skin.Characters_Motion_10Combo[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_10Combo[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_10Combo_Clear": {
-									OpenTaiko.Skin.Characters_Motion_10Combo_Clear[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_10Combo_Clear[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_10Combo_Max": {
-									OpenTaiko.Skin.Characters_Motion_10ComboMax[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_10ComboMax[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_Miss": {
-									OpenTaiko.Skin.Characters_Motion_Miss[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_Miss[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_MissDown": {
-									OpenTaiko.Skin.Characters_Motion_MissDown[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_MissDown[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_ClearIn": {
-									OpenTaiko.Skin.Characters_Motion_ClearIn[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_ClearIn[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_Clear": {
-									OpenTaiko.Skin.Characters_Motion_Clear[i] = CConversion.StringToIntArray(strParam);
-									OpenTaiko.Skin.Characters_Motion_ClearMax[i] = OpenTaiko.Skin.Characters_Motion_Clear[i];
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_Clear[i] = CConversion.StringToIntArray(strParam);
+										OpenTaiko.Skin.Characters_Motion_ClearMax[i] = OpenTaiko.Skin.Characters_Motion_Clear[i];
+										break;
+									}
 								case "Game_Chara_Motion_ClearMax": {
-									OpenTaiko.Skin.Characters_Motion_ClearMax[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_ClearMax[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_MissIn": {
-									OpenTaiko.Skin.Characters_Motion_MissIn[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_MissIn[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_MissDownIn": {
-									OpenTaiko.Skin.Characters_Motion_MissDownIn[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_MissDownIn[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_GoGoStart": {
-									OpenTaiko.Skin.Characters_Motion_GoGoStart[i] = CConversion.StringToIntArray(strParam);
-									OpenTaiko.Skin.Characters_Motion_GoGoStartMax[i] = OpenTaiko.Skin.Characters_Motion_GoGoStart[i];
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_GoGoStart[i] = CConversion.StringToIntArray(strParam);
+										OpenTaiko.Skin.Characters_Motion_GoGoStartMax[i] = OpenTaiko.Skin.Characters_Motion_GoGoStart[i];
+										break;
+									}
 								case "Game_Chara_Motion_GoGoStart_Clear": {
-									OpenTaiko.Skin.Characters_Motion_GoGoStart_Clear[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_GoGoStart_Clear[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_GoGoStart_Max": {
-									OpenTaiko.Skin.Characters_Motion_GoGoStartMax[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_GoGoStartMax[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_GoGo": {
-									OpenTaiko.Skin.Characters_Motion_GoGo[i] = CConversion.StringToIntArray(strParam);
-									OpenTaiko.Skin.Characters_Motion_GoGoMax[i] = OpenTaiko.Skin.Characters_Motion_GoGo[i];
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_GoGo[i] = CConversion.StringToIntArray(strParam);
+										OpenTaiko.Skin.Characters_Motion_GoGoMax[i] = OpenTaiko.Skin.Characters_Motion_GoGo[i];
+										break;
+									}
 								case "Game_Chara_Motion_GoGo_Max": {
-									OpenTaiko.Skin.Characters_Motion_GoGoMax[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_GoGoMax[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_SoulIn": {
-									OpenTaiko.Skin.Characters_Motion_SoulIn[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_SoulIn[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_SoulOut": {
-									OpenTaiko.Skin.Characters_Motion_SoulOut[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_SoulOut[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_ClearOut": {
-									OpenTaiko.Skin.Characters_Motion_ClearOut[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_ClearOut[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								case "Game_Chara_Motion_Return": {
-									OpenTaiko.Skin.Characters_Motion_Return[i] = CConversion.StringToIntArray(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Motion_Return[i] = CConversion.StringToIntArray(strParam);
+										break;
+									}
 								/*case "Game_Chara_Motion_Tower_Standing":
                                 {
                                     TJAPlayer3.Skin.Characters_Motion_Tower_Standing[i] = CConversion.StringToIntArray(strParam);
@@ -2039,147 +2039,147 @@ class TextureLoader {
                                     break;
                                 }*/
 								case "Game_Chara_Beat_Normal": {
-									OpenTaiko.Skin.Characters_Beat_Normal[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Normal[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_10Combo": {
-									OpenTaiko.Skin.Characters_Beat_10Combo[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_10Combo[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_10ComboMax": {
-									OpenTaiko.Skin.Characters_Beat_10ComboMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_10ComboMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Miss": {
-									OpenTaiko.Skin.Characters_Beat_Miss[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Miss[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_MissDown": {
-									OpenTaiko.Skin.Characters_Beat_MissDown[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_MissDown[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_ClearIn": {
-									OpenTaiko.Skin.Characters_Beat_ClearIn[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_ClearIn[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Clear": {
-									OpenTaiko.Skin.Characters_Beat_Clear[i] = float.Parse(strParam);
-									OpenTaiko.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Clear[i] = float.Parse(strParam);
+										OpenTaiko.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_ClearMax": {
-									OpenTaiko.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_ClearMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_MissIn": {
-									OpenTaiko.Skin.Characters_Beat_MissIn[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_MissIn[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_MissDownIn": {
-									OpenTaiko.Skin.Characters_Beat_MissDownIn[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_MissDownIn[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_GoGoStart": {
-									OpenTaiko.Skin.Characters_Beat_GoGoStart[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_GoGoStart[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_GoGoStartClear": {
-									OpenTaiko.Skin.Characters_Beat_GoGoStart_Clear[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_GoGoStart_Clear[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_GoGoStartMax": {
-									OpenTaiko.Skin.Characters_Beat_GoGoStartMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_GoGoStartMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_GoGo": {
-									OpenTaiko.Skin.Characters_Beat_GoGo[i] = float.Parse(strParam);
-									OpenTaiko.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_GoGo[i] = float.Parse(strParam);
+										OpenTaiko.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_GoGoMax": {
-									OpenTaiko.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_GoGoMax[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_SoulIn": {
-									OpenTaiko.Skin.Characters_Beat_SoulIn[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_SoulIn[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Return": {
-									OpenTaiko.Skin.Characters_Beat_Return[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Return[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Tower_Standing": {
-									OpenTaiko.Skin.Characters_Beat_Tower_Standing[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Tower_Standing[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Tower_Standing_Tired": {
-									OpenTaiko.Skin.Characters_Beat_Tower_Standing_Tired[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Tower_Standing_Tired[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Tower_Fail": {
-									OpenTaiko.Skin.Characters_Beat_Tower_Fail[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Tower_Fail[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Tower_Clear": {
-									OpenTaiko.Skin.Characters_Beat_Tower_Clear[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Tower_Clear[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Beat_Tower_Clear_Tired": {
-									OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[i] = float.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[i] = float.Parse(strParam);
+										break;
+									}
 								case "Game_Chara_Tower_Clear_IsLooping": {
-									OpenTaiko.Skin.Characters_Tower_Clear_IsLooping[i] = int.Parse(strParam) != 0;
-									break;
-								}
+										OpenTaiko.Skin.Characters_Tower_Clear_IsLooping[i] = int.Parse(strParam) != 0;
+										break;
+									}
 								case "Game_Chara_Tower_Clear_Tired_IsLooping": {
-									OpenTaiko.Skin.Characters_Tower_Clear_Tired_IsLooping[i] = int.Parse(strParam) != 0;
-									break;
-								}
+										OpenTaiko.Skin.Characters_Tower_Clear_Tired_IsLooping[i] = int.Parse(strParam) != 0;
+										break;
+									}
 								case "Game_Chara_Tower_Fail_IsLooping": {
-									OpenTaiko.Skin.Characters_Tower_Fail_IsLooping[i] = int.Parse(strParam) != 0;
-									break;
-								}
+										OpenTaiko.Skin.Characters_Tower_Fail_IsLooping[i] = int.Parse(strParam) != 0;
+										break;
+									}
 								case "Chara_Entry_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Title_Entry_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Title_Entry_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Normal_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Title_Normal_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Title_Normal_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Menu_Loop_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Menu_Loop_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Menu_Loop_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Menu_Select_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Menu_Select_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Menu_Select_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Menu_Start_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Menu_Start_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Menu_Start_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Menu_Wait_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Menu_Wait_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Menu_Wait_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Result_Normal_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Result_Normal_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Result_Normal_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Result_Clear_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Result_Failed_In_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								case "Chara_Result_Failed_AnimationDuration": {
-									OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
-									break;
-								}
+										OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
+										break;
+									}
 								/*
                                 case "Chara_Result_SpeechText":
                                 {

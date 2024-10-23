@@ -331,8 +331,8 @@ internal class CActConfigKeyAssign : CActivity {
 			//	 TJAPlayer3.InputManager.Keyboard.KeyPressed( i ) )
 			//{
 			if (i != (int)SlimDXKeys.Key.Escape &&
-			    i != (int)SlimDXKeys.Key.Return &&
-			    OpenTaiko.InputManager.Keyboard.KeyPressed(i)) {
+				i != (int)SlimDXKeys.Key.Return &&
+				OpenTaiko.InputManager.Keyboard.KeyPressed(i)) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 				if (pad < EKeyConfigPad.Capture)
 					OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.Keyboard, 0, i, this.pad);

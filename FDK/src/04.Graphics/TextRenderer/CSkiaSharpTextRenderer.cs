@@ -130,23 +130,23 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 				if (_varSplit.Length > 0) {
 					switch (_varSplit[0]) {
 						case "g": {
-							if (_varSplit.Length > 2) {
-								newToken.UseGradiant = true;
-								newToken.GradiantTop = ColorTranslator.FromHtml(_varSplit[1]);
-								newToken.GradiantBottom = ColorTranslator.FromHtml(_varSplit[2]);
+								if (_varSplit.Length > 2) {
+									newToken.UseGradiant = true;
+									newToken.GradiantTop = ColorTranslator.FromHtml(_varSplit[1]);
+									newToken.GradiantBottom = ColorTranslator.FromHtml(_varSplit[2]);
+								}
+								break;
 							}
-							break;
-						}
 						case "c": {
-							if (_varSplit.Length > 1) {
-								newToken.TextColor = ColorTranslator.FromHtml(_varSplit[1]);
+								if (_varSplit.Length > 1) {
+									newToken.TextColor = ColorTranslator.FromHtml(_varSplit[1]);
+								}
+								if (_varSplit.Length > 2) {
+									newToken.UseOutline = true;
+									newToken.OutlineColor = ColorTranslator.FromHtml(_varSplit[2]);
+								}
+								break;
 							}
-							if (_varSplit.Length > 2) {
-								newToken.UseOutline = true;
-								newToken.OutlineColor = ColorTranslator.FromHtml(_varSplit[2]);
-							}
-							break;
-						}
 
 					}
 				}

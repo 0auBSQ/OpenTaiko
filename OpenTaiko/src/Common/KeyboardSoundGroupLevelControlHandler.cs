@@ -33,11 +33,11 @@ internal static class KeyboardSoundGroupLevelControlHandler {
 		CSkin.CSystemSound システムサウンド = null;
 
 		if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) ||
-		    keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) {
+			keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) {
 			soundGroup = ESoundGroup.SoundEffect;
 			システムサウンド = skin.soundDecideSFX;
 		} else if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift) ||
-		           keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift)) {
+				   keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift)) {
 			soundGroup = ESoundGroup.Voice;
 			システムサウンド = skin.soundゲーム開始音;
 		} else {

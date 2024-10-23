@@ -525,28 +525,28 @@ internal class CActImplLaneTaiko : CActivity {
 
 				switch (i) {
 					case 0: {
-						if (OpenTaiko.ConfigIni.bTokkunMode) {
-							tex = OpenTaiko.Tx.Taiko_Frame[3];
-						} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-							tex = OpenTaiko.Tx.Taiko_Frame[5];
-						} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-							tex = OpenTaiko.Tx.Taiko_Frame[2];
-						} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
-							tex = OpenTaiko.Tx.Taiko_Frame[6];
-						} else {
-							tex = OpenTaiko.Tx.Taiko_Frame[0];
+							if (OpenTaiko.ConfigIni.bTokkunMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[3];
+							} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[5];
+							} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+								tex = OpenTaiko.Tx.Taiko_Frame[2];
+							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
+								tex = OpenTaiko.Tx.Taiko_Frame[6];
+							} else {
+								tex = OpenTaiko.Tx.Taiko_Frame[0];
+							}
 						}
-					}
 						break;
 					case 1: {
-						if (OpenTaiko.ConfigIni.bAIBattleMode) {
-							tex = OpenTaiko.Tx.Taiko_Frame[4];
-						} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
-							tex = OpenTaiko.Tx.Taiko_Frame[6];
-						} else {
-							tex = OpenTaiko.Tx.Taiko_Frame[1];
+							if (OpenTaiko.ConfigIni.bAIBattleMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[4];
+							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
+								tex = OpenTaiko.Tx.Taiko_Frame[6];
+							} else {
+								tex = OpenTaiko.Tx.Taiko_Frame[1];
+							}
 						}
-					}
 						break;
 					case 2:
 						tex = OpenTaiko.Tx.Taiko_Frame[6];
@@ -758,11 +758,11 @@ internal class CActImplLaneTaiko : CActivity {
 				case 0x14:
 				case 0x1A:
 				case 0x1B: {
-					if (b両手入力)
-						this.st状態[nPlayer].nIsBig = 1;
-					else
-						this.st状態[nPlayer].nIsBig = 0;
-				}
+						if (b両手入力)
+							this.st状態[nPlayer].nIsBig = 1;
+						else
+							this.st状態[nPlayer].nIsBig = 0;
+					}
 					break;
 			}
 		}

@@ -60,9 +60,9 @@ internal static class CDTXCompanionFileFinder {
 		// and the one used by zip tools that are not unicode aware.)
 		// This step finds >99% of files with mangled names.
 		if (TryFindViaDecodedFileName(
-			    "Encoding.GetEncoding(437)",
-			    Encoding.GetEncoding(437),
-			    out var foundCompanionFileNameViaEncoding437)) {
+				"Encoding.GetEncoding(437)",
+				Encoding.GetEncoding(437),
+				out var foundCompanionFileNameViaEncoding437)) {
 			return foundCompanionFileNameViaEncoding437;
 		}
 
@@ -71,9 +71,9 @@ internal static class CDTXCompanionFileFinder {
 		// has not been observed during testing on US English computers,
 		// but it is safe to perform and may assist other locales.
 		if (TryFindViaDecodedFileName(
-			    "Encoding.Default",
-			    Encoding.Default,
-			    out var foundCompanionFileNameViaEncodingDefault)) {
+				"Encoding.Default",
+				Encoding.Default,
+				out var foundCompanionFileNameViaEncodingDefault)) {
 			return foundCompanionFileNameViaEncodingDefault;
 		}
 
@@ -81,10 +81,10 @@ internal static class CDTXCompanionFileFinder {
 		// with the expected extension but having the same file name as the
 		// main file with which it is associated (in most use cases: the .tja file.)
 		if (TryFindViaMainFileName(
-			    directory,
-			    mainFileName,
-			    expectedCompanionPath,
-			    out var foundCompanionFileNameByMainFileName)) {
+				directory,
+				mainFileName,
+				expectedCompanionPath,
+				out var foundCompanionFileNameByMainFileName)) {
 			return foundCompanionFileNameByMainFileName;
 		}
 
@@ -93,9 +93,9 @@ internal static class CDTXCompanionFileFinder {
 		// one file is found with the same extension, we can't reliably
 		// choose the right one of them.)
 		if (TryFindViaCompanionFileExtension(
-			    directory,
-			    expectedCompanionPath,
-			    out var foundCompanionFileNameByExtension)) {
+				directory,
+				expectedCompanionPath,
+				out var foundCompanionFileNameByExtension)) {
 			return foundCompanionFileNameByExtension;
 		}
 

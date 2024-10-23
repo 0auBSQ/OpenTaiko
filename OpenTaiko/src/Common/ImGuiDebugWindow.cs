@@ -38,7 +38,7 @@ public static class ImGuiDebugWindow {
 		#endregion
 
 		ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, 0), ImGuiCond.FirstUseEver);
-		ImGui.SetNextWindowSize(new System.Numerics.Vector2(400,300), ImGuiCond.FirstUseEver);
+		ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 300), ImGuiCond.FirstUseEver);
 		if (ImGui.Begin("Debug Window (Toggle Visbility with F11)###DEBUG")) {
 
 			#region Debug Info
@@ -47,7 +47,7 @@ public static class ImGuiDebugWindow {
 
 			ImGui.Separator();
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
-			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}",(float)pagedmemory / (1024 * 1024 * 1024))}GB)");
+			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
 			ImGui.Text($"FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS.NowFPS : "???")}");
 			ImGui.Text("Current Stage: " + OpenTaiko.r現在のステージ.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.r現在のステージ.eStageID).ToString() + ")");
 			#endregion
@@ -284,7 +284,7 @@ public static class ImGuiDebugWindow {
 					break;
 				case CStage.EStage.Game:
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						if (ImGui.TreeNodeEx($"Player {i+1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
+						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
 							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
 							var dtx = OpenTaiko.GetDTX(i);
@@ -330,8 +330,8 @@ public static class ImGuiDebugWindow {
 							ImGui.Text("Note Count: ");
 							ImGui.Indent();
 							ImGui.Text("Normal: " + dtx.nノーツ数_Branch[0] +
-							           " / Expert: " + dtx.nノーツ数_Branch[1] +
-							           " / Master: " + dtx.nノーツ数_Branch[2]);
+									   " / Expert: " + dtx.nノーツ数_Branch[1] +
+									   " / Master: " + dtx.nノーツ数_Branch[2]);
 							ImGui.Unindent();
 
 							ImGui.TreePop();
@@ -401,9 +401,8 @@ public static class ImGuiDebugWindow {
 				if (DrawCTextureForImGui(texture, 800, 800)) {
 					ImGui.Text("Pointer: " + texture.Pointer);
 					ImGui.Text("Size: x" + texture.szTextureSize.Width + ",y" + texture.szTextureSize.Height);
-					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}",GetTextureMemAllocationInMegabytes(texture)) + "MB");
-				}
-				else {
+					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}", GetTextureMemAllocationInMegabytes(texture)) + "MB");
+				} else {
 					ImGui.TextDisabled("Texture is not loaded.");
 				}
 				ImGui.EndTooltip();
@@ -414,7 +413,7 @@ public static class ImGuiDebugWindow {
 		if (texture == null) return false;
 		return DrawCTextureForImGui(texture,
 			new Vector2(texture.szTextureSize.Width, texture.szTextureSize.Height),
-			new Vector2(0,0), new Vector2(1,1));
+			new Vector2(0, 0), new Vector2(1, 1));
 	}
 	private static bool DrawCTextureForImGui(CTexture texture, int max_width, int max_height) {
 		if (texture == null) return false;

@@ -708,14 +708,14 @@ public class CTexture : IDisposable {
 
 			//スケーリング-----
 			mvp *= Matrix4X4.CreateScale(rc画像内の描画領域.Width / GameWindowSize.Width, rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
-			       Matrix4X4.CreateScale(flipX ? -vcScaleRatio.X : vcScaleRatio.X, flipY ? -vcScaleRatio.Y : vcScaleRatio.Y, 1.0f);
+				   Matrix4X4.CreateScale(flipX ? -vcScaleRatio.X : vcScaleRatio.X, flipY ? -vcScaleRatio.Y : vcScaleRatio.Y, 1.0f);
 			//-----
 
 			//回転-----
 			mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-			       Matrix4X4.CreateRotationZ(fZ軸中心回転) *
-			       Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
-			//-----
+				   Matrix4X4.CreateRotationZ(fZ軸中心回転) *
+				   Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
+																		//-----
 
 			//移動----
 			float offsetX = rc画像内の描画領域.Width * vcScaleRatio.X / GameWindowSize.Width;
@@ -844,14 +844,14 @@ public class CTexture : IDisposable {
 
 			//スケーリング-----
 			mvp *= Matrix4X4.CreateScale((float)rc画像内の描画領域.Width / GameWindowSize.Width, (float)rc画像内の描画領域.Height / GameWindowSize.Height, 1) *
-			       Matrix4X4.CreateScale(xScale, yScale, 1.0f);
+				   Matrix4X4.CreateScale(xScale, yScale, 1.0f);
 			//-----
 
 			//回転-----
 			mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-			       Matrix4X4.CreateRotationZ(fZ軸中心回転) *
-			       Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
-			//-----
+				   Matrix4X4.CreateRotationZ(fZ軸中心回転) *
+				   Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
+																		//-----
 
 			//移動----
 			float offsetX = rc画像内の描画領域.Width * xScale / GameWindowSize.Width;

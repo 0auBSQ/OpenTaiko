@@ -131,12 +131,12 @@ internal class CStageコンフィグ : CStage {
 					txMenuItemLeft[i, 0] = OpenTaiko.tテクスチャの生成(bmpStr, false);
 				}
 				using (var bmpStr = prvFont.DrawText(strMenuItem[i],
-					       Color.White,
-					       Color.Black,
-					       null,
-					       OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
-					       OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
-					       30)) {
+						   Color.White,
+						   Color.Black,
+						   null,
+						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
+						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
+						   30)) {
 					txMenuItemLeft[i, 1]?.Dispose();
 					txMenuItemLeft[i, 1] = OpenTaiko.tテクスチャの生成(bmpStr, false);
 				}
@@ -296,8 +296,8 @@ internal class CStageコンフィグ : CStage {
 
 			int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
 			txMenuItemLeft[i, flag].t2D中心基準描画(OpenTaiko.Skin.Config_Item_X[i] + OpenTaiko.Skin.Config_Item_Font_Offset[0], OpenTaiko.Skin.Config_Item_Y[i] + OpenTaiko.Skin.Config_Item_Font_Offset[1]); //55
-			//txMenuItem.Dispose();
-			//menuY += stepY;
+																																																		 //txMenuItem.Dispose();
+																																																		 //menuY += stepY;
 		}
 		//---------------------
 		#endregion
@@ -367,7 +367,7 @@ internal class CStageコンフィグ : CStage {
 		// キー入力
 
 		if ((base.ePhaseID != CStage.EPhase.Common_NORMAL)
-		    || this.actKeyAssign.bキー入力待ちの最中である)
+			|| this.actKeyAssign.bキー入力待ちの最中である)
 			return 0;
 
 		if (actCalibrationMode.IsStarted) {
@@ -388,12 +388,12 @@ internal class CStageコンフィグ : CStage {
 			}
 			using (var prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale)) {
 				using (var status_text = new CTexture(prvFont.DrawText(
-					       CScoreIni_Importer.Status,
-					       Color.White,
-					       Color.Black,
-					       null,
-					       30,
-					       true))) {
+						   CScoreIni_Importer.Status,
+						   Color.White,
+						   Color.Black,
+						   null,
+						   30,
+						   true))) {
 					status_text.t2D_DisplayImage_AnchorCenter(SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
 				}
 			}

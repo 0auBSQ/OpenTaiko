@@ -15,8 +15,8 @@ public class SoundManager   // : CSound
 	}
 	public static CSoundTimer PlayTimer = null;
 	public static bool bUseOSTimer = false;     // OSのタイマーを使うか、CSoundTimerを使うか。DTXCではfalse, DTXManiaではtrue。
-	// DTXC(DirectSound)でCSoundTimerを使うと、内部で無音のループサウンドを再生するため
-	// サウンドデバイスを占有してしまい、Viewerとして呼び出されるDTXManiaで、ASIOが使えなくなる。
+												// DTXC(DirectSound)でCSoundTimerを使うと、内部で無音のループサウンドを再生するため
+												// サウンドデバイスを占有してしまい、Viewerとして呼び出されるDTXManiaで、ASIOが使えなくなる。
 
 	// DTXMania単体でこれをtrueにすると、WASAPI/ASIO時に演奏タイマーとしてFDKタイマーではなく
 	// システムのタイマーを使うようになる。こうするとスクロールは滑らかになるが、音ズレが出るかもしれない。
@@ -253,9 +253,9 @@ public class SoundManager   // : CSound
 			}
 		}
 		if (soundDeviceType == ESoundDeviceType.Bass
-		    || soundDeviceType == ESoundDeviceType.ExclusiveWASAPI
-		    || soundDeviceType == ESoundDeviceType.SharedWASAPI
-		    || soundDeviceType == ESoundDeviceType.ASIO) {
+			|| soundDeviceType == ESoundDeviceType.ExclusiveWASAPI
+			|| soundDeviceType == ESoundDeviceType.SharedWASAPI
+			|| soundDeviceType == ESoundDeviceType.ASIO) {
 			//Bass.BASS_SetConfig( BASSConfig.BASS_CONFIG_UPDATETHREADS, 4 );
 			//Bass.BASS_SetConfig( BASSConfig.BASS_CONFIG_UPDATEPERIOD, 0 );
 

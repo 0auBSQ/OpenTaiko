@@ -211,7 +211,7 @@ internal class CActSelect曲リスト : CActivity {
 		//Trace.TraceInformation( "Skinpath: " + this.r現在選択中の曲.strSkinPath );
 		bool ret = false;
 		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(this.rCurrentlySelectedSong.strSkinPath)
-		    && CSkin.bUseBoxDefSkin) {
+			&& CSkin.bUseBoxDefSkin) {
 			ret = true;
 			// BOXに入るときは、スキン変更発生時のみboxdefスキン設定の更新を行う
 			OpenTaiko.Skin.SetCurrentSkinSubfolderFullName(
@@ -228,8 +228,8 @@ internal class CActSelect曲リスト : CActivity {
 		// INFO: This null check is added due to `list子リスト` might be null during rapid sorting
 		//		Despite what editor tell you here it is possible to be null
 		if (rCurrentlySelectedSong != null &&
-		    rCurrentlySelectedSong.list子リスト != null &&
-		    rCurrentlySelectedSong.list子リスト.Count != 1) {
+			rCurrentlySelectedSong.list子リスト != null &&
+			rCurrentlySelectedSong.list子リスト.Count != 1) {
 			if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
 				this.rCurrentlySelectedSong = this.rCurrentlySelectedSong.list子リスト[0];
 				nSelectSongIndex = 0;
@@ -268,7 +268,7 @@ internal class CActSelect曲リスト : CActivity {
 
 		bool ret = false;
 		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(this.rCurrentlySelectedSong.strSkinPath)
-		    && CSkin.bUseBoxDefSkin) {
+			&& CSkin.bUseBoxDefSkin) {
 			ret = true;
 		}
 		// スキン変更が発生しなくても、boxdef圏外に出る場合は、boxdefスキン設定の更新が必要
@@ -312,7 +312,7 @@ internal class CActSelect曲リスト : CActivity {
 			if (!useOpenFlag || !e.bIsOpenFolder) ret.Add(e);
 
 			if (e.eノード種別 == CSongListNode.ENodeType.BOX &&
-			    (!useOpenFlag || e.bIsOpenFolder)) {
+				(!useOpenFlag || e.bIsOpenFolder)) {
 				ret.AddRange(flattenList(e.list子リスト, useOpenFlag));
 			}
 		}
@@ -1108,10 +1108,10 @@ internal class CActSelect曲リスト : CActivity {
 
 			// x set here
 			int xAnime = xZahyou + (int)((xNextZahyou - xZahyou)
-			                             * (1.0 - fNowScrollAnime));
+										 * (1.0 - fNowScrollAnime));
 
 			int y = yZahyou + (int)((yNextZahyou - yZahyou)
-			                        * (1.0 - fNowScrollAnime));
+									* (1.0 - fNowScrollAnime));
 
 			// (B) スクロール中の選択曲バー、またはその他のバーの描画。
 
@@ -1362,7 +1362,7 @@ internal class CActSelect曲リスト : CActivity {
 
 
 		if (OpenTaiko.Skin.SongSelect_Bar_Select_Skip_Fade ||
-		    this.ctScrollCounter.CurrentValue == this.ctScrollCounter.EndValue) {
+			this.ctScrollCounter.CurrentValue == this.ctScrollCounter.EndValue) {
 			#region [ Bar_Select ]
 
 			int barSelect_width = OpenTaiko.Tx.SongSelect_Bar_Select.sz画像サイズ.Width;
@@ -1560,284 +1560,284 @@ internal class CActSelect曲リスト : CActivity {
 
 			switch (rCurrentlySelectedSong.eノード種別) {
 				case CSongListNode.ENodeType.SCORE: {
-					var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
-					var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
+						var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
+						var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(rCurrentlySelectedSong);
 
-					#region [Difficulty bars]
+						#region [Difficulty bars]
 
-					if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
-						// 難易度がTower、Danではない
-						if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan) {
-							#region [Display difficulty boxes]
+						if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
+							// 難易度がTower、Danではない
+							if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan) {
+								#region [Display difficulty boxes]
 
-							bool uraExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
-							bool omoteExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
+								bool uraExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
+								bool omoteExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
 
-							for (int i = 0; i < (int)Difficulty.Edit + 1; i++) {
-								if (ctBarOpen.CurrentValue >= 100 || OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade) {
-									#region [Skip conditions]
+								for (int i = 0; i < (int)Difficulty.Edit + 1; i++) {
+									if (ctBarOpen.CurrentValue >= 100 || OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade) {
+										#region [Skip conditions]
 
-									// Don't even bother process the Ura box if there isn't one
-									if (!uraExists && i == (int)Difficulty.Edit)
-										break;
+										// Don't even bother process the Ura box if there isn't one
+										if (!uraExists && i == (int)Difficulty.Edit)
+											break;
 
-									// Don't process oni box if ura exists but not oni
-									else if (uraExists && !omoteExists && i == (int)Difficulty.Oni)
-										continue;
+										// Don't process oni box if ura exists but not oni
+										else if (uraExists && !omoteExists && i == (int)Difficulty.Oni)
+											continue;
 
-									#endregion
+										#endregion
 
-									// avaliable : bool (Chart exists)
-									#region [Gray box if stage isn't avaliable]
+										// avaliable : bool (Chart exists)
+										#region [Gray box if stage isn't avaliable]
 
-									bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
+										bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
 
-									if (avaliable)
-										OpenTaiko.Tx.SongSelect_Frame_Score[0].color4 = new Color4(1f, 1f, 1f, 1f);
-									else
-										OpenTaiko.Tx.SongSelect_Frame_Score[0].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
-
-									#endregion
-
-									// opacity : int (Box and scores opacity)
-									#region [Opacity management]
-
-									int opacity = 0;
-
-									if (avaliable && BarAnimeCount == 1.0) {
-										if (ctScoreFrameAnime.CurrentValue <= 3000)
-											opacity = Math.Max(0, ctScoreFrameAnime.CurrentValue - 2745);
+										if (avaliable)
+											OpenTaiko.Tx.SongSelect_Frame_Score[0].color4 = new Color4(1f, 1f, 1f, 1f);
 										else
-											opacity = Math.Min(255, 255 - (ctScoreFrameAnime.CurrentValue - 5745));
-									}
+											OpenTaiko.Tx.SongSelect_Frame_Score[0].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
 
-									#endregion
+										#endregion
 
-									#region [Display box parameters]
+										// opacity : int (Box and scores opacity)
+										#region [Opacity management]
 
-									bool _switchingUra = i == (int)Difficulty.Edit && omoteExists;
+										int opacity = 0;
 
-									int difSelectOpacity = (_switchingUra) ? (BarAnimeCount < 1.0 ? 0 : opacity) : (int)(BarAnimeCount * 255.0f);
-
-									if (OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade && !_switchingUra) {
-										difSelectOpacity = 255;
-									}
-
-
-									if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect || ctDifficultyIn.CurrentValue < 1000) {
-										OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity = difSelectOpacity;
-										OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difSelectOpacity;
-										OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difSelectOpacity);
-										OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difSelectOpacity);
-										if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difSelectOpacity;
-									} else if (ctDifficultyIn.CurrentValue >= 1000) {
-										int difInOpacity = (int)((float)((int)255.0f - (ctDifficultyIn.CurrentValue - 1000)) * ((i == (int)Difficulty.Edit && omoteExists) ? (float)difSelectOpacity / 255f : 1f));
-
-										OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity = difInOpacity;
-										OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difInOpacity;
-										OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difInOpacity);
-										OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difInOpacity);
-										if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difInOpacity;
-									}
-
-									#endregion
-
-									#region [Displayables]
-
-									int displayingDiff = Math.Min(i, (int)Difficulty.Oni);
-									int positionalOffset = displayingDiff * 122;
-
-									int width = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Width / 5;
-									int height = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Height;
-
-									OpenTaiko.Tx.SongSelect_Frame_Score[0].t2D描画(OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff], OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff], new Rectangle(width * i, 0, width, height));
-
-									if (avaliable) {
-										t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
-											OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i],
-											i,
-											OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[i]
-										);
-
-										if (OpenTaiko.Tx.SongSelect_Level != null) {
-											int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
-											int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
-
-											for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i]; i2++) {
-												OpenTaiko.Tx.SongSelect_Level.t2D描画(
-													OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
-													OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),
-													new RectangleF(level_width * i, 0, level_width, level_height));
-											}
+										if (avaliable && BarAnimeCount == 1.0) {
+											if (ctScoreFrameAnime.CurrentValue <= 3000)
+												opacity = Math.Max(0, ctScoreFrameAnime.CurrentValue - 2745);
+											else
+												opacity = Math.Min(255, 255 - (ctScoreFrameAnime.CurrentValue - 5745));
 										}
 
-										if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.b譜面分岐[i]) {
-											OpenTaiko.Tx.SongSelect_Branch?.tUpdateOpacity(OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity);
-											OpenTaiko.Tx.SongSelect_Branch?.t2D描画(
+										#endregion
 
-												OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff] + OpenTaiko.Skin.SongSelect_Branch_Offset[0],
-												OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff] + OpenTaiko.Skin.SongSelect_Branch_Offset[1]
+										#region [Display box parameters]
+
+										bool _switchingUra = i == (int)Difficulty.Edit && omoteExists;
+
+										int difSelectOpacity = (_switchingUra) ? (BarAnimeCount < 1.0 ? 0 : opacity) : (int)(BarAnimeCount * 255.0f);
+
+										if (OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade && !_switchingUra) {
+											difSelectOpacity = 255;
+										}
+
+
+										if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect || ctDifficultyIn.CurrentValue < 1000) {
+											OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity = difSelectOpacity;
+											OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difSelectOpacity;
+											OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difSelectOpacity);
+											OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difSelectOpacity);
+											if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difSelectOpacity;
+										} else if (ctDifficultyIn.CurrentValue >= 1000) {
+											int difInOpacity = (int)((float)((int)255.0f - (ctDifficultyIn.CurrentValue - 1000)) * ((i == (int)Difficulty.Edit && omoteExists) ? (float)difSelectOpacity / 255f : 1f));
+
+											OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity = difInOpacity;
+											OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difInOpacity;
+											OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difInOpacity);
+											OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difInOpacity);
+											if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difInOpacity;
+										}
+
+										#endregion
+
+										#region [Displayables]
+
+										int displayingDiff = Math.Min(i, (int)Difficulty.Oni);
+										int positionalOffset = displayingDiff * 122;
+
+										int width = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Width / 5;
+										int height = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Height;
+
+										OpenTaiko.Tx.SongSelect_Frame_Score[0].t2D描画(OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff], OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff], new Rectangle(width * i, 0, width, height));
+
+										if (avaliable) {
+											t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
+												OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i],
+												i,
+												OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[i]
 											);
+
+											if (OpenTaiko.Tx.SongSelect_Level != null) {
+												int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
+												int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
+
+												for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i]; i2++) {
+													OpenTaiko.Tx.SongSelect_Level.t2D描画(
+														OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
+														OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),
+														new RectangleF(level_width * i, 0, level_width, level_height));
+												}
+											}
+
+											if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.b譜面分岐[i]) {
+												OpenTaiko.Tx.SongSelect_Branch?.tUpdateOpacity(OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity);
+												OpenTaiko.Tx.SongSelect_Branch?.t2D描画(
+
+													OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff] + OpenTaiko.Skin.SongSelect_Branch_Offset[0],
+													OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff] + OpenTaiko.Skin.SongSelect_Branch_Offset[1]
+												);
+											}
+
+										}
+
+										#endregion
+
+									}
+								}
+
+								#endregion
+
+							} else {
+								// diff : int (5 : Tower, 6 : Dan)
+								#region [Check if Dan or Tower]
+
+								int diff = 5;
+								if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+									diff = 6;
+
+								#endregion
+
+								// avaliable : bool (Chart exists)
+								#region [Gray box if stage isn't avaliable]
+
+								bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff] >= 0;
+
+								if (avaliable)
+									OpenTaiko.Tx.SongSelect_Frame_Score[1].color4 = new Color4(1f, 1f, 1f, 1f);
+								else
+									OpenTaiko.Tx.SongSelect_Frame_Score[1].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
+
+								#endregion
+
+								#region [Display box parameters]
+
+								int difSelectOpacity = (int)(BarAnimeCount * 255);
+
+								if (OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade)
+									difSelectOpacity = 255;
+
+								if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect || ctDifficultyIn.CurrentValue < 1000) {
+									OpenTaiko.Tx.SongSelect_Frame_Score[1].Opacity = difSelectOpacity;
+									OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difSelectOpacity;
+									OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difSelectOpacity);
+									OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difSelectOpacity);
+									if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difSelectOpacity;
+								} else if (ctDifficultyIn.CurrentValue >= 1000) {
+									int difInOpacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+
+									OpenTaiko.Tx.SongSelect_Frame_Score[1].Opacity = difInOpacity;
+									OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difInOpacity;
+									OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difInOpacity);
+									OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difInOpacity);
+									if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difInOpacity;
+								}
+
+								#endregion
+
+								#region [Displayables]
+
+								int displayingDiff = diff == 5 ? 0 : 2;
+								int width = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Width / 5;
+								int height = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Height;
+
+								OpenTaiko.Tx.SongSelect_Frame_Score[1].t2D描画(OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff], OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff], new Rectangle(width * displayingDiff, 0, width, height));
+
+								var _level_number = (diff == 5) ? OpenTaiko.Skin.SongSelect_Level_Number_Tower : OpenTaiko.Skin.SongSelect_Level_Number_Tower;
+
+
+								if (avaliable) {
+									t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
+										OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff],
+										diff,
+										OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[diff]
+									);
+
+									if (diff == 5) {
+										var _sidet = OpenTaiko.Tx.SongSelect_Tower_Side;
+										if (_sidet != null) {
+											var _side = (OpenTaiko.stageSongSelect.rNowSelectedSong.nSide == CDTX.ESide.eNormal) ? 0 : 1;
+											var _sc = _sidet.sz画像サイズ.Width / 2;
+											_sidet.t2D描画(
+												OpenTaiko.Skin.SongSelect_Tower_Side[0],
+												OpenTaiko.Skin.SongSelect_Tower_Side[1],
+												new Rectangle(_side * _sc, 0, _sc, _sidet.sz画像サイズ.Height));
 										}
 
 									}
 
-									#endregion
+									if (OpenTaiko.Tx.SongSelect_Level != null) {
+										int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
+										int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
 
-								}
-							}
+										for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++) {
+											OpenTaiko.Tx.SongSelect_Level?.t2D描画(
+												OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
+												OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),
+												new RectangleF(level_width * diff, 0, level_width, level_height));
 
-							#endregion
-
-						} else {
-							// diff : int (5 : Tower, 6 : Dan)
-							#region [Check if Dan or Tower]
-
-							int diff = 5;
-							if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
-								diff = 6;
-
-							#endregion
-
-							// avaliable : bool (Chart exists)
-							#region [Gray box if stage isn't avaliable]
-
-							bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff] >= 0;
-
-							if (avaliable)
-								OpenTaiko.Tx.SongSelect_Frame_Score[1].color4 = new Color4(1f, 1f, 1f, 1f);
-							else
-								OpenTaiko.Tx.SongSelect_Frame_Score[1].color4 = new Color4(0.5f, 0.5f, 0.5f, 1f);
-
-							#endregion
-
-							#region [Display box parameters]
-
-							int difSelectOpacity = (int)(BarAnimeCount * 255);
-
-							if (OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade)
-								difSelectOpacity = 255;
-
-							if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect || ctDifficultyIn.CurrentValue < 1000) {
-								OpenTaiko.Tx.SongSelect_Frame_Score[1].Opacity = difSelectOpacity;
-								OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difSelectOpacity;
-								OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difSelectOpacity);
-								OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difSelectOpacity);
-								if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difSelectOpacity;
-							} else if (ctDifficultyIn.CurrentValue >= 1000) {
-								int difInOpacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
-
-								OpenTaiko.Tx.SongSelect_Frame_Score[1].Opacity = difInOpacity;
-								OpenTaiko.Tx.SongSelect_Level_Number.Opacity = difInOpacity;
-								OpenTaiko.Tx.SongSelect_Level_Number_Icon?.tUpdateOpacity(difInOpacity);
-								OpenTaiko.Tx.SongSelect_Level_Number_Colored?.tUpdateOpacity(difInOpacity);
-								if (OpenTaiko.Tx.SongSelect_Level != null) OpenTaiko.Tx.SongSelect_Level.Opacity = difInOpacity;
-							}
-
-							#endregion
-
-							#region [Displayables]
-
-							int displayingDiff = diff == 5 ? 0 : 2;
-							int width = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Width / 5;
-							int height = OpenTaiko.Tx.SongSelect_Frame_Score[0].sz画像サイズ.Height;
-
-							OpenTaiko.Tx.SongSelect_Frame_Score[1].t2D描画(OpenTaiko.Skin.SongSelect_Frame_Score_X[displayingDiff], OpenTaiko.Skin.SongSelect_Frame_Score_Y[displayingDiff], new Rectangle(width * displayingDiff, 0, width, height));
-
-							var _level_number = (diff == 5) ? OpenTaiko.Skin.SongSelect_Level_Number_Tower : OpenTaiko.Skin.SongSelect_Level_Number_Tower;
-
-
-							if (avaliable) {
-								t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
-									OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff],
-									diff,
-									OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[diff]
-								);
-
-								if (diff == 5) {
-									var _sidet = OpenTaiko.Tx.SongSelect_Tower_Side;
-									if (_sidet != null) {
-										var _side = (OpenTaiko.stageSongSelect.rNowSelectedSong.nSide == CDTX.ESide.eNormal) ? 0 : 1;
-										var _sc = _sidet.sz画像サイズ.Width / 2;
-										_sidet.t2D描画(
-											OpenTaiko.Skin.SongSelect_Tower_Side[0],
-											OpenTaiko.Skin.SongSelect_Tower_Side[1],
-											new Rectangle(_side * _sc, 0, _sc, _sidet.sz画像サイズ.Height));
-									}
-
-								}
-
-								if (OpenTaiko.Tx.SongSelect_Level != null) {
-									int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
-									int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
-
-									for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++) {
-										OpenTaiko.Tx.SongSelect_Level?.t2D描画(
-											OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
-											OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),
-											new RectangleF(level_width * diff, 0, level_width, level_height));
-
+										}
 									}
 								}
-							}
 
-							#endregion
+								#endregion
+
+							}
 
 						}
 
+						#endregion
 					}
-
-					#endregion
-				}
 					break;
 
 				case CSongListNode.ENodeType.BOX: {
-					#region [Box explanation]
+						#region [Box explanation]
 
-					for (int j = 0; j < 3; j++) {
-						if (!ctBoxOpen.IsEnded && ctBoxOpen.CurrentValue != 0) {
+						for (int j = 0; j < 3; j++) {
+							if (!ctBoxOpen.IsEnded && ctBoxOpen.CurrentValue != 0) {
+								if (txBoxText[j] != null)
+									this.txBoxText[j].Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
+										ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
+							} else
 							if (txBoxText[j] != null)
-								this.txBoxText[j].Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
-									ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
-						} else
-						if (txBoxText[j] != null)
-							this.txBoxText[j].Opacity = (int)(BarAnimeCount * 255.0f);
+								this.txBoxText[j].Opacity = (int)(BarAnimeCount * 255.0f);
 
-						if (this.txBoxText[j].szTextureSize.Width >= 510)
-							this.txBoxText[j].vcScaleRatio.X = 510f / this.txBoxText[j].szTextureSize.Width;
+							if (this.txBoxText[j].szTextureSize.Width >= 510)
+								this.txBoxText[j].vcScaleRatio.X = 510f / this.txBoxText[j].szTextureSize.Width;
 
-						this.txBoxText[j].t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_BoxExplanation_X, OpenTaiko.Skin.SongSelect_BoxExplanation_Y + j * OpenTaiko.Skin.SongSelect_BoxExplanation_Interval);
-					}
-
-					#endregion
-
-					#region [Box chara]
-
-					var box_chara = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxChara, OpenTaiko.Tx.SongSelect_Box_Chara);
-
-					// If BoxChara < 0, don't display any character
-					{
-						if (!ctBoxOpen.IsEnded)
-							box_chara.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
-								ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
-						else {
-							if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
-								box_chara.Opacity = (int)(BarAnimeCount * 255.0f);
-							else if (ctDifficultyIn.CurrentValue >= 1000)
-								box_chara.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+							this.txBoxText[j].t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_BoxExplanation_X, OpenTaiko.Skin.SongSelect_BoxExplanation_Y + j * OpenTaiko.Skin.SongSelect_BoxExplanation_Interval);
 						}
 
-						box_chara?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Box_Chara_X[0] - (BarAnimeCount * OpenTaiko.Skin.SongSelect_Box_Chara_Move), OpenTaiko.Skin.SongSelect_Box_Chara_Y[0],
-							new Rectangle(0, 0, box_chara.szTextureSize.Width / 2,
-								box_chara.szTextureSize.Height));
+						#endregion
 
-						box_chara?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Box_Chara_X[1] + (BarAnimeCount * OpenTaiko.Skin.SongSelect_Box_Chara_Move), OpenTaiko.Skin.SongSelect_Box_Chara_Y[1],
-							new Rectangle(box_chara.szTextureSize.Width / 2, 0,
-								box_chara.szTextureSize.Width / 2, box_chara.szTextureSize.Height));
+						#region [Box chara]
+
+						var box_chara = HGenreBar.tGetGenreBar(rCurrentlySelectedSong.BoxChara, OpenTaiko.Tx.SongSelect_Box_Chara);
+
+						// If BoxChara < 0, don't display any character
+						{
+							if (!ctBoxOpen.IsEnded)
+								box_chara.Opacity = (int)(ctBoxOpen.CurrentValue >= 1200 && ctBoxOpen.CurrentValue <= 1620 ? 255 - (ctBoxOpen.CurrentValue - 1200) * 2.55f :
+									ctBoxOpen.CurrentValue >= 2000 ? (ctBoxOpen.CurrentValue - 2000) * 2.55f : ctBoxOpen.CurrentValue <= 1200 ? 255 : 0);
+							else {
+								if (!OpenTaiko.stageSongSelect.actDifficultySelectionScreen.bIsDifficltSelect)
+									box_chara.Opacity = (int)(BarAnimeCount * 255.0f);
+								else if (ctDifficultyIn.CurrentValue >= 1000)
+									box_chara.Opacity = (int)255.0f - (ctDifficultyIn.CurrentValue - 1000);
+							}
+
+							box_chara?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Box_Chara_X[0] - (BarAnimeCount * OpenTaiko.Skin.SongSelect_Box_Chara_Move), OpenTaiko.Skin.SongSelect_Box_Chara_Y[0],
+								new Rectangle(0, 0, box_chara.szTextureSize.Width / 2,
+									box_chara.szTextureSize.Height));
+
+							box_chara?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Box_Chara_X[1] + (BarAnimeCount * OpenTaiko.Skin.SongSelect_Box_Chara_Move), OpenTaiko.Skin.SongSelect_Box_Chara_Y[1],
+								new Rectangle(box_chara.szTextureSize.Width / 2, 0,
+									box_chara.szTextureSize.Width / 2, box_chara.szTextureSize.Height));
+						}
+
+						#endregion
 					}
-
-					#endregion
-				}
 					break;
 
 				case CSongListNode.ENodeType.BACKBOX:
@@ -1891,10 +1891,10 @@ internal class CActSelect曲リスト : CActivity {
 			//int x = this.ptバーの基本座標[ n見た目の行番号 ].X + ( (int) ( ( this.ptバーの基本座標[ n次のパネル番号 ].X - this.ptバーの基本座標[ n見た目の行番号 ].X ) * ( ( (double) Math.Abs( this.n現在のスクロールカウンタ ) ) / 100.0 ) ) );
 			int x = i選曲バーX座標;
 			int xAnime = OpenTaiko.Skin.SongSelect_Bar_X[n見た目の行番号] + ((int)((OpenTaiko.Skin.SongSelect_Bar_X[n次のパネル番号] - OpenTaiko.Skin.SongSelect_Bar_X[n見た目の行番号]) *
-			                                                                fNowScrollAnime));
+																			fNowScrollAnime));
 
 			int y = OpenTaiko.Skin.SongSelect_Bar_Y[n見た目の行番号] + ((int)((OpenTaiko.Skin.SongSelect_Bar_Y[n次のパネル番号] - OpenTaiko.Skin.SongSelect_Bar_Y[n見た目の行番号]) *
-			                                                           fNowScrollAnime));
+																	   fNowScrollAnime));
 
 			if ((i == barCenterNum) && ctScrollCounter.CurrentValue == ctScrollCounter.EndValue) {
 				CTexture txSelectedSongSubtitle = null;
@@ -2075,7 +2075,7 @@ internal class CActSelect曲リスト : CActivity {
 		#region [Decide]
 
 		if ((OpenTaiko.Pad.bPressedDGB(EPad.Decide)) ||
-		    ((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
+			((OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
 			if (emc == eMenuContext.SearchByDifficulty) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
@@ -2121,7 +2121,7 @@ internal class CActSelect曲リスト : CActivity {
 		#region [Left]
 
 		else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)
-		         || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+				 || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 			if (emc == eMenuContext.SearchByDifficulty) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
@@ -2143,7 +2143,7 @@ internal class CActSelect曲リスト : CActivity {
 		#region [Right]
 
 		else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)
-		         || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+				 || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 			if (emc == eMenuContext.SearchByDifficulty) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
@@ -2568,7 +2568,7 @@ internal class CActSelect曲リスト : CActivity {
 			if (SongUnlockable != null) {
 				string _cond = "???";
 				if (HRarity.tRarityToModalInt(SongUnlockable.rarity)
-				    < HRarity.tRarityToModalInt("Epic"))
+					< HRarity.tRarityToModalInt("Epic"))
 					_cond = SongUnlockable.unlockConditions.tConditionMessage(DBUnlockables.CUnlockConditions.EScreen.SongSelect);
 				this.ttkNowUnlockConditionText = new TitleTextureKey(_cond, this.pfBoxText, Color.White, Color.Black, 1000);
 			}
@@ -2885,8 +2885,8 @@ internal class CActSelect曲リスト : CActivity {
 
 	public void displayFavoriteStatus(int x, int y, CSongUniqueID csu, float _resize) {
 		if (csu != null
-		    && OpenTaiko.Tx.SongSelect_Favorite != null
-		    && OpenTaiko.Favorites.tIsFavorite(csu.data.id)) {
+			&& OpenTaiko.Tx.SongSelect_Favorite != null
+			&& OpenTaiko.Favorites.tIsFavorite(csu.data.id)) {
 			OpenTaiko.Tx.SongSelect_Favorite.vcScaleRatio.X = _resize;
 			OpenTaiko.Tx.SongSelect_Favorite.vcScaleRatio.Y = _resize;
 			OpenTaiko.Tx.SongSelect_Favorite.t2D拡大率考慮中央基準描画(x, y);
@@ -2959,7 +2959,7 @@ internal class CActSelect曲リスト : CActivity {
 	public void tDisplayLevelIcon(int x, int y, CDTX.ELevelIcon icon, CTexture iconTex = null) {
 		var _tex = (iconTex != null) ? iconTex : OpenTaiko.Tx.SongSelect_Level_Number_Big_Icon;
 		if (icon != CDTX.ELevelIcon.eNone &&
-		    _tex != null) {
+			_tex != null) {
 			var __width = _tex.sz画像サイズ.Width / 3;
 			var __height = _tex.sz画像サイズ.Height;
 			_tex.t2D_DisplayImage_AnchorUpRight(

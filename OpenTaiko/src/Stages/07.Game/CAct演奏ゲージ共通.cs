@@ -361,60 +361,60 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		switch (e今回の判定) {
 			case ENoteJudge.Perfect:
 			case ENoteJudge.Great: {
-				if (this.DTX[nPlayer].bチップがある.Branch) {
-					fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
-				} else
-					fDamage = this.dbゲージ増加量[0][nPlayer];
-			}
+					if (this.DTX[nPlayer].bチップがある.Branch) {
+						fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
+					} else
+						fDamage = this.dbゲージ増加量[0][nPlayer];
+				}
 				break;
 			case ENoteJudge.Good: {
-				if (this.DTX[nPlayer].bチップがある.Branch) {
-					fDamage = this.dbゲージ増加量_Branch[nコース, 1][nPlayer];
-				} else
-					fDamage = this.dbゲージ増加量[1][nPlayer];
-			}
+					if (this.DTX[nPlayer].bチップがある.Branch) {
+						fDamage = this.dbゲージ増加量_Branch[nコース, 1][nPlayer];
+					} else
+						fDamage = this.dbゲージ増加量[1][nPlayer];
+				}
 				break;
 			case ENoteJudge.Poor:
 			case ENoteJudge.Miss: {
-				if (this.DTX[nPlayer].bチップがある.Branch) {
-					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
-				} else
-					fDamage = this.dbゲージ増加量[2][nPlayer];
+					if (this.DTX[nPlayer].bチップがある.Branch) {
+						fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
+					} else
+						fDamage = this.dbゲージ増加量[2][nPlayer];
 
-				if (fDamage >= 0) {
-					fDamage = -fDamage;
+					if (fDamage >= 0) {
+						fDamage = -fDamage;
+					}
+
+					var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
+
+					int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
+					int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
+
+					switch (chara.effect.tGetGaugeType()) {
+						case "Hard":
+							fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);
+							break;
+						case "Extreme":
+							fDamage = -HGaugeMethods.tExtremeGaugeGetDamage((Difficulty)nanidou, level);
+							break;
+					}
+
+					if (this.bRisky) {
+						this.nRiskyTimes--;
+					}
 				}
-
-				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-
-				int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
-				int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
-
-				switch (chara.effect.tGetGaugeType()) {
-					case "Hard":
-						fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);
-						break;
-					case "Extreme":
-						fDamage = -HGaugeMethods.tExtremeGaugeGetDamage((Difficulty)nanidou, level);
-						break;
-				}
-
-				if (this.bRisky) {
-					this.nRiskyTimes--;
-				}
-			}
 
 				break;
 
 
 
 			default: {
-				if (this.DTX[nPlayer].bチップがある.Branch) {
-					fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
-				} else
-					fDamage = this.dbゲージ増加量[0][nPlayer];
-				break;
-			}
+					if (this.DTX[nPlayer].bチップがある.Branch) {
+						fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
+					} else
+						fDamage = this.dbゲージ増加量[0][nPlayer];
+					break;
+				}
 
 
 		}

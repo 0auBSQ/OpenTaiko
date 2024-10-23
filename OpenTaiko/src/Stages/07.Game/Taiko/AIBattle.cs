@@ -123,10 +123,10 @@ class AIBattle : CStage {
 
 
 			float size_x = OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[0] +
-			               ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[0] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[0]) * value);
+						   ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[0] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[0]) * value);
 
 			float size_y = OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1] +
-			               ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[1] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1]) * value);
+						   ((OpenTaiko.Skin.Game_AIBattle_Batch_Size[1] - OpenTaiko.Skin.Game_AIBattle_Batch_Anime_Size[1]) * value);
 
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.X = (size_x / (float)width) + inScale;
 			OpenTaiko.Tx.AIBattle_Batch.vcScaleRatio.Y = (size_y / (float)height) + inScale;

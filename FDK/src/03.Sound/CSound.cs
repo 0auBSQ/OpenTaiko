@@ -49,7 +49,7 @@ public class CSound : IDisposable {
 		get { return 0; }
 	}
 	public bool IsStreamPlay            // 取りあえずfalse固定★★★★★★★★★★★★★★★★★★★★
-		// trueにすると同一チップ音の多重再生で問題が出る(4POLY音源として動かない)
+										// trueにすると同一チップ音の多重再生で問題が出る(4POLY音源として動かない)
 	{
 		get { return false; }
 	}
@@ -246,8 +246,8 @@ public class CSound : IDisposable {
 		set {
 			if (this.IsBassSound) {
 				float f位置 = Math.Min(Math.Max(value, -100), 100) / 100.0f;  // -100～100 → -1.0～1.0
-				//var nodes = new BASS_MIXER_NODE[ 1 ] { new BASS_MIXER_NODE( 0, f位置 ) };
-				//BassMix.BASS_Mixer_ChannelSetEnvelope( this.hBassStream, BASSMIXEnvelope.BASS_MIXER_ENV_PAN, nodes );
+																			//var nodes = new BASS_MIXER_NODE[ 1 ] { new BASS_MIXER_NODE( 0, f位置 ) };
+																			//BassMix.BASS_Mixer_ChannelSetEnvelope( this.hBassStream, BASSMIXEnvelope.BASS_MIXER_ENV_PAN, nodes );
 				Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Pan, f位置);
 			}
 		}
@@ -329,7 +329,7 @@ public class CSound : IDisposable {
 		get {
 			if (this.IsBassSound) {
 				bool ret = (!BassMixExtensions.ChannelIsPlaying(this.hBassStream)) &
-				           (BassMix.ChannelGetPosition(this.hBassStream) > 0);
+						   (BassMix.ChannelGetPosition(this.hBassStream) > 0);
 				return ret;
 			} else {
 				return (this.PauseCount > 0);
@@ -488,7 +488,7 @@ public class CSound : IDisposable {
 					sounds[i].Dispose(true, false);
 					device.tCreateSound(strファイル名, sounds[i]);
 					break;
-				#endregion
+					#endregion
 			}
 		}
 	}
@@ -563,28 +563,28 @@ public class CSound : IDisposable {
 	protected int _hTempoStream = 0;
 	protected int _hBassStream = -1;                    // ASIO, WASAPI 用
 	protected int hBassStream = 0;                      // #31076 2013.4.1 yyagi; プロパティとして実装すると動作が低速になったため、
-	// tBASSサウンドを作成する_ストリーム生成後の共通処理()のタイミングと、
-	// 再生速度を変更したタイミングでのみ、
-	// hBassStreamを更新するようにした。
-	//{
-	//    get
-	//    {
-	//        if ( _hTempoStream != 0 && !this.bIs1倍速再生 )	// 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
-	//        {
-	//            return _hTempoStream;
-	//        }
-	//        else
-	//        {
-	//            return _hBassStream;
-	//        }
-	//    }
-	//    set
-	//    {
-	//        _hBassStream = value;
-	//    }
-	//}
+														// tBASSサウンドを作成する_ストリーム生成後の共通処理()のタイミングと、
+														// 再生速度を変更したタイミングでのみ、
+														// hBassStreamを更新するようにした。
+														//{
+														//    get
+														//    {
+														//        if ( _hTempoStream != 0 && !this.bIs1倍速再生 )	// 再生速度がx1.000のときは、TempoStreamを用いないようにして高速化する
+														//        {
+														//            return _hTempoStream;
+														//        }
+														//        else
+														//        {
+														//            return _hBassStream;
+														//        }
+														//    }
+														//    set
+														//    {
+														//        _hBassStream = value;
+														//    }
+														//}
 	protected int hMixer = -1;  // 設計壊してゴメン Mixerに後で登録するときに使う
-	//-----------------
+								//-----------------
 	#endregion
 
 	#region [ private ]
@@ -730,7 +730,7 @@ public class CSound : IDisposable {
 			bool b1 = BassMix.MixerAddChannel(this.hMixer, this.hBassStream, bf);
 			//bool b2 = BassMix.BASS_Mixer_ChannelPause( this.hBassStream );
 			tSetPositonToBegin();   // StreamAddChannelの後で再生位置を戻さないとダメ。逆だと再生位置が変わらない。
-			//Trace.TraceInformation( "Add Mixer: " + Path.GetFileName( this.strファイル名 ) + " (" + hBassStream + ")" + " MixedStreams=" + CSound管理.nMixing );
+									//Trace.TraceInformation( "Add Mixer: " + Path.GetFileName( this.strファイル名 ) + " (" + hBassStream + ")" + " MixedStreams=" + CSound管理.nMixing );
 			Bass.ChannelUpdate(this.hBassStream, 0);    // pre-buffer
 			return b1;  // &b2;
 		}

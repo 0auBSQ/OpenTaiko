@@ -224,7 +224,7 @@ internal class CSongDict {
 		foreach (CSongListNode nodeT in nodes.Values) {
 			var score = nodeT.nLevel;
 			if (tLevelMatches(score[difficulty], level)
-			    || (difficulty == (int)Difficulty.Oni && tLevelMatches(score[(int)Difficulty.Edit], level))) // Oni includes Ura
+				|| (difficulty == (int)Difficulty.Oni && tLevelMatches(score[(int)Difficulty.Edit], level))) // Oni includes Ura
 			{
 				var node = tReadaptChildNote(parent, nodeT);
 				if (node != null) {

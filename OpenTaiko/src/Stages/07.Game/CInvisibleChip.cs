@@ -107,7 +107,7 @@ public class CInvisibleChip : IDisposable {
 				}
 
 				if (ccounter[nInst].CurrentValue <= 0 || ccounter[nInst].CurrentValue > nDisplayTimeMs + nFadeoutTimeMs)
-					// まだ一度もMissっていない or フェードアウトしきった後
+				// まだ一度もMissっていない or フェードアウトしきった後
 				{
 					cc.b可視 = false;
 					cc.n透明度 = 255;

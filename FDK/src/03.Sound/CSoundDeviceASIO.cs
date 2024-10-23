@@ -348,7 +348,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	protected int nバッファサイズsample = 0;
 	protected AsioSampleFormat fmtASIOデバイスフォーマット = AsioSampleFormat.Unknown;
 	protected AsioSampleFormat fmtASIOチャンネルフォーマット = AsioSampleFormat.Bit16;     // 16bit 固定
-	//protected BASSASIOFormat fmtASIOチャンネルフォーマット = BASSASIOFormat.BASS_ASIO_FORMAT_32BIT;// 16bit 固定
+																				//protected BASSASIOFormat fmtASIOチャンネルフォーマット = BASSASIOFormat.BASS_ASIO_FORMAT_32BIT;// 16bit 固定
 	protected AsioProcedure tAsioProc = null;
 
 	protected int tAsio処理(bool input, int channel, IntPtr buffer, int length, IntPtr user) {
