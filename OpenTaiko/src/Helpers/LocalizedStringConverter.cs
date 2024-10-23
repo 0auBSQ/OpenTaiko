@@ -1,23 +1,23 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace OpenTaiko {
-	internal class LocalizedStringConverter<T> : JsonConverter {
-		public override bool CanConvert(Type objectType) {
-			// CanConvert is not called when the [JsonConverter] attribute is used
-			return false;
-		}
+namespace OpenTaiko;
 
-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-			JToken token = JToken.Load(reader);
-			if (token.Type == JTokenType.Object) {
-				return token.ToObject<T>(serializer);
-			}
-			return token.ToString();
-		}
+internal class LocalizedStringConverter<T> : JsonConverter {
+	public override bool CanConvert(Type objectType) {
+		// CanConvert is not called when the [JsonConverter] attribute is used
+		return false;
+	}
 
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-			serializer.Serialize(writer, value);
+	public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+		JToken token = JToken.Load(reader);
+		if (token.Type == JTokenType.Object) {
+			return token.ToObject<T>(serializer);
 		}
+		return token.ToString();
+	}
+
+	public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+		serializer.Serialize(writer, value);
 	}
 }

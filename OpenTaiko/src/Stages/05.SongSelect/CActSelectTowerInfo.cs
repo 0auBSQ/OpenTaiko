@@ -2,69 +2,69 @@
 using FDK;
 
 // Minimalist menu class to use for custom menus
-namespace OpenTaiko {
-	class CActSelectTowerInfo : CStage {
-		public CActSelectTowerInfo() {
-			base.IsDeActivated = true;
-		}
+namespace OpenTaiko;
 
-		public override void Activate() {
-			// On activation
+class CActSelectTowerInfo : CStage {
+	public CActSelectTowerInfo() {
+		base.IsDeActivated = true;
+	}
 
-			if (base.IsActivated)
-				return;
+	public override void Activate() {
+		// On activation
+
+		if (base.IsActivated)
+			return;
 
 
 
-			base.Activate();
-		}
+		base.Activate();
+	}
 
-		public override void DeActivate() {
-			// On de-activation
+	public override void DeActivate() {
+		// On de-activation
 
-			base.DeActivate();
-		}
+		base.DeActivate();
+	}
 
-		public override void CreateManagedResource() {
+	public override void CreateManagedResource() {
 
-			// Ressource allocation
+		// Ressource allocation
 
-			base.CreateManagedResource();
-		}
+		base.CreateManagedResource();
+	}
 
-		public override void ReleaseManagedResource() {
+	public override void ReleaseManagedResource() {
 
-			// Ressource freeing
+		// Ressource freeing
 
-			base.ReleaseManagedResource();
-		}
+		base.ReleaseManagedResource();
+	}
 
-		public override int Draw() {
-			if (OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5] != null)
-			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.arスコア[5].譜面情報.nTotalFloor);
+	public override int Draw() {
+		if (OpenTaiko.stageSongSelect.rNowSelectedSong.score[5] != null)
+			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.score[5].譜面情報.nTotalFloor);
 
-			return 0;
-		}
+		return 0;
+	}
 
-		#region [Private]
+	#region [Private]
 
-		private void tFloorNumberDraw(float originx, float originy, int num) {
-			int[] nums = CConversion.SeparateDigits(num);
+	private void tFloorNumberDraw(float originx, float originy, int num) {
+		int[] nums = CConversion.SeparateDigits(num);
 
-			for (int j = 0; j < nums.Length; j++) {
-				if (OpenTaiko.Skin.SongSelect_FloorNum_Show && OpenTaiko.Tx.SongSelect_Floor_Number != null) {
-					float offset = j;
-					float x = originx - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[0] * offset);
-					float y = originy - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[1] * offset);
+		for (int j = 0; j < nums.Length; j++) {
+			if (OpenTaiko.Skin.SongSelect_FloorNum_Show && OpenTaiko.Tx.SongSelect_Floor_Number != null) {
+				float offset = j;
+				float x = originx - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[0] * offset);
+				float y = originy - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[1] * offset);
 
-					float width = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Width / 10.0f;
-					float height = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Height;
+				float width = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Width / 10.0f;
+				float height = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Height;
 
-					OpenTaiko.Tx.SongSelect_Floor_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
-				}
+				OpenTaiko.Tx.SongSelect_Floor_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
-
-		#endregion
 	}
+
+	#endregion
 }

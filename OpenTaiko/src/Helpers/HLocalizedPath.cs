@@ -1,23 +1,23 @@
-namespace OpenTaiko {
-	public static class HLocalizedPath {
-		public static string GetFullPathWithoutExtension(string path) {
-			return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path));
-		}
+namespace OpenTaiko;
 
-		public static String GetLocalizedPath(String ogPath, String langCode = null) {
-			if (String.IsNullOrEmpty(langCode))
-				langCode = CLangManager.fetchLang();
+public static class HLocalizedPath {
+	public static string GetFullPathWithoutExtension(string path) {
+		return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetFileNameWithoutExtension(path));
+	}
 
-			String ext = System.IO.Path.GetExtension(ogPath);
-			String fp = HLocalizedPath.GetFullPathWithoutExtension(ogPath);
-			return (fp + "_" + langCode + ext);
-		}
+	public static String GetLocalizedPath(String ogPath, String langCode = null) {
+		if (String.IsNullOrEmpty(langCode))
+			langCode = CLangManager.fetchLang();
 
-		public static String GetAvailableLocalizedPath(String ogPath, String langCode = null) {
-			string path = GetLocalizedPath(ogPath, langCode);
+		String ext = System.IO.Path.GetExtension(ogPath);
+		String fp = HLocalizedPath.GetFullPathWithoutExtension(ogPath);
+		return (fp + "_" + langCode + ext);
+	}
 
-			if (File.Exists(path)) return path;
-			return ogPath;
-		}
+	public static String GetAvailableLocalizedPath(String ogPath, String langCode = null) {
+		string path = GetLocalizedPath(ogPath, langCode);
+
+		if (File.Exists(path)) return path;
+		return ogPath;
 	}
 }
