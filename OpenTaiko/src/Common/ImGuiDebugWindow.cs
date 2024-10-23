@@ -314,7 +314,6 @@ namespace OpenTaiko {
 								ImGui.Text("Subtitle: " + dtx.SUBTITLE.GetString(""));
 								ImGui.Text("Charter: " + dtx.MAKER);
 
-								// BPM
 								ImGui.Text("BPM: " + dtx.BASEBPM + (dtx.listBPM.Count > 1 ? (" (Min: " + dtx.MinBPM + " / Max: " + dtx.MaxBPM + ")") : ""));
 								if (dtx.listBPM.Count > 1) {
 									if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
@@ -324,7 +323,7 @@ namespace OpenTaiko {
 										ImGui.TreePop();
 									}
 								}
-								// Lyrics
+
 								ImGui.Text("Lyrics: " + (dtx.bLyrics ? (dtx.usingLyricsFile ? dtx.listLyric2.Count : dtx.listLyric.Count) : "None"));
 
 								ImGui.NewLine();
@@ -483,18 +482,18 @@ namespace OpenTaiko {
 				}
 			}
 		}
-		private static int CTextureListPopup(IEnumerable<CTexture> texture_list, string label, string id) {
-			if (texture_list == null) return 0;
-			int memory_count = GetTotalMemoryUsageFromCTextureList(texture_list);
+		private static int CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
+			if (textureList == null) return 0;
+			int memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
-			if (ImGui.TreeNodeEx($"{label} Textures: ({texture_list.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memory_count))}MB)###{id}")) {
+			if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
 				int index = 0;
-				foreach (CTexture tex in texture_list) {
+				foreach (CTexture tex in textureList) {
 					CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
 				}
 				ImGui.TreePop();
 			}
-			return memory_count;
+			return memoryCount;
 		}
 		private static int CTextureListPopup(ScriptBG script, string label, string id) {
 			return script != null ? CTextureListPopup(script.Textures.Values, label, id) : 0;
