@@ -8,13 +8,13 @@ internal sealed class CSongListNodeComparerUnlockStatus : IComparer<CSongListNod
 
 
 		if (_n1s == 0 || _n2s == 0) {
-			return -1;
+			return 0;
 		}
 		return _unlockStatusToInt(n1).CompareTo(_unlockStatusToInt(n2));
 	}
 
 	private int _unlockStatusToInt(CSongListNode n1) {
-		if (!OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(n1)) return -1;
-		return (int)OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(n1);
+		if (!OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(n1)) return 0;
+		return (int)OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(n1) + 1;
 	}
 }
