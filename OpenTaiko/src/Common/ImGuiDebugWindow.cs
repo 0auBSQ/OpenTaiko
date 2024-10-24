@@ -411,11 +411,11 @@ public static class ImGuiDebugWindow {
 								"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
 							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PerfectScript,
 								"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PassScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PassScript,
 								"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_FullComboScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_FullComboScript,
 								"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PerfectScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PerfectScript,
 								"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
 							break;
 						default:
