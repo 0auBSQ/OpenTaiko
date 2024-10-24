@@ -15,13 +15,13 @@
 
 （译者注：编译指南：[https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows)](https://github.com/l1m0n3/OpenTaiko/wiki/How-to-build-OpenTaiko-without-using-Visual-Studio-(on-Windows))）
 
-## 使用前注意事项（重要！！！）
+## 使用前注意事项（重要）
 
 - 您**全权**对您对本软件的使用负责。创作者不为您使用本软件造成的任何问题承担任何责任。
 
 - 在向他人寻求帮助前请先自行研究。
 
-- 若您的计算机不能维持稳定60FPS帧率，则本软件不适合它。
+- 若您的计算机不能维持稳定60FPS帧率，则本软件不能良好运行。
 
 - 从0.6.0开始，请通过OpenTaiko Hub下载和管理OpenTaiko的发布：https://github.com/OpenTaiko/OpenTaiko-Hub
 
@@ -41,7 +41,7 @@
 
 ### 编辑源代码/再发布
 
-OpenTaiko是在MIT许可证下开放源代码。
+OpenTaiko在MIT许可证下开放源代码。
 在MIT许可证下，您可以编辑或二次发布。但您须**自行承担**全部责任。
 此外，编辑或再发布时**请**将“License”文件夹包含在您的库许可证内。
 请同样遵守其它皮肤或曲目包创作者的许可证和规则。
@@ -77,7 +77,7 @@ OpenTaiko许可不适用于这类情况。
 
 需求的功能如果好的话可能会被添加。
 
-- **重要！！！**：类似于“请按照（此处插入任意商业游戏名称）重建用户界面与体验”的请求会被直接否决，不会得到回答。
+- **重要**：类似于“请按照（此处插入任意商业游戏名称）重建用户界面与体验”的请求会被直接否决，不会得到回答。
 
 ## 贡献者名单
 
