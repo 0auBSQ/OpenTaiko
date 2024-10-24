@@ -171,7 +171,7 @@ internal class CActCalibrationMode : CActivity {
 		return 0;
 	}
 	public int CurrentOffset() {
-		return CalibrateTick.CurrentValue > 250 ? CalibrateTick.CurrentValue - 500 : CalibrateTick.CurrentValue;
+		return -(CalibrateTick.CurrentValue > 250 ? CalibrateTick.CurrentValue - 500 : CalibrateTick.CurrentValue);
 	}
 
 	private void UpdateText() {
