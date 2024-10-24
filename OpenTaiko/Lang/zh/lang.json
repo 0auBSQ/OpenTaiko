@@ -180,7 +180,7 @@
 		"SETTINGS_GAME_NOINFO": "无信息模式",
 		"SETTINGS_GAME_NOINFO_DESC": "打开会关闭曲目信息显示，\n关闭会打开曲目信息显示。",
 		"SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
-		"SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量。\n。范围：1—99999",
+		"SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量。\n范围：1—99999",
 		"SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
 		"SETTINGS_GAME_SCOREDISPLAY_DESC": "在左下方显示良、可、不可数量。\n（仅在单人模式下生效）",
 		"SETTINGS_GAME_BRANCHANIME": "谱面分歧动画",
