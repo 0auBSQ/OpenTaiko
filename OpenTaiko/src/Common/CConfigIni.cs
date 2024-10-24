@@ -1618,6 +1618,21 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.ConfigIniFileName = "";
 		this.dicJoystick = new Dictionary<int, string>(10);
 		this.dicGamepad = new Dictionary<int, string>(10);
+
+		this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>() {
+			{ ESectionType.System, this.ProcessSystemSection },
+			{ ESectionType.AutoPlay, this.ProcessAutoPlaySection },
+			{ ESectionType.HitRange, this.ProcessHitRangeSection },
+			{ ESectionType.Log, this.ProcessLogSection },
+			{ ESectionType.PlayOption, this.ProcessPlayOptionSection },
+			{ ESectionType.ViewerOption, this.ProcessViewerOptionSection },
+			{ ESectionType.GUID, this.ProcessGuidSection },
+			{ ESectionType.DrumsKeyAssign, this.ProcessDrumKeyAssignmentSection },
+			{ ESectionType.SystemKeyAssign, this.ProcessSystemKeyAssignmentSection },
+			{ ESectionType.TrainingKeyAssign, this.ProcessTrainingKeyAssignmentSection },
+			{ ESectionType.DEBUG, this.ProcessDebugSection },
+		};
+
 		this.SetDefaultKeyAssignments();
 
 		#region [ velocityMin ]
@@ -1668,20 +1683,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.bTimeStretch = false; // #23664 2013.2.24 yyagi 初期値はfalse (再生速度変更を、ピッチ変更にて行う)
 		this.nDisplayTimesMs = 3000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップ再表示期間
 		this.nFadeoutTimeMs = 2000; // #32072 2013.10.24 yyagi Semi-Invisibleでの、チップフェードアウト時間
-
-		this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>() {
-			{ ESectionType.System, this.ProcessSystemSection },
-			{ ESectionType.AutoPlay, this.ProcessAutoPlaySection },
-			{ ESectionType.HitRange, this.ProcessHitRangeSection },
-			{ ESectionType.Log, this.ProcessLogSection },
-			{ ESectionType.PlayOption, this.ProcessPlayOptionSection },
-			{ ESectionType.ViewerOption, this.ProcessViewerOptionSection },
-			{ ESectionType.GUID, this.ProcessGuidSection },
-			{ ESectionType.DrumsKeyAssign, this.ProcessDrumKeyAssignmentSection },
-			{ ESectionType.SystemKeyAssign, this.ProcessSystemKeyAssignmentSection },
-			{ ESectionType.TrainingKeyAssign, this.ProcessTrainingKeyAssignmentSection },
-			{ ESectionType.DEBUG, this.ProcessDebugSection },
-		};
 
 		bViewerVSyncWait = true;
 		bViewerShowDebugStatus = true;
