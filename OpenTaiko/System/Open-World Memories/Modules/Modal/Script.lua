@@ -24,13 +24,16 @@ local font_modal_body = nil
 local font_modal_plate = nil
 
 -- Modal counter
-local modal_duration = 2000
+local modal_duration = 500 -- 2000
 local modal_counter = 0
 local script_busy = false
 
 -- After the item is revealed, a circle glow or smth like that?
 local modal_loopanim_duration = 1000
 local modal_loopanim_counter = 0
+
+-- Song modal cache
+local modal_preimage_ref = nil
 
 -- Tmp (until new format)
 local modal_asset_id = 0
@@ -90,6 +93,11 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	-- > modal_asset_visual_references: CTexture (Preimage)
 	_modal_header = getLocalizedString("MODAL_TITLE_SONG")
 	_modal_body = (modal_current_info ~= nil) and modal_current_info.ldTitle:GetString("") or "??? (Not found)"
+	if (modal_current_info ~= nil) then
+		modal_preimage_ref = modal_current_visual(modal_current_info)
+	else
+		modal_preimage_ref = nil
+	end
 
 	end 
 
@@ -184,8 +192,8 @@ function draw()
 			modal_current_visual:DrawTitlePlate(960, 490, 255, modal_current_info.Value.nameplateInfo.iType, tx_title, modal_current_rarity, modal_current_info.Key)
 		elseif modal_current_type == 4 then
 			-- Song
-			if modal_current_visual ~= nil then
-				modal_current_visual:t2D_DisplayImage_AnchorCenter(960,490)
+			if modal_preimage_ref ~= nil then
+				modal_preimage_ref:t2D_DisplayImage_AnchorCenter(960,490)
 			end
 			tx_body = getTextTex(ttk_modal_body, false, false)
 			tx_body:t2D_DisplayImage_AnchorCenter(960,790)

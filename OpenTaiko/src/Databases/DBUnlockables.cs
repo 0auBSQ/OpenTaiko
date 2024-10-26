@@ -11,7 +11,7 @@ class DBUnlockables {
 		["lp"] = 3,
 		["sp"] = 2,
 		["sg"] = 2,
-
+		["sd"] = 2,
 		["sc"] = 2,
 		["ce"] = 1,
 		["tp"] = 1,
@@ -107,6 +107,7 @@ class DBUnlockables {
 		 * cs : "Coins shop", coin requirement, payable only within the Medal shop selection screen
 		 * cm : "Coins menu", coin requirement, payable only within the song select screen (used only for songs)
 		 * ce : "Coins earned", coins earned since the creation of the save file, 1 value : [Total earned coins]
+		 * sd : "Song distinct (performance)", count of the number of distinct chart where a given status was got, condition 2 values : [Song count, Clear status (0~4)], input 1 value [Count of fullfiled songs]
 		 * dp : "Difficulty pass", count of difficulties pass, unlock check during the results screen, condition 3 values : [Difficulty int (0~4), Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
 		 * lp : "Level pass", count of level pass, unlock check during the results screen, condition 3 values : [Star rating, Clear status (0~4), Number of performances], input 1 value [Plays fitting the condition]
 		 * sp : "Song performance", count of a specific song pass, unlock check during the results screen, condition 2 x n values for n songs  : [Difficulty int (0~4, if -1 : Any), Clear status (0~4), ...], input 1 value [Count of fullfiled songs], n references for n songs (Song ids)
@@ -148,6 +149,11 @@ class DBUnlockables {
 				case "tp":
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.TotalPlaycount }, screen);
+					else
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+				case "sd":
+					if (this.Values.Length == 2)
+						return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
 					else
 						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
 				case "dp":
@@ -197,6 +203,7 @@ class DBUnlockables {
 					case "tp":
 					case "ap":
 					case "aw":
+					case "sd":
 						bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
 						return (fulfiled, "");
 					case "dp":
@@ -208,6 +215,8 @@ class DBUnlockables {
 					case "sc":
 						fulfiled = this.tValueRequirementMet(inputValues[0], this.Reference.Length);
 						return (fulfiled, "");
+					default:
+						return (false, null);
 				}
 			}
 			// Trying to unlock an item from the Shop menu (If shop => check if enough coins, else => Invalid command)
@@ -274,6 +283,24 @@ class DBUnlockables {
 					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIWIN", this.Values[0], SaveData.AIBattleModeWins);
 				case "tp":
 					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY", this.Values[0], SaveData.TotalPlaycount);
+				case "sd": {
+						var _aimedStatus = this.Values[1];
+
+						if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+
+						int[] _values = {
+							SaveData.bestPlaysStats.DistinctPlays,
+							SaveData.bestPlaysStats.DistinctClears,
+							SaveData.bestPlaysStats.DistinctClears,
+							SaveData.bestPlaysStats.DistinctFCs,
+							SaveData.bestPlaysStats.DistinctPerfects
+						};
+
+						var _count = _values[_aimedStatus];
+						var statusString = GetRequiredClearStatus(_aimedStatus);
+
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDISTINCT", statusString, this.Values[0], _count);
+					}
 				case "dp": {
 						var _aimedDifficulty = this.Values[0];
 						var _aimedStatus = this.Values[1];
@@ -432,6 +459,22 @@ class DBUnlockables {
 
 			var bpDistinctCharts = OpenTaiko.SaveFileInstances[player].data.bestPlaysDistinctCharts;
 			var chartStats = OpenTaiko.SaveFileInstances[player].data.bestPlaysStats;
+
+			if (this.Condition == "sd") {
+				_aimedStatus = this.Values[1];
+
+				int[] _values = {
+					chartStats.DistinctPlays,
+					chartStats.DistinctClears,
+					chartStats.DistinctClears,
+					chartStats.DistinctFCs,
+					chartStats.DistinctPerfects
+				};
+
+				if (_aimedStatus < (int)EClearStatus.NONE || _aimedStatus >= (int)EClearStatus.TOTAL) return 0;
+
+				return (_values[_aimedStatus]);
+			}
 
 			switch (this.Condition) {
 				case "dp":
