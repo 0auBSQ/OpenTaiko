@@ -502,6 +502,10 @@
 		// {1}: Current progress
 		"UNLOCK_CONDITION_PLAY": "游玩 {0} 首歌曲以解锁该物品！（{1}／{0}）", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: Total plays needed
+		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress

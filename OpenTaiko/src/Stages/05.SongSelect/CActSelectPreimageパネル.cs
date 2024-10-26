@@ -61,8 +61,8 @@ internal class CActSelectPreimageパネル : CActivity {
 		return 0;
 	}
 
-	public CTexture? tGenerateAndGetPreimage(CScore? cScoreInst) {
-		this.tUpdatePreimage(cScoreInst);
+	public CTexture? tGenerateAndGetPreimage(CSongListNode cScoreInst) {
+		this.tUpdatePreimage(cScoreInst?.score[0] ?? null);
 		return tGetPreimageTextureResized();
 	}
 
