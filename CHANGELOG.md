@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.4] - 2024-10-27 (Beta)
+
+- Deprecate unused textures
+- Fix tall preimages not being scaled correctly
+- Fix Sort Songs menu not updating lang values
+
 ## [0.6.0.3] - 2024-10-27 (Beta)
 
 - Fix wrong roll speed in non
