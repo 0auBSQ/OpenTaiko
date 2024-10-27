@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.2] - 2024-10-27 (Beta)
+
+- Fix crash due to undefined mob, dancer, & runner
+
 ## [0.6.0.1] - 2024-10-27 (Beta)
 
 - Fix Mob, Dancer, Runner appearing despite empty array on the scene preset
