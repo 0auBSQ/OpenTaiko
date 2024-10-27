@@ -76,10 +76,11 @@ internal class CActSelectPreimageパネル : CActivity {
 
 			float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Width;
 			float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Height;
+			float bestRatio = Math.Min(xRatio, yRatio);
 
 			this.rCurrentlyDisplayedPreimage.Opacity = 255;
-			this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = xRatio;
-			this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = xRatio;
+			this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = bestRatio;
+			this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = bestRatio;
 
 		}
 		return rCurrentlyDisplayedPreimage;
@@ -148,10 +149,11 @@ internal class CActSelectPreimageパネル : CActivity {
 
 				float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Width;
 				float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Height;
+				float bestRatio = Math.Min(xRatio, yRatio);
 
 				this.rCurrentlyDisplayedPreimage.Opacity = (int)(255f * num3);
-				this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = num4 * xRatio;
-				this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = num4 * xRatio;
+				this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = num4 * bestRatio;
+				this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = num4 * bestRatio;
 
 				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong);
 
