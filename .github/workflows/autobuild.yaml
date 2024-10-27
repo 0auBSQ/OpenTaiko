@@ -162,7 +162,7 @@ jobs:
           prerelease: false
 
       - name: Upload All Builds
-        uses: xresloader/upload-to-github-release@v1.4.2
+        uses: xresloader/upload-to-github-release@v1.6.0
         with:
           file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
           overwrite: true
