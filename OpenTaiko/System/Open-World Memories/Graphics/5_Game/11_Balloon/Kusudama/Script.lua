@@ -105,7 +105,7 @@ end
 function draw()
 
     func:SetOpacity(fadeValue * 255, "Kusudama_Back.png")
-    func:DrawGraph(0, 0, "Kusudama_Back.png")
+    func:DrawRectGraph(0, 0, 0, 0, 1920, 1080, "Kusudama_Back.png")
 
     -- Into Kusudama
     if kusuState == 1 then

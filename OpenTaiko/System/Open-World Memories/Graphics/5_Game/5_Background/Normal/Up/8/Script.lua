@@ -44,7 +44,7 @@ function draw()
         if player == 1 then
             y = 804
         end
-        func:DrawGraph(0, y, "BG.png")
+        func:DrawRectGraph(0, y, 0, 0, 1920, 288, "BG.png")
         for i = 0, 3 do
         func:DrawGraph((ribbon0LoopWidth * i) - ribbon0ScrollX, y, "Ribbon0.png")
         func:DrawGraph((ribbon1LoopWidth * i) - ribbon1ScrollX, y, "Ribbon1.png")
