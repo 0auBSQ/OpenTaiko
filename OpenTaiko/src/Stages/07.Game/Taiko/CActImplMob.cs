@@ -20,7 +20,7 @@ internal class CActImplMob : CActivity {
 			Random random = new Random();
 
 			var upDirs = System.IO.Directory.GetDirectories(mobDir);
-			if (preset.MobSet != null) {
+			if (preset.MobSet.Length > 0 && preset.MobSet != null) {
 				var _presetPath = (preset.MobSet.Length > 0) ? $@"{mobDir}" + preset.MobSet[random.Next(0, preset.MobSet.Length)] : "";
 				var path = Directory.Exists(_presetPath)
 					? _presetPath

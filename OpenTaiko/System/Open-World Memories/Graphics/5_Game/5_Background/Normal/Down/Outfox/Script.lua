@@ -53,9 +53,9 @@ function draw()
     func:SetOpacity(bgClearFade, "Down_Clear.png");
     func:SetBlendMode("Add", "Tile.png");
 
-    func:DrawGraph(0, 540, bgPath);
+    func:DrawRectGraph(0, 540, 0, 0, 1920, effectLoopHeight, bgPath);
 
-    func:DrawGraph(0, 540, "Down_Clear.png");
+    func:DrawRectGraph(0, 540, 0, 0, 1920, effectLoopHeight, "Down_Clear.png");
 
     func:DrawRectGraph(0, 540, 0, effectScrollY, 1920, effectLoopHeight, "Tile.png");
 end

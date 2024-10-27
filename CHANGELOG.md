@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0.1] - 2024-10-27 (Beta)
+
+- Fix Mob, Dancer, Runner appearing despite empty array on the scene preset
+- Chapter IV nameplates and make Chapter III all
+- songs nameplates accessible (condition changed from 999 songs to 34)
+- Japanese translations for some nameplates
+
 ## [0.6.0.0] - 2024-10-26 (Beta)
 
 The first Beta version of OpenTaiko, including multiple structural changes!
