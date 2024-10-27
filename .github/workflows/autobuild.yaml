@@ -34,7 +34,7 @@ jobs:
         id: get-latest-commit
         run: |
           $latestCommitMessage = git log -1 --pretty=format:%s
-          echo "latest_commit_message=$latestCommitMessage" >> $GITHUB_OUTPUT
+          echo "latest_commit_message=$latestCommitMessage" >> $GITHUB_ENV
 
       - name: Extract version from commit message
         id: extract-version
@@ -42,10 +42,10 @@ jobs:
           if ('${{ steps.get-latest-commit.outputs.latest_commit_message }}' -match '^(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s-\s') {
             $version = $matches['version']
             Write-Host "Extracted version is: $version"
-            echo "version=$version" >> $GITHUB_OUTPUT
+            echo "version=$version" >> $GITHUB_ENV
           } else {
             Write-Host "No valid version found in the latest commit message. Skipping bump."
-            echo "version=" >> $GITHUB_OUTPUT
+            echo "version=" >> $GITHUB_ENV
           }
 
       - name: Bump OpenTaiko version if necessary
@@ -65,13 +65,13 @@ jobs:
         id: get-date
         run: |
           $date = Get-Date -Format "yyyy-MM-dd"
-          echo "date=$date" >> $GITHUB_OUTPUT
+          echo "date=$date" >> $GITHUB_ENV
 
       - name: Get changelogs from commit description
         id: get-commit-message
         run: |
           $message = git log -1 --pretty=%b
-          echo "message=$message" >> GITHUB_OUTPUT
+          echo "message=$message" >> $GITHUB_ENV
 
       - name: Update CHANGELOG.md
         run: |
