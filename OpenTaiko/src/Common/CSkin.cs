@@ -764,8 +764,15 @@ internal class CSkin : IDisposable {
 	/// 3. System/ (従来互換)
 	/// </summary>
 	public void ReloadSkinPaths() {
-		#region [ まず System/*** をenumerateする ]
+		#region [ Enumerate System ]
+		if (!Directory.Exists(strSystemSkinRoot))
+			throw new DirectoryNotFoundException("OpenTaiko could not find the System folder, which contains the skin(s) needed to load the game.");
+
 		string[] tempSkinSubfolders = System.IO.Directory.GetDirectories(strSystemSkinRoot, "*");
+
+		if (tempSkinSubfolders.Length == 0)
+			throw new DirectoryNotFoundException("OpenTaiko found the System folder, but could not find any skin(s) to load.");
+
 		strSystemSkinSubfolders = new string[tempSkinSubfolders.Length];
 		int size = 0;
 		for (int i = 0; i < tempSkinSubfolders.Length; i++) {
