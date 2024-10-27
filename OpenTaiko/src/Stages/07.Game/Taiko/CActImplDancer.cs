@@ -35,7 +35,7 @@ internal class CActImplDancer : CActivity {
 		var dancerOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.DANCER}");
 		if (Directory.Exists($@"{dancerOrigindir}")) {
 			var dirs = Directory.GetDirectories($@"{dancerOrigindir}");
-			if (preset.DancerSet.Length > 0 && preset.DancerSet != null) {
+			if (preset.DancerSet?.Length > 0) {
 				var _presetPath = (preset.DancerSet.Length > 0) ? $@"{dancerOrigindir}" + preset.DancerSet[random.Next(0, preset.DancerSet.Length)] : "";
 				var path = (Directory.Exists(_presetPath))
 					? _presetPath

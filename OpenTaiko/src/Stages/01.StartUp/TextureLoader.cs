@@ -142,7 +142,6 @@ class TextureLoader {
 		#endregion
 
 		#region 1_タイトル画面
-		//Title_Background = TxC(TITLE + @$"Background.png");
 		Entry_Bar = TxC(TITLE + @$"Entry_Bar.png");
 		Entry_Bar_Text = TxC(TITLE + @$"Entry_Bar_Text.png");
 
@@ -152,9 +151,6 @@ class TextureLoader {
 
 		Banapas_Load_Clear[0] = TxC(TITLE + @$"Banapas_Load_Clear.png");
 		Banapas_Load_Clear[1] = TxC(TITLE + @$"Banapas_Load_Clear_Anime.png");
-
-		Banapas_Load_Failure[0] = TxC(TITLE + @$"Banapas_Load_Failure.png");
-		Banapas_Load_Failure[1] = TxC(TITLE + @$"Banapas_Load_Clear_Anime.png");
 
 		Entry_Player[0] = TxC(TITLE + @$"Entry_Player.png");
 		Entry_Player[1] = TxC(TITLE + @$"Entry_Player_Select_Bar.png");
@@ -196,7 +192,6 @@ class TextureLoader {
 		SongSelect_Coin_Slot[2] = TxC(SONGSELECT + @$"Coin_Slot_4P.png");
 		SongSelect_Coin_Slot[3] = TxC(SONGSELECT + @$"Coin_Slot_5P.png");
 
-		SongSelect_Auto = TxC(SONGSELECT + @$"Auto.png");
 		SongSelect_Level = TxC(SONGSELECT + @$"Level.png");
 		SongSelect_Branch = TxC(SONGSELECT + @$"Branch.png");
 		SongSelect_Branch_Text = TxC(SONGSELECT + @$"Branch_Text.png");
@@ -431,10 +426,6 @@ class TextureLoader {
 			OpenTaiko.Skin.Game_SkinScenes = ConfigManager.GetConfig<DBSkinPreset.SkinPreset>(_presetsDefs);
 		else
 			OpenTaiko.Skin.Game_SkinScenes = new DBSkinPreset.SkinPreset();
-
-		#endregion
-
-		#region Mob
 
 		#endregion
 
@@ -707,19 +698,6 @@ class TextureLoader {
 
 		#endregion
 
-		#region ClearFailed
-
-		Failed_Game = TxC(GAME + FAILED + @$"Game.png");
-		Failed_Stage = TxC(GAME + FAILED + @$"Stage.png");
-
-		#endregion
-
-		#region Runner
-
-		//Runner = TxC(GAME + RUNNER + @$"0.png");
-
-		#endregion
-
 		#region DanC
 
 		DanC_Background = TxC(GAME + DANC + @$"Background.png");
@@ -945,10 +923,6 @@ class TextureLoader {
 		for (int i = 0; i < 3; i++)
 			Result_Crown[i] = TxC(RESULT + @$"Crown{Path.DirectorySeparatorChar}Crown_" + i.ToString() + ".png");
 
-		#endregion
-
-		#region 7_終了画面
-		//Exit_Background = TxC(EXIT + @$"Background.png");
 		#endregion
 
 		#region 7_AIResults

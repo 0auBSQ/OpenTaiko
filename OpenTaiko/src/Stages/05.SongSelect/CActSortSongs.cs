@@ -5,6 +5,9 @@ internal class CActSortSongs : CActSelectPopupMenu {
 	// Constructor
 
 	public CActSortSongs() {
+	}
+
+	public override void Activate() {
 		List<CItemBase> lci = new List<CItemBase>();
 		lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_PATH"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
 		lci.Add(new CItemList(CLangManager.LangInstance.GetString("SONGSELECT_SORT_TITLE"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "Z,Y,X,...", "A,B,C,..." }));
@@ -15,8 +18,8 @@ internal class CActSortSongs : CActSelectPopupMenu {
 #endif
 		lci.Add(new CItemList(CLangManager.LangInstance.GetString("MENU_RETURN"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 		base.Initialize(lci, false, CLangManager.LangInstance.GetString("SONGSELECT_SORT"));
+		base.Activate();
 	}
-
 
 	// メソッド
 	public void tActivatePopupMenu(EInstrumentPad einst, ref CActSelect曲リスト ca) {

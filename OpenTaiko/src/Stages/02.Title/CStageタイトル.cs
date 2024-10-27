@@ -181,7 +181,7 @@ internal class CStageタイトル : CStage {
 				*/
 
 				// 1st step (Save file loading)
-				if (!bSaveIsLoading && !bSaveFailedToLoad) {
+				if (!bSaveIsLoading) {
 
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
 						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
@@ -341,7 +341,7 @@ internal class CStageタイトル : CStage {
 			if (bSaveFileLoaded == false) {
 				#region [ Save Loading ]
 
-				if (!bSaveIsLoading && !bSaveFailedToLoad) {
+				if (!bSaveIsLoading) {
 					OpenTaiko.Tx.Entry_Bar.t2D描画(0, 0);
 
 					if (this.ctコインイン待機.CurrentValue <= 255)
@@ -393,26 +393,6 @@ internal class CStageタイトル : CStage {
 								}
 							}
 
-						}
-						if (bSaveFailedToLoad) {
-							OpenTaiko.Tx.Tile_Black.Opacity = this.ctSaveLoadingFailed.CurrentValue <= 1000 ? 128 : 128 - (this.ctSaveLoadingFailed.CurrentValue - 1000);
-
-							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
-								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
-
-							if (!OpenTaiko.Skin.soundError.bPlayed)
-								OpenTaiko.Skin.soundError.tPlay();
-
-							int count = this.ctSaveLoadingFailed.CurrentValue;
-							OpenTaiko.Tx.Banapas_Load_Failure[0].Opacity = count >= 872 ? 255 - (count - 872) * 2 : count * 2;
-							OpenTaiko.Tx.Banapas_Load_Failure[0].vcScaleRatio.Y = count <= 100 ? count * 0.01f : 1.0f;
-							OpenTaiko.Tx.Banapas_Load_Failure[0].t2D描画(0, 0);
-
-							if (ctSaveLoadingFailed.CurrentValue >= 1128) {
-								bSaveFailedToLoad = false;
-								OpenTaiko.Skin.soundError.bPlayed = false;
-							}
 						}
 					} else {
 						if (bSaveIsLoading) {
@@ -941,7 +921,6 @@ internal class CStageタイトル : CStage {
 		this.ctBarMove.CurrentValue = 250;
 
 		this.bSaveIsLoading = false;
-		this.bSaveFailedToLoad = false;
 		this.bプレイヤーエントリー = false;
 		this.bプレイヤーエントリー決定 = false;
 		this.bモード選択 = false;
@@ -982,7 +961,6 @@ internal class CStageタイトル : CStage {
 	private int usedMenusCount;
 
 	private bool bSaveIsLoading;
-	private bool bSaveFailedToLoad;
 	private bool bプレイヤーエントリー;
 	private bool bプレイヤーエントリー決定;
 	private bool bモード選択;
