@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.6] - 2024-10-28 (Beta)
+
+- Add optional offset values for characters on menus and result screen
+
 ## [0.6.0.5] - 2024-10-28 (Beta)
 
 - Fix big note judgement preventing early BAD of big notes in Easy window
