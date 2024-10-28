@@ -1093,6 +1093,8 @@ class TextureLoader {
 		OpenTaiko.Skin.Characters_Resolution = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_Heya_Render_Offset = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_UseResult1P = new bool[OpenTaiko.Skin.Characters_Ptn];
+		OpenTaiko.Skin.Characters_Menu_Offset = new int[OpenTaiko.Skin.Characters_Ptn][];
+		OpenTaiko.Skin.Characters_Result_Offset = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_X = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_Y = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_4P = new int[OpenTaiko.Skin.Characters_Ptn][];
@@ -1679,6 +1681,8 @@ class TextureLoader {
 
 			#region [Default values]
 
+			OpenTaiko.Skin.Characters_Menu_Offset[i] = new int[] { 0, 0 };
+			OpenTaiko.Skin.Characters_Result_Offset[i] = new int[] { 0, 0 };
 			OpenTaiko.Skin.Characters_X[i] = new int[] { 0, 0 };
 			OpenTaiko.Skin.Characters_Y[i] = new int[] { 0, 537 };
 			OpenTaiko.Skin.Characters_4P[i] = new int[] { 165, 68 };
@@ -1782,6 +1786,20 @@ class TextureLoader {
 							strParam = strArray[1].Trim();
 
 							switch (strCommand) {
+								case "Menu_Offset": {
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Menu_Offset[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
+									}
+								case "Result_Offset": {
+										string[] strSplit = strParam.Split(',');
+										for (int k = 0; k < 2; k++) {
+											OpenTaiko.Skin.Characters_Result_Offset[i][k] = int.Parse(strSplit[k]);
+										}
+										break;
+									}
 								case "Game_Chara_X": {
 										string[] strSplit = strParam.Split(',');
 										for (int k = 0; k < 2; k++) {
