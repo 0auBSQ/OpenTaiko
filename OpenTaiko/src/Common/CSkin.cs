@@ -7753,6 +7753,8 @@ internal class CSkin : IDisposable {
 	public int[][] Characters_Resolution;
 	public int[][] Characters_Heya_Render_Offset;
 	public bool[] Characters_UseResult1P;
+	public int[][] Characters_Menu_Offset;
+	public int[][] Characters_Result_Offset;
 	public int[][] Characters_X;
 	public int[][] Characters_Y;
 	public int[][] Characters_4P;
