@@ -1,3 +1,5 @@
+# Original script from totoa553/OpenTaiko and DragonRatTiger/OpenTaiko
+
 name: Build OpenTaiko
 
 on:
@@ -10,6 +12,8 @@ jobs:
     runs-on: windows-latest
 
     permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
       contents: write
 
     steps:
@@ -101,3 +105,67 @@ jobs:
 
           # Write updated content back to CHANGELOG.md
           Set-Content -Path $changelogPath -Value $changelog
+
+      - name: Commit CHANGELOG.md and OpenTaiko.csproj changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add OpenTaiko/OpenTaiko.csproj
+          git add CHANGELOG.md
+          git commit -m "Update changelog for version $env.version"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+
+      - name: Build for Windows x64
+        shell: cmd
+        run: |
+          build-win-x64.bat
+
+      - name: Create Archive (Win x64)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net8.0\win-x64\
+          7z a ../../../../../OpenTaiko.Win.x64.zip publish/ -xr!publish/Songs/ -xr!publish/FFmpeg/ -xr!publish/System/ -xr!publish/Libs/
+          7z u ../../../../../OpenTaiko.Win.x64.zip "publish/Libs/win-x64/*" "publish/FFmpeg/win-x64/*" "publish/Songs/L2 Custom Charts/*" "publish/Songs/L3 Downloaded Songs/*" "publish/Songs/S1 Dan-i Dojo/box.def" "publish/Songs/S2 Taiko Towers/box.def" "publish/Songs/X1 Favorite/*" "publish/Songs/X2 Recent/*" "publish/Songs/X3 Search By Difficulty/*"
+          cd ..\..\..\..\..\
+
+      - name: Build for Linux x64
+        shell: cmd
+        run: |
+          build-linux-x64.bat
+
+      - name: Create Archive (Linux x64)
+        shell: cmd
+        run: |
+          cd OpenTaiko\bin\Release\net8.0\linux-x64\
+          7z a ../../../../../OpenTaiko.Linux.x64.zip publish/ -xr!publish/Songs/ -xr!publish/FFmpeg/ -xr!publish/System/ -xr!publish/Libs/
+          7z u ../../../../../OpenTaiko.Linux.x64.zip "publish/Libs/linux-x64/*" "publish/FFmpeg/linux-x64/*" "publish/Songs/L2 Custom Charts/*" "publish/Songs/L3 Downloaded Songs/*" "publish/Songs/S1 Dan-i Dojo/box.def" "publish/Songs/S2 Taiko Towers/box.def" "publish/Songs/X1 Favorite/*" "publish/Songs/X2 Recent/*" "publish/Songs/X3 Search By Difficulty/*"
+          cd ..\..\..\..\..\
+
+      - name: Check if tag exists
+        uses: mukunku/tag-exists-action@v1.6.0
+        id: check-tag
+        with:
+          tag: $env:version
+
+      - name: Create Release
+        if: steps.check-tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: $env.version
+          release_name: OpenTaiko v$env.version
+          body: |
+            Note: The releases do not contain skins nor songs.
+            Please download/update through the OpenTaiko Hub: https://github.com/OpenTaiko/OpenTaiko-Hub/releases
+          draft: false
+          prerelease: false
+
+      - name: Upload All Builds
+        uses: xresloader/upload-to-github-release@v1.6.0
+        with:
+          file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
+          overwrite: true
+          tag_name: $env.version
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}
