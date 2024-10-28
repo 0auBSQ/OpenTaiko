@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.5] - 2024-10-28 (Beta)
+
+- Fix big note judgement preventing early BAD of big notes in Easy window
+
 ## [0.6.0.4] - 2024-10-27 (Beta)
 
 - Deprecate unused textures
