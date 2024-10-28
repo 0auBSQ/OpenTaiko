@@ -620,10 +620,10 @@ internal class CTja : CActivity {
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
-	public int nOFFSET = 0;
-	private bool bOFFSETの値がマイナスである = false;
-	private int nMOVIEOFFSET = 0;
-	private bool bMOVIEOFFSETの値がマイナスである = false;
+	public int msOFFSET_Abs = 0; // from initial measure to music begin
+	private bool isOFFSET_Negative = false;
+	private int msMOVIEOFFSET_Abs = 0; // from music begin to video begin
+	private bool isMOVIEOFFSET_Negative = false;
 	private double dbNowBPM = 120.0;
 	private int nDELAY = 0;
 
@@ -763,8 +763,8 @@ internal class CTja : CActivity {
 		this.BACKGROUND_GR = "";
 		this.PATH_WAV = "";
 		this.BPM = 120.0;
-		this.nOFFSET = OpenTaiko.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
-		this.bOFFSETの値がマイナスである = nOFFSET < 0;
+		this.msOFFSET_Abs = OpenTaiko.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
+		this.isOFFSET_Negative = msOFFSET_Abs < 0;
 		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 		stdgbvalue.Drums = 0;
 		stdgbvalue.Guitar = 0;
@@ -1421,8 +1421,8 @@ internal class CTja : CActivity {
 						case 0x01: {
 								n発声位置 = chip.n発声位置;
 
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 
 								#region[listlyric2の時間合わせ]
@@ -1444,8 +1444,8 @@ internal class CTja : CActivity {
 						case 0x02:  // BarLength
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								dbBarLength = chip.db実数値;
 								continue;
@@ -1453,8 +1453,8 @@ internal class CTja : CActivity {
 						case 0x03:  // BPM
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								bpm = this.BASEBPM + chip.n整数値;
 								this.dbNowBPM = bpm;
@@ -1471,15 +1471,15 @@ internal class CTja : CActivity {
 						case 0x1D:
 						case 0x20:
 						case 0x21: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.nNoteEndTimems += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x18: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1493,8 +1493,8 @@ internal class CTja : CActivity {
 							break;
 
 						case 0x50: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								if (this.n内部番号BRANCH1to + 1 > this.listBRANCH.Count)
 									continue;
 
@@ -1520,8 +1520,8 @@ internal class CTja : CActivity {
 						case 0x08:  // 拡張BPM
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
 									bpm = (cBPM.n表記上の番号 == 0 ? 0.0 : this.BASEBPM) + cBPM.dbBPM値;
@@ -1531,27 +1531,27 @@ internal class CTja : CActivity {
 							}
 						case 0x54:  // 動画再生
 						{
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
-								if (this.bMOVIEOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nMOVIEOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+								if (this.isMOVIEOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msMOVIEOFFSET_Abs;
 								else
-									chip.n発声時刻ms -= this.nMOVIEOFFSET;
+									chip.n発声時刻ms -= this.msMOVIEOFFSET_Abs;
 								continue;
 							}
 						case 0x97:
 						case 0x98:
 						case 0x99: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.nNoteEndTimems += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x9A: {
 
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1559,37 +1559,37 @@ internal class CTja : CActivity {
 								continue;
 							}
 						case 0xDC: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xDE: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.n分岐時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.n分岐時刻ms += this.msOFFSET_Abs;
 								}
 								this.n現在のコース = chip.nBranch;
 								continue;
 							}
 						case 0x52: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.n分岐時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.n分岐時刻ms += this.msOFFSET_Abs;
 								}
 								this.n現在のコース = chip.nBranch;
 								continue;
 							}
 						case 0xDF: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xE0: {
 								continue;
 							}
 						default: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								chip.dbBPM = this.dbNowBPM;
 								continue;
 							}
@@ -2196,10 +2196,10 @@ internal class CTja : CActivity {
 
 			var chip1 = new CChip();
 			chip1.nChannelNo = 0x54;
-			if (this.nMOVIEOFFSET == 0)
+			if (this.msMOVIEOFFSET_Abs == 0)
 				chip1.n発声時刻ms = (int)this.dbNowTime;
 			else
-				chip1.n発声時刻ms = (int)this.nMOVIEOFFSET;
+				chip1.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
 			chip1.dbBPM = this.dbNowBPM;
 			chip1.fNow_Measure_m = this.fNow_Measure_m;
 			chip1.fNow_Measure_s = this.fNow_Measure_s;
@@ -4567,8 +4567,8 @@ internal class CTja : CActivity {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
-			nNextSongOffset += nOFFSET;
-			var delayTime = 6200.0 + nOFFSET; // 6.2秒ディレイ
+			nNextSongOffset += msOFFSET_Abs;
+			var delayTime = 6200.0 + msOFFSET_Abs; // 6.2秒ディレイ
 											  //チップ追加して割り込んでみる。
 			var chip = new CChip();
 
@@ -4578,7 +4578,7 @@ internal class CTja : CActivity {
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
 			this.dbNowTime += delayTime;
-			this.dbNowBMScollTime += (delayTime - nOFFSET) * this.dbNowBPM / 15000;
+			this.dbNowBMScollTime += (delayTime - msOFFSET_Abs) * this.dbNowBPM / 15000;
 			chip.n整数値_内部番号 = 0;
 			chip.nBranch = this.n現在のコース;
 
@@ -5490,23 +5490,23 @@ internal class CTja : CActivity {
 				}
 			}
 		} else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam)) {
-			this.nOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.msOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
 
-			this.bOFFSETの値がマイナスである = this.nOFFSET < 0 ? true : false;
+			this.isOFFSET_Negative = this.msOFFSET_Abs < 0 ? true : false;
 
 			this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
-			if (this.bOFFSETの値がマイナスである == true)
-				this.nOFFSET = this.nOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
+			if (this.isOFFSET_Negative == true)
+				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 												  //tbOFFSET.Text = strCommandParam;
 
 			// Substract global offset
-			this.nOFFSET += ((this.bOFFSETの値がマイナスである == true) ? -OpenTaiko.ConfigIni.nGlobalOffsetMs : OpenTaiko.ConfigIni.nGlobalOffsetMs);
+			this.msOFFSET_Abs += ((this.isOFFSET_Negative == true) ? -OpenTaiko.ConfigIni.nGlobalOffsetMs : OpenTaiko.ConfigIni.nGlobalOffsetMs);
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
-			this.nMOVIEOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
-			this.bMOVIEOFFSETの値がマイナスである = this.nMOVIEOFFSET < 0 ? true : false;
+			this.msMOVIEOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
 
-			if (this.bMOVIEOFFSETの値がマイナスである == true)
-				this.nMOVIEOFFSET = this.nMOVIEOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
+			if (this.isMOVIEOFFSET_Negative == true)
+				this.msMOVIEOFFSET_Abs = this.msMOVIEOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 															//tbOFFSET.Text = strCommandParam;
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]

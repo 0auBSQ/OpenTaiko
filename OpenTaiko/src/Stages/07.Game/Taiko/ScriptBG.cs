@@ -257,7 +257,7 @@ class ScriptBG : IDisposable {
 				// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
 				timestamp = (((double)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0) +
-							(-(OpenTaiko.ConfigIni.MusicPreTimeMs + OpenTaiko.TJA.nOFFSET) / 1000.0) +
+							(-(OpenTaiko.ConfigIni.MusicPreTimeMs + OpenTaiko.TJA.msOFFSET_Abs) / 1000.0) +
 							timeoffset;
 			}
 

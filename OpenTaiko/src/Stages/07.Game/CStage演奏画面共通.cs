@@ -4287,7 +4287,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		float bpm_time = 0;
 		int last_input = 0;
 		float last_bpm_change_time;
-		play_time = SoundManager.PlayTimer.NowTimeMs * (float)OpenTaiko.ConfigIni.SongPlaybackSpeed - tja.nOFFSET;
+		play_time = SoundManager.PlayTimer.NowTimeMs * (float)OpenTaiko.ConfigIni.SongPlaybackSpeed - tja.msOFFSET_Abs;
 
 		for (int i = 1; ; i++) {
 			//BPMCHANGEの数越えた
