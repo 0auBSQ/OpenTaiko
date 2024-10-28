@@ -970,6 +970,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return _timingzonesAreEasy;
 	}
 
+	protected CConfigIni.CTimingZones GetTimingZones(int idxPlayerActual) {
+		// To change later to adapt to Tower Ama-kuchi
+		//diff = Math.Min(diff, (int)Difficulty.Oni);
+
+		int timingShift = OpenTaiko.ConfigIni.nTimingZones[idxPlayerActual];
+
+		bool _timingzonesAreEasy = tEasyTimeZones(idxPlayerActual);
+
+		return (_timingzonesAreEasy == true) ? OpenTaiko.ConfigIni.tzLevels[timingShift] : OpenTaiko.ConfigIni.tzLevels[2 + timingShift];
+	}
+
 	private void tIncreaseComboDan(int danSong) {
 		this.nCombo[danSong]++;
 		if (this.nCombo[danSong] > this.nHighestCombo[danSong])
@@ -992,18 +1003,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 
-
-
-			// To change later to adapt to Tower Ama-kuchi
-			//diff = Math.Min(diff, (int)Difficulty.Oni);
-
 			int actual = OpenTaiko.GetActualPlayer(player);
-
-			int timingShift = OpenTaiko.ConfigIni.nTimingZones[actual];
-
-			bool _timingzonesAreEasy = tEasyTimeZones(player);
-
-			CConfigIni.CTimingZones tz = (_timingzonesAreEasy == true) ? OpenTaiko.ConfigIni.tzLevels[timingShift] : OpenTaiko.ConfigIni.tzLevels[2 + timingShift];
+			CConfigIni.CTimingZones tz = GetTimingZones(actual);
 
 			if (nDeltaTime <= tz.nGoodZone * OpenTaiko.ConfigIni.SongPlaybackSpeed) {
 				return ENoteJudge.Perfect;

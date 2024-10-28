@@ -1215,14 +1215,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 							// Process big notes (judge big notes on)
 							if (e判定 != ENoteJudge.Miss && ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga)) {
+								CConfigIni.CTimingZones tz = this.GetTimingZones(nUsePlayer);
 								double divided_songspeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 								float time = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed);
 								int nWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
 
-								bool _timeB110 = time <= 110;
+								bool _timeBadOrLater = time <= tz.nBadZone;
 
 								if (chipNoHit.eNoteState == ENoteState.None) {
-									if (_timeB110) {
+									if (_timeBadOrLater) {
 										chipNoHit.nProcessTime = (int)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed);
 										chipNoHit.eNoteState = ENoteState.Wait;
 										//this.nWaitButton = waitInstr;
@@ -1233,10 +1234,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 									bool _isExpected = NotesManager.IsExpectedPad(this.nStoredHit[nUsePlayer], (int)_pad, chipNoHit, _gt);
 
 									// Double tap success
-									// (this.nWaitButton == waitRec && _timeB110 && chipNoHit.nProcessTime
-									//   + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
-
-									if (_isExpected && _timeB110 && chipNoHit.nProcessTime
+									if (_isExpected && _timeBadOrLater && chipNoHit.nProcessTime
 										+ nWaitTime > (int)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed)) {
 										this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
 										bHitted = true;
@@ -1245,9 +1243,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 									}
 
 									// Double tap failure
-									// else if (this.nWaitButton == waitInstr && _timeB110 && chipNoHit.nProcessTime
-									//    + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻ms * divided_songspeed))
-									else if (!_isExpected || (_timeB110 && chipNoHit.nProcessTime
+									else if (!_isExpected || (_timeBadOrLater && chipNoHit.nProcessTime
 												 + nWaitTime < (int)(SoundManager.PlayTimer.NowTimeMs * divided_songspeed))) {
 										if (!_isPinkKonga) {
 											this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
@@ -1329,271 +1325,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					bHitted = true;
 				}
 
-
-
-				#region [ (A) ヒットしていればヒット処理して次の inputEvent へ ]
-				//-----------------------------
-
-				#region [Legacy]
-
-				/*
-                switch (((Eパッド)nPad))
-                {
-                    case Eパッド.LRed:
-                    case Eパッド.LRed2P:
-                        #region[ 面のヒット処理 ]
-                        //-----------------------------
-                        {
-                        if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x11)
-                        {
-                                this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, false, nUsePlayer);
-                                bHitted = true;
-                            }
-                            if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, true, nUsePlayer);
-                                bHitted = true;
-                                this.nWaitButton = 0;
-                                break;
-                            }
-                            if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                if (chipNoHit.eNoteState == ENoteState.none)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    if (time <= 110)
-                                    {
-                                        chipNoHit.nProcessTime = (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                        chipNoHit.eNoteState = ENoteState.wait;
-                                        this.nWaitButton = 2;
-                                    }
-                                }
-                                else if (chipNoHit.eNoteState == ENoteState.wait)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
-                                    if (this.nWaitButton == 1 && time <= 110 && chipNoHit.nProcessTime + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, true, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                                    else if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, false, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                            }
-                        }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x15 || chipNoHit.nチャンネル番号 == 0x16 || chipNoHit.nチャンネル番号 == 0x17))
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.LRed, chipNoHit, false, nUsePlayer);
-                            }
-
-                            if (!bHitted)
-                                break;
-                            continue;
-                        }
-                    //-----------------------------
-                    #endregion
-                    case Eパッド.RRed:
-                    case Eパッド.RRed2P:
-                        #region[ 面のヒット処理 ]
-                        //-----------------------------
-                        {
-                        if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x11)
-                        {
-                                this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, false, nUsePlayer);
-                                bHitted = true;
-                            }
-                            if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && !TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, true, nUsePlayer);
-                                bHitted = true;
-                                this.nWaitButton = 0;
-                                break;
-                            }
-                            if (e判定 != E判定.Miss && (_isBigDonTaiko || chipNoHit.nチャンネル番号 == 0x1A) && TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                if (chipNoHit.eNoteState == ENoteState.none)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    if (time <= 110)
-                                    {
-                                        chipNoHit.nProcessTime = (int)CSound管理.rc演奏用タイマ.n現在時刻ms;
-                                        this.n待機中の大音符の座標 = chipNoHit.nバーからの距離dot.Taiko;
-                                        chipNoHit.eNoteState = ENoteState.wait;
-                                        this.nWaitButton = 1;
-                                    }
-                                }
-                                else if (chipNoHit.eNoteState == ENoteState.wait)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
-                                    if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, true, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                        break;
-                                    }
-                                    else if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, false, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                                }
-                            }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x15 || chipNoHit.nチャンネル番号 == 0x16 || chipNoHit.nチャンネル番号 == 0x17))
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.RRed, chipNoHit, false, nUsePlayer);
-                            }
-
-                            if (!bHitted)
-                                break;
-
-                            continue;
-                        }
-                    //-----------------------------
-                    #endregion
-
-                    case Eパッド.LBlue:
-                    case Eパッド.LBlue2P:
-                        #region[ ふちのヒット処理 ]
-                        //-----------------------------
-                        {
-
-
-
-                        if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x12)
-                        {
-                                this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, false, nUsePlayer);
-                                bHitted = true;
-                            }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x14 || chipNoHit.nチャンネル番号 == 0x1B) && !TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, true, nUsePlayer);
-                                bHitted = true;
-                                this.nWaitButton = 0;
-                                break;
-                            }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x14 || chipNoHit.nチャンネル番号 == 0x1B) && TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                if (chipNoHit.eNoteState == ENoteState.none)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    if (time <= 110)
-                                    {
-                                        chipNoHit.nProcessTime = (int)CSound管理.rc演奏用タイマ.n現在時刻ms;
-                                        chipNoHit.eNoteState = ENoteState.wait;
-                                        this.nWaitButton = 2;
-                                    }
-                                }
-                                else if (chipNoHit.eNoteState == ENoteState.wait)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
-                                    if (this.nWaitButton == 1 && time <= 110 && chipNoHit.nProcessTime + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, true, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                                    else if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, false, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                                }
-                        }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x15 || chipNoHit.nチャンネル番号 == 0x16))
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.LBlue, chipNoHit, false, nUsePlayer);
-                            }
-
-                            if (!bHitted)
-                                break;
-                            continue;
-                        }
-                    //-----------------------------
-                    #endregion
-
-                    case Eパッド.RBlue:
-                    case Eパッド.RBlue2P:
-                        #region[ ふちのヒット処理 ]
-                        //-----------------------------
-                        {
-                            if (e判定 != E判定.Miss && chipNoHit.nチャンネル番号 == 0x12)
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.RBlue, chipNoHit, false, nUsePlayer);
-                                bHitted = true;
-                            }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x14 || chipNoHit.nチャンネル番号 == 0x1B) && !TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.RBlue, chipNoHit, true, nUsePlayer);
-                                bHitted = true;
-                                this.nWaitButton = 0;
-                                break;
-                            }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x14 || chipNoHit.nチャンネル番号 == 0x1B) && TJAPlayer3.ConfigIni.b大音符判定)
-                            {
-                                if (chipNoHit.eNoteState == ENoteState.none)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    if (time <= 110)
-                                    {
-                                        chipNoHit.nProcessTime = (int)CSound管理.rc演奏用タイマ.n現在時刻ms;
-                                        this.n待機中の大音符の座標 = chipNoHit.nバーからの距離dot.Taiko;
-                                        chipNoHit.eNoteState = ENoteState.wait;
-                                        this.nWaitButton = 1;
-                                    }
-                                }
-                                else if (chipNoHit.eNoteState == ENoteState.wait)
-                                {
-                                    float time = chipNoHit.n発声時刻ms - (float)(CSound管理.rc演奏用タイマ.n現在時刻ms * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0));
-                                    int nWaitTime = TJAPlayer3.ConfigIni.n両手判定の待ち時間;
-                                    if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime > (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.RBlue, chipNoHit, true, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                        break;
-                                    }
-                                    else if (this.nWaitButton == 2 && time <= 110 && chipNoHit.nProcessTime + nWaitTime < (int)(CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0)))
-                                    {
-                                        this.tドラムヒット処理(nTime, Eパッド.RBlue, chipNoHit, false, nUsePlayer);
-                                        bHitted = true;
-                                        this.nWaitButton = 0;
-                                    }
-                            }
-                         }
-                            if (e判定 != E判定.Miss && (chipNoHit.nチャンネル番号 == 0x15 || chipNoHit.nチャンネル番号 == 0x16))
-                            {
-                                this.tドラムヒット処理(nTime, Eパッド.RBlue, chipNoHit, false, nUsePlayer);
-                            }
-
-                            if (!bHitted)
-                                break;
-                            continue;
-                        }
-                        //-----------------------------
-                        #endregion
-                }
-                */
-
-				#endregion
-
-				//2016.07.14 kairera0467 Adlibの場合、一括して処理を行う。
-
-
-				//-----------------------------
-				#endregion
-
-
-				#region [ (B) ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
+				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 				//-----------------------------
 				int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
 								// BAD or TIGHT 時の処理。
@@ -2235,9 +1967,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
 
 			if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko)) {
+				CConfigIni.CTimingZones tz = this.GetTimingZones(i);
 				float timeC = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				int nWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-				if (chipNoHit.eNoteState == ENoteState.Wait && timeC <= 110
+				if (chipNoHit.eNoteState == ENoteState.Wait && timeC <= tz.nBadZone
 															&& chipNoHit.nProcessTime + nWaitTime <= (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
 					if (!_isSwapNote) {
 						this.tドラムヒット処理(chipNoHit.nProcessTime, EPad.RRed, chipNoHit, false, i);
