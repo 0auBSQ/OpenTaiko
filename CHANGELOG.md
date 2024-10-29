@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.7] - 2024-10-29 (Beta)
+
+- Fix judge text drop frame when prev one remove
+
 ## [0.6.0.6] - 2024-10-28 (Beta)
 
 - Add optional offset values for characters on menus and result screen
