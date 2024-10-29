@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.9] - 2024-10-29 (Beta)
+
+- Fix crash when exiting title screen by Esc
+
 ## [0.6.0.8] - 2024-10-29 (Beta)
 
 - Additional Chinese and Russian translations
