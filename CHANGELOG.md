@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.8] - 2024-10-29 (Beta)
+
+- Additional Chinese and Russian translations
+
 ## [0.6.0.7] - 2024-10-29 (Beta)
 
 - Fix judge text drop frame when prev one remove
