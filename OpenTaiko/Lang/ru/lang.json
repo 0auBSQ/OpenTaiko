@@ -500,11 +500,11 @@
 		"UNLOCK_CONDITION_AIWIN": "Побеждайте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY": "Играйте {0} песн., чтобы разблокировать этот товар! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY": "Играйте {0} раз., чтобы разблокировать этот товар! ({1}/{0})", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} песн., чтобы разблокировать этот товар! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
