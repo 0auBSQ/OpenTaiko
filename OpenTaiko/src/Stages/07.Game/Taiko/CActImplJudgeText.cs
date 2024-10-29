@@ -34,7 +34,7 @@ internal class CActImplJudgeText : CActivity {
 				for (int i = 0; i < JudgeAnimes[j].Count; i++) {
 					var judgeC = JudgeAnimes[j][i];
 					if (judgeC.counter.CurrentValue == judgeC.counter.EndValue) {
-						JudgeAnimes[j].Remove(judgeC);
+						JudgeAnimes[j].RemoveAt(i--);
 						continue;
 					}
 					judgeC.counter.Tick();
