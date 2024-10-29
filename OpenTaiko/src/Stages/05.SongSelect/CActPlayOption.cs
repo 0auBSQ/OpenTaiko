@@ -138,37 +138,12 @@ internal class CActPlayOption : CActivity {
 
 
 
-	public int On進行描画(int player) {
+	public int On進行描画(int nPlayers, ReadOnlySpan<bool> bOptions) {
 		if (this.IsDeActivated)
 			return 0;
 
-		if (ctOpen.CurrentValue == 0)
-			Init(player);
-
-		ctOpen.Tick();
-		ctClose.Tick();
-
-		if (!ctOpen.IsTicked) ctOpen.Start(0, 50, 6, OpenTaiko.Timer);
-
 		var act難易度 = OpenTaiko.stageSongSelect.actDifficultySelectionScreen;
 		var danAct = OpenTaiko.stage段位選択.段位挑戦選択画面;
-
-		#region [ Open & Close ]
-
-		float oy1 = ctOpen.CurrentValue * 18;
-		float oy2 = (ctOpen.CurrentValue - 30) * 4;
-		float oy3 = ctOpen.CurrentValue < 30 ? 410 - oy1 : -80 + oy2;
-
-		float cy1 = ctClose.CurrentValue * 3;
-		float cy2 = (ctClose.CurrentValue - 20) * 16;
-		float cy3 = ctClose.CurrentValue < 20 ? 0 - cy1 : 20 + cy2;
-
-		float y = oy3 + cy3;
-
-		#endregion
-
-
-
 
 		var _textures = new CTexture[]
 		{
@@ -186,124 +161,167 @@ internal class CActPlayOption : CActivity {
 			txFunMods[nFunMods],
 		};
 
-		var pos = player % 2;
-		var _shift = pos == 1 ? (OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
-		var _rect = new Rectangle(_shift, 0, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Height);
+		// menu key input, for the lowest-index player who is modifying play options
+		bool leftMenu = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+		bool rightMenu = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+		bool centerMenu = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
+			(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+		bool upMenu = (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow));
+		bool downMenu = (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow));
+		bool cancelMenu = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 
-		OpenTaiko.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
-		OpenTaiko.Tx.Difficulty_Option_Select.t2D描画(_shift + OpenTaiko.Skin.SongSelect_Option_Select_Offset[0] + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[0],
-			OpenTaiko.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[1], _rect);
-
-		for (int i = 0; i < OptionType.Length; i++) {
-			OptionType[i].t2D描画(OpenTaiko.Skin.SongSelect_Option_OptionType_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
-				OpenTaiko.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
-		}
-
-		txModMults[0]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults1_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
-		txModMults[1]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults2_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
-
-		for (int i = 0; i < _textures.Length; i++) {
-			_textures[i]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_Value_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
-				OpenTaiko.Skin.SongSelect_Option_Value_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
-		}
-
-		if (ctClose.CurrentValue >= 50) {
-			Decision(player);
-			NowCount = 0;
-			ctOpen.Stop();
-			ctOpen.CurrentValue = 0;
-			ctClose.Stop();
-			ctClose.CurrentValue = 0;
-			bEnd = false;
-			act難易度.bOption[player] = false;
-			danAct.bOption = false;
-		}
-
-		#region [ Inputs ]
-
-		if (!ctClose.IsTicked) {
-			bool _leftDrum = false;
-
-			bool _rightDrum = false;
-
-			bool _centerDrum = false;
-
-			bool _cancel = false;
-
-			switch (player) {
-				case 0:
-					_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-					_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
-					_centerDrum = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-								   (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
-					_cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
-					break;
-				case 1:
-					_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
-					_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
-					_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
-					break;
-				case 2:
-					_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
-					_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
-					_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
-					break;
-				case 3:
-					_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
-					_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
-					_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
-					break;
-				case 4:
-					_rightDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
-					_leftDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
-					_centerDrum = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
-					break;
+		for (int player = 0; player < nPlayers; ++player) {
+			if (!bOptions[player]) {
+				continue;
 			}
 
+			if (ctOpen.CurrentValue == 0)
+				Init(player);
 
-			if (_leftDrum || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
-				OptionSelect(true);
-				tFetchMults(player);
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
+			ctOpen.Tick();
+			ctClose.Tick();
+
+			if (!ctOpen.IsTicked)
+				ctOpen.Start(0, 50, 6, OpenTaiko.Timer);
+
+			#region [ Open & Close ]
+
+			float oy1 = ctOpen.CurrentValue * 18;
+			float oy2 = (ctOpen.CurrentValue - 30) * 4;
+			float oy3 = ctOpen.CurrentValue < 30 ? 410 - oy1 : -80 + oy2;
+
+			float cy1 = ctClose.CurrentValue * 3;
+			float cy2 = (ctClose.CurrentValue - 20) * 16;
+			float cy3 = ctClose.CurrentValue < 20 ? 0 - cy1 : 20 + cy2;
+
+			float y = oy3 + cy3;
+
+			#endregion
+
+			var pos = player % 2;
+			var _shift = pos == 1 ? (OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
+			var _rect = new Rectangle(_shift, 0, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Height);
+
+			OpenTaiko.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
+			OpenTaiko.Tx.Difficulty_Option_Select.t2D描画(_shift + OpenTaiko.Skin.SongSelect_Option_Select_Offset[0] + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+				OpenTaiko.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[1], _rect);
+
+			for (int i = 0; i < OptionType.Length; i++) {
+				OptionType[i].t2D描画(OpenTaiko.Skin.SongSelect_Option_OptionType_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+					OpenTaiko.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
-			if (_rightDrum || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
-				OptionSelect(false);
-				tFetchMults(player);
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
+			txModMults[0]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults1_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
+			txModMults[1]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults2_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
+
+			for (int i = 0; i < _textures.Length; i++) {
+				_textures[i]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_Value_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+					OpenTaiko.Skin.SongSelect_Option_Value_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
-			if (_centerDrum && ctOpen.CurrentValue >= ctOpen.EndValue) {
-				OpenTaiko.Skin.soundDecideSFX.tPlay();
-				if (NowCount < nOptionCount) {
-					NowCount++;
-				} else if (NowCount >= nOptionCount && !bEnd) {
+			if (ctClose.CurrentValue >= 50) {
+				Decision(player);
+				NowCount = 0;
+				ctOpen.Stop();
+				ctOpen.CurrentValue = 0;
+				ctClose.Stop();
+				ctClose.CurrentValue = 0;
+				bEnd = false;
+				act難易度.bOption[player] = false;
+				danAct.bOption = false;
+			}
+
+			#region [ Inputs ]
+
+			if (!ctClose.IsTicked) {
+				// per-player key input
+				bool _leftDrum = leftMenu;
+				bool _rightDrum = rightMenu;
+				bool _centerDrum = centerMenu;
+				bool _up = upMenu;
+				bool _down = downMenu;
+				bool _cancel = cancelMenu;
+
+				leftMenu = false;
+				rightMenu = false;
+				centerMenu = false;
+				upMenu = false;
+				downMenu = false;
+				cancelMenu = false;
+
+				switch (player) {
+					case 0:
+						_rightDrum = _rightDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue));
+						_leftDrum = _leftDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue));
+						_centerDrum = _centerDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed));
+						break;
+					case 1:
+						_rightDrum = _rightDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
+						_leftDrum = _leftDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
+						_centerDrum = _centerDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
+						break;
+					case 2:
+						_rightDrum = _rightDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
+						_leftDrum = _leftDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
+						_centerDrum = _centerDrum ||(OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
+						break;
+					case 3:
+						_rightDrum = _rightDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
+						_leftDrum = _leftDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
+						_centerDrum = _centerDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
+						break;
+					case 4:
+						_rightDrum = _rightDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
+						_leftDrum = _leftDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
+						_centerDrum = _centerDrum || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
+						break;
+				}
+
+
+				if (_leftDrum) {
+					OptionSelect(true);
+					tFetchMults(player);
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+				}
+
+				if (_rightDrum) {
+					OptionSelect(false);
+					tFetchMults(player);
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+				}
+
+				if (_centerDrum && ctOpen.CurrentValue >= ctOpen.EndValue) {
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
+					if (NowCount < nOptionCount) {
+						NowCount++;
+					} else if (NowCount >= nOptionCount && !bEnd) {
+						bEnd = true;
+						ctClose.Start(0, 50, 6, OpenTaiko.Timer);
+					}
+				}
+
+				int cp1 = nOptionCount + 1;
+
+				if (_up) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+					NowCount = (NowCount + cp1 - 1) % cp1;
+				}
+
+				if (_down) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+					NowCount = (NowCount + 1) % cp1;
+				}
+
+				if (_cancel) {
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					bEnd = true;
 					ctClose.Start(0, 50, 6, OpenTaiko.Timer);
 				}
 			}
 
-			int cp1 = nOptionCount + 1;
 
-			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) {
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
-				NowCount = (NowCount + cp1 - 1) % cp1;
-			}
-
-			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
-				NowCount = (NowCount + 1) % cp1;
-			}
-
-			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
-				OpenTaiko.Skin.soundDecideSFX.tPlay();
-				bEnd = true;
-				ctClose.Start(0, 50, 6, OpenTaiko.Timer);
-			}
+			#endregion
 		}
-
-
-		#endregion
 
 		return 0;
 	}

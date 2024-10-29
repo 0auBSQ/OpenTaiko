@@ -250,7 +250,7 @@ class CStage段位選択 : CStage {
 			this.段位挑戦選択画面.Draw();
 		}
 
-		if (段位挑戦選択画面.bOption) actPlayOption.On進行描画(0);
+		this.actPlayOption.On進行描画(1, [this.段位挑戦選択画面.bOption]);
 
 		if (ct待機.CurrentValue >= 3000) {
 			if (段位リスト.currentBar.nodeType == CSongListNode.ENodeType.RANDOM) {
