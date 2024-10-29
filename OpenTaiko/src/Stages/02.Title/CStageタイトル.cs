@@ -62,6 +62,8 @@ internal class CStageタイトル : CStage {
 			// Init Menus
 			tReloadMenus();
 
+			this._idNextStageForced = null;
+
 			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TITLE}Script.lua"));
 			Background.Init();
 
@@ -154,7 +156,7 @@ internal class CStageタイトル : CStage {
 							OpenTaiko.Skin.soundEntry.tPlay();
 					} else {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
-						n現在の選択行モード選択 = (int)E戻り値.EXIT + 1;
+						this._idNextStageForced = E戻り値.EXIT;
 						this.actFO.tフェードアウト開始(0, 500);
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
@@ -172,7 +174,7 @@ internal class CStageタイトル : CStage {
 				{
 					TJAPlayer3.Skin.soundEntry.t停止する();
 
-					n現在の選択行モード選択 = (int)E戻り値.CONFIG - 1;
+					this._idNextStageForced = E戻り値.CONFIG;
 
 					this.actFO.tフェードアウト開始();
 					base.eフェーズID = CStage.Eフェーズ.共通_フェードアウト;
@@ -832,8 +834,8 @@ internal class CStageタイトル : CStage {
 
 
 					// Select Menu here
-
-					return ((int)CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp);
+					return (int)(this._idNextStageForced ??
+						CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp);
 
 				case CStage.EPhase.Title_FadeIn:
 					if (this.actFIfromSetup.Draw() != 0) {
@@ -968,6 +970,7 @@ internal class CStageタイトル : CStage {
 
 	private int n現在の選択行プレイヤーエントリー;
 	private int n現在の選択行モード選択;
+	private E戻り値? _idNextStageForced;
 
 	/*private Point[] ptプレイヤーエントリーバー座標 =
 		{ new Point(337, 488), new Point( 529, 487), new Point(743, 486) };
