@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.10] - 2024-10-30 (Beta)
+
+- Fix Softlocked in difficulty selection when any non P1 player has no key binds     * Now menu keys control the lowerest index operable player
+- Fix P1 could have only use menu keys but not drum keys, if the key binds differ     * Now both work
+- Fix Up and Down arrow keys controlled multiple players at once in gameplay option     * Now menu keys only control the lowerest index operable player
+
 ## [0.6.0.9] - 2024-10-29 (Beta)
 
 - Fix crash when exiting title screen by Esc
