@@ -2,10 +2,7 @@
 
 ## [0.6.0.11] - 2024-10-31 (Beta)
 
-- Fix TJA newline after last note symbol and before `,` caused wrong note
-- symbols
-- per
-- measure calculation
+- Fix TJA newline after last note symbol and before `,` caused wrong note-symbols-per-measure calculation
 
 ## [0.6.0.10] - 2024-10-30 (Beta)
 
@@ -41,8 +38,7 @@
 
 ## [0.6.0.3] - 2024-10-27 (Beta)
 
-- Fix wrong roll speed in non
-- 1x play speed
+- Fix wrong roll speed in non-1x play speed
 
 ## [0.6.0.2] - 2024-10-27 (Beta)
 
@@ -51,8 +47,7 @@
 ## [0.6.0.1] - 2024-10-27 (Beta)
 
 - Fix Mob, Dancer, Runner appearing despite empty array on the scene preset
-- Chapter IV nameplates and make Chapter III all
-- songs nameplates accessible (condition changed from 999 songs to 34)
+- Chapter IV nameplates and make Chapter III all-songs nameplates accessible (condition changed from 999 songs to 34)
 - Japanese translations for some nameplates
 
 ## [0.6.0.0] - 2024-10-26 (Beta)
