@@ -183,11 +183,11 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 
 					if (OpenTaiko.Tx.Gauge_Dan[2] != null) {
-						for (int i = 0; i < OpenTaiko.DTX.Dan_C.Length; i++) {
-							if (OpenTaiko.DTX.Dan_C[i] != null) {
-								Dan_C dan_c = OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
-									OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
-									OpenTaiko.DTX.Dan_C[i];
+						for (int i = 0; i < OpenTaiko.TJA.Dan_C.Length; i++) {
+							if (OpenTaiko.TJA.Dan_C[i] != null) {
+								Dan_C dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
+									OpenTaiko.TJA.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
+									OpenTaiko.TJA.Dan_C[i];
 
 								if (dan_c.GetExamType() == Exam.Type.Gauge) {
 									OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (dan_c.GetValue(false) / 2 * nWidth), gauge_y[0],
@@ -219,10 +219,10 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 						else
 							OpenTaiko.Tx.Gauge_Dan[1]?.t2D描画(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
-						for (int i = 0; i < OpenTaiko.DTX.Dan_C.Length; i++) {
-							Dan_C dan_c = OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
-								OpenTaiko.DTX.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
-								OpenTaiko.DTX.Dan_C[i];
+						for (int i = 0; i < OpenTaiko.TJA.Dan_C.Length; i++) {
+							Dan_C dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
+								OpenTaiko.TJA.List_DanSongs[OpenTaiko.stage演奏ドラム画面.actDan.NowCymbolShowingNumber].Dan_C[i] :
+								OpenTaiko.TJA.Dan_C[i];
 
 							if (dan_c != null && dan_c.GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= dan_c.GetValue(false)) {
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;

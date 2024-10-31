@@ -64,104 +64,104 @@ internal class OpenTaiko : Game {
 	}
 
 	#region [DTX instances]
-	public static CDTX DTX {
+	public static CTja TJA {
 		get {
-			return dtx[0];
+			return tja[0];
 		}
 		set {
-			if ((dtx[0] != null) && (app != null)) {
-				dtx[0].DeActivate();
-				dtx[0].ReleaseManagedResource();
-				dtx[0].ReleaseUnmanagedResource();
-				app.listトップレベルActivities.Remove(dtx[0]);
+			if ((tja[0] != null) && (app != null)) {
+				tja[0].DeActivate();
+				tja[0].ReleaseManagedResource();
+				tja[0].ReleaseUnmanagedResource();
+				app.listTopLevelActivities.Remove(tja[0]);
 			}
-			dtx[0] = value;
-			if ((dtx[0] != null) && (app != null)) {
-				app.listトップレベルActivities.Add(dtx[0]);
+			tja[0] = value;
+			if ((tja[0] != null) && (app != null)) {
+				app.listTopLevelActivities.Add(tja[0]);
 			}
 		}
 	}
-	public static CDTX DTX_2P {
+	public static CTja TJA_2P {
 		get {
-			return dtx[1];
+			return tja[1];
 		}
 		set {
-			if ((dtx[1] != null) && (app != null)) {
-				dtx[1].DeActivate();
-				dtx[1].ReleaseManagedResource();
-				dtx[1].ReleaseUnmanagedResource();
-				app.listトップレベルActivities.Remove(dtx[1]);
+			if ((tja[1] != null) && (app != null)) {
+				tja[1].DeActivate();
+				tja[1].ReleaseManagedResource();
+				tja[1].ReleaseUnmanagedResource();
+				app.listTopLevelActivities.Remove(tja[1]);
 			}
-			dtx[1] = value;
-			if ((dtx[1] != null) && (app != null)) {
-				app.listトップレベルActivities.Add(dtx[1]);
+			tja[1] = value;
+			if ((tja[1] != null) && (app != null)) {
+				app.listTopLevelActivities.Add(tja[1]);
 			}
 		}
 	}
-	public static CDTX DTX_3P {
+	public static CTja TJA_3P {
 		get {
-			return dtx[2];
+			return tja[2];
 		}
 		set {
-			if ((dtx[2] != null) && (app != null)) {
-				dtx[2].DeActivate();
-				dtx[2].ReleaseManagedResource();
-				dtx[2].ReleaseUnmanagedResource();
-				app.listトップレベルActivities.Remove(dtx[2]);
+			if ((tja[2] != null) && (app != null)) {
+				tja[2].DeActivate();
+				tja[2].ReleaseManagedResource();
+				tja[2].ReleaseUnmanagedResource();
+				app.listTopLevelActivities.Remove(tja[2]);
 			}
-			dtx[2] = value;
-			if ((dtx[2] != null) && (app != null)) {
-				app.listトップレベルActivities.Add(dtx[2]);
+			tja[2] = value;
+			if ((tja[2] != null) && (app != null)) {
+				app.listTopLevelActivities.Add(tja[2]);
 			}
 		}
 	}
-	public static CDTX DTX_4P {
+	public static CTja TJA_4P {
 		get {
-			return dtx[3];
+			return tja[3];
 		}
 		set {
-			if ((dtx[3] != null) && (app != null)) {
-				dtx[3].DeActivate();
-				dtx[3].ReleaseManagedResource();
-				dtx[3].ReleaseUnmanagedResource();
-				app.listトップレベルActivities.Remove(dtx[3]);
+			if ((tja[3] != null) && (app != null)) {
+				tja[3].DeActivate();
+				tja[3].ReleaseManagedResource();
+				tja[3].ReleaseUnmanagedResource();
+				app.listTopLevelActivities.Remove(tja[3]);
 			}
-			dtx[3] = value;
-			if ((dtx[3] != null) && (app != null)) {
-				app.listトップレベルActivities.Add(dtx[3]);
+			tja[3] = value;
+			if ((tja[3] != null) && (app != null)) {
+				app.listTopLevelActivities.Add(tja[3]);
 			}
 		}
 	}
-	public static CDTX DTX_5P {
+	public static CTja TJA_5P {
 		get {
-			return dtx[4];
+			return tja[4];
 		}
 		set {
-			if ((dtx[4] != null) && (app != null)) {
-				dtx[4].DeActivate();
-				dtx[4].ReleaseManagedResource();
-				dtx[4].ReleaseUnmanagedResource();
-				app.listトップレベルActivities.Remove(dtx[4]);
+			if ((tja[4] != null) && (app != null)) {
+				tja[4].DeActivate();
+				tja[4].ReleaseManagedResource();
+				tja[4].ReleaseUnmanagedResource();
+				app.listTopLevelActivities.Remove(tja[4]);
 			}
-			dtx[4] = value;
-			if ((dtx[4] != null) && (app != null)) {
-				app.listトップレベルActivities.Add(dtx[4]);
+			tja[4] = value;
+			if ((tja[4] != null) && (app != null)) {
+				app.listTopLevelActivities.Add(tja[4]);
 			}
 		}
 	}
 
-	public static CDTX GetDTX(int player) {
+	public static CTja GetDTX(int player) {
 		switch (player) {
 			case 0:
-				return OpenTaiko.DTX;
+				return OpenTaiko.TJA;
 			case 1:
-				return OpenTaiko.DTX_2P;
+				return OpenTaiko.TJA_2P;
 			case 2:
-				return OpenTaiko.DTX_3P;
+				return OpenTaiko.TJA_3P;
 			case 3:
-				return OpenTaiko.DTX_4P;
+				return OpenTaiko.TJA_4P;
 			case 4:
-				return OpenTaiko.DTX_5P;
+				return OpenTaiko.TJA_5P;
 		}
 		return null;
 	}
@@ -471,14 +471,14 @@ internal class OpenTaiko : Game {
 			this.bマウスカーソル表示中 = false;
 		}
 
-		if (this.listトップレベルActivities != null) {
-			foreach (CActivity activity in this.listトップレベルActivities)
+		if (this.listTopLevelActivities != null) {
+			foreach (CActivity activity in this.listTopLevelActivities)
 				activity.CreateUnmanagedResource();
 		}
 	}
 	protected override void UnloadContent() {
-		if (this.listトップレベルActivities != null) {
-			foreach (CActivity activity in this.listトップレベルActivities)
+		if (this.listTopLevelActivities != null) {
+			foreach (CActivity activity in this.listTopLevelActivities)
 				activity.ReleaseUnmanagedResource();
 		}
 	}
@@ -1115,10 +1115,10 @@ internal class OpenTaiko : Game {
 							#region [ ESC押下時は、曲の読み込みを中止して選曲画面に戻る ]
 							if (this.n進行描画の戻り値 == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
 								//DTX.t全チップの再生停止();
-								if (DTX != null) {
-									DTX.DeActivate();
-									DTX.ReleaseManagedResource();
-									DTX.ReleaseUnmanagedResource();
+								if (TJA != null) {
+									TJA.DeActivate();
+									TJA.ReleaseManagedResource();
+									TJA.ReleaseUnmanagedResource();
 								}
 
 								// ???
@@ -1187,10 +1187,10 @@ for (int i = 0; i < 3; i++) {
 						switch (this.n進行描画の戻り値) {
 							case (int)EGameplayScreenReturnValue.ReloadAndReplay:
 								#region [ DTXファイルを再読み込みして、再演奏 ]
-								DTX.t全チップの再生停止();
-								DTX.DeActivate();
-								DTX.ReleaseManagedResource();
-								DTX.ReleaseUnmanagedResource();
+								TJA.t全チップの再生停止();
+								TJA.DeActivate();
+								TJA.ReleaseManagedResource();
+								TJA.ReleaseUnmanagedResource();
 								r現在のステージ.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									r現在のステージ.ReleaseManagedResource();
@@ -1219,10 +1219,10 @@ for (int i = 0; i < 3; i++) {
 								#region [ 演奏キャンセル ]
 								//-----------------------------
 
-								DTX.t全チップの再生停止();
-								DTX.DeActivate();
-								DTX.ReleaseManagedResource();
-								DTX.ReleaseUnmanagedResource();
+								TJA.t全チップの再生停止();
+								TJA.DeActivate();
+								TJA.ReleaseManagedResource();
+								TJA.ReleaseUnmanagedResource();
 								r現在のステージ.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									r現在のステージ.ReleaseManagedResource();
@@ -1251,10 +1251,10 @@ for (int i = 0; i < 3; i++) {
 								#region [ 演奏失敗(StageFailed) ]
 								//-----------------------------
 
-								DTX.t全チップの再生停止();
-								DTX.DeActivate();
-								DTX.ReleaseManagedResource();
-								DTX.ReleaseUnmanagedResource();
+								TJA.t全チップの再生停止();
+								TJA.DeActivate();
+								TJA.ReleaseManagedResource();
+								TJA.ReleaseUnmanagedResource();
 								r現在のステージ.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									r現在のステージ.ReleaseManagedResource();
@@ -1313,10 +1313,10 @@ for (int i = 0; i < 3; i++) {
 						//-----------------------------
 						if (this.n進行描画の戻り値 != 0) {
 							//DTX.t全チップの再生一時停止();
-							DTX.t全チップの再生停止とミキサーからの削除();
-							DTX.DeActivate();
-							DTX.ReleaseManagedResource();
-							DTX.ReleaseUnmanagedResource();
+							TJA.t全チップの再生停止とミキサーからの削除();
+							TJA.DeActivate();
+							TJA.ReleaseManagedResource();
+							TJA.ReleaseUnmanagedResource();
 							r現在のステージ.DeActivate();
 							if (!ConfigIni.PreAssetsLoading) {
 								r現在のステージ.ReleaseManagedResource();
@@ -1505,9 +1505,9 @@ for (int i = 0; i < 3; i++) {
 
 					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
 
-					if (OpenTaiko.DTX != null) {
+					if (OpenTaiko.TJA != null) {
 						//object rendering
-						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.DTX.listObj) {
+						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
 							pair.Value.tDraw();
 						}
 					}
@@ -1754,11 +1754,11 @@ for (int i = 0; i < 3; i++) {
 	private bool b終了処理完了済み;
 	public bool bネットワークに接続中 { get; private set; } = false;
 	private long 前回のシステム時刻ms = long.MinValue;
-	private static CDTX[] dtx = new CDTX[5];
+	private static CTja[] tja = new CTja[5];
 
 	public static TextureLoader Tx = new TextureLoader();
 
-	public List<CActivity> listトップレベルActivities;
+	public List<CActivity> listTopLevelActivities;
 	private int n進行描画の戻り値;
 	private string strWindowTitle
 	// ayo komi isn't this useless code? - tfd500
@@ -1830,7 +1830,7 @@ for (int i = 0; i < 3; i++) {
 		//---------------------
 		#endregion
 
-		DTX = null;
+		TJA = null;
 
 		#region [ Skin の初期化 ]
 		//---------------------
@@ -2086,22 +2086,22 @@ for (int i = 0; i < 3; i++) {
 		stage終了 = new CStage終了();
 		NamePlate = new CNamePlate();
 		SaveFile = 0;
-		this.listトップレベルActivities = new List<CActivity>();
-		this.listトップレベルActivities.Add(actEnumSongs);
-		this.listトップレベルActivities.Add(actTextConsole);
-		this.listトップレベルActivities.Add(stage起動);
-		this.listトップレベルActivities.Add(stageタイトル);
-		this.listトップレベルActivities.Add(stageコンフィグ);
-		this.listトップレベルActivities.Add(stageSongSelect);
-		this.listトップレベルActivities.Add(stage段位選択);
-		this.listトップレベルActivities.Add(stageHeya);
-		this.listトップレベルActivities.Add(stageOnlineLounge);
-		this.listトップレベルActivities.Add(stageTowerSelect);
-		this.listトップレベルActivities.Add(stage曲読み込み);
-		this.listトップレベルActivities.Add(stage演奏ドラム画面);
-		this.listトップレベルActivities.Add(stage結果);
-		this.listトップレベルActivities.Add(stageChangeSkin);
-		this.listトップレベルActivities.Add(stage終了);
+		this.listTopLevelActivities = new List<CActivity>();
+		this.listTopLevelActivities.Add(actEnumSongs);
+		this.listTopLevelActivities.Add(actTextConsole);
+		this.listTopLevelActivities.Add(stage起動);
+		this.listTopLevelActivities.Add(stageタイトル);
+		this.listTopLevelActivities.Add(stageコンフィグ);
+		this.listTopLevelActivities.Add(stageSongSelect);
+		this.listTopLevelActivities.Add(stage段位選択);
+		this.listTopLevelActivities.Add(stageHeya);
+		this.listTopLevelActivities.Add(stageOnlineLounge);
+		this.listTopLevelActivities.Add(stageTowerSelect);
+		this.listTopLevelActivities.Add(stage曲読み込み);
+		this.listTopLevelActivities.Add(stage演奏ドラム画面);
+		this.listTopLevelActivities.Add(stage結果);
+		this.listTopLevelActivities.Add(stageChangeSkin);
+		this.listTopLevelActivities.Add(stage終了);
 		//---------------------
 		#endregion
 

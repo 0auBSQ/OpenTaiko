@@ -1757,7 +1757,7 @@ internal class CActSelect曲リスト : CActivity {
 									if (diff == 5) {
 										var _sidet = OpenTaiko.Tx.SongSelect_Tower_Side;
 										if (_sidet != null) {
-											var _side = (OpenTaiko.stageSongSelect.rNowSelectedSong.nSide == CDTX.ESide.eNormal) ? 0 : 1;
+											var _side = (OpenTaiko.stageSongSelect.rNowSelectedSong.nSide == CTja.ESide.eNormal) ? 0 : 1;
 											var _sc = _sidet.sz画像サイズ.Width / 2;
 											_sidet.t2D描画(
 												OpenTaiko.Skin.SongSelect_Tower_Side[0],
@@ -2261,7 +2261,7 @@ internal class CActSelect曲リスト : CActivity {
 		public bool BoxCharaChanged;
 
 		public int[] ar難易度;
-		public CDTX.ELevelIcon[] nLevelIcon;
+		public CTja.ELevelIcon[] nLevelIcon;
 		public bool[] b分岐;
 		public string strジャンル;
 		public string strサブタイトル;
@@ -2955,9 +2955,9 @@ internal class CActSelect曲リスト : CActivity {
 		}
 	}
 
-	public void tDisplayLevelIcon(int x, int y, CDTX.ELevelIcon icon, CTexture iconTex = null) {
+	public void tDisplayLevelIcon(int x, int y, CTja.ELevelIcon icon, CTexture iconTex = null) {
 		var _tex = (iconTex != null) ? iconTex : OpenTaiko.Tx.SongSelect_Level_Number_Big_Icon;
-		if (icon != CDTX.ELevelIcon.eNone &&
+		if (icon != CTja.ELevelIcon.eNone &&
 			_tex != null) {
 			var __width = _tex.sz画像サイズ.Width / 3;
 			var __height = _tex.sz画像サイズ.Height;
@@ -2970,7 +2970,7 @@ internal class CActSelect曲リスト : CActivity {
 		}
 	}
 
-	private void t小文字表示(int x, int y, int num, int diff, CDTX.ELevelIcon icon) {
+	private void t小文字表示(int x, int y, int num, int diff, CTja.ELevelIcon icon) {
 		int[] nums = CConversion.SeparateDigits(num);
 		float[] icon_coords = new float[2] { -999, -999 };
 		for (int j = 0; j < nums.Length; j++) {

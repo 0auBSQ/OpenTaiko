@@ -420,13 +420,13 @@ class HGaugeMethods {
 
 	public static float UNSAFE_KillZonePercent(int player) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CDTX[] dtxs =
+		CTja[] dtxs =
 		{
-			OpenTaiko.DTX,
-			OpenTaiko.DTX_2P,
-			OpenTaiko.DTX_3P,
-			OpenTaiko.DTX_4P,
-			OpenTaiko.DTX_5P
+			OpenTaiko.TJA,
+			OpenTaiko.TJA_2P,
+			OpenTaiko.TJA_3P,
+			OpenTaiko.TJA_4P,
+			OpenTaiko.TJA_5P
 		};
 
 		// Total hits and perfect hits
@@ -448,13 +448,13 @@ class HGaugeMethods {
 
 	public static void UNSAFE_DrawGaugeFast(int player, int opacity, int rainbowTextureIndex, int soulFlameIndex) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CDTX[] dtxs =
+		CTja[] dtxs =
 		{
-			OpenTaiko.DTX,
-			OpenTaiko.DTX_2P,
-			OpenTaiko.DTX_3P,
-			OpenTaiko.DTX_4P,
-			OpenTaiko.DTX_5P
+			OpenTaiko.TJA,
+			OpenTaiko.TJA_2P,
+			OpenTaiko.TJA_3P,
+			OpenTaiko.TJA_4P,
+			OpenTaiko.TJA_5P
 		};
 
 		// Set box
@@ -595,13 +595,13 @@ class HGaugeMethods {
 
 	public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CDTX[] dtxs =
+		CTja[] dtxs =
 		{
-			OpenTaiko.DTX,
-			OpenTaiko.DTX_2P,
-			OpenTaiko.DTX_3P,
-			OpenTaiko.DTX_4P,
-			OpenTaiko.DTX_5P
+			OpenTaiko.TJA,
+			OpenTaiko.TJA_2P,
+			OpenTaiko.TJA_3P,
+			OpenTaiko.TJA_4P,
+			OpenTaiko.TJA_5P
 		};
 
 		// Set box

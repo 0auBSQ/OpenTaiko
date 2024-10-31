@@ -28,11 +28,11 @@ internal class CAct演奏ゲージ共通 : CActivity {
 				dbゲージ増加量_Branch[i, n] = new float[5];
 			}
 		}
-		this.DTX[0] = OpenTaiko.DTX;
-		this.DTX[1] = OpenTaiko.DTX_2P;
-		this.DTX[2] = OpenTaiko.DTX_3P;
-		this.DTX[3] = OpenTaiko.DTX_4P;
-		this.DTX[4] = OpenTaiko.DTX_5P;
+		this.DTX[0] = OpenTaiko.TJA;
+		this.DTX[1] = OpenTaiko.TJA_2P;
+		this.DTX[2] = OpenTaiko.TJA_3P;
+		this.DTX[3] = OpenTaiko.TJA_4P;
+		this.DTX[4] = OpenTaiko.TJA_5P;
 		actLVLNFont = new CActLVLNFont();
 		actLVLNFont.Activate();
 		base.Activate();
@@ -354,9 +354,9 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
 	}
 
-	public void Damage(EInstrumentPad screenmode, EInstrumentPad part, ENoteJudge e今回の判定, int nPlayer) {
+	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer) {
 		float fDamage;
-		int nコース = (int)OpenTaiko.stage演奏ドラム画面.n現在のコース[nPlayer];
+		int nコース = (int)OpenTaiko.stage演奏ドラム画面.nCurrentBranch[nPlayer];
 
 		switch (e今回の判定) {
 			case ENoteJudge.Perfect:
@@ -439,7 +439,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	//-----------------
 	#endregion
 
-	private CDTX[] DTX = new CDTX[5];
+	private CTja[] DTX = new CTja[5];
 	public double[] db現在のゲージ値 = new double[5];
 	protected CCounter ct炎;
 	protected CCounter ct虹アニメ;

@@ -87,7 +87,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 
 	public void t叩ききりまショー_初期化() {
 		this.st叩ききりまショー = new ST叩ききりまショー();
-		this.n演奏時間 = (OpenTaiko.DTX.listChip.Count > 0) ? OpenTaiko.DTX.listChip[OpenTaiko.DTX.listChip.Count - 1].n発声時刻ms : 0;
+		this.n演奏時間 = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
 		this.st叩ききりまショー.ct残り時間 = new CCounter(0, 25000, 1, OpenTaiko.Timer);
 		this.st叩ききりまショー.ct加算時間表示 = new CCounter();
 		this.st叩ききりまショー.ct加算審査中 = new CCounter();
@@ -248,7 +248,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			};
 
 			//★10の場合超激辛モードになる。
-			if (OpenTaiko.DTX.LEVELtaiko[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]] >= 10) {
+			if (OpenTaiko.TJA.LEVELtaiko[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]] >= 10) {
 				#region[ 超激辛 ]
 				this.st叩ききりまショー.b超激辛 = true;
 
@@ -549,8 +549,8 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 				}
 			}
 			#region[ 全体 ]
-			if (OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect != 0 || OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great != 0) {
-				double db全体精度 = ((double)(OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great) / this.st叩ききりまショー.n区間ノート数) * 100.0;
+			if (OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect != 0 || OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great != 0) {
+				double db全体精度 = ((double)(OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great) / this.st叩ききりまショー.n区間ノート数) * 100.0;
 				for (int i = 0; i < this.n全体精度ボーナス.Length; i++) {
 					if (db全体精度 >= this.n全体精度ボーナス[i].ret) {
 						n延長する時間 += this.n全体精度ボーナス[i].point;
@@ -570,8 +570,8 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 				}
 			}
 			#endregion
-			if (OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] != 0) {
-				double db全体コンボ率 = ((double)OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
+			if (OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0] != 0) {
+				double db全体コンボ率 = ((double)OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0] / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
 				for (int i = 0; i < this.n全体コンボ率ボーナス.Length; i++) {
 					if (db全体コンボ率 >= this.n全体コンボ率ボーナス[i].ret) {
 						n延長する時間 += this.n全体コンボ率ボーナス[i].point;
@@ -580,7 +580,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 				}
 			}
 
-			double db全体ミス率 = (((double)OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Poor + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss) / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
+			double db全体ミス率 = (((double)OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Poor + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Miss) / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
 			for (int i = 0; i < this.n全体ミス率ボーナス.Length; i++) {
 				if (db全体ミス率 >= this.n全体ミス率ボーナス[i].ret) {
 					n延長する時間 += this.n全体ミス率ボーナス[i].point;

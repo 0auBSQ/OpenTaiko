@@ -11,12 +11,12 @@ internal static class CLagLogger {
 
 	private static readonly List<int> LagValues = new List<int>(2000);
 
-	public static void Add(int nPlayer, CDTX.CChip pChip) {
+	public static void Add(int nPlayer, CChip pChip) {
 		if (nPlayer != 0) {
 			return;
 		}
 
-		switch (pChip.nチャンネル番号) {
+		switch (pChip.nChannelNo) {
 			case 0x15:
 			case 0x16:
 			case 0x17:

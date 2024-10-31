@@ -61,16 +61,16 @@ internal class Dan_Cert : CActivity {
 
 		ScreenPoint = new double[] { OpenTaiko.Skin.Game_Lane_X[0] - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Resolution[0] };
 
-		OpenTaiko.stage演奏ドラム画面.ReSetScore(OpenTaiko.DTX.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.DTX.List_DanSongs[NowShowingNumber].ScoreDiff);
+		OpenTaiko.stage演奏ドラム画面.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff);
 
-		OpenTaiko.stage演奏ドラム画面.ftDanReSetScoreNiji(OpenTaiko.DTX.nDan_NotesCount[NowShowingNumber], OpenTaiko.DTX.nDan_BalloonCount[NowShowingNumber]);
-		OpenTaiko.stage演奏ドラム画面.ftDanReSetBranches(OpenTaiko.DTX.bHasBranchDan[NowShowingNumber]);
+		OpenTaiko.stage演奏ドラム画面.ftDanReSetScoreNiji(OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber], OpenTaiko.TJA.nDan_BalloonCount[NowShowingNumber]);
+		OpenTaiko.stage演奏ドラム画面.ftDanReSetBranches(OpenTaiko.TJA.bHasBranchDan[NowShowingNumber]);
 
 		IsAnimating = true;
 
 		//段位道場
 		//TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
-		OpenTaiko.stage演奏ドラム画面.actPanel.SetPanelString(OpenTaiko.DTX.List_DanSongs[NowShowingNumber].Title,
+		OpenTaiko.stage演奏ドラム画面.actPanel.SetPanelString(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].Title,
 			CLangManager.LangInstance.GetString("TITLE_MODE_DAN"),
 			1 + NowShowingNumber + "曲目");
 
@@ -80,7 +80,7 @@ internal class Dan_Cert : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
-			if (OpenTaiko.DTX.Dan_C[i] != null) Challenge[i] = new Dan_C(OpenTaiko.DTX.Dan_C[i]);
+			if (OpenTaiko.TJA.Dan_C[i] != null) Challenge[i] = new Dan_C(OpenTaiko.TJA.Dan_C[i]);
 
 			for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; j++) {
 				if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i] != null) {
@@ -121,7 +121,7 @@ internal class Dan_Cert : CActivity {
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
 
-		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.DTX.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
+		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
 		base.Activate();
 	}
@@ -134,14 +134,14 @@ internal class Dan_Cert : CActivity {
 			var oldReached = Challenge[i].GetReached();
 			var isChangedAmount = false;
 
-			int totalGoods = (int)OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect;
-			int totalOks = (int)OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great;
-			int totalBads = (int)OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss;
-			int totalCombo = (int)OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0];
+			int totalGoods = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect;
+			int totalOks = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great;
+			int totalBads = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Miss;
+			int totalCombo = (int)OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0];
 
-			int individualGoods = OpenTaiko.stage演奏ドラム画面.n良[NowShowingNumber];
-			int individualOks = OpenTaiko.stage演奏ドラム画面.n可[NowShowingNumber];
-			int individualBads = OpenTaiko.stage演奏ドラム画面.n不可[NowShowingNumber];
+			int individualGoods = OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber];
+			int individualOks = OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber];
+			int individualBads = OpenTaiko.stage演奏ドラム画面.nBad[NowShowingNumber];
 			int individualCombo = OpenTaiko.stage演奏ドラム画面.nHighestCombo[NowShowingNumber];
 
 			int totalADLIBs = OpenTaiko.stage演奏ドラム画面.CChartScore[0].nADLIB;
@@ -176,10 +176,10 @@ internal class Dan_Cert : CActivity {
 					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stage演奏ドラム画面.actScore.GetScore(0));
 					break;
 				case Exam.Type.Roll:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.n連打[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
+					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.nRoll[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
 					break;
 				case Exam.Type.Hit:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.n良[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.n可[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.n連打[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great + OpenTaiko.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great + OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
+					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.nRoll[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
 					break;
 				case Exam.Type.Combo:
 					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualCombo : totalCombo);
@@ -205,10 +205,10 @@ internal class Dan_Cert : CActivity {
 			if (Challenge[i].GetExamRange() == Exam.Range.Less) {
 				Challenge[i].SetReached(!Challenge[i].IsCleared[0]);
 			} else {
-				songsnotesremain[NowShowingNumber] = OpenTaiko.DTX.nDan_NotesCount[NowShowingNumber]
-													 - (OpenTaiko.stage演奏ドラム画面.n良[NowShowingNumber]
-														+ OpenTaiko.stage演奏ドラム画面.n可[NowShowingNumber]
-														+ OpenTaiko.stage演奏ドラム画面.n不可[NowShowingNumber]);
+				songsnotesremain[NowShowingNumber] = OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber]
+													 - (OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber]
+														+ OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber]
+														+ OpenTaiko.stage演奏ドラム画面.nBad[NowShowingNumber]);
 
 				/*
                 notesremain = TJAPlayer3.DTX.nノーツ数[3]
@@ -220,7 +220,7 @@ internal class Dan_Cert : CActivity {
                         + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss);
                 */
 
-				notesremain = OpenTaiko.DTX.nノーツ数[3]
+				notesremain = OpenTaiko.TJA.nノーツ数[3]
 							  - (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
 								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
 								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss);
@@ -253,8 +253,8 @@ internal class Dan_Cert : CActivity {
 								: notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
 						break;
 					case Exam.Type.Combo:
-						if (notesremain + OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.P1 < ((Challenge[i].Value[0]))
-							&& OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
+						if (notesremain + OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.P1 < ((Challenge[i].Value[0]))
+							&& OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
 						break;
 					default:
 						break;
@@ -265,10 +265,10 @@ internal class Dan_Cert : CActivity {
 
 				// Check challenge fails at the end of each songs
 
-				if (OpenTaiko.DTX.listChip.Count > 0) {
+				if (OpenTaiko.TJA.listChip.Count > 0) {
 					if (ExamChange[i]
-							? OpenTaiko.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= SoundManager.PlayTimer.NowTime//TJAPlayer3.Timer.n現在時刻
-							: OpenTaiko.DTX.listChip[OpenTaiko.DTX.listChip.Count - 1].n発声時刻ms <= SoundManager.PlayTimer.NowTime)//TJAPlayer3.Timer.n現在時刻)
+							? OpenTaiko.TJA.pDan_LastChip[NowShowingNumber].n発声時刻ms <= SoundManager.PlayTimer.NowTime//TJAPlayer3.Timer.n現在時刻
+							: OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms <= SoundManager.PlayTimer.NowTime)//TJAPlayer3.Timer.n現在時刻)
 					{
 						switch (Challenge[i].GetExamType()) {
 							case Exam.Type.Score:
@@ -350,20 +350,20 @@ internal class Dan_Cert : CActivity {
 			if (Counter_Text.CurrentValue >= 2000) {
 				for (int i = Counter_Text_Old; i < Counter_Text.CurrentValue; i++) {
 					if (i % 2 == 0) {
-						if (OpenTaiko.DTX.List_DanSongs[NowShowingNumber].TitleTex != null) {
-							OpenTaiko.DTX.List_DanSongs[NowShowingNumber].TitleTex.Opacity--;
+						if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
+							OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity--;
 						}
-						if (OpenTaiko.DTX.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-							OpenTaiko.DTX.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity--;
+						if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
+							OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity--;
 						}
 					}
 				}
 			} else {
-				if (OpenTaiko.DTX.List_DanSongs[NowShowingNumber].TitleTex != null) {
-					OpenTaiko.DTX.List_DanSongs[NowShowingNumber].TitleTex.Opacity = 255;
+				if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = 255;
 				}
-				if (OpenTaiko.DTX.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-					OpenTaiko.DTX.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = 255;
+				if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = 255;
 				}
 			}
 			Counter_Text_Old = Counter_Text.CurrentValue;
@@ -430,8 +430,8 @@ internal class Dan_Cert : CActivity {
 		}
 		if (Counter_Text != null) {
 			if (Counter_Text.IsUnEnded) {
-				var title = OpenTaiko.DTX.List_DanSongs[NowShowingNumber].TitleTex;
-				var subTitle = OpenTaiko.DTX.List_DanSongs[NowShowingNumber].SubTitleTex;
+				var title = OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex;
+				var subTitle = OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex;
 				if (subTitle == null)
 					title?.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Game_DanC_Title_X[0], OpenTaiko.Skin.Game_DanC_Title_Y[0]);
 				else {

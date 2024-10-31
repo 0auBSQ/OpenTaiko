@@ -60,7 +60,7 @@ internal class CScore {
 		public STDGBVALUE<int> 演奏回数;
 		public STHISTORY 演奏履歴;
 		public bool レベルを非表示にする;
-		public CDTX.E種別 曲種別;
+		public CTja.E種別 曲種別;
 		public double Bpm;
 		public double BaseBpm;
 		public double MinBpm;
@@ -77,7 +77,7 @@ internal class CScore {
 		public int[] nレベル;
 		public int[] nクリア;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 		public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
-		public CDTX.ELevelIcon[] nLevelIcon;
+		public CTja.ELevelIcon[] nLevelIcon;
 
 		// Tower lifes
 		public int nLife;
@@ -243,7 +243,7 @@ internal class CScore {
 		this.譜面情報.演奏履歴.行7 = "";
 		this.譜面情報.レベルを非表示にする = false;
 		this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
-		this.譜面情報.曲種別 = CDTX.E種別.DTX;
+		this.譜面情報.曲種別 = CTja.E種別.DTX;
 		this.譜面情報.Bpm = 120.0;
 		this.譜面情報.MinBpm = 120.0;
 		this.譜面情報.MaxBpm = 120.0;
@@ -257,7 +257,7 @@ internal class CScore {
 		this.譜面情報.nハイスコア = new int[(int)Difficulty.Total];
 		this.譜面情報.strサブタイトル = "";
 		this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
-		this.譜面情報.nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
+		this.譜面情報.nLevelIcon = new CTja.ELevelIcon[(int)Difficulty.Total] { CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone };
 		this.譜面情報.nクリア = new int[5];
 		this.譜面情報.nスコアランク = new int[5];
 		this.譜面情報.nExamResult = new List<int[]> { };

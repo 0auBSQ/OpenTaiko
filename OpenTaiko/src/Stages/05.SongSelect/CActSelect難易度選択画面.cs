@@ -527,7 +527,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 	}
 	private STレベル数字[] st小文字位置 = new STレベル数字[10];
 
-	private void t小文字表示(int num, float x, float y, int diff, CDTX.ELevelIcon icon) {
+	private void t小文字表示(int num, float x, float y, int diff, CTja.ELevelIcon icon) {
 		int[] nums = CConversion.SeparateDigits(num);
 		float[] icon_coords = new float[2] { -999, -999 };
 		for (int j = 0; j < nums.Length; j++) {

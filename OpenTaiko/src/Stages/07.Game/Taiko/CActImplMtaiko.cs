@@ -22,8 +22,8 @@ internal class CActImplMtaiko : CActivity {
 
 		this.ctレベルアップダウン = new CCounter[5];
 		ctSymbolFlash = new CCounter[5];
-		this.After = new CDTX.ECourse[5];
-		this.Before = new CDTX.ECourse[5];
+		this.After = new CTja.ECourse[5];
+		this.Before = new CTja.ECourse[5];
 		for (int i = 0; i < 5; i++) {
 			this.ctレベルアップダウン[i] = new CCounter();
 			BackSymbolEvent(i);
@@ -463,7 +463,7 @@ internal class CActImplMtaiko : CActivity {
 
 	}
 
-	public void tBranchEvent(CDTX.ECourse Before, CDTX.ECourse After, int player) {
+	public void tBranchEvent(CTja.ECourse Before, CTja.ECourse After, int player) {
 		if (After != Before)
 			this.ctレベルアップダウン[player] = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 
@@ -569,8 +569,8 @@ internal class CActImplMtaiko : CActivity {
 
 	//譜面分岐
 	private CCounter[] ctレベルアップダウン;
-	public CDTX.ECourse[] After;
-	public CDTX.ECourse[] Before;
+	public CTja.ECourse[] After;
+	public CTja.ECourse[] Before;
 	private CCounter[] ctSymbolFlash = new CCounter[5];
 	//-----------------
 	#endregion

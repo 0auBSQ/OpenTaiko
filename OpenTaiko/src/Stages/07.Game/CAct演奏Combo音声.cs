@@ -10,7 +10,7 @@ internal class CAct演奏Combo音声 : CActivity {
 	}
 
 	// メソッド
-	public void t再生(int nCombo, int player) {
+	public void tPlay(int nCombo, int player) {
 		if (VoiceIndex[player] < ListCombo[player].Count) {
 
 			var index = ListCombo[player][VoiceIndex[player]];

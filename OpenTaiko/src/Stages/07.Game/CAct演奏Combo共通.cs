@@ -6,7 +6,7 @@ namespace OpenTaiko;
 internal class CAct演奏Combo共通 : CActivity {
 	// Properties
 
-	public STCOMBO n現在のコンボ数;
+	public STCOMBO nCurrentCombo;
 	public struct STCOMBO {
 		public CAct演奏Combo共通 act;
 
@@ -141,7 +141,7 @@ internal class CAct演奏Combo共通 : CActivity {
 	//protected CTexture txCOMBO太鼓;
 	//protected CTexture txCOMBO太鼓_でかいやつ;
 	//protected CTexture txコンボラメ;
-	public CCounter[] ctコンボ加算;
+	public CCounter[] ctComboAddCounter;
 	public CCounter ctコンボラメ;
 
 	protected float[,] nコンボ拡大率_座標 = new float[,]{
@@ -323,7 +323,7 @@ internal class CAct演奏Combo共通 : CActivity {
 		int[] n位の数 = new int[10];   // 表示は10桁もあれば足りるだろう
 
 		this.ctコンボラメ.TickLoop();
-		this.ctコンボ加算[nPlayer].Tick();
+		this.ctComboAddCounter[nPlayer].Tick();
 
 		#region [ nCombo値を桁数ごとに n位の数[] に格納する。（例：nCombo値=125 のとき n位の数 = { 5,2,1,0,0,0,0,0,0,0 } ） ]
 		//-----------------
@@ -454,7 +454,7 @@ internal class CAct演奏Combo共通 : CActivity {
 
 			if (n桁数 <= 1) {
 				if (OpenTaiko.Tx.Taiko_Combo[0] != null) {
-					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctコンボ加算[nPlayer].CurrentValue];
+					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
 					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
 					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
 					OpenTaiko.Tx.Taiko_Combo[0].t2D拡大率考慮下中心基準描画(rightX, combo_y, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
@@ -463,14 +463,14 @@ internal class CAct演奏Combo共通 : CActivity {
 				//int[] arComboX = { CDTXMania.Skin.Game_Taiko_Combo_X[nPlayer] + CDTXMania.Skin.Game_Taiko_Combo_Padding[0], CDTXMania.Skin.Game_Taiko_Combo_X[nPlayer] - CDTXMania.Skin.Game_Taiko_Combo_Padding[0] };
 				if (nCombo値 < 50) {
 					if (OpenTaiko.Tx.Taiko_Combo[0] != null) {
-						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctコンボ加算[nPlayer].CurrentValue];
+						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
 						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
 						OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
 						OpenTaiko.Tx.Taiko_Combo[0].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
 					}
 				} else {
 					if (OpenTaiko.Tx.Taiko_Combo[2] != null) {
-						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctコンボ加算[nPlayer].CurrentValue];
+						var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale[this.ctComboAddCounter[nPlayer].CurrentValue];
 						OpenTaiko.Tx.Taiko_Combo[2].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0] + yScalling;
 						OpenTaiko.Tx.Taiko_Combo[2].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[0];
 						OpenTaiko.Tx.Taiko_Combo[2].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[0] * i, combo_y, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size[0], OpenTaiko.Skin.Game_Taiko_Combo_Size[1]));
@@ -480,32 +480,32 @@ internal class CAct演奏Combo共通 : CActivity {
 				}
 			} else if (n桁数 == 3) {
 				if (nCombo値 >= 300 && OpenTaiko.Tx.Taiko_Combo[3] != null) {
-					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 0];
+					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
 					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
 					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
-					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 1] : 0;
+					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
 					OpenTaiko.Tx.Taiko_Combo[3].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				} else if (OpenTaiko.Tx.Taiko_Combo[1] != null) {
-					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 0];
+					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
 					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.Y = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1] + yScalling;
 					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[1];
-					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 1] : 0;
+					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
 					OpenTaiko.Tx.Taiko_Combo[1].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[1] * i, combo_ex_y + yJumping, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				}
 
 				if (!OpenTaiko.ConfigIni.SimpleMode) showComboEffect(1, i, rightX, combo_ex_y, nPlayer);
 			} else {
 				if (nCombo値 >= 300 && OpenTaiko.Tx.Taiko_Combo[3] != null) {
-					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 0];
+					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
 					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.Y = 1.0f + yScalling;
 					OpenTaiko.Tx.Taiko_Combo[3].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
-					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 1] : 0;
+					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
 					OpenTaiko.Tx.Taiko_Combo[3].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				} else if (OpenTaiko.Tx.Taiko_Combo[1] != null) {
-					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 0];
+					var yScalling = OpenTaiko.ConfigIni.SimpleMode ? 0 : ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 0];
 					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.Y = 1.0f + yScalling;
 					OpenTaiko.Tx.Taiko_Combo[1].vcScaleRatio.X = OpenTaiko.Skin.Game_Taiko_Combo_Scale[2];
-					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctコンボ加算[nPlayer].CurrentValue, 1] : 0;
+					var yJumping = OpenTaiko.Skin.Game_Taiko_Combo_Ex_IsJumping ? (int)ComboScale_Ex[this.ctComboAddCounter[nPlayer].CurrentValue, 1] : 0;
 					OpenTaiko.Tx.Taiko_Combo[1].t2D拡大率考慮下中心基準描画(rightX - OpenTaiko.Skin.Game_Taiko_Combo_Padding[2] * i, combo_ex_y + yJumping, new Rectangle(n位の数[i] * OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], 0, OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[0], OpenTaiko.Skin.Game_Taiko_Combo_Size_Ex[1]));
 				}
 
@@ -521,10 +521,10 @@ internal class CAct演奏Combo共通 : CActivity {
 	// CActivity 実装
 
 	public override void Activate() {
-		this.n現在のコンボ数 = new STCOMBO() { act = this };
-		this.n現在のコンボ数.最高値 = new int[5];
+		this.nCurrentCombo = new STCOMBO() { act = this };
+		this.nCurrentCombo.最高値 = new int[5];
 		this.status = new CSTATUS();
-		this.ctコンボ加算 = new CCounter[5];
+		this.ctComboAddCounter = new CCounter[5];
 		for (int i = 0; i < 5; i++) {
 			this.status[i].e現在のモード = EMode.非表示中;
 			this.status[i].nCOMBO値 = 0;
@@ -534,7 +534,7 @@ internal class CAct演奏Combo共通 : CActivity {
 			this.status[i].nジャンプインデックス値 = 99999;
 			this.status[i].n前回の時刻_ジャンプ用 = -1;
 			this.status[i].nコンボが切れた時刻 = -1;
-			this.ctコンボ加算[i] = new CCounter(0, 12, 12, OpenTaiko.Timer);
+			this.ctComboAddCounter[i] = new CCounter(0, 12, 12, OpenTaiko.Timer);
 		}
 		this.ctコンボラメ = new CCounter(0, 35, 16, OpenTaiko.Timer);
 		base.Activate();

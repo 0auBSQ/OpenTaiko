@@ -32,11 +32,11 @@ internal class CActImplScore : CAct演奏スコア共通 {
 			}
 
 			for (int i = 0; i < 5; i++) {
-				if (!this.ctボーナス加算タイマ[i].IsStoped) {
-					this.ctボーナス加算タイマ[i].Tick();
-					if (this.ctボーナス加算タイマ[i].IsEnded) {
+				if (!this.ctBonusAddTimer[i].IsStoped) {
+					this.ctBonusAddTimer[i].Tick();
+					if (this.ctBonusAddTimer[i].IsEnded) {
 						OpenTaiko.stage演奏ドラム画面.actScore.BonusAdd(i);
-						this.ctボーナス加算タイマ[i].Stop();
+						this.ctBonusAddTimer[i].Stop();
 					}
 				}
 			}

@@ -65,12 +65,12 @@ internal class CActResultImage : CActivity {
 	private CTexture txリザルト画像;
 
 	private bool tプレビュー画像の指定があれば構築する() {
-		if (string.IsNullOrEmpty(OpenTaiko.DTX.PREIMAGE)) {
+		if (string.IsNullOrEmpty(OpenTaiko.TJA.PREIMAGE)) {
 			return false;
 		}
 		OpenTaiko.tDisposeSafely(ref this.txリザルト画像);
 		this.r表示するリザルト画像 = null;
-		string path = OpenTaiko.DTX.strフォルダ名 + OpenTaiko.DTX.PREIMAGE;
+		string path = OpenTaiko.TJA.strフォルダ名 + OpenTaiko.TJA.PREIMAGE;
 		if (!File.Exists(path)) {
 			Trace.TraceWarning("ファイルが存在しません。({0})", new object[] { path });
 			return false;

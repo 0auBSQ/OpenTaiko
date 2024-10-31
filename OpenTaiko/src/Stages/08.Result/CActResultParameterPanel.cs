@@ -460,7 +460,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood,
 							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss,
 							OpenTaiko.stage演奏ドラム画面.GetRoll(i),
-							OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[i],
+							OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[i],
 							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nADLIB,
 							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMine,
 						};

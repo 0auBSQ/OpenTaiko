@@ -9,12 +9,12 @@ internal class CActImplLane : CActivity {
 
 	public override void Activate() {
 		this.ct分岐アニメ進行 = new CCounter[5];
-		this.nBefore = new CDTX.ECourse[5];
-		this.nAfter = new CDTX.ECourse[5];
+		this.nBefore = new CTja.ECourse[5];
+		this.nAfter = new CTja.ECourse[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			this.ct分岐アニメ進行[i] = new CCounter();
-			this.nBefore = new CDTX.ECourse[5];
-			this.nAfter = new CDTX.ECourse[5];
+			this.nBefore = new CTja.ECourse[5];
+			this.nAfter = new CTja.ECourse[5];
 			this.bState[i] = false;
 		}
 		if (OpenTaiko.Tx.Lane_Base[0] != null)
@@ -87,13 +87,13 @@ internal class CActImplLane : CActivity {
 				} else if (this.ct分岐アニメ進行[i].IsTicked && !_laneNull) {
 					#region[ 普通譜面_レベルアップ ]
 					//普通→玄人
-					if (nBefore[i] == 0 && nAfter[i] == CDTX.ECourse.eNormal) {
+					if (nBefore[i] == 0 && nAfter[i] == CTja.ECourse.eNormal) {
 						OpenTaiko.Tx.Lane_Base[1].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
 						OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
 						OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 					}
 					//普通→達人
-					if (nBefore[i] == 0 && nAfter[i] == CDTX.ECourse.eMaster) {
+					if (nBefore[i] == 0 && nAfter[i] == CTja.ECourse.eMaster) {
 						OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
 						if (this.ct分岐アニメ進行[i].CurrentValue < 100) {
 							OpenTaiko.Tx.Lane_Base[1].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
@@ -110,7 +110,7 @@ internal class CActImplLane : CActivity {
 					#endregion
 
 					#region[ 玄人譜面_レベルアップ ]
-					if (nBefore[i] == CDTX.ECourse.eExpert && nAfter[i] == CDTX.ECourse.eMaster) {
+					if (nBefore[i] == CTja.ECourse.eExpert && nAfter[i] == CTja.ECourse.eMaster) {
 						OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 						OpenTaiko.Tx.Lane_Base[2].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
 						OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
@@ -118,7 +118,7 @@ internal class CActImplLane : CActivity {
 					#endregion
 
 					#region[ 玄人譜面_レベルダウン ]
-					if (nBefore[i] == CDTX.ECourse.eExpert && nAfter[i] == CDTX.ECourse.eNormal) {
+					if (nBefore[i] == CTja.ECourse.eExpert && nAfter[i] == CTja.ECourse.eNormal) {
 						OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 						OpenTaiko.Tx.Lane_Base[0].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
 						OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
@@ -126,7 +126,7 @@ internal class CActImplLane : CActivity {
 					#endregion
 
 					#region[ 達人譜面_レベルダウン ]
-					if (nBefore[i] == CDTX.ECourse.eMaster && nAfter[i] == CDTX.ECourse.eNormal) {
+					if (nBefore[i] == CTja.ECourse.eMaster && nAfter[i] == CTja.ECourse.eNormal) {
 						OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
 						if (this.ct分岐アニメ進行[i].CurrentValue < 100) {
 							OpenTaiko.Tx.Lane_Base[1].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
@@ -140,7 +140,7 @@ internal class CActImplLane : CActivity {
 							OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
 						}
 					}
-					if (nBefore[i] == CDTX.ECourse.eMaster && nAfter[i] == CDTX.ECourse.eExpert) {
+					if (nBefore[i] == CTja.ECourse.eMaster && nAfter[i] == CTja.ECourse.eExpert) {
 						OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
 						OpenTaiko.Tx.Lane_Base[2].Opacity = this.ct分岐アニメ進行[i].CurrentValue > 100 ? 255 : ((this.ct分岐アニメ進行[i].CurrentValue * 0xff) / 100);
 						OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
@@ -152,7 +152,7 @@ internal class CActImplLane : CActivity {
 		return base.Draw();
 	}
 
-	public virtual void t分岐レイヤー_コース変化(CDTX.ECourse n現在, CDTX.ECourse n次回, int player) {
+	public virtual void t分岐レイヤー_コース変化(CTja.ECourse n現在, CTja.ECourse n次回, int player) {
 		if (n現在 == n次回) {
 			return;
 		}
@@ -168,8 +168,8 @@ internal class CActImplLane : CActivity {
 	//-----------------
 	public bool[] bState = new bool[5];
 	public CCounter[] ct分岐アニメ進行 = new CCounter[5];
-	private CDTX.ECourse[] nBefore;
-	private CDTX.ECourse[] nAfter;
+	private CTja.ECourse[] nBefore;
+	private CTja.ECourse[] nAfter;
 	private int[] n透明度 = new int[5];
 	//private CTexture[] tx普通譜面 = new CTexture[2];
 	//private CTexture[] tx玄人譜面 = new CTexture[2];

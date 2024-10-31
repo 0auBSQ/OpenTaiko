@@ -172,7 +172,7 @@ internal class CActImplBalloon : CActivity {
 		} else {
 			if (n連打数 == 0 && OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player]) {
 				OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
-				OpenTaiko.stage演奏ドラム画面.b連打中[player] = false;
+				OpenTaiko.stage演奏ドラム画面.bCurrentlyDrumRoll[player] = false;
 			}
 		}
 

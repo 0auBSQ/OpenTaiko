@@ -1249,7 +1249,7 @@ class TextureLoader {
 		#endregion
 
 		if (OpenTaiko.ConfigIni.PreAssetsLoading) {
-			foreach (var act in OpenTaiko.app.listトップレベルActivities) {
+			foreach (var act in OpenTaiko.app.listTopLevelActivities) {
 				act.CreateManagedResource();
 				act.CreateUnmanagedResource();
 			}
@@ -2268,7 +2268,7 @@ class TextureLoader {
 
 		//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 		{
-			foreach (var act in OpenTaiko.app.listトップレベルActivities) {
+			foreach (var act in OpenTaiko.app.listTopLevelActivities) {
 				act.ReleaseManagedResource();
 				act.ReleaseUnmanagedResource();
 			}

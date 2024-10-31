@@ -146,7 +146,7 @@ internal class CSongs管理 {
 
 						bool b = false;
 						for (int n = 0; n < (int)Difficulty.Total; n++) {
-							CDTX dtx = new CDTX(fileinfo.FullName, false, 1.0, 0, 1);
+							CTja dtx = new CTja(fileinfo.FullName, false, 1.0, 0, 1);
 							if (dtx.b譜面が存在する[n]) {
 								c曲リストノード.difficultiesCount++;
 								c曲リストノード.rParentNode = node親;
@@ -183,9 +183,9 @@ internal class CSongs管理 {
 								c曲リストノード.nTotalFloor = 0;
 
 								for (int i = 0; i < dtx.listChip.Count; i++) {
-									CDTX.CChip pChip = dtx.listChip[i];
+									CChip pChip = dtx.listChip[i];
 
-									if (pChip.n整数値_内部番号 > c曲リストノード.nTotalFloor && pChip.nチャンネル番号 == 0x50) c曲リストノード.nTotalFloor = pChip.n整数値_内部番号;
+									if (pChip.n整数値_内部番号 > c曲リストノード.nTotalFloor && pChip.nChannelNo == 0x50) c曲リストノード.nTotalFloor = pChip.n整数値_内部番号;
 
 								}
 								c曲リストノード.nTotalFloor++;
@@ -282,7 +282,7 @@ internal class CSongs管理 {
 
 						this.n検索された曲ノード数++;
 					} else {
-						CDTX dtx = new CDTX(filePath, false, 1.0, 0, 0);
+						CTja dtx = new CTja(filePath, false, 1.0, 0, 0);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
 
@@ -607,7 +607,7 @@ internal class CSongs管理 {
 	//-----------------
 	#endregion
 
-	private void LoadChartInfo(CSongListNode c曲リストノード, CDTX cdtx, int i) {
+	private void LoadChartInfo(CSongListNode c曲リストノード, CTja cdtx, int i) {
 		if ((c曲リストノード.score[i] != null) && !c曲リストノード.score[i].bSongDBにキャッシュがあった) {
 			#region [ DTX ファイルのヘッダだけ読み込み、Cスコア.譜面情報 を設定する ]
 			//-----------------
@@ -654,9 +654,9 @@ internal class CSongs管理 {
 
 					c曲リストノード.score[i].譜面情報.nTotalFloor = 0;
 					for (int k = 0; k < cdtx.listChip.Count; k++) {
-						CDTX.CChip pChip = cdtx.listChip[k];
+						CChip pChip = cdtx.listChip[k];
 
-						if (pChip.n整数値_内部番号 > c曲リストノード.score[i].譜面情報.nTotalFloor && pChip.nチャンネル番号 == 0x50)
+						if (pChip.n整数値_内部番号 > c曲リストノード.score[i].譜面情報.nTotalFloor && pChip.nChannelNo == 0x50)
 							c曲リストノード.score[i].譜面情報.nTotalFloor = pChip.n整数値_内部番号;
 					}
 					c曲リストノード.score[i].譜面情報.nTotalFloor++;
