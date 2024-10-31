@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0.11] - 2024-10-31 (Beta)
+
+- Fix TJA newline after last note symbol and before `,` caused wrong note
+- symbols
+- per
+- measure calculation
+
 ## [0.6.0.10] - 2024-10-30 (Beta)
 
 - Fix Softlocked in difficulty selection when any non P1 player has no key binds     * Now menu keys control the lowerest index operable player
