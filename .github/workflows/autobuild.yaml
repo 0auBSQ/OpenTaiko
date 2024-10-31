@@ -62,6 +62,10 @@ jobs:
         with:
           proj-path: OpenTaiko/OpenTaiko.csproj
 
+      - name: Store projectVersion in environment
+        run: |
+          echo "projectVersion=${{ steps.get-version.outputs.version }}" >> $env:GITHUB_ENV
+
       - name: Get current date
         id: get-date
         run: |
@@ -76,7 +80,7 @@ jobs:
 
       - name: Update CHANGELOG.md
         run: |
-          $version = $env:version
+          $version = $env:projectVersion
           $date = $env:date
           $message = $env:message
           $changelogPath = "CHANGELOG.md"
@@ -110,7 +114,7 @@ jobs:
           git config --global user.email "actions@github.com"
           git add OpenTaiko/OpenTaiko.csproj
           git add CHANGELOG.md
-          git commit -m "Update changelog for version $env:version"
+          git commit -m "Update changelog for version $env:projectVersion"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
 
       - name: Build for Windows x64
@@ -143,7 +147,7 @@ jobs:
         uses: mukunku/tag-exists-action@v1.6.0
         id: check-tag
         with:
-          tag: ${{ env.version }}
+          tag: ${{ env.projectVersion }}
 
       - name: Create Release
         if: steps.check-tag.outputs.exists == 'false' && env.version != ''
@@ -151,8 +155,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.version }}
-          release_name: OpenTaiko v${{ env.version }}
+          tag_name: ${{ env.projectVersion }}
+          release_name: OpenTaiko v${{ env.projectVersion }}
           body: |
             Note: The releases do not contain skins nor songs.
             Please download/update through the OpenTaiko Hub: https://github.com/OpenTaiko/OpenTaiko-Hub/releases
@@ -164,6 +168,6 @@ jobs:
         with:
           file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
           overwrite: true
-          tag_name: ${{ env.version }}
+          tag_name: ${{ env.projectVersion }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
