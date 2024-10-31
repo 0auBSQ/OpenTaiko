@@ -71,20 +71,25 @@ jobs:
         id: get-commit-message
         run: |
           $message = git log -1 --pretty=%b
-          echo "::set-output name=message::$message"
+          $messagePath = 'COMMIT_MSG'
+          echo $message >> $messagePath
+          echo "messagePath=$messagePath" >> $env:GITHUB_ENV
 
       - name: Update CHANGELOG.md
         run: |
           $version = '${{steps.get-version.outputs.version}}'
           $date = '${{steps.get-date.outputs.date}}'
-          $message = '${{steps.get-commit-message.outputs.message}}'
+          $messagePath = $env:messagePath
           $changelogPath = "CHANGELOG.md"
+
+          # Read commit description content
+          $message = Get-Content -Path $messagePath
 
           # Read CHANGELOG.md content
           $changelog = Get-Content -Path $changelogPath
 
           # Split the message into individual items, trim whitespace, and format
-          $messageArray = $message -split '-' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+          $messageArray = $message -split '(^|\r|\n)\s*-' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
 
           # Format each item to have a leading dash
           $message = ($messageArray | ForEach-Object { "- $_" }) -join "`n"
