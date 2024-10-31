@@ -4876,6 +4876,12 @@ internal class CTja : CActivity {
 
 				for (int n = 0; n < InputText.Length; n++) {
 					if (InputText.Substring(n, 1) == ",") {
+						if (n文字数 == 0) {
+							this.dbLastTime = this.dbNowTime;
+							this.dbLastBMScrollTime = this.dbNowBMScollTime;
+							this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / 1));
+							this.dbNowBMScollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / 1));
+						}
 						this.n現在の小節数++;
 						this.b小節線を挿入している = false;
 						return;
