@@ -146,7 +146,7 @@ jobs:
           tag: ${{ env.version }}
 
       - name: Create Release
-        if: steps.check-tag.outputs.exists == 'false'
+        if: steps.check-tag.outputs.exists == 'false' && env.version != ''
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
