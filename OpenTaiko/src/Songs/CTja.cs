@@ -1893,7 +1893,6 @@ internal class CTja : CActivity {
 	}
 
 	// Regexes
-	private static readonly Regex regexForPrefixingCommaStartingLinesWithZero = new Regex(@"^,", RegexOptions.Multiline | RegexOptions.Compiled);
 	private static readonly Regex regexForStrippingHeadingLines = new Regex(
 		@"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MAKER|SELECTBG|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
 		RegexOptions.Multiline | RegexOptions.Compiled);
@@ -1912,10 +1911,6 @@ internal class CTja : CActivity {
 		nDifficulty = difficulty;
 		if (!String.IsNullOrEmpty(strInput)) //空なら通さない
 		{
-
-			//2017.01.31 DD カンマのみの行を0,に置き換え
-			strInput = regexForPrefixingCommaStartingLinesWithZero.Replace(strInput, "0,");
-
 			//2017.02.03 DD ヘッダ内にある命令以外の文字列を削除
 			var startIndex = strInput.IndexOf("#START");
 			if (startIndex < 0) {
