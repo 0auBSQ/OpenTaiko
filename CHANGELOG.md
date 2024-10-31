@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.12] - 2024-10-31 (Beta)
+
+- Fix TJA not inserting timing space for `,`
+- only measures
+
 ## [0.6.0.11] - 2024-10-31 (Beta)
 
 - Fix TJA newline after last note symbol and before `,` caused wrong note-symbols-per-measure calculation
