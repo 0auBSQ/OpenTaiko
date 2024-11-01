@@ -49,7 +49,7 @@ internal class CActSelectPopupMenu : CActivity {
 	}
 
 	protected void Initialize(List<CItemBase> menulist, bool showAllItems, string title, int defaultPos) {
-		ConditionallyInitializePrvFont();
+		InitializePrvFont();
 
 		b選択した = false;
 		stqMenuTitle = new stQuickMenuItem();
@@ -72,10 +72,9 @@ internal class CActSelectPopupMenu : CActivity {
 		n現在の選択行 = defaultPos;
 	}
 
-	private void ConditionallyInitializePrvFont() {
-		if (prvFont == null) {
-			prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.PopupMenu_Font_Size);
-		}
+	private void InitializePrvFont() {
+		prvFont?.Dispose();
+		prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.PopupMenu_Font_Size);
 	}
 
 	public static void RefleshSkin() {
@@ -86,7 +85,7 @@ internal class CActSelectPopupMenu : CActivity {
 
 	public void _RefleshSkin() {
 		OpenTaiko.tDisposeSafely(ref prvFont);
-		ConditionallyInitializePrvFont();
+		InitializePrvFont();
 
 		using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem.str項目名, Color.White, Color.Black, null, 30)) {
 			OpenTaiko.tDisposeSafely(ref stqMenuTitle.txName);
@@ -201,7 +200,7 @@ internal class CActSelectPopupMenu : CActivity {
 	public override void CreateManagedResource() {
 		base.CreateManagedResource();
 
-		ConditionallyInitializePrvFont();
+		InitializePrvFont();
 	}
 
 	public override void ReleaseManagedResource() {
