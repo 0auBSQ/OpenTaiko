@@ -187,6 +187,22 @@ class DBUnlockables {
 						this.Type = "me";
 						bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
 						return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
+					case "ce":
+					case "tp":
+					case "ap":
+					case "aw":
+					case "sd":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+						return (fulfiled, null);
+					case "dp":
+					case "lp":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
+						return (fulfiled, null);
+					case "sp":
+					case "sg":
+					case "sc":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Reference.Length);
+						return (fulfiled, null);
 					default:
 						return (false, null); // Return the same text if my room
 				}
@@ -239,6 +255,22 @@ class DBUnlockables {
 						this.Type = "me";
 						bool fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
 						return (fulfiled, CLangManager.LangInstance.GetString(fulfiled ? "UNLOCK_COIN_BOUGHT" : "UNLOCK_COIN_MORE"));
+					case "ce":
+					case "tp":
+					case "ap":
+					case "aw":
+					case "sd":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[0]);
+						return (fulfiled, null);
+					case "dp":
+					case "lp":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Values[2]);
+						return (fulfiled, null);
+					case "sp":
+					case "sg":
+					case "sc":
+						fulfiled = this.tValueRequirementMet(inputValues[0], this.Reference.Length);
+						return (fulfiled, null);
 					default:
 						return (false, null);
 				}
