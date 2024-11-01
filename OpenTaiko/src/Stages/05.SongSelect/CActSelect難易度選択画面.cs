@@ -157,43 +157,53 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 		if (this.ctBarAnimeIn.IsEnded && exextraAnimation == 0) // Prevent player actions if animation is active
 		{
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (!bSelect[i] && !isOnOption()) {
-					bool right = false;
-					bool left = false;
-					bool decide = false;
+			// menu key input, for the lowest-index player who is still selecting the difficulty
+			bool rightMenu = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
+			bool leftMenu = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
+			bool decideMenu = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
+				(OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
+			bool cancelMenu = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
 
-					bool cancel = false;
+			// per-player key input
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				if (!bSelect[i] && !isOnOption() &&
+					!(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)
+					) {
+					bool right = rightMenu;
+					bool left = leftMenu;
+					bool decide = decideMenu;
+					bool cancel = cancelMenu;
+
+					rightMenu = false;
+					leftMenu = false;
+					decideMenu = false;
+					cancelMenu = false;
 
 					switch (i) {
 						case 0:
-							right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow));
-							left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow));
-							decide = (OpenTaiko.Pad.bPressedDGB(EPad.Decide) ||
-									  (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)));
-							cancel = (OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape));
+							right = right || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue);
+							left = left || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange);
+							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed));
 							break;
 						case 1:
-							if (!OpenTaiko.ConfigIni.bAIBattleMode) {
-								right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
-								left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
-								decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
-							}
+							right = right || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue2P));
+							left = left || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue2P));
+							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P));
 							break;
 						case 2:
-							right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
-							left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
-							decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
+							right = right || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue3P));
+							left = left || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue3P));
+							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed3P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed3P));
 							break;
 						case 3:
-							right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
-							left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
-							decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
+							right = right || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue4P));
+							left = left || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue4P));
+							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed4P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed4P));
 							break;
 						case 4:
-							right = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
-							left = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
-							decide = (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
+							right = right || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue5P));
+							left = left || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue5P));
+							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed5P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed5P));
 							break;
 					}
 
@@ -517,7 +527,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 	}
 	private STレベル数字[] st小文字位置 = new STレベル数字[10];
 
-	private void t小文字表示(int num, float x, float y, int diff, CDTX.ELevelIcon icon) {
+	private void t小文字表示(int num, float x, float y, int diff, CTja.ELevelIcon icon) {
 		int[] nums = CConversion.SeparateDigits(num);
 		float[] icon_coords = new float[2] { -999, -999 };
 		for (int j = 0; j < nums.Length; j++) {

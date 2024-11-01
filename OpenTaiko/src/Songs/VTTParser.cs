@@ -4,7 +4,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using FDK;
 using SkiaSharp;
-using static OpenTaiko.CDTX;
+using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
 

@@ -1123,11 +1123,7 @@ internal class CStage選曲 : CStage {
 				}
 			}
 
-			if (actDifficultySelectionScreen.bOption[0]) actPlayOption.On進行描画(0);
-			if (actDifficultySelectionScreen.bOption[1]) actPlayOption.On進行描画(1);
-			if (actDifficultySelectionScreen.bOption[2]) actPlayOption.On進行描画(2);
-			if (actDifficultySelectionScreen.bOption[3]) actPlayOption.On進行描画(3);
-			if (actDifficultySelectionScreen.bOption[4]) actPlayOption.On進行描画(4);
+			this.actPlayOption.On進行描画(5, this.actDifficultySelectionScreen.bOption);
 
 			if (actNewHeya.IsOpend) actNewHeya.Draw();
 

@@ -56,17 +56,17 @@ internal class CSongListNode {
 	public CLocalizationData ldSubtitle = new CLocalizationData();
 	public string strMaker = "";
 	public string[] strNotesDesigner = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
-	public CDTX.ESide nSide = CDTX.ESide.eEx;
+	public CTja.ESide nSide = CTja.ESide.eEx;
 	public bool bExplicit = false;
 	public bool bMovie = false;
 	public int[] nLevel = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
-	public CDTX.ELevelIcon[] nLevelIcon = new CDTX.ELevelIcon[(int)Difficulty.Total] { CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone, CDTX.ELevelIcon.eNone };
+	public CTja.ELevelIcon[] nLevelIcon = new CTja.ELevelIcon[(int)Difficulty.Total] { CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone };
 
 	// Branches
 	public bool bBranch = false;
 
 	// Dan
-	public List<CDTX.DanSongs> DanSongs;
+	public List<CTja.DanSongs> DanSongs;
 	public Dan_C[] Dan_C;
 
 	// Tower Lives

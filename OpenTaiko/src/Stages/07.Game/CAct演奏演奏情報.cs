@@ -22,18 +22,18 @@ internal class CAct演奏演奏情報 : CActivity {
 	public override void Activate() {
 		for (int i = 0; i < 5; i++) {
 			NowMeasure[i] = 0;
-			this.dbBPM[i] = OpenTaiko.DTX.BASEBPM;
+			this.dbBPM[i] = OpenTaiko.TJA.BASEBPM;
 		}
 		this.dbSCROLL = 1.0;
 
-		_chipCounts[0] = OpenTaiko.DTX.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
-		_chipCounts[1] = OpenTaiko.DTX.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
+		_chipCounts[0] = OpenTaiko.TJA.listChip.Where(num => NotesManager.IsMissableNote(num)).Count();
+		_chipCounts[1] = OpenTaiko.TJA.listChip_Branch[2].Where(num => NotesManager.IsMissableNote(num)).Count();
 
-		NotesTextN = string.Format("NoteN:         {0:####0}", OpenTaiko.DTX.nノーツ数_Branch[0]);
-		NotesTextE = string.Format("NoteE:         {0:####0}", OpenTaiko.DTX.nノーツ数_Branch[1]);
-		NotesTextM = string.Format("NoteM:         {0:####0}", OpenTaiko.DTX.nノーツ数_Branch[2]);
-		NotesTextC = string.Format("NoteC:         {0:####0}", OpenTaiko.DTX.nノーツ数[3]);
-		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.DTX.nScoreModeTmp);
+		NotesTextN = string.Format("NoteN:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[0]);
+		NotesTextE = string.Format("NoteE:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[1]);
+		NotesTextM = string.Format("NoteM:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[2]);
+		NotesTextC = string.Format("NoteC:         {0:####0}", OpenTaiko.TJA.nノーツ数[3]);
+		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.TJA.nScoreModeTmp);
 		ListChipText = string.Format("ListChip:      {0:####0}", _chipCounts[0]);
 		ListChipMText = string.Format("ListChipM:     {0:####0}", _chipCounts[1]);
 
@@ -45,9 +45,9 @@ internal class CAct演奏演奏情報 : CActivity {
 	public void t進行描画(int x, int y) {
 		if (!base.IsDeActivated) {
 			y += 0x153;
-			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.DTX.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
+			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
 			y -= 0x10;
-			int num = (OpenTaiko.DTX.listChip.Count > 0) ? OpenTaiko.DTX.listChip[OpenTaiko.DTX.listChip.Count - 1].n発声時刻ms : 0;
+			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
 			string str = "Time:          " + ((((double)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0)).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, str);
 			y -= 0x10;

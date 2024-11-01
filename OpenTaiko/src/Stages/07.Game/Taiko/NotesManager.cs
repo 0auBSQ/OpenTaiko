@@ -49,7 +49,7 @@ class NotesManager {
 		return -1;
 	}
 
-	public static int GetNoteX(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
+	public static int GetNoteX(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
 		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
 		double screen_ratio = OpenTaiko.Skin.Resolution[0] / 1280.0;
 		switch (eScrollMode) {
@@ -66,7 +66,7 @@ class NotesManager {
 		}
 	}
 
-	public static int GetNoteY(CDTX.CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
+	public static int GetNoteY(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
 		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
 		double screen_ratio = OpenTaiko.Skin.Resolution[1] / 720.0;
 		switch (eScrollMode) {
@@ -87,7 +87,7 @@ class NotesManager {
 
 	#region [Gameplay]
 
-	public static bool IsExpectedPad(int stored, int hit, CDTX.CChip chip, EGameType gt) {
+	public static bool IsExpectedPad(int stored, int hit, CChip chip, EGameType gt) {
 		var inPad = (EPad)hit;
 		var onPad = (EPad)stored;
 
@@ -120,56 +120,56 @@ class NotesManager {
 
 	#region [General]
 
-	public static bool IsCommonNote(CDTX.CChip chip) {
+	public static bool IsCommonNote(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 >= 0x11 && chip.nチャンネル番号 < 0x18;
+		return chip.nChannelNo >= 0x11 && chip.nChannelNo < 0x18;
 	}
-	public static bool IsMine(CDTX.CChip chip) {
+	public static bool IsMine(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x1C;
-	}
-
-	public static bool IsDonNote(CDTX.CChip chip) {
-		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x11 || chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A;
+		return chip.nChannelNo == 0x1C;
 	}
 
-	public static bool IsKaNote(CDTX.CChip chip) {
+	public static bool IsDonNote(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x12 || chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B;
+		return chip.nChannelNo == 0x11 || chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A;
 	}
 
-	public static bool IsSmallNote(CDTX.CChip chip, bool blue) {
+	public static bool IsKaNote(CChip chip) {
 		if (chip == null) return false;
-		return blue ? chip.nチャンネル番号 == 0x12 : chip.nチャンネル番号 == 0x11;
+		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B;
 	}
 
-	public static bool IsSmallNote(CDTX.CChip chip) {
+	public static bool IsSmallNote(CChip chip, bool blue) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x12 || chip.nチャンネル番号 == 0x11;
+		return blue ? chip.nChannelNo == 0x12 : chip.nChannelNo == 0x11;
 	}
 
-	public static bool IsBigNote(CDTX.CChip chip) {
+	public static bool IsSmallNote(CChip chip) {
 		if (chip == null) return false;
-		return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1A || chip.nチャンネル番号 == 0x1B);
+		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x11;
 	}
 
-	public static bool IsBigKaTaiko(CDTX.CChip chip, EGameType gt) {
+	public static bool IsBigNote(CChip chip) {
 		if (chip == null) return false;
-		return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.Taiko;
+		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1A || chip.nChannelNo == 0x1B);
 	}
 
-	public static bool IsBigDonTaiko(CDTX.CChip chip, EGameType gt) {
+	public static bool IsBigKaTaiko(CChip chip, EGameType gt) {
 		if (chip == null) return false;
-		return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A) && gt == EGameType.Taiko;
+		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Taiko;
 	}
 
-	public static bool IsClapKonga(CDTX.CChip chip, EGameType gt) {
+	public static bool IsBigDonTaiko(CChip chip, EGameType gt) {
 		if (chip == null) return false;
-		return (chip.nチャンネル番号 == 0x14 || chip.nチャンネル番号 == 0x1B) && gt == EGameType.Konga;
+		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A) && gt == EGameType.Taiko;
 	}
 
-	public static bool IsSwapNote(CDTX.CChip chip, EGameType gt) {
+	public static bool IsClapKonga(CChip chip, EGameType gt) {
+		if (chip == null) return false;
+		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Konga;
+	}
+
+	public static bool IsSwapNote(CChip chip, EGameType gt) {
 		if (chip == null) return false;
 		return (
 			IsKongaPink(chip, gt)                           // Konga Pink note
@@ -177,87 +177,87 @@ class NotesManager {
 		);
 	}
 
-	public static bool IsKongaPink(CDTX.CChip chip, EGameType gt) {
+	public static bool IsKongaPink(CChip chip, EGameType gt) {
 		if (chip == null) return false;
 		// Purple notes are treated as Pink in Konga
-		return (chip.nチャンネル番号 == 0x13 || chip.nチャンネル番号 == 0x1A || IsPurpleNote(chip)) && gt == EGameType.Konga;
+		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A || IsPurpleNote(chip)) && gt == EGameType.Konga;
 	}
-	public static bool IsPurpleNote(CDTX.CChip chip) {
+	public static bool IsPurpleNote(CChip chip) {
 		if (chip == null) return false;
-		return (chip.nチャンネル番号 == 0x101);
+		return (chip.nChannelNo == 0x101);
 	}
 
-	public static bool IsYellowRoll(CDTX.CChip chip) {
+	public static bool IsYellowRoll(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x21;
+		return chip.nChannelNo == 0x21;
 	}
 
-	public static bool IsClapRoll(CDTX.CChip chip) {
+	public static bool IsClapRoll(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x20;
+		return chip.nChannelNo == 0x20;
 	}
 
-	public static bool IsKusudama(CDTX.CChip chip) {
+	public static bool IsKusudama(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x19;
+		return chip.nChannelNo == 0x19;
 	}
 
-	public static bool IsFuzeRoll(CDTX.CChip chip) {
+	public static bool IsFuzeRoll(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x1D;
+		return chip.nChannelNo == 0x1D;
 	}
 
-	public static bool IsRollEnd(CDTX.CChip chip) {
+	public static bool IsRollEnd(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x18;
+		return chip.nChannelNo == 0x18;
 	}
 
-	public static bool IsBalloon(CDTX.CChip chip) {
+	public static bool IsBalloon(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x17;
+		return chip.nChannelNo == 0x17;
 	}
 
-	public static bool IsBigRoll(CDTX.CChip chip) {
+	public static bool IsBigRoll(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x16;
+		return chip.nChannelNo == 0x16;
 	}
 
-	public static bool IsSmallRoll(CDTX.CChip chip) {
+	public static bool IsSmallRoll(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x15;
+		return chip.nChannelNo == 0x15;
 	}
 
-	public static bool IsADLIB(CDTX.CChip chip) {
+	public static bool IsADLIB(CChip chip) {
 		if (chip == null) return false;
-		return chip.nチャンネル番号 == 0x1F;
+		return chip.nChannelNo == 0x1F;
 	}
 
-	public static bool IsRoll(CDTX.CChip chip) {
+	public static bool IsRoll(CChip chip) {
 		if (chip == null) return false;
 		return IsBigRoll(chip) || IsSmallRoll(chip) || IsClapRoll(chip) || IsYellowRoll(chip);
 	}
 
-	public static bool IsGenericBalloon(CDTX.CChip chip) {
+	public static bool IsGenericBalloon(CChip chip) {
 		if (chip == null) return false;
 		return IsBalloon(chip) || IsKusudama(chip) || IsFuzeRoll(chip);
 	}
 
-	public static bool IsGenericRoll(CDTX.CChip chip) {
+	public static bool IsGenericRoll(CChip chip) {
 		if (chip == null) return false;
-		return (0x15 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x19) ||
-			   (chip.nチャンネル番号 == 0x20 || chip.nチャンネル番号 == 0x21)
-			   || chip.nチャンネル番号 == 0x1D;
+		return (0x15 <= chip.nChannelNo && chip.nChannelNo <= 0x19) ||
+			   (chip.nChannelNo == 0x20 || chip.nChannelNo == 0x21)
+			   || chip.nChannelNo == 0x1D;
 	}
 
-	public static bool IsMissableNote(CDTX.CChip chip) {
+	public static bool IsMissableNote(CChip chip) {
 		if (chip == null) return false;
-		return (0x11 <= chip.nチャンネル番号 && chip.nチャンネル番号 <= 0x14)
-			   || chip.nチャンネル番号 == 0x1A
-			   || chip.nチャンネル番号 == 0x1B
-			   || chip.nチャンネル番号 == 0x101;
+		return (0x11 <= chip.nChannelNo && chip.nChannelNo <= 0x14)
+			   || chip.nChannelNo == 0x1A
+			   || chip.nChannelNo == 0x1B
+			   || chip.nChannelNo == 0x101;
 	}
 
-	public static bool IsHittableNote(CDTX.CChip chip) {
+	public static bool IsHittableNote(CChip chip) {
 		if (chip == null) return false;
 		return IsMissableNote(chip)
 			   || IsGenericRoll(chip)
@@ -287,7 +287,7 @@ class NotesManager {
 	}
 
 	// Regular display
-	public static void DisplayNote(int player, int x, int y, CDTX.CChip chip, int frame, int length = -1) {
+	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1) {
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 			return;
 
@@ -325,7 +325,7 @@ class NotesManager {
 	}
 
 	// Roll display
-	public static void DisplayRoll(int player, int x, int y, CDTX.CChip chip, int frame,
+	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
 		Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
 		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
@@ -417,7 +417,7 @@ class NotesManager {
 	}
 
 	// SENotes
-	public static void DisplaySENotes(int player, int x, int y, CDTX.CChip chip) {
+	public static void DisplaySENotes(int player, int x, int y, CChip chip) {
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
 			return;
 

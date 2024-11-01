@@ -1,9 +1,49 @@
 # Changelog
 
+## [0.6.0.12] - 2024-10-31 (Beta)
+
+- Fix TJA not inserting timing space for `,`
+- only measures
+
+## [0.6.0.11] - 2024-10-31 (Beta)
+
+- Fix TJA newline after last note symbol and before `,` caused wrong note-symbols-per-measure calculation
+
+## [0.6.0.10] - 2024-10-30 (Beta)
+
+- Fix Softlocked in difficulty selection when any non P1 player has no key binds     * Now menu keys control the lowerest index operable player
+- Fix P1 could have only use menu keys but not drum keys, if the key binds differ     * Now both work
+- Fix Up and Down arrow keys controlled multiple players at once in gameplay option     * Now menu keys only control the lowerest index operable player
+
+## [0.6.0.9] - 2024-10-29 (Beta)
+
+- Fix crash when exiting title screen by Esc
+
+## [0.6.0.8] - 2024-10-29 (Beta)
+
+- Additional Chinese and Russian translations
+
+## [0.6.0.7] - 2024-10-29 (Beta)
+
+- Fix judge text drop frame when prev one remove
+
+## [0.6.0.6] - 2024-10-28 (Beta)
+
+- Add optional offset values for characters on menus and result screen
+
+## [0.6.0.5] - 2024-10-28 (Beta)
+
+- Fix big note judgement preventing early BAD of big notes in Easy window
+
+## [0.6.0.4] - 2024-10-27 (Beta)
+
+- Deprecate unused textures
+- Fix tall preimages not being scaled correctly
+- Fix Sort Songs menu not updating lang values
+
 ## [0.6.0.3] - 2024-10-27 (Beta)
 
-- Fix wrong roll speed in non
-- 1x play speed
+- Fix wrong roll speed in non-1x play speed
 
 ## [0.6.0.2] - 2024-10-27 (Beta)
 
@@ -12,8 +52,7 @@
 ## [0.6.0.1] - 2024-10-27 (Beta)
 
 - Fix Mob, Dancer, Runner appearing despite empty array on the scene preset
-- Chapter IV nameplates and make Chapter III all
-- songs nameplates accessible (condition changed from 999 songs to 34)
+- Chapter IV nameplates and make Chapter III all-songs nameplates accessible (condition changed from 999 songs to 34)
 - Japanese translations for some nameplates
 
 ## [0.6.0.0] - 2024-10-26 (Beta)

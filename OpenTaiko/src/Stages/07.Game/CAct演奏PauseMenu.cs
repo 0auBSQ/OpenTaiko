@@ -68,7 +68,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 				SoundManager.PlayTimer.Resume();
 				OpenTaiko.Timer.Resume();
-				OpenTaiko.DTX.t全チップの再生再開();
+				OpenTaiko.TJA.t全チップの再生再開();
 				OpenTaiko.stage演奏ドラム画面.actAVI.tPauseControl();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();

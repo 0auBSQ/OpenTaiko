@@ -208,8 +208,8 @@ class CResultCharacter {
 			float resolutionRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][0];
 			float resolutionRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][1];
 
-			float _x = x;
-			float _y = y;
+			float _x = x + (OpenTaiko.Skin.Characters_Result_Offset[_charaId][0] * _tex.vcScaleRatio.X);
+			float _y = y + (OpenTaiko.Skin.Characters_Result_Offset[_charaId][1] * _tex.vcScaleRatio.Y);
 
 			_tex.vcScaleRatio.X *= resolutionRatioX;
 			_tex.vcScaleRatio.Y *= resolutionRatioY;

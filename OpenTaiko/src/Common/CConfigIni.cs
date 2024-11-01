@@ -1587,7 +1587,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		for (int i = 0; i < 3; i++) {
 			this.bReverse[i] = false;
 			this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.AboveLane;
-			this.eInvisible[i] = EInvisible.Off;
 		}
 
 
@@ -2233,16 +2232,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; Enable countdown in songselect.(0:No, 1:Yes)");
 		sw.WriteLine("EnableCountDownTimer={0}", this.bEnableCountdownTimer ? 1 : 0);
 		sw.WriteLine();
-
-		#region [ Invisible ]
-
-		sw.WriteLine("; ドラムチップ非表示モード (0:OFF, 1=SEMI, 2:FULL)");
-		sw.WriteLine("; Drums chip invisible mode");
-		sw.WriteLine("DrumsInvisible={0}", (int)this.eInvisible.Drums);
-		sw.WriteLine();
-
-		#endregion
-
 		sw.WriteLine("; ドラムREVERSEモード(0:OFF, 1:ON)");
 		sw.WriteLine("DrumsReverse={0}", this.bReverse.Drums ? 1 : 0);
 		sw.WriteLine();
@@ -3041,10 +3030,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "EnableCountDownTimer":
 				this.bEnableCountdownTimer = CConversion.bONorOFF(value[0]);
-				break;
-			case "DrumsInvisible":
-				this.eInvisible.Drums =
-					(EInvisible)CConversion.ParseIntInRange(value, 0, 2, (int)this.eInvisible.Drums);
 				break;
 			case "DrumsReverse":
 				this.bReverse.Drums = CConversion.bONorOFF(value[0]);

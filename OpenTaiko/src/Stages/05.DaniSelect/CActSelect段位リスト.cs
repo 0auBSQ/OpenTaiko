@@ -255,7 +255,7 @@ class CActSelect段位リスト : CStage {
 		public int[] n曲難易度;
 		public int[] n曲レベル;
 		public CSongListNode.ENodeType eノード種別;
-		public List<CDTX.DanSongs> List_DanSongs;
+		public List<CTja.DanSongs> List_DanSongs;
 		public CTexture txBarCenter;
 		public CTexture txDanPlate;
 

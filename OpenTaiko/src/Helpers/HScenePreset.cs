@@ -41,10 +41,10 @@ class HScenePreset {
 			: null;
 
 		if (sectionIsValid
-			&& OpenTaiko.DTX.scenePreset != null
-			&& ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.DTX.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
+			&& OpenTaiko.TJA.scenePreset != null
+			&& ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.TJA.scenePreset)) // If currently selected song has valid SCENEPRESET metadata within TJA
 		{
-			preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[OpenTaiko.DTX.scenePreset];
+			preset = ((Dictionary<string, DBSkinPreset.SkinScene>)_ps)[OpenTaiko.TJA.scenePreset];
 		} else if (sectionIsValid
 				   && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
 				   && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset)) {

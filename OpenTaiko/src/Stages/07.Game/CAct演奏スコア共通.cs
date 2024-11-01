@@ -16,7 +16,7 @@ internal class CAct演奏スコア共通 : CActivity {
 	protected CCounter ctTimer;
 	public CCounter[] ct点数アニメタイマ;
 
-	public CCounter[] ctボーナス加算タイマ;
+	public CCounter[] ctBonusAddTimer;
 
 	protected STスコア[] stScore;
 	protected int nNowDisplayedAddScore;
@@ -257,9 +257,9 @@ internal class CAct演奏スコア共通 : CActivity {
 		for (int i = 0; i < 5; i++) {
 			this.ct点数アニメタイマ[i] = new CCounter();
 		}
-		this.ctボーナス加算タイマ = new CCounter[5];
+		this.ctBonusAddTimer = new CCounter[5];
 		for (int i = 0; i < 5; i++) {
-			this.ctボーナス加算タイマ[i] = new CCounter();
+			this.ctBonusAddTimer[i] = new CCounter();
 		}
 		base.Activate();
 	}

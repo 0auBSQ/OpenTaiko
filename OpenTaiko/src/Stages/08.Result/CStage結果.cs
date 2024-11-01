@@ -39,7 +39,7 @@ internal class CStage結果 : CStage {
 	public int[] nスコアランク = { 0, 0, 0, 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 	public int[] nHighScore = { 0, 0, 0, 0, 0 };
 
-	public CDTX.CChip[] r空うちドラムチップ;
+	public CChip[] r空うちドラムチップ;
 	public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
 
 
@@ -50,7 +50,7 @@ internal class CStage結果 : CStage {
 		this.st演奏記録.Guitar = new CScoreIni.C演奏記録();
 		this.st演奏記録.Bass = new CScoreIni.C演奏記録();
 		this.st演奏記録.Taiko = new CScoreIni.C演奏記録();
-		this.r空うちドラムチップ = new CDTX.CChip[10];
+		this.r空うちドラムチップ = new CChip[10];
 		this.n総合ランク値 = -1;
 		this.nチャンネル0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 7, 0 };
 		base.eStageID = CStage.EStage.Results;
@@ -325,7 +325,7 @@ internal class CStage結果 : CStage {
 				};
 
 				int level = OpenTaiko.stageSongSelect.rChoosenSong.nLevel[diff];
-				CDTX.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
+				CTja.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
@@ -630,7 +630,7 @@ internal class CStage結果 : CStage {
 			this.ctPhase3 = null;
 			examsShift = 0;
 
-			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.DTX.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
+			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
 			base.Activate();
 
@@ -1533,7 +1533,7 @@ internal class CStage結果 : CStage {
 			OpenTaiko.stage演奏ドラム画面.GetRoll(0), 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_MaxCombo[0] + offset, OpenTaiko.Skin.DanResult_MaxCombo[1],
-			OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[0], 1.0f);
+			OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0], 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_TotalHit[0] + offset, OpenTaiko.Skin.DanResult_TotalHit[1],
 			totalHit, 1.0f);
@@ -1596,10 +1596,10 @@ internal class CStage結果 : CStage {
 
 		int[] scoresArr =
 		{
-			OpenTaiko.stage演奏ドラム画面.n良[i],
-			OpenTaiko.stage演奏ドラム画面.n可[i],
-			OpenTaiko.stage演奏ドラム画面.n不可[i],
-			OpenTaiko.stage演奏ドラム画面.n連打[i]
+			OpenTaiko.stage演奏ドラム画面.nGood[i],
+			OpenTaiko.stage演奏ドラム画面.nOk[i],
+			OpenTaiko.stage演奏ドラム画面.nBad[i],
+			OpenTaiko.stage演奏ドラム画面.nRoll[i]
 		};
 
 		int[] num_x = {

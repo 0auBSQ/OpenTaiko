@@ -315,7 +315,7 @@ internal class DBSaves {
 			currentPlay.HighScoreGoodCount = chartScore.nGreat;
 			currentPlay.HighScoreOkCount = chartScore.nGood;
 			currentPlay.HighScoreBadCount = chartScore.nMiss;
-			currentPlay.HighScoreMaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.n現在のコンボ数.最高値[player];
+			currentPlay.HighScoreMaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[player];
 			currentPlay.HighScoreRollCount = chartScore.nRoll;
 			currentPlay.HighScoreADLibCount = chartScore.nADLIB;
 			currentPlay.HighScoreBoomCount = chartScore.nMine;

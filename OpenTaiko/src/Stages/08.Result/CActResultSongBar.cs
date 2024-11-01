@@ -21,7 +21,7 @@ internal class CActResultSongBar : CActivity {
 
 	public override void Activate() {
 
-		var title = OpenTaiko.DTX.TITLE.GetString("");
+		var title = OpenTaiko.TJA.TITLE.GetString("");
 
 		using (var bmpSongTitle = pfMusicName.DrawText(title, OpenTaiko.Skin.Result_MusicName_ForeColor, OpenTaiko.Skin.Result_MusicName_BackColor, null, 30)) {
 			this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);

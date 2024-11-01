@@ -125,20 +125,20 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.stage演奏ドラム画面.bUseBranch[i] == true) {
 				#region[ 動いていない ]
-				switch (OpenTaiko.stage演奏ドラム画面.nレーン用表示コース[i]) {
-					case CDTX.ECourse.eNormal:
+				switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+					case CTja.ECourse.eNormal:
 						if (OpenTaiko.Tx.Lane_Base[0] != null) {
 							OpenTaiko.Tx.Lane_Base[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
 						}
 						break;
-					case CDTX.ECourse.eExpert:
+					case CTja.ECourse.eExpert:
 						if (OpenTaiko.Tx.Lane_Base[1] != null) {
 							OpenTaiko.Tx.Lane_Base[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 						}
 						break;
-					case CDTX.ECourse.eMaster:
+					case CTja.ECourse.eMaster:
 						if (OpenTaiko.Tx.Lane_Base[2] != null) {
 							OpenTaiko.Tx.Lane_Base[2].Opacity = 255;
 							OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
@@ -159,7 +159,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 						#region[ 普通譜面_レベルアップ ]
 						//普通→玄人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eNormal && this.stBranch[i].nAfter == CDTX.ECourse.eExpert) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
 							if (OpenTaiko.Tx.Lane_Base[0] != null && OpenTaiko.Tx.Lane_Base[1] != null) {
 								OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
 								OpenTaiko.Tx.Lane_Base[1].Opacity = this.stBranch[i].nBranchレイヤー透明度;
@@ -167,7 +167,7 @@ internal class CActImplLaneTaiko : CActivity {
 							}
 						}
 						//普通→達人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eNormal && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 100) {
 								n透明度 = ((100 - this.stBranch[i].ct分岐アニメ進行.CurrentValue) * 0xff) / 100;
 							}
@@ -179,7 +179,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 						#endregion
 						#region[ 玄人譜面_レベルアップ ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							if (OpenTaiko.Tx.Lane_Base[1] != null && OpenTaiko.Tx.Lane_Base[2] != null) {
 								OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 								OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
@@ -188,7 +188,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 						#endregion
 						#region[ 玄人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							if (OpenTaiko.Tx.Lane_Base[1] != null && OpenTaiko.Tx.Lane_Base[0] != null) {
 								OpenTaiko.Tx.Lane_Base[1].t2D描画(x[i], y[i]);
 								OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
@@ -197,7 +197,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 						#endregion
 						#region[ 達人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eMaster && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							if (OpenTaiko.Tx.Lane_Base[2] != null && OpenTaiko.Tx.Lane_Base[0] != null) {
 								OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
 								OpenTaiko.Tx.Lane_Base[0].t2D描画(x[i], y[i]);
@@ -257,32 +257,32 @@ internal class CActImplLaneTaiko : CActivity {
 				#endregion
 
 				if (OpenTaiko.ConfigIni.SimpleMode) {
-					switch (OpenTaiko.stage演奏ドラム画面.nレーン用表示コース[i]) {
-						case CDTX.ECourse.eNormal:
+					switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+						case CTja.ECourse.eNormal:
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
 							break;
-						case CDTX.ECourse.eExpert:
+						case CTja.ECourse.eExpert:
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
 							break;
-						case CDTX.ECourse.eMaster:
+						case CTja.ECourse.eMaster:
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
 							break;
 					}
 				} else if (OpenTaiko.ConfigIni.nBranchAnime == 0 && !_laneNull) {
 					if (!this.stBranch[i].ct分岐アニメ進行.IsTicked) {
-						switch (OpenTaiko.stage演奏ドラム画面.nレーン用表示コース[i]) {
-							case CDTX.ECourse.eNormal:
+						switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+							case CTja.ECourse.eNormal:
 								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
 								break;
-							case CDTX.ECourse.eExpert:
+							case CTja.ECourse.eExpert:
 								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
 								break;
-							case CDTX.ECourse.eMaster:
+							case CTja.ECourse.eMaster:
 								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
 								break;
@@ -291,7 +291,7 @@ internal class CActImplLaneTaiko : CActivity {
 					if (this.stBranch[i].ct分岐アニメ進行.IsTicked) {
 						#region[ 普通譜面_レベルアップ ]
 						//普通→玄人
-						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CDTX.ECourse.eExpert) {
+						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -311,7 +311,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 
 						//普通→達人
-						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -346,7 +346,7 @@ internal class CActImplLaneTaiko : CActivity {
 						#endregion
 						#region[ 玄人譜面_レベルアップ ]
 						//玄人→達人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -362,7 +362,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 						#endregion
 						#region[ 玄人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -378,7 +378,7 @@ internal class CActImplLaneTaiko : CActivity {
 						}
 						#endregion
 						#region[ 達人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eMaster && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -403,7 +403,7 @@ internal class CActImplLaneTaiko : CActivity {
 								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
 							}
 						}
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eMaster && this.stBranch[i].nAfter == CDTX.ECourse.eExpert) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
@@ -426,16 +426,16 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 
 					if (this.stBranch[i].nY座標 == 0) {
-						switch (OpenTaiko.stage演奏ドラム画面.nレーン用表示コース[i]) {
-							case CDTX.ECourse.eNormal:
+						switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+							case CTja.ECourse.eNormal:
 								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
 								break;
-							case CDTX.ECourse.eExpert:
+							case CTja.ECourse.eExpert:
 								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
 								break;
-							case CDTX.ECourse.eMaster:
+							case CTja.ECourse.eMaster:
 								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
 								break;
@@ -445,13 +445,13 @@ internal class CActImplLaneTaiko : CActivity {
 					if (this.stBranch[i].nY座標 != 0) {
 						#region[ 普通譜面_レベルアップ ]
 						//普通→玄人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eNormal && this.stBranch[i].nAfter == CDTX.ECourse.eExpert) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].nBranchレイヤー透明度;
 						}
 						//普通→達人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eNormal && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].nBranchレイヤー透明度;
@@ -459,26 +459,26 @@ internal class CActImplLaneTaiko : CActivity {
 						#endregion
 						#region[ 玄人譜面_レベルアップ ]
 						//玄人→達人
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eMaster) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
 							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].nBranchレイヤー透明度;
 						}
 						#endregion
 						#region[ 玄人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eExpert && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].nBranchレイヤー透明度;
 						}
 						#endregion
 						#region[ 達人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eMaster && this.stBranch[i].nAfter == CDTX.ECourse.eNormal) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
 							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].nBranchレイヤー透明度;
 						}
-						if (this.stBranch[i].nBefore == CDTX.ECourse.eMaster && this.stBranch[i].nAfter == CDTX.ECourse.eExpert) {
+						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
 							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
 							OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].nBranchレイヤー透明度;
@@ -607,7 +607,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 
 
-		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.DTX.listVD.Count > 0 && OpenTaiko.stage演奏ドラム画面.ShowVideo) {
+		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stage演奏ドラム画面.ShowVideo) {
 			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
@@ -775,7 +775,7 @@ internal class CActImplLaneTaiko : CActivity {
 	}
 
 
-	public void t分岐レイヤー_コース変化(CDTX.ECourse n現在, CDTX.ECourse n次回, int nPlayer) {
+	public void t分岐レイヤー_コース変化(CTja.ECourse n現在, CTja.ECourse n次回, int nPlayer) {
 		if (n現在 == n次回) {
 			return;
 		}
@@ -851,8 +851,8 @@ internal class CActImplLaneTaiko : CActivity {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct STBRANCH {
 		public CCounter ct分岐アニメ進行;
-		public CDTX.ECourse nBefore;
-		public CDTX.ECourse nAfter;
+		public CTja.ECourse nBefore;
+		public CTja.ECourse nAfter;
 
 		public long nフラッシュ制御タイマ;
 		public int nBranchレイヤー透明度;
