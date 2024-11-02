@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.15] - 2024-11-02 (Beta)
+
+- Korean translation by AsPho
+
 ## [0.6.0.14] - 2024-11-02 (Beta)
 
 - Additional Nameplate titles
