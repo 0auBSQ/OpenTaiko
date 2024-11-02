@@ -1,5 +1,4 @@
 using System.Drawing;
-using DiscordRPC;
 using FDK;
 
 namespace OpenTaiko;
@@ -254,7 +253,8 @@ class CActNewHeya : CActivity {
 										//TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
 										//TJAPlayer3.NamePlateConfig.tSpendCoins(TJAPlayer3.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0], iPlayer);
 										OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Add(OpenTaiko.Skin.Puchicharas_Name[CurrentIndex]);
-										OpenTaiko.SaveFileInstances[CurrentPlayer].tSpendCoins(OpenTaiko.Tx.Puchichara[CurrentIndex].unlock.Values[0]);
+										if (OpenTaiko.Tx.Puchichara[CurrentIndex].unlock.Condition == "ch")
+											OpenTaiko.SaveFileInstances[CurrentPlayer].tSpendCoins(OpenTaiko.Tx.Puchichara[CurrentIndex].unlock.Values[0]);
 										OpenTaiko.Skin.soundDecideSFX.tPlay();
 									} else {
 										OpenTaiko.Skin.soundError.tPlay();
@@ -286,7 +286,8 @@ class CActNewHeya : CActivity {
 										CurrentMode = ModeType.None;
 									} else if (ess == ESelectStatus.SUCCESS) {
 										OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Add(OpenTaiko.Skin.Characters_DirName[CurrentIndex]);
-										OpenTaiko.SaveFileInstances[CurrentPlayer].tSpendCoins(OpenTaiko.Tx.Characters[CurrentIndex].unlock.Values[0]);
+										if (OpenTaiko.Tx.Characters[CurrentIndex].unlock.Condition == "ch")
+											OpenTaiko.SaveFileInstances[CurrentPlayer].tSpendCoins(OpenTaiko.Tx.Characters[CurrentIndex].unlock.Values[0]);
 										OpenTaiko.Skin.soundDecideSFX.tPlay();
 									} else {
 										OpenTaiko.Skin.soundError.tPlay();

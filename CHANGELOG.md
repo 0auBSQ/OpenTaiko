@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0.14] - 2024-11-02 (Beta)
+
+- Additional Nameplate titles
+
+## [0.6.0.13] - 2024-11-01 (Beta)
+
+- Unlockables with fulfilled conditions can be obtained directly on the select screen/my room by Decide input
+
 ## [0.6.0.12] - 2024-10-31 (Beta)
 
 - Fix TJA not inserting timing space for `,`

@@ -871,7 +871,8 @@ internal class CStage選曲 : CStage {
 																	"unlocked_songs",
 																	this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
 																);
-																OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																if (SongToUnlock.unlockConditions.Condition == "cm")
+																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
 																// Play modal animation here ?
 															} else
 																OpenTaiko.Skin.soundError.tPlay();

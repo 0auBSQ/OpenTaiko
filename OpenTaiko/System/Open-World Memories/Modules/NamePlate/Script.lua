@@ -31,7 +31,7 @@ local config_title_plate_offset_y = nil
 local config_titletypes = { "0", "1" }
 local config_titleplate_effects = { }
 
-local nameplate_count = 33
+local nameplate_count = 37
 
 local base = nil
 local dan_gradation = { }
