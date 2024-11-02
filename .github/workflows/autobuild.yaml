@@ -105,9 +105,13 @@ jobs:
           $date = $env:date
           $changelogPath = "CHANGELOG.md"
 
-          for ($c = 0; $c -lt $env:nMessages; ++$c) {
+          :commit for ($c = 0; $c -lt $env:nMessages; ++$c) {
               # (Re-)read CHANGELOG.md content as (re-)split lines
               $changelog = Get-Content -Path $changelogPath
+              # Ensure list type for []-indexing
+              if ($changelog.Count -eq 1) {
+                  $changelog = , $changelog
+              }
 
               # Read the message as individual items
               $commitBody = Get-Content -Path ($env:messagePathPrefix + $c) | Select-Object -Skip 1
@@ -117,18 +121,49 @@ jobs:
 
               # Check if the version already exists
               $version = $versions | Select-Object -Index $c
-              if ($changelog -match "## \[$version\]") {
-                  if ($message) {
-                      # Capture the existing content under the version heading
-                      $changelog = $changelog -replace "(## \[($version)\] .* \(Beta\))", "`$1`n`n$message"
+              for ($i = 0; $i -lt $changelog.Count; ++$i) {
+                  if (-not ($changelog[$i] -match "## \[$version\]")) {
+                      continue
                   }
-              } else {
-                  # Insert new version under '# Changelog'
-                  $changelog = $changelog -replace "(# Changelog)", "`$1`n`n## [$version] - $date (Beta)`n`n$message"
+                  # Capture the existing content under the version heading
+                  if ($message) {
+                      # Append after the empty line (if exist) or the heading
+                      $di = ($changelog[$i + 1] -eq "")
+                      $changelog[$i + $di] += "`n$message"
+                  }
+
+                  # Write updated content back to CHANGELOG.md
+                  Set-Content -Path $changelogPath -Value $changelog
+
+                  continue commit
               }
 
-              # Write updated content back to CHANGELOG.md
-              Set-Content -Path $changelogPath -Value $changelog
+              # Insert new version under '# Changelog'
+              for ($i = 0; $i -lt $changelog.Count; ++$i) {
+                  if (-not ($changelog[$i] -match "# Changelog")) {
+                      continue
+                  }
+                  # Append after the title, create empty line space
+                  $changelog[$i] += "`n`n## [$version] - $date (Beta)`n`n"
+                  if ($message) {
+                      $changelog[$i] += "$message`n"
+                  }
+                  # Remove original empty line space
+                  while (++$i -lt $changelog.Count) {
+                      if ($changelog[$i] -ne "") {
+                          break
+                      }
+                      $changelog[$i] = $null
+                  }
+
+                  # Write updated content back to CHANGELOG.md
+                  Set-Content -Path $changelogPath -Value $changelog
+
+                  continue commit
+              }
+
+              # No '# Changelog', do nothing
+              break commit
           }
 
       - name: Commit CHANGELOG.md and OpenTaiko.csproj changes
