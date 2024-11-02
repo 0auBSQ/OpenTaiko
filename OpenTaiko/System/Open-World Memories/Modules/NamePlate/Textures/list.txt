@@ -31,3 +31,7 @@
 30 - NEP0
 31 - DRT Sky
 32 - OpTk Chapter IV
+33 - Status Clear
+34 - Status Full Combo
+35 - Status Perfect
+36 - Template
