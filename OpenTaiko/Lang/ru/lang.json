@@ -486,38 +486,48 @@
 		"UNLOCK_COIN_BOUGHT": "Товар куплен!",
 		"UNLOCK_COIN_MORE": "Недостаточно монет!",
 
-		"UNLOCK_CONDITION_ERROR": "Следующее условие: Для {0} требуется {1} значения.",
-		"UNLOCK_CONDITION_ERROR2": "Следующее условие: Для {0} требуется ({1} * n) значения и n ссылок.",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "Следующее условие: Для {0} требуется значение.",
+		"UNLOCK_CONDITION_ERROR": "Следующее условие: Для {0} требуется {1} значени..",
+		"UNLOCK_CONDITION_ERROR2": "Следующее условие: Для {0} требуется ({1} * n) значений и n ссылок.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN_SINGULAR": "Получайте монету, чтобы разблокировать этот товар! ({1}/{0})", // ce
 		"UNLOCK_CONDITION_EARN": "Получайте в общей сложности {0} монет., чтобы разблокировать этот товар! ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY_SINGULAR": "Играйте бытву ИИ, чтобы разблокировать этот товар! ({1}/{0})", // ap
 		"UNLOCK_CONDITION_AIPLAY": "Играйте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN_SINGULAR": "Побеждайте бытву ИИ, чтобы разблокировать этот товар! ({1}/{0})", // aw
 		"UNLOCK_CONDITION_AIWIN": "Побеждайте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_PLAY_ONCE": "Играйте раз, чтобы разблокировать этот товар! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_TWICE": "Играйте 2 раза, чтобы разблокировать этот товар! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "Играйте {0} раз., чтобы разблокировать этот товар! ({1}/{0})", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} песню/е, чтобы разблокировать этот товар! ({2}/{1})", // sd
 		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} песн., чтобы разблокировать этот товар! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{0} песню/е на {2} трудности, чтобы разблокировать этот товар! ({3}/{1})", // dp
 		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} песн. на {2} трудности, чтобы разблокировать этот товар! ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} песню/е с {2} звезд., чтобы разблокировать этот товар! ({3}/{1})", // lp
 		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} песн. с {2} звезд., чтобы разблокировать этот товар! ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE": "Получайте следующее представления, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Получайте следующее представление, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "Получайте следующие представления, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
@@ -526,11 +536,13 @@
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {0} песню/е в папке {2}. ({3}/{1})", // sg
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} песн. в папке {2}. ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} партитуру/е сделано {2}. ({3}/{1})", // sc
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} партитур. сделано {2}. ({3}/{1})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Играйте",

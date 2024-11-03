@@ -28,7 +28,7 @@
 		"SETTINGS_SYSTEM": "시스템 옵션",
 		"SETTINGS_SYSTEM_DESC": "전체 시스템 설정입니다.",
 		"SETTINGS_GAME": "게임 플레이 옵션",
-		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다,.",
+		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다.",
 		"SETTINGS_EXIT": "나가기",
 		"SETTINGS_EXIT_DESC": "저장하고 나가기.",
 
@@ -46,7 +46,7 @@
 		"SETTINGS_SYSTEM_LANGUAGE": "시스템 언어",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "시스템, 게임 언어를 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_PLAYERCOUNT": "플레이어 수",
-		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "플레이어 수를 변경 할 수 있습니다 .",
+		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "플레이어 수를 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_RELOADSONG": "곡 다시 불러오기",
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "곡 파일을 다시 불러옵니다.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "곡 다시 불러오기 (Hard reload)",
@@ -68,7 +68,7 @@
 
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "전체화면 모드",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경 할 수 있습니다..",
+		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_VSYNC": "VSync 모드",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "VSync로 전환, 또는 해제 할 수 있습니다.\nVSync 모드로 전환하시면, 프레임이 60FPS로 고정됩니다, 하지만 인풋렉은 늘어납니다.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "그래픽 API",
@@ -105,7 +105,7 @@
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "간단하게 거의 모든 이미지, 이펙트를 없앱니다.",
 
 		"SETTINGS_SYSTEM_SKIN": "현재 스킨",
-		"SETTINGS_SYSTEM_SKIN_DESC": "System 폴더에 있는 스킨들을 고르세요..",
+		"SETTINGS_SYSTEM_SKIN_DESC": "System 폴더에 있는 스킨들을 고르세요.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "곡 재생",
@@ -486,33 +486,47 @@
 		"UNLOCK_COIN_BOUGHT": "아이템 구매 완료!",
 		"UNLOCK_COIN_MORE": "코인이 부족합니다!",
 
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "다음 조건입니다: {0}에 1 값이 필요합니다.",
 		"UNLOCK_CONDITION_ERROR": "다음 조건입니다: {0}에 {1} 값이 필요합니다.",
 		"UNLOCK_CONDITION_ERROR2": "다음 조건입니다: {0} requires ({1} * n) values and n references.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN_SINGULAR": "코인을 획득하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // ce
 		"UNLOCK_CONDITION_EARN": "총 {0} 코인을 획득하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY_SINGULAR": "이 아이템을 잠금 해제하려면 1번의 AI 배틀 모드를 플레이하세요! ({1}/{0})", // ap
 		"UNLOCK_CONDITION_AIPLAY": "이 아이템을 잠금 해제하려면 {0}번의 AI 배틀 모드를 플레이하세요! ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN_SINGULAR": "AI 배틀 모드에서 1번 승리하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // aw
 		"UNLOCK_CONDITION_AIWIN": "AI 배틀 모드에서 {0}번 승리하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY": "이 아이템을 잠금 해제하려면 {0}곡을 플레이하세요! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_ONCE": "이 아이템을 잠금 해제하려면 1회를 플레이하세요! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_TWICE": "이 아이템을 잠금 해제하려면 2회를 플레이하세요! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY": "이 아이템을 잠금 해제하려면 {0}회를 플레이하세요! ({1}/{0})", // tp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: Total plays needed
+		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "이 아이템을 잠금 해제하려면 1곡을 {0}하세요! ({2}/{1})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "이 아이템을 잠금 해제하려면 {1}곡을 {0}하세요! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2} 난이도로 {0}를 해야합니다! ({3}/{1})", // dp
 		"UNLOCK_CONDITION_PLAYDIFF": "이 아이템을 잠금 해제하려면 {1} 곡에서 {2} 난이도로 {0}를 해야합니다! ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2}성 난이도로 {0}를 해야합니다! ({3}/{1})", // lp
 		"UNLOCK_CONDITION_PLAYLEVEL": "이 아이템을 잠금 해제하려면 {1} 곡에서 {2}성 난이도로 {0}를 해야합니다! ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({0}/{1})", // sp, sg, sc
 		"UNLOCK_CONDITION_CHALLENGE": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
@@ -522,11 +536,13 @@
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {2}에 있는 1 곡을 {0}하세요. ({3}/{1})", // sg
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {2}에 있는 {1} 곡을 {0}하세요. ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {2}이(가) 만든 1 곡을 {0}하세요. ({3}/{1})", // sc
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {2}이(가) 만든 {1} 곡을 {0}하세요. ({3}/{1})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "플레이",
@@ -550,7 +566,7 @@
 		"AI_NAME": "AI",
 		"AI_TITLE": "Deus-Ex-Machina",
 		// {0}: Section No.
-		"AI_SECTION": "섹션 {0}", // ~區
+		"AI_SECTION": "섹션 {0}",
 
 		// Mods
 		"MOD_NONE": "없음",

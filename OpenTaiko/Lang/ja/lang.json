@@ -486,37 +486,47 @@
 		"UNLOCK_COIN_BOUGHT": "商品購入済み !",
 		"UNLOCK_COIN_MORE": "コインが足りません !",
 
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "下記の条件 : {0} requires a value.",
 		"UNLOCK_CONDITION_ERROR": "下記の条件 : {0} requires {1} values.",
 		"UNLOCK_CONDITION_ERROR2": "下記の条件 : {0} requires ({1} * n) values and n references.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN_SINGULAR": "コイン手に入れた ({1}/{0})", // ce
 		"UNLOCK_CONDITION_EARN": "{0}コイン以上手に入れた ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY_SINGULAR": "AI演奏バトルを1回プレイ ({1}/{0})", // ap
 		"UNLOCK_CONDITION_AIPLAY": "AI演奏バトルを{0}回プレイ ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN_SINGULAR": "AI演奏バトルで1回勝利 ({1}/{0})", // aw
 		"UNLOCK_CONDITION_AIWIN": "AI演奏バトルで{0}回勝利 ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_PLAY_ONCE": "1回プレイ ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_TWICE": "2回プレイ ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "{0}回プレイ ({1}/{0})", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "1譜面を{0} ({2}/{1})", // sd
 		"UNLOCK_CONDITION_PLAYDISTINCT": "{1}譜面を{0} ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{2}で1譜面を{0} ({3}/{1})", // dp
 		"UNLOCK_CONDITION_PLAYDIFF": "{2}で{1}譜面を{0} ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{2}★の1譜面を{0} ({3}/{1})", // lp
 		"UNLOCK_CONDITION_PLAYLEVEL": "{2}★の{1}譜面を{0} ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "以下の条件をクリアしましょう！： ({0}/{1})", // sp, sg, sc
 		"UNLOCK_CONDITION_CHALLENGE": "以下の条件をクリアしましょう！： ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
@@ -526,11 +536,13 @@
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "※{2}ジャンルの1譜面を{0} ({3}/{1})", // sg
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "※{2}ジャンルの{1}譜面を{0} ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "※{2}さんの1譜面を{0} ({3}/{1})", // sc
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "※{2}さんの{1}譜面を{0} ({3}/{1})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "プレイ",

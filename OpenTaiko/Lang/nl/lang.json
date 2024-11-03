@@ -42,7 +42,6 @@
 		"SETTINGS_KEYASSIGN_TRAINING": "Training Modus Toetsinstellingen",
 		"SETTINGS_KEYASSIGN_TRAINING_DESC": "Een tweede menu voor het instellen van toetsen\ntijdens de Training Modus.",
 
-
 		// Settings - System
 		"SETTINGS_SYSTEM_LANGUAGE": "Systeemtaal",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Verander de taal\nvan het spel en de menu's.",
@@ -76,6 +75,7 @@
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode:\nSelecteer de opties OpenGL,\nDirectX11, Vulkan of Metal.\nOpenGL is langzaam, maar compatibel en stabiel.\nDirectX11 is snel en stabiel, maar\n werkt alleen op Windows.\nVulkan werkt het snelst op Linux.\nMetal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",
 		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Bevriezen bij het starten verdwijnt.\nZet deze optie uit als sommige textures zwart worden.\nDeze optie activeert na het herstarten van OpenTaiko.",
+
 		"SETTINGS_SYSTEM_BGMOVIE": "Video's Afspelen",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Schakelt achtergrond video's aan/uit.\nAls dit is ingeschakeld en het lied geen video heeft,\ndan zal de achtergrond zwart worden.",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Afspeelmodus",
@@ -86,6 +86,7 @@
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Beide",
 		"SETTINGS_SYSTEM_LANEOPACITY": "Laan Achtergrond Doorzichtigheid",
 		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "Verandert de doorzichtigheid van de achtergrond\nbij het spelen van video's.\n\n0 = volledig doorzichtig,\n255 = niet doorzichtig.",
+
 		"SETTINGS_SYSTEM_BGA": "BGA Weergeven",
 		"SETTINGS_SYSTEM_BGA_DESC": "Schakelt animaties in de achtergrond aan/uit.",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "Karakters Weergeven",
@@ -102,6 +103,7 @@
 		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Laat PuchiChara foto's zien.",
 		"SETTINGS_SYSTEM_SIMPLEMODE": "Simpele Modus",
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Versimpelt graphics door visuele effecten en\nopmaak te verbergen tijdens gameplay.",
+
 		"SETTINGS_SYSTEM_SKIN": "Huidige Skin",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Kies een skin uit de systeemfolder om te gebruiken.",
 
@@ -120,10 +122,12 @@
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Past de volume aan voor het lied voorbeeld.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Toetsenbord Volume Wijziging",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Geeft aan hoeveel de volume wordt aangepast voor de\nvolume omhoog/omlaag knoppen.\nU kunt een waarde instellen tussen 1 en 20.",
+
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Lied Afspeel Buffer",
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "De tijdsduur voordat een lied afspeelt in het spel.\nAls deze waarde laag staat, kunnen nummers te vroeg afspelen.",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Lied Voorbeeld Buffer",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "De tijdsduur voordat een lied voorbeeld afspeelt.\nAls deze waarde erg laag staat kunnen\nliedjes tijdens het scrollen afspelen.\nU kunt een waarde kiezen tussen 0ms en 10000ms.",
+
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Geluid Afspeelmodus",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Werkt alleen op apparaten die ASIO audio ondersteunen\n- Heeft de laagste inputvertraging\nWasapi:\n- Alleen compatibel met Windows\n- Heeft de op een na laagste inputvertraging\nBASS:\n- Op alle platforms ondersteund\nOpmerking: verlaat de instellingen\nom dit op te slaan.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO Afspeelapparaat",
@@ -482,38 +486,48 @@
 		"UNLOCK_COIN_BOUGHT": "Item gekocht!",
 		"UNLOCK_COIN_MORE": "Niet genoeg munten!",
 
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "The following condition: {0} requires a value.",
 		"UNLOCK_CONDITION_ERROR": "De volgende conditie: {0} vereist {1} waardes.",
-
 		"UNLOCK_CONDITION_ERROR2": "De volgende conditie: {0} vereist ({1} * n) waardes en n referenties.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN_SINGULAR": "Earn a coin to unlock this item! ({1}/{0})", // ce
 		"UNLOCK_CONDITION_EARN": "Verdien in totaal {0} munten om dit itme te ontgrendelen! ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY_SINGULAR": "Play an AI battle match to unlock this item! ({1}/{0})", // ap
 		"UNLOCK_CONDITION_AIPLAY": "Speel {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN_SINGULAR": "Win an AI battle match to unlock this item! ({1}/{0})", // aw
 		"UNLOCK_CONDITION_AIWIN": "Win {0} AI gevecht wedstrijden om dit item to ontgrendelen! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_PLAY_ONCE": "Play once to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_TWICE": "Play twice to unlock this item! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "Speel {0} liedjes om dit item te ontgrendelen! ({1}/{0})", // tp
+		// The quantifier above has been changed from "songs" to "times", please change as soon as possible.
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} a song to unlock this item! ({2}/{1})", // sd
 		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{0} a song on {2} difficulty to unlock this item! ({3}/{1})", // dp
 		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} liedjes op {2} moeilijkheidsgraad om dit item te ontgrendelen! ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} a song with a star rating of {2} to unlock this item! ({3}/{1})", // lp
 		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} nummers met een ster waarde van {2} om dit item te ontgrendelen! ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Get the following performance to unlock this item:  ({0}/{1})", // sp, sg, sc
 		"UNLOCK_CONDITION_CHALLENGE": "Behaal de volgende prestaties om dit item te ontgrendelen:  ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
@@ -523,11 +537,13 @@
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {0} a song within the {2} folder. ({3}/{1})", // sg
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} liedjes binnen de {2} folder. ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} a chart made by {2}. ({3}/{1})", // sc
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} nummers gemaakt door {2}. ({3}/{1})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Speel",

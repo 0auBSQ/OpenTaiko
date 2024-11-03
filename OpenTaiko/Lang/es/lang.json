@@ -487,37 +487,47 @@
 		"UNLOCK_COIN_BOUGHT": "¡Item comprado!",
 		"UNLOCK_COIN_MORE": "¡Monedas insuficientes!",
 
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "Esta condición: {0} requires a value.",
 		"UNLOCK_CONDITION_ERROR": "Esta condición: {0} requires {1} values.",
 		"UNLOCK_CONDITION_ERROR2": "Esta condición: {0} requires ({1} * n) values and n references.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
+		"UNLOCK_CONDITION_EARN_SINGULAR": "Earn a coin to unlock this item! ({1}/{0})", // ce
 		"UNLOCK_CONDITION_EARN": "Earn a total of {0} coins to unlock this item! ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIPLAY_SINGULAR": "Play an AI battle match to unlock this item! ({1}/{0})", // ap
 		"UNLOCK_CONDITION_AIPLAY": "Play {0} AI battle matches to unlock this item! ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
+		"UNLOCK_CONDITION_AIWIN_SINGULAR": "Win an AI battle match to unlock this item! ({1}/{0})", // aw
 		"UNLOCK_CONDITION_AIWIN": "Win {0} AI battle matches to unlock this item! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY": "Play {0} songs to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_ONCE": "Play once to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_TWICE": "Play twice to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY": "Play {0} times to unlock this item! ({1}/{0})", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} a song to unlock this item! ({2}/{1})", // sd
 		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{0} a song on {2} difficulty to unlock this item! ({3}/{1})", // dp
 		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} songs on {2} difficulty to unlock this item! ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} a song with a star rating of {2} to unlock this item! ({3}/{1})", // lp
 		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Get the following performance to unlock this item:  ({0}/{1})", // sp, sg, sc
 		"UNLOCK_CONDITION_CHALLENGE": "Get the following performances to unlock this item:  ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
@@ -527,11 +537,13 @@
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {0} a song within the {2} folder. ({3}/{1})", // sg
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} songs within the {2} folder. ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} a chart made by {2}. ({3}/{1})", // sc
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} charts made by {2}. ({3}/{1})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Play",
