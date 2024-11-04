@@ -225,12 +225,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload All Builds
-        if: steps.check-tag.outputs.exists == 'false' && env.version != ''
+      - name: Upload All Builds for the Latest Release
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
           file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
           overwrite: true
-          tag_name: ${{ env.version }}
+          tag_name: ${{ env.versionLast }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
