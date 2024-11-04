@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
 	"Language": "English",
-	"Version":  "0.6.0.0",
+	"Version":  "0.6.0.16",
 	"Entries": {
 
 		// Common
